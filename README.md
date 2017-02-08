@@ -30,4 +30,4 @@ https://github.com/react-boilerplate/react-boilerplate
 
 ## License
 
-This project is licensed under the MIT license, see `LICENSE.md`.
+This project is licensed under the MIT license, see [LICENSE.md](LICENSE.md).
