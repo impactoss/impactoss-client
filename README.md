@@ -3,13 +3,12 @@
 ## Quick start
 
 1. Clone this repo using `git clone https://github.com/dumparkltd/hr-nmrf-client.git`
-1. Run `npm run setup` to install dependencies and clean the git repo.<br />
+2. Run `npm run setup` to install dependencies and clean the git repo.<br />
    *We auto-detect `yarn` for installing packages by default, if you wish to force `npm` usage do: `USE_YARN=false npm run setup`*<br />
    *At this point you can run `npm start` to see the example app at `http://localhost:3000`.*
-1. Run `npm run clean` to delete the example app.
 
-
-## Documentation (React Boilerplate)
+## Documentation
+From React Boilerplate that this application is based on (see Acknowledgement below)
 
 - [**The Hitchhikers Guide to `react-boilerplate`**](docs/general/introduction.md): An introduction for newcomers to this boilerplate.
 - [Overview](docs/general): A short overview of the included tools
