@@ -20,7 +20,7 @@ From React Boilerplate that this application is based on (see Acknowledgement be
 
 ## Contributors
 
-See CONTRIBUTORS.md
+See [CONTRIBUTORS.md](CONTRIBUTORS.md)
 
 ## Acknowledgement
 
