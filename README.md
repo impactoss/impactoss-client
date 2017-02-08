@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/dumparkltd/hr-nmrf-client.png?label=ready&title=Ready)](https://waffle.io/dumparkltd/hr-nmrf-client)
 
 
 ## Quick start
