@@ -1,12 +1,13 @@
-tmfrnz
+### `hr-nmrf-client`
+- tmfrnz
 
-### React Boilerplate
-mxstbr
-oliverturner
-justingreenberg
-gihrig
-sedubois
-chaintng
-samit4me
-amilajack
-Dattaya
+### `react-boilerplate`
+- mxstbr
+- oliverturner
+- justingreenberg
+- gihrig
+- sedubois
+- chaintng
+- samit4me
+- amilajack
+- Dattaya
