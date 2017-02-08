@@ -26,8 +26,7 @@ See [CONTRIBUTORS.md](CONTRIBUTORS.md)
 
 This application was originally based on Max Stoiber's excellent `react-boilerplate`
 
-https://www.reactboilerplate.com/
-https://github.com/react-boilerplate/react-boilerplate
+https://www.reactboilerplate.com, https://github.com/react-boilerplate/react-boilerplate
 
 ## License
 
