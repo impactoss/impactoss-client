@@ -39,10 +39,21 @@ const makeSelectLocationState = () => {
   };
 };
 
+const makeSelectEmail = () => createSelector(
+  selectGlobal,
+  (globalState) => globalState.getIn(['form','login','email'])
+);
+const makeSelectPassword = () => createSelector(
+  selectGlobal,
+  (globalState) => globalState.getIn(['form','login','password'])
+);
+
 export {
   selectGlobal,  
   makeSelectLoading,
   makeSelectError,  
   makeSelectEntities,  
   makeSelectLocationState,
+  makeSelectEmail,
+  makeSelectPassword,
 };

@@ -14,7 +14,12 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
-import { makeSelectEntities, makeSelectLoading, makeSelectError } from 'containers/App/selectors';
+import { 
+  makeSelectEntities, 
+  makeSelectLoading, 
+  makeSelectError 
+} from 'containers/App/selectors';
+
 import messages from './messages';
 import { loadEntitiesIfNeeded } from '../App/actions';
 
