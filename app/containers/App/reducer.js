@@ -22,12 +22,19 @@ import {
   LOAD_ENTITIES,
   LOAD_ENTITIES_SUCCESS,  
   LOAD_ENTITIES_ERROR,
+  LOGOUT_SUCCESS  
 } from './constants';
 
 // The initial state of the App
 const initialState = fromJS({
-  loading: false,
-  error: false,
+  server:{
+    loading: false,
+    error: false,
+  },
+  auth:{
+    sending: false,
+    error: false,
+  },
   entities: {
     actions: false,
     recommendations: false,
@@ -50,14 +57,27 @@ function appReducer(state = initialState, payload) {
   switch (payload.type) {
     case CHANGE_EMAIL:      
         return state          
-          .setIn(['form','login', "email"], payload.email)    
+          .setIn(['form','login','email'], payload.email)    
     case CHANGE_PASSWORD:      
         return state          
-          .setIn(['form','login', "password"], payload.password)        
+          .setIn(['form','login','password'], payload.password)        
+    case LOGOUT_SUCCESS:   
+        return state          
+          .setIn(['user','attributes'], "")
+          .setIn(['user','isSignedIn'], false)          
     case AUTHENTICATE_SUCCESS:   
         return state          
-          .setIn(['user', "attributes"], payload.user.data)
-          .setIn(['user', "isSignedIn"], true);
+          .setIn(['user','attributes'], payload.user)
+          .setIn(['user','isSignedIn'], true)
+          .setIn(['auth','sending'], false);
+    case AUTHENTICATE_ERROR:   
+        return state          
+          .setIn(['auth','sending'], false)
+          .setIn(['auth','error'], payload.error.message);
+    case AUTHENTICATE_SENDING:   
+        return state          
+          .setIn(['auth','sending'], true)
+          .setIn(['auth','error'], false);
     case SET_AUTHENTICATION_STATE:      
         return state          
           .setIn(['user', "isSignedIn"], payload.newAuthState);
@@ -69,11 +89,11 @@ function appReducer(state = initialState, payload) {
     case LOAD_ENTITIES_SUCCESS:
       return state
         .setIn(['entities', payload.path], payload.entities)
-        .set('loading', false);
+        .setIn(['server','loading'], false);
     case LOAD_ENTITIES_ERROR:
       return state
-        .set('error', payload.error)
-        .set('loading', false);
+        .setIn(['server','error'], payload.error)
+        .setIn(['server','loading'], false);
     default:
       return state;
   }

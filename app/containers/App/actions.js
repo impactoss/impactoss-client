@@ -27,7 +27,12 @@ import {
   LOAD_ENTITIES,
   LOAD_ENTITIES_SUCCESS,
   LOAD_ENTITIES_ERROR,
+  LOGOUT,
+  LOGOUT_SUCCESS,
 } from './constants';
+
+import { parseResponse } from 'utils/handle-request-response';
+
 
 /**
  * Load the entities, this action starts the request saga
@@ -59,11 +64,14 @@ export function loadEntities(path) {
  *
  * @return {object}      An action object with a type of LOAD_ENTITIES_SUCCESS passing the entities
  */
-export function entitiesLoaded(entities,path) {  
+export function entitiesLoaded(entities, path, headers) {  
+  
+  
   return {
     type: LOAD_ENTITIES_SUCCESS,
-    entities: entities,
-    path: path,
+    entities: entities.data,
+    path,
+    headers
   };
 }
 
@@ -127,10 +135,12 @@ export function authenticate(data) {
  *
  * @return {object}      An action object with a type of AUTHENTICATE_SUCCESS passing the user
  */
-export function authenticateSuccess(user) {  
+export function authenticateSuccess(user,headers) {  
+
   return {
-    type: AUTHENTICATE_SUCCESS,
-    user,    
+    type: AUTHENTICATE_SUCCESS,    
+    user: user.data,
+    headers,            
   };
 }
 
@@ -159,5 +169,15 @@ export function changePassword(password) {
   return {
     type: CHANGE_PASSWORD,
     password
+  };
+}
+export function logout() {
+  return {
+    type: LOGOUT
+  };
+}
+export function logoutSuccess() {
+  return {
+    type: LOGOUT_SUCCESS
   };
 }

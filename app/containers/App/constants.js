@@ -21,6 +21,9 @@ export const AUTHENTICATE = 'nmrf/App/AUTHENTICATE';
 export const AUTHENTICATE_SUCCESS = 'nmrf/App/AUTHENTICATE_SUCCESS';
 export const AUTHENTICATE_ERROR = 'nmrf/App/AUTHENTICATE_ERROR';
 export const SET_AUTHENTICATION_STATE = 'nmrf/App/SET_AUTHENTICATION_STATE';
+export const LOGOUT = 'nmrf/App/LOGOUT';
+export const LOGOUT_SUCCESS = 'nmrf/App/LOGOUT_SUCCESS';
+export const LOGOUT_ERROR = 'nmrf/App/LOGOUT_ERROR';
 
 export const CHANGE_EMAIL = 'nmrf/App/CHANGE_EMAIL';
 export const CHANGE_PASSWORD = 'nmrf/App/CHANGE_PASSWORD';

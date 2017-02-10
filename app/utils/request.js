@@ -39,13 +39,6 @@ function checkStatus(response) {
  * @return {object}           The response data
  */
 export default function request(url, options) {
-//  if (!options.headers) {
-//    options.headers = {}
-//  }    
-//  extend(options.headers, getAuthHeaders(url));
-//  
   return fetch(url, options)
     .then(checkStatus)
-    .then(parseJSON);
-//    .then(resp => updateAuthCredentials(resp));
 }

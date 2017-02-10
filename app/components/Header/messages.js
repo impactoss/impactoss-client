@@ -16,6 +16,10 @@ export default defineMessages({
   },
   login: {
     id: 'nmrf.components.Header.login',
-    defaultMessage: 'Login Page',
+    defaultMessage: 'Login',
+  },
+  logout: {
+    id: 'nmrf.components.Header.logout',    
+    defaultMessage: 'Logout',
   },
 });
