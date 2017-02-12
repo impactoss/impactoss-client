@@ -1,7 +1,6 @@
 /*
  * TestPage
  *
- * List all the features
  */
 import React from 'react';
 import { FormattedMessage } from 'react-intl';

@@ -45,6 +45,44 @@ export default function createRoutes(store) {
           .catch(errorLoading);
       },
     }, {      
+      path: '/login',
+      name: 'login',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/App/sagas'),
+          import('containers/LoginPage'),
+        ]);        
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([sagas, component]) => {
+          injectSagas(sagas.default);      
+          
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {      
+      path: '/logout',
+      name: 'logout',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/App/sagas'),
+          import('containers/LogoutPage'),
+        ]);        
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([sagas, component]) => {
+          injectSagas(sagas.default);      
+          
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {      
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {

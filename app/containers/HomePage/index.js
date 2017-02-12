@@ -14,7 +14,12 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
-import { makeSelectEntities, makeSelectLoading, makeSelectError } from 'containers/App/selectors';
+import { 
+  makeSelectEntities, 
+  makeSelectLoading, 
+  makeSelectError 
+} from 'containers/App/selectors';
+
 import messages from './messages';
 import { loadEntitiesIfNeeded } from '../App/actions';
 
@@ -30,8 +35,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
   
   render() {
-    console.log("render")
-    console.log(this.props)
     const { loading, error, actions } = this.props;
     const actionsListProps = {
       loading,
@@ -69,6 +72,7 @@ export function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('actions'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_actions'));
+      dispatch(loadEntitiesIfNeeded('users'));
     },
   };
 }
