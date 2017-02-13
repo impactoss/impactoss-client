@@ -2,7 +2,7 @@
  * Gets the entities from server
  */
 
-import { take, call, put, select, cancel, takeLatest, takeEvery } from 'redux-saga/effects';
+import { take, call, put, select, cancel, takeLatest, takeEvery, fork } from 'redux-saga/effects';
 import {
   LOAD_ENTITIES,
   LOAD_ENTITIES_SUCCESS,
@@ -103,25 +103,12 @@ export function* authenticateSaga(payload) {
   }
 }
 export function* logoutSaga() {
-  // TODO set server URL in config
-  const requestURL = 'https://undp-sadata-staging.herokuapp.com/auth/sign_out';
-  // TODO get auth headers
-  const options = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    method: 'delete',
-  };
-  extend(options.headers, getAuthHeaders());
   try {
-    // Call our request helper (see 'utils/request')
-
-
-    yield call(request, requestURL, options);
+    yield call(apiRequest, 'delete', 'auth/sign_out');
 
     yield put(logoutSuccess());
-//    })
   } catch (err) {
+    console.error(err);
     // yield put(authenticateError(err));
   }
 }
@@ -141,21 +128,17 @@ export function* getEntitiesSuccessSaga(payload) {
 /**
  * Root saga manages watcher lifecycle
  */
-export function* rootSaga() {
+export default function* rootSaga() {
+  console.log('calling rootSaga')
   // yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
 
   // Watches for LOAD_ENTITIES entities and calls getEntities when one comes in.
   // It returns task descriptor (just like fork) so we can continue execution
   // yield takeEvery(LOAD_ENTITIES, getEntitiesSaga);
   yield takeLatest(AUTHENTICATE, authenticateSaga);
-  // yield takeLatest(LOGOUT, logoutSaga);
+  yield takeLatest(LOGOUT, logoutSaga);
 
   // yield takeLatest(AUTHENTICATE_SUCCESS, authenticateSuccessSaga);
   // yield takeLatest(LOAD_ENTITIES_SUCCESS, getEntitiesSuccessSaga);
   // yield takeLatest(LOGOUT_SUCCESS, logoutSuccessSaga);
 }
-
-// Bootstrap sagas
-export default [
-  rootSaga,
-];

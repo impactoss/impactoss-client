@@ -153,6 +153,7 @@ export function logout() {
     type: LOGOUT,
   };
 }
+
 export function logoutSuccess() {
   return {
     type: LOGOUT_SUCCESS,

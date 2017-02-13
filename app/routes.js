@@ -22,15 +22,12 @@ export default function createRoutes(store) {
       name: 'home',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/App/sagas'),
           import('containers/HomePage'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([sagas, component]) => {
-          injectSagas(sagas.default);
-
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 
@@ -49,14 +46,12 @@ export default function createRoutes(store) {
       name: 'logout',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/App/sagas'),
           import('containers/LogoutPage'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([sagas, component]) => {
-          injectSagas(sagas.default);
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 

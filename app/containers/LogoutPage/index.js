@@ -4,14 +4,7 @@
  */
 import React from 'react';
 import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
-
 import { FormattedMessage } from 'react-intl';
-
-import {
-  makeSelectPassword,
-  makeSelectEmail,
-} from 'containers/App/selectors';
 
 import Form from './Form';
 
@@ -22,15 +15,6 @@ import {
 
 
 export class LogoutPage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  /**
-   * when initial state email is not null, submit the form to load repos
-   */
-//  componentDidMount() {
-//    if (this.props.email && this.props.email.trim().length > 0) {
-//      this.props.onSubmitForm();
-//    }
-//  }
-
   render() {
     return (
       <article>
@@ -38,7 +22,9 @@ export class LogoutPage extends React.PureComponent { // eslint-disable-line rea
           <FormattedMessage {...messages.header} />
         </div>
         <Form onSubmit={this.props.onSubmitForm}>
-          <button>Log out</button>
+          <button type="submit">
+            <FormattedMessage {...messages.logout} />
+          </button>
         </Form>
       </article>
     );
@@ -58,8 +44,6 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-const mapStateToProps = createStructuredSelector({
-});
 
 // Wrap the component to inject dispatch and state into it
-export default connect(mapStateToProps, mapDispatchToProps)(LogoutPage);
+export default connect(null, mapDispatchToProps)(LogoutPage);
