@@ -22,4 +22,8 @@ export default defineMessages({
     id: 'nmrf.components.Header.logout',
     defaultMessage: 'Logout',
   },
+  register: {
+    id: 'nmrf.components.Header.register',
+    defaultMessage: 'Register',
+  },
 });
