@@ -39,7 +39,7 @@ const initialState = fromJS({
     recommendation_actions: false,
   },
   user: {
-    attributes: '',
+    attributes: null,
     isSignedIn: false,
   },
 });
@@ -48,7 +48,7 @@ function appReducer(state = initialState, payload) {
   switch (payload.type) {
     case LOGOUT_SUCCESS:
       return state
-          .setIn(['user', 'attributes'], '')
+          .setIn(['user', 'attributes'], null)
           .setIn(['user', 'isSignedIn'], false);
     case AUTHENTICATE_SUCCESS:
       return state

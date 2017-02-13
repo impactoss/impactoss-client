@@ -62,7 +62,7 @@ export function loadEntities(path) {
 export function entitiesLoaded(entities, path) {
   return {
     type: LOAD_ENTITIES_SUCCESS,
-    entities: entities.data,
+    entities,
     path,
   };
 }
@@ -130,7 +130,7 @@ export function authenticate(data) {
 export function authenticateSuccess(user) {
   return {
     type: AUTHENTICATE_SUCCESS,
-    user: user.data,
+    user,
   };
 }
 

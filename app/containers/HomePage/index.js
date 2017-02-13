@@ -71,7 +71,7 @@ export function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('actions'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_actions'));
-      dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('users'));// Giving not acceptable header
     },
   };
 }

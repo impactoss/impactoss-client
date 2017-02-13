@@ -10,12 +10,10 @@ const selectLoginPageDomain = (state) => state.get('loginPage');
  */
 const credentialsSelector = createSelector(
   selectLoginPageDomain,
-  (substate) => {
-    return {
-      email: substate.get('email'),
-      password: substate.get('password'),
-    };
-  }
+  (substate) => ({
+    email: substate.get('email'),
+    password: substate.get('password'),
+  })
 );
 
 /**
