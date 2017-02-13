@@ -3,7 +3,6 @@
  */
 
 import { take, call, put, select, cancel, takeLatest, takeEvery } from 'redux-saga/effects';
-import { LOCATION_CHANGE } from 'react-router-redux';
 import {
   LOAD_ENTITIES,
   LOAD_ENTITIES_SUCCESS,
@@ -22,16 +21,13 @@ import {
   authenticateError,
   logoutSuccess,
 } from 'containers/App/actions';
-import {
-  makeSelectEmail,
-  makeSelectPassword,
-} from 'containers/App/selectors';
 
 import { makeSelectEntities } from 'containers/App/selectors';
 import extend from 'lodash/extend';
 
 import request from 'utils/request';
-import { updateAuthHeaders, getAuthHeaders, destroySession } from 'utils/session-storage';
+import apiRequest from 'utils/api-request';
+//import { updateAuthHeaders, getAuthHeaders, destroySession } from 'utils/session-storage';
 import { parseResponse } from 'utils/handle-request-response';
 
 
@@ -60,46 +56,49 @@ export function* getEntitiesSaga(payload) {
   // TODO get auth headers
   const options = {};
   options.headers = {};
-  extend(options.headers, getAuthHeaders());
+  //extend(options.headers, getAuthHeaders());
   try {
     // Call our request helper (see 'utils/request')
 
-    const response = yield call(request, requestURL, options);
-
-    const headers = yield response.headers;
-    const entities = yield response.json();
-
-    yield put(entitiesLoaded(entities, payload.path, headers));
+    // const response = yield call(request, requestURL, options);
+    //
+    // const headers = yield response.headers;
+    // const entities = yield response.json();
+    //
+    // yield put(entitiesLoaded(entities, payload.path));
+    yield put(entitiesLoaded({}, payload.path));
   } catch (err) {
     yield put(entitiesLoadingError(err));
   }
 }
 export function* authenticateSaga(payload) {
 
-  const requestURL = 'https://undp-sadata-staging.herokuapp.com/auth/sign_in';
+  //const requestURL = 'https://undp-sadata-staging.herokuapp.com/auth/sign_in';
   const { password, email } = payload.data;
-
-  console.log(password)
 
   yield put(authenticateSending());
   try {
     // Call our request helper (see 'utils/request')
 
     // yield call(api, 'post', {email, password})
-    const response = yield call(request, requestURL, {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      method: 'post',
-      body: JSON.stringify({ email, password }),
-    });
+    // const response = yield call(request, requestURL, {
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   method: 'post',
+    //   body: JSON.stringify({ email, password }),
+    // });
+    const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
 
-    const headers = yield response.headers;
-    const user = yield response.json();
-    yield put(authenticateSuccess(user, headers));
+    console.log(response);
+
+    // const headers = yield response.headers;
+    // const user = yield response.json();
+    // yield put(authenticateSuccess(user, headers));
 //    })
   } catch (err) {
+    console.error(err);
     yield put(authenticateError(err));
   }
 }
@@ -143,17 +142,17 @@ export function* getEntitiesSuccessSaga(payload) {
  * Root saga manages watcher lifecycle
  */
 export function* rootSaga() {
-  yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
+  // yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
 
   // Watches for LOAD_ENTITIES entities and calls getEntities when one comes in.
   // It returns task descriptor (just like fork) so we can continue execution
-  yield takeEvery(LOAD_ENTITIES, getEntitiesSaga);
+  // yield takeEvery(LOAD_ENTITIES, getEntitiesSaga);
   yield takeLatest(AUTHENTICATE, authenticateSaga);
-  yield takeLatest(LOGOUT, logoutSaga);
+  // yield takeLatest(LOGOUT, logoutSaga);
 
-  yield takeLatest(AUTHENTICATE_SUCCESS, authenticateSuccessSaga);
-  yield takeLatest(LOAD_ENTITIES_SUCCESS, getEntitiesSuccessSaga);
-  yield takeLatest(LOGOUT_SUCCESS, logoutSuccessSaga);
+  // yield takeLatest(AUTHENTICATE_SUCCESS, authenticateSuccessSaga);
+  // yield takeLatest(LOAD_ENTITIES_SUCCESS, getEntitiesSuccessSaga);
+  // yield takeLatest(LOGOUT_SUCCESS, logoutSuccessSaga);
 }
 
 // Bootstrap sagas

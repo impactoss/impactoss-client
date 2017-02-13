@@ -11,11 +11,6 @@ function parseJSON(response) {
   return response.json();
 }
 
-function parseAuth(response) {
-  console.log(response);
-  return response;
-}
-
 /**
  * Checks if a network request came back fine, and throws an error if not
  *
@@ -42,9 +37,9 @@ function checkStatus(response) {
  *
  * @return {object}           The response data
  */
-export default function request(url, options) {
+export default function request(url, options, middleware) {
   return fetch(url, options)
     .then(checkStatus)
-    .then(parseAuth)
-    .then(parseJSON)
+    .then((response) => middleware ? middleware(response) : response)
+    .then(parseJSON);
 }

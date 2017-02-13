@@ -20,8 +20,6 @@ import {
   AUTHENTICATE,
   AUTHENTICATE_SUCCESS,
   AUTHENTICATE_ERROR,
-  CHANGE_PASSWORD,
-  CHANGE_EMAIL,
   SET_AUTHENTICATION_STATE,
   LOAD_ENTITIES_IF_NEEDED,
   LOAD_ENTITIES,
@@ -30,9 +28,6 @@ import {
   LOGOUT,
   LOGOUT_SUCCESS,
 } from './constants';
-
-import { parseResponse } from 'utils/handle-request-response';
-
 
 /**
  * Load the entities, this action starts the request saga
@@ -64,12 +59,11 @@ export function loadEntities(path) {
  *
  * @return {object}      An action object with a type of LOAD_ENTITIES_SUCCESS passing the entities
  */
-export function entitiesLoaded(entities, path, headers) {
+export function entitiesLoaded(entities, path) {
   return {
     type: LOAD_ENTITIES_SUCCESS,
     entities: entities.data,
     path,
-    headers,
   };
 }
 
@@ -133,11 +127,10 @@ export function authenticate(data) {
  *
  * @return {object}      An action object with a type of AUTHENTICATE_SUCCESS passing the user
  */
-export function authenticateSuccess(user, headers) {
+export function authenticateSuccess(user) {
   return {
     type: AUTHENTICATE_SUCCESS,
     user: user.data,
-    headers,
   };
 }
 
