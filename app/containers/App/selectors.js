@@ -18,7 +18,7 @@ const makeSelectError = () => createSelector(
 
 const makeSelectEntities = (path) => createSelector(
   selectGlobal,
-  (globalState) => globalState.getIn(['entities',path])
+  (globalState) => globalState.getIn(['entities', path])
 );
 
 
@@ -41,18 +41,18 @@ const makeSelectLocationState = () => {
 
 const makeSelectEmail = () => createSelector(
   selectGlobal,
-  (globalState) => globalState.getIn(['form','login','email'])
+  (globalState) => globalState.getIn(['form', 'login', 'email'])
 );
 const makeSelectPassword = () => createSelector(
   selectGlobal,
-  (globalState) => globalState.getIn(['form','login','password'])
+  (globalState) => globalState.getIn(['form', 'login', 'password'])
 );
 
 export {
-  selectGlobal,  
+  selectGlobal,
   makeSelectLoading,
-  makeSelectError,  
-  makeSelectEntities,  
+  makeSelectError,
+  makeSelectEntities,
   makeSelectLocationState,
   makeSelectEmail,
   makeSelectPassword,

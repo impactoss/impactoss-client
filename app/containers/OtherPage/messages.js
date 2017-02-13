@@ -9,5 +9,5 @@ export default defineMessages({
   header: {
     id: 'nmrf.containers.OtherPage.header',
     defaultMessage: 'Other page',
-  }
+  },
 });

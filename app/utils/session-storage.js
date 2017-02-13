@@ -1,24 +1,24 @@
 // based on https://github.com/lynndylanhurley/redux-auth
-//import Cookies from "browser-cookies";
+// import Cookies from "browser-cookies";
 
-var root = Function("return this")() || (42, eval)("this");
+const root = Function('return this')() || (42, eval)('this');
 
 export function getTokenFormat() {
   return {
-    "access-token": "{{ access-token }}",
-    "token-type": "Bearer",
-    "client": "{{ client }}",
-    "expiry": "{{ expiry }}",
-    "uid": "{{ uid }}"
-  }
+    'access-token': '{{ access-token }}',
+    'token-type': 'Bearer',
+    client: '{{ client }}',
+    expiry: '{{ expiry }}',
+    uid: '{{ uid }}',
+  };
 }
 
-export function persistData (key, val) {
+export function persistData(key, val) {
   val = JSON.stringify(val);
 
 //  switch () {
 //    case "localStorage":
-      root.localStorage.setItem(key, val);
+  root.localStorage.setItem(key, val);
 //      break;
 
 //    default:
@@ -28,13 +28,13 @@ export function persistData (key, val) {
 //      });
 //      break;
 //  }
-};
+}
 export function retrieveData(key) {
-  var val = null;
+  let val = null;
 
 //  switch (storage || root.authState.currentSettings.storage) {
 //    case "localStorage":
-      val = root.localStorage && root.localStorage.getItem(key);
+  val = root.localStorage && root.localStorage.getItem(key);
 //      break;
 
 //    default:
@@ -49,13 +49,13 @@ export function retrieveData(key) {
     return JSON.parse(val);
   } catch (err) {
     // unescape quotes
-    console.log(err)
+    console.log(err);
     return unescapeQuotes(val);
   }
-};
-function unescapeQuotes (val) {
-  return val && val.replace(/("|')/g, "");
-};
+}
+function unescapeQuotes(val) {
+  return val && val.replace(/("|')/g, '');
+}
 /**
  * Add access token as a bearer token in accordance to RFC 6750
  *
@@ -65,62 +65,56 @@ function unescapeQuotes (val) {
  */
 function addAuthorizationHeader(accessToken, headers) {
   return Object.assign({}, headers, {
-    Authorization: `Bearer ${accessToken}`
+    Authorization: `Bearer ${accessToken}`,
   });
 }
 
-export function destroySession () {
-
-  
+export function destroySession() {
     // kill all local storage keys
-    if (root.localStorage) {
-      root.localStorage.removeItem("authHeaders");
-    }
+  if (root.localStorage) {
+    root.localStorage.removeItem('authHeaders');
+  }
 
 //    // remove from base path in case config is not specified
 //    Cookies.erase(key, {
 //      path: root.authState.currentSettings.cookiePath || "/"
 //    });
-  
 }
 
 export function getAuthHeaders() {
     // fetch current auth headers from storage
-    var currentHeaders = retrieveData("authHeaders") || {},
-        nextHeaders = {};
+  let currentHeaders = retrieveData('authHeaders') || {},
+    nextHeaders = {};
   // bust IE cache
-  nextHeaders["If-Modified-Since"] = "Mon, 26 Jul 1997 05:00:00 GMT";
+  nextHeaders['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT';
 
   // set header for each key in `tokenFormat` config
-  for (var key in getTokenFormat()) {
+  for (const key in getTokenFormat()) {
     nextHeaders[key] = currentHeaders[key];
   }
   return addAuthorizationHeader(currentHeaders['access-token'], nextHeaders);
-  
-  
 }
 
 export function updateAuthHeaders(headers) {
   // check config apiUrl matches the current response url
     // set header for each key in `tokenFormat` config
-    var newHeaders = {};
+  const newHeaders = {};
 
     // set flag to ensure that we don't accidentally nuke the headers
     // if the response tokens aren't sent back from the API
-    var blankHeaders = true;
+  let blankHeaders = true;
 
     // set header key + val for each key in `tokenFormat` config
-    for (var key in getTokenFormat()) {
-      newHeaders[key] = headers.get(key);
+  for (const key in getTokenFormat()) {
+    newHeaders[key] = headers.get(key);
 
-      if (newHeaders[key]) {
-        blankHeaders = false;
-      }
+    if (newHeaders[key]) {
+      blankHeaders = false;
     }
+  }
 
     // persist headers for next request
-    if (!blankHeaders) {
-      persistData("authHeaders", newHeaders);
-    }
-
+  if (!blankHeaders) {
+    persistData('authHeaders', newHeaders);
+  }
 }

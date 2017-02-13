@@ -14,10 +14,10 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
-import { 
-  makeSelectEntities, 
-  makeSelectLoading, 
-  makeSelectError 
+import {
+  makeSelectEntities,
+  makeSelectLoading,
+  makeSelectError,
 } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -25,15 +25,15 @@ import { loadEntitiesIfNeeded } from '../App/actions';
 
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  
-  
+
+
   /**
    * load actions
    */
   componentDidMount() {
-    this.props.onComponentDidMount()
+    this.props.onComponentDidMount();
   }
-  
+
   render() {
     const { loading, error, actions } = this.props;
     const actionsListProps = {
@@ -51,7 +51,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 }
 
 
-
 HomePage.propTypes = {
   loading: React.PropTypes.bool,
   error: React.PropTypes.oneOfType([
@@ -61,13 +60,12 @@ HomePage.propTypes = {
   actions: React.PropTypes.oneOfType([
     React.PropTypes.array,
     React.PropTypes.bool,
-  ]) 
+  ]),
 };
 
 export function mapDispatchToProps(dispatch) {
-  
   return {
-    onComponentDidMount: (evt) => {          
+    onComponentDidMount: (evt) => {
       // consider using https://github.com/tshelburne/redux-batched-actions
       dispatch(loadEntitiesIfNeeded('actions'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
@@ -78,7 +76,7 @@ export function mapDispatchToProps(dispatch) {
 }
 
 const mapStateToProps = createStructuredSelector({
-  actions: makeSelectEntities('actions'),  
+  actions: makeSelectEntities('actions'),
   loading: makeSelectLoading(),
   error: makeSelectError(),
 });

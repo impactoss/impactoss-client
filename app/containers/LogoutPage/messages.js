@@ -9,6 +9,6 @@ export default defineMessages({
   header: {
     id: 'nmrf.containers.LogoutPage.header',
     defaultMessage: 'Logout Page',
-  },      
-    
+  },
+
 });

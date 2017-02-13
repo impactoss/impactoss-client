@@ -18,7 +18,7 @@ export default class OtherPage extends React.Component { // eslint-disable-line 
   render() {
     return (
       <div>
-          <FormattedMessage {...messages.header} />
+        <FormattedMessage {...messages.header} />
       </div>
     );
   }

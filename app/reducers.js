@@ -43,7 +43,7 @@ function routeReducer(state = routeInitialState, action) {
 export default function createReducer(asyncReducers) {
   return combineReducers({
     route: routeReducer,
-    global: globalReducer,    
+    global: globalReducer,
     language: languageProviderReducer,
     ...asyncReducers,
   });

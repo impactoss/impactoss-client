@@ -25,5 +25,5 @@ export const LOGOUT = 'nmrf/App/LOGOUT';
 export const LOGOUT_SUCCESS = 'nmrf/App/LOGOUT_SUCCESS';
 export const LOGOUT_ERROR = 'nmrf/App/LOGOUT_ERROR';
 
-export const CHANGE_EMAIL = 'nmrf/App/CHANGE_EMAIL';
-export const CHANGE_PASSWORD = 'nmrf/App/CHANGE_PASSWORD';
+// TODO need to pull from an env file
+export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com/';

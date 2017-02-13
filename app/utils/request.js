@@ -11,6 +11,11 @@ function parseJSON(response) {
   return response.json();
 }
 
+function parseAuth(response) {
+  console.log(response);
+  return response;
+}
+
 /**
  * Checks if a network request came back fine, and throws an error if not
  *
@@ -29,7 +34,6 @@ function checkStatus(response) {
 }
 
 
-
 /**
  * Requests a URL, returning a promise
  *
@@ -41,4 +45,6 @@ function checkStatus(response) {
 export default function request(url, options) {
   return fetch(url, options)
     .then(checkStatus)
+    .then(parseAuth)
+    .then(parseJSON)
 }

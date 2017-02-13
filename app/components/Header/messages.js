@@ -19,7 +19,7 @@ export default defineMessages({
     defaultMessage: 'Login',
   },
   logout: {
-    id: 'nmrf.components.Header.logout',    
+    id: 'nmrf.components.Header.logout',
     defaultMessage: 'Logout',
   },
 });

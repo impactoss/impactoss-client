@@ -16,8 +16,8 @@
  */
 
 import {
-  AUTHENTICATE_SENDING,  
-  AUTHENTICATE,  
+  AUTHENTICATE_SENDING,
+  AUTHENTICATE,
   AUTHENTICATE_SUCCESS,
   AUTHENTICATE_ERROR,
   CHANGE_PASSWORD,
@@ -42,7 +42,7 @@ import { parseResponse } from 'utils/handle-request-response';
 export function loadEntitiesIfNeeded(path) {
   return {
     type: LOAD_ENTITIES_IF_NEEDED,
-    path: path,
+    path,
   };
 }
 /**
@@ -53,7 +53,7 @@ export function loadEntitiesIfNeeded(path) {
 export function loadEntities(path) {
   return {
     type: LOAD_ENTITIES,
-    path:path,
+    path,
   };
 }
 
@@ -64,14 +64,12 @@ export function loadEntities(path) {
  *
  * @return {object}      An action object with a type of LOAD_ENTITIES_SUCCESS passing the entities
  */
-export function entitiesLoaded(entities, path, headers) {  
-  
-  
+export function entitiesLoaded(entities, path, headers) {
   return {
     type: LOAD_ENTITIES_SUCCESS,
     entities: entities.data,
     path,
-    headers
+    headers,
   };
 }
 
@@ -94,22 +92,22 @@ export function entitiesLoadingError(error) {
  * Sets the authentication state of the application
  * @param  {boolean} newAuthState True means a user is logged in, false means no user is logged in
  */
-export function setAuthenticationState (newAuthState) {
+export function setAuthenticationState(newAuthState) {
   return {
     type: SET_AUTHENTICATION_STATE,
-    newAuthState
-  }
+    newAuthState,
+  };
 }
 
 /**
  * Sets the `currentlySending` state, which displays a loading indicator during requests
  * @param  {boolean} sending True means we're sending a request, false means we're not
  */
-export function authenticateSending (sending) {
+export function authenticateSending(sending) {
   return {
-    type: AUTHENTICATE_SENDING, 
-    sending
-  }
+    type: AUTHENTICATE_SENDING,
+    sending,
+  };
 }
 
 /**
@@ -118,13 +116,13 @@ export function authenticateSending (sending) {
  * @param  {object} data          The data we're sending for log in
  * @param  {string} data.email The email of the user to log in
  * @param  {string} data.password The password of the user to log in
- * 
+ *
  * @return {object} An action object with a type of AUTHENTICATE
  */
 export function authenticate(data) {
   return {
     type: AUTHENTICATE,
-    data
+    data,
   };
 }
 
@@ -135,12 +133,11 @@ export function authenticate(data) {
  *
  * @return {object}      An action object with a type of AUTHENTICATE_SUCCESS passing the user
  */
-export function authenticateSuccess(user,headers) {  
-
+export function authenticateSuccess(user, headers) {
   return {
-    type: AUTHENTICATE_SUCCESS,    
+    type: AUTHENTICATE_SUCCESS,
     user: user.data,
-    headers,            
+    headers,
   };
 }
 
@@ -158,26 +155,13 @@ export function authenticateError(error) {
   };
 }
 
-export function changeEmail(email) {
-  return {
-    type: CHANGE_EMAIL,
-    email
-  };
-}
-
-export function changePassword(password) {
-  return {
-    type: CHANGE_PASSWORD,
-    password
-  };
-}
 export function logout() {
   return {
-    type: LOGOUT
+    type: LOGOUT,
   };
 }
 export function logoutSuccess() {
   return {
-    type: LOGOUT_SUCCESS
+    type: LOGOUT_SUCCESS,
   };
 }

@@ -6,6 +6,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { fromJS } from 'immutable';
 import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
+import { rootSaga } from 'containers/App/sagas';
 import createReducer from './reducers';
 
 const sagaMiddleware = createSagaMiddleware();
@@ -39,6 +40,8 @@ export default function configureStore(initialState = {}, history) {
   );
 
   // Extensions
+
+  sagaMiddleware.run(rootSaga); // Load app level sagas ( https://github.com/mxstbr/react-boilerplate/issues/1077 )
   store.runSaga = sagaMiddleware.run;
   store.asyncReducers = {}; // Async reducer registry
 

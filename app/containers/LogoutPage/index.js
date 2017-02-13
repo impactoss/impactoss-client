@@ -8,16 +8,16 @@ import { createStructuredSelector } from 'reselect';
 
 import { FormattedMessage } from 'react-intl';
 
-import { 
-  makeSelectPassword, 
-  makeSelectEmail
+import {
+  makeSelectPassword,
+  makeSelectEmail,
 } from 'containers/App/selectors';
 
 import Form from './Form';
 
 import messages from './messages';
-import { 
-  logout
+import {
+  logout,
 } from '../App/actions';
 
 
@@ -30,15 +30,14 @@ export class LogoutPage extends React.PureComponent { // eslint-disable-line rea
 //      this.props.onSubmitForm();
 //    }
 //  }
-  
+
   render() {
-    
     return (
-      <article>            
+      <article>
         <div>
           <FormattedMessage {...messages.header} />
         </div>
-        <Form onSubmit={this.props.onSubmitForm}>                     
+        <Form onSubmit={this.props.onSubmitForm}>
           <button>Log out</button>
         </Form>
       </article>
@@ -46,8 +45,8 @@ export class LogoutPage extends React.PureComponent { // eslint-disable-line rea
   }
 }
 
-LogoutPage.propTypes = {  
-  onSubmitForm: React.PropTypes.func,  
+LogoutPage.propTypes = {
+  onSubmitForm: React.PropTypes.func,
 };
 
 export function mapDispatchToProps(dispatch) {
@@ -59,7 +58,7 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-const mapStateToProps = createStructuredSelector({  
+const mapStateToProps = createStructuredSelector({
 });
 
 // Wrap the component to inject dispatch and state into it

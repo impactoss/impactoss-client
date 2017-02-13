@@ -29,8 +29,8 @@ export default function createRoutes(store) {
         const renderRoute = loadModule(cb);
 
         importModules.then(([sagas, component]) => {
-          injectSagas(sagas.default);      
-          
+          injectSagas(sagas.default);
+
           renderRoute(component);
         });
 
@@ -44,45 +44,45 @@ export default function createRoutes(store) {
           .then(loadModule(cb))
           .catch(errorLoading);
       },
-    }, {      
-      path: '/login',
-      name: 'login',
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/App/sagas'),
-          import('containers/LoginPage'),
-        ]);        
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([sagas, component]) => {
-          injectSagas(sagas.default);      
-          
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    }, {      
+    }, {
       path: '/logout',
       name: 'logout',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/App/sagas'),
           import('containers/LogoutPage'),
-        ]);        
+        ]);
 
         const renderRoute = loadModule(cb);
 
         importModules.then(([sagas, component]) => {
-          injectSagas(sagas.default);      
-          
+          injectSagas(sagas.default);
           renderRoute(component);
         });
 
         importModules.catch(errorLoading);
       },
-    }, {      
+    }, {
+      path: '/login',
+      name: 'loginPage',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/LoginPage/reducer'),
+          import('containers/LoginPage/sagas'),
+          import('containers/LoginPage'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('loginPage', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {
