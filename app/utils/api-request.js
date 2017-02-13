@@ -1,30 +1,62 @@
 import { API_ENDPOINT } from '../containers/App/constants';
 import request from './request';
-import { getToken, setToken } from './session-storage';
+import { get, set } from './session-storage';
 
-function parseAuthHeaders(response) {
-  const token = response.headers.get('Access-Token');
-  setToken(token);
+// We will look for these headers, and save them to localStorage
+const authKeys = [
+  'access-token',
+  'token-type',
+  'client',
+  'expiry',
+  'uid',
+];
+
+// Look at each authKey in session-storage, if found add to returned object
+function getAuthValues() {
+  return authKeys.reduce((headers, key) => {
+    const value = get(key);
+    return value ? { // value found in storage, add it to the headers object
+      ...headers,
+      [key]: value,
+    }
+    : headers; // no value found, return existing headers
+  }, {});
+}
+
+// Look at each authKey, if its in the response header save it to session-storage
+// This method will be passed as the middleware param to `request`
+function saveAuthHeaders(response) {
+  authKeys.forEach((key) => {
+    set(key, response.headers.get(key));
+  });
+
   return response;
 }
 
+// Add authorization headers if we have some
 function addAuthHeaders(headers = {}) {
-  const token = getToken();
-  return token ? {
+  const authValues = getAuthValues();
+
+  // If we have access-token in session-storage going to presume we have the rest
+  return 'access-token' in authValues ? {
     ...headers,
-    Authorization: `Bearer ${token}`,
-  } : headers;
+    ...authValues,
+    authorization: `Bearer ${authValues['access-token']}`,
+  }
+  : headers; // can't find access-token, no auth headers to add
 }
+
 
 function getHeaders() {
   return addAuthHeaders({
+    // and always add these headers
     Accept: 'application/json',
     'Content-Type': 'application/json',
     'If-Modified-Since': 'Mon, 26 Jul 1997 05:00:00 GMT', // Bust IE Cache
   });
 }
 
-function urlParamify(params) {
+function urlParamify(params = {}) {
   const urlValues = Object.keys(params).reduce((urlParams, k) => {
     urlParams.append(k, params[k]);
     return urlParams;
@@ -33,7 +65,7 @@ function urlParamify(params) {
   return urlValues.toString();
 }
 
-export default function apiRequest(method, action, params) {
+export default function apiRequest(method, action, params = {}) {
   const headers = getHeaders();
   let url = `${API_ENDPOINT}/${action}`;
   let options = {
@@ -41,14 +73,18 @@ export default function apiRequest(method, action, params) {
     headers,
   };
 
-  if (method.toUpperCase() === 'GET') { // Create a query string for GET requests
+  // Add params to request
+  if (method.toUpperCase() === 'GET') {
+    // Create a query string for GET requests
     url = `${url}?${urlParamify(params)}`;
-  } else { // all other methods add params to request body
+  } else {
+    // all other methods add params to request body
     options = {
       ...options,
       body: JSON.stringify(params),
     };
   }
 
-  return request(url, options, parseAuthHeaders);
+  // Pass the saveAuthHeaders middleware function to the request library
+  return request(url, options, saveAuthHeaders);
 }

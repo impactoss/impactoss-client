@@ -1,9 +1,9 @@
 const localStorage = global.window.localStorage;
 
-export function getToken() {
-  return localStorage.token;
+export function get(key) {
+  return localStorage.getItem(key);
 }
 
-export function setToken(token) {
-  localStorage.token = token;
+export function set(key, value) {
+  localStorage.setItem(key, value);
 }
