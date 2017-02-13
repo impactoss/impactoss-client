@@ -27,7 +27,10 @@ function getAuthValues() {
 // This method will be passed as the middleware param to `request`
 function saveAuthHeaders(response) {
   authKeys.forEach((key) => {
-    set(key, response.headers.get(key));
+    const headerValue = response.headers.get(key);
+    if (headerValue) { // TODO temp, should clear headers here, I'm not now to debug https://github.com/dumparkltd/hr-nmrf-client/issues/75
+      set(key, headerValue);
+    }
   });
 
   return response;
