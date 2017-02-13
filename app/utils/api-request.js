@@ -73,16 +73,18 @@ export default function apiRequest(method, action, params = {}) {
     headers,
   };
 
-  // Add params to request
-  if (method.toUpperCase() === 'GET') {
-    // Create a query string for GET requests
-    url = `${url}?${urlParamify(params)}`;
-  } else {
-    // all other methods add params to request body
-    options = {
-      ...options,
-      body: JSON.stringify(params),
-    };
+  if (Object.keys(params).length > 0) {
+    // Add params to request
+    if (method.toUpperCase() === 'GET') {
+      // Create a query string for GET requests
+      url = `${url}?${urlParamify(params)}`;
+    } else {
+      // all other methods add params to request body
+      options = {
+        ...options,
+        body: JSON.stringify(params),
+      };
+    }
   }
 
   // Pass the saveAuthHeaders middleware function to the request library
