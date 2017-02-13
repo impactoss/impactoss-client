@@ -35,12 +35,12 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const { loading, error, actions } = this.props;
-    const actionsListProps = {
-      loading,
-      error,
-      actions,
-    };
+    // const { loading, error, actions } = this.props;
+    // const actionsListProps = {
+    //   loading,
+    //   error,
+    //   actions,
+    // };
 
     return (
       <h1>
@@ -52,20 +52,21 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 
 
 HomePage.propTypes = {
-  loading: React.PropTypes.bool,
-  error: React.PropTypes.oneOfType([
-    React.PropTypes.object,
-    React.PropTypes.bool,
-  ]),
-  actions: React.PropTypes.oneOfType([
-    React.PropTypes.array,
-    React.PropTypes.bool,
-  ]),
+  // loading: React.PropTypes.bool,
+  // error: React.PropTypes.oneOfType([
+  //   React.PropTypes.object,
+  //   React.PropTypes.bool,
+  // ]),
+  // actions: React.PropTypes.oneOfType([
+  //   React.PropTypes.array,
+  //   React.PropTypes.bool,
+  // ]),
+  onComponentDidMount: React.PropTypes.func,
 };
 
 export function mapDispatchToProps(dispatch) {
   return {
-    onComponentDidMount: (evt) => {
+    onComponentDidMount: () => {
       // consider using https://github.com/tshelburne/redux-batched-actions
       dispatch(loadEntitiesIfNeeded('actions'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
