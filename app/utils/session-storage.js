@@ -5,5 +5,9 @@ export function get(key) {
 }
 
 export function set(key, value) {
-  localStorage.setItem(key, value);
+  if (value === null) {
+    localStorage.removeItem(key);
+  } else {
+    localStorage.setItem(key, value);
+  }
 }

@@ -27,7 +27,10 @@ function getAuthValues() {
 // This method will be passed as the middleware param to `request`
 function saveAuthHeaders(response) {
   authKeys.forEach((key) => {
-    set(key, response.headers.get(key));
+    const headerValue = response.headers.get(key);
+    if (headerValue) { // TODO temp, should clear headers here, I'm not now to debug https://github.com/dumparkltd/hr-nmrf-client/issues/75
+      set(key, headerValue);
+    }
   });
 
   return response;
@@ -73,16 +76,18 @@ export default function apiRequest(method, action, params = {}) {
     headers,
   };
 
-  // Add params to request
-  if (method.toUpperCase() === 'GET') {
-    // Create a query string for GET requests
-    url = `${url}?${urlParamify(params)}`;
-  } else {
-    // all other methods add params to request body
-    options = {
-      ...options,
-      body: JSON.stringify(params),
-    };
+  if (Object.keys(params).length > 0) {
+    // Add params to request
+    if (method.toUpperCase() === 'GET') {
+      // Create a query string for GET requests
+      url = `${url}?${urlParamify(params)}`;
+    } else {
+      // all other methods add params to request body
+      options = {
+        ...options,
+        body: JSON.stringify(params),
+      };
+    }
   }
 
   // Pass the saveAuthHeaders middleware function to the request library
