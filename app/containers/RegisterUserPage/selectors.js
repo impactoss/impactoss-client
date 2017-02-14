@@ -9,11 +9,12 @@ const selectRegisterUserPageDomain = () => (state) => state.get('registerUserPag
  * Other specific selectors
  */
 const registerCredentialsSelector = createSelector(
-  selectRegisterUserPageDomain,
+  selectRegisterUserPageDomain(),
   (substate) => ({
+    name: substate.get('name'),
     email: substate.get('email'),
     password: substate.get('password'),
-    verify: substate.get('verify'),
+    passwordConfirmation: substate.get('passwordConfirmation'),
   })
 );
 
