@@ -8,7 +8,11 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   header: {
     id: 'app.containers.RegisterUserPage.header',
-    defaultMessage: 'This is RegisterUserPage container !',
+    defaultMessage: 'Register User',
+  },
+  name: {
+    id: 'nmrf.containers.RegisterUserPage.name',
+    defaultMessage: 'Full Name',
   },
   email: {
     id: 'nmrf.containers.RegisterUserPage.email',
@@ -18,8 +22,8 @@ export default defineMessages({
     id: 'nmrf.containers.RegisterUserPage.password',
     defaultMessage: 'Password',
   },
-  verify: {
-    id: 'nmrf.containers.RegisterUserPage.verify',
+  passwordConfirmation: {
+    id: 'nmrf.containers.RegisterUserPage.passwordConfirmation',
     defaultMessage: 'Verify Password',
   },
   submit: {
