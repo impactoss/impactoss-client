@@ -12,22 +12,34 @@
  */
 
 import React from 'react';
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 
 import Header from 'components/Header';
+import { makeSelectSignedIn } from './selectors';
 
 
-export default class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     children: React.PropTypes.node,
+    isSignedIn: React.PropTypes.bool,
   };
 
   render() {
     return (
       <div>
-        <Header />
+        <Header
+          isSignedIn={this.props.isSignedIn}
+        />
         {React.Children.toArray(this.props.children)}
       </div>
     );
   }
 }
+
+const mapStateToProps = createStructuredSelector({
+  isSignedIn: makeSelectSignedIn(),
+});
+
+export default connect(mapStateToProps)(App);

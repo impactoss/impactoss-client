@@ -6,6 +6,11 @@ import HeaderLink from './HeaderLink';
 import messages from './messages';
 
 class Header extends React.Component { // eslint-disable-line react/prefer-stateless-function
+
+  static propTypes = {
+    isSignedIn: React.PropTypes.bool,
+  }
+
   render() {
     return (
       <div>
@@ -13,15 +18,21 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
           <HeaderLink to="/">
             <FormattedMessage {...messages.home} />
           </HeaderLink>
-          <HeaderLink to="/login">
-            <FormattedMessage {...messages.login} />
-          </HeaderLink>
-          <HeaderLink to="/logout">
-            <FormattedMessage {...messages.logout} />
-          </HeaderLink>
-          <HeaderLink to="/register">
-            <FormattedMessage {...messages.register} />
-          </HeaderLink>
+          {this.props.isSignedIn &&
+            <HeaderLink to="/logout">
+              <FormattedMessage {...messages.logout} />
+            </HeaderLink>
+          }
+          {!this.props.isSignedIn &&
+            <span>
+              <HeaderLink to="/login">
+                <FormattedMessage {...messages.login} />
+              </HeaderLink>
+              <HeaderLink to="/register">
+                <FormattedMessage {...messages.register} />
+              </HeaderLink>
+            </span>
+          }
         </NavBar>
       </div>
     );

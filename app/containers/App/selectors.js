@@ -21,6 +21,10 @@ const makeSelectEntities = (path) => createSelector(
   (globalState) => globalState.getIn(['entities', path])
 );
 
+const makeSelectSignedIn = () => createSelector(
+  selectGlobal,
+  (globalState) => globalState.getIn(['user', 'isSignedIn'])
+);
 
 // makeSelectLocationState expects a plain JS object for the routing state
 const makeSelectLocationState = () => {
@@ -56,4 +60,5 @@ export {
   makeSelectLocationState,
   makeSelectEmail,
   makeSelectPassword,
+  makeSelectSignedIn,
 };
