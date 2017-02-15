@@ -25,9 +25,17 @@ function checkStatus(response) {
 
   const error = new Error(response.statusText);
   error.response = response;
+
+  // Checks if content is json or not and adds it to the response.
+  error.response.json = isContentJSON(response) ? parseJSON(response) : null;
+
   throw error;
 }
 
+function isContentJSON(response) {
+  const contentType = response.headers.get('content-type');
+  return contentType && contentType.indexOf('application/json') !== -1;
+}
 
 /**
  * Requests a URL, returning a promise
