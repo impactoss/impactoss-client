@@ -6,7 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 
-import Form from './Form';
+// import Form from './Form';
 
 import messages from './messages';
 import {
@@ -15,17 +15,22 @@ import {
 
 
 export class LogoutPage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
+  componentWillMount() {
+    this.props.onSubmitForm();
+  }
+
   render() {
     return (
       <article>
         <div>
           <FormattedMessage {...messages.header} />
         </div>
-        <Form onSubmit={this.props.onSubmitForm}>
+        {/* <Form onSubmit={this.props.onSubmitForm}>
           <button type="submit">
-            <FormattedMessage {...messages.logout} />
+          <FormattedMessage {...messages.logout} />
           </button>
-        </Form>
+        </Form> */}
       </article>
     );
   }

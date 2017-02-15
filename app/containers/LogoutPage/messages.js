@@ -8,7 +8,7 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   header: {
     id: 'nmrf.containers.LogoutPage.header',
-    defaultMessage: 'Logout Page',
+    defaultMessage: 'You have now logged out!',
   },
   logout: {
     id: 'nmrf.containers.LogoutPage.logout',
