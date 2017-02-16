@@ -12,7 +12,7 @@ const authKeys = [
 ];
 
 // Look at each authKey in session-storage, if found add to returned object
-function getAuthValues() {
+export function getAuthValues() {
   return authKeys.reduce((headers, key) => {
     const value = get(key);
     return value ? { // value found in storage, add it to the headers object
@@ -34,6 +34,12 @@ function saveAuthHeaders(response) {
   });
 
   return response;
+}
+
+export function clearAuthValues() {
+  authKeys.forEach((key) => {
+    set(key, null);
+  });
 }
 
 // Add authorization headers if we have some
@@ -95,4 +101,5 @@ export default function apiRequest(method, action, params = {}) {
 }
 
 // TODO create is logged in function which gets the token from storage
+
 // TODO create a clear function to clear auth information from local storage
