@@ -5,6 +5,7 @@
  */
 
 import { fromJS } from 'immutable';
+import { checkErrorMessagesExist } from 'utils/request';
 import {
   CHANGE_PASSWORD,
   CHANGE_EMAIL,
@@ -38,9 +39,10 @@ function registerUserPageReducer(state = initialState, action) {
       return state.set('password', action.password);
     case CHANGE_PASSWORD_CONFIRMATION:
       return state.set('passwordConfirmation', action.passwordConfirmation);
-    case REGISTER_USER_ERROR:
-      // TODO need to do some checking here as the errors may not exist
-      return state.setIn(['register', 'messages'], action.error.response.errors.full_messages).setIn(['register', 'error'], true);
+    case REGISTER_USER_ERROR: {
+      const errors = checkErrorMessagesExist(action.error.response);
+      return state.setIn(['register', 'messages'], errors).setIn(['register', 'error'], true);
+    }
     case REGISTER_USER_SUCCESS:
       return initialState.setIn(['register', 'success'], true); // this is a better idea to empty the store once registration is successful
     case REGISTER_USER_SENDING:

@@ -22,13 +22,7 @@ export function* registerUserSaga(payload) {
     yield put(registerUserSuccess(response.data));
     yield put(authenticate({ email, password }));
   } catch (err) {
-    const response = yield err.response.json();
-
-    // checking if response returns json TODO: need to handle if there is no response
-    if (Object.keys(response)) {
-      err.response = response;
-    }
-
+    err.response.json = yield err.response.json();
     yield put(registerUserError(err));
   }
 }
