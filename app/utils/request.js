@@ -26,15 +26,21 @@ function checkStatus(response) {
   const error = new Error(response.statusText);
   error.response = response;
 
-  // Checks if content is json or not and adds it to the response.
-  error.response.json = isContentJSON(response) ? parseJSON(response) : null;
-
   throw error;
 }
 
-function isContentJSON(response) {
+export function isContentJSON(response) {
   const contentType = response.headers.get('content-type');
   return contentType && contentType.indexOf('application/json') !== -1;
+}
+
+export function checkErrorMessagesExist(response) {
+  if (response && response.json && response.json.errors && response.json.errors.full_messages) {
+    return response.json.errors.full_messages;
+  } else if (response && response.json && response.json.errors) {
+    return response.json.errors;
+  }
+  return [];
 }
 
 /**
