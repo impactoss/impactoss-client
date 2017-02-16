@@ -27,6 +27,7 @@ import {
   LOAD_ENTITIES_ERROR,
   LOGOUT,
   LOGOUT_SUCCESS,
+  VALIDATE_TOKEN,
 } from './constants';
 
 /**
@@ -157,5 +158,11 @@ export function logout() {
 export function logoutSuccess() {
   return {
     type: LOGOUT_SUCCESS,
+  };
+}
+
+export function validateToken() {
+  return {
+    type: VALIDATE_TOKEN,
   };
 }

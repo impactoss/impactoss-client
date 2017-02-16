@@ -8,6 +8,7 @@ import {
     LOAD_ENTITIES,
     AUTHENTICATE,
     LOGOUT,
+    VALIDATE_TOKEN,
 } from 'containers/App/constants';
 import {
     loadEntities,
@@ -21,7 +22,7 @@ import {
 
 import { makeSelectEntities } from 'containers/App/selectors';
 
-import apiRequest from 'utils/api-request';
+import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
 
 /**
  * Check if entities already present
@@ -85,11 +86,26 @@ export function* logoutSaga() {
   }
 }
 
+export function* validateTokenSaga() {
+  yield put(authenticateSending());
+
+  try {
+    const { uid, client, 'access-token': accessToken } = yield getAuthValues();
+    const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
+    yield put(authenticateSuccess(response.data));
+  } catch (err) {
+    clearAuthValues();
+    err.response.json = yield err.response.json();
+    yield put(authenticateError(err));
+  }
+}
+
 /**
  * Root saga manages watcher lifecycle
  */
 export default function* rootSaga() {
   // console.log('calling rootSaga');
+  yield takeEvery(VALIDATE_TOKEN, validateTokenSaga);
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
 
   // Watches for LOAD_ENTITIES entities and calls getEntities when one comes in.

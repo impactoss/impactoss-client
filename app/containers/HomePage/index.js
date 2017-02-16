@@ -21,7 +21,7 @@ import {
 } from 'containers/App/selectors';
 
 import messages from './messages';
-import { loadEntitiesIfNeeded } from '../App/actions';
+import { loadEntitiesIfNeeded, validateToken } from '../App/actions';
 
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -72,6 +72,7 @@ export function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_actions'));
       dispatch(loadEntitiesIfNeeded('users'));// Giving not acceptable header
+      dispatch(validateToken());
     },
   };
 }
