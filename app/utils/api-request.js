@@ -99,7 +99,3 @@ export default function apiRequest(method, action, params = {}) {
   // Pass the saveAuthHeaders middleware function to the request library
   return request(url, options, saveAuthHeaders);
 }
-
-// TODO create is logged in function which gets the token from storage
-
-// TODO create a clear function to clear auth information from local storage

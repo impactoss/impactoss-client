@@ -17,6 +17,7 @@ import { createStructuredSelector } from 'reselect';
 
 import Header from 'components/Header';
 import { makeSelectSignedIn } from './selectors';
+import { validateToken } from './actions';
 
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -24,7 +25,14 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   static propTypes = {
     children: React.PropTypes.node,
     isSignedIn: React.PropTypes.bool,
+    onComponentWillMount: React.PropTypes.func,
   };
+
+  componentWillMount() {
+    if (this.props.onComponentWillMount) {
+      this.props.onComponentWillMount();
+    }
+  }
 
   render() {
     return (
@@ -42,4 +50,12 @@ const mapStateToProps = createStructuredSelector({
   isSignedIn: makeSelectSignedIn(),
 });
 
-export default connect(mapStateToProps)(App);
+export function mapDispatchToProps(dispatch) {
+  return {
+    onComponentWillMount: () => {
+      dispatch(validateToken()); // Maybe this could move to routes.js or App wrapper
+    },
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
