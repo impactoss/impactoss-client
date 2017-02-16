@@ -69,7 +69,7 @@ export function* authenticateSaga(payload) {
 
     yield put(authenticateSuccess(response.data));
   } catch (err) {
-        // TODO ensure this is displayed
+    err.response.json = yield err.response.json();
     yield put(authenticateError(err));
   }
 }

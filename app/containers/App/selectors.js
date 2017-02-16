@@ -16,6 +16,11 @@ const makeSelectError = () => createSelector(
   (globalState) => globalState.get('error')
 );
 
+const makeSelectAuth = () => createSelector(
+  selectGlobal,
+  (globalState) => globalState.get('auth').toJS()
+);
+
 const makeSelectEntities = (path) => createSelector(
   selectGlobal,
   (globalState) => globalState.getIn(['entities', path])
@@ -61,4 +66,5 @@ export {
   makeSelectEmail,
   makeSelectPassword,
   makeSelectSignedIn,
+  makeSelectAuth,
 };

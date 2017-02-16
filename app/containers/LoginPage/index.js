@@ -8,6 +8,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
+import { makeSelectAuth } from 'containers/App/selectors';
 import makeSelectLoginPage from './selectors';
 import { changeEmail, changePassword, submitForm } from './actions';
 import messages from './messages';
@@ -17,6 +18,7 @@ import Form from './Form';
 export class LoginPage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { email, password } = this.props.LoginPage;
+    const { error, messages: message } = this.props.Authentication;
     return (
       <div>
         <div>
@@ -43,6 +45,11 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           </label>
           <button>Sign in</button>
         </Form>
+        {error &&
+          message.map((errorMessage, i) =>
+            <p key={i}>{errorMessage}</p>
+          )
+        }
       </div>
     );
   }
@@ -50,6 +57,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
 
 LoginPage.propTypes = {
   LoginPage: PropTypes.object.isRequired,
+  Authentication: PropTypes.object,
   onSubmitForm: PropTypes.func,
   onChangeEmail: PropTypes.func,
   onChangePassword: PropTypes.func,
@@ -57,6 +65,7 @@ LoginPage.propTypes = {
 
 const mapStateToProps = createStructuredSelector({
   LoginPage: makeSelectLoginPage(),
+  Authentication: makeSelectAuth(),
 });
 
 export function mapDispatchToProps(dispatch) {

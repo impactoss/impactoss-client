@@ -11,7 +11,7 @@
  */
 
 import { fromJS } from 'immutable';
-
+import { checkErrorMessagesExist } from 'utils/request';
 import {
   AUTHENTICATE_SENDING,
   AUTHENTICATE_SUCCESS,
@@ -32,6 +32,7 @@ const initialState = fromJS({
   auth: {
     sending: false,
     error: false,
+    messages: [],
   },
   entities: {
     actions: false,
@@ -55,10 +56,12 @@ function appReducer(state = initialState, payload) {
           .setIn(['user', 'attributes'], payload.user)
           .setIn(['user', 'isSignedIn'], true)
           .setIn(['auth', 'sending'], false);
-    case AUTHENTICATE_ERROR:
+    case AUTHENTICATE_ERROR: {
+      const errors = checkErrorMessagesExist(payload.error.response);
       return state
-          .setIn(['auth', 'sending'], false)
-          .setIn(['auth', 'error'], payload.error.message);
+        .setIn(['auth', 'messages'], errors)
+        .setIn(['auth', 'error'], true);
+    }
     case AUTHENTICATE_SENDING:
       return state
           .setIn(['auth', 'sending'], true)
