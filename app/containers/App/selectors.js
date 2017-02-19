@@ -5,6 +5,7 @@
 import { createSelector } from 'reselect';
 
 const selectGlobal = (state) => state.get('global');
+const selectRoute = (state) => state.get('route');
 
 const makeSelectLoading = () => createSelector(
   selectGlobal,
@@ -57,6 +58,17 @@ const makeSelectPassword = () => createSelector(
   (globalState) => globalState.getIn(['form', 'login', 'password'])
 );
 
+const makeSelectNextPathname = () => createSelector(
+  selectRoute,
+  (routeState) => {
+    try {
+      return routeState.getIn(['locationBeforeTransitions', 'state', 'nextPathname']);
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
 export {
   selectGlobal,
   makeSelectLoading,
@@ -67,4 +79,5 @@ export {
   makeSelectPassword,
   makeSelectSignedIn,
   makeSelectAuth,
+  makeSelectNextPathname,
 };

@@ -3,10 +3,13 @@
  */
 
 import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
+import { push } from 'react-router-redux';
+
 import {
     LOAD_ENTITIES_IF_NEEDED,
     LOAD_ENTITIES,
     AUTHENTICATE,
+    AUTHENTICATE_SUCCESS,
     LOGOUT,
     VALIDATE_TOKEN,
 } from 'containers/App/constants';
@@ -20,7 +23,10 @@ import {
     logoutSuccess,
 } from 'containers/App/actions';
 
-import { makeSelectEntities } from 'containers/App/selectors';
+import {
+  makeSelectEntities,
+  makeSelectNextPathname,
+} from 'containers/App/selectors';
 
 import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
 
@@ -75,10 +81,17 @@ export function* authenticateSaga(payload) {
   }
 }
 
+export function* authenticateSuccessSaga() {
+  const nextPathName = yield select(makeSelectNextPathname());
+  if (nextPathName) {
+    yield put(push(nextPathName));
+  }
+}
+
 export function* logoutSaga() {
   try {
     yield call(apiRequest, 'delete', 'auth/sign_out');
-
+    yield call(clearAuthValues);
     yield put(logoutSuccess());
   } catch (err) {
       // TODO ensure this is displayed
@@ -94,7 +107,7 @@ export function* validateTokenSaga() {
     const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
     yield put(authenticateSuccess(response.data));
   } catch (err) {
-    clearAuthValues();
+    yield call(clearAuthValues);
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
   }
@@ -112,5 +125,6 @@ export default function* rootSaga() {
   // It returns task descriptor (just like fork) so we can continue execution
   yield takeEvery(LOAD_ENTITIES, getEntitiesSaga);
   yield takeLatest(AUTHENTICATE, authenticateSaga);
+  yield takeLatest(AUTHENTICATE_SUCCESS, authenticateSuccessSaga);
   yield takeLatest(LOGOUT, logoutSaga);
 }

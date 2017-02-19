@@ -63,6 +63,7 @@ const rootRoute = {
   childRoutes: createRoutes(store),
 };
 
+// console.log(this.props.location)
 const render = (messages) => {
   ReactDOM.render(
     <Provider store={store}>

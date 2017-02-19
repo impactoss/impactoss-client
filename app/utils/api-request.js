@@ -2,13 +2,19 @@ import { API_ENDPOINT } from '../containers/App/constants';
 import request from './request';
 import { get, set } from './session-storage';
 
+const KEY_ACCESS_TOKEN = 'access-token';
+const KEY_TOKEN_TYPE = 'token-type';
+const KEY_CLIENT = 'client';
+const KEY_EXPIRY = 'expiry';
+const KEY_UID = 'uid';
+
 // We will look for these headers, and save them to localStorage
 const authKeys = [
-  'access-token',
-  'token-type',
-  'client',
-  'expiry',
-  'uid',
+  KEY_ACCESS_TOKEN,
+  KEY_TOKEN_TYPE,
+  KEY_CLIENT,
+  KEY_UID,
+  KEY_EXPIRY,
 ];
 
 // Look at each authKey in session-storage, if found add to returned object
@@ -28,7 +34,7 @@ export function getAuthValues() {
 function saveAuthHeaders(response) {
   authKeys.forEach((key) => {
     const headerValue = response.headers.get(key);
-    if (headerValue) { // TODO temp, should clear headers here, I'm not now to debug https://github.com/dumparkltd/hr-nmrf-client/issues/75
+    if (headerValue) {
       set(key, headerValue);
     }
   });
@@ -50,7 +56,7 @@ function addAuthHeaders(headers = {}) {
   return 'access-token' in authValues ? {
     ...headers,
     ...authValues,
-    authorization: `Bearer ${authValues['access-token']}`,
+    authorization: `Bearer ${authValues[KEY_ACCESS_TOKEN]}`,
   }
   : headers; // can't find access-token, no auth headers to add
 }
@@ -72,6 +78,10 @@ function urlParamify(params = {}) {
   }, new URLSearchParams());
 
   return urlValues.toString();
+}
+
+export function isSignedIn() {
+  return !!get(KEY_ACCESS_TOKEN);
 }
 
 export default function apiRequest(method, action, params = {}) {

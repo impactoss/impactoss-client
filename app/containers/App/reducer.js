@@ -12,6 +12,7 @@
 
 import { fromJS } from 'immutable';
 import { checkErrorMessagesExist } from 'utils/request';
+import { isSignedIn } from 'utils/api-request';
 import {
   AUTHENTICATE_SENDING,
   AUTHENTICATE_SUCCESS,
@@ -41,7 +42,7 @@ const initialState = fromJS({
   },
   user: {
     attributes: null,
-    isSignedIn: false,
+    isSignedIn: isSignedIn(),
   },
 });
 
