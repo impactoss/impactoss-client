@@ -91,7 +91,7 @@ export function* authenticateSuccessSaga() {
 export function* logoutSaga() {
   try {
     yield call(apiRequest, 'delete', 'auth/sign_out');
-
+    yield call(clearAuthValues);
     yield put(logoutSuccess());
   } catch (err) {
       // TODO ensure this is displayed
@@ -107,7 +107,7 @@ export function* validateTokenSaga() {
     const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
     yield put(authenticateSuccess(response.data));
   } catch (err) {
-    clearAuthValues();
+    yield call(clearAuthValues);
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
   }
