@@ -22,6 +22,7 @@ import {
   LOAD_ENTITIES_SUCCESS,
   LOAD_ENTITIES_ERROR,
   LOGOUT_SUCCESS,
+  ADD_ENTITY,
 } from './constants';
 
 // The initial state of the App
@@ -36,9 +37,9 @@ const initialState = fromJS({
     messages: [],
   },
   entities: {
-    actions: false,
-    recommendations: false,
-    recommendation_actions: false,
+    actions: {},
+    recommendations: {},
+    recommendation_actions: {},
   },
   user: {
     attributes: null,
@@ -70,11 +71,14 @@ function appReducer(state = initialState, payload) {
     case SET_AUTHENTICATION_STATE:
       return state
           .setIn(['user', 'isSignedIn'], payload.newAuthState);
+    case ADD_ENTITY:
+      return state
+          .setIn(['entities', `${payload.path}s`, payload.entity.id], payload.entity);
     case LOAD_ENTITIES:
       return state
           .set('loading', true)
           .set('error', false)
-          .setIn(['entities', payload.path], false);
+          .setIn(['entities', payload.path], {});
     case LOAD_ENTITIES_SUCCESS:
       return state
         .setIn(['entities', payload.path], payload.entities)

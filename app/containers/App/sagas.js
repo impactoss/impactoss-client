@@ -4,6 +4,7 @@
 
 import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
 import { push } from 'react-router-redux';
+import collection from 'lodash/collection';
 
 import {
     LOAD_ENTITIES_IF_NEEDED,
@@ -59,7 +60,7 @@ export function* getEntitiesSaga(payload) {
 
     // console.log('got ', response);
 
-    yield put(entitiesLoaded(response.data, payload.path));
+    yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path));
   } catch (err) {
     // console.error(err);
     yield put(entitiesLoadingError(err));
