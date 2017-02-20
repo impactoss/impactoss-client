@@ -26,4 +26,8 @@ export default defineMessages({
     id: 'nmrf.components.Header.register',
     defaultMessage: 'Register',
   },
+  actions: {
+    id: 'nmrf.components.Header.actions',
+    defaultMessage: 'Actions',
+  },
 });
