@@ -27,6 +27,21 @@ const makeSelectEntities = (path) => createSelector(
   (globalState) => globalState.getIn(['entities', path])
 );
 
+const makeSelectActions = () => createSelector(
+  selectGlobal,
+  (globalState) => globalState.getIn(['entities', 'actions'])
+);
+
+const makeSelectRecommendations = createSelector(
+  selectGlobal,
+  (globalState) => globalState.getIn(['entities', 'recommendations'])
+);
+
+const makeSelectRecommendationActions = createSelector(
+  selectGlobal,
+  (globalState) => globalState.getIn(['entities', 'recommendation_actions'])
+);
+
 const makeSelectSignedIn = () => createSelector(
   selectGlobal,
   (globalState) => globalState.getIn(['user', 'isSignedIn'])
@@ -80,4 +95,7 @@ export {
   makeSelectSignedIn,
   makeSelectAuth,
   makeSelectNextPathname,
+  makeSelectActions,
+  makeSelectRecommendations,
+  makeSelectRecommendationActions,
 };
