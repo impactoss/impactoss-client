@@ -8,6 +8,6 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   header: {
     id: 'app.containers.ActionView.header',
-    defaultMessage: 'This is ActionView container !',
+    defaultMessage: 'Action',
   },
 });
