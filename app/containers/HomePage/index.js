@@ -14,11 +14,11 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
-import {
-  makeSelectEntities,
-  makeSelectLoading,
-  makeSelectError,
-} from 'containers/App/selectors';
+// import {
+//   makeSelectEntities,
+//   makeSelectLoading,
+//   makeSelectError,
+// } from 'containers/App/selectors';
 
 import messages from './messages';
 import { loadEntitiesIfNeeded } from '../App/actions';
@@ -77,9 +77,9 @@ export function mapDispatchToProps(dispatch) {
 }
 
 const mapStateToProps = createStructuredSelector({
-  actions: makeSelectEntities('actions'),
-  loading: makeSelectLoading(),
-  error: makeSelectError(),
+  // actions: makeSelectEntities('actions'),
+  // loading: makeSelectLoading(),
+  // error: makeSelectError(),
 });
 
 // Wrap the component to inject dispatch and state into it

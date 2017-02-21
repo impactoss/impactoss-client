@@ -44,7 +44,7 @@ export function* checkEntitiesSaga(payload) {
   // console.log('checking entities', entities);
   // TODO add other checks here, eg if user or user role changed (not sure how) to ensure we also get the DRAFT posts
   //    easiest would be to just set entities to false on login thus triggering a reload
-  if (!entities.size) {
+  if (entities && !entities.size) {
     yield put(loadEntities(payload.path));
   } else {
     yield put(entitiesPopulated(payload.path));
