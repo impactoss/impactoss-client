@@ -4,7 +4,6 @@
  *
  */
 
-export const DEFAULT_ACTION = 'app/ActionView/DEFAULT_ACTION';
 export const GET_ENTITIES_AND_ACTION_BY_ID = 'app/ActionView/GET_ENTITIES_AND_ACTION_BY_ID';
 
 export const LOAD_ACTION = 'app/ActionView/LOAD_ACTION';
