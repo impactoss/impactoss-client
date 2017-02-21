@@ -28,6 +28,7 @@ import {
   LOGOUT,
   LOGOUT_SUCCESS,
   VALIDATE_TOKEN,
+  ENTITIES_POPULATED,
   ADD_ENTITY,
 } from './constants';
 
@@ -99,6 +100,13 @@ export function setAuthenticationState(newAuthState) {
   return {
     type: SET_AUTHENTICATION_STATE,
     newAuthState,
+  };
+}
+
+export function entitiesPopulated(path) {
+  return {
+    type: ENTITIES_POPULATED,
+    path,
   };
 }
 

@@ -22,6 +22,7 @@ import {
     authenticateSending,
     authenticateError,
     logoutSuccess,
+    entitiesPopulated,
 } from 'containers/App/actions';
 
 import {
@@ -45,6 +46,8 @@ export function* checkEntitiesSaga(payload) {
   //    easiest would be to just set entities to false on login thus triggering a reload
   if (!entities.size) {
     yield put(loadEntities(payload.path));
+  } else {
+    yield put(entitiesPopulated(payload.path));
   }
 }
 
@@ -62,6 +65,7 @@ export function* getEntitiesSaga(payload) {
     // console.log('got ', response);
 
     yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path));
+    yield put(entitiesPopulated(payload.path));
   } catch (err) {
     // console.error(err);
     yield put(entitiesLoadingError(err));
