@@ -73,15 +73,15 @@ function appReducer(state = initialState, payload) {
           .setIn(['user', 'isSignedIn'], payload.newAuthState);
     case ADD_ENTITY:
       return state
-          .setIn(['entities', `${payload.path}s`, payload.entity.id], payload.entity);
+          .setIn(['entities', `${payload.path}s`, payload.entity.id], fromJS(payload.entity));
     case LOAD_ENTITIES:
       return state
           .set('loading', true)
           .set('error', false)
-          .setIn(['entities', payload.path], {});
+          .setIn(['entities', payload.path], fromJS({}));
     case LOAD_ENTITIES_SUCCESS:
       return state
-        .setIn(['entities', payload.path], payload.entities)
+        .setIn(['entities', payload.path], fromJS(payload.entities))
         .setIn(['server', 'loading'], false);
     case LOAD_ENTITIES_ERROR:
       return state

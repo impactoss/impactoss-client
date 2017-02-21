@@ -12,7 +12,7 @@ import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router';
 
 import {
-  makeSelectEntities,
+  actionsListSelector,
 } from 'containers/App/selectors';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
@@ -64,7 +64,7 @@ ActionList.propTypes = {
 };
 
 const mapStateToProps = createStructuredSelector({
-  actions: makeSelectEntities('actions'),
+  actions: actionsListSelector,
   // user:
 });
 

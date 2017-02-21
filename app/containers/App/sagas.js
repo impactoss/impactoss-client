@@ -39,10 +39,9 @@ export function* checkEntitiesSaga(payload) {
   const entities = yield select(makeSelectEntities(payload.path));
 
   // console.log('checking entities', entities);
-
   // TODO add other checks here, eg if user or user role changed (not sure how) to ensure we also get the DRAFT posts
   //    easiest would be to just set entities to false on login thus triggering a reload
-  if (!entities) {
+  if (!entities.size) {
     yield put(loadEntities(payload.path));
   }
 }
