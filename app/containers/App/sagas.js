@@ -25,8 +25,8 @@ import {
 } from 'containers/App/actions';
 
 import {
-  makeSelectEntities,
   makeSelectNextPathname,
+  entitiesPathSelector,
 } from 'containers/App/selectors';
 
 import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
@@ -36,7 +36,9 @@ import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
  */
 export function* checkEntitiesSaga(payload) {
   // select entities from store
-  const entities = yield select(makeSelectEntities(payload.path));
+  const entitiesFilter = yield select(entitiesPathSelector);
+
+  const entities = entitiesFilter(payload.path);
 
   // console.log('checking entities', entities);
   // TODO add other checks here, eg if user or user role changed (not sure how) to ensure we also get the DRAFT posts

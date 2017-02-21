@@ -3,10 +3,21 @@
  */
 
 import { createSelector } from 'reselect';
-import _ from 'lodash/function';
+import { memoize } from 'lodash/function';
 
 const selectGlobal = (state) => state.get('global');
 const selectRoute = (state) => state.get('route');
+
+/**
+* NOTE TODO These shouldn't actually be MakeSelect...,
+* Use a make selector when different components will use a selector with different data
+* https://github.com/reactjs/reselect#sharing-selectors-with-props-across-multiple-components
+* otherwise use straight createSelector ( I think :/ )
+* https://github.com/react-boilerplate/react-boilerplate/pull/1205#issuecomment-274319934
+*
+* Selectors with arguments, see this guide
+* https://github.com/reactjs/reselect#q-how-do-i-create-a-selector-that-takes-an-argument
+*/
 
 const makeSelectLoading = () => createSelector(
   selectGlobal,
@@ -23,15 +34,14 @@ const makeSelectAuth = () => createSelector(
   (globalState) => globalState.get('auth').toJS()
 );
 
+/*
+ Pretty sure this won't cache correclty so have removed, see
+ entitiesPathSelector for an alternative
 const makeSelectEntities = (path) => createSelector(
   selectGlobal,
   (globalState) => globalState.getIn(['entities', path])
 );
-
-const makeSelectActions = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.getIn(['entities', 'actions'])
-);
+*/
 
 const makeSelectRecommendations = createSelector(
   selectGlobal,
@@ -92,7 +102,7 @@ const entitiesSelector = createSelector(
 
 const entitiesPathSelector = createSelector(
   entitiesSelector,
-  (entities) => _.memoize(
+  (entities) => memoize(
     (path) => entities.get(path)
   )
 );
@@ -107,20 +117,16 @@ const actionsListSelector = createSelector(
   (actions) => actions.toIndexedSeq().toJS()
 );
 
-// const actionsSelector = entitiesSelector('actions');
-
 export {
   selectGlobal,
   makeSelectLoading,
   makeSelectError,
-  makeSelectEntities,
   makeSelectLocationState,
   makeSelectEmail,
   makeSelectPassword,
   makeSelectSignedIn,
   makeSelectAuth,
   makeSelectNextPathname,
-  makeSelectActions,
   makeSelectRecommendations,
   makeSelectRecommendationActions,
   entitiesSelector,
