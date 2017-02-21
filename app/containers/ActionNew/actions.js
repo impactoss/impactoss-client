@@ -5,11 +5,12 @@
  */
 
 import {
-  DEFAULT_ACTION,
+  SAVE,
 } from './constants';
 
-export function defaultAction() {
+export function save(data) {
   return {
-    type: DEFAULT_ACTION,
+    type: SAVE,
+    data,
   };
 }

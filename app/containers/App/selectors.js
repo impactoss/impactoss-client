@@ -3,6 +3,7 @@
  */
 
 import { createSelector } from 'reselect';
+import _ from 'lodash/function';
 
 const selectGlobal = (state) => state.get('global');
 const selectRoute = (state) => state.get('route');
@@ -84,6 +85,30 @@ const makeSelectNextPathname = () => createSelector(
   }
 );
 
+const entitiesSelector = createSelector(
+  selectGlobal,
+  (globalState) => globalState.get('entities')
+);
+
+const entitiesPathSelector = createSelector(
+  entitiesSelector,
+  (entities) => _.memoize(
+    (path) => entities.get(path)
+  )
+);
+
+const actionsSelector = createSelector(
+  entitiesSelector,
+  (entities) => entities.get('actions')
+);
+
+const actionsListSelector = createSelector(
+  actionsSelector,
+  (actions) => actions.toIndexedSeq().toJS()
+);
+
+// const actionsSelector = entitiesSelector('actions');
+
 export {
   selectGlobal,
   makeSelectLoading,
@@ -98,4 +123,8 @@ export {
   makeSelectActions,
   makeSelectRecommendations,
   makeSelectRecommendationActions,
+  entitiesSelector,
+  entitiesPathSelector,
+  actionsSelector,
+  actionsListSelector,
 };

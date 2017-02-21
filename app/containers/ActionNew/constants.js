@@ -4,4 +4,4 @@
  *
  */
 
-export const DEFAULT_ACTION = 'app/ActionNew/DEFAULT_ACTION';
+export const SAVE = 'nmrf/ActionNew/SAVE';

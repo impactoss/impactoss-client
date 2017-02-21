@@ -29,6 +29,7 @@ import {
   LOGOUT_SUCCESS,
   VALIDATE_TOKEN,
   ENTITIES_POPULATED,
+  ADD_ENTITY,
 } from './constants';
 
 /**
@@ -83,6 +84,13 @@ export function entitiesLoadingError(error) {
   };
 }
 
+export function addEntity(path, entity) {
+  return {
+    type: ADD_ENTITY,
+    path,
+    entity,
+  };
+}
 
 /**
  * Sets the authentication state of the application

@@ -4,6 +4,7 @@
 
 import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
 import { push } from 'react-router-redux';
+import collection from 'lodash/collection';
 
 import {
     LOAD_ENTITIES_IF_NEEDED,
@@ -39,10 +40,9 @@ export function* checkEntitiesSaga(payload) {
   const entities = yield select(makeSelectEntities(payload.path));
 
   // console.log('checking entities', entities);
-
   // TODO add other checks here, eg if user or user role changed (not sure how) to ensure we also get the DRAFT posts
   //    easiest would be to just set entities to false on login thus triggering a reload
-  if (!entities) {
+  if (!entities.size) {
     yield put(loadEntities(payload.path));
   } else {
     yield put(entitiesPopulated(payload.path));
@@ -62,7 +62,7 @@ export function* getEntitiesSaga(payload) {
 
     // console.log('got ', response);
 
-    yield put(entitiesLoaded(response.data, payload.path));
+    yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path));
     yield put(entitiesPopulated(payload.path));
   } catch (err) {
     // console.error(err);
