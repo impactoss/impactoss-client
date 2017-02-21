@@ -26,7 +26,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   }
 
   render() {
-    const { action } = this.props.action;
+    const { action, getEntitiesError, loadActionError } = this.props.actionView;
     return (
       <div>
         <Helmet
@@ -47,6 +47,12 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
             <p>{action.attributes['updated-at']}</p>
           </div>
         }
+        {getEntitiesError &&
+          <p>{getEntitiesError}</p>
+        }
+        {loadActionError &&
+          <p>{loadActionError}</p>
+        }
       </div>
     );
   }
@@ -55,7 +61,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 ActionView.propTypes = {
   onComponentWillMount: PropTypes.func,
   params: PropTypes.object,
-  action: PropTypes.object,
+  actionView: PropTypes.object,
 };
 
 const mapStateToProps = createStructuredSelector({
