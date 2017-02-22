@@ -17,6 +17,7 @@ import { save } from './actions';
 
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
+    const { saveSending, saveError } = this.props.ActionNew.page;
     return (
       <div>
         <Helmet
@@ -42,6 +43,13 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           </Control.select>
           <button type="submit">Save</button>
         </Form>
+        {saveSending &&
+          <p>Saving Action</p>
+        }
+        {saveError &&
+          <p>{saveError}</p>
+        }
+
       </div>
     );
   }
@@ -49,6 +57,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
 
 ActionNew.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
+  ActionNew: PropTypes.object,
 };
 
 const mapStateToProps = createStructuredSelector({

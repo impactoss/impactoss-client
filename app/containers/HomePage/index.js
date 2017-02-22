@@ -15,8 +15,8 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
 import {
-  makeSelectLoading,
-  makeSelectError,
+  // makeSelectLoading,
+  // makeSelectError,
 } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -76,8 +76,9 @@ export function mapDispatchToProps(dispatch) {
 }
 
 const mapStateToProps = createStructuredSelector({
-  loading: makeSelectLoading(),
-  error: makeSelectError(),
+  // actions: makeSelectEntities('actions'),
+  // loading: makeSelectLoading(),
+  // error: makeSelectError(),
 });
 
 // Wrap the component to inject dispatch and state into it
