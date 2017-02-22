@@ -65,7 +65,7 @@ ActionView.propTypes = {
 };
 
 const mapStateToProps = createStructuredSelector({
-  action: makeSelectActionView(),
+  actionView: makeSelectActionView(),
 });
 
 function mapDispatchToProps(dispatch) {
