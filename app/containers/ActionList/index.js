@@ -50,7 +50,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           const { title, description, draft } = attributes;
           return (
             <span key={i}>
-              <Link to={`actions/${id}`}><h5>{title}</h5></Link>
+              <Link to={`/actions/${id}`}><h5>{title}</h5></Link>
               <ul>
                 <li>Description: {description}</li>
                 <li>Draft: {draft ? 'YES' : 'NO'}</li>
