@@ -27,7 +27,10 @@ const actionListSelector = (state) => state.get('actionList');
 
 const sortBySelector = createSelector(
   actionListSelector, // Note this imported from App/selectors
-  (substate) => [substate.get('sort'), substate.get('order')]
+  (substate) => ({
+    sort: substate.get('sort'),
+    order: substate.get('order'),
+  })
 );
 
 /**
@@ -52,7 +55,7 @@ const actionsListJSSelector = createSelector(
 const actionsSortedSelector = createSelector(
   actionsListJSSelector,
   sortBySelector,
-  (actions, [sort, order]) => orderBy(actions, getSortIteratee(sort), order)
+  (actions, { sort, order }) => orderBy(actions, getSortIteratee(sort), order)
 );
 
 /**

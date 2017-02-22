@@ -67,7 +67,7 @@ ActionList.propTypes = {
   componentWillMount: PropTypes.func,
   actions: React.PropTypes.array,
   onSetOrder: React.PropTypes.func.isRequired,
-  sortBy: React.PropTypes.array,
+  sortBy: React.PropTypes.object.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({

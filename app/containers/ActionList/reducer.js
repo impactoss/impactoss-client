@@ -11,7 +11,7 @@ import {
 
 const initialState = fromJS({
   sort: 'id',
-  order: 'asc',
+  order: 'desc',
 });
 
 function actionListReducer(state = initialState, action) {
