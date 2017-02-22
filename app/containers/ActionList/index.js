@@ -11,11 +11,16 @@ import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router';
 
-import {
-  actionsListSelector,
-} from 'containers/App/selectors';
-
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
+
+import {
+  actionsSortedSelector,
+  sortBySelector,
+} from './selectors';
+
+import {
+  setSort,
+} from './actions';
 
 import messages from './messages';
 
@@ -26,7 +31,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
   }
 
   render() {
-    const { actions } = this.props;
     return (
       <div>
         <Helmet
@@ -37,7 +41,11 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         />
         <FormattedMessage {...messages.header} />
         <Link to="actions/new">Add Action</Link>
-        {actions && actions.map((list, i) => {
+        <select onChange={this.props.onSetOrder} value={this.props.sortBy.order}>
+          <option value="asc">Asc</option>
+          <option value="desc">Desc</option>
+        </select>
+        {this.props.actions && this.props.actions.map((list, i) => {
           const { id, attributes } = list;
           const { title, description, draft } = attributes;
           return (
@@ -57,21 +65,24 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
 
 ActionList.propTypes = {
   componentWillMount: PropTypes.func,
-  actions: PropTypes.oneOfType([
-    React.PropTypes.array,
-    React.PropTypes.bool,
-  ]),
+  actions: React.PropTypes.array,
+  onSetOrder: React.PropTypes.func.isRequired,
+  sortBy: React.PropTypes.array,
 };
 
 const mapStateToProps = createStructuredSelector({
-  actions: actionsListSelector,
-  // user:
+  actions: actionsSortedSelector,
+  sortBy: sortBySelector,
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     componentWillMount: () => {
       dispatch(loadEntitiesIfNeeded('actions'));
+    },
+    onSetOrder: (evt) => {
+      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+      dispatch(setSort('id', evt.target.value));
     },
   };
 }

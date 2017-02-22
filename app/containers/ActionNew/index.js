@@ -53,7 +53,6 @@ ActionNew.propTypes = {
 
 const mapStateToProps = createStructuredSelector({
   ActionNew: makeSelectActionNew(),
-  //fields: selectFormFields()
 });
 
 function mapDispatchToProps(dispatch) {

@@ -5,11 +5,13 @@
  */
 
 import {
-  DEFAULT_ACTION,
+  SET_SORT,
 } from './constants';
 
-export function defaultAction() {
+export function setSort(sort, order) {
   return {
-    type: DEFAULT_ACTION,
+    type: SET_SORT,
+    sort,
+    order,
   };
 }

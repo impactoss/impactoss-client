@@ -6,15 +6,20 @@
 
 import { fromJS } from 'immutable';
 import {
-  DEFAULT_ACTION,
+  SET_SORT,
 } from './constants';
 
-const initialState = fromJS({});
+const initialState = fromJS({
+  sort: 'id',
+  order: 'asc',
+});
 
 function actionListReducer(state = initialState, action) {
   switch (action.type) {
-    case DEFAULT_ACTION:
-      return state;
+    case SET_SORT:
+      return state
+        .set('sort', action.sort)
+        .set('order', action.order);
     default:
       return state;
   }

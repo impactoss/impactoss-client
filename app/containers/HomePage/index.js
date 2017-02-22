@@ -15,7 +15,6 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
 import {
-  makeSelectEntities,
   makeSelectLoading,
   makeSelectError,
 } from 'containers/App/selectors';
@@ -77,7 +76,6 @@ export function mapDispatchToProps(dispatch) {
 }
 
 const mapStateToProps = createStructuredSelector({
-  actions: makeSelectEntities('actions'),
   loading: makeSelectLoading(),
   error: makeSelectError(),
 });

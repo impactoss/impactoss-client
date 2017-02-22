@@ -4,4 +4,4 @@
  *
  */
 
-export const DEFAULT_ACTION = 'app/ActionList/DEFAULT_ACTION';
+export const SET_SORT = 'nmrf/ActionList/SET_SORT';
