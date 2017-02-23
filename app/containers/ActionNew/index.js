@@ -36,7 +36,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           <label htmlFor="description">Description:</label>
           <Control.textarea id="description" model=".description" />
           <label htmlFor="status">Status:</label>
-          <Control.select id="status" model=".status" dynamic={false}>
+          <Control.select id="status" model=".draft" dynamic={false}>
             {ACTION_STATUSES.map((status) =>
               <option key={status.value} value={status.value}>{status.label}</option>
             )}
