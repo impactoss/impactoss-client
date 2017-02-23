@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
+import { Link } from 'react-router';
 
 import
   makeSelectActionView
@@ -47,6 +48,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
             <p>{action.attributes['updated-at']}</p>
           </div>
         }
+        <Link to={`/actions/edit/${this.props.params.id}`}><button>Edit Action</button></Link>
         {getEntitiesError &&
           <p>{getEntitiesError}</p>
         }
