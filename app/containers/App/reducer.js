@@ -23,6 +23,7 @@ import {
   LOAD_ENTITIES_ERROR,
   LOGOUT_SUCCESS,
   ADD_ENTITY,
+  UPDATE_ENTITY,
 } from './constants';
 
 // The initial state of the App
@@ -72,6 +73,7 @@ function appReducer(state = initialState, payload) {
       return state
           .setIn(['user', 'isSignedIn'], payload.newAuthState);
     case ADD_ENTITY:
+    case UPDATE_ENTITY:
       return state
           .setIn(['entities', `${payload.path}s`, payload.entity.id], fromJS(payload.entity));
     case LOAD_ENTITIES:

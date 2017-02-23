@@ -30,6 +30,7 @@ import {
   VALIDATE_TOKEN,
   ENTITIES_POPULATED,
   ADD_ENTITY,
+  UPDATE_ENTITY,
 } from './constants';
 
 /**
@@ -87,6 +88,14 @@ export function entitiesLoadingError(error) {
 export function addEntity(path, entity) {
   return {
     type: ADD_ENTITY,
+    path,
+    entity,
+  };
+}
+
+export function updateEntity(path, entity) {
+  return {
+    type: UPDATE_ENTITY,
     path,
     entity,
   };

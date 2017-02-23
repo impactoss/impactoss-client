@@ -27,10 +27,11 @@ export const LOGOUT_SUCCESS = 'nmrf/App/LOGOUT_SUCCESS';
 export const LOGOUT_ERROR = 'nmrf/App/LOGOUT_ERROR';
 export const VALIDATE_TOKEN = 'nmrf/App/VALIDATE_TOKEN';
 export const ADD_ENTITY = 'nmrf/App/ADD_ENTITY';
+export const UPDATE_ENTITY = 'nmrf/App/UPDATE_ENTITY';
 
 export const ACTION_STATUSES = [
-  { value: 'public', label: 'Public' },
-  { value: 'draft', label: 'Draft' },
+  { value: 'false', label: 'Public' },
+  { value: 'true', label: 'Draft' },
 ];
 
 // TODO need to pull from an env file
