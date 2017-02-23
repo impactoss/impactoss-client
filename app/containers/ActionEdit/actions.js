@@ -15,6 +15,7 @@
    SAVE_SUCCESS,
    SAVE_ERROR,
    UPDATE_ENTITY,
+   LOAD_ACTION_ERROR,
  } from './constants';
 
  export function getEntitiesAndActionById(path, id) {
@@ -81,5 +82,12 @@
    return {
      type: UPDATE_ENTITY,
      data,
+   };
+ }
+
+ export function loadActionError(error) {
+   return {
+     type: LOAD_ACTION_ERROR,
+     error,
    };
  }
