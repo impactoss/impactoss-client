@@ -34,5 +34,10 @@ export const ACTION_STATUSES = [
   { value: 'true', label: 'Draft' },
 ];
 
+export const RECOMMENDATION_STATUSES = [
+  { value: 'false', label: 'Public' },
+  { value: 'true', label: 'Draft' },
+];
+
 // TODO need to pull from an env file
 export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';

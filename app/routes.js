@@ -176,6 +176,26 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/recommendations/new',
+      name: 'recommendationNew',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/RecommendationNew/reducer'),
+          import('containers/RecommendationNew/sagas'),
+          import('containers/RecommendationNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('recommendationNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {
