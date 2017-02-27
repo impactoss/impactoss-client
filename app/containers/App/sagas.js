@@ -22,6 +22,7 @@ import {
     authenticateSending,
     authenticateError,
     logoutSuccess,
+    logout,
     entitiesPopulated,
 } from 'containers/App/actions';
 
@@ -111,8 +112,12 @@ export function* validateTokenSaga() {
 
   try {
     const { uid, client, 'access-token': accessToken } = yield getAuthValues();
-    const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
-    yield put(authenticateSuccess(response.data));
+    if (uid && client && accessToken) {
+      const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
+      yield put(authenticateSuccess(response.data));
+    } else {
+      yield put(logout());
+    }
   } catch (err) {
     yield call(clearAuthValues);
     err.response.json = yield err.response.json();
