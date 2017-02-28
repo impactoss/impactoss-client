@@ -30,4 +30,8 @@ export default defineMessages({
     id: 'nmrf.components.Header.actions',
     defaultMessage: 'Actions',
   },
+  recommendationNew: {
+    id: 'nmrf.components.Header.recommendationNew',
+    defaultMessage: 'Create a recommenation',
+  },
 });
