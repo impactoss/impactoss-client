@@ -53,7 +53,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
               <Link to={`/actions/${id}`}><h5>{title}</h5></Link>
               <ul>
                 <li>Description: {description}</li>
-                <li>Draft: {draft ? 'YES' : 'NO'}</li>
+                <li>Public: {draft === false ? 'YES' : 'NO'}</li>
               </ul>
             </span>
           );
