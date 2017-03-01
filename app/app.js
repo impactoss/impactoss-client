@@ -27,8 +27,8 @@ import { makeSelectLocationState } from 'containers/App/selectors';
 import LanguageProvider from 'containers/LanguageProvider';
 
 // Import ThemeProvider
-import {ThemeProvider} from 'styled-components';
-import theme from 'themes/theme.js';
+import { ThemeProvider } from 'styled-components';
+import theme from 'themes/theme';
 
 // Load the favicon, and the .htaccess file
 /* eslint-disable import/no-unresolved, import/extensions */
@@ -46,7 +46,6 @@ import './global-styles';
 
 // Import root routes
 import createRoutes from './routes';
-
 
 
 // Create redux store with history

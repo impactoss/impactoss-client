@@ -18,7 +18,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
       <div>
         <NavBar>
           <HeaderLink to="/">
-            <Icon name='home' />
+            <Icon name="home" />
             <FormattedMessage {...messages.home} />
           </HeaderLink>
           {this.props.isSignedIn &&

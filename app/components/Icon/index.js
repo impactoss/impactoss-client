@@ -1,7 +1,7 @@
 import React from 'react';
 import icons from 'themes/icons';
 
-import SVG from './SVG'
+import SVG from './SVG';
 
 function Icon(props) {
   // var SVG = IconFactory(icons)
@@ -11,16 +11,17 @@ function Icon(props) {
       viewBox="0 0 1024 1024"
       preserveAspectRatio="xMidYMid meet"
       role="img"
-      {...props}
+      palette={props.palette}
+      paletteIndex={props.paletteIndex}
+      size={props.size}
+      color={props.color}
     >
-      <title>{props.title || "Icon: " + props.name}</title>
+      <title>{props.title || `Icon: ${props.name}`}</title>
       {
-        icons[props.name].map(function(path, index){
-          return <path d={path} key={index}></path>;
-        })
+        icons[props.name].map((path, index) => <path d={path} key={index}></path>)
       }
     </SVG>
-  ) : null
+  ) : null;
 }
 
 Icon.propTypes = {
@@ -29,8 +30,8 @@ Icon.propTypes = {
   palette: React.PropTypes.string,
   paletteIndex: React.PropTypes.number,
   size: React.PropTypes.string,
-  color: React.PropTypes.string
+  color: React.PropTypes.string,
 };
 
 
-export default Icon
+export default Icon;
