@@ -14,7 +14,6 @@ theme.breakpoints = {
 
 
 
-
 // styled-theme settings https://github.com/diegohaz/styled-theme
 
 // color palettes
