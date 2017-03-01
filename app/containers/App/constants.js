@@ -29,14 +29,9 @@ export const VALIDATE_TOKEN = 'nmrf/App/VALIDATE_TOKEN';
 export const ADD_ENTITY = 'nmrf/App/ADD_ENTITY';
 export const UPDATE_ENTITY = 'nmrf/App/UPDATE_ENTITY';
 
-export const ACTION_STATUSES = [
-  { value: 'false', label: 'Public' },
-  { value: 'true', label: 'Draft' },
-];
-
-export const RECOMMENDATION_STATUSES = [
-  { value: 'false', label: 'Public' },
-  { value: 'true', label: 'Draft' },
+export const PUBLISH_STATUSES = [
+  { value: true, label: 'Draft' },
+  { value: false, label: 'Public' },
 ];
 
 // TODO need to pull from an env file

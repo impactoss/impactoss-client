@@ -43,7 +43,7 @@ function actionNewReducer(state = initialState, action) {
 const actionForm = fromJS({
   title: '',
   description: '',
-  draft: '',
+  draft: true,
 });
 
 export default combineReducers({

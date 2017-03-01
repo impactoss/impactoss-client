@@ -43,7 +43,7 @@ function recommendationNewReducer(state = initialState, action) {
 const recommendationForm = fromJS({
   title: '',
   number: '',
-  draft: '',
+  draft: true,
 });
 
 export default combineReducers({

@@ -10,7 +10,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import { Control, Form } from 'react-redux-form/immutable';
-import { ACTION_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { actionSelector, pageSelector } from './selectors';
 import messages from './messages';
@@ -42,7 +42,7 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
           <Control.textarea id="description" model=".description" />
           <label htmlFor="status">Status:</label>
           <Control.select id="status" model=".draft" value={draft}>
-            {ACTION_STATUSES.map((status) =>
+            {PUBLISH_STATUSES.map((status) =>
               <option key={status.value} value={status.value}>{status.label}</option>
             )}
           </Control.select>

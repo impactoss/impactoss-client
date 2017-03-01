@@ -10,7 +10,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import { Control, Form } from 'react-redux-form/immutable';
-import { RECOMMENDATION_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES } from 'containers/App/constants';
 import makeSelectRecommendationNew from './selectors';
 import messages from './messages';
 import { save } from './actions';
@@ -37,7 +37,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           <Control.textarea id="number" model=".number" />
           <label htmlFor="status">Status:</label>
           <Control.select id="status" model=".draft" dynamic={false}>
-            {RECOMMENDATION_STATUSES.map((status) =>
+            {PUBLISH_STATUSES.map((status) =>
               <option key={status.value} value={status.value}>{status.label}</option>
             )}
           </Control.select>
