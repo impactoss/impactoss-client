@@ -42,8 +42,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
             <h1>{action.attributes.title}</h1>
             <h5>Description</h5>
             <p>{action.attributes.description}</p>
-            <h5>Draft Status:</h5>
-            <p>{action.attributes.draft ? 'Y' : 'N'}</p>
+            <h5>Public:</h5>
+            <p>{action.attributes.draft === false ? 'YES' : 'NO'}</p>
             <h5>Updated At:</h5>
             <p>{action.attributes['updated-at']}</p>
           </div>
