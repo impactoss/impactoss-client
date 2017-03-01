@@ -6,32 +6,30 @@ import SVG from './SVG'
 function Icon(props) {
   // var SVG = IconFactory(icons)
 
-  if (typeof props.name !== "undefined"  && typeof icons[props.name] !== "undefined"){
-    return (
-      <SVG
-        viewBox="0 0 1024 1024"
-        preserveAspectRatio="xMidYMid meet"
-        palette={props.palette}
-        paletteIndex={props.paletteIndex || 0}
-        size={props.size || "1em"}
-      >
-        {
-          icons[props.name].map(function(path, index){
-            return <path d={path} key={index}></path>;
-          })
-        }
-      </SVG>
-    );
-  } else {
-    return null
-  }
+  return props.name && icons[props.name] ? (
+    <SVG
+      viewBox="0 0 1024 1024"
+      preserveAspectRatio="xMidYMid meet"
+      role="img"
+      {...props}
+    >
+      <title>{props.title || "Icon: " + props.name}</title>
+      {
+        icons[props.name].map(function(path, index){
+          return <path d={path} key={index}></path>;
+        })
+      }
+    </SVG>
+  ) : null
 }
 
 Icon.propTypes = {
   name: React.PropTypes.string,
+  title: React.PropTypes.string,
   palette: React.PropTypes.string,
   paletteIndex: React.PropTypes.number,
-  size: React.PropTypes.string
+  size: React.PropTypes.string,
+  color: React.PropTypes.string
 };
 
 

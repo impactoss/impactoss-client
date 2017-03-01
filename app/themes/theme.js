@@ -35,7 +35,7 @@ theme.fonts = {
 // sizes
 theme.sizes = {}
 
-// styled-theme settings end
+// end styled-theme settings
 
 // other global theme variables
 // eg transitions

@@ -12,4 +12,9 @@ const SVG = styled.svg`
   margin-right:${ props => parseFloat(props.size)/4 + props.size.split(/[0-9]+/)[1] };
 `
 
+SVG.defaultProps = {
+  size: '1em',
+  paletteIndex: 0
+}
+
 export default SVG;
