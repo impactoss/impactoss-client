@@ -23,7 +23,7 @@ export function* saveAction({ data }) {
     yield put(addEntity('action', res.data));
     yield put(saveSuccess());
     yield put(actions.reset('actionNew.form.action'));
-    browserHistory.push('/actions');
+    browserHistory.push(`/actions/${res.data.id}`);
   } catch (error) {
     const message = yield error.response.json();
     yield put(saveError(message.error));

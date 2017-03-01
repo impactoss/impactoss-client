@@ -45,7 +45,7 @@ export function* saveAction({ data }) {
     const res = yield call(apiRequest, 'put', `measures/${id}`, data);
     yield put(updateEntity('action', res.data));
     yield put(saveSuccess());
-    browserHistory.push('/actions');
+    browserHistory.push(`/actions/${id}`);
   } catch (error) {
     const message = yield error.response.json();
     yield put(saveError(message.error));
