@@ -26,6 +26,10 @@ import { makeSelectLocationState } from 'containers/App/selectors';
 // Import Language Provider
 import LanguageProvider from 'containers/LanguageProvider';
 
+// Import ThemeProvider
+import { ThemeProvider } from 'styled-components';
+import theme from 'themes/theme';
+
 // Load the favicon, and the .htaccess file
 /* eslint-disable import/no-unresolved, import/extensions */
 import '!file-loader?name=[name].[ext]!./favicon.ico';
@@ -42,6 +46,7 @@ import './global-styles';
 
 // Import root routes
 import createRoutes from './routes';
+
 
 // Create redux store with history
 // this uses the singleton browserHistory provided by react-router
@@ -68,15 +73,17 @@ const render = (messages) => {
   ReactDOM.render(
     <Provider store={store}>
       <LanguageProvider messages={messages}>
-        <Router
-          history={history}
-          routes={rootRoute}
-          render={
-            // Scroll to top when going to a new page, imitating default browser
-            // behaviour
-            applyRouterMiddleware(useScroll())
-          }
-        />
+        <ThemeProvider theme={theme}>
+          <Router
+            history={history}
+            routes={rootRoute}
+            render={
+              // Scroll to top when going to a new page, imitating default browser
+              // behaviour
+              applyRouterMiddleware(useScroll())
+            }
+          />
+        </ThemeProvider>
       </LanguageProvider>
     </Provider>,
     document.getElementById('app')
