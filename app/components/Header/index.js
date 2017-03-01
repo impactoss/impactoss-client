@@ -1,6 +1,8 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import Icon from 'components/Icon';
+
 import NavBar from './NavBar';
 import HeaderLink from './HeaderLink';
 import messages from './messages';
@@ -16,6 +18,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
       <div>
         <NavBar>
           <HeaderLink to="/">
+            <Icon name='home' />
             <FormattedMessage {...messages.home} />
           </HeaderLink>
           {this.props.isSignedIn &&
