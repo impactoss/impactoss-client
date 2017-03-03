@@ -10,4 +10,12 @@ export default defineMessages({
     id: 'app.containers.ActionEdit.header',
     defaultMessage: 'This is ActionEdit container !',
   },
+  notFound: {
+    id: 'app.containers.ActionEdit.notFound',
+    defaultMessage: 'Sorry no action found',
+  },
+  loading: {
+    id: 'app.containers.ActionEdit.loading',
+    defaultMessage: 'Loading action...',
+  },
 });

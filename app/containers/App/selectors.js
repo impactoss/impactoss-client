@@ -95,15 +95,27 @@ const makeSelectNextPathname = () => createSelector(
   }
 );
 
+const requestedSelector = createSelector(
+  selectGlobal,
+  (state) => state.get('requested')
+);
+
 const entitiesSelector = createSelector(
   selectGlobal,
-  (globalState) => globalState.get('entities')
+  (state) => state.get('entities')
 );
 
 const entitiesPathSelector = createSelector(
   entitiesSelector,
   (entities) => memoize(
     (path) => entities.get(path)
+  )
+);
+
+const entitySelector = createSelector(
+  entitiesSelector,
+  (entities) => memoize(
+    (path, id) => entities.getIn([path, id])
   )
 );
 
@@ -130,7 +142,9 @@ export {
   makeSelectRecommendations,
   makeSelectRecommendationActions,
   entitiesSelector,
+  entitySelector,
   entitiesPathSelector,
   actionsSelector,
   actionsListSelector,
+  requestedSelector,
 };

@@ -11,12 +11,12 @@ import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router';
 
-import
-  makeSelectActionView
-from './selectors';
+import {
+  actionSelector,
+  notFoundSelector,
+} from './selectors';
 
-import { getEntitiesAndActionById } from './actions';
-
+import { getActionById } from './actions';
 
 import messages from './messages';
 
@@ -27,7 +27,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   }
 
   render() {
-    const { action, getEntitiesError, loadActionError } = this.props.actionView;
+    const { action, notFound } = this.props;
     return (
       <div>
         <Helmet
@@ -37,7 +37,17 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           ]}
         />
         <FormattedMessage {...messages.header} />
-        {action &&
+        { notFound &&
+          <div>
+            <FormattedMessage {...messages.notFound} />
+          </div>
+        }
+        { !action && !notFound &&
+          <div>
+            <FormattedMessage {...messages.loading} />
+          </div>
+        }
+        { action &&
           <div>
             <h1>{action.attributes.title}</h1>
             <h5>Description</h5>
@@ -48,13 +58,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
             <p>{action.attributes['updated-at']}</p>
           </div>
         }
-        <Link to={`/actions/edit/${this.props.params.id}`}><button>Edit Action</button></Link>
-        {getEntitiesError &&
-          <p>{getEntitiesError}</p>
-        }
-        {loadActionError &&
-          <p>{loadActionError}</p>
-        }
+        { action &&
+        <Link to={`/actions/edit/${action.id}`}><button>Edit Action</button></Link> }
       </div>
     );
   }
@@ -63,17 +68,19 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 ActionView.propTypes = {
   onComponentWillMount: PropTypes.func,
   params: PropTypes.object,
-  actionView: PropTypes.object,
+  action: PropTypes.object,
+  notFound: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({
-  actionView: makeSelectActionView(),
+  action: actionSelector,
+  notFound: notFoundSelector,
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     onComponentWillMount: (id) => {
-      dispatch(getEntitiesAndActionById('actions', id));
+      dispatch(getActionById(id));
     },
   };
 }

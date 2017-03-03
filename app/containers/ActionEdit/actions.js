@@ -5,50 +5,27 @@
  */
 
  import {
-   GET_ENTITIES_AND_ACTION_BY_ID,
-   ADD_ACTION_ID,
-   GET_ENTITIES_LOADING,
-   GET_ENTITIES_SUCCESS,
-   GET_ENTITIES_ERROR,
+   GET_ACTION_BY_ID,
+   SET_ACTION_ID,
    SAVE,
    SAVE_SENDING,
    SAVE_SUCCESS,
    SAVE_ERROR,
    UPDATE_ENTITY,
-   LOAD_ACTION_ERROR,
+   ACTION_NOT_FOUND,
  } from './constants';
 
- export function getEntitiesAndActionById(path, id) {
+ export function getActionById(id) {
    return {
-     type: GET_ENTITIES_AND_ACTION_BY_ID,
-     path,
+     type: GET_ACTION_BY_ID,
      id,
    };
  }
 
- export function addActionId(id) {
+ export function setActionId(id) {
    return {
-     type: ADD_ACTION_ID,
+     type: SET_ACTION_ID,
      id,
-   };
- }
-
- export function getEntitiesLoading() {
-   return {
-     type: GET_ENTITIES_LOADING,
-   };
- }
-
- export function getEntitiesSuccess() {
-   return {
-     type: GET_ENTITIES_SUCCESS,
-   };
- }
-
- export function getEntitiesError(error) {
-   return {
-     type: GET_ENTITIES_ERROR,
-     error,
    };
  }
 
@@ -85,9 +62,9 @@
    };
  }
 
- export function loadActionError(error) {
+ export function actionNotFound(error) {
    return {
-     type: LOAD_ACTION_ERROR,
+     type: ACTION_NOT_FOUND,
      error,
    };
  }

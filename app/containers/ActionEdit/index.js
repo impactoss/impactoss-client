@@ -12,16 +12,20 @@ import { createStructuredSelector } from 'reselect';
 import { Control, Form } from 'react-redux-form/immutable';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
-import { actionSelector, pageSelector } from './selectors';
+import {
+  actionJSSelector,
+  notFoundSelector,
+  pageSelector,
+} from './selectors';
 import messages from './messages';
-import { save, getEntitiesAndActionById } from './actions';
+import { save, getActionById } from './actions';
 
 export class ActionEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     this.props.onComponentWillMount(this.props.params.id);
   }
   render() {
-    const { draft } = this.props.action;
+    const { action, notFound } = this.props;
     const { saveSending, saveError } = this.props.page;
     return (
       <div>
@@ -32,22 +36,35 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
           ]}
         />
         <FormattedMessage {...messages.header} />
-        <Form
-          model="actionEdit.form.action"
-          onSubmit={this.props.handleSubmit}
-        >
-          <label htmlFor="title">Title:</label>
-          <Control.text id="title" model=".title" />
-          <label htmlFor="description">Description:</label>
-          <Control.textarea id="description" model=".description" />
-          <label htmlFor="status">Status:</label>
-          <Control.select id="status" model=".draft" value={draft}>
-            {PUBLISH_STATUSES.map((status) =>
-              <option key={status.value} value={status.value}>{status.label}</option>
-            )}
-          </Control.select>
-          <button type="submit">Save</button>
-        </Form>
+        <FormattedMessage {...messages.header} />
+        { notFound &&
+          <div>
+            <FormattedMessage {...messages.notFound} />
+          </div>
+        }
+        { !action && !notFound &&
+          <div>
+            <FormattedMessage {...messages.loading} />
+          </div>
+        }
+        {action &&
+          <Form
+            model="actionEdit.form.action"
+            onSubmit={this.props.handleSubmit}
+          >
+            <label htmlFor="title">Title:</label>
+            <Control.text id="title" model=".title" />
+            <label htmlFor="description">Description:</label>
+            <Control.textarea id="description" model=".description" />
+            <label htmlFor="status">Status:</label>
+            <Control.select id="status" model=".draft" value={action && action.draft}>
+              {PUBLISH_STATUSES.map((status) =>
+                <option key={status.value} value={status.value}>{status.label}</option>
+              )}
+            </Control.select>
+            <button type="submit">Save</button>
+            </Form>
+          }
         {saveSending &&
           <p>Saving</p>
         }
@@ -65,17 +82,19 @@ ActionEdit.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   action: PropTypes.object,
   page: PropTypes.object,
+  notFound: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({
-  action: actionSelector,
+  action: actionJSSelector,
   page: pageSelector,
+  notFound: notFoundSelector,
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     onComponentWillMount: (id) => {
-      dispatch(getEntitiesAndActionById('actions', id));
+      dispatch(getActionById(id));
     },
     handleSubmit: (formData) => {
       dispatch(save(formData));
