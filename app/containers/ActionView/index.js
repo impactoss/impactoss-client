@@ -8,22 +8,24 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { createStructuredSelector } from 'reselect';
+// import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router';
 
+import { loadEntitiesIfNeeded } from 'containers/App/actions';
+
 import {
-  actionSelector,
-  notFoundSelector,
+  makeActionSelector,
+  // notFoundSelector,
 } from './selectors';
 
-import { getActionById } from './actions';
+// import { getActionById } from './actions';
 
 import messages from './messages';
 
 export class ActionView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    this.props.onComponentWillMount(this.props.params.id);
+    this.props.onComponentWillMount();
   }
 
   render() {
@@ -67,22 +69,29 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 
 ActionView.propTypes = {
   onComponentWillMount: PropTypes.func,
-  params: PropTypes.object,
+  // params: PropTypes.object,
   action: PropTypes.object,
-  notFound: PropTypes.bool.isRequired,
+  notFound: PropTypes.boolean,
 };
 
-const mapStateToProps = createStructuredSelector({
-  action: actionSelector,
-  notFound: notFoundSelector,
-});
+// const mapStateToProps = createStructuredSelector({
+//   action: actionSelector,
+//   notFound: notFoundSelector,
+// });
+const makeMapStateToProps = () => {
+  const getAction = makeActionSelector();
+  const mapStateToProps = (state, props) => ({
+    action: getAction(state, props),
+  });
+  return mapStateToProps;
+};
 
 function mapDispatchToProps(dispatch) {
   return {
-    onComponentWillMount: (id) => {
-      dispatch(getActionById(id));
+    onComponentWillMount: () => {
+      dispatch(loadEntitiesIfNeeded('actions'));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionView);
+export default connect(makeMapStateToProps, mapDispatchToProps)(ActionView);

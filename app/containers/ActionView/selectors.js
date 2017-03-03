@@ -25,10 +25,12 @@ const actionFoundSelector = createSelector(
   (actions, id) => id && actions.has(id)
 );
 
-const actionSelector = createSelector(
-  actionsSelector,
-  idSelector,
-  (actions, id) => id && actions.has(id) ? actions.get(id).toJS() : null
+const actionSelector = (state, props) =>
+  state.getIn(['global', 'entities', 'actions']).get(props.params.id);
+
+const makeActionSelector = () => createSelector(
+    actionSelector,
+    (action) => action ? action.toJS() : null
 );
 
 /**
@@ -47,4 +49,5 @@ export {
   actionSelector,
   notFoundSelector,
   actionFoundSelector,
+  makeActionSelector,
 };
