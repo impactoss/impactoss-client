@@ -19,6 +19,12 @@ const notFoundSelector = createSelector(
   (substate) => substate.get('actionNotFound')
 );
 
+const actionFoundSelector = createSelector(
+  actionsSelector,
+  idSelector,
+  (actions, id) => id && actions.has(id)
+);
+
 const actionSelector = createSelector(
   actionsSelector,
   idSelector,
@@ -40,4 +46,5 @@ export {
   actionViewPageSelector,
   actionSelector,
   notFoundSelector,
+  actionFoundSelector,
 };

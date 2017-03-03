@@ -30,6 +30,7 @@ import {
   VALIDATE_TOKEN,
   ENTITIES_REQUESTED,
   ENTITIES_READY,
+  UNKNOWN_ENTITIES_READY,
   ADD_ENTITY,
   UPDATE_ENTITY,
 } from './constants';
@@ -123,8 +124,8 @@ export function entitiesRequested(path, time) {
 }
 
 export function entitiesReady(path) {
-  return {
-    type: ENTITIES_READY,
+  return { // TODO revist the UNKNOWN_ENTITIES_READY case here
+    type: path in ENTITIES_READY ? ENTITIES_READY[path] : UNKNOWN_ENTITIES_READY,
     path,
   };
 }

@@ -4,7 +4,7 @@ import { actions as formActions } from 'react-redux-form';
 import { browserHistory } from 'react-router';
 
 import apiRequest from 'utils/api-request';
-import { ENTITIES_READY } from 'containers/App/constants';
+import { ACTION_ENTITIES_READY } from 'containers/App/constants';
 
 import {
   loadEntitiesIfNeeded,
@@ -33,7 +33,7 @@ function* getActionById(payload) {
   yield put(loadEntitiesIfNeeded('actions'));
   // Ok execution will wait at this take until Entities are loaded
   // if they already have been fetched this will take quickly, otherwise it will take as soon as we hear back from the api
-  yield take(ENTITIES_READY);
+  yield take(ACTION_ENTITIES_READY);
   // Entities are ready now, so set the action ID
   yield put(setActionId(payload.id));
 
