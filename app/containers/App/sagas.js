@@ -8,14 +8,13 @@ import collection from 'lodash/collection';
 
 import {
     LOAD_ENTITIES_IF_NEEDED,
-    LOAD_ENTITIES,
     AUTHENTICATE,
     AUTHENTICATE_SUCCESS,
     LOGOUT,
     VALIDATE_TOKEN,
 } from 'containers/App/constants';
 import {
-    loadEntities,
+    loadingEntities,
     entitiesLoaded,
     entitiesLoadingError,
     authenticateSuccess,
@@ -23,12 +22,13 @@ import {
     authenticateError,
     logoutSuccess,
     logout,
-    entitiesPopulated,
+    entitiesRequested,
+    entitiesReady,
 } from 'containers/App/actions';
 
 import {
   makeSelectNextPathname,
-  entitiesPathSelector,
+  requestedSelector,
 } from 'containers/App/selectors';
 
 import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
@@ -37,40 +37,32 @@ import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
  * Check if entities already present
  */
 export function* checkEntitiesSaga(payload) {
-  // select entities from store
-  const entitiesFilter = yield select(entitiesPathSelector);
+  // requestedSelector returns the times that entities where fetched from the API
+  const requested = yield select(requestedSelector);
+  const requestedAt = requested.get(payload.path);
 
-  const entities = entitiesFilter(payload.path);
-
-  // console.log('checking entities', entities);
-  // TODO add other checks here, eg if user or user role changed (not sure how) to ensure we also get the DRAFT posts
-  //    easiest would be to just set entities to false on login thus triggering a reload
-  if (entities && !entities.size) {
-    yield put(loadEntities(payload.path));
-  } else {
-    yield put(entitiesPopulated(payload.path));
+  // If haven't requested yet, do so now.
+  if (!requestedAt) {
+    // First record that we are requesting
+    yield put(entitiesRequested(payload.path, Date.now()));
+    // Updates the loading state of the app
+    yield put(loadingEntities(payload.path));
+    try {
+      // Actions are called measures on the server
+      const serverPath = payload.path.replace('action', 'measure');
+      // Call the API
+      const response = yield call(apiRequest, 'get', serverPath);
+      // Save response and set loading = false
+      yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path));
+    } catch (err) {
+      // Whoops Save error
+      yield put(entitiesLoadingError(err, payload.path));
+      // Clear the request time on error, This will cause us to try again next time, which we probably want to do?
+      yield put(entitiesRequested(payload.path, null));
+    }
   }
-}
-
-/**
- * Server API request/response handler
- */
-export function* getEntitiesSaga(payload) {
-  try {
-    const serverPath = payload.path.replace('action', 'measure');
-
-    // console.log('getting ',serverPath);
-
-    const response = yield call(apiRequest, 'get', serverPath);
-
-    // console.log('got ', response);
-
-    yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path));
-    yield put(entitiesPopulated(payload.path));
-  } catch (err) {
-    // console.error(err);
-    yield put(entitiesLoadingError(err));
-  }
+  // Entities are ready, let listeners know
+  yield put(entitiesReady(payload.path));
 }
 
 export function* authenticateSaga(payload) {
@@ -133,9 +125,6 @@ export default function* rootSaga() {
   yield takeEvery(VALIDATE_TOKEN, validateTokenSaga);
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
 
-  // Watches for LOAD_ENTITIES entities and calls getEntities when one comes in.
-  // It returns task descriptor (just like fork) so we can continue execution
-  yield takeEvery(LOAD_ENTITIES, getEntitiesSaga);
   yield takeLatest(AUTHENTICATE, authenticateSaga);
   yield takeLatest(AUTHENTICATE_SUCCESS, authenticateSuccessSaga);
   yield takeLatest(LOGOUT, logoutSaga);

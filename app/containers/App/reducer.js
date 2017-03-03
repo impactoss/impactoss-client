@@ -18,12 +18,13 @@ import {
   AUTHENTICATE_SUCCESS,
   AUTHENTICATE_ERROR,
   SET_AUTHENTICATION_STATE,
-  LOAD_ENTITIES,
+  LOADING_ENTITIES,
   LOAD_ENTITIES_SUCCESS,
   LOAD_ENTITIES_ERROR,
   LOGOUT_SUCCESS,
   ADD_ENTITY,
   UPDATE_ENTITY,
+  ENTITIES_REQUESTED,
 } from './constants';
 
 // The initial state of the App
@@ -36,6 +37,11 @@ const initialState = fromJS({
     sending: false,
     error: false,
     messages: [],
+  },
+  requested: { // Record the time that entities where requested / loaded from the server
+    actions: null,
+    recommendations: null,
+    recommendation_actions: null,
   },
   entities: {
     actions: {},
@@ -76,7 +82,10 @@ function appReducer(state = initialState, payload) {
     case UPDATE_ENTITY:
       return state
           .setIn(['entities', `${payload.path}s`, payload.entity.id], fromJS(payload.entity));
-    case LOAD_ENTITIES:
+    case ENTITIES_REQUESTED:
+      return state
+          .setIn(['requested', payload.path], payload.time);
+    case LOADING_ENTITIES:
       return state
           .set('loading', true)
           .set('error', false)
@@ -88,7 +97,9 @@ function appReducer(state = initialState, payload) {
     case LOAD_ENTITIES_ERROR:
       return state
         .setIn(['server', 'error'], payload.error)
-        .setIn(['server', 'loading'], false);
+        .setIn(['server', 'loading'], false)
+        .setIn(['requested', payload.path], null);
+
     default:
       return state;
   }

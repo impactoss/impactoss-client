@@ -1,36 +1,43 @@
 import { createSelector } from 'reselect';
+import { actionsSelector } from 'containers/App/selectors';
 
 /**
  * Direct selector to the actionView state domain
  */
-const selectActionViewDomain = () => (state) => state.get('actionView');
+const actionViewSelector = (state) => state.get('actionView');
 
 /**
  * Other specific selectors
  */
 const idSelector = createSelector(
-  selectActionViewDomain(),
+  actionViewSelector,
   (substate) => substate.get('id')
 );
 
+const notFoundSelector = createSelector(
+  actionViewSelector,
+  (substate) => substate.get('actionNotFound')
+);
+
 const actionSelector = createSelector(
-  selectActionViewDomain,
-  (substate) => substate.get('action')
+  actionsSelector,
+  idSelector,
+  (actions, id) => id && actions.has(id) ? actions.get(id).toJS() : null
 );
 
 /**
  * Default selector used by ActionView
  */
 
-const makeSelectActionView = () => createSelector(
-  selectActionViewDomain(),
+const actionViewPageSelector = createSelector(
+  actionViewSelector,
   (substate) => substate.toJS()
 );
 
-export default makeSelectActionView;
+export default actionViewPageSelector;
 export {
-  selectActionViewDomain,
   idSelector,
-  makeSelectActionView,
+  actionViewPageSelector,
   actionSelector,
+  notFoundSelector,
 };

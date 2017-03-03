@@ -22,13 +22,14 @@ import {
   AUTHENTICATE_ERROR,
   SET_AUTHENTICATION_STATE,
   LOAD_ENTITIES_IF_NEEDED,
-  LOAD_ENTITIES,
+  LOADING_ENTITIES,
   LOAD_ENTITIES_SUCCESS,
   LOAD_ENTITIES_ERROR,
   LOGOUT,
   LOGOUT_SUCCESS,
   VALIDATE_TOKEN,
-  ENTITIES_POPULATED,
+  ENTITIES_REQUESTED,
+  ENTITIES_READY,
   ADD_ENTITY,
   UPDATE_ENTITY,
 } from './constants';
@@ -45,13 +46,13 @@ export function loadEntitiesIfNeeded(path) {
   };
 }
 /**
- * Load the entities, this action starts the request saga
+ * Load the entities, this action is fired when we being loading entities
  *
  * @return {object} An action object with a type of LOAD_ENTITIES
  */
-export function loadEntities(path) {
+export function loadingEntities(path) {
   return {
-    type: LOAD_ENTITIES,
+    type: LOADING_ENTITIES,
     path,
   };
 }
@@ -78,10 +79,11 @@ export function entitiesLoaded(entities, path) {
  *
  * @return {object}       An action object with a type of LOAD_ENTITIES_ERROR passing the error
  */
-export function entitiesLoadingError(error) {
+export function entitiesLoadingError(error, path) {
   return {
     type: LOAD_ENTITIES_ERROR,
     error,
+    path,
   };
 }
 
@@ -112,9 +114,17 @@ export function setAuthenticationState(newAuthState) {
   };
 }
 
-export function entitiesPopulated(path) {
+export function entitiesRequested(path, time) {
   return {
-    type: ENTITIES_POPULATED,
+    type: ENTITIES_REQUESTED,
+    path,
+    time,
+  };
+}
+
+export function entitiesReady(path) {
+  return {
+    type: ENTITIES_READY,
     path,
   };
 }

@@ -1,40 +1,49 @@
 import { takeLatest, take, put, cancel, select, call } from 'redux-saga/effects';
-import { loadEntitiesIfNeeded, updateEntity } from 'containers/App/actions';
 import { LOCATION_CHANGE } from 'react-router-redux';
-import { ENTITIES_POPULATED } from 'containers/App/constants';
-import { actionsSelector } from 'containers/App/selectors';
-import apiRequest from 'utils/api-request';
 import { actions as formActions } from 'react-redux-form';
 import { browserHistory } from 'react-router';
 
-import { addActionId, getEntitiesLoading, getEntitiesSuccess, getEntitiesError, loadActionError, saveSending, saveSuccess, saveError } from './actions';
-import { GET_ENTITIES_AND_ACTION_BY_ID, SAVE } from './constants';
-import { idSelector } from './selectors';
+import apiRequest from 'utils/api-request';
+import { ENTITIES_READY } from 'containers/App/constants';
 
-function* checkEntities(payload) {
-  try {
-    yield put(getEntitiesLoading());
-    yield put(addActionId(payload.id));
-    yield put(loadEntitiesIfNeeded(payload.path));
-    yield put(getEntitiesSuccess());
-  } catch (err) {
-    // TODO handle the error
-    yield put(getEntitiesError(err));
-  }
-}
+import {
+  loadEntitiesIfNeeded,
+  updateEntity,
+} from 'containers/App/actions';
 
-function* getActionById() {
-  try {
-    const actions = yield select(actionsSelector);
-    const id = yield select(idSelector);
-    const action = actions.get(id).get('attributes').toJS();
-    const { title, description, draft } = action;
-    // TODO could use merge and do this in one line, except need to use redux thunk
-    yield put(formActions.change('actionEdit.form.action.title', title));
-    yield put(formActions.change('actionEdit.form.action.description', description));
-    yield put(formActions.change('actionEdit.form.action.draft', draft));
-  } catch (err) {
-    yield put(loadActionError(err));
+import {
+  setActionId,
+  actionNotFound,
+  saveSending,
+  saveSuccess,
+  saveError,
+} from './actions';
+
+import {
+  actionSelector,
+  idSelector,
+} from './selectors';
+
+import {
+  GET_ACTION_BY_ID,
+  SAVE,
+} from './constants';
+
+function* getActionById(payload) {
+  yield put(loadEntitiesIfNeeded('actions'));
+  // Ok execution will wait at this take until Entities are loaded
+  // if they already have been fetched this will take quickly, otherwise it will take as soon as we hear back from the api
+  yield take(ENTITIES_READY);
+  // Entities are ready now, so set the action ID
+  yield put(setActionId(payload.id));
+
+  const action = yield select(actionSelector);
+  if (!action) {
+    // Handle error case, where action can't be found
+    yield put(actionNotFound());
+  } else {
+    // populate the form
+    yield put(formActions.load('actionEdit.form.action', action.get('attributes')));
   }
 }
 
@@ -55,14 +64,13 @@ export function* saveAction({ data }) {
 // Individual exports for testing
 export function* defaultSaga() {
   // See example in containers/HomePage/sagas.js
-  const watcher = yield takeLatest(GET_ENTITIES_AND_ACTION_BY_ID, checkEntities);
-  const entitiesWatcher = yield takeLatest(ENTITIES_POPULATED, getActionById);
+  const watcher = yield takeLatest(GET_ACTION_BY_ID, getActionById);
   const saveWatcher = yield takeLatest(SAVE, saveAction);
 
   yield take(LOCATION_CHANGE);
   yield cancel(saveWatcher);
+
   yield cancel(watcher);
-  yield cancel(entitiesWatcher);
 }
 
 // All sagas to be loaded
