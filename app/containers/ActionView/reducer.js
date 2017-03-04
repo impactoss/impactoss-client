@@ -5,26 +5,17 @@
  */
 
 import { fromJS } from 'immutable';
-
-import {
-  SET_ACTION_ID,
-  ACTION_NOT_FOUND,
-} from './constants';
+import { ACTION_ENTITIES_READY } from 'containers/App/constants';
 
 const initialState = fromJS({
-  id: '',
-  actionNotFound: false,
+  actionsReady: false,
 });
 
 function actionViewReducer(state = initialState, action) {
   switch (action.type) {
-    case SET_ACTION_ID:
+    case ACTION_ENTITIES_READY:
       return state
-      .set('id', action.id)
-      .set('actionNotFound', false);
-    case ACTION_NOT_FOUND:
-      return state
-      .set('actionNotFound', true);
+      .set('actionsReady', true);
     default:
       return state;
   }

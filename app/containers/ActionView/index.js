@@ -15,7 +15,7 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import {
   makeActionSelector,
-  // notFoundSelector,
+  actionsReadySelector,
 } from './selectors';
 
 // import { getActionById } from './actions';
@@ -29,7 +29,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   }
 
   render() {
-    const { action, notFound } = this.props;
+    const { action, actionsReady } = this.props;
     return (
       <div>
         <Helmet
@@ -39,14 +39,14 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           ]}
         />
         <FormattedMessage {...messages.header} />
-        { notFound &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        { !action && !notFound &&
+        { !action && !actionsReady &&
           <div>
             <FormattedMessage {...messages.loading} />
+          </div>
+        }
+        { !action && actionsReady &&
+          <div>
+            <FormattedMessage {...messages.notFound} />
           </div>
         }
         { action &&
@@ -69,9 +69,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 
 ActionView.propTypes = {
   onComponentWillMount: PropTypes.func,
-  // params: PropTypes.object,
   action: PropTypes.object,
-  notFound: PropTypes.boolean,
+  actionsReady: PropTypes.bool,
 };
 
 // const mapStateToProps = createStructuredSelector({
@@ -82,6 +81,7 @@ const makeMapStateToProps = () => {
   const getAction = makeActionSelector();
   const mapStateToProps = (state, props) => ({
     action: getAction(state, props),
+    actionsReady: actionsReadySelector(state),
   });
   return mapStateToProps;
 };
