@@ -8,14 +8,13 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-// import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import {
   makeActionSelector,
-  actionsReadySelector,
+  makeActionsReadySelector,
 } from './selectors';
 
 // import { getActionById } from './actions';
@@ -30,6 +29,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 
   render() {
     const { action, actionsReady } = this.props;
+
     return (
       <div>
         <Helmet
@@ -79,9 +79,10 @@ ActionView.propTypes = {
 // });
 const makeMapStateToProps = () => {
   const getAction = makeActionSelector();
+  const actionsReady = makeActionsReadySelector();
   const mapStateToProps = (state, props) => ({
     action: getAction(state, props),
-    actionsReady: actionsReadySelector(state),
+    actionsReady: actionsReady(state),
   });
   return mapStateToProps;
 };

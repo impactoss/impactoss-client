@@ -9,10 +9,7 @@ const actionViewSelector = (state) => state.get('actionView');
 /**
  * Other specific selectors
  */
-const actionsReadySelector = createSelector(
-  actionViewSelector,
-  (substate) => substate.get('actionsReady'),
-);
+
 
 const actionSelector = (state, props) =>
   state.getIn(['global', 'entities', 'actions']).get(props.params.id);
@@ -20,6 +17,14 @@ const actionSelector = (state, props) =>
 const makeActionSelector = () => createSelector(
   actionSelector,
   (action) => action ? action.toJS() : null
+);
+
+const actionsReadySelector = (state) =>
+  !!state.getIn(['global', 'entities', 'actions']).size && !!state.getIn(['global', 'requested', 'actions']);
+
+const makeActionsReadySelector = () => createSelector(
+  actionsReadySelector,
+  (ready) => ready
 );
 
 /**
@@ -34,6 +39,6 @@ const actionViewPageSelector = createSelector(
 export default actionViewPageSelector;
 export {
   actionViewPageSelector,
-  actionsReadySelector,
+  makeActionsReadySelector,
   makeActionSelector,
 };
