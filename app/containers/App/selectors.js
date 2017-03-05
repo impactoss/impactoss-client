@@ -136,8 +136,7 @@ const makeEntitySelector = () => createSelector(
 const entitiesReadySelector = createSelector(
   entitiesPathSelector,
   requestedPathSelector,
-  (entities, requested) =>
-    () => !!entities.size && !!requested
+  (entities, requested) => !!entities.size && !!requested
 );
 
 const makeEntitiesReadySelector = () => createSelector(

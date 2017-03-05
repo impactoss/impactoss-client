@@ -87,7 +87,7 @@ const makeMapStateToProps = () => {
   const entitiesReady = makeEntitiesReadySelector();
   const mapStateToProps = (state, props) => ({
     action: getEntity(state, { id: props.params.id, path: 'actions' }),
-    actionsReady: entitiesReady(state, { path: 'actions' })(),
+    actionsReady: entitiesReady(state, { path: 'actions' }),
   });
   return mapStateToProps;
 };
@@ -96,6 +96,7 @@ function mapDispatchToProps(dispatch, props) {
   return {
     onComponentWillMount: () => {
       dispatch(findEntity('actions', props.params.id));
+      // dispatch(loadEntitiesIfNeeded('actions'));
     },
   };
 }
