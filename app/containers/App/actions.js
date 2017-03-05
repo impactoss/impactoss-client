@@ -33,6 +33,9 @@ import {
   UNKNOWN_ENTITIES_READY,
   ADD_ENTITY,
   UPDATE_ENTITY,
+  ENTITY_NOT_FOUND,
+  UNKNOWN_ENTITY_NOT_FOUND,
+  FIND_ENTITY,
 } from './constants';
 
 /**
@@ -127,6 +130,22 @@ export function entitiesReady(path) {
   return { // TODO revist the UNKNOWN_ENTITIES_READY case here
     type: path in ENTITIES_READY ? ENTITIES_READY[path] : UNKNOWN_ENTITIES_READY,
     path,
+  };
+}
+
+export function entityNotFound(path, id) {
+  return {
+    type: path in ENTITY_NOT_FOUND ? ENTITY_NOT_FOUND[path] : UNKNOWN_ENTITY_NOT_FOUND,
+    path,
+    id,
+  };
+}
+
+export function findEntity(path, id) {
+  return {
+    type: FIND_ENTITY,
+    path,
+    id,
   };
 }
 

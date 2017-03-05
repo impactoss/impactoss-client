@@ -10,12 +10,17 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { findEntity } from 'containers/App/actions';
 
 import {
-  makeActionSelector,
-  makeActionsReadySelector,
-} from './selectors';
+  makeEntitySelector,
+  makeEntitiesReadySelector,
+} from 'containers/App/selectors';
+
+// import {
+//   // makeActionSelector,
+//   makeActionsReadySelector,
+// } from './selectors';
 
 // import { getActionById } from './actions';
 
@@ -78,19 +83,19 @@ ActionView.propTypes = {
 //   notFound: notFoundSelector,
 // });
 const makeMapStateToProps = () => {
-  const getAction = makeActionSelector();
-  const actionsReady = makeActionsReadySelector();
+  const getEntity = makeEntitySelector();
+  const entitiesReady = makeEntitiesReadySelector();
   const mapStateToProps = (state, props) => ({
-    action: getAction(state, props),
-    actionsReady: actionsReady(state),
+    action: getEntity(state, { id: props.params.id, path: 'actions' }),
+    actionsReady: entitiesReady(state, { path: 'actions' })(),
   });
   return mapStateToProps;
 };
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, props) {
   return {
     onComponentWillMount: () => {
-      dispatch(loadEntitiesIfNeeded('actions'));
+      dispatch(findEntity('actions', props.params.id));
     },
   };
 }

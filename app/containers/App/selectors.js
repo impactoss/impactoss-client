@@ -3,7 +3,6 @@
  */
 
 import { createSelector } from 'reselect';
-import { memoize } from 'lodash/function';
 
 const selectGlobal = (state) => state.get('global');
 const selectRoute = (state) => state.get('route');
@@ -105,23 +104,45 @@ const entitiesSelector = createSelector(
   (state) => state.get('entities')
 );
 
-const entitiesPathSelector = createSelector(
-  entitiesSelector,
-  (entities) => memoize(
-    (path) => entities.get(path)
-  )
-);
-
-const entitySelector = createSelector(
-  entitiesSelector,
-  (entities) => memoize(
-    (path, id) => entities.getIn([path, id])
-  )
-);
+// const entitySelector = createSelector(
+//   entitiesSelector,
+//   (entities) => memoize(
+//     (path, id) => entities.getIn([path, id])
+//   )
+// );
 
 const actionsSelector = createSelector(
   entitiesSelector,
   (entities) => entities.get('actions')
+);
+
+const entitySelector = (state, { path, id }) =>
+  state.getIn(['global', 'entities', path]).get(id);
+
+const haveEntitySelector = (state, { path, id }) =>
+  state.getIn(['global', 'entities', path]).has(id);
+
+const entitiesPathSelector = (state, { path }) =>
+  state.getIn(['global', 'entities', path]);
+
+const requestedPathSelector = (state, { path }) =>
+  state.getIn(['global', 'requested', path]);
+
+const makeEntitySelector = () => createSelector(
+  entitySelector,
+  (entity) => entity ? entity.toJS() : null
+);
+
+const entitiesReadySelector = createSelector(
+  entitiesPathSelector,
+  requestedPathSelector,
+  (entities, requested) =>
+    () => !!entities.size && !!requested
+);
+
+const makeEntitiesReadySelector = () => createSelector(
+  entitiesReadySelector,
+  (ready) => ready
 );
 
 const actionsListSelector = createSelector(
@@ -147,4 +168,8 @@ export {
   actionsSelector,
   actionsListSelector,
   requestedSelector,
+  entitiesReadySelector,
+  haveEntitySelector,
+  makeEntitySelector,
+  makeEntitiesReadySelector,
 };

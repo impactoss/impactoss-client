@@ -2,7 +2,7 @@
  * Gets the entities from server
  */
 
-import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
+import { call, put, select, takeLatest, takeEvery, take } from 'redux-saga/effects';
 import { push } from 'react-router-redux';
 import collection from 'lodash/collection';
 
@@ -12,6 +12,8 @@ import {
     AUTHENTICATE_SUCCESS,
     LOGOUT,
     VALIDATE_TOKEN,
+    ENTITIES_READY,
+    FIND_ENTITY,
 } from 'containers/App/constants';
 import {
     loadingEntities,
@@ -24,14 +26,33 @@ import {
     logout,
     entitiesRequested,
     entitiesReady,
+    loadEntitiesIfNeeded,
+    entityNotFound,
 } from 'containers/App/actions';
 
 import {
   makeSelectNextPathname,
   requestedSelector,
+  haveEntitySelector,
 } from 'containers/App/selectors';
 
 import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
+
+export function* findEntitySaga({ path, id }) {
+  let found = yield select(haveEntitySelector, { path, id });
+  if (!found) {
+    yield put(loadEntitiesIfNeeded(path));
+    // Execution will wait at this take until Entities are loaded
+    // if they already have been fetched this will take quickly, otherwise it will take as soon as we hear back from the api
+    yield take(ENTITIES_READY[path]);
+
+    found = yield select(haveEntitySelector, { path, id });
+    if (!found) {
+      // Handle error case, where action can't be found
+      yield put(entityNotFound({ path, id }));
+    }
+  }
+}
 
 /**
  * Check if entities already present
@@ -124,6 +145,7 @@ export default function* rootSaga() {
   // console.log('calling rootSaga');
   yield takeEvery(VALIDATE_TOKEN, validateTokenSaga);
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
+  yield takeEvery(FIND_ENTITY, findEntitySaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
   yield takeLatest(AUTHENTICATE_SUCCESS, authenticateSuccessSaga);
