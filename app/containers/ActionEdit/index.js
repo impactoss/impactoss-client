@@ -8,24 +8,50 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { createStructuredSelector } from 'reselect';
-import { Control, Form } from 'react-redux-form/immutable';
+import { Control, Form, actions as formActions } from 'react-redux-form/immutable';
+// import { actions as formActions } from 'react-redux-form';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
+import { loadEntitiesIfNeeded } from 'containers/App/actions';
+
 import {
-  actionJSSelector,
-  notFoundSelector,
+  makeEntityMapSelector,
+  makeEntitiesReadySelector,
+} from 'containers/App/selectors';
+
+import {
   pageSelector,
 } from './selectors';
+
 import messages from './messages';
-import { save, getActionById } from './actions';
+import { save } from './actions';
+
+const populateForm = (action) =>
+  formActions.load('actionEdit.form.action', action.get('attributes'));
 
 export class ActionEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
   componentWillMount() {
-    this.props.onComponentWillMount(this.props.params.id);
+    const { dispatch } = this.props;
+
+    dispatch(loadEntitiesIfNeeded('actions'));
+
+    if (this.props.action && this.props.actionsReady) {
+      dispatch(populateForm(this.props.action));
+    }
   }
+
+  componentWillReceiveProps(nextProps) {
+    const { dispatch } = this.props;
+
+    if (nextProps.action && nextProps.actionsReady && !this.props.actionsReady) {
+      dispatch(populateForm(nextProps.action));
+    }
+  }
+
+
   render() {
-    const { action, notFound } = this.props;
+    const { action, actionsReady } = this.props;
     const { saveSending, saveError } = this.props.page;
     return (
       <div>
@@ -36,15 +62,14 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
           ]}
         />
         <FormattedMessage {...messages.header} />
-        <FormattedMessage {...messages.header} />
-        { notFound &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        { !action && !notFound &&
+        { !action && !actionsReady &&
           <div>
             <FormattedMessage {...messages.loading} />
+          </div>
+        }
+        { !action && actionsReady &&
+          <div>
+            <FormattedMessage {...messages.notFound} />
           </div>
         }
         {action &&
@@ -77,29 +102,34 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
 }
 
 ActionEdit.propTypes = {
-  onComponentWillMount: PropTypes.func,
-  params: PropTypes.object,
+  dispatch: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
-  action: PropTypes.object,
   page: PropTypes.object,
-  notFound: PropTypes.bool.isRequired,
+  action: PropTypes.object,
+  actionsReady: PropTypes.bool,
 };
 
-const mapStateToProps = createStructuredSelector({
-  action: actionJSSelector,
-  page: pageSelector,
-  notFound: notFoundSelector,
-});
+const makeMapStateToProps = () => {
+  const getEntity = makeEntityMapSelector();
+  const entitiesReady = makeEntitiesReadySelector();
+  const mapStateToProps = (state, props) => ({
+    action: getEntity(state, { id: props.params.id, path: 'actions' }),
+    actionsReady: entitiesReady(state, { path: 'actions' }),
+    page: pageSelector(state),
+  });
+  return mapStateToProps;
+};
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, props) {
   return {
-    onComponentWillMount: (id) => {
-      dispatch(getActionById(id));
+    dispatch,
+    onComponentWillMount: () => {
+      dispatch(loadEntitiesIfNeeded('actions'));
     },
     handleSubmit: (formData) => {
-      dispatch(save(formData));
+      dispatch(save(formData, props.params.id));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionEdit);
+export default connect(makeMapStateToProps, mapDispatchToProps)(ActionEdit);

@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { orderBy } from 'lodash/collection';
-import { actionsSelector } from '../App/selectors';
+import { makeEntitiesArraySelector } from '../App/selectors';
 
 /**
 * TODO implement filtering selectors, see actionsSortedSelector as a reference
@@ -34,26 +34,10 @@ const sortBySelector = createSelector(
 );
 
 /**
-* Convert entity Map to a List
-*/
-const actionsListSelector = createSelector(
-  actionsSelector,
-  (actions) => actions.toList()
-);
-
-/**
-* Convert List to a JS array
-*/
-const actionsListJSSelector = createSelector(
-  actionsListSelector,
-  (list) => list.toJS()
-);
-
-/**
 * Order JS list of actions based on sort state
 */
 const actionsSortedSelector = createSelector(
-  actionsListJSSelector,
+  makeEntitiesArraySelector(),
   sortBySelector,
   (actions, { sort, order }) => orderBy(actions, getSortIteratee(sort), order)
 );
@@ -70,7 +54,5 @@ export default actionViewJSSelector;
 
 export {
   actionsSortedSelector,
-  actionsListSelector,
-  actionsListJSSelector,
   sortBySelector,
 };

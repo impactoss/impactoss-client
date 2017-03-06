@@ -10,19 +10,12 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router';
 
-import { findEntity } from 'containers/App/actions';
+import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import {
   makeEntitySelector,
   makeEntitiesReadySelector,
 } from 'containers/App/selectors';
-
-// import {
-//   // makeActionSelector,
-//   makeActionsReadySelector,
-// } from './selectors';
-
-// import { getActionById } from './actions';
 
 import messages from './messages';
 
@@ -78,10 +71,6 @@ ActionView.propTypes = {
   actionsReady: PropTypes.bool,
 };
 
-// const mapStateToProps = createStructuredSelector({
-//   action: actionSelector,
-//   notFound: notFoundSelector,
-// });
 const makeMapStateToProps = () => {
   const getEntity = makeEntitySelector();
   const entitiesReady = makeEntitiesReadySelector();
@@ -92,11 +81,10 @@ const makeMapStateToProps = () => {
   return mapStateToProps;
 };
 
-function mapDispatchToProps(dispatch, props) {
+function mapDispatchToProps(dispatch) {
   return {
     onComponentWillMount: () => {
-      dispatch(findEntity('actions', props.params.id));
-      // dispatch(loadEntitiesIfNeeded('actions'));
+      dispatch(loadEntitiesIfNeeded('actions'));
     },
   };
 }

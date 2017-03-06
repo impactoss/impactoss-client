@@ -17,20 +17,6 @@ export const LOAD_ENTITIES_SUCCESS = 'nmrf/App/LOAD_ENTITIES_SUCCESS';
 export const LOAD_ENTITIES_ERROR = 'nmrf/App/LOAD_ENTITIES_ERROR';
 export const ENTITIES_REQUESTED = 'nmrf/App/ENTITIES_REQUESTED';
 
-export const ACTION_ENTITIES_READY = 'nmrf/App/ENTITIES_READY';
-export const RECOMENDATION_ENTITIES_READY = 'nmrf/App/RECOMENDATION_ENTITIES_READY';
-export const RECOMENDATION_ACTIONS_ENTITIES_READY = 'nmrf/App/RECOMENDATION_ACTIONS_ENTITIES_READY';
-// TODO revisit this
-export const UNKNOWN_ENTITIES_READY = 'nmrf/App/UNKNOWN_ENTITIES_READY';
-
-export const ACTION_ENTITY_NOT_FOUND = 'nmrf/App/ENTITY_NOT_FOUND';
-export const RECOMENDATION_ENTITY_NOT_FOUND = 'nmrf/App/RECOMENDATION_ENTITY_NOT_FOUND';
-export const RECOMENDATION_ACTIONS_ENTITY_NOT_FOUND = 'nmrf/App/RECOMENDATION_ACTIONS_ENTITY_NOT_FOUND';
-// TODO revisit this
-export const UNKNOWN_ENTITY_NOT_FOUND = 'nmrf/App/UNKNOWN_ENTITY_NOT_FOUND';
-
-export const FIND_ENTITY = 'nmrf/App/FIND_ENTITY';
-
 export const AUTHENTICATE_SENDING = 'nmrf/App/AUTHENTICATE_SENDING';
 export const AUTHENTICATE = 'nmrf/App/AUTHENTICATE';
 export const AUTHENTICATE_SUCCESS = 'nmrf/App/AUTHENTICATE_SUCCESS';
@@ -49,17 +35,7 @@ export const PUBLISH_STATUSES = [
   { value: false, label: 'Public' },
 ];
 
-export const ENTITIES_READY = {
-  actions: ACTION_ENTITIES_READY,
-  recommendations: RECOMENDATION_ENTITIES_READY,
-  recommendation_actions: RECOMENDATION_ACTIONS_ENTITIES_READY,
-};
-
-export const ENTITY_NOT_FOUND = {
-  actions: ACTION_ENTITY_NOT_FOUND,
-  recommendations: RECOMENDATION_ENTITY_NOT_FOUND,
-  recommendation_actions: RECOMENDATION_ACTIONS_ENTITY_NOT_FOUND,
-};
+export const ENTITIES_READY = 'nmrf/App/ENTITIES_READY';
 
 // TODO need to pull from an env file
 export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';
