@@ -25,6 +25,7 @@ import {
   ADD_ENTITY,
   UPDATE_ENTITY,
   ENTITIES_REQUESTED,
+  INVALIDATE_ENTITIES,
 } from './constants';
 
 // The initial state of the App
@@ -99,7 +100,11 @@ function appReducer(state = initialState, payload) {
         .setIn(['server', 'error'], payload.error)
         .setIn(['server', 'loading'], false)
         .setIn(['requested', payload.path], null);
-
+    case INVALIDATE_ENTITIES:
+      // reset requested to initial state
+      return state
+        .set('requested', fromJS(initialState.toJS().requested))
+        .set('entities', fromJS(initialState.toJS().entities));
     default:
       return state;
   }

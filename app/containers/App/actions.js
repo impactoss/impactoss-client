@@ -32,6 +32,7 @@ import {
   ENTITIES_READY,
   ADD_ENTITY,
   UPDATE_ENTITY,
+  INVALIDATE_ENTITIES,
 } from './constants';
 
 /**
@@ -199,5 +200,11 @@ export function logoutSuccess() {
 export function validateToken() {
   return {
     type: VALIDATE_TOKEN,
+  };
+}
+
+export function invalidateEntities() {
+  return {
+    type: INVALIDATE_ENTITIES,
   };
 }
