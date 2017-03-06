@@ -75,20 +75,15 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
               [
                 {
                   id: 'title',
-                  label: 'Title',
-                  type: 'text',
-                  model: '.title',
+                  controlType: 'input',
                 },
                 {
                   id: 'description',
-                  label: 'Description: ',
-                  type: 'textarea',
-                  model: '.description',
+                  controlType: 'textarea',
                 },
                 {
                   id: 'status',
-                  label: 'Status: ',
-                  type: 'select',
+                  controlType: 'select',
                   model: '.draft',
                   value: action && action.draft,
                   options: PUBLISH_STATUSES,
