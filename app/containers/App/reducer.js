@@ -11,89 +11,95 @@
  */
 
 import { fromJS } from 'immutable';
-
+import { checkErrorMessagesExist } from 'utils/request';
+import { isSignedIn } from 'utils/api-request';
 import {
-  AUTHENTICATE_SENDING,  
+  AUTHENTICATE_SENDING,
   AUTHENTICATE_SUCCESS,
   AUTHENTICATE_ERROR,
-  SET_AUTHENTICATION_STATE,  
-  CHANGE_PASSWORD,
-  CHANGE_EMAIL,  
-  LOAD_ENTITIES,
-  LOAD_ENTITIES_SUCCESS,  
+  SET_AUTHENTICATION_STATE,
+  LOADING_ENTITIES,
+  LOAD_ENTITIES_SUCCESS,
   LOAD_ENTITIES_ERROR,
-  LOGOUT_SUCCESS  
+  LOGOUT_SUCCESS,
+  ADD_ENTITY,
+  UPDATE_ENTITY,
+  ENTITIES_REQUESTED,
 } from './constants';
 
 // The initial state of the App
 const initialState = fromJS({
-  server:{
+  server: {
     loading: false,
     error: false,
   },
-  auth:{
+  auth: {
     sending: false,
     error: false,
+    messages: [],
+  },
+  requested: { // Record the time that entities where requested / loaded from the server
+    actions: null,
+    recommendations: null,
+    recommendation_actions: null,
   },
   entities: {
-    actions: false,
-    recommendations: false,
-    recommendation_actions: false,    
+    actions: {},
+    recommendations: {},
+    recommendation_actions: {},
   },
-  form:{
-    login:{
-      email:"",
-      password:""
-    }
-  },
-  user:{
-    attributes:"",
-    attributes:"",
-    isSignedIn:false
+  user: {
+    attributes: null,
+    isSignedIn: isSignedIn(),
   },
 });
 
 function appReducer(state = initialState, payload) {
   switch (payload.type) {
-    case CHANGE_EMAIL:      
-        return state          
-          .setIn(['form','login','email'], payload.email)    
-    case CHANGE_PASSWORD:      
-        return state          
-          .setIn(['form','login','password'], payload.password)        
-    case LOGOUT_SUCCESS:   
-        return state          
-          .setIn(['user','attributes'], "")
-          .setIn(['user','isSignedIn'], false)          
-    case AUTHENTICATE_SUCCESS:   
-        return state          
-          .setIn(['user','attributes'], payload.user)
-          .setIn(['user','isSignedIn'], true)
-          .setIn(['auth','sending'], false);
-    case AUTHENTICATE_ERROR:   
-        return state          
-          .setIn(['auth','sending'], false)
-          .setIn(['auth','error'], payload.error.message);
-    case AUTHENTICATE_SENDING:   
-        return state          
-          .setIn(['auth','sending'], true)
-          .setIn(['auth','error'], false);
-    case SET_AUTHENTICATION_STATE:      
-        return state          
-          .setIn(['user', "isSignedIn"], payload.newAuthState);
-    case LOAD_ENTITIES:      
-        return state
+    case LOGOUT_SUCCESS:
+      return state
+          .setIn(['user', 'attributes'], null)
+          .setIn(['user', 'isSignedIn'], false);
+    case AUTHENTICATE_SUCCESS:
+      return state
+          .setIn(['user', 'attributes'], payload.user)
+          .setIn(['user', 'isSignedIn'], true)
+          .setIn(['auth', 'sending'], false);
+    case AUTHENTICATE_ERROR: {
+      const errors = checkErrorMessagesExist(payload.error.response);
+      return state
+        .setIn(['auth', 'messages'], errors)
+        .setIn(['auth', 'error'], true);
+    }
+    case AUTHENTICATE_SENDING:
+      return state
+          .setIn(['auth', 'sending'], true)
+          .setIn(['auth', 'error'], false);
+    case SET_AUTHENTICATION_STATE:
+      return state
+          .setIn(['user', 'isSignedIn'], payload.newAuthState);
+    case ADD_ENTITY:
+    case UPDATE_ENTITY:
+      return state
+          .setIn(['entities', `${payload.path}s`, payload.entity.id], fromJS(payload.entity));
+    case ENTITIES_REQUESTED:
+      return state
+          .setIn(['requested', payload.path], payload.time);
+    case LOADING_ENTITIES:
+      return state
           .set('loading', true)
           .set('error', false)
-          .setIn(['entities', payload.path], false);
+          .setIn(['entities', payload.path], fromJS({}));
     case LOAD_ENTITIES_SUCCESS:
       return state
-        .setIn(['entities', payload.path], payload.entities)
-        .setIn(['server','loading'], false);
+        .setIn(['entities', payload.path], fromJS(payload.entities))
+        .setIn(['server', 'loading'], false);
     case LOAD_ENTITIES_ERROR:
       return state
-        .setIn(['server','error'], payload.error)
-        .setIn(['server','loading'], false);
+        .setIn(['server', 'error'], payload.error)
+        .setIn(['server', 'loading'], false)
+        .setIn(['requested', payload.path], null);
+
     default:
       return state;
   }

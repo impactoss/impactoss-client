@@ -5,6 +5,17 @@
 import { createSelector } from 'reselect';
 
 const selectGlobal = (state) => state.get('global');
+const selectRoute = (state) => state.get('route');
+
+/**
+* Use a make selector when different components will use a selector with different data
+* https://github.com/reactjs/reselect#sharing-selectors-with-props-across-multiple-components
+* otherwise use straight createSelector ( I think :/ )
+* https://github.com/react-boilerplate/react-boilerplate/pull/1205#issuecomment-274319934
+*
+* Selectors with arguments, see this guide
+* https://github.com/reactjs/reselect#q-how-do-i-create-a-selector-that-takes-an-argument
+*/
 
 const makeSelectLoading = () => createSelector(
   selectGlobal,
@@ -16,11 +27,15 @@ const makeSelectError = () => createSelector(
   (globalState) => globalState.get('error')
 );
 
-const makeSelectEntities = (path) => createSelector(
+const makeSelectAuth = () => createSelector(
   selectGlobal,
-  (globalState) => globalState.getIn(['entities',path])
+  (globalState) => globalState.get('auth').toJS()
 );
 
+const makeSelectSignedIn = () => createSelector(
+  selectGlobal,
+  (globalState) => globalState.getIn(['user', 'isSignedIn'])
+);
 
 // makeSelectLocationState expects a plain JS object for the routing state
 const makeSelectLocationState = () => {
@@ -41,19 +56,90 @@ const makeSelectLocationState = () => {
 
 const makeSelectEmail = () => createSelector(
   selectGlobal,
-  (globalState) => globalState.getIn(['form','login','email'])
+  (globalState) => globalState.getIn(['form', 'login', 'email'])
 );
 const makeSelectPassword = () => createSelector(
   selectGlobal,
-  (globalState) => globalState.getIn(['form','login','password'])
+  (globalState) => globalState.getIn(['form', 'login', 'password'])
+);
+
+const makeSelectNextPathname = () => createSelector(
+  selectRoute,
+  (routeState) => {
+    try {
+      return routeState.getIn(['locationBeforeTransitions', 'state', 'nextPathname']);
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
+const requestedSelector = createSelector(
+  selectGlobal,
+  (state) => state.get('requested')
+);
+
+const entitiesSelector = createSelector(
+  selectGlobal,
+  (state) => state.get('entities')
+);
+
+const entitySelector = (state, { path, id }) =>
+  state.getIn(['global', 'entities', path]).get(id);
+
+const haveEntitySelector = (state, { path, id }) =>
+  state.getIn(['global', 'entities', path]).has(id);
+
+const entitiesPathSelector = (state, { path }) =>
+  state.getIn(['global', 'entities', path]);
+
+const requestedPathSelector = (state, { path }) =>
+  state.getIn(['global', 'requested', path]);
+
+const makeEntitySelector = () => createSelector(
+  entitySelector,
+  (entity) => entity ? entity.toJS() : null
+);
+
+const makeEntityMapSelector = () => createSelector(
+  entitySelector,
+  (entity) => entity
+);
+
+const makeEntitiesReadySelector = () => createSelector(
+  entitiesPathSelector,
+  requestedPathSelector,
+  (entities, requested) => !!entities.size && !!requested
+);
+
+const makeEntitiesListSelector = () => createSelector(
+  entitiesPathSelector,
+  (entities) => entities.toList()
+);
+
+const makeEntitiesArraySelector = () => createSelector(
+  makeEntitiesListSelector(),
+  (entitiesList) => entitiesList.toJS()
 );
 
 export {
-  selectGlobal,  
+  selectGlobal,
   makeSelectLoading,
-  makeSelectError,  
-  makeSelectEntities,  
+  makeSelectError,
   makeSelectLocationState,
   makeSelectEmail,
   makeSelectPassword,
+  makeSelectSignedIn,
+  makeSelectAuth,
+  makeSelectNextPathname,
+  entitiesSelector,
+  entitySelector,
+  entitiesPathSelector,
+  requestedSelector,
+  haveEntitySelector,
+  makeEntitySelector,
+  makeEntitiesReadySelector,
+  makeEntityMapSelector,
+  makeEntitiesListSelector,
+  makeEntitiesArraySelector,
 };

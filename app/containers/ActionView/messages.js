@@ -1,0 +1,21 @@
+/*
+ * ActionView Messages
+ *
+ * This contains all the text for the ActionView component.
+ */
+import { defineMessages } from 'react-intl';
+
+export default defineMessages({
+  header: {
+    id: 'app.containers.ActionView.header',
+    defaultMessage: 'Action',
+  },
+  notFound: {
+    id: 'app.containers.ActionView.notFound',
+    defaultMessage: 'Sorry no action found',
+  },
+  loading: {
+    id: 'app.containers.ActionView.loading',
+    defaultMessage: 'Loading action...',
+  },
+});

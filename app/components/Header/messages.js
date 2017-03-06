@@ -19,7 +19,19 @@ export default defineMessages({
     defaultMessage: 'Login',
   },
   logout: {
-    id: 'nmrf.components.Header.logout',    
+    id: 'nmrf.components.Header.logout',
     defaultMessage: 'Logout',
+  },
+  register: {
+    id: 'nmrf.components.Header.register',
+    defaultMessage: 'Register',
+  },
+  actions: {
+    id: 'nmrf.components.Header.actions',
+    defaultMessage: 'Actions',
+  },
+  recommendationNew: {
+    id: 'nmrf.components.Header.recommendationNew',
+    defaultMessage: 'Create a recommenation',
   },
 });

@@ -12,9 +12,10 @@
 export const DEFAULT_LOCALE = 'en';
 
 export const LOAD_ENTITIES_IF_NEEDED = 'nmrf/App/LOAD_ENTITIES_IF_NEEDED';
-export const LOAD_ENTITIES = 'nmrf/App/LOAD_ENTITIES';
+export const LOADING_ENTITIES = 'nmrf/App/LOADING_ENTITIES';
 export const LOAD_ENTITIES_SUCCESS = 'nmrf/App/LOAD_ENTITIES_SUCCESS';
 export const LOAD_ENTITIES_ERROR = 'nmrf/App/LOAD_ENTITIES_ERROR';
+export const ENTITIES_REQUESTED = 'nmrf/App/ENTITIES_REQUESTED';
 
 export const AUTHENTICATE_SENDING = 'nmrf/App/AUTHENTICATE_SENDING';
 export const AUTHENTICATE = 'nmrf/App/AUTHENTICATE';
@@ -24,6 +25,17 @@ export const SET_AUTHENTICATION_STATE = 'nmrf/App/SET_AUTHENTICATION_STATE';
 export const LOGOUT = 'nmrf/App/LOGOUT';
 export const LOGOUT_SUCCESS = 'nmrf/App/LOGOUT_SUCCESS';
 export const LOGOUT_ERROR = 'nmrf/App/LOGOUT_ERROR';
+export const VALIDATE_TOKEN = 'nmrf/App/VALIDATE_TOKEN';
 
-export const CHANGE_EMAIL = 'nmrf/App/CHANGE_EMAIL';
-export const CHANGE_PASSWORD = 'nmrf/App/CHANGE_PASSWORD';
+export const ADD_ENTITY = 'nmrf/App/ADD_ENTITY';
+export const UPDATE_ENTITY = 'nmrf/App/UPDATE_ENTITY';
+
+export const PUBLISH_STATUSES = [
+  { value: true, label: 'Draft' },
+  { value: false, label: 'Public' },
+];
+
+export const ENTITIES_READY = 'nmrf/App/ENTITIES_READY';
+
+// TODO need to pull from an env file
+export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';

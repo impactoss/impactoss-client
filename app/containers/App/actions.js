@@ -16,23 +16,23 @@
  */
 
 import {
-  AUTHENTICATE_SENDING,  
-  AUTHENTICATE,  
+  AUTHENTICATE_SENDING,
+  AUTHENTICATE,
   AUTHENTICATE_SUCCESS,
   AUTHENTICATE_ERROR,
-  CHANGE_PASSWORD,
-  CHANGE_EMAIL,
   SET_AUTHENTICATION_STATE,
   LOAD_ENTITIES_IF_NEEDED,
-  LOAD_ENTITIES,
+  LOADING_ENTITIES,
   LOAD_ENTITIES_SUCCESS,
   LOAD_ENTITIES_ERROR,
   LOGOUT,
   LOGOUT_SUCCESS,
+  VALIDATE_TOKEN,
+  ENTITIES_REQUESTED,
+  ENTITIES_READY,
+  ADD_ENTITY,
+  UPDATE_ENTITY,
 } from './constants';
-
-import { parseResponse } from 'utils/handle-request-response';
-
 
 /**
  * Load the entities, this action starts the request saga
@@ -42,18 +42,18 @@ import { parseResponse } from 'utils/handle-request-response';
 export function loadEntitiesIfNeeded(path) {
   return {
     type: LOAD_ENTITIES_IF_NEEDED,
-    path: path,
+    path,
   };
 }
 /**
- * Load the entities, this action starts the request saga
+ * Load the entities, this action is fired when we being loading entities
  *
  * @return {object} An action object with a type of LOAD_ENTITIES
  */
-export function loadEntities(path) {
+export function loadingEntities(path) {
   return {
-    type: LOAD_ENTITIES,
-    path:path,
+    type: LOADING_ENTITIES,
+    path,
   };
 }
 
@@ -64,14 +64,11 @@ export function loadEntities(path) {
  *
  * @return {object}      An action object with a type of LOAD_ENTITIES_SUCCESS passing the entities
  */
-export function entitiesLoaded(entities, path, headers) {  
-  
-  
+export function entitiesLoaded(entities, path) {
   return {
     type: LOAD_ENTITIES_SUCCESS,
-    entities: entities.data,
+    entities,
     path,
-    headers
   };
 }
 
@@ -82,34 +79,65 @@ export function entitiesLoaded(entities, path, headers) {
  *
  * @return {object}       An action object with a type of LOAD_ENTITIES_ERROR passing the error
  */
-export function entitiesLoadingError(error) {
+export function entitiesLoadingError(error, path) {
   return {
     type: LOAD_ENTITIES_ERROR,
     error,
+    path,
   };
 }
 
+export function addEntity(path, entity) {
+  return {
+    type: ADD_ENTITY,
+    path,
+    entity,
+  };
+}
+
+export function updateEntity(path, entity) {
+  return {
+    type: UPDATE_ENTITY,
+    path,
+    entity,
+  };
+}
 
 /**
  * Sets the authentication state of the application
  * @param  {boolean} newAuthState True means a user is logged in, false means no user is logged in
  */
-export function setAuthenticationState (newAuthState) {
+export function setAuthenticationState(newAuthState) {
   return {
     type: SET_AUTHENTICATION_STATE,
-    newAuthState
-  }
+    newAuthState,
+  };
+}
+
+export function entitiesRequested(path, time) {
+  return {
+    type: ENTITIES_REQUESTED,
+    path,
+    time,
+  };
+}
+
+export function entitiesReady(path) {
+  return {
+    type: ENTITIES_READY,
+    path,
+  };
 }
 
 /**
  * Sets the `currentlySending` state, which displays a loading indicator during requests
  * @param  {boolean} sending True means we're sending a request, false means we're not
  */
-export function authenticateSending (sending) {
+export function authenticateSending(sending) {
   return {
-    type: AUTHENTICATE_SENDING, 
-    sending
-  }
+    type: AUTHENTICATE_SENDING,
+    sending,
+  };
 }
 
 /**
@@ -118,13 +146,13 @@ export function authenticateSending (sending) {
  * @param  {object} data          The data we're sending for log in
  * @param  {string} data.email The email of the user to log in
  * @param  {string} data.password The password of the user to log in
- * 
+ *
  * @return {object} An action object with a type of AUTHENTICATE
  */
 export function authenticate(data) {
   return {
     type: AUTHENTICATE,
-    data
+    data,
   };
 }
 
@@ -135,12 +163,10 @@ export function authenticate(data) {
  *
  * @return {object}      An action object with a type of AUTHENTICATE_SUCCESS passing the user
  */
-export function authenticateSuccess(user,headers) {  
-
+export function authenticateSuccess(user) {
   return {
-    type: AUTHENTICATE_SUCCESS,    
-    user: user.data,
-    headers,            
+    type: AUTHENTICATE_SUCCESS,
+    user,
   };
 }
 
@@ -158,26 +184,20 @@ export function authenticateError(error) {
   };
 }
 
-export function changeEmail(email) {
+export function logout() {
   return {
-    type: CHANGE_EMAIL,
-    email
+    type: LOGOUT,
   };
 }
 
-export function changePassword(password) {
-  return {
-    type: CHANGE_PASSWORD,
-    password
-  };
-}
-export function logout() {
-  return {
-    type: LOGOUT
-  };
-}
 export function logoutSuccess() {
   return {
-    type: LOGOUT_SUCCESS
+    type: LOGOUT_SUCCESS,
+  };
+}
+
+export function validateToken() {
+  return {
+    type: VALIDATE_TOKEN,
   };
 }

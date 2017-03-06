@@ -1,43 +1,26 @@
 /*
+ *
  * LoginPage
  *
  */
-import React from 'react';
+
+import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
-
 import { FormattedMessage } from 'react-intl';
-
-import { 
-  makeSelectPassword, 
-  makeSelectEmail
-} from 'containers/App/selectors';
-
-import Form from './Form';
-import Input from './Input';
-
+import { createStructuredSelector } from 'reselect';
+import { makeSelectAuth } from 'containers/App/selectors';
+import makeSelectLoginPage from './selectors';
+import { changeEmail, changePassword, submitForm } from './actions';
 import messages from './messages';
-import { 
-  authenticate,
-  changeEmail,
-  changePassword
-} from '../App/actions';
-
+import Input from './Input';
+import Form from './Form';
 
 export class LoginPage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  /**
-   * when initial state email is not null, submit the form to load repos
-   */
-//  componentDidMount() {
-//    if (this.props.email && this.props.email.trim().length > 0) {
-//      this.props.onSubmitForm();
-//    }
-//  }
-  
   render() {
-    
+    const { email, password } = this.props.LoginPage;
+    const { error, messages: message } = this.props.Authentication;
     return (
-      <article>            
+      <div>
         <div>
           <FormattedMessage {...messages.header} />
         </div>
@@ -47,55 +30,57 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
             <Input
               id="email"
               type="text"
-              placeholder="placeholder"
-              value={this.props.email}
-              onChange={this.props.onChangeEmail}            
+              value={email}
+              onChange={this.props.onChangeEmail}
             />
           </label>
           <label htmlFor="password">
             <FormattedMessage {...messages.password} />
             <Input
               id="password"
-              type="text"
-              placeholder="placeholder"
-              value={this.props.password}
-              onChange={this.props.onChangePassword}            
+              type="password"
+              value={password}
+              onChange={this.props.onChangePassword}
             />
           </label>
           <button>Sign in</button>
         </Form>
-      </article>
+        {error &&
+          message.map((errorMessage, i) =>
+            <p key={i}>{errorMessage}</p>
+          )
+        }
+      </div>
     );
   }
 }
 
-LoginPage.propTypes = {  
-  email: React.PropTypes.string,
-  password: React.PropTypes.string,    
-  onSubmitForm: React.PropTypes.func,  
-  onChangeEmail: React.PropTypes.func,
-  onChangePassword: React.PropTypes.func,  
+LoginPage.propTypes = {
+  LoginPage: PropTypes.object.isRequired,
+  Authentication: PropTypes.object,
+  onSubmitForm: PropTypes.func,
+  onChangeEmail: PropTypes.func,
+  onChangePassword: PropTypes.func,
 };
+
+const mapStateToProps = createStructuredSelector({
+  LoginPage: makeSelectLoginPage(),
+  Authentication: makeSelectAuth(),
+});
 
 export function mapDispatchToProps(dispatch) {
   return {
     onChangeEmail: (evt) => {
-      dispatch(changeEmail(evt.target.value))
-    },    
+      dispatch(changeEmail(evt.target.value));
+    },
     onChangePassword: (evt) => {
-      dispatch(changePassword(evt.target.value))
-    },    
+      dispatch(changePassword(evt.target.value));
+    },
     onSubmitForm: (evt) => {
       if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-      dispatch(authenticate());
+      dispatch(submitForm());
     },
   };
 }
 
-const mapStateToProps = createStructuredSelector({  
-  email: makeSelectEmail(),
-  password: makeSelectPassword(),
-});
-
-// Wrap the component to inject dispatch and state into it
 export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);

@@ -12,22 +12,50 @@
  */
 
 import React from 'react';
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 
 import Header from 'components/Header';
+import { makeSelectSignedIn } from './selectors';
+import { validateToken } from './actions';
 
 
-export default class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     children: React.PropTypes.node,
+    isSignedIn: React.PropTypes.bool,
+    onComponentWillMount: React.PropTypes.func,
   };
+
+  componentWillMount() {
+    if (this.props.onComponentWillMount) {
+      this.props.onComponentWillMount();
+    }
+  }
 
   render() {
     return (
       <div>
-        <Header />      
+        <Header
+          isSignedIn={this.props.isSignedIn}
+        />
         {React.Children.toArray(this.props.children)}
       </div>
     );
   }
 }
+
+const mapStateToProps = createStructuredSelector({
+  isSignedIn: makeSelectSignedIn(),
+});
+
+export function mapDispatchToProps(dispatch) {
+  return {
+    onComponentWillMount: () => {
+      dispatch(validateToken()); // Maybe this could move to routes.js or App wrapper
+    },
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

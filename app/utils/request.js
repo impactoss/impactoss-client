@@ -25,10 +25,23 @@ function checkStatus(response) {
 
   const error = new Error(response.statusText);
   error.response = response;
+
   throw error;
 }
 
+export function isContentJSON(response) {
+  const contentType = response.headers.get('content-type');
+  return contentType && contentType.indexOf('application/json') !== -1;
+}
 
+export function checkErrorMessagesExist(response) {
+  if (response && response.json && response.json.errors && response.json.errors.full_messages) {
+    return response.json.errors.full_messages;
+  } else if (response && response.json && response.json.errors) {
+    return response.json.errors;
+  }
+  return [];
+}
 
 /**
  * Requests a URL, returning a promise
@@ -38,7 +51,9 @@ function checkStatus(response) {
  *
  * @return {object}           The response data
  */
-export default function request(url, options) {
+export default function request(url, options, middleware) {
   return fetch(url, options)
     .then(checkStatus)
+    .then((response) => middleware ? middleware(response) : response)
+    .then(parseJSON);
 }
