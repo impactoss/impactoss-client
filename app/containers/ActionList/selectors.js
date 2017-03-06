@@ -23,10 +23,10 @@ const getSortIteratee = (field) => {
   }
 };
 
-const actionListSelector = (state) => state.get('actionList');
+const localStateSelector = (state) => state.get('actionList');
 
 const sortBySelector = createSelector(
-  actionListSelector, // Note this imported from App/selectors
+  localStateSelector,
   (substate) => ({
     sort: substate.get('sort'),
     order: substate.get('order'),
@@ -41,16 +41,6 @@ const actionsSortedSelector = createSelector(
   sortBySelector,
   (actions, { sort, order }) => orderBy(actions, getSortIteratee(sort), order)
 );
-
-/**
-* Convert container state to JS  ( maybe not needed )
-*/
-const actionViewJSSelector = createSelector(
-  actionListSelector,
-  (substate) => substate.toJS()
-);
-
-export default actionViewJSSelector;
 
 export {
   actionsSortedSelector,
