@@ -3,13 +3,11 @@
  */
 
 import { createSelector } from 'reselect';
-import { memoize } from 'lodash/function';
 
 const selectGlobal = (state) => state.get('global');
 const selectRoute = (state) => state.get('route');
 
 /**
-* NOTE TODO These shouldn't actually be MakeSelect...,
 * Use a make selector when different components will use a selector with different data
 * https://github.com/reactjs/reselect#sharing-selectors-with-props-across-multiple-components
 * otherwise use straight createSelector ( I think :/ )
@@ -32,25 +30,6 @@ const makeSelectError = () => createSelector(
 const makeSelectAuth = () => createSelector(
   selectGlobal,
   (globalState) => globalState.get('auth').toJS()
-);
-
-/*
- Pretty sure this won't cache correclty so have removed, see
- entitiesPathSelector for an alternative
-const makeSelectEntities = (path) => createSelector(
-  selectGlobal,
-  (globalState) => globalState.getIn(['entities', path])
-);
-*/
-
-const makeSelectRecommendations = createSelector(
-  selectGlobal,
-  (globalState) => globalState.getIn(['entities', 'recommendations'])
-);
-
-const makeSelectRecommendationActions = createSelector(
-  selectGlobal,
-  (globalState) => globalState.getIn(['entities', 'recommendation_actions'])
 );
 
 const makeSelectSignedIn = () => createSelector(
@@ -105,28 +84,42 @@ const entitiesSelector = createSelector(
   (state) => state.get('entities')
 );
 
-const entitiesPathSelector = createSelector(
-  entitiesSelector,
-  (entities) => memoize(
-    (path) => entities.get(path)
-  )
+const entitySelector = (state, { path, id }) =>
+  state.getIn(['global', 'entities', path]).get(id);
+
+const haveEntitySelector = (state, { path, id }) =>
+  state.getIn(['global', 'entities', path]).has(id);
+
+const entitiesPathSelector = (state, { path }) =>
+  state.getIn(['global', 'entities', path]);
+
+const requestedPathSelector = (state, { path }) =>
+  state.getIn(['global', 'requested', path]);
+
+const makeEntitySelector = () => createSelector(
+  entitySelector,
+  (entity) => entity ? entity.toJS() : null
 );
 
-const entitySelector = createSelector(
-  entitiesSelector,
-  (entities) => memoize(
-    (path, id) => entities.getIn([path, id])
-  )
+const makeEntityMapSelector = () => createSelector(
+  entitySelector,
+  (entity) => entity
 );
 
-const actionsSelector = createSelector(
-  entitiesSelector,
-  (entities) => entities.get('actions')
+const makeEntitiesReadySelector = () => createSelector(
+  entitiesPathSelector,
+  requestedPathSelector,
+  (entities, requested) => !!entities.size && !!requested
 );
 
-const actionsListSelector = createSelector(
-  actionsSelector,
-  (actions) => actions.toIndexedSeq().toJS()
+const makeEntitiesListSelector = () => createSelector(
+  entitiesPathSelector,
+  (entities) => entities.toList()
+);
+
+const makeEntitiesArraySelector = () => createSelector(
+  makeEntitiesListSelector(),
+  (entitiesList) => entitiesList.toJS()
 );
 
 export {
@@ -139,12 +132,14 @@ export {
   makeSelectSignedIn,
   makeSelectAuth,
   makeSelectNextPathname,
-  makeSelectRecommendations,
-  makeSelectRecommendationActions,
   entitiesSelector,
   entitySelector,
   entitiesPathSelector,
-  actionsSelector,
-  actionsListSelector,
   requestedSelector,
+  haveEntitySelector,
+  makeEntitySelector,
+  makeEntitiesReadySelector,
+  makeEntityMapSelector,
+  makeEntitiesListSelector,
+  makeEntitiesArraySelector,
 };

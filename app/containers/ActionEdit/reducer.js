@@ -9,11 +9,9 @@ import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 
 import {
-  SET_ACTION_ID,
   SAVE_SENDING,
   SAVE_ERROR,
   SAVE_SUCCESS,
-  ACTION_NOT_FOUND,
 } from './constants';
 
 const initialState = fromJS({
@@ -26,8 +24,6 @@ const initialState = fromJS({
 
 function actionEditReducer(state = initialState, action) {
   switch (action.type) {
-    case SET_ACTION_ID:
-      return state.set('id', action.id);
     case SAVE_SENDING:
       return state
         .set('saveSending', true)
@@ -41,14 +37,12 @@ function actionEditReducer(state = initialState, action) {
       return state
         .set('saveSending', false)
         .set('saveError', action.error);
-    case ACTION_NOT_FOUND:
-      return state
-      .set('actionNotFound', true);
     default:
       return state;
   }
 }
 
+// tim: I don't know how to pull from the global state to set these now, It doesn't seem to be possible
 const actionForm = fromJS({
   title: '',
   description: '',

@@ -8,7 +8,6 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
@@ -70,10 +69,13 @@ ActionList.propTypes = {
   sortBy: React.PropTypes.object.isRequired,
 };
 
-const mapStateToProps = createStructuredSelector({
-  actions: actionsSortedSelector,
-  sortBy: sortBySelector,
-});
+const makeMapStateToProps = () => {
+  const mapStateToProps = (state) => ({
+    actions: actionsSortedSelector(state, { path: 'actions' }),
+    sortBy: sortBySelector(state),
+  });
+  return mapStateToProps;
+};
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -87,4 +89,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionList);
+export default connect(makeMapStateToProps(), mapDispatchToProps)(ActionList);

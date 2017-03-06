@@ -8,26 +8,26 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { createStructuredSelector } from 'reselect';
 import { Link } from 'react-router';
 
-import {
-  actionSelector,
-  notFoundSelector,
-} from './selectors';
+import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
-import { getActionById } from './actions';
+import {
+  makeEntitySelector,
+  makeEntitiesReadySelector,
+} from 'containers/App/selectors';
 
 import messages from './messages';
 
 export class ActionView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    this.props.onComponentWillMount(this.props.params.id);
+    this.props.onComponentWillMount();
   }
 
   render() {
-    const { action, notFound } = this.props;
+    const { action, actionsReady } = this.props;
+
     return (
       <div>
         <Helmet
@@ -37,14 +37,14 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           ]}
         />
         <FormattedMessage {...messages.header} />
-        { notFound &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        { !action && !notFound &&
+        { !action && !actionsReady &&
           <div>
             <FormattedMessage {...messages.loading} />
+          </div>
+        }
+        { !action && actionsReady &&
+          <div>
+            <FormattedMessage {...messages.notFound} />
           </div>
         }
         { action &&
@@ -52,8 +52,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
             <h1>{action.attributes.title}</h1>
             <h5>Description</h5>
             <p>{action.attributes.description}</p>
-            <h5>Draft Status:</h5>
-            <p>{action.attributes.draft ? 'Y' : 'N'}</p>
+            <h5>Public:</h5>
+            <p>{action.attributes.draft === false ? 'YES' : 'NO'}</p>
             <h5>Updated At:</h5>
             <p>{action.attributes['updated-at']}</p>
           </div>
@@ -67,22 +67,26 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 
 ActionView.propTypes = {
   onComponentWillMount: PropTypes.func,
-  params: PropTypes.object,
   action: PropTypes.object,
-  notFound: PropTypes.bool.isRequired,
+  actionsReady: PropTypes.bool,
 };
 
-const mapStateToProps = createStructuredSelector({
-  action: actionSelector,
-  notFound: notFoundSelector,
-});
+const makeMapStateToProps = () => {
+  const getEntity = makeEntitySelector();
+  const entitiesReady = makeEntitiesReadySelector();
+  const mapStateToProps = (state, props) => ({
+    action: getEntity(state, { id: props.params.id, path: 'actions' }),
+    actionsReady: entitiesReady(state, { path: 'actions' }),
+  });
+  return mapStateToProps;
+};
 
 function mapDispatchToProps(dispatch) {
   return {
-    onComponentWillMount: (id) => {
-      dispatch(getActionById(id));
+    onComponentWillMount: () => {
+      dispatch(loadEntitiesIfNeeded('actions'));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionView);
+export default connect(makeMapStateToProps, mapDispatchToProps)(ActionView);
