@@ -19,7 +19,6 @@ const initialState = fromJS({
   saveSending: false,
   saveSuccess: false,
   saveError: false,
-  actionNotFound: false,
 });
 
 function actionEditReducer(state = initialState, action) {
