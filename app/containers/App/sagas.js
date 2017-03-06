@@ -24,6 +24,7 @@ import {
     logout,
     entitiesRequested,
     entitiesReady,
+    invalidateEntities,
 } from 'containers/App/actions';
 
 import {
@@ -74,6 +75,7 @@ export function* authenticateSaga(payload) {
     const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
 
     yield put(authenticateSuccess(response.data));
+    yield put(invalidateEntities());
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
@@ -92,6 +94,7 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', 'auth/sign_out');
     yield call(clearAuthValues);
     yield put(logoutSuccess());
+    yield put(invalidateEntities());
   } catch (err) {
     yield call(clearAuthValues);
       // TODO ensure this is displayed
@@ -107,6 +110,7 @@ export function* validateTokenSaga() {
     if (uid && client && accessToken) {
       const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
       yield put(authenticateSuccess(response.data));
+      yield put(invalidateEntities());
     } else {
       yield put(logout());
     }
