@@ -47,16 +47,17 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
 
   render() {
     const { action, actionsReady } = this.props;
+    const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
+
     return (
       <div>
         <Helmet
-          title="ActionEdit"
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
-            { name: 'description', content: 'Description of ActionEdit' },
+            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <FormattedMessage {...messages.header} />
         { !action && !actionsReady &&
           <div>
             <FormattedMessage {...messages.loading} />
@@ -110,6 +111,11 @@ ActionEdit.propTypes = {
   page: PropTypes.object,
   action: PropTypes.object,
   actionsReady: PropTypes.bool,
+  params: PropTypes.object,
+};
+
+ActionEdit.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
 };
 
 const makeMapStateToProps = () => {

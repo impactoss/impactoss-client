@@ -6,6 +6,14 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  pageTitle: {
+    id: 'app.container.ActionEdit.pageTitle',
+    defaultMessage: 'Edit Action',
+  },
+  metaDescription: {
+    id: 'app.container.ActionEdit.metaDescription',
+    defaultMessage: 'Edit Action page description',
+  },
   header: {
     id: 'app.containers.ActionEdit.header',
     defaultMessage: 'This is ActionEdit container !',
