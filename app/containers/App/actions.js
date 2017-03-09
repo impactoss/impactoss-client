@@ -65,11 +65,12 @@ export function loadingEntities(path) {
  *
  * @return {object}      An action object with a type of LOAD_ENTITIES_SUCCESS passing the entities
  */
-export function entitiesLoaded(entities, path) {
+export function entitiesLoaded(entities, path, time) {
   return {
     type: LOAD_ENTITIES_SUCCESS,
     entities,
     path,
+    time,
   };
 }
 
@@ -123,10 +124,11 @@ export function entitiesRequested(path, time) {
   };
 }
 
-export function entitiesReady(path) {
+export function entitiesReady(path, time) {
   return {
     type: ENTITIES_READY,
     path,
+    time,
   };
 }
 

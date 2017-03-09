@@ -25,6 +25,7 @@ import {
   ADD_ENTITY,
   UPDATE_ENTITY,
   ENTITIES_REQUESTED,
+  ENTITIES_READY,
   INVALIDATE_ENTITIES,
 } from './constants';
 
@@ -39,7 +40,12 @@ const initialState = fromJS({
     error: false,
     messages: [],
   },
-  requested: { // Record the time that entities where requested / loaded from the server
+  requested: { // Record the time that entities where requested from the server
+    actions: null,
+    recommendations: null,
+    recommendation_actions: null,
+  },
+  ready: { // Record the time that entities where returned from the server
     actions: null,
     recommendations: null,
     recommendation_actions: null,
@@ -95,6 +101,9 @@ function appReducer(state = initialState, payload) {
       return state
         .setIn(['entities', payload.path], fromJS(payload.entities))
         .setIn(['server', 'loading'], false);
+    case ENTITIES_READY:
+      return state
+        .setIn(['ready', payload.path], payload.time);
     case LOAD_ENTITIES_ERROR:
       return state
         .setIn(['server', 'error'], payload.error)
@@ -103,7 +112,7 @@ function appReducer(state = initialState, payload) {
     case INVALIDATE_ENTITIES:
       // reset requested to initial state
       return state
-        .set('requested', fromJS(initialState.toJS().requested))
+        .set('requested', fromJS(initialState.toJS().requested)) // should trigger new entity load
         .set('entities', fromJS(initialState.toJS().entities));
     default:
       return state;
