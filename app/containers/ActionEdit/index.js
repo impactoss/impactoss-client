@@ -8,11 +8,13 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { Control, Form, actions as formActions } from 'react-redux-form/immutable';
+import { actions as formActions } from 'react-redux-form/immutable';
 // import { actions as formActions } from 'react-redux-form';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
+
+import EntityForm from 'components/EntityForm';
 
 import {
   makeEntityMapSelector,
@@ -26,26 +28,19 @@ import {
 import messages from './messages';
 import { save } from './actions';
 
-const populateForm = (action) =>
-  formActions.load('actionEdit.form.action', action.get('attributes'));
-
 export class ActionEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    const { dispatch } = this.props;
-
-    dispatch(loadEntitiesIfNeeded('actions'));
+    this.props.loadEntitiesIfNeeded();
 
     if (this.props.action && this.props.actionsReady) {
-      dispatch(populateForm(this.props.action));
+      this.props.populateForm('actionEdit.form.action', this.props.action.get('attributes'));
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const { dispatch } = this.props;
-
     if (nextProps.action && nextProps.actionsReady && !this.props.actionsReady) {
-      dispatch(populateForm(nextProps.action));
+      this.props.populateForm('actionEdit.form.action', nextProps.action.get('attributes'));
     }
   }
 
@@ -73,23 +68,30 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
           </div>
         }
         {action &&
-          <Form
+          <EntityForm
             model="actionEdit.form.action"
-            onSubmit={this.props.handleSubmit}
-          >
-            <label htmlFor="title">Title:</label>
-            <Control.text id="title" model=".title" />
-            <label htmlFor="description">Description:</label>
-            <Control.textarea id="description" model=".description" />
-            <label htmlFor="status">Status:</label>
-            <Control.select id="status" model=".draft" value={action && action.draft}>
-              {PUBLISH_STATUSES.map((status) =>
-                <option key={status.value} value={status.value}>{status.label}</option>
-              )}
-            </Control.select>
-            <button type="submit">Save</button>
-            </Form>
-          }
+            handleSubmit={this.props.handleSubmit}
+            fields={
+              [
+                {
+                  id: 'title',
+                  controlType: 'input',
+                },
+                {
+                  id: 'description',
+                  controlType: 'textarea',
+                },
+                {
+                  id: 'status',
+                  controlType: 'select',
+                  model: '.draft',
+                  value: action && action.draft,
+                  options: PUBLISH_STATUSES,
+                },
+              ]
+            }
+          />
+        }
         {saveSending &&
           <p>Saving</p>
         }
@@ -102,7 +104,8 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
 }
 
 ActionEdit.propTypes = {
-  dispatch: PropTypes.func,
+  loadEntitiesIfNeeded: PropTypes.func,
+  populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   page: PropTypes.object,
   action: PropTypes.object,
@@ -122,9 +125,11 @@ const makeMapStateToProps = () => {
 
 function mapDispatchToProps(dispatch, props) {
   return {
-    dispatch,
-    onComponentWillMount: () => {
+    loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('actions'));
+    },
+    populateForm: (model, data) => {
+      dispatch(formActions.load(model, data));
     },
     handleSubmit: (formData) => {
       dispatch(save(formData, props.params.id));

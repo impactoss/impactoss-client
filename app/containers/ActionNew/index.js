@@ -8,12 +8,15 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { Control, Form } from 'react-redux-form/immutable';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { createStructuredSelector } from 'reselect';
+
+import EntityForm from 'components/EntityForm';
+
 import makeSelectActionNew from './selectors';
 import messages from './messages';
 import { save } from './actions';
+
 
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -27,22 +30,33 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           ]}
         />
         <FormattedMessage {...messages.header} />
-        <Form
+        <EntityForm
           model="actionNew.form.action"
-          onSubmit={this.props.handleSubmit}
-        >
-          <label htmlFor="title">Title:</label>
-          <Control.text id="title" model=".title" />
-          <label htmlFor="description">Description:</label>
-          <Control.textarea id="description" model=".description" />
-          <label htmlFor="status">Status:</label>
-          <Control.select id="status" model=".draft">
-            {PUBLISH_STATUSES.map((status) =>
-              <option key={status.value} value={status.value}>{status.label}</option>
-            )}
-          </Control.select>
-          <button type="submit">Save</button>
-        </Form>
+          handleSubmit={this.props.handleSubmit}
+          fields={
+            [
+              {
+                id: 'title',
+                label: 'Title',
+                type: 'text',
+                model: '.title',
+              },
+              {
+                id: 'description',
+                label: 'Description: ',
+                type: 'textarea',
+                model: '.description',
+              },
+              {
+                id: 'status',
+                label: 'Status: ',
+                type: 'select',
+                model: '.draft',
+                options: PUBLISH_STATUSES,
+              },
+            ]
+          }
+        />
         {saveSending &&
           <p>Saving Action</p>
         }
