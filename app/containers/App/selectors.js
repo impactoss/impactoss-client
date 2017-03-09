@@ -79,6 +79,11 @@ const requestedSelector = createSelector(
   (state) => state.get('requested')
 );
 
+const readySelector = createSelector(
+  selectGlobal,
+  (state) => state.get('ready')
+);
+
 const entitiesSelector = createSelector(
   selectGlobal,
   (state) => state.get('entities')
@@ -96,6 +101,9 @@ const entitiesPathSelector = (state, { path }) =>
 const requestedPathSelector = (state, { path }) =>
   state.getIn(['global', 'requested', path]);
 
+const readyPathSelector = (state, { path }) =>
+  state.getIn(['global', 'ready', path]);
+
 const makeEntitySelector = () => createSelector(
   entitySelector,
   (entity) => entity ? entity.toJS() : null
@@ -107,9 +115,13 @@ const makeEntityMapSelector = () => createSelector(
 );
 
 const makeEntitiesReadySelector = () => createSelector(
-  entitiesPathSelector,
+  readyPathSelector,
+  (ready) => !!ready
+);
+
+const makeEntitiesRequestedSelector = () => createSelector(
   requestedPathSelector,
-  (entities, requested) => !!entities.size && !!requested
+  (requested) => !!requested
 );
 
 const makeEntitiesListSelector = () => createSelector(
@@ -136,9 +148,11 @@ export {
   entitySelector,
   entitiesPathSelector,
   requestedSelector,
+  readySelector,
   haveEntitySelector,
   makeEntitySelector,
   makeEntitiesReadySelector,
+  makeEntitiesRequestedSelector,
   makeEntityMapSelector,
   makeEntitiesListSelector,
   makeEntitiesArraySelector,

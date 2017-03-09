@@ -54,7 +54,7 @@ export function* checkEntitiesSaga(payload) {
       // Call the API
       const response = yield call(apiRequest, 'get', serverPath);
       // Save response and set loading = false
-      yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path));
+      yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path, Date.now()));
     } catch (err) {
       // Whoops Save error
       yield put(entitiesLoadingError(err, payload.path));
@@ -63,7 +63,7 @@ export function* checkEntitiesSaga(payload) {
     }
   }
   // Entities are ready, let listeners know
-  yield put(entitiesReady(payload.path));
+  yield put(entitiesReady(payload.path, Date.now()));
 }
 
 export function* authenticateSaga(payload) {
@@ -110,7 +110,6 @@ export function* validateTokenSaga() {
     if (uid && client && accessToken) {
       const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
       yield put(authenticateSuccess(response.data));
-      yield put(invalidateEntities());
     } else {
       yield put(logout());
     }
