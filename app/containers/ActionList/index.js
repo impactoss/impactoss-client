@@ -11,17 +11,18 @@ import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
-import EntityList from 'components/EntityList';
+import EntityQuery from 'containers/EntityQuery';
+import { updateQueryStringParams } from 'utils/history';
 
-import {
-  makeEntitiesPagedSelector,
-  // sortBySelector,
-} from 'containers/App/selectors';
-
-import {
-  // actionsPagedSelector,
-  sortBySelector,
-} from './selectors';
+// import {
+//   makeEntitiesPagedSelector,
+//   // sortBySelector,
+// } from 'containers/App/selectors';
+//
+// import {
+//   // actionsPagedSelector,
+//   sortBySelector,
+// } from './selectors';
 
 
 import {
@@ -34,25 +35,35 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
 
   static propTypes = {
     componentWillMount: PropTypes.func,
-    pagedActions: React.PropTypes.object.isRequired,
-    onSetOrder: React.PropTypes.func.isRequired,
-    sortBy: React.PropTypes.object.isRequired,
+    location: React.PropTypes.object.isRequired,
   }
 
   componentWillMount() {
     this.props.componentWillMount();
   }
 
-  render() {
+  getQueryVar = (key) =>
+    key in this.props.location.query ? this.props.location.query[key] : null;
 
-    const { page, ...pagingProps } = this.props.pagedActions
-    const entities = page.map(({ id, attributes }) => ({
-      id,
-      title: attributes.title,
-      linkTo: `/actions/${id}`,
-      reference: id,
-      status: attributes.draft ? 'draft' : null,
-    }));
+  setPage = (page) => {
+    updateQueryStringParams({ page });
+  }
+
+  setSort = (sortBy, sortOrder) => {
+    updateQueryStringParams({ sortBy, sortOrder });
+  }
+
+  mapToEntityList = ({ id, attributes }) => ({
+    id,
+    title: attributes.title,
+    linkTo: `/actions/${id}`,
+    reference: id,
+    status: attributes.draft ? 'draft' : null,
+  })
+
+  render() {
+    const { page, sortBy, sortOrder } = this.props.location.query;
+    const currentPage = parseInt(page || 1, 10);
 
     return (
       <div>
@@ -64,28 +75,19 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         />
         <FormattedMessage {...messages.header} />
         <Link to="actions/new">Add Action</Link>
-        <EntityList
-          entities={entities}
-          {...pagingProps}
-          onSort={console.log}
+        <EntityQuery
+          mapEntities={this.mapToEntityList}
+          entities="actions"
+          currentPage={currentPage}
+          onSetPage={this.setPage}
+          onSort={this.setSort}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
         />
       </div>
     );
   }
 }
-
-const entitiesPagedSelector = makeEntitiesPagedSelector();
-
-const makeMapStateToProps = () => {
-  const mapStateToProps = (state, props) => {
-    console.log(props);
-    return {
-      pagedActions: entitiesPagedSelector(state, { path: 'actions', perPage: 20, currentPage: 1, sortBy: 'id', sortOrder: 'desc' }),
-      sortBy: sortBySelector(state),
-    }
-  };
-  return mapStateToProps;
-};
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -99,4 +101,5 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(makeMapStateToProps(), mapDispatchToProps)(ActionList);
+// export default connect(makeMapStateToProps(), mapDispatchToProps)(ActionList);
+export default connect(null, mapDispatchToProps)(ActionList);

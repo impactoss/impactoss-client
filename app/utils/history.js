@@ -1,22 +1,27 @@
-export const updateQueryStringParam = (key, value, push = true) => {
-  const baseUrl = `${location.protocol}//${location.host}${location.pathname}`;
-  const urlQueryString = document.location.search;
-  const newParam = `${key}=${value}`;
-  let params = `?${newParam}`;
+import { browserHistory } from 'react-router';
 
-  // If the "search" string exists, then build params from it
-  if (urlQueryString) {
-    const keyRegex = new RegExp(`([?&])${key}[^&]*`);
-    // If param exists already, update it
-    if (urlQueryString.match(keyRegex) !== null) {
-      params = urlQueryString.replace(keyRegex, `$1${newParam}`);
-    } else { // Otherwise, add it to end of query string
-      params = `${urlQueryString}&${newParam}`;
-    }
-  }
+function urlParamify(params = {}) {
+  const urlValues = Object.keys(params).reduce((urlParams, k) => {
+    urlParams.append(k, params[k]);
+    return urlParams;
+  }, new URLSearchParams());
+
+  return urlValues.toString();
+}
+
+export const updateQueryStringParams = (params, push = true) => {
+  const location = browserHistory.getCurrentLocation();
+  const baseUrl = location.pathname;
+  const newParams = urlParamify({
+    ...location.query,
+    ...params,
+  });
+
+  const path = `${baseUrl}?${newParams}`;
+
   if (push) {
-    window.history.pushState({}, '', baseUrl + params);
+    browserHistory.push(path);
   } else {
-    window.history.replaceState({}, '', baseUrl + params);
+    browserHistory.replace(path);
   }
 };
