@@ -3,9 +3,21 @@
  */
 
 import { createSelector } from 'reselect';
+import { slice } from 'lodash/array';
+import { orderBy } from 'lodash/collection';
 
 const selectGlobal = (state) => state.get('global');
 const selectRoute = (state) => state.get('route');
+
+const getSortIteratee = (field) => {
+  switch (field) {
+    case 'id':
+      // ID field needs to be treated as an int when sorting
+      return (entity) => parseInt(entity.id, 10);
+    default:
+      return field;
+  }
+};
 
 /**
 * Use a make selector when different components will use a selector with different data
@@ -96,6 +108,16 @@ const entitiesPathSelector = (state, { path }) =>
 const requestedPathSelector = (state, { path }) =>
   state.getIn(['global', 'requested', path]);
 
+const pagingSelector = (_, { perPage, currentPage }) => ({
+  perPage,
+  currentPage,
+});
+
+const sortBySelector = (_, { sortBy, sortOrder }) => ({
+  sortBy,
+  sortOrder,
+});
+
 const makeEntitySelector = () => createSelector(
   entitySelector,
   (entity) => entity ? entity.toJS() : null
@@ -122,6 +144,35 @@ const makeEntitiesArraySelector = () => createSelector(
   (entitiesList) => entitiesList.toJS()
 );
 
+const makeEntitisSortedSelector = () => createSelector(
+  sortBySelector,
+  makeEntitiesArraySelector(),
+  ({ sortBy, sortOrder }, entities) => orderBy(entities, getSortIteratee(sortBy), sortOrder)
+);
+
+const makeEntitiesPagedSelector = () => createSelector(
+  pagingSelector,
+  makeEntitisSortedSelector(),
+  ({ currentPage, perPage }, entities) => {
+    const length = entities.length;
+    const totalPages = Math.ceil(Math.max(length, 0) / perPage);
+    const pageNum = Math.min(currentPage, totalPages);
+    const offset = (pageNum - 1) * perPage;
+    const end = offset + perPage;
+    const haveNextPage = end < entities.length;
+    const havePrevPage = pageNum > 1;
+    const page = slice(entities, offset, end);
+    return {
+      page,
+      havePrevPage,
+      haveNextPage,
+      totalPages,
+      currentPage,
+      perPage,
+    };
+  }
+);
+
 export {
   selectGlobal,
   makeSelectLoading,
@@ -142,4 +193,5 @@ export {
   makeEntityMapSelector,
   makeEntitiesListSelector,
   makeEntitiesArraySelector,
+  makeEntitiesPagedSelector,
 };
