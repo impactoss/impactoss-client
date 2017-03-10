@@ -6,17 +6,17 @@ import PrimaryAction from './PrimaryAction';
 import SimpleAction from './SimpleAction';
 
 class Page extends React.Component { // eslint-disable-line react/prefer-stateless-function
-  renderAction = (action) => {
+  renderAction = (action, i) => {
     if (action.type === 'simple') {
       return (
-        <SimpleAction onClick={action.onClick}>
+        <SimpleAction key={i} onClick={() => action.onClick()}>
           {action.title}
         </SimpleAction>
       );
     }
     if (action.type === 'primary') {
       return (
-        <PrimaryAction onClick={action.onClick}>
+        <PrimaryAction key={i} onClick={() => action.onClick()}>
           {action.title}
         </PrimaryAction>
       );
@@ -28,8 +28,8 @@ class Page extends React.Component { // eslint-disable-line react/prefer-statele
       <Container>
         <H1>{this.props.title}</H1>
         {
-          this.props.actions.map((action) => (
-            this.renderAction(action)
+          this.props.actions.map((action, i) => (
+            this.renderAction(action, i)
           ))
         }
         {this.props.children}
@@ -41,7 +41,7 @@ class Page extends React.Component { // eslint-disable-line react/prefer-statele
 Page.propTypes = {
   title: PropTypes.string.isRequired,
   actions: PropTypes.array,
-  children: PropTypes.array,
+  children: PropTypes.object,
 };
 
 export default Page;

@@ -59,6 +59,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             </span>
           ))
         }
+        <button onClick={this.props.handleCancel}>Cancel</button>
         <button type="submit">Save</button>
       </Form>
     );
@@ -67,6 +68,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
 
 EntityForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
+  handleCancel: PropTypes.func.isRequired,
   model: PropTypes.string,
   fields: PropTypes.array,
 };
