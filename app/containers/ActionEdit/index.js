@@ -14,6 +14,7 @@ import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
+import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
 
 import {
@@ -43,7 +44,12 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
       this.props.populateForm('actionEdit.form.action', nextProps.action.get('attributes'));
     }
   }
-
+  cancelClick() {
+    //
+  }
+  saveClick() {
+   //
+  }
 
   render() {
     const { action, actionsReady } = this.props;
@@ -69,29 +75,47 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
           </div>
         }
         {action &&
-          <EntityForm
-            model="actionEdit.form.action"
-            handleSubmit={this.props.handleSubmit}
-            fields={
+          <Page
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            actions={
               [
                 {
-                  id: 'title',
-                  controlType: 'input',
+                  type: 'simple',
+                  title: 'Cancel',
+                  onClick: this.cancelClick,
                 },
                 {
-                  id: 'description',
-                  controlType: 'textarea',
-                },
-                {
-                  id: 'status',
-                  controlType: 'select',
-                  model: '.draft',
-                  value: action && action.draft,
-                  options: PUBLISH_STATUSES,
+                  type: 'primary',
+                  title: 'Save',
+                  onClick: this.saveClick,
                 },
               ]
             }
-          />
+          >
+            <EntityForm
+              model="actionEdit.form.action"
+              handleSubmit={this.props.handleSubmit}
+              fields={
+                [
+                  {
+                    id: 'title',
+                    controlType: 'input',
+                  },
+                  {
+                    id: 'description',
+                    controlType: 'textarea',
+                  },
+                  {
+                    id: 'status',
+                    controlType: 'select',
+                    model: '.draft',
+                    value: action && action.draft,
+                    options: PUBLISH_STATUSES,
+                  },
+                ]
+              }
+            />
+          </Page>
         }
         {saveSending &&
           <p>Saving</p>

@@ -6,9 +6,9 @@ const theme = {};
 // grid-styles settings https://github.com/jxnblk/grid-styled
 theme.gutter = 20;
 theme.breakpoints = {
-  small: '32em',
-  medium: '48em',
-  large: '64em',
+  small: '768px',
+  medium: '992px',
+  large: '1200px',
 };
 
 

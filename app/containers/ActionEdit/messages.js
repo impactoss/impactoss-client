@@ -16,7 +16,7 @@ export default defineMessages({
   },
   header: {
     id: 'app.containers.ActionEdit.header',
-    defaultMessage: 'This is ActionEdit container !',
+    defaultMessage: 'Edit Action',
   },
   notFound: {
     id: 'app.containers.ActionEdit.notFound',
