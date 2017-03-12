@@ -7,13 +7,13 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
-// import { createStructuredSelector } from 'reselect';
 import EntityListItem from 'components/EntityListItem';
 import {
+  loadEntitiesIfNeeded,
+} from 'containers/App/actions';
+import {
   makeEntitiesPagedSelector,
-  // sortBySelector,
 } from 'containers/App/selectors';
-// import makeSelectEntityQuery from './selectors';
 import messages from './messages';
 
 export class EntityQuery extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -24,7 +24,8 @@ export class EntityQuery extends React.PureComponent { // eslint-disable-line re
       haveNextPage: PropTypes.boolean,
       havePrevPage: PropTypes.boolean,
     }).isRequired,
-    mapEntities: PropTypes.func.isRequired,
+    mapToEntityList: PropTypes.func.isRequired,
+    componentWillMount: PropTypes.func.isRequired,
     currentPage: PropTypes.number,
     onSetPage: PropTypes.func,
     onSort: PropTypes.func,
@@ -37,6 +38,10 @@ export class EntityQuery extends React.PureComponent { // eslint-disable-line re
     currentPage: 1,
     sortBy: 'id',
     sortOrder: 'desc',
+  }
+
+  componentWillMount() {
+    this.props.componentWillMount();
   }
 
   onSort = (evt) => {
@@ -62,7 +67,7 @@ export class EntityQuery extends React.PureComponent { // eslint-disable-line re
   render() {
     const { sortOrder, pagedEntities } = this.props;
     const { page, havePrevPage, haveNextPage } = pagedEntities;
-    const entities = page.map(this.props.mapEntities);
+    const entities = page.map(this.props.mapToEntityList);
     return (
       <div>
         <FormattedMessage {...messages.header} />
@@ -99,9 +104,11 @@ const makeMapStateToProps = () => {
   return mapStateToProps;
 };
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, props) {
   return {
-    dispatch,
+    componentWillMount: () => {
+      dispatch(loadEntitiesIfNeeded(props.entities));
+    },
   };
 }
 
