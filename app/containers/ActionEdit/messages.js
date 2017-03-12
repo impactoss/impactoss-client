@@ -26,4 +26,8 @@ export default defineMessages({
     id: 'app.containers.ActionEdit.loading',
     defaultMessage: 'Loading action...',
   },
+  fieldRequired: {
+    id: 'app.containers.ActionNew.header',
+    defaultMessage: 'Required',
+  },
 });

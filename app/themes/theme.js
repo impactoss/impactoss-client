@@ -33,7 +33,9 @@ theme.fonts = {
 };
 
 // sizes
-theme.sizes = {};
+theme.sizes = {
+  h1: '2em',
+};
 
 // end styled-theme settings
 

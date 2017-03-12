@@ -21,6 +21,9 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
             <Icon name="home" />
             <FormattedMessage {...messages.home} />
           </HeaderLink>
+          <HeaderLink to="/actions">
+            <FormattedMessage {...messages.actions} />
+          </HeaderLink>
           {this.props.isSignedIn &&
             <HeaderLink to="/logout">
               <FormattedMessage {...messages.logout} />
@@ -36,12 +39,6 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
               </HeaderLink>
             </span>
           }
-          <HeaderLink to="/actions">
-            <FormattedMessage {...messages.actions} />
-          </HeaderLink>
-          <HeaderLink to="/recommendations/new">
-            <FormattedMessage {...messages.recommendationNew} />
-          </HeaderLink>
         </NavBar>
       </div>
     );

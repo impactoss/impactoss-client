@@ -89,6 +89,11 @@ const entitiesSelector = createSelector(
   (state) => state.get('entities')
 );
 
+const usersSelector = createSelector(
+  entitiesSelector,
+  (entities) => entities.get('users')
+);
+
 const entitySelector = (state, { path, id }) =>
   state.getIn(['global', 'entities', path]).get(id);
 
@@ -111,7 +116,20 @@ const makeEntitySelector = () => createSelector(
 
 const makeEntityMapSelector = () => createSelector(
   entitySelector,
-  (entity) => entity
+  usersSelector,
+  (entity, users) => {
+    if (entity) {
+      const username = users
+        ? users.get(entity.get('attributes').get('last_modified_user_id')).get('attributes').get('name')
+        : 'Hidden';
+      return entity.setIn(['attributes', 'last_modified_user'],
+        entity.get('attributes').get('last_modified_user_id')
+          ? username
+          : 'System'
+      );
+    }
+    return null;
+  }
 );
 
 const makeEntitiesReadySelector = () => createSelector(

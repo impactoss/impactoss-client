@@ -1,20 +1,34 @@
 import React, { PropTypes } from 'react';
 import { omit } from 'lodash/object';
 import { startCase } from 'lodash/string';
-import { Control, Form } from 'react-redux-form/immutable';
+import { Control, Form, Errors } from 'react-redux-form/immutable';
+import Grid from 'grid-styled';
+
+import Row from 'components/basic/Row';
+import FormWrapper from 'components/basic/FormWrapper';
+import FormHeader from './FormHeader';
+import FormBody from './FormBody';
+import FormFooter from './FormFooter';
+import ControlInfo from './ControlInfo';
+import ControlInput from './ControlInput';
+import ControlTextArea from './ControlTextArea';
+import ControlSelect from './ControlSelect';
+import Label from './Label';
+import Field from './Field';
 
 const controls = {
-  input: Control.input,
-  textarea: Control.textarea,
+  input: ControlInput,
+  textarea: ControlTextArea,
+  info: ControlInfo,
   radio: Control.radio,
   checkbox: Control.checkbox,
   file: Control.file,
-  select: Control.select,
+  select: ControlSelect,
   button: Control.button,
 };
 
 // These props will be omitted before being passed to the Control component
-const nonControlProps = ['label', 'component', 'controlType', 'children', 'options'];
+const nonControlProps = ['label', 'component', 'controlType', 'children', 'options', 'errorMessages'];
 
 class EntityForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -31,37 +45,98 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     const FieldComponent = this.getFieldComponent(field);
     const { id, model, ...props } = omit(field, nonControlProps);
     return (
-      <FieldComponent id={id} model={model || `.${id}`} {...props} >
+      <FieldComponent
+        id={id}
+        model={model || `.${id}`}
+        {...props}
+      >
         {this.renderFieldChildren(field)}
       </FieldComponent>
     );
   }
+
+  renderSection = (fields) => fields.map((field, index) => (
+    <Field key={index}>
+      <Label htmlFor={field.id}>
+        {`${field.label || startCase(field.id)} ${field.validators && field.validators.required ? '*' : ''}`}
+      </Label>
+      {this.renderField(field)}
+      {
+        field.errorMessages &&
+        <Errors
+          className="errors"
+          model={field.model}
+          show="touched"
+          messages={field.errorMessages}
+        />
+      }
+    </Field>
+  ))
+
 
   renderFieldChildren = (field) => {
     if (field.controlType === 'select' && field.options) { // handle known cases here
       return field.options.map((option, i) =>
         <option key={i} value={option.value} {...option.props}>{option.label}</option>);
     }
+    if (field.controlType === 'info') { // handle known cases here
+      return field.displayValue;
+    }
     return field.children || null; // enables passing children component, or null
   }
 
   render() {
+    const { fields } = this.props;
+
     return (
-      <Form
-        model={this.props.model}
-        onSubmit={this.props.handleSubmit}
-      >
-        {
-          this.props.fields.map((field, index) => (
-            <span key={index}>
-              <label htmlFor={field.id}>{field.label || `${startCase(field.id)}:`}</label>
-              {this.renderField(field)}
-            </span>
-          ))
-        }
-        <button onClick={this.props.handleCancel}>Cancel</button>
-        <button type="submit">Save</button>
-      </Form>
+      <FormWrapper>
+        <Form
+          model={this.props.model}
+          onSubmit={this.props.handleSubmit}
+        >
+          {
+            fields.header &&
+            <FormHeader>
+              <Row>
+                <Grid sm={3 / 4}>
+                  {
+                    fields.header.main &&
+                    this.renderSection(fields.header.main)
+                  }
+                </Grid>
+                <Grid sm={1 / 4}>
+                  {
+                    fields.header.aside &&
+                    this.renderSection(fields.header.aside)
+                  }
+                </Grid>
+              </Row>
+            </FormHeader>
+          }
+          { fields.body &&
+            <FormBody>
+              <Row>
+                <Grid sm={3 / 4}>
+                  {
+                    fields.body.main &&
+                    this.renderSection(fields.body.main)
+                  }
+                </Grid>
+                <Grid sm={1 / 4}>
+                  {
+                    fields.body.aside &&
+                    this.renderSection(fields.body.aside)
+                  }
+                </Grid>
+              </Row>
+            </FormBody>
+          }
+          <FormFooter>
+            <button onClick={this.props.handleCancel}>Cancel</button>
+            <button type="submit">Save</button>
+          </FormFooter>
+        </Form>
+      </FormWrapper>
     );
   }
 }
@@ -70,7 +145,7 @@ EntityForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   model: PropTypes.string,
-  fields: PropTypes.array,
+  fields: PropTypes.object,
 };
 
 export default EntityForm;
