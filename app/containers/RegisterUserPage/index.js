@@ -10,8 +10,8 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 
-import Input from 'components/Input';
-import Form from 'components/Form';
+import Input from 'components/basic/Input';
+import Form from 'components/basic/Form';
 
 import { changeEmail, changePassword, changePasswordConfirmation, changeName, submitForm } from './actions';
 import makeSelectRegisterUserPage from './selectors';
