@@ -118,23 +118,48 @@ const makeEntityMapSelector = () => createSelector(
   entitySelector,
   (entity) => entity
 );
-const makeEntityExtendedMapSelector = () => createSelector(
+// const makeEntityExtendedMapSelector = () => createSelector(
+//   entitySelector,
+//   usersSelector,
+//   (entity, users) => {
+//     console.log(entity)
+//     console.log(users)
+//     if (entity) {
+//       const user = users ? users.get(entity.get('attributes').get('last_modified_user_id')) : null
+//       const username = user
+//         ? user.get('attributes').get('name')
+//         : '';
+//     console.log(username)
+//       return entity.setIn(['attributes', 'last_modified_user'],
+//         entity.get('attributes').get('last_modified_user_id')
+//           ? username
+//           : 'System'
+//       );
+//     }
+//     return null;
+//   }
+// );
+
+const userById = (users, id) => users && id && users.get(id);
+
+const extendEntityUserName = (entity, user) =>
+  entity &&
+  entity.setIn(['attributes', 'last_modified_user'], user ? user.get('attributes').get('name') : 'System');
+
+const makeEntityExtendedSelector = () => createSelector(
   entitySelector,
   usersSelector,
-  (entity, users) => {
-    if (entity) {
-      const username = users
-        ? users.get(entity.get('attributes').get('last_modified_user_id')).get('attributes').get('name')
-        : '';
-      return entity.setIn(['attributes', 'last_modified_user'],
-        entity.get('attributes').get('last_modified_user_id')
-          ? username
-          : 'System'
-      );
+  argsSelector,
+  (entity, users, { toJS }) => {
+    if (entity && users) {
+      const user = userById(users, entity.get('attributes').get('last_modified_user_id'));
+      const entityExtended = extendEntityUserName(entity, user);
+      return entityExtended && toJS ? entityExtended.toJS() : entityExtended;
     }
     return null;
   }
 );
+
 
 const makeEntitiesReadySelector = () => createSelector(
   readyPathSelector,
@@ -221,7 +246,7 @@ export {
   makeEntitiesReadySelector,
   makeEntitiesRequestedSelector,
   makeEntityMapSelector,
-  makeEntityExtendedMapSelector,
+  makeEntityExtendedSelector,
   makeEntitiesListSelector,
   makeEntitiesArraySelector,
   makeTaxonomyByTypeSelector,

@@ -10,6 +10,9 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
+import collection from 'lodash/collection';
+
+import { fromJS } from 'immutable';
 
 
 // import { actions as formActions } from 'react-redux-form';
@@ -21,7 +24,10 @@ import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
 
 import {
-  makeEntityExtendedMapSelector,
+  makeEntitiesSelector,
+  makeTaxonomyByTypeSelector,
+  makeCategoryByTaxonomyTypeSelector,
+  makeEntityExtendedSelector,
   makeEntitiesReadySelector,
 } from 'containers/App/selectors';
 
@@ -39,13 +45,13 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
     this.props.loadEntitiesIfNeeded();
 
     if (this.props.action && this.props.actionsReady) {
-      this.props.populateForm('actionEdit.form.action', this.props.action.get('attributes'));
+      this.props.populateForm('actionEdit.form.action', fromJS(this.props.action.attributes));
     }
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.action && nextProps.actionsReady && !this.props.actionsReady) {
-      this.props.populateForm('actionEdit.form.action', nextProps.action.get('attributes'));
+      this.props.populateForm('actionEdit.form.action', fromJS(nextProps.action.attributes));
     }
   }
 
@@ -54,6 +60,16 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
+
+
+    const taxonomyOptions = collection.map(this.props.taxonomies, (tax) => ({
+      id: tax.attributes.title,
+      controlType: 'select',
+      options: collection.map(this.props.categoriesByTaxonomyType[tax.id], (cat) => ({
+        value: cat.id,
+        label: cat.attributes.title,
+      })),
+    }));
 
     return (
       <div>
@@ -124,12 +140,12 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
                     {
                       id: 'updated',
                       controlType: 'info',
-                      displayValue: action && action.get('attributes').get('updated_at'),
+                      displayValue: action && action.attributes.updated_at,
                     },
                     {
                       id: 'updated_by',
                       controlType: 'info',
-                      displayValue: action && action.get('attributes').get('last_modified_user'),
+                      displayValue: action && action.attributes.last_modified_user,
                     },
                   ],
                 },
@@ -140,7 +156,16 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
                       controlType: 'textarea',
                       model: '.description',
                     },
+                    {
+                      id: 'recommendations',
+                      controlType: 'select',
+                      options: collection.map(this.props.recommendations, (rec) => ({
+                        value: rec.id,
+                        label: rec.attributes.title,
+                      })),
+                    },
                   ],
+                  aside: taxonomyOptions,
                 },
               }}
             />
@@ -167,6 +192,9 @@ ActionEdit.propTypes = {
   action: PropTypes.object,
   actionsReady: PropTypes.bool,
   params: PropTypes.object,
+  taxonomies: PropTypes.object,
+  categoriesByTaxonomyType: PropTypes.object,
+  recommendations: PropTypes.object,
 };
 
 ActionEdit.contextTypes = {
@@ -174,13 +202,20 @@ ActionEdit.contextTypes = {
 };
 
 const makeMapStateToProps = () => {
-  const getEntity = makeEntityExtendedMapSelector();
+  const getEntity = makeEntityExtendedSelector();
   const entitiesReady = makeEntitiesReadySelector();
+  const getTaxonomies = makeTaxonomyByTypeSelector();
+  const getCategories = makeCategoryByTaxonomyTypeSelector();
+  const getEntities = makeEntitiesSelector();
+
   const mapStateToProps = (state, props) => ({
-    action: getEntity(state, { id: props.params.id, path: 'actions' }),
+    action: getEntity(state, { id: props.params.id, path: 'actions', toJS: true }),
     actionsReady: entitiesReady(state, { path: 'actions' }),
     page: pageSelector(state),
     form: formSelector(state),
+    taxonomies: getTaxonomies(state, { type: 'actions', toJS: true }),
+    categoriesByTaxonomyType: getCategories(state, { type: 'actions', toJS: true }),
+    recommendations: getEntities(state, { path: 'recommendations', toJS: true }),
   });
   return mapStateToProps;
 };
@@ -190,6 +225,9 @@ function mapDispatchToProps(dispatch, props) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('actions'));
       dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
     },
     populateForm: (model, data) => {
       dispatch(formActions.load(model, data));
