@@ -21,7 +21,7 @@ import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
 
 import {
-  makeEntityMapSelector,
+  makeEntityExtendedMapSelector,
   makeEntitiesReadySelector,
 } from 'containers/App/selectors';
 
@@ -174,7 +174,7 @@ ActionEdit.contextTypes = {
 };
 
 const makeMapStateToProps = () => {
-  const getEntity = makeEntityMapSelector();
+  const getEntity = makeEntityExtendedMapSelector();
   const entitiesReady = makeEntitiesReadySelector();
   const mapStateToProps = (state, props) => ({
     action: getEntity(state, { id: props.params.id, path: 'actions' }),

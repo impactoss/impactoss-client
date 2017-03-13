@@ -116,12 +116,16 @@ const makeEntitySelector = () => createSelector(
 
 const makeEntityMapSelector = () => createSelector(
   entitySelector,
+  (entity) => entity
+);
+const makeEntityExtendedMapSelector = () => createSelector(
+  entitySelector,
   usersSelector,
   (entity, users) => {
     if (entity) {
       const username = users
         ? users.get(entity.get('attributes').get('last_modified_user_id')).get('attributes').get('name')
-        : 'Hidden';
+        : '';
       return entity.setIn(['attributes', 'last_modified_user'],
         entity.get('attributes').get('last_modified_user_id')
           ? username
@@ -172,6 +176,7 @@ export {
   makeEntitiesReadySelector,
   makeEntitiesRequestedSelector,
   makeEntityMapSelector,
+  makeEntityExtendedMapSelector,
   makeEntitiesListSelector,
   makeEntitiesArraySelector,
 };
