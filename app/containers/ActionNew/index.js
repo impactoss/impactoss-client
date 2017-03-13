@@ -21,8 +21,7 @@ import EntityForm from 'components/EntityForm';
 
 import {
   makeEntitiesSelector,
-  makeTaxonomyByTypeSelector,
-  makeCategoryByTaxonomyTypeSelector,
+  makeTaxonomiesByTypeExtendedSelector,
 } from 'containers/App/selectors';
 
 import actionNewSelector from './selectors';
@@ -40,10 +39,10 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     const { saveSending, saveError } = this.props.actionNew.page;
     const required = (val) => val && val.length;
 
-    const taxonomyOptions = collection.map(this.props.taxonomies, (tax) => ({
+    const taxonomyOptions = collection.map(this.props.taxonomiesExtended, (tax) => ({
       id: tax.attributes.title,
       controlType: 'select',
-      options: collection.map(this.props.categoriesByTaxonomyType[tax.id], (cat) => ({
+      options: collection.map(tax.categories, (cat) => ({
         value: cat.id,
         label: cat.attributes.title,
       })),
@@ -144,8 +143,7 @@ ActionNew.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   actionNew: PropTypes.object,
-  taxonomies: PropTypes.object,
-  categoriesByTaxonomyType: PropTypes.object,
+  taxonomiesExtended: PropTypes.object,
   recommendations: PropTypes.object,
 };
 
@@ -154,14 +152,12 @@ ActionNew.contextTypes = {
 };
 
 const makeMapStateToProps = () => {
-  const getTaxonomies = makeTaxonomyByTypeSelector();
-  const getCategories = makeCategoryByTaxonomyTypeSelector();
+  const getTaxonomies = makeTaxonomiesByTypeExtendedSelector();
   const getEntities = makeEntitiesSelector();
 
   const mapStateToProps = (state) => ({
     actionNew: actionNewSelector(state),
-    taxonomies: getTaxonomies(state, { type: 'actions', toJS: true }),
-    categoriesByTaxonomyType: getCategories(state, { type: 'actions', toJS: true }),
+    taxonomiesExtended: getTaxonomies(state, { type: 'actions', toJS: true }),
     recommendations: getEntities(state, { path: 'recommendations', toJS: true }),
   });
 

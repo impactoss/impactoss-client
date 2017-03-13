@@ -197,7 +197,7 @@ const taxonomyByType = (taxonomies, type) =>
   taxonomies && type && taxonomies.filter((taxonomy) =>
     taxonomy.get('attributes').get(`tags_${type === 'actions' ? 'measures' : type}`));
 
-const makeTaxonomyByTypeSelector = () => createSelector(
+const makeTaxonomiesByTypeSelector = () => createSelector(
   taxonomiesSelector,
   argsSelector,
   (taxonomies, { type, toJS }) => {
@@ -214,7 +214,7 @@ const categoryByTaxonomyId = (categories, taxId) =>
   categories && taxId && categories.filter((cat) =>
     cat.get('attributes').get('taxonomy_id') === parseInt(taxId, 10));
 
-const makeCategoryByTaxonomyTypeSelector = () => createSelector(
+const makeTaxonomiesByTypeExtendedSelector = () => createSelector(
   taxonomiesSelector,
   categoriesSelector,
   actionCategoriesSelector,
@@ -256,7 +256,7 @@ export {
   makeEntityExtendedSelector,
   makeEntitiesListSelector,
   makeEntitiesArraySelector,
-  makeTaxonomyByTypeSelector,
-  makeCategoryByTaxonomyTypeSelector,
+  makeTaxonomiesByTypeSelector,
+  makeTaxonomiesByTypeExtendedSelector,
   makeEntitiesSelector,
 };
