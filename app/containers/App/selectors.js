@@ -208,6 +208,7 @@ const makeTaxonomyByTypeSelector = () => createSelector(
 
 // CATEGORY QUERIES
 const categoriesSelector = (state) => state.getIn(['global', 'entities', 'categories']);
+const actionCategoriesSelector = (state) => state.getIn(['global', 'entities', 'action_categories']);
 
 const categoryByTaxonomyId = (categories, taxId) =>
   categories && taxId && categories.filter((cat) =>
@@ -216,11 +217,17 @@ const categoryByTaxonomyId = (categories, taxId) =>
 const makeCategoryByTaxonomyTypeSelector = () => createSelector(
   taxonomiesSelector,
   categoriesSelector,
+  actionCategoriesSelector,
   argsSelector,
-  (taxonomies, categories, { type, toJS }) => {
+  (taxonomies, categories, actionCategories, { actionId, type, toJS }) => {
     const taxonomiesByType = taxonomyByType(taxonomies, type);
     const categoriesByTaxonomyType = taxonomiesByType && taxonomiesByType.map((tax) =>
-      categoryByTaxonomyId(categories, tax.get('id'))
+      tax.set('categories', categoryByTaxonomyId(categories, tax.get('id')).map((cat) => {
+        const assigned = actionCategories.find((ac) =>
+          ac.getIn(['attributes', 'measure_id']) === actionId && ac.getIn(['attributes', 'category_id']) === cat.id
+        );
+        return cat.set('assigned', !!assigned && assigned.length);
+      }))
     );
     return categoriesByTaxonomyType && toJS ? categoriesByTaxonomyType.toJS() : categoriesByTaxonomyType;
   }

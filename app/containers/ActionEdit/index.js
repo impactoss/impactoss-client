@@ -25,7 +25,6 @@ import EntityForm from 'components/EntityForm';
 
 import {
   makeEntitiesSelector,
-  makeTaxonomyByTypeSelector,
   makeCategoryByTaxonomyTypeSelector,
   makeEntityExtendedSelector,
   makeEntitiesReadySelector,
@@ -61,13 +60,12 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
 
-
-    const taxonomyOptions = collection.map(this.props.taxonomies, (tax) => ({
+    const taxonomyOptions = collection.map(this.props.categoriesByTaxonomyType, (tax) => ({
       id: tax.attributes.title,
       controlType: 'select',
-      options: collection.map(this.props.categoriesByTaxonomyType[tax.id], (cat) => ({
+      options: collection.map(tax.categories, (cat) => ({
         value: cat.id,
-        label: cat.attributes.title,
+        label: `${cat.attributes.title}${cat.assigned ? ' - assigned' : ' - not assigned'}`,
       })),
     }));
 
@@ -192,7 +190,6 @@ ActionEdit.propTypes = {
   action: PropTypes.object,
   actionsReady: PropTypes.bool,
   params: PropTypes.object,
-  taxonomies: PropTypes.object,
   categoriesByTaxonomyType: PropTypes.object,
   recommendations: PropTypes.object,
 };
@@ -204,7 +201,6 @@ ActionEdit.contextTypes = {
 const makeMapStateToProps = () => {
   const getEntity = makeEntityExtendedSelector();
   const entitiesReady = makeEntitiesReadySelector();
-  const getTaxonomies = makeTaxonomyByTypeSelector();
   const getCategories = makeCategoryByTaxonomyTypeSelector();
   const getEntities = makeEntitiesSelector();
 
@@ -213,8 +209,10 @@ const makeMapStateToProps = () => {
     actionsReady: entitiesReady(state, { path: 'actions' }),
     page: pageSelector(state),
     form: formSelector(state),
-    taxonomies: getTaxonomies(state, { type: 'actions', toJS: true }),
-    categoriesByTaxonomyType: getCategories(state, { type: 'actions', toJS: true }),
+    categoriesByTaxonomyType: getCategories(
+      state,
+      { actionId: props.params.id, type: 'actions', toJS: true }
+    ),
     recommendations: getEntities(state, { path: 'recommendations', toJS: true }),
   });
   return mapStateToProps;
@@ -228,6 +226,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('action_categories'));
     },
     populateForm: (model, data) => {
       dispatch(formActions.load(model, data));
