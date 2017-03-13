@@ -151,9 +151,54 @@ const makeEntitiesListSelector = () => createSelector(
   (entities) => entities.toList()
 );
 
+const makeEntitiesSelector = () => createSelector(
+  entitiesPathSelector,
+  argsSelector,
+  (entities, { toJS }) => entities && toJS ? entities.toJS() : entities
+);
+
 const makeEntitiesArraySelector = () => createSelector(
   makeEntitiesListSelector(),
   (entitiesList) => entitiesList.toJS()
+);
+
+// GENERIC ARGS QUERY
+const argsSelector = (state, args) => args;
+
+// TAXONOMY QUERIES
+const taxonomiesSelector = (state) => state.getIn(['global', 'entities', 'taxonomies']);
+
+const taxonomyByType = (taxonomies, type) =>
+  taxonomies && type && taxonomies.filter((taxonomy) =>
+    taxonomy.get('attributes').get(`tags_${type === 'actions' ? 'measures' : type}`));
+
+const makeTaxonomyByTypeSelector = () => createSelector(
+  taxonomiesSelector,
+  argsSelector,
+  (taxonomies, { type, toJS }) => {
+    const taxonomiesByType = taxonomyByType(taxonomies, type);
+    return taxonomiesByType && toJS ? taxonomiesByType.toJS() : taxonomiesByType;
+  }
+);
+
+// CATEGORY QUERIES
+const categoriesSelector = (state) => state.getIn(['global', 'entities', 'categories']);
+
+const categoryByTaxonomyId = (categories, taxId) =>
+  categories && taxId && categories.filter((cat) =>
+    cat.get('attributes').get('taxonomy_id') === parseInt(taxId, 10));
+
+const makeCategoryByTaxonomyTypeSelector = () => createSelector(
+  taxonomiesSelector,
+  categoriesSelector,
+  argsSelector,
+  (taxonomies, categories, { type, toJS }) => {
+    const taxonomiesByType = taxonomyByType(taxonomies, type);
+    const categoriesByTaxonomyType = taxonomiesByType && taxonomiesByType.map((tax) =>
+      categoryByTaxonomyId(categories, tax.get('id'))
+    );
+    return categoriesByTaxonomyType && toJS ? categoriesByTaxonomyType.toJS() : categoriesByTaxonomyType;
+  }
 );
 
 export {
@@ -179,4 +224,7 @@ export {
   makeEntityExtendedMapSelector,
   makeEntitiesListSelector,
   makeEntitiesArraySelector,
+  makeTaxonomyByTypeSelector,
+  makeCategoryByTaxonomyTypeSelector,
+  makeEntitiesSelector,
 };

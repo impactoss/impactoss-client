@@ -41,19 +41,28 @@ const initialState = fromJS({
     messages: [],
   },
   requested: { // Record the time that entities where requested from the server
+    users: null,
     actions: null,
     recommendations: null,
     recommendation_actions: null,
+    taxonomies: null,
+    categories: null,
   },
   ready: { // Record the time that entities where returned from the server
+    users: null,
     actions: null,
     recommendations: null,
     recommendation_actions: null,
+    taxonomies: null,
+    categories: null,
   },
   entities: {
+    users: {},
     actions: {},
     recommendations: {},
     recommendation_actions: {},
+    taxonomies: {},
+    categories: {},
   },
   user: {
     attributes: null,
