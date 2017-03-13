@@ -7,10 +7,13 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
-import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { createStructuredSelector } from 'reselect';
+import { browserHistory } from 'react-router';
 
+import { PUBLISH_STATUSES } from 'containers/App/constants';
+
+
+import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
 
 import makeSelectActionNew from './selectors';
@@ -21,42 +24,77 @@ import { save } from './actions';
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { saveSending, saveError } = this.props.ActionNew.page;
+    const required = (val) => val && val.length;
+
     return (
       <div>
         <Helmet
-          title="ActionNew"
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
           meta={[
-            { name: 'description', content: 'Description of ActionNew' },
+            {
+              name: 'description',
+              content: this.context.intl.formatMessage(messages.metaDescription),
+            },
           ]}
         />
-        <FormattedMessage {...messages.header} />
-        <EntityForm
-          model="actionNew.form.action"
-          handleSubmit={this.props.handleSubmit}
-          fields={
+        <Page
+          title={this.context.intl.formatMessage(messages.pageTitle)}
+          actions={
             [
               {
-                id: 'title',
-                label: 'Title',
-                type: 'text',
-                model: '.title',
+                type: 'simple',
+                title: 'Cancel',
+                onClick: this.props.handleCancel,
               },
               {
-                id: 'description',
-                label: 'Description: ',
-                type: 'textarea',
-                model: '.description',
-              },
-              {
-                id: 'status',
-                label: 'Status: ',
-                type: 'select',
-                model: '.draft',
-                options: PUBLISH_STATUSES,
+                type: 'primary',
+                title: 'Save',
+                onClick: () => this.props.handleSubmit(this.props.ActionNew.form.action),
               },
             ]
           }
-        />
+        >
+          <EntityForm
+            model="actionNew.form.action"
+            handleSubmit={this.props.handleSubmit}
+            handleCancel={this.props.handleCancel}
+            fields={{
+              header: {
+                main: [
+                  {
+                    id: 'title',
+                    controlType: 'input',
+                    model: '.title',
+                    placeholder: this.context.intl.formatMessage(messages.fields.title.placeholder),
+                    validators: {
+                      required,
+                    },
+                    errorMessages: {
+                      required: this.context.intl.formatMessage(messages.fieldRequired),
+                    },
+                  },
+                ],
+                aside: [
+                  {
+                    id: 'status',
+                    controlType: 'select',
+                    model: '.draft',
+                    options: PUBLISH_STATUSES,
+                  },
+                ],
+              },
+              body: {
+                main: [
+                  {
+                    id: 'description',
+                    controlType: 'textarea',
+                    model: '.description',
+                  },
+                ],
+              },
+            }}
+          />
+        </Page>
         {saveSending &&
           <p>Saving Action</p>
         }
@@ -71,7 +109,12 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
 
 ActionNew.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
+  handleCancel: PropTypes.func.isRequired,
   ActionNew: PropTypes.object,
+};
+
+ActionNew.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -80,9 +123,15 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch,
     handleSubmit: (formData) => {
       dispatch(save(formData));
+    },
+    handleCancel: () => {
+      // not really a dispatch function here, could be a member function instead
+      // however
+      // - this could in the future be moved to a saga or reducer
+      // - also its nice to be next to handleSubmit
+      browserHistory.push('/actions');
     },
   };
 }

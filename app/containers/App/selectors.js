@@ -91,9 +91,19 @@ const requestedSelector = createSelector(
   (state) => state.get('requested')
 );
 
+const readySelector = createSelector(
+  selectGlobal,
+  (state) => state.get('ready')
+);
+
 const entitiesSelector = createSelector(
   selectGlobal,
   (state) => state.get('entities')
+);
+
+const usersSelector = createSelector(
+  entitiesSelector,
+  (entities) => entities.get('users')
 );
 
 const entitySelector = (state, { path, id }) =>
@@ -118,6 +128,9 @@ const sortBySelector = (_, { sortBy, sortOrder }) => ({
   sortOrder,
 });
 
+const readyPathSelector = (state, { path }) =>
+  state.getIn(['global', 'ready', path]);
+
 const makeEntitySelector = () => createSelector(
   entitySelector,
   (entity) => entity ? entity.toJS() : null
@@ -127,11 +140,32 @@ const makeEntityMapSelector = () => createSelector(
   entitySelector,
   (entity) => entity
 );
+const makeEntityExtendedMapSelector = () => createSelector(
+  entitySelector,
+  usersSelector,
+  (entity, users) => {
+    if (entity) {
+      const username = users
+        ? users.get(entity.get('attributes').get('last_modified_user_id')).get('attributes').get('name')
+        : '';
+      return entity.setIn(['attributes', 'last_modified_user'],
+        entity.get('attributes').get('last_modified_user_id')
+          ? username
+          : 'System'
+      );
+    }
+    return null;
+  }
+);
 
 const makeEntitiesReadySelector = () => createSelector(
-  entitiesPathSelector,
+  readyPathSelector,
+  (ready) => !!ready
+);
+
+const makeEntitiesRequestedSelector = () => createSelector(
   requestedPathSelector,
-  (entities, requested) => !!entities.size && !!requested
+  (requested) => !!requested
 );
 
 const makeEntitiesListSelector = () => createSelector(
@@ -187,10 +221,13 @@ export {
   entitySelector,
   entitiesPathSelector,
   requestedSelector,
+  readySelector,
   haveEntitySelector,
   makeEntitySelector,
   makeEntitiesReadySelector,
+  makeEntitiesRequestedSelector,
   makeEntityMapSelector,
+  makeEntityExtendedMapSelector,
   makeEntitiesListSelector,
   makeEntitiesArraySelector,
   makeEntitiesPagedSelector,

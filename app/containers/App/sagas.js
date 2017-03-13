@@ -24,6 +24,7 @@ import {
     logout,
     entitiesRequested,
     entitiesReady,
+    invalidateEntities,
 } from 'containers/App/actions';
 
 import {
@@ -53,7 +54,7 @@ export function* checkEntitiesSaga(payload) {
       // Call the API
       const response = yield call(apiRequest, 'get', serverPath);
       // Save response and set loading = false
-      yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path));
+      yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path, Date.now()));
     } catch (err) {
       // Whoops Save error
       yield put(entitiesLoadingError(err, payload.path));
@@ -62,7 +63,7 @@ export function* checkEntitiesSaga(payload) {
     }
   }
   // Entities are ready, let listeners know
-  yield put(entitiesReady(payload.path));
+  yield put(entitiesReady(payload.path, Date.now()));
 }
 
 export function* authenticateSaga(payload) {
@@ -74,6 +75,7 @@ export function* authenticateSaga(payload) {
     const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
 
     yield put(authenticateSuccess(response.data));
+    yield put(invalidateEntities());
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
@@ -92,6 +94,7 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', 'auth/sign_out');
     yield call(clearAuthValues);
     yield put(logoutSuccess());
+    yield put(invalidateEntities());
   } catch (err) {
     yield call(clearAuthValues);
       // TODO ensure this is displayed
