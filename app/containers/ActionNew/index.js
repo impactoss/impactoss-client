@@ -7,24 +7,46 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
+import collection from 'lodash/collection';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
+
+import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 
 import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
 
-import makeSelectActionNew from './selectors';
+
+import {
+  makeEntitiesSelector,
+  makeTaxonomiesByTypeExtendedSelector,
+} from 'containers/App/selectors';
+
+import actionNewSelector from './selectors';
 import messages from './messages';
 import { save } from './actions';
 
 
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
+  componentWillMount() {
+    this.props.loadEntitiesIfNeeded();
+  }
+
   render() {
-    const { saveSending, saveError } = this.props.ActionNew.page;
+    const { saveSending, saveError } = this.props.actionNew.page;
     const required = (val) => val && val.length;
+
+    const taxonomyOptions = collection.map(this.props.taxonomiesExtended, (tax) => ({
+      id: tax.attributes.title,
+      controlType: 'select',
+      options: collection.map(tax.categories, (cat) => ({
+        value: cat.id,
+        label: cat.attributes.title,
+      })),
+    }));
 
     return (
       <div>
@@ -49,7 +71,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
               {
                 type: 'primary',
                 title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.ActionNew.form.action),
+                onClick: () => this.props.handleSubmit(this.props.actionNew.form.action),
               },
             ]
           }
@@ -90,7 +112,16 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                     controlType: 'textarea',
                     model: '.description',
                   },
+                  {
+                    id: 'recommendations',
+                    controlType: 'select',
+                    options: collection.map(this.props.recommendations, (rec) => ({
+                      value: rec.id,
+                      label: rec.attributes.title,
+                    })),
+                  },
                 ],
+                aside: taxonomyOptions,
               },
             }}
           />
@@ -108,21 +139,38 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
 }
 
 ActionNew.propTypes = {
+  loadEntitiesIfNeeded: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  ActionNew: PropTypes.object,
+  actionNew: PropTypes.object,
+  taxonomiesExtended: PropTypes.object,
+  recommendations: PropTypes.object,
 };
 
 ActionNew.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-const mapStateToProps = createStructuredSelector({
-  ActionNew: makeSelectActionNew(),
-});
+const makeMapStateToProps = () => {
+  const getTaxonomies = makeTaxonomiesByTypeExtendedSelector();
+  const getEntities = makeEntitiesSelector();
+
+  const mapStateToProps = (state) => ({
+    actionNew: actionNewSelector(state),
+    taxonomiesExtended: getTaxonomies(state, { type: 'actions', toJS: true }),
+    recommendations: getEntities(state, { path: 'recommendations', toJS: true }),
+  });
+
+  return mapStateToProps;
+};
 
 function mapDispatchToProps(dispatch) {
   return {
+    loadEntitiesIfNeeded: () => {
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
+    },
     handleSubmit: (formData) => {
       dispatch(save(formData));
     },
@@ -136,4 +184,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionNew);
+export default connect(makeMapStateToProps, mapDispatchToProps)(ActionNew);

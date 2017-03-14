@@ -14,12 +14,12 @@ const selectActionNewDomain = () => (state) => state.get('actionNew');
  * Default selector used by ActionNew
  */
 
-const makeSelectActionNew = () => createSelector(
+const actionNewSelector = createSelector(
   selectActionNewDomain(),
   (substate) => substate.toJS()
 );
 
-export default makeSelectActionNew;
+export default actionNewSelector;
 export {
   selectActionNewDomain,
 };

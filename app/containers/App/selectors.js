@@ -118,16 +118,6 @@ const entitiesPathSelector = (state, { path }) =>
 const requestedPathSelector = (state, { path }) =>
   state.getIn(['global', 'requested', path]);
 
-const pagingSelector = (_, { perPage, currentPage }) => ({
-  perPage,
-  currentPage,
-});
-
-const sortBySelector = (_, { sortBy, sortOrder }) => ({
-  sortBy,
-  sortOrder,
-});
-
 const readyPathSelector = (state, { path }) =>
   state.getIn(['global', 'ready', path]);
 
@@ -140,23 +130,48 @@ const makeEntityMapSelector = () => createSelector(
   entitySelector,
   (entity) => entity
 );
-const makeEntityExtendedMapSelector = () => createSelector(
+// const makeEntityExtendedMapSelector = () => createSelector(
+//   entitySelector,
+//   usersSelector,
+//   (entity, users) => {
+//     console.log(entity)
+//     console.log(users)
+//     if (entity) {
+//       const user = users ? users.get(entity.get('attributes').get('last_modified_user_id')) : null
+//       const username = user
+//         ? user.get('attributes').get('name')
+//         : '';
+//     console.log(username)
+//       return entity.setIn(['attributes', 'last_modified_user'],
+//         entity.get('attributes').get('last_modified_user_id')
+//           ? username
+//           : 'System'
+//       );
+//     }
+//     return null;
+//   }
+// );
+
+const userById = (users, id) => users && id && users.get(id);
+
+const extendEntityUserName = (entity, user) =>
+  entity &&
+  entity.setIn(['attributes', 'last_modified_user'], user ? user.get('attributes').get('name') : 'System');
+
+const makeEntityExtendedSelector = () => createSelector(
   entitySelector,
   usersSelector,
-  (entity, users) => {
-    if (entity) {
-      const username = users
-        ? users.get(entity.get('attributes').get('last_modified_user_id')).get('attributes').get('name')
-        : '';
-      return entity.setIn(['attributes', 'last_modified_user'],
-        entity.get('attributes').get('last_modified_user_id')
-          ? username
-          : 'System'
-      );
+  argsSelector,
+  (entity, users, { toJS }) => {
+    if (entity && users) {
+      const user = userById(users, entity.get('attributes').get('last_modified_user_id'));
+      const entityExtended = extendEntityUserName(entity, user);
+      return entityExtended && toJS ? entityExtended.toJS() : entityExtended;
     }
     return null;
   }
 );
+
 
 const makeEntitiesReadySelector = () => createSelector(
   readyPathSelector,
@@ -173,21 +188,30 @@ const makeEntitiesListSelector = () => createSelector(
   (entities) => entities.toList()
 );
 
+const makeEntitiesSelector = () => createSelector(
+  entitiesPathSelector,
+  argsSelector,
+  (entities, { toJS }) => entities && toJS ? entities.toJS() : entities
+);
+
 const makeEntitiesArraySelector = () => createSelector(
   makeEntitiesListSelector(),
   (entitiesList) => entitiesList.toJS()
 );
 
 const makeEntitisSortedSelector = () => createSelector(
-  sortBySelector,
   makeEntitiesArraySelector(),
-  ({ sortBy, sortOrder }, entities) => orderBy(entities, getSortIteratee(sortBy), sortOrder)
+  argsSelector,
+  (entities, { sortBy, sortOrder }) => {
+    console.log('no cache for ',sortBy, sortOrder);
+    return orderBy(entities, getSortIteratee(sortBy), sortOrder);
+  }
 );
 
 const makeEntitiesPagedSelector = () => createSelector(
-  pagingSelector,
   makeEntitisSortedSelector(),
-  ({ currentPage, perPage }, entities) => {
+  argsSelector,
+  (entities, { currentPage, perPage }) => {
     const length = entities.length;
     const totalPages = Math.ceil(Math.max(length, 0) / perPage);
     const pageNum = Math.min(currentPage, totalPages);
@@ -196,6 +220,7 @@ const makeEntitiesPagedSelector = () => createSelector(
     const haveNextPage = end < entities.length;
     const havePrevPage = pageNum > 1;
     const page = slice(entities, offset, end);
+    console.log('no cache for offset', offset);
     return {
       page,
       havePrevPage,
@@ -204,6 +229,52 @@ const makeEntitiesPagedSelector = () => createSelector(
       currentPage,
       perPage,
     };
+  }
+);
+
+// GENERIC ARGS QUERY
+const argsSelector = (state, args) => args;
+
+// TAXONOMY QUERIES
+const taxonomiesSelector = (state) => state.getIn(['global', 'entities', 'taxonomies']);
+
+const taxonomyByType = (taxonomies, type) =>
+  taxonomies && type && taxonomies.filter((taxonomy) =>
+    taxonomy.get('attributes').get(`tags_${type === 'actions' ? 'measures' : type}`));
+
+const makeTaxonomiesByTypeSelector = () => createSelector(
+  taxonomiesSelector,
+  argsSelector,
+  (taxonomies, { type, toJS }) => {
+    const taxonomiesByType = taxonomyByType(taxonomies, type);
+    return taxonomiesByType && toJS ? taxonomiesByType.toJS() : taxonomiesByType;
+  }
+);
+
+// CATEGORY QUERIES
+const categoriesSelector = (state) => state.getIn(['global', 'entities', 'categories']);
+const actionCategoriesSelector = (state) => state.getIn(['global', 'entities', 'action_categories']);
+
+const categoryByTaxonomyId = (categories, taxId) =>
+  categories && taxId && categories.filter((cat) =>
+    cat.get('attributes').get('taxonomy_id') === parseInt(taxId, 10));
+
+const makeTaxonomiesByTypeExtendedSelector = () => createSelector(
+  taxonomiesSelector,
+  categoriesSelector,
+  actionCategoriesSelector,
+  argsSelector,
+  (taxonomies, categories, actionCategories, { actionId, type, toJS }) => {
+    const taxonomiesByType = taxonomyByType(taxonomies, type);
+    const categoriesByTaxonomyType = taxonomiesByType && taxonomiesByType.map((tax) =>
+      tax.set('categories', categoryByTaxonomyId(categories, tax.get('id')).map((cat) => {
+        const assigned = actionCategories.find((ac) =>
+          ac.getIn(['attributes', 'measure_id']) === actionId && ac.getIn(['attributes', 'category_id']) === cat.id
+        );
+        return cat.set('assigned', !!assigned && assigned.length);
+      }))
+    );
+    return categoriesByTaxonomyType && toJS ? categoriesByTaxonomyType.toJS() : categoriesByTaxonomyType;
   }
 );
 
@@ -227,8 +298,11 @@ export {
   makeEntitiesReadySelector,
   makeEntitiesRequestedSelector,
   makeEntityMapSelector,
-  makeEntityExtendedMapSelector,
+  makeEntityExtendedSelector,
   makeEntitiesListSelector,
   makeEntitiesArraySelector,
   makeEntitiesPagedSelector,
+  makeTaxonomiesByTypeSelector,
+  makeTaxonomiesByTypeExtendedSelector,
+  makeEntitiesSelector,
 };
