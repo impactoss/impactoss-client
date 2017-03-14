@@ -12,7 +12,7 @@ import {
   loadEntitiesIfNeeded,
 } from 'containers/App/actions';
 import {
-  makeEntitiesPagedSelector,
+  entitiesPagedSelector,
 } from 'containers/App/selectors';
 import messages from './messages';
 
@@ -90,19 +90,15 @@ export class EntityQuery extends React.PureComponent { // eslint-disable-line re
   }
 }
 
-const makeMapStateToProps = () => {
-  const entitiesPagedSelector = makeEntitiesPagedSelector();
-  const mapStateToProps = (state, props) => ({
-    pagedEntities: entitiesPagedSelector(state, {
-      path: props.entities,
-      perPage: props.perPage || EntityQuery.defaultProps.perPage,
-      currentPage: props.currentPage || EntityQuery.defaultProps.currentPage,
-      sortBy: props.sortBy || EntityQuery.defaultProps.sortBy,
-      sortOrder: props.sortOrder || EntityQuery.defaultProps.sortOrder,
-    }),
-  });
-  return mapStateToProps;
-};
+const mapStateToProps = (state, props) => ({
+  pagedEntities: entitiesPagedSelector(state, {
+    path: props.entities,
+    perPage: props.perPage || EntityQuery.defaultProps.perPage,
+    currentPage: props.currentPage || EntityQuery.defaultProps.currentPage,
+    sortBy: props.sortBy || EntityQuery.defaultProps.sortBy,
+    sortOrder: props.sortOrder || EntityQuery.defaultProps.sortOrder,
+  }),
+});
 
 function mapDispatchToProps(dispatch, props) {
   return {
@@ -112,4 +108,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(makeMapStateToProps(), mapDispatchToProps)(EntityQuery);
+export default connect(mapStateToProps, mapDispatchToProps)(EntityQuery);

@@ -13,8 +13,8 @@ import { Link } from 'react-router';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import {
-  makeEntitySelector,
-  makeEntitiesReadySelector,
+  entityJSSelector,
+  entitiesReadySelector,
 } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -71,15 +71,10 @@ ActionView.propTypes = {
   actionsReady: PropTypes.bool,
 };
 
-const makeMapStateToProps = () => {
-  const getEntity = makeEntitySelector();
-  const entitiesReady = makeEntitiesReadySelector();
-  const mapStateToProps = (state, props) => ({
-    action: getEntity(state, { id: props.params.id, path: 'actions' }),
-    actionsReady: entitiesReady(state, { path: 'actions' }),
-  });
-  return mapStateToProps;
-};
+const mapStateToProps = (state, props) => ({
+  action: entityJSSelector(state, { id: props.params.id, path: 'actions' }),
+  actionsReady: entitiesReadySelector(state, { path: 'actions' }),
+});
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -89,4 +84,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(makeMapStateToProps, mapDispatchToProps)(ActionView);
+export default connect(mapStateToProps, mapDispatchToProps)(ActionView);

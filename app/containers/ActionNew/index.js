@@ -20,8 +20,8 @@ import EntityForm from 'components/EntityForm';
 
 
 import {
-  makeEntitiesSelector,
-  makeTaxonomiesByTypeExtendedSelector,
+  entitiesSelector,
+  taxonomiesByTypeExtendedSelector,
 } from 'containers/App/selectors';
 
 import actionNewSelector from './selectors';
@@ -151,18 +151,11 @@ ActionNew.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-const makeMapStateToProps = () => {
-  const getTaxonomies = makeTaxonomiesByTypeExtendedSelector();
-  const getEntities = makeEntitiesSelector();
-
-  const mapStateToProps = (state) => ({
-    actionNew: actionNewSelector(state),
-    taxonomiesExtended: getTaxonomies(state, { type: 'actions', toJS: true }),
-    recommendations: getEntities(state, { path: 'recommendations', toJS: true }),
-  });
-
-  return mapStateToProps;
-};
+const mapStateToProps = (state) => ({
+  actionNew: actionNewSelector(state),
+  taxonomiesExtended: taxonomiesByTypeExtendedSelector(state, { type: 'actions', toJS: true }),
+  recommendations: entitiesSelector(state, { path: 'recommendations', toJS: true }),
+});
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -184,4 +177,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(makeMapStateToProps, mapDispatchToProps)(ActionNew);
+export default connect(mapStateToProps, mapDispatchToProps)(ActionNew);

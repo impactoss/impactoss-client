@@ -24,10 +24,10 @@ import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
 
 import {
-  makeEntitiesSelector,
-  makeTaxonomiesByTypeExtendedSelector,
-  makeEntityExtendedSelector,
-  makeEntitiesReadySelector,
+  entitiesSelector,
+  taxonomiesByTypeExtendedSelector,
+  entityExtendedSelector,
+  entitiesReadySelector,
 } from 'containers/App/selectors';
 
 import {
@@ -198,25 +198,17 @@ ActionEdit.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-const makeMapStateToProps = () => {
-  const getEntity = makeEntityExtendedSelector();
-  const entitiesReady = makeEntitiesReadySelector();
-  const getTaxonomies = makeTaxonomiesByTypeExtendedSelector();
-  const getEntities = makeEntitiesSelector();
-
-  const mapStateToProps = (state, props) => ({
-    action: getEntity(state, { id: props.params.id, path: 'actions', toJS: true }),
-    actionsReady: entitiesReady(state, { path: 'actions' }),
-    page: pageSelector(state),
-    form: formSelector(state),
-    taxonomiesExtended: getTaxonomies(
-      state,
-      { actionId: props.params.id, type: 'actions', toJS: true }
-    ),
-    recommendations: getEntities(state, { path: 'recommendations', toJS: true }),
-  });
-  return mapStateToProps;
-};
+const mapStateToProps = (state, props) => ({
+  action: entityExtendedSelector(state, { id: props.params.id, path: 'actions', toJS: true }),
+  actionsReady: entitiesReadySelector(state, { path: 'actions' }),
+  page: pageSelector(state),
+  form: formSelector(state),
+  taxonomiesExtended: taxonomiesByTypeExtendedSelector(
+    state,
+    { actionId: props.params.id, type: 'actions', toJS: true }
+  ),
+  recommendations: entitiesSelector(state, { path: 'recommendations', toJS: true }),
+});
 
 function mapDispatchToProps(dispatch, props) {
   return {
@@ -244,4 +236,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(makeMapStateToProps, mapDispatchToProps)(ActionEdit);
+export default connect(mapStateToProps, mapDispatchToProps)(ActionEdit);
