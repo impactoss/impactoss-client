@@ -9,20 +9,30 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { browserHistory } from 'react-router';
+import collection from 'lodash/collection';
+
+import { fromJS } from 'immutable';
+
+
 // import { actions as formActions } from 'react-redux-form';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
+import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
 
 import {
-  makeEntityMapSelector,
-  makeEntitiesReadySelector,
+  entitiesSelector,
+  taxonomiesByTypeExtendedSelector,
+  entityExtendedSelector,
+  entitiesReadySelector,
 } from 'containers/App/selectors';
 
 import {
   pageSelector,
+  formSelector,
 } from './selectors';
 
 import messages from './messages';
@@ -34,29 +44,39 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
     this.props.loadEntitiesIfNeeded();
 
     if (this.props.action && this.props.actionsReady) {
-      this.props.populateForm('actionEdit.form.action', this.props.action.get('attributes'));
+      this.props.populateForm('actionEdit.form.action', fromJS(this.props.action.attributes));
     }
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.action && nextProps.actionsReady && !this.props.actionsReady) {
-      this.props.populateForm('actionEdit.form.action', nextProps.action.get('attributes'));
+      this.props.populateForm('actionEdit.form.action', fromJS(nextProps.action.attributes));
     }
   }
 
-
   render() {
     const { action, actionsReady } = this.props;
+    const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
+    const required = (val) => val && val.length;
+
+    const taxonomyOptions = collection.map(this.props.taxonomiesExtended, (tax) => ({
+      id: tax.attributes.title,
+      controlType: 'select',
+      options: collection.map(tax.categories, (cat) => ({
+        value: cat.id,
+        label: `${cat.attributes.title}${cat.assigned ? ' - assigned' : ' - not assigned'}`,
+      })),
+    }));
+
     return (
       <div>
         <Helmet
-          title="ActionEdit"
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
-            { name: 'description', content: 'Description of ActionEdit' },
+            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <FormattedMessage {...messages.header} />
         { !action && !actionsReady &&
           <div>
             <FormattedMessage {...messages.loading} />
@@ -68,29 +88,86 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
           </div>
         }
         {action &&
-          <EntityForm
-            model="actionEdit.form.action"
-            handleSubmit={this.props.handleSubmit}
-            fields={
-              [
-                {
-                  id: 'title',
-                  controlType: 'input',
+          <Page
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            actions={[
+              {
+                type: 'simple',
+                title: 'Cancel',
+                onClick: this.props.handleCancel,
+              },
+              {
+                type: 'primary',
+                title: 'Save',
+                onClick: () => this.props.handleSubmit(this.props.form.action),
+              },
+            ]}
+          >
+            <EntityForm
+              model="actionEdit.form.action"
+              handleSubmit={this.props.handleSubmit}
+              handleCancel={this.props.handleCancel}
+              fields={{
+                header: {
+                  main: [
+                    {
+                      id: 'title',
+                      controlType: 'input',
+                      model: '.title',
+                      validators: {
+                        required,
+                      },
+                      errorMessages: {
+                        required: this.context.intl.formatMessage(messages.fieldRequired),
+                      },
+                    },
+                  ],
+                  aside: [
+                    {
+                      id: 'no',
+                      controlType: 'info',
+                      displayValue: reference,
+                    },
+                    {
+                      id: 'status',
+                      controlType: 'select',
+                      model: '.draft',
+                      value: action && action.draft,
+                      options: PUBLISH_STATUSES,
+                    },
+                    {
+                      id: 'updated',
+                      controlType: 'info',
+                      displayValue: action && action.attributes.updated_at,
+                    },
+                    {
+                      id: 'updated_by',
+                      controlType: 'info',
+                      displayValue: action && action.attributes.last_modified_user,
+                    },
+                  ],
                 },
-                {
-                  id: 'description',
-                  controlType: 'textarea',
+                body: {
+                  main: [
+                    {
+                      id: 'description',
+                      controlType: 'textarea',
+                      model: '.description',
+                    },
+                    {
+                      id: 'recommendations',
+                      controlType: 'select',
+                      options: collection.map(this.props.recommendations, (rec) => ({
+                        value: rec.id,
+                        label: rec.attributes.title,
+                      })),
+                    },
+                  ],
+                  aside: taxonomyOptions,
                 },
-                {
-                  id: 'status',
-                  controlType: 'select',
-                  model: '.draft',
-                  value: action && action.draft,
-                  options: PUBLISH_STATUSES,
-                },
-              ]
-            }
-          />
+              }}
+            />
+          </Page>
         }
         {saveSending &&
           <p>Saving</p>
@@ -107,26 +184,41 @@ ActionEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
+  handleCancel: PropTypes.func.isRequired,
   page: PropTypes.object,
+  form: PropTypes.object,
   action: PropTypes.object,
   actionsReady: PropTypes.bool,
+  params: PropTypes.object,
+  taxonomiesExtended: PropTypes.object,
+  recommendations: PropTypes.object,
 };
 
-const makeMapStateToProps = () => {
-  const getEntity = makeEntityMapSelector();
-  const entitiesReady = makeEntitiesReadySelector();
-  const mapStateToProps = (state, props) => ({
-    action: getEntity(state, { id: props.params.id, path: 'actions' }),
-    actionsReady: entitiesReady(state, { path: 'actions' }),
-    page: pageSelector(state),
-  });
-  return mapStateToProps;
+ActionEdit.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
 };
+
+const mapStateToProps = (state, props) => ({
+  action: entityExtendedSelector(state, { id: props.params.id, path: 'actions', toJS: true }),
+  actionsReady: entitiesReadySelector(state, { path: 'actions' }),
+  page: pageSelector(state),
+  form: formSelector(state),
+  taxonomiesExtended: taxonomiesByTypeExtendedSelector(
+    state,
+    { actionId: props.params.id, type: 'actions', toJS: true }
+  ),
+  recommendations: entitiesSelector(state, { path: 'recommendations', toJS: true }),
+});
 
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('actions'));
+      dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('action_categories'));
     },
     populateForm: (model, data) => {
       dispatch(formActions.load(model, data));
@@ -134,7 +226,14 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmit: (formData) => {
       dispatch(save(formData, props.params.id));
     },
+    handleCancel: () => {
+      // not really a dispatch function here, could be a member function instead
+      // however
+      // - this could in the future be moved to a saga or reducer
+      // - also its nice to be next to handleSubmit
+      browserHistory.push(`/actions/${props.params.id}`);
+    },
   };
 }
 
-export default connect(makeMapStateToProps, mapDispatchToProps)(ActionEdit);
+export default connect(mapStateToProps, mapDispatchToProps)(ActionEdit);

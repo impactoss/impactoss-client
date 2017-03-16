@@ -3,18 +3,29 @@
  */
 
 import { createSelector } from 'reselect';
+import { slice } from 'lodash/array';
+import { orderBy } from 'lodash/collection';
+import createCachedSelector from 're-reselect';
+// import createCachedSelector from 'utils/createCachedSelector';
+import { getEntitySortIteratee } from 'utils/sort';
 
 const selectGlobal = (state) => state.get('global');
 const selectRoute = (state) => state.get('route');
 
+// TAXONOMY QUERIES
+const taxonomiesSelector = (state) => state.getIn(['global', 'entities', 'taxonomies']);
+
 /**
-* Use a make selector when different components will use a selector with different data
-* https://github.com/reactjs/reselect#sharing-selectors-with-props-across-multiple-components
-* otherwise use straight createSelector ( I think :/ )
+* Use `createCachedSelector` when you want to make a selector that takes arguments
+* https://github.com/reactjs/reselect/issues/184 ( problem )
+* https://github.com/toomuchdesign/re-reselect ( solution )
+*
+* use the makeSelector () => createSelector pattern when you want a selector that
+* doesn't take arguments, but can have its own cache between components
+*
+* otherwise use straight createSelector
 * https://github.com/react-boilerplate/react-boilerplate/pull/1205#issuecomment-274319934
 *
-* Selectors with arguments, see this guide
-* https://github.com/reactjs/reselect#q-how-do-i-create-a-selector-that-takes-an-argument
 */
 
 const makeSelectLoading = () => createSelector(
@@ -84,10 +95,8 @@ const readySelector = createSelector(
   (state) => state.get('ready')
 );
 
-const entitiesSelector = createSelector(
-  selectGlobal,
-  (state) => state.get('entities')
-);
+const usersSelector = (state) =>
+  state.getIn(['global', 'entities', 'users']);
 
 const entitySelector = (state, { path, id }) =>
   state.getIn(['global', 'entities', path]).get(id);
@@ -98,41 +107,152 @@ const haveEntitySelector = (state, { path, id }) =>
 const entitiesPathSelector = (state, { path }) =>
   state.getIn(['global', 'entities', path]);
 
-const requestedPathSelector = (state, { path }) =>
-  state.getIn(['global', 'requested', path]);
-
 const readyPathSelector = (state, { path }) =>
   state.getIn(['global', 'ready', path]);
 
-const makeEntitySelector = () => createSelector(
+const entityJSSelector = createCachedSelector(
   entitySelector,
   (entity) => entity ? entity.toJS() : null
-);
+)((state, { path, id }) => `${path}:${id}`);
 
-const makeEntityMapSelector = () => createSelector(
+const userById = (users, id) => users && id && users.get(id);
+
+const argsToJsSelector = (state, { toJS }) => toJS;
+
+const extendEntityUserName = (entity, user) =>
+  entity &&
+  entity.setIn(['attributes', 'last_modified_user'], user ? user.get('attributes').get('name') : 'System');
+
+const entityExtendedSelector = createCachedSelector(
   entitySelector,
-  (entity) => entity
-);
+  usersSelector,
+  argsToJsSelector,
+  (entity, users, toJS) => {
+    if (entity && users) {
+      const user = userById(users, entity.get('attributes').get('last_modified_user_id'));
+      const entityExtended = extendEntityUserName(entity, user);
+      return entityExtended && toJS ? entityExtended.toJS() : entityExtended;
+    }
+    return null;
+  }
+)((state, { id, path, toJS }) => `${id}:${path}:${toJS}}`);
 
-const makeEntitiesReadySelector = () => createSelector(
+const entitiesReadySelector = createCachedSelector(
   readyPathSelector,
   (ready) => !!ready
-);
+)((state, { path }) => path);
 
-const makeEntitiesRequestedSelector = () => createSelector(
-  requestedPathSelector,
-  (requested) => !!requested
-);
-
-const makeEntitiesListSelector = () => createSelector(
+const entitiesSelector = createCachedSelector(
   entitiesPathSelector,
-  (entities) => entities.toList()
+  argsToJsSelector,
+  (entities, toJS) => entities && toJS ? entities.toJS() : entities
+)((state, { path, toJS }) => `${path}:${toJS}`);
+
+const sortBySelector = (state, { sortBy }) => sortBy;
+const sortOrderSelector = (state, { sortOrder }) => sortOrder;
+
+const entitiesSortedSelector = createCachedSelector(
+  entitiesPathSelector,
+  sortBySelector,
+  sortOrderSelector,
+  (entities, sortBy, sortOrder) => { // eslint-disable-line
+    // console.log('no cache for ', sortBy, sortOrder); // eslint-disable-line
+    return orderBy(entities.toList().toJS(), getEntitySortIteratee(sortBy), sortOrder);
+  }
+)((state, { path, sortBy, sortOrder }) => {
+  const entities = entitiesPathSelector(state, { path });
+  return `${entities.hashCode()}:${sortBy}:${sortOrder}`;
+});
+
+const perPageSelector = (state, { currentPage }) => currentPage;
+const currentPageSelector = (state, { perPage }) => perPage;
+
+const entitiesPagedSelector = createCachedSelector(
+  entitiesSortedSelector,
+  perPageSelector,
+  currentPageSelector,
+  (entities, currentPage, perPage) => {
+    const length = entities.length;
+    const totalPages = Math.ceil(Math.max(length, 0) / perPage);
+    const pageNum = Math.min(currentPage, totalPages);
+    const offset = (pageNum - 1) * perPage;
+    const end = offset + perPage;
+    const haveNextPage = end < entities.length;
+    const havePrevPage = pageNum > 1;
+    const page = slice(entities, offset, end);
+    // console.log('no cache for offset', offset);
+    return {
+      page,
+      havePrevPage,
+      haveNextPage,
+      totalPages,
+      currentPage,
+      perPage,
+    };
+  }
+)((state, { path, currentPage, perPage }) => {
+  const entities = entitiesPathSelector(state, { path });
+  return `${entities.hashCode()}:${currentPage}:${perPage}`;
+});
+
+const argsTypeSelector = (state, { type }) => type;
+
+const taxonomiesByTypeSelector = createCachedSelector(
+  taxonomiesSelector,
+  argsTypeSelector,
+  argsToJsSelector,
+  (taxonomies, type, toJS) => {
+    const taxonomiesByType = taxonomies.filter((taxonomy) =>
+      taxonomy.get('attributes').get(`tags_${type === 'actions' ? 'measures' : type}`));
+    return taxonomiesByType && toJS ? taxonomiesByType.toJS() : taxonomiesByType;
+  }
+)((state, { type, toJS }) => `${type}:${toJS}`);
+
+// CATEGORY QUERIES
+const categoriesSelector = (state) => state.getIn(['global', 'entities', 'categories']);
+const actionCategoriesSelector = (state) => state.getIn(['global', 'entities', 'action_categories']);
+
+const argsEntityIdSelector = (state, { id }) => id;
+
+const categoryByTaxonomyIdSelector = createSelector(
+  categoriesSelector,
+  argsEntityIdSelector,
+  (categories, taxId) => categories.filter((cat) => cat.getIn(['attributes', 'taxonomy_id']) === parseInt(taxId, 10))
 );
 
-const makeEntitiesArraySelector = () => createSelector(
-  makeEntitiesListSelector(),
-  (entitiesList) => entitiesList.toJS()
-);
+const argsActionIdSelector = (state, { actionId }) => actionId;
+const argsCategoryIdSelector = (state, { categoryId }) => categoryId;
+
+const assignedActionCategorySelector = createCachedSelector(
+  actionCategoriesSelector,
+  argsActionIdSelector,
+  argsCategoryIdSelector,
+  (actionCategories, actionId, categoryId) =>
+    actionCategories.find((ac) =>
+      ac.getIn(['attributes', 'measure_id']) === actionId && ac.getIn(['attributes', 'category_id']) === categoryId)
+)((state, { categoryId, actionId }) => `${categoryId}:${actionId}`);
+
+const taxonomiesByTypeExtendedSelector = createCachedSelector(
+  (state) => state, // pass through so we can use raw state with other selectors
+  argsActionIdSelector,
+  argsTypeSelector,
+  argsToJsSelector,
+  (state, type, actionId, toJS) => {
+    const taxonomiesByType = taxonomiesByTypeSelector(state, { type });
+
+    const categoriesByTaxonomyType = taxonomiesByType.map((tax) => {
+      const categoriesByTaxonomyId = categoryByTaxonomyIdSelector(state, { id: tax.get('id') });
+
+      const categories = categoriesByTaxonomyId.map((cat) => {
+        const assigned = assignedActionCategorySelector(state, { actionId, categoryId: cat.get('id') });
+        return cat.set('assigned', !!assigned && assigned.length);
+      });
+
+      return tax.set('categories', categories);
+    });
+    return categoriesByTaxonomyType && toJS ? categoriesByTaxonomyType.toJS() : categoriesByTaxonomyType;
+  }
+)((state, { actionId, type, toJS }) => `${actionId}:${type}:${toJS}`);
 
 export {
   selectGlobal,
@@ -150,10 +270,11 @@ export {
   requestedSelector,
   readySelector,
   haveEntitySelector,
-  makeEntitySelector,
-  makeEntitiesReadySelector,
-  makeEntitiesRequestedSelector,
-  makeEntityMapSelector,
-  makeEntitiesListSelector,
-  makeEntitiesArraySelector,
+  taxonomiesByTypeSelector,
+  taxonomiesByTypeExtendedSelector,
+  entityJSSelector,
+  entitiesReadySelector,
+  entityExtendedSelector,
+  entitiesPagedSelector,
+  entitiesSortedSelector,
 };
