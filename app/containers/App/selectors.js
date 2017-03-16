@@ -237,7 +237,7 @@ const taxonomiesByTypeExtendedSelector = createCachedSelector(
   argsActionIdSelector,
   argsTypeSelector,
   argsToJsSelector,
-  (state, type, actionId, toJS) => {
+  (state, actionId, type, toJS) => {
     const taxonomiesByType = taxonomiesByTypeSelector(state, { type });
 
     const categoriesByTaxonomyType = taxonomiesByType.map((tax) => {
