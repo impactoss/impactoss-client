@@ -56,7 +56,7 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
-
+    // console.log(JSON.stringify(this.props.action))
     const taxonomyOptions = collection.map(this.props.taxonomiesExtended, (tax) => ({
       id: tax.attributes.title,
       controlType: 'select',

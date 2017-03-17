@@ -20,8 +20,7 @@ import EntityForm from 'components/EntityForm';
 
 
 import {
-  entitiesSelector,
-  taxonomiesByTypeExtendedSelector,
+  entitiesSelect,
 } from 'containers/App/selectors';
 
 import actionNewSelector from './selectors';
@@ -153,8 +152,26 @@ ActionNew.contextTypes = {
 
 const mapStateToProps = (state) => ({
   actionNew: actionNewSelector(state),
-  taxonomiesExtended: taxonomiesByTypeExtendedSelector(state, { type: 'actions', toJS: true }),
-  recommendations: entitiesSelector(state, { path: 'recommendations', toJS: true }),
+  taxonomiesExtended: entitiesSelect(
+    state,
+    {
+      path: 'taxonomies',
+      where: {
+        tags_measures: true,
+      },
+      extend: {
+        path: 'categories',
+        on: 'taxonomy_id',
+      },
+      out: 'js',
+    },
+  ),
+  recommendations: entitiesSelect(
+    state, {
+      path: 'recommendations',
+      out: 'js',
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {

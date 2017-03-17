@@ -30,7 +30,7 @@ export class Taxonomies extends React.PureComponent { // eslint-disable-line rea
 
   render() {
     const { taxonomies } = this.props;
-
+    // console.log(taxonomies)
     return (
       <div>
         <Helmet

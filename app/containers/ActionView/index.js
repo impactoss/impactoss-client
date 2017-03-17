@@ -13,7 +13,7 @@ import { Link } from 'react-router';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import {
-  entityJSSelector,
+  entitySelect,
   entitiesReadySelector,
 } from 'containers/App/selectors';
 
@@ -72,7 +72,21 @@ ActionView.propTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  action: entityJSSelector(state, { id: props.params.id, path: 'actions' }),
+  action: entitySelect(
+    state,
+    {
+      id: props.params.id,
+      path: 'actions',
+      out: 'js',
+      extend: {
+        type: 'id',
+        path: 'users',
+        on: 'last_modified_user_id',
+        reverse: true,
+        as: 'user',
+      },
+    },
+  ),
   actionsReady: entitiesReadySelector(state, { path: 'actions' }),
 });
 

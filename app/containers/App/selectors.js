@@ -11,6 +11,7 @@ import createCachedSelector from 're-reselect';
 import { getEntitySortIteratee } from 'utils/sort';
 
 const selectGlobal = (state) => state.get('global');
+const selectGlobalEntities = (state) => state.getIn(['global', 'entities']);
 const selectRoute = (state) => state.get('route');
 
 
@@ -94,71 +95,44 @@ const readySelector = createSelector(
   (state) => state.get('ready')
 );
 
-const taxonomiesSelector = (state) =>
-  state.getIn(['global', 'entities', 'taxonomies']);
+const entitiesPathSelector = createSelector(
+  selectGlobalEntities,
+  (state, { path }) => path,
+  (entities, path) =>
+    entities.get(path)
+);
 
-const usersSelector = (state) =>
-  state.getIn(['global', 'entities', 'users']);
+const entitySelector = createSelector(
+  entitiesPathSelector,
+  (state, { id }) => id,
+  (entities, id) =>
+    entities.get(id)
+);
 
-const entitySelector = (state, { path, id }) =>
-  state.getIn(['global', 'entities', path]).get(id);
+const haveEntitySelector = createSelector(
+  entitiesPathSelector,
+  (state, { id }) => id,
+  (entities, id) =>
+    entities.has(id)
+);
 
-const haveEntitySelector = (state, { path, id }) =>
-  state.getIn(['global', 'entities', path]).has(id);
-
-const entitiesPathSelector = (state, { path }) => state.getIn(['global', 'entities', path]);
-
-
-const readyPathSelector = (state, { path }) =>
-  state.getIn(['global', 'ready', path]);
-
-const entityJSSelector = createCachedSelector(
-  entitySelector,
-  (entity) => entity ? entity.toJS() : null
-)((state, { path, id }) => `${path}:${id}`);
-
-const userById = (users, id) => users && id && users.get(id);
-
-const argsToJsSelector = (state, { toJS }) => toJS;
-
-const extendEntityUserName = (entity, user) =>
-  entity &&
-  entity.setIn(['attributes', 'last_modified_user'], user ? user.get('attributes').get('name') : 'System');
-
-const entityExtendedSelector = createCachedSelector(
-  entitySelector,
-  usersSelector,
-  argsToJsSelector,
-  (entity, users, toJS) => {
-    // console.log('entityExtendedSelector')
-    if (entity && users) {
-      const user = userById(users, entity.get('attributes').get('last_modified_user_id'));
-      const entityExtended = extendEntityUserName(entity, user);
-      return entityExtended && toJS ? entityExtended.toJS() : entityExtended;
-    }
-    return null;
-  }
-)((state, { id, path, toJS }) => `${id}:${path}:${toJS}}`);
+const readyPathSelector = createSelector(
+  readySelector,
+  (state, { path }) => path,
+  (ready, path) =>
+    ready.get(path)
+);
 
 const entitiesReadySelector = createCachedSelector(
   readyPathSelector,
   (ready) => !!ready
 )((state, { path }) => path);
 
-const entitiesSelector = createCachedSelector(
-  entitiesPathSelector,
-  argsToJsSelector,
-  (entities, toJS) =>
-    entities && toJS ? entities.toJS() : entities
-)((state, { path, toJS }) => `${path}:${toJS}`);
-
-const sortBySelector = (state, { sortBy }) => sortBy;
-const sortOrderSelector = (state, { sortOrder }) => sortOrder;
 
 const entitiesSortedSelector = createCachedSelector(
   entitiesPathSelector,
-  sortBySelector,
-  sortOrderSelector,
+  (state, { sortBy }) => sortBy,
+  (state, { sortOrder }) => sortOrder,
   (entities, sortBy, sortOrder) => { // eslint-disable-line
     // console.log('no cache for ', sortBy, sortOrder); // eslint-disable-line
     return orderBy(entities.toList().toJS(), getEntitySortIteratee(sortBy), sortOrder);
@@ -168,13 +142,10 @@ const entitiesSortedSelector = createCachedSelector(
   return `${entities.hashCode()}:${sortBy}:${sortOrder}`;
 });
 
-const perPageSelector = (state, { currentPage }) => currentPage;
-const currentPageSelector = (state, { perPage }) => perPage;
-
 const entitiesPagedSelector = createCachedSelector(
   entitiesSortedSelector,
-  perPageSelector,
-  currentPageSelector,
+  (state, { currentPage }) => currentPage,
+  (state, { perPage }) => perPage,
   (entities, currentPage, perPage) => {
     const length = entities.length;
     const totalPages = Math.ceil(Math.max(length, 0) / perPage);
@@ -198,105 +169,6 @@ const entitiesPagedSelector = createCachedSelector(
   const entities = entitiesPathSelector(state, { path });
   return `${entities.hashCode()}:${currentPage}:${perPage}`;
 });
-
-const argsTypeSelector = (state, { type }) => type;
-
-const taxonomiesByTypeSelector = createCachedSelector(
-  taxonomiesSelector,
-  argsTypeSelector,
-  argsToJsSelector,
-  (taxonomies, type, toJS) => {
-    const taxonomiesByType = taxonomies.filter((taxonomy) =>
-      taxonomy.get('attributes').get(`tags_${type === 'actions' ? 'measures' : type}`));
-    return taxonomiesByType && toJS ? taxonomiesByType.toJS() : taxonomiesByType;
-  }
-)((state, { type, toJS }) => `${type}:${toJS}`);
-
-// CATEGORY QUERIES
-const categoriesSelector = (state) => state.getIn(['global', 'entities', 'categories']);
-const actionCategoriesSelector = (state) => state.getIn(['global', 'entities', 'action_categories']);
-
-const argsEntityIdSelector = (state, { id }) => id;
-
-const categoryByTaxonomyIdSelector = createSelector(
-  categoriesSelector,
-  argsEntityIdSelector,
-  (categories, taxId) => categories.filter((cat) => cat.getIn(['attributes', 'taxonomy_id']) === parseInt(taxId, 10))
-);
-
-const argsActionIdSelector = (state, { actionId }) => actionId;
-const argsCategoryIdSelector = (state, { categoryId }) => categoryId;
-
-const assignedActionCategorySelector = createCachedSelector(
-  actionCategoriesSelector,
-  argsActionIdSelector,
-  argsCategoryIdSelector,
-  (actionCategories, actionId, categoryId) =>
-    actionCategories.find((ac) =>
-      ac.getIn(['attributes', 'measure_id']) === actionId && ac.getIn(['attributes', 'category_id']) === categoryId)
-)((state, { categoryId, actionId }) => `${categoryId}:${actionId}`);
-
-const taxonomiesByTypeExtendedSelector = createCachedSelector(
-  (state) => state, // pass through so we can use raw state with other selectors
-  argsActionIdSelector,
-  argsTypeSelector,
-  argsToJsSelector,
-  (state, actionId, type, toJS) => {
-    const taxonomiesByType = taxonomiesByTypeSelector(state, { type });
-
-    const categoriesByTaxonomyType = taxonomiesByType.map((tax) => {
-      const categoriesByTaxonomyId = categoryByTaxonomyIdSelector(state, { id: tax.get('id') });
-
-      const categories = categoriesByTaxonomyId.map((cat) => {
-        const assigned = assignedActionCategorySelector(state, { actionId, categoryId: cat.get('id') });
-        return cat.set('assigned', !!assigned && assigned.length);
-      });
-
-      return tax.set('categories', categories);
-    });
-    return categoriesByTaxonomyType && toJS ? categoriesByTaxonomyType.toJS() : categoriesByTaxonomyType;
-  }
-)((state, { actionId, type, toJS }) => `${actionId}:${type}:${toJS}`);
-
-const entitySelect = createSelector(
-  (state) => state,
-  entitySelector,
-  (state, args) => args,
-  (state, entity, args) => {
-    // console.log('entitySelect: ' + JSON.stringify(args))
-    let result = entity;
-    if (entity && args.extend) {
-      const argsExtended = {
-        path: args.extend.path,
-      };
-      let extended;
-
-      if (args.extend.type === 'id') {
-        if (args.extend.reverse) {
-          argsExtended.id = entity.getIn(['attributes', args.extend.on]);
-        } else {
-          argsExtended.where = {};
-          argsExtended.where[args.extend.on] = entity.get('id');
-        }
-        extended = entitySelect(state, argsExtended);
-      } else {
-        argsExtended.where = {};
-        if (args.extend.reverse) {
-          argsExtended.where.id = entity.getIn(['attributes', args.extend.on]);
-        } else {
-          argsExtended.where[args.extend.on] = entity.get('id');
-        }
-        extended = entitiesSelect(state, argsExtended);
-        if (args.extend.type === 'count') {
-          extended = extended.size;
-        }
-      }
-      result = result.set(args.extend.as || args.extend.path, extended);
-    }
-    return result && args.out === 'js' ? result.toJS() : result;
-  }
-);
-
 
 const entitiesSelectWhere = createCachedSelector(
   entitiesPathSelector,
@@ -342,6 +214,46 @@ const entitiesSelect = createSelector(
   }
 );
 
+const entitySelect = createSelector(
+  (state) => state,
+  entitySelector,
+  (state, args) => args,
+  (state, entity, args) => {
+    // console.log('entitySelect: ' + JSON.stringify(args))
+    let result = entity;
+    if (entity && args.extend) {
+      const argsExtended = {
+        path: args.extend.path,
+      };
+      let extended;
+
+      if (args.extend.type === 'id') {
+        if (args.extend.reverse) {
+          argsExtended.id = entity.getIn(['attributes', args.extend.on]);
+        } else {
+          argsExtended.where = {};
+          argsExtended.where[args.extend.on] = entity.get('id');
+        }
+        extended = entitySelect(state, argsExtended);
+      } else {
+        argsExtended.where = {};
+        if (args.extend.reverse) {
+          argsExtended.where.id = entity.getIn(['attributes', args.extend.on]);
+        } else {
+          argsExtended.where[args.extend.on] = entity.get('id');
+        }
+        extended = entitiesSelect(state, argsExtended);
+        if (args.extend.type === 'count') {
+          extended = extended.size;
+        }
+      }
+      result = result.set(args.extend.as || args.extend.path, extended);
+    }
+    return result && args.out === 'js' ? result.toJS() : result;
+  }
+);
+
+
 export {
   selectGlobal,
   makeSelectLoading,
@@ -352,17 +264,10 @@ export {
   makeSelectSignedIn,
   makeSelectAuth,
   makeSelectNextPathname,
-  entitiesSelector,
-  entitySelector,
-  entitiesPathSelector,
   requestedSelector,
   readySelector,
   haveEntitySelector,
-  taxonomiesByTypeSelector,
-  taxonomiesByTypeExtendedSelector,
-  entityJSSelector,
   entitiesReadySelector,
-  entityExtendedSelector,
   entitiesPagedSelector,
   entitiesSortedSelector,
   entitiesSelect,
