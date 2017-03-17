@@ -101,7 +101,7 @@ const entitiesPathSelector = createSelector(
   (entities, path) => entities.get(path)
 );
 
-const entitySelector = createSelector(
+const entityPathSelector = createSelector(
   entitiesPathSelector,
   (state, { id }) => id,
   (entities, id) => entities.get(id)
@@ -212,7 +212,7 @@ const entitiesSelect = createSelector(
 
 const entitySelect = createSelector(
   (state) => state,
-  entitySelector,
+  entityPathSelector,
   (state, args) => args,
   (state, entity, args) => {
     // console.log('entitySelect: ' + JSON.stringify(args))
