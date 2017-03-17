@@ -12,7 +12,7 @@ export default class EntityList extends React.PureComponent { // eslint-disable-
 
   static propTypes = {
     location: PropTypes.object.isRequired,
-    entities: PropTypes.string.isRequired,
+    path: PropTypes.string.isRequired,
     mapToEntityList: PropTypes.func.isRequired,
   }
 
@@ -34,7 +34,7 @@ export default class EntityList extends React.PureComponent { // eslint-disable-
     return (
       <EntityQuery
         mapToEntityList={this.props.mapToEntityList}
-        entities={this.props.entities}
+        path={this.props.path}
         currentPage={currentPage}
         onSetPage={this.setPage}
         onSort={this.setSort}

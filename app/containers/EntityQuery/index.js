@@ -92,7 +92,7 @@ export class EntityQuery extends React.PureComponent { // eslint-disable-line re
 
 const mapStateToProps = (state, props) => ({
   pagedEntities: entitiesPagedSelector(state, {
-    path: props.entities,
+    path: props.path,
     perPage: props.perPage || EntityQuery.defaultProps.perPage,
     currentPage: props.currentPage || EntityQuery.defaultProps.currentPage,
     sortBy: props.sortBy || EntityQuery.defaultProps.sortBy,
@@ -103,7 +103,7 @@ const mapStateToProps = (state, props) => ({
 function mapDispatchToProps(dispatch, props) {
   return {
     componentWillMount: () => {
-      dispatch(loadEntitiesIfNeeded(props.entities));
+      dispatch(loadEntitiesIfNeeded(props.path));
     },
   };
 }

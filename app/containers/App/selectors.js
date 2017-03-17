@@ -125,47 +125,6 @@ const entitiesReadySelector = createCachedSelector(
 )((state, { path }) => path);
 
 
-const entitiesSortedSelector = createCachedSelector(
-  entitiesPathSelector,
-  (state, { sortBy }) => sortBy,
-  (state, { sortOrder }) => sortOrder,
-  (entities, sortBy, sortOrder) => { // eslint-disable-line
-    // console.log('no cache for ', sortBy, sortOrder); // eslint-disable-line
-    return orderBy(entities.toList().toJS(), getEntitySortIteratee(sortBy), sortOrder);
-  }
-)((state, { path, sortBy, sortOrder }) => {
-  const entities = entitiesPathSelector(state, { path });
-  return `${entities.hashCode()}:${sortBy}:${sortOrder}`;
-});
-
-const entitiesPagedSelector = createCachedSelector(
-  entitiesSortedSelector,
-  (state, { currentPage }) => currentPage,
-  (state, { perPage }) => perPage,
-  (entities, currentPage, perPage) => {
-    const length = entities.length;
-    const totalPages = Math.ceil(Math.max(length, 0) / perPage);
-    const pageNum = Math.min(currentPage, totalPages);
-    const offset = (pageNum - 1) * perPage;
-    const end = offset + perPage;
-    const haveNextPage = end < entities.length;
-    const havePrevPage = pageNum > 1;
-    const page = slice(entities, offset, end);
-    // console.log('no cache for offset', offset);
-    return {
-      page,
-      havePrevPage,
-      haveNextPage,
-      totalPages,
-      currentPage,
-      perPage,
-    };
-  }
-)((state, { path, currentPage, perPage }) => {
-  const entities = entitiesPathSelector(state, { path });
-  return `${entities.hashCode()}:${currentPage}:${perPage}`;
-});
-
 const entitiesSelectWhere = createCachedSelector(
   entitiesPathSelector,
   (state, { where }) => where ? JSON.stringify(where) : null,
@@ -248,6 +207,48 @@ const entitySelect = createSelector(
     return result && args.out === 'js' ? result.toJS() : result;
   }
 );
+
+
+const entitiesSortedSelector = createCachedSelector(
+  entitiesSelect,
+  (state, { sortBy }) => sortBy,
+  (state, { sortOrder }) => sortOrder,
+  (entities, sortBy, sortOrder) => { // eslint-disable-line
+    // console.log('no cache for ', sortBy, sortOrder); // eslint-disable-line
+    return orderBy(entities.toList().toJS(), getEntitySortIteratee(sortBy), sortOrder);
+  }
+)((state, { path, sortBy, sortOrder }) => {
+  const entities = entitiesPathSelector(state, { path });
+  return `${entities.hashCode()}:${sortBy}:${sortOrder}`;
+});
+
+const entitiesPagedSelector = createCachedSelector(
+  entitiesSortedSelector,
+  (state, { currentPage }) => currentPage,
+  (state, { perPage }) => perPage,
+  (entities, currentPage, perPage) => {
+    const length = entities.length;
+    const totalPages = Math.ceil(Math.max(length, 0) / perPage);
+    const pageNum = Math.min(currentPage, totalPages);
+    const offset = (pageNum - 1) * perPage;
+    const end = offset + perPage;
+    const haveNextPage = end < entities.length;
+    const havePrevPage = pageNum > 1;
+    const page = slice(entities, offset, end);
+    // console.log('no cache for offset', offset);
+    return {
+      page,
+      havePrevPage,
+      haveNextPage,
+      totalPages,
+      currentPage,
+      perPage,
+    };
+  }
+)((state, { path, currentPage, perPage }) => {
+  const entities = entitiesPathSelector(state, { path });
+  return `${entities.hashCode()}:${currentPage}:${perPage}`;
+});
 
 
 export {
