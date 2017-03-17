@@ -4,16 +4,15 @@
 
 import { createSelector } from 'reselect';
 import { slice } from 'lodash/array';
-import { orderBy } from 'lodash/collection';
+import { orderBy, reduce } from 'lodash/collection';
 import createCachedSelector from 're-reselect';
+
 // import createCachedSelector from 'utils/createCachedSelector';
 import { getEntitySortIteratee } from 'utils/sort';
 
 const selectGlobal = (state) => state.get('global');
 const selectRoute = (state) => state.get('route');
 
-// TAXONOMY QUERIES
-const taxonomiesSelector = (state) => state.getIn(['global', 'entities', 'taxonomies']);
 
 /**
 * Use `createCachedSelector` when you want to make a selector that takes arguments
@@ -95,6 +94,9 @@ const readySelector = createSelector(
   (state) => state.get('ready')
 );
 
+const taxonomiesSelector = (state) =>
+  state.getIn(['global', 'entities', 'taxonomies']);
+
 const usersSelector = (state) =>
   state.getIn(['global', 'entities', 'users']);
 
@@ -104,8 +106,8 @@ const entitySelector = (state, { path, id }) =>
 const haveEntitySelector = (state, { path, id }) =>
   state.getIn(['global', 'entities', path]).has(id);
 
-const entitiesPathSelector = (state, { path }) =>
-  state.getIn(['global', 'entities', path]);
+const entitiesPathSelector = (state, { path }) => state.getIn(['global', 'entities', path]);
+
 
 const readyPathSelector = (state, { path }) =>
   state.getIn(['global', 'ready', path]);
@@ -128,6 +130,7 @@ const entityExtendedSelector = createCachedSelector(
   usersSelector,
   argsToJsSelector,
   (entity, users, toJS) => {
+    // console.log('entityExtendedSelector')
     if (entity && users) {
       const user = userById(users, entity.get('attributes').get('last_modified_user_id'));
       const entityExtended = extendEntityUserName(entity, user);
@@ -145,7 +148,8 @@ const entitiesReadySelector = createCachedSelector(
 const entitiesSelector = createCachedSelector(
   entitiesPathSelector,
   argsToJsSelector,
-  (entities, toJS) => entities && toJS ? entities.toJS() : entities
+  (entities, toJS) =>
+    entities && toJS ? entities.toJS() : entities
 )((state, { path, toJS }) => `${path}:${toJS}`);
 
 const sortBySelector = (state, { sortBy }) => sortBy;
@@ -254,6 +258,90 @@ const taxonomiesByTypeExtendedSelector = createCachedSelector(
   }
 )((state, { actionId, type, toJS }) => `${actionId}:${type}:${toJS}`);
 
+const entitySelect = createSelector(
+  (state) => state,
+  entitySelector,
+  (state, args) => args,
+  (state, entity, args) => {
+    // console.log('entitySelect: ' + JSON.stringify(args))
+    let result = entity;
+    if (entity && args.extend) {
+      const argsExtended = {
+        path: args.extend.path,
+      };
+      let extended;
+
+      if (args.extend.type === 'id') {
+        if (args.extend.reverse) {
+          argsExtended.id = entity.getIn(['attributes', args.extend.on]);
+        } else {
+          argsExtended.where = {};
+          argsExtended.where[args.extend.on] = entity.get('id');
+        }
+        extended = entitySelect(state, argsExtended);
+      } else {
+        argsExtended.where = {};
+        if (args.extend.reverse) {
+          argsExtended.where.id = entity.getIn(['attributes', args.extend.on]);
+        } else {
+          argsExtended.where[args.extend.on] = entity.get('id');
+        }
+        extended = entitiesSelect(state, argsExtended);
+        if (args.extend.type === 'count') {
+          extended = extended.size;
+        }
+      }
+      result = result.set(args.extend.as || args.extend.path, extended);
+    }
+    return result && args.out === 'js' ? result.toJS() : result;
+  }
+);
+
+
+const entitiesSelectWhere = createCachedSelector(
+  entitiesPathSelector,
+  (state, { where }) => where ? JSON.stringify(where) : null,
+  (entities, where) => // console.log("entitiesSelectWhere: " + where)
+    where ? entities.filter((entity) =>
+        reduce(JSON.parse(where), (result, value, key) => {
+          if (key === 'id') {
+            return entity.get('id') === value.toString();
+          }
+          return entity.getIn(['attributes', key]) && entity.getIn(['attributes', key]).toString() === value.toString();
+        }, true)
+      ) : entities
+)((state, { path, where, out }) => `${path}:${JSON.stringify(where)}:${out}`);
+
+
+const entitiesSelect = createSelector(
+  (state) => state,
+  entitiesSelectWhere,
+  (state, args) => args,
+  (state, entities, args) => {
+    // not to worry about caching here as "inexpensive"
+    // console.log('entitiesSelect: ' + JSON.stringify(args))
+    let result = entities;
+    if (args.extend) {
+      result = entities.map((entity) => {
+        const where = args.extend.where || {};
+        let extended;
+        where[args.extend.on] = entity.get('id');
+        // recursive call
+        extended = entitiesSelect(state, {
+          path: args.extend.path,
+          where,
+          extend: args.extend.extend,
+        });
+        if (args.extend.type === 'count') {
+          extended = extended.size;
+        }
+        return entity.set(args.extend.as || args.extend.path, extended);
+      });
+    }
+    return result && args.out === 'js' ? result.toJS() : result;
+  }
+);
+
 export {
   selectGlobal,
   makeSelectLoading,
@@ -277,4 +365,6 @@ export {
   entityExtendedSelector,
   entitiesPagedSelector,
   entitiesSortedSelector,
+  entitiesSelect,
+  entitySelect,
 };

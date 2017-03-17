@@ -14,8 +14,6 @@ import collection from 'lodash/collection';
 
 import { fromJS } from 'immutable';
 
-
-// import { actions as formActions } from 'react-redux-form';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
@@ -24,9 +22,8 @@ import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
 
 import {
-  entitiesSelector,
-  taxonomiesByTypeExtendedSelector,
-  entityExtendedSelector,
+  entitySelect,
+  entitiesSelect,
   entitiesReadySelector,
 } from 'containers/App/selectors';
 
@@ -143,7 +140,7 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
                     {
                       id: 'updated_by',
                       controlType: 'info',
-                      displayValue: action && action.attributes.last_modified_user,
+                      displayValue: action && action.user.attributes.name,
                     },
                   ],
                 },
@@ -199,15 +196,52 @@ ActionEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  action: entityExtendedSelector(state, { id: props.params.id, path: 'actions', toJS: true }),
-  actionsReady: entitiesReadySelector(state, { path: 'actions' }),
+  action: entitySelect(
+    state,
+    {
+      id: props.params.id,
+      path: 'actions',
+      out: 'js',
+      extend: {
+        type: 'id',
+        path: 'users',
+        on: 'last_modified_user_id',
+        reverse: true,
+        as: 'user',
+      },
+    },
+  ),
+  actionsReady: entitiesReadySelector(state, { path: 'actions', }),
   page: pageSelector(state),
   form: formSelector(state),
-  taxonomiesExtended: taxonomiesByTypeExtendedSelector(
+  taxonomiesExtended: entitiesSelect(
     state,
-    { actionId: props.params.id, type: 'actions', toJS: true }
+  	{
+  		path: 'taxonomies',
+      where: {
+        tags_measures: true,
+      },
+      extend: {
+  			path: 'categories',
+  			on: 'taxonomy_id',
+        extend: {
+          path: 'measure_categories',
+          on: 'category_id',
+          as: 'assigned',
+          where: {
+            action_id: props.params.id,
+          },
+        },
+      },
+  		out: 'js',
+  	},
   ),
-  recommendations: entitiesSelector(state, { path: 'recommendations', toJS: true }),
+  recommendations: entitiesSelect(
+    state, {
+      path: 'recommendations',
+      out: 'js',
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -218,7 +252,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('action_categories'));
+      dispatch(loadEntitiesIfNeeded('measure_categories'));
     },
     populateForm: (model, data) => {
       dispatch(formActions.load(model, data));
