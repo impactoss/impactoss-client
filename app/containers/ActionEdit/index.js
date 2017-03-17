@@ -211,19 +211,19 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
-  actionsReady: entitiesReadySelector(state, { path: 'actions', }),
+  actionsReady: entitiesReadySelector(state, { path: 'actions' }),
   page: pageSelector(state),
   form: formSelector(state),
   taxonomiesExtended: entitiesSelect(
     state,
-  	{
-  		path: 'taxonomies',
+    {
+      path: 'taxonomies',
       where: {
         tags_measures: true,
       },
       extend: {
-  			path: 'categories',
-  			on: 'taxonomy_id',
+        path: 'categories',
+        on: 'taxonomy_id',
         extend: {
           path: 'measure_categories',
           on: 'category_id',
@@ -233,8 +233,8 @@ const mapStateToProps = (state, props) => ({
           },
         },
       },
-  		out: 'js',
-  	},
+      out: 'js',
+    },
   ),
   recommendations: entitiesSelect(
     state, {
