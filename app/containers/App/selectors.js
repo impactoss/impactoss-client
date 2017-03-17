@@ -98,29 +98,25 @@ const readySelector = createSelector(
 const entitiesPathSelector = createSelector(
   selectGlobalEntities,
   (state, { path }) => path,
-  (entities, path) =>
-    entities.get(path)
+  (entities, path) => entities.get(path)
 );
 
 const entitySelector = createSelector(
   entitiesPathSelector,
   (state, { id }) => id,
-  (entities, id) =>
-    entities.get(id)
+  (entities, id) => entities.get(id)
 );
 
 const haveEntitySelector = createSelector(
   entitiesPathSelector,
   (state, { id }) => id,
-  (entities, id) =>
-    entities.has(id)
+  (entities, id) => entities.has(id)
 );
 
 const readyPathSelector = createSelector(
   readySelector,
   (state, { path }) => path,
-  (ready, path) =>
-    ready.get(path)
+  (ready, path) => ready.get(path)
 );
 
 const entitiesReadySelector = createCachedSelector(
@@ -174,14 +170,14 @@ const entitiesSelectWhere = createCachedSelector(
   entitiesPathSelector,
   (state, { where }) => where ? JSON.stringify(where) : null,
   (entities, where) => // console.log("entitiesSelectWhere: " + where)
-    where ? entities.filter((entity) =>
-        reduce(JSON.parse(where), (result, value, key) => {
-          if (key === 'id') {
-            return entity.get('id') === value.toString();
-          }
-          return entity.getIn(['attributes', key]) && entity.getIn(['attributes', key]).toString() === value.toString();
-        }, true)
-      ) : entities
+    entities && where ? entities.filter((entity) =>
+      reduce(JSON.parse(where), (result, value, key) => {
+        if (key === 'id') {
+          return entity.get('id') === value.toString();
+        }
+        return entity.getIn(['attributes', key]) && entity.getIn(['attributes', key]).toString() === value.toString();
+      }, true)
+    ) : entities
 )((state, { path, where, out }) => `${path}:${JSON.stringify(where)}:${out}`);
 
 
