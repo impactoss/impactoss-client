@@ -1,5 +1,16 @@
 /**
  * The global state selectors
+ *
+ * Use `createCachedSelector` when you want to make a selector that takes arguments
+ * https://github.com/reactjs/reselect/issues/184 ( problem )
+ * https://github.com/toomuchdesign/re-reselect ( solution )
+ *
+ * use the makeSelector () => createSelector pattern when you want a selector that
+ * doesn't take arguments, but can have its own cache between components
+ *
+ * otherwise use straight createSelector
+ * https://github.com/react-boilerplate/react-boilerplate/pull/1205#issuecomment-274319934
+ *
  */
 
 import { createSelector } from 'reselect';
@@ -7,44 +18,33 @@ import { slice } from 'lodash/array';
 import { orderBy, reduce } from 'lodash/collection';
 import createCachedSelector from 're-reselect';
 
-// import createCachedSelector from 'utils/createCachedSelector';
 import { getEntitySortIteratee } from 'utils/sort';
 
-const selectGlobal = (state) => state.get('global');
-const selectGlobalEntities = (state) => state.getIn(['global', 'entities']);
-const selectRoute = (state) => state.get('route');
+// high level state selects
+const getRoute = (state) => state.get('route');
+const getGlobal = (state) => state.get('global');
+const getGlobalEntities = (state) => state.getIn(['global', 'entities']);
+const getGlobalRequested = (state) => state.getIn(['global', 'requested']);
+const getGlobalReady = (state) => state.getIn(['global', 'ready']);
 
-
-/**
-* Use `createCachedSelector` when you want to make a selector that takes arguments
-* https://github.com/reactjs/reselect/issues/184 ( problem )
-* https://github.com/toomuchdesign/re-reselect ( solution )
-*
-* use the makeSelector () => createSelector pattern when you want a selector that
-* doesn't take arguments, but can have its own cache between components
-*
-* otherwise use straight createSelector
-* https://github.com/react-boilerplate/react-boilerplate/pull/1205#issuecomment-274319934
-*
-*/
 
 const makeSelectLoading = () => createSelector(
-  selectGlobal,
+  getGlobal,
   (globalState) => globalState.get('loading')
 );
 
 const makeSelectError = () => createSelector(
-  selectGlobal,
+  getGlobal,
   (globalState) => globalState.get('error')
 );
 
 const makeSelectAuth = () => createSelector(
-  selectGlobal,
+  getGlobal,
   (globalState) => globalState.get('auth').toJS()
 );
 
 const makeSelectSignedIn = () => createSelector(
-  selectGlobal,
+  getGlobal,
   (globalState) => globalState.getIn(['user', 'isSignedIn'])
 );
 
@@ -66,16 +66,17 @@ const makeSelectLocationState = () => {
 };
 
 const makeSelectEmail = () => createSelector(
-  selectGlobal,
+  getGlobal,
   (globalState) => globalState.getIn(['form', 'login', 'email'])
 );
+
 const makeSelectPassword = () => createSelector(
-  selectGlobal,
+  getGlobal,
   (globalState) => globalState.getIn(['form', 'login', 'password'])
 );
 
 const makeSelectNextPathname = () => createSelector(
-  selectRoute,
+  getRoute,
   (routeState) => {
     try {
       return routeState.getIn(['locationBeforeTransitions', 'state', 'nextPathname']);
@@ -85,48 +86,32 @@ const makeSelectNextPathname = () => createSelector(
   }
 );
 
-const requestedSelector = createSelector(
-  selectGlobal,
-  (state) => state.get('requested')
-);
 
-const readySelector = createSelector(
-  selectGlobal,
-  (state) => state.get('ready')
-);
-
-const entitiesPathSelector = createSelector(
-  selectGlobalEntities,
+const getRequestedAt = createSelector(
+  getGlobalRequested,
   (state, { path }) => path,
-  (entities, path) => entities.get(path)
+  (requested, path) => requested.get(path)
 );
 
-const entityPathSelector = createSelector(
-  entitiesPathSelector,
-  (state, { id }) => id,
-  (entities, id) => entities.get(id)
-);
-
-const haveEntitySelector = createSelector(
-  entitiesPathSelector,
-  (state, { id }) => id,
-  (entities, id) => entities.has(id)
-);
-
-const readyPathSelector = createSelector(
-  readySelector,
+const getReady = createSelector(
+  getGlobalReady,
   (state, { path }) => path,
   (ready, path) => ready.get(path)
 );
 
-const entitiesReadySelector = createCachedSelector(
-  readyPathSelector,
+const isReady = createSelector(
+  getReady,
   (ready) => !!ready
-)((state, { path }) => path);
+);
 
+const getEntitiesPure = createSelector(
+  getGlobalEntities,
+  (state, { path }) => path,
+  (entities, path) => entities.get(path)
+);
 
-const entitiesSelectWhere = createCachedSelector(
-  entitiesPathSelector,
+const getEntitiesWhere = createCachedSelector(
+  getEntitiesPure,
   (state, { where }) => where ? JSON.stringify(where) : null,
   (entities, where) => // console.log("entitiesSelectWhere: " + where)
     entities && where ? entities.filter((entity) =>
@@ -140,9 +125,9 @@ const entitiesSelectWhere = createCachedSelector(
 )((state, { path, where, out }) => `${path}:${JSON.stringify(where)}:${out}`);
 
 
-const entitiesSelect = createSelector(
+const getEntities = createSelector(
   (state) => state,
-  entitiesSelectWhere,
+  getEntitiesWhere,
   (state, args) => args,
   (state, entities, args) => {
     // not to worry about caching here as "inexpensive"
@@ -154,7 +139,7 @@ const entitiesSelect = createSelector(
         let extended;
         where[args.extend.on] = entity.get('id');
         // recursive call
-        extended = entitiesSelect(state, {
+        extended = getEntities(state, {
           path: args.extend.path,
           where,
           extend: args.extend.extend,
@@ -169,48 +154,8 @@ const entitiesSelect = createSelector(
   }
 );
 
-const entitySelect = createSelector(
-  (state) => state,
-  entityPathSelector,
-  (state, args) => args,
-  (state, entity, args) => {
-    // console.log('entitySelect: ' + JSON.stringify(args))
-    let result = entity;
-    if (entity && args.extend) {
-      const argsExtended = {
-        path: args.extend.path,
-      };
-      let extended;
-
-      if (args.extend.type === 'id') {
-        if (args.extend.reverse) {
-          argsExtended.id = entity.getIn(['attributes', args.extend.on]);
-        } else {
-          argsExtended.where = {};
-          argsExtended.where[args.extend.on] = entity.get('id');
-        }
-        extended = entitySelect(state, argsExtended);
-      } else {
-        argsExtended.where = {};
-        if (args.extend.reverse) {
-          argsExtended.where.id = entity.getIn(['attributes', args.extend.on]);
-        } else {
-          argsExtended.where[args.extend.on] = entity.get('id');
-        }
-        extended = entitiesSelect(state, argsExtended);
-        if (args.extend.type === 'count') {
-          extended = extended.size;
-        }
-      }
-      result = result.set(args.extend.as || args.extend.path, extended);
-    }
-    return result && args.out === 'js' ? result.toJS() : result;
-  }
-);
-
-
-const entitiesSortedSelector = createCachedSelector(
-  entitiesSelect,
+const getEntitiesSorted = createCachedSelector(
+  getEntities,
   (state, { sortBy }) => sortBy,
   (state, { sortOrder }) => sortOrder,
   (entities, sortBy, sortOrder) => { // eslint-disable-line
@@ -218,12 +163,12 @@ const entitiesSortedSelector = createCachedSelector(
     return orderBy(entities.toList().toJS(), getEntitySortIteratee(sortBy), sortOrder);
   }
 )((state, { path, sortBy, sortOrder }) => {
-  const entities = entitiesPathSelector(state, { path });
+  const entities = getEntitiesPure(state, { path });
   return `${entities.hashCode()}:${sortBy}:${sortOrder}`;
 });
 
-const entitiesPagedSelector = createCachedSelector(
-  entitiesSortedSelector,
+const getEntitiesPaged = createCachedSelector(
+  getEntitiesSorted,
   (state, { currentPage }) => currentPage,
   (state, { perPage }) => perPage,
   (entities, currentPage, perPage) => {
@@ -246,13 +191,65 @@ const entitiesPagedSelector = createCachedSelector(
     };
   }
 )((state, { path, currentPage, perPage }) => {
-  const entities = entitiesPathSelector(state, { path });
+  const entities = getEntitiesPure(state, { path });
   return `${entities.hashCode()}:${currentPage}:${perPage}`;
 });
 
 
+const getEntityPure = createSelector(
+  getEntitiesPure,
+  (state, { id }) => id,
+  (entities, id) => entities.get(id)
+);
+
+const hasEntity = createSelector(
+  getEntitiesPure,
+  (state, { id }) => id,
+  (entities, id) => entities.has(id)
+);
+
+const getEntity = createSelector(
+  (state) => state,
+  getEntityPure,
+  (state, args) => args,
+  (state, entity, args) => {
+    // console.log('entitySelect: ' + JSON.stringify(args))
+    let result = entity;
+    if (entity && args.extend) {
+      const argsExtended = {
+        path: args.extend.path,
+      };
+      let extended;
+
+      if (args.extend.type === 'id') {
+        if (args.extend.reverse) {
+          argsExtended.id = entity.getIn(['attributes', args.extend.on]);
+        } else {
+          argsExtended.where = {};
+          argsExtended.where[args.extend.on] = entity.get('id');
+        }
+        extended = getEntity(state, argsExtended);
+      } else {
+        argsExtended.where = {};
+        if (args.extend.reverse) {
+          argsExtended.where.id = entity.getIn(['attributes', args.extend.on]);
+        } else {
+          argsExtended.where[args.extend.on] = entity.get('id');
+        }
+        extended = getEntities(state, argsExtended);
+        if (args.extend.type === 'count') {
+          extended = extended.size;
+        }
+      }
+      result = result.set(args.extend.as || args.extend.path, extended);
+    }
+    return result && args.out === 'js' ? result.toJS() : result;
+  }
+);
+
+
 export {
-  selectGlobal,
+  getGlobal,
   makeSelectLoading,
   makeSelectError,
   makeSelectLocationState,
@@ -261,12 +258,13 @@ export {
   makeSelectSignedIn,
   makeSelectAuth,
   makeSelectNextPathname,
-  requestedSelector,
-  readySelector,
-  haveEntitySelector,
-  entitiesReadySelector,
-  entitiesPagedSelector,
-  entitiesSortedSelector,
-  entitiesSelect,
-  entitySelect,
+  getRequestedAt,
+  getReady,
+  isReady,
+  getEntitiesWhere,
+  getEntities,
+  getEntitiesSorted,
+  getEntitiesPaged,
+  hasEntity,
+  getEntity,
 };

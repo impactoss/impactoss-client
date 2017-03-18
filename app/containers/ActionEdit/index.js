@@ -22,9 +22,9 @@ import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
 
 import {
-  entitySelect,
-  entitiesSelect,
-  entitiesReadySelector,
+  getEntity,
+  getEntities,
+  isReady,
 } from 'containers/App/selectors';
 
 import {
@@ -196,7 +196,10 @@ ActionEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  action: entitySelect(
+  page: pageSelector(state),
+  form: formSelector(state),
+  actionsReady: isReady(state, { path: 'actions' }),
+  action: getEntity(
     state,
     {
       id: props.params.id,
@@ -211,10 +214,7 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
-  actionsReady: entitiesReadySelector(state, { path: 'actions' }),
-  page: pageSelector(state),
-  form: formSelector(state),
-  taxonomiesExtended: entitiesSelect(
+  taxonomiesExtended: getEntities(
     state,
     {
       path: 'taxonomies',
@@ -236,7 +236,7 @@ const mapStateToProps = (state, props) => ({
       out: 'js',
     },
   ),
-  recommendations: entitiesSelect(
+  recommendations: getEntities(
     state, {
       path: 'recommendations',
       out: 'js',

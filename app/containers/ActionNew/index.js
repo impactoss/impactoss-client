@@ -20,7 +20,7 @@ import EntityForm from 'components/EntityForm';
 
 
 import {
-  entitiesSelect,
+  getEntities,
 } from 'containers/App/selectors';
 
 import actionNewSelector from './selectors';
@@ -152,7 +152,7 @@ ActionNew.contextTypes = {
 
 const mapStateToProps = (state) => ({
   actionNew: actionNewSelector(state),
-  taxonomiesExtended: entitiesSelect(
+  taxonomiesExtended: getEntities(
     state,
     {
       path: 'taxonomies',
@@ -166,7 +166,7 @@ const mapStateToProps = (state) => ({
       out: 'js',
     },
   ),
-  recommendations: entitiesSelect(
+  recommendations: getEntities(
     state, {
       path: 'recommendations',
       out: 'js',

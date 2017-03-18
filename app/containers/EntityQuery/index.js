@@ -12,7 +12,7 @@ import {
   loadEntitiesIfNeeded,
 } from 'containers/App/actions';
 import {
-  entitiesPagedSelector,
+  getEntitiesPaged,
 } from 'containers/App/selectors';
 import messages from './messages';
 
@@ -91,7 +91,7 @@ export class EntityQuery extends React.PureComponent { // eslint-disable-line re
 }
 
 const mapStateToProps = (state, props) => ({
-  pagedEntities: entitiesPagedSelector(state, {
+  pagedEntities: getEntitiesPaged(state, {
     path: props.path,
     perPage: props.perPage || EntityQuery.defaultProps.perPage,
     currentPage: props.currentPage || EntityQuery.defaultProps.currentPage,

@@ -12,7 +12,7 @@ import { FormattedMessage } from 'react-intl';
 // containers
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import {
-  entitiesSelect,
+  getEntities,
 } from 'containers/App/selectors';
 
 // components
@@ -66,7 +66,7 @@ Taxonomies.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  taxonomies: entitiesSelect(
+  taxonomies: getEntities(
     state,
     {
       path: 'taxonomies',

@@ -13,8 +13,8 @@ import { Link } from 'react-router';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import {
-  entitySelect,
-  entitiesReadySelector,
+  getEntity,
+  isReady,
 } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -72,7 +72,7 @@ ActionView.propTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  action: entitySelect(
+  action: getEntity(
     state,
     {
       id: props.params.id,
@@ -87,7 +87,7 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
-  actionsReady: entitiesReadySelector(state, { path: 'actions' }),
+  actionsReady: isReady(state, { path: 'actions' }),
 });
 
 function mapDispatchToProps(dispatch) {
