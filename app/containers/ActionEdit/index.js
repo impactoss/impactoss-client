@@ -56,8 +56,8 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
-    // console.log(JSON.stringify(this.props.action))
-    const taxonomyOptions = collection.map(this.props.taxonomiesExtended, (tax) => ({
+
+    const taxonomyOptions = collection.map(this.props.taxonomies, (tax) => ({
       id: tax.attributes.title,
       controlType: 'select',
       options: collection.map(tax.categories, (cat) => ({
@@ -187,7 +187,7 @@ ActionEdit.propTypes = {
   action: PropTypes.object,
   actionsReady: PropTypes.bool,
   params: PropTypes.object,
-  taxonomiesExtended: PropTypes.object,
+  taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
 };
 
@@ -198,23 +198,23 @@ ActionEdit.contextTypes = {
 const mapStateToProps = (state, props) => ({
   page: pageSelector(state),
   form: formSelector(state),
-  actionsReady: isReady(state, { path: 'actions' }),
+  actionsReady: isReady(state, { path: 'measures' }),
   action: getEntity(
     state,
     {
       id: props.params.id,
-      path: 'actions',
+      path: 'measures',
       out: 'js',
       extend: {
-        type: 'id',
+        type: 'single',
         path: 'users',
-        on: 'last_modified_user_id',
-        reverse: true,
+        key: 'last_modified_user_id',
         as: 'user',
       },
     },
   ),
-  taxonomiesExtended: getEntities(
+  // all categories for all taggable taxonomies, listing connection if any
+  taxonomies: getEntities(
     state,
     {
       path: 'taxonomies',
@@ -223,11 +223,13 @@ const mapStateToProps = (state, props) => ({
       },
       extend: {
         path: 'categories',
-        on: 'taxonomy_id',
+        key: 'taxonomy_id',
+        reverse: true,
         extend: {
-          path: 'measure_categories',
-          on: 'category_id',
           as: 'assigned',
+          path: 'measure_categories',
+          key: 'category_id',
+          reverse: true,
           where: {
             action_id: props.params.id,
           },
@@ -236,10 +238,20 @@ const mapStateToProps = (state, props) => ({
       out: 'js',
     },
   ),
+  // all recommendations, listing connection if any
   recommendations: getEntities(
     state, {
       path: 'recommendations',
       out: 'js',
+      extend: {
+        as: 'connected',
+        path: 'recommendation_measures',
+        key: 'recommendation_id',
+        reverse: true,
+        where: {
+          action_id: props.params.id,
+        },
+      },
     },
   ),
 });
@@ -247,7 +259,7 @@ const mapStateToProps = (state, props) => ({
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('actions'));
+      dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));

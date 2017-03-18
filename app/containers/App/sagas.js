@@ -49,7 +49,7 @@ export function* checkEntitiesSaga(payload) {
     yield put(loadingEntities(payload.path));
     try {
       // Actions are called measures on the server
-      const serverPath = payload.path.replace('action', 'measure');
+      const serverPath = payload.path;
       // Call the API
       const response = yield call(apiRequest, 'get', serverPath);
       // Save response and set loading = false

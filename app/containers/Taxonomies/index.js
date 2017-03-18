@@ -30,7 +30,6 @@ export class Taxonomies extends React.PureComponent { // eslint-disable-line rea
 
   render() {
     const { taxonomies } = this.props;
-    // console.log(taxonomies)
     return (
       <div>
         <Helmet
@@ -73,7 +72,9 @@ const mapStateToProps = (state) => ({
       extend: {
         type: 'count',
         path: 'categories',
-        on: 'taxonomy_id',
+        key: 'taxonomy_id',
+        reverse: true,
+        as: 'categoryCount',
       },
       out: 'js',
     }

@@ -14,6 +14,7 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import {
   getEntity,
+  getEntities,
   isReady,
 } from 'containers/App/selectors';
 
@@ -22,7 +23,7 @@ import messages from './messages';
 export class ActionView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    this.props.onComponentWillMount();
+    this.props.loadEntitiesIfNeeded();
   }
 
   render() {
@@ -66,34 +67,75 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 }
 
 ActionView.propTypes = {
-  onComponentWillMount: PropTypes.func,
+  loadEntitiesIfNeeded: PropTypes.func,
   action: PropTypes.object,
   actionsReady: PropTypes.bool,
 };
 
 const mapStateToProps = (state, props) => ({
+  actionsReady: isReady(state, { path: 'measures' }),
   action: getEntity(
     state,
     {
       id: props.params.id,
-      path: 'actions',
+      path: 'measures',
       out: 'js',
       extend: {
-        type: 'id',
+        type: 'single',
         path: 'users',
-        on: 'last_modified_user_id',
-        reverse: true,
+        key: 'last_modified_user_id',
         as: 'user',
       },
     },
   ),
-  actionsReady: isReady(state, { path: 'actions' }),
+  // all categories for all taggable taxonomies, listing connection if any
+  taxonomies: getEntities(
+    state,
+    {
+      path: 'taxonomies',
+      where: {
+        tags_measures: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+        join: {
+          path: 'measure_categories',
+          key: 'category_id',
+          where: {
+            action_id: props.params.id,
+          },
+        },
+      },
+      out: 'js',
+    },
+  ),
+  // all recommendations, listing connection if any
+  recommendations: getEntities(
+    state, {
+      path: 'recommendations',
+      out: 'js',
+      join: {
+        path: 'recommendation_measures',
+        key: 'recommendation_id',
+        where: {
+          action_id: props.params.id,
+        },
+      },
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    onComponentWillMount: () => {
-      dispatch(loadEntitiesIfNeeded('actions'));
+    loadEntitiesIfNeeded: () => {
+      dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('measure_categories'));
     },
   };
 }

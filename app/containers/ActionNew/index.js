@@ -161,7 +161,8 @@ const mapStateToProps = (state) => ({
       },
       extend: {
         path: 'categories',
-        on: 'taxonomy_id',
+        key: 'taxonomy_id',
+        reverse: true,
       },
       out: 'js',
     },

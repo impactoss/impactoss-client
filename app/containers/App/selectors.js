@@ -110,54 +110,106 @@ const getEntitiesPure = createSelector(
   (entities, path) => entities.get(path)
 );
 
-const getEntitiesWhere = createCachedSelector(
+const getEntitiesJoint = createSelector(
+  (state) => state,
   getEntitiesPure,
-  (state, { where }) => where ? JSON.stringify(where) : null,
-  (entities, where) => // console.log("entitiesSelectWhere: " + where)
-    entities && where ? entities.filter((entity) =>
-      reduce(JSON.parse(where), (result, value, key) => {
-        if (key === 'id') {
-          return entity.get('id') === value.toString();
-        }
-        return entity.getIn(['attributes', key]) && entity.getIn(['attributes', key]).toString() === value.toString();
-      }, true)
-    ) : entities
-)((state, { path, where, out }) => `${path}:${JSON.stringify(where)}:${out}`);
+  (state, { join }) => join,
+  (state, entities, join) => {
+    if (join) {
+      const where = join.where;
+      return entities.filter((entity) => {
+        where[join.key] = entity.get('id');
+        const joins = getEntitiesWhere(state, {
+          path: join.path,
+          where,
+        });
+        return joins && joins.size;
+      });
+    }
+    return entities;
+  }
+);
+
+
+const getEntitiesWhere = createCachedSelector(
+  getEntitiesJoint,
+  (state, { where }) => where ? JSON.stringify(where) : null, // enable caching
+  (entities, whereString) => {
+    if (whereString) {
+      const where = JSON.parse(whereString);
+      return entities.filter((entity) =>
+        reduce(where, (result, value, key) => {
+          if (key === 'id') {
+            return entity.get('id') === value.toString();
+          }
+          return entity.getIn(['attributes', key]) && entity.getIn(['attributes', key]).toString() === value.toString();
+        }, true)
+      );
+    }
+    return entities;
+  }
+)((state, { path, where }) => `${path}:${JSON.stringify(where)}`);
 
 
 const getEntities = createSelector(
   (state) => state,
   getEntitiesWhere,
-  (state, args) => args,
-  (state, entities, args) => {
+  (state, { out }) => out,
+  (state, { extend }) => extend,
+  (state, entities, out, extend) => {
     // not to worry about caching here as "inexpensive"
-    // console.log('entitiesSelect: ' + JSON.stringify(args))
-    let result = entities;
-    if (args.extend) {
-      result = entities.map((entity) => {
-        const where = args.extend.where || {};
-        let extended;
-        where[args.extend.on] = entity.get('id');
-        // recursive call
-        extended = getEntities(state, {
-          path: args.extend.path,
-          where,
-          extend: args.extend.extend,
-        });
-        if (args.extend.type === 'count') {
-          extended = extended.size;
-        }
-        return entity.set(args.extend.as || args.extend.path, extended);
-      });
+    let result;
+    if (extend) {
+      result = entities.map((entity) =>
+        extendEntity(state, entity, extend)
+      );
+    } else {
+      result = entities;
     }
-    return result && args.out === 'js' ? result.toJS() : result;
+    return out === 'js' ? result.toJS() : result;
   }
 );
+// helper
+const extendEntity = (state, entity, args) => {
+  const extend = {
+    path: args.path, // the table to look up, required
+    key: args.key, // the foreign key
+    type: args.type || 'list', // one of: list, count, single
+    as: args.as || args.path, // the attribute to store
+    reverse: args.reverse || false, // reverse relation
+    via: args.via || null, // the associative table, many:many relationship
+    where: args.where || {}, // conditions for join
+    extend: args.extend || null,
+    join: args.join || null,
+  };
+  if (extend.reverse) {
+    // reverse: other entity pointing to entity
+    extend.where[extend.key] = entity.get('id');
+  } else if (extend.type === 'single') {
+    extend.id = entity.getIn(['attributes', extend.key]);
+  } else {
+    extend.where.id = entity.getIn(['attributes', extend.key]);
+  }
+
+  let extended;
+  if (extend.type === 'single') {
+    extended = getEntity(state, extend);
+  } else {
+    extended = getEntities(state, extend);
+
+    if (extended && extend.type === 'count') {
+      extended = extended.size;
+    }
+  }
+  // console.log(extend)
+  // console.log(extended.toJS())
+  return entity.set(extend.as, extended);
+};
 
 const getEntitiesSorted = createCachedSelector(
   getEntities,
-  (state, { sortBy }) => sortBy,
-  (state, { sortOrder }) => sortOrder,
+  (state, { sortBy }) => sortBy || 'id',
+  (state, { sortOrder }) => sortOrder || 'desc',
   (entities, sortBy, sortOrder) => { // eslint-disable-line
     // console.log('no cache for ', sortBy, sortOrder); // eslint-disable-line
     return orderBy(entities.toList().toJS(), getEntitySortIteratee(sortBy), sortOrder);
@@ -211,39 +263,17 @@ const hasEntity = createSelector(
 const getEntity = createSelector(
   (state) => state,
   getEntityPure,
-  (state, args) => args,
-  (state, entity, args) => {
+  (state, { out }) => out,
+  (state, { extend }) => extend,
+  (state, entity, out, extend) => {
     // console.log('entitySelect: ' + JSON.stringify(args))
-    let result = entity;
-    if (entity && args.extend) {
-      const argsExtended = {
-        path: args.extend.path,
-      };
-      let extended;
-
-      if (args.extend.type === 'id') {
-        if (args.extend.reverse) {
-          argsExtended.id = entity.getIn(['attributes', args.extend.on]);
-        } else {
-          argsExtended.where = {};
-          argsExtended.where[args.extend.on] = entity.get('id');
-        }
-        extended = getEntity(state, argsExtended);
-      } else {
-        argsExtended.where = {};
-        if (args.extend.reverse) {
-          argsExtended.where.id = entity.getIn(['attributes', args.extend.on]);
-        } else {
-          argsExtended.where[args.extend.on] = entity.get('id');
-        }
-        extended = getEntities(state, argsExtended);
-        if (args.extend.type === 'count') {
-          extended = extended.size;
-        }
-      }
-      result = result.set(args.extend.as || args.extend.path, extended);
+    let result;
+    if (entity && extend) {
+      result = extendEntity(state, entity, extend);
+    } else {
+      result = entity;
     }
-    return result && args.out === 'js' ? result.toJS() : result;
+    return result && out === 'js' ? result.toJS() : result;
   }
 );
 
