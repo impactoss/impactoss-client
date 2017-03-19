@@ -11,6 +11,7 @@ import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import EntityView from 'components/EntityView';
 
 import {
   getEntity,
@@ -28,7 +29,6 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 
   render() {
     const { action, actionsReady } = this.props;
-
     return (
       <div>
         <Helmet
@@ -49,15 +49,11 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           </div>
         }
         { action &&
-          <div>
-            <h1>{action.attributes.title}</h1>
-            <h5>Description</h5>
-            <p>{action.attributes.description}</p>
-            <h5>Public:</h5>
-            <p>{action.attributes.draft === false ? 'YES' : 'NO'}</p>
-            <h5>Updated At:</h5>
-            <p>{action.attributes['updated-at']}</p>
-          </div>
+          <EntityView
+            type="Action"
+            {...action.attributes}
+            updatedAt={action.attributes.updated_at}
+          />
         }
         { action &&
         <Link to={`/actions/edit/${action.id}`}><button>Edit Action</button></Link> }
