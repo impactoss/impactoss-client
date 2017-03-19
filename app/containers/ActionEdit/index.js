@@ -10,7 +10,6 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
-import collection from 'lodash/collection';
 
 import { fromJS } from 'immutable';
 
@@ -51,20 +50,27 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
+  mapCategoryOptions = (categories) => Object.values(categories).map((cat) => ({
+    value: cat.id,
+    label: `${cat.attributes.title}${cat.connected ? ' - assigned' : ' - not assigned'}`,
+  }));
+  mapRecommendationOptions = (recommendations) => Object.values(recommendations).map((rec) => ({
+    value: rec.id,
+    label: `${rec.attributes.title}${rec.connected ? ' - connected' : ' - not connected'}`,
+  }));
+
+  renderTaxonomyControl = (taxonomies) => Object.values(taxonomies).map((tax) => ({
+    id: tax.attributes.title,
+    controlType: 'select',
+    options: this.mapCategoryOptions(tax.categories),
+  }));
+
+
   render() {
     const { action, actionsReady } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
-
-    const taxonomyOptions = collection.map(this.props.taxonomies, (tax) => ({
-      id: tax.attributes.title,
-      controlType: 'select',
-      options: collection.map(tax.categories, (cat) => ({
-        value: cat.id,
-        label: `${cat.attributes.title}${cat.assigned ? ' - assigned' : ' - not assigned'}`,
-      })),
-    }));
 
     return (
       <div>
@@ -154,13 +160,10 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
                     {
                       id: 'recommendations',
                       controlType: 'select',
-                      options: collection.map(this.props.recommendations, (rec) => ({
-                        value: rec.id,
-                        label: rec.attributes.title,
-                      })),
+                      options: this.mapRecommendationOptions(this.props.recommendations),
                     },
                   ],
-                  aside: taxonomyOptions,
+                  aside: this.renderTaxonomyControl(this.props.taxonomies),
                 },
               }}
             />

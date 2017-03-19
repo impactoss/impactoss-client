@@ -204,7 +204,7 @@ const extendEntity = (state, entity, extendArgs) => {
         extended = extended.size;
       }
     }
-    result = result.set(extend.as, extended);
+    result = result.set(extend.as, extended.size === 0 ? null : extended);
   });
   return result;
 };
