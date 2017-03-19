@@ -88,7 +88,7 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
-  // all categories for all taggable taxonomies, listing connection if any
+  // all categories for all action-taggable taxonomies, listing connection if any
   taxonomies: getEntities(
     state,
     {
@@ -132,10 +132,11 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
     },
   };
 }

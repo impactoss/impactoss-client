@@ -177,7 +177,6 @@ const extendEntity = (state, entity, args) => {
     type: args.type || 'list', // one of: list, count, single
     as: args.as || args.path, // the attribute to store
     reverse: args.reverse || false, // reverse relation
-    via: args.via || null, // the associative table, many:many relationship
     where: args.where || {}, // conditions for join
     extend: args.extend || null,
     join: args.join || null,
@@ -185,14 +184,14 @@ const extendEntity = (state, entity, args) => {
   if (extend.reverse) {
     // reverse: other entity pointing to entity
     extend.where[extend.key] = entity.get('id');
-  } else if (extend.type === 'single') {
-    extend.id = entity.getIn(['attributes', extend.key]);
   } else {
+    // entity pointing to other entity
     extend.where.id = entity.getIn(['attributes', extend.key]);
   }
 
   let extended;
   if (extend.type === 'single') {
+    extend.id = extend.where.id; // getEntityPure selector requires id
     extended = getEntity(state, extend);
   } else {
     extended = getEntities(state, extend);
