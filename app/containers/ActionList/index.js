@@ -5,29 +5,27 @@
  */
 
 import React, { PropTypes } from 'react';
-import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
-
-import {
-  actionsSortedSelector,
-  sortBySelector,
-} from './selectors';
-
-import {
-  setSort,
-} from './actions';
+import EntityList from 'components/EntityList';
 
 import messages from './messages';
 
-export class ActionList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export default class ActionList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  componentWillMount() {
-    this.props.componentWillMount();
+  static propTypes = {
+    location: PropTypes.object.isRequired,
   }
+
+  mapToEntityList = ({ id, attributes }) => ({
+    id,
+    title: attributes.title,
+    linkTo: `/actions/${id}`,
+    reference: id,
+    status: attributes.draft ? 'draft' : null,
+  })
 
   render() {
     return (
@@ -40,53 +38,12 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         />
         <FormattedMessage {...messages.header} />
         <Link to="actions/new">Add Action</Link>
-        <select onChange={this.props.onSetOrder} value={this.props.sortBy.order}>
-          <option value="asc">Asc</option>
-          <option value="desc">Desc</option>
-        </select>
-        {this.props.actions && this.props.actions.map((list, i) => {
-          const { id, attributes } = list;
-          const { title, description, draft } = attributes;
-          return (
-            <span key={i}>
-              <Link to={`/actions/${id}`}><h5>{title}</h5></Link>
-              <ul>
-                <li>Description: {description}</li>
-                <li>Public: {draft === false ? 'YES' : 'NO'}</li>
-              </ul>
-            </span>
-          );
-        })}
+        <EntityList
+          location={this.props.location}
+          mapToEntityList={this.mapToEntityList}
+          path="measures"
+        />
       </div>
     );
   }
 }
-
-ActionList.propTypes = {
-  componentWillMount: PropTypes.func,
-  actions: React.PropTypes.array,
-  onSetOrder: React.PropTypes.func.isRequired,
-  sortBy: React.PropTypes.object.isRequired,
-};
-
-const makeMapStateToProps = () => {
-  const mapStateToProps = (state) => ({
-    actions: actionsSortedSelector(state, { path: 'actions' }),
-    sortBy: sortBySelector(state),
-  });
-  return mapStateToProps;
-};
-
-function mapDispatchToProps(dispatch) {
-  return {
-    componentWillMount: () => {
-      dispatch(loadEntitiesIfNeeded('actions'));
-    },
-    onSetOrder: (evt) => {
-      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-      dispatch(setSort('id', evt.target.value));
-    },
-  };
-}
-
-export default connect(makeMapStateToProps(), mapDispatchToProps)(ActionList);

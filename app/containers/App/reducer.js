@@ -41,19 +41,49 @@ const initialState = fromJS({
     messages: [],
   },
   requested: { // Record the time that entities where requested from the server
-    actions: null,
+    taxonomies: null,
+    categories: null,
+    roles: null,
+    users: null,
+    user_categories: null,
+    user_roles: null,
+    indicators: null,
+    measures: null,
+    measure_categories: null,
+    measure_indicators: null,
     recommendations: null,
-    recommendation_actions: null,
+    recommendation_measures: null,
+    recommendation_categories: null,
   },
   ready: { // Record the time that entities where returned from the server
-    actions: null,
+    taxonomies: null,
+    categories: null,
+    roles: null,
+    users: null,
+    user_categories: null,
+    user_roles: null,
+    indicators: null,
+    measures: null,
+    measure_categories: null,
+    measure_indicators: null,
     recommendations: null,
-    recommendation_actions: null,
+    recommendation_measures: null,
+    recommendation_categories: null,
   },
   entities: {
-    actions: {},
+    taxonomies: {},
+    categories: {},
+    roles: {},
+    users: {},
+    user_categories: {},
+    user_roles: {},
+    indicators: {},
+    measures: {},
+    measure_categories: {},
+    measure_indicators: {},
     recommendations: {},
-    recommendation_actions: {},
+    recommendation_measures: {},
+    recommendation_categories: {},
   },
   user: {
     attributes: null,
@@ -88,7 +118,7 @@ function appReducer(state = initialState, payload) {
     case ADD_ENTITY:
     case UPDATE_ENTITY:
       return state
-          .setIn(['entities', `${payload.path}s`, payload.entity.id], fromJS(payload.entity));
+          .setIn(['entities', `${payload.path}`, payload.entity.id], fromJS(payload.entity));
     case ENTITIES_REQUESTED:
       return state
           .setIn(['requested', payload.path], payload.time);

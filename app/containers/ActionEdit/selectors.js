@@ -13,6 +13,10 @@ const pageSelector = createSelector(
   selectActionEditDomain,
   (substate) => substate.get('page').toJS()
  );
+const formSelector = createSelector(
+  selectActionEditDomain,
+  (substate) => substate.get('form')
+ );
 
 
 /**
@@ -29,4 +33,5 @@ export {
   selectActionEditDomain,
   actionEditSelect,
   pageSelector,
+  formSelector,
 };
