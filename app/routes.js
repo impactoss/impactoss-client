@@ -200,14 +200,28 @@ export default function createRoutes(store) {
       name: 'taxonomies',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/Taxonomies/reducer'),
           import('containers/Taxonomies'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, component]) => {
-          injectReducer('taxonomies', reducer.default);
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/categories/:id', // the taxonomy id
+      name: 'taxonomyCategories',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/TaxonomyCategories'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 

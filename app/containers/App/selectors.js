@@ -170,39 +170,42 @@ const getEntities = createSelector(
   }
 );
 // helper
-const extendEntity = (state, entity, args) => {
-  const extend = {
-    path: args.path, // the table to look up, required
-    key: args.key, // the foreign key
-    type: args.type || 'list', // one of: list, count, single
-    as: args.as || args.path, // the attribute to store
-    reverse: args.reverse || false, // reverse relation
-    where: args.where || {}, // conditions for join
-    extend: args.extend || null,
-    join: args.join || null,
-  };
-  if (extend.reverse) {
-    // reverse: other entity pointing to entity
-    extend.where[extend.key] = entity.get('id');
-  } else {
-    // entity pointing to other entity
-    extend.where.id = entity.getIn(['attributes', extend.key]);
-  }
-
-  let extended;
-  if (extend.type === 'single') {
-    extend.id = extend.where.id; // getEntityPure selector requires id
-    extended = getEntity(state, extend);
-  } else {
-    extended = getEntities(state, extend);
-
-    if (extended && extend.type === 'count') {
-      extended = extended.size;
+const extendEntity = (state, entity, extendArgs) => {
+  const argsArray = Array.isArray(extendArgs) ? extendArgs : [extendArgs];
+  let result = entity;
+  argsArray.forEach((args) => {
+    const extend = {
+      path: args.path, // the table to look up, required
+      key: args.key, // the foreign key
+      type: args.type || 'list', // one of: list, count, single
+      as: args.as || args.path, // the attribute to store
+      reverse: args.reverse || false, // reverse relation
+      where: args.where || {}, // conditions for join
+      extend: args.extend || null,
+      join: args.join || null,
+    };
+    if (extend.reverse) {
+      // reverse: other entity pointing to entity
+      extend.where[extend.key] = entity.get('id');
+    } else {
+      // entity pointing to other entity
+      extend.where.id = entity.getIn(['attributes', extend.key]);
     }
-  }
-  // console.log(extend)
-  // console.log(extended.toJS())
-  return entity.set(extend.as, extended);
+
+    let extended;
+    if (extend.type === 'single') {
+      extend.id = extend.where.id; // getEntityPure selector requires id
+      extended = getEntity(state, extend);
+    } else {
+      extended = getEntities(state, extend);
+
+      if (extended && extend.type === 'count') {
+        extended = extended.size;
+      }
+    }
+    result = result.set(extend.as, extended);
+  });
+  return result;
 };
 
 const getEntitiesSorted = createCachedSelector(

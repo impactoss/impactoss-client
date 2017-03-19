@@ -17,6 +17,7 @@ import {
 
 // components
 import Page from 'components/Page';
+import TaxonomyList from 'components/TaxonomyList';
 
 // relative
 import messages from './messages';
@@ -28,8 +29,21 @@ export class Taxonomies extends React.PureComponent { // eslint-disable-line rea
     this.props.loadEntitiesIfNeeded();
   }
 
+  mapToTaxonomyList = (taxonomies) => Object.values(taxonomies).map((tax) => ({
+    id: tax.id,
+    title: tax.attributes.title,
+    count: tax.count,
+    linkTo: `/categories/${tax.id}`,
+    tags: {
+      recommendations: !!tax.attributes.tags_recommendations,
+      actions: !!tax.attributes.tags_measures,
+      users: !!tax.attributes.tags_users,
+    },
+  }))
+
   render() {
-    const { taxonomies } = this.props;
+    const taxonomies = this.mapToTaxonomyList(this.props.taxonomies);
+
     return (
       <div>
         <Helmet
@@ -48,6 +62,9 @@ export class Taxonomies extends React.PureComponent { // eslint-disable-line rea
             title={this.context.intl.formatMessage(messages.pageTitle)}
             actions={[]}
           >
+            <TaxonomyList
+              taxonomies={taxonomies}
+            />
           </Page>
         }
       </div>
@@ -74,10 +91,10 @@ const mapStateToProps = (state) => ({
         path: 'categories',
         key: 'taxonomy_id',
         reverse: true,
-        as: 'categoryCount',
+        as: 'count',
       },
       out: 'js',
-    }
+    },
   ),
 });
 
