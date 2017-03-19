@@ -41,7 +41,7 @@ export default class ActionList extends React.PureComponent { // eslint-disable-
         <EntityList
           location={this.props.location}
           mapToEntityList={this.mapToEntityList}
-          entities="actions"
+          path="measures"
         />
       </div>
     );

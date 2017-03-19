@@ -29,7 +29,7 @@ import {
 
 import {
   makeSelectNextPathname,
-  requestedSelector,
+  getRequestedAt,
 } from 'containers/App/selectors';
 
 import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
@@ -39,8 +39,7 @@ import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
  */
 export function* checkEntitiesSaga(payload) {
   // requestedSelector returns the times that entities where fetched from the API
-  const requested = yield select(requestedSelector);
-  const requestedAt = requested.get(payload.path);
+  const requestedAt = yield select(getRequestedAt, { path: payload.path });
 
   // If haven't requested yet, do so now.
   if (!requestedAt) {
@@ -50,7 +49,7 @@ export function* checkEntitiesSaga(payload) {
     yield put(loadingEntities(payload.path));
     try {
       // Actions are called measures on the server
-      const serverPath = payload.path.replace('action', 'measure');
+      const serverPath = payload.path;
       // Call the API
       const response = yield call(apiRequest, 'get', serverPath);
       // Save response and set loading = false

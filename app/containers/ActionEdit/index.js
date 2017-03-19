@@ -14,8 +14,6 @@ import collection from 'lodash/collection';
 
 import { fromJS } from 'immutable';
 
-
-// import { actions as formActions } from 'react-redux-form';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
@@ -24,10 +22,9 @@ import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
 
 import {
-  entitiesSelector,
-  taxonomiesByTypeExtendedSelector,
-  entityExtendedSelector,
-  entitiesReadySelector,
+  getEntity,
+  getEntities,
+  isReady,
 } from 'containers/App/selectors';
 
 import {
@@ -60,7 +57,7 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
 
-    const taxonomyOptions = collection.map(this.props.taxonomiesExtended, (tax) => ({
+    const taxonomyOptions = collection.map(this.props.taxonomies, (tax) => ({
       id: tax.attributes.title,
       controlType: 'select',
       options: collection.map(tax.categories, (cat) => ({
@@ -132,18 +129,18 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
                       id: 'status',
                       controlType: 'select',
                       model: '.draft',
-                      value: action && action.draft,
+                      value: action.draft,
                       options: PUBLISH_STATUSES,
                     },
                     {
                       id: 'updated',
                       controlType: 'info',
-                      displayValue: action && action.attributes.updated_at,
+                      displayValue: action.attributes.updated_at,
                     },
                     {
                       id: 'updated_by',
                       controlType: 'info',
-                      displayValue: action && action.attributes.last_modified_user,
+                      displayValue: action.user && action.user.attributes.name,
                     },
                   ],
                 },
@@ -190,7 +187,7 @@ ActionEdit.propTypes = {
   action: PropTypes.object,
   actionsReady: PropTypes.bool,
   params: PropTypes.object,
-  taxonomiesExtended: PropTypes.object,
+  taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
 };
 
@@ -199,26 +196,75 @@ ActionEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  action: entityExtendedSelector(state, { id: props.params.id, path: 'actions', toJS: true }),
-  actionsReady: entitiesReadySelector(state, { path: 'actions' }),
   page: pageSelector(state),
   form: formSelector(state),
-  taxonomiesExtended: taxonomiesByTypeExtendedSelector(
+  actionsReady: isReady(state, { path: 'measures' }),
+  action: getEntity(
     state,
-    { actionId: props.params.id, type: 'actions', toJS: true }
+    {
+      id: props.params.id,
+      path: 'measures',
+      out: 'js',
+      extend: {
+        type: 'single',
+        path: 'users',
+        key: 'last_modified_user_id',
+        as: 'user',
+      },
+    },
   ),
-  recommendations: entitiesSelector(state, { path: 'recommendations', toJS: true }),
+  // all categories for all taggable taxonomies, listing connection if any
+  taxonomies: getEntities(
+    state,
+    {
+      path: 'taxonomies',
+      where: {
+        tags_measures: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+        extend: {
+          as: 'assigned',
+          path: 'measure_categories',
+          key: 'category_id',
+          reverse: true,
+          where: {
+            action_id: props.params.id,
+          },
+        },
+      },
+      out: 'js',
+    },
+  ),
+  // all recommendations, listing connection if any
+  recommendations: getEntities(
+    state, {
+      path: 'recommendations',
+      out: 'js',
+      extend: {
+        as: 'connected',
+        path: 'recommendation_measures',
+        key: 'recommendation_id',
+        reverse: true,
+        where: {
+          action_id: props.params.id,
+        },
+      },
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('actions'));
+      dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('action_categories'));
+      dispatch(loadEntitiesIfNeeded('measure_categories'));
     },
     populateForm: (model, data) => {
       dispatch(formActions.load(model, data));
