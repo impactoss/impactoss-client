@@ -12,6 +12,8 @@ import { Link } from 'react-router';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
+import EntityView from 'components/EntityView';
+
 import {
   getEntity,
   isReady,
@@ -48,9 +50,11 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
           </div>
         }
         { category &&
-          <div>
-            <h1>{category.attributes.title}</h1>
-          </div>
+          <EntityView
+            type="Category"
+            {...category.attributes}
+            updatedAt={category.attributes.updated_at}
+          />
         }
         { category &&
         <Link to={`/category/edit/${category.id}`}><button>Edit Category</button></Link> }

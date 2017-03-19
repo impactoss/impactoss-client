@@ -139,16 +139,12 @@ export default function createRoutes(store) {
       name: 'actionView',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          // import('containers/ActionView/reducer'),
-          import('containers/ActionView/sagas'),
           import('containers/ActionView'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([sagas, component]) => {
-          // injectReducer('actionView', reducer.default);
-          injectSagas(sagas.default);
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 

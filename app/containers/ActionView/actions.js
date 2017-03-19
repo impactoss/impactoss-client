@@ -1,5 +1,0 @@
-/*
- *
- * ActionView actions
- *
- */

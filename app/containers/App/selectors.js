@@ -189,7 +189,8 @@ const extendEntity = (state, entity, extendArgs) => {
       extend.where[extend.key] = entity.get('id');
     } else {
       // entity pointing to other entity
-      extend.where.id = entity.getIn(['attributes', extend.key]).toString();
+      const key = entity.getIn(['attributes', extend.key]);
+      extend.where.id = key && key.toString();
     }
 
     let extended;
@@ -252,7 +253,7 @@ const getEntitiesPaged = createCachedSelector(
 
 const getEntityPure = createSelector(
   getEntitiesPure,
-  (state, { id }) => id.toString(),
+  (state, { id }) => id && id.toString(),
   (entities, id) => entities.get(id)
 );
 
