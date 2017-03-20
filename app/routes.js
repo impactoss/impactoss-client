@@ -228,7 +228,7 @@ export default function createRoutes(store) {
       name: 'categoryView',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/categoryView'),
+          import('containers/CategoryView'),
         ]);
 
         const renderRoute = loadModule(cb);
