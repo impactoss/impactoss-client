@@ -22,7 +22,7 @@ export function* saveAction({ id, data }) {
   try {
     yield put(saveSending());
     const res = yield call(apiRequest, 'put', `measures/${id}`, data);
-    yield put(updateEntity('action', res.data));
+    yield put(updateEntity('measures', res.data));
     yield put(saveSuccess());
     browserHistory.push(`/actions/${id}`);
   } catch (error) {

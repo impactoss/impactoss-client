@@ -20,7 +20,7 @@ export function* saveAction({ data }) {
   try {
     yield put(saveSending());
     const res = yield call(apiRequest, 'post', 'measures', data);
-    yield put(addEntity('action', res.data));
+    yield put(addEntity('measures', res.data));
     yield put(saveSuccess());
     yield put(actions.reset('actionNew.form.action'));
     browserHistory.push(`/actions/${res.data.id}`);

@@ -37,7 +37,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
 }
 
 EntityView.propTypes = {
-  type: React.PropTypes.oneOf(['Action', 'Recommendation']),
+  type: React.PropTypes.string,
   title: React.PropTypes.string.isRequired,
   description: React.PropTypes.string.isRequired,
   draft: React.PropTypes.bool.isRequired,
