@@ -8,9 +8,6 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { browserHistory } from 'react-router';
-import collection from 'lodash/collection';
-
-import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
@@ -126,6 +123,7 @@ CategoryNew.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   categoryNew: PropTypes.object,
+  params: PropTypes.object,
 };
 
 CategoryNew.contextTypes = {
