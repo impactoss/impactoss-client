@@ -78,7 +78,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               {
                 type: 'simple',
                 title: 'Cancel',
-                onClick: this.props.handleCancel,
+                onClick: () => this.props.handleCancel(reference),
               },
               {
                 type: 'primary',
@@ -90,7 +90,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             <EntityForm
               model="categoryEdit.form.category"
               handleSubmit={this.props.handleSubmit}
-              handleCancel={this.props.handleCancel}
+              handleCancel={() => this.props.handleCancel(reference)}
               fields={{
                 header: {
                   main: [
@@ -206,12 +206,12 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmit: (formData) => {
       dispatch(save(formData, props.params.id));
     },
-    handleCancel: () => {
+    handleCancel: (reference) => {
       // not really a dispatch function here, could be a member function instead
       // however
       // - this could in the future be moved to a saga or reducer
       // - also its nice to be next to handleSubmit
-      browserHistory.push(`/categories/${props.params.id}`);
+      browserHistory.push(`/category/${reference}`);
     },
   };
 }

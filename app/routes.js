@@ -224,6 +224,27 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/categories/:id/new', // the taxonomy id
+      name: 'categoryNew',
+      onEnter: redirectToLoginIfNeeded,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/CategoryNew/reducer'),
+          import('containers/CategoryNew/sagas'),
+          import('containers/CategoryNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('categoryNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/category/:id',
       name: 'categoryView',
       getComponent(nextState, cb) {

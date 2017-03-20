@@ -1,8 +1,8 @@
 /*
-*
-* CategoryEdit reducer
-*
-*/
+ *
+ * CategoryNew reducer
+ *
+ */
 
 import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
@@ -10,18 +10,17 @@ import { combineForms } from 'react-redux-form/immutable';
 
 import {
   SAVE_SENDING,
-  SAVE_ERROR,
   SAVE_SUCCESS,
+  SAVE_ERROR,
 } from './constants';
 
 const initialState = fromJS({
-  id: null,
   saveSending: false,
   saveSuccess: false,
   saveError: false,
 });
 
-function categoryEditReducer(state = initialState, action) {
+function categoryNewReducer(state = initialState, action) {
   switch (action.type) {
     case SAVE_SENDING:
       return state
@@ -41,7 +40,6 @@ function categoryEditReducer(state = initialState, action) {
   }
 }
 
-// tim: I don't know how to pull from the global state to set these now, It doesn't seem to be possible
 const categoryForm = fromJS({
   title: '',
   description: '',
@@ -51,8 +49,8 @@ const categoryForm = fromJS({
 });
 
 export default combineReducers({
-  page: categoryEditReducer,
+  page: categoryNewReducer,
   form: combineForms({
     category: categoryForm,
-  }, 'categoryEdit.form'),
+  }, 'categoryNew.form'),
 });
