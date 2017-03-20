@@ -127,9 +127,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                   ],
                   aside: [
                     {
-                      id: 'no',
-                      controlType: 'info',
-                      displayValue: reference,
+                      id: 'number',
+                      controlType: 'input',
+                      model: '.number',
                     },
                     {
                       id: 'status',

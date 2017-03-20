@@ -44,6 +44,7 @@ function recommendationEditReducer(state = initialState, action) {
 // tim: I don't know how to pull from the global state to set these now, It doesn't seem to be possible
 const recommendationForm = fromJS({
   title: '',
+  number: '',
   draft: '',
 });
 
