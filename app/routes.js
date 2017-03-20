@@ -228,6 +228,27 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/recommendations/edit/:id',
+      name: 'recommendationEdit',
+      onEnter: redirectToLoginIfNeeded,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/RecommendationEdit/reducer'),
+          import('containers/RecommendationEdit/sagas'),
+          import('containers/RecommendationEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('recommendationEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/categories',
       name: 'taxonomies',
       getComponent(nextState, cb) {
