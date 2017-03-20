@@ -24,7 +24,7 @@ export function* saveAction({ id, data }) {
     const res = yield call(apiRequest, 'put', `categories/${id}`, data);
     yield put(updateEntity('categories', res.data));
     yield put(saveSuccess());
-    browserHistory.push(`/categories/${id}`);
+    browserHistory.push(`/category/${id}`);
   } catch (error) {
     const message = yield error.response.json();
     yield put(saveError(message.error));
