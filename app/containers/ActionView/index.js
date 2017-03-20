@@ -8,7 +8,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { Link } from 'react-router';
+import { browserHistory } from 'react-router';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import EntityView from 'components/EntityView';
@@ -25,6 +25,14 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+  }
+
+  handleEdit = () => {
+    browserHistory.push(`/actions/edit/${this.props.action.id}`);
+  }
+
+  handleCancel = () => {
+
   }
 
   render() {
@@ -50,29 +58,45 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
         }
         { action &&
           <EntityView
-            type="Action"
-            {...action.attributes}
-            updatedAt={action.attributes.updated_at}
+            handleEdit={this.handleEdit}
+            handleCancel={this.handleCancel}
             fields={{
               header: {
                 main: [
                   {
                     id: 'title',
-                    value: '',
+                    value: action.attributes.title,
                   },
                 ],
                 aside: [
                   {
                     id: 'status',
-                    value: '',
+                    value: action.attributes.draft,
+                  },
+                  {
+                    id: 'Last Updated',
+                    value: 'date',
+                  },
+                ],
+              },
+              body: {
+                main: [
+                  {
+                    id: 'description',
+                    value: action.attributes.description,
+                  },
+                ],
+                aside: [
+                  {
+                    id: 'description',
+                    value: action.attributes.description,
                   },
                 ],
               },
             }}
           />
         }
-        { action &&
-        <Link to={`/actions/edit/${action.id}`}><button>Edit Action</button></Link> }
+
       </div>
     );
   }
