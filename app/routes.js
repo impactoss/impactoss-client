@@ -212,6 +212,22 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/recommendations/:id',
+      name: 'recommendationView',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/RecommendationView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/categories',
       name: 'taxonomies',
       getComponent(nextState, cb) {
