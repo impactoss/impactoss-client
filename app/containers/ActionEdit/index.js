@@ -267,6 +267,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
     },
     populateForm: (model, data) => {
