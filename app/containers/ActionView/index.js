@@ -52,6 +52,22 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
             type="Action"
             {...action.attributes}
             updatedAt={action.attributes.updated_at}
+            fields={{
+              header: {
+                main: [
+                  {
+                    id: 'title',
+                    value: '',
+                  },
+                ],
+                aside: [
+                  {
+                    id: 'status',
+                    value: '',
+                  },
+                ],
+              },
+            }}
           />
         }
         { action &&
