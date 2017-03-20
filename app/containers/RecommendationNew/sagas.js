@@ -20,17 +20,17 @@ export function* saveAction({ data }) {
   try {
     yield put(saveSending());
     const res = yield call(apiRequest, 'post', 'recommendations', data);
-    yield put(addEntity('recommendation', res.data));
+    yield put(addEntity('recommendations', res.data));
     yield put(saveSuccess());
     yield put(actions.reset('recommendationNew.form.action'));
-    browserHistory.push('/actions');
+    browserHistory.push(`/recommendations/${res.data.id}`);
   } catch (error) {
     const message = yield error.response.json();
     yield put(saveError(message.error));
   }
 }
 
-export function* actionSaga() {
+export function* defaultSaga() {
   const saveWatcher = yield takeLatest(SAVE, saveAction);
 
   yield take(LOCATION_CHANGE);
@@ -40,5 +40,5 @@ export function* actionSaga() {
 
 // All sagas to be loaded
 export default [
-  actionSaga,
+  defaultSaga,
 ];
