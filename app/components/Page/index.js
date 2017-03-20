@@ -17,7 +17,7 @@ class Page extends React.Component { // eslint-disable-line react/prefer-statele
 Page.propTypes = {
   title: PropTypes.string.isRequired,
   actions: PropTypes.array,
-  children: PropTypes.object,
+  children: PropTypes.node,
 };
 
 export default Page;

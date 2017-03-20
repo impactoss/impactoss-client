@@ -8,6 +8,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
+import { Link } from 'react-router';
 
 // containers
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
@@ -29,7 +30,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
     this.props.loadEntitiesIfNeeded();
   }
 
-  mapToCategoryList = (categories) => Object.values(categories).map((cat) => ({
+  mapToCategoryList = (categories) => categories && Object.values(categories).map((cat) => ({
     id: cat.id,
     title: cat.attributes.title,
     linkTo: `/category/${cat.id}`,
@@ -53,14 +54,17 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
             <FormattedMessage {...messages.loading} />
           </div>
         }
-        {taxonomy &&
+        { taxonomy &&
           <Page
             title={`${this.context.intl.formatMessage(messages.pageTitle)} for ${taxonomy.attributes.title}`}
             actions={[]}
           >
-            <CategoryList
-              categories={categories}
-            />
+            <Link to={`/categories/${taxonomy.id}/new`}>Add Category</Link>
+            { categories &&
+              <CategoryList
+                categories={categories}
+              />
+            }
           </Page>
         }
       </div>
