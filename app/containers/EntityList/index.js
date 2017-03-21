@@ -11,18 +11,12 @@ import { updateQueryStringParams } from 'utils/history';
 import EntityListItem from 'components/EntityListItem';
 import Container from 'components/basic/Container';
 
-import {
-  loadEntitiesIfNeeded,
-} from 'containers/App/actions';
+
 import {
   getEntitiesPaged,
 } from 'containers/App/selectors';
 
 export class EntityQuery extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
-    this.props.loadEntitiesIfNeeded();
-  }
 
   onSort = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -79,18 +73,17 @@ EntityQuery.propTypes = {
     haveNextPage: PropTypes.boolean,
     havePrevPage: PropTypes.boolean,
   }).isRequired,
-  // path: PropTypes.string.isRequired,    only used in mapStateToProps
   mapToEntityList: PropTypes.func.isRequired,
   location: PropTypes.object.isRequired,
-  loadEntitiesIfNeeded: PropTypes.func.isRequired,
-  // perPage: PropTypes.number,    only used in mapStateToProps
-  // currentPage: PropTypes.number,    only used in mapStateToProps
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
+  // path: PropTypes.string.isRequired,    only used in mapStateToProps
+  // perPage: PropTypes.number,    only used in mapStateToProps
+  // currentPage: PropTypes.number,    only used in mapStateToProps
 };
 
 EntityQuery.defaultProps = {
-  perPage: 5,
+  perPage: 100,
   currentPage: 1,
   sortBy: 'id',
   sortOrder: 'desc',
@@ -99,9 +92,33 @@ EntityQuery.defaultProps = {
 const mapStateToProps = (state, props) => {
   const { page, sortBy, sortOrder } = props.location.query;
   const currentPage = parseInt(page || 1, 10);
+
+  // asssociative conditions
+  // query:"cat=id1+id2+id3"
+  const join = [];
+  if (props.filters && props.location.query && props.location.query.cat) {
+    join.push({
+      key: props.filters.categoryKey,
+      path: props.filters.categoriesPath,
+      where: props.location.query.cat.split(' ').map((catId) => ({ category_id: catId })),
+    });
+  }
+  // attribute conditions
+  // where:"where=att1:value+att2:value"
+  let where;
+  if (props.location.query && props.location.query.where) {
+    where = props.location.query.where.split(' ').reduce((result, item) => {
+      const r = result;
+      const keyValue = item.split(':');
+      r[keyValue[0]] = keyValue[1];
+      return r;
+    }, {});
+  }
   return {
     pagedEntities: getEntitiesPaged(state, {
       path: props.path,
+      join,
+      where,
       perPage: props.perPage || EntityQuery.defaultProps.perPage,
       currentPage: currentPage || EntityQuery.defaultProps.currentPage,
       sortBy: sortBy || EntityQuery.defaultProps.sortBy,
@@ -110,12 +127,5 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-function mapDispatchToProps(dispatch, props) {
-  return {
-    loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded(props.path));
-    },
-  };
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(EntityQuery);
+export default connect(mapStateToProps, null)(EntityQuery);

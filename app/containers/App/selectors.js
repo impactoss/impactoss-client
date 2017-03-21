@@ -110,26 +110,27 @@ const getEntitiesPure = createSelector(
   (entities, path) => entities.get(path)
 );
 
+// check if entities have connections with other entities via associative table
 const getEntitiesJoint = createSelector(
   (state) => state,
   getEntitiesPure,
   (state, { join }) => join,
-  (state, entities, join) => {
-    if (join) {
-      const where = join.where;
-      return entities.filter((entity) => {
-        where[join.key] = entity.get('id');
-        const joins = getEntitiesWhere(state, {
-          path: join.path,
-          where,
-        });
-        return joins && joins.size;
-      });
-    }
-    return entities;
-  }
+  (state, entities, join) => join
+    ? entities.filter((entity) =>
+      reduce(Array.isArray(join) ? join : [join], (passing, joinWhere) => joinWhere.where // allows multiple joins
+        ? reduce(Array.isArray(joinWhere.where) ? joinWhere.where : [joinWhere.where], (passingWhere, where) => { // and multiple wheres
+          const w = where;
+          w[joinWhere.key] = entity.get('id');
+          const joins = getEntitiesWhere(state, {
+            path: joinWhere.path, // path of associative table
+            where: w,
+          });
+          return joins && joins.size; // assication present
+        }, true)
+        : true, true)
+      )
+    : entities
 );
-
 
 const getEntitiesWhere = createCachedSelector(
   getEntitiesJoint,
@@ -138,11 +139,15 @@ const getEntitiesWhere = createCachedSelector(
     if (whereString) {
       const where = JSON.parse(whereString);
       return entities.filter((entity) =>
-        reduce(where, (result, value, key) => {
+        reduce(where, (passing, value, key) => {
           if (key === 'id') {
             return entity.get('id') === value.toString();
           }
-          return entity.getIn(['attributes', key]) && entity.getIn(['attributes', key]).toString() === value.toString();
+          const test = entity.getIn(['attributes', key]);
+          if (typeof test === 'boolean') {
+            return test.toString() === value;
+          }
+          return test && test.toString() === value.toString();
         }, true)
       );
     }

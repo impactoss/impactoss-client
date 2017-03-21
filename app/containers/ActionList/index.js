@@ -5,18 +5,23 @@
  */
 
 import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { Link } from 'react-router';
 
 import EntityList from 'containers/EntityList';
 import Page from 'components/Page';
 
+import {
+  loadEntitiesIfNeeded,
+} from 'containers/App/actions';
+
 import messages from './messages';
 
 export class ActionList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  static propTypes = {
-    location: PropTypes.object.isRequired,
+  componentWillMount() {
+    this.props.loadEntitiesIfNeeded();
   }
 
   mapToEntityList = ({ id, attributes }) => ({
@@ -28,6 +33,10 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
   })
 
   render() {
+    const filters = {
+      categoriesPath: 'measure_categories',
+      categoryKey: 'measure_id',
+    };
     return (
       <div>
         <Helmet
@@ -45,6 +54,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             location={this.props.location}
             mapToEntityList={this.mapToEntityList}
             path="measures"
+            filters={filters}
           />
         </Page>
       </div>
@@ -52,8 +62,22 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
   }
 }
 
+ActionList.propTypes = {
+  loadEntitiesIfNeeded: PropTypes.func,
+  location: PropTypes.object.isRequired,
+};
+
 ActionList.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-export default ActionList;
+function mapDispatchToProps(dispatch) {
+  return {
+    loadEntitiesIfNeeded: () => {
+      dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('measure_categories'));
+    },
+  };
+}
+
+export default connect(null, mapDispatchToProps)(ActionList);
