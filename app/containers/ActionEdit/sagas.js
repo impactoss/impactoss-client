@@ -34,7 +34,7 @@ export function* saveAction({ id, data }) {
 }
 
 export function saveTaxonomies(id, data) {
-  const requests = data.taxonomies.create.map((categoryId) => apiRequest('post', 'measure_categories/category', { category_id: categoryId, measure_id: id }));
+  const requests = data.taxonomies.create.map((categoryId) => apiRequest('post', 'measure_categories/', { category_id: categoryId, measure_id: id }));
   // TODO handle deletes
   // requests.concat(Object.keys(data.taxonomies.delete).map((categoryId) => apiRequest('post',`measure_categories/`,{category_id: categoryId, measure_id, measure_id: id}));
   return Promise.all(requests);
