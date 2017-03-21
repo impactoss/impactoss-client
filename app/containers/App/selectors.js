@@ -237,7 +237,7 @@ const getEntitiesPaged = createCachedSelector(
     const page = slice(entities, offset, end);
     // console.log('no cache for offset', offset);
     return {
-      page,
+      entities: page,
       havePrevPage,
       haveNextPage,
       totalPages,
