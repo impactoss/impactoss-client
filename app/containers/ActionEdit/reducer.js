@@ -46,6 +46,7 @@ const actionForm = fromJS({
   title: '',
   description: '',
   draft: '',
+  // organisation: [],
 });
 
 export default combineReducers({

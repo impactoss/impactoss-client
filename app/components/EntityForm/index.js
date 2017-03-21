@@ -6,6 +6,7 @@ import Grid from 'grid-styled';
 
 import Row from 'components/basic/Row';
 import FormWrapper from 'components/basic/FormWrapper';
+import MultiSelect from 'components/MultiSelect';
 import FormHeader from './FormHeader';
 import FormBody from './FormBody';
 import FormFooter from './FormFooter';
@@ -25,12 +26,13 @@ const controls = {
   file: Control.file,
   select: ControlSelect,
   button: Control.button,
+  multiselect: MultiSelect,
 };
 
 // These props will be omitted before being passed to the Control component
-const nonControlProps = ['label', 'component', 'controlType', 'children', 'options', 'errorMessages'];
+const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
 
-class EntityForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class EntityForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   getFieldComponent = (field) => {
     if (field.component) {
@@ -41,9 +43,18 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     return controls.input; // Default to input type if not specified
   }
 
+  getControlProps = (field) => {
+    switch (field.controlType) {
+      case 'select': // we will render select options as children, so don't pass options prop directly to the control
+        return omit(field, nonControlProps.concat(['options']));
+      default:
+        return omit(field, nonControlProps);
+    }
+  }
+
   renderField = (field) => {
     const FieldComponent = this.getFieldComponent(field);
-    const { id, model, ...props } = omit(field, nonControlProps);
+    const { id, model, ...props } = this.getControlProps(field);
     return (
       <FieldComponent
         id={id}

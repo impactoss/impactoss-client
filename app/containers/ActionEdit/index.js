@@ -10,6 +10,8 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
+import { camelCase } from 'lodash/string';
+import { difference, without } from 'lodash/array';
 
 import { fromJS } from 'immutable';
 
@@ -19,6 +21,7 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
+// import MultiSelect from 'components/MultiSelect';
 
 import {
   getEntity,
@@ -34,36 +37,63 @@ import {
 import messages from './messages';
 import { save } from './actions';
 
-export class ActionEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class ActionEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
     if (this.props.action && this.props.actionsReady) {
-      this.props.populateForm('actionEdit.form.action', fromJS(this.props.action.attributes));
+      this.props.populateForm('actionEdit.form.action', this.getInitialFormData());
     }
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.action && nextProps.actionsReady && !this.props.actionsReady) {
-      this.props.populateForm('actionEdit.form.action', fromJS(nextProps.action.attributes));
+      this.props.populateForm('actionEdit.form.action', this.getInitialFormData(nextProps));
     }
+  }
+
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const data = props.action.attributes;
+    const { taxonomies } = this.props;
+
+    // TODO this functionality should be shared
+    if (taxonomies) {
+      // Reducer - starts with {}, iterate taxonomies, and store assigned ids as { [camelCase(tax.title)]: [assigned,category,ids], ... }
+      const assignedTaxonmies = Object.values(taxonomies).reduce((values, tax) => {
+        const assigned = tax.categories ? Object.values(tax.categories).filter((cat) => cat.connected) : [];
+        return assigned.length > 0
+        ? {
+          ...values,
+          [camelCase(tax.attributes.title)]: assigned.map((cat) => cat.id),
+        }
+        : values;
+      }, {});
+
+      data.taxonomies = assignedTaxonmies;
+    }
+
+    return data;
   }
 
   mapCategoryOptions = (categories) => Object.values(categories).map((cat) => ({
     value: cat.id,
-    label: `${cat.attributes.title}${cat.connected ? ' - assigned' : ' - not assigned'}`,
+    label: cat.attributes.title,
   }));
+
   mapRecommendationOptions = (recommendations) => Object.values(recommendations).map((rec) => ({
     value: rec.id,
     label: `${rec.attributes.title}${rec.connected ? ' - connected' : ' - not connected'}`,
   }));
 
-  renderTaxonomyControl = (taxonomies) => Object.values(taxonomies).map((tax) => ({
-    id: tax.attributes.title,
-    controlType: 'select',
-    options: this.mapCategoryOptions(tax.categories),
-  }));
+  // TODO this should be shared functionality
+  renderTaxonomyControl = (taxonomies) => taxonomies ? Object.values(taxonomies).map((tax) => ({
+    model: `.taxonomies.${camelCase(tax.attributes.title)}`,
+    title: tax.attributes.title,
+    controlType: 'multiselect',
+    options: tax.categories ? this.mapCategoryOptions(tax.categories) : [],
+  })) : [];
 
 
   render() {
@@ -71,6 +101,9 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
+
+    // const taxonomyControl = this.renderTaxonomyControl(this.props.taxonomies);
+    // console.log(taxonomyControl)
 
     return (
       <div>
@@ -102,13 +135,13 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
               {
                 type: 'primary',
                 title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.form.action),
+                onClick: () => this.props.handleSubmit(this.props.form.action), // TODO This won't work will need a ref I think
               },
             ]}
           >
             <EntityForm
               model="actionEdit.form.action"
-              handleSubmit={this.props.handleSubmit}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, this.getInitialFormData())} // we can use inital form data for diffing
               handleCancel={this.props.handleCancel}
               fields={{
                 header: {
@@ -167,6 +200,8 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
                 },
               }}
             />
+            {/* {taxonomyControl.length > 0 && taxonomyControl[0].options && taxonomyControl[0].options.length > 0 &&
+            <MultiSelect onChange={console.log} values={[]} options={taxonomyControl[0].options} /> } */}
           </Page>
         }
         {saveSending &&
@@ -270,11 +305,22 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
     },
-    populateForm: (model, data) => {
-      dispatch(formActions.load(model, data));
+    populateForm: (model, formData) => {
+      dispatch(formActions.load(model, fromJS(formData)));
     },
-    handleSubmit: (formData) => {
-      dispatch(save(formData, props.params.id));
+    handleSubmit: (formData, prevFormData) => {
+      // TODO maybe this function should be updated to work with Immutable objects, instead of converting
+      const prevTaxonomies = prevFormData.taxonomies || {};
+      const saveData = formData.toJS();
+      const formTaxonomies = saveData.taxonomies;
+
+      saveData.taxonomies = Object.keys(formTaxonomies).reduce((updates, taxonomy) => ({
+        // TODO delete actually needs the join table id :/
+        delete: updates.delete.concat(difference(prevTaxonomies[taxonomy], formTaxonomies[taxonomy])),
+        create: updates.create.concat(without(formTaxonomies[taxonomy], prevTaxonomies[taxonomy])),
+      }), { delete: [], create: [] });
+
+      dispatch(save(saveData, props.params.id));
     },
     handleCancel: () => {
       // not really a dispatch function here, could be a member function instead
