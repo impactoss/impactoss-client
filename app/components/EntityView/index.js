@@ -17,11 +17,18 @@ import ViewFooter from './ViewFooter';
 
 
 class EntityView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  renderSection = (fields) => fields.map((field, index) => (
-    <div key={index}>
-      <p>{field.value}</p>
-    </div>
-  ))
+  renderSection = (fields) => fields.map((field, index) => {
+    if (field.type === 'taxonomies') {
+      return (
+        <div key={index}>taxonomy</div>
+      );
+    }
+    return (
+      <div key={index}>
+        <p>{field.value}</p>
+      </div>
+    );
+  })
   render() {
     const { fields } = this.props;
     return (
