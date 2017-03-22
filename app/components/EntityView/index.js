@@ -33,7 +33,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   renderField = (field, index) => (
     <div key={index}>
       {field.heading &&
-        <h3>{field.id}</h3>
+        <h3>{field.heading}</h3>
       }
       <p>{field.value}</p>
     </div>
