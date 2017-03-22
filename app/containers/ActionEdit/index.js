@@ -71,7 +71,6 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
-    console.log(this.props.taxonomies)
 
     return (
       <div>
