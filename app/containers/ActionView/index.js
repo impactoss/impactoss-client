@@ -38,6 +38,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   mapCategoryOptions = (categories) => (
     categories ? Object.values(categories).map((cat) => ({
       value: cat.id,
+      label: `${cat.attributes.title} - ${cat.attributes.connected}`,
     })) : []
   )
 
@@ -48,8 +49,15 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     }))
   )
 
+  renderRecommendations = (recommendations) => (
+    Object.values(recommendations).filter((recommendation) => recommendation.connected).map((recommendation) => ({
+      id: recommendation.attrib,
+    }))
+  )
+
   render() {
     const { action, actionsReady } = this.props;
+    const reference = this.props.params.id;
     return (
       <div>
         <Helmet
@@ -83,14 +91,24 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                 ],
                 aside: [
                   {
-                    id: 'status',
-                    heading: 'Status',
-                    value: action.attributes.draft,
+                    id: 'no',
+                    heading: 'No.',
+                    value: reference,
                   },
                   {
-                    id: 'lastUpdated',
-                    heading: 'Last Updated',
-                    value: 'date',
+                    id: 'status',
+                    heading: 'Status',
+                    value: action.draft ? 'Draft' : 'Public',
+                  },
+                  {
+                    id: 'updated',
+                    heading: 'Updated At',
+                    value: action.attributes.updated_at,
+                  },
+                  {
+                    id: 'updated_by',
+                    heading: 'Updated By',
+                    value: action.user && action.user.attributes.name,
                   },
                 ],
               },
@@ -100,6 +118,11 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                     id: 'description',
                     heading: 'Description',
                     value: action.attributes.description,
+                  },
+                  {
+                    id: 'recommendations',
+                    heading: 'Recommendations',
+                    values: this.renderRecommendations(this.props.recommendations),
                   },
                 ],
                 aside: this.renderTaxonomies(this.props.taxonomies),
@@ -118,6 +141,8 @@ ActionView.propTypes = {
   action: PropTypes.object,
   actionsReady: PropTypes.bool,
   taxonomies: PropTypes.object,
+  recommendations: PropTypes.object,
+  params: PropTypes.object,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -148,9 +173,11 @@ const mapStateToProps = (state, props) => ({
         path: 'categories',
         key: 'taxonomy_id',
         reverse: true,
-        join: {
+        extend: {
+          as: 'assigned',
           path: 'measure_categories',
           key: 'category_id',
+          reverse: true,
           where: {
             action_id: props.params.id,
           },
@@ -164,9 +191,11 @@ const mapStateToProps = (state, props) => ({
     state, {
       path: 'recommendations',
       out: 'js',
-      join: {
+      extend: {
+        as: 'connected',
         path: 'recommendation_measures',
         key: 'recommendation_id',
+        reverse: true,
         where: {
           action_id: props.params.id,
         },
