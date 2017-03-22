@@ -110,10 +110,51 @@ const getEntitiesPure = createSelector(
   (entities, path) => entities.get(path)
 );
 
+// check if entities are not connected to any other entities via associative table
+const getEntitiesWithout = createSelector(
+  (state) => state,
+  getEntitiesPure,
+  (state, { without }) => without,
+  (state, entities, without) => without
+    ? entities.filter((entity) =>
+      reduce(Array.isArray(without) ? without : [without], (passing, withoutCond) => {
+        const where = {};
+        where[withoutCond.key] = entity.get('id');
+        // taxonomy
+        if (withoutCond.taxonomyId) {
+          // get all associations for entity and store category count for given taxonomy
+          const associations = getEntities(state, {
+            path: withoutCond.connectedPath, // measure_categories
+            where, // {measure_id : 3}
+            extend: {
+              path: 'categories',
+              as: 'count',
+              key: 'category_id',
+              type: 'count',
+              where: {
+                taxonomy_id: withoutCond.taxonomyId,
+              },
+            },
+          });
+          // check if any category present (count > 0)
+          return !associations.reduce((hasCategories, association) =>
+            hasCategories || association.get('count') > 0, false
+          );
+        }
+        const joins = getEntitiesWhere(state, {
+          path: withoutCond.connectedPath, // recommendation_measures
+          where, // {measure_id : 3}
+        });
+        return !(joins && joins.size); // !not associated
+      }, true)
+    )
+    : entities
+);
+
 // check if entities have connections with other entities via associative table
 const getEntitiesJoint = createSelector(
   (state) => state,
-  getEntitiesPure,
+  getEntitiesWithout,
   (state, { join }) => join,
   (state, entities, join) => join
     ? entities.filter((entity) =>
@@ -132,6 +173,7 @@ const getEntitiesJoint = createSelector(
     : entities
 );
 
+// check entity attributes or id
 const getEntitiesWhere = createCachedSelector(
   getEntitiesJoint,
   (state, { where }) => where ? JSON.stringify(where) : null, // enable caching
@@ -141,13 +183,15 @@ const getEntitiesWhere = createCachedSelector(
       return entities.filter((entity) =>
         reduce(where, (passing, value, key) => {
           if (key === 'id') {
-            return entity.get('id') === value.toString();
+            return passing && entity.get('id') === value.toString();
           }
-          const test = entity.getIn(['attributes', key]);
-          if (typeof test === 'boolean') {
-            return test.toString() === value;
+          const testValue = entity.getIn(['attributes', key]);
+          if (typeof testValue === 'undefined') {
+            return false;
+          } else if (typeof testValue === 'boolean') {
+            return passing && testValue.toString() === value;
           }
-          return test && test.toString() === value.toString();
+          return passing && testValue.toString() === value.toString();
         }, true)
       );
     }
@@ -204,7 +248,6 @@ const extendEntity = (state, entity, extendArgs) => {
       extended = getEntity(state, extend);
     } else {
       extended = getEntities(state, extend);
-
       if (extended && extend.type === 'count') {
         extended = extended.size;
       }
@@ -243,6 +286,7 @@ const getEntitiesPaged = createCachedSelector(
     // console.log('no cache for offset', offset);
     return {
       entities: page,
+      total: entities.length,
       havePrevPage,
       haveNextPage,
       totalPages,

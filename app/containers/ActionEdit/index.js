@@ -234,7 +234,7 @@ const mapStateToProps = (state, props) => ({
           key: 'category_id',
           reverse: true,
           where: {
-            action_id: props.params.id,
+            measure_id: props.params.id,
           },
         },
       },

@@ -11,6 +11,7 @@ import { Link } from 'react-router';
 
 import EntityList from 'containers/EntityList';
 import Page from 'components/Page';
+import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import {
   loadEntitiesIfNeeded,
@@ -34,9 +35,57 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
 
   render() {
     const filters = {
-      categoriesPath: 'recommendation_categories',
-      categoryKey: 'recommendation_id',
+      keyword: {
+        attributes: [
+          'no',
+          'title',
+        ],
+      },
+      attributes: [ // filter by attribute value
+        {
+          label: 'Status',
+          attribute: 'draft',
+          type: 'boolean',
+          options: PUBLISH_STATUSES,
+        },
+      ],
+      taxonomies: { // filter by each category
+        options: {
+          path: 'taxonomies',
+          where: {
+            tags_recommendations: true,
+          },
+          each: {
+            path: 'categories',
+            key: 'taxonomy_id',
+            without: true,
+            join: {
+              path: 'reommendation_categories',
+              key: 'category_id',
+              ownKey: 'reommendation_id',
+            },
+          },
+        },
+        query: {
+          arg: 'cat',
+          path: 'reommendation_categories',
+          key: 'category_id',
+          ownKey: 'reommendation_id',
+        },
+      },
+      connections: [ // filter by associated entity
+        {
+          path: 'measures', // filter by recommendation connection
+          query: 'actions',
+          join: {
+            path: 'recommendation_measures',
+            key: 'measure_id',
+            ownKey: 'recommendation_id',
+          },
+        },
+      ],
     };
+
     return (
       <div>
         <Helmet
@@ -76,6 +125,10 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
+      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('measures'));
     },
   };
 }
