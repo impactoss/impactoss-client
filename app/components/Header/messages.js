@@ -30,6 +30,10 @@ export default defineMessages({
     id: 'nmrf.components.Header.actions',
     defaultMessage: 'Actions',
   },
+  recommendations: {
+    id: 'nmrf.components.Header.recommendations',
+    defaultMessage: 'Recommendations',
+  },
   taxonomies: {
     id: 'nmrf.components.Header.taxonomies',
     defaultMessage: 'Categories',

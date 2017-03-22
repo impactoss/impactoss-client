@@ -30,7 +30,7 @@ export function* saveAction({ data }) {
   }
 }
 
-export function* actionSaga() {
+export function* defaultSaga() {
   const saveWatcher = yield takeLatest(SAVE, saveAction);
 
   yield take(LOCATION_CHANGE);
@@ -40,5 +40,5 @@ export function* actionSaga() {
 
 // All sagas to be loaded
 export default [
-  actionSaga,
+  defaultSaga,
 ];

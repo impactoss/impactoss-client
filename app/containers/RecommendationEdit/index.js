@@ -1,6 +1,6 @@
 /*
  *
- * ActionEdit
+ * RecommendationEdit
  *
  */
 
@@ -34,32 +34,32 @@ import {
 import messages from './messages';
 import { save } from './actions';
 
-export class ActionEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class RecommendationEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
-    if (this.props.action && this.props.actionsReady) {
-      this.props.populateForm('actionEdit.form.action', fromJS(this.props.action.attributes));
+    if (this.props.recommendation && this.props.recommendationsReady) {
+      this.props.populateForm('recommendationEdit.form.recommendation', fromJS(this.props.recommendation.attributes));
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.action && nextProps.actionsReady && !this.props.actionsReady) {
-      this.props.populateForm('actionEdit.form.action', fromJS(nextProps.action.attributes));
+    if (nextProps.recommendation && nextProps.recommendationsReady && !this.props.recommendationsReady) {
+      this.props.populateForm('recommendationEdit.form.recommendation', fromJS(nextProps.recommendation.attributes));
     }
   }
 
-  mapCategoryOptions = (categories) => Object.values(categories).map((cat) => ({
+  mapCategoryOptions = (categories) => categories && Object.values(categories).map((cat) => ({
     value: cat.id,
     label: `${cat.attributes.title}${cat.connected ? ' - assigned' : ' - not assigned'}`,
   }));
-  mapRecommendationOptions = (recommendations) => Object.values(recommendations).map((rec) => ({
-    value: rec.id,
-    label: `${rec.attributes.title}${rec.connected ? ' - connected' : ' - not connected'}`,
+  mapActionOptions = (actions) => actions && Object.values(actions).map((action) => ({
+    value: action.id,
+    label: `${action.attributes.title}${action.connected ? ' - connected' : ' - not connected'}`,
   }));
 
-  renderTaxonomyControl = (taxonomies) => Object.values(taxonomies).map((tax) => ({
+  renderTaxonomyControl = (taxonomies) => taxonomies && Object.values(taxonomies).map((tax) => ({
     id: tax.attributes.title,
     controlType: 'select',
     options: this.mapCategoryOptions(tax.categories),
@@ -67,7 +67,7 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
 
 
   render() {
-    const { action, actionsReady } = this.props;
+    const { recommendation, recommendationsReady } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
@@ -80,17 +80,17 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !action && !actionsReady &&
+        { !recommendation && !recommendationsReady &&
           <div>
             <FormattedMessage {...messages.loading} />
           </div>
         }
-        { !action && actionsReady &&
+        { !recommendation && recommendationsReady &&
           <div>
             <FormattedMessage {...messages.notFound} />
           </div>
         }
-        {action &&
+        {recommendation &&
           <Page
             title={this.context.intl.formatMessage(messages.pageTitle)}
             actions={[
@@ -102,12 +102,12 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
               {
                 type: 'primary',
                 title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.form.action),
+                onClick: () => this.props.handleSubmit(this.props.form.recommendation),
               },
             ]}
           >
             <EntityForm
-              model="actionEdit.form.action"
+              model="recommendationEdit.form.recommendation"
               handleSubmit={this.props.handleSubmit}
               handleCancel={this.props.handleCancel}
               fields={{
@@ -127,40 +127,35 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
                   ],
                   aside: [
                     {
-                      id: 'no',
-                      controlType: 'info',
-                      displayValue: reference,
+                      id: 'number',
+                      controlType: 'input',
+                      model: '.number',
                     },
                     {
                       id: 'status',
                       controlType: 'select',
                       model: '.draft',
-                      value: action.draft,
+                      value: recommendation.draft,
                       options: PUBLISH_STATUSES,
                     },
                     {
                       id: 'updated',
                       controlType: 'info',
-                      displayValue: action.attributes.updated_at,
+                      displayValue: recommendation.attributes.updated_at,
                     },
                     {
                       id: 'updated_by',
                       controlType: 'info',
-                      displayValue: action.user && action.user.attributes.name,
+                      displayValue: recommendation.user && recommendation.user.attributes.name,
                     },
                   ],
                 },
                 body: {
                   main: [
                     {
-                      id: 'description',
-                      controlType: 'textarea',
-                      model: '.description',
-                    },
-                    {
-                      id: 'recommendations',
+                      id: 'actions',
                       controlType: 'select',
-                      options: this.mapRecommendationOptions(this.props.recommendations),
+                      options: this.mapActionOptions(this.props.actions),
                     },
                   ],
                   aside: this.renderTaxonomyControl(this.props.taxonomies),
@@ -180,33 +175,33 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
   }
 }
 
-ActionEdit.propTypes = {
+RecommendationEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   page: PropTypes.object,
   form: PropTypes.object,
-  action: PropTypes.object,
-  actionsReady: PropTypes.bool,
+  recommendation: PropTypes.object,
+  recommendationsReady: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
-  recommendations: PropTypes.object,
+  actions: PropTypes.object,
 };
 
-ActionEdit.contextTypes = {
+RecommendationEdit.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
   page: pageSelector(state),
   form: formSelector(state),
-  actionsReady: isReady(state, { path: 'measures' }),
-  action: getEntity(
+  recommendationsReady: isReady(state, { path: 'recommendations' }),
+  recommendation: getEntity(
     state,
     {
       id: props.params.id,
-      path: 'measures',
+      path: 'recommendations',
       out: 'js',
       extend: {
         type: 'single',
@@ -222,7 +217,7 @@ const mapStateToProps = (state, props) => ({
     {
       path: 'taxonomies',
       where: {
-        tags_measures: true,
+        tags_recommendations: true,
       },
       extend: {
         path: 'categories',
@@ -230,29 +225,29 @@ const mapStateToProps = (state, props) => ({
         reverse: true,
         extend: {
           as: 'assigned',
-          path: 'measure_categories',
+          path: 'recommendation_categories',
           key: 'category_id',
           reverse: true,
           where: {
-            action_id: props.params.id,
+            recommendation_id: props.params.id,
           },
         },
       },
       out: 'js',
     },
   ),
-  // all recommendations, listing connection if any
-  recommendations: getEntities(
+  // // all actions, listing connection if any
+  actions: getEntities(
     state, {
-      path: 'recommendations',
+      path: 'measures',
       out: 'js',
       extend: {
         as: 'connected',
         path: 'recommendation_measures',
-        key: 'recommendation_id',
+        key: 'action_id',
         reverse: true,
         where: {
-          action_id: props.params.id,
+          recommendation_id: props.params.id,
         },
       },
     },
@@ -268,7 +263,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
     },
     populateForm: (model, data) => {
       dispatch(formActions.load(model, data));
@@ -281,9 +276,9 @@ function mapDispatchToProps(dispatch, props) {
       // however
       // - this could in the future be moved to a saga or reducer
       // - also its nice to be next to handleSubmit
-      browserHistory.push(`/actions/${props.params.id}`);
+      browserHistory.push(`/recommendations/${props.params.id}`);
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionEdit);
+export default connect(mapStateToProps, mapDispatchToProps)(RecommendationEdit);

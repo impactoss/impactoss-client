@@ -172,6 +172,26 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/recommendations',
+      name: 'recommendationList',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/RecommendationList/reducer'),
+          import('containers/RecommendationList/sagas'),
+          import('containers/RecommendationList'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('recommendationList', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/recommendations/new',
       name: 'recommendationNew',
       getComponent(nextState, cb) {
@@ -185,6 +205,43 @@ export default function createRoutes(store) {
 
         importModules.then(([reducer, sagas, component]) => {
           injectReducer('recommendationNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/recommendations/:id',
+      name: 'recommendationView',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/RecommendationView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/recommendations/edit/:id',
+      name: 'recommendationEdit',
+      onEnter: redirectToLoginIfNeeded,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/RecommendationEdit/reducer'),
+          import('containers/RecommendationEdit/sagas'),
+          import('containers/RecommendationEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('recommendationEdit', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });

@@ -15,6 +15,9 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
 
+import {
+  getEntity,
+} from 'containers/App/selectors';
 
 import categoryNewSelector from './selectors';
 import messages from './messages';
@@ -31,11 +34,18 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     const { saveSending, saveError } = this.props.categoryNew.page;
     const required = (val) => val && val.length;
     const taxonomyReference = this.props.params.id;
+    const taxonomy = this.props.taxonomy;
+
+    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
+
+    if (taxonomy && taxonomy.attributes) {
+      pageTitle = `${pageTitle} (${taxonomy.attributes.title})`;
+    }
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={this.context.intl.formatMessage(messages.pageTitle)}
           meta={[
             {
               name: 'description',
@@ -44,7 +54,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
           ]}
         />
         <Page
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={pageTitle}
           actions={
             [
               {
@@ -123,6 +133,7 @@ CategoryNew.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   categoryNew: PropTypes.object,
+  taxonomy: PropTypes.object,
   params: PropTypes.object,
 };
 
@@ -130,13 +141,22 @@ CategoryNew.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   categoryNew: categoryNewSelector(state),
+  taxonomy: getEntity(
+    state,
+    {
+      id: props.params.id,
+      path: 'taxonomies',
+      out: 'js',
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('categories'));
     },
     handleSubmit: (formData, taxonomyReference) => {
