@@ -32,8 +32,21 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   }
 
   handleCancel = () => {
-
+    // TODO handle cancel
   }
+
+  mapCategoryOptions = (categories) => (
+    categories ? Object.values(categories).map((cat) => ({
+      value: cat.id,
+    })) : []
+  )
+
+  renderTaxonomies = (taxonomies) => (
+    Object.values(taxonomies).map((taxonomy) => ({
+      id: taxonomy.attributes.title,
+      values: this.mapCategoryOptions(taxonomy.categories),
+    }))
+  )
 
   render() {
     const { action, actionsReady } = this.props;
@@ -71,10 +84,12 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                 aside: [
                   {
                     id: 'status',
+                    heading: 'Status',
                     value: action.attributes.draft,
                   },
                   {
-                    id: 'Last Updated',
+                    id: 'lastUpdated',
+                    heading: 'Last Updated',
                     value: 'date',
                   },
                 ],
@@ -83,15 +98,11 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                 main: [
                   {
                     id: 'description',
+                    heading: 'Description',
                     value: action.attributes.description,
                   },
                 ],
-                aside: [
-                  {
-                    id: 'description',
-                    value: action.attributes.description,
-                  },
-                ],
+                aside: this.renderTaxonomies(this.props.taxonomies),
               },
             }}
           />
@@ -106,6 +117,7 @@ ActionView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   action: PropTypes.object,
   actionsReady: PropTypes.bool,
+  taxonomies: PropTypes.object,
 };
 
 const mapStateToProps = (state, props) => ({
