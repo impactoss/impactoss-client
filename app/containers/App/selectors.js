@@ -188,8 +188,6 @@ const getEntitiesWhere = createCachedSelector(
           const testValue = entity.getIn(['attributes', key]);
           if (typeof testValue === 'undefined') {
             return false;
-          } else if (typeof testValue === 'boolean') {
-            return passing && testValue.toString() === value;
           }
           return passing && testValue.toString() === value.toString();
         }, true)
