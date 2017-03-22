@@ -89,6 +89,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   // TODO this should be shared functionality
   renderTaxonomyControl = (taxonomies) => taxonomies ? Object.values(taxonomies).map((tax) => ({
+    id: camelCase(tax.attributes.title),
     model: `.taxonomies.${camelCase(tax.attributes.title)}`,
     title: tax.attributes.title,
     controlType: 'multiselect',
