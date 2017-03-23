@@ -25,8 +25,6 @@ const getRoute = (state) => state.get('route');
 const getGlobal = (state) => state.get('global');
 const getGlobalEntities = (state) => state.getIn(['global', 'entities']);
 const getGlobalRequested = (state) => state.getIn(['global', 'requested']);
-const getGlobalReady = (state) => state.getIn(['global', 'ready']);
-
 
 const makeSelectLoading = () => createSelector(
   getGlobal,
@@ -93,16 +91,11 @@ const getRequestedAt = createSelector(
   (requested, path) => requested.get(path)
 );
 
-const getReady = createSelector(
-  getGlobalReady,
-  (state, { path }) => path,
-  (ready, path) => ready.get(path)
-);
-
-const isReady = createSelector(
-  getReady,
-  (ready) => !!ready
-);
+const isReady = (state, { path }) =>
+  reduce(Array.isArray(path) ? path : [path],
+    (areReady, readyPath) => areReady && !!state.getIn(['global', 'ready', readyPath]),
+    true
+  );
 
 const getEntitiesPure = createSelector(
   getGlobalEntities,
@@ -339,7 +332,6 @@ export {
   makeSelectAuth,
   makeSelectNextPathname,
   getRequestedAt,
-  getReady,
   isReady,
   getEntitiesWhere,
   getEntities,
