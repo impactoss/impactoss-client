@@ -58,18 +58,27 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       attributes: props.action.attributes,
     };
 
-    const { taxonomies } = this.props;
+    const { taxonomies, recommendations } = this.props;
     // TODO this functionality should be shared
-    if (taxonomies) {
       // Reducer - starts with {}, iterate taxonomies, and store assigned ids as { [tax.id]: [assigned,category,ids], ... }
-      data.assignedTaxonomies = Object.values(taxonomies).reduce((values, tax) => {
+    data.assignedTaxonomies = taxonomies
+      ? Object.values(taxonomies).reduce((values, tax) => {
         const result = values;
         result[tax.id] = Object.values(tax.categories).reduce((ids, cat) =>
           cat.assigned ? ids.concat([cat.id]) : ids
         , []);
         return result;
-      }, {});
-    }
+      }, {})
+      : {};
+
+    // TODO this functionality should be shared
+      // Reducer - starts with {}, iterate taxonomies, and store assigned ids as { [tax.id]: [assigned,category,ids], ... }
+    data.connectedRecommendations = recommendations
+      ? Object.values(recommendations).reduce((ids, rec) =>
+          rec.connected ? ids.concat([rec.id]) : ids
+        , [])
+      : [];
+
     return data;
   }
 
@@ -80,8 +89,9 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   mapRecommendationOptions = (recommendations) => Object.values(recommendations).map((rec) => ({
     value: rec.id,
-    label: `${rec.attributes.title}${rec.connected ? ' - connected' : ' - not connected'}`,
+    label: rec.attributes.title,
   }));
+
 
   // TODO this should be shared functionality
   renderTaxonomyControl = (taxonomies) => taxonomies ? Object.values(taxonomies).map((tax) => ({
@@ -91,6 +101,15 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     controlType: 'multiselect',
     options: tax.categories ? this.mapCategoryOptions(tax.categories) : [],
   })) : [];
+
+  // TODO this should be shared functionality
+  renderRecommendationControl = (recommendations) => recommendations ? ({
+    id: 'recommendations',
+    model: '.connectedRecommendations',
+    label: 'Recommendations',
+    controlType: 'multiselect',
+    options: this.mapRecommendationOptions(recommendations),
+  }) : [];
 
 
   render() {
@@ -131,7 +150,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 title: 'Save',
                 onClick: () => this.props.handleSubmit(
                   this.props.form.data,
-                  this.props.taxonomies
+                  this.props.taxonomies,
+                  this.props.recommendations
                 ), // TODO This won't work will need a ref I think
               },
             ]}
@@ -141,6 +161,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 this.props.taxonomies,
+                this.props.recommendations
               )} // we can use inital form data for diffing
               handleCancel={this.props.handleCancel}
               fields={{
@@ -190,11 +211,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                       controlType: 'textarea',
                       model: '.attributes.description',
                     },
-                    {
-                      id: 'recommendations',
-                      controlType: 'select',
-                      options: this.mapRecommendationOptions(this.props.recommendations),
-                    },
+                    this.renderRecommendationControl(this.props.recommendations),
                   ],
                   aside: this.renderTaxonomyControl(this.props.taxonomies),
                 },
@@ -295,7 +312,7 @@ const mapStateToProps = (state, props) => ({
         key: 'recommendation_id',
         reverse: true,
         where: {
-          action_id: props.params.id,
+          measure_id: props.params.id,
         },
       },
     },
@@ -316,11 +333,12 @@ function mapDispatchToProps(dispatch, props) {
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, fromJS(formData)));
     },
-    handleSubmit: (formData, taxonomies) => {
+    handleSubmit: (formData, taxonomies, recommendations) => {
       // TODO maybe this function should be updated to work with Immutable objects, instead of converting
       // const prevTaxonomies = prevFormData.assignedTaxonomies || {};
       const saveData = formData.toJS();
 
+      // taxonomies
       saveData.taxonomies = reduce(taxonomies, (updates, tax, taxId) => {
         const formCategoryIds = saveData.assignedTaxonomies[taxId]; // the list of categories checked in form
         const assignedCategories = Object.values(tax.categories).reduce((catsAssigned, cat) => {
@@ -344,6 +362,30 @@ function mapDispatchToProps(dispatch, props) {
           , [])),
         };
       }, { delete: [], create: [] });
+
+      // recommendations
+      const formRecommendationIds = saveData.connectedRecommendations;
+      const connectedRecommendations = Object.values(recommendations).reduce((recsAssigned, rec) => {
+        const result = recsAssigned;
+        if (rec.connected) {
+          result[rec.id] = Object.keys(rec.connected)[0];
+        }
+        return result;
+      }, {});
+
+      saveData.recommendations = {
+        delete: reduce(connectedRecommendations, (assignedIds, assignedId, recId) =>
+          formRecommendationIds.indexOf(recId.toString()) === -1
+            ? assignedIds.concat([assignedId])
+            : assignedIds
+        , []),
+        create: reduce(formRecommendationIds, (recIds, recId) =>
+          Object.keys(connectedRecommendations).indexOf(recId.toString()) === -1
+            ? recIds.concat([recId])
+            : recIds
+        , []),
+      };
+
       dispatch(save(saveData));
     },
     handleCancel: () => {

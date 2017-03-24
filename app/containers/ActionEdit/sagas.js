@@ -24,6 +24,7 @@ export function* saveAction({ data }) {
   try {
     yield put(saveSending());
     yield call(updateTaxonomies, data);
+    yield call(updateRecommendations, data);
     const res = yield call(apiRequest, 'put', `measures/${data.id}`, data.attributes);
     yield put(updateEntity('measures', res.data.attributes));
     yield put(saveSuccess());
@@ -45,6 +46,20 @@ export function updateTaxonomies(data) {
   requests.concat(data.taxonomies.delete.map((assignedId) =>
     // console.log('delete', assignedId)
     apiRequest('delete', `measure_categories/${assignedId}`)
+  ));
+  return Promise.all(requests); // .then((ress) => console.log(ress));
+}
+export function updateRecommendations(data) {
+  const requests = [];
+  // create action-category associations
+  requests.concat(data.recommendations.create.map((recId) =>
+    // console.log('create', categoryId, data.id)
+    apiRequest('post', 'recommendation_measures/', { recommendation_id: recId, measure_id: data.id })
+  ));
+  // delete action-category associations
+  requests.concat(data.recommendations.delete.map((assignedId) =>
+    // console.log('delete', assignedId)
+    apiRequest('delete', `recommendation_measures/${assignedId}`)
   ));
   return Promise.all(requests); // .then((ress) => console.log(ress));
 }
