@@ -30,6 +30,7 @@ export const VALIDATE_TOKEN = 'nmrf/App/VALIDATE_TOKEN';
 
 export const ADD_ENTITY = 'nmrf/App/ADD_ENTITY';
 export const UPDATE_ENTITY = 'nmrf/App/UPDATE_ENTITY';
+export const DELETE_ENTITY = 'nmrf/App/DELETE_ENTITY';
 
 export const PUBLISH_STATUSES = [
   { value: true, label: 'Draft' },

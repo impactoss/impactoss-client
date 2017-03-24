@@ -24,6 +24,7 @@ import {
   LOGOUT_SUCCESS,
   ADD_ENTITY,
   UPDATE_ENTITY,
+  DELETE_ENTITY,
   ENTITIES_REQUESTED,
   ENTITIES_READY,
   INVALIDATE_ENTITIES,
@@ -119,6 +120,9 @@ function appReducer(state = initialState, payload) {
     case UPDATE_ENTITY:
       return state
           .setIn(['entities', `${payload.path}`, payload.entity.id], fromJS(payload.entity));
+    case DELETE_ENTITY:
+      return state
+          .deleteIn(['entities', `${payload.path}`, payload.id]);
     case ENTITIES_REQUESTED:
       return state
           .setIn(['requested', payload.path], payload.time);

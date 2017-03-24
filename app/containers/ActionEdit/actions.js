@@ -11,11 +11,10 @@
    SAVE_ERROR,
  } from './constants';
 
- export function save(data, id) {
+ export function save(data) {
    return {
      type: SAVE,
      data,
-     id,
    };
  }
 

@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Control } from 'react-redux-form';
+import { Control } from 'react-redux-form/immutable';
 
 import MultiSelect from './MultiSelect';
 
@@ -7,6 +7,7 @@ const MultiSelectControl = (props) => {
   const { model, options, ...otherProps } = props;
   return (
     <Control
+      type="multiselect"
       model={model}
       component={MultiSelect}
       multiple
