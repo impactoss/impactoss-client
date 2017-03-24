@@ -152,7 +152,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                   this.props.form.data,
                   this.props.taxonomies,
                   this.props.recommendations
-                ), // TODO This won't work will need a ref I think
+                ),
               },
             ]}
           >
