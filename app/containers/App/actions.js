@@ -32,6 +32,7 @@ import {
   ENTITIES_READY,
   ADD_ENTITY,
   UPDATE_ENTITY,
+  DELETE_ENTITY,
   INVALIDATE_ENTITIES,
 } from './constants';
 
@@ -102,6 +103,15 @@ export function updateEntity(path, entity) {
     type: UPDATE_ENTITY,
     path,
     entity,
+  };
+}
+
+
+export function deleteEntity(path, id) {
+  return {
+    type: DELETE_ENTITY,
+    path,
+    id,
   };
 }
 

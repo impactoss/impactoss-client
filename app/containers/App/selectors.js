@@ -25,8 +25,6 @@ const getRoute = (state) => state.get('route');
 const getGlobal = (state) => state.get('global');
 const getGlobalEntities = (state) => state.getIn(['global', 'entities']);
 const getGlobalRequested = (state) => state.getIn(['global', 'requested']);
-const getGlobalReady = (state) => state.getIn(['global', 'ready']);
-
 
 const makeSelectLoading = () => createSelector(
   getGlobal,
@@ -93,16 +91,11 @@ const getRequestedAt = createSelector(
   (requested, path) => requested.get(path)
 );
 
-const getReady = createSelector(
-  getGlobalReady,
-  (state, { path }) => path,
-  (ready, path) => ready.get(path)
-);
-
-const isReady = createSelector(
-  getReady,
-  (ready) => !!ready
-);
+const isReady = (state, { path }) =>
+  reduce(Array.isArray(path) ? path : [path],
+    (areReady, readyPath) => areReady && !!state.getIn(['global', 'ready', readyPath]),
+    true
+  );
 
 const getEntitiesPure = createSelector(
   getGlobalEntities,
@@ -110,27 +103,70 @@ const getEntitiesPure = createSelector(
   (entities, path) => entities.get(path)
 );
 
-const getEntitiesJoint = createSelector(
+// check if entities are not connected to any other entities via associative table
+const getEntitiesWithout = createSelector(
   (state) => state,
   getEntitiesPure,
-  (state, { join }) => join,
-  (state, entities, join) => {
-    if (join) {
-      const where = join.where;
-      return entities.filter((entity) => {
-        where[join.key] = entity.get('id');
+  (state, { without }) => without,
+  (state, entities, without) => without
+    ? entities.filter((entity) =>
+      reduce(Array.isArray(without) ? without : [without], (passing, withoutCond) => {
+        const where = {};
+        where[withoutCond.key] = entity.get('id');
+        // taxonomy
+        if (withoutCond.taxonomyId) {
+          // get all associations for entity and store category count for given taxonomy
+          const associations = getEntities(state, {
+            path: withoutCond.connectedPath, // measure_categories
+            where, // {measure_id : 3}
+            extend: {
+              path: 'categories',
+              as: 'count',
+              key: 'category_id',
+              type: 'count',
+              where: {
+                taxonomy_id: withoutCond.taxonomyId,
+              },
+            },
+          });
+          // check if any category present (count > 0)
+          return !associations.reduce((hasCategories, association) =>
+            hasCategories || association.get('count') > 0, false
+          );
+        }
         const joins = getEntitiesWhere(state, {
-          path: join.path,
-          where,
+          path: withoutCond.connectedPath, // recommendation_measures
+          where, // {measure_id : 3}
         });
-        return joins && joins.size;
-      });
-    }
-    return entities;
-  }
+        return !(joins && joins.size); // !not associated
+      }, true)
+    )
+    : entities
 );
 
+// check if entities have connections with other entities via associative table
+const getEntitiesJoint = createSelector(
+  (state) => state,
+  getEntitiesWithout,
+  (state, { join }) => join,
+  (state, entities, join) => join
+    ? entities.filter((entity) =>
+      reduce(Array.isArray(join) ? join : [join], (passing, joinWhere) => joinWhere.where // allows multiple joins
+        ? reduce(Array.isArray(joinWhere.where) ? joinWhere.where : [joinWhere.where], (passingWhere, where) => { // and multiple wheres
+          const w = where;
+          w[joinWhere.key] = entity.get('id');
+          const joins = getEntitiesWhere(state, {
+            path: joinWhere.path, // path of associative table
+            where: w,
+          });
+          return joins && joins.size; // assication present
+        }, true)
+        : true, true)
+      )
+    : entities
+);
 
+// check entity attributes or id
 const getEntitiesWhere = createCachedSelector(
   getEntitiesJoint,
   (state, { where }) => where ? JSON.stringify(where) : null, // enable caching
@@ -138,11 +174,15 @@ const getEntitiesWhere = createCachedSelector(
     if (whereString) {
       const where = JSON.parse(whereString);
       return entities.filter((entity) =>
-        reduce(where, (result, value, key) => {
+        reduce(where, (passing, value, key) => {
           if (key === 'id') {
-            return entity.get('id') === value.toString();
+            return passing && entity.get('id') === value.toString();
           }
-          return entity.getIn(['attributes', key]) && entity.getIn(['attributes', key]).toString() === value.toString();
+          const testValue = entity.getIn(['attributes', key]);
+          if (typeof testValue === 'undefined') {
+            return false;
+          }
+          return passing && testValue.toString() === value.toString();
         }, true)
       );
     }
@@ -199,7 +239,6 @@ const extendEntity = (state, entity, extendArgs) => {
       extended = getEntity(state, extend);
     } else {
       extended = getEntities(state, extend);
-
       if (extended && extend.type === 'count') {
         extended = extended.size;
       }
@@ -237,7 +276,8 @@ const getEntitiesPaged = createCachedSelector(
     const page = slice(entities, offset, end);
     // console.log('no cache for offset', offset);
     return {
-      page,
+      entities: page,
+      total: entities.length,
       havePrevPage,
       haveNextPage,
       totalPages,
@@ -292,7 +332,6 @@ export {
   makeSelectAuth,
   makeSelectNextPathname,
   getRequestedAt,
-  getReady,
   isReady,
   getEntitiesWhere,
   getEntities,
