@@ -6,8 +6,8 @@ import apiRequest from 'utils/api-request';
 
 import {
   updateEntity,
-  // deleteEntity,
-  // addEntity,
+  deleteEntity,
+  addEntity,
 } from 'containers/App/actions';
 
 import {
@@ -23,45 +23,57 @@ import {
 export function* saveAction({ data }) {
   try {
     yield put(saveSending());
-    yield call(updateTaxonomies, data);
-    yield call(updateRecommendations, data);
+    const recRes = yield call(updateRecommendations, data);
+    yield recRes.map((r) =>
+      typeof r === 'object'
+        ? put(addEntity('recommendation_measures', r.data))
+        : put(deleteEntity('recommendation_measures', r))
+    );
+    const taxonomyRes = yield call(updateTaxonomies, data);
+    yield taxonomyRes.map((r) =>
+      typeof r === 'object'
+        ? put(addEntity('measure_categories', r.data))
+        : put(deleteEntity('measure_categories', r))
+    );
+
     const res = yield call(apiRequest, 'put', `measures/${data.id}`, data.attributes);
-    yield put(updateEntity('measures', res.data.attributes));
+
+    yield put(updateEntity('measures', {
+      id: res.data.id,
+      attributes: res.data.attributes,
+    }));
     yield put(saveSuccess());
     browserHistory.push(`/actions/${data.id}`);
   } catch (error) {
-    const message = yield error.response.json();
-    yield put(saveError(message.error));
+    yield put(saveError(error));
   }
 }
 
 export function updateTaxonomies(data) {
-  const requests = [];
   // create action-category associations
-  requests.concat(data.taxonomies.create.map((categoryId) =>
+  const requests = [].concat(data.taxonomies.create.map((categoryId) =>
     // console.log('create', categoryId, data.id)
     apiRequest('post', 'measure_categories/', { category_id: categoryId, measure_id: data.id })
-  ));
+  ))
   // delete action-category associations
-  requests.concat(data.taxonomies.delete.map((assignedId) =>
+  .concat(data.taxonomies.delete.map((assignedId) =>
     // console.log('delete', assignedId)
-    apiRequest('delete', `measure_categories/${assignedId}`)
+    apiRequest('delete', `measure_categories/${assignedId}`).then(() => assignedId)
   ));
-  return Promise.all(requests); // .then((ress) => console.log(ress));
+  return Promise.all(requests);
 }
 export function updateRecommendations(data) {
-  const requests = [];
   // create action-category associations
-  requests.concat(data.recommendations.create.map((recId) =>
+  const requests = [].concat(data.recommendations.create.map((recId) =>
     // console.log('create', categoryId, data.id)
     apiRequest('post', 'recommendation_measures/', { recommendation_id: recId, measure_id: data.id })
-  ));
+  ))
   // delete action-category associations
-  requests.concat(data.recommendations.delete.map((assignedId) =>
+  .concat(data.recommendations.delete.map((assignedId) =>
     // console.log('delete', assignedId)
     apiRequest('delete', `recommendation_measures/${assignedId}`)
   ));
-  return Promise.all(requests); // .then((ress) => console.log(ress));
+  return Promise.all(requests);
 }
 
 // Individual exports for testing
