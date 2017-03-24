@@ -117,12 +117,14 @@ function appReducer(state = initialState, payload) {
       return state
           .setIn(['user', 'isSignedIn'], payload.newAuthState);
     case ADD_ENTITY:
+      return state
+        .setIn(['entities', payload.path, payload.entity.id], fromJS(payload.entity));
     case UPDATE_ENTITY:
       return state
-          .setIn(['entities', `${payload.path}`, payload.entity.id], fromJS(payload.entity));
+          .setIn(['entities', payload.path, payload.entity.id, 'attributes'], fromJS(payload.entity.attributes));
     case DELETE_ENTITY:
       return state
-          .deleteIn(['entities', `${payload.path}`, payload.id]);
+          .deleteIn(['entities', payload.path, payload.id]);
     case ENTITIES_REQUESTED:
       return state
           .setIn(['requested', payload.path], payload.time);

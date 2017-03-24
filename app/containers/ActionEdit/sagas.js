@@ -6,8 +6,8 @@ import apiRequest from 'utils/api-request';
 
 import {
   updateEntity,
-  // deleteEntity,
-  // addEntity,
+  deleteEntity,
+  addEntity,
 } from 'containers/App/actions';
 
 import {
@@ -23,10 +23,18 @@ import {
 export function* saveAction({ data }) {
   try {
     yield put(saveSending());
-    const taxonmoyRes = yield call(updateTaxonomies, data);
-    console.log(taxonmoyRes);
+    const taxonomyRes = yield call(updateTaxonomies, data);
+    yield taxonomyRes.map((r) =>
+      typeof r === 'object'
+        ? put(addEntity('measure_categories', r.data))
+        : put(deleteEntity('measure_categories', r))
+    );
     const res = yield call(apiRequest, 'put', `measures/${data.id}`, data.attributes);
-    yield put(updateEntity('measures', res.data.attributes));
+
+    yield put(updateEntity('measures', {
+      id: res.data.id,
+      attributes: res.data.attributes,
+    }));
     yield put(saveSuccess());
     browserHistory.push(`/actions/${data.id}`);
   } catch (error) {
