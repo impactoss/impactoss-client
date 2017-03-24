@@ -23,30 +23,29 @@ import {
 export function* saveAction({ data }) {
   try {
     yield put(saveSending());
-    yield call(updateTaxonomies, data);
+    const taxonmoyRes = yield call(updateTaxonomies, data);
+    console.log(taxonmoyRes);
     const res = yield call(apiRequest, 'put', `measures/${data.id}`, data.attributes);
     yield put(updateEntity('measures', res.data.attributes));
     yield put(saveSuccess());
     browserHistory.push(`/actions/${data.id}`);
   } catch (error) {
-    const message = yield error.response.json();
-    yield put(saveError(message.error));
+    yield put(saveError(error));
   }
 }
 
 export function updateTaxonomies(data) {
-  const requests = [];
   // create action-category associations
-  requests.concat(data.taxonomies.create.map((categoryId) =>
+  const requests = [].concat(data.taxonomies.create.map((categoryId) =>
     // console.log('create', categoryId, data.id)
     apiRequest('post', 'measure_categories/', { category_id: categoryId, measure_id: data.id })
-  ));
+  ))
   // delete action-category associations
-  requests.concat(data.taxonomies.delete.map((assignedId) =>
+  .concat(data.taxonomies.delete.map((assignedId) =>
     // console.log('delete', assignedId)
-    apiRequest('delete', `measure_categories/${assignedId}`)
+    apiRequest('delete', `measure_categories/${assignedId}`).then(() => assignedId)
   ));
-  return Promise.all(requests); // .then((ress) => console.log(ress));
+  return Promise.all(requests);
 }
 
 // Individual exports for testing
