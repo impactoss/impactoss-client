@@ -33,8 +33,32 @@ import {
   ADD_ENTITY,
   UPDATE_ENTITY,
   DELETE_ENTITY,
+  SAVE_ENTITY,
   INVALIDATE_ENTITIES,
+  SAVE_SENDING,
+  SAVE_SUCCESS,
+  SAVE_ERROR,
 } from './constants';
+
+
+export function saveSending() {
+  return {
+    type: SAVE_SENDING,
+  };
+}
+
+export function saveSuccess() {
+  return {
+    type: SAVE_SUCCESS,
+  };
+}
+
+export function saveError(error) {
+  return {
+    type: SAVE_ERROR,
+    error,
+  };
+}
 
 /**
  * Load the entities, this action starts the request saga
@@ -112,6 +136,13 @@ export function deleteEntity(path, id) {
     type: DELETE_ENTITY,
     path,
     id,
+  };
+}
+
+export function saveEntity(data) {
+  return {
+    type: SAVE_ENTITY,
+    data,
   };
 }
 

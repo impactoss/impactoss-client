@@ -5,14 +5,17 @@
 import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
 import { push } from 'react-router-redux';
 import collection from 'lodash/collection';
+import { browserHistory } from 'react-router';
 
 import {
     LOAD_ENTITIES_IF_NEEDED,
+    SAVE_ENTITY,
     AUTHENTICATE,
     AUTHENTICATE_SUCCESS,
     LOGOUT,
     VALIDATE_TOKEN,
 } from 'containers/App/constants';
+
 import {
     loadingEntities,
     entitiesLoaded,
@@ -25,6 +28,12 @@ import {
     entitiesRequested,
     entitiesReady,
     invalidateEntities,
+    updateEntity,
+    addEntity,
+    deleteEntity,
+    saveSending,
+    saveSuccess,
+    saveError,
 } from 'containers/App/actions';
 
 import {
@@ -32,6 +41,7 @@ import {
   getRequestedAt,
 } from 'containers/App/selectors';
 
+import { updateEntityRequest, updateAssociationsRequest } from 'utils/entities-update';
 import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
 
 /**
@@ -119,6 +129,53 @@ export function* validateTokenSaga() {
   }
 }
 
+export function* saveEntitySaga({ data }) {
+  try {
+    yield put(saveSending());
+
+    // update entity attributes
+    const entityUpdated = yield call(updateEntityRequest, data.path, data.entity);
+
+    yield put(updateEntity(data.path, {
+      id: entityUpdated.data.id,
+      attributes: entityUpdated.data.attributes,
+    }));
+
+    // update recommendation-action connections
+    if (data.entity.recommendationMeasures) {
+      const connectionsUpdated = yield call(
+        updateAssociationsRequest,
+        'recommendation_measures',
+        data.entity.recommendationMeasures
+      );
+      yield connectionsUpdated.map((connection) => connection.type === 'delete'
+        ? put(deleteEntity('recommendation_measures', connection.id))
+        : put(addEntity('recommendation_measures', connection.data))
+      );
+    }
+
+    // update action-category connections
+    if (data.entity.measureCategories) {
+      const connectionsUpdated = yield call(
+        updateAssociationsRequest,
+        'measure_categories',
+        data.entity.measureCategories
+      );
+      yield connectionsUpdated.map((connection) => connection.type === 'delete'
+        ? put(deleteEntity('measure_categories', connection.id))
+        : put(addEntity('measure_categories', connection.data))
+      );
+    }
+
+    yield put(saveSuccess());
+    yield browserHistory.push(data.redirect);
+  } catch (error) {
+    yield put(saveError('An error occurred saving all or parts of your changes. Please review carefully and try again. '));
+    yield put(invalidateEntities());
+  }
+}
+
+
 /**
  * Root saga manages watcher lifecycle
  */
@@ -126,6 +183,8 @@ export default function* rootSaga() {
   // console.log('calling rootSaga');
   yield takeEvery(VALIDATE_TOKEN, validateTokenSaga);
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
+
+  yield takeEvery(SAVE_ENTITY, saveEntitySaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
   yield takeLatest(AUTHENTICATE_SUCCESS, authenticateSuccessSaga);

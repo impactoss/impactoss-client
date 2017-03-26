@@ -148,6 +148,7 @@ function appReducer(state = initialState, payload) {
     case INVALIDATE_ENTITIES:
       // reset requested to initial state
       return state
+        .set('ready', fromJS(initialState.toJS().ready)) // should trigger new entity load
         .set('requested', fromJS(initialState.toJS().requested)) // should trigger new entity load
         .set('entities', fromJS(initialState.toJS().entities));
     default:
