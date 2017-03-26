@@ -10,6 +10,7 @@ import { browserHistory } from 'react-router';
 import {
     LOAD_ENTITIES_IF_NEEDED,
     SAVE_ENTITY,
+    NEW_ENTITY,
     AUTHENTICATE,
     AUTHENTICATE_SUCCESS,
     LOGOUT,
@@ -41,7 +42,11 @@ import {
   getRequestedAt,
 } from 'containers/App/selectors';
 
-import { updateEntityRequest, updateAssociationsRequest } from 'utils/entities-update';
+import {
+  newEntityRequest,
+  updateEntityRequest,
+  updateAssociationsRequest,
+} from 'utils/entities-update';
 import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
 
 /**
@@ -175,6 +180,62 @@ export function* saveEntitySaga({ data }) {
   }
 }
 
+export function* newEntitySaga({ data }) {
+  try {
+    yield put(saveSending());
+
+    // update entity attributes
+    const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
+
+    yield put(addEntity(data.path, entityCreated.data));
+
+    // update recommendation-action connections
+    if (data.entity.recommendationMeasures) {
+      // make sure to use new entity id for full payload
+      const recommendationMeasures = data.entity.recommendationMeasures;
+      recommendationMeasures.create = recommendationMeasures.create.map((create) => ({
+        recommendation_id: create.recommendation_id || entityCreated.data.id,
+        measure_id: create.measure_id || entityCreated.data.id,
+      }));
+      const connectionsUpdated = yield call(
+        updateAssociationsRequest,
+        'recommendation_measures',
+        recommendationMeasures
+      );
+      yield connectionsUpdated.map((connection) => connection.type === 'delete'
+        ? put(deleteEntity('recommendation_measures', connection.id))
+        : put(addEntity('recommendation_measures', connection.data))
+      );
+    }
+
+    // update action-category connections
+    if (data.entity.measureCategories) {
+      // make sure to use new entity id for full payload
+      const measureCategories = data.entity.measureCategories;
+      measureCategories.create = measureCategories.create.map((create) => ({
+        category_id: create.category_id,
+        measure_id: create.measure_id || entityCreated.data.id,
+      }));
+      const connectionsUpdated = yield call(
+        updateAssociationsRequest,
+        'measure_categories',
+        measureCategories
+      );
+      yield connectionsUpdated.map((connection) => connection.type === 'delete'
+        ? put(deleteEntity('measure_categories', connection.id))
+        : put(addEntity('measure_categories', connection.data))
+      );
+    }
+
+    yield put(saveSuccess());
+    yield browserHistory.push(`${data.redirect}/${entityCreated.data.id}`);
+  } catch (error) {
+    console.error(error);
+    yield put(saveError('An error occurred saving your data. Please review carefully and try again. '));
+    yield put(invalidateEntities());
+  }
+}
+
 
 /**
  * Root saga manages watcher lifecycle
@@ -185,6 +246,7 @@ export default function* rootSaga() {
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
 
   yield takeEvery(SAVE_ENTITY, saveEntitySaga);
+  yield takeEvery(NEW_ENTITY, newEntitySaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
   yield takeLatest(AUTHENTICATE_SUCCESS, authenticateSuccessSaga);

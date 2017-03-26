@@ -25,6 +25,11 @@ export function deleteAssociationRequest(path, associationId) {
 }
 
 export function updateEntityRequest(path, payload) {
-  // update action entity attributes
+  // update entity attributes
   return apiRequest('put', `${path}/${payload.id}`, payload.attributes);
+}
+
+export function newEntityRequest(path, payload) {
+  // create new entity with attributes
+  return apiRequest('post', `${path}`, payload);
 }

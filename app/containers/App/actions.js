@@ -33,6 +33,7 @@ import {
   ADD_ENTITY,
   UPDATE_ENTITY,
   DELETE_ENTITY,
+  NEW_ENTITY,
   SAVE_ENTITY,
   INVALIDATE_ENTITIES,
   SAVE_SENDING,
@@ -142,6 +143,13 @@ export function deleteEntity(path, id) {
 export function saveEntity(data) {
   return {
     type: SAVE_ENTITY,
+    data,
+  };
+}
+
+export function newEntity(data) {
+  return {
+    type: NEW_ENTITY,
     data,
   };
 }

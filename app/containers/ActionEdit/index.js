@@ -20,7 +20,6 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
-// import MultiSelect from 'components/MultiSelect';
 
 import {
   getEntity,

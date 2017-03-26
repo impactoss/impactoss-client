@@ -12,7 +12,7 @@ import {
   SAVE_SENDING,
   SAVE_SUCCESS,
   SAVE_ERROR,
-} from './constants';
+} from 'containers/App/constants';
 
 const initialState = fromJS({
   saveSending: false,
@@ -34,21 +34,26 @@ function actionNewReducer(state = initialState, action) {
     case SAVE_ERROR:
       return state
         .set('saveSending', false)
+        .set('saveSuccess', false)
         .set('saveError', action.error);
     default:
       return state;
   }
 }
 
-const actionForm = fromJS({
-  title: '',
-  description: '',
-  draft: true,
+const formData = fromJS({
+  attributes: {
+    title: '',
+    description: '',
+    draft: true,
+  },
+  associatedTaxonomies: {},
+  associatedRecommendations: [],
 });
 
 export default combineReducers({
   page: actionNewReducer,
   form: combineForms({
-    action: actionForm,
+    data: formData,
   }, 'actionNew.form'),
 });
