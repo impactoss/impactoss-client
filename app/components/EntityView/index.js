@@ -24,7 +24,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
       }
       {field.values.map((value, i) => (
         <div key={i}>
-          <p>{value.value}</p>
+          <p>{value.label} - {value.value}</p>
         </div>
       ))}
     </span>

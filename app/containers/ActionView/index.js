@@ -38,7 +38,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   mapCategoryOptions = (categories) => (
     categories ? Object.values(categories).map((cat) => ({
       value: cat.id,
-      label: `${cat.attributes.title} - ${cat.attributes.connected}`,
+      label: `${cat.attributes.title} - ${cat.connected}`,
     })) : []
   )
 
@@ -50,8 +50,11 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   )
 
   renderRecommendations = (recommendations) => (
-    Object.values(recommendations).filter((recommendation) => recommendation.connected).map((recommendation) => ({
-      id: recommendation.attrib,
+    Object.values(recommendations)
+    .filter((recommendation) => recommendation.connected)
+    .map((recommendation) => ({
+      id: recommendation.id,
+      label: recommendation.attributes.title,
     }))
   )
 
