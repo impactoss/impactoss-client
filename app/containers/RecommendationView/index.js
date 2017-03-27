@@ -41,26 +41,24 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     // TODO should be "go back" if history present or to actions list when not
   }
 
-  mapCategoryOptions = (categories) => (
-    categories ? Object.values(categories).map((cat) => ({
-      value: cat.id,
-      label: `${cat.attributes.title} - ${cat.connected}`,
-    })) : []
-  )
-
-  renderTaxonomies = (taxonomies) => (
-    Object.values(taxonomies).map((taxonomy) => ({
-      id: taxonomy.attributes.title,
-      values: this.mapCategoryOptions(taxonomy.categories),
-    }))
-  )
-
-  renderActions = (actions) => (
-    Object.values(actions)
-    .filter((action) => action.connected)
-    .map((action) => ({
-      id: action.id,
+  mapActions = (actions) =>
+    Object.values(actions).map((action) => ({
       label: action.attributes.title,
+    }))
+
+  mapCategories = (categories) => categories
+    ? Object.values(categories).map((cat) => ({
+      label: cat.attributes.title,
+    }))
+    : []
+
+
+  renderTaxonomyLists = (taxonomies) => (
+    Object.values(taxonomies).map((taxonomy) => ({
+      id: taxonomy.id,
+      heading: taxonomy.attributes.title,
+      type: 'list',
+      values: this.mapCategories(taxonomy.categories),
     }))
   )
 
@@ -114,8 +112,8 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
                   ],
                   aside: [
                     {
-                      id: 'no',
-                      heading: 'No.',
+                      id: 'number',
+                      heading: 'Number',
                       value: recommendation.attributes.number.toString(),
                     },
                     {
@@ -137,13 +135,14 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
                 },
                 body: {
                   main: [
-                    // {
-                    //   id: 'actions',
-                    //   heading: 'Actions',
-                    //   values: this.renderActions(this.props.actions),
-                    // },
+                    {
+                      id: 'actions',
+                      heading: 'Actions',
+                      type: 'list',
+                      values: this.mapActions(this.props.actions),
+                    },
                   ],
-                  // aside: this.renderTaxonomies(this.props.taxonomies),
+                  aside: this.renderTaxonomyLists(this.props.taxonomies),
                 },
               }}
             />
@@ -158,8 +157,8 @@ RecommendationView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   recommendation: PropTypes.object,
   dataReady: PropTypes.bool,
-  // taxonomies: PropTypes.object,
-  // actions: PropTypes.object,
+  taxonomies: PropTypes.object,
+  actions: PropTypes.object,
   params: PropTypes.object,
 };
 
@@ -184,7 +183,7 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
-  // all categories for all recommendation-taggable taxonomies, listing connection if any
+  // all connected categories for all recommendation-taggable taxonomies
   taxonomies: getEntities(
     state,
     {
@@ -207,7 +206,7 @@ const mapStateToProps = (state, props) => ({
       out: 'js',
     },
   ),
-  // all actions, listing connection if any
+  // all connected actions
   actions: getEntities(
     state, {
       path: 'measures',
@@ -215,7 +214,6 @@ const mapStateToProps = (state, props) => ({
       join: {
         path: 'recommendation_measures',
         key: 'measure_id',
-        reverse: true,
         where: {
           recommendation_id: props.params.id,
         },

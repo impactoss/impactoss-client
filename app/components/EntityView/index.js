@@ -24,7 +24,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
       }
       {field.values.map((value, i) => (
         <div key={i}>
-          <p>{value.label} - {value.value}</p>
+          <p>{value.label}</p>
         </div>
       ))}
     </span>
@@ -40,12 +40,10 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   )
 
   renderSection = (fields) => fields.map((field, index) => {
-    if (field.value) {
-      return this.renderField(field, index);
-    } else if (field.values) {
+    if (field.type === 'list') {
       return this.renderList(field, index);
     }
-    return null;
+    return this.renderField(field, index);
   })
 
   render() {
@@ -77,8 +75,6 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
                     this.renderSection(fields.body.main)
                   }
                 </Grid>
-              </Row>
-              <Row>
                 <Grid sm={1 / 4}>
                   { fields.body.aside &&
                     this.renderSection(fields.body.aside)
