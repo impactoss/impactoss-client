@@ -19,7 +19,7 @@ export default defineMessages({
     defaultMessage: 'New Action',
   },
   loading: {
-    id: 'app.containers.ActionEdit.loading',
+    id: 'app.containers.ActionNew.loading',
     defaultMessage: 'Loading data...',
   },
   fieldRequired: {

@@ -107,9 +107,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             }
             <EntityForm
               model="actionNew.form.data"
-              handleSubmit={(formData) => this.props.handleSubmit(
-                formData,
-              )}
+              handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               fields={{
                 header: {

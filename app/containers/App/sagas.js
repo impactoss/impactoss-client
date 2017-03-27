@@ -139,8 +139,9 @@ export function* saveEntitySaga({ data }) {
     yield put(saveSending());
 
     // update entity attributes
+    // on the server
     const entityUpdated = yield call(updateEntityRequest, data.path, data.entity);
-
+    // and on the client
     yield put(updateEntity(data.path, {
       id: entityUpdated.data.id,
       attributes: entityUpdated.data.attributes,
@@ -148,11 +149,13 @@ export function* saveEntitySaga({ data }) {
 
     // update recommendation-action connections
     if (data.entity.recommendationMeasures) {
+      // on the server
       const connectionsUpdated = yield call(
         updateAssociationsRequest,
         'recommendation_measures',
         data.entity.recommendationMeasures
       );
+      // and on the client
       yield connectionsUpdated.map((connection) => connection.type === 'delete'
         ? put(deleteEntity('recommendation_measures', connection.id))
         : put(addEntity('recommendation_measures', connection.data))
@@ -161,14 +164,31 @@ export function* saveEntitySaga({ data }) {
 
     // update action-category connections
     if (data.entity.measureCategories) {
+      // on the server
       const connectionsUpdated = yield call(
         updateAssociationsRequest,
         'measure_categories',
         data.entity.measureCategories
       );
+      // and on the client
       yield connectionsUpdated.map((connection) => connection.type === 'delete'
         ? put(deleteEntity('measure_categories', connection.id))
         : put(addEntity('measure_categories', connection.data))
+      );
+    }
+
+    // update recommendation-category connections
+    if (data.entity.recommendationCategories) {
+      // on the server
+      const connectionsUpdated = yield call(
+        updateAssociationsRequest,
+        'recommendation_categories',
+        data.entity.recommendationCategories
+      );
+      // and on the client
+      yield connectionsUpdated.map((connection) => connection.type === 'delete'
+        ? put(deleteEntity('recommendation_categories', connection.id))
+        : put(addEntity('recommendation_categories', connection.data))
       );
     }
 
@@ -184,23 +204,27 @@ export function* newEntitySaga({ data }) {
   try {
     yield put(saveSending());
     // update entity attributes
+    // on the server
     const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
-
     yield put(addEntity(data.path, entityCreated.data));
 
+    // check for associations/connections
     // update recommendation-action connections
     if (data.entity.recommendationMeasures) {
       // make sure to use new entity id for full payload
+      // we should have either the one (recommendation_id) or the other (measure_id)
       const recommendationMeasures = data.entity.recommendationMeasures;
       recommendationMeasures.create = recommendationMeasures.create.map((create) => ({
         recommendation_id: create.recommendation_id || entityCreated.data.id,
         measure_id: create.measure_id || entityCreated.data.id,
       }));
+      // on the server
       const connectionsUpdated = yield call(
         updateAssociationsRequest,
         'recommendation_measures',
         recommendationMeasures
       );
+      // and on the client
       yield connectionsUpdated.map((connection) => connection.type === 'delete'
         ? put(deleteEntity('recommendation_measures', connection.id))
         : put(addEntity('recommendation_measures', connection.data))
@@ -210,19 +234,42 @@ export function* newEntitySaga({ data }) {
     // update action-category connections
     if (data.entity.measureCategories) {
       // make sure to use new entity id for full payload
-      const measureCategories = data.entity.measureCategories;
-      measureCategories.create = measureCategories.create.map((create) => ({
+      const categories = data.entity.measureCategories;
+      categories.create = categories.create.map((create) => ({
         category_id: create.category_id,
-        measure_id: create.measure_id || entityCreated.data.id,
+        measure_id: entityCreated.data.id,
       }));
+      // on the server
       const connectionsUpdated = yield call(
         updateAssociationsRequest,
         'measure_categories',
-        measureCategories
+        categories
       );
+      // and on the client
       yield connectionsUpdated.map((connection) => connection.type === 'delete'
         ? put(deleteEntity('measure_categories', connection.id))
         : put(addEntity('measure_categories', connection.data))
+      );
+    }
+
+    // update recommendation-category connections
+    if (data.entity.recommendationCategories) {
+      // make sure to use new entity id for full payload
+      const categories = data.entity.recommendationCategories;
+      categories.create = categories.create.map((create) => ({
+        category_id: create.category_id,
+        recommendation_id: entityCreated.data.id,
+      }));
+      // on the server
+      const connectionsUpdated = yield call(
+        updateAssociationsRequest,
+        'recommendation_categories',
+        categories
+      );
+      // and on the client
+      yield connectionsUpdated.map((connection) => connection.type === 'delete'
+        ? put(deleteEntity('recommendation_categories', connection.id))
+        : put(addEntity('recommendation_categories', connection.data))
       );
     }
 
