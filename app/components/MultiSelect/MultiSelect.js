@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { fromJS } from 'immutable';
+import { kebabCase } from 'lodash/string';
 
 export default class MultiSelect extends React.Component {
 
@@ -40,9 +41,9 @@ export default class MultiSelect extends React.Component {
               onChange={this.handleClick}
               checked={checked}
               value={value}
-              id={value}
+              id={`${value}-${kebabCase(label)}`}
             />
-            <label htmlFor={value} >
+            <label htmlFor={`${value}-${kebabCase(label)}`} >
               {label}
             </label>
           </div>

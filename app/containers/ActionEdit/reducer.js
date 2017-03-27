@@ -49,7 +49,6 @@ const formData = fromJS({
     description: '',
     draft: '',
   },
-  taxonomies: [],
 });
 
 export default combineReducers({
