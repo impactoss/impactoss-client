@@ -171,7 +171,15 @@ ActionView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: 'measures' }),
+  dataReady: isReady(state, { path: [
+    'measures',
+    'users',
+    'taxonomies',
+    'categories',
+    'recommendations',
+    'recommendation_measures',
+    'measure_categories',
+  ] }),
   action: getEntity(
     state,
     {

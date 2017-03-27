@@ -168,7 +168,15 @@ RecommendationView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: 'recommendations' }),
+  dataReady: isReady(state, { path: [
+    'recommendations',
+    'users',
+    'taxonomies',
+    'categories',
+    'measures',
+    'recommendation_measures',
+    'recommendation_categories',
+  ] }),
   recommendation: getEntity(
     state,
     {
