@@ -5,7 +5,7 @@
 */
 
 import React from 'react';
-// import styled from 'styled-components';
+import { Link } from 'react-router';
 
 import ViewWrapper from 'components/basic/ViewWrapper';
 import Grid from 'grid-styled';
@@ -24,7 +24,10 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
       }
       {field.values.map((value, i) => (
         <div key={i}>
-          <p>{value.label}</p>
+          {value.linkTo
+            ? <Link key={i} to={value.linkTo}>{value.label}</Link>
+            : <p>{value.label}</p>
+          }
         </div>
       ))}
     </span>

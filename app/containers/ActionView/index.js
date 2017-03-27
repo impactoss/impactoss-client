@@ -44,11 +44,13 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   mapRecommendations = (recommendations) =>
     Object.values(recommendations).map((recommendation) => ({
       label: recommendation.attributes.title,
+      linkTo: `/recommendations/${recommendation.id}`,
     }))
 
   mapCategoryOptions = (categories) => categories
     ? Object.values(categories).map((cat) => ({
       label: cat.attributes.title,
+      linkTo: `/category/${cat.id}`,
     }))
     : []
 

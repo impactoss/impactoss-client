@@ -44,11 +44,13 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   mapActions = (actions) =>
     Object.values(actions).map((action) => ({
       label: action.attributes.title,
+      linkTo: `/actions/${action.id}`,
     }))
 
   mapCategories = (categories) => categories
     ? Object.values(categories).map((cat) => ({
       label: cat.attributes.title,
+      linkTo: `/category/${cat.id}`,
     }))
     : []
 
