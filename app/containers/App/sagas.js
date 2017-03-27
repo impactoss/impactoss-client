@@ -183,7 +183,6 @@ export function* saveEntitySaga({ data }) {
 export function* newEntitySaga({ data }) {
   try {
     yield put(saveSending());
-
     // update entity attributes
     const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
 
@@ -230,7 +229,7 @@ export function* newEntitySaga({ data }) {
     yield put(saveSuccess());
     yield browserHistory.push(`${data.redirect}/${entityCreated.data.id}`);
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     yield put(saveError('An error occurred saving your data. Please review carefully and try again. '));
     yield put(invalidateEntities());
   }

@@ -12,18 +12,11 @@ import { browserHistory } from 'react-router';
 import { reduce } from 'lodash/collection';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
-
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
-
+import { getEntities, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
-
-
-import {
-  getEntities,
-  isReady,
-} from 'containers/App/selectors';
 
 import actionNewSelector from './selectors';
 import messages from './messages';

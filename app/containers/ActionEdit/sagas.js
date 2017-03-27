@@ -3,11 +3,10 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { saveEntity } from 'containers/App/actions';
 
-
 import { SAVE } from './constants';
 
 
-export function* saveAction({ data }) {
+export function* save({ data }) {
   yield put(saveEntity({
     path: 'measures',
     entity: data,
@@ -15,11 +14,10 @@ export function* saveAction({ data }) {
   }));
 }
 
-
 // Individual exports for testing
 export function* defaultSaga() {
   // See example in containers/HomePage/sagas.js
-  const saveWatcher = yield takeLatest(SAVE, saveAction);
+  const saveWatcher = yield takeLatest(SAVE, save);
 
   yield take(LOCATION_CHANGE);
   yield cancel(saveWatcher);
