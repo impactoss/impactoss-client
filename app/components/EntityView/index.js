@@ -13,7 +13,7 @@ import Grid from 'grid-styled';
 import Row from 'components/basic/Row';
 import ViewHeader from './ViewHeader';
 import ViewBody from './ViewBody';
-import ViewFooter from './ViewFooter';
+// import ViewFooter from './ViewFooter';
 
 
 class EntityView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -87,10 +87,6 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
               </Row>
             </ViewBody>
           }
-          <ViewFooter>
-            <button onClick={this.props.handleCancel}>Cancel</button>
-            <button onClick={this.props.handleEdit}>Edit</button>
-          </ViewFooter>
         </ViewWrapper>
       </span>
     );
@@ -98,8 +94,6 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
 }
 
 EntityView.propTypes = {
-  handleEdit: React.PropTypes.func,
-  handleCancel: React.PropTypes.func,
   fields: React.PropTypes.object,
 };
 

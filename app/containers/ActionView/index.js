@@ -11,6 +11,8 @@ import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
+
+import Page from 'components/Page';
 import EntityView from 'components/EntityView';
 
 import {
@@ -31,8 +33,9 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     browserHistory.push(`/actions/edit/${this.props.action.id}`);
   }
 
-  handleCancel = () => {
-    // TODO handle cancel
+  handleClose = () => {
+    browserHistory.push('/actions');
+    // TODO should be "go back" if history present or to actions list when not
   }
 
   mapCategoryOptions = (categories) => (
@@ -64,12 +67,11 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     return (
       <div>
         <Helmet
-          title="Action"
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
-            { name: 'description', content: 'Description of ActionView' },
+            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <FormattedMessage {...messages.header} />
         { !action && !actionsReady &&
           <div>
             <FormattedMessage {...messages.loading} />
@@ -81,57 +83,71 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           </div>
         }
         { action &&
-          <EntityView
-            handleEdit={this.handleEdit}
-            handleCancel={this.handleCancel}
-            fields={{
-              header: {
-                main: [
-                  {
-                    id: 'title',
-                    value: action.attributes.title,
-                  },
-                ],
-                aside: [
-                  {
-                    id: 'no',
-                    heading: 'No.',
-                    value: reference,
-                  },
-                  {
-                    id: 'status',
-                    heading: 'Status',
-                    value: action.draft ? 'Draft' : 'Public',
-                  },
-                  {
-                    id: 'updated',
-                    heading: 'Updated At',
-                    value: action.attributes.updated_at,
-                  },
-                  {
-                    id: 'updated_by',
-                    heading: 'Updated By',
-                    value: action.user && action.user.attributes.name,
-                  },
-                ],
+          <Page
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            actions={[
+              {
+                type: 'simple',
+                title: 'Edit',
+                onClick: this.handleEdit,
               },
-              body: {
-                main: [
-                  {
-                    id: 'description',
-                    heading: 'Description',
-                    value: action.attributes.description,
-                  },
-                  {
-                    id: 'recommendations',
-                    heading: 'Recommendations',
-                    values: this.renderRecommendations(this.props.recommendations),
-                  },
-                ],
-                aside: this.renderTaxonomies(this.props.taxonomies),
+              {
+                type: 'primary',
+                title: 'Close',
+                onClick: this.handleClose,
               },
-            }}
-          />
+            ]}
+          >
+            <EntityView
+              fields={{
+                header: {
+                  main: [
+                    {
+                      id: 'title',
+                      value: action.attributes.title,
+                    },
+                  ],
+                  aside: [
+                    {
+                      id: 'no',
+                      heading: 'No.',
+                      value: reference,
+                    },
+                    {
+                      id: 'status',
+                      heading: 'Status',
+                      value: action.draft ? 'Draft' : 'Public',
+                    },
+                    {
+                      id: 'updated',
+                      heading: 'Updated At',
+                      value: action.attributes.updated_at,
+                    },
+                    {
+                      id: 'updated_by',
+                      heading: 'Updated By',
+                      value: action.user && action.user.attributes.name,
+                    },
+                  ],
+                },
+                body: {
+                  main: [
+                    {
+                      id: 'description',
+                      heading: 'Description',
+                      value: action.attributes.description,
+                    },
+                    {
+                      id: 'recommendations',
+                      heading: 'Recommendations',
+                      values: this.renderRecommendations(this.props.recommendations),
+                    },
+                  ],
+                  aside: this.renderTaxonomies(this.props.taxonomies),
+                },
+              }}
+            />
+          </Page>
         }
 
       </div>
@@ -147,6 +163,11 @@ ActionView.propTypes = {
   recommendations: PropTypes.object,
   params: PropTypes.object,
 };
+
+ActionView.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
+};
+
 
 const mapStateToProps = (state, props) => ({
   actionsReady: isReady(state, { path: 'measures' }),
