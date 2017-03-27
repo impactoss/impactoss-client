@@ -8,7 +8,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { Link } from 'react-router';
+import { browserHistory } from 'react-router';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import EntityView from 'components/EntityView';
@@ -27,8 +27,40 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     this.props.loadEntitiesIfNeeded();
   }
 
+  handleEdit = () => {
+    browserHistory.push(`/actions/edit/${this.props.action.id}`);
+  }
+
+  handleCancel = () => {
+    // TODO handle cancel
+  }
+
+  mapCategoryOptions = (categories) => (
+    categories ? Object.values(categories).map((cat) => ({
+      value: cat.id,
+      label: `${cat.attributes.title} - ${cat.connected}`,
+    })) : []
+  )
+
+  renderTaxonomies = (taxonomies) => (
+    Object.values(taxonomies).map((taxonomy) => ({
+      id: taxonomy.attributes.title,
+      values: this.mapCategoryOptions(taxonomy.categories),
+    }))
+  )
+
+  renderRecommendations = (recommendations) => (
+    Object.values(recommendations)
+    .filter((recommendation) => recommendation.connected)
+    .map((recommendation) => ({
+      id: recommendation.id,
+      label: recommendation.attributes.title,
+    }))
+  )
+
   render() {
     const { action, actionsReady } = this.props;
+    const reference = this.props.params.id;
     return (
       <div>
         <Helmet
@@ -50,13 +82,58 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
         }
         { action &&
           <EntityView
-            type="Action"
-            {...action.attributes}
-            updatedAt={action.attributes.updated_at}
+            handleEdit={this.handleEdit}
+            handleCancel={this.handleCancel}
+            fields={{
+              header: {
+                main: [
+                  {
+                    id: 'title',
+                    value: action.attributes.title,
+                  },
+                ],
+                aside: [
+                  {
+                    id: 'no',
+                    heading: 'No.',
+                    value: reference,
+                  },
+                  {
+                    id: 'status',
+                    heading: 'Status',
+                    value: action.draft ? 'Draft' : 'Public',
+                  },
+                  {
+                    id: 'updated',
+                    heading: 'Updated At',
+                    value: action.attributes.updated_at,
+                  },
+                  {
+                    id: 'updated_by',
+                    heading: 'Updated By',
+                    value: action.user && action.user.attributes.name,
+                  },
+                ],
+              },
+              body: {
+                main: [
+                  {
+                    id: 'description',
+                    heading: 'Description',
+                    value: action.attributes.description,
+                  },
+                  {
+                    id: 'recommendations',
+                    heading: 'Recommendations',
+                    values: this.renderRecommendations(this.props.recommendations),
+                  },
+                ],
+                aside: this.renderTaxonomies(this.props.taxonomies),
+              },
+            }}
           />
         }
-        { action &&
-        <Link to={`/actions/edit/${action.id}`}><button>Edit Action</button></Link> }
+
       </div>
     );
   }
@@ -66,6 +143,9 @@ ActionView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   action: PropTypes.object,
   actionsReady: PropTypes.bool,
+  taxonomies: PropTypes.object,
+  recommendations: PropTypes.object,
+  params: PropTypes.object,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -96,9 +176,11 @@ const mapStateToProps = (state, props) => ({
         path: 'categories',
         key: 'taxonomy_id',
         reverse: true,
-        join: {
+        extend: {
+          as: 'assigned',
           path: 'measure_categories',
           key: 'category_id',
+          reverse: true,
           where: {
             action_id: props.params.id,
           },
@@ -112,9 +194,11 @@ const mapStateToProps = (state, props) => ({
     state, {
       path: 'recommendations',
       out: 'js',
-      join: {
+      extend: {
+        as: 'connected',
         path: 'recommendation_measures',
         key: 'recommendation_id',
+        reverse: true,
         where: {
           action_id: props.params.id,
         },
