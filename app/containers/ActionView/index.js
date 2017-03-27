@@ -9,8 +9,11 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
+import { find } from 'lodash/collection';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
+
+import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import Page from 'components/Page';
 import EntityView from 'components/EntityView';
@@ -30,7 +33,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   }
 
   handleEdit = () => {
-    browserHistory.push(`/actions/edit/${this.props.action.id}`);
+    browserHistory.push(`/actions/edit/${this.props.params.id}`);
   }
 
   handleClose = () => {
@@ -62,8 +65,10 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   )
 
   render() {
-    const { action, actionsReady } = this.props;
+    const { action, dataReady } = this.props;
     const reference = this.props.params.id;
+    const status = action && find(PUBLISH_STATUSES, { value: action.attributes.draft });
+
     return (
       <div>
         <Helmet
@@ -72,12 +77,12 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !action && !actionsReady &&
+        { !action && !dataReady &&
           <div>
             <FormattedMessage {...messages.loading} />
           </div>
         }
-        { !action && actionsReady &&
+        { !action && dataReady &&
           <div>
             <FormattedMessage {...messages.notFound} />
           </div>
@@ -116,7 +121,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                     {
                       id: 'status',
                       heading: 'Status',
-                      value: action.draft ? 'Draft' : 'Public',
+                      value: status && status.label,
                     },
                     {
                       id: 'updated',
@@ -149,7 +154,6 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
             />
           </Page>
         }
-
       </div>
     );
   }
@@ -158,7 +162,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 ActionView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   action: PropTypes.object,
-  actionsReady: PropTypes.bool,
+  dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
   params: PropTypes.object,
@@ -170,7 +174,7 @@ ActionView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
-  actionsReady: isReady(state, { path: 'measures' }),
+  dataReady: isReady(state, { path: 'measures' }),
   action: getEntity(
     state,
     {
@@ -203,7 +207,7 @@ const mapStateToProps = (state, props) => ({
           key: 'category_id',
           reverse: true,
           where: {
-            action_id: props.params.id,
+            measure_id: props.params.id,
           },
         },
       },
@@ -221,7 +225,7 @@ const mapStateToProps = (state, props) => ({
         key: 'recommendation_id',
         reverse: true,
         where: {
-          action_id: props.params.id,
+          measure_id: props.params.id,
         },
       },
     },

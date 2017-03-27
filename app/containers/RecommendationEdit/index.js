@@ -201,7 +201,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                       id: 'status',
                       controlType: 'select',
                       model: '.attributes.draft',
-                      value: recommendation.draft,
+                      value: recommendation.attributes.draft,
                       options: PUBLISH_STATUSES,
                     },
                     {
