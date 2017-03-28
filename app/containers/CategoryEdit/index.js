@@ -36,19 +36,23 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
-    if (this.props.category && this.props.categoriesReady) {
-      this.props.populateForm('categoryEdit.form.category', fromJS(this.props.category.attributes));
+    if (this.props.category && this.props.dataReady) {
+      this.props.populateForm('categoryEdit.form.data', this.props.category);
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.category && nextProps.categoriesReady && !this.props.categoriesReady) {
-      this.props.populateForm('categoryEdit.form.category', fromJS(nextProps.category.attributes));
+    if (nextProps.category && nextProps.dataReady && !this.props.dataReady) {
+      this.props.populateForm('categoryEdit.form.data', nextProps.category);
+    }
+    // reload entities if invalidated
+    if (this.props.category && !nextProps.category && !nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
     }
   }
 
   render() {
-    const { category, categoriesReady } = this.props;
+    const { category, dataReady } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
@@ -61,12 +65,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !category && !categoriesReady &&
+        { !category && !dataReady &&
           <div>
             <FormattedMessage {...messages.loading} />
           </div>
         }
-        { !category && categoriesReady &&
+        { !category && dataReady && !saveError &&
           <div>
             <FormattedMessage {...messages.notFound} />
           </div>
@@ -83,13 +87,19 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               {
                 type: 'primary',
                 title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.form.category),
+                onClick: () => this.props.handleSubmit(this.props.form.data),
               },
             ]}
           >
+            {saveSending &&
+              <p>Saving</p>
+            }
+            {saveError &&
+              <p>{saveError}</p>
+            }
             <EntityForm
-              model="categoryEdit.form.category"
-              handleSubmit={this.props.handleSubmit}
+              model="categoryEdit.form.data"
+              handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={() => this.props.handleCancel(reference)}
               fields={{
                 header: {
@@ -97,7 +107,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                     {
                       id: 'title',
                       controlType: 'input',
-                      model: '.title',
+                      model: '.attributes.title',
                       validators: {
                         required,
                       },
@@ -129,29 +139,23 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                     {
                       id: 'description',
                       controlType: 'textarea',
-                      model: '.description',
+                      model: '.attributes.description',
                     },
                     {
                       id: 'short_title',
                       controlType: 'input',
-                      model: '.short_title',
+                      model: '.attributes.short_title',
                     },
                     {
                       id: 'url',
                       controlType: 'input',
-                      model: '.url',
+                      model: '.attributes.url',
                     },
                   ],
                 },
               }}
             />
           </Page>
-        }
-        {saveSending &&
-          <p>Saving</p>
-        }
-        {saveError &&
-          <p>{saveError}</p>
         }
       </div>
     );
@@ -166,7 +170,7 @@ CategoryEdit.propTypes = {
   page: PropTypes.object,
   form: PropTypes.object,
   category: PropTypes.object,
-  categoriesReady: PropTypes.bool,
+  dataReady: PropTypes.bool,
   params: PropTypes.object,
 };
 
@@ -177,7 +181,10 @@ CategoryEdit.contextTypes = {
 const mapStateToProps = (state, props) => ({
   page: pageSelector(state),
   form: formSelector(state),
-  categoriesReady: isReady(state, { path: 'categories' }),
+  dataReady: isReady(state, { path: [
+    'categories',
+    'users',
+  ] }),
   category: getEntity(
     state,
     {
@@ -194,17 +201,17 @@ const mapStateToProps = (state, props) => ({
   ),
 });
 
-function mapDispatchToProps(dispatch, props) {
+function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('categories'));
     },
-    populateForm: (model, data) => {
-      dispatch(formActions.load(model, data));
+    populateForm: (model, formData) => {
+      dispatch(formActions.load(model, fromJS(formData)));
     },
     handleSubmit: (formData) => {
-      dispatch(save(formData, props.params.id));
+      dispatch(save(formData.toJS()));
     },
     handleCancel: (reference) => {
       // not really a dispatch function here, could be a member function instead

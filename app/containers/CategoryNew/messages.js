@@ -18,6 +18,10 @@ export default defineMessages({
     id: 'app.containers.CategoryNew.header',
     defaultMessage: 'New Category',
   },
+  loading: {
+    id: 'app.containers.ActionEdit.loading',
+    defaultMessage: 'Loading data...',
+  },
   fieldRequired: {
     id: 'app.containers.CategoryNew.header',
     defaultMessage: 'Required',

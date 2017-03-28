@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
-// import { sortBy } from 'lodash/collection';
-import { without } from 'lodash/array';
+import { fromJS } from 'immutable';
+import { kebabCase } from 'lodash/string';
 
 export default class MultiSelect extends React.Component {
 
@@ -9,30 +9,24 @@ export default class MultiSelect extends React.Component {
       label: PropTypes.string.isRequired, // Todo enable component here
       value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     })),
-    values: PropTypes.array.isRequired,
+    values: PropTypes.object.isRequired, // immutable
     onChange: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
-    values: [],
+    values: fromJS([]),
   }
 
   handleClick = (evt) => {
     if (evt && evt !== undefined) evt.stopPropagation();
-
-    const value = evt.target.value;
-    const values = this.props.values;
-
-    if (evt.target.checked) {
-      this.props.onChange(values.concat([value]));
-    } else {
-      this.props.onChange(without(values, value));
-    }
+    this.props.onChange(evt.target.checked
+      ? this.props.values.concat([evt.target.value])
+      : this.props.values.filter((value) => value !== evt.target.value)
+    );
   }
 
   render() {
     const { options, values } = this.props;
-
     const checkboxes = options.map((option) => ({
       ...option,
       checked: values.indexOf(option.value) > -1,
@@ -47,9 +41,9 @@ export default class MultiSelect extends React.Component {
               onChange={this.handleClick}
               checked={checked}
               value={value}
-              id={value}
+              id={`${value}-${kebabCase(label)}`}
             />
-            <label htmlFor={value} >
+            <label htmlFor={`${value}-${kebabCase(label)}`} >
               {label}
             </label>
           </div>

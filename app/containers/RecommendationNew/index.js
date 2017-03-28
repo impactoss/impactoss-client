@@ -7,21 +7,16 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
-import collection from 'lodash/collection';
+import { reduce } from 'lodash/collection';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
-
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
-
+import { getEntities, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
-
-
-import {
-  getEntities,
-} from 'containers/App/selectors';
 
 import recommendationNewSelector from './selectors';
 import messages from './messages';
@@ -34,18 +29,38 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     this.props.loadEntitiesIfNeeded();
   }
 
+  mapCategoryOptions = (categories) => Object.values(categories).map((cat) => ({
+    value: cat.id,
+    label: cat.attributes.title,
+  }));
+
+  mapActionOptions = (actions) => Object.values(actions).map((action) => ({
+    value: action.id,
+    label: action.attributes.title,
+  }));
+
+  // TODO this should be shared functionality
+  renderTaxonomyControl = (taxonomies) => taxonomies ? Object.values(taxonomies).map((tax) => ({
+    id: tax.id,
+    model: `.associatedTaxonomies.${tax.id}`,
+    label: tax.attributes.title,
+    controlType: 'multiselect',
+    options: tax.categories ? this.mapCategoryOptions(tax.categories) : [],
+  })) : [];
+
+  // TODO this should be shared functionality
+  renderActionControl = (actions) => actions ? ({
+    id: 'actions',
+    model: '.associatedActions',
+    label: 'Actions',
+    controlType: 'multiselect',
+    options: this.mapActionOptions(actions),
+  }) : [];
+
   render() {
+    const { dataReady } = this.props;
     const { saveSending, saveError } = this.props.recommendationNew.page;
     const required = (val) => val && val.length;
-
-    const taxonomyOptions = collection.map(this.props.taxonomiesExtended, (tax) => ({
-      id: tax.attributes.title,
-      controlType: 'select',
-      options: collection.map(tax.categories, (cat) => ({
-        value: cat.id,
-        label: cat.attributes.title,
-      })),
-    }));
 
     return (
       <div>
@@ -58,80 +73,81 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
             },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.pageTitle)}
-          actions={
-            [
-              {
-                type: 'simple',
-                title: 'Cancel',
-                onClick: this.props.handleCancel,
-              },
-              {
-                type: 'primary',
-                title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.recommendationNew.form.recommendation),
-              },
-            ]
-          }
-        >
-          <EntityForm
-            model="recommendationNew.form.recommendation"
-            handleSubmit={this.props.handleSubmit}
-            handleCancel={this.props.handleCancel}
-            fields={{
-              header: {
-                main: [
-                  {
-                    id: 'title',
-                    controlType: 'input',
-                    model: '.title',
-                    placeholder: this.context.intl.formatMessage(messages.fields.title.placeholder),
-                    validators: {
-                      required,
-                    },
-                    errorMessages: {
-                      required: this.context.intl.formatMessage(messages.fieldRequired),
-                    },
-                  },
-                ],
-                aside: [
-                  {
-                    id: 'number',
-                    controlType: 'input',
-                    model: '.number',
-                  },
-                  {
-                    id: 'status',
-                    controlType: 'select',
-                    model: '.draft',
-                    options: PUBLISH_STATUSES,
-                  },
-                ],
-              },
-              body: {
-                main: [
-                  {
-                    id: 'actions',
-                    controlType: 'select',
-                    options: collection.map(this.props.actions, (action) => ({
-                      value: action.id,
-                      label: action.attributes.title,
-                    })),
-                  },
-                ],
-                aside: taxonomyOptions,
-              },
-            }}
-          />
-        </Page>
-        {saveSending &&
-          <p>Saving Recommendation</p>
+        { !dataReady &&
+          <div>
+            <FormattedMessage {...messages.loading} />
+          </div>
         }
-        {saveError &&
-          <p>{saveError}</p>
+        {dataReady &&
+          <Page
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            actions={
+              [
+                {
+                  type: 'simple',
+                  title: 'Cancel',
+                  onClick: this.props.handleCancel,
+                },
+                {
+                  type: 'primary',
+                  title: 'Save',
+                  onClick: () => this.props.handleSubmit(
+                    this.props.recommendationNew.form.data
+                  ),
+                },
+              ]
+            }
+          >
+            {saveSending &&
+              <p>Saving Recommendation</p>
+            }
+            {saveError &&
+              <p>{saveError}</p>
+            }
+            <EntityForm
+              model="recommendationNew.form.data"
+              handleSubmit={(formData) => this.props.handleSubmit(formData)}
+              handleCancel={this.props.handleCancel}
+              fields={{
+                header: {
+                  main: [
+                    {
+                      id: 'title',
+                      controlType: 'input',
+                      model: '.attributes.title',
+                      placeholder: this.context.intl.formatMessage(messages.fields.title.placeholder),
+                      validators: {
+                        required,
+                      },
+                      errorMessages: {
+                        required: this.context.intl.formatMessage(messages.fieldRequired),
+                      },
+                    },
+                  ],
+                  aside: [
+                    {
+                      id: 'number',
+                      controlType: 'input',
+                      model: '.attributes.number',
+                    },
+                    {
+                      id: 'status',
+                      controlType: 'select',
+                      model: '.attributes.draft',
+                      options: PUBLISH_STATUSES,
+                    },
+                  ],
+                },
+                body: {
+                  main: [
+                    this.renderActionControl(this.props.actions),
+                  ],
+                  aside: this.renderTaxonomyControl(this.props.taxonomies),
+                },
+              }}
+            />
+          </Page>
         }
-
       </div>
     );
   }
@@ -142,7 +158,8 @@ RecommendationNew.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   recommendationNew: PropTypes.object,
-  taxonomiesExtended: PropTypes.object,
+  dataReady: PropTypes.bool,
+  taxonomies: PropTypes.object,
   actions: PropTypes.object,
 };
 
@@ -152,7 +169,12 @@ RecommendationNew.contextTypes = {
 
 const mapStateToProps = (state) => ({
   recommendationNew: recommendationNewSelector(state),
-  taxonomiesExtended: getEntities(
+  dataReady: isReady(state, { path: [
+    'categories',
+    'taxonomies',
+    'measures',
+  ] }),
+  taxonomies: getEntities(
     state,
     {
       path: 'taxonomies',
@@ -183,7 +205,29 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('measures'));
     },
     handleSubmit: (formData) => {
-      dispatch(save(formData));
+      const saveData = formData.toJS();
+
+      // measureCategories
+      if (saveData.associatedTaxonomies) {
+        saveData.recommendationCategories = reduce(saveData.associatedTaxonomies, (updates, formCategoryIds) => ({
+          delete: [],
+          create: updates.create.concat(formCategoryIds.map((catId) => ({
+            category_id: catId,
+          }))),
+        }), { delete: [], create: [] });
+      }
+
+      // actions
+      if (saveData.associatedActions) {
+        saveData.recommendationMeasures = {
+          delete: [],
+          create: saveData.associatedActions.map((actionId) => ({
+            measure_id: actionId,
+          })),
+        };
+      }
+
+      dispatch(save(saveData));
     },
     handleCancel: () => {
       // not really a dispatch function here, could be a member function instead

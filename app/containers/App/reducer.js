@@ -24,6 +24,7 @@ import {
   LOGOUT_SUCCESS,
   ADD_ENTITY,
   UPDATE_ENTITY,
+  DELETE_ENTITY,
   ENTITIES_REQUESTED,
   ENTITIES_READY,
   INVALIDATE_ENTITIES,
@@ -116,9 +117,14 @@ function appReducer(state = initialState, payload) {
       return state
           .setIn(['user', 'isSignedIn'], payload.newAuthState);
     case ADD_ENTITY:
+      return state
+        .setIn(['entities', payload.path, payload.entity.id], fromJS(payload.entity));
     case UPDATE_ENTITY:
       return state
-          .setIn(['entities', `${payload.path}`, payload.entity.id], fromJS(payload.entity));
+          .setIn(['entities', payload.path, payload.entity.id, 'attributes'], fromJS(payload.entity.attributes));
+    case DELETE_ENTITY:
+      return state
+          .deleteIn(['entities', payload.path, payload.id]);
     case ENTITIES_REQUESTED:
       return state
           .setIn(['requested', payload.path], payload.time);
@@ -142,6 +148,7 @@ function appReducer(state = initialState, payload) {
     case INVALIDATE_ENTITIES:
       // reset requested to initial state
       return state
+        .set('ready', fromJS(initialState.toJS().ready)) // should trigger new entity load
         .set('requested', fromJS(initialState.toJS().requested)) // should trigger new entity load
         .set('entities', fromJS(initialState.toJS().entities));
     default:

@@ -76,6 +76,7 @@ EntityQuery.propTypes = {
   }).isRequired,
   mapToEntityList: PropTypes.func.isRequired,
   location: PropTypes.object.isRequired,
+  // TODO: do not pass location directly but specific props, to allow multiple lists on same page
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
   // path: PropTypes.string.isRequired,    only used in mapStateToProps

@@ -18,6 +18,10 @@ export default defineMessages({
     id: 'app.containers.RecommendationNew.header',
     defaultMessage: 'New Recommendation',
   },
+  loading: {
+    id: 'app.containers.RecommendationNew.loading',
+    defaultMessage: 'Loading data...',
+  },
   fieldRequired: {
     id: 'app.containers.RecommendationNew.header',
     defaultMessage: 'Required',

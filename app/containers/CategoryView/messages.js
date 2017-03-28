@@ -6,9 +6,13 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
-  header: {
-    id: 'app.containers.CategoryView.header',
+  pageTitle: {
+    id: 'app.container.CategoryView.pageTitle',
     defaultMessage: 'Category',
+  },
+  metaDescription: {
+    id: 'app.container.CategoryView.metaDescription',
+    defaultMessage: 'Category page description',
   },
   notFound: {
     id: 'app.containers.CategoryView.notFound',

@@ -6,9 +6,13 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
-  header: {
-    id: 'app.containers.RecommendationView.header',
+  pageTitle: {
+    id: 'app.container.RecommendationView.pageTitle',
     defaultMessage: 'Recommendation',
+  },
+  metaDescription: {
+    id: 'app.container.RecommendationView.metaDescription',
+    defaultMessage: 'Recommendation page description',
   },
   notFound: {
     id: 'app.containers.RecommendationView.notFound',

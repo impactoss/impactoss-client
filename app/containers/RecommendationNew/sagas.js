@@ -1,37 +1,20 @@
-import { take, call, put, cancel, takeLatest } from 'redux-saga/effects';
+import { take, put, cancel, takeLatest } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
-import apiRequest from 'utils/api-request';
-import { browserHistory } from 'react-router';
-import { actions } from 'react-redux-form';
 
-import {
-  addEntity,
-} from 'containers/App/actions';
-import {
-  saveSending,
-  saveSuccess,
-  saveError,
-} from './actions';
-import {
-  SAVE,
-} from './constants';
+import { newEntity } from 'containers/App/actions';
 
-export function* saveAction({ data }) {
-  try {
-    yield put(saveSending());
-    const res = yield call(apiRequest, 'post', 'recommendations', data);
-    yield put(addEntity('recommendations', res.data));
-    yield put(saveSuccess());
-    yield put(actions.reset('recommendationNew.form.action'));
-    browserHistory.push(`/recommendations/${res.data.id}`);
-  } catch (error) {
-    const message = yield error.response.json();
-    yield put(saveError(message.error));
-  }
+import { SAVE } from './constants';
+
+export function* save({ data }) {
+  yield put(newEntity({
+    path: 'recommendations',
+    entity: data,
+    redirect: '/recommendations',
+  }));
 }
 
 export function* defaultSaga() {
-  const saveWatcher = yield takeLatest(SAVE, saveAction);
+  const saveWatcher = yield takeLatest(SAVE, save);
 
   yield take(LOCATION_CHANGE);
 
