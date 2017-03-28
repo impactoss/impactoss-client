@@ -30,6 +30,10 @@ export const VALIDATE_TOKEN = 'nmrf/App/VALIDATE_TOKEN';
 
 export const ADD_ENTITY = 'nmrf/App/ADD_ENTITY';
 export const UPDATE_ENTITY = 'nmrf/App/UPDATE_ENTITY';
+export const DELETE_ENTITY = 'nmrf/App/DELETE_ENTITY';
+
+export const SAVE_ENTITY = 'nmrf/App/SAVE_ENTITY';
+export const NEW_ENTITY = 'nmrf/App/NEW_ENTITY';
 
 export const PUBLISH_STATUSES = [
   { value: true, label: 'Draft' },
@@ -37,6 +41,10 @@ export const PUBLISH_STATUSES = [
 ];
 
 export const ENTITIES_READY = 'nmrf/App/ENTITIES_READY';
+
+export const SAVE_SENDING = 'nmrf/App/SAVE_SENDING';
+export const SAVE_SUCCESS = 'nmrf/App/SAVE_SUCCESS';
+export const SAVE_ERROR = 'nmrf/App/SAVE_ERROR';
 
 // TODO need to pull from an env file
 export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';

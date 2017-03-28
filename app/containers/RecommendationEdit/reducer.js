@@ -12,10 +12,9 @@ import {
   SAVE_SENDING,
   SAVE_ERROR,
   SAVE_SUCCESS,
-} from './constants';
+} from 'containers/App/constants';
 
 const initialState = fromJS({
-  id: null,
   saveSending: false,
   saveSuccess: false,
   saveError: false,
@@ -35,6 +34,7 @@ function recommendationEditReducer(state = initialState, action) {
     case SAVE_ERROR:
       return state
         .set('saveSending', false)
+        .set('saveSuccess', false)
         .set('saveError', action.error);
     default:
       return state;
@@ -42,15 +42,18 @@ function recommendationEditReducer(state = initialState, action) {
 }
 
 // tim: I don't know how to pull from the global state to set these now, It doesn't seem to be possible
-const recommendationForm = fromJS({
-  title: '',
-  number: '',
-  draft: '',
+const formData = fromJS({
+  id: '',
+  attributes: {
+    title: '',
+    number: '',
+    draft: '',
+  },
 });
 
 export default combineReducers({
   page: recommendationEditReducer,
   form: combineForms({
-    recommendation: recommendationForm,
+    data: formData,
   }, 'recommendationEdit.form'),
 });

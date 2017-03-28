@@ -1,40 +1,23 @@
-import { takeLatest, take, put, cancel, call } from 'redux-saga/effects';
+import { takeLatest, take, put, cancel } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
-import { browserHistory } from 'react-router';
 
-import apiRequest from 'utils/api-request';
+import { saveEntity } from 'containers/App/actions';
 
-import {
-  updateEntity,
-} from 'containers/App/actions';
+import { SAVE } from './constants';
 
-import {
-  saveSending,
-  saveSuccess,
-  saveError,
-} from './actions';
 
-import {
-  SAVE,
-} from './constants';
-
-export function* saveAction({ id, data }) {
-  try {
-    yield put(saveSending());
-    const res = yield call(apiRequest, 'put', `measures/${id}`, data);
-    yield put(updateEntity('measures', res.data));
-    yield put(saveSuccess());
-    browserHistory.push(`/actions/${id}`);
-  } catch (error) {
-    const message = yield error.response.json();
-    yield put(saveError(message.error));
-  }
+export function* save({ data }) {
+  yield put(saveEntity({
+    path: 'measures',
+    entity: data,
+    redirect: `/actions/${data.id}`,
+  }));
 }
 
 // Individual exports for testing
 export function* defaultSaga() {
   // See example in containers/HomePage/sagas.js
-  const saveWatcher = yield takeLatest(SAVE, saveAction);
+  const saveWatcher = yield takeLatest(SAVE, save);
 
   yield take(LOCATION_CHANGE);
   yield cancel(saveWatcher);

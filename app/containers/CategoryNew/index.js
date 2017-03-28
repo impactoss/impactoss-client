@@ -10,14 +10,10 @@ import Helmet from 'react-helmet';
 import { browserHistory } from 'react-router';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
-
+import { getEntity, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
 import EntityForm from 'components/EntityForm';
-
-import {
-  getEntity,
-} from 'containers/App/selectors';
 
 import categoryNewSelector from './selectors';
 import messages from './messages';
@@ -31,10 +27,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   }
 
   render() {
+    const { taxonomy, dataReady } = this.props;
     const { saveSending, saveError } = this.props.categoryNew.page;
-    const required = (val) => val && val.length;
     const taxonomyReference = this.props.params.id;
-    const taxonomy = this.props.taxonomy;
+    const required = (val) => val && val.length;
+
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
 
@@ -53,76 +50,84 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             },
           ]}
         />
-        <Page
-          title={pageTitle}
-          actions={
-            [
-              {
-                type: 'simple',
-                title: 'Cancel',
-                onClick: () => this.props.handleCancel(taxonomyReference),
-              },
-              {
-                type: 'primary',
-                title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.categoryNew.form.category, taxonomyReference),
-              },
-            ]
-          }
-        >
-          <EntityForm
-            model="categoryNew.form.category"
-            handleSubmit={(formData) => this.props.handleSubmit(formData, taxonomyReference)}
-            handleCancel={() => this.props.handleCancel(taxonomyReference)}
-            fields={{
-              header: {
-                main: [
-                  {
-                    id: 'title',
-                    controlType: 'input',
-                    model: '.title',
-                    placeholder: this.context.intl.formatMessage(messages.fields.title.placeholder),
-                    validators: {
-                      required,
-                    },
-                    errorMessages: {
-                      required: this.context.intl.formatMessage(messages.fieldRequired),
-                    },
-                  },
-                ],
-                aside: [
+        {dataReady &&
+          <Page
+            title={pageTitle}
+            actions={
+              [
+                {
+                  type: 'simple',
+                  title: 'Cancel',
+                  onClick: () => this.props.handleCancel(taxonomyReference),
+                },
+                {
+                  type: 'primary',
+                  title: 'Save',
+                  onClick: () => this.props.handleSubmit(
+                    this.props.categoryNew.form.data,
+                    taxonomyReference
+                  ),
+                },
+              ]
+            }
+          >
+            {saveSending &&
+              <p>Saving Category</p>
+            }
+            {saveError &&
+              <p>{saveError}</p>
+            }
 
-                ],
-              },
-              body: {
-                main: [
-                  {
-                    id: 'description',
-                    controlType: 'textarea',
-                    model: '.description',
-                  },
-                  {
-                    id: 'short_title',
-                    controlType: 'input',
-                    model: '.short_title',
-                  },
-                  {
-                    id: 'url',
-                    controlType: 'input',
-                    model: '.url',
-                  },
-                ],
-              },
-            }}
-          />
-        </Page>
-        {saveSending &&
-          <p>Saving Category</p>
-        }
-        {saveError &&
-          <p>{saveError}</p>
-        }
+            <EntityForm
+              model="categoryNew.form.data"
+              handleSubmit={(formData) => this.props.handleSubmit(
+                formData,
+                taxonomyReference
+              )}
+              handleCancel={() => this.props.handleCancel(taxonomyReference)}
+              fields={{
+                header: {
+                  main: [
+                    {
+                      id: 'title',
+                      controlType: 'input',
+                      model: '.attributes.title',
+                      placeholder: this.context.intl.formatMessage(messages.fields.title.placeholder),
+                      validators: {
+                        required,
+                      },
+                      errorMessages: {
+                        required: this.context.intl.formatMessage(messages.fieldRequired),
+                      },
+                    },
+                  ],
+                  aside: [
 
+                  ],
+                },
+                body: {
+                  main: [
+                    {
+                      id: 'description',
+                      controlType: 'textarea',
+                      model: '.attributes.description',
+                    },
+                    {
+                      id: 'short_title',
+                      controlType: 'input',
+                      model: '.attributes.short_title',
+                    },
+                    {
+                      id: 'url',
+                      controlType: 'input',
+                      model: '.attributes.url',
+                    },
+                  ],
+                },
+              }}
+            />
+          </Page>
+        }
       </div>
     );
   }
@@ -132,6 +137,7 @@ CategoryNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  dataReady: PropTypes.bool,
   categoryNew: PropTypes.object,
   taxonomy: PropTypes.object,
   params: PropTypes.object,
@@ -143,6 +149,10 @@ CategoryNew.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   categoryNew: categoryNewSelector(state),
+  dataReady: isReady(state, { path: [
+    'categories',
+    'taxonomies',
+  ] }),
   taxonomy: getEntity(
     state,
     {
@@ -160,7 +170,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('categories'));
     },
     handleSubmit: (formData, taxonomyReference) => {
-      dispatch(save(formData.set('taxonomy_id', taxonomyReference)));
+      const saveData = formData.toJS();
+      saveData.attributes.taxonomy_id = taxonomyReference;
+      dispatch(save(saveData));
     },
     handleCancel: (taxonomyReference) => {
       // not really a dispatch function here, could be a member function instead

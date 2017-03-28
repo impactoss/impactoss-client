@@ -12,7 +12,7 @@ import {
   SAVE_SENDING,
   SAVE_SUCCESS,
   SAVE_ERROR,
-} from './constants';
+} from 'containers/App/constants';
 
 const initialState = fromJS({
   saveSending: false,
@@ -40,17 +40,19 @@ function categoryNewReducer(state = initialState, action) {
   }
 }
 
-const categoryForm = fromJS({
-  title: '',
-  description: '',
-  short_title: '',
-  url: '',
-  taxonomy_id: '',
+const formData = fromJS({
+  attributes: {
+    title: '',
+    description: '',
+    short_title: '',
+    url: '',
+    taxonomy_id: '',
+  },
 });
 
 export default combineReducers({
   page: categoryNewReducer,
   form: combineForms({
-    category: categoryForm,
+    data: formData,
   }, 'categoryNew.form'),
 });

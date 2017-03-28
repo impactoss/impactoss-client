@@ -10,6 +10,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
+import { reduce } from 'lodash/collection';
 
 import { fromJS } from 'immutable';
 
@@ -34,40 +35,90 @@ import {
 import messages from './messages';
 import { save } from './actions';
 
-export class ActionEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class ActionEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-
-    if (this.props.action && this.props.actionsReady) {
-      this.props.populateForm('actionEdit.form.action', fromJS(this.props.action.attributes));
+    if (this.props.action && this.props.dataReady) {
+      this.props.populateForm('actionEdit.form.data', this.getInitialFormData());
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.action && nextProps.actionsReady && !this.props.actionsReady) {
-      this.props.populateForm('actionEdit.form.action', fromJS(nextProps.action.attributes));
+    // console.log('componentWillReceiveProps', nextProps, this.props)
+    // repopulate if new data becomes ready
+    if (nextProps.action && nextProps.dataReady && !this.props.dataReady) {
+      this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
     }
+    // reload entities if invalidated
+    if (this.props.action && !nextProps.action && !nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
+
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const data = {
+      id: props.action.id,
+      attributes: props.action.attributes,
+    };
+
+    const { taxonomies, recommendations } = this.props;
+    // TODO this functionality should be shared
+      // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }
+    data.associatedTaxonomies = taxonomies
+      ? Object.values(taxonomies).reduce((values, tax) => {
+        const result = values;
+        result[tax.id] = Object.values(tax.categories).reduce((ids, cat) =>
+          cat.associated ? ids.concat([cat.id]) : ids
+        , []);
+        return result;
+      }, {})
+      : {};
+
+    // TODO this functionality should be shared
+      // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }
+    data.associatedRecommendations = recommendations
+      ? Object.values(recommendations).reduce((ids, rec) =>
+          rec.associated ? ids.concat([rec.id]) : ids
+        , [])
+      : [];
+
+    return data;
   }
 
   mapCategoryOptions = (categories) => Object.values(categories).map((cat) => ({
     value: cat.id,
-    label: `${cat.attributes.title}${cat.connected ? ' - assigned' : ' - not assigned'}`,
-  }));
-  mapRecommendationOptions = (recommendations) => Object.values(recommendations).map((rec) => ({
-    value: rec.id,
-    label: `${rec.attributes.title}${rec.connected ? ' - connected' : ' - not connected'}`,
+    label: cat.attributes.title,
   }));
 
-  renderTaxonomyControl = (taxonomies) => Object.values(taxonomies).map((tax) => ({
-    id: tax.attributes.title,
-    controlType: 'select',
-    options: this.mapCategoryOptions(tax.categories),
+  mapRecommendationOptions = (recommendations) => Object.values(recommendations).map((rec) => ({
+    value: rec.id,
+    label: rec.attributes.title,
   }));
+
+
+  // TODO this should be shared functionality
+  renderTaxonomyControl = (taxonomies) => taxonomies ? Object.values(taxonomies).map((tax) => ({
+    id: tax.id,
+    model: `.associatedTaxonomies.${tax.id}`,
+    label: tax.attributes.title,
+    controlType: 'multiselect',
+    options: tax.categories ? this.mapCategoryOptions(tax.categories) : [],
+  })) : [];
+
+  // TODO this should be shared functionality
+  renderRecommendationControl = (recommendations) => recommendations ? ({
+    id: 'recommendations',
+    model: '.associatedRecommendations',
+    label: 'Recommendations',
+    controlType: 'multiselect',
+    options: this.mapRecommendationOptions(recommendations),
+  }) : [];
 
 
   render() {
-    const { action, actionsReady } = this.props;
+    const { action, dataReady } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
@@ -80,12 +131,12 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !action && !actionsReady &&
+        { !action && !dataReady &&
           <div>
             <FormattedMessage {...messages.loading} />
           </div>
         }
-        { !action && actionsReady &&
+        { !action && dataReady && !saveError &&
           <div>
             <FormattedMessage {...messages.notFound} />
           </div>
@@ -102,13 +153,27 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
               {
                 type: 'primary',
                 title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.form.action),
+                onClick: () => this.props.handleSubmit(
+                  this.props.form.data,
+                  this.props.taxonomies,
+                  this.props.recommendations
+                ),
               },
             ]}
           >
+            {saveSending &&
+              <p>Saving</p>
+            }
+            {saveError &&
+              <p>{saveError}</p>
+            }
             <EntityForm
-              model="actionEdit.form.action"
-              handleSubmit={this.props.handleSubmit}
+              model="actionEdit.form.data"
+              handleSubmit={(formData) => this.props.handleSubmit(
+                formData,
+                this.props.taxonomies,
+                this.props.recommendations
+              )}
               handleCancel={this.props.handleCancel}
               fields={{
                 header: {
@@ -116,7 +181,7 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
                     {
                       id: 'title',
                       controlType: 'input',
-                      model: '.title',
+                      model: '.attributes.title',
                       validators: {
                         required,
                       },
@@ -134,7 +199,7 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
                     {
                       id: 'status',
                       controlType: 'select',
-                      model: '.draft',
+                      model: '.attributes.draft',
                       value: action.draft,
                       options: PUBLISH_STATUSES,
                     },
@@ -155,25 +220,15 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
                     {
                       id: 'description',
                       controlType: 'textarea',
-                      model: '.description',
+                      model: '.attributes.description',
                     },
-                    {
-                      id: 'recommendations',
-                      controlType: 'select',
-                      options: this.mapRecommendationOptions(this.props.recommendations),
-                    },
+                    this.renderRecommendationControl(this.props.recommendations),
                   ],
                   aside: this.renderTaxonomyControl(this.props.taxonomies),
                 },
               }}
             />
           </Page>
-        }
-        {saveSending &&
-          <p>Saving</p>
-        }
-        {saveError &&
-          <p>{saveError}</p>
         }
       </div>
     );
@@ -188,7 +243,7 @@ ActionEdit.propTypes = {
   page: PropTypes.object,
   form: PropTypes.object,
   action: PropTypes.object,
-  actionsReady: PropTypes.bool,
+  dataReady: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
@@ -201,7 +256,15 @@ ActionEdit.contextTypes = {
 const mapStateToProps = (state, props) => ({
   page: pageSelector(state),
   form: formSelector(state),
-  actionsReady: isReady(state, { path: 'measures' }),
+  dataReady: isReady(state, { path: [
+    'measures',
+    'users',
+    'categories',
+    'taxonomies',
+    'recommendations',
+    'recommendation_measures',
+    'measure_categories',
+  ] }),
   action: getEntity(
     state,
     {
@@ -229,12 +292,12 @@ const mapStateToProps = (state, props) => ({
         key: 'taxonomy_id',
         reverse: true,
         extend: {
-          as: 'assigned',
+          as: 'associated',
           path: 'measure_categories',
           key: 'category_id',
           reverse: true,
           where: {
-            action_id: props.params.id,
+            measure_id: props.params.id,
           },
         },
       },
@@ -247,12 +310,12 @@ const mapStateToProps = (state, props) => ({
       path: 'recommendations',
       out: 'js',
       extend: {
-        as: 'connected',
+        as: 'associated',
         path: 'recommendation_measures',
         key: 'recommendation_id',
         reverse: true,
         where: {
-          action_id: props.params.id,
+          measure_id: props.params.id,
         },
       },
     },
@@ -270,11 +333,72 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
     },
-    populateForm: (model, data) => {
-      dispatch(formActions.load(model, data));
+    populateForm: (model, formData) => {
+      dispatch(formActions.load(model, fromJS(formData)));
     },
-    handleSubmit: (formData) => {
-      dispatch(save(formData, props.params.id));
+    handleSubmit: (formData, taxonomies, recommendations) => {
+      // TODO maybe this function should be updated to work with Immutable objects, instead of converting
+      // const prevTaxonomies = prevFormData.associatedTaxonomies || {};
+      const saveData = formData.toJS();
+
+      // measureCategories
+      saveData.measureCategories = reduce(taxonomies, (updates, tax, taxId) => {
+        const formCategoryIds = saveData.associatedTaxonomies[taxId]; // the list of categories checked in form
+        // store associated cats as { [cat.id]: [association.id], ... }
+        // then we can use keys for creating new associations and values for deleting
+        const associatedCategories = Object.values(tax.categories).reduce((catsAssociated, cat) => {
+          const result = catsAssociated;
+          if (cat.associated) {
+            result[cat.id] = Object.keys(cat.associated)[0];
+          }
+          return result;
+        }, {});
+
+        return {
+          delete: updates.delete.concat(reduce(associatedCategories, (associatedIds, associatedId, catId) =>
+            formCategoryIds.indexOf(catId.toString()) === -1
+              ? associatedIds.concat([associatedId])
+              : associatedIds
+          , [])),
+          create: updates.create.concat(reduce(formCategoryIds, (payloads, catId) =>
+            Object.keys(associatedCategories).indexOf(catId.toString()) === -1
+              ? payloads.concat([{
+                category_id: catId,
+                measure_id: saveData.id,
+              }])
+              : payloads
+          , [])),
+        };
+      }, { delete: [], create: [] });
+
+      // recommendations
+      const formRecommendationIds = saveData.associatedRecommendations;
+      // store associated recs as { [rec.id]: [association.id], ... }
+      const associatedRecommendations = Object.values(recommendations).reduce((recsAssociated, rec) => {
+        const result = recsAssociated;
+        if (rec.associated) {
+          result[rec.id] = Object.keys(rec.associated)[0];
+        }
+        return result;
+      }, {});
+
+      saveData.recommendationMeasures = {
+        delete: reduce(associatedRecommendations, (associatedIds, associatedId, recId) =>
+          formRecommendationIds.indexOf(recId.toString()) === -1
+            ? associatedIds.concat([associatedId])
+            : associatedIds
+        , []),
+        create: reduce(formRecommendationIds, (payloads, recId) =>
+          Object.keys(associatedRecommendations).indexOf(recId.toString()) === -1
+            ? payloads.concat([{
+              recommendation_id: recId,
+              measure_id: saveData.id,
+            }])
+            : payloads
+        , []),
+      };
+
+      dispatch(save(saveData));
     },
     handleCancel: () => {
       // not really a dispatch function here, could be a member function instead
