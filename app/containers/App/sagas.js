@@ -25,7 +25,6 @@ import {
     authenticateSending,
     authenticateError,
     logoutSuccess,
-    logout,
     entitiesRequested,
     entitiesReady,
     invalidateEntities,
@@ -117,15 +116,12 @@ export function* logoutSaga() {
 }
 
 export function* validateTokenSaga() {
-  yield put(authenticateSending());
-
   try {
     const { uid, client, 'access-token': accessToken } = yield getAuthValues();
     if (uid && client && accessToken) {
+      yield put(authenticateSending());
       const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
       yield put(authenticateSuccess(response.data));
-    } else {
-      yield put(logout());
     }
   } catch (err) {
     yield call(clearAuthValues);
