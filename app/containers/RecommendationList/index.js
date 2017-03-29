@@ -50,37 +50,37 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         },
       ],
       taxonomies: { // filter by each category
-        options: {
-          path: 'taxonomies',
-          where: {
-            tags_recommendations: true,
-          },
-          each: {
-            path: 'categories',
-            key: 'taxonomy_id',
-            without: true,
-            join: {
-              path: 'reommendation_categories',
-              key: 'category_id',
-              ownKey: 'reommendation_id',
-            },
-          },
-        },
-        query: {
-          arg: 'cat',
+        // options: {
+        //   path: 'taxonomies',
+        //   where: {
+        //     tags_recommendations: true,
+        //   },
+        //   each: {
+        //     path: 'categories',
+        //     key: 'taxonomy_id',
+        //     without: true,
+        //     join: {
+        //       path: 'reommendation_categories',
+        //       key: 'category_id',
+        //       ownKey: 'reommendation_id',
+        //     },
+        //   },
+        // },
+        query: 'cat',
+        connected: {
           path: 'reommendation_categories',
-          key: 'category_id',
-          ownKey: 'reommendation_id',
+          key: 'reommendation_id',
+          whereKey: 'category_id',
         },
       },
       connections: [ // filter by associated entity
         {
           path: 'measures', // filter by recommendation connection
           query: 'actions',
-          join: {
+          connected: {
             path: 'recommendation_measures',
-            key: 'measure_id',
-            ownKey: 'recommendation_id',
+            key: 'recommendation_id',
+            whereKey: 'measure_id',
           },
         },
       ],
