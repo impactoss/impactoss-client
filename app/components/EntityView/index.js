@@ -3,7 +3,6 @@
 * EntityView
 *
 */
-
 import React from 'react';
 import { Link } from 'react-router';
 
@@ -52,42 +51,40 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   render() {
     const { fields } = this.props;
     return (
-      <span>
-        <ViewWrapper>
-          { fields.header &&
-            <ViewHeader>
-              <Row>
-                <Grid sm={3 / 4}>
-                  { fields.header.main &&
-                    this.renderSection(fields.header.main)
-                  }
-                </Grid>
-                <Grid sm={1 / 4}>
-                  { fields.header.aside &&
-                    this.renderSection(fields.header.aside)
-                  }
-                </Grid>
-              </Row>
-            </ViewHeader>
-          }
-          { fields.body &&
-            <ViewBody>
-              <Row>
-                <Grid sm={3 / 4}>
-                  { fields.body.main &&
-                    this.renderSection(fields.body.main)
-                  }
-                </Grid>
-                <Grid sm={1 / 4}>
-                  { fields.body.aside &&
-                    this.renderSection(fields.body.aside)
-                  }
-                </Grid>
-              </Row>
-            </ViewBody>
-          }
-        </ViewWrapper>
-      </span>
+      <ViewWrapper>
+        { fields.header &&
+          <ViewHeader>
+            <Row>
+              <Grid sm={3 / 4}>
+                { fields.header.main &&
+                  this.renderSection(fields.header.main)
+                }
+              </Grid>
+              <Grid sm={1 / 4}>
+                { fields.header.aside &&
+                  this.renderSection(fields.header.aside)
+                }
+              </Grid>
+            </Row>
+          </ViewHeader>
+        }
+        { fields.body &&
+          <ViewBody>
+            <Row>
+              <Grid sm={3 / 4}>
+                { fields.body.main &&
+                  this.renderSection(fields.body.main)
+                }
+              </Grid>
+              <Grid sm={1 / 4}>
+                { fields.body.aside &&
+                  this.renderSection(fields.body.aside)
+                }
+              </Grid>
+            </Row>
+          </ViewBody>
+        }
+      </ViewWrapper>
     );
   }
 }

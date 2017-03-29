@@ -7,15 +7,13 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { Link } from 'react-router';
+import { browserHistory } from 'react-router';
 
 import EntityList from 'containers/EntityList';
-import Page from 'components/Page';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
-import {
-  loadEntitiesIfNeeded,
-} from 'containers/App/actions';
+import Page from 'components/Page';
 
 import messages from './messages';
 
@@ -68,8 +66,8 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         // },
         query: 'cat',
         connected: {
-          path: 'reommendation_categories',
-          key: 'reommendation_id',
+          path: 'recommendation_categories',
+          key: 'recommendation_id',
           whereKey: 'category_id',
         },
       },
@@ -89,16 +87,19 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     return (
       <div>
         <Helmet
-          title="SADATA - List Recommendations"
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
           meta={[
-            { name: 'description', content: 'Description of RecommendationList' },
+            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Page
           title={this.context.intl.formatMessage(messages.header)}
-          actions={[]}
+          actions={[{
+            type: 'primary',
+            title: 'New recommendation',
+            onClick: () => browserHistory.push('/recommendations/new/'),
+          }]}
         >
-          <Link to="recommendations/new">Add Recommendation</Link>
           <EntityList
             location={this.props.location}
             mapToEntityList={this.mapToEntityList}

@@ -7,10 +7,9 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { Link } from 'react-router';
+import { browserHistory } from 'react-router';
 
 import EntityList from 'containers/EntityList';
-import Page from 'components/Page';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import {
@@ -130,27 +129,30 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       },
 
     };
+    const headerOptions = {
+      title: this.context.intl.formatMessage(messages.header),
+      actions: [{
+        type: 'primary',
+        title: 'New action',
+        onClick: () => browserHistory.push('/actions/new/'),
+      }],
+    };
 
     return (
       <div>
         <Helmet
-          title="SADATA - List Actions"
+          title={this.context.intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: 'Description of ActionList' },
+            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.header)}
-          actions={[]}
-        >
-          <Link to="actions/new">Add Action</Link>
-          <EntityList
-            location={this.props.location}
-            mapToEntityList={this.mapToEntityList}
-            path="measures"
-            filters={filters}
-          />
-        </Page>
+        <EntityList
+          location={this.props.location}
+          mapToEntityList={this.mapToEntityList}
+          path="measures"
+          filters={filters}
+          header={headerOptions}
+        />
       </div>
     );
   }
