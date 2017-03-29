@@ -18,4 +18,8 @@ export default defineMessages({
     id: 'app.containers.ActionList.header',
     defaultMessage: 'Actions',
   },
+  loading: {
+    id: 'app.containers.ActionList.loading',
+    defaultMessage: 'Loading actions...',
+  },
 });

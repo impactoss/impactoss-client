@@ -306,7 +306,8 @@ const mapStateToProps = (state, props) => ({
   ),
   // all recommendations, listing connection if any
   recommendations: getEntities(
-    state, {
+    state,
+    {
       path: 'recommendations',
       out: 'js',
       extend: {

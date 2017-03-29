@@ -13,8 +13,6 @@ import EntityList from 'containers/EntityList';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
-import Page from 'components/Page';
-
 import messages from './messages';
 
 export class RecommendationList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -32,6 +30,21 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   })
 
   render() {
+    const extensions = [
+      {
+        path: 'recommendation_categories',
+        key: 'recommendation_id',
+        reverse: true,
+        as: 'taxonomies',
+      },
+      {
+        path: 'recommendation_measures',
+        key: 'recommendation_id',
+        reverse: true,
+        as: 'measures',
+      },
+    ];
+
     const filters = {
       keyword: {
         attributes: [
@@ -48,22 +61,18 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         },
       ],
       taxonomies: { // filter by each category
-        // options: {
-        //   path: 'taxonomies',
-        //   where: {
-        //     tags_recommendations: true,
-        //   },
-        //   each: {
-        //     path: 'categories',
-        //     key: 'taxonomy_id',
-        //     without: true,
-        //     join: {
-        //       path: 'reommendation_categories',
-        //       key: 'category_id',
-        //       ownKey: 'reommendation_id',
-        //     },
-        //   },
-        // },
+        select: {
+          out: 'js',
+          path: 'taxonomies',
+          where: {
+            tags_recommendations: true,
+          },
+          extend: {
+            path: 'categories',
+            key: 'taxonomy_id',
+            reverse: true,
+          },
+        },
         query: 'cat',
         connected: {
           path: 'recommendation_categories',
@@ -84,6 +93,15 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       ],
     };
 
+    const headerOptions = {
+      title: this.context.intl.formatMessage(messages.header),
+      actions: [{
+        type: 'primary',
+        title: 'New recommendation',
+        onClick: () => browserHistory.push('/recommendations/new/'),
+      }],
+    };
+
     return (
       <div>
         <Helmet
@@ -92,21 +110,14 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.header)}
-          actions={[{
-            type: 'primary',
-            title: 'New recommendation',
-            onClick: () => browserHistory.push('/recommendations/new/'),
-          }]}
-        >
-          <EntityList
-            location={this.props.location}
-            mapToEntityList={this.mapToEntityList}
-            path="recommendations"
-            filters={filters}
-          />
-        </Page>
+        <EntityList
+          location={this.props.location}
+          mapToEntityList={this.mapToEntityList}
+          path="recommendations"
+          filters={filters}
+          extensions={extensions}
+          header={headerOptions}
+        />
       </div>
     );
   }

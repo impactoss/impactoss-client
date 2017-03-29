@@ -7,6 +7,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
 
 import EntityList from 'containers/EntityList';
@@ -15,6 +16,8 @@ import { PUBLISH_STATUSES } from 'containers/App/constants';
 import {
   loadEntitiesIfNeeded,
 } from 'containers/App/actions';
+
+import { isReady } from 'containers/App/selectors';
 
 import messages from './messages';
 
@@ -33,6 +36,23 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
   })
 
   render() {
+    const { dataReady } = this.props;
+
+    const extensions = [
+      {
+        path: 'measure_categories',
+        key: 'measure_id',
+        reverse: true,
+        as: 'taxonomies',
+      },
+      {
+        path: 'recommendation_measures',
+        key: 'measure_id',
+        reverse: true,
+        as: 'recommendations',
+      },
+    ];
+
     const filters = {
       keyword: {
         attributes: [
@@ -41,31 +61,20 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           'description',
         ],
       },
-      attributes: [ // filter by attribute value
-        {
-          label: 'Status',
-          attribute: 'draft',
-          type: 'boolean',
-          options: PUBLISH_STATUSES,
-        },
-      ],
       taxonomies: { // filter by each category
-        // options: {
-        //   path: 'taxonomies',
-        //   where: {
-        //     tags_measures: true,
-        //   },
-        //   each: {
-        //     path: 'categories',
-        //     key: 'taxonomy_id',
-        //     without: true,
-        //     connected: {
-        //       path: 'measure_categories',
-        //       whereKey: 'category_id',
-        //       key: 'measure_id',
-        //     },
-        //   },
-        // },
+        label: 'By category',
+        select: {
+          out: 'js',
+          path: 'taxonomies',
+          where: {
+            tags_measures: true,
+          },
+          extend: {
+            path: 'categories',
+            key: 'taxonomy_id',
+            reverse: true,
+          },
+        },
         query: 'cat',
         connected: {
           path: 'measure_categories',
@@ -94,10 +103,13 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         },
       ],
       connectedTaxonomies: { // filter by each category
+        label: 'By associated categories',
         query: 'catx',
         connections: [
           {
             path: 'recommendations', // filter by recommendation connection
+            title: 'Recommendations',
+            key: 'recommendation_id',
             connected: {
               path: 'recommendation_measures',
               key: 'measure_id',
@@ -108,26 +120,34 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
                 whereKey: 'category_id',
               },
             },
-            // options: {
-            //   path: 'taxonomies',
-            //   where: {
-            //     tags_recommendations: true,
-            //   },
-            //   each: {
-            //     path: 'categories',
-            //     key: 'taxonomy_id',
-            //     without: true,
-            //     connected: {
-            //       path: 'recommendation_categories',
-            //       key: 'category_id',
-            //       ownKey: 'recommendation_id',
-            //     },
-            //   },
-            // }
+            select: {
+              out: 'js',
+              path: 'taxonomies',
+              where: {
+                tags_recommendations: true,
+              },
+              extend: {
+                path: 'categories',
+                key: 'taxonomy_id',
+                reverse: true,
+                extend: {
+                  path: 'recommendation_categories',
+                  key: 'category_id',
+                  reverse: true,
+                  as: 'recommendations',
+                },
+              },
+            },
           },
         ],
       },
-
+      attributes: [ // filter by attribute value
+        {
+          label: 'Status',
+          attribute: 'draft',
+          options: PUBLISH_STATUSES,
+        },
+      ],
     };
     const headerOptions = {
       title: this.context.intl.formatMessage(messages.header),
@@ -146,13 +166,21 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <EntityList
-          location={this.props.location}
-          mapToEntityList={this.mapToEntityList}
-          path="measures"
-          filters={filters}
-          header={headerOptions}
-        />
+        { !dataReady &&
+          <div>
+            <FormattedMessage {...messages.loading} />
+          </div>
+        }
+        { dataReady &&
+          <EntityList
+            location={this.props.location}
+            mapToEntityList={this.mapToEntityList}
+            path="measures"
+            filters={filters}
+            extensions={extensions}
+            header={headerOptions}
+          />
+        }
       </div>
     );
   }
@@ -161,17 +189,33 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
 ActionList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   location: PropTypes.object.isRequired,
+  dataReady: PropTypes.bool,
 };
 
 ActionList.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
+const mapStateToProps = (state) => ({
+  dataReady: isReady(state, { path: [
+    'measures',
+    'measure_categories',
+    'users',
+    'taxonomies',
+    'categories',
+    'recommendations',
+    'recommendation_measures',
+    'recommendation_categories',
+    'indicators',
+    'measure_indicators',
+  ] }),
+});
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
@@ -183,4 +227,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(null, mapDispatchToProps)(ActionList);
+export default connect(mapStateToProps, mapDispatchToProps)(ActionList);
