@@ -91,38 +91,56 @@ EntityQuery.defaultProps = {
   sortOrder: 'desc',
 };
 
-// asssociative conditions
-// query:"cat=1+2+3" catids regardless of taxonomy
-const getRelatedQuery = (props) => {
+// associative conditions
+const getConnectedQuery = (props) => {
   if (props.filters && props.location.query) {
-    const join = [];
-    forEach(props.location.query, (value, key) => {
-      // category query
-      if (key === props.filters.taxonomies.query.arg) {
-        join.push({
-          path: props.filters.taxonomies.query.path,
-          key: props.filters.taxonomies.query.ownKey,
-          where: value.split(' ').map((catId) => {
-            const cond = {};
-            cond[props.filters.taxonomies.query.key] = catId;
-            return cond;
-          }),
-        });
+    const connected = [];
+    forEach(props.location.query, (value, queryKey) => {
+      // filter by associated category
+      // "cat=1+2+3" catids regardless of taxonomy
+      if (queryKey === props.filters.taxonomies.query) {
+        const condition = props.filters.taxonomies.connected;
+        condition.where = value.split(' ').map((catId) => ({
+          [condition.whereKey]: catId,
+        })); // eg { category_id: 3 }
+        connected.push(condition);
       }
-      if (map(props.filters.connections, 'query').indexOf(key) > -1) {
-        const connection = find(props.filters.connections, { query: key });
-        join.push({
-          path: connection.join.path,
-          key: connection.join.ownKey,
-          where: value.split(' ').map((connectionId) => {
-            const cond = {};
-            cond[connection.join.key] = connectionId;
-            return cond;
-          }),
+      // filter by associated entity
+      // "recommendations=1+2" recommendationids
+      if (map(props.filters.connections, 'query').indexOf(queryKey) > -1) {
+        const connectedEntity = find(
+          props.filters.connections,
+          { query: queryKey }
+        );
+        if (connectedEntity) {
+          const condition = connectedEntity.connected;
+          condition.where = value.split(' ').map((connectionId) => ({
+            [condition.whereKey]: connectionId,
+          })); // eg { recommendation_id: 3 }
+          connected.push(condition);
+        }
+      }
+      // filter by associated category of associated entity
+      // query:"catx=recommendations:1" entitypath:catids regardless of taxonomy
+      if (queryKey === props.filters.connectedTaxonomies.query) {
+        value.split(' ').forEach((val) => {
+          const pathValue = val.split(':');
+          const connectedTaxonomy = find(
+            props.filters.connectedTaxonomies.connections,
+            (connection) => connection.path === pathValue[0]
+          );
+          // console.log(connection)
+          if (connectedTaxonomy) {
+            const condition = connectedTaxonomy.connected;
+            condition.connected.where = {
+              [condition.connected.whereKey]: pathValue[1],
+            };
+            connected.push(condition);
+          }
         });
       }
     });
-    return join;
+    return connected;
   }
   return null;
 };
@@ -170,11 +188,10 @@ const getAttributeQuery = (props) => {
 const mapStateToProps = (state, props) => {
   const { page, sortBy, sortOrder } = props.location.query;
   const currentPage = parseInt(page || 1, 10);
-
   return {
     pagedEntities: getEntitiesPaged(state, {
       path: props.path,
-      join: getRelatedQuery(props),
+      connected: getConnectedQuery(props),
       without: getWithoutQuery(props),
       where: getAttributeQuery(props),
       perPage: props.perPage || EntityQuery.defaultProps.perPage,

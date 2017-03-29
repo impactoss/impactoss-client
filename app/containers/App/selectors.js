@@ -103,10 +103,34 @@ const getEntitiesPure = createSelector(
   (entities, path) => entities.get(path)
 );
 
+// check entity attributes or id
+const getEntitiesWhere = createCachedSelector(
+  getEntitiesPure,
+  (state, { where }) => where ? JSON.stringify(where) : null, // enable caching
+  (entities, whereString) => {
+    if (whereString) {
+      const where = JSON.parse(whereString);
+      return entities.filter((entity) =>
+        reduce(where, (passing, value, key) => {
+          if (key === 'id') {
+            return passing && entity.get('id') === value.toString();
+          }
+          const testValue = entity.getIn(['attributes', key]);
+          if (typeof testValue === 'undefined') {
+            return false;
+          }
+          return passing && testValue.toString() === value.toString();
+        }, true)
+      );
+    }
+    return entities;
+  }
+)((state, { path, where }) => `${path}:${JSON.stringify(where)}`);
+
 // check if entities are not connected to any other entities via associative table
 const getEntitiesWithout = createSelector(
   (state) => state,
-  getEntitiesPure,
+  getEntitiesWhere,
   (state, { without }) => without,
   (state, entities, without) => without
     ? entities.filter((entity) =>
@@ -145,55 +169,45 @@ const getEntitiesWithout = createSelector(
 );
 
 // check if entities have connections with other entities via associative table
-const getEntitiesJoint = createSelector(
+const getEntitiesIfConnected = createSelector(
   (state) => state,
   getEntitiesWithout,
-  (state, { join }) => join,
-  (state, entities, join) => join
-    ? entities.filter((entity) =>
-      reduce(Array.isArray(join) ? join : [join], (passing, joinWhere) => joinWhere.where // allows multiple joins
-        ? reduce(Array.isArray(joinWhere.where) ? joinWhere.where : [joinWhere.where], (passingWhere, where) => { // and multiple wheres
-          const w = where;
-          w[joinWhere.key] = entity.get('id');
-          const joins = getEntitiesWhere(state, {
-            path: joinWhere.path, // path of associative table
-            where: w,
-          });
-          return joins && joins.size; // assication present
-        }, true)
-        : true, true)
-      )
-    : entities
+  (state, { connected }) => connected,
+  (state, entities, connected) => connected
+    ? entities.filter((entity) => reduce(
+      Array.isArray(connected) ? connected : [connected], // allows multiple connections
+      (passing, argsConnected) => {
+        if (argsConnected.connected || argsConnected.where) {
+          const where = argsConnected.where || {};
+          return reduce(
+            Array.isArray(where) ? where : [where],
+            (passingWhere, whereArgs) => { // and multiple wheres
+              const connections = getEntitiesIfConnected(state, {
+                path: argsConnected.path, // path of associative table
+                where: {
+                  ...whereArgs,
+                  [argsConnected.key]: argsConnected.attribute
+                    ? entity.getIn(['attributes', argsConnected.attribute])
+                    : entity.get('id'),
+                },
+                connected: argsConnected.connected || null,
+              });
+              return connections && connections.size; // association present
+            },
+            true
+          );
+        }
+        return true;
+      },
+      true
+    )) // reduce connected conditions // filter entities
+  : entities  // !connected
 );
-
-// check entity attributes or id
-const getEntitiesWhere = createCachedSelector(
-  getEntitiesJoint,
-  (state, { where }) => where ? JSON.stringify(where) : null, // enable caching
-  (entities, whereString) => {
-    if (whereString) {
-      const where = JSON.parse(whereString);
-      return entities.filter((entity) =>
-        reduce(where, (passing, value, key) => {
-          if (key === 'id') {
-            return passing && entity.get('id') === value.toString();
-          }
-          const testValue = entity.getIn(['attributes', key]);
-          if (typeof testValue === 'undefined') {
-            return false;
-          }
-          return passing && testValue.toString() === value.toString();
-        }, true)
-      );
-    }
-    return entities;
-  }
-)((state, { path, where }) => `${path}:${JSON.stringify(where)}`);
 
 
 const getEntities = createSelector(
   (state) => state,
-  getEntitiesWhere,
+  getEntitiesIfConnected,
   (state, { out }) => out,
   (state, { extend }) => extend,
   (state, entities, out, extend) => {
@@ -222,7 +236,7 @@ const extendEntity = (state, entity, extendArgs) => {
       reverse: args.reverse || false, // reverse relation
       where: args.where || {}, // conditions for join
       extend: args.extend || null,
-      join: args.join || null,
+      connected: args.connected || null,
     };
     if (extend.reverse) {
       // reverse: other entity pointing to entity

@@ -207,8 +207,7 @@ const mapStateToProps = (state, props) => ({
       extend: {
         path: 'categories',
         key: 'taxonomy_id',
-        reverse: true,
-        join: {
+        connected: {
           path: 'measure_categories',
           key: 'category_id',
           where: {
@@ -224,10 +223,9 @@ const mapStateToProps = (state, props) => ({
     state, {
       path: 'recommendations',
       out: 'js',
-      join: {
+      connected: {
         path: 'recommendation_measures',
         key: 'recommendation_id',
-        reverse: true,
         where: {
           measure_id: props.params.id,
         },

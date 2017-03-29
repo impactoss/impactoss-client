@@ -51,49 +51,84 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         },
       ],
       taxonomies: { // filter by each category
-        options: {
-          path: 'taxonomies',
-          where: {
-            tags_measures: true,
-          },
-          each: {
-            path: 'categories',
-            key: 'taxonomy_id',
-            without: true,
-            join: {
-              path: 'measure_categories',
-              key: 'category_id',
-              ownKey: 'measure_id',
-            },
-          },
-        },
-        query: {
-          arg: 'cat',
+        // options: {
+        //   path: 'taxonomies',
+        //   where: {
+        //     tags_measures: true,
+        //   },
+        //   each: {
+        //     path: 'categories',
+        //     key: 'taxonomy_id',
+        //     without: true,
+        //     connected: {
+        //       path: 'measure_categories',
+        //       whereKey: 'category_id',
+        //       key: 'measure_id',
+        //     },
+        //   },
+        // },
+        query: 'cat',
+        connected: {
           path: 'measure_categories',
-          key: 'category_id',
-          ownKey: 'measure_id',
+          key: 'measure_id',
+          whereKey: 'category_id',
         },
       },
       connections: [ // filter by associated entity
         {
           path: 'indicators', // filter by recommendation connection
           query: 'indicators',
-          join: {
+          connected: {
             path: 'measure_indicators',
-            key: 'indicator_id',
-            ownKey: 'measure_id',
+            key: 'measure_id',
+            whereKey: 'indicator_id',
           },
         },
         {
           path: 'recommendations', // filter by recommendation connection
           query: 'recommendations',
-          join: {
+          connected: {
             path: 'recommendation_measures',
-            key: 'recommendation_id',
-            ownKey: 'measure_id',
+            key: 'measure_id',
+            whereKey: 'recommendation_id',
           },
         },
       ],
+      connectedTaxonomies: { // filter by each category
+        query: 'catx',
+        connections: [
+          {
+            path: 'recommendations', // filter by recommendation connection
+            connected: {
+              path: 'recommendation_measures',
+              key: 'measure_id',
+              connected: {
+                path: 'recommendation_categories',
+                key: 'recommendation_id',
+                attribute: 'recommendation_id',
+                whereKey: 'category_id',
+              },
+            },
+            // options: {
+            //   path: 'taxonomies',
+            //   where: {
+            //     tags_recommendations: true,
+            //   },
+            //   each: {
+            //     path: 'categories',
+            //     key: 'taxonomy_id',
+            //     without: true,
+            //     connected: {
+            //       path: 'recommendation_categories',
+            //       key: 'category_id',
+            //       ownKey: 'recommendation_id',
+            //     },
+            //   },
+            // }
+          },
+        ],
+      },
+
     };
 
     return (
@@ -139,6 +174,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
     },
