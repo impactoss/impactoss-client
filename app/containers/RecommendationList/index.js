@@ -7,11 +7,14 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
 
 import EntityList from 'containers/EntityList';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
+
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { isReady } from 'containers/App/selectors';
 
 import messages from './messages';
 
@@ -30,6 +33,8 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   })
 
   render() {
+    const { dataReady } = this.props;
+
     const extensions = [
       {
         path: 'recommendation_categories',
@@ -52,15 +57,18 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           'title',
         ],
       },
-      attributes: [ // filter by attribute value
-        {
-          label: 'Status',
-          attribute: 'draft',
-          type: 'boolean',
-          options: PUBLISH_STATUSES,
-        },
-      ],
+      attributes: {  // filter by attribute value
+        label: 'By attribute',
+        options: [
+          {
+            label: 'Status',
+            attribute: 'draft',
+            options: PUBLISH_STATUSES,
+          },
+        ],
+      },
       taxonomies: { // filter by each category
+        label: 'By category',
         select: {
           out: 'js',
           path: 'taxonomies',
@@ -80,17 +88,22 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           whereKey: 'category_id',
         },
       },
-      connections: [ // filter by associated entity
-        {
-          path: 'measures', // filter by recommendation connection
-          query: 'actions',
-          connected: {
-            path: 'recommendation_measures',
-            key: 'recommendation_id',
-            whereKey: 'measure_id',
+      connections: { // filter by associated entity
+        label: 'By connection',
+        options: [
+          {
+            label: 'By action',
+            path: 'measures', // filter by recommendation connection
+            query: 'actions',
+            key: 'measure_id',
+            connected: {
+              path: 'recommendation_measures',
+              key: 'recommendation_id',
+              whereKey: 'measure_id',
+            },
           },
-        },
-      ],
+        ],
+      },
     };
 
     const headerOptions = {
@@ -110,14 +123,21 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <EntityList
-          location={this.props.location}
-          mapToEntityList={this.mapToEntityList}
-          path="recommendations"
-          filters={filters}
-          extensions={extensions}
-          header={headerOptions}
-        />
+        { !dataReady &&
+          <div>
+            <FormattedMessage {...messages.loading} />
+          </div>
+        }
+        { dataReady &&
+          <EntityList
+            location={this.props.location}
+            mapToEntityList={this.mapToEntityList}
+            path="recommendations"
+            filters={filters}
+            extensions={extensions}
+            header={headerOptions}
+          />
+        }
       </div>
     );
   }
@@ -126,11 +146,24 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
 RecommendationList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   location: PropTypes.object.isRequired,
+  dataReady: PropTypes.bool,
 };
 
 RecommendationList.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
+
+const mapStateToProps = (state) => ({
+  dataReady: isReady(state, { path: [
+    'measures',
+    'users',
+    'taxonomies',
+    'categories',
+    'recommendations',
+    'recommendation_measures',
+    'recommendation_categories',
+  ] }),
+});
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -138,6 +171,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('measures'));
@@ -145,4 +179,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(null, mapDispatchToProps)(RecommendationList);
+export default connect(mapStateToProps, mapDispatchToProps)(RecommendationList);

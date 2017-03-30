@@ -38,6 +38,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
   render() {
     const { dataReady } = this.props;
 
+    // specify the associations to query with entities
     const extensions = [
       {
         path: 'measure_categories',
@@ -51,14 +52,31 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         reverse: true,
         as: 'recommendations',
       },
+      {
+        path: 'measure_indicators',
+        key: 'measure_id',
+        reverse: true,
+        as: 'indicators',
+      },
     ];
 
+    // specify the filter and query  options
     const filters = {
       keyword: {
         attributes: [
           'id',
           'title',
           'description',
+        ],
+      },
+      attributes: {  // filter by attribute value
+        label: 'By attribute',
+        options: [
+          {
+            label: 'Status',
+            attribute: 'draft',
+            options: PUBLISH_STATUSES,
+          },
         ],
       },
       taxonomies: { // filter by each category
@@ -82,26 +100,33 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           whereKey: 'category_id',
         },
       },
-      connections: [ // filter by associated entity
-        {
-          path: 'indicators', // filter by recommendation connection
-          query: 'indicators',
-          connected: {
-            path: 'measure_indicators',
-            key: 'measure_id',
-            whereKey: 'indicator_id',
+      connections: { // filter by associated entity
+        label: 'By connection',
+        options: [
+          {
+            label: 'By indicator',
+            path: 'indicators', // filter by recommendation connection
+            query: 'indicators',
+            key: 'indicator_id',
+            connected: {
+              path: 'measure_indicators',
+              key: 'measure_id',
+              whereKey: 'indicator_id',
+            },
           },
-        },
-        {
-          path: 'recommendations', // filter by recommendation connection
-          query: 'recommendations',
-          connected: {
-            path: 'recommendation_measures',
-            key: 'measure_id',
-            whereKey: 'recommendation_id',
+          {
+            label: 'By recommendation',
+            path: 'recommendations', // filter by recommendation connection
+            query: 'recommendations',
+            key: 'recommendation_id',
+            connected: {
+              path: 'recommendation_measures',
+              key: 'measure_id',
+              whereKey: 'recommendation_id',
+            },
           },
-        },
-      ],
+        ],
+      },
       connectedTaxonomies: { // filter by each category
         label: 'By associated categories',
         query: 'catx',
@@ -141,13 +166,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           },
         ],
       },
-      attributes: [ // filter by attribute value
-        {
-          label: 'Status',
-          attribute: 'draft',
-          options: PUBLISH_STATUSES,
-        },
-      ],
     };
     const headerOptions = {
       title: this.context.intl.formatMessage(messages.header),

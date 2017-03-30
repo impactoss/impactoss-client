@@ -18,4 +18,8 @@ export default defineMessages({
     id: 'app.containers.RecommendationList.header',
     defaultMessage: 'Recommendations',
   },
+  loading: {
+    id: 'app.containers.RecommendationList.loading',
+    defaultMessage: 'Loading recommendations...',
+  },
 });

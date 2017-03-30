@@ -50,7 +50,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       location,
       filters,
       taxonomies,
-      // connections,
+      connections,
       connectedTaxonomies,
     } = this.props;
 
@@ -61,11 +61,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     );
 
     // console.log(entities)
-    // console.log(connectedTaxonomies)
+    // console.log(connections)
 
     // console.log(this.props)
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
 
+    // figure out filter panel options based on entities, taxononomies, connections, and connectedTaxonomies
     const filterOptions = {};
     // iterate through entities and create filterOptions at the same time
     entities = map(Object.values(entities), (entity) => {
@@ -85,9 +86,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             }), {}),
           };
         }
-        if (entityUpdated.taxonomies) {
+        if (entity.taxonomies) {
           // add categories from entities if not present otherwise increase count
-          entityUpdated.categoryIds = map(map(Object.values(entityUpdated.taxonomies), 'attributes'), 'category_id');
+          entityUpdated.categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
           forEach(entityUpdated.categoryIds, (catId) => {
             const taxonomy = find(Object.values(taxonomies), (tax) =>
               tax.categories && Object.keys(tax.categories).indexOf(catId.toString()) > -1
@@ -175,96 +176,87 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       }
 
       // connections
+      if (filters.connections && connections) {
+        // first prepare taxonomy options
+        if (!filterOptions.connections) {
+          filterOptions.connections = {
+            label: filters.connections.label,
+            options: reduce(filters.connections.options, (options, option) => ({
+              ...options,
+              [option.path]: {
+                label: option.label,
+                options: {},
+              },
+            }), {}),
+          };
+        }
+
+        forEach(filters.connections.options, (option) => {
+          if (entity[option.path]) {
+            // add connected entities if not present otherwise increase count
+            entityUpdated.connectedIds = {
+              [option.path]: map(map(Object.values(entity[option.path]), 'attributes'), option.key),
+            };
+            forEach(entityUpdated.connectedIds[option.path], (connectedId) => {
+              const connection = connections[option.path][connectedId];
+              // if not taxonomy already considered
+              if (connection) {
+                // if category already added
+                if (filterOptions.connections.options[option.path].options[connectedId]) {
+                  filterOptions.connections.options[option.path].options[connectedId].count += 1;
+                } else {
+                  filterOptions.connections.options[option.path].options[connectedId] = {
+                    label: connection.attributes.title,
+                    value: connectedId,
+                    count: 1,
+                    query: option.path,
+                    isSet: !!(location.query[option.path] && location.query[option.path].split(' ').indexOf(connectedId.toString()) > -1),
+                  };
+                }
+              }
+            });
+          }
+        });
+      }
 
       // attributes
-
+      if (filters.attributes) {
+        // first prepare taxonomy options
+        if (!filterOptions.attributes) {
+          filterOptions.attributes = {
+            label: filters.attributes.label,
+            options: reduce(filters.attributes.options, (options, option) => ({
+              ...options,
+              [option.attribute]: {
+                label: option.label,
+                options: {},
+              },
+            }), {}),
+          };
+        }
+        forEach(filters.attributes.options, (attributeOption) => {
+          if (typeof entity.attributes[attributeOption.attribute] !== 'undefined') {
+            // add connected entities if not present otherwise increase count
+            const value = entity.attributes[attributeOption.attribute].toString();
+            if (filterOptions.attributes.options[attributeOption.attribute].options[value]) {
+              filterOptions.attributes.options[attributeOption.attribute].options[value].count += 1;
+            } else {
+              const attribute = find(attributeOption.options, (option) => option.value.toString() === value);
+              filterOptions.attributes.options[attributeOption.attribute].options[value] = {
+                label: attribute ? attribute.label : value,
+                value,
+                count: 1,
+                query: 'where',
+                isSet: !!(location.query.where && location.query.where.split(' ').indexOf(`${attributeOption.attribute}:${value}`) > -1),
+              };
+            }
+          }
+        });
+      }
       return entityUpdated;
     });
+
     // console.log(filterOptions)
-
-    // TODO: figure out filter panel options based on entities, taxononomies, connections, and connectedTaxonomies
-    // this is what we want here
-    // filterOptions: {
-    //   taxonomies: {
-    //     label: 'By category',
-    //     options: {
-    //       [taxonomy.id] : {
-    //         label: taxonomy.title,
-    //         options: {
-    //           [category.id]: {
-    //             label: category.title,
-    //             value: category.id,
-    //             count: category.count,
-    //             query: 'cat',
-    //           },
-    //           ...,
-    //           without: {
-    //             label: "Without " + taxonomy.title,
-    //             value: taxonomy.id,
-    //             count: taxonomy.countWithout,
-    //             query: 'without',
-    //           }
-    //         ]
-    //       },
-    //       ...
-    //     }
-    //   },
-    //   connectedTaxonomies: {
-    //     label: 'By associated category',
-    //     expanded: false,
-    //     options: [
-    //       {
-    //         label: taxonomy.title,
-    //         options: [
-    //           {
-    //             label: category.title,
-    //             value: taxonomy.connectedEntity + ":" +category.id, // recommendations:3
-    //             count: category.count,
-    //             query: 'catx',
-    //
-    //           },
-    //           ...,
-    //         ]
-    //       },
-    //       ...
-    //     ]
-    //   },
-    //   connections: {
-    //     label: 'By connections',
-    //     options: [
-    //       {
-    //         label: connection.title,
-    //         options: [
-    //           {
-    //             label: entity.title,
-    //             value: entity.id,
-    //             count: entity.count,
-    //             query: connection.path, // recommendations
-    //           },
-    //           ...,
-    //           {
-    //             label: "Without " + connection.title,
-    //             value: connection.path,
-    //             count: connection.countWithout,
-    //             query: 'without',
-    //           }
-    //         ]
-    //       },
-    //       ...
-    //     ]
-    //   },
-    //   attributes: {
-    //     label: 'By attributes',
-    //     options: [
-    //       {
-    //         label: attribute.label,
-    //         query: 'where'
-    //         options: attribute.options,
-    //       }
-    //     ]
-    //   }
-    // }
-
 
     return (
       <Container>
@@ -289,7 +281,7 @@ EntityList.propTypes = {
   location: PropTypes.object,
   filters: PropTypes.object,
   taxonomies: PropTypes.object,
-  // connections: PropTypes.object,
+  connections: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   mapToEntityList: PropTypes.func.isRequired,
   //  location: PropTypes.object.isRequired, only needed in mapStateToProps
@@ -329,9 +321,9 @@ const getConnectedQuery = (props) => {
     }
     // filter by associated entity
     // "recommendations=1+2" recommendationids
-    if (props.filters.connections && map(props.filters.connections, 'query').indexOf(queryKey) > -1) {
+    if (props.filters.connections && map(props.filters.connections.options, 'query').indexOf(queryKey) > -1) {
       const connectedEntity = find(
-        props.filters.connections,
+        props.filters.connections.options,
         { query: queryKey }
       );
       if (connectedEntity) {
@@ -377,9 +369,12 @@ const getWithoutQuery = (props) =>
         key: props.filters.taxonomies.connected.key,
       };
     }
-    // related entity filter
-    const connection = find(props.filters.connections, { query: pathOrTax });
-    return connection ? connection.connected : {};
+    if (props.filters.connections.options) {
+      // related entity filter
+      const connection = find(props.filters.connections.options, { query: pathOrTax });
+      return connection ? connection.connected : {};
+    }
+    return {};
   });
 
 const mapStateToProps = (state, props) => ({
@@ -395,7 +390,7 @@ const mapStateToProps = (state, props) => ({
     ? getEntities(state, props.filters.taxonomies.select)
     : null,
   connections: props.filters && props.filters.connections
-    ? reduce(props.filters.connections, (result, { path }) => ({
+    ? reduce(props.filters.connections.options, (result, { path }) => ({
       ...result,
       [path]: getEntities(state, {
         out: 'js',
