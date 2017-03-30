@@ -13,10 +13,7 @@ import { browserHistory } from 'react-router';
 import EntityList from 'containers/EntityList';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
-import {
-  loadEntitiesIfNeeded,
-} from 'containers/App/actions';
-
+import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -81,6 +78,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       },
       taxonomies: { // filter by each category
         label: 'By category',
+        query: 'cat',
         select: {
           out: 'js',
           path: 'taxonomies',
@@ -93,7 +91,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             reverse: true,
           },
         },
-        query: 'cat',
         connected: {
           path: 'measure_categories',
           key: 'measure_id',
@@ -104,7 +101,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         label: 'By connection',
         options: [
           {
-            label: 'By indicator',
+            label: 'Indicators',
             path: 'indicators', // filter by recommendation connection
             query: 'indicators',
             key: 'indicator_id',
@@ -115,7 +112,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             },
           },
           {
-            label: 'By recommendation',
+            label: 'Recommendations',
             path: 'recommendations', // filter by recommendation connection
             query: 'recommendations',
             key: 'recommendation_id',

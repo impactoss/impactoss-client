@@ -87,6 +87,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           };
         }
         if (entity.taxonomies) {
+          const taxonomyIds = []; // track taxonomies, so we can add without options for those not in here
           // add categories from entities if not present otherwise increase count
           entityUpdated.categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
           forEach(entityUpdated.categoryIds, (catId) => {
@@ -95,6 +96,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             );
             // if not taxonomy already considered
             if (taxonomy) {
+              taxonomyIds.push(taxonomy.id);
               // if category already added
               if (filterOptions.taxonomies.options[taxonomy.id].options[catId]) {
                 filterOptions.taxonomies.options[taxonomy.id].options[catId].count += 1;
@@ -103,8 +105,23 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   label: taxonomy.categories[catId].attributes.title,
                   value: catId,
                   count: 1,
-                  query: 'cat',
+                  query: filters.taxonomies.query,
                   isSet: !!(location.query.cat && location.query.cat.split(' ').indexOf(catId.toString()) > -1),
+                };
+              }
+            }
+          });
+          // add without option
+          forEach(taxonomies, (tax) => {
+            if (taxonomyIds.indexOf(tax.id) === -1) {
+              if (filterOptions.taxonomies.options[tax.id].options.without) {
+                filterOptions.taxonomies.options[tax.id].options.without.count += 1;
+              } else {
+                filterOptions.taxonomies.options[tax.id].options.without = {
+                  label: `Without ${tax.attributes.title}`,
+                  value: tax.id,
+                  count: 1,
+                  query: 'without',
                 };
               }
             }
@@ -165,7 +182,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     label: taxonomy.categories[catId].attributes.title,
                     value: `${connection.path}:${catId}`,
                     count: 1,
-                    query: 'catx',
+                    query: filters.connectedTaxonomies.query,
                     isSet: !!(location.query.catx && location.query.catx.split(' ').indexOf(`${connection.path}:${catId}`) > -1),
                   };
                 }
@@ -215,6 +232,17 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 }
               }
             });
+          } else if (filterOptions.connections.options[option.path].options.without) {
+            // no connection present
+            // add without option
+            filterOptions.connections.options[option.path].options.without.count += 1;
+          } else {
+            filterOptions.connections.options[option.path].options.without = {
+              label: `Without ${option.label}`,
+              value: option.path,
+              count: 1,
+              query: 'without',
+            };
           }
         });
       }
@@ -255,8 +283,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       }
       return entityUpdated;
     });
-
-    // console.log(filterOptions)
 
     return (
       <Container>

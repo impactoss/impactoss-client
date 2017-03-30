@@ -69,6 +69,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       },
       taxonomies: { // filter by each category
         label: 'By category',
+        query: 'cat',
         select: {
           out: 'js',
           path: 'taxonomies',
@@ -81,7 +82,6 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             reverse: true,
           },
         },
-        query: 'cat',
         connected: {
           path: 'recommendation_categories',
           key: 'recommendation_id',
