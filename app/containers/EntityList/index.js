@@ -12,6 +12,8 @@ import { getEntitySortIteratee } from 'utils/sort';
 
 import Grid from 'grid-styled';
 
+import EntityListFilters from 'containers/EntityListFilters';
+
 import PageHeader from 'components/PageHeader';
 import EntityListItem from 'components/EntityListItem';
 import Row from 'components/basic/Row';
@@ -288,7 +290,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       <Container>
         <Row>
           <Grid sm={1 / 4}>
-            Filters
+            <EntityListFilters
+              filterOptions={filterOptions}
+            />
           </Grid>
           <Grid sm={3 / 4}>
             <PageHeader title={this.props.header.title} actions={this.props.header.actions} />
