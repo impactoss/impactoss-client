@@ -56,7 +56,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       connectedTaxonomies,
     } = this.props;
 
-    let entities = this.props.entities && orderBy(
+    const entities = this.props.entities && orderBy(
       this.props.entities,
       getEntitySortIteratee(sortBy),
       sortOrder
@@ -70,9 +70,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     // figure out filter panel options based on entities, taxononomies, connections, and connectedTaxonomies
     const filterOptions = {};
-    // iterate through entities and create filterOptions at the same time
-    entities = map(Object.values(entities), (entity) => {
-      const entityUpdated = entity;
+    // iterate through entities and create filterOptions
+    // TODO refactor to function
+    forEach(Object.values(entities), (entity) => {
       // taxonomies
       if (filters.taxonomies && taxonomies) {
         // first prepare taxonomy options
@@ -91,8 +91,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         if (entity.taxonomies) {
           const taxonomyIds = []; // track taxonomies, so we can add without options for those not in here
           // add categories from entities if not present otherwise increase count
-          entityUpdated.categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
-          forEach(entityUpdated.categoryIds, (catId) => {
+          const categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
+          forEach(categoryIds, (catId) => {
             const taxonomy = find(Object.values(taxonomies), (tax) =>
               tax.categories && Object.keys(tax.categories).indexOf(catId.toString()) > -1
             );
@@ -128,6 +128,20 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               }
             }
           });
+        } else {
+          // without any taxonomies: add without for all taxonomies
+          forEach(taxonomies, (tax) => {
+            if (filterOptions.taxonomies.options[tax.id].options.without) {
+              filterOptions.taxonomies.options[tax.id].options.without.count += 1;
+            } else {
+              filterOptions.taxonomies.options[tax.id].options.without = {
+                label: `Without ${tax.attributes.title}`,
+                value: tax.id,
+                count: 1,
+                query: 'without',
+              };
+            }
+          });
         }
       }
 
@@ -150,7 +164,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         forEach(filters.connectedTaxonomies.connections, (connection) => {
           if (entity[connection.path]) { // recommendations stores recommendation_measures
             // add categories from entities if not present otherwise increase count
-            entityUpdated.connectedCategoryIds = reduce(Object.values(connectedTaxonomies.taxonomies), (ids, tax) => {
+            const connectedCategoryIds = reduce(Object.values(connectedTaxonomies.taxonomies), (ids, tax) => {
               const idsUpdated = ids;
               const recIds = map(map(Object.values(entity[connection.path]), 'attributes'), connection.key);
               // console.log('recIds', recIds);
@@ -170,7 +184,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               return idsUpdated;
             }, []);
 
-            forEach(entityUpdated.connectedCategoryIds, (catId) => {
+            forEach(connectedCategoryIds, (catId) => {
               // TODO: the taxonomy lookup can may be omitted as we already iterate over taxonomies above
               const taxonomy = find(Object.values(connectedTaxonomies.taxonomies), (tax) =>
                 tax.categories && Object.keys(tax.categories).indexOf(catId.toString()) > -1
@@ -213,10 +227,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         forEach(filters.connections.options, (option) => {
           if (entity[option.path]) {
             // add connected entities if not present otherwise increase count
-            entityUpdated.connectedIds = {
+            const connectedIds = {
               [option.path]: map(map(Object.values(entity[option.path]), 'attributes'), option.key),
             };
-            forEach(entityUpdated.connectedIds[option.path], (connectedId) => {
+            forEach(connectedIds[option.path], (connectedId) => {
               const connection = connections[option.path][connectedId];
               // if not taxonomy already considered
               if (connection) {
@@ -283,8 +297,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           }
         });
       }
-      return entityUpdated;
     });
+    // console.log(filterOptions)
 
     return (
       <Container>
