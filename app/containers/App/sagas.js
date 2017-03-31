@@ -162,6 +162,21 @@ export function* saveEntitySaga({ data }) {
       );
     }
 
+    // update action-indicatos connections
+    if (data.entity.measureIndicators) {
+      // on the server
+      const connectionsUpdated = yield call(
+        updateAssociationsRequest,
+        'measure_indicators',
+        data.entity.measureIndicators
+      );
+      // and on the client
+      yield connectionsUpdated.map((connection) => connection.type === 'delete'
+        ? put(deleteEntity('measure_indicators', connection.id))
+        : put(addEntity('measure_indicators', connection.data))
+      );
+    }
+
     // update action-category connections
     if (data.entity.measureCategories) {
       // on the server
@@ -225,10 +240,26 @@ export function* newEntitySaga({ data }) {
         recommendationMeasures
       );
       // and on the client
-      yield connectionsUpdated.map((connection) => connection.type === 'delete'
-        ? put(deleteEntity('recommendation_measures', connection.id))
-        : put(addEntity('recommendation_measures', connection.data))
+      yield connectionsUpdated.map((connection) => put(addEntity('recommendation_measures', connection.data)));
+    }
+
+    // update action-indicator connections
+    if (data.entity.measureIndicators) {
+      // make sure to use new entity id for full payload
+      // we should have either the one (recommendation_id) or the other (measure_id)
+      const measureIndicators = data.entity.measureIndicators;
+      measureIndicators.create = measureIndicators.create.map((create) => ({
+        indicator_id: create.indicator_id || entityCreated.data.id,
+        measure_id: create.measure_id || entityCreated.data.id,
+      }));
+      // on the server
+      const connectionsUpdated = yield call(
+        updateAssociationsRequest,
+        'measure_indicators',
+        measureIndicators
       );
+      // and on the client
+      yield connectionsUpdated.map((connection) => put(addEntity('measure_indicators', connection.data)));
     }
 
     // update action-category connections
@@ -246,10 +277,7 @@ export function* newEntitySaga({ data }) {
         categories
       );
       // and on the client
-      yield connectionsUpdated.map((connection) => connection.type === 'delete'
-        ? put(deleteEntity('measure_categories', connection.id))
-        : put(addEntity('measure_categories', connection.data))
-      );
+      yield connectionsUpdated.map((connection) => put(addEntity('measure_categories', connection.data)));
     }
 
     // update recommendation-category connections
