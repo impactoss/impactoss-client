@@ -1,9 +1,10 @@
 import { createSelector } from 'reselect';
+import { REDUCER_PATH } from './constants';
 
 /**
  * Direct selector to the actionEdit state domain
  */
-const selectEntityListFiltersDomain = (state) => state.get('entityListFilters');
+const selectEntityListFiltersDomain = (state) => state.get(REDUCER_PATH);
 
 /**
  * Other specific selectors
@@ -14,6 +15,20 @@ const formSelector = createSelector(
   (substate) => substate.get('form')
  );
 
+const pageSelector = createSelector(
+   selectEntityListFiltersDomain,
+   (substate) => substate.get('page')
+ );
+
+const showFilterFormSelector = createSelector(
+  pageSelector,
+  (pageState) => pageState.get('showFilterForm')
+);
+
+const formOptionsSelector = createSelector(
+  pageSelector,
+  (pageState) => pageState.get('formOptions')
+);
 
 /**
  * Default selector used by ActionEdit
@@ -29,4 +44,6 @@ export {
   selectEntityListFiltersDomain,
   entityListSelect,
   formSelector,
+  showFilterFormSelector,
+  formOptionsSelector,
 };

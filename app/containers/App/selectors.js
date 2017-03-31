@@ -110,6 +110,7 @@ const getEntitiesWhere = createCachedSelector(
       const where = JSON.parse(whereString);
       return entities.filter((entity) =>
         reduce(where, (passing, value, key) => {
+          // TODO if !passing return false, no point going further
           if (key === 'id') {
             return passing && entity.get('id') === value.toString();
           }
@@ -186,6 +187,7 @@ const getEntitiesIfConnected = createSelector(
           return passing && reduce(
             Array.isArray(where) ? where : [where],
             (passingWhere, whereArgs) => { // and multiple wheres
+              // TODO if passingWhere is false we don't need to do any more work
               const connections = getEntitiesIfConnected(state, {
                 path: argsConnected.path, // path of associative table
                 where: {
@@ -258,7 +260,7 @@ const extendEntity = (state, entity, extendArgs) => {
       extend.id = extend.where.id; // getEntityPure selector requires id
       extended = getEntity(state, extend);
     } else {
-      extended = getEntities(state, extend);
+      extended = getEntities(state, extend); // TODO How does this not recursively loop?
       if (extended && extend.type === 'count') {
         extended = extended.size;
       }
