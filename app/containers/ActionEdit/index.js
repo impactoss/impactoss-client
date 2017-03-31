@@ -63,14 +63,14 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       attributes: props.action.attributes,
     };
 
-    const { taxonomies, recommendations } = this.props;
+    const { taxonomies, recommendations, indicators } = this.props;
     // TODO this functionality should be shared
       // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }
     data.associatedTaxonomies = taxonomies
       ? Object.values(taxonomies).reduce((values, tax) => {
         const result = values;
-        result[tax.id] = Object.values(tax.categories).reduce((ids, cat) =>
-          cat.associated ? ids.concat([cat.id]) : ids
+        result[tax.id] = Object.values(tax.categories).reduce((ids, entity) =>
+          entity.associated ? ids.concat([entity.id]) : ids
         , []);
         return result;
       }, {})
@@ -79,8 +79,14 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     // TODO this functionality should be shared
       // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }
     data.associatedRecommendations = recommendations
-      ? Object.values(recommendations).reduce((ids, rec) =>
-          rec.associated ? ids.concat([rec.id]) : ids
+      ? Object.values(recommendations).reduce((ids, entity) =>
+          entity.associated ? ids.concat([entity.id]) : ids
+        , [])
+      : [];
+
+    data.associatedIndicators = indicators
+      ? Object.values(indicators).reduce((ids, entity) =>
+          entity.associated ? ids.concat([entity.id]) : ids
         , [])
       : [];
 
@@ -95,6 +101,11 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   mapRecommendationOptions = (recommendations) => Object.values(recommendations).map((rec) => ({
     value: rec.id,
     label: rec.attributes.title,
+  }));
+
+  mapIndicatorOptions = (indicators) => Object.values(indicators).map((entity) => ({
+    value: entity.id,
+    label: entity.attributes.title,
   }));
 
 
@@ -114,6 +125,15 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     label: 'Recommendations',
     controlType: 'multiselect',
     options: this.mapRecommendationOptions(recommendations),
+  }) : [];
+
+  // TODO this should be shared functionality
+  renderIndicatorControl = (indicators) => indicators ? ({
+    id: 'indicators',
+    model: '.associatedIndicators',
+    label: 'Indicators',
+    controlType: 'multiselect',
+    options: this.mapIndicatorOptions(indicators),
   }) : [];
 
 
@@ -156,7 +176,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 onClick: () => this.props.handleSubmit(
                   this.props.form.data,
                   this.props.taxonomies,
-                  this.props.recommendations
+                  this.props.recommendations,
+                  this.props.indicators
                 ),
               },
             ]}
@@ -172,7 +193,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 this.props.taxonomies,
-                this.props.recommendations
+                this.props.recommendations,
+                this.props.indicators
               )}
               handleCancel={this.props.handleCancel}
               fields={{
@@ -223,6 +245,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                       model: '.attributes.description',
                     },
                     this.renderRecommendationControl(this.props.recommendations),
+                    this.renderIndicatorControl(this.props.indicators),
                   ],
                   aside: this.renderTaxonomyControl(this.props.taxonomies),
                 },
@@ -247,6 +270,7 @@ ActionEdit.propTypes = {
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
+  indicators: PropTypes.object,
 };
 
 ActionEdit.contextTypes = {
@@ -264,6 +288,8 @@ const mapStateToProps = (state, props) => ({
     'recommendations',
     'recommendation_measures',
     'measure_categories',
+    'indicators',
+    'measure_indicators',
   ] }),
   action: getEntity(
     state,
@@ -321,6 +347,22 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
+  indicators: getEntities(
+    state,
+    {
+      path: 'indicators',
+      out: 'js',
+      extend: {
+        as: 'associated',
+        path: 'measure_indicators',
+        key: 'indicator_id',
+        reverse: true,
+        where: {
+          measure_id: props.params.id,
+        },
+      },
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -333,11 +375,13 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('measure_indicators'));
     },
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, fromJS(formData)));
     },
-    handleSubmit: (formData, taxonomies, recommendations) => {
+    handleSubmit: (formData, taxonomies, recommendations, indicators) => {
       // TODO maybe this function should be updated to work with Immutable objects, instead of converting
       // const prevTaxonomies = prevFormData.associatedTaxonomies || {};
       const saveData = formData.toJS();
@@ -393,6 +437,33 @@ function mapDispatchToProps(dispatch, props) {
           Object.keys(associatedRecommendations).indexOf(recId.toString()) === -1
             ? payloads.concat([{
               recommendation_id: recId,
+              measure_id: saveData.id,
+            }])
+            : payloads
+        , []),
+      };
+
+      // indicators
+      const formIndicatorIds = saveData.associatedIndicators;
+      // store associated recs as { [rec.id]: [association.id], ... }
+      const associatedIndicators = Object.values(indicators).reduce((indicatorsAssociated, indicator) => {
+        const result = indicatorsAssociated;
+        if (indicator.associated) {
+          result[indicator.id] = Object.keys(indicator.associated)[0];
+        }
+        return result;
+      }, {});
+
+      saveData.measure_indicators = {
+        delete: reduce(associatedIndicators, (associatedIds, associatedId, id) =>
+          formIndicatorIds.indexOf(id.toString()) === -1
+            ? associatedIds.concat([associatedId])
+            : associatedIds
+        , []),
+        create: reduce(formIndicatorIds, (payloads, id) =>
+          Object.keys(associatedIndicators).indexOf(id.toString()) === -1
+            ? payloads.concat([{
+              indicator_id: id,
               measure_id: saveData.id,
             }])
             : payloads
