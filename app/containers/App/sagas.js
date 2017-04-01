@@ -14,6 +14,7 @@ import {
     AUTHENTICATE,
     AUTHENTICATE_SUCCESS,
     LOGOUT,
+    LOGOUT_SUCCESS,
     VALIDATE_TOKEN,
 } from 'containers/App/constants';
 
@@ -105,12 +106,17 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', 'auth/sign_out');
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(invalidateEntities());
   } catch (err) {
     yield call(clearAuthValues);
       // TODO ensure this is displayed
     yield put(authenticateError(err));
   }
+}
+
+export function* logoutSuccessSaga() {
+  yield put(invalidateEntities());
+  const nextPathName = yield select(makeSelectNextPathname());
+  yield put(push(nextPathName || 'login'));
 }
 
 export function* validateTokenSaga() {
@@ -291,4 +297,5 @@ export default function* rootSaga() {
   yield takeLatest(AUTHENTICATE, authenticateSaga);
   yield takeLatest(AUTHENTICATE_SUCCESS, authenticateSuccessSaga);
   yield takeLatest(LOGOUT, logoutSaga);
+  yield takeLatest(LOGOUT_SUCCESS, logoutSuccessSaga);
 }

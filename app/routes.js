@@ -38,10 +38,10 @@ export default function createRoutes(store) {
       },
     }, {
       path: '/logout',
-      name: 'logout',
+      name: 'userLogout',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/LogoutPage'),
+          import('containers/UserLogout'),
         ]);
 
         const renderRoute = loadModule(cb);
