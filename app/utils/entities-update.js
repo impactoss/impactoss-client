@@ -33,3 +33,8 @@ export function newEntityRequest(path, payload) {
   // create new entity with attributes
   return apiRequest('post', `${path}`, payload);
 }
+
+export function registerUserRequest(payload) {
+  // create new entity with attributes
+  return apiRequest('post', 'auth', payload);
+}

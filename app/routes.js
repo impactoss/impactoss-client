@@ -75,18 +75,19 @@ export default function createRoutes(store) {
       },
     }, {
       path: '/register',
-      name: 'registerUserPage',
+      name: 'userRegister',
+      onEnter: redirectToHomeIfSignedIn,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/RegisterUserPage/reducer'),
-          import('containers/RegisterUserPage/sagas'),
-          import('containers/RegisterUserPage'),
+          import('containers/UserRegister/reducer'),
+          import('containers/UserRegister/sagas'),
+          import('containers/UserRegister'),
         ]);
 
         const renderRoute = loadModule(cb);
 
         importModules.then(([reducer, sagas, component]) => {
-          injectReducer('registerUserPage', reducer.default);
+          injectReducer('userRegister', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });

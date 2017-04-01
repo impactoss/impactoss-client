@@ -6,16 +6,14 @@ import Grid from 'grid-styled';
 
 import Row from 'components/basic/Row';
 import FormWrapper from 'components/basic/FormWrapper';
-import MultiSelect from 'components/MultiSelect';
-import FormHeader from './FormHeader';
-import FormBody from './FormBody';
-import FormFooter from './FormFooter';
-import ControlInfo from './ControlInfo';
-import ControlInput from './ControlInput';
-import ControlTextArea from './ControlTextArea';
-import ControlSelect from './ControlSelect';
-import Label from './Label';
-import Field from './Field';
+import FormBody from '../FormBody';
+import FormFooter from '../FormFooter';
+import ControlInfo from '../ControlInfo';
+import ControlInput from '../ControlInput';
+import ControlTextArea from '../ControlTextArea';
+import ControlSelect from '../ControlSelect';
+import Label from '../Label';
+import Field from '../Field';
 
 const controls = {
   input: ControlInput,
@@ -26,13 +24,12 @@ const controls = {
   file: Control.file,
   select: ControlSelect,
   button: Control.button,
-  multiselect: MultiSelect,
 };
 
 // These props will be omitted before being passed to the Control component
 const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
 
-class EntityForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class SimpleForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   getFieldComponent = (field) => {
     if (field.component) {
@@ -105,46 +102,20 @@ class EntityForm extends React.PureComponent { // eslint-disable-line react/pref
           model={this.props.model}
           onSubmit={this.props.handleSubmit}
         >
-          {
-            fields.header &&
-            <FormHeader>
-              <Row>
-                <Grid sm={3 / 4}>
-                  {
-                    fields.header.main &&
-                    this.renderSection(fields.header.main)
-                  }
-                </Grid>
-                <Grid sm={1 / 4}>
-                  {
-                    fields.header.aside &&
-                    this.renderSection(fields.header.aside)
-                  }
-                </Grid>
-              </Row>
-            </FormHeader>
-          }
-          { fields.body &&
-            <FormBody>
-              <Row>
-                <Grid sm={3 / 4}>
-                  {
-                    fields.body.main &&
-                    this.renderSection(fields.body.main)
-                  }
-                </Grid>
-                <Grid sm={1 / 4}>
-                  {
-                    fields.body.aside &&
-                    this.renderSection(fields.body.aside)
-                  }
-                </Grid>
-              </Row>
-            </FormBody>
-          }
+          <FormBody>
+            <Row>
+              <Grid sm={1 / 4}></Grid>
+              <Grid sm={1 / 2}>
+                {
+                  fields &&
+                  this.renderSection(fields)
+                }
+              </Grid>
+            </Row>
+          </FormBody>
           <FormFooter>
             <button onClick={this.props.handleCancel}>Cancel</button>
-            <button type="submit">Save</button>
+            <button type="submit">{this.props.labels.submit}</button>
           </FormFooter>
         </Form>
       </FormWrapper>
@@ -152,11 +123,12 @@ class EntityForm extends React.PureComponent { // eslint-disable-line react/pref
   }
 }
 
-EntityForm.propTypes = {
+SimpleForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  labels: PropTypes.object,
   model: PropTypes.string,
-  fields: PropTypes.object,
+  fields: PropTypes.array,
 };
 
-export default EntityForm;
+export default SimpleForm;

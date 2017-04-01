@@ -13,7 +13,7 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { getEntity, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
-import EntityForm from 'components/EntityForm';
+import EntityForm from 'components/forms/EntityForm';
 
 import categoryNewSelector from './selectors';
 import messages from './messages';

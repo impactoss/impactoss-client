@@ -16,7 +16,7 @@ import { fromJS } from 'immutable';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import Page from 'components/Page';
-import EntityForm from 'components/EntityForm';
+import EntityForm from 'components/forms/EntityForm';
 
 import {
   getEntity,

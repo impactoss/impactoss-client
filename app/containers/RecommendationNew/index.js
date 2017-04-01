@@ -16,7 +16,7 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { getEntities, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
-import EntityForm from 'components/EntityForm';
+import EntityForm from 'components/forms/EntityForm';
 
 import recommendationNewSelector from './selectors';
 import messages from './messages';
