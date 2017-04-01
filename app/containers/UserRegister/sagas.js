@@ -2,15 +2,15 @@ import { takeLatest, put, take, cancel, call } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import { browserHistory } from 'react-router';
 
-import {
-  userRegisterSending,
-  userRegisterSuccess,
-  userRegisterError,
-} from 'containers/UserRegister/actions';
 
 import { authenticate } from 'containers/App/actions';
 import { registerUserRequest } from 'utils/entities-update';
 
+import {
+  userRegisterSending,
+  userRegisterSuccess,
+  userRegisterError,
+} from './actions';
 import { SAVE } from './constants';
 
 

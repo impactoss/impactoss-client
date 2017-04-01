@@ -54,20 +54,18 @@ export default function createRoutes(store) {
       },
     }, {
       path: '/login',
-      name: 'loginPage',
+      name: 'userLogin',
       onEnter: redirectToHomeIfSignedIn,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/LoginPage/reducer'),
-          import('containers/LoginPage/sagas'),
-          import('containers/LoginPage'),
+          import('containers/UserLogin/reducer'),
+          import('containers/UserLogin'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('loginPage', reducer.default);
-          injectSagas(sagas.default);
+        importModules.then(([reducer, component]) => {
+          injectReducer('userLogin', reducer.default);
           renderRoute(component);
         });
 

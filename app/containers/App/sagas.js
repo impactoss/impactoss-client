@@ -97,9 +97,7 @@ export function* authenticateSaga(payload) {
 
 export function* authenticateSuccessSaga() {
   const nextPathName = yield select(makeSelectNextPathname());
-  if (nextPathName) {
-    yield put(push(nextPathName));
-  }
+  yield put(push(nextPathName || '/'));
 }
 
 export function* logoutSaga() {
