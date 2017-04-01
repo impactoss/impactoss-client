@@ -59,13 +59,15 @@ export default function createRoutes(store) {
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserLogin/reducer'),
+          import('containers/UserLogin/sagas'),
           import('containers/UserLogin'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, component]) => {
+        importModules.then(([reducer, sagas, component]) => {
           injectReducer('userLogin', reducer.default);
+          injectSagas(sagas.default);
           renderRoute(component);
         });
 
@@ -87,6 +89,22 @@ export default function createRoutes(store) {
         importModules.then(([reducer, sagas, component]) => {
           injectReducer('userRegister', reducer.default);
           injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/users/:id',
+      name: 'userView',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 

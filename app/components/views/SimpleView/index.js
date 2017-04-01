@@ -1,6 +1,6 @@
 /**
 *
-* EntityView
+* SimpleView
 *
 */
 
@@ -11,12 +11,10 @@ import ViewWrapper from 'components/basic/ViewWrapper';
 import Grid from 'grid-styled';
 
 import Row from 'components/basic/Row';
-import ViewHeader from './ViewHeader';
-import ViewBody from './ViewBody';
-// import ViewFooter from './ViewFooter';
+import ViewBody from '../ViewBody';
 
 
-class EntityView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class SimpleView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   renderList = (field, index) => (
     <span key={index}>
       {field.heading &&
@@ -54,34 +52,12 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
     return (
       <span>
         <ViewWrapper>
-          { fields.header &&
-            <ViewHeader>
-              <Row>
-                <Grid sm={3 / 4}>
-                  { fields.header.main &&
-                    this.renderSection(fields.header.main)
-                  }
-                </Grid>
-                <Grid sm={1 / 4}>
-                  { fields.header.aside &&
-                    this.renderSection(fields.header.aside)
-                  }
-                </Grid>
-              </Row>
-            </ViewHeader>
-          }
-          { fields.body &&
+          { fields &&
             <ViewBody>
               <Row>
-                <Grid sm={3 / 4}>
-                  { fields.body.main &&
-                    this.renderSection(fields.body.main)
-                  }
-                </Grid>
-                <Grid sm={1 / 4}>
-                  { fields.body.aside &&
-                    this.renderSection(fields.body.aside)
-                  }
+                <Grid sm={1 / 4}></Grid>
+                <Grid sm={1 / 2}>
+                  { this.renderSection(fields) }
                 </Grid>
               </Row>
             </ViewBody>
@@ -92,8 +68,8 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   }
 }
 
-EntityView.propTypes = {
-  fields: React.PropTypes.object,
+SimpleView.propTypes = {
+  fields: React.PropTypes.array,
 };
 
-export default EntityView;
+export default SimpleView;

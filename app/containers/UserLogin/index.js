@@ -14,9 +14,9 @@ import { browserHistory, Link } from 'react-router';
 import Page from 'components/Page';
 import SimpleForm from 'components/forms/SimpleForm';
 
-import { authenticate } from 'containers/App/actions';
 import { makeSelectAuth } from 'containers/App/selectors';
 
+import { login } from './actions';
 import makeUserLoginSelector from './selectors';
 import messages from './messages';
 
@@ -120,8 +120,7 @@ const mapStateToProps = createStructuredSelector({
 export function mapDispatchToProps(dispatch) {
   return {
     handleSubmit: (formData) => {
-      // console.log(formData.toJS())
-      dispatch(authenticate(formData.toJS()));
+      dispatch(login(formData.toJS()));
     },
     handleCancel: () => {
       // not really a dispatch function here, could be a member function instead

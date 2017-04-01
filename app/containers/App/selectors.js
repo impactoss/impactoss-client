@@ -41,10 +41,23 @@ const makeSelectAuth = () => createSelector(
   (globalState) => globalState.get('auth').toJS()
 );
 
-const makeSelectSignedIn = () => createSelector(
+const getCurrentUser = createSelector(
   getGlobal,
-  (globalState) => globalState.getIn(['user', 'isSignedIn'])
+  (globalState) => globalState.get('user')
 );
+
+const getCurrentUserId = createSelector(
+  getCurrentUser,
+  (user) => user && user.attributes && user.getIn(['attributes', 'id']).toString()
+);
+
+const isSignedIn = createSelector(
+  getCurrentUser,
+  (currentUser) => currentUser.get('isSignedIn')
+);
+
+const makeSelectSignedIn = () => isSignedIn;
+const makeSelectCurrentUserId = () => getCurrentUserId;
 
 // makeSelectLocationState expects a plain JS object for the routing state
 const makeSelectLocationState = () => {
@@ -62,16 +75,6 @@ const makeSelectLocationState = () => {
     return prevRoutingStateJS;
   };
 };
-
-const makeSelectEmail = () => createSelector(
-  getGlobal,
-  (globalState) => globalState.getIn(['form', 'login', 'email'])
-);
-
-const makeSelectPassword = () => createSelector(
-  getGlobal,
-  (globalState) => globalState.getIn(['form', 'login', 'password'])
-);
 
 const makeSelectNextPathname = () => createSelector(
   getRoute,
@@ -101,6 +104,11 @@ const getEntitiesPure = createSelector(
   getGlobalEntities,
   (state, { path }) => path,
   (entities, path) => entities.get(path)
+);
+
+const getUsersPure = createSelector(
+  getGlobalEntities,
+  (entities) => entities.get('users')
 );
 
 // check if entities are not connected to any other entities via associative table
@@ -297,6 +305,12 @@ const getEntityPure = createSelector(
   (entities, id) => entities.get(id)
 );
 
+const getUserPure = createSelector(
+  getUsersPure,
+  (state, { id }) => id && id.toString(),
+  (users, id) => users.get(id)
+);
+
 const hasEntity = createSelector(
   getEntitiesPure,
   (state, { id }) => id,
@@ -320,14 +334,22 @@ const getEntity = createSelector(
   }
 );
 
+const getUser = createSelector(
+  (state) => state,
+  getUserPure,
+  (state, { out }) => out,
+  (state, user, out) => {
+    const result = user || getCurrentUser(state);
+    return result && out === 'js' ? result.toJS() : result;
+  }
+);
+
 
 export {
   getGlobal,
   makeSelectLoading,
   makeSelectError,
   makeSelectLocationState,
-  makeSelectEmail,
-  makeSelectPassword,
   makeSelectSignedIn,
   makeSelectAuth,
   makeSelectNextPathname,
@@ -339,4 +361,9 @@ export {
   getEntitiesPaged,
   hasEntity,
   getEntity,
+  getUser,
+  getCurrentUser,
+  isSignedIn,
+  makeSelectCurrentUserId,
+  getCurrentUserId,
 };
