@@ -62,8 +62,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       sortOrder
     );
 
-    // console.log(entities)
-    // console.log(connections)
+    const URLParams = new URLSearchParams(location.search);
 
     // console.log(this.props)
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
@@ -108,7 +107,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   value: catId,
                   count: 1,
                   query: filters.taxonomies.query,
-                  isSet: !!(location.query.cat && location.query.cat.split(' ').indexOf(catId.toString()) > -1),
+                //   isSet: !!(location.query.cat && location.query.cat.split(' ').indexOf(catId.toString()) > -1),
+                  isSet: URLParams.has(location.query.cat) && URLParams.getAll(location.query.cat).indexOf(catId.toString()) > -1,
                 };
               }
             }
@@ -199,7 +199,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     value: `${connection.path}:${catId}`,
                     count: 1,
                     query: filters.connectedTaxonomies.query,
-                    isSet: !!(location.query.catx && location.query.catx.split(' ').indexOf(`${connection.path}:${catId}`) > -1),
+                    isSet: URLParams.has(location.query.catx) && URLParams.getAll(location.query.catx).indexOf(`${connection.path}:${catId}`) > -1,
                   };
                 }
               }
@@ -243,7 +243,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     value: connectedId,
                     count: 1,
                     query: option.path,
-                    isSet: !!(location.query[option.path] && location.query[option.path].split(' ').indexOf(connectedId.toString()) > -1),
+                    isSet: URLParams.has(location.query[option.path]) && URLParams.getAll(location.query[option.path]).indexOf(connectedId.toString()) > -1,
                   };
                 }
               }
@@ -291,7 +291,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 value,
                 count: 1,
                 query: 'where',
-                isSet: !!(location.query.where && location.query.where.split(' ').indexOf(`${attributeOption.attribute}:${value}`) > -1),
+                isSet: URLParams.has(location.query.where) && URLParams.getAll(location.query.where).indexOf(`${attributeOption.attribute}:${value}`) > -1,
               };
             }
           }
@@ -350,6 +350,8 @@ const getAttributeQuery = (props) =>
     return r;
   }, {});
 
+const asArray = (v) => Array.isArray(v) ? v : [v];
+
 // associative conditions
 const getConnectedQuery = (props) => {
   const connected = [];
@@ -358,30 +360,28 @@ const getConnectedQuery = (props) => {
     // "cat=1+2+3" catids regardless of taxonomy
     if (props.filters.taxonomies && queryKey === props.filters.taxonomies.query) {
       const condition = props.filters.taxonomies.connected;
-      condition.where = value.split(' ').map((catId) => ({
+      condition.where = asArray(value).map((catId) => ({
         [condition.whereKey]: catId,
       })); // eg { category_id: 3 }
       connected.push(condition);
-    }
     // filter by associated entity
     // "recommendations=1+2" recommendationids
-    if (props.filters.connections && map(props.filters.connections.options, 'query').indexOf(queryKey) > -1) {
+    } else if (props.filters.connections && map(props.filters.connections.options, 'query').indexOf(queryKey) > -1) {
       const connectedEntity = find(
         props.filters.connections.options,
         { query: queryKey }
       );
       if (connectedEntity) {
         const condition = connectedEntity.connected;
-        condition.where = value.split(' ').map((connectionId) => ({
+        condition.where = asArray(value).map((connectionId) => ({
           [condition.whereKey]: connectionId,
         })); // eg { recommendation_id: 3 }
         connected.push(condition);
       }
-    }
     // filter by associated category of associated entity
     // query:"catx=recommendations:1" entitypath:catids regardless of taxonomy
-    if (props.filters.connectedTaxonomies && queryKey === props.filters.connectedTaxonomies.query) {
-      value.split(' ').forEach((val) => {
+    } else if (props.filters.connectedTaxonomies && queryKey === props.filters.connectedTaxonomies.query) {
+      asArray(value).forEach((val) => {
         const pathValue = val.split(':');
         const connectedTaxonomy = find(
           props.filters.connectedTaxonomies.connections,
@@ -404,7 +404,7 @@ const getConnectedQuery = (props) => {
 // absent taxonomy conditions
 // query:"without=1+2+3+actions" either tax-id (numeric) or table path
 const getWithoutQuery = (props) =>
-  props.location.query.without.split(' ').map((pathOrTax) => {
+  asArray(props.location.query.without).map((pathOrTax) => {
     // check numeric ? taxonomy filter : related entity filter
     if (!isNaN(parseFloat(pathOrTax)) && isFinite(pathOrTax)) {
       return {

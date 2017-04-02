@@ -12,7 +12,7 @@ const selectEntityListFiltersDomain = (state) => state.get(REDUCER_PATH);
 
 const formSelector = createSelector(
   selectEntityListFiltersDomain,
-  (substate) => substate.get('form')
+  (substate) => substate.get('form').data // TODO WTF HTF GRR
  );
 
 const pageSelector = createSelector(
@@ -28,6 +28,24 @@ const showFilterFormSelector = createSelector(
 const formOptionsSelector = createSelector(
   pageSelector,
   (pageState) => pageState.get('formOptions')
+);
+
+const filtersCheckedSelector = createSelector(
+  formSelector,
+  // () => window.location.href,
+  // (formData, href) => {
+  (formData) => {
+    const values = formData.get('values');
+    // going to want some intesection logic here aren't we
+    // some way to remove all the existing params that we are using before appending
+    // SEE https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
+    // const url = new URL(href);
+    return values.reduce((URLParams, value) => {
+      URLParams.append(value.get('query'), value.get('value'));
+      return URLParams;
+    }, new URLSearchParams());
+    // }, new URLSearchParams(url.search));
+  }
 );
 
 /**
@@ -46,4 +64,5 @@ export {
   formSelector,
   showFilterFormSelector,
   formOptionsSelector,
+  filtersCheckedSelector,
 };

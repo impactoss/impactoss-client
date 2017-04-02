@@ -13,6 +13,7 @@ import {
 
 const initialState = fromJS({
   showFilterForm: false,
+  formOptions: [],
 });
 
 const formData = fromJS({
@@ -25,7 +26,11 @@ function entityListFilterReducer(state = initialState, action) {
     case SHOW_FILTER_FORM:
       return state
       .set('showFilterForm', true)
-      .set('formOptions', action.options);
+      .set('formTitle', action.title)
+      .set('formOptions', fromJS(action.options.map((option) => ({
+        label: option.label,
+        value: option,
+      }))));
     default:
       return state;
   }
