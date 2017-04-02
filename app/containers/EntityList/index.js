@@ -288,7 +288,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               const attribute = find(attributeOption.options, (option) => option.value.toString() === value);
               filterOptions.attributes.options[attributeOption.attribute].options[value] = {
                 label: attribute ? attribute.label : value,
-                value,
+                value: `${attributeOption.attribute}:${value}`,
                 count: 1,
                 query: 'where',
                 isSet: URLParams.has(location.query.where) && URLParams.getAll(location.query.where).indexOf(`${attributeOption.attribute}:${value}`) > -1,
@@ -343,7 +343,7 @@ EntityList.defaultProps = {
 // attribute conditions
 // query:"where=att1:value+att2:value"
 const getAttributeQuery = (props) =>
-  props.location.query.where.split(' ').reduce((result, item) => {
+  asArray(props.location.query.where).reduce((result, item) => {
     const r = result;
     const keyValue = item.split(':');
     r[keyValue[0]] = keyValue[1];
