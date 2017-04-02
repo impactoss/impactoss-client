@@ -41,10 +41,8 @@ const makeSelectAuth = () => createSelector(
   (globalState) => globalState.get('auth').toJS()
 );
 
-const makeSelectSignedIn = () => createSelector(
-  getGlobal,
-  (globalState) => globalState.getIn(['user', 'isSignedIn'])
-);
+const makeSelectSignedIn = () => isSignedIn;
+const makeSelectSessionUserId = () => getSessionUserId;
 
 // makeSelectLocationState expects a plain JS object for the routing state
 const makeSelectLocationState = () => {
@@ -63,21 +61,22 @@ const makeSelectLocationState = () => {
   };
 };
 
-const makeSelectEmail = () => createSelector(
-  getGlobal,
-  (globalState) => globalState.getIn(['form', 'login', 'email'])
-);
-
-const makeSelectPassword = () => createSelector(
-  getGlobal,
-  (globalState) => globalState.getIn(['form', 'login', 'password'])
-);
-
-const makeSelectNextPathname = () => createSelector(
+const makeSelectPathnameOnAuthChange = () => createSelector(
   getRoute,
   (routeState) => {
     try {
-      return routeState.getIn(['locationBeforeTransitions', 'state', 'nextPathname']);
+      return routeState.getIn(['locationBeforeTransitions', 'pathnameOnAuthChange']);
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
+const makeSelectPreviousPathname = () => createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.getIn(['locationBeforeTransitions', 'pathnamePrevious']);
     } catch (error) {
       return null;
     }
@@ -101,6 +100,11 @@ const getEntitiesPure = createSelector(
   getGlobalEntities,
   (state, { path }) => path,
   (entities, path) => entities.get(path)
+);
+
+const getUserEntities = createSelector(
+  getGlobalEntities,
+  (entities) => entities.get('users')
 );
 
 // check if entities are not connected to any other entities via associative table
@@ -321,16 +325,54 @@ const getEntity = createSelector(
 );
 
 
+const getSessionUser = createSelector(
+  getGlobal,
+  (state) => state.get('user')
+);
+
+const getSessionUserId = createSelector(
+  getSessionUser,
+  (sessionUser) =>
+    sessionUser
+    && sessionUser.get('attributes')
+    && sessionUser.get('attributes').id.toString()
+);
+
+const isSignedIn = createSelector(
+  getSessionUser,
+  (sessionUser) => sessionUser.get('isSignedIn')
+);
+
+const getUserEntity = createSelector(
+  getUserEntities,
+  (state, { id }) => id && id.toString(),
+  (users, id) => users.get(id)
+);
+
+const getUser = createSelector(
+  (state) => state,
+  getUserEntity,
+  (state, { out }) => out,
+  (state, { extend }) => extend,
+  (state, user, out, extend) => {
+    let result = user || getUserEntity(state, { id: getSessionUserId(state) });
+    if (result && extend) {
+      result = extendEntity(state, result, extend);
+    }
+    return result && out === 'js' ? result.toJS() : result;
+  }
+);
+
+
 export {
   getGlobal,
   makeSelectLoading,
   makeSelectError,
   makeSelectLocationState,
-  makeSelectEmail,
-  makeSelectPassword,
   makeSelectSignedIn,
   makeSelectAuth,
-  makeSelectNextPathname,
+  makeSelectPathnameOnAuthChange,
+  makeSelectPreviousPathname,
   getRequestedAt,
   isReady,
   getEntitiesWhere,
@@ -339,4 +381,9 @@ export {
   getEntitiesPaged,
   hasEntity,
   getEntity,
+  getUser,
+  getSessionUser,
+  isSignedIn,
+  makeSelectSessionUserId,
+  getSessionUserId,
 };

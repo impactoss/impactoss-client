@@ -22,6 +22,10 @@ export default defineMessages({
     id: 'nmrf.components.Header.logout',
     defaultMessage: 'Logout',
   },
+  user: {
+    id: 'nmrf.components.Header.user',
+    defaultMessage: 'User profile',
+  },
   register: {
     id: 'nmrf.components.Header.register',
     defaultMessage: 'Register',
