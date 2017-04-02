@@ -61,11 +61,22 @@ const makeSelectLocationState = () => {
   };
 };
 
-const makeSelectNextPathname = () => createSelector(
+const makeSelectPathnameOnAuthChange = () => createSelector(
   getRoute,
   (routeState) => {
     try {
-      return routeState.getIn(['locationBeforeTransitions', 'state', 'nextPathname']);
+      return routeState.getIn(['locationBeforeTransitions', 'pathnameOnAuthChange']);
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
+const makeSelectPreviousPathname = () => createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.getIn(['locationBeforeTransitions', 'pathnamePrevious']);
     } catch (error) {
       return null;
     }
@@ -360,7 +371,8 @@ export {
   makeSelectLocationState,
   makeSelectSignedIn,
   makeSelectAuth,
-  makeSelectNextPathname,
+  makeSelectPathnameOnAuthChange,
+  makeSelectPreviousPathname,
   getRequestedAt,
   isReady,
   getEntitiesWhere,

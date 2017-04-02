@@ -5,15 +5,15 @@
  */
 
 import {
-  SAVE,
+  REGISTER,
   REGISTER_USER_SENDING,
   REGISTER_USER_SUCCESS,
   REGISTER_USER_ERROR,
 } from './constants';
 
-export function save(data) {
+export function register(data) {
   return {
-    type: SAVE,
+    type: REGISTER,
     data,
   };
 }

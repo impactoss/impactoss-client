@@ -15,7 +15,7 @@ import SimpleForm from 'components/forms/SimpleForm';
 
 import userRegisterSelector from './selectors';
 import messages from './messages';
-import { save } from './actions';
+import { register } from './actions';
 
 
 export class UserRegister extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -142,7 +142,7 @@ const mapStateToProps = (state) => ({
 export function mapDispatchToProps(dispatch) {
   return {
     handleSubmit: (formData) => {
-      dispatch(save(formData.toJS()));
+      dispatch(register(formData.toJS()));
     },
     handleCancel: () => {
       // not really a dispatch function here, could be a member function instead

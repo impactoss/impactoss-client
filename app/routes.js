@@ -17,7 +17,7 @@ const loadModule = (cb) => (componentModule) => {
 export default function createRoutes(store) {
   // Create reusable async injectors using getAsyncInjectors factory
   const { injectReducer, injectSagas } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
-  const { redirectToLoginIfNeeded, redirectToHomeIfSignedIn } = getRedirects(store);
+  const { redirectIfNotPermitted, redirectIfLoggedIn } = getRedirects(store);
 
   return [
     {
@@ -55,7 +55,7 @@ export default function createRoutes(store) {
     }, {
       path: '/login',
       name: 'userLogin',
-      onEnter: redirectToHomeIfSignedIn,
+      onEnter: redirectIfLoggedIn,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserLogin/reducer'),
@@ -76,7 +76,7 @@ export default function createRoutes(store) {
     }, {
       path: '/register',
       name: 'userRegister',
-      onEnter: redirectToHomeIfSignedIn,
+      onEnter: redirectIfLoggedIn,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserRegister/reducer'),
@@ -97,6 +97,7 @@ export default function createRoutes(store) {
     }, {
       path: '/users/:id',
       name: 'userView',
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserView'),
@@ -113,7 +114,7 @@ export default function createRoutes(store) {
     }, {
       path: '/users/edit/:id',
       name: 'userEdit',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserEdit/reducer'),
@@ -134,7 +135,7 @@ export default function createRoutes(store) {
     }, {
       path: '/users/password/:id',
       name: 'userPassword',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserPassword/reducer'),
@@ -175,7 +176,7 @@ export default function createRoutes(store) {
     }, {
       path: '/actions/new',
       name: 'actionNew',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ActionNew/reducer'),
@@ -212,7 +213,7 @@ export default function createRoutes(store) {
     }, {
       path: '/actions/edit/:id',
       name: 'actionEdit',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ActionEdit/reducer'),
@@ -289,7 +290,7 @@ export default function createRoutes(store) {
     }, {
       path: '/recommendations/edit/:id',
       name: 'recommendationEdit',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/RecommendationEdit/reducer'),
@@ -342,7 +343,7 @@ export default function createRoutes(store) {
     }, {
       path: '/categories/:id/new', // the taxonomy id
       name: 'categoryNew',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/CategoryNew/reducer'),
@@ -379,7 +380,7 @@ export default function createRoutes(store) {
     }, {
       path: '/category/edit/:id',
       name: 'categoryEdit',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/CategoryEdit/reducer'),
