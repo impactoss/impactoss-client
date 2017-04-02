@@ -16,7 +16,7 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import Page from 'components/Page';
-import EntityView from 'components/EntityView';
+import EntityView from 'components/views/EntityView';
 
 import {
   getEntity,
@@ -40,6 +40,12 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     browserHistory.push('/actions');
     // TODO should be "go back" if history present or to actions list when not
   }
+
+  mapIndicators = (indicators) =>
+    Object.values(indicators).map((indicator) => ({
+      label: indicator.attributes.title,
+      linkTo: `/indicators/${indicator.id}`,
+    }))
 
   mapRecommendations = (recommendations) =>
     Object.values(recommendations).map((recommendation) => ({
@@ -146,6 +152,12 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                       type: 'list',
                       values: this.mapRecommendations(this.props.recommendations),
                     },
+                    {
+                      id: 'indicators',
+                      heading: 'Indicators',
+                      type: 'list',
+                      values: this.mapIndicators(this.props.indicators),
+                    },
                   ],
                   aside: this.renderTaxonomyLists(this.props.taxonomies),
                 },
@@ -164,6 +176,7 @@ ActionView.propTypes = {
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
+  indicators: PropTypes.object,
   params: PropTypes.object,
 };
 
@@ -181,6 +194,8 @@ const mapStateToProps = (state, props) => ({
     'recommendations',
     'recommendation_measures',
     'measure_categories',
+    'indicators',
+    'measure_indicators',
   ] }),
   action: getEntity(
     state,
@@ -207,8 +222,7 @@ const mapStateToProps = (state, props) => ({
       extend: {
         path: 'categories',
         key: 'taxonomy_id',
-        reverse: true,
-        join: {
+        connected: {
           path: 'measure_categories',
           key: 'category_id',
           where: {
@@ -224,10 +238,23 @@ const mapStateToProps = (state, props) => ({
     state, {
       path: 'recommendations',
       out: 'js',
-      join: {
+      connected: {
         path: 'recommendation_measures',
         key: 'recommendation_id',
-        reverse: true,
+        where: {
+          measure_id: props.params.id,
+        },
+      },
+    },
+  ),
+  // all connected indicators
+  indicators: getEntities(
+    state, {
+      path: 'indicators',
+      out: 'js',
+      connected: {
+        path: 'measure_indicators',
+        key: 'indicator_id',
         where: {
           measure_id: props.params.id,
         },
@@ -246,6 +273,8 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('measure_indicators'));
     },
   };
 }

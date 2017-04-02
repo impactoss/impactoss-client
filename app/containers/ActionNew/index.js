@@ -16,7 +16,7 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { getEntities, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
-import EntityForm from 'components/EntityForm';
+import EntityForm from 'components/forms/EntityForm';
 
 import actionNewSelector from './selectors';
 import messages from './messages';
@@ -39,6 +39,11 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     label: rec.attributes.title,
   }));
 
+  mapIndicatorOptions = (indicators) => Object.values(indicators).map((indicator) => ({
+    value: indicator.id,
+    label: indicator.attributes.title,
+  }));
+
   // TODO this should be shared functionality
   renderTaxonomyControl = (taxonomies) => taxonomies ? Object.values(taxonomies).map((tax) => ({
     id: tax.id,
@@ -55,6 +60,15 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     label: 'Recommendations',
     controlType: 'multiselect',
     options: this.mapRecommendationOptions(recommendations),
+  }) : [];
+
+  // TODO this should be shared functionality
+  renderIndicatorControl = (indicators) => indicators ? ({
+    id: 'indicators',
+    model: '.associatedIndicators',
+    label: 'Indicators',
+    controlType: 'multiselect',
+    options: this.mapIndicatorOptions(indicators),
   }) : [];
 
   render() {
@@ -142,6 +156,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                       model: '.attributes.description',
                     },
                     this.renderRecommendationControl(this.props.recommendations),
+                    this.renderIndicatorControl(this.props.indicators),
                   ],
                   aside: this.renderTaxonomyControl(this.props.taxonomies),
                 },
@@ -162,6 +177,7 @@ ActionNew.propTypes = {
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
+  indicators: PropTypes.object,
 };
 
 ActionNew.contextTypes = {
@@ -175,6 +191,7 @@ const mapStateToProps = (state) => ({
     'categories',
     'taxonomies',
     'recommendations',
+    'indicators',
   ] }),
   taxonomies: getEntities(
     state,
@@ -198,6 +215,13 @@ const mapStateToProps = (state) => ({
       out: 'js',
     },
   ),
+  // all indicators,
+  indicators: getEntities(
+    state, {
+      path: 'indicators',
+      out: 'js',
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -208,6 +232,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
       // dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       // dispatch(loadEntitiesIfNeeded('measure_categories'));
     },
@@ -230,6 +255,16 @@ function mapDispatchToProps(dispatch) {
           delete: [],
           create: saveData.associatedRecommendations.map((recId) => ({
             recommendation_id: recId,
+          })),
+        };
+      }
+
+      // recommendations
+      if (saveData.associatedIndicators) {
+        saveData.measureIndicators = {
+          delete: [],
+          create: saveData.associatedIndicators.map((id) => ({
+            indicator_id: id,
           })),
         };
       }

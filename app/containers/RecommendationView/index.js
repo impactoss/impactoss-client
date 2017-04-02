@@ -16,7 +16,7 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import Page from 'components/Page';
-import EntityView from 'components/EntityView';
+import EntityView from 'components/views/EntityView';
 
 import {
   getEntity,
@@ -205,7 +205,7 @@ const mapStateToProps = (state, props) => ({
         path: 'categories',
         key: 'taxonomy_id',
         reverse: true,
-        join: {
+        connected: {
           path: 'recommendation_categories',
           key: 'category_id',
           where: {
@@ -221,7 +221,7 @@ const mapStateToProps = (state, props) => ({
     state, {
       path: 'measures',
       out: 'js',
-      join: {
+      connected: {
         path: 'recommendation_measures',
         key: 'measure_id',
         where: {

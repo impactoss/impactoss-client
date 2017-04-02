@@ -7,15 +7,14 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { Link } from 'react-router';
+import { FormattedMessage } from 'react-intl';
+import { browserHistory } from 'react-router';
 
 import EntityList from 'containers/EntityList';
-import Page from 'components/Page';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
-import {
-  loadEntitiesIfNeeded,
-} from 'containers/App/actions';
+import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { isReady } from 'containers/App/selectors';
 
 import messages from './messages';
 
@@ -34,6 +33,31 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
   })
 
   render() {
+    const { dataReady } = this.props;
+
+    // specify the associations to query with entities
+    const extensions = [
+      {
+        path: 'measure_categories',
+        key: 'measure_id',
+        reverse: true,
+        as: 'taxonomies',
+      },
+      {
+        path: 'recommendation_measures',
+        key: 'measure_id',
+        reverse: true,
+        as: 'recommendations',
+      },
+      {
+        path: 'measure_indicators',
+        key: 'measure_id',
+        reverse: true,
+        as: 'indicators',
+      },
+    ];
+
+    // specify the filter and query  options
     const filters = {
       keyword: {
         attributes: [
@@ -42,80 +66,136 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           'description',
         ],
       },
-      attributes: [ // filter by attribute value
-        {
-          label: 'Status',
-          attribute: 'draft',
-          type: 'boolean',
-          options: PUBLISH_STATUSES,
-        },
-      ],
+      attributes: {  // filter by attribute value
+        label: 'By attribute',
+        options: [
+          {
+            label: 'Status',
+            attribute: 'draft',
+            options: PUBLISH_STATUSES,
+          },
+        ],
+      },
       taxonomies: { // filter by each category
-        options: {
+        label: 'By category',
+        query: 'cat',
+        select: {
+          out: 'js',
           path: 'taxonomies',
           where: {
             tags_measures: true,
           },
-          each: {
+          extend: {
             path: 'categories',
             key: 'taxonomy_id',
-            without: true,
-            join: {
-              path: 'measure_categories',
-              key: 'category_id',
-              ownKey: 'measure_id',
-            },
+            reverse: true,
           },
         },
-        query: {
-          arg: 'cat',
+        connected: {
           path: 'measure_categories',
-          key: 'category_id',
-          ownKey: 'measure_id',
+          key: 'measure_id',
+          whereKey: 'category_id',
         },
       },
-      connections: [ // filter by associated entity
-        {
-          path: 'indicators', // filter by recommendation connection
-          query: 'indicators',
-          join: {
-            path: 'measure_indicators',
+      connections: { // filter by associated entity
+        label: 'By connection',
+        options: [
+          {
+            label: 'Indicators',
+            path: 'indicators', // filter by recommendation connection
+            query: 'indicators',
             key: 'indicator_id',
-            ownKey: 'measure_id',
+            connected: {
+              path: 'measure_indicators',
+              key: 'measure_id',
+              whereKey: 'indicator_id',
+            },
           },
-        },
-        {
-          path: 'recommendations', // filter by recommendation connection
-          query: 'recommendations',
-          join: {
-            path: 'recommendation_measures',
+          {
+            label: 'Recommendations',
+            path: 'recommendations', // filter by recommendation connection
+            query: 'recommendations',
             key: 'recommendation_id',
-            ownKey: 'measure_id',
+            connected: {
+              path: 'recommendation_measures',
+              key: 'measure_id',
+              whereKey: 'recommendation_id',
+            },
           },
-        },
-      ],
+        ],
+      },
+      connectedTaxonomies: { // filter by each category
+        label: 'By associated categories',
+        query: 'catx',
+        connections: [
+          {
+            path: 'recommendations', // filter by recommendation connection
+            title: 'Recommendations',
+            key: 'recommendation_id',
+            connected: {
+              path: 'recommendation_measures',
+              key: 'measure_id',
+              connected: {
+                path: 'recommendation_categories',
+                key: 'recommendation_id',
+                attribute: 'recommendation_id',
+                whereKey: 'category_id',
+              },
+            },
+            select: {
+              out: 'js',
+              path: 'taxonomies',
+              where: {
+                tags_recommendations: true,
+              },
+              extend: {
+                path: 'categories',
+                key: 'taxonomy_id',
+                reverse: true,
+                extend: {
+                  path: 'recommendation_categories',
+                  key: 'category_id',
+                  reverse: true,
+                  as: 'recommendations',
+                },
+              },
+            },
+          },
+        ],
+      },
+    };
+    const headerOptions = {
+      title: this.context.intl.formatMessage(messages.header),
+      actions: [{
+        type: 'primary',
+        title: 'New action',
+        onClick: () => browserHistory.push('/actions/new/'),
+      }],
     };
 
     return (
       <div>
         <Helmet
-          title="SADATA - List Actions"
+          title={this.context.intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: 'Description of ActionList' },
+            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.header)}
-          actions={[]}
-        >
-          <Link to="actions/new">Add Action</Link>
+        { !dataReady &&
+          <div>
+            <FormattedMessage {...messages.loading} />
+          </div>
+        }
+        { dataReady &&
           <EntityList
             location={this.props.location}
             mapToEntityList={this.mapToEntityList}
             path="measures"
             filters={filters}
+            extensions={extensions}
+            header={headerOptions}
           />
-        </Page>
+        }
       </div>
     );
   }
@@ -124,25 +204,42 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
 ActionList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   location: PropTypes.object.isRequired,
+  dataReady: PropTypes.bool,
 };
 
 ActionList.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
+const mapStateToProps = (state) => ({
+  dataReady: isReady(state, { path: [
+    'measures',
+    'measure_categories',
+    'users',
+    'taxonomies',
+    'categories',
+    'recommendations',
+    'recommendation_measures',
+    'recommendation_categories',
+    'indicators',
+    'measure_indicators',
+  ] }),
+});
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
     },
   };
 }
 
-export default connect(null, mapDispatchToProps)(ActionList);
+export default connect(mapStateToProps, mapDispatchToProps)(ActionList);
