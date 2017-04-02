@@ -14,6 +14,7 @@ import {
     AUTHENTICATE,
     AUTHENTICATE_SUCCESS,
     LOGOUT,
+    LOGOUT_SUCCESS,
     VALIDATE_TOKEN,
 } from 'containers/App/constants';
 
@@ -25,7 +26,6 @@ import {
     authenticateSending,
     authenticateError,
     logoutSuccess,
-    logout,
     entitiesRequested,
     entitiesReady,
     invalidateEntities,
@@ -38,7 +38,8 @@ import {
 } from 'containers/App/actions';
 
 import {
-  makeSelectNextPathname,
+  makeSelectPathnameOnAuthChange,
+  makeSelectPreviousPathname,
   getRequestedAt,
 } from 'containers/App/selectors';
 
@@ -83,23 +84,31 @@ export function* checkEntitiesSaga(payload) {
 export function* authenticateSaga(payload) {
   const { password, email } = payload.data;
 
-  yield put(authenticateSending());
-
   try {
+    yield put(authenticateSending());
     const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
-
     yield put(authenticateSuccess(response.data));
-    yield put(invalidateEntities());
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
   }
 }
 
-export function* authenticateSuccessSaga() {
-  const nextPathName = yield select(makeSelectNextPathname());
-  if (nextPathName) {
-    yield put(push(nextPathName));
+export function* authChangeSaga() {
+  yield put(invalidateEntities());
+  // forward to nextPathName if set
+  const nextPathname = yield select(makeSelectPathnameOnAuthChange());
+  if (nextPathname) {
+    yield put(push(nextPathname));
+  } else {
+    // else forward to prevPathName if set
+    const prevPathname = yield select(makeSelectPreviousPathname());
+    if (prevPathname) {
+      yield put(push(prevPathname));
+    } else {
+      // forward to home
+      yield put(push('/'));
+    }
   }
 }
 
@@ -108,7 +117,6 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', 'auth/sign_out');
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(invalidateEntities());
   } catch (err) {
     yield call(clearAuthValues);
       // TODO ensure this is displayed
@@ -117,15 +125,12 @@ export function* logoutSaga() {
 }
 
 export function* validateTokenSaga() {
-  yield put(authenticateSending());
-
   try {
     const { uid, client, 'access-token': accessToken } = yield getAuthValues();
     if (uid && client && accessToken) {
+      yield put(authenticateSending());
       const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
       yield put(authenticateSuccess(response.data));
-    } else {
-      yield put(logout());
     }
   } catch (err) {
     yield call(clearAuthValues);
@@ -323,6 +328,7 @@ export default function* rootSaga() {
   yield takeEvery(NEW_ENTITY, newEntitySaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
-  yield takeLatest(AUTHENTICATE_SUCCESS, authenticateSuccessSaga);
+  yield takeLatest(AUTHENTICATE_SUCCESS, authChangeSaga);
   yield takeLatest(LOGOUT, logoutSaga);
+  yield takeLatest(LOGOUT_SUCCESS, authChangeSaga);
 }
