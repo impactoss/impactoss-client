@@ -42,7 +42,7 @@ const makeSelectAuth = () => createSelector(
 );
 
 const makeSelectSignedIn = () => isSignedIn;
-const makeSelectsessionUserId = () => getSessionUserId;
+const makeSelectSessionUserId = () => getSessionUserId;
 
 // makeSelectLocationState expects a plain JS object for the routing state
 const makeSelectLocationState = () => {
@@ -384,6 +384,6 @@ export {
   getUser,
   getSessionUser,
   isSignedIn,
-  makeSelectsessionUserId,
+  makeSelectSessionUserId,
   getSessionUserId,
 };
