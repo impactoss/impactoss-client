@@ -260,7 +260,7 @@ const extendEntity = (state, entity, extendArgs) => {
       extend.id = extend.where.id; // getEntityPure selector requires id
       extended = getEntity(state, extend);
     } else {
-      extended = getEntities(state, extend); // TODO How does this not recursively loop?
+      extended = getEntities(state, extend);
       if (extended && extend.type === 'count') {
         extended = extended.size;
       }
