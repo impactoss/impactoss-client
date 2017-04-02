@@ -5,8 +5,8 @@ import { kebabCase } from 'lodash/string';
 export default class MultiSelect extends React.Component {
 
   static propTypes = {
-    options: PropTypes.instanceOf(Immutable.List), // immutable list
-    values: PropTypes.instanceOf(Immutable.List), // immutable
+    options: PropTypes.instanceOf(Immutable.List),
+    values: PropTypes.instanceOf(Immutable.List),
     onChange: PropTypes.func.isRequired,
     valueCompare: PropTypes.func,
   }

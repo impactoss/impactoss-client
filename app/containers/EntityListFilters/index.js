@@ -29,6 +29,7 @@ import {
 
 import {
   showFilterForm,
+  hideFilterForm,
 } from './actions';
 
 export class EntityListFilters extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -66,19 +67,21 @@ export class EntityListFilters extends React.Component { // eslint-disable-line 
           map(group.options, (option, id) => (
             <div key={id}>
               <button
-                onClick={() => this.props.onShowFilterForm(option)}
+                onClick={(evt) => {
+                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                  this.props.onShowFilterForm(option);
+                }}
               >{option.label}
               </button>
             </div>
-          )
-        )
-      }
+          ))
+        }
       </div>
     </div>
   );
 
   render() {
-    const { filterOptions, formOptions } = this.props;
+    const { filterOptions, formOptions, onHideFilterForm } = this.props;
     return (
       <div>
         { filterOptions &&
@@ -88,6 +91,7 @@ export class EntityListFilters extends React.Component { // eslint-disable-line 
           <FilterForm
             model={FORM_MODEL}
             options={formOptions}
+            onClose={onHideFilterForm}
           />
         }
       </div>
@@ -99,6 +103,7 @@ EntityListFilters.propTypes = {
   filterOptions: PropTypes.object,
   showFilterForm: PropTypes.bool,
   onShowFilterForm: PropTypes.func.isRequired,
+  onHideFilterForm: PropTypes.func.isRequired,
   // populateForm: PropTypes.func,
   formOptions: PropTypes.instanceOf(Immutable.List),
   // handleSubmit: PropTypes.func.isRequired,
@@ -124,6 +129,10 @@ function mapDispatchToProps(dispatch) {
     },
     onShowFilterForm: (option) => {
       dispatch(showFilterForm(option.label, Object.values(option.options)));
+    },
+    onHideFilterForm: (evt) => {
+      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+      dispatch(hideFilterForm());
     },
     handleSubmit: () => {
 

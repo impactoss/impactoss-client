@@ -9,6 +9,7 @@ import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 import {
   SHOW_FILTER_FORM,
+  HIDE_FILTER_FORM,
 } from './constants';
 
 const initialState = fromJS({
@@ -31,6 +32,8 @@ function entityListFilterReducer(state = initialState, action) {
         label: option.label,
         value: option,
       }))));
+    case HIDE_FILTER_FORM:
+      return initialState;
     default:
       return state;
   }

@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import Immutable from 'immutable';
 import { Form } from 'react-redux-form/immutable';
 import MultiSelect from 'components/MultiSelect';
 
@@ -6,8 +7,9 @@ export default class FilterForm extends React.Component { // eslint-disable-line
 
   static propTypes = {
     model: PropTypes.string.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
-    options: PropTypes.object.isRequired,
+    options: PropTypes.instanceOf(Immutable.List),
+    handleSubmit: PropTypes.func,
+    onClose: PropTypes.func,
   }
 
   render() {
@@ -16,6 +18,9 @@ export default class FilterForm extends React.Component { // eslint-disable-line
         model={this.props.model}
         onSubmit={this.props.handleSubmit}
       >
+        { this.props.onClose &&
+          <button onClick={this.props.onClose}>close</button>
+        }
         <MultiSelect
           model=".values"
           options={this.props.options}

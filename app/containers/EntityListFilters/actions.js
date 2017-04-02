@@ -6,6 +6,7 @@
 
 import {
   SHOW_FILTER_FORM,
+  HIDE_FILTER_FORM,
 } from './constants';
 
 export function showFilterForm(title, options) {
@@ -13,5 +14,11 @@ export function showFilterForm(title, options) {
     type: SHOW_FILTER_FORM,
     title,
     options,
+  };
+}
+
+export function hideFilterForm() {
+  return {
+    type: HIDE_FILTER_FORM,
   };
 }
