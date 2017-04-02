@@ -111,6 +111,27 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/users/edit/:id',
+      name: 'userEdit',
+      onEnter: redirectToLoginIfNeeded,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserEdit/reducer'),
+          import('containers/UserEdit/sagas'),
+          import('containers/UserEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('userEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/actions',
       name: 'actionList',
       getComponent(nextState, cb) {

@@ -13,7 +13,7 @@ import { browserHistory } from 'react-router';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import Page from 'components/Page';
-import SimpleView from 'components/views/SimpleView';
+import EntityView from 'components/views/EntityView';
 
 import {
   getUser,
@@ -32,6 +32,10 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     browserHistory.push(`/users/edit/${this.props.user.id || this.props.user.attributes.id}`);
   }
 
+  handleEditPassword = () => {
+    browserHistory.push(`/users/password/${this.props.user.id || this.props.user.attributes.id}`);
+  }
+
   handleClose = () => {
     browserHistory.push('/');
     // TODO should be "go back" if history present or to categories list when not
@@ -39,6 +43,8 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
   render() {
     const { user, dataReady } = this.props;
+
+    const reference = user && user.id;
 
     return (
       <div>
@@ -68,25 +74,55 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                 onClick: this.handleEdit,
               },
               {
+                type: 'simple',
+                title: 'Change password',
+                onClick: this.handleEditPassword,
+              },
+              {
                 type: 'primary',
                 title: 'Close',
                 onClick: this.handleClose,
               },
             ]}
           >
-            <SimpleView
-              fields={[
-                {
-                  id: 'name',
-                  heading: 'Name',
-                  value: user.attributes.name,
+            <EntityView
+              fields={{
+                header: {
+                  main: [
+                    {
+                      id: 'name',
+                      heading: 'Name',
+                      value: user.attributes.name,
+                    },
+                  ],
+                  aside: [
+                    {
+                      id: 'number',
+                      heading: 'Number',
+                      value: reference,
+                    },
+                    {
+                      id: 'updated',
+                      heading: 'Updated At',
+                      value: user.attributes.updated_at,
+                    },
+                    {
+                      id: 'updated_by',
+                      heading: 'Updated By',
+                      value: user.user && user.user.attributes.name,
+                    },
+                  ],
                 },
-                {
-                  id: 'email',
-                  heading: 'Email',
-                  value: user.attributes.email,
+                body: {
+                  main: [
+                    {
+                      id: 'email',
+                      heading: 'Email',
+                      value: user.attributes.email,
+                    },
+                  ],
                 },
-              ]}
+              }}
             />
           </Page>
         }
@@ -117,6 +153,12 @@ const mapStateToProps = (state, props) => ({
     {
       id: props.params.id,
       out: 'js',
+      extend: {
+        type: 'single',
+        path: 'users',
+        key: 'last_modified_user_id',
+        as: 'user',
+      },
     },
   ),
 });

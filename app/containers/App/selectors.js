@@ -41,23 +41,8 @@ const makeSelectAuth = () => createSelector(
   (globalState) => globalState.get('auth').toJS()
 );
 
-const getCurrentUser = createSelector(
-  getGlobal,
-  (globalState) => globalState.get('user')
-);
-
-const getCurrentUserId = createSelector(
-  getCurrentUser,
-  (user) => user && user.attributes && user.getIn(['attributes', 'id']).toString()
-);
-
-const isSignedIn = createSelector(
-  getCurrentUser,
-  (currentUser) => currentUser.get('isSignedIn')
-);
-
 const makeSelectSignedIn = () => isSignedIn;
-const makeSelectCurrentUserId = () => getCurrentUserId;
+const makeSelectsessionUserId = () => getSessionUserId;
 
 // makeSelectLocationState expects a plain JS object for the routing state
 const makeSelectLocationState = () => {
@@ -106,7 +91,7 @@ const getEntitiesPure = createSelector(
   (entities, path) => entities.get(path)
 );
 
-const getUsersPure = createSelector(
+const getUserEntities = createSelector(
   getGlobalEntities,
   (entities) => entities.get('users')
 );
@@ -305,12 +290,6 @@ const getEntityPure = createSelector(
   (entities, id) => entities.get(id)
 );
 
-const getUserPure = createSelector(
-  getUsersPure,
-  (state, { id }) => id && id.toString(),
-  (users, id) => users.get(id)
-);
-
 const hasEntity = createSelector(
   getEntitiesPure,
   (state, { id }) => id,
@@ -334,12 +313,41 @@ const getEntity = createSelector(
   }
 );
 
+
+const getSessionUser = createSelector(
+  getGlobal,
+  (state) => state.get('user')
+);
+
+const getSessionUserId = createSelector(
+  getSessionUser,
+  (sessionUser) =>
+    sessionUser
+    && sessionUser.get('attributes')
+    && sessionUser.get('attributes').id.toString()
+);
+
+const isSignedIn = createSelector(
+  getSessionUser,
+  (sessionUser) => sessionUser.get('isSignedIn')
+);
+
+const getUserEntity = createSelector(
+  getUserEntities,
+  (state, { id }) => id && id.toString(),
+  (users, id) => users.get(id)
+);
+
 const getUser = createSelector(
   (state) => state,
-  getUserPure,
+  getUserEntity,
   (state, { out }) => out,
-  (state, user, out) => {
-    const result = user || getCurrentUser(state);
+  (state, { extend }) => extend,
+  (state, user, out, extend) => {
+    let result = user || getUserEntity(state, { id: getSessionUserId(state) });
+    if (result && extend) {
+      result = extendEntity(state, result, extend);
+    }
     return result && out === 'js' ? result.toJS() : result;
   }
 );
@@ -362,8 +370,8 @@ export {
   hasEntity,
   getEntity,
   getUser,
-  getCurrentUser,
+  getSessionUser,
   isSignedIn,
-  makeSelectCurrentUserId,
-  getCurrentUserId,
+  makeSelectsessionUserId,
+  getSessionUserId,
 };
