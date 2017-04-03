@@ -10,9 +10,8 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
-import { reduce } from 'lodash/collection';
 
-import { fromJS } from 'immutable';
+import { Map, List } from 'immutable';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -45,76 +44,79 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('componentWillReceiveProps', nextProps, this.props)
-    // repopulate if new data becomes ready
-    if (nextProps.action && nextProps.dataReady && !this.props.dataReady) {
-      this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
-    }
     // reload entities if invalidated
-    if (this.props.action && !nextProps.action && !nextProps.dataReady) {
+    if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    // repopulate if new data becomes ready
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const data = {
+    const { taxonomies, recommendations, indicators } = props;
+    return Map({
       id: props.action.id,
       attributes: props.action.attributes,
-    };
-
-    const { taxonomies, recommendations } = this.props;
-    // TODO this functionality should be shared
-      // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }
-    data.associatedTaxonomies = taxonomies
-      ? Object.values(taxonomies).reduce((values, tax) => {
-        const result = values;
-        result[tax.id] = Object.values(tax.categories).reduce((ids, cat) =>
-          cat.associated ? ids.concat([cat.id]) : ids
-        , []);
-        return result;
-      }, {})
-      : {};
-
-    // TODO this functionality should be shared
-      // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }
-    data.associatedRecommendations = recommendations
-      ? Object.values(recommendations).reduce((ids, rec) =>
-          rec.associated ? ids.concat([rec.id]) : ids
-        , [])
-      : [];
-
-    return data;
+      associatedTaxonomies: taxonomies
+      ? taxonomies.reduce((values, tax) =>
+          values.set(
+            tax.get('id'),
+            tax.get('categories').reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List()))
+        , Map())
+      : Map(),
+      associatedRecommendations: recommendations
+        ? recommendations.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
+        : List(),
+      associatedIndicators: indicators
+        ? indicators.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
+        : List(),
+    });
   }
 
-  mapCategoryOptions = (categories) => Object.values(categories).map((cat) => ({
-    value: cat.id,
-    label: cat.attributes.title,
+  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
-  mapRecommendationOptions = (recommendations) => Object.values(recommendations).map((rec) => ({
-    value: rec.id,
-    label: rec.attributes.title,
+  mapRecommendationOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
+  mapIndicatorOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
+  }));
 
   // TODO this should be shared functionality
-  renderTaxonomyControl = (taxonomies) => taxonomies ? Object.values(taxonomies).map((tax) => ({
-    id: tax.id,
-    model: `.associatedTaxonomies.${tax.id}`,
-    label: tax.attributes.title,
+  renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({
+    id: tax.get('id'),
+    model: `.associatedTaxonomies.${tax.get('id')}`,
+    label: tax.getIn(['attributes', 'title']),
     controlType: 'multiselect',
-    options: tax.categories ? this.mapCategoryOptions(tax.categories) : [],
-  })) : [];
+    options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
+  }), [])
 
   // TODO this should be shared functionality
-  renderRecommendationControl = (recommendations) => recommendations ? ({
+  renderRecommendationControl = (recommendations) => ({
     id: 'recommendations',
     model: '.associatedRecommendations',
     label: 'Recommendations',
     controlType: 'multiselect',
     options: this.mapRecommendationOptions(recommendations),
-  }) : [];
+  });
+
+  // TODO this should be shared functionality
+  renderIndicatorControl = (indicators) => ({
+    id: 'indicators',
+    model: '.associatedIndicators',
+    label: 'Indicators',
+    controlType: 'multiselect',
+    options: this.mapIndicatorOptions(indicators),
+  });
 
 
   render() {
@@ -156,7 +158,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 onClick: () => this.props.handleSubmit(
                   this.props.form.data,
                   this.props.taxonomies,
-                  this.props.recommendations
+                  this.props.recommendations,
+                  this.props.indicators
                 ),
               },
             ]}
@@ -172,7 +175,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 this.props.taxonomies,
-                this.props.recommendations
+                this.props.recommendations,
+                this.props.indicators
               )}
               handleCancel={this.props.handleCancel}
               fields={{
@@ -222,9 +226,10 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                       controlType: 'textarea',
                       model: '.attributes.description',
                     },
-                    this.renderRecommendationControl(this.props.recommendations),
+                    this.props.recommendations ? this.renderRecommendationControl(this.props.recommendations) : null,
+                    this.props.indicators ? this.renderIndicatorControl(this.props.indicators) : null,
                   ],
-                  aside: this.renderTaxonomyControl(this.props.taxonomies),
+                  aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
                 },
               }}
             />
@@ -247,6 +252,7 @@ ActionEdit.propTypes = {
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
+  indicators: PropTypes.object,
 };
 
 ActionEdit.contextTypes = {
@@ -264,6 +270,8 @@ const mapStateToProps = (state, props) => ({
     'recommendations',
     'recommendation_measures',
     'measure_categories',
+    'indicators',
+    'measure_indicators',
   ] }),
   action: getEntity(
     state,
@@ -301,18 +309,33 @@ const mapStateToProps = (state, props) => ({
           },
         },
       },
-      out: 'js',
     },
   ),
   // all recommendations, listing connection if any
   recommendations: getEntities(
-    state, {
+    state,
+    {
       path: 'recommendations',
-      out: 'js',
       extend: {
         as: 'associated',
         path: 'recommendation_measures',
         key: 'recommendation_id',
+        reverse: true,
+        where: {
+          measure_id: props.params.id,
+        },
+      },
+    },
+  ),
+  indicators: getEntities(
+    state,
+    {
+      path: 'indicators',
+      out: 'js',
+      extend: {
+        as: 'associated',
+        path: 'measure_indicators',
+        key: 'indicator_id',
         reverse: true,
         where: {
           measure_id: props.params.id,
@@ -332,73 +355,96 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('measure_indicators'));
     },
     populateForm: (model, formData) => {
-      dispatch(formActions.load(model, fromJS(formData)));
+      dispatch(formActions.load(model, formData));
     },
-    handleSubmit: (formData, taxonomies, recommendations) => {
-      // TODO maybe this function should be updated to work with Immutable objects, instead of converting
-      // const prevTaxonomies = prevFormData.associatedTaxonomies || {};
-      const saveData = formData.toJS();
 
-      // measureCategories
-      saveData.measureCategories = reduce(taxonomies, (updates, tax, taxId) => {
-        const formCategoryIds = saveData.associatedTaxonomies[taxId]; // the list of categories checked in form
+    handleSubmit: (formData, taxonomies, recommendations, indicators) => {
+      let saveData = formData.set('measureCategories', taxonomies.reduce((updates, tax, taxId) => {
+        const formCategoryIds = formData.getIn(['associatedTaxonomies', taxId]); // the list of categories checked in form
+
         // store associated cats as { [cat.id]: [association.id], ... }
         // then we can use keys for creating new associations and values for deleting
-        const associatedCategories = Object.values(tax.categories).reduce((catsAssociated, cat) => {
-          const result = catsAssociated;
-          if (cat.associated) {
-            result[cat.id] = Object.keys(cat.associated)[0];
+        const associatedCategories = tax.get('categories').reduce((catsAssociated, cat) => {
+          if (cat.get('associated')) {
+            return catsAssociated.set(cat.get('id'), cat.get('associated').keySeq().first());
           }
-          return result;
-        }, {});
+          return catsAssociated;
+        }, Map());
 
-        return {
-          delete: updates.delete.concat(reduce(associatedCategories, (associatedIds, associatedId, catId) =>
-            formCategoryIds.indexOf(catId.toString()) === -1
-              ? associatedIds.concat([associatedId])
+        return Map({
+          delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) =>
+            !formCategoryIds.includes(catId)
+              ? associatedIds.push(associatedId)
               : associatedIds
-          , [])),
-          create: updates.create.concat(reduce(formCategoryIds, (payloads, catId) =>
-            Object.keys(associatedCategories).indexOf(catId.toString()) === -1
-              ? payloads.concat([{
+          , List())),
+          create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) =>
+            !associatedCategories.has(catId)
+              ? payloads.push(Map({
                 category_id: catId,
-                measure_id: saveData.id,
-              }])
+                measure_id: formData.get('id'),
+              }))
               : payloads
-          , [])),
-        };
-      }, { delete: [], create: [] });
+          , List())),
+        });
+      }, Map({ delete: List(), create: List() })));
 
       // recommendations
-      const formRecommendationIds = saveData.associatedRecommendations;
+      const formRecommendationIds = formData.get('associatedRecommendations');
       // store associated recs as { [rec.id]: [association.id], ... }
-      const associatedRecommendations = Object.values(recommendations).reduce((recsAssociated, rec) => {
-        const result = recsAssociated;
-        if (rec.associated) {
-          result[rec.id] = Object.keys(rec.associated)[0];
+      const associatedRecommendations = recommendations.reduce((recsAssociated, rec) => {
+        if (rec.get('associated')) {
+          return recsAssociated.set(rec.get('id'), rec.get('associated').keySeq().first());
         }
-        return result;
-      }, {});
+        return recsAssociated;
+      }, Map());
 
-      saveData.recommendationMeasures = {
-        delete: reduce(associatedRecommendations, (associatedIds, associatedId, recId) =>
-          formRecommendationIds.indexOf(recId.toString()) === -1
-            ? associatedIds.concat([associatedId])
+      saveData = saveData.set('recommendationMeasures', Map({
+        delete: associatedRecommendations.reduce((associatedIds, associatedId, recId) =>
+          !formRecommendationIds.includes(recId)
+            ? associatedIds.push(associatedId)
             : associatedIds
-        , []),
-        create: reduce(formRecommendationIds, (payloads, recId) =>
-          Object.keys(associatedRecommendations).indexOf(recId.toString()) === -1
-            ? payloads.concat([{
+        , List()),
+        create: formRecommendationIds.reduce((payloads, recId) =>
+          !associatedRecommendations.has(recId)
+            ? payloads.push(Map({
               recommendation_id: recId,
-              measure_id: saveData.id,
-            }])
+              measure_id: formData.get('id'),
+            }))
             : payloads
-        , []),
-      };
+        , List()),
+      }));
 
-      dispatch(save(saveData));
+      // indicators
+      const formIndicatorIds = formData.get('associatedIndicators');
+      // store associated recs as { [rec.id]: [association.id], ... }
+      const associatedIndicators = indicators.reduce((indicatorsAssociated, indicator) => {
+        if (indicator.get('associated')) {
+          return indicatorsAssociated.set(indicator.get('id'), indicator.get('associated').keySeq().first());
+        }
+        return indicatorsAssociated;
+      }, Map());
+
+      saveData = saveData.set('measureIndicators', Map({
+        delete: associatedIndicators.reduce((associatedIds, associatedId, recId) =>
+          !formIndicatorIds.includes(recId)
+            ? associatedIds.push(associatedId)
+            : associatedIds
+        , List()),
+        create: formIndicatorIds.reduce((payloads, id) =>
+          !associatedIndicators.has(id)
+            ? payloads.push(Map({
+              indicator_id: id,
+              measure_id: formData.get('id'),
+            }))
+            : payloads
+        , List()),
+      }));
+
+      dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
       // not really a dispatch function here, could be a member function instead

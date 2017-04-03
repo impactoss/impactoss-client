@@ -59,7 +59,7 @@ export function checkErrorMessagesExist(response) {
  */
 export default function request(url, options, middleware) {
   return fetch(url, options)
-    .then(checkStatus)
     .then((response) => middleware ? middleware(response) : response)
+    .then(checkStatus)
     .then(parseJSON);
 }

@@ -309,6 +309,84 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/indicators',
+      name: 'indicatorList',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorList/reducer'),
+          import('containers/IndicatorList/sagas'),
+          import('containers/IndicatorList'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('indicatorList', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/indicators/new',
+      name: 'indicatorNew',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorNew/reducer'),
+          import('containers/IndicatorNew/sagas'),
+          import('containers/IndicatorNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('indicatorNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/indicators/:id',
+      name: 'indicatorView',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/indicatorView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/indicators/edit/:id',
+      name: 'indicatorEdit',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorEdit/reducer'),
+          import('containers/IndicatorEdit/sagas'),
+          import('containers/IndicatorEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('indicatorEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/categories',
       name: 'taxonomies',
       getComponent(nextState, cb) {

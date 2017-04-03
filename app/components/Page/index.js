@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 
 import Container from 'components/basic/Container';
-import PageHeader from './PageHeader';
+import PageHeader from 'components/PageHeader';
 
 class Page extends React.Component { // eslint-disable-line react/prefer-stateless-function
   render() {

@@ -10,13 +10,11 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
     status: PropTypes.string,
     children: PropTypes.object,
     side: PropTypes.object,
-    className: PropTypes.string,
   }
 
   static defaultProps = {
     children: null,
     side: null,
-    className: 'entityListItem',
   }
 
   render() {
@@ -25,12 +23,12 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
       : <h2>{this.props.title}</h2>;
 
     return (
-      <div className={this.props.className}>
-        <div className="left">
+      <div >
+        <div>
           <input type="checkbox" />
         </div>
-        <div className="main">
-          <div className="detail">
+        <div>
+          <div>
             {this.props.reference &&
               <span>{this.props.reference}</span>
             }
@@ -40,13 +38,13 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
             }
           </div>
           {this.props.children &&
-          <div className="children">
+          <div>
             {this.props.children}
           </div>
           }
         </div>
         {this.props.side &&
-          <div className="right">
+          <div>
             {this.props.side}
           </div>
         }

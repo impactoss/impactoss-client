@@ -30,6 +30,10 @@ export default defineMessages({
     id: 'nmrf.components.Header.register',
     defaultMessage: 'Register',
   },
+  indicators: {
+    id: 'nmrf.components.Header.indicators',
+    defaultMessage: 'Indicators',
+  },
   actions: {
     id: 'nmrf.components.Header.actions',
     defaultMessage: 'Actions',

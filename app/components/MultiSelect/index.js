@@ -1,10 +1,11 @@
 import React, { PropTypes } from 'react';
+import Immutable from 'immutable';
 import { Control } from 'react-redux-form/immutable';
 
 import MultiSelect from './MultiSelect';
 
 const MultiSelectControl = (props) => {
-  const { model, options, ...otherProps } = props;
+  const { model, options, valueCompare, ...otherProps } = props;
   return (
     <Control
       type="multiselect"
@@ -17,6 +18,7 @@ const MultiSelectControl = (props) => {
       }}
       controlProps={{
         options,
+        valueCompare,
       }}
       {...otherProps}
     />
@@ -25,7 +27,8 @@ const MultiSelectControl = (props) => {
 
 MultiSelectControl.propTypes = {
   model: PropTypes.string.isRequired,
-  options: PropTypes.array.isRequired,
+  options: PropTypes.instanceOf(Immutable.List),
+  valueCompare: PropTypes.func,
 };
 
 export default MultiSelectControl;
