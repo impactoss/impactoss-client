@@ -17,12 +17,15 @@ import languageProviderReducer from 'containers/LanguageProvider/reducer';
  * The change is necessitated by moving to react-router-redux@4
  *
  */
+const loginRoutes = ['/login', '/register'];
 // Initial routing state
 const routeInitialState = fromJS({
   locationBeforeTransitions: {
     ...browserHistory.getCurrentLocation(),
-    pathnameOnAuthChange: browserHistory.getCurrentLocation().pathname,
-    // stay on same path on authenticateSuccess
+    pathnameOnAuthChange: loginRoutes.indexOf(browserHistory.getCurrentLocation().pathname) > -1
+      ? '/'
+      : browserHistory.getCurrentLocation().pathname,
+    // stay on same path on authenticateSuccess unless on login or register
   },
 });
 

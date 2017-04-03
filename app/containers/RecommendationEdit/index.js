@@ -39,20 +39,19 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.recommendation && this.props.dataReady) {
+    if (this.props.dataReady) {
       this.props.populateForm('recommendationEdit.form.data', this.getInitialFormData());
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('componentWillReceiveProps', nextProps, this.props)
-    // repopulate if new data becomes ready
-    if (nextProps.recommendation && nextProps.dataReady && !this.props.dataReady) {
-      this.props.populateForm('recommendationEdit.form.data', this.getInitialFormData(nextProps));
-    }
     // reload entities if invalidated
-    if (this.props.recommendation && !nextProps.recommendation && !nextProps.dataReady) {
+    if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    // repopulate if new data becomes ready
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.populateForm('recommendationEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
@@ -63,7 +62,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       attributes: props.recommendation.attributes,
     };
 
-    const { taxonomies, actions } = this.props;
+    const { taxonomies, actions } = props;
 
     // TODO this functionality should be shared
       // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }

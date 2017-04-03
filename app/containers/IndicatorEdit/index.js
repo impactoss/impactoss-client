@@ -40,20 +40,19 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     // console.log('componentWillMount', this.props.indicator, this.props.dataReady)
-    if (this.props.indicator && this.props.dataReady) {
+    if (this.props.dataReady) {
       this.props.populateForm('indicatorEdit.form.data', this.getInitialFormData());
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('componentWillReceiveProps', nextProps, this.props)
-    // repopulate if new data becomes ready
-    if (nextProps.indicator && nextProps.dataReady && !this.props.dataReady) {
-      this.props.populateForm('indicatorEdit.form.data', this.getInitialFormData(nextProps));
-    }
     // reload entities if invalidated
-    if (this.props.indicator && !nextProps.indicator && !nextProps.dataReady) {
+    if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    // repopulate if new data becomes ready
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.populateForm('indicatorEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
@@ -64,7 +63,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       attributes: props.indicator.attributes,
     };
 
-    const { actions } = this.props;
+    const { actions } = props;
 
     // TODO this functionality should be shared
       // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }

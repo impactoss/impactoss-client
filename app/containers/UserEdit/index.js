@@ -10,6 +10,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
+import { reduce } from 'lodash/collection';
 
 import { fromJS } from 'immutable';
 
@@ -20,6 +21,7 @@ import EntityForm from 'components/forms/EntityForm';
 
 import {
   getUser,
+  getEntities,
   isReady,
 } from 'containers/App/selectors';
 
@@ -35,21 +37,52 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-
-    if (this.props.user && this.props.dataReady) {
-      this.props.populateForm('userEdit.form.data', this.props.user);
+    if (this.props.dataReady) {
+      this.props.populateForm('userEdit.form.data', this.getInitialFormData());
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.user && nextProps.dataReady && !this.props.dataReady) {
-      this.props.populateForm('userEdit.form.data', nextProps.user);
-    }
     // reload entities if invalidated
-    if (this.props.user && !nextProps.user && !nextProps.dataReady) {
+    if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.populateForm('userEdit.form.data', this.getInitialFormData(nextProps));
+    }
   }
+
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const data = {
+      id: props.user.id,
+      attributes: props.user.attributes,
+    };
+
+    const { roles } = props;
+
+    data.associatedRoles = roles
+      ? Object.values(roles).reduce((ids, entity) =>
+          entity.associated ? ids.concat([entity.id]) : ids
+        , [])
+      : [];
+
+    return data;
+  }
+
+  mapRoleOptions = (roles) => Object.values(roles).map((entity) => ({
+    value: entity.id,
+    label: entity.attributes.friendly_name,
+  }));
+
+  renderRoleControl = (roles) => roles ? ({
+    id: 'roles',
+    model: '.associatedRoles',
+    label: 'Roles',
+    controlType: 'multiselect',
+    options: this.mapRoleOptions(roles),
+  }) : [];
+
 
   render() {
     const { user, dataReady } = this.props;
@@ -87,7 +120,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               {
                 type: 'primary',
                 title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.form.data),
+                onClick: () => this.props.handleSubmit(this.props.form.data, this.props.roles),
               },
             ]}
           >
@@ -99,7 +132,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             }
             <EntityForm
               model="userEdit.form.data"
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, this.props.roles)}
               handleCancel={() => this.props.handleCancel(reference)}
               fields={{
                 header: {
@@ -148,6 +181,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                       },
                     },
                   ],
+                  aside: [
+                    this.renderRoleControl(this.props.roles),
+                  ],
                 },
               }}
             />
@@ -166,6 +202,7 @@ UserEdit.propTypes = {
   page: PropTypes.object,
   form: PropTypes.object,
   user: PropTypes.object,
+  roles: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
 };
@@ -179,6 +216,8 @@ const mapStateToProps = (state, props) => ({
   form: formSelector(state),
   dataReady: isReady(state, { path: [
     'users',
+    'user_roles',
+    'roles',
   ] }),
   user: getUser(
     state,
@@ -193,18 +232,64 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
+  roles: getEntities(
+    state,
+    {
+      path: 'roles',
+      out: 'js',
+      extend: {
+        as: 'associated',
+        path: 'user_roles',
+        key: 'role_id',
+        reverse: true,
+        where: {
+          user_id: props.params.id,
+        },
+      },
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
+      dispatch(loadEntitiesIfNeeded('roles'));
     },
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, fromJS(formData)));
     },
-    handleSubmit: (formData) => {
-      dispatch(save(formData.toJS()));
+    handleSubmit: (formData, roles) => {
+      const saveData = formData.toJS();
+
+      // roles
+      const formRoleIds = saveData.associatedRoles;
+      // store associated recs as { [rec.id]: [association.id], ... }
+      const associatedRoles = Object.values(roles).reduce((rolesAssociated, role) => {
+        const result = rolesAssociated;
+        if (role.associated) {
+          result[role.id] = Object.keys(role.associated)[0];
+        }
+        return result;
+      }, {});
+
+      saveData.userRoles = {
+        delete: reduce(associatedRoles, (associatedIds, associatedId, id) =>
+          formRoleIds.indexOf(id.toString()) === -1
+            ? associatedIds.concat([associatedId])
+            : associatedIds
+        , []),
+        create: reduce(formRoleIds, (payloads, id) =>
+          Object.keys(associatedRoles).indexOf(id.toString()) === -1
+            ? payloads.concat([{
+              role_id: id,
+              user_id: saveData.id,
+            }])
+            : payloads
+        , []),
+      };
+      dispatch(save(saveData));
     },
     handleCancel: (reference) => {
       // not really a dispatch function here, could be a member function instead

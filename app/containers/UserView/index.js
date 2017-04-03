@@ -28,6 +28,23 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     this.props.loadEntitiesIfNeeded();
   }
 
+  componentWillReceiveProps(nextProps) {
+    // reload entities if not ready or no longer ready (eg invalidated)
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
+
+  // only show the highest rated role (lower role ids means higher)
+  getUserRole = (roles) => {
+    const highestRole = Object.values(roles).reduce((currentHighestRole, role) =>
+      !currentHighestRole || role.role.id < currentHighestRole.id
+      ? role.role
+      : currentHighestRole
+    , null);
+    return highestRole.attributes.friendly_name;
+  }
+
   handleEdit = () => {
     browserHistory.push(`/users/edit/${this.props.user.id || this.props.user.attributes.id}`);
   }
@@ -43,7 +60,6 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
   render() {
     const { user, dataReady } = this.props;
-
     const reference = user && user.id;
 
     return (
@@ -64,7 +80,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
             <FormattedMessage {...messages.notFound} />
           </div>
         }
-        { user && user.attributes &&
+        { user && dataReady &&
           <Page
             title={this.context.intl.formatMessage(messages.pageTitle)}
             actions={[
@@ -121,6 +137,13 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                       value: user.attributes.email,
                     },
                   ],
+                  aside: [
+                    {
+                      id: 'role',
+                      heading: 'Role',
+                      value: user.roles ? this.getUserRole(user.roles) : 'User',
+                    },
+                  ],
                 },
               }}
             />
@@ -143,8 +166,10 @@ UserView.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
-    // 'categories',
     'users',
+    'user_roles',
+    'roles',
+    // 'categories',
     // 'taxonomies',
     // 'indicators',
   ] }),
@@ -153,12 +178,26 @@ const mapStateToProps = (state, props) => ({
     {
       id: props.params.id,
       out: 'js',
-      extend: {
-        type: 'single',
-        path: 'users',
-        key: 'last_modified_user_id',
-        as: 'user',
-      },
+      extend: [
+        {
+          type: 'single',
+          path: 'users',
+          key: 'last_modified_user_id',
+          as: 'user',
+        },
+        {
+          path: 'user_roles',
+          key: 'user_id',
+          as: 'roles',
+          reverse: true,
+          extend: {
+            type: 'single',
+            path: 'roles',
+            key: 'role_id',
+            as: 'role',
+          },
+        },
+      ],
     },
   ),
 });
@@ -169,6 +208,8 @@ function mapDispatchToProps(dispatch) {
       // dispatch(loadEntitiesIfNeeded('taxonomies'));
       // dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
+      dispatch(loadEntitiesIfNeeded('roles'));
     },
   };
 }
