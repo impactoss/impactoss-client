@@ -23,6 +23,29 @@ export default class MultiSelect extends React.Component {
     );
   }
 
+  renderCheckbox = (option) => {
+    const value = option.get('value');
+    const checked = option.get('checked');
+    const label = option.get('label');
+    return (
+      <div>
+        <input
+          type="checkbox"
+          onChange={(evt) => {
+            if (evt && evt !== undefined) evt.stopPropagation();
+            this.check(evt.target.checked, value);
+          }}
+          checked={checked}
+          value={value}
+          id={`${value}-${kebabCase(label)}`}
+        />
+        <label htmlFor={`${value}-${kebabCase(label)}`} >
+          {label}
+        </label>
+      </div>
+    );
+  }
+
   render() {
     const { options, values, valueCompare } = this.props;
     const checkboxes = options.map((option) =>
@@ -30,28 +53,16 @@ export default class MultiSelect extends React.Component {
 
     return (
       <div>
-        {checkboxes && checkboxes.map((option, i) => {
-          const value = option.get('value');
-          const checked = option.get('checked');
-          const label = option.get('label');
-          return (
-            <div key={i}>
-              <input
-                type="checkbox"
-                onChange={(evt) => {
-                  if (evt && evt !== undefined) evt.stopPropagation();
-                  this.check(evt.target.checked, value);
-                }}
-                checked={checked}
-                value={value}
-                id={`${value}-${kebabCase(label)}`}
-              />
-              <label htmlFor={`${value}-${kebabCase(label)}`} >
-                {label}
-              </label>
-            </div>
-          );
-        })}
+        {checkboxes && checkboxes.filter((option) => option.get('checked')).map((option, i) =>
+          <div key={`checked-${i}`}>
+            {this.renderCheckbox(option)}
+          </div>
+        )}
+        {checkboxes && checkboxes.filterNot((option) => option.get('checked')).map((option, i) =>
+          <div key={`unchecked-${i}`}>
+            {this.renderCheckbox(option)}
+          </div>
+        )}
       </div>
     );
   }
