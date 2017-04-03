@@ -9,7 +9,8 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
-import { reduce } from 'lodash/collection';
+
+import { Map, List } from 'immutable';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
@@ -29,47 +30,47 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     this.props.loadEntitiesIfNeeded();
   }
 
-  mapCategoryOptions = (categories) => Object.values(categories).map((cat) => ({
-    value: cat.id,
-    label: cat.attributes.title,
+  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
-  mapRecommendationOptions = (recommendations) => Object.values(recommendations).map((rec) => ({
-    value: rec.id,
-    label: rec.attributes.title,
+  mapRecommendationOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
-  mapIndicatorOptions = (indicators) => Object.values(indicators).map((indicator) => ({
-    value: indicator.id,
-    label: indicator.attributes.title,
+  mapIndicatorOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
   // TODO this should be shared functionality
-  renderTaxonomyControl = (taxonomies) => taxonomies ? Object.values(taxonomies).map((tax) => ({
-    id: tax.id,
-    model: `.associatedTaxonomies.${tax.id}`,
-    label: tax.attributes.title,
+  renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({
+    id: tax.get('id'),
+    model: `.associatedTaxonomies.${tax.get('id')}`,
+    label: tax.getIn(['attributes', 'title']),
     controlType: 'multiselect',
-    options: tax.categories ? this.mapCategoryOptions(tax.categories) : [],
-  })) : [];
+    options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
+  }), [])
 
   // TODO this should be shared functionality
-  renderRecommendationControl = (recommendations) => recommendations ? ({
+  renderRecommendationControl = (recommendations) => ({
     id: 'recommendations',
     model: '.associatedRecommendations',
     label: 'Recommendations',
     controlType: 'multiselect',
     options: this.mapRecommendationOptions(recommendations),
-  }) : [];
+  });
 
   // TODO this should be shared functionality
-  renderIndicatorControl = (indicators) => indicators ? ({
+  renderIndicatorControl = (indicators) => ({
     id: 'indicators',
     model: '.associatedIndicators',
     label: 'Indicators',
     controlType: 'multiselect',
     options: this.mapIndicatorOptions(indicators),
-  }) : [];
+  });
 
   render() {
     const { dataReady } = this.props;
@@ -155,10 +156,10 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                       controlType: 'textarea',
                       model: '.attributes.description',
                     },
-                    this.renderRecommendationControl(this.props.recommendations),
-                    this.renderIndicatorControl(this.props.indicators),
+                    this.props.recommendations ? this.renderRecommendationControl(this.props.recommendations) : null,
+                    this.props.indicators ? this.renderIndicatorControl(this.props.indicators) : null,
                   ],
-                  aside: this.renderTaxonomyControl(this.props.taxonomies),
+                  aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
                 },
               }}
             />
@@ -205,21 +206,18 @@ const mapStateToProps = (state) => ({
         key: 'taxonomy_id',
         reverse: true,
       },
-      out: 'js',
     },
   ),
   // all recommendations,
   recommendations: getEntities(
     state, {
       path: 'recommendations',
-      out: 'js',
     },
   ),
   // all indicators,
   indicators: getEntities(
     state, {
       path: 'indicators',
-      out: 'js',
     },
   ),
 });
@@ -237,39 +235,40 @@ function mapDispatchToProps(dispatch) {
       // dispatch(loadEntitiesIfNeeded('measure_categories'));
     },
     handleSubmit: (formData) => {
-      const saveData = formData.toJS();
-
       // measureCategories
-      if (saveData.associatedTaxonomies) {
-        saveData.measureCategories = reduce(saveData.associatedTaxonomies, (updates, formCategoryIds) => ({
-          delete: [],
-          create: updates.create.concat(formCategoryIds.map((catId) => ({
-            category_id: catId,
-          }))),
-        }), { delete: [], create: [] });
+      let saveData = formData;
+      if (formData.get('associatedTaxonomies')) {
+        saveData = saveData.set(
+          'measureCategories',
+          formData.get('associatedTaxonomies').reduce((updates, formCategoryIds) => Map({
+            delete: List(),
+            create: updates.get('create').concat(formCategoryIds.map((id) => Map({
+              category_id: id,
+            }))),
+          }), Map({ delete: List(), create: List() }))
+        );
       }
 
       // recommendations
-      if (saveData.associatedRecommendations) {
-        saveData.recommendationMeasures = {
-          delete: [],
-          create: saveData.associatedRecommendations.map((recId) => ({
-            recommendation_id: recId,
+      if (formData.get('associatedRecommendations')) {
+        saveData = saveData.set('recommendationMeasures', Map({
+          delete: List(),
+          create: formData.get('associatedRecommendations').map((id) => Map({
+            recommendation_id: id,
           })),
-        };
+        }));
+      }
+      // indicators
+      if (formData.get('associatedIndicators')) {
+        saveData = saveData.set('measureIndicators', Map({
+          delete: List(),
+          create: formData.get('associatedIndicators').map((id) => Map({
+            recommendation_id: id,
+          })),
+        }));
       }
 
-      // recommendations
-      if (saveData.associatedIndicators) {
-        saveData.measureIndicators = {
-          delete: [],
-          create: saveData.associatedIndicators.map((id) => ({
-            indicator_id: id,
-          })),
-        };
-      }
-
-      dispatch(save(saveData));
+      dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
       // not really a dispatch function here, could be a member function instead

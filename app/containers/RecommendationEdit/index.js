@@ -10,9 +10,8 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
-import { reduce } from 'lodash/collection';
 
-import { fromJS } from 'immutable';
+import { Map, List } from 'immutable';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -57,65 +56,50 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const data = {
+    const { taxonomies, actions } = props;
+    return Map({
       id: props.recommendation.id,
       attributes: props.recommendation.attributes,
-    };
-
-    const { taxonomies, actions } = props;
-
-    // TODO this functionality should be shared
-      // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }
-    data.associatedTaxonomies = taxonomies
-      ? Object.values(taxonomies).reduce((values, tax) => {
-        const result = values;
-        result[tax.id] = Object.values(tax.categories).reduce((ids, cat) =>
-          cat.associated ? ids.concat([cat.id]) : ids
-        , []);
-        return result;
-      }, {})
-      : {};
-
-    // TODO this functionality should be shared
-      // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }
-    data.associatedActions = actions
-      ? Object.values(actions).reduce((ids, action) =>
-          action.associated ? ids.concat([action.id]) : ids
-        , [])
-      : [];
-
-    return data;
+      associatedTaxonomies: taxonomies
+      ? taxonomies.reduce((values, tax) =>
+          values.set(
+            tax.get('id'),
+            tax.get('categories').reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List()))
+        , Map())
+      : Map(),
+      associatedActions: actions
+        ? actions.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
+        : List(),
+    });
   }
 
-  mapCategoryOptions = (categories) => Object.values(categories).map((cat) => ({
-    value: cat.id,
-    label: cat.attributes.title,
+  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
-  mapActionOptions = (actions) => Object.values(actions).map((action) => ({
-    value: action.id,
-    label: action.attributes.title,
+  mapActionOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
-
 
   // TODO this should be shared functionality
-  renderTaxonomyControl = (taxonomies) => taxonomies ? Object.values(taxonomies).map((tax) => ({
-    id: tax.id,
-    model: `.associatedTaxonomies.${tax.id}`,
-    label: tax.attributes.title,
+  renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({
+    id: tax.get('id'),
+    model: `.associatedTaxonomies.${tax.get('id')}`,
+    label: tax.getIn(['attributes', 'title']),
     controlType: 'multiselect',
-    options: tax.categories ? this.mapCategoryOptions(tax.categories) : [],
-  })) : [];
+    options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
+  }), [])
 
   // TODO this should be shared functionality
-  renderActionControl = (actions) => actions ? ({
+  renderActionControl = (actions) => ({
     id: 'actions',
     model: '.associatedActions',
     label: 'Actions',
     controlType: 'multiselect',
     options: this.mapActionOptions(actions),
-  }) : [];
-
+  });
 
   render() {
     const { recommendation, dataReady } = this.props;
@@ -217,9 +201,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                 },
                 body: {
                   main: [
-                    this.renderActionControl(this.props.actions),
+                    this.props.actions ? this.renderActionControl(this.props.actions) : null,
                   ],
-                  aside: this.renderTaxonomyControl(this.props.taxonomies),
+                  aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
                 },
               }}
             />
@@ -296,14 +280,12 @@ const mapStateToProps = (state, props) => ({
           },
         },
       },
-      out: 'js',
     },
   ),
   // // all actions, listing connection if any
   actions: getEntities(
     state, {
       path: 'measures',
-      out: 'js',
       extend: {
         as: 'associated',
         path: 'recommendation_measures',
@@ -329,71 +311,65 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
     },
     populateForm: (model, formData) => {
-      dispatch(formActions.load(model, fromJS(formData)));
+      dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData, taxonomies, actions) => {
-      // TODO maybe this function should be updated to work with Immutable objects, instead of converting
-      // const prevTaxonomies = prevFormData.associatedTaxonomies || {};
-      const saveData = formData.toJS();
+      let saveData = formData.set('recommendationCategories', taxonomies.reduce((updates, tax, taxId) => {
+        const formCategoryIds = formData.getIn(['associatedTaxonomies', taxId]); // the list of categories checked in form
 
-      // recommendationCategories
-      saveData.recommendationCategories = reduce(taxonomies, (updates, tax, taxId) => {
-        const formCategoryIds = saveData.associatedTaxonomies[taxId]; // the list of categories checked in form
         // store associated cats as { [cat.id]: [association.id], ... }
         // then we can use keys for creating new associations and values for deleting
-        const associatedCategories = Object.values(tax.categories).reduce((catsAssociated, cat) => {
-          const result = catsAssociated;
-          if (cat.associated) {
-            result[cat.id] = Object.keys(cat.associated)[0];
+        const associatedCategories = tax.get('categories').reduce((catsAssociated, cat) => {
+          if (cat.get('associated')) {
+            return catsAssociated.set(cat.get('id'), cat.get('associated').keySeq().first());
           }
-          return result;
-        }, {});
+          return catsAssociated;
+        }, Map());
 
-        return {
-          delete: updates.delete.concat(reduce(associatedCategories, (associatedIds, associatedId, catId) =>
-            formCategoryIds.indexOf(catId.toString()) === -1
-              ? associatedIds.concat([associatedId])
+        return Map({
+          delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) =>
+            !formCategoryIds.includes(catId)
+              ? associatedIds.push(associatedId)
               : associatedIds
-          , [])),
-          create: updates.create.concat(reduce(formCategoryIds, (payloads, catId) =>
-            Object.keys(associatedCategories).indexOf(catId.toString()) === -1
-              ? payloads.concat([{
+          , List())),
+          create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) =>
+            !associatedCategories.has(catId)
+              ? payloads.push(Map({
                 category_id: catId,
-                recommendation_id: saveData.id,
-              }])
+                recommendation_id: formData.get('id'),
+              }))
               : payloads
-          , [])),
-        };
-      }, { delete: [], create: [] });
+          , List())),
+        });
+      }, Map({ delete: List(), create: List() })));
 
       // recommendations
-      const formActionIds = saveData.associatedActions;
+      const formActionIds = formData.get('associatedActions');
       // store associated Actions as { [action.id]: [association.id], ... }
-      const associatedActions = Object.values(actions).reduce((actionsAssociated, action) => {
-        const result = actionsAssociated;
-        if (action.associated) {
-          result[action.id] = Object.keys(action.associated)[0];
+      const associatedActions = actions.reduce((actionsAssociated, action) => {
+        if (action.get('associated')) {
+          return actionsAssociated.set(action.get('id'), action.get('associated').keySeq().first());
         }
-        return result;
-      }, {});
+        return actionsAssociated;
+      }, Map());
 
-      saveData.recommendationMeasures = {
-        delete: reduce(associatedActions, (associatedIds, associatedId, actionId) =>
-          formActionIds.indexOf(actionId.toString()) === -1
-            ? associatedIds.concat([associatedId])
+      saveData = saveData.set('recommendationMeasures', Map({
+        delete: associatedActions.reduce((associatedIds, associatedId, id) =>
+          !formActionIds.includes(id)
+            ? associatedIds.push(associatedId)
             : associatedIds
-        , []),
-        create: reduce(formActionIds, (payloads, actionId) =>
-          Object.keys(associatedActions).indexOf(actionId.toString()) === -1
-            ? payloads.concat([{
-              measure_id: actionId,
-              recommendation_id: saveData.id,
-            }])
+        , List()),
+        create: formActionIds.reduce((payloads, id) =>
+          !associatedActions.has(id)
+            ? payloads.push(Map({
+              measure_id: id,
+              recommendation_id: formData.get('id'),
+            }))
             : payloads
-        , []),
-      };
+        , List()),
+      }));
 
-      dispatch(save(saveData));
+      dispatch(save(saveData.toJS()));
       // dispatch(save(formData, props.params.id));
     },
     handleCancel: () => {
