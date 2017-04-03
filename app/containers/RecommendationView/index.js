@@ -31,7 +31,12 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
   handleEdit = () => {
     browserHistory.push(`/recommendations/edit/${this.props.params.id}`);
   }

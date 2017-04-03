@@ -20,7 +20,7 @@ export default defineMessages({
   },
   notFound: {
     id: 'app.containers.IndicatorEdit.notFound',
-    defaultMessage: 'Sorry no action found',
+    defaultMessage: 'Sorry no indicator found',
   },
   loading: {
     id: 'app.containers.IndicatorEdit.loading',

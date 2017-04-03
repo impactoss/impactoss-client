@@ -343,7 +343,7 @@ function mapDispatchToProps(dispatch, props) {
         });
       }, Map({ delete: List(), create: List() })));
 
-      // recommendations
+      // actions
       const formActionIds = formData.get('associatedActions');
       // store associated Actions as { [action.id]: [association.id], ... }
       const associatedActions = actions.reduce((actionsAssociated, action) => {

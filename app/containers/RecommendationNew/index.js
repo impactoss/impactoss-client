@@ -9,7 +9,8 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
-import { reduce } from 'lodash/collection';
+
+import { Map, List } from 'immutable';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
@@ -29,33 +30,40 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     this.props.loadEntitiesIfNeeded();
   }
 
-  mapCategoryOptions = (categories) => Object.values(categories).map((cat) => ({
-    value: cat.id,
-    label: cat.attributes.title,
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
+
+  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
-  mapActionOptions = (actions) => Object.values(actions).map((action) => ({
-    value: action.id,
-    label: action.attributes.title,
+  mapActionOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
   // TODO this should be shared functionality
-  renderTaxonomyControl = (taxonomies) => taxonomies ? Object.values(taxonomies).map((tax) => ({
-    id: tax.id,
-    model: `.associatedTaxonomies.${tax.id}`,
-    label: tax.attributes.title,
+  renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({
+    id: tax.get('id'),
+    model: `.associatedTaxonomies.${tax.get('id')}`,
+    label: tax.getIn(['attributes', 'title']),
     controlType: 'multiselect',
-    options: tax.categories ? this.mapCategoryOptions(tax.categories) : [],
-  })) : [];
+    options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
+  }), [])
 
   // TODO this should be shared functionality
-  renderActionControl = (actions) => actions ? ({
+  renderActionControl = (actions) => ({
     id: 'actions',
     model: '.associatedActions',
     label: 'Actions',
     controlType: 'multiselect',
     options: this.mapActionOptions(actions),
-  }) : [];
+  });
 
   render() {
     const { dataReady } = this.props;
@@ -140,9 +148,9 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                 },
                 body: {
                   main: [
-                    this.renderActionControl(this.props.actions),
+                    this.props.actions ? this.renderActionControl(this.props.actions) : null,
                   ],
-                  aside: this.renderTaxonomyControl(this.props.taxonomies),
+                  aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
                 },
               }}
             />
@@ -186,13 +194,11 @@ const mapStateToProps = (state) => ({
         key: 'taxonomy_id',
         reverse: true,
       },
-      out: 'js',
     },
   ),
   actions: getEntities(
     state, {
       path: 'measures',
-      out: 'js',
     },
   ),
 });
@@ -205,29 +211,32 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('measures'));
     },
     handleSubmit: (formData) => {
-      const saveData = formData.toJS();
+      let saveData = formData;
 
       // measureCategories
-      if (saveData.associatedTaxonomies) {
-        saveData.recommendationCategories = reduce(saveData.associatedTaxonomies, (updates, formCategoryIds) => ({
-          delete: [],
-          create: updates.create.concat(formCategoryIds.map((catId) => ({
-            category_id: catId,
-          }))),
-        }), { delete: [], create: [] });
+      if (formData.get('associatedTaxonomies')) {
+        saveData = saveData.set(
+          'recommendationsCategories',
+          formData.get('associatedTaxonomies').reduce((updates, formCategoryIds) => Map({
+            delete: List(),
+            create: updates.get('create').concat(formCategoryIds.map((id) => Map({
+              category_id: id,
+            }))),
+          }), Map({ delete: List(), create: List() }))
+        );
       }
 
       // actions
-      if (saveData.associatedActions) {
-        saveData.recommendationMeasures = {
-          delete: [],
-          create: saveData.associatedActions.map((actionId) => ({
-            measure_id: actionId,
+      if (formData.get('associatedActions')) {
+        saveData = saveData.set('recommendationMeasures', Map({
+          delete: List(),
+          create: formData.get('associatedActions').map((id) => Map({
+            measure_id: id,
           })),
-        };
+        }));
       }
 
-      dispatch(save(saveData));
+      dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
       // not really a dispatch function here, could be a member function instead

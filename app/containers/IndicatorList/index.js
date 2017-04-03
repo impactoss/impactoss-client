@@ -48,7 +48,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         path: 'measure_indicators',
         key: 'indicator_id',
         reverse: true,
-        as: 'actions',
+        as: 'measures',
       },
     ];
 

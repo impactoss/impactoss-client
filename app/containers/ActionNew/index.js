@@ -30,6 +30,13 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     this.props.loadEntitiesIfNeeded();
   }
 
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
+
   mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
     value: entity.get('id'),
     label: entity.getIn(['attributes', 'title']),
@@ -76,7 +83,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     const { dataReady } = this.props;
     const { saveSending, saveError } = this.props.actionNew.page;
     const required = (val) => val && val.length;
-
 
     return (
       <div>
@@ -235,8 +241,9 @@ function mapDispatchToProps(dispatch) {
       // dispatch(loadEntitiesIfNeeded('measure_categories'));
     },
     handleSubmit: (formData) => {
-      // measureCategories
       let saveData = formData;
+
+      // measureCategories
       if (formData.get('associatedTaxonomies')) {
         saveData = saveData.set(
           'measureCategories',
@@ -263,7 +270,7 @@ function mapDispatchToProps(dispatch) {
         saveData = saveData.set('measureIndicators', Map({
           delete: List(),
           create: formData.get('associatedIndicators').map((id) => Map({
-            recommendation_id: id,
+            indicator_id: id,
           })),
         }));
       }

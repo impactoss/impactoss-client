@@ -31,7 +31,12 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
   handleEdit = () => {
     browserHistory.push(`/indicators/edit/${this.props.params.id}`);
   }

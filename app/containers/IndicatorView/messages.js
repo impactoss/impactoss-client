@@ -20,10 +20,10 @@ export default defineMessages({
   },
   notFound: {
     id: 'app.containers.IndicatorView.notFound',
-    defaultMessage: 'Sorry no action found',
+    defaultMessage: 'Sorry no indicator found',
   },
   loading: {
     id: 'app.containers.IndicatorView.loading',
-    defaultMessage: 'Loading action...',
+    defaultMessage: 'Loading indicator...',
   },
 });
