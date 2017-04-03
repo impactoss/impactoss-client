@@ -45,14 +45,13 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('componentWillReceiveProps', nextProps, this.props)
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
     // repopulate if new data becomes ready
     if (nextProps.action && nextProps.dataReady && !this.props.dataReady) {
       this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
-    }
-    // reload entities if invalidated
-    if (this.props.action && !nextProps.action && !nextProps.dataReady) {
-      this.props.loadEntitiesIfNeeded();
     }
   }
 

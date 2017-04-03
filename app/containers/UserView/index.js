@@ -166,10 +166,10 @@ UserView.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
-    // 'categories',
     'users',
     'user_roles',
     'roles',
+    // 'categories',
     // 'taxonomies',
     // 'indicators',
   ] }),

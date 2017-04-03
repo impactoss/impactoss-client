@@ -140,6 +140,22 @@ export function* saveEntitySaga({ data }) {
   try {
     yield put(saveSending());
 
+    // update user-roles connections
+    // TODO: move below updateEntityRequest when user endpoint working
+    if (data.entity.userRoles) {
+      // on the server
+      const connectionsUpdated = yield call(
+        updateAssociationsRequest,
+        'user_roles',
+        data.entity.userRoles
+      );
+      // and on the client
+      yield connectionsUpdated.map((connection) => connection.type === 'delete'
+        ? put(deleteEntity('user_roles', connection.id))
+        : put(addEntity('user_roles', connection.data))
+      );
+    }
+
     // update entity attributes
     // on the server
     const entityUpdated = yield call(updateEntityRequest, data.path, data.entity);
