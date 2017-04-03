@@ -37,7 +37,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.user && this.props.dataReady) {
+    if (this.props.dataReady) {
       this.props.populateForm('userEdit.form.data', this.getInitialFormData());
     }
   }
@@ -47,8 +47,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-
-    if (nextProps.user && nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.dataReady && !this.props.dataReady) {
       this.props.populateForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
@@ -60,7 +59,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       attributes: props.user.attributes,
     };
 
-    const { roles } = this.props;
+    const { roles } = props;
 
     data.associatedRoles = roles
       ? Object.values(roles).reduce((ids, entity) =>
@@ -217,6 +216,8 @@ const mapStateToProps = (state, props) => ({
   form: formSelector(state),
   dataReady: isReady(state, { path: [
     'users',
+    'user_roles',
+    'roles',
   ] }),
   user: getUser(
     state,

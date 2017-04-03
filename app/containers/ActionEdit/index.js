@@ -50,7 +50,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.action && nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.dataReady && !this.props.dataReady) {
       this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
@@ -62,7 +62,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       attributes: props.action.attributes,
     };
 
-    const { taxonomies, recommendations, indicators } = this.props;
+    const { taxonomies, recommendations, indicators } = nextProps;
     // TODO this functionality should be shared
       // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }
     data.associatedTaxonomies = taxonomies
