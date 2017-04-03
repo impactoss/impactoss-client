@@ -107,7 +107,9 @@ function appReducer(state = initialState, payload) {
       const errors = checkErrorMessagesExist(payload.error.response);
       return state
         .setIn(['auth', 'messages'], errors)
-        .setIn(['auth', 'error'], true);
+        .setIn(['auth', 'error'], true)
+        .setIn(['user', 'attributes'], null)
+        .setIn(['user', 'isSignedIn'], false);
     }
     case AUTHENTICATE_SENDING:
       return state

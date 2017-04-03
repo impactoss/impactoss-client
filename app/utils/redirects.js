@@ -1,16 +1,16 @@
 import checkStore from './checkStore';
 
-function redirectToLoginIfNeeded(store) {
+function redirectIfNotPermitted(store) {
   return (nextState, replace) => {
     if (!store.getState().getIn(['global', 'user', 'isSignedIn'])) {
       replace({
         pathname: '/login',
-        state: { nextPathname: nextState.location.pathname },
+        pathnameOnAuthChange: nextState.location.pathname,
       });
     }
   };
 }
-function redirectToHomeIfSignedIn(store) {
+function redirectIfLoggedIn(store) {
   return (nextState, replace) => {
     if (store.getState().getIn(['global', 'user', 'isSignedIn'])) {
       replace({
@@ -27,7 +27,7 @@ export function getRedirects(store) {
   checkStore(store);
 
   return {
-    redirectToLoginIfNeeded: redirectToLoginIfNeeded(store),
-    redirectToHomeIfSignedIn: redirectToHomeIfSignedIn(store),
+    redirectIfNotPermitted: redirectIfNotPermitted(store),
+    redirectIfLoggedIn: redirectIfLoggedIn(store),
   };
 }

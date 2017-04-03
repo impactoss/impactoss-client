@@ -5,6 +5,7 @@
 import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
+import { browserHistory } from 'react-router';
 
 import globalReducer from 'containers/App/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
@@ -17,21 +18,27 @@ import entityListFilterReducer from 'containers/EntityListFilters/reducer';
  * The change is necessitated by moving to react-router-redux@4
  *
  */
-
 // Initial routing state
 const routeInitialState = fromJS({
-  locationBeforeTransitions: null,
+  locationBeforeTransitions: {
+    ...browserHistory.getCurrentLocation(),
+    pathnameOnAuthChange: browserHistory.getCurrentLocation().pathname,
+    // stay on same path on authenticateSuccess
+  },
 });
 
 /**
- * Merge route into the global application state
+ * Merge route into the global application state and remember previous route
  */
 function routeReducer(state = routeInitialState, action) {
   switch (action.type) {
     /* istanbul ignore next */
     case LOCATION_CHANGE:
       return state.merge({
-        locationBeforeTransitions: action.payload,
+        locationBeforeTransitions: {
+          ...action.payload,
+          pathnamePrevious: state.getIn(['locationBeforeTransitions', 'pathname']),
+        },
       });
     default:
       return state;

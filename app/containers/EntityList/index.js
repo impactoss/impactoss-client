@@ -242,8 +242,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     label: connection.attributes.title,
                     value: connectedId,
                     count: 1,
-                    query: option.path,
-                    isSet: URLParams.has(location.query[option.path]) && URLParams.getAll(location.query[option.path]).indexOf(connectedId.toString()) > -1,
+                    query: option.query,
+                    isSet: URLParams.has(location.query[option.query]) && URLParams.getAll(location.query[option.query]).indexOf(connectedId.toString()) > -1,
                   };
                 }
               }
@@ -255,7 +255,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           } else {
             filterOptions.connections.options[option.path].options.without = {
               label: `Without ${option.label}`,
-              value: option.path,
+              value: option.query,
               count: 1,
               query: 'without',
             };
