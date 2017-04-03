@@ -2,7 +2,7 @@
  * Gets the entities from server
  */
 
-import { call, put, select, takeLatest, takeEvery } from 'redux-saga/effects';
+import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
 import { push } from 'react-router-redux';
 import collection from 'lodash/collection';
 import { browserHistory } from 'react-router';
@@ -16,10 +16,10 @@ import {
     LOGOUT,
     LOGOUT_SUCCESS,
     VALIDATE_TOKEN,
+    INVALIDATE_ENTITIES,
 } from 'containers/App/constants';
 
 import {
-    loadingEntities,
     entitiesLoaded,
     entitiesLoadingError,
     authenticateSuccess,
@@ -27,7 +27,6 @@ import {
     authenticateError,
     logoutSuccess,
     entitiesRequested,
-    entitiesReady,
     invalidateEntities,
     updateEntity,
     addEntity,
@@ -56,20 +55,20 @@ import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
 export function* checkEntitiesSaga(payload) {
   // requestedSelector returns the times that entities where fetched from the API
   const requestedAt = yield select(getRequestedAt, { path: payload.path });
-
   // If haven't requested yet, do so now.
   if (!requestedAt) {
-    // First record that we are requesting
-    yield put(entitiesRequested(payload.path, Date.now()));
-    // Updates the loading state of the app
-    yield put(loadingEntities(payload.path));
     try {
-      // Actions are called measures on the server
-      const serverPath = payload.path;
-      // Call the API
-      const response = yield call(apiRequest, 'get', serverPath);
-      // Save response and set loading = false
-      yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path, Date.now()));
+      // First record that we are requesting
+      yield put(entitiesRequested(payload.path, Date.now()));
+      // Call the API, cancel on invalidate
+      const { response } = yield race({
+        response: call(apiRequest, 'get', payload.path),
+        cancel: take(INVALIDATE_ENTITIES), // will also reset entities requested
+      });
+      if (response) {
+      // Save response
+        yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path, Date.now()));
+      }
     } catch (err) {
       // Whoops Save error
       yield put(entitiesLoadingError(err, payload.path));
@@ -77,8 +76,6 @@ export function* checkEntitiesSaga(payload) {
       yield put(entitiesRequested(payload.path, null));
     }
   }
-  // Entities are ready, let listeners know
-  yield put(entitiesReady(payload.path, Date.now()));
 }
 
 export function* authenticateSaga(payload) {
@@ -142,6 +139,22 @@ export function* validateTokenSaga() {
 export function* saveEntitySaga({ data }) {
   try {
     yield put(saveSending());
+
+    // update user-roles connections
+    // TODO: move below updateEntityRequest when user endpoint working
+    if (data.entity.userRoles) {
+      // on the server
+      const connectionsUpdated = yield call(
+        updateAssociationsRequest,
+        'user_roles',
+        data.entity.userRoles
+      );
+      // and on the client
+      yield connectionsUpdated.map((connection) => connection.type === 'delete'
+        ? put(deleteEntity('user_roles', connection.id))
+        : put(addEntity('user_roles', connection.data))
+      );
+    }
 
     // update entity attributes
     // on the server
@@ -321,14 +334,15 @@ export function* newEntitySaga({ data }) {
  */
 export default function* rootSaga() {
   // console.log('calling rootSaga');
-  yield takeEvery(VALIDATE_TOKEN, validateTokenSaga);
-  yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
-
-  yield takeEvery(SAVE_ENTITY, saveEntitySaga);
-  yield takeEvery(NEW_ENTITY, newEntitySaga);
+  yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
   yield takeLatest(AUTHENTICATE_SUCCESS, authChangeSaga);
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(LOGOUT_SUCCESS, authChangeSaga);
+
+  yield takeEvery(SAVE_ENTITY, saveEntitySaga);
+  yield takeEvery(NEW_ENTITY, newEntitySaga);
+
+  yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
 }

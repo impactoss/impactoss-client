@@ -44,14 +44,13 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('componentWillReceiveProps', nextProps, this.props)
-    // repopulate if new data becomes ready
-    if (nextProps.action && nextProps.dataReady && !this.props.dataReady) {
-      this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
-    }
     // reload entities if invalidated
-    if (this.props.action && !nextProps.action && !nextProps.dataReady) {
+    if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    // repopulate if new data becomes ready
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
@@ -83,7 +82,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   }));
 
   mapRecommendationOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entityentity.get('id'),
+    value: entity.get('id'),
     label: entity.getIn(['attributes', 'title']),
   }));
 
