@@ -7,15 +7,14 @@
 import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
-import Option from 'components/FilterForm/Option';
 import {
   SHOW_FILTER_FORM,
   HIDE_FILTER_FORM,
 } from './constants';
 
 const initialState = fromJS({
-  showFilterForm: false,
-  formOptions: [],
+  optionsPath: [],
+  title: null,
 });
 
 const formData = fromJS({
@@ -26,19 +25,8 @@ const formData = fromJS({
 function entityListFilterReducer(state = initialState, action) {
   switch (action.type) {
     case SHOW_FILTER_FORM:
-      return state.withMutations((mstate) => {
-        const formOptions = fromJS(action.options.map((option) => ({
-          value: option,
-        })));
-
-        return mstate.set('showFilterForm', true)
-        .set('formTitle', action.title)
-        .set('formOptions', formOptions.map((option) =>
-          option.set('label', Option({
-            label: option.getIn(['value', 'label']),
-            count: option.getIn(['value', 'count']),
-          }))));
-      });
+      return state.set('formTitle', action.title)
+        .set('optionsPath', fromJS(action.optionsPath));
     case HIDE_FILTER_FORM:
       return initialState;
     default:

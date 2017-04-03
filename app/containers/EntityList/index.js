@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 // import { updateQueryStringParams } from 'utils/history';
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
 import { getEntitySortIteratee } from 'utils/sort';
+import { fromJS } from 'immutable';
 
 import Grid from 'grid-styled';
 
@@ -107,7 +108,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   value: catId,
                   count: 1,
                   query: filters.taxonomies.query,
-                //   isSet: !!(location.query.cat && location.query.cat.split(' ').indexOf(catId.toString()) > -1),
                   isSet: URLParams.has(location.query.cat) && URLParams.getAll(location.query.cat).indexOf(catId.toString()) > -1,
                 };
               }
@@ -298,14 +298,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         });
       }
     });
-    // console.log(filterOptions)
 
     return (
       <Container>
         <Row>
           <Grid sm={1 / 4}>
             <EntityListFilters
-              filterOptions={filterOptions}
+              filterOptions={fromJS(filterOptions)}
             />
           </Grid>
           <Grid sm={3 / 4}>

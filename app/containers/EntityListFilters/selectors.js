@@ -20,14 +20,9 @@ const pageSelector = createSelector(
    (substate) => substate.get('page')
  );
 
-const showFilterFormSelector = createSelector(
+const optionsPathSelector = createSelector(
   pageSelector,
-  (pageState) => pageState.get('showFilterForm')
-);
-
-const formOptionsSelector = createSelector(
-  pageSelector,
-  (pageState) => pageState.get('formOptions')
+  (pageState) => pageState.get('optionsPath').toJS()
 );
 
 const filtersCheckedSelector = createSelector(
@@ -62,7 +57,6 @@ export {
   selectEntityListFiltersDomain,
   entityListSelect,
   formSelector,
-  showFilterFormSelector,
-  formOptionsSelector,
+  optionsPathSelector,
   filtersCheckedSelector,
 };
