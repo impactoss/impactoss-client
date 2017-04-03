@@ -10,6 +10,8 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
 
+import { Map, List } from 'immutable';
+
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { getEntities, isReady } from 'containers/App/selectors';
@@ -28,25 +30,31 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     this.props.loadEntitiesIfNeeded();
   }
 
-  mapActionOptions = (actions) => Object.values(actions).map((action) => ({
-    value: action.id,
-    label: action.attributes.title,
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
+
+  mapActionOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
   // TODO this should be shared functionality
-  renderActionControl = (actions) => actions ? ({
+  renderActionControl = (actions) => ({
     id: 'actions',
     model: '.associatedActions',
     label: 'Actions',
     controlType: 'multiselect',
     options: this.mapActionOptions(actions),
-  }) : [];
+  });
 
   render() {
     const { dataReady } = this.props;
     const { saveSending, saveError } = this.props.indicatorNew.page;
     const required = (val) => val && val.length;
-
 
     return (
       <div>
@@ -126,7 +134,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                       controlType: 'textarea',
                       model: '.attributes.description',
                     },
-                    this.renderActionControl(this.props.actions),
+                    this.props.actions ? this.renderActionControl(this.props.actions) : null,
                   ],
                 },
               }}
@@ -162,7 +170,6 @@ const mapStateToProps = (state) => ({
   actions: getEntities(
     state, {
       path: 'measures',
-      out: 'js',
     },
   ),
 });
@@ -177,18 +184,18 @@ function mapDispatchToProps(dispatch) {
       // dispatch(loadEntitiesIfNeeded('measure_categories'));
     },
     handleSubmit: (formData) => {
-      const saveData = formData.toJS();
+      let saveData = formData;
       // actions
-      if (saveData.associatedActions) {
-        saveData.measureIndicators = {
-          delete: [],
-          create: saveData.associatedActions.map((actionId) => ({
-            measure_id: actionId,
+      if (formData.get('associatedActions')) {
+        saveData = saveData.set('measureIndicators', Map({
+          delete: List(),
+          create: formData.get('associatedActions').map((id) => Map({
+            measure_id: id,
           })),
-        };
+        }));
       }
 
-      dispatch(save(saveData));
+      dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
       // not really a dispatch function here, could be a member function instead

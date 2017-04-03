@@ -31,7 +31,12 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
   handleEdit = () => {
     browserHistory.push(`/actions/edit/${this.props.params.id}`);
   }

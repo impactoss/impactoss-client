@@ -38,7 +38,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.action && this.props.dataReady) {
+    if (this.props.dataReady) {
       this.props.populateForm('actionEdit.form.data', this.getInitialFormData());
     }
   }
@@ -331,7 +331,6 @@ const mapStateToProps = (state, props) => ({
     state,
     {
       path: 'indicators',
-      out: 'js',
       extend: {
         as: 'associated',
         path: 'measure_indicators',

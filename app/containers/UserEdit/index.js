@@ -10,9 +10,8 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
-import { reduce } from 'lodash/collection';
 
-import { fromJS } from 'immutable';
+import { Map, List } from 'immutable';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
@@ -54,34 +53,29 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const data = {
-      id: props.user.id,
-      attributes: props.user.attributes,
-    };
-
     const { roles } = props;
 
-    data.associatedRoles = roles
-      ? Object.values(roles).reduce((ids, entity) =>
-          entity.associated ? ids.concat([entity.id]) : ids
-        , [])
-      : [];
-
-    return data;
+    return Map({
+      id: props.user.id,
+      attributes: props.user.attributes,
+      associatedRoles: roles
+        ? roles.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
+        : List(),
+    });
   }
 
-  mapRoleOptions = (roles) => Object.values(roles).map((entity) => ({
-    value: entity.id,
-    label: entity.attributes.friendly_name,
+  mapRoleOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'friendly_name']),
   }));
 
-  renderRoleControl = (roles) => roles ? ({
+  renderRoleControl = (roles) => ({
     id: 'roles',
     model: '.associatedRoles',
     label: 'Roles',
     controlType: 'multiselect',
     options: this.mapRoleOptions(roles),
-  }) : [];
+  });
 
 
   render() {
@@ -182,7 +176,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                     },
                   ],
                   aside: [
-                    this.renderRoleControl(this.props.roles),
+                    this.props.roles ? this.renderRoleControl(this.props.roles) : null,
                   ],
                 },
               }}
@@ -236,7 +230,6 @@ const mapStateToProps = (state, props) => ({
     state,
     {
       path: 'roles',
-      out: 'js',
       extend: {
         as: 'associated',
         path: 'user_roles',
@@ -258,38 +251,34 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('roles'));
     },
     populateForm: (model, formData) => {
-      dispatch(formActions.load(model, fromJS(formData)));
+      dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData, roles) => {
-      const saveData = formData.toJS();
-
       // roles
-      const formRoleIds = saveData.associatedRoles;
+      const formRoleIds = formData.get('associatedRoles');
       // store associated recs as { [rec.id]: [association.id], ... }
-      const associatedRoles = Object.values(roles).reduce((rolesAssociated, role) => {
-        const result = rolesAssociated;
-        if (role.associated) {
-          result[role.id] = Object.keys(role.associated)[0];
+      const associatedRoles = roles.reduce((rolesAssociated, entity) => {
+        if (entity.get('associated')) {
+          return rolesAssociated.set(entity.get('id'), entity.get('associated').keySeq().first());
         }
-        return result;
-      }, {});
+        return rolesAssociated;
+      }, Map());
 
-      saveData.userRoles = {
-        delete: reduce(associatedRoles, (associatedIds, associatedId, id) =>
-          formRoleIds.indexOf(id.toString()) === -1
-            ? associatedIds.concat([associatedId])
-            : associatedIds
-        , []),
-        create: reduce(formRoleIds, (payloads, id) =>
-          Object.keys(associatedRoles).indexOf(id.toString()) === -1
-            ? payloads.concat([{
+      const saveData = formData.set('userRoles', Map({
+        delete: associatedRoles.reduce((associatedIds, associatedId, id) =>
+          !formRoleIds.includes(id) ? associatedIds.push(associatedId) : associatedIds
+        , List()),
+        create: formRoleIds.reduce((payloads, id) =>
+          !associatedRoles.has(id)
+            ? payloads.push(Map({
               role_id: id,
-              user_id: saveData.id,
-            }])
+              user_id: formData.get('id'),
+            }))
             : payloads
-        , []),
-      };
-      dispatch(save(saveData));
+        , List()),
+      }));
+
+      dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
       // not really a dispatch function here, could be a member function instead

@@ -10,9 +10,8 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
-import { reduce } from 'lodash/collection';
 
-import { fromJS } from 'immutable';
+import { Map, List } from 'immutable';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -39,7 +38,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    // console.log('componentWillMount', this.props.indicator, this.props.dataReady)
     if (this.props.dataReady) {
       this.props.populateForm('indicatorEdit.form.data', this.getInitialFormData());
     }
@@ -58,37 +56,29 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const data = {
+    const { actions } = props;
+    return Map({
       id: props.indicator.id,
       attributes: props.indicator.attributes,
-    };
-
-    const { actions } = props;
-
-    // TODO this functionality should be shared
-      // Reducer - starts with {}, iterate taxonomies, and store associated ids as { [tax.id]: [associated,category,ids], ... }
-    data.associatedActions = actions
-      ? Object.values(actions).reduce((ids, action) =>
-          action.associated ? ids.concat([action.id]) : ids
-        , [])
-      : [];
-
-    return data;
+      associatedActions: actions
+        ? actions.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
+        : List(),
+    });
   }
 
-  mapActionOptions = (actions) => Object.values(actions).map((action) => ({
-    value: action.id,
-    label: action.attributes.title,
+  mapActionOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
   // TODO this should be shared functionality
-  renderActionControl = (actions) => actions ? ({
+  renderActionControl = (actions) => ({
     id: 'actions',
     model: '.associatedActions',
     label: 'Actions',
     controlType: 'multiselect',
     options: this.mapActionOptions(actions),
-  }) : [];
+  });
 
 
   render() {
@@ -194,7 +184,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                       controlType: 'textarea',
                       model: '.attributes.description',
                     },
-                    this.renderActionControl(this.props.actions),
+                    this.props.actions ? this.renderActionControl(this.props.actions) : null,
                   ],
                 },
               }}
@@ -253,7 +243,6 @@ const mapStateToProps = (state, props) => ({
     state,
     {
       path: 'measures',
-      out: 'js',
       extend: {
         as: 'associated',
         path: 'measure_indicators',
@@ -277,41 +266,36 @@ function mapDispatchToProps(dispatch, props) {
     },
     populateForm: (model, formData) => {
       // console.log('populateForm', formData)
-      dispatch(formActions.load(model, fromJS(formData)));
+      dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData, actions) => {
-      // TODO maybe this function should be updated to work with Immutable objects, instead of converting
-      // const prevTaxonomies = prevFormData.associatedTaxonomies || {};
-      const saveData = formData.toJS();
-
-      // measures
-      const formActionIds = saveData.associatedActions;
-      // store associated recs as { [rec.id]: [association.id], ... }
-      const associatedActions = Object.values(actions).reduce((actionsAssociated, action) => {
-        const result = actionsAssociated;
-        if (action.associated) {
-          result[action.id] = Object.keys(action.associated)[0];
+      // actions
+      const formActionIds = formData.get('associatedActions');
+      // store associated Actions as { [action.id]: [association.id], ... }
+      const associatedActions = actions.reduce((actionsAssociated, action) => {
+        if (action.get('associated')) {
+          return actionsAssociated.set(action.get('id'), action.get('associated').keySeq().first());
         }
-        return result;
-      }, {});
+        return actionsAssociated;
+      }, Map());
 
-      saveData.measureIndicators = {
-        delete: reduce(associatedActions, (associatedIds, associatedId, actionId) =>
-          formActionIds.indexOf(actionId.toString()) === -1
-            ? associatedIds.concat([associatedId])
+      const saveData = formData.set('measureIndicators', Map({
+        delete: associatedActions.reduce((associatedIds, associatedId, id) =>
+          !formActionIds.includes(id)
+            ? associatedIds.push(associatedId)
             : associatedIds
-        , []),
-        create: reduce(formActionIds, (payloads, actionId) =>
-          Object.keys(associatedActions).indexOf(actionId.toString()) === -1
-            ? payloads.concat([{
-              measure_id: actionId,
-              indicator_id: saveData.id,
-            }])
+        , List()),
+        create: formActionIds.reduce((payloads, id) =>
+          !associatedActions.has(id)
+            ? payloads.push(Map({
+              measure_id: id,
+              indicator_id: formData.get('id'),
+            }))
             : payloads
-        , []),
-      };
+        , List()),
+      }));
 
-      dispatch(save(saveData));
+      dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
       // not really a dispatch function here, could be a member function instead

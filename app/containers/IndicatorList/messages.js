@@ -20,6 +20,6 @@ export default defineMessages({
   },
   loading: {
     id: 'app.containers.IndicatorList.loading',
-    defaultMessage: 'Loading actions...',
+    defaultMessage: 'Loading data...',
   },
 });
