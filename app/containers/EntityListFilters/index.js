@@ -10,18 +10,7 @@ import Immutable, { Map } from 'immutable';
 import FilterForm from 'components/FilterForm';
 import Option from 'components/FilterForm/Option';
 
-export default class EntityListFilters extends React.Component { // eslint-disable-line react/prefer-stateless-function
-  static propTypes = {
-    filterGroups: PropTypes.instanceOf(Immutable.Map),
-    formOptions: PropTypes.object,
-    onShowFilterForm: PropTypes.func.isRequired,
-    onHideFilterForm: PropTypes.func.isRequired,
-    formModel: PropTypes.string,
-  };
-
-  // static contextTypes = {
-  //   intl: React.PropTypes.object.isRequired,
-  // };
+export class EntityListFilters extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   getFormOptions(formOptions) {
     // Display the options
@@ -76,3 +65,17 @@ export default class EntityListFilters extends React.Component { // eslint-disab
     );
   }
 }
+
+EntityListFilters.propTypes = {
+  filterGroups: PropTypes.instanceOf(Immutable.Map),
+  formOptions: PropTypes.object,
+  onShowFilterForm: PropTypes.func.isRequired,
+  onHideFilterForm: PropTypes.func.isRequired,
+  formModel: PropTypes.string,
+};
+
+EntityListFilters.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
+};
+
+export default EntityListFilters;

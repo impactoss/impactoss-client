@@ -13,7 +13,9 @@ import { fromJS } from 'immutable';
 
 import Grid from 'grid-styled';
 
+import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListFilters from 'components/EntityListFilters';
+import EntityListEdit from 'components/EntityListEdit';
 
 import PageHeader from 'components/PageHeader';
 import EntityListItem from 'components/EntityListItem';
@@ -23,16 +25,24 @@ import Container from 'components/basic/Container';
 import { getEntities } from 'containers/App/selectors';
 
 import {
-  FORM_MODEL,
+  FILTER_FORM_MODEL,
+  EDIT_FORM_MODEL,
+  FILTERS_PANEL,
+  EDIT_PANEL,
 } from './constants';
 
 import {
   activeFilterOptionSelector,
+  activeEditOptionSelector,
+  activePanelSelector,
 } from './selectors';
 
 import {
+  showEditForm,
+  hideEditForm,
   showFilterForm,
   hideFilterForm,
+  showPanel,
 } from './actions';
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -259,8 +269,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   }
   makeActiveFilterOptions = (entities) => {
     const { activeFilterOption } = this.props;
-    // iterate through entities and create filterOptions
-    // TODO refactor to function
+    // create filterOptions
     // if taxonomy options
     switch (activeFilterOption.group) {
       case 'taxonomies':
@@ -359,38 +368,155 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         }), {}),
       };
     }
-    // filterOptions = this.fillActiveFilterOptions(filterOptions, entities)
 
     return filterGroups;
   }
 
+  makeEditGroups = () => {
+    const {
+      edits,
+      taxonomies,
+      connections,
+      activeEditOption,
+    } = this.props;
+
+    const editGroups = {};
+
+    // taxonomy option group
+    if (edits.taxonomies && taxonomies) {
+      // first prepare taxonomy options
+      editGroups.taxonomies = {
+        id: 'taxonomies', // filterGroupId
+        label: edits.taxonomies.label,
+        show: true,
+        options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
+          ...taxOptions,
+          [taxonomy.id]: {
+            id: `taxonomies-${taxonomy.id}`, // filterOptionId
+            label: taxonomy.attributes.title,
+            active: !!activeEditOption && activeEditOption.optionId === `taxonomies-${taxonomy.id}`,
+          },
+        }), {}),
+      };
+    }
+
+    // connections option group
+    if (edits.connections && connections) {
+      // first prepare taxonomy options
+      editGroups.connections = {
+        id: 'connections', // filterGroupId
+        label: edits.connections.label,
+        show: true,
+        options: reduce(edits.connections.options, (options, option) => ({
+          ...options,
+          [option.path]: {
+            id: `connections-${option.path}`, // filterOptionId
+            label: option.label,
+            active: !!activeEditOption && activeEditOption.optionId === `connections-${option.path}`,
+          },
+        }), {}),
+      };
+    }
+
+    // attributes
+    if (edits.attributes) {
+      // first prepare taxonomy options
+      editGroups.attributes = {
+        id: 'attributes', // filterGroupId
+        label: edits.attributes.label,
+        show: true,
+        options: reduce(edits.attributes.options, (options, option) => ({
+          ...options,
+          [option.attribute]: {
+            id: `attributes-${option.attribute}`, // filterOptionId
+            label: option.label,
+            active: !!activeEditOption && activeEditOption.optionId === `attributes-${option.attribute}`,
+          },
+        }), {}),
+      };
+    }
+
+    return editGroups;
+  }
+
+  // makeActiveEditOptions = (entities) => {
+  makeActiveEditOptions = () => {
+    const { activeEditOption } = this.props;
+    // iterate through entities and create filterOptions
+    // if taxonomy options
+    switch (activeEditOption.group) {
+      // case 'taxonomies':
+      //   return this.taxonomyFilterOptions(entities);
+      // case 'connections':
+      //   return this.connectionFilterOptions(entities);
+      // case 'attributes':
+      //   return this.attributeFilterOptions(entities);
+      default:
+        return null;
+    }
+  }
+
   render() {
-    const { sortBy, sortOrder, activeFilterOption } = this.props;
+    const {
+      sortBy,
+      sortOrder,
+      activeFilterOption,
+      activeEditOption,
+      activePanel,
+    } = this.props;
     // sorted entities
     const entities = this.props.entities && orderBy(
       this.props.entities,
       getEntitySortIteratee(sortBy),
       sortOrder
     );
-    // figure out filter panel options based on entities, taxononomies, connections, and connectedTaxonomies
-    // const filterOptions = this.makeFilterOptions(filters, entities, taxonomies, connectedTaxonomies, connections, location);
-    const filterGroups = this.makeFilterGroups();
-    // get active filter options
-    const formOptions = activeFilterOption ? this.makeActiveFilterOptions(entities) : null;
+
     // map entities to entity list item data
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
+
+    const panelSwitchOptions = [
+      {
+        label: 'Filter list',
+        active: activePanel === FILTERS_PANEL,
+        onClick: () => {
+          this.props.onPanelSelect(FILTERS_PANEL);
+        },
+      },
+      {
+        label: 'Edit list',
+        active: activePanel === EDIT_PANEL,
+        onClick: () => {
+          this.props.onPanelSelect(EDIT_PANEL);
+        },
+      },
+    ];
 
     return (
       <Container>
         <Row>
           <Grid sm={1 / 4}>
-            <EntityListFilters
-              filterGroups={fromJS(filterGroups)}
-              formOptions={fromJS(formOptions)}
-              formModel={FORM_MODEL}
-              onShowFilterForm={this.props.onShowFilterForm}
-              onHideFilterForm={this.props.onHideFilterForm}
-            />
+            <EntityListSidebar
+              options={panelSwitchOptions}
+            >
+              { activePanel === FILTERS_PANEL &&
+                <EntityListFilters
+                  filterGroups={fromJS(this.makeFilterGroups())}
+                  formOptions={activeFilterOption ? fromJS(this.makeActiveFilterOptions(entities)) : null}
+                  formModel={FILTER_FORM_MODEL}
+                  onShowFilterForm={this.props.onShowFilterForm}
+                  onHideFilterForm={this.props.onHideFilterForm}
+                />
+              }
+              { activePanel === EDIT_PANEL &&
+                <EntityListEdit
+                  editGroups={fromJS(this.makeEditGroups())}
+                  formOptions={activeEditOption ? fromJS(this.makeActiveFormOptions(entities)) : null}
+                  formModel={EDIT_FORM_MODEL}
+                  onShowEditForm={this.props.onShowEditForm}
+                  onHideEditForm={this.props.onHideEditForm}
+                />
+              }
+            </EntityListSidebar>
           </Grid>
           <Grid sm={3 / 4}>
             <PageHeader title={this.props.header.title} actions={this.props.header.actions} />
@@ -406,7 +532,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
 EntityList.propTypes = {
   entities: PropTypes.object.isRequired,
+  // selects: PropTypes.object, // only used in mapStateToProps
   filters: PropTypes.object,
+  edits: PropTypes.object,
   taxonomies: PropTypes.object,
   connections: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
@@ -417,8 +545,13 @@ EntityList.propTypes = {
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
   activeFilterOption: PropTypes.object,
+  activeEditOption: PropTypes.object,
   onShowFilterForm: PropTypes.func.isRequired,
   onHideFilterForm: PropTypes.func.isRequired,
+  onShowEditForm: PropTypes.func.isRequired,
+  onHideEditForm: PropTypes.func.isRequired,
+  onPanelSelect: PropTypes.func.isRequired,
+  activePanel: PropTypes.string,
 };
 
 EntityList.defaultProps = {
@@ -509,6 +642,8 @@ const getWithoutQuery = (props) =>
 
 const mapStateToProps = (state, props) => ({
   activeFilterOption: activeFilterOptionSelector(state),
+  activeEditOption: activeEditOptionSelector(state),
+  activePanel: activePanelSelector(state),
   entities: getEntities(state, {
     out: 'js',
     path: props.path,
@@ -517,11 +652,11 @@ const mapStateToProps = (state, props) => ({
     without: props.location.query && props.location.query.without ? getWithoutQuery(props) : null,
     extend: props.extensions,
   }),
-  taxonomies: props.filters && props.filters.taxonomies
-    ? getEntities(state, props.filters.taxonomies.select)
+  taxonomies: props.selects && props.selects.taxonomies
+    ? getEntities(state, props.selects.taxonomies)
     : null,
-  connections: props.filters && props.filters.connections
-    ? reduce(props.filters.connections.options, (result, { path }) => ({
+  connections: props.selects && props.selects.connections
+    ? reduce(props.selects.connections.options, (result, path) => ({
       ...result,
       [path]: getEntities(state, {
         out: 'js',
@@ -529,8 +664,8 @@ const mapStateToProps = (state, props) => ({
       }),
     }), {})
     : null,
-  connectedTaxonomies: props.filters && props.filters.connectedTaxonomies
-  ? reduce(props.filters.connectedTaxonomies.connections, (result, { select }) => ({
+  connectedTaxonomies: props.selects && props.selects.connectedTaxonomies
+  ? reduce(props.selects.connectedTaxonomies.options, (result, select) => ({
     ...result,
     [select.path]: getEntities(state, select),
   }), {})
@@ -539,12 +674,22 @@ const mapStateToProps = (state, props) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    onShowFilterForm: (activeFilterOption) => {
-      dispatch(showFilterForm(activeFilterOption));
+    onShowFilterForm: (option) => {
+      dispatch(showFilterForm(option));
     },
     onHideFilterForm: (evt) => {
       if (evt !== undefined && evt.preventDefault) evt.preventDefault();
       dispatch(hideFilterForm());
+    },
+    onShowEditForm: (option) => {
+      dispatch(showEditForm(option));
+    },
+    onHideEditForm: (evt) => {
+      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+      dispatch(hideEditForm());
+    },
+    onPanelSelect: (activePanel) => {
+      dispatch(showPanel(activePanel));
     },
   };
 }

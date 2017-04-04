@@ -4,7 +4,7 @@ import { filtersCheckedSelector } from './selectors';
 // import { credentialsSelector } from './selectors';
 
 import {
-  FORM_MODEL,
+  FILTER_FORM_MODEL,
 } from './constants';
 
 export function* doFilter() {
@@ -15,5 +15,5 @@ export function* doFilter() {
 
 export default function* filterSaga() {
   yield takeLatest((action) =>
-  action.type === 'rrf/change' && action.model === `${FORM_MODEL}.values`, doFilter);
+  action.type === 'rrf/change' && action.model === `${FILTER_FORM_MODEL}.values`, doFilter);
 }

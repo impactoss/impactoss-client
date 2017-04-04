@@ -10,14 +10,19 @@ const selectEntityListDomain = (state) => state.get(REDUCER_PATH);
  * Other specific selectors
  */
 
-const formSelector = createSelector(
-  selectEntityListDomain,
-  (substate) => substate.get('form').data // TODO WTF HTF GRR
- );
-
 const pageSelector = createSelector(
    selectEntityListDomain,
    (substate) => substate.get('page')
+ );
+
+const filterFormSelector = createSelector(
+  selectEntityListDomain,
+  (substate) => substate.get('filterForm').data // TODO WTF HTF GRR
+ );
+
+const editFormSelector = createSelector(
+  selectEntityListDomain,
+  (substate) => substate.get('editForm').data // TODO WTF HTF GRR
  );
 
 const activeFilterOptionSelector = createSelector(
@@ -25,8 +30,18 @@ const activeFilterOptionSelector = createSelector(
   (pageState) => pageState.get('activeFilterOption')
 );
 
+const activeEditOptionSelector = createSelector(
+  pageSelector,
+  (pageState) => pageState.get('activeEditOption')
+);
+
+const activePanelSelector = createSelector(
+  pageSelector,
+  (pageState) => pageState.get('activePanel')
+);
+
 const filtersCheckedSelector = createSelector(
-  formSelector,
+  filterFormSelector,
   // () => window.location.href,
   // (formData, href) => {
   (formData) => {
@@ -56,7 +71,10 @@ export default entityListSelect;
 export {
   selectEntityListDomain,
   entityListSelect,
-  formSelector,
+  editFormSelector,
+  filterFormSelector,
   activeFilterOptionSelector,
+  activeEditOptionSelector,
   filtersCheckedSelector,
+  activePanelSelector,
 };

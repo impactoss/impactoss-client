@@ -10,6 +10,10 @@ import { combineForms } from 'react-redux-form/immutable';
 import {
   SHOW_FILTER_FORM,
   HIDE_FILTER_FORM,
+  SHOW_EDIT_FORM,
+  HIDE_EDIT_FORM,
+  SHOW_PANEL,
+  FILTERS_PANEL,
 } from './constants';
 
 const initialState = fromJS({
@@ -18,25 +22,30 @@ const initialState = fromJS({
   //   group: 'taxonomies',
   //   optionId: 'taxonomies-6',
   // },
+  activeEditOption: null,
+  activePanel: FILTERS_PANEL,
 });
 
-const formData = fromJS({
-  filterId: null,
+const filterFormData = fromJS({
+  values: [],
+});
+
+const editFormData = fromJS({
   values: [],
 });
 
 function entityListReducer(state = initialState, action) {
   switch (action.type) {
+    case SHOW_PANEL:
+      return state.set('activePanel', action.activePanel);
     case SHOW_FILTER_FORM:
-      return state
-        .set('formTitle', action.title)
-        .set('activeFilterOption', action.activeFilterOption);
-        // {
-        //   group: '',
-        //   optionId: ''
-        // }
+      return state.set('activeFilterOption', action.option);
     case HIDE_FILTER_FORM:
-      return initialState;
+      return state.set('activeFilterOption', fromJS(initialState.toJS().activeFilterOption));
+    case SHOW_EDIT_FORM:
+      return state.set('activeEditOption', action.option);
+    case HIDE_EDIT_FORM:
+      return state.set('activeEditOption', fromJS(initialState.toJS().activeEditOption));
     default:
       return state;
   }
@@ -44,9 +53,12 @@ function entityListReducer(state = initialState, action) {
 
 export default combineReducers({
   page: entityListReducer,
-  form: combineForms({
-    data: formData,
-  }, 'entityList.form'),
+  filterForm: combineForms({
+    data: filterFormData,
+  }, 'entityList.filterForm'),
+  editForm: combineForms({
+    data: editFormData,
+  }, 'entityList.editForm'),
 });
 
 // export default entityListFilterReducer;
