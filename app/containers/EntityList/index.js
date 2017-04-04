@@ -13,7 +13,7 @@ import { fromJS } from 'immutable';
 
 import Grid from 'grid-styled';
 
-import EntityListFilters from 'containers/EntityListFilters';
+import EntityListFilters from 'components/EntityListFilters';
 
 import PageHeader from 'components/PageHeader';
 import EntityListItem from 'components/EntityListItem';
