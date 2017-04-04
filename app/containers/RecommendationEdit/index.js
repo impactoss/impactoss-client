@@ -11,7 +11,7 @@ import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
 
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -59,7 +59,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     const { taxonomies, actions } = props;
     return Map({
       id: props.recommendation.id,
-      attributes: props.recommendation.attributes,
+      attributes: fromJS(props.recommendation.attributes),
       associatedTaxonomies: taxonomies
       ? taxonomies.reduce((values, tax) =>
           values.set(
