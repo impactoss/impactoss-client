@@ -34,6 +34,8 @@ export const DELETE_ENTITY = 'nmrf/App/DELETE_ENTITY';
 
 export const SAVE_ENTITY = 'nmrf/App/SAVE_ENTITY';
 export const NEW_ENTITY = 'nmrf/App/NEW_ENTITY';
+export const UPDATE_CONNECTIONS = 'nmrf/App/UPDATE_CONNECTIONS';
+export const UPDATE_ENTITIES = 'nmrf/App/UPDATE_ENTITIES';
 
 export const PUBLISH_STATUSES = [
   { value: true, label: 'Draft' },

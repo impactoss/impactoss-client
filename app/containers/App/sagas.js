@@ -17,6 +17,8 @@ import {
     LOGOUT_SUCCESS,
     VALIDATE_TOKEN,
     INVALIDATE_ENTITIES,
+    UPDATE_CONNECTIONS,
+    UPDATE_ENTITIES,
 } from 'containers/App/constants';
 
 import {
@@ -45,6 +47,7 @@ import {
 import {
   newEntityRequest,
   updateEntityRequest,
+  updateEntitiesRequest,
   updateAssociationsRequest,
 } from 'utils/entities-update';
 import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
@@ -136,7 +139,7 @@ export function* validateTokenSaga() {
   }
 }
 
-export function* updateConnections({ path, updates }) {
+export function* updateConnectionsSaga({ path, updates }) {
   // on the server
   const connectionsUpdated = yield call(updateAssociationsRequest, path, updates);
   // and on the client
@@ -147,7 +150,7 @@ export function* updateConnections({ path, updates }) {
   // TODO: error handling
 }
 
-export function* createConnections({ entityId, path, updates, keyPair }) {
+export function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
   // make sure to use new entity id for full payload
   // we should have either the one (recommendation_id) or the other (measure_id)
   const updatesUpdated = updates;
@@ -156,7 +159,7 @@ export function* createConnections({ entityId, path, updates, keyPair }) {
     [keyPair[1]]: create[keyPair[1]] || entityId,
   }));
 
-  yield call(updateConnections, { path, updates: updatesUpdated });
+  yield call(updateConnectionsSaga, { path, updates: updatesUpdated });
 }
 
 export function* saveEntitySaga({ data }) {
@@ -172,7 +175,7 @@ export function* saveEntitySaga({ data }) {
 
     // update user-roles connections
     if (data.entity.userRoles) {
-      yield call(updateConnections, {
+      yield call(updateConnectionsSaga, {
         path: 'user_roles',
         updates: data.entity.userRoles,
       });
@@ -180,7 +183,7 @@ export function* saveEntitySaga({ data }) {
 
     // update recommendation-action connections
     if (data.entity.recommendationMeasures) {
-      yield call(updateConnections, {
+      yield call(updateConnectionsSaga, {
         path: 'recommendation_measures',
         updates: data.entity.recommendationMeasures,
       });
@@ -188,7 +191,7 @@ export function* saveEntitySaga({ data }) {
 
     // update action-indicatos connections
     if (data.entity.measureIndicators) {
-      yield call(updateConnections, {
+      yield call(updateConnectionsSaga, {
         path: 'measure_indicators',
         updates: data.entity.measureIndicators,
       });
@@ -196,7 +199,7 @@ export function* saveEntitySaga({ data }) {
 
     // update action-category connections
     if (data.entity.measureCategories) {
-      yield call(updateConnections, {
+      yield call(updateConnectionsSaga, {
         path: 'measure_categories',
         updates: data.entity.measureCategories,
       });
@@ -204,7 +207,7 @@ export function* saveEntitySaga({ data }) {
 
     // update recommendation-category connections
     if (data.entity.recommendationCategories) {
-      yield call(updateConnections, {
+      yield call(updateConnectionsSaga, {
         path: 'recommendation_categories',
         updates: data.entity.recommendationCategories,
       });
@@ -229,7 +232,7 @@ export function* newEntitySaga({ data }) {
     // check for associations/connections
     // update recommendation-action connections
     if (data.entity.recommendationMeasures) {
-      yield call(createConnections, {
+      yield call(createConnectionsSaga, {
         entityId: entityCreated.data.id,
         path: 'recommendation_measures',
         updates: data.entity.recommendationMeasures,
@@ -239,7 +242,7 @@ export function* newEntitySaga({ data }) {
 
     // update action-indicator connections
     if (data.entity.measureIndicators) {
-      yield call(createConnections, {
+      yield call(createConnectionsSaga, {
         entityId: entityCreated.data.id,
         path: 'measure_indicators',
         updates: data.entity.measureIndicators,
@@ -249,7 +252,7 @@ export function* newEntitySaga({ data }) {
 
     // update action-category connections
     if (data.entity.measureCategories) {
-      yield call(createConnections, {
+      yield call(createConnectionsSaga, {
         entityId: entityCreated.data.id,
         path: 'measure_categories',
         updates: data.entity.measureCategories,
@@ -259,7 +262,7 @@ export function* newEntitySaga({ data }) {
 
     // update recommendation-category connections
     if (data.entity.recommendationCategories) {
-      yield call(createConnections, {
+      yield call(createConnectionsSaga, {
         entityId: entityCreated.data.id,
         path: 'recommendation_categories',
         updates: data.entity.recommendationCategories,
@@ -272,6 +275,22 @@ export function* newEntitySaga({ data }) {
   } catch (error) {
     // console.error(error);
     yield put(saveError('An error occurred saving your data. Please review carefully and try again. '));
+    yield put(invalidateEntities());
+  }
+}
+
+// Batch update entity attributes
+// WARNING untested =)
+export function* updateEntitiesSaga({ data }) {
+  try {
+    yield put(saveSending());
+    // on the server
+    const entitiesUpdated = yield call(updateEntitiesRequest, data.path, data.entities);
+    // and on the client
+    yield entitiesUpdated.map((entity) => put(updateEntity(data.path, entity)));
+    yield put(saveSuccess());
+  } catch (error) {
+    yield put(saveError('An error occurred saving all or parts of your changes. Please review carefully and try again. '));
     yield put(invalidateEntities());
   }
 }
@@ -290,7 +309,10 @@ export default function* rootSaga() {
   yield takeLatest(LOGOUT_SUCCESS, authChangeSaga);
 
   yield takeEvery(SAVE_ENTITY, saveEntitySaga);
+  yield takeEvery(SAVE_ENTITY, saveEntitySaga);
   yield takeEvery(NEW_ENTITY, newEntitySaga);
+  yield takeEvery(UPDATE_CONNECTIONS, updateConnectionsSaga);
+  yield takeEvery(UPDATE_ENTITIES, updateEntitiesSaga);
 
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
 }
