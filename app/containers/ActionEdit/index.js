@@ -11,7 +11,7 @@ import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
 
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -57,9 +57,10 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
     const { taxonomies, recommendations, indicators } = props;
+
     return Map({
       id: props.action.id,
-      attributes: props.action.attributes,
+      attributes: fromJS(props.action.attributes),
       associatedTaxonomies: taxonomies
       ? taxonomies.reduce((values, tax) =>
           values.set(
