@@ -18,7 +18,7 @@ import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import Page from 'components/Page';
-import EntityForm from 'components/EntityForm';
+import EntityForm from 'components/forms/EntityForm';
 
 import {
   getEntity,
@@ -38,50 +38,57 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.action && this.props.dataReady) {
+    if (this.props.dataReady) {
       this.props.populateForm('actionEdit.form.data', this.getInitialFormData());
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('componentWillReceiveProps', nextProps, this.props)
-    // repopulate if new data becomes ready
-    if (nextProps.action && nextProps.dataReady && !this.props.dataReady) {
-      this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
-    }
     // reload entities if invalidated
-    if (this.props.action && !nextProps.action && !nextProps.dataReady) {
+    if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    // repopulate if new data becomes ready
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, recommendations } = props;
+    const { taxonomies, recommendations, indicators } = props;
     return Map({
       id: props.action.id,
       attributes: props.action.attributes,
       associatedTaxonomies: taxonomies
       ? taxonomies.reduce((values, tax) =>
-          values.set(tax.get('id'), tax.get('categories').reduce((ids, cat) =>
-            cat.get('associated') ? ids.push(cat.get('id')) : ids
-            , List()))
+          values.set(
+            tax.get('id'),
+            tax.get('categories').reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List()))
         , Map())
       : Map(),
       associatedRecommendations: recommendations
-        ? recommendations.reduce((ids, rec) => rec.get('associated') ? ids.push(rec.get('id')) : ids, List())
+        ? recommendations.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
+        : List(),
+      associatedIndicators: indicators
+        ? indicators.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
         : List(),
     });
   }
 
-  mapCategoryOptions = (categories) => categories.toList().map((cat) => Map({
-    value: cat.get('id'),
-    label: cat.getIn(['attributes', 'title']),
+  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
-  mapRecommendationOptions = (recommendations) => recommendations.toList().map((rec) => Map({
-    value: rec.get('id'),
-    label: rec.getIn(['attributes', 'title']),
+  mapRecommendationOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
+  }));
+
+  mapIndicatorOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
   }));
 
   // TODO this should be shared functionality
@@ -100,7 +107,17 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     label: 'Recommendations',
     controlType: 'multiselect',
     options: this.mapRecommendationOptions(recommendations),
-  })
+  });
+
+  // TODO this should be shared functionality
+  renderIndicatorControl = (indicators) => ({
+    id: 'indicators',
+    model: '.associatedIndicators',
+    label: 'Indicators',
+    controlType: 'multiselect',
+    options: this.mapIndicatorOptions(indicators),
+  });
+
 
   render() {
     const { action, dataReady } = this.props;
@@ -141,7 +158,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 onClick: () => this.props.handleSubmit(
                   this.props.form.data,
                   this.props.taxonomies,
-                  this.props.recommendations
+                  this.props.recommendations,
+                  this.props.indicators
                 ),
               },
             ]}
@@ -157,7 +175,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 this.props.taxonomies,
-                this.props.recommendations
+                this.props.recommendations,
+                this.props.indicators
               )}
               handleCancel={this.props.handleCancel}
               fields={{
@@ -208,6 +227,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                       model: '.attributes.description',
                     },
                     this.props.recommendations ? this.renderRecommendationControl(this.props.recommendations) : null,
+                    this.props.indicators ? this.renderIndicatorControl(this.props.indicators) : null,
                   ],
                   aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
                 },
@@ -232,6 +252,7 @@ ActionEdit.propTypes = {
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
+  indicators: PropTypes.object,
 };
 
 ActionEdit.contextTypes = {
@@ -249,6 +270,8 @@ const mapStateToProps = (state, props) => ({
     'recommendations',
     'recommendation_measures',
     'measure_categories',
+    'indicators',
+    'measure_indicators',
   ] }),
   action: getEntity(
     state,
@@ -304,6 +327,21 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
+  indicators: getEntities(
+    state,
+    {
+      path: 'indicators',
+      extend: {
+        as: 'associated',
+        path: 'measure_indicators',
+        key: 'indicator_id',
+        reverse: true,
+        where: {
+          measure_id: props.params.id,
+        },
+      },
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -316,13 +354,17 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('measure_indicators'));
     },
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
-    handleSubmit: (formData, taxonomies, recommendations) => {
+
+    handleSubmit: (formData, taxonomies, recommendations, indicators) => {
       let saveData = formData.set('measureCategories', taxonomies.reduce((updates, tax, taxId) => {
         const formCategoryIds = formData.getIn(['associatedTaxonomies', taxId]); // the list of categories checked in form
+
         // store associated cats as { [cat.id]: [association.id], ... }
         // then we can use keys for creating new associations and values for deleting
         const associatedCategories = tax.get('categories').reduce((catsAssociated, cat) => {
@@ -369,6 +411,32 @@ function mapDispatchToProps(dispatch, props) {
           !associatedRecommendations.has(recId)
             ? payloads.push(Map({
               recommendation_id: recId,
+              measure_id: formData.get('id'),
+            }))
+            : payloads
+        , List()),
+      }));
+
+      // indicators
+      const formIndicatorIds = formData.get('associatedIndicators');
+      // store associated recs as { [rec.id]: [association.id], ... }
+      const associatedIndicators = indicators.reduce((indicatorsAssociated, indicator) => {
+        if (indicator.get('associated')) {
+          return indicatorsAssociated.set(indicator.get('id'), indicator.get('associated').keySeq().first());
+        }
+        return indicatorsAssociated;
+      }, Map());
+
+      saveData = saveData.set('measureIndicators', Map({
+        delete: associatedIndicators.reduce((associatedIds, associatedId, recId) =>
+          !formIndicatorIds.includes(recId)
+            ? associatedIds.push(associatedId)
+            : associatedIds
+        , List()),
+        create: formIndicatorIds.reduce((payloads, id) =>
+          !associatedIndicators.has(id)
+            ? payloads.push(Map({
+              indicator_id: id,
               measure_id: formData.get('id'),
             }))
             : payloads

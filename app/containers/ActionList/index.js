@@ -24,6 +24,13 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     this.props.loadEntitiesIfNeeded();
   }
 
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
+
   mapToEntityList = ({ id, attributes }) => ({
     id,
     title: attributes.title,
@@ -116,6 +123,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             path: 'recommendations', // filter by recommendation connection
             query: 'recommendations',
             key: 'recommendation_id',
+            searchAttributes: ['number'],
             connected: {
               path: 'recommendation_measures',
               key: 'measure_id',

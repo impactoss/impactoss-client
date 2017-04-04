@@ -13,7 +13,7 @@ import { browserHistory } from 'react-router';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import Page from 'components/Page';
-import EntityView from 'components/EntityView';
+import EntityView from 'components/views/EntityView';
 
 import {
   getEntity,

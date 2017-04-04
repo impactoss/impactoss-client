@@ -24,6 +24,7 @@ import { getEntities } from 'containers/App/selectors';
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
+
   // onSort = (evt) => {
   //   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
   //   let sortOrder = this.props.location.query.sortOrder || this.props.sortOrder;
@@ -46,30 +47,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   //   updateQueryStringParams({ page });
   // };
 
-  render() {
-    const {
-      sortBy,
-      sortOrder,
-      location,
-      filters,
-      taxonomies,
-      connections,
-      connectedTaxonomies,
-    } = this.props;
 
-    const entities = this.props.entities && orderBy(
-      this.props.entities,
-      getEntitySortIteratee(sortBy),
-      sortOrder
-    );
-
+  // figure out filter options for filter panel
+  // TODO: this should only give form options if filter form is visible
+  makeFilterOptions = (filters, entities, taxonomies, connectedTaxonomies, connections, location) => {
+    const filterOptions = {};
     const URLParams = new URLSearchParams(location.search);
 
-    // console.log(this.props)
-    const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
-
-    // figure out filter panel options based on entities, taxononomies, connections, and connectedTaxonomies
-    const filterOptions = {};
     // iterate through entities and create filterOptions
     // TODO refactor to function
     forEach(Object.values(entities), (entity) => {
@@ -190,6 +174,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 tax.categories && Object.keys(tax.categories).indexOf(catId.toString()) > -1
               );
               if (taxonomy) {
+                // TODO and if taxonomy filter panel open
                 // if category already added
                 if (filterOptions.connectedTaxonomies.options[taxonomy.id].options[catId]) {
                   filterOptions.connectedTaxonomies.options[taxonomy.id].options[catId].count += 1;
@@ -234,6 +219,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               const connection = connections[option.path][connectedId];
               // if not taxonomy already considered
               if (connection) {
+                // TODO and if connection filter panel open
                 // if category already added
                 if (filterOptions.connections.options[option.path].options[connectedId]) {
                   filterOptions.connections.options[option.path].options[connectedId].count += 1;
@@ -241,9 +227,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   filterOptions.connections.options[option.path].options[connectedId] = {
                     label: connection.attributes.title,
                     value: connectedId,
+                    search: option.searchAttributes && option.searchAttributes.map((attribute) => connection.attributes[attribute]).join(),
                     count: 1,
-                    query: option.path,
-                    isSet: URLParams.has(location.query[option.path]) && URLParams.getAll(location.query[option.path]).indexOf(connectedId.toString()) > -1,
+                    query: option.query,
+                    isSet: URLParams.has(location.query[option.query]) && URLParams.getAll(location.query[option.query]).indexOf(connectedId.toString()) > -1,
                   };
                 }
               }
@@ -255,7 +242,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           } else {
             filterOptions.connections.options[option.path].options.without = {
               label: `Without ${option.label}`,
-              value: option.path,
+              value: option.query,
               count: 1,
               query: 'without',
             };
@@ -298,6 +285,34 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         });
       }
     });
+
+    return filterOptions;
+  }
+
+  render() {
+    const {
+      sortBy,
+      sortOrder,
+      location,
+      filters,
+      taxonomies,
+      connections,
+      connectedTaxonomies,
+    } = this.props;
+
+
+    // sort entities
+    const entities = this.props.entities && orderBy(
+      this.props.entities,
+      getEntitySortIteratee(sortBy),
+      sortOrder
+    );
+
+    // figure out filter panel options based on entities, taxononomies, connections, and connectedTaxonomies
+    const filterOptions = this.makeFilterOptions(filters, entities, taxonomies, connectedTaxonomies, connections, location);
+
+    // map entities to entity list item data
+    const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
 
     return (
       <Container>

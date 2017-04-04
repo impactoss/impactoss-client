@@ -18,7 +18,6 @@ import {
   AUTHENTICATE_SUCCESS,
   AUTHENTICATE_ERROR,
   SET_AUTHENTICATION_STATE,
-  LOADING_ENTITIES,
   LOAD_ENTITIES_SUCCESS,
   LOAD_ENTITIES_ERROR,
   LOGOUT_SUCCESS,
@@ -26,14 +25,12 @@ import {
   UPDATE_ENTITY,
   DELETE_ENTITY,
   ENTITIES_REQUESTED,
-  ENTITIES_READY,
   INVALIDATE_ENTITIES,
 } from './constants';
 
 // The initial state of the App
 const initialState = fromJS({
   server: {
-    loading: false,
     error: false,
   },
   auth: {
@@ -107,7 +104,9 @@ function appReducer(state = initialState, payload) {
       const errors = checkErrorMessagesExist(payload.error.response);
       return state
         .setIn(['auth', 'messages'], errors)
-        .setIn(['auth', 'error'], true);
+        .setIn(['auth', 'error'], true)
+        .setIn(['user', 'attributes'], null)
+        .setIn(['user', 'isSignedIn'], false);
     }
     case AUTHENTICATE_SENDING:
       return state
@@ -128,23 +127,15 @@ function appReducer(state = initialState, payload) {
     case ENTITIES_REQUESTED:
       return state
           .setIn(['requested', payload.path], payload.time);
-    case LOADING_ENTITIES:
-      return state
-          .set('loading', true)
-          .set('error', false)
-          .setIn(['entities', payload.path], fromJS({}));
     case LOAD_ENTITIES_SUCCESS:
       return state
         .setIn(['entities', payload.path], fromJS(payload.entities))
-        .setIn(['server', 'loading'], false);
-    case ENTITIES_READY:
-      return state
         .setIn(['ready', payload.path], payload.time);
     case LOAD_ENTITIES_ERROR:
       return state
         .setIn(['server', 'error'], payload.error)
-        .setIn(['server', 'loading'], false)
-        .setIn(['requested', payload.path], null);
+        .setIn(['requested', payload.path], null)
+        .setIn(['ready', payload.path], null);
     case INVALIDATE_ENTITIES:
       // reset requested to initial state
       return state

@@ -17,7 +17,7 @@ const loadModule = (cb) => (componentModule) => {
 export default function createRoutes(store) {
   // Create reusable async injectors using getAsyncInjectors factory
   const { injectReducer, injectSagas } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
-  const { redirectToLoginIfNeeded, redirectToHomeIfSignedIn } = getRedirects(store);
+  const { redirectIfNotPermitted, redirectIfLoggedIn } = getRedirects(store);
 
   return [
     {
@@ -38,10 +38,10 @@ export default function createRoutes(store) {
       },
     }, {
       path: '/logout',
-      name: 'logout',
+      name: 'userLogout',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/LogoutPage'),
+          import('containers/UserLogout'),
         ]);
 
         const renderRoute = loadModule(cb);
@@ -54,19 +54,19 @@ export default function createRoutes(store) {
       },
     }, {
       path: '/login',
-      name: 'loginPage',
-      onEnter: redirectToHomeIfSignedIn,
+      name: 'userLogin',
+      onEnter: redirectIfLoggedIn,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/LoginPage/reducer'),
-          import('containers/LoginPage/sagas'),
-          import('containers/LoginPage'),
+          import('containers/UserLogin/reducer'),
+          import('containers/UserLogin/sagas'),
+          import('containers/UserLogin'),
         ]);
 
         const renderRoute = loadModule(cb);
 
         importModules.then(([reducer, sagas, component]) => {
-          injectReducer('loginPage', reducer.default);
+          injectReducer('userLogin', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });
@@ -75,18 +75,78 @@ export default function createRoutes(store) {
       },
     }, {
       path: '/register',
-      name: 'registerUserPage',
+      name: 'userRegister',
+      onEnter: redirectIfLoggedIn,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/RegisterUserPage/reducer'),
-          import('containers/RegisterUserPage/sagas'),
-          import('containers/RegisterUserPage'),
+          import('containers/UserRegister/reducer'),
+          import('containers/UserRegister/sagas'),
+          import('containers/UserRegister'),
         ]);
 
         const renderRoute = loadModule(cb);
 
         importModules.then(([reducer, sagas, component]) => {
-          injectReducer('registerUserPage', reducer.default);
+          injectReducer('userRegister', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/users/:id',
+      name: 'userView',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/users/edit/:id',
+      name: 'userEdit',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserEdit/reducer'),
+          import('containers/UserEdit/sagas'),
+          import('containers/UserEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('userEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/users/password/:id',
+      name: 'userPassword',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserPassword/reducer'),
+          import('containers/UserPassword/sagas'),
+          import('containers/UserPassword'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('userPassword', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });
@@ -116,7 +176,7 @@ export default function createRoutes(store) {
     }, {
       path: '/actions/new',
       name: 'actionNew',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ActionNew/reducer'),
@@ -153,7 +213,7 @@ export default function createRoutes(store) {
     }, {
       path: '/actions/edit/:id',
       name: 'actionEdit',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ActionEdit/reducer'),
@@ -230,7 +290,7 @@ export default function createRoutes(store) {
     }, {
       path: '/recommendations/edit/:id',
       name: 'recommendationEdit',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/RecommendationEdit/reducer'),
@@ -242,6 +302,84 @@ export default function createRoutes(store) {
 
         importModules.then(([reducer, sagas, component]) => {
           injectReducer('recommendationEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/indicators',
+      name: 'indicatorList',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorList/reducer'),
+          import('containers/IndicatorList/sagas'),
+          import('containers/IndicatorList'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('indicatorList', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/indicators/new',
+      name: 'indicatorNew',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorNew/reducer'),
+          import('containers/IndicatorNew/sagas'),
+          import('containers/IndicatorNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('indicatorNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/indicators/:id',
+      name: 'indicatorView',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/indicatorView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/indicators/edit/:id',
+      name: 'indicatorEdit',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorEdit/reducer'),
+          import('containers/IndicatorEdit/sagas'),
+          import('containers/IndicatorEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('indicatorEdit', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });
@@ -283,7 +421,7 @@ export default function createRoutes(store) {
     }, {
       path: '/categories/:id/new', // the taxonomy id
       name: 'categoryNew',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/CategoryNew/reducer'),
@@ -320,7 +458,7 @@ export default function createRoutes(store) {
     }, {
       path: '/category/edit/:id',
       name: 'categoryEdit',
-      onEnter: redirectToLoginIfNeeded,
+      onEnter: redirectIfNotPermitted,
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/CategoryEdit/reducer'),

@@ -25,13 +25,11 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   static propTypes = {
     children: React.PropTypes.node,
     isSignedIn: React.PropTypes.bool,
-    onComponentWillMount: React.PropTypes.func,
+    validateToken: React.PropTypes.func,
   };
 
   componentWillMount() {
-    if (this.props.onComponentWillMount) {
-      this.props.onComponentWillMount();
-    }
+    this.props.validateToken();
   }
 
   render() {
@@ -52,7 +50,7 @@ const mapStateToProps = createStructuredSelector({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    onComponentWillMount: () => {
+    validateToken: () => {
       dispatch(validateToken()); // Maybe this could move to routes.js or App wrapper
     },
   };
