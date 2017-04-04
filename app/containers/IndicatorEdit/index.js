@@ -11,7 +11,7 @@ import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
 
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -59,7 +59,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     const { actions } = props;
     return Map({
       id: props.indicator.id,
-      attributes: props.indicator.attributes,
+      attributes: fromJS(props.indicator.attributes),
       associatedActions: actions
         ? actions.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
         : List(),
