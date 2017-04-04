@@ -183,21 +183,24 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     const edits = {
       taxonomies: { // edit category
         label: 'Update categories',
+        connectPath: 'measure_categories',
       },
       connections: { // filter by associated entity
         label: 'Update conections',
         options: [
           {
             label: 'Indicators',
-            path: 'indicators', // filter by recommendation connection
-            // key: 'indicator_id',
+            path: 'indicators',
+            connectPath: 'measure_indicators',
+            key: 'indicator_id',
             // search: true,
 
           },
           {
             label: 'Recommendations',
-            path: 'recommendations', // filter by recommendation connection
-            // key: 'recommendation_id',
+            path: 'recommendations',
+            connectPath: 'recommendation_measures',
+            key: 'recommendation_id',
             // search: true,
             // searchAttributes: ['number'],
           },

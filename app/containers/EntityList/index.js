@@ -439,18 +439,120 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     return editGroups;
   }
 
-  // makeActiveEditOptions = (entities) => {
-  makeActiveEditOptions = () => {
+  taxonomyEditOptions = (entitiesSelected) => {
+    const { edits, taxonomies, activeEditOption } = this.props;
+
+    const editOptions = {
+      groupId: 'taxonomies',
+      search: true,
+      options: {},
+      selectedCount: entitiesSelected.length,
+      path: edits.taxonomies.connectPath,
+    };
+    forEach(taxonomies, (taxonomy) => {
+      // if taxonomy active add filter option
+      if (activeEditOption.optionId === `taxonomies-${taxonomy.id}`) {
+        editOptions.title = taxonomy.attributes.title;
+        forEach(taxonomy.categories, (category) => {
+          const count = reduce(entitiesSelected, (counter, entity) => {
+            const categoryIds = entity.taxonomies
+              ? map(map(Object.values(entity.taxonomies), 'attributes'), (attribute) => attribute.category_id.toString())
+              : [];
+            return categoryIds && categoryIds.indexOf(category.id) > -1 ? counter + 1 : counter;
+          }, 0);
+          editOptions.options[category.id] = {
+            label: category.attributes.title,
+            value: category.id,
+            all: count === entitiesSelected.length,
+            none: count === 0,
+            some: count > 0 && count < entitiesSelected.length,
+            count,
+          };
+        });
+      }
+    });
+    return editOptions;
+  }
+  connectionEditOptions = (entitiesSelected) => {
+    const { edits, connections, activeEditOption } = this.props;
+
+    const editOptions = {
+      groupId: 'connections',
+      search: true,
+      options: {},
+      selectedCount: entitiesSelected.length,
+    };
+    // forEach(connections, (connection) => {
+    forEach(edits.connections.options, (option) => {
+      if (activeEditOption.optionId === `connections-${option.path}`) {
+        editOptions.title = option.label;
+        editOptions.path = option.connectPath;
+        forEach(connections[option.path], (connection) => {
+          const count = reduce(entitiesSelected, (counter, entity) => {
+            const connectedIds = entity[option.path]
+              ? map(map(Object.values(entity[option.path]), 'attributes'), (attribute) => attribute[option.key].toString())
+              : null;
+            return connectedIds && connectedIds.indexOf(connection.id) > -1 ? counter + 1 : counter;
+          }, 0);
+          editOptions.options[connection.id] = {
+            label: connection.attributes.title,
+            value: connection.id,
+            all: count === entitiesSelected.length,
+            none: count === 0,
+            some: count > 0 && count < entitiesSelected.length,
+            count,
+          };
+        });
+      }
+    });
+    return editOptions;
+  }
+  attributeEditOptions = (entitiesSelected) => {
+    const { edits, activeEditOption } = this.props;
+
+    const editOptions = {
+      groupId: 'attributes',
+      search: true,
+      options: {},
+      selectedCount: entitiesSelected.length,
+    };
+    // forEach(connections, (connection) => {
+    forEach(edits.attributes.options, (option) => {
+      if (activeEditOption.optionId === `attributes-${option.attribute}`) {
+        editOptions.title = option.label;
+        forEach(option.options, (attributeOption) => {
+          const count = reduce(entitiesSelected, (counter, entity) =>
+            typeof entity.attributes[option.attribute] !== 'undefined'
+              && entity.attributes[option.attribute].toString() === attributeOption.value.toString()
+              ? counter + 1
+              : counter
+          , 0);
+          editOptions.options[attributeOption.value] = {
+            label: attributeOption.label,
+            value: attributeOption.value,
+            attribute: option.attribute,
+            all: count === entitiesSelected.length,
+            none: count === 0,
+            some: count > 0 && count < entitiesSelected.length,
+            count,
+          };
+        });
+      }
+    });
+    return editOptions;
+  }
+
+  makeActiveEditOptions = (entitiesSelected) => {
     const { activeEditOption } = this.props;
     // iterate through entities and create filterOptions
     // if taxonomy options
     switch (activeEditOption.group) {
-      // case 'taxonomies':
-      //   return this.taxonomyFilterOptions(entities);
-      // case 'connections':
-      //   return this.connectionFilterOptions(entities);
-      // case 'attributes':
-      //   return this.attributeFilterOptions(entities);
+      case 'taxonomies':
+        return this.taxonomyEditOptions(entitiesSelected);
+      case 'connections':
+        return this.connectionEditOptions(entitiesSelected);
+      case 'attributes':
+        return this.attributeEditOptions(entitiesSelected);
       default:
         return null;
     }
@@ -471,6 +573,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       sortOrder
     );
 
+    const entitiesSelected = [];
+    // TODO filter for entities selected in list
+    // const entitiesSelected = entities; // uncomment this for testing and temporarily assume all are selected
+
     // map entities to entity list item data
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
 
@@ -490,7 +596,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         },
       },
     ];
-
     return (
       <Container>
         <Row>
@@ -509,8 +614,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               }
               { activePanel === EDIT_PANEL &&
                 <EntityListEdit
-                  editGroups={fromJS(this.makeEditGroups())}
-                  formOptions={activeEditOption ? fromJS(this.makeActiveFormOptions(entities)) : null}
+                  editGroups={entitiesSelected.length ? fromJS(this.makeEditGroups()) : null}
+                  formOptions={activeEditOption && entitiesSelected.length ? fromJS(this.makeActiveEditOptions(entitiesSelected)) : null}
                   formModel={EDIT_FORM_MODEL}
                   onShowEditForm={this.props.onShowEditForm}
                   onHideEditForm={this.props.onHideEditForm}

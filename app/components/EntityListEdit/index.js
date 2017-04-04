@@ -7,16 +7,16 @@
 import React, { PropTypes } from 'react';
 import Immutable, { Map } from 'immutable';
 
-// import EditForm from 'components/EditForm';
-// import Option from 'components/EditForm/Option';
+import EditForm from 'components/EditForm';
+import Option from 'components/EditForm/Option';
 
 export default class EntityListEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     editGroups: PropTypes.instanceOf(Immutable.Map),
-    // formOptions: PropTypes.object,
+    formOptions: PropTypes.object,
     onShowEditForm: PropTypes.func.isRequired,
-    // onHideEditForm: PropTypes.func.isRequired,
-    // formModel: PropTypes.string,
+    onHideEditForm: PropTypes.func.isRequired,
+    formModel: PropTypes.string,
   };
 
   // static contextTypes = {
@@ -27,7 +27,7 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
     // Display the options
     return formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
       value: option,
-      label: <div label={option.get('label')} />,
+      label: <Option label={option.get('label')} count={option.get('count')} />,
     }));
   }
 
@@ -56,21 +56,20 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
       </div>
     </div>
   );
-// { formOptions &&
-//   <EditForm
-//     model={formModel}
-//     title={formOptions.get('title')}
-//     options={this.getFormOptions(formOptions.get('options'))}
-//     onClose={onHideEditForm}
-//   />
-// }
   render() {
-    // const { editGroups, formOptions, onHideEditForm, formModel } = this.props;
-    const { editGroups } = this.props;
+    const { editGroups, formOptions, onHideEditForm, formModel } = this.props;
     return (
       <div>
         { editGroups &&
           editGroups.entrySeq().map(([groupId, group]) => this.renderEditGroup(group, groupId))
+        }
+        { formOptions &&
+          <EditForm
+            model={formModel}
+            title={formOptions.get('title')}
+            options={this.getFormOptions(formOptions.get('options'))}
+            onClose={onHideEditForm}
+          />
         }
       </div>
     );
