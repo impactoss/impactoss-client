@@ -23,12 +23,13 @@ export default class MultiSelect extends React.Component {
     );
   }
 
-  renderCheckbox = (option) => {
+  renderCheckbox = (option, i) => {
     const value = option.get('value');
     const checked = option.get('checked');
     const label = option.get('label');
+    const id = `${checked && 'checked'}-${i}-${kebabCase(label)}`;
     return (
-      <div>
+      <div key={id}>
         <input
           type="checkbox"
           onChange={(evt) => {
@@ -36,10 +37,9 @@ export default class MultiSelect extends React.Component {
             this.check(evt.target.checked, value);
           }}
           checked={checked}
-          value={value}
-          id={`${value}-${kebabCase(label)}`}
+          id={id}
         />
-        <label htmlFor={`${value}-${kebabCase(label)}`} >
+        <label htmlFor={id} >
           {label}
         </label>
       </div>
@@ -53,16 +53,8 @@ export default class MultiSelect extends React.Component {
 
     return (
       <div>
-        {checkboxes && checkboxes.filter((option) => option.get('checked')).map((option, i) =>
-          <div key={`checked-${i}`}>
-            {this.renderCheckbox(option)}
-          </div>
-        )}
-        {checkboxes && checkboxes.filterNot((option) => option.get('checked')).map((option, i) =>
-          <div key={`unchecked-${i}`}>
-            {this.renderCheckbox(option)}
-          </div>
-        )}
+        {checkboxes && checkboxes.filter((option) => option.get('checked')).map(this.renderCheckbox)}
+        {checkboxes && checkboxes.filterNot((option) => option.get('checked')).map(this.renderCheckbox)}
       </div>
     );
   }

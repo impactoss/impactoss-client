@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import { Form } from 'react-redux-form/immutable';
 import MultiSelect from 'components/MultiSelect';
 
-export default class FilterForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export default class EditForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     model: PropTypes.string.isRequired,

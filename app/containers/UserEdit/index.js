@@ -11,7 +11,7 @@ import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
 
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
@@ -57,7 +57,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
     return Map({
       id: props.user.id,
-      attributes: props.user.attributes,
+      attributes: fromJS(props.user.attributes),
       associatedRoles: roles
         ? roles.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
         : List(),
