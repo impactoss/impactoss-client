@@ -4,25 +4,25 @@ import { REDUCER_PATH } from './constants';
 /**
  * Direct selector to the actionEdit state domain
  */
-const selectEntityListFiltersDomain = (state) => state.get(REDUCER_PATH);
+const selectEntityListDomain = (state) => state.get(REDUCER_PATH);
 
 /**
  * Other specific selectors
  */
 
 const formSelector = createSelector(
-  selectEntityListFiltersDomain,
+  selectEntityListDomain,
   (substate) => substate.get('form').data // TODO WTF HTF GRR
  );
 
 const pageSelector = createSelector(
-   selectEntityListFiltersDomain,
+   selectEntityListDomain,
    (substate) => substate.get('page')
  );
 
-const optionsPathSelector = createSelector(
+const activeFilterOptionSelector = createSelector(
   pageSelector,
-  (pageState) => pageState.get('optionsPath').toJS()
+  (pageState) => pageState.get('activeFilterOption')
 );
 
 const filtersCheckedSelector = createSelector(
@@ -48,15 +48,15 @@ const filtersCheckedSelector = createSelector(
  */
 
 const entityListSelect = createSelector(
-  selectEntityListFiltersDomain,
+  selectEntityListDomain,
   (substate) => substate.toJS()
 );
 
 export default entityListSelect;
 export {
-  selectEntityListFiltersDomain,
+  selectEntityListDomain,
   entityListSelect,
   formSelector,
-  optionsPathSelector,
+  activeFilterOptionSelector,
   filtersCheckedSelector,
 };

@@ -9,11 +9,10 @@ import {
   HIDE_FILTER_FORM,
 } from './constants';
 
-export function showFilterForm(title, optionsPath) {
+export function showFilterForm(activeFilterOption) {
   return {
     type: SHOW_FILTER_FORM,
-    title,
-    optionsPath,
+    activeFilterOption,
   };
 }
 

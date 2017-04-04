@@ -7,7 +7,7 @@ import { fromJS } from 'immutable';
 import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
 import appSaga from 'containers/App/sagas';
-import filterSaga from 'containers/EntityListFilters/sagas';
+import entityListSaga from 'containers/EntityList/sagas';
 import createReducer from './reducers';
 
 const sagaMiddleware = createSagaMiddleware();
@@ -44,7 +44,7 @@ export default function configureStore(initialState = {}, history) {
 
   // Load app level sagas ( https://github.com/mxstbr/react-boilerplate/issues/1077 )
   sagaMiddleware.run(appSaga);
-  sagaMiddleware.run(filterSaga);
+  sagaMiddleware.run(entityListSaga);
 
   store.runSaga = sagaMiddleware.run;
   store.asyncReducers = {}; // Async reducer registry

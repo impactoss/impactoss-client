@@ -77,6 +77,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         label: 'By attribute',
         options: [
           {
+            search: false,
             label: 'Status',
             attribute: 'draft',
             options: PUBLISH_STATUSES,
@@ -86,6 +87,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       taxonomies: { // filter by each category
         label: 'By category',
         query: 'cat',
+        search: true,
         select: {
           out: 'js',
           path: 'taxonomies',
@@ -112,6 +114,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             path: 'indicators', // filter by recommendation connection
             query: 'indicators',
             key: 'indicator_id',
+            search: true,
             connected: {
               path: 'measure_indicators',
               key: 'measure_id',
@@ -123,6 +126,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             path: 'recommendations', // filter by recommendation connection
             query: 'recommendations',
             key: 'recommendation_id',
+            search: true,
             searchAttributes: ['number'],
             connected: {
               path: 'recommendation_measures',
@@ -135,6 +139,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       connectedTaxonomies: { // filter by each category
         label: 'By associated categories',
         query: 'catx',
+        search: true,
         connections: [
           {
             path: 'recommendations', // filter by recommendation connection

@@ -13,8 +13,11 @@ import {
 } from './constants';
 
 const initialState = fromJS({
-  optionsPath: [],
-  title: null,
+  activeFilterOption: null,
+  // {
+  //   group: 'taxonomies',
+  //   optionId: 'taxonomies-6',
+  // },
 });
 
 const formData = fromJS({
@@ -22,11 +25,16 @@ const formData = fromJS({
   values: [],
 });
 
-function entityListFilterReducer(state = initialState, action) {
+function entityListReducer(state = initialState, action) {
   switch (action.type) {
     case SHOW_FILTER_FORM:
-      return state.set('formTitle', action.title)
-        .set('optionsPath', fromJS(action.optionsPath));
+      return state
+        .set('formTitle', action.title)
+        .set('activeFilterOption', action.activeFilterOption);
+        // {
+        //   group: '',
+        //   optionId: ''
+        // }
     case HIDE_FILTER_FORM:
       return initialState;
     default:
@@ -35,10 +43,10 @@ function entityListFilterReducer(state = initialState, action) {
 }
 
 export default combineReducers({
-  page: entityListFilterReducer,
+  page: entityListReducer,
   form: combineForms({
     data: formData,
-  }, 'entityListFilters.form'),
+  }, 'entityList.form'),
 });
 
 // export default entityListFilterReducer;

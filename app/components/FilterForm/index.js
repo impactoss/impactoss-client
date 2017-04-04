@@ -10,6 +10,7 @@ export default class FilterForm extends React.Component { // eslint-disable-line
     options: PropTypes.instanceOf(Immutable.List),
     handleSubmit: PropTypes.func,
     onClose: PropTypes.func,
+    title: PropTypes.string,
   }
 
   render() {
@@ -18,6 +19,9 @@ export default class FilterForm extends React.Component { // eslint-disable-line
         model={this.props.model}
         onSubmit={this.props.handleSubmit}
       >
+        { this.props.title &&
+          <strong>{this.props.title}</strong>
+        }
         { this.props.onClose &&
           <button onClick={this.props.onClose}>close</button>
         }

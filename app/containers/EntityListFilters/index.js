@@ -5,39 +5,19 @@
  */
 
 import React, { PropTypes } from 'react';
-import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
 import Immutable, { Map } from 'immutable';
 
 import FilterForm from 'components/FilterForm';
 import Option from 'components/FilterForm/Option';
 
-import {
-  FORM_MODEL,
-} from './constants';
-
-import {
-  optionsPathSelector,
-  filtersCheckedSelector,
-} from './selectors';
-
-import {
-  showFilterForm,
-  hideFilterForm,
-} from './actions';
-
 export class EntityListFilters extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
-  getFormOptions() {
-    const { filterOptions, optionsPath } = this.props;
-    // Display the options at [`optionsPath`] ( which is set in the onClick of renderFilterGroup )
-    if (optionsPath.length > 0 && filterOptions.hasIn(optionsPath)) {
-      return filterOptions.getIn(optionsPath).toList().sortBy((option) => option.get('label')).map((option) => Map({
-        value: option,
-        label: <Option label={option.get('label')} count={option.get('count')} />,
-      }));
-    }
-    return null;
+  getFormOptions(formOptions) {
+    // Display the options
+    return formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
+      value: option,
+      label: <Option label={option.get('label')} count={option.get('count')} />,
+    }));
   }
 
   renderFilterGroup = (group, groupId) => (
@@ -45,15 +25,19 @@ export class EntityListFilters extends React.Component { // eslint-disable-line 
       <strong>{group.get('label')}</strong>
       <div>
         { group.get('options') &&
-          group.get('options').entrySeq().map(([optionId, option]) => (
-            <div key={optionId}>
+          group.get('options').valueSeq().map((option) => (
+            <div key={option.get('id')}>
               <button
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
                   // Here we are recording the path to the "filter options" that we want to display within this.props.filterOptions
-                  this.props.onShowFilterForm(group.get('label'), [groupId, 'options', optionId, 'options']);
+                  this.props.onShowFilterForm({
+                    group: group.get('id'),
+                    optionId: option.get('id'),
+                  });
                 }}
-              >{option.get('label')}
+              >
+                {option.get('label')}
               </button>
             </div>
           ))
@@ -63,18 +47,17 @@ export class EntityListFilters extends React.Component { // eslint-disable-line 
   );
 
   render() {
-    const { filterOptions, onHideFilterForm } = this.props;
-    const formOptions = this.getFormOptions();
-
+    const { filterGroups, formOptions, onHideFilterForm, formModel } = this.props;
     return (
       <div>
-        { filterOptions &&
-          filterOptions.entrySeq().map(([groupId, group]) => this.renderFilterGroup(group, groupId))
+        { filterGroups &&
+          filterGroups.entrySeq().map(([groupId, group]) => this.renderFilterGroup(group, groupId))
         }
         { formOptions &&
           <FilterForm
-            model={FORM_MODEL}
-            options={formOptions}
+            model={formModel}
+            title={formOptions.get('title')}
+            options={this.getFormOptions(formOptions.get('options'))}
             onClose={onHideFilterForm}
           />
         }
@@ -84,32 +67,15 @@ export class EntityListFilters extends React.Component { // eslint-disable-line 
 }
 
 EntityListFilters.propTypes = {
-  filterOptions: PropTypes.instanceOf(Immutable.Map),
+  filterGroups: PropTypes.instanceOf(Immutable.Map),
+  formOptions: PropTypes.object,
   onShowFilterForm: PropTypes.func.isRequired,
   onHideFilterForm: PropTypes.func.isRequired,
-  optionsPath: PropTypes.array,
+  formModel: PropTypes.string,
 };
 
 EntityListFilters.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-const mapStateToProps = createStructuredSelector({
-  optionsPath: optionsPathSelector,
-  filtersChecked: filtersCheckedSelector,
-});
-
-function mapDispatchToProps(dispatch) {
-  return {
-    onShowFilterForm: (title, optionsPath) => {
-      dispatch(showFilterForm(title, optionsPath));
-    },
-    onHideFilterForm: (evt) => {
-      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-      dispatch(hideFilterForm());
-    },
-  };
-}
-
-// export default connect(mapStateToProps, mapDispatchToProps)(EntityListFilters);
-export default connect(mapStateToProps, mapDispatchToProps)(EntityListFilters);
+export default EntityListFilters;

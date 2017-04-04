@@ -3,6 +3,10 @@ import { browserHistory } from 'react-router';
 import { filtersCheckedSelector } from './selectors';
 // import { credentialsSelector } from './selectors';
 
+import {
+  FORM_MODEL,
+} from './constants';
+
 export function* doFilter() {
   const URLSearchParams = yield select(filtersCheckedSelector);
   const location = browserHistory.getCurrentLocation();
@@ -11,5 +15,5 @@ export function* doFilter() {
 
 export default function* filterSaga() {
   yield takeLatest((action) =>
-  action.type === 'rrf/change' && action.model === 'entityListFilters.form.data.values', doFilter);
+  action.type === 'rrf/change' && action.model === `${FORM_MODEL}.values`, doFilter);
 }
