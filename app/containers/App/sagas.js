@@ -309,7 +309,6 @@ export default function* rootSaga() {
   yield takeLatest(LOGOUT_SUCCESS, authChangeSaga);
 
   yield takeEvery(SAVE_ENTITY, saveEntitySaga);
-  yield takeEvery(SAVE_ENTITY, saveEntitySaga);
   yield takeEvery(NEW_ENTITY, newEntitySaga);
   yield takeEvery(UPDATE_CONNECTIONS, updateConnectionsSaga);
   yield takeEvery(UPDATE_ENTITIES, updateEntitiesSaga);
