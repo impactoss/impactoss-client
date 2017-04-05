@@ -573,9 +573,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       sortOrder
     );
 
-    const entitiesSelected = [];
+    // const entitiesSelected = [];
     // TODO filter for entities selected in list
-    // const entitiesSelected = entities; // uncomment this for testing and temporarily assume all are selected
+    const entitiesSelected = entities; // uncomment this for testing and temporarily assume all are selected
 
     // map entities to entity list item data
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
