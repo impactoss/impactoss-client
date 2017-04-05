@@ -36,6 +36,7 @@ import {
     saveSending,
     saveSuccess,
     saveError,
+    logout,
 } from 'containers/App/actions';
 
 import {
@@ -130,7 +131,10 @@ export function* validateTokenSaga() {
     if (uid && client && accessToken) {
       yield put(authenticateSending());
       const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
-      yield put(authenticateSuccess(response.data));
+      if (!response.success) {
+        yield put(logout());
+      }
+      // Otherwise do nothing, the users existing token is good.
     }
   } catch (err) {
     yield call(clearAuthValues);
