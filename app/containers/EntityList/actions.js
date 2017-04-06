@@ -10,6 +10,7 @@ import {
   SHOW_EDIT_FORM,
   HIDE_EDIT_FORM,
   SHOW_PANEL,
+  SAVE_EDITS,
 } from './constants';
 
 export function showFilterForm(option) {
@@ -42,5 +43,12 @@ export function showPanel(activePanel) {
   return {
     type: SHOW_PANEL,
     activePanel,
+  };
+}
+
+export function saveEdits(data) {
+  return {
+    type: SAVE_EDITS,
+    data,
   };
 }

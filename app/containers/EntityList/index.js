@@ -43,6 +43,7 @@ import {
   showFilterForm,
   hideFilterForm,
   showPanel,
+  saveEdits,
 } from './actions';
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -657,6 +658,7 @@ EntityList.propTypes = {
   onHideEditForm: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,
   activePanel: PropTypes.string,
+  // handleEditSubmit: PropTypes.func.isRequired,
 };
 
 EntityList.defaultProps = {
@@ -795,6 +797,17 @@ function mapDispatchToProps(dispatch) {
     },
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));
+    },
+    handleEditSubmit: (editFormData) => {
+    // handleEditSubmit: (editFormData, selectedEntities) => {
+      const saveData = {
+        path: 'path_of_associative_table', // TODO figure out from edits, eg props.edits[activeGroup].connectPath
+        updates: editFormData, // TODO figure out the create id pairs and delete association id
+        // create: [{entity_id:X, other_entity_id:Y}, ...] // for all connections added, figure out entity id from affected selectedEntity and other id from form option value
+        // delete: [{id:Z}, ...] // for all connections deleted, figure out the association id from affected selectedEntity
+      };
+
+      dispatch(saveEdits(saveData.toJS()));
     },
   };
 }
