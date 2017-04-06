@@ -41,22 +41,25 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   render() {
     const { dataReady } = this.props;
 
-    const extensions = [
-      {
-        path: 'recommendation_categories',
-        key: 'recommendation_id',
-        reverse: true,
-        as: 'taxonomies',
-      },
-      {
-        path: 'recommendation_measures',
-        key: 'recommendation_id',
-        reverse: true,
-        as: 'measures',
-      },
-    ];
     // define selects for getEntities
     const selects = {
+      entities: {
+        path: 'recommendations',
+        extensions: [
+          {
+            path: 'recommendation_categories',
+            key: 'recommendation_id',
+            reverse: true,
+            as: 'taxonomies',
+          },
+          {
+            path: 'recommendation_measures',
+            key: 'recommendation_id',
+            reverse: true,
+            as: 'measures',
+          },
+        ],
+      },
       connections: {
         options: ['measures'],
       },
@@ -170,11 +173,9 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           <EntityList
             location={this.props.location}
             mapToEntityList={this.mapToEntityList}
-            path="recommendations"
             selects={selects}
             filters={filters}
             edits={edits}
-            extensions={extensions}
             header={headerOptions}
           />
         }
