@@ -6,6 +6,7 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { browserHistory } from 'react-router';
 // import { updateQueryStringParams } from 'utils/history';
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
 import { getEntitySortIteratee } from 'utils/sort';
@@ -47,6 +48,11 @@ import {
 } from './actions';
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
+  constructor(props) {
+    super(props);
+    this.URLParams = new URLSearchParams(browserHistory.getCurrentLocation().search);
+  }
 
   getConnectedCategoryIds = (entity, connection, taxonomies) => {
     const connectionIds = map(map(Object.values(entity[connection.path]), 'attributes'), connection.key);
@@ -99,13 +105,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               if (filterOptions.options[catId]) {
                 filterOptions.options[catId].count += 1;
               } else {
-                filterOptions.options[catId] = {
+                filterOptions.options[catId] = this.initOption({
                   label: taxonomy.categories[catId].attributes.title,
                   value: catId,
                   count: 1,
                   query: filters.taxonomies.query,
-                  // isSet: URLParams.has(location.query.cat) && URLParams.getAll(location.query.cat).indexOf(catId.toString()) > -1,
-                };
+                });
               }
             }
           }
@@ -117,12 +122,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           if (filterOptions.options.without) {
             filterOptions.options.without.count += 1;
           } else {
-            filterOptions.options.without = {
+            filterOptions.options.without = this.initOption({
               label: `Without ${taxonomy.attributes.title}`,
               value: taxonomy.id,
               count: 1,
               query: 'without',
-            };
+            });
           }
         }
       });
@@ -159,13 +164,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               if (filterOptions.options[catId]) {
                 filterOptions.options[catId].count += 1;
               } else {
-                filterOptions.options[catId] = {
+                filterOptions.options[catId] = this.initOption({
                   label: taxonomy.categories[catId].attributes.title,
                   value: `${connection.path}:${catId}`,
                   count: 1,
                   query: filters.connectedTaxonomies.query,
-                  // isSet: URLParams.has(location.query.catx) && URLParams.getAll(location.query.catx).indexOf(`${connection.path}:${catId}`) > -1,
-                };
+                });
               }
             }
           });
@@ -203,14 +207,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 if (filterOptions.options[connectedId]) {
                   filterOptions.options[connectedId].count += 1;
                 } else {
-                  filterOptions.options[connectedId] = {
+                  filterOptions.options[connectedId] = this.initOption({
                     label: connection.attributes.title,
                     value: connectedId,
                     search: option.searchAttributes && option.searchAttributes.map((attribute) => connection.attributes[attribute]).join(),
                     count: 1,
                     query: option.query,
-                    // isSet: URLParams.has(location.query[option.query]) && URLParams.getAll(location.query[option.query]).indexOf(connectedId.toString()) > -1,
-                  };
+                  });
                 }
               }
             });
@@ -219,12 +222,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             // add without option
             filterOptions.options.without.count += 1;
           } else {
-            filterOptions.options.without = {
+            filterOptions.options.without = this.initOption({
               label: `Without ${option.label}`,
               value: option.query,
               count: 1,
               query: 'without',
-            };
+            });
           }
         } // if (filterOptions.options.connections.options[option.path].show) {
       });
@@ -253,13 +256,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               filterOptions.options[value].count += 1;
             } else {
               const attribute = find(option.options, (o) => o.value.toString() === value);
-              filterOptions.options[value] = {
+              filterOptions.options[value] = this.initOption({
                 label: attribute ? attribute.label : value,
                 value: `${option.attribute}:${value}`,
                 count: 1,
                 query: 'where',
-                // isSet: URLParams.has(location.query.where) && URLParams.getAll(location.query.where).indexOf(`${option.attribute}:${value}`) > -1,
-              };
+              });
             }
           }
         }
@@ -558,6 +560,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         return null;
     }
   }
+
+  initOption = (option) => ({
+    ...option,
+    isSet: this.URLParams.has(option.query) && this.URLParams.getAll(option.query).indexOf(option.value.toString()) >= 0,
+  })
 
   render() {
     const {

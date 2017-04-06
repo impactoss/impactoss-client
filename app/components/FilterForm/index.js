@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import { browserHistory } from 'react-router';
 import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { Form, actions as formActions } from 'react-redux-form/immutable';
@@ -15,11 +14,6 @@ class FilterForm extends React.Component { // eslint-disable-line react/prefer-s
     onClose: PropTypes.func,
     title: PropTypes.string,
     populateForm: PropTypes.func.isRequired,
-  }
-
-  constructor(props) {
-    super(props);
-    this.URLParams = new URLSearchParams(browserHistory.getCurrentLocation().search);
   }
 
   componentWillMount() {
@@ -52,14 +46,10 @@ class FilterForm extends React.Component { // eslint-disable-line react/prefer-s
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  populateForm: (model, options, URLParams) => {
+  populateForm: (model, options) => {
     // Filter each option, keep the values of those in the URL
     const urlValues = options
-    .filter((option) => {
-      const query = option.getIn(['value', 'query']);
-      const value = option.getIn(['value', 'value']);
-      return URLParams.has(query) && URLParams.getAll(query).indexOf(value.toString()) >= 0;
-    })
+    .filter((option) => option.getIn(['value', 'isSet']))
     .map((option) => option.get('value'));
 
     if (urlValues.size > 0) {
