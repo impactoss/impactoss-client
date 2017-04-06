@@ -42,30 +42,31 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
   render() {
     const { dataReady } = this.props;
 
-    // specify the associations to query with entities
-    const extensions = [
-      {
-        path: 'measure_categories',
-        key: 'measure_id',
-        reverse: true,
-        as: 'taxonomies',
-      },
-      {
-        path: 'recommendation_measures',
-        key: 'measure_id',
-        reverse: true,
-        as: 'recommendations',
-      },
-      {
-        path: 'measure_indicators',
-        key: 'measure_id',
-        reverse: true,
-        as: 'indicators',
-      },
-    ];
-
     // define selects for getEntities
     const selects = {
+      entities: {
+        path: 'measures',
+        extensions: [
+          {
+            path: 'measure_categories',
+            key: 'measure_id',
+            reverse: true,
+            as: 'taxonomies',
+          },
+          {
+            path: 'recommendation_measures',
+            key: 'measure_id',
+            reverse: true,
+            as: 'recommendations',
+          },
+          {
+            path: 'measure_indicators',
+            key: 'measure_id',
+            reverse: true,
+            as: 'indicators',
+          },
+        ],
+      },
       connections: {
         options: ['indicators', 'recommendations'],
       },
@@ -243,11 +244,9 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           <EntityList
             location={this.props.location}
             mapToEntityList={this.mapToEntityList}
-            path="measures"
             selects={selects}
             filters={filters}
             edits={edits}
-            extensions={extensions}
             header={headerOptions}
           />
         }

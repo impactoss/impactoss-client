@@ -42,17 +42,19 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
   render() {
     const { dataReady } = this.props;
 
-    // specify the associations to query with entities
-    const extensions = [
-      {
-        path: 'measure_indicators',
-        key: 'indicator_id',
-        reverse: true,
-        as: 'measures',
-      },
-    ];
     // define selects for getEntities
     const selects = {
+      entities: {
+        path: 'indicators',
+        extensions: [
+          {
+            path: 'measure_indicators',
+            key: 'indicator_id',
+            reverse: true,
+            as: 'measures',
+          },
+        ],
+      },
       connections: {
         options: ['measures'],
       },
@@ -143,11 +145,9 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
           <EntityList
             location={this.props.location}
             mapToEntityList={this.mapToEntityList}
-            path="indicators"
             selects={selects}
             filters={filters}
             edits={edits}
-            extensions={extensions}
             header={headerOptions}
           />
         }

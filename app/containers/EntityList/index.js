@@ -751,11 +751,11 @@ const mapStateToProps = (state, props) => ({
   activePanel: activePanelSelector(state),
   entities: getEntities(state, {
     out: 'js',
-    path: props.path,
+    path: props.selects.entities.path,
     where: props.location.query && props.location.query.where ? getAttributeQuery(props) : null,
     connected: props.filters && props.location.query ? getConnectedQuery(props) : null,
     without: props.location.query && props.location.query.without ? getWithoutQuery(props) : null,
-    extend: props.extensions,
+    extend: props.selects.entities.extensions,
   }),
   taxonomies: props.selects && props.selects.taxonomies
     ? getEntities(state, props.selects.taxonomies)
