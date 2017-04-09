@@ -46,6 +46,7 @@ const formData = fromJS({
     title: '',
     description: '',
     draft: true,
+    manager_id: '',
   },
 });
 
