@@ -95,6 +95,23 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/users',
+      name: 'userList',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserList'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/users/:id',
       name: 'userView',
       onEnter: redirectIfNotPermitted,
@@ -158,16 +175,12 @@ export default function createRoutes(store) {
       name: 'actionList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/ActionList/reducer'),
-          import('containers/ActionList/sagas'),
           import('containers/ActionList'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('actionList', reducer.default);
-          injectSagas(sagas.default);
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 
@@ -236,16 +249,12 @@ export default function createRoutes(store) {
       name: 'recommendationList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/RecommendationList/reducer'),
-          import('containers/RecommendationList/sagas'),
           import('containers/RecommendationList'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('recommendationList', reducer.default);
-          injectSagas(sagas.default);
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 
@@ -313,16 +322,12 @@ export default function createRoutes(store) {
       name: 'indicatorList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/IndicatorList/reducer'),
-          import('containers/IndicatorList/sagas'),
           import('containers/IndicatorList'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('indicatorList', reducer.default);
-          injectSagas(sagas.default);
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 
