@@ -88,6 +88,7 @@ export function* authenticateSaga(payload) {
     yield put(authenticateSending());
     const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
     yield put(authenticateSuccess(response.data));
+    yield put(invalidateEntities());
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
@@ -95,7 +96,6 @@ export function* authenticateSaga(payload) {
 }
 
 export function* authChangeSaga() {
-  yield put(invalidateEntities());
   // forward to nextPathName if set
   const nextPathname = yield select(makeSelectPathnameOnAuthChange());
   if (nextPathname) {
@@ -117,6 +117,7 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', 'auth/sign_out');
     yield call(clearAuthValues);
     yield put(logoutSuccess());
+    yield put(invalidateEntities());
   } catch (err) {
     yield call(clearAuthValues);
       // TODO ensure this is displayed
@@ -128,12 +129,13 @@ export function* validateTokenSaga() {
   try {
     const { uid, client, 'access-token': accessToken } = yield getAuthValues();
     if (uid && client && accessToken) {
+      yield put(authenticateSending());
       const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
       if (!response.success) {
         yield call(clearAuthValues);
         yield put(invalidateEntities());
       }
-      // Otherwise do nothing, the users existing token is good.
+      yield put(authenticateSuccess(response.data)); // need to store currentUserData
     }
   } catch (err) {
     yield call(clearAuthValues);
