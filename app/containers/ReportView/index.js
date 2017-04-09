@@ -1,6 +1,6 @@
 /*
  *
- * IndicatorView
+ * ReportView
  *
  */
 
@@ -20,50 +20,37 @@ import EntityView from 'components/views/EntityView';
 
 import {
   getEntity,
-  getEntities,
   isReady,
 } from 'containers/App/selectors';
 
 import messages from './messages';
 
-export class IndicatorView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class ReportView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  componentWillReceiveProps(nextProps) {
-    // reload entities if invalidated
-    if (!nextProps.dataReady) {
-      this.props.loadEntitiesIfNeeded();
-    }
-  }
+
   handleEdit = () => {
-    browserHistory.push(`/indicators/edit/${this.props.params.id}`);
-  }
-  handleNewReport = () => {
-    browserHistory.push(`/reports/new/${this.props.params.id}`);
+    browserHistory.push(`/reports/edit/${this.props.params.id}`);
   }
 
   handleClose = () => {
-    browserHistory.push('/indicators');
-    // TODO should be "go back" if history present or to indicators list when not
+    browserHistory.push(`/indicators/${this.props.report.indicator.id}`);
+    // TODO should be "go back" if history present or to reports list when not
   }
 
-  mapActions = (actions) =>
-    Object.values(actions).map((action) => ({
-      label: action.attributes.title,
-      linkTo: `/actions/${action.id}`,
-    }))
-  mapReports = (reports) =>
-    Object.values(reports).map((report) => ({
-      label: report.attributes.title,
-      linkTo: `/reports/${report.id}`,
-    }))
-
   render() {
-    const { indicator, dataReady } = this.props;
+    const { report, dataReady } = this.props;
     const reference = this.props.params.id;
-    const status = indicator && find(PUBLISH_STATUSES, { value: indicator.attributes.draft });
+    const status = report && find(PUBLISH_STATUSES, { value: report.attributes.draft });
+    const statusDoc = report && find(PUBLISH_STATUSES, { value: report.attributes.document_public });
+
+    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
+
+    if (report) {
+      pageTitle = `${pageTitle} (Indicator: ${report.attributes.indicator_id})`;
+    }
 
     return (
       <div>
@@ -73,25 +60,20 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !indicator && !dataReady &&
+        { !report && !dataReady &&
           <div>
             <FormattedMessage {...messages.loading} />
           </div>
         }
-        { !indicator && dataReady &&
+        { !report && dataReady &&
           <div>
             <FormattedMessage {...messages.notFound} />
           </div>
         }
-        { indicator &&
+        { report &&
           <Page
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={pageTitle}
             actions={[
-              {
-                type: 'simple',
-                title: 'Add progress report',
-                onClick: this.handleNewReport,
-              },
               {
                 type: 'simple',
                 title: 'Edit',
@@ -110,7 +92,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                   main: [
                     {
                       id: 'title',
-                      value: indicator.attributes.title,
+                      value: report.attributes.title,
                     },
                   ],
                   aside: [
@@ -127,12 +109,12 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                     {
                       id: 'updated',
                       heading: 'Updated At',
-                      value: indicator.attributes.updated_at,
+                      value: report.attributes.updated_at,
                     },
                     {
                       id: 'updated_by',
                       heading: 'Updated By',
-                      value: indicator.user && indicator.user.attributes.name,
+                      value: report.user && report.user.attributes.name,
                     },
                   ],
                 },
@@ -141,26 +123,17 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                     {
                       id: 'description',
                       heading: 'Description',
-                      value: indicator.attributes.description,
+                      value: report.attributes.description,
                     },
                     {
-                      id: 'actions',
-                      heading: 'Actions',
-                      type: 'list',
-                      values: this.mapActions(this.props.actions),
+                      id: 'document_url',
+                      heading: 'Document URL',
+                      value: report.attributes.document_url,
                     },
                     {
-                      id: 'reports',
-                      heading: 'Progress reports',
-                      type: 'list',
-                      values: this.mapReports(this.props.reports),
-                    },
-                  ],
-                  aside: [
-                    {
-                      id: 'manager',
-                      heading: 'Indicator manager',
-                      value: indicator.manager && indicator.manager.attributes.name,
+                      id: 'document_public',
+                      heading: 'Document public',
+                      value: statusDoc && statusDoc.label,
                     },
                   ],
                 },
@@ -173,33 +146,28 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   }
 }
 
-IndicatorView.propTypes = {
+ReportView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  indicator: PropTypes.object,
+  report: PropTypes.object,
   dataReady: PropTypes.bool,
-  actions: PropTypes.object,
-  reports: PropTypes.object,
   params: PropTypes.object,
 };
 
-IndicatorView.contextTypes = {
+ReportView.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-
 const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
-    'measures',
+    'progress_reports',
     'users',
     'indicators',
-    'measure_indicators',
-    'progress_reports',
   ] }),
-  indicator: getEntity(
+  report: getEntity(
     state,
     {
       id: props.params.id,
-      path: 'indicators',
+      path: 'progress_reports',
       out: 'js',
       extend: [
         {
@@ -210,36 +178,11 @@ const mapStateToProps = (state, props) => ({
         },
         {
           type: 'single',
-          path: 'users',
-          key: 'manager_id',
-          as: 'manager',
+          path: 'indicators',
+          key: 'indicator_id',
+          as: 'indicator',
         },
       ],
-    },
-  ),
-
-  // all connected actions
-  actions: getEntities(
-    state, {
-      path: 'measures',
-      out: 'js',
-      connected: {
-        path: 'measure_indicators',
-        key: 'measure_id',
-        where: {
-          indicator_id: props.params.id,
-        },
-      },
-    },
-  ),
-  // all connected reports
-  reports: getEntities(
-    state, {
-      path: 'progress_reports',
-      out: 'js',
-      where: {
-        indicator_id: props.params.id,
-      },
     },
   ),
 });
@@ -247,13 +190,11 @@ const mapStateToProps = (state, props) => ({
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('progress_reports'));
+      dispatch(loadEntitiesIfNeeded('users'));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IndicatorView);
+export default connect(mapStateToProps, mapDispatchToProps)(ReportView);

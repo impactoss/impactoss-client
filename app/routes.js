@@ -392,6 +392,73 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/reports/new/:id', // the indicator id
+      name: 'reportNew',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ReportNew/reducer'),
+          import('containers/ReportNew/sagas'),
+          import('containers/ReportNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('reportNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/reports/:id', // the report id
+      name: 'reportView',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ReportView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/reports/edit/:id',
+      name: 'reportEdit',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ReportEdit/reducer'),
+          import('containers/ReportEdit/sagas'),
+          import('containers/ReportEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('reportEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '*',
+      name: 'notfound',
+      getComponent(nextState, cb) {
+        import('containers/NotFoundPage')
+          .then(loadModule(cb))
+          .catch(errorLoading);
+      },
+    }, {
       path: '/categories',
       name: 'taxonomies',
       getComponent(nextState, cb) {
