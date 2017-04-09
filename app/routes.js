@@ -354,7 +354,7 @@ export default function createRoutes(store) {
       name: 'indicatorView',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/indicatorView'),
+          import('containers/IndicatorView'),
         ]);
 
         const renderRoute = loadModule(cb);

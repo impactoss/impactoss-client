@@ -24,6 +24,14 @@ export function deleteAssociationRequest(path, associationId) {
   }));
 }
 
+export function updateEntitiesRequest(path, entities) {
+  let requests = [];
+  requests = requests.concat(entities.map((payload) =>
+    updateEntityRequest(path, payload)));
+  // update entity attributes
+  return Promise.all(requests);
+}
+
 export function updateEntityRequest(path, payload) {
   // update entity attributes
   return apiRequest('put', `${path}/${payload.id}`, payload.attributes);

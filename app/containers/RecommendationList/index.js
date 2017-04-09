@@ -41,20 +41,41 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   render() {
     const { dataReady } = this.props;
 
-    const extensions = [
-      {
-        path: 'recommendation_categories',
-        key: 'recommendation_id',
-        reverse: true,
-        as: 'taxonomies',
+    // define selects for getEntities
+    const selects = {
+      entities: {
+        path: 'recommendations',
+        extensions: [
+          {
+            path: 'recommendation_categories',
+            key: 'recommendation_id',
+            reverse: true,
+            as: 'taxonomies',
+          },
+          {
+            path: 'recommendation_measures',
+            key: 'recommendation_id',
+            reverse: true,
+            as: 'measures',
+          },
+        ],
       },
-      {
-        path: 'recommendation_measures',
-        key: 'recommendation_id',
-        reverse: true,
-        as: 'measures',
+      connections: {
+        options: ['measures'],
       },
-    ];
+      taxonomies: { // filter by each category
+        out: 'js',
+        path: 'taxonomies',
+        where: {
+          tags_recommendations: true,
+        },
+        extend: {
+          path: 'categories',
+          key: 'taxonomy_id',
+          reverse: true,
+        },
+      },
+    };
 
     const filters = {
       keyword: {
@@ -76,18 +97,6 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       taxonomies: { // filter by each category
         label: 'By category',
         query: 'cat',
-        select: {
-          out: 'js',
-          path: 'taxonomies',
-          where: {
-            tags_recommendations: true,
-          },
-          extend: {
-            path: 'categories',
-            key: 'taxonomy_id',
-            reverse: true,
-          },
-        },
         connected: {
           path: 'recommendation_categories',
           key: 'recommendation_id',
@@ -111,7 +120,33 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         ],
       },
     };
+    const edits = {
+      taxonomies: { // edit category
+        label: 'Update categories',
+      },
+      connections: { // filter by associated entity
+        label: 'Update conections',
+        options: [
+          {
+            label: 'Actions',
+            path: 'measures', // filter by recommendation connection
+            // key: 'indicator_id',
+            // search: true,
 
+          },
+        ],
+      },
+      attributes: {  // edit attribute value
+        label: 'Update attribute',
+        options: [
+          {
+            label: 'Status',
+            attribute: 'draft',
+            options: PUBLISH_STATUSES,
+          },
+        ],
+      },
+    };
     const headerOptions = {
       title: this.context.intl.formatMessage(messages.header),
       actions: [{
@@ -138,9 +173,9 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           <EntityList
             location={this.props.location}
             mapToEntityList={this.mapToEntityList}
-            path="recommendations"
+            selects={selects}
             filters={filters}
-            extensions={extensions}
+            edits={edits}
             header={headerOptions}
           />
         }

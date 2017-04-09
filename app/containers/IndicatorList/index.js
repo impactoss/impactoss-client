@@ -42,15 +42,23 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
   render() {
     const { dataReady } = this.props;
 
-    // specify the associations to query with entities
-    const extensions = [
-      {
-        path: 'measure_indicators',
-        key: 'indicator_id',
-        reverse: true,
-        as: 'measures',
+    // define selects for getEntities
+    const selects = {
+      entities: {
+        path: 'indicators',
+        extensions: [
+          {
+            path: 'measure_indicators',
+            key: 'indicator_id',
+            reverse: true,
+            as: 'measures',
+          },
+        ],
       },
-    ];
+      connections: {
+        options: ['measures'],
+      },
+    };
 
     // specify the filter and query  options
     const filters = {
@@ -88,6 +96,29 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         ],
       },
     };
+    const edits = {
+      connections: { // filter by associated entity
+        label: 'Update connections',
+        options: [
+          {
+            label: 'Actions',
+            path: 'measures', // filter by recommendation connection
+            key: 'measure_id',
+            // search: true,
+          },
+        ],
+      },
+      attributes: {  // edit attribute value
+        label: 'Update attribute',
+        options: [
+          {
+            label: 'Status',
+            attribute: 'draft',
+            options: PUBLISH_STATUSES,
+          },
+        ],
+      },
+    };
     const headerOptions = {
       title: this.context.intl.formatMessage(messages.header),
       actions: [{
@@ -114,9 +145,9 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
           <EntityList
             location={this.props.location}
             mapToEntityList={this.mapToEntityList}
-            path="indicators"
+            selects={selects}
             filters={filters}
-            extensions={extensions}
+            edits={edits}
             header={headerOptions}
           />
         }

@@ -4,29 +4,44 @@ import { REDUCER_PATH } from './constants';
 /**
  * Direct selector to the actionEdit state domain
  */
-const selectEntityListFiltersDomain = (state) => state.get(REDUCER_PATH);
+const selectEntityListDomain = (state) => state.get(REDUCER_PATH);
 
 /**
  * Other specific selectors
  */
 
-const formSelector = createSelector(
-  selectEntityListFiltersDomain,
-  (substate) => substate.get('form').data // TODO WTF HTF GRR
- );
-
 const pageSelector = createSelector(
-   selectEntityListFiltersDomain,
+   selectEntityListDomain,
    (substate) => substate.get('page')
  );
 
-const optionsPathSelector = createSelector(
+const filterFormSelector = createSelector(
+  selectEntityListDomain,
+  (substate) => substate.get('filterForm').data // TODO WTF HTF GRR
+ );
+
+const editFormSelector = createSelector(
+  selectEntityListDomain,
+  (substate) => substate.get('editForm').data // TODO WTF HTF GRR
+ );
+
+const activeFilterOptionSelector = createSelector(
   pageSelector,
-  (pageState) => pageState.get('optionsPath').toJS()
+  (pageState) => pageState.get('activeFilterOption')
+);
+
+const activeEditOptionSelector = createSelector(
+  pageSelector,
+  (pageState) => pageState.get('activeEditOption')
+);
+
+const activePanelSelector = createSelector(
+  pageSelector,
+  (pageState) => pageState.get('activePanel')
 );
 
 const filtersCheckedSelector = createSelector(
-  formSelector,
+  filterFormSelector,
   // () => window.location.href,
   // (formData, href) => {
   (formData) => {
@@ -48,15 +63,18 @@ const filtersCheckedSelector = createSelector(
  */
 
 const entityListSelect = createSelector(
-  selectEntityListFiltersDomain,
+  selectEntityListDomain,
   (substate) => substate.toJS()
 );
 
 export default entityListSelect;
 export {
-  selectEntityListFiltersDomain,
+  selectEntityListDomain,
   entityListSelect,
-  formSelector,
-  optionsPathSelector,
+  editFormSelector,
+  filterFormSelector,
+  activeFilterOptionSelector,
+  activeEditOptionSelector,
   filtersCheckedSelector,
+  activePanelSelector,
 };

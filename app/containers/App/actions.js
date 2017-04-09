@@ -39,6 +39,8 @@ import {
   SAVE_SENDING,
   SAVE_SUCCESS,
   SAVE_ERROR,
+  UPDATE_CONNECTIONS,
+  UPDATE_ENTITIES,
 } from './constants';
 
 
@@ -150,6 +152,20 @@ export function saveEntity(data) {
 export function newEntity(data) {
   return {
     type: NEW_ENTITY,
+    data,
+  };
+}
+
+export function updateConnections(data) {
+  return {
+    type: UPDATE_CONNECTIONS,
+    data,
+  };
+}
+
+export function updateEntities(data) {
+  return {
+    type: UPDATE_ENTITIES,
     data,
   };
 }
