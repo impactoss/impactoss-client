@@ -1,8 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import Icon from 'components/Icon';
-
 import NavBar from './NavBar';
 import HeaderLink from './HeaderLink';
 import messages from './messages';
@@ -18,7 +16,6 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
       <div>
         <NavBar>
           <HeaderLink to="/">
-            <Icon name="home" />
             <FormattedMessage {...messages.home} />
           </HeaderLink>
           <HeaderLink to="/categories">
@@ -35,6 +32,9 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
           </HeaderLink>
           {this.props.isSignedIn &&
             <span>
+              <HeaderLink to="/users">
+                <FormattedMessage {...messages.users} />
+              </HeaderLink>
               <HeaderLink to="/logout">
                 <FormattedMessage {...messages.logout} />
               </HeaderLink>
