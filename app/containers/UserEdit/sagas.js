@@ -10,7 +10,7 @@ export function* save({ data }) {
   yield put(saveEntity({
     path: 'users',
     entity: data,
-    redirect: `/user/${data.id}`,
+    redirect: `/users/${data.id}`,
   }));
 }
 
