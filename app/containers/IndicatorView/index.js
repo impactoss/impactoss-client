@@ -137,6 +137,13 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                       values: this.mapActions(this.props.actions),
                     },
                   ],
+                  aside: [
+                    {
+                      id: 'manager',
+                      heading: 'Indicator manager',
+                      value: indicator.manager && indicator.manager.attributes.name,
+                    },
+                  ],
                 },
               }}
             />
@@ -173,12 +180,20 @@ const mapStateToProps = (state, props) => ({
       id: props.params.id,
       path: 'indicators',
       out: 'js',
-      extend: {
-        type: 'single',
-        path: 'users',
-        key: 'last_modified_user_id',
-        as: 'user',
-      },
+      extend: [
+        {
+          type: 'single',
+          path: 'users',
+          key: 'last_modified_user_id',
+          as: 'user',
+        },
+        {
+          type: 'single',
+          path: 'users',
+          key: 'manager_id',
+          as: 'manager',
+        },
+      ],
     },
   ),
 
