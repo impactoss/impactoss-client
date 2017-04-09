@@ -65,30 +65,39 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       ? taxonomies.reduce((values, tax) =>
           values.set(
             tax.get('id'),
-            tax.get('categories').reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List()))
+            tax.get('categories').reduce((option, entity) => option.push(Map({
+              checked: !!entity.get('associated'),
+              value: entity.get('id'),
+            })), List()))
         , Map())
       : Map(),
       associatedRecommendations: recommendations
-        ? recommendations.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
-        : List(),
+      ? recommendations.reduce((option, entity) => option.push(Map({
+        checked: !!entity.get('associated'),
+        value: entity.get('id'),
+      })), List())
+      : List(),
       associatedIndicators: indicators
-        ? indicators.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
+        ? indicators.reduce((option, entity) => option.push(Map({
+          checked: !!entity.get('associated'),
+          value: entity.get('id'),
+        })), List())
         : List(),
     });
   }
 
   mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
   mapRecommendationOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
   mapIndicatorOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
@@ -363,8 +372,10 @@ function mapDispatchToProps(dispatch, props) {
     },
 
     handleSubmit: (formData, taxonomies, recommendations, indicators) => {
+      const checkedIdsReducer = (checkedIds, option) => option.get('checked') ? checkedIds.push(option.get('value')) : checkedIds;
+
       let saveData = formData.set('measureCategories', taxonomies.reduce((updates, tax, taxId) => {
-        const formCategoryIds = formData.getIn(['associatedTaxonomies', taxId]); // the list of categories checked in form
+        const formCategoryIds = formData.getIn(['associatedTaxonomies', taxId]).reduce(checkedIdsReducer, List()); // the list of categories checked in form
 
         // store associated cats as { [cat.id]: [association.id], ... }
         // then we can use keys for creating new associations and values for deleting
@@ -393,7 +404,7 @@ function mapDispatchToProps(dispatch, props) {
       }, Map({ delete: List(), create: List() })));
 
       // recommendations
-      const formRecommendationIds = formData.get('associatedRecommendations');
+      const formRecommendationIds = formData.get('associatedRecommendations').reduce(checkedIdsReducer, List());
       // store associated recs as { [rec.id]: [association.id], ... }
       const associatedRecommendations = recommendations.reduce((recsAssociated, rec) => {
         if (rec.get('associated')) {
@@ -419,7 +430,7 @@ function mapDispatchToProps(dispatch, props) {
       }));
 
       // indicators
-      const formIndicatorIds = formData.get('associatedIndicators');
+      const formIndicatorIds = formData.get('associatedIndicators').reduce(checkedIdsReducer, List());
       // store associated recs as { [rec.id]: [association.id], ... }
       const associatedIndicators = indicators.reduce((indicatorsAssociated, indicator) => {
         if (indicator.get('associated')) {

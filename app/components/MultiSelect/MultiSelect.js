@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import { kebabCase } from 'lodash/string';
+import IndeterminateCheckbox from 'components/IndeterminateCheckbox';
 
 export default class MultiSelect extends React.Component {
 
@@ -9,36 +10,48 @@ export default class MultiSelect extends React.Component {
     values: PropTypes.instanceOf(Immutable.List),
     onChange: PropTypes.func.isRequired,
     valueCompare: PropTypes.func,
+    threeState: PropTypes.bool,
   }
 
   static defaultProps = {
     values: new Immutable.List(),
-    valueCompare: (a, b) => a === b,
+    valueCompare: (a, b) => a.get('value') === b.get('value'),
+    threeState: false,
   }
 
-  check = (checked, value) => {
-    this.props.onChange(checked
-      ? this.props.values.concat([value])
-      : this.props.values.filterNot((v) => this.props.valueCompare(v, value))
-    );
+  check = (checked, theValue) => {
+    const nextValues = this.props.values.map((value) => this.props.valueCompare(value, theValue) ? value.set('checked', checked) : value);
+    this.props.onChange(nextValues);// sent back to rrf
   }
 
   renderCheckbox = (option, i) => {
     const value = option.get('value');
-    const checked = option.get('checked');
+    const checked = value.get('checked');
     const label = option.get('label');
-    const id = `${checked && 'checked'}-${i}-${kebabCase(label)}`;
+    const id = `${checked}-${i}-${kebabCase(label)}`;
     return (
       <div key={id}>
-        <input
-          type="checkbox"
-          onChange={(evt) => {
-            if (evt && evt !== undefined) evt.stopPropagation();
-            this.check(evt.target.checked, value);
-          }}
-          checked={checked}
-          id={id}
-        />
+        { this.props.threeState &&
+          <IndeterminateCheckbox
+            onChange={(status) => {
+              this.check(status, value);
+            }}
+            value={value.get('label')}
+            checked={checked}
+            id={id}
+          />
+        }
+        { !this.props.threeState &&
+          <input
+            id={id}
+            type="checkbox"
+            checked={checked}
+            onChange={(evt) => {
+              if (evt && evt !== undefined) evt.stopPropagation();
+              this.check(evt.target.checked, value);
+            }}
+          />
+        }
         <label htmlFor={id} >
           {label}
         </label>
@@ -48,8 +61,10 @@ export default class MultiSelect extends React.Component {
 
   render() {
     const { options, values, valueCompare } = this.props;
-    const checkboxes = options.map((option) =>
-      option.set('checked', values.some((v) => valueCompare(v, option.get('value')))));
+    const checkboxes = options.map((option) => {
+      const value = values.find((v) => valueCompare(option.get('value'), v));
+      return value ? option.setIn(['value', 'checked'], value.get('checked')) : option;
+    });
 
     return (
       <div>

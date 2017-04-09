@@ -19,10 +19,6 @@ export default class EntityListFilters extends React.Component { // eslint-disab
     formModel: PropTypes.string,
   };
 
-  // static contextTypes = {
-  //   intl: React.PropTypes.object.isRequired,
-  // };
-
   getFormOptions(formOptions) {
     // Display the options
     return formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({

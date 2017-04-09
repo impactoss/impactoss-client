@@ -7,8 +7,10 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
+import { Form } from 'react-redux-form/immutable';
 // import { updateQueryStringParams } from 'utils/history';
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
+import { pick } from 'lodash/object';
 import { getEntitySortIteratee } from 'utils/sort';
 import { fromJS } from 'immutable';
 
@@ -28,6 +30,7 @@ import { getEntities } from 'containers/App/selectors';
 import {
   FILTER_FORM_MODEL,
   EDIT_FORM_MODEL,
+  LISTINGS_FORM_MODEL,
   FILTERS_PANEL,
   EDIT_PANEL,
 } from './constants';
@@ -36,6 +39,7 @@ import {
   activeFilterOptionSelector,
   activeEditOptionSelector,
   activePanelSelector,
+  entitiesSelectedSelector,
 } from './selectors';
 
 import {
@@ -53,6 +57,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     super(props);
     this.URLParams = new URLSearchParams(browserHistory.getCurrentLocation().search);
   }
+
+  getEntitiesSelected = () => Object.values(pick(this.props.entities, this.props.entityIdsSelected));
 
   getConnectedCategoryIds = (entity, connection, taxonomies) => {
     const connectionIds = map(map(Object.values(entity[connection.path]), 'attributes'), connection.key);
@@ -105,7 +111,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               if (filterOptions.options[catId]) {
                 filterOptions.options[catId].count += 1;
               } else {
-                filterOptions.options[catId] = this.initOption({
+                filterOptions.options[catId] = this.initURLOption({
                   label: taxonomy.categories[catId].attributes.title,
                   value: catId,
                   count: 1,
@@ -122,7 +128,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           if (filterOptions.options.without) {
             filterOptions.options.without.count += 1;
           } else {
-            filterOptions.options.without = this.initOption({
+            filterOptions.options.without = this.initURLOption({
               label: `Without ${taxonomy.attributes.title}`,
               value: taxonomy.id,
               count: 1,
@@ -164,7 +170,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               if (filterOptions.options[catId]) {
                 filterOptions.options[catId].count += 1;
               } else {
-                filterOptions.options[catId] = this.initOption({
+                filterOptions.options[catId] = this.initURLOption({
                   label: taxonomy.categories[catId].attributes.title,
                   value: `${connection.path}:${catId}`,
                   count: 1,
@@ -207,7 +213,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 if (filterOptions.options[connectedId]) {
                   filterOptions.options[connectedId].count += 1;
                 } else {
-                  filterOptions.options[connectedId] = this.initOption({
+                  filterOptions.options[connectedId] = this.initURLOption({
                     label: connection.attributes.title,
                     value: connectedId,
                     search: option.searchAttributes && option.searchAttributes.map((attribute) => connection.attributes[attribute]).join(),
@@ -222,7 +228,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             // add without option
             filterOptions.options.without.count += 1;
           } else {
-            filterOptions.options.without = this.initOption({
+            filterOptions.options.without = this.initURLOption({
               label: `Without ${option.label}`,
               value: option.query,
               count: 1,
@@ -256,7 +262,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               filterOptions.options[value].count += 1;
             } else {
               const attribute = find(option.options, (o) => o.value.toString() === value);
-              filterOptions.options[value] = this.initOption({
+              filterOptions.options[value] = this.initURLOption({
                 label: attribute ? attribute.label : value,
                 value: `${option.attribute}:${value}`,
                 count: 1,
@@ -561,9 +567,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  initOption = (option) => ({
+
+  initURLOption = (option) => ({
     ...option,
-    isSet: this.URLParams.has(option.query) && this.URLParams.getAll(option.query).indexOf(option.value.toString()) >= 0,
+    checked: this.URLParams.has(option.query) && this.URLParams.getAll(option.query).indexOf(option.value.toString()) >= 0,
   })
 
   render() {
@@ -583,7 +590,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     // const entitiesSelected = [];
     // TODO filter for entities selected in list
-    const entitiesSelected = entities; // uncomment this for testing and temporarily assume all are selected
+    const entitiesSelected = this.getEntitiesSelected(); // uncomment this for testing and temporarily assume all are selected
+    // console.log(entitiesSelected);
 
     // map entities to entity list item data
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
@@ -633,9 +641,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           </Grid>
           <Grid sm={3 / 4}>
             <PageHeader title={this.props.header.title} actions={this.props.header.actions} />
-            {entitiesList.map((entity, i) =>
-              <EntityListItem key={i} {...entity} />
-            )}
+            <Form model={LISTINGS_FORM_MODEL}>
+              {entitiesList.map((entity, i) =>
+                <EntityListItem key={i} model={`.entities.${entity.id}`} {...entity} />
+              )}
+            </Form>
           </Grid>
         </Row>
       </Container>
@@ -665,6 +675,7 @@ EntityList.propTypes = {
   onHideEditForm: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,
   activePanel: PropTypes.string,
+  entityIdsSelected: PropTypes.array,
   // handleEditSubmit: PropTypes.func.isRequired,
 };
 
@@ -758,6 +769,7 @@ const mapStateToProps = (state, props) => ({
   activeFilterOption: activeFilterOptionSelector(state),
   activeEditOption: activeEditOptionSelector(state),
   activePanel: activePanelSelector(state),
+  entityIdsSelected: entitiesSelectedSelector(state),
   entities: getEntities(state, {
     out: 'js',
     path: props.selects.entities.path,

@@ -34,6 +34,10 @@ const editFormData = fromJS({
   values: [],
 });
 
+const listingsFormData = fromJS({
+  entities: {},
+});
+
 function entityListReducer(state = initialState, action) {
   switch (action.type) {
     case SHOW_PANEL:
@@ -59,6 +63,9 @@ export default combineReducers({
   editForm: combineForms({
     data: editFormData,
   }, 'entityList.editForm'),
+  listingsForm: combineForms({
+    data: listingsFormData,
+  }, 'entityList.listingsForm'),
 });
 
 // export default entityListFilterReducer;

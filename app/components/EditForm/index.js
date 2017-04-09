@@ -1,9 +1,12 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form } from 'react-redux-form/immutable';
+import { connect } from 'react-redux';
+import { isEqual } from 'lodash/lang';
+import { Form, actions as formActions } from 'react-redux-form/immutable';
 import MultiSelect from 'components/MultiSelect';
+// import { STATES as CHECKBOX_STATES } from 'components/IndeterminateCheckbox';
 
-export default class EditForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class EditForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     model: PropTypes.string.isRequired,
@@ -11,6 +14,18 @@ export default class EditForm extends React.Component { // eslint-disable-line r
     handleSubmit: PropTypes.func,
     onClose: PropTypes.func,
     title: PropTypes.string,
+    populateForm: PropTypes.func.isRequired,
+  }
+
+  componentWillMount() {
+    this.props.populateForm(this.props.model, this.props.options);
+  }
+  //
+  componentDidUpdate(prevProps) {
+     // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
+    if (!isEqual(prevProps.options.toJS(), this.props.options.toJS())) {
+      this.props.populateForm(this.props.model, this.props.options);
+    }
   }
 
   render() {
@@ -27,13 +42,18 @@ export default class EditForm extends React.Component { // eslint-disable-line r
         }
         <MultiSelect
           model=".values"
+          threeState
           options={this.props.options}
-          valueCompare={(a, b) =>
-            // our values, are maps with nested value keys :)
-            a.get('value') === b.get('value')
-          }
         />
       </Form>
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+  populateForm: (model, options) => {
+    dispatch(formActions.load(model, Immutable.Map({ values: options.map((option) => option.get('value')) })));
+  },
+});
+
+export default connect(null, mapDispatchToProps)(EditForm);

@@ -9,6 +9,7 @@ import Immutable, { Map } from 'immutable';
 
 import EditForm from 'components/EditForm';
 import Option from 'components/EditForm/Option';
+import { STATES as CHECKBOX_STATES } from 'components/IndeterminateCheckbox';
 
 export default class EntityListEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
@@ -23,12 +24,23 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
   //   intl: React.PropTypes.object.isRequired,
   // };
 
-  getFormOptions(formOptions) {
-    // Display the options
-    return formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
-      value: option,
+  getFormOptions = (formOptions) =>
+    formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
+      value: Map({
+        checked: this.getCheckState(option),
+        value: option.get('value'),
+      }),
       label: <Option label={option.get('label')} count={option.get('count')} />,
     }));
+
+  getCheckState = (option) => {
+    if (option.get('all')) {
+      return CHECKBOX_STATES.checked;
+    }
+    if (option.get('none')) {
+      return CHECKBOX_STATES.unchecked;
+    }
+    return CHECKBOX_STATES.indeterminate;
   }
 
   renderEditGroup = (group, groupId) => (

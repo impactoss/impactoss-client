@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { Form, actions as formActions } from 'react-redux-form/immutable';
 import MultiSelect from 'components/MultiSelect';
 
-// TODO as this now connects to redux in order to populate the form maybe it should live in `containers`
 class FilterForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
@@ -35,10 +34,6 @@ class FilterForm extends React.Component { // eslint-disable-line react/prefer-s
         <MultiSelect
           model=".values"
           options={this.props.options}
-          valueCompare={(value, option) =>
-            // our values, are maps with nested value keys :)
-            value.get('value') === option.get('value')
-          }
         />
       </Form>
     );
@@ -47,14 +42,7 @@ class FilterForm extends React.Component { // eslint-disable-line react/prefer-s
 
 const mapDispatchToProps = (dispatch) => ({
   populateForm: (model, options) => {
-    // Filter each option, keep the values of those in the URL
-    const urlValues = options
-    .filter((option) => option.getIn(['value', 'isSet']))
-    .map((option) => option.get('value'));
-
-    if (urlValues.size > 0) {
-      dispatch(formActions.load(model, Immutable.Map({ values: urlValues })));
-    }
+    dispatch(formActions.load(model, Immutable.Map({ values: options.map((option) => option.get('value')) })));
   },
 });
 

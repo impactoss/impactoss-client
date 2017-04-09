@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
+import { Control, Fieldset } from 'react-redux-form/immutable';
 
 export default class EntityListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -10,6 +11,7 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
     status: PropTypes.string,
     children: PropTypes.object,
     side: PropTypes.object,
+    model: PropTypes.string,
   }
 
   static defaultProps = {
@@ -17,15 +19,17 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
     side: null,
   }
 
-  render() {
+  renderListItem = () => {
     const title = this.props.linkTo
-      ? <h2><Link to={this.props.linkTo}>{this.props.title}</Link></h2>
-      : <h2>{this.props.title}</h2>;
+    ? <h2><Link to={this.props.linkTo}>{this.props.title}</Link></h2>
+    : <h2>{this.props.title}</h2>;
 
     return (
-      <div >
+      <div>
         <div>
-          <input type="checkbox" />
+          {this.props.model &&
+            <Control.checkbox model=".selected" />
+          }
         </div>
         <div>
           <div>
@@ -38,15 +42,30 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
             }
           </div>
           {this.props.children &&
-          <div>
-            {this.props.children}
-          </div>
+            <div>
+              {this.props.children}
+            </div>
           }
         </div>
         {this.props.side &&
           <div>
             {this.props.side}
           </div>
+        }
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <div>
+        {this.props.model &&
+          <Fieldset model={this.props.model} >
+            {this.renderListItem()}
+          </Fieldset>
+        }
+        {!this.props.model &&
+            this.renderListItem()
         }
       </div>
     );
