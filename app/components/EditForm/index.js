@@ -11,10 +11,15 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
   static propTypes = {
     model: PropTypes.string.isRequired,
     options: PropTypes.instanceOf(Immutable.List),
-    handleSubmit: PropTypes.func,
+    onSubmit: PropTypes.func,
     onClose: PropTypes.func,
     title: PropTypes.string,
     populateForm: PropTypes.func.isRequired,
+    submitLabel: PropTypes.string,
+  }
+
+  static defaultProps = {
+    submitLabel: 'Assign',
   }
 
   componentWillMount() {
@@ -32,7 +37,7 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
     return (
       <Form
         model={this.props.model}
-        onSubmit={this.props.handleSubmit}
+        onSubmit={this.props.onSubmit}
       >
         { this.props.title &&
           <strong>{this.props.title}</strong>
@@ -45,6 +50,9 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
           threeState
           options={this.props.options}
         />
+        {this.props.onSubmit &&
+          <button type="submit">{this.props.submitLabel}</button>
+        }
       </Form>
     );
   }

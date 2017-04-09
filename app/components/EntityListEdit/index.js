@@ -18,11 +18,8 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
     onShowEditForm: PropTypes.func.isRequired,
     onHideEditForm: PropTypes.func.isRequired,
     formModel: PropTypes.string,
+    onAssign: PropTypes.func.isRequired,
   };
-
-  // static contextTypes = {
-  //   intl: React.PropTypes.object.isRequired,
-  // };
 
   getFormOptions = (formOptions) =>
     formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
@@ -68,8 +65,9 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
       </div>
     </div>
   );
+
   render() {
-    const { editGroups, formOptions, onHideEditForm, formModel } = this.props;
+    const { editGroups, formOptions, onHideEditForm, formModel, onAssign } = this.props;
     return (
       <div>
         { editGroups &&
@@ -81,6 +79,7 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
             title={formOptions.get('title')}
             options={this.getFormOptions(formOptions.get('options'))}
             onClose={onHideEditForm}
+            onSubmit={onAssign}
           />
         }
       </div>

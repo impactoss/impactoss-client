@@ -635,6 +635,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   formModel={EDIT_FORM_MODEL}
                   onShowEditForm={this.props.onShowEditForm}
                   onHideEditForm={this.props.onHideEditForm}
+                  onAssign={(values) => console.log(values.toJS())}
                 />
               }
             </EntityListSidebar>
