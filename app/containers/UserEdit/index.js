@@ -53,11 +53,18 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { roles } = props;
+    const { taxonomies, roles } = props;
 
     return Map({
       id: props.user.id,
       attributes: fromJS(props.user.attributes),
+      associatedTaxonomies: taxonomies
+      ? taxonomies.reduce((values, tax) =>
+          values.set(
+            tax.get('id'),
+            tax.get('categories').reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List()))
+        , Map())
+      : Map(),
       associatedRoles: roles
         ? roles.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
         : List(),
@@ -76,7 +83,19 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     controlType: 'multiselect',
     options: this.mapRoleOptions(roles),
   });
+  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
+  }));
 
+  // TODO this should be shared functionality
+  renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({
+    id: tax.get('id'),
+    model: `.associatedTaxonomies.${tax.get('id')}`,
+    label: tax.getIn(['attributes', 'title']),
+    controlType: 'multiselect',
+    options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
+  }), [])
 
   render() {
     const { user, dataReady } = this.props;
@@ -114,7 +133,11 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               {
                 type: 'primary',
                 title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.form.data, this.props.roles),
+                onClick: () => this.props.handleSubmit(
+                  this.props.form.data,
+                  this.props.taxonomies,
+                  this.props.roles
+                ),
               },
             ]}
           >
@@ -126,7 +149,11 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             }
             <EntityForm
               model="userEdit.form.data"
-              handleSubmit={(formData) => this.props.handleSubmit(formData, this.props.roles)}
+              handleSubmit={(formData) => this.props.handleSubmit(
+                formData,
+                this.props.taxonomies,
+                this.props.roles
+              )}
               handleCancel={() => this.props.handleCancel(reference)}
               fields={{
                 header: {
@@ -144,6 +171,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                     },
                   ],
                   aside: [
+                    this.props.roles ? this.renderRoleControl(this.props.roles) : null,
                     {
                       id: 'no',
                       controlType: 'info',
@@ -175,9 +203,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                       },
                     },
                   ],
-                  aside: [
-                    this.props.roles ? this.renderRoleControl(this.props.roles) : null,
-                  ],
+                  aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
                 },
               }}
             />
@@ -197,6 +223,7 @@ UserEdit.propTypes = {
   form: PropTypes.object,
   user: PropTypes.object,
   roles: PropTypes.object,
+  taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
 };
@@ -212,6 +239,9 @@ const mapStateToProps = (state, props) => ({
     'users',
     'user_roles',
     'roles',
+    'categories',
+    'taxonomies',
+    'user_categories',
   ] }),
   user: getUser(
     state,
@@ -223,6 +253,30 @@ const mapStateToProps = (state, props) => ({
         path: 'users',
         key: 'last_modified_user_id',
         as: 'user',
+      },
+    },
+  ),
+  // all categories for all taggable taxonomies, listing connection if any
+  taxonomies: getEntities(
+    state,
+    {
+      path: 'taxonomies',
+      where: {
+        tags_users: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+        extend: {
+          as: 'associated',
+          path: 'user_categories',
+          key: 'category_id',
+          reverse: true,
+          where: {
+            user_id: props.params.id,
+          },
+        },
       },
     },
   ),
@@ -249,11 +303,43 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
       dispatch(loadEntitiesIfNeeded('roles'));
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('user_categories'));
     },
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
-    handleSubmit: (formData, roles) => {
+    handleSubmit: (formData, taxonomies, roles) => {
+      let saveData = formData.set('userCategories', taxonomies.reduce((updates, tax, taxId) => {
+        const formCategoryIds = formData.getIn(['associatedTaxonomies', taxId]); // the list of categories checked in form
+
+        // store associated cats as { [cat.id]: [association.id], ... }
+        // then we can use keys for creating new associations and values for deleting
+        const associatedCategories = tax.get('categories').reduce((catsAssociated, cat) => {
+          if (cat.get('associated')) {
+            return catsAssociated.set(cat.get('id'), cat.get('associated').keySeq().first());
+          }
+          return catsAssociated;
+        }, Map());
+
+        return Map({
+          delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) =>
+            !formCategoryIds.includes(catId)
+              ? associatedIds.push(associatedId)
+              : associatedIds
+          , List())),
+          create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) =>
+            !associatedCategories.has(catId)
+              ? payloads.push(Map({
+                category_id: catId,
+                user_id: formData.get('id'),
+              }))
+              : payloads
+          , List())),
+        });
+      }, Map({ delete: List(), create: List() })));
+
       // roles
       const formRoleIds = formData.get('associatedRoles');
       // store associated recs as { [rec.id]: [association.id], ... }
@@ -264,7 +350,7 @@ function mapDispatchToProps(dispatch) {
         return rolesAssociated;
       }, Map());
 
-      const saveData = formData.set('userRoles', Map({
+      saveData = saveData.set('userRoles', Map({
         delete: associatedRoles.reduce((associatedIds, associatedId, id) =>
           !formRoleIds.includes(id) ? associatedIds.push(associatedId) : associatedIds
         , List()),

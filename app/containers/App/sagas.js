@@ -186,6 +186,14 @@ export function* saveEntitySaga({ data }) {
       });
     }
 
+    // update user-category connections
+    if (data.entity.userCategories) {
+      yield call(updateConnectionsSaga, {
+        path: 'user_categories',
+        updates: data.entity.userCategories,
+      });
+    }
+
     // update recommendation-action connections
     if (data.entity.recommendationMeasures) {
       yield call(updateConnectionsSaga, {
