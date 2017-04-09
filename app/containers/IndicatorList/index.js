@@ -53,6 +53,12 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
             reverse: true,
             as: 'measures',
           },
+          {
+            single: true,
+            path: 'users',
+            key: 'manager_id',
+            as: 'manager',
+          },
         ],
       },
       connections: {
@@ -76,6 +82,15 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
             label: 'Status',
             attribute: 'draft',
             options: PUBLISH_STATUSES,
+          },
+          {
+            label: 'Manager',
+            attribute: 'manager_id',
+            extension: {
+              key: 'manager',
+              label: 'name',
+              without: true,
+            },
           },
         ],
       },

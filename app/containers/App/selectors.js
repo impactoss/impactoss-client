@@ -114,8 +114,8 @@ const getEntitiesWhere = createCachedSelector(
             return passing && entity.get('id') === value.toString();
           }
           const testValue = entity.getIn(['attributes', key]);
-          if (typeof testValue === 'undefined') {
-            return false;
+          if (typeof testValue === 'undefined' || testValue === null) {
+            return (value === 'null') ? passing : false;
           }
           return passing && testValue.toString() === value.toString();
         }, true)
@@ -250,7 +250,7 @@ const extendEntity = (state, entity, extendArgs) => {
     } else {
       // entity pointing to other entity
       const key = entity.getIn(['attributes', extend.key]);
-      extend.where.id = key && key.toString();
+      extend.where.id = !!key && key.toString();
     }
 
     let extended;
