@@ -125,7 +125,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 HomePage.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   taxonomies: PropTypes.object,
-  dataReady: PropTypes.boolean,
+  dataReady: PropTypes.bool,
 };
 
 HomePage.contextTypes = {
