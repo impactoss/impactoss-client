@@ -48,12 +48,11 @@ export default class IndeterminateCheckbox extends React.Component {
           if (evt && evt !== undefined) evt.preventDefault();
           switch (this.props.checked) {
             case STATES.checked:
-              return onChange(STATES.indeterminate, value);
-            case STATES.indeterminate:
               return onChange(STATES.unchecked, value);
-            // case STATES.unchecked:
-            default:
+            case STATES.indeterminate:
               return onChange(STATES.checked, value);
+            default: // STATES.unchecked:
+              return onChange(STATES.indeterminate, value);
           }
         }}
         {...props}

@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import Immutable from 'immutable';
+import Immutable, { fromJS } from 'immutable';
 import { Control } from 'react-redux-form/immutable';
 
 import MultiSelect from './MultiSelect';
@@ -15,6 +15,7 @@ const MultiSelectControl = (props) => {
       multiple
       mapProps={{
         values: (cprops) => cprops.viewValue,
+        initialValues: (cprops) => fromJS(cprops.fieldValue.loadedValue),
         onChange: (cprops) => cprops.onChange,
       }}
       controlProps={{

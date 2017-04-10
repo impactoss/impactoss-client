@@ -12,7 +12,7 @@ import { Form } from 'react-redux-form/immutable';
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
 import { pick } from 'lodash/object';
 import { getEntitySortIteratee } from 'utils/sort';
-import { fromJS } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 import Grid from 'grid-styled';
 
@@ -567,7 +567,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-
   initURLOption = (option) => ({
     ...option,
     checked: this.URLParams.has(option.query) && this.URLParams.getAll(option.query).indexOf(option.value.toString()) >= 0,
@@ -635,7 +634,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   formModel={EDIT_FORM_MODEL}
                   onShowEditForm={this.props.onShowEditForm}
                   onHideEditForm={this.props.onHideEditForm}
-                  onAssign={(values) => console.log(values.toJS())}
+                  onAssign={(associations) => this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
                 />
               }
             </EntityListSidebar>
@@ -677,7 +676,7 @@ EntityList.propTypes = {
   onPanelSelect: PropTypes.func.isRequired,
   activePanel: PropTypes.string,
   entityIdsSelected: PropTypes.array,
-  // handleEditSubmit: PropTypes.func.isRequired,
+  handleEditSubmit: PropTypes.func.isRequired,
 };
 
 EntityList.defaultProps = {
@@ -799,7 +798,7 @@ const mapStateToProps = (state, props) => ({
   : null,
 });
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, props) {
   return {
     onShowFilterForm: (option) => {
       dispatch(showFilterForm(option));
@@ -818,16 +817,51 @@ function mapDispatchToProps(dispatch) {
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));
     },
-    handleEditSubmit: (editFormData) => {
-    // handleEditSubmit: (editFormData, selectedEntities) => {
-      const saveData = {
-        path: 'path_of_associative_table', // TODO figure out from edits, eg props.edits[activeGroup].connectPath
-        updates: editFormData, // TODO figure out the create id pairs and delete association id
-        // create: [{entity_id:X, other_entity_id:Y}, ...] // for all connections added, figure out entity id from affected selectedEntity and other id from form option value
-        // delete: [{id:Z}, ...] // for all connections deleted, figure out the association id from affected selectedEntity
-      };
+    handleEditSubmit: (associations, selectedEntities, activeEditOption) => {
+      const entities = fromJS(selectedEntities);
+      const changes = associations.get('values').filter((option) => option.get('hasChanged'));
+      const creates = changes.filter((option) => option.get('checked') === true).map((option) => option.get('value'));
+      const deletes = changes.filter((option) => option.get('checked') === false).map((option) => option.get('value'));
 
-      dispatch(saveEdits(saveData.toJS()));
+      const saveData = Map({
+        path: props.edits[activeEditOption.group].connectPath,
+        create: entities.reduce((create, entity) => {
+          const existingAssigments = entity.get(activeEditOption.group);
+          if (existingAssigments) {
+            // find the relations that this entity already has
+            const existingAssigmentIds = existingAssigments.map((related) =>
+              related.getIn(['attributes', 'category_id']).toString() // todo category_id only works for taxonomies, how can I make this variable dynamic
+            ).toList();
+            // exclude existing relations from the changeSet
+            const changeSet = creates.filterNot((id) => existingAssigmentIds.includes(id.toString()));
+            // if we have changes, record them
+            return changeSet.size ? create.set(entity.get('id'), changeSet) : create;
+          }
+          // no existing values assigned, so add them all now
+          return create.set(entity.get('id'), creates);
+        }, Map()),
+        delete: entities.reduce((del, entity) => {
+          const existingAssigments = entity.get(activeEditOption.group);
+          if (existingAssigments) {
+            const existingAssigmentIds = existingAssigments.map((related) =>
+              related.getIn(['attributes', 'category_id']).toString() // todo category_id only works for taxonomies, how can I make this variable dynamic
+            );
+            // deletes = [z] existingAssigmentIds = [a:w,b:x,c:y] => changeSet = []
+            // deletes = [z] existingAssigmentIds = [b:x,c:y,d:z] => changeSet = [d]
+            const changeSet = existingAssigmentIds
+              .filter((categoryId) => deletes.includes(categoryId)) // we have this id so we need to delete it
+              .map((categoryId, relationId) => relationId) // return the join table id
+              .toList();
+            // if we have deletes, record them
+            return changeSet.size ? del.set(entity.get('id'), changeSet) : del;
+          }
+          // No existing relations, so nothing to delete for this entity
+          return del;
+        }, Map()),
+      });
+      console.log(saveData.toJS());
+      return;
+      // dispatch(saveEdits(associations, selectedEntities));
     },
   };
 }
