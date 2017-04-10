@@ -95,6 +95,23 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/users',
+      name: 'userList',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserList'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/users/:id',
       name: 'userView',
       onEnter: redirectIfNotPermitted,
@@ -158,16 +175,12 @@ export default function createRoutes(store) {
       name: 'actionList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/ActionList/reducer'),
-          import('containers/ActionList/sagas'),
           import('containers/ActionList'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('actionList', reducer.default);
-          injectSagas(sagas.default);
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 
@@ -236,16 +249,12 @@ export default function createRoutes(store) {
       name: 'recommendationList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/RecommendationList/reducer'),
-          import('containers/RecommendationList/sagas'),
           import('containers/RecommendationList'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('recommendationList', reducer.default);
-          injectSagas(sagas.default);
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 
@@ -313,16 +322,12 @@ export default function createRoutes(store) {
       name: 'indicatorList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/IndicatorList/reducer'),
-          import('containers/IndicatorList/sagas'),
           import('containers/IndicatorList'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('indicatorList', reducer.default);
-          injectSagas(sagas.default);
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 
@@ -380,6 +385,65 @@ export default function createRoutes(store) {
 
         importModules.then(([reducer, sagas, component]) => {
           injectReducer('indicatorEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/reports/new/:id', // the indicator id
+      name: 'reportNew',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ReportNew/reducer'),
+          import('containers/ReportNew/sagas'),
+          import('containers/ReportNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('reportNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/reports/:id', // the report id
+      name: 'reportView',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ReportView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/reports/edit/:id',
+      name: 'reportEdit',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ReportEdit/reducer'),
+          import('containers/ReportEdit/sagas'),
+          import('containers/ReportEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('reportEdit', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });

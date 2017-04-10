@@ -1,8 +1,8 @@
 /*
-*
-* IndicatorEdit reducer
-*
-*/
+ *
+ * ReportNew reducer
+ *
+ */
 
 import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
@@ -10,8 +10,8 @@ import { combineForms } from 'react-redux-form/immutable';
 
 import {
   SAVE_SENDING,
-  SAVE_ERROR,
   SAVE_SUCCESS,
+  SAVE_ERROR,
 } from 'containers/App/constants';
 
 const initialState = fromJS({
@@ -20,7 +20,7 @@ const initialState = fromJS({
   saveError: false,
 });
 
-function indicatorEditReducer(state = initialState, action) {
+function reportNewReducer(state = initialState, action) {
   switch (action.type) {
     case SAVE_SENDING:
       return state
@@ -34,27 +34,26 @@ function indicatorEditReducer(state = initialState, action) {
     case SAVE_ERROR:
       return state
         .set('saveSending', false)
-        .set('saveSuccess', false)
         .set('saveError', action.error);
     default:
       return state;
   }
 }
 
-// tim: I don't know how to pull from the global state to set these now, It doesn't seem to be possible
 const formData = fromJS({
-  id: '',
   attributes: {
+    draft: true,
     title: '',
     description: '',
-    draft: '',
-    manager_id: '',
+    document_url: '',
+    document_public: true,
+    indicator_id: '',
   },
 });
 
 export default combineReducers({
-  page: indicatorEditReducer,
+  page: reportNewReducer,
   form: combineForms({
     data: formData,
-  }, 'indicatorEdit.form'),
+  }, 'reportNew.form'),
 });

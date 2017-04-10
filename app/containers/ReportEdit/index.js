@@ -1,6 +1,6 @@
 /*
  *
- * CategoryEdit
+ * ReportEdit
  *
  */
 
@@ -11,7 +11,9 @@ import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
 
-import { Map, List, fromJS } from 'immutable';
+import { fromJS } from 'immutable';
+
+import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
@@ -20,7 +22,6 @@ import EntityForm from 'components/forms/EntityForm';
 
 import {
   getEntity,
-  getEntities,
   isReady,
 } from 'containers/App/selectors';
 
@@ -32,13 +33,13 @@ import {
 import messages from './messages';
 import { save } from './actions';
 
-export class CategoryEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class ReportEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
     if (this.props.dataReady) {
-      this.props.populateForm('categoryEdit.form.data', this.getInitialFormData());
+      this.props.populateForm('reportEdit.form.data', this.props.report);
     }
   }
 
@@ -47,44 +48,22 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
+
     if (nextProps.dataReady && !this.props.dataReady) {
-      this.props.populateForm('categoryEdit.form.data', this.getInitialFormData(nextProps));
+      this.props.populateForm('reportEdit.form.data', nextProps.report);
     }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { category } = props;
-    return Map({
-      id: category.id,
-      attributes: fromJS(category.attributes),
-      associatedUser: category.attributes.manager_id ? List().push(category.attributes.manager_id.toString()) : List(),
-      // TODO allow single value for singleSelect
-    });
-  }
-
-  mapUserOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
-    label: entity.getIn(['attributes', 'name']),
-  }));
-
-  renderUserControl = (users) => ({
-    id: 'users',
-    model: '.associatedUser',
-    label: 'Category manager',
-    controlType: 'multiselect',
-    options: this.mapUserOptions(users),
-  });
-
   render() {
-    const { category, dataReady } = this.props;
+    const { report, dataReady } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
 
-    const mainAsideFields = [];
-    if (dataReady && !!category.taxonomy.attributes.has_manager && this.props.users) {
-      mainAsideFields.push(this.renderUserControl(this.props.users));
+    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
+
+    if (report) {
+      pageTitle = `${pageTitle} (Indicator: ${report.attributes.indicator_id})`;
     }
 
     return (
@@ -95,19 +74,19 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !category && !dataReady &&
+        { !report && !dataReady &&
           <div>
             <FormattedMessage {...messages.loading} />
           </div>
         }
-        { !category && dataReady && !saveError &&
+        { !report && dataReady && !saveError &&
           <div>
             <FormattedMessage {...messages.notFound} />
           </div>
         }
-        {category && dataReady &&
+        {report &&
           <Page
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={pageTitle}
             actions={[
               {
                 type: 'simple',
@@ -128,7 +107,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               <p>{saveError}</p>
             }
             <EntityForm
-              model="categoryEdit.form.data"
+              model="reportEdit.form.data"
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={() => this.props.handleCancel(reference)}
               fields={{
@@ -153,14 +132,21 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                       displayValue: reference,
                     },
                     {
+                      id: 'status',
+                      controlType: 'select',
+                      model: '.attributes.draft',
+                      value: report.draft,
+                      options: PUBLISH_STATUSES,
+                    },
+                    {
                       id: 'updated',
                       controlType: 'info',
-                      displayValue: category.attributes.updated_at,
+                      displayValue: report.attributes.updated_at,
                     },
                     {
                       id: 'updated_by',
                       controlType: 'info',
-                      displayValue: category.user && category.user.attributes.name,
+                      displayValue: report.user && report.user.attributes.name,
                     },
                   ],
                 },
@@ -172,17 +158,17 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                       model: '.attributes.description',
                     },
                     {
-                      id: 'short_title',
+                      id: 'document_url',
                       controlType: 'input',
-                      model: '.attributes.short_title',
+                      model: '.attributes.document_url',
                     },
                     {
-                      id: 'url',
-                      controlType: 'input',
-                      model: '.attributes.url',
+                      id: 'document_public',
+                      controlType: 'select',
+                      model: '.attributes.document_public',
+                      options: PUBLISH_STATUSES,
                     },
                   ],
-                  aside: mainAsideFields,
                 },
               }}
             />
@@ -193,20 +179,19 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   }
 }
 
-CategoryEdit.propTypes = {
+ReportEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   page: PropTypes.object,
   form: PropTypes.object,
-  category: PropTypes.object,
+  report: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
-  users: PropTypes.object,
 };
 
-CategoryEdit.contextTypes = {
+ReportEdit.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
@@ -214,44 +199,20 @@ const mapStateToProps = (state, props) => ({
   page: pageSelector(state),
   form: formSelector(state),
   dataReady: isReady(state, { path: [
+    'progress_reports',
     'users',
-    'user_roles',
-    'categories',
-    'taxonomies',
   ] }),
-  category: getEntity(
+  report: getEntity(
     state,
     {
       id: props.params.id,
-      path: 'categories',
+      path: 'progress_reports',
       out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-        {
-          type: 'single',
-          path: 'taxonomies',
-          key: 'taxonomy_id',
-          as: 'taxonomy',
-        },
-      ],
-    },
-  ),
-  // all users of role manager
-  users: getEntities(
-    state,
-    {
-      path: 'users',
-      connected: {
-        path: 'user_roles',
-        key: 'user_id',
-        where: {
-          role_id: 1, // managers only TODO: from constants
-        },
+      extend: {
+        type: 'single',
+        path: 'users',
+        key: 'last_modified_user_id',
+        as: 'user',
       },
     },
   ),
@@ -261,31 +222,22 @@ function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('progress_reports'));
     },
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, fromJS(formData)));
     },
     handleSubmit: (formData) => {
-      let saveData = formData;
-      // TODO: remove once have singleselect instead of multiselect
-      if (List.isList(saveData.get('associatedUser'))) {
-        saveData = saveData.setIn(['attributes', 'manager_id'], saveData.get('associatedUser').first());
-      }
-      dispatch(save(saveData.toJS()));
+      dispatch(save(formData.toJS()));
     },
     handleCancel: (reference) => {
       // not really a dispatch function here, could be a member function instead
       // however
       // - this could in the future be moved to a saga or reducer
       // - also its nice to be next to handleSubmit
-      browserHistory.push(`/category/${reference}`);
+      browserHistory.push(`/reports/${reference}`);
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryEdit);
+export default connect(mapStateToProps, mapDispatchToProps)(ReportEdit);

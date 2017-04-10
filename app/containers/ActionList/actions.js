@@ -1,5 +1,0 @@
-/*
- *
- * ActionList actions
- *
- */

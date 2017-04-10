@@ -1,74 +1,40 @@
 /*
  *
- * CategoryNew
+ * ReportNew
  *
  */
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
 
-import { Map, List } from 'immutable';
-
+import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
-
-import {
-  getEntity,
-  getEntities,
-  isReady,
-} from 'containers/App/selectors';
+import { getEntity, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
 
-import categoryNewSelector from './selectors';
+import reportNewSelector from './selectors';
 import messages from './messages';
 import { save } from './actions';
 
 
-export class CategoryNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class ReportNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
-  componentWillReceiveProps(nextProps) {
-    // reload entities if invalidated
-    if (!nextProps.dataReady) {
-      this.props.loadEntitiesIfNeeded();
-    }
-  }
-  mapUserOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
-    label: entity.getIn(['attributes', 'name']),
-  }));
-  renderUserControl = (users) => ({
-    id: 'users',
-    model: '.associatedUser',
-    label: 'Category manager',
-    controlType: 'multiselect',
-    options: this.mapUserOptions(users),
-  });
-
   render() {
-    const { taxonomy, dataReady } = this.props;
-    const { saveSending, saveError } = this.props.categoryNew.page;
-    const taxonomyReference = this.props.params.id;
+    const { dataReady } = this.props;
+    const { saveSending, saveError } = this.props.reportNew.page;
+    const indicatorReference = this.props.params.id;
     const required = (val) => val && val.length;
 
-
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-
-    if (taxonomy && taxonomy.attributes) {
-      pageTitle = `${pageTitle} (${taxonomy.attributes.title})`;
-    }
-
-    const mainAsideFields = [];
-    if (dataReady && !!taxonomy.attributes.has_manager && this.props.users) {
-      mainAsideFields.push(this.renderUserControl(this.props.users));
-    }
+    pageTitle = `${pageTitle} (Indicator: ${indicatorReference})`;
 
     return (
       <div>
@@ -81,11 +47,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             },
           ]}
         />
-        { !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
         {dataReady &&
           <Page
             title={pageTitle}
@@ -94,33 +55,33 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                 {
                   type: 'simple',
                   title: 'Cancel',
-                  onClick: () => this.props.handleCancel(taxonomyReference),
+                  onClick: () => this.props.handleCancel(indicatorReference),
                 },
                 {
                   type: 'primary',
                   title: 'Save',
                   onClick: () => this.props.handleSubmit(
-                    this.props.categoryNew.form.data,
-                    taxonomyReference
+                    this.props.reportNew.form.data,
+                    indicatorReference
                   ),
                 },
               ]
             }
           >
             {saveSending &&
-              <p>Saving Category</p>
+              <p>Saving Report</p>
             }
             {saveError &&
               <p>{saveError}</p>
             }
 
             <EntityForm
-              model="categoryNew.form.data"
+              model="reportNew.form.data"
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
-                taxonomyReference
+                indicatorReference
               )}
-              handleCancel={() => this.props.handleCancel(taxonomyReference)}
+              handleCancel={() => this.props.handleCancel(indicatorReference)}
               fields={{
                 header: {
                   main: [
@@ -137,7 +98,14 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                       },
                     },
                   ],
-                  aside: [],
+                  aside: [
+                    {
+                      id: 'status',
+                      controlType: 'select',
+                      model: '.attributes.draft',
+                      options: PUBLISH_STATUSES,
+                    },
+                  ],
                 },
                 body: {
                   main: [
@@ -147,17 +115,17 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                       model: '.attributes.description',
                     },
                     {
-                      id: 'short_title',
+                      id: 'document_url',
                       controlType: 'input',
-                      model: '.attributes.short_title',
+                      model: '.attributes.document_url',
                     },
                     {
-                      id: 'url',
-                      controlType: 'input',
-                      model: '.attributes.url',
+                      id: 'document_public',
+                      controlType: 'select',
+                      model: '.attributes.document_public',
+                      options: PUBLISH_STATUSES,
                     },
                   ],
-                  aside: mainAsideFields,
                 },
               }}
             />
@@ -168,48 +136,31 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   }
 }
 
-CategoryNew.propTypes = {
+ReportNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
-  categoryNew: PropTypes.object,
-  taxonomy: PropTypes.object,
+  reportNew: PropTypes.object,
+  // indicator: PropTypes.object,
   params: PropTypes.object,
-  users: PropTypes.object,
 };
 
-CategoryNew.contextTypes = {
+ReportNew.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
-  categoryNew: categoryNewSelector(state),
+  reportNew: reportNewSelector(state),
   dataReady: isReady(state, { path: [
-    'taxonomies',
-    'users',
-    'user_roles',
+    'indicators',
   ] }),
-  taxonomy: getEntity(
+  indicator: getEntity(
     state,
     {
       id: props.params.id,
-      path: 'taxonomies',
+      path: 'indicators',
       out: 'js',
-    },
-  ),
-  // all users of role manager
-  users: getEntities(
-    state,
-    {
-      path: 'users',
-      connected: {
-        path: 'user_roles',
-        key: 'user_id',
-        where: {
-          role_id: 1, // managers only TODO: from constants
-        },
-      },
     },
   ),
 });
@@ -217,26 +168,21 @@ const mapStateToProps = (state, props) => ({
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
     },
-    handleSubmit: (formData, taxonomyReference) => {
-      let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomyReference);
-      // TODO: remove once have singleselect instead of multiselect
-      if (List.isList(saveData.get('associatedUser'))) {
-        saveData = saveData.setIn(['attributes', 'manager_id'], saveData.get('associatedUser').first());
-      }
-      dispatch(save(saveData.toJS()));
+    handleSubmit: (formData, indicatorReference) => {
+      const saveData = formData.toJS();
+      saveData.attributes.indicator_id = indicatorReference;
+      dispatch(save(saveData));
     },
-    handleCancel: (taxonomyReference) => {
+    handleCancel: (indicatorReference) => {
       // not really a dispatch function here, could be a member function instead
       // however
       // - this could in the future be moved to a saga or reducer
       // - also its nice to be next to handleSubmit
-      browserHistory.push(`/categories/${taxonomyReference}`);
+      browserHistory.push(`/indicators/${indicatorReference}`);
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryNew);
+export default connect(mapStateToProps, mapDispatchToProps)(ReportNew);

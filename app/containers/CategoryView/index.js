@@ -27,6 +27,12 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
 
   handleEdit = () => {
     browserHistory.push(`/category/edit/${this.props.params.id}`);
@@ -40,6 +46,14 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
   render() {
     const { category, dataReady } = this.props;
     const reference = this.props.params.id;
+    const mainAsideFields = [];
+    if (dataReady && !!category.taxonomy.attributes.has_manager) {
+      mainAsideFields.push({
+        id: 'manager',
+        heading: 'Category manager',
+        value: category.manager && category.manager.attributes.name,
+      });
+    }
 
     return (
       <div>
@@ -59,7 +73,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             <FormattedMessage {...messages.notFound} />
           </div>
         }
-        { category &&
+        { category && dataReady &&
           <Page
             title={this.context.intl.formatMessage(messages.pageTitle)}
             actions={[
@@ -120,6 +134,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                       value: category.attributes.url,
                     },
                   ],
+                  aside: mainAsideFields,
                 },
               }}
             />
@@ -163,6 +178,12 @@ const mapStateToProps = (state, props) => ({
           path: 'users',
           key: 'last_modified_user_id',
           as: 'user',
+        },
+        {
+          type: 'single',
+          path: 'users',
+          key: 'manager_id',
+          as: 'manager',
         },
         {
           type: 'single',
