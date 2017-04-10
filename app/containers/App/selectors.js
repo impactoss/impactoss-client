@@ -306,8 +306,7 @@ const getSessionUser = createSelector(
 const getSessionUserId = createSelector(
   getSessionUser,
   (sessionUser) =>
-    sessionUser
-    && sessionUser.get('attributes')
+    sessionUser.get('attributes')
     && sessionUser.get('attributes').id.toString()
 );
 
@@ -333,7 +332,7 @@ const getUser = createSelector(
   (state, { out }) => out,
   (state, { extend }) => extend,
   (state, user, out, extend) => {
-    let result = user || getUserEntity(state, { id: getSessionUserId(state) });
+    let result = user;
     if (result && extend) {
       result = extendEntity(state, result, extend);
     }
