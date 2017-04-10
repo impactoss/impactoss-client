@@ -38,17 +38,17 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   }
 
   mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
   mapRecommendationOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
   mapIndicatorOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
@@ -242,12 +242,16 @@ function mapDispatchToProps(dispatch) {
     },
     handleSubmit: (formData) => {
       let saveData = formData;
+      const checkedIdsReducer = (checkedIds, option) => option.get('checked') ? checkedIds.push(option.get('value')) : checkedIds;
+      console.log(formData.toJS())
 
       // measureCategories
       if (formData.get('associatedTaxonomies')) {
         saveData = saveData.set(
           'measureCategories',
-          formData.get('associatedTaxonomies').reduce((updates, formCategoryIds) => Map({
+          formData.get('associatedTaxonomies')
+          .reduce(checkedIdsReducer, List())
+          .reduce((updates, formCategoryIds) => Map({
             delete: List(),
             create: updates.get('create').concat(formCategoryIds.map((id) => Map({
               category_id: id,
@@ -260,7 +264,9 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('associatedRecommendations')) {
         saveData = saveData.set('recommendationMeasures', Map({
           delete: List(),
-          create: formData.get('associatedRecommendations').map((id) => Map({
+          create: formData.get('associatedRecommendations')
+          .reduce(checkedIdsReducer, List())
+          .map((id) => Map({
             recommendation_id: id,
           })),
         }));
@@ -269,11 +275,16 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('associatedIndicators')) {
         saveData = saveData.set('measureIndicators', Map({
           delete: List(),
-          create: formData.get('associatedIndicators').map((id) => Map({
+          create: formData.get('associatedIndicators')
+          .reduce(checkedIdsReducer, List())
+          .map((id) => Map({
             indicator_id: id,
           })),
         }));
       }
+
+      console.log(saveData.toJS());
+      return
 
       dispatch(save(saveData.toJS()));
     },

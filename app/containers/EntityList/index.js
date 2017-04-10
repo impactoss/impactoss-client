@@ -112,7 +112,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 filterOptions.options[catId].count += 1;
               } else {
                 filterOptions.options[catId] = this.initURLOption({
-                  label: taxonomy.categories[catId].attributes.title || taxonomy.categories[catId].attributes.name,,
+                  label: taxonomy.categories[catId].attributes.title || taxonomy.categories[catId].attributes.name,
                   value: catId,
                   count: 1,
                   query: filters.taxonomies.query,
@@ -214,7 +214,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   filterOptions.options[connectedId].count += 1;
                 } else {
                   filterOptions.options[connectedId] = this.initURLOption({
-                    label: connection.attributes.title || connection.attributes.name,,
+                    label: connection.attributes.title || connection.attributes.name,
                     value: connectedId,
                     search: option.searchAttributes && option.searchAttributes.map((attribute) => connection.attributes[attribute]).join(),
                     count: 1,
