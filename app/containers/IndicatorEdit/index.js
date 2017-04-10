@@ -58,8 +58,8 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     const props = nextProps || this.props;
     const { actions, indicator } = props;
     return Map({
-      id: props.indicator.id,
-      attributes: fromJS(props.indicator.attributes),
+      id: indicator.id,
+      attributes: fromJS(indicator.attributes),
       associatedActions: actions
         ? actions.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
         : List(),
@@ -255,12 +255,6 @@ const mapStateToProps = (state, props) => ({
           key: 'last_modified_user_id',
           as: 'user',
         },
-        {
-          type: 'single',
-          path: 'users',
-          key: 'manager_id',
-          as: 'user',
-        },
       ],
     },
   ),
@@ -282,7 +276,7 @@ const mapStateToProps = (state, props) => ({
     },
   ),
 
-  // all users, listing connection if any
+  // all users of role contributor
   users: getEntities(
     state,
     {
@@ -291,7 +285,7 @@ const mapStateToProps = (state, props) => ({
         path: 'user_roles',
         key: 'user_id',
         where: {
-          role_id: 2, // contributors only
+          role_id: 2, // contributors only TODO: from constants
         },
       },
     },

@@ -49,6 +49,7 @@ const formData = fromJS({
     description: '',
     short_title: '',
     url: '',
+    manager_id: '',
   },
   taxonomy_id: '',
 });
