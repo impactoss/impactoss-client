@@ -9,6 +9,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
 
   static propTypes = {
     isSignedIn: React.PropTypes.bool,
+    userId: React.PropTypes.string,
   }
 
   render() {
@@ -38,7 +39,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
               <HeaderLink to="/logout">
                 <FormattedMessage {...messages.logout} />
               </HeaderLink>
-              <HeaderLink to="/users/profile">
+              <HeaderLink to={`/users/${this.props.userId}`}>
                 <FormattedMessage {...messages.user} />
               </HeaderLink>
             </span>

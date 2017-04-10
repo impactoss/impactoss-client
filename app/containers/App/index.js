@@ -16,7 +16,7 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
 import Header from 'components/Header';
-import { makeSelectSignedIn } from './selectors';
+import { makeSelectSignedIn, makeSelectSessionUserId } from './selectors';
 import { validateToken } from './actions';
 
 
@@ -25,6 +25,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   static propTypes = {
     children: React.PropTypes.node,
     isSignedIn: React.PropTypes.bool,
+    userId: React.PropTypes.string,
     validateToken: React.PropTypes.func,
   };
 
@@ -37,6 +38,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       <div>
         <Header
           isSignedIn={this.props.isSignedIn}
+          userId={this.props.userId}
         />
         {React.Children.toArray(this.props.children)}
       </div>
@@ -46,6 +48,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 
 const mapStateToProps = createStructuredSelector({
   isSignedIn: makeSelectSignedIn(),
+  userId: makeSelectSessionUserId(),
 });
 
 export function mapDispatchToProps(dispatch) {
