@@ -44,13 +44,15 @@ class PageHeader extends React.Component { // eslint-disable-line react/prefer-s
             <H1>{this.props.title}</H1>
           </Grid>
           <Grid sm={1 / 2}>
-            <ButtonGroup>
-              {
-                this.props.actions.map((action, i) => (
-                  this.renderAction(action, i)
-                ))
-              }
-            </ButtonGroup>
+            { this.props.actions &&
+              <ButtonGroup>
+                {
+                  this.props.actions.map((action, i) => (
+                    this.renderAction(action, i)
+                  ))
+                }
+              </ButtonGroup>
+            }
           </Grid>
         </Row>
       </Styled>

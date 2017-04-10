@@ -13,6 +13,7 @@ import { FormattedMessage } from 'react-intl';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import {
   getEntities,
+  isReady,
 } from 'containers/App/selectors';
 
 // components
@@ -24,9 +25,14 @@ import messages from './messages';
 
 export class Taxonomies extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  // make sure to load all data from server
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+  }
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
   }
 
   mapToTaxonomyList = (taxonomies) => Object.values(taxonomies).map((tax) => ({
@@ -42,7 +48,7 @@ export class Taxonomies extends React.PureComponent { // eslint-disable-line rea
   }))
 
   render() {
-    const taxonomies = this.mapToTaxonomyList(this.props.taxonomies);
+    const { dataReady } = this.props;
 
     return (
       <div>
@@ -52,21 +58,20 @@ export class Taxonomies extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !taxonomies &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        {taxonomies &&
-          <Page
-            title={this.context.intl.formatMessage(messages.pageTitle)}
-            actions={[]}
-          >
+        <Page
+          title={this.context.intl.formatMessage(messages.pageTitle)}
+        >
+          { !dataReady &&
+            <div>
+              <FormattedMessage {...messages.loading} />
+            </div>
+          }
+          { dataReady &&
             <TaxonomyList
-              taxonomies={taxonomies}
+              taxonomies={this.mapToTaxonomyList(this.props.taxonomies)}
             />
-          </Page>
-        }
+          }
+        </Page>
       </div>
     );
   }
@@ -75,6 +80,7 @@ export class Taxonomies extends React.PureComponent { // eslint-disable-line rea
 Taxonomies.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   taxonomies: PropTypes.object,
+  dataReady: PropTypes.bool,
 };
 
 Taxonomies.contextTypes = {
@@ -82,6 +88,12 @@ Taxonomies.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
+  dataReady: isReady(state, { path: [
+    'categories',
+    'taxonomies',
+    // 'recommendation_categories',
+    // 'measure_categories',
+  ] }),
   taxonomies: getEntities(
     state,
     {
