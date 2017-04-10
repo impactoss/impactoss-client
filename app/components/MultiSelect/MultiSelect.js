@@ -23,7 +23,7 @@ export default class MultiSelect extends React.Component {
   static defaultProps = {
     values: new Immutable.List(),
     initialValues: new Immutable.List(),
-    valueCompare: (a, b) => (a && b) && (a.get('value') === b.get('value')),
+    valueCompare: (a, b) => a.get('value') === b.get('value'),
     threeState: false,
   }
 
