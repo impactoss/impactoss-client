@@ -7,10 +7,18 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
 
+import { Map, List } from 'immutable';
+
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
-import { getEntity, isReady } from 'containers/App/selectors';
+
+import {
+  getEntity,
+  getEntities,
+  isReady,
+} from 'containers/App/selectors';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -26,6 +34,24 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     this.props.loadEntitiesIfNeeded();
   }
 
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
+  mapUserOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'name']),
+  }));
+  renderUserControl = (users) => ({
+    id: 'users',
+    model: '.associatedUser',
+    label: 'Category manager',
+    controlType: 'multiselect',
+    options: this.mapUserOptions(users),
+  });
+
   render() {
     const { taxonomy, dataReady } = this.props;
     const { saveSending, saveError } = this.props.categoryNew.page;
@@ -39,6 +65,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       pageTitle = `${pageTitle} (${taxonomy.attributes.title})`;
     }
 
+    const mainAsideFields = [];
+    if (dataReady && !!taxonomy.attributes.has_manager && this.props.users) {
+      mainAsideFields.push(this.renderUserControl(this.props.users));
+    }
+
     return (
       <div>
         <Helmet
@@ -50,6 +81,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             },
           ]}
         />
+        { !dataReady &&
+          <div>
+            <FormattedMessage {...messages.loading} />
+          </div>
+        }
         {dataReady &&
           <Page
             title={pageTitle}
@@ -101,9 +137,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                       },
                     },
                   ],
-                  aside: [
-
-                  ],
+                  aside: [],
                 },
                 body: {
                   main: [
@@ -123,6 +157,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                       model: '.attributes.url',
                     },
                   ],
+                  aside: mainAsideFields,
                 },
               }}
             />
@@ -141,6 +176,7 @@ CategoryNew.propTypes = {
   categoryNew: PropTypes.object,
   taxonomy: PropTypes.object,
   params: PropTypes.object,
+  users: PropTypes.object,
 };
 
 CategoryNew.contextTypes = {
@@ -151,6 +187,8 @@ const mapStateToProps = (state, props) => ({
   categoryNew: categoryNewSelector(state),
   dataReady: isReady(state, { path: [
     'taxonomies',
+    'users',
+    'user_roles',
   ] }),
   taxonomy: getEntity(
     state,
@@ -160,17 +198,36 @@ const mapStateToProps = (state, props) => ({
       out: 'js',
     },
   ),
+  // all users of role manager
+  users: getEntities(
+    state,
+    {
+      path: 'users',
+      connected: {
+        path: 'user_roles',
+        key: 'user_id',
+        where: {
+          role_id: 1, // managers only TODO: from constants
+        },
+      },
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
     },
     handleSubmit: (formData, taxonomyReference) => {
-      const saveData = formData.toJS();
-      saveData.attributes.taxonomy_id = taxonomyReference;
-      dispatch(save(saveData));
+      let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomyReference);
+      // TODO: remove once have singleselect instead of multiselect
+      if (List.isList(saveData.get('associatedUser'))) {
+        saveData = saveData.setIn(['attributes', 'manager_id'], saveData.get('associatedUser').first());
+      }
+      dispatch(save(saveData.toJS()));
     },
     handleCancel: (taxonomyReference) => {
       // not really a dispatch function here, could be a member function instead
