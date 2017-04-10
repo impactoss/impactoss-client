@@ -16,8 +16,10 @@ export function* doFilter() {
   browserHistory.replace(`${location.pathname}?${URLSearchParams.toString()}`);
 }
 
-export function* saveEdits({ path, updates }) {
-  yield put(updateConnections({ path, updates }));
+export function* saveEdits({ data }) {
+  if (!data.attributes) {
+    yield put(updateConnections(data));
+  }
 }
 
 // Individual exports for testing

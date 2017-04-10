@@ -123,14 +123,19 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     const edits = {
       taxonomies: { // edit category
         label: 'Update categories',
+        connectPath: 'recommendation_categories',
+        key: 'category_id',
+        ownKey: 'recommendation_id',
       },
       connections: { // filter by associated entity
         label: 'Update conections',
         options: [
           {
             label: 'Actions',
-            path: 'measures', // filter by recommendation connection
-            // key: 'indicator_id',
+            path: 'measures',
+            connectPath: 'recommendation_measures', // filter by recommendation connection
+            key: 'measure_id',
+            ownKey: 'recommendation_id',
             // search: true,
 
           },

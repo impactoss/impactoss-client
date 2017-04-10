@@ -142,13 +142,13 @@ export function* validateTokenSaga() {
   }
 }
 
-export function* updateConnectionsSaga({ path, updates }) {
+export function* updateConnectionsSaga({ data }) {
   // on the server
-  const connectionsUpdated = yield call(updateAssociationsRequest, path, updates);
+  const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
   // and on the client
   yield connectionsUpdated.map((connection) => connection.type === 'delete'
-    ? put(deleteEntity(path, connection.id))
-    : put(addEntity(path, connection.data))
+    ? put(deleteEntity(data.path, connection.id))
+    : put(addEntity(data.path, connection.data))
   );
   // TODO: error handling
 }
