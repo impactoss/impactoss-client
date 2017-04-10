@@ -44,12 +44,12 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
       entities: {
         path: 'users',
         extensions: [
-          // {
-          //   path: 'user_categories',
-          //   key: 'user_id',
-          //   reverse: true,
-          //   as: 'taxonomies',
-          // },
+          {
+            path: 'user_categories',
+            key: 'user_id',
+            reverse: true,
+            as: 'taxonomies',
+          },
           {
             path: 'user_roles',
             key: 'user_id',
@@ -61,20 +61,32 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
       connections: {
         options: ['roles'],
       },
+      taxonomies: { // filter by each category
+        out: 'js',
+        path: 'taxonomies',
+        where: {
+          tags_users: true,
+        },
+        extend: {
+          path: 'categories',
+          key: 'taxonomy_id',
+          reverse: true,
+        },
+      },
     };
 
     // specify the filter and query  options
     const filters = {
-      // taxonomies: { // filter by each category
-      //   label: 'By category',
-      //   query: 'cat',
-      //   search: true,
-      //   connected: {
-      //     path: 'user_categories',
-      //     key: 'user_id',
-      //     whereKey: 'category_id',
-      //   },
-      // },
+      taxonomies: { // filter by each category
+        label: 'By category',
+        query: 'cat',
+        search: true,
+        connected: {
+          path: 'user_categories',
+          key: 'user_id',
+          whereKey: 'category_id',
+        },
+      },
       connections: { // filter by associated entity
         label: 'By connection',
         options: [
@@ -92,7 +104,12 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
         ],
       },
     };
-    const edits = {};
+    const edits = {
+      taxonomies: { // edit category
+        label: 'Update categories',
+        connectPath: 'user_categories',
+      },
+    };
     const headerOptions = {
       title: this.context.intl.formatMessage(messages.header),
       actions: [],
@@ -141,9 +158,9 @@ const mapStateToProps = (state) => ({
     'users',
     'user_roles',
     'roles',
-    // 'user_categories',
-    // 'categories',
-    // 'taxonomies',
+    'user_categories',
+    'categories',
+    'taxonomies',
   ] }),
 });
 function mapDispatchToProps(dispatch) {
@@ -152,9 +169,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
       dispatch(loadEntitiesIfNeeded('roles'));
-      // dispatch(loadEntitiesIfNeeded('user_categories'));
-      // dispatch(loadEntitiesIfNeeded('categories'));
-      // dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('user_categories'));
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
     },
   };
 }

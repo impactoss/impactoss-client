@@ -252,7 +252,6 @@ const extendEntity = (state, entity, extendArgs) => {
       const key = entity.getIn(['attributes', extend.key]);
       extend.where.id = !!key && key.toString();
     }
-
     let extended;
     if (extend.type === 'single') {
       extend.id = extend.where.id; // getEntityPure selector requires id
