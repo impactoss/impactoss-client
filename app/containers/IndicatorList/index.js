@@ -103,7 +103,9 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
           {
             label: 'Actions',
             path: 'measures', // filter by recommendation connection
+            connectPath: 'measure_indicators',
             key: 'measure_id',
+            ownKey: 'indicator_id',
             // search: true,
           },
         ],
