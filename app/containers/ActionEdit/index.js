@@ -8,93 +8,233 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { Control, Form, actions as formActions } from 'react-redux-form/immutable';
-// import { actions as formActions } from 'react-redux-form';
+import { actions as formActions } from 'react-redux-form/immutable';
+import { browserHistory } from 'react-router';
+
+import { Map, List, fromJS } from 'immutable';
+
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
+import Page from 'components/Page';
+import EntityForm from 'components/forms/EntityForm';
+
 import {
-  makeEntityMapSelector,
-  makeEntitiesReadySelector,
+  getEntity,
+  getEntities,
+  isReady,
 } from 'containers/App/selectors';
 
 import {
   pageSelector,
+  formSelector,
 } from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
 
-const populateForm = (action) =>
-  formActions.load('actionEdit.form.action', action.get('attributes'));
-
-export class ActionEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class ActionEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    const { dispatch } = this.props;
-
-    dispatch(loadEntitiesIfNeeded('actions'));
-
-    if (this.props.action && this.props.actionsReady) {
-      dispatch(populateForm(this.props.action));
+    this.props.loadEntitiesIfNeeded();
+    if (this.props.dataReady) {
+      this.props.populateForm('actionEdit.form.data', this.getInitialFormData());
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const { dispatch } = this.props;
-
-    if (nextProps.action && nextProps.actionsReady && !this.props.actionsReady) {
-      dispatch(populateForm(nextProps.action));
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+    // repopulate if new data becomes ready
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const { taxonomies, recommendations, indicators } = props;
+
+    return Map({
+      id: props.action.id,
+      attributes: fromJS(props.action.attributes),
+      associatedTaxonomies: taxonomies
+      ? taxonomies.reduce((values, tax) =>
+          values.set(
+            tax.get('id'),
+            tax.get('categories').reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List()))
+        , Map())
+      : Map(),
+      associatedRecommendations: recommendations
+        ? recommendations.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
+        : List(),
+      associatedIndicators: indicators
+        ? indicators.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
+        : List(),
+    });
+  }
+
+  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
+  }));
+
+  mapRecommendationOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
+  }));
+
+  mapIndicatorOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
+  }));
+
+  // TODO this should be shared functionality
+  renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({
+    id: tax.get('id'),
+    model: `.associatedTaxonomies.${tax.get('id')}`,
+    label: tax.getIn(['attributes', 'title']),
+    controlType: 'multiselect',
+    options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
+  }), [])
+
+  // TODO this should be shared functionality
+  renderRecommendationControl = (recommendations) => ({
+    id: 'recommendations',
+    model: '.associatedRecommendations',
+    label: 'Recommendations',
+    controlType: 'multiselect',
+    options: this.mapRecommendationOptions(recommendations),
+  });
+
+  // TODO this should be shared functionality
+  renderIndicatorControl = (indicators) => ({
+    id: 'indicators',
+    model: '.associatedIndicators',
+    label: 'Indicators',
+    controlType: 'multiselect',
+    options: this.mapIndicatorOptions(indicators),
+  });
+
 
   render() {
-    const { action, actionsReady } = this.props;
+    const { action, dataReady } = this.props;
+    const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
+    const required = (val) => val && val.length;
+
     return (
       <div>
         <Helmet
-          title="ActionEdit"
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
-            { name: 'description', content: 'Description of ActionEdit' },
+            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <FormattedMessage {...messages.header} />
-        { !action && !actionsReady &&
+        { !action && !dataReady &&
           <div>
             <FormattedMessage {...messages.loading} />
           </div>
         }
-        { !action && actionsReady &&
+        { !action && dataReady && !saveError &&
           <div>
             <FormattedMessage {...messages.notFound} />
           </div>
         }
         {action &&
-          <Form
-            model="actionEdit.form.action"
-            onSubmit={this.props.handleSubmit}
+          <Page
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            actions={[
+              {
+                type: 'simple',
+                title: 'Cancel',
+                onClick: this.props.handleCancel,
+              },
+              {
+                type: 'primary',
+                title: 'Save',
+                onClick: () => this.props.handleSubmit(
+                  this.props.form.data,
+                  this.props.taxonomies,
+                  this.props.recommendations,
+                  this.props.indicators
+                ),
+              },
+            ]}
           >
-            <label htmlFor="title">Title:</label>
-            <Control.text id="title" model=".title" />
-            <label htmlFor="description">Description:</label>
-            <Control.textarea id="description" model=".description" />
-            <label htmlFor="status">Status:</label>
-            <Control.select id="status" model=".draft" value={action && action.draft}>
-              {PUBLISH_STATUSES.map((status) =>
-                <option key={status.value} value={status.value}>{status.label}</option>
+            {saveSending &&
+              <p>Saving</p>
+            }
+            {saveError &&
+              <p>{saveError}</p>
+            }
+            <EntityForm
+              model="actionEdit.form.data"
+              handleSubmit={(formData) => this.props.handleSubmit(
+                formData,
+                this.props.taxonomies,
+                this.props.recommendations,
+                this.props.indicators
               )}
-            </Control.select>
-            <button type="submit">Save</button>
-            </Form>
-          }
-        {saveSending &&
-          <p>Saving</p>
-        }
-        {saveError &&
-          <p>{saveError}</p>
+              handleCancel={this.props.handleCancel}
+              fields={{
+                header: {
+                  main: [
+                    {
+                      id: 'title',
+                      controlType: 'input',
+                      model: '.attributes.title',
+                      validators: {
+                        required,
+                      },
+                      errorMessages: {
+                        required: this.context.intl.formatMessage(messages.fieldRequired),
+                      },
+                    },
+                  ],
+                  aside: [
+                    {
+                      id: 'no',
+                      controlType: 'info',
+                      displayValue: reference,
+                    },
+                    {
+                      id: 'status',
+                      controlType: 'select',
+                      model: '.attributes.draft',
+                      value: action.draft,
+                      options: PUBLISH_STATUSES,
+                    },
+                    {
+                      id: 'updated',
+                      controlType: 'info',
+                      displayValue: action.attributes.updated_at,
+                    },
+                    {
+                      id: 'updated_by',
+                      controlType: 'info',
+                      displayValue: action.user && action.user.attributes.name,
+                    },
+                  ],
+                },
+                body: {
+                  main: [
+                    {
+                      id: 'description',
+                      controlType: 'textarea',
+                      model: '.attributes.description',
+                    },
+                    this.props.recommendations ? this.renderRecommendationControl(this.props.recommendations) : null,
+                    this.props.indicators ? this.renderIndicatorControl(this.props.indicators) : null,
+                  ],
+                  aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
+                },
+              }}
+            />
+          </Page>
         }
       </div>
     );
@@ -102,34 +242,218 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
 }
 
 ActionEdit.propTypes = {
-  dispatch: PropTypes.func,
+  loadEntitiesIfNeeded: PropTypes.func,
+  populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
+  handleCancel: PropTypes.func.isRequired,
   page: PropTypes.object,
+  form: PropTypes.object,
   action: PropTypes.object,
-  actionsReady: PropTypes.bool,
+  dataReady: PropTypes.bool,
+  params: PropTypes.object,
+  taxonomies: PropTypes.object,
+  recommendations: PropTypes.object,
+  indicators: PropTypes.object,
 };
 
-const makeMapStateToProps = () => {
-  const getEntity = makeEntityMapSelector();
-  const entitiesReady = makeEntitiesReadySelector();
-  const mapStateToProps = (state, props) => ({
-    action: getEntity(state, { id: props.params.id, path: 'actions' }),
-    actionsReady: entitiesReady(state, { path: 'actions' }),
-    page: pageSelector(state),
-  });
-  return mapStateToProps;
+ActionEdit.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
 };
+
+const mapStateToProps = (state, props) => ({
+  page: pageSelector(state),
+  form: formSelector(state),
+  dataReady: isReady(state, { path: [
+    'measures',
+    'users',
+    'categories',
+    'taxonomies',
+    'recommendations',
+    'recommendation_measures',
+    'measure_categories',
+    'indicators',
+    'measure_indicators',
+  ] }),
+  action: getEntity(
+    state,
+    {
+      id: props.params.id,
+      path: 'measures',
+      out: 'js',
+      extend: {
+        type: 'single',
+        path: 'users',
+        key: 'last_modified_user_id',
+        as: 'user',
+      },
+    },
+  ),
+  // all categories for all taggable taxonomies, listing connection if any
+  taxonomies: getEntities(
+    state,
+    {
+      path: 'taxonomies',
+      where: {
+        tags_measures: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+        extend: {
+          as: 'associated',
+          path: 'measure_categories',
+          key: 'category_id',
+          reverse: true,
+          where: {
+            measure_id: props.params.id,
+          },
+        },
+      },
+    },
+  ),
+  // all recommendations, listing connection if any
+  recommendations: getEntities(
+    state,
+    {
+      path: 'recommendations',
+      extend: {
+        as: 'associated',
+        path: 'recommendation_measures',
+        key: 'recommendation_id',
+        reverse: true,
+        where: {
+          measure_id: props.params.id,
+        },
+      },
+    },
+  ),
+  indicators: getEntities(
+    state,
+    {
+      path: 'indicators',
+      extend: {
+        as: 'associated',
+        path: 'measure_indicators',
+        key: 'indicator_id',
+        reverse: true,
+        where: {
+          measure_id: props.params.id,
+        },
+      },
+    },
+  ),
+});
 
 function mapDispatchToProps(dispatch, props) {
   return {
-    dispatch,
-    onComponentWillMount: () => {
-      dispatch(loadEntitiesIfNeeded('actions'));
+    loadEntitiesIfNeeded: () => {
+      dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('measure_indicators'));
     },
-    handleSubmit: (formData) => {
-      dispatch(save(formData, props.params.id));
+    populateForm: (model, formData) => {
+      dispatch(formActions.load(model, formData));
+    },
+
+    handleSubmit: (formData, taxonomies, recommendations, indicators) => {
+      let saveData = formData.set('measureCategories', taxonomies.reduce((updates, tax, taxId) => {
+        const formCategoryIds = formData.getIn(['associatedTaxonomies', taxId]); // the list of categories checked in form
+
+        // store associated cats as { [cat.id]: [association.id], ... }
+        // then we can use keys for creating new associations and values for deleting
+        const associatedCategories = tax.get('categories').reduce((catsAssociated, cat) => {
+          if (cat.get('associated')) {
+            return catsAssociated.set(cat.get('id'), cat.get('associated').keySeq().first());
+          }
+          return catsAssociated;
+        }, Map());
+
+        return Map({
+          delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) =>
+            !formCategoryIds.includes(catId)
+              ? associatedIds.push(associatedId)
+              : associatedIds
+          , List())),
+          create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) =>
+            !associatedCategories.has(catId)
+              ? payloads.push(Map({
+                category_id: catId,
+                measure_id: formData.get('id'),
+              }))
+              : payloads
+          , List())),
+        });
+      }, Map({ delete: List(), create: List() })));
+
+      // recommendations
+      const formRecommendationIds = formData.get('associatedRecommendations');
+      // store associated recs as { [rec.id]: [association.id], ... }
+      const associatedRecommendations = recommendations.reduce((recsAssociated, rec) => {
+        if (rec.get('associated')) {
+          return recsAssociated.set(rec.get('id'), rec.get('associated').keySeq().first());
+        }
+        return recsAssociated;
+      }, Map());
+
+      saveData = saveData.set('recommendationMeasures', Map({
+        delete: associatedRecommendations.reduce((associatedIds, associatedId, recId) =>
+          !formRecommendationIds.includes(recId)
+            ? associatedIds.push(associatedId)
+            : associatedIds
+        , List()),
+        create: formRecommendationIds.reduce((payloads, recId) =>
+          !associatedRecommendations.has(recId)
+            ? payloads.push(Map({
+              recommendation_id: recId,
+              measure_id: formData.get('id'),
+            }))
+            : payloads
+        , List()),
+      }));
+
+      // indicators
+      const formIndicatorIds = formData.get('associatedIndicators');
+      // store associated recs as { [rec.id]: [association.id], ... }
+      const associatedIndicators = indicators.reduce((indicatorsAssociated, indicator) => {
+        if (indicator.get('associated')) {
+          return indicatorsAssociated.set(indicator.get('id'), indicator.get('associated').keySeq().first());
+        }
+        return indicatorsAssociated;
+      }, Map());
+
+      saveData = saveData.set('measureIndicators', Map({
+        delete: associatedIndicators.reduce((associatedIds, associatedId, recId) =>
+          !formIndicatorIds.includes(recId)
+            ? associatedIds.push(associatedId)
+            : associatedIds
+        , List()),
+        create: formIndicatorIds.reduce((payloads, id) =>
+          !associatedIndicators.has(id)
+            ? payloads.push(Map({
+              indicator_id: id,
+              measure_id: formData.get('id'),
+            }))
+            : payloads
+        , List()),
+      }));
+
+      dispatch(save(saveData.toJS()));
+    },
+    handleCancel: () => {
+      // not really a dispatch function here, could be a member function instead
+      // however
+      // - this could in the future be moved to a saga or reducer
+      // - also its nice to be next to handleSubmit
+      browserHistory.push(`/actions/${props.params.id}`);
     },
   };
 }
 
-export default connect(makeMapStateToProps, mapDispatchToProps)(ActionEdit);
+export default connect(mapStateToProps, mapDispatchToProps)(ActionEdit);

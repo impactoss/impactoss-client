@@ -8,7 +8,12 @@ import 'whatwg-fetch';
  * @return {object}          The parsed JSON from the request
  */
 function parseJSON(response) {
-  return response.json();
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.indexOf('application/json') !== -1) {
+    return response.json();
+  }
+  console.error("Non JSON response!"); // eslint-disable-line
+  return {};
 }
 
 /**
@@ -19,6 +24,7 @@ function parseJSON(response) {
  * @return {object|undefined} Returns either the response, or throws an error
  */
 function checkStatus(response) {
+  // debugger;
   if (response.status >= 200 && response.status < 300) {
     return response;
   }
@@ -53,7 +59,7 @@ export function checkErrorMessagesExist(response) {
  */
 export default function request(url, options, middleware) {
   return fetch(url, options)
-    .then(checkStatus)
     .then((response) => middleware ? middleware(response) : response)
+    .then(checkStatus)
     .then(parseJSON);
 }

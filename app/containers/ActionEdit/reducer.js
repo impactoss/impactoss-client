@@ -12,14 +12,12 @@ import {
   SAVE_SENDING,
   SAVE_ERROR,
   SAVE_SUCCESS,
-} from './constants';
+} from 'containers/App/constants';
 
 const initialState = fromJS({
-  id: null,
   saveSending: false,
   saveSuccess: false,
   saveError: false,
-  actionNotFound: false,
 });
 
 function actionEditReducer(state = initialState, action) {
@@ -36,6 +34,7 @@ function actionEditReducer(state = initialState, action) {
     case SAVE_ERROR:
       return state
         .set('saveSending', false)
+        .set('saveSuccess', false)
         .set('saveError', action.error);
     default:
       return state;
@@ -43,15 +42,18 @@ function actionEditReducer(state = initialState, action) {
 }
 
 // tim: I don't know how to pull from the global state to set these now, It doesn't seem to be possible
-const actionForm = fromJS({
-  title: '',
-  description: '',
-  draft: '',
+const formData = fromJS({
+  id: '',
+  attributes: {
+    title: '',
+    description: '',
+    draft: '',
+  },
 });
 
 export default combineReducers({
   page: actionEditReducer,
   form: combineForms({
-    action: actionForm,
+    data: formData,
   }, 'actionEdit.form'),
 });

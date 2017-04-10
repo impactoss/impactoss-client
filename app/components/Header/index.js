@@ -1,8 +1,6 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import Icon from 'components/Icon';
-
 import NavBar from './NavBar';
 import HeaderLink from './HeaderLink';
 import messages from './messages';
@@ -11,6 +9,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
 
   static propTypes = {
     isSignedIn: React.PropTypes.bool,
+    userId: React.PropTypes.string,
   }
 
   render() {
@@ -18,13 +17,32 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
       <div>
         <NavBar>
           <HeaderLink to="/">
-            <Icon name="home" />
             <FormattedMessage {...messages.home} />
           </HeaderLink>
+          <HeaderLink to="/categories">
+            <FormattedMessage {...messages.taxonomies} />
+          </HeaderLink>
+          <HeaderLink to="/recommendations">
+            <FormattedMessage {...messages.recommendations} />
+          </HeaderLink>
+          <HeaderLink to="/actions">
+            <FormattedMessage {...messages.actions} />
+          </HeaderLink>
+          <HeaderLink to="/indicators">
+            <FormattedMessage {...messages.indicators} />
+          </HeaderLink>
           {this.props.isSignedIn &&
-            <HeaderLink to="/logout">
-              <FormattedMessage {...messages.logout} />
-            </HeaderLink>
+            <span>
+              <HeaderLink to="/users">
+                <FormattedMessage {...messages.users} />
+              </HeaderLink>
+              <HeaderLink to="/logout">
+                <FormattedMessage {...messages.logout} />
+              </HeaderLink>
+              <HeaderLink to={`/users/${this.props.userId}`}>
+                <FormattedMessage {...messages.user} />
+              </HeaderLink>
+            </span>
           }
           {!this.props.isSignedIn &&
             <span>
@@ -36,12 +54,6 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
               </HeaderLink>
             </span>
           }
-          <HeaderLink to="/actions">
-            <FormattedMessage {...messages.actions} />
-          </HeaderLink>
-          <HeaderLink to="/recommendations/new">
-            <FormattedMessage {...messages.recommendationNew} />
-          </HeaderLink>
         </NavBar>
       </div>
     );

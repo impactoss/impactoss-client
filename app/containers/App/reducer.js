@@ -18,19 +18,19 @@ import {
   AUTHENTICATE_SUCCESS,
   AUTHENTICATE_ERROR,
   SET_AUTHENTICATION_STATE,
-  LOADING_ENTITIES,
   LOAD_ENTITIES_SUCCESS,
   LOAD_ENTITIES_ERROR,
   LOGOUT_SUCCESS,
   ADD_ENTITY,
   UPDATE_ENTITY,
+  DELETE_ENTITY,
   ENTITIES_REQUESTED,
+  INVALIDATE_ENTITIES,
 } from './constants';
 
 // The initial state of the App
 const initialState = fromJS({
   server: {
-    loading: false,
     error: false,
   },
   auth: {
@@ -38,15 +38,53 @@ const initialState = fromJS({
     error: false,
     messages: [],
   },
-  requested: { // Record the time that entities where requested / loaded from the server
-    actions: null,
+  requested: { // Record the time that entities where requested from the server
+    taxonomies: null,
+    categories: null,
+    roles: null,
+    users: null,
+    user_categories: null,
+    user_roles: null,
+    indicators: null,
+    measures: null,
+    measure_categories: null,
+    measure_indicators: null,
     recommendations: null,
-    recommendation_actions: null,
+    recommendation_measures: null,
+    recommendation_categories: null,
+    progress_reports: null,
+  },
+  ready: { // Record the time that entities where returned from the server
+    taxonomies: null,
+    categories: null,
+    roles: null,
+    users: null,
+    user_categories: null,
+    user_roles: null,
+    indicators: null,
+    measures: null,
+    measure_categories: null,
+    measure_indicators: null,
+    recommendations: null,
+    recommendation_measures: null,
+    recommendation_categories: null,
+    progress_reports: null,
   },
   entities: {
-    actions: {},
+    taxonomies: {},
+    categories: {},
+    roles: {},
+    users: {},
+    user_categories: {},
+    user_roles: {},
+    indicators: {},
+    measures: {},
+    measure_categories: {},
+    measure_indicators: {},
     recommendations: {},
-    recommendation_actions: {},
+    recommendation_measures: {},
+    recommendation_categories: {},
+    progress_reports: {},
   },
   user: {
     attributes: null,
@@ -69,7 +107,9 @@ function appReducer(state = initialState, payload) {
       const errors = checkErrorMessagesExist(payload.error.response);
       return state
         .setIn(['auth', 'messages'], errors)
-        .setIn(['auth', 'error'], true);
+        .setIn(['auth', 'error'], true)
+        .setIn(['user', 'attributes'], null)
+        .setIn(['user', 'isSignedIn'], false);
     }
     case AUTHENTICATE_SENDING:
       return state
@@ -79,27 +119,38 @@ function appReducer(state = initialState, payload) {
       return state
           .setIn(['user', 'isSignedIn'], payload.newAuthState);
     case ADD_ENTITY:
+      return state
+        .setIn(['entities', payload.path, payload.entity.id], fromJS(payload.entity));
     case UPDATE_ENTITY:
       return state
-          .setIn(['entities', `${payload.path}s`, payload.entity.id], fromJS(payload.entity));
+          .setIn(['entities', payload.path, payload.entity.id, 'attributes'], fromJS(payload.entity.attributes));
+    case DELETE_ENTITY:
+      return state
+          .deleteIn(['entities', payload.path, payload.id]);
     case ENTITIES_REQUESTED:
       return state
           .setIn(['requested', payload.path], payload.time);
-    case LOADING_ENTITIES:
-      return state
-          .set('loading', true)
-          .set('error', false)
-          .setIn(['entities', payload.path], fromJS({}));
     case LOAD_ENTITIES_SUCCESS:
       return state
         .setIn(['entities', payload.path], fromJS(payload.entities))
-        .setIn(['server', 'loading'], false);
+        .setIn(['ready', payload.path], payload.time);
     case LOAD_ENTITIES_ERROR:
+      // check unauthorised (401)
+      if (payload.error.response.status === 401) {
+        return state
+          .setIn(['server', 'error'], payload.error)
+          .setIn(['entities', payload.path], fromJS([]))
+          .setIn(['ready', payload.path], Date.now());
+      }
       return state
         .setIn(['server', 'error'], payload.error)
-        .setIn(['server', 'loading'], false)
-        .setIn(['requested', payload.path], null);
-
+        .setIn(['ready', payload.path], null);
+    case INVALIDATE_ENTITIES:
+      // reset requested to initial state
+      return state
+        .set('ready', fromJS(initialState.toJS().ready)) // should trigger new entity load
+        .set('requested', fromJS(initialState.toJS().requested)) // should trigger new entity load
+        .set('entities', fromJS(initialState.toJS().entities));
     default:
       return state;
   }

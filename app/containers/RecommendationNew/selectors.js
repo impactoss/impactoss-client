@@ -14,12 +14,12 @@ const selectRecommendationNewDomain = () => (state) => state.get('recommendation
  * Default selector used by RecommendationNew
  */
 
-const makeSelectRecommendationNew = () => createSelector(
+const recommendationNewSelector = createSelector(
   selectRecommendationNewDomain(),
   (substate) => substate.toJS()
 );
 
-export default makeSelectRecommendationNew;
+export default recommendationNewSelector;
 export {
   selectRecommendationNewDomain,
 };

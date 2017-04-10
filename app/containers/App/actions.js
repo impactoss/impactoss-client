@@ -32,7 +32,36 @@ import {
   ENTITIES_READY,
   ADD_ENTITY,
   UPDATE_ENTITY,
+  DELETE_ENTITY,
+  NEW_ENTITY,
+  SAVE_ENTITY,
+  INVALIDATE_ENTITIES,
+  SAVE_SENDING,
+  SAVE_SUCCESS,
+  SAVE_ERROR,
+  UPDATE_CONNECTIONS,
+  UPDATE_ENTITIES,
 } from './constants';
+
+
+export function saveSending() {
+  return {
+    type: SAVE_SENDING,
+  };
+}
+
+export function saveSuccess() {
+  return {
+    type: SAVE_SUCCESS,
+  };
+}
+
+export function saveError(error) {
+  return {
+    type: SAVE_ERROR,
+    error,
+  };
+}
 
 /**
  * Load the entities, this action starts the request saga
@@ -64,11 +93,12 @@ export function loadingEntities(path) {
  *
  * @return {object}      An action object with a type of LOAD_ENTITIES_SUCCESS passing the entities
  */
-export function entitiesLoaded(entities, path) {
+export function entitiesLoaded(entities, path, time) {
   return {
     type: LOAD_ENTITIES_SUCCESS,
     entities,
     path,
+    time,
   };
 }
 
@@ -103,6 +133,43 @@ export function updateEntity(path, entity) {
   };
 }
 
+
+export function deleteEntity(path, id) {
+  return {
+    type: DELETE_ENTITY,
+    path,
+    id,
+  };
+}
+
+export function saveEntity(data) {
+  return {
+    type: SAVE_ENTITY,
+    data,
+  };
+}
+
+export function newEntity(data) {
+  return {
+    type: NEW_ENTITY,
+    data,
+  };
+}
+
+export function updateConnections(data) {
+  return {
+    type: UPDATE_CONNECTIONS,
+    data,
+  };
+}
+
+export function updateEntities(data) {
+  return {
+    type: UPDATE_ENTITIES,
+    data,
+  };
+}
+
 /**
  * Sets the authentication state of the application
  * @param  {boolean} newAuthState True means a user is logged in, false means no user is logged in
@@ -122,10 +189,11 @@ export function entitiesRequested(path, time) {
   };
 }
 
-export function entitiesReady(path) {
+export function entitiesReady(path, time) {
   return {
     type: ENTITIES_READY,
     path,
+    time,
   };
 }
 
@@ -199,5 +267,11 @@ export function logoutSuccess() {
 export function validateToken() {
   return {
     type: VALIDATE_TOKEN,
+  };
+}
+
+export function invalidateEntities() {
+  return {
+    type: INVALIDATE_ENTITIES,
   };
 }
