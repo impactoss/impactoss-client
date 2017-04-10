@@ -76,6 +76,11 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     label: entity.getIn(['attributes', 'friendly_name']),
   }));
 
+  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'title']),
+  }));
+
   renderRoleControl = (roles) => ({
     id: 'roles',
     model: '.associatedRoles',
@@ -83,10 +88,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     controlType: 'multiselect',
     options: this.mapRoleOptions(roles),
   });
-  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
-    label: entity.getIn(['attributes', 'title']),
-  }));
 
   // TODO this should be shared functionality
   renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({

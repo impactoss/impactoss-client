@@ -17,6 +17,7 @@ import EntityView from 'components/views/EntityView';
 
 import {
   getUser,
+  getEntities,
   isReady,
 } from 'containers/App/selectors';
 
@@ -58,10 +59,25 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     // TODO should be "go back" if history present or to categories list when not
   }
 
+  mapCategoryOptions = (categories) => categories
+    ? Object.values(categories).map((cat) => ({
+      label: cat.attributes.title,
+      linkTo: `/category/${cat.id}`,
+    }))
+    : []
+
+  renderTaxonomyLists = (taxonomies) =>
+    Object.values(taxonomies).map((taxonomy) => ({
+      id: taxonomy.id,
+      heading: taxonomy.attributes.title,
+      type: 'list',
+      values: this.mapCategoryOptions(taxonomy.categories),
+    }))
+
   render() {
     const { user, dataReady } = this.props;
     const reference = user && user.id;
-
+    // dataReady && console.log(this.props.taxonomies)
     return (
       <div>
         <Helmet
@@ -113,6 +129,11 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                   ],
                   aside: [
                     {
+                      id: 'role',
+                      heading: 'Role',
+                      value: user.roles ? this.getUserRole(user.roles) : 'User',
+                    },
+                    {
                       id: 'number',
                       heading: 'Number',
                       value: reference,
@@ -137,13 +158,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                       value: user.attributes.email,
                     },
                   ],
-                  aside: [
-                    {
-                      id: 'role',
-                      heading: 'Role',
-                      value: user.roles ? this.getUserRole(user.roles) : 'User',
-                    },
-                  ],
+                  aside: this.renderTaxonomyLists(this.props.taxonomies),
                 },
               }}
             />
@@ -157,6 +172,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 UserView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   user: PropTypes.object,
+  taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
 };
 
@@ -169,9 +185,9 @@ const mapStateToProps = (state, props) => ({
     'users',
     'user_roles',
     'roles',
-    // 'categories',
-    // 'taxonomies',
-    // 'indicators',
+    'categories',
+    'taxonomies',
+    'user_categories',
   ] }),
   user: getUser(
     state,
@@ -200,16 +216,40 @@ const mapStateToProps = (state, props) => ({
       ],
     },
   ),
+  // all connected categories for all user-taggable taxonomies
+  taxonomies: getEntities(
+    state,
+    {
+      path: 'taxonomies',
+      where: {
+        tags_users: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+        connected: {
+          path: 'user_categories',
+          key: 'category_id',
+          where: {
+            user_id: props.params.id,
+          },
+        },
+      },
+      out: 'js',
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      // dispatch(loadEntitiesIfNeeded('taxonomies'));
-      // dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
       dispatch(loadEntitiesIfNeeded('roles'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('user_categories'));
     },
   };
 }
