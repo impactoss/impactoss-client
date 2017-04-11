@@ -20,10 +20,10 @@ export default defineMessages({
   },
   notFound: {
     id: 'app.containers.Taxonomies.notFound',
-    defaultMessage: 'Sorry no taxonomies found',
+    defaultMessage: 'Sorry no categories found',
   },
   loading: {
     id: 'app.containers.Taxonomies.loading',
-    defaultMessage: 'Loading taxonomies...',
+    defaultMessage: 'Loading data...',
   },
 });
