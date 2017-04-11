@@ -17,6 +17,7 @@ import { Link } from 'react-router';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
+import Button from 'components/basic/Button';
 import Page from 'components/Page';
 import TaxonomyList from 'components/TaxonomyList';
 
@@ -96,9 +97,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               <FormattedMessage {...messages.actionsExploreContent} />
             </p>
             <Link to={'/actions'}>
-              <h3>
+              <Button>
                 <FormattedMessage {...messages.actionsExploreLink} />
-              </h3>
+              </Button>
             </Link>
           </div>
           <hr />
@@ -110,14 +111,14 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               <FormattedMessage {...messages.moreExploreContent} />
             </p>
             <Link to={'/recommendations'}>
-              <h3>
+              <Button>
                 <FormattedMessage {...messages.recommendationsExploreLink} />
-              </h3>
+              </Button>
             </Link>
             <Link to={'/indicators'}>
-              <h3>
+              <Button>
                 <FormattedMessage {...messages.indicatorsExploreLink} />
-              </h3>
+              </Button>
             </Link>
           </div>
         </Page>
