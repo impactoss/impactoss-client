@@ -41,20 +41,43 @@ export default class MultiSelect extends React.Component {
   }
 
   onChange = (checked, theValue) => {
-    const currentValues = this.props.options.reduce((values, option) => {
-      const value = this.props.values.find((v) => this.props.valueCompare(option.get('value'), v));
-      return values.push(value || option.get('value'));
-    }, Immutable.List());
+    // const nextValues = currentValues.map((value) => {
+    //   if (this.props.valueCompare(value, theValue)) {
+    //     return value.set('checked', checked).set('hasChanged', this.getInitialValue(value) !== theValue);
+    //   }
+    //   return value;
+    // });
+    // console.log('theValue', theValue.toJS());
+    // console.log('currentValues', this.props.values.toJS())
+    // console.log('changedVlaues,', this.props.values.push(theValue
+    //   .set('checked', checked)
+    //   .set('hasChanged', theValue.get('checked') !== checked)).toJS())
 
-    const nextValues = currentValues.map((value) => {
-      if (this.props.valueCompare(value, theValue)) {
-        return value.set('checked', checked).set('hasChanged', this.getInitialValue(value) !== theValue);
-      }
-      return value;
-    });
+    // debugger;
+    const originalValue = this.getOptionValue(theValue);
+    const originalChecked = originalValue.has('checked') ? originalValue.get('checked') : false;
+    // console.log(checked,'!==',originalChecked)
+    const newValue = theValue
+      .set('checked', checked)
+      .set('hasChanged', checked !== originalChecked);
+    // const existingValue = this.props.values.find((v) => this.valueCompare(v, theValue))
+    const existingValueIndex = this.props.values.findIndex((v) => this.props.valueCompare(v, theValue));
+    // console.log('existingValueIndex', existingValueIndex);
+    const nextValues = existingValueIndex >= 0 ? this.props.values.set(existingValueIndex, newValue) : this.props.values.push(newValue);
 
     this.props.onChange(nextValues);
   }
+
+  getOptionValue = (value) => {
+    const option = this.props.options.find((o) => this.props.valueCompare(o.get('value'), value));
+    return option ? option.get('value') : null;
+  }
+
+  // getCurrentValues = () =>
+  //   this.props.options.reduce((values, option) => {
+  //     const value = this.props.values.find((v) => this.props.valueCompare(option.get('value'), v));
+  //     return value ? values.push(value) : values;
+  //   }, Immutable.List());
 
   getInitialValue = (value) => value ? this.props.initialValues.find((v) => this.props.valueCompare(value, v)) : null;
 
