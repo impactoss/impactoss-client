@@ -7,7 +7,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
 
 import EntityList from 'containers/EntityList';
@@ -123,14 +122,19 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     const edits = {
       taxonomies: { // edit category
         label: 'Update categories',
+        connectPath: 'recommendation_categories',
+        key: 'category_id',
+        ownKey: 'recommendation_id',
       },
       connections: { // filter by associated entity
         label: 'Update conections',
         options: [
           {
             label: 'Actions',
-            path: 'measures', // filter by recommendation connection
-            // key: 'indicator_id',
+            path: 'measures',
+            connectPath: 'recommendation_measures', // filter by recommendation connection
+            key: 'measure_id',
+            ownKey: 'recommendation_id',
             // search: true,
 
           },
@@ -164,21 +168,15 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { dataReady &&
-          <EntityList
-            location={this.props.location}
-            mapToEntityList={this.mapToEntityList}
-            selects={selects}
-            filters={filters}
-            edits={edits}
-            header={headerOptions}
-          />
-        }
+        <EntityList
+          location={this.props.location}
+          mapToEntityList={this.mapToEntityList}
+          selects={selects}
+          filters={filters}
+          edits={edits}
+          header={headerOptions}
+          dataReady={dataReady}
+        />
       </div>
     );
   }

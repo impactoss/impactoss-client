@@ -20,7 +20,7 @@ const initialState = fromJS({
   activeFilterOption: null,
   // {
   //   group: 'taxonomies',
-  //   optionId: 'taxonomies-6',
+  //   optionId: '6',
   // },
   activeEditOption: null,
   activePanel: FILTERS_PANEL,

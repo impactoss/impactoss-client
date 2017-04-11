@@ -54,6 +54,9 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
                   this.props.onShowEditForm({
                     group: group.get('id'),
                     optionId: option.get('id'),
+                    path: option.get('path'),
+                    key: option.get('key'),
+                    ownKey: option.get('ownKey'),
                   });
                 }}
               >

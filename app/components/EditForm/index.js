@@ -19,17 +19,17 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
   }
 
   static defaultProps = {
-    submitLabel: 'Assign',
+    submitLabel: 'Update',
   }
 
   componentWillMount() {
     this.props.populateForm(this.props.model, this.props.options);
   }
-  //
-  componentDidUpdate(prevProps) {
+
+  componentWillReceiveProps(nextProps) {
      // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
-    if (!isEqual(prevProps.options.toJS(), this.props.options.toJS())) {
-      this.props.populateForm(this.props.model, this.props.options);
+    if (!isEqual(nextProps.options.toJS(), this.props.options.toJS())) {
+      this.props.populateForm(nextProps.model, nextProps.options);
     }
   }
 
@@ -60,7 +60,9 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
 
 const mapDispatchToProps = (dispatch) => ({
   populateForm: (model, options) => {
-    dispatch(formActions.load(model, Immutable.Map({ values: options.map((option) => option.get('value')) })));
+    dispatch(formActions.load(model, Immutable.Map({
+      values: options.map((option) => option.get('value')),
+    })));
   },
 });
 
