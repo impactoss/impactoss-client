@@ -46,10 +46,9 @@ export function showPanel(activePanel) {
   };
 }
 
-export function saveEdits(associations, selectedEntities) {
+export function saveEdits(data) {
   return {
     type: SAVE_EDITS,
-    associations,
-    selectedEntities,
+    data,
   };
 }
