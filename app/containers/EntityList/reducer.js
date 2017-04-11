@@ -20,7 +20,7 @@ const initialState = fromJS({
   activeFilterOption: null,
   // {
   //   group: 'taxonomies',
-  //   optionId: 'taxonomies-6',
+  //   optionId: '6',
   // },
   activeEditOption: null,
   activePanel: FILTERS_PANEL,
@@ -32,6 +32,10 @@ const filterFormData = fromJS({
 
 const editFormData = fromJS({
   values: [],
+});
+
+const listingsFormData = fromJS({
+  entities: {},
 });
 
 function entityListReducer(state = initialState, action) {
@@ -59,6 +63,9 @@ export default combineReducers({
   editForm: combineForms({
     data: editFormData,
   }, 'entityList.editForm'),
+  listingsForm: combineForms({
+    data: listingsFormData,
+  }, 'entityList.listingsForm'),
 });
 
 // export default entityListFilterReducer;

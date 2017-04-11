@@ -144,13 +144,13 @@ export function* validateTokenSaga() {
   }
 }
 
-export function* updateConnectionsSaga({ path, updates }) {
+export function* updateConnectionsSaga({ data }) {
   // on the server
-  const connectionsUpdated = yield call(updateAssociationsRequest, path, updates);
+  const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
   // and on the client
   yield connectionsUpdated.map((connection) => connection.type === 'delete'
-    ? put(deleteEntity(path, connection.id))
-    : put(addEntity(path, connection.data))
+    ? put(deleteEntity(data.path, connection.id))
+    : put(addEntity(data.path, connection.data))
   );
   // TODO: error handling
 }
@@ -299,8 +299,8 @@ export function* updateEntitiesSaga({ data }) {
     yield put(saveSending());
     // on the server
     const entitiesUpdated = yield call(updateEntitiesRequest, data.path, data.entities);
-    // and on the client
-    yield entitiesUpdated.map((entity) => put(updateEntity(data.path, entity)));
+    // // and on the client
+    yield entitiesUpdated.map((entity) => put(updateEntity(data.path, entity.data)));
     yield put(saveSuccess());
   } catch (error) {
     yield put(saveError('An error occurred saving all or parts of your changes. Please review carefully and try again. '));

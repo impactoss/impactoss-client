@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
+import { Control, Fieldset } from 'react-redux-form/immutable';
 
 import ListItem from './ListItem';
 
@@ -12,6 +13,7 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
     status: PropTypes.string,
     children: PropTypes.object,
     side: PropTypes.object,
+    model: PropTypes.string,
   }
 
   static defaultProps = {
@@ -19,7 +21,7 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
     side: null,
   }
 
-  render() {
+  renderListItem = () => {
     const title = this.props.linkTo
       ? <strong><Link to={this.props.linkTo}>{this.props.title}</Link></strong>
       : <strong>{this.props.title}</strong>;
@@ -28,7 +30,9 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
       <ListItem>
         <table><tbody><tr>
           <td>
-            <input type="checkbox" />
+            {this.props.model &&
+              <Control.checkbox model=".selected" />
+            }
           </td>
           <td>
             <div>
@@ -57,6 +61,21 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
           </td>
         </tr></tbody></table>
       </ListItem>
+    );
+  }
+
+  render() {
+    return (
+      <div>
+        {this.props.model &&
+          <Fieldset model={this.props.model} >
+            {this.renderListItem()}
+          </Fieldset>
+        }
+        {!this.props.model &&
+            this.renderListItem()
+        }
+      </div>
     );
   }
 }

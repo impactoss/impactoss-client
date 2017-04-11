@@ -13,6 +13,8 @@ import { browserHistory } from 'react-router';
 
 import { Map, List, fromJS } from 'immutable';
 
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
@@ -64,22 +66,28 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       ? taxonomies.reduce((values, tax) =>
           values.set(
             tax.get('id'),
-            tax.get('categories').reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List()))
+            tax.get('categories').reduce((options, entity) => options.push(Map({
+              checked: !!entity.get('associated'),
+              value: entity.get('id'),
+            })), List()))
         , Map())
       : Map(),
       associatedActions: actions
-        ? actions.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
-        : List(),
+      ? actions.reduce((options, entity) => options.push(Map({
+        checked: !!entity.get('associated'),
+        value: entity.get('id'),
+      })), List())
+      : List(),
     });
   }
 
   mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
   mapActionOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
@@ -315,7 +323,7 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleSubmit: (formData, taxonomies, actions) => {
       let saveData = formData.set('recommendationCategories', taxonomies.reduce((updates, tax, taxId) => {
-        const formCategoryIds = formData.getIn(['associatedTaxonomies', taxId]); // the list of categories checked in form
+        const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
 
         // store associated cats as { [cat.id]: [association.id], ... }
         // then we can use keys for creating new associations and values for deleting
@@ -344,7 +352,7 @@ function mapDispatchToProps(dispatch, props) {
       }, Map({ delete: List(), create: List() })));
 
       // actions
-      const formActionIds = formData.get('associatedActions');
+      const formActionIds = getCheckedValuesFromOptions(formData.get('associatedActions'));
       // store associated Actions as { [action.id]: [association.id], ... }
       const associatedActions = actions.reduce((actionsAssociated, action) => {
         if (action.get('associated')) {

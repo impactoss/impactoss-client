@@ -7,11 +7,13 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
+import { Form } from 'react-redux-form/immutable';
 
 // import { updateQueryStringParams } from 'utils/history';
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
+import { pick } from 'lodash/object';
 import { getEntitySortIteratee } from 'utils/sort';
-import { fromJS } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import Grid from 'grid-styled';
 
@@ -30,6 +32,7 @@ import { getEntities } from 'containers/App/selectors';
 import {
   FILTER_FORM_MODEL,
   EDIT_FORM_MODEL,
+  LISTINGS_FORM_MODEL,
   FILTERS_PANEL,
   EDIT_PANEL,
 } from './constants';
@@ -38,6 +41,7 @@ import {
   activeFilterOptionSelector,
   activeEditOptionSelector,
   activePanelSelector,
+  entitiesSelectedSelector,
 } from './selectors';
 
 import {
@@ -55,6 +59,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     super(props);
     this.URLParams = new URLSearchParams(browserHistory.getCurrentLocation().search);
   }
+
+  getEntitiesSelected = () => Object.values(pick(this.props.entities, this.props.entityIdsSelected));
 
   getConnectedCategoryIds = (entity, connection, taxonomies) => {
     const connectionIds = map(map(Object.values(entity[connection.path]), 'attributes'), connection.key);
@@ -101,13 +107,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           if (taxonomy) {
             taxonomyIds.push(taxonomy.id); // tracking to identify missing taxonomies
             // if taxonomy active add filter option
-            if (activeFilterOption.optionId === `taxonomies-${taxonomy.id}`) {
+            if (activeFilterOption.optionId === taxonomy.id.toString()) {
               filterOptions.title = filterOptions.title || taxonomy.attributes.title;
               // if category already added
               if (filterOptions.options[catId]) {
                 filterOptions.options[catId].count += 1;
               } else {
-                filterOptions.options[catId] = this.initOption({
+                filterOptions.options[catId] = this.initURLOption({
                   label: taxonomy.categories[catId].attributes.title || taxonomy.categories[catId].attributes.name,
                   value: catId,
                   count: 1,
@@ -120,11 +126,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       }
       // add without option for those taxonomies not associated with entity
       forEach(taxonomies, (taxonomy) => {
-        if (activeFilterOption.optionId === `taxonomies-${taxonomy.id}` && taxonomyIds.indexOf(taxonomy.id) === -1) {
+        if (activeFilterOption.optionId === taxonomy.id && taxonomyIds.indexOf(taxonomy.id) === -1) {
           if (filterOptions.options.without) {
             filterOptions.options.without.count += 1;
           } else {
-            filterOptions.options.without = this.initOption({
+            filterOptions.options.without = this.initURLOption({
               label: `Without ${taxonomy.attributes.title}`,
               value: taxonomy.id,
               count: 1,
@@ -160,13 +166,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             const taxonomy = find(Object.values(connectedTaxonomies.taxonomies), (tax) =>
               tax.categories && Object.keys(tax.categories).indexOf(catId.toString()) > -1
             );
-            if (taxonomy && activeFilterOption.optionId === `connectedTaxonomies-${taxonomy.id}`) {
+            if (taxonomy && activeFilterOption.optionId === taxonomy.id) {
               filterOptions.title = filterOptions.title || taxonomy.attributes.title;
               // if category already added
               if (filterOptions.options[catId]) {
                 filterOptions.options[catId].count += 1;
               } else {
-                filterOptions.options[catId] = this.initOption({
+                filterOptions.options[catId] = this.initURLOption({
                   label: taxonomy.categories[catId].attributes.title,
                   value: `${connection.path}:${catId}`,
                   count: 1,
@@ -192,7 +198,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     forEach(Object.values(entities), (entity) => {
       forEach(filters.connections.options, (option) => {
         // if option active
-        if (activeFilterOption.optionId === `connections-${option.path}`) {
+        if (activeFilterOption.optionId === option.path) {
           filterOptions.title = filterOptions.title || option.label;
           filterOptions.search = filterOptions.search || option.search;
           // if entity has connected entities
@@ -209,7 +215,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 if (filterOptions.options[connectedId]) {
                   filterOptions.options[connectedId].count += 1;
                 } else {
-                  filterOptions.options[connectedId] = this.initOption({
+                  filterOptions.options[connectedId] = this.initURLOption({
                     label: connection.attributes.title || connection.attributes.name,
                     value: connectedId,
                     search: option.searchAttributes && option.searchAttributes.map((attribute) => connection.attributes[attribute]).join(),
@@ -224,7 +230,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             // add without option
             filterOptions.options.without.count += 1;
           } else {
-            filterOptions.options.without = this.initOption({
+            filterOptions.options.without = this.initURLOption({
               label: `Without ${option.label}`,
               value: option.query,
               count: 1,
@@ -244,21 +250,21 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       groupId: 'attributes',
       options: {},
     };
-
     forEach(Object.values(entities), (entity) => {
       forEach(filters.attributes.options, (option) => {
-        if (activeFilterOption.optionId === `attributes-${option.attribute}`) {
+        // the attribute option
+        if (activeFilterOption.optionId === option.attribute) {
           filterOptions.title = filterOptions.title || option.label;
           filterOptions.search = filterOptions.search || option.search;
 
-          if (typeof entity.attributes[option.attribute] !== 'undefined' && !!entity.attributes[option.attribute]) {
+          if (typeof entity.attributes[option.attribute] !== 'undefined' && entity.attributes[option.attribute] !== null) {
             // add connected entities if not present otherwise increase count
             const value = entity.attributes[option.attribute].toString();
             if (filterOptions.options[value]) {
               filterOptions.options[value].count += 1;
             } else if (option.options) {
               const attribute = find(option.options, (o) => o.value.toString() === value);
-              filterOptions.options[value] = this.initOption({
+              filterOptions.options[value] = this.initURLOption({
                 label: attribute ? attribute.label : value,
                 value: `${option.attribute}:${value}`,
                 count: 1,
@@ -266,20 +272,20 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               });
             } else if (option.extension && !!entity[option.extension.key]) {
               const extension = Object.values(entity[option.extension.key])[0];
-              filterOptions.options[value] = this.initOption({
+              filterOptions.options[value] = this.initURLOption({
                 label: extension ? extension.attributes[option.extension.label] : value,
                 value: `${option.attribute}:${value}`,
                 count: 1,
                 query: 'where',
               });
             }
-          } else if (option.extension.without) {
+          } else if (option.extension && option.extension.without) {
             if (filterOptions.options.without) {
               // no connection present
               // add without option
               filterOptions.options.without.count += 1;
             } else {
-              filterOptions.options.without = this.initOption({
+              filterOptions.options.without = this.initURLOption({
                 label: `Without ${option.label}`,
                 value: `${option.attribute}:null`,
                 count: 1,
@@ -333,9 +339,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
           ...taxOptions,
           [taxonomy.id]: {
-            id: `taxonomies-${taxonomy.id}`, // filterOptionId
+            id: taxonomy.id, // filterOptionId
             label: taxonomy.attributes.title,
-            active: !!activeFilterOption && activeFilterOption.optionId === `taxonomies-${taxonomy.id}`,
+            active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.id,
           },
         }), {}),
       };
@@ -351,9 +357,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         options: reduce(Object.values(connectedTaxonomies.taxonomies), (taxOptions, taxonomy) => ({
           ...taxOptions,
           [taxonomy.id]: {
-            id: `connectedTaxonomies-${taxonomy.id}`, // filterOptionId
+            id: taxonomy.id, // filterOptionId
             label: taxonomy.attributes.title,
-            active: !!activeFilterOption && activeFilterOption.optionId === `connectedTaxonomies-${taxonomy.id}`,
+            active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.id,
           },
         }), {}),
       };
@@ -369,9 +375,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         options: reduce(filters.connections.options, (options, option) => ({
           ...options,
           [option.path]: {
-            id: `connections-${option.path}`, // filterOptionId
+            id: option.path, // filterOptionId
             label: option.label,
-            active: !!activeFilterOption && activeFilterOption.optionId === `connections-${option.path}`,
+            active: !!activeFilterOption && activeFilterOption.optionId === option.path,
           },
         }), {}),
       };
@@ -387,9 +393,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         options: reduce(filters.attributes.options, (options, option) => ({
           ...options,
           [option.attribute]: {
-            id: `attributes-${option.attribute}`, // filterOptionId
+            id: option.attribute, // filterOptionId
             label: option.label,
-            active: !!activeFilterOption && activeFilterOption.optionId === `attributes-${option.attribute}`,
+            active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
           },
         }), {}),
       };
@@ -418,9 +424,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
           ...taxOptions,
           [taxonomy.id]: {
-            id: `taxonomies-${taxonomy.id}`, // filterOptionId
+            id: taxonomy.id, // filterOptionId
             label: taxonomy.attributes.title,
-            active: !!activeEditOption && activeEditOption.optionId === `taxonomies-${taxonomy.id}`,
+            path: edits.taxonomies.connectPath,
+            key: edits.taxonomies.key,
+            ownKey: edits.taxonomies.ownKey,
+            active: !!activeEditOption && activeEditOption.optionId === taxonomy.id,
           },
         }), {}),
       };
@@ -436,9 +445,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         options: reduce(edits.connections.options, (options, option) => ({
           ...options,
           [option.path]: {
-            id: `connections-${option.path}`, // filterOptionId
+            id: option.path, // filterOptionId
             label: option.label,
-            active: !!activeEditOption && activeEditOption.optionId === `connections-${option.path}`,
+            path: option.connectPath,
+            key: option.key,
+            ownKey: option.ownKey,
+            active: !!activeEditOption && activeEditOption.optionId === option.path,
           },
         }), {}),
       };
@@ -454,9 +466,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         options: reduce(edits.attributes.options, (options, option) => ({
           ...options,
           [option.attribute]: {
-            id: `attributes-${option.attribute}`, // filterOptionId
+            id: option.attribute, // filterOptionId
             label: option.label,
-            active: !!activeEditOption && activeEditOption.optionId === `attributes-${option.attribute}`,
+            active: !!activeEditOption && activeEditOption.optionId === option.attribute,
           },
         }), {}),
       };
@@ -466,18 +478,17 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   }
 
   taxonomyEditOptions = (entitiesSelected) => {
-    const { edits, taxonomies, activeEditOption } = this.props;
+    const { taxonomies, activeEditOption } = this.props;
 
     const editOptions = {
       groupId: 'taxonomies',
       search: true,
       options: {},
       selectedCount: entitiesSelected.length,
-      path: edits.taxonomies.connectPath,
     };
     forEach(taxonomies, (taxonomy) => {
       // if taxonomy active add filter option
-      if (activeEditOption.optionId === `taxonomies-${taxonomy.id}`) {
+      if (activeEditOption.optionId === taxonomy.id) {
         editOptions.title = taxonomy.attributes.title;
         forEach(taxonomy.categories, (category) => {
           const count = reduce(entitiesSelected, (counter, entity) => {
@@ -510,7 +521,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     };
     // forEach(connections, (connection) => {
     forEach(edits.connections.options, (option) => {
-      if (activeEditOption.optionId === `connections-${option.path}`) {
+      if (activeEditOption.optionId === option.path) {
         editOptions.title = option.label;
         editOptions.path = option.connectPath;
         forEach(connections[option.path], (connection) => {
@@ -544,7 +555,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     };
     // forEach(connections, (connection) => {
     forEach(edits.attributes.options, (option) => {
-      if (activeEditOption.optionId === `attributes-${option.attribute}`) {
+      if (activeEditOption.optionId === option.attribute) {
         editOptions.title = option.label;
         forEach(option.options, (attributeOption) => {
           const count = reduce(entitiesSelected, (counter, entity) =>
@@ -584,9 +595,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  initOption = (option) => ({
+  initURLOption = (option) => ({
     ...option,
-    isSet: this.URLParams.has(option.query) && this.URLParams.getAll(option.query).indexOf(option.value.toString()) >= 0,
+    checked: this.URLParams.has(option.query) && this.URLParams.getAll(option.query).indexOf(option.value.toString()) >= 0,
   })
 
   render() {
@@ -607,7 +618,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     // const entitiesSelected = [];
     // TODO filter for entities selected in list
-    const entitiesSelected = entities; // uncomment this for testing and temporarily assume all are selected
+    const entitiesSelected = this.getEntitiesSelected(); // uncomment this for testing and temporarily assume all are selected
+    // console.log(entitiesSelected);
 
     // map entities to entity list item data
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
@@ -651,6 +663,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   formModel={EDIT_FORM_MODEL}
                   onShowEditForm={this.props.onShowEditForm}
                   onHideEditForm={this.props.onHideEditForm}
+                  onAssign={(associations) => this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
                 />
               }
             </EntityListSidebar>
@@ -663,9 +676,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               </div>
             }
             { dataReady &&
-              entitiesList.map((entity, i) =>
-                <EntityListItem key={i} {...entity} />
-              )
+              <Form model={LISTINGS_FORM_MODEL}>
+                {entitiesList.map((entity, i) =>
+                  <EntityListItem key={i} model={`.entities.${entity.id}`} {...entity} />
+                )}
+              </Form>
             }
           </Grid>
         </Row>
@@ -697,7 +712,8 @@ EntityList.propTypes = {
   onHideEditForm: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,
   activePanel: PropTypes.string,
-  // handleEditSubmit: PropTypes.func.isRequired,
+  entityIdsSelected: PropTypes.array,
+  handleEditSubmit: PropTypes.func.isRequired,
 };
 
 EntityList.defaultProps = {
@@ -790,6 +806,7 @@ const mapStateToProps = (state, props) => ({
   activeFilterOption: activeFilterOptionSelector(state),
   activeEditOption: activeEditOptionSelector(state),
   activePanel: activePanelSelector(state),
+  entityIdsSelected: entitiesSelectedSelector(state),
   entities: getEntities(state, {
     out: 'js',
     path: props.selects.entities.path,
@@ -818,7 +835,7 @@ const mapStateToProps = (state, props) => ({
   : null,
 });
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, props) {
   return {
     onShowFilterForm: (option) => {
       dispatch(showFilterForm(option));
@@ -837,14 +854,98 @@ function mapDispatchToProps(dispatch) {
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));
     },
-    handleEditSubmit: (editFormData) => {
-    // handleEditSubmit: (editFormData, selectedEntities) => {
-      const saveData = {
-        path: 'path_of_associative_table', // TODO figure out from edits, eg props.edits[activeGroup].connectPath
-        updates: editFormData, // TODO figure out the create id pairs and delete association id
-        // create: [{entity_id:X, other_entity_id:Y}, ...] // for all connections added, figure out entity id from affected selectedEntity and other id from form option value
-        // delete: [{id:Z}, ...] // for all connections deleted, figure out the association id from affected selectedEntity
-      };
+    handleEditSubmit: (formData, selectedEntities, activeEditOption) => {
+      const entities = fromJS(selectedEntities);
+      let saveData = Map();
+      const changes = formData.get('values').filter((option) => option.get('hasChanged'));
+      const creates = changes
+        .filter((option) => option.get('checked') === true)
+        .map((option) => option.get('value'));
+      const deletes = changes
+        .filter((option) => option.get('checked') === false)
+        .map((option) => option.get('value'));
+
+      if (activeEditOption.group === 'attributes') {
+        if (creates.size > 0) {
+          const newValue = creates.first(); // take the first TODO multiselect should be run in single value mode and only return 1 value
+          saveData = saveData
+            .set('attributes', true)
+            .set('path', props.selects.entities.path)
+            .set('entities', entities.reduce((updatedEntities, entity) =>
+              entity.getIn(['attributes', activeEditOption.optionId]) !== newValue
+                ? updatedEntities.push(entity.setIn(['attributes', activeEditOption.optionId], newValue))
+                : updatedEntities
+            , List()));
+        }
+      } else {
+        // associations
+        saveData = saveData
+          .set('attributes', false)
+          .set('path', activeEditOption.path)
+          .set('updates', Map({
+            create: List(),
+            delete: List(),
+          }));
+
+        if (creates.size > 0) {
+          saveData = saveData.setIn(['updates', 'create'], entities.reduce((createList, entity) => {
+            let changeSet = List();
+            let existingAssignments;
+            switch (activeEditOption.group) {
+              case ('taxonomies'):
+                existingAssignments = entity.get(activeEditOption.group);
+                break;
+              case ('connections'):
+                existingAssignments = entity.get(activeEditOption.optionId);
+                break;
+              default:
+                existingAssignments = List();
+                break;
+            }
+
+            if (!!existingAssignments && existingAssignments.size > 0) {
+              const existingAssignmentIds = existingAssignments.map((assigned) =>
+                assigned.getIn(['attributes', activeEditOption.key]).toString()
+              ).toList();
+              // exclude existing relations from the changeSet
+              changeSet = creates.filterNot((id) => existingAssignmentIds.includes(id.toString()));
+            } else {
+              changeSet = creates; // add for all creates
+            }
+
+            return createList.concat(changeSet.map((change) => ({
+              [activeEditOption.ownKey]: entity.get('id'),
+              [activeEditOption.key]: change,
+            })));
+          }, List()));
+        }
+        if (deletes.size > 0) {
+          saveData = saveData.setIn(['updates', 'delete'], entities.reduce((deleteList, entity) => {
+            let changeSet = List();
+            let existingAssignments;
+            switch (activeEditOption.group) {
+              case ('taxonomies'):
+                existingAssignments = entity.get(activeEditOption.group);
+                break;
+              case ('connections'):
+                existingAssignments = entity.get(activeEditOption.optionId);
+                break;
+              default:
+                existingAssignments = List();
+                break;
+            }
+
+            if (!!existingAssignments && existingAssignments.size > 0) {
+              changeSet = existingAssignments
+                .filter((assigned) =>
+                  deletes.includes(assigned.getIn(['attributes', activeEditOption.key]).toString()))
+                .map((assigned) => assigned.get('id'));
+            }
+
+            return deleteList.concat(changeSet);
+          }, List()));
+        }
+      }
 
       dispatch(saveEdits(saveData.toJS()));
     },

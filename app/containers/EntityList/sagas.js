@@ -1,7 +1,7 @@
 import { takeLatest, select, put } from 'redux-saga/effects';
 import { browserHistory } from 'react-router';
 // import { credentialsSelector } from './selectors';
-import { updateConnections } from 'containers/App/actions';
+import { updateConnections, updateEntities } from 'containers/App/actions';
 
 import { filtersCheckedSelector } from './selectors';
 
@@ -16,8 +16,20 @@ export function* doFilter() {
   browserHistory.replace(`${location.pathname}?${URLSearchParams.toString()}`);
 }
 
-export function* saveEdits({ path, updates }) {
-  yield put(updateConnections({ path, updates }));
+export function* saveEdits({ data }) {
+  if (data.attributes) {
+    // data = { attributes: true, path: path, entities: [
+    //  { id: id, attributes: {...} },
+    //  { id: id, attributes: {...} }, ...
+    // ]}
+    yield put(updateEntities(data));
+  } else {
+    // data = { attributes: true, path: path, updates: {
+    //   creates: [{entity_id, assignedId}, ...],
+    //   deletes: [assignment, ids,...]
+    // }}
+    yield put(updateConnections(data));
+  }
 }
 
 // Individual exports for testing

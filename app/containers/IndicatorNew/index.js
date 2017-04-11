@@ -12,6 +12,8 @@ import { browserHistory } from 'react-router';
 
 import { Map, List } from 'immutable';
 
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { getEntities, isReady } from 'containers/App/selectors';
@@ -38,12 +40,12 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   }
 
   mapActionOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
   mapUserOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'name']),
   }));
 
@@ -223,14 +225,16 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('associatedActions')) {
         saveData = saveData.set('measureIndicators', Map({
           delete: List(),
-          create: formData.get('associatedActions').map((id) => Map({
+          create: getCheckedValuesFromOptions(formData.get('associatedActions'))
+          .map((id) => Map({
             measure_id: id,
           })),
         }));
       }
       // TODO: remove once have singleselect instead of multiselect
       if (List.isList(saveData.get('associatedUser'))) {
-        saveData = saveData.setIn(['attributes', 'manager_id'], saveData.get('associatedUser').first());
+        const user = saveData.get('associatedUser').first();
+        saveData = saveData.setIn(['attributes', 'manager_id'], user ? user.get('value') : null);
       }
       dispatch(save(saveData.toJS()));
     },

@@ -1,23 +1,43 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
-import { Form } from 'react-redux-form/immutable';
+import { connect } from 'react-redux';
+import { isEqual } from 'lodash/lang';
+import { Form, actions as formActions } from 'react-redux-form/immutable';
 import MultiSelect from 'components/MultiSelect';
+// import { STATES as CHECKBOX_STATES } from 'components/IndeterminateCheckbox';
 
-export default class EditForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class EditForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     model: PropTypes.string.isRequired,
     options: PropTypes.instanceOf(Immutable.List),
-    handleSubmit: PropTypes.func,
+    onSubmit: PropTypes.func,
     onClose: PropTypes.func,
     title: PropTypes.string,
+    populateForm: PropTypes.func.isRequired,
+    submitLabel: PropTypes.string,
+  }
+
+  static defaultProps = {
+    submitLabel: 'Update',
+  }
+
+  componentWillMount() {
+    this.props.populateForm(this.props.model, this.props.options);
+  }
+
+  componentWillReceiveProps(nextProps) {
+     // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
+    if (!isEqual(nextProps.options.toJS(), this.props.options.toJS())) {
+      this.props.populateForm(nextProps.model, nextProps.options);
+    }
   }
 
   render() {
     return (
       <Form
         model={this.props.model}
-        onSubmit={this.props.handleSubmit}
+        onSubmit={this.props.onSubmit}
       >
         { this.props.title &&
           <strong>{this.props.title}</strong>
@@ -27,13 +47,23 @@ export default class EditForm extends React.Component { // eslint-disable-line r
         }
         <MultiSelect
           model=".values"
+          threeState
           options={this.props.options}
-          valueCompare={(a, b) =>
-            // our values, are maps with nested value keys :)
-            a.get('value') === b.get('value')
-          }
         />
+        {this.props.onSubmit &&
+          <button type="submit">{this.props.submitLabel}</button>
+        }
       </Form>
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+  populateForm: (model, options) => {
+    dispatch(formActions.load(model, Immutable.Map({
+      values: options.map((option) => option.get('value')),
+    })));
+  },
+});
+
+export default connect(null, mapDispatchToProps)(EditForm);

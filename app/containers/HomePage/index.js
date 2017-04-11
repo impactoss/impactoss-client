@@ -68,6 +68,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           <p>
             <FormattedMessage {...messages.intro} />
           </p>
+          <hr />
           <div>
             <h2>
               <FormattedMessage {...messages.categoriesExplore} />
@@ -86,6 +87,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               />
             }
           </div>
+          <hr />
           <div>
             <h2>
               <FormattedMessage {...messages.actionsExplore} />
@@ -99,6 +101,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               </h3>
             </Link>
           </div>
+          <hr />
           <div>
             <h2>
               <FormattedMessage {...messages.moreExplore} />

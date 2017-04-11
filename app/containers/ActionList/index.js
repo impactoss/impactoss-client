@@ -184,6 +184,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       taxonomies: { // edit category
         label: 'Update categories',
         connectPath: 'measure_categories',
+        key: 'category_id',
+        ownKey: 'measure_id',
       },
       connections: { // filter by associated entity
         label: 'Update conections',
@@ -193,14 +195,15 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             path: 'indicators',
             connectPath: 'measure_indicators',
             key: 'indicator_id',
+            ownKey: 'measure_id',
             // search: true,
-
           },
           {
             label: 'Recommendations',
             path: 'recommendations',
             connectPath: 'recommendation_measures',
             key: 'recommendation_id',
+            ownKey: 'measure_id',
             // search: true,
             // searchAttributes: ['number'],
           },

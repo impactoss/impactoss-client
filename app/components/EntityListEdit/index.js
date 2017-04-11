@@ -9,6 +9,7 @@ import Immutable, { Map } from 'immutable';
 
 import EditForm from 'components/EditForm';
 import Option from 'components/EditForm/Option';
+import { STATES as CHECKBOX_STATES } from 'components/IndeterminateCheckbox';
 
 export default class EntityListEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
@@ -17,18 +18,26 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
     onShowEditForm: PropTypes.func.isRequired,
     onHideEditForm: PropTypes.func.isRequired,
     formModel: PropTypes.string,
+    onAssign: PropTypes.func.isRequired,
   };
 
-  // static contextTypes = {
-  //   intl: React.PropTypes.object.isRequired,
-  // };
-
-  getFormOptions(formOptions) {
-    // Display the options
-    return formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
-      value: option,
+  getFormOptions = (formOptions) =>
+    formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
+      value: Map({
+        checked: this.getCheckState(option),
+        value: option.get('value'),
+      }),
       label: <Option label={option.get('label')} count={option.get('count')} />,
     }));
+
+  getCheckState = (option) => {
+    if (option.get('all')) {
+      return CHECKBOX_STATES.checked;
+    }
+    if (option.get('none')) {
+      return CHECKBOX_STATES.unchecked;
+    }
+    return CHECKBOX_STATES.indeterminate;
   }
 
   renderEditGroup = (group, groupId) => (
@@ -45,6 +54,9 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
                   this.props.onShowEditForm({
                     group: group.get('id'),
                     optionId: option.get('id'),
+                    path: option.get('path'),
+                    key: option.get('key'),
+                    ownKey: option.get('ownKey'),
                   });
                 }}
               >
@@ -56,8 +68,9 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
       </div>
     </div>
   );
+
   render() {
-    const { editGroups, formOptions, onHideEditForm, formModel } = this.props;
+    const { editGroups, formOptions, onHideEditForm, formModel, onAssign } = this.props;
     return (
       <div>
         { editGroups &&
@@ -69,6 +82,7 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
             title={formOptions.get('title')}
             options={this.getFormOptions(formOptions.get('options'))}
             onClose={onHideEditForm}
+            onSubmit={onAssign}
           />
         }
       </div>
