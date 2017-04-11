@@ -6,12 +6,12 @@ import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/Ind
 export const getChangedOptions = (options) =>
   options.filter((o) => o.get('hasChanged'));
 
-export const getCheckedIdsFromOptions = (options, onlyChanged = false) => {
+export const getCheckedValuesFromOptions = (options, onlyChanged = false) => {
   const opts = onlyChanged ? getChangedOptions(options) : options;
   return opts.filter((o) => o.get('checked')).map((o) => o.get('value'));
 };
 
-export const getUncheckedIdsFromOptions = (options, onlyChanged = false) => {
+export const getUncheckedValuesFromOptions = (options, onlyChanged = false) => {
   const opts = onlyChanged ? getChangedOptions(options) : options;
   return opts.filterNot((o) => o.get('checked')).map((o) => o.get('value'));
 };

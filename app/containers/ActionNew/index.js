@@ -12,7 +12,7 @@ import { browserHistory } from 'react-router';
 
 import { Map, List } from 'immutable';
 
-import { getCheckedIdsFromOptions } from 'components/MultiSelect';
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
@@ -250,7 +250,7 @@ function mapDispatchToProps(dispatch) {
         saveData = saveData.set(
           'measureCategories',
           formData.get('associatedTaxonomies')
-          .map(getCheckedIdsFromOptions)
+          .map(getCheckedValuesFromOptions)
           .reduce((updates, formCategoryIds) => Map({
             delete: List(),
             create: updates.get('create').concat(formCategoryIds.map((id) => Map({
@@ -264,7 +264,7 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('associatedRecommendations')) {
         saveData = saveData.set('recommendationMeasures', Map({
           delete: List(),
-          create: getCheckedIdsFromOptions(formData.get('associatedRecommendations'))
+          create: getCheckedValuesFromOptions(formData.get('associatedRecommendations'))
           .map((id) => Map({
             recommendation_id: id,
           })),
@@ -275,7 +275,7 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('associatedIndicators')) {
         saveData = saveData.set('measureIndicators', Map({
           delete: List(),
-          create: getCheckedIdsFromOptions(formData.get('associatedIndicators'))
+          create: getCheckedValuesFromOptions(formData.get('associatedIndicators'))
           .map((id) => Map({
             indicator_id: id,
           })),
