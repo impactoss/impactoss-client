@@ -6,6 +6,6 @@ const FormWrapper = styled.div`
   -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
   box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
   background:#F4F4F4;
-  color:#A4A6A8;
+  color:#333;
 `;
 export default FormWrapper;

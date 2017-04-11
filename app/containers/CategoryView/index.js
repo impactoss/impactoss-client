@@ -18,6 +18,7 @@ import EntityView from 'components/views/EntityView';
 import {
   getEntity,
   isReady,
+  isUserManager,
 } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -44,17 +45,34 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
   }
 
   render() {
-    const { category, dataReady } = this.props;
+    const { category, dataReady, isManager } = this.props;
     const reference = this.props.params.id;
     const mainAsideFields = [];
-    if (dataReady && !!category.taxonomy.attributes.has_manager) {
+    if (dataReady && isManager && !!category.taxonomy.attributes.has_manager) {
       mainAsideFields.push({
         id: 'manager',
         heading: 'Category manager',
         value: category.manager && category.manager.attributes.name,
       });
     }
-
+    const pageActions = dataReady && isManager
+    ? [
+      {
+        type: 'simple',
+        title: 'Edit',
+        onClick: this.handleEdit,
+      },
+      {
+        type: 'primary',
+        title: 'Close',
+        onClick: this.handleClose,
+      },
+    ]
+    : [{
+      type: 'primary',
+      title: 'Close',
+      onClick: this.handleClose,
+    }];
     return (
       <div>
         <Helmet
@@ -63,32 +81,21 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !category && !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { !category && dataReady &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        { category && dataReady &&
-          <Page
-            title={this.context.intl.formatMessage(messages.pageTitle)}
-            actions={[
-              {
-                type: 'simple',
-                title: 'Edit',
-                onClick: this.handleEdit,
-              },
-              {
-                type: 'primary',
-                title: 'Close',
-                onClick: this.handleClose,
-              },
-            ]}
-          >
+        <Page
+          title={this.context.intl.formatMessage(messages.pageTitle)}
+          actions={pageActions}
+        >
+          { !category && !dataReady &&
+            <div>
+              <FormattedMessage {...messages.loading} />
+            </div>
+          }
+          { !category && dataReady &&
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          }
+          { category && dataReady &&
             <EntityView
               fields={{
                 header: {
@@ -98,7 +105,8 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                       value: category.attributes.title,
                     },
                   ],
-                  aside: [
+                  aside: isManager
+                  ? [
                     {
                       id: 'number',
                       heading: 'Number',
@@ -114,7 +122,8 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                       heading: 'Updated By',
                       value: category.user && category.user.attributes.name,
                     },
-                  ],
+                  ]
+                  : [],
                 },
                 body: {
                   main: [
@@ -138,8 +147,8 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                 },
               }}
             />
-          </Page>
-        }
+          }
+        </Page>
       </div>
     );
   }
@@ -150,6 +159,7 @@ CategoryView.propTypes = {
   category: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
+  isManager: PropTypes.bool,
 };
 
 CategoryView.contextTypes = {
@@ -157,6 +167,7 @@ CategoryView.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
+  isManager: isUserManager(state),
   dataReady: isReady(state, { path: [
     'categories',
     'users',
@@ -228,6 +239,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
     },
   };
 }

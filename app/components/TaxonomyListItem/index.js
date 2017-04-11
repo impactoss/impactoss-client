@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
+import ListItem from './ListItem';
 
 export default class TaxonomyListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -11,7 +12,10 @@ export default class TaxonomyListItem extends React.PureComponent { // eslint-di
     const { taxonomy } = this.props;
     return (
       <Link to={taxonomy.linkTo}>
-        <h4>{`${taxonomy.count} ${taxonomy.title}`}</h4>
+        <ListItem>
+          {taxonomy.count}
+          <strong> {taxonomy.title}</strong>
+        </ListItem>
       </Link>
     );
   }

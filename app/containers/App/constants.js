@@ -42,6 +42,12 @@ export const PUBLISH_STATUSES = [
   { value: false, label: 'Public' },
 ];
 
+export const USER_ROLES = {
+  ADMIN: 1,
+  MANAGER: 2,
+  CONTRIBUTOR: 3,
+};
+
 export const ENTITIES_READY = 'nmrf/App/ENTITIES_READY';
 
 export const SAVE_SENDING = 'nmrf/App/SAVE_SENDING';

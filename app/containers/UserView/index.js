@@ -19,6 +19,7 @@ import {
   getUser,
   getEntities,
   isReady,
+  isUserManager,
 } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -75,7 +76,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     }))
 
   render() {
-    const { user, dataReady } = this.props;
+    const { user, dataReady, isManager } = this.props;
     const reference = user && user.id;
     // dataReady && console.log(this.props.taxonomies)
     return (
@@ -86,37 +87,37 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !user && !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { !user && dataReady &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        { user && dataReady &&
-          <Page
-            title={this.context.intl.formatMessage(messages.pageTitle)}
-            actions={[
-              {
-                type: 'simple',
-                title: 'Edit',
-                onClick: this.handleEdit,
-              },
-              {
-                type: 'simple',
-                title: 'Change password',
-                onClick: this.handleEditPassword,
-              },
-              {
-                type: 'primary',
-                title: 'Close',
-                onClick: this.handleClose,
-              },
-            ]}
-          >
+        <Page
+          title={this.context.intl.formatMessage(messages.pageTitle)}
+          actions={[
+            {
+              type: 'simple',
+              title: 'Edit',
+              onClick: this.handleEdit,
+            },
+            {
+              type: 'simple',
+              title: 'Change password',
+              onClick: this.handleEditPassword,
+            },
+            {
+              type: 'primary',
+              title: 'Close',
+              onClick: this.handleClose,
+            },
+          ]}
+        >
+          { !user && !dataReady &&
+            <div>
+              <FormattedMessage {...messages.loading} />
+            </div>
+          }
+          { !user && dataReady &&
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          }
+          { user && dataReady &&
             <EntityView
               fields={{
                 header: {
@@ -127,7 +128,8 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                       value: user.attributes.name,
                     },
                   ],
-                  aside: [
+                  aside: isManager
+                  ? [
                     {
                       id: 'role',
                       heading: 'Role',
@@ -148,7 +150,8 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                       heading: 'Updated By',
                       value: user.user && user.user.attributes.name,
                     },
-                  ],
+                  ]
+                  : [],
                 },
                 body: {
                   main: [
@@ -158,12 +161,12 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                       value: user.attributes.email,
                     },
                   ],
-                  aside: this.renderTaxonomyLists(this.props.taxonomies),
+                  aside: isManager ? this.renderTaxonomyLists(this.props.taxonomies) : [],
                 },
               }}
             />
-          </Page>
-        }
+          }
+        </Page>
       </div>
     );
   }
@@ -174,6 +177,7 @@ UserView.propTypes = {
   user: PropTypes.object,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
+  isManager: PropTypes.bool,
 };
 
 UserView.contextTypes = {
@@ -181,9 +185,9 @@ UserView.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
+  isManager: isUserManager(state),
   dataReady: isReady(state, { path: [
     'users',
-    'user_roles',
     'roles',
     'categories',
     'taxonomies',

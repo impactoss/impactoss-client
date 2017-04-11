@@ -9,6 +9,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
 
   static propTypes = {
     isSignedIn: React.PropTypes.bool,
+    isManager: React.PropTypes.bool,
     userId: React.PropTypes.string,
   }
 
@@ -31,11 +32,13 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
           <HeaderLink to="/indicators">
             <FormattedMessage {...messages.indicators} />
           </HeaderLink>
+          {this.props.isSignedIn && this.props.isManager &&
+            <HeaderLink to="/users">
+              <FormattedMessage {...messages.users} />
+            </HeaderLink>
+          }
           {this.props.isSignedIn &&
             <span>
-              <HeaderLink to="/users">
-                <FormattedMessage {...messages.users} />
-              </HeaderLink>
               <HeaderLink to="/logout">
                 <FormattedMessage {...messages.logout} />
               </HeaderLink>

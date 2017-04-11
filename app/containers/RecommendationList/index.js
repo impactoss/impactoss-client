@@ -214,6 +214,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
     },
   };
 }

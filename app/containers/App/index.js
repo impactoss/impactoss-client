@@ -16,21 +16,23 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
 import Header from 'components/Header';
-import { makeSelectSignedIn, makeSelectSessionUserId } from './selectors';
-import { validateToken } from './actions';
-
+import { makeSelectSignedIn, makeSelectSessionUserId, makeIsUserManager } from './selectors';
+import { validateToken, loadEntitiesIfNeeded } from './actions';
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     children: React.PropTypes.node,
     isSignedIn: React.PropTypes.bool,
+    isManager: React.PropTypes.bool,
     userId: React.PropTypes.string,
     validateToken: React.PropTypes.func,
+    loadEntitiesIfNeeded: React.PropTypes.func,
   };
 
   componentWillMount() {
     this.props.validateToken();
+    this.props.loadEntitiesIfNeeded();
   }
 
   render() {
@@ -38,6 +40,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       <div>
         <Header
           isSignedIn={this.props.isSignedIn}
+          isManager={this.props.isManager}
           userId={this.props.userId}
         />
         {React.Children.toArray(this.props.children)}
@@ -47,6 +50,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 }
 
 const mapStateToProps = createStructuredSelector({
+  isManager: makeIsUserManager(),
   isSignedIn: makeSelectSignedIn(),
   userId: makeSelectSessionUserId(),
 });
@@ -55,6 +59,9 @@ export function mapDispatchToProps(dispatch) {
   return {
     validateToken: () => {
       dispatch(validateToken()); // Maybe this could move to routes.js or App wrapper
+    },
+    loadEntitiesIfNeeded: () => {
+      dispatch(loadEntitiesIfNeeded('user_roles'));
     },
   };
 }

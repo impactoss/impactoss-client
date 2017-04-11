@@ -22,6 +22,7 @@ import {
   getEntity,
   getEntities,
   isReady,
+  isUserManager,
 } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -70,9 +71,54 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   )
 
   render() {
-    const { recommendation, dataReady } = this.props;
+    const { recommendation, dataReady, isManager } = this.props;
     const reference = this.props.params.id;
     const status = recommendation && find(PUBLISH_STATUSES, { value: recommendation.attributes.draft });
+
+    let asideFields = recommendation && [{
+      id: 'number',
+      heading: 'Number',
+      value: recommendation.attributes.number.toString(),
+    }];
+    if (recommendation && isManager) {
+      asideFields = asideFields.concat([
+        {
+          id: 'status',
+          heading: 'Status',
+          value: status && status.label,
+        },
+        {
+          id: 'updated',
+          heading: 'Updated At',
+          value: recommendation.attributes.updated_at,
+        },
+        {
+          id: 'updated_by',
+          heading: 'Updated By',
+          value: recommendation.user && recommendation.user.attributes.name,
+        },
+      ]);
+    }
+
+    const pageActions = isManager
+    ? [
+      {
+        type: 'simple',
+        title: 'Edit',
+        onClick: this.handleEdit,
+      },
+      {
+        type: 'primary',
+        title: 'Close',
+        onClick: this.handleClose,
+      },
+    ]
+    : [{
+      type: 'primary',
+      title: 'Close',
+      onClick: this.handleClose,
+    }];
+
 
     return (
       <div>
@@ -82,32 +128,21 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !recommendation && !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { !recommendation && dataReady &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        { recommendation &&
-          <Page
-            title={this.context.intl.formatMessage(messages.pageTitle)}
-            actions={[
-              {
-                type: 'simple',
-                title: 'Edit',
-                onClick: this.handleEdit,
-              },
-              {
-                type: 'primary',
-                title: 'Close',
-                onClick: this.handleClose,
-              },
-            ]}
-          >
+        <Page
+          title={this.context.intl.formatMessage(messages.pageTitle)}
+          actions={pageActions}
+        >
+          { !recommendation && !dataReady &&
+            <div>
+              <FormattedMessage {...messages.loading} />
+            </div>
+          }
+          { !recommendation && dataReady &&
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          }
+          { recommendation && dataReady &&
             <EntityView
               fields={{
                 header: {
@@ -117,28 +152,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
                       value: recommendation.attributes.title,
                     },
                   ],
-                  aside: [
-                    {
-                      id: 'number',
-                      heading: 'Number',
-                      value: recommendation.attributes.number.toString(),
-                    },
-                    {
-                      id: 'status',
-                      heading: 'Status',
-                      value: status && status.label,
-                    },
-                    {
-                      id: 'updated',
-                      heading: 'Updated At',
-                      value: recommendation.attributes.updated_at,
-                    },
-                    {
-                      id: 'updated_by',
-                      heading: 'Updated By',
-                      value: recommendation.user && recommendation.user.attributes.name,
-                    },
-                  ],
+                  aside: asideFields,
                 },
                 body: {
                   main: [
@@ -153,8 +167,8 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
                 },
               }}
             />
-          </Page>
-        }
+          }
+        </Page>
       </div>
     );
   }
@@ -167,6 +181,7 @@ RecommendationView.propTypes = {
   taxonomies: PropTypes.object,
   actions: PropTypes.object,
   params: PropTypes.object,
+  isManager: PropTypes.bool,
 };
 
 RecommendationView.contextTypes = {
@@ -175,6 +190,7 @@ RecommendationView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
+  isManager: isUserManager(state),
   dataReady: isReady(state, { path: [
     'recommendations',
     'users',
@@ -247,6 +263,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
     },
   };
 }
