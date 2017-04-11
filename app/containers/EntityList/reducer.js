@@ -7,6 +7,7 @@
 import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
+import { LOCATION_CHANGE } from 'react-router-redux';
 import {
   SHOW_FILTER_FORM,
   HIDE_FILTER_FORM,
@@ -51,6 +52,8 @@ function entityListReducer(state = initialState, action) {
       return state.set('activeEditOption', action.option);
     case HIDE_EDIT_FORM:
       return state.set('activeEditOption', fromJS(initialState.toJS().activeEditOption));
+    case LOCATION_CHANGE:
+      return action.payload.action === 'PUSH' ? initialState : state;
     case RESET_STATE:
       return initialState;
     default:
