@@ -19,6 +19,7 @@ import {
   getEntity,
   getEntities,
   isReady,
+  isUserAdmin,
 } from 'containers/App/selectors';
 
 import Page from 'components/Page';
@@ -54,7 +55,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   });
 
   render() {
-    const { taxonomy, dataReady } = this.props;
+    const { taxonomy, dataReady, isAdmin } = this.props;
     const { saveSending, saveError } = this.props.categoryNew.page;
     const taxonomyReference = this.props.params.id;
     const required = (val) => val && val.length;
@@ -67,7 +68,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     }
 
     const mainAsideFields = [];
-    if (dataReady && !!taxonomy.attributes.has_manager && this.props.users) {
+    if (dataReady && isAdmin && !!taxonomy.attributes.has_manager && this.props.users) {
       mainAsideFields.push(this.renderUserControl(this.props.users));
     }
 
@@ -174,6 +175,7 @@ CategoryNew.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
+  isAdmin: PropTypes.bool,
   categoryNew: PropTypes.object,
   taxonomy: PropTypes.object,
   params: PropTypes.object,
@@ -185,6 +187,7 @@ CategoryNew.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
+  isAdmin: isUserAdmin,
   categoryNew: categoryNewSelector(state),
   dataReady: isReady(state, { path: [
     'taxonomies',
@@ -208,7 +211,7 @@ const mapStateToProps = (state, props) => ({
         path: 'user_roles',
         key: 'user_id',
         where: {
-          role_id: USER_ROLES.MANAGER, // managers only TODO: from constants
+          role_id: USER_ROLES.MANAGER,
         },
       },
     },

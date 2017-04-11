@@ -23,6 +23,7 @@ import {
   getEntity,
   getEntities,
   isReady,
+  isUserAdmin,
 } from 'containers/App/selectors';
 
 import {
@@ -81,13 +82,13 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   });
 
   render() {
-    const { category, dataReady } = this.props;
+    const { category, dataReady, isAdmin } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
 
     const mainAsideFields = [];
-    if (dataReady && !!category.taxonomy.attributes.has_manager && this.props.users) {
+    if (dataReady && isAdmin && !!category.taxonomy.attributes.has_manager && this.props.users) {
       mainAsideFields.push(this.renderUserControl(this.props.users));
     }
 
@@ -206,6 +207,7 @@ CategoryEdit.propTypes = {
   form: PropTypes.object,
   category: PropTypes.object,
   dataReady: PropTypes.bool,
+  isAdmin: PropTypes.bool,
   params: PropTypes.object,
   users: PropTypes.object,
 };
@@ -215,6 +217,7 @@ CategoryEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
+  isAdmin: isUserAdmin(state),
   page: pageSelector(state),
   form: formSelector(state),
   dataReady: isReady(state, { path: [
