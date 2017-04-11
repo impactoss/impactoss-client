@@ -23,17 +23,23 @@ export default class MultiSelect extends React.Component {
   static defaultProps = {
     values: new Immutable.List(),
     initialValues: new Immutable.List(),
-    valueCompare: (a, b) => (a && b) && (a.get('value') === b.get('value')),
+    valueCompare: (a, b) => a.get('value') === b.get('value'),
     threeState: false,
   }
 
   onChange = (checked, theValue) => {
-    const nextValues = this.props.values.map((value) => {
+    const currentValues = this.props.options.reduce((values, option) => {
+      const value = this.props.values.find((v) => this.props.valueCompare(option.get('value'), v));
+      return values.push(value || option.get('value'));
+    }, Immutable.List());
+
+    const nextValues = currentValues.map((value) => {
       if (this.props.valueCompare(value, theValue)) {
         return value.set('checked', checked).set('hasChanged', this.getInitialValue(value) !== theValue);
       }
       return value;
     });
+
     this.props.onChange(nextValues);
   }
 

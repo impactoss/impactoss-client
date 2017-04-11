@@ -26,6 +26,10 @@ export default defineMessages({
     id: 'nmrf.components.Header.user',
     defaultMessage: 'User profile',
   },
+  users: {
+    id: 'nmrf.components.Header.users',
+    defaultMessage: 'Users',
+  },
   register: {
     id: 'nmrf.components.Header.register',
     defaultMessage: 'Register',

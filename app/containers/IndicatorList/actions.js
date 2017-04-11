@@ -1,5 +1,0 @@
-/*
- *
- * IndicatorList actions
- *
- */

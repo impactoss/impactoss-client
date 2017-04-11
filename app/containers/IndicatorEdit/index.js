@@ -56,19 +56,26 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { actions } = props;
+    const { actions, indicator } = props;
     return Map({
-      id: props.indicator.id,
-      attributes: fromJS(props.indicator.attributes),
+      id: indicator.id,
+      attributes: fromJS(indicator.attributes),
       associatedActions: actions
         ? actions.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
         : List(),
+      associatedUser: indicator.attributes.manager_id ? List().push(indicator.attributes.manager_id.toString()) : List(),
+      // TODO allow single value for singleSelect
     });
   }
 
   mapActionOptions = (entities) => entities.toList().map((entity) => Map({
     value: entity.get('id'),
     label: entity.getIn(['attributes', 'title']),
+  }));
+
+  mapUserOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'name']),
   }));
 
   // TODO this should be shared functionality
@@ -78,6 +85,13 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     label: 'Actions',
     controlType: 'multiselect',
     options: this.mapActionOptions(actions),
+  });
+  renderUserControl = (users) => ({
+    id: 'users',
+    model: '.associatedUser',
+    label: 'Indicator manager',
+    controlType: 'multiselect',
+    options: this.mapUserOptions(users),
   });
 
 
@@ -186,6 +200,9 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                     },
                     this.props.actions ? this.renderActionControl(this.props.actions) : null,
                   ],
+                  aside: [
+                    this.props.users ? this.renderUserControl(this.props.users) : null,
+                  ],
                 },
               }}
             />
@@ -207,6 +224,7 @@ IndicatorEdit.propTypes = {
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   actions: PropTypes.object,
+  users: PropTypes.object,
 };
 
 IndicatorEdit.contextTypes = {
@@ -219,6 +237,7 @@ const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
     'measures',
     'users',
+    'user_roles',
     'indicators',
     'measure_indicators',
   ] }),
@@ -229,12 +248,14 @@ const mapStateToProps = (state, props) => ({
       id: props.params.id,
       path: 'indicators',
       out: 'js',
-      extend: {
-        type: 'single',
-        path: 'users',
-        key: 'last_modified_user_id',
-        as: 'user',
-      },
+      extend: [
+        {
+          type: 'single',
+          path: 'users',
+          key: 'last_modified_user_id',
+          as: 'user',
+        },
+      ],
     },
   ),
 
@@ -254,6 +275,21 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
+
+  // all users of role contributor
+  users: getEntities(
+    state,
+    {
+      path: 'users',
+      connected: {
+        path: 'user_roles',
+        key: 'user_id',
+        where: {
+          role_id: 2, // contributors only TODO: from constants
+        },
+      },
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -261,6 +297,7 @@ function mapDispatchToProps(dispatch, props) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
     },
@@ -279,7 +316,8 @@ function mapDispatchToProps(dispatch, props) {
         return actionsAssociated;
       }, Map());
 
-      const saveData = formData.set('measureIndicators', Map({
+
+      let saveData = formData.set('measureIndicators', Map({
         delete: associatedActions.reduce((associatedIds, associatedId, id) =>
           !formActionIds.includes(id)
             ? associatedIds.push(associatedId)
@@ -295,6 +333,10 @@ function mapDispatchToProps(dispatch, props) {
         , List()),
       }));
 
+      // TODO: remove once have singleselect instead of multiselect
+      if (List.isList(saveData.get('associatedUser'))) {
+        saveData = saveData.setIn(['attributes', 'manager_id'], saveData.get('associatedUser').first());
+      }
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {

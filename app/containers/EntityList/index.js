@@ -112,7 +112,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 filterOptions.options[catId].count += 1;
               } else {
                 filterOptions.options[catId] = this.initURLOption({
-                  label: taxonomy.categories[catId].attributes.title,
+                  label: taxonomy.categories[catId].attributes.title || taxonomy.categories[catId].attributes.name,
                   value: catId,
                   count: 1,
                   query: filters.taxonomies.query,
@@ -214,7 +214,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   filterOptions.options[connectedId].count += 1;
                 } else {
                   filterOptions.options[connectedId] = this.initURLOption({
-                    label: connection.attributes.title,
+                    label: connection.attributes.title || connection.attributes.name,
                     value: connectedId,
                     search: option.searchAttributes && option.searchAttributes.map((attribute) => connection.attributes[attribute]).join(),
                     count: 1,
@@ -255,16 +255,37 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           filterOptions.title = filterOptions.title || option.label;
           filterOptions.search = filterOptions.search || option.search;
 
-          if (typeof entity.attributes[option.attribute] !== 'undefined') {
+          if (typeof entity.attributes[option.attribute] !== 'undefined' && !!entity.attributes[option.attribute]) {
             // add connected entities if not present otherwise increase count
             const value = entity.attributes[option.attribute].toString();
             if (filterOptions.options[value]) {
               filterOptions.options[value].count += 1;
-            } else {
+            } else if (option.options) {
               const attribute = find(option.options, (o) => o.value.toString() === value);
               filterOptions.options[value] = this.initURLOption({
                 label: attribute ? attribute.label : value,
                 value: `${option.attribute}:${value}`,
+                count: 1,
+                query: 'where',
+              });
+            } else if (option.extension && !!entity[option.extension.key]) {
+              const extension = Object.values(entity[option.extension.key])[0];
+              filterOptions.options[value] = this.initOption({
+                label: extension ? extension.attributes[option.extension.label] : value,
+                value: `${option.attribute}:${value}`,
+                count: 1,
+                query: 'where',
+              });
+            }
+          } else if (option.extension.without) {
+            if (filterOptions.options.without) {
+              // no connection present
+              // add without option
+              filterOptions.options.without.count += 1;
+            } else {
+              filterOptions.options.without = this.initOption({
+                label: `Without ${option.label}`,
+                value: `${option.attribute}:null`,
                 count: 1,
                 query: 'where',
               });

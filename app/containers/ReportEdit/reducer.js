@@ -1,6 +1,6 @@
 /*
 *
-* IndicatorEdit reducer
+* ReportEdit reducer
 *
 */
 
@@ -20,7 +20,7 @@ const initialState = fromJS({
   saveError: false,
 });
 
-function indicatorEditReducer(state = initialState, action) {
+function reportEditReducer(state = initialState, action) {
   switch (action.type) {
     case SAVE_SENDING:
       return state
@@ -45,16 +45,17 @@ function indicatorEditReducer(state = initialState, action) {
 const formData = fromJS({
   id: '',
   attributes: {
+    draft: true,
     title: '',
     description: '',
-    draft: '',
-    manager_id: '',
+    document_url: '',
+    document_public: true,
   },
 });
 
 export default combineReducers({
-  page: indicatorEditReducer,
+  page: reportEditReducer,
   form: combineForms({
     data: formData,
-  }, 'indicatorEdit.form'),
+  }, 'reportEdit.form'),
 });
