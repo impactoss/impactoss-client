@@ -12,6 +12,8 @@ import { browserHistory } from 'react-router';
 
 import { Map, List } from 'immutable';
 
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { getEntities, isReady } from 'containers/App/selectors';
@@ -38,12 +40,12 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
   }
 
   mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
   mapActionOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
@@ -217,7 +219,9 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('associatedTaxonomies')) {
         saveData = saveData.set(
           'recommendationsCategories',
-          formData.get('associatedTaxonomies').reduce((updates, formCategoryIds) => Map({
+          formData.get('associatedTaxonomies')
+          .map(getCheckedValuesFromOptions)
+          .reduce((updates, formCategoryIds) => Map({
             delete: List(),
             create: updates.get('create').concat(formCategoryIds.map((id) => Map({
               category_id: id,
@@ -230,7 +234,8 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('associatedActions')) {
         saveData = saveData.set('recommendationMeasures', Map({
           delete: List(),
-          create: formData.get('associatedActions').map((id) => Map({
+          create: getCheckedValuesFromOptions(formData.get('associatedActions'))
+          .map((id) => Map({
             measure_id: id,
           })),
         }));

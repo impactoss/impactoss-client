@@ -3,6 +3,19 @@ import Immutable from 'immutable';
 import { kebabCase } from 'lodash/string';
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/IndeterminateCheckbox';
 
+export const getChangedOptions = (options) =>
+  options.filter((o) => o.get('hasChanged'));
+
+export const getCheckedValuesFromOptions = (options, onlyChanged = false) => {
+  const opts = onlyChanged ? getChangedOptions(options) : options;
+  return opts.filter((o) => o.get('checked')).map((o) => o.get('value'));
+};
+
+export const getUncheckedValuesFromOptions = (options, onlyChanged = false) => {
+  const opts = onlyChanged ? getChangedOptions(options) : options;
+  return opts.filterNot((o) => o.get('checked')).map((o) => o.get('value'));
+};
+
 const sortValues = {
   [CHECKBOX_STATES.checked]: 1,
   [CHECKBOX_STATES.indeterminate]: 0,
@@ -23,21 +36,27 @@ export default class MultiSelect extends React.Component {
   static defaultProps = {
     values: new Immutable.List(),
     initialValues: new Immutable.List(),
-    valueCompare: (a, b) => (a && b) && (a.get('value') === b.get('value')),
+    valueCompare: (a, b) => a.get('value') === b.get('value'),
     threeState: false,
   }
 
   onChange = (checked, theValue) => {
-    const nextValues = this.props.values.map((value) => {
+    const currentValues = this.props.options.reduce((values, option) => {
+      const value = this.props.values.find((v) => this.props.valueCompare(option.get('value'), v));
+      return values.push(value || option.get('value'));
+    }, Immutable.List());
+
+    const nextValues = currentValues.map((value) => {
       if (this.props.valueCompare(value, theValue)) {
         return value.set('checked', checked).set('hasChanged', this.getInitialValue(value) !== theValue);
       }
       return value;
     });
+
     this.props.onChange(nextValues);
   }
 
-  getInitialValue = (value) => this.props.initialValues.find((v) => this.props.valueCompare(value, v));
+  getInitialValue = (value) => value ? this.props.initialValues.find((v) => this.props.valueCompare(value, v)) : null;
 
   setChecked = (option, value) => value ? option.setIn(['value', 'checked'], value.get('checked')) : option;
 

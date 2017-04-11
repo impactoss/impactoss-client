@@ -13,6 +13,8 @@ import { browserHistory } from 'react-router';
 
 import { Map, List, fromJS } from 'immutable';
 
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import Page from 'components/Page';
@@ -62,22 +64,28 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       ? taxonomies.reduce((values, tax) =>
           values.set(
             tax.get('id'),
-            tax.get('categories').reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List()))
+            tax.get('categories').reduce((options, entity) => options.push(Map({
+              checked: !!entity.get('associated'),
+              value: entity.get('id'),
+            })), List()))
         , Map())
       : Map(),
       associatedRoles: roles
-        ? roles.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
-        : List(),
+      ? roles.reduce((options, entity) => options.push(Map({
+        checked: !!entity.get('associated'),
+        value: entity.get('id'),
+      })), List())
+      : List(),
     });
   }
 
   mapRoleOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'friendly_name']),
   }));
 
   mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
@@ -313,7 +321,7 @@ function mapDispatchToProps(dispatch) {
     },
     handleSubmit: (formData, taxonomies, roles) => {
       let saveData = formData.set('userCategories', taxonomies.reduce((updates, tax, taxId) => {
-        const formCategoryIds = formData.getIn(['associatedTaxonomies', taxId]); // the list of categories checked in form
+        const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
 
         // store associated cats as { [cat.id]: [association.id], ... }
         // then we can use keys for creating new associations and values for deleting
@@ -342,7 +350,7 @@ function mapDispatchToProps(dispatch) {
       }, Map({ delete: List(), create: List() })));
 
       // roles
-      const formRoleIds = formData.get('associatedRoles');
+      const formRoleIds = getCheckedValuesFromOptions(formData.get('associatedRoles'));
       // store associated recs as { [rec.id]: [association.id], ... }
       const associatedRoles = roles.reduce((rolesAssociated, entity) => {
         if (entity.get('associated')) {
