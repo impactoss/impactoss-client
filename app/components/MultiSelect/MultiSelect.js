@@ -27,7 +27,6 @@ export default class MultiSelect extends React.Component {
   static propTypes = {
     options: PropTypes.instanceOf(Immutable.List),
     values: PropTypes.instanceOf(Immutable.List),
-    initialValues: PropTypes.instanceOf(Immutable.List),
     onChange: PropTypes.func.isRequired,
     valueCompare: PropTypes.func,
     threeState: PropTypes.bool,
@@ -41,28 +40,12 @@ export default class MultiSelect extends React.Component {
   }
 
   onChange = (checked, theValue) => {
-    // const nextValues = currentValues.map((value) => {
-    //   if (this.props.valueCompare(value, theValue)) {
-    //     return value.set('checked', checked).set('hasChanged', this.getInitialValue(value) !== theValue);
-    //   }
-    //   return value;
-    // });
-    // console.log('theValue', theValue.toJS());
-    // console.log('currentValues', this.props.values.toJS())
-    // console.log('changedVlaues,', this.props.values.push(theValue
-    //   .set('checked', checked)
-    //   .set('hasChanged', theValue.get('checked') !== checked)).toJS())
-
-    // debugger;
     const originalValue = this.getOptionValue(theValue);
     const originalChecked = originalValue.has('checked') ? originalValue.get('checked') : false;
-    // console.log(checked,'!==',originalChecked)
     const newValue = theValue
       .set('checked', checked)
       .set('hasChanged', checked !== originalChecked);
-    // const existingValue = this.props.values.find((v) => this.valueCompare(v, theValue))
     const existingValueIndex = this.props.values.findIndex((v) => this.props.valueCompare(v, theValue));
-    // console.log('existingValueIndex', existingValueIndex);
     const nextValues = existingValueIndex >= 0 ? this.props.values.set(existingValueIndex, newValue) : this.props.values.push(newValue);
 
     this.props.onChange(nextValues);
@@ -72,14 +55,6 @@ export default class MultiSelect extends React.Component {
     const option = this.props.options.find((o) => this.props.valueCompare(o.get('value'), value));
     return option ? option.get('value') : null;
   }
-
-  // getCurrentValues = () =>
-  //   this.props.options.reduce((values, option) => {
-  //     const value = this.props.values.find((v) => this.props.valueCompare(option.get('value'), v));
-  //     return value ? values.push(value) : values;
-  //   }, Immutable.List());
-
-  getInitialValue = (value) => value ? this.props.initialValues.find((v) => this.props.valueCompare(value, v)) : null;
 
   setChecked = (option, value) => value ? option.setIn(['value', 'checked'], value.get('checked')) : option;
 
@@ -124,7 +99,7 @@ export default class MultiSelect extends React.Component {
     const { options, values, valueCompare, threeState } = this.props;
     const checkboxes = options.map((option) => {
       const value = values.find((v) => valueCompare(option.get('value'), v));
-      const initialValue = this.getInitialValue(value);
+      const initialValue = option.get('value');
       const isThreeState = threeState && initialValue.get('checked') === CHECKBOX_STATES.indeterminate;
       return option.withMutations((o) => this.setChecked(o, value).set('initialValue', initialValue).set('isThreeState', isThreeState));
     })
