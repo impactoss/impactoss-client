@@ -14,11 +14,13 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import {
   getEntity,
   isReady,
+  isUserManager,
 } from 'containers/App/selectors';
 
 // components
 import Page from 'components/Page';
 import CategoryList from 'components/CategoryList';
+
 
 // relative
 import messages from './messages';
@@ -44,13 +46,13 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
     browserHistory.push(`/categories/${this.props.taxonomy.id}/new`);
   }
   render() {
-    const { taxonomy, dataReady } = this.props;
+    const { taxonomy, dataReady, isManager } = this.props;
 
     const pageTitle = dataReady
       ? `${this.context.intl.formatMessage(messages.pageTitle)} for ${taxonomy.attributes.title}`
       : this.context.intl.formatMessage(messages.pageTitle);
 
-    const pageActions = dataReady
+    const pageActions = dataReady && isManager
       ? [{
         type: 'primary',
         title: '+ Add Category',
@@ -90,6 +92,7 @@ TaxonomyCategories.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   taxonomy: PropTypes.object,
   dataReady: PropTypes.bool,
+  isManager: PropTypes.bool,
 };
 
 TaxonomyCategories.contextTypes = {
@@ -97,11 +100,10 @@ TaxonomyCategories.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
+  isManager: isUserManager(state),
   dataReady: isReady(state, { path: [
     'categories',
     'taxonomies',
-    // 'recommendation_categories',
-    // 'measure_categories',
   ] }),
   taxonomy: getEntity(
     state,
@@ -143,6 +145,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
     },
   };
 }

@@ -164,7 +164,7 @@ export function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
     [keyPair[1]]: create[keyPair[1]] || entityId,
   }));
 
-  yield call(updateConnectionsSaga, { path, updates: updatesUpdated });
+  yield call(updateConnectionsSaga, { data: { path, updates: updatesUpdated } });
 }
 
 export function* saveEntitySaga({ data }) {
@@ -181,48 +181,60 @@ export function* saveEntitySaga({ data }) {
     // update user-roles connections
     if (data.entity.userRoles) {
       yield call(updateConnectionsSaga, {
-        path: 'user_roles',
-        updates: data.entity.userRoles,
+        data: {
+          path: 'user_roles',
+          updates: data.entity.userRoles,
+        },
       });
     }
 
     // update user-category connections
     if (data.entity.userCategories) {
       yield call(updateConnectionsSaga, {
-        path: 'user_categories',
-        updates: data.entity.userCategories,
+        data: {
+          path: 'user_categories',
+          updates: data.entity.userCategories,
+        },
       });
     }
 
     // update recommendation-action connections
     if (data.entity.recommendationMeasures) {
       yield call(updateConnectionsSaga, {
-        path: 'recommendation_measures',
-        updates: data.entity.recommendationMeasures,
+        data: {
+          path: 'recommendation_measures',
+          updates: data.entity.recommendationMeasures,
+        },
       });
     }
 
     // update action-indicatos connections
     if (data.entity.measureIndicators) {
       yield call(updateConnectionsSaga, {
-        path: 'measure_indicators',
-        updates: data.entity.measureIndicators,
+        data: {
+          path: 'measure_indicators',
+          updates: data.entity.measureIndicators,
+        },
       });
     }
 
     // update action-category connections
     if (data.entity.measureCategories) {
       yield call(updateConnectionsSaga, {
-        path: 'measure_categories',
-        updates: data.entity.measureCategories,
+        data: {
+          path: 'measure_categories',
+          updates: data.entity.measureCategories,
+        },
       });
     }
 
     // update recommendation-category connections
     if (data.entity.recommendationCategories) {
       yield call(updateConnectionsSaga, {
-        path: 'recommendation_categories',
-        updates: data.entity.recommendationCategories,
+        data: {
+          path: 'recommendation_categories',
+          updates: data.entity.recommendationCategories,
+        },
       });
     }
 

@@ -22,6 +22,7 @@ import {
   getEntity,
   getEntities,
   isReady,
+  isUserManager,
 } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -74,9 +75,53 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     }))
 
   render() {
-    const { action, dataReady } = this.props;
+    const { action, dataReady, isManager } = this.props;
     const reference = this.props.params.id;
     const status = action && find(PUBLISH_STATUSES, { value: action.attributes.draft });
+
+    let asideFields = action && [{
+      id: 'number',
+      heading: 'Number',
+      value: reference,
+    }];
+    if (action && isManager) {
+      asideFields = asideFields.concat([
+        {
+          id: 'status',
+          heading: 'Status',
+          value: status && status.label,
+        },
+        {
+          id: 'updated',
+          heading: 'Updated At',
+          value: action.attributes.updated_at,
+        },
+        {
+          id: 'updated_by',
+          heading: 'Updated By',
+          value: action.user && action.user.attributes.name,
+        },
+      ]);
+    }
+
+    const pageActions = isManager
+    ? [
+      {
+        type: 'simple',
+        title: 'Edit',
+        onClick: this.handleEdit,
+      },
+      {
+        type: 'primary',
+        title: 'Close',
+        onClick: this.handleClose,
+      },
+    ]
+    : [{
+      type: 'primary',
+      title: 'Close',
+      onClick: this.handleClose,
+    }];
 
     return (
       <div>
@@ -86,32 +131,21 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !action && !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { !action && dataReady &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        { action &&
-          <Page
-            title={this.context.intl.formatMessage(messages.pageTitle)}
-            actions={[
-              {
-                type: 'simple',
-                title: 'Edit',
-                onClick: this.handleEdit,
-              },
-              {
-                type: 'primary',
-                title: 'Close',
-                onClick: this.handleClose,
-              },
-            ]}
-          >
+        <Page
+          title={this.context.intl.formatMessage(messages.pageTitle)}
+          actions={pageActions}
+        >
+          { !action && !dataReady &&
+            <div>
+              <FormattedMessage {...messages.loading} />
+            </div>
+          }
+          { !action && dataReady &&
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          }
+          { action && dataReady &&
             <EntityView
               fields={{
                 header: {
@@ -121,28 +155,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                       value: action.attributes.title,
                     },
                   ],
-                  aside: [
-                    {
-                      id: 'number',
-                      heading: 'Number',
-                      value: reference,
-                    },
-                    {
-                      id: 'status',
-                      heading: 'Status',
-                      value: status && status.label,
-                    },
-                    {
-                      id: 'updated',
-                      heading: 'Updated At',
-                      value: action.attributes.updated_at,
-                    },
-                    {
-                      id: 'updated_by',
-                      heading: 'Updated By',
-                      value: action.user && action.user.attributes.name,
-                    },
-                  ],
+                  aside: asideFields,
                 },
                 body: {
                   main: [
@@ -168,8 +181,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                 },
               }}
             />
-          </Page>
-        }
+          }
+        </Page>
       </div>
     );
   }
@@ -179,6 +192,7 @@ ActionView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   action: PropTypes.object,
   dataReady: PropTypes.bool,
+  isManager: PropTypes.bool,
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
@@ -191,6 +205,7 @@ ActionView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
+  isManager: isUserManager(state),
   dataReady: isReady(state, { path: [
     'measures',
     'users',
@@ -227,6 +242,7 @@ const mapStateToProps = (state, props) => ({
       extend: {
         path: 'categories',
         key: 'taxonomy_id',
+        reverse: true,
         connected: {
           path: 'measure_categories',
           key: 'category_id',
@@ -280,6 +296,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
     },
   };
 }

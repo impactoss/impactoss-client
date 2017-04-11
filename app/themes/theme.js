@@ -18,7 +18,7 @@ theme.breakpoints = {
 theme.palette = {
   primary: coolorsToHex('https://coolors.co/f7f7f2-e4e6c3-899878-222725-121113'),
   secondary: coolorsToHex('https://coolors.co/c2185b-e91e63-f06292-f48caf-f8bbd0'),
-  danger: coolorsToHex('https://coolors.co/d32f2f-f44336-f8877f-f9a7a1-ffcdd2'),
+  danger: coolorsToHex('https://coolors.co/d32f2f-f44336-EB6E51-f9a7a1-ffcdd2'),
   alert: coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-fff2ce'),
   success: coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-c8e6c9'),
   grayscale: ['#212121', '#616161', '#9e9e9e', '#bdbdbd', '#e0e0e0', '#ffffff'],

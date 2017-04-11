@@ -22,6 +22,7 @@ import {
   getEntity,
   getEntities,
   isReady,
+  isUserManager,
 } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -61,9 +62,57 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     }))
 
   render() {
-    const { indicator, dataReady } = this.props;
+    const { indicator, dataReady, isManager } = this.props;
     const reference = this.props.params.id;
     const status = indicator && find(PUBLISH_STATUSES, { value: indicator.attributes.draft });
+
+    let asideFields = indicator && [{
+      id: 'number',
+      heading: 'Number',
+      value: reference,
+    }];
+    if (indicator && isManager) {
+      asideFields = asideFields.concat([
+        {
+          id: 'status',
+          heading: 'Status',
+          value: status && status.label,
+        },
+        {
+          id: 'updated',
+          heading: 'Updated At',
+          value: indicator.attributes.updated_at,
+        },
+        {
+          id: 'updated_by',
+          heading: 'Updated By',
+          value: indicator.user && indicator.user.attributes.name,
+        },
+      ]);
+    }
+    const pageActions = isManager
+    ? [
+      {
+        type: 'simple',
+        title: 'Add progress report',
+        onClick: this.handleNewReport,
+      },
+      {
+        type: 'simple',
+        title: 'Edit',
+        onClick: this.handleEdit,
+      },
+      {
+        type: 'primary',
+        title: 'Close',
+        onClick: this.handleClose,
+      },
+    ]
+    : [{
+      type: 'primary',
+      title: 'Close',
+      onClick: this.handleClose,
+    }];
 
     return (
       <div>
@@ -73,37 +122,21 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !indicator && !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { !indicator && dataReady &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        { indicator &&
-          <Page
-            title={this.context.intl.formatMessage(messages.pageTitle)}
-            actions={[
-              {
-                type: 'simple',
-                title: 'Add progress report',
-                onClick: this.handleNewReport,
-              },
-              {
-                type: 'simple',
-                title: 'Edit',
-                onClick: this.handleEdit,
-              },
-              {
-                type: 'primary',
-                title: 'Close',
-                onClick: this.handleClose,
-              },
-            ]}
-          >
+        <Page
+          title={this.context.intl.formatMessage(messages.pageTitle)}
+          actions={pageActions}
+        >
+          { !indicator && !dataReady &&
+            <div>
+              <FormattedMessage {...messages.loading} />
+            </div>
+          }
+          { !indicator && dataReady &&
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          }
+          { indicator &&
             <EntityView
               fields={{
                 header: {
@@ -113,28 +146,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                       value: indicator.attributes.title,
                     },
                   ],
-                  aside: [
-                    {
-                      id: 'number',
-                      heading: 'Number',
-                      value: reference,
-                    },
-                    {
-                      id: 'status',
-                      heading: 'Status',
-                      value: status && status.label,
-                    },
-                    {
-                      id: 'updated',
-                      heading: 'Updated At',
-                      value: indicator.attributes.updated_at,
-                    },
-                    {
-                      id: 'updated_by',
-                      heading: 'Updated By',
-                      value: indicator.user && indicator.user.attributes.name,
-                    },
-                  ],
+                  aside: asideFields,
                 },
                 body: {
                   main: [
@@ -156,18 +168,20 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                       values: this.mapReports(this.props.reports),
                     },
                   ],
-                  aside: [
-                    {
-                      id: 'manager',
-                      heading: 'Indicator manager',
-                      value: indicator.manager && indicator.manager.attributes.name,
-                    },
-                  ],
+                  aside: isManager
+                    ? [
+                      {
+                        id: 'manager',
+                        heading: 'Indicator manager',
+                        value: indicator.manager && indicator.manager.attributes.name,
+                      },
+                    ]
+                    : [],
                 },
               }}
             />
-          </Page>
-        }
+          }
+        </Page>
       </div>
     );
   }
@@ -177,6 +191,7 @@ IndicatorView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   indicator: PropTypes.object,
   dataReady: PropTypes.bool,
+  isManager: PropTypes.bool,
   actions: PropTypes.object,
   reports: PropTypes.object,
   params: PropTypes.object,
@@ -188,6 +203,7 @@ IndicatorView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
+  isManager: isUserManager(state),
   dataReady: isReady(state, { path: [
     'measures',
     'users',
@@ -252,6 +268,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('progress_reports'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
     },
   };
 }

@@ -27,7 +27,7 @@ import EntityListItem from 'components/EntityListItem';
 import Row from 'components/basic/Row';
 import Container from 'components/basic/Container';
 
-import { getEntities } from 'containers/App/selectors';
+import { getEntities, isUserManager } from 'containers/App/selectors';
 
 import {
   FILTER_FORM_MODEL,
@@ -608,6 +608,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       activeEditOption,
       activePanel,
       dataReady,
+      isManager,
     } = this.props;
     // sorted entities
     const entities = this.props.entities && orderBy(
@@ -623,15 +624,16 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     // map entities to entity list item data
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
-
-    const panelSwitchOptions = [
-      {
-        label: 'Filter list',
-        active: activePanel === FILTERS_PANEL,
-        onClick: () => {
-          this.props.onPanelSelect(FILTERS_PANEL);
-        },
+    const filterListOption = {
+      label: 'Filter list',
+      active: activePanel === FILTERS_PANEL,
+      onClick: () => {
+        this.props.onPanelSelect(FILTERS_PANEL);
       },
+    };
+    const panelSwitchOptions = isManager
+    ? [
+      filterListOption,
       {
         label: 'Edit list',
         active: activePanel === EDIT_PANEL,
@@ -639,7 +641,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           this.props.onPanelSelect(EDIT_PANEL);
         },
       },
+    ]
+    : [
+      filterListOption,
     ];
+
     return (
       <Container>
         <Row>
@@ -656,7 +662,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   onHideFilterForm={this.props.onHideFilterForm}
                 />
               }
-              { dataReady && activePanel === EDIT_PANEL &&
+              { dataReady && isManager && activePanel === EDIT_PANEL &&
                 <EntityListEdit
                   editGroups={entitiesSelected.length ? fromJS(this.makeEditGroups()) : null}
                   formOptions={activeEditOption && entitiesSelected.length ? fromJS(this.makeActiveEditOptions(entitiesSelected)) : null}
@@ -669,7 +675,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             </EntityListSidebar>
           </Grid>
           <Grid sm={3 / 4}>
-            <PageHeader title={this.props.header.title} actions={this.props.header.actions} />
+            <PageHeader
+              title={this.props.header.title}
+              actions={
+                isManager
+                ? this.props.header.actions
+                : []
+              }
+            />
             { !dataReady &&
               <div>
                 <Loading />
@@ -678,7 +691,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             { dataReady &&
               <Form model={LISTINGS_FORM_MODEL}>
                 {entitiesList.map((entity, i) =>
-                  <EntityListItem key={i} model={`.entities.${entity.id}`} {...entity} />
+                  <EntityListItem
+                    key={i}
+                    model={`.entities.${entity.id}`}
+                    select={isManager}
+                    {...entity}
+                  />
                 )}
               </Form>
             }
@@ -693,6 +711,7 @@ EntityList.propTypes = {
   entities: PropTypes.object.isRequired,
   // selects: PropTypes.object, // only used in mapStateToProps
   dataReady: PropTypes.bool,
+  isManager: PropTypes.bool,
   filters: PropTypes.object,
   edits: PropTypes.object,
   taxonomies: PropTypes.object,
@@ -803,6 +822,7 @@ const getWithoutQuery = (props) =>
   });
 
 const mapStateToProps = (state, props) => ({
+  isManager: isUserManager(state),
   activeFilterOption: activeFilterOptionSelector(state),
   activeEditOption: activeEditOptionSelector(state),
   activePanel: activePanelSelector(state),

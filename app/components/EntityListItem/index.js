@@ -14,6 +14,7 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
     children: PropTypes.object,
     side: PropTypes.object,
     model: PropTypes.string,
+    select: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -30,7 +31,7 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
       <ListItem>
         <table><tbody><tr>
           <td>
-            {this.props.model &&
+            {this.props.model && this.props.select &&
               <Control.checkbox model=".selected" />
             }
           </td>

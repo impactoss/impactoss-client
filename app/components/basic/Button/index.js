@@ -6,8 +6,8 @@ import styled from 'styled-components';
 
 const Button = styled.div`
   display: inline-block;
-  color: #000;
-  font-size:16px;
+  color: #EB6E51;
+  font-size:20px;
   font-weight:bold;
   &:hover {
     color: #f8877f;

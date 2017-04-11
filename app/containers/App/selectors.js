@@ -17,6 +17,8 @@ import { createSelector } from 'reselect';
 import createCachedSelector from 're-reselect';
 import { reduce } from 'lodash/collection';
 
+import { USER_ROLES } from 'containers/App/constants';
+
 // high level state selects
 const getRoute = (state) => state.get('route');
 const getGlobal = (state) => state.get('global');
@@ -315,6 +317,41 @@ const isSignedIn = createSelector(
   (sessionUser) => sessionUser.get('isSignedIn')
 );
 
+// const makeSessionUserRoles = () => sessionUserRoles;
+const sessionUserRoles = createSelector(
+  (state) => state,
+  getSessionUser,
+  (state, sessionUser) => {
+    if (sessionUser.get('attributes') && sessionUser.get('isSignedIn')) {
+      const roles = getEntities(state, {
+        path: 'user_roles',
+        out: 'js',
+        where: {
+          user_id: sessionUser.get('attributes').id,
+        },
+      });
+      return roles ? Object.values(roles).map((role) => role.attributes.role_id) : [];
+    }
+    return [];
+  }
+);
+
+const isUserAdmin = createSelector(
+  sessionUserRoles,
+  (userRoles) => userRoles.indexOf(USER_ROLES.ADMIN) > -1
+);
+
+const makeIsUserManager = () => isUserManager;
+const isUserManager = createSelector(
+  sessionUserRoles,
+  (userRoles) => userRoles.indexOf(USER_ROLES.MANAGER) > -1
+);
+
+const isUserContributor = createSelector(
+  sessionUserRoles,
+  (userRoles) => userRoles.indexOf(USER_ROLES.CONTRIBUTOR) > -1
+);
+
 const getUserEntities = createSelector(
   getGlobalEntities,
   (entities) => entities.get('users')
@@ -361,4 +398,9 @@ export {
   isSignedIn,
   makeSelectSessionUserId,
   getSessionUserId,
+  sessionUserRoles,
+  isUserAdmin,
+  isUserManager,
+  makeIsUserManager,
+  isUserContributor,
 };

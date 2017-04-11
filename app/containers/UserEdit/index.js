@@ -24,6 +24,7 @@ import {
   getUser,
   getEntities,
   isReady,
+  isUserManager,
 } from 'containers/App/selectors';
 
 import {
@@ -107,7 +108,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   }), [])
 
   render() {
-    const { user, dataReady } = this.props;
+    const { user, dataReady, isManager } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
@@ -120,42 +121,42 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !user && !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { !user && dataReady && !saveError &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        {user &&
-          <Page
-            title={this.context.intl.formatMessage(messages.pageTitle)}
-            actions={[
-              {
-                type: 'simple',
-                title: 'Cancel',
-                onClick: () => this.props.handleCancel(reference),
-              },
-              {
-                type: 'primary',
-                title: 'Save',
-                onClick: () => this.props.handleSubmit(
-                  this.props.form.data,
-                  this.props.taxonomies,
-                  this.props.roles
-                ),
-              },
-            ]}
-          >
-            {saveSending &&
-              <p>Saving</p>
-            }
-            {saveError &&
-              <p>{saveError}</p>
-            }
+        <Page
+          title={this.context.intl.formatMessage(messages.pageTitle)}
+          actions={[
+            {
+              type: 'simple',
+              title: 'Cancel',
+              onClick: () => this.props.handleCancel(reference),
+            },
+            {
+              type: 'primary',
+              title: 'Save',
+              onClick: () => this.props.handleSubmit(
+                this.props.form.data,
+                this.props.taxonomies,
+                this.props.roles
+              ),
+            },
+          ]}
+        >
+          {saveSending &&
+            <p>Saving</p>
+          }
+          {saveError &&
+            <p>{saveError}</p>
+          }
+          { !user && !dataReady &&
+            <div>
+              <FormattedMessage {...messages.loading} />
+            </div>
+          }
+          { !user && dataReady && !saveError &&
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          }
+          {user &&
             <EntityForm
               model="userEdit.form.data"
               handleSubmit={(formData) => this.props.handleSubmit(
@@ -179,24 +180,26 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                       },
                     },
                   ],
-                  aside: [
-                    this.props.roles ? this.renderRoleControl(this.props.roles) : null,
-                    {
-                      id: 'no',
-                      controlType: 'info',
-                      displayValue: reference,
-                    },
-                    {
-                      id: 'updated',
-                      controlType: 'info',
-                      displayValue: user.attributes.updated_at,
-                    },
-                    {
-                      id: 'updated_by',
-                      controlType: 'info',
-                      displayValue: user.user && user.user.attributes.name,
-                    },
-                  ],
+                  aside: isManager
+                    ? [
+                      this.props.roles ? this.renderRoleControl(this.props.roles) : null,
+                      {
+                        id: 'no',
+                        controlType: 'info',
+                        displayValue: reference,
+                      },
+                      {
+                        id: 'updated',
+                        controlType: 'info',
+                        displayValue: user.attributes.updated_at,
+                      },
+                      {
+                        id: 'updated_by',
+                        controlType: 'info',
+                        displayValue: user.user && user.user.attributes.name,
+                      },
+                    ]
+                  : [],
                 },
                 body: {
                   main: [
@@ -212,12 +215,12 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                       },
                     },
                   ],
-                  aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
+                  aside: isManager && this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
                 },
               }}
             />
-          </Page>
-        }
+          }
+        </Page>
       </div>
     );
   }
@@ -234,6 +237,7 @@ UserEdit.propTypes = {
   roles: PropTypes.object,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
+  isManager: PropTypes.bool,
   params: PropTypes.object,
 };
 
@@ -242,11 +246,11 @@ UserEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
+  isManager: isUserManager(state),
   page: pageSelector(state),
   form: formSelector(state),
   dataReady: isReady(state, { path: [
     'users',
-    'user_roles',
     'roles',
     'categories',
     'taxonomies',
@@ -372,7 +376,6 @@ function mapDispatchToProps(dispatch) {
             : payloads
         , List()),
       }));
-
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
