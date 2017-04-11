@@ -3,6 +3,19 @@ import Immutable from 'immutable';
 import { kebabCase } from 'lodash/string';
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/IndeterminateCheckbox';
 
+export const getChangedOptions = (options) =>
+  options.filter((o) => o.get('hasChanged'));
+
+export const getCheckedValuesFromOptions = (options, onlyChanged = false) => {
+  const opts = onlyChanged ? getChangedOptions(options) : options;
+  return opts.filter((o) => o.get('checked')).map((o) => o.get('value'));
+};
+
+export const getUncheckedValuesFromOptions = (options, onlyChanged = false) => {
+  const opts = onlyChanged ? getChangedOptions(options) : options;
+  return opts.filterNot((o) => o.get('checked')).map((o) => o.get('value'));
+};
+
 const sortValues = {
   [CHECKBOX_STATES.checked]: 1,
   [CHECKBOX_STATES.indeterminate]: 0,
@@ -43,7 +56,7 @@ export default class MultiSelect extends React.Component {
     this.props.onChange(nextValues);
   }
 
-  getInitialValue = (value) => this.props.initialValues.find((v) => this.props.valueCompare(value, v));
+  getInitialValue = (value) => value ? this.props.initialValues.find((v) => this.props.valueCompare(value, v)) : null;
 
   setChecked = (option, value) => value ? option.setIn(['value', 'checked'], value.get('checked')) : option;
 

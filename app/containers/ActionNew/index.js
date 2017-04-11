@@ -12,6 +12,8 @@ import { browserHistory } from 'react-router';
 
 import { Map, List } from 'immutable';
 
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { getEntities, isReady } from 'containers/App/selectors';
@@ -242,15 +244,13 @@ function mapDispatchToProps(dispatch) {
     },
     handleSubmit: (formData) => {
       let saveData = formData;
-      const checkedIdsReducer = (checkedIds, option) => option.get('checked') ? checkedIds.push(option.get('value')) : checkedIds;
-      console.log(formData.toJS())
 
       // measureCategories
       if (formData.get('associatedTaxonomies')) {
         saveData = saveData.set(
           'measureCategories',
           formData.get('associatedTaxonomies')
-          .reduce(checkedIdsReducer, List())
+          .map(getCheckedValuesFromOptions)
           .reduce((updates, formCategoryIds) => Map({
             delete: List(),
             create: updates.get('create').concat(formCategoryIds.map((id) => Map({
@@ -264,27 +264,23 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('associatedRecommendations')) {
         saveData = saveData.set('recommendationMeasures', Map({
           delete: List(),
-          create: formData.get('associatedRecommendations')
-          .reduce(checkedIdsReducer, List())
+          create: getCheckedValuesFromOptions(formData.get('associatedRecommendations'))
           .map((id) => Map({
             recommendation_id: id,
           })),
         }));
       }
+
       // indicators
       if (formData.get('associatedIndicators')) {
         saveData = saveData.set('measureIndicators', Map({
           delete: List(),
-          create: formData.get('associatedIndicators')
-          .reduce(checkedIdsReducer, List())
+          create: getCheckedValuesFromOptions(formData.get('associatedIndicators'))
           .map((id) => Map({
             indicator_id: id,
           })),
         }));
       }
-
-      console.log(saveData.toJS());
-      return
 
       dispatch(save(saveData.toJS()));
     },
