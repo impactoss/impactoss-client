@@ -26,6 +26,7 @@ import {
   getEntity,
   getEntities,
   isReady,
+  isUserManager,
 } from 'containers/App/selectors';
 
 import {
@@ -104,7 +105,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
 
   render() {
-    const { indicator, dataReady } = this.props;
+    const { indicator, dataReady, isManager } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
@@ -209,7 +210,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                     this.props.actions ? this.renderActionControl(this.props.actions) : null,
                   ],
                   aside: [
-                    this.props.users ? this.renderUserControl(this.props.users) : null,
+                    this.props.users && isManager ? this.renderUserControl(this.props.users) : null,
                   ],
                 },
               }}
@@ -230,6 +231,7 @@ IndicatorEdit.propTypes = {
   form: PropTypes.object,
   indicator: PropTypes.object,
   dataReady: PropTypes.bool,
+  isManager: PropTypes.bool,
   params: PropTypes.object,
   actions: PropTypes.object,
   users: PropTypes.object,
@@ -240,6 +242,7 @@ IndicatorEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
+  isManager: isUserManager(state),
   page: pageSelector(state),
   form: formSelector(state),
   dataReady: isReady(state, { path: [
