@@ -11,6 +11,7 @@ import {
   HIDE_EDIT_FORM,
   SHOW_PANEL,
   SAVE_EDITS,
+  RESET_STATE,
 } from './constants';
 
 export function showFilterForm(option) {
@@ -50,5 +51,11 @@ export function saveEdits(data) {
   return {
     type: SAVE_EDITS,
     data,
+  };
+}
+
+export function resetState() {
+  return {
+    type: RESET_STATE,
   };
 }
