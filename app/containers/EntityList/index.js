@@ -8,6 +8,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 import { Form } from 'react-redux-form/immutable';
+
 // import { updateQueryStringParams } from 'utils/history';
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
 import { pick } from 'lodash/object';
@@ -16,6 +17,7 @@ import { Map, List, fromJS } from 'immutable';
 
 import Grid from 'grid-styled';
 
+import Loading from 'components/Loading';
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListFilters from 'components/EntityListFilters';
 import EntityListEdit from 'components/EntityListEdit';
@@ -105,7 +107,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           if (taxonomy) {
             taxonomyIds.push(taxonomy.id); // tracking to identify missing taxonomies
             // if taxonomy active add filter option
-            if (activeFilterOption.optionId === taxonomy.id.toString) {
+            if (activeFilterOption.optionId === taxonomy.id.toString()) {
               filterOptions.title = filterOptions.title || taxonomy.attributes.title;
               // if category already added
               if (filterOptions.options[catId]) {
@@ -248,14 +250,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       groupId: 'attributes',
       options: {},
     };
-
     forEach(Object.values(entities), (entity) => {
       forEach(filters.attributes.options, (option) => {
+        // the attribute option
         if (activeFilterOption.optionId === option.attribute) {
           filterOptions.title = filterOptions.title || option.label;
           filterOptions.search = filterOptions.search || option.search;
 
-          if (typeof entity.attributes[option.attribute] !== 'undefined' && !!entity.attributes[option.attribute]) {
+          if (typeof entity.attributes[option.attribute] !== 'undefined' && entity.attributes[option.attribute] !== null) {
             // add connected entities if not present otherwise increase count
             const value = entity.attributes[option.attribute].toString();
             if (filterOptions.options[value]) {
@@ -270,20 +272,20 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               });
             } else if (option.extension && !!entity[option.extension.key]) {
               const extension = Object.values(entity[option.extension.key])[0];
-              filterOptions.options[value] = this.initOption({
+              filterOptions.options[value] = this.initURLOption({
                 label: extension ? extension.attributes[option.extension.label] : value,
                 value: `${option.attribute}:${value}`,
                 count: 1,
                 query: 'where',
               });
             }
-          } else if (option.extension.without) {
+          } else if (option.extension && option.extension.without) {
             if (filterOptions.options.without) {
               // no connection present
               // add without option
               filterOptions.options.without.count += 1;
             } else {
-              filterOptions.options.without = this.initOption({
+              filterOptions.options.without = this.initURLOption({
                 label: `Without ${option.label}`,
                 value: `${option.attribute}:null`,
                 count: 1,
@@ -605,6 +607,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       activeFilterOption,
       activeEditOption,
       activePanel,
+      dataReady,
     } = this.props;
     // sorted entities
     const entities = this.props.entities && orderBy(
@@ -644,7 +647,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             <EntityListSidebar
               options={panelSwitchOptions}
             >
-              { activePanel === FILTERS_PANEL &&
+              { dataReady && activePanel === FILTERS_PANEL &&
                 <EntityListFilters
                   filterGroups={fromJS(this.makeFilterGroups())}
                   formOptions={activeFilterOption ? fromJS(this.makeActiveFilterOptions(entities)) : null}
@@ -653,7 +656,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   onHideFilterForm={this.props.onHideFilterForm}
                 />
               }
-              { activePanel === EDIT_PANEL &&
+              { dataReady && activePanel === EDIT_PANEL &&
                 <EntityListEdit
                   editGroups={entitiesSelected.length ? fromJS(this.makeEditGroups()) : null}
                   formOptions={activeEditOption && entitiesSelected.length ? fromJS(this.makeActiveEditOptions(entitiesSelected)) : null}
@@ -667,11 +670,18 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           </Grid>
           <Grid sm={3 / 4}>
             <PageHeader title={this.props.header.title} actions={this.props.header.actions} />
-            <Form model={LISTINGS_FORM_MODEL}>
-              {entitiesList.map((entity, i) =>
-                <EntityListItem key={i} model={`.entities.${entity.id}`} {...entity} />
-              )}
-            </Form>
+            { !dataReady &&
+              <div>
+                <Loading />
+              </div>
+            }
+            { dataReady &&
+              <Form model={LISTINGS_FORM_MODEL}>
+                {entitiesList.map((entity, i) =>
+                  <EntityListItem key={i} model={`.entities.${entity.id}`} {...entity} />
+                )}
+              </Form>
+            }
           </Grid>
         </Row>
       </Container>
@@ -682,6 +692,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 EntityList.propTypes = {
   entities: PropTypes.object.isRequired,
   // selects: PropTypes.object, // only used in mapStateToProps
+  dataReady: PropTypes.bool,
   filters: PropTypes.object,
   edits: PropTypes.object,
   taxonomies: PropTypes.object,

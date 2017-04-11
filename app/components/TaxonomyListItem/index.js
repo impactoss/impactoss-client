@@ -10,13 +10,9 @@ export default class TaxonomyListItem extends React.PureComponent { // eslint-di
   render() {
     const { taxonomy } = this.props;
     return (
-      <div>
-        <h2>
-          <Link to={taxonomy.linkTo}>
-            {`${taxonomy.count} ${taxonomy.title}`}
-          </Link>
-        </h2>
-      </div>
+      <Link to={taxonomy.linkTo}>
+        <h4>{`${taxonomy.count} ${taxonomy.title}`}</h4>
+      </Link>
     );
   }
 }

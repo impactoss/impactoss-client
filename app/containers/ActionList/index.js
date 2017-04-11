@@ -7,7 +7,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
 
 import EntityList from 'containers/EntityList';
@@ -238,21 +237,15 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { dataReady &&
-          <EntityList
-            location={this.props.location}
-            mapToEntityList={this.mapToEntityList}
-            selects={selects}
-            filters={filters}
-            edits={edits}
-            header={headerOptions}
-          />
-        }
+        <EntityList
+          location={this.props.location}
+          mapToEntityList={this.mapToEntityList}
+          selects={selects}
+          filters={filters}
+          edits={edits}
+          header={headerOptions}
+          dataReady={dataReady}
+        />
       </div>
     );
   }
