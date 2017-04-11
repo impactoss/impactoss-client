@@ -1,6 +1,6 @@
 /*
  *
- * ActionNew actions
+ * CategoryNew actions
  *
  */
 

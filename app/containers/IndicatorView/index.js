@@ -40,6 +40,9 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   handleEdit = () => {
     browserHistory.push(`/indicators/edit/${this.props.params.id}`);
   }
+  handleNewReport = () => {
+    browserHistory.push(`/reports/new/${this.props.params.id}`);
+  }
 
   handleClose = () => {
     browserHistory.push('/indicators');
@@ -50,6 +53,11 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     Object.values(actions).map((action) => ({
       label: action.attributes.title,
       linkTo: `/actions/${action.id}`,
+    }))
+  mapReports = (reports) =>
+    Object.values(reports).map((report) => ({
+      label: report.attributes.title,
+      linkTo: `/reports/${report.id}`,
     }))
 
   render() {
@@ -79,6 +87,11 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
           <Page
             title={this.context.intl.formatMessage(messages.pageTitle)}
             actions={[
+              {
+                type: 'simple',
+                title: 'Add progress report',
+                onClick: this.handleNewReport,
+              },
               {
                 type: 'simple',
                 title: 'Edit',
@@ -136,6 +149,19 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                       type: 'list',
                       values: this.mapActions(this.props.actions),
                     },
+                    {
+                      id: 'reports',
+                      heading: 'Progress reports',
+                      type: 'list',
+                      values: this.mapReports(this.props.reports),
+                    },
+                  ],
+                  aside: [
+                    {
+                      id: 'manager',
+                      heading: 'Indicator manager',
+                      value: indicator.manager && indicator.manager.attributes.name,
+                    },
                   ],
                 },
               }}
@@ -152,6 +178,7 @@ IndicatorView.propTypes = {
   indicator: PropTypes.object,
   dataReady: PropTypes.bool,
   actions: PropTypes.object,
+  reports: PropTypes.object,
   params: PropTypes.object,
 };
 
@@ -166,6 +193,7 @@ const mapStateToProps = (state, props) => ({
     'users',
     'indicators',
     'measure_indicators',
+    'progress_reports',
   ] }),
   indicator: getEntity(
     state,
@@ -173,12 +201,20 @@ const mapStateToProps = (state, props) => ({
       id: props.params.id,
       path: 'indicators',
       out: 'js',
-      extend: {
-        type: 'single',
-        path: 'users',
-        key: 'last_modified_user_id',
-        as: 'user',
-      },
+      extend: [
+        {
+          type: 'single',
+          path: 'users',
+          key: 'last_modified_user_id',
+          as: 'user',
+        },
+        {
+          type: 'single',
+          path: 'users',
+          key: 'manager_id',
+          as: 'manager',
+        },
+      ],
     },
   ),
 
@@ -196,6 +232,16 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
+  // all connected reports
+  reports: getEntities(
+    state, {
+      path: 'progress_reports',
+      out: 'js',
+      where: {
+        indicator_id: props.params.id,
+      },
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -205,6 +251,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      dispatch(loadEntitiesIfNeeded('progress_reports'));
     },
   };
 }

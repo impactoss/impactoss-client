@@ -1,5 +1,0 @@
-/*
- *
- * RecommendationList constants
- *
- */

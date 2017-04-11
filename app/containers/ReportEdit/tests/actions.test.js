@@ -6,7 +6,7 @@ import {
   DEFAULT_ACTION,
 } from '../constants';
 
-describe('ActionList actions', () => {
+describe('ActionEdit actions', () => {
   describe('Default Action', () => {
     it('has a type of DEFAULT_ACTION', () => {
       const expected = {

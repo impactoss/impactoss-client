@@ -42,6 +42,11 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     label: entity.getIn(['attributes', 'title']),
   }));
 
+  mapUserOptions = (entities) => entities.toList().map((entity) => Map({
+    value: entity.get('id'),
+    label: entity.getIn(['attributes', 'name']),
+  }));
+
   // TODO this should be shared functionality
   renderActionControl = (actions) => ({
     id: 'actions',
@@ -49,6 +54,13 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     label: 'Actions',
     controlType: 'multiselect',
     options: this.mapActionOptions(actions),
+  });
+  renderUserControl = (users) => ({
+    id: 'users',
+    model: '.associatedUser',
+    label: 'Indicator manager',
+    controlType: 'multiselect',
+    options: this.mapUserOptions(users),
   });
 
   render() {
@@ -136,6 +148,9 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                     },
                     this.props.actions ? this.renderActionControl(this.props.actions) : null,
                   ],
+                  aside: [
+                    this.props.users ? this.renderUserControl(this.props.users) : null,
+                  ],
                 },
               }}
             />
@@ -153,6 +168,7 @@ IndicatorNew.propTypes = {
   indicatorNew: PropTypes.object,
   dataReady: PropTypes.bool,
   actions: PropTypes.object,
+  users: PropTypes.object,
 };
 
 IndicatorNew.contextTypes = {
@@ -164,6 +180,8 @@ const mapStateToProps = (state) => ({
   // all categories for all taggable taxonomies
   dataReady: isReady(state, { path: [
     'measures',
+    'users',
+    'user_roles',
   ] }),
 
   // all actions,
@@ -172,14 +190,30 @@ const mapStateToProps = (state) => ({
       path: 'measures',
     },
   ),
+
+  // all users, listing connection if any
+  users: getEntities(
+    state,
+    {
+      path: 'users',
+      connected: {
+        path: 'user_roles',
+        key: 'user_id',
+        where: {
+          role_id: 2, // contributors only
+        },
+      },
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       // dispatch(loadEntitiesIfNeeded('indicators'));
-      // dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
       // dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       // dispatch(loadEntitiesIfNeeded('measure_categories'));
     },
@@ -194,7 +228,10 @@ function mapDispatchToProps(dispatch) {
           })),
         }));
       }
-
+      // TODO: remove once have singleselect instead of multiselect
+      if (List.isList(saveData.get('associatedUser'))) {
+        saveData = saveData.setIn(['attributes', 'manager_id'], saveData.get('associatedUser').first());
+      }
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
