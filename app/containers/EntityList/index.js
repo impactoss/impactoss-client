@@ -7,6 +7,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
+
 // import { updateQueryStringParams } from 'utils/history';
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
 import { getEntitySortIteratee } from 'utils/sort';
@@ -14,6 +15,7 @@ import { fromJS } from 'immutable';
 
 import Grid from 'grid-styled';
 
+import Loading from 'components/Loading';
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListFilters from 'components/EntityListFilters';
 import EntityListEdit from 'components/EntityListEdit';
@@ -594,6 +596,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       activeFilterOption,
       activeEditOption,
       activePanel,
+      dataReady,
     } = this.props;
     // sorted entities
     const entities = this.props.entities && orderBy(
@@ -632,7 +635,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             <EntityListSidebar
               options={panelSwitchOptions}
             >
-              { activePanel === FILTERS_PANEL &&
+              { dataReady && activePanel === FILTERS_PANEL &&
                 <EntityListFilters
                   filterGroups={fromJS(this.makeFilterGroups())}
                   formOptions={activeFilterOption ? fromJS(this.makeActiveFilterOptions(entities)) : null}
@@ -641,7 +644,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   onHideFilterForm={this.props.onHideFilterForm}
                 />
               }
-              { activePanel === EDIT_PANEL &&
+              { dataReady && activePanel === EDIT_PANEL &&
                 <EntityListEdit
                   editGroups={entitiesSelected.length ? fromJS(this.makeEditGroups()) : null}
                   formOptions={activeEditOption && entitiesSelected.length ? fromJS(this.makeActiveEditOptions(entitiesSelected)) : null}
@@ -654,9 +657,16 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           </Grid>
           <Grid sm={3 / 4}>
             <PageHeader title={this.props.header.title} actions={this.props.header.actions} />
-            {entitiesList.map((entity, i) =>
-              <EntityListItem key={i} {...entity} />
-            )}
+            { !dataReady &&
+              <div>
+                <Loading />
+              </div>
+            }
+            { dataReady &&
+              entitiesList.map((entity, i) =>
+                <EntityListItem key={i} {...entity} />
+              )
+            }
           </Grid>
         </Row>
       </Container>
@@ -667,6 +677,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 EntityList.propTypes = {
   entities: PropTypes.object.isRequired,
   // selects: PropTypes.object, // only used in mapStateToProps
+  dataReady: PropTypes.bool,
   filters: PropTypes.object,
   edits: PropTypes.object,
   taxonomies: PropTypes.object,

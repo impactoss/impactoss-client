@@ -1,6 +1,8 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 
+import ListItem from './ListItem';
+
 export default class EntityListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
@@ -19,36 +21,42 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
 
   render() {
     const title = this.props.linkTo
-      ? <h2><Link to={this.props.linkTo}>{this.props.title}</Link></h2>
-      : <h2>{this.props.title}</h2>;
+      ? <strong><Link to={this.props.linkTo}>{this.props.title}</Link></strong>
+      : <strong>{this.props.title}</strong>;
 
     return (
-      <div >
-        <div>
-          <input type="checkbox" />
-        </div>
-        <div>
-          <div>
-            {this.props.reference &&
-              <span>{this.props.reference}</span>
+      <ListItem>
+        <table><tbody><tr>
+          <td>
+            <input type="checkbox" />
+          </td>
+          <td>
+            <div>
+              {this.props.reference &&
+                <div>{this.props.reference}</div>
+              }
+              <div>
+                {title}
+                {this.props.status &&
+                  <span>{` (${this.props.status})`}</span>
+                }
+              </div>
+            </div>
+            {this.props.children &&
+            <div>
+              {this.props.children}
+            </div>
             }
-            {title}
-            {this.props.status &&
-              <span>{this.props.status}</span>
+          </td>
+          <td>
+            {this.props.side &&
+              <span>
+                {this.props.side}
+              </span>
             }
-          </div>
-          {this.props.children &&
-          <div>
-            {this.props.children}
-          </div>
-          }
-        </div>
-        {this.props.side &&
-          <div>
-            {this.props.side}
-          </div>
-        }
-      </div>
+          </td>
+        </tr></tbody></table>
+      </ListItem>
     );
   }
 }
