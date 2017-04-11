@@ -1,7 +1,7 @@
 import { takeLatest, select, put } from 'redux-saga/effects';
 import { browserHistory } from 'react-router';
 // import { credentialsSelector } from './selectors';
-import { updateConnections } from 'containers/App/actions';
+import { updateConnections, updateEntities } from 'containers/App/actions';
 
 import { filtersCheckedSelector } from './selectors';
 
@@ -17,7 +17,17 @@ export function* doFilter() {
 }
 
 export function* saveEdits({ data }) {
-  if (!data.attributes) {
+  if (data.attributes) {
+    // data = { attributes: true, path: path, entities: [
+    //  { id: id, attributes: {...} },
+    //  { id: id, attributes: {...} }, ...
+    // ]}
+    yield put(updateEntities(data));
+  } else {
+    // data = { attributes: true, path: path, updates: {
+    //   creates: [{entity_id, assignedId}, ...],
+    //   deletes: [assignment, ids,...]
+    // }}
     yield put(updateConnections(data));
   }
 }

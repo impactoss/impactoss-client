@@ -289,8 +289,8 @@ export function* updateEntitiesSaga({ data }) {
     yield put(saveSending());
     // on the server
     const entitiesUpdated = yield call(updateEntitiesRequest, data.path, data.entities);
-    // and on the client
-    yield entitiesUpdated.map((entity) => put(updateEntity(data.path, entity)));
+    // // and on the client
+    yield entitiesUpdated.map((entity) => put(updateEntity(data.path, entity.data)));
     yield put(saveSuccess());
   } catch (error) {
     yield put(saveError('An error occurred saving all or parts of your changes. Please review carefully and try again. '));

@@ -803,7 +803,7 @@ const mapStateToProps = (state, props) => ({
   : null,
 });
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, props) {
   return {
     onShowFilterForm: (option) => {
       dispatch(showFilterForm(option));
@@ -834,8 +834,17 @@ function mapDispatchToProps(dispatch) {
         .map((option) => option.get('value'));
 
       if (activeEditOption.group === 'attributes') {
-        saveData = saveData.set('attributes', true);
-        // TODO attributes
+        if (creates.size > 0) {
+          const newValue = creates.first(); // take the first TODO multiselect should be run in single value mode and only return 1 value
+          saveData = saveData
+            .set('attributes', true)
+            .set('path', props.selects.entities.path)
+            .set('entities', entities.reduce((updatedEntities, entity) =>
+              entity.getIn(['attributes', activeEditOption.optionId]) !== newValue
+                ? updatedEntities.push(entity.setIn(['attributes', activeEditOption.optionId], newValue))
+                : updatedEntities
+            , List()));
+        }
       } else {
         // associations
         saveData = saveData
@@ -905,6 +914,7 @@ function mapDispatchToProps(dispatch) {
           }, List()));
         }
       }
+
       dispatch(saveEdits(saveData.toJS()));
     },
   };
