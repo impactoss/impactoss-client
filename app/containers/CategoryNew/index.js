@@ -13,6 +13,7 @@ import { browserHistory } from 'react-router';
 import { Map, List } from 'immutable';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { USER_ROLES } from 'containers/App/constants';
 
 import {
   getEntity,
@@ -207,7 +208,7 @@ const mapStateToProps = (state, props) => ({
         path: 'user_roles',
         key: 'user_id',
         where: {
-          role_id: 1, // managers only TODO: from constants
+          role_id: USER_ROLES.MANAGER, // managers only TODO: from constants
         },
       },
     },

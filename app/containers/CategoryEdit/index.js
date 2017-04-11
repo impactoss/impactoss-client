@@ -17,6 +17,7 @@ import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
+import { USER_ROLES } from 'containers/App/constants';
 
 import {
   getEntity,
@@ -253,7 +254,7 @@ const mapStateToProps = (state, props) => ({
         path: 'user_roles',
         key: 'user_id',
         where: {
-          role_id: 1, // managers only TODO: from constants
+          role_id: USER_ROLES.MANAGER, // managers only TODO: from constants
         },
       },
     },

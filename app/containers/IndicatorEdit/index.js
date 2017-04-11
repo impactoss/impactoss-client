@@ -15,7 +15,7 @@ import { Map, List, fromJS } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
@@ -293,7 +293,7 @@ const mapStateToProps = (state, props) => ({
         path: 'user_roles',
         key: 'user_id',
         where: {
-          role_id: 2, // contributors only TODO: from constants
+          role_id: USER_ROLES.CONTRIBUTOR, // contributors only TODO: from constants
         },
       },
     },
