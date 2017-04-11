@@ -14,6 +14,7 @@ import {
   HIDE_EDIT_FORM,
   SHOW_PANEL,
   FILTERS_PANEL,
+  RESET_STATE,
 } from './constants';
 
 const initialState = fromJS({
@@ -50,6 +51,8 @@ function entityListReducer(state = initialState, action) {
       return state.set('activeEditOption', action.option);
     case HIDE_EDIT_FORM:
       return state.set('activeEditOption', fromJS(initialState.toJS().activeEditOption));
+    case RESET_STATE:
+      return initialState;
     default:
       return state;
   }

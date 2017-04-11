@@ -1,5 +1,6 @@
 import { takeLatest, select, put } from 'redux-saga/effects';
 import { browserHistory } from 'react-router';
+import { LOCATION_CHANGE } from 'react-router-redux';
 // import { credentialsSelector } from './selectors';
 import { updateConnections, updateEntities } from 'containers/App/actions';
 
@@ -9,6 +10,8 @@ import {
   FILTER_FORM_MODEL,
   SAVE_EDITS,
 } from './constants';
+
+import { resetState } from './actions';
 
 export function* doFilter() {
   const URLSearchParams = yield select(filtersCheckedSelector);
@@ -32,6 +35,10 @@ export function* saveEdits({ data }) {
   }
 }
 
+export function* doResetState() {
+  yield put(resetState());
+}
+
 // Individual exports for testing
 export default function* entityList() {
   yield takeLatest(
@@ -40,4 +47,9 @@ export default function* entityList() {
   );
 
   yield takeLatest(SAVE_EDITS, saveEdits);
+
+  yield takeLatest(
+    (action) => action.type === LOCATION_CHANGE && action.payload.action === 'PUSH',
+    doResetState
+  );
 }
