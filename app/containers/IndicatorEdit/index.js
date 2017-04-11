@@ -13,6 +13,8 @@ import { browserHistory } from 'react-router';
 
 import { Map, List, fromJS } from 'immutable';
 
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
@@ -61,20 +63,26 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       id: indicator.id,
       attributes: fromJS(indicator.attributes),
       associatedActions: actions
-        ? actions.reduce((ids, entity) => entity.get('associated') ? ids.push(entity.get('id')) : ids, List())
-        : List(),
-      associatedUser: indicator.attributes.manager_id ? List().push(indicator.attributes.manager_id.toString()) : List(),
+      ? actions.reduce((options, entity) => options.push(Map({
+        checked: !!entity.get('associated'),
+        value: entity.get('id'),
+      })), List())
+      : List(),
+      associatedUser: indicator.attributes.manager_id ? List([Map({
+        value: indicator.attributes.manager_id.toString(),
+        checked: true,
+      })]) : List(),
       // TODO allow single value for singleSelect
     });
   }
 
   mapActionOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
   mapUserOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'name']),
   }));
 
@@ -307,7 +315,7 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleSubmit: (formData, actions) => {
       // actions
-      const formActionIds = formData.get('associatedActions');
+      const formActionIds = getCheckedValuesFromOptions(formData.get('associatedActions'));
       // store associated Actions as { [action.id]: [association.id], ... }
       const associatedActions = actions.reduce((actionsAssociated, action) => {
         if (action.get('associated')) {
@@ -335,8 +343,10 @@ function mapDispatchToProps(dispatch, props) {
 
       // TODO: remove once have singleselect instead of multiselect
       if (List.isList(saveData.get('associatedUser'))) {
-        saveData = saveData.setIn(['attributes', 'manager_id'], saveData.get('associatedUser').first());
+        const user = saveData.get('associatedUser').first();
+        saveData = saveData.setIn(['attributes', 'manager_id'], user ? user.get('value') : null);
       }
+
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
