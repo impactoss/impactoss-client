@@ -13,6 +13,8 @@ import { browserHistory } from 'react-router';
 
 import { Map, List, fromJS } from 'immutable';
 
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
@@ -372,10 +374,8 @@ function mapDispatchToProps(dispatch, props) {
     },
 
     handleSubmit: (formData, taxonomies, recommendations, indicators) => {
-      const checkedIdsReducer = (checkedIds, option) => option.get('checked') ? checkedIds.push(option.get('value')) : checkedIds;
-
       let saveData = formData.set('measureCategories', taxonomies.reduce((updates, tax, taxId) => {
-        const formCategoryIds = formData.getIn(['associatedTaxonomies', taxId]).reduce(checkedIdsReducer, List()); // the list of categories checked in form
+        const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
 
         // store associated cats as { [cat.id]: [association.id], ... }
         // then we can use keys for creating new associations and values for deleting
@@ -404,7 +404,7 @@ function mapDispatchToProps(dispatch, props) {
       }, Map({ delete: List(), create: List() })));
 
       // recommendations
-      const formRecommendationIds = formData.get('associatedRecommendations').reduce(checkedIdsReducer, List());
+      const formRecommendationIds = getCheckedValuesFromOptions(formData.get('associatedRecommendations'));
       // store associated recs as { [rec.id]: [association.id], ... }
       const associatedRecommendations = recommendations.reduce((recsAssociated, rec) => {
         if (rec.get('associated')) {
@@ -430,7 +430,7 @@ function mapDispatchToProps(dispatch, props) {
       }));
 
       // indicators
-      const formIndicatorIds = formData.get('associatedIndicators').reduce(checkedIdsReducer, List());
+      const formIndicatorIds = getCheckedValuesFromOptions(formData.get('associatedIndicators'));
       // store associated recs as { [rec.id]: [association.id], ... }
       const associatedIndicators = indicators.reduce((indicatorsAssociated, indicator) => {
         if (indicator.get('associated')) {

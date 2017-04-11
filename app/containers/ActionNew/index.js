@@ -12,6 +12,8 @@ import { browserHistory } from 'react-router';
 
 import { Map, List } from 'immutable';
 
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { getEntities, isReady } from 'containers/App/selectors';
@@ -38,17 +40,17 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   }
 
   mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
   mapRecommendationOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
   mapIndicatorOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'title']),
   }));
 
@@ -247,7 +249,9 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('associatedTaxonomies')) {
         saveData = saveData.set(
           'measureCategories',
-          formData.get('associatedTaxonomies').reduce((updates, formCategoryIds) => Map({
+          formData.get('associatedTaxonomies')
+          .map(getCheckedValuesFromOptions)
+          .reduce((updates, formCategoryIds) => Map({
             delete: List(),
             create: updates.get('create').concat(formCategoryIds.map((id) => Map({
               category_id: id,
@@ -260,16 +264,19 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('associatedRecommendations')) {
         saveData = saveData.set('recommendationMeasures', Map({
           delete: List(),
-          create: formData.get('associatedRecommendations').map((id) => Map({
+          create: getCheckedValuesFromOptions(formData.get('associatedRecommendations'))
+          .map((id) => Map({
             recommendation_id: id,
           })),
         }));
       }
+
       // indicators
       if (formData.get('associatedIndicators')) {
         saveData = saveData.set('measureIndicators', Map({
           delete: List(),
-          create: formData.get('associatedIndicators').map((id) => Map({
+          create: getCheckedValuesFromOptions(formData.get('associatedIndicators'))
+          .map((id) => Map({
             indicator_id: id,
           })),
         }));

@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import Immutable, { fromJS } from 'immutable';
 import { Control } from 'react-redux-form/immutable';
 
-import MultiSelect from './MultiSelect';
+import MultiSelect, { getChangedOptions, getCheckedValuesFromOptions, getUncheckedValuesFromOptions } from './MultiSelect';
 
 const MultiSelectControl = (props) => {
   const { model, options, valueCompare, threeState, ...otherProps } = props;
@@ -15,7 +15,7 @@ const MultiSelectControl = (props) => {
       multiple
       mapProps={{
         values: (cprops) => cprops.viewValue,
-        initialValues: (cprops) => fromJS(cprops.fieldValue.loadedValue),
+        initialValues: (cprops) => fromJS(cprops.fieldValue.loadedValue), // TODO remove
         onChange: (cprops) => cprops.onChange,
       }}
       controlProps={{
@@ -36,3 +36,9 @@ MultiSelectControl.propTypes = {
 };
 
 export default MultiSelectControl;
+// Helper functions
+export {
+  getChangedOptions,
+  getCheckedValuesFromOptions,
+  getUncheckedValuesFromOptions,
+};

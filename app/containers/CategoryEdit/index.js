@@ -13,6 +13,7 @@ import { browserHistory } from 'react-router';
 
 import { Map, List, fromJS } from 'immutable';
 
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import Page from 'components/Page';
@@ -58,13 +59,16 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     return Map({
       id: category.id,
       attributes: fromJS(category.attributes),
-      associatedUser: category.attributes.manager_id ? List().push(category.attributes.manager_id.toString()) : List(),
+      associatedUser: category.attributes.manager_id ? List().push(Map({
+        value: category.attributes.manager_id.toString(),
+        checked: true,
+      })) : List(),
       // TODO allow single value for singleSelect
     });
   }
 
   mapUserOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'name']),
   }));
 
@@ -274,7 +278,7 @@ function mapDispatchToProps(dispatch) {
       let saveData = formData;
       // TODO: remove once have singleselect instead of multiselect
       if (List.isList(saveData.get('associatedUser'))) {
-        saveData = saveData.setIn(['attributes', 'manager_id'], saveData.get('associatedUser').first());
+        saveData = saveData.setIn(['attributes', 'manager_id'], getCheckedValuesFromOptions(saveData.get('associatedUser')).first());
       }
       dispatch(save(saveData.toJS()));
     },
