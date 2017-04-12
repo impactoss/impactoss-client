@@ -6,7 +6,6 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { browserHistory } from 'react-router';
 import { Form } from 'react-redux-form/immutable';
 
 // import { updateQueryStringParams } from 'utils/history';
@@ -54,11 +53,6 @@ import {
 } from './actions';
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  constructor(props) {
-    super(props);
-    this.URLParams = new URLSearchParams(browserHistory.getCurrentLocation().search);
-  }
 
   getEntitiesSelected = () => Object.values(pick(this.props.entities, this.props.entityIdsSelected));
 
@@ -597,8 +591,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
   initURLOption = (option) => ({
     ...option,
-    checked: this.URLParams.has(option.query) && this.URLParams.getAll(option.query).indexOf(option.value.toString()) >= 0,
-  })
+    checked: !!(
+      this.props.location.query[option.query]
+      && this.props.location.query[option.query].indexOf(option.value.toString()) > -1
+    ),
+  });
 
   render() {
     const {
@@ -718,7 +715,7 @@ EntityList.propTypes = {
   connections: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   mapToEntityList: PropTypes.func.isRequired,
-  //  location: PropTypes.object.isRequired, only needed in mapStateToProps
+  location: PropTypes.object.isRequired,
   // TODO: do not pass location directly but specific props, to allow multiple lists on same page
   header: PropTypes.object,
   sortBy: PropTypes.string,
