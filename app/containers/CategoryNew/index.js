@@ -187,7 +187,7 @@ CategoryNew.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isAdmin: isUserAdmin,
+  isAdmin: isUserAdmin(state),
   categoryNew: categoryNewSelector(state),
   dataReady: isReady(state, { path: [
     'taxonomies',
