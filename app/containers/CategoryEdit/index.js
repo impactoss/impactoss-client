@@ -13,6 +13,8 @@ import { browserHistory } from 'react-router';
 
 import { Map, List, fromJS } from 'immutable';
 
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
 import Page from 'components/Page';
@@ -280,9 +282,9 @@ function mapDispatchToProps(dispatch) {
     handleSubmit: (formData) => {
       let saveData = formData;
       // TODO: remove once have singleselect instead of multiselect
-      if (List.isList(saveData.get('associatedUser'))) {
-        const user = saveData.get('associatedUser').first();
-        saveData = saveData.setIn(['attributes', 'manager_id'], user ? user.get('value') : null);
+      const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));
+      if (List.isList(formUserIds) && formUserIds.size) {
+        saveData = saveData.setIn(['attributes', 'manager_id'], formUserIds.first());
       }
       dispatch(save(saveData.toJS()));
     },

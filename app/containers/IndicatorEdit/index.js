@@ -345,9 +345,9 @@ function mapDispatchToProps(dispatch, props) {
       }));
 
       // TODO: remove once have singleselect instead of multiselect
-      if (List.isList(saveData.get('associatedUser'))) {
-        const user = saveData.get('associatedUser').first();
-        saveData = saveData.setIn(['attributes', 'manager_id'], user ? user.get('value') : null);
+      const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));
+      if (List.isList(formUserIds) && formUserIds.size) {
+        saveData = saveData.setIn(['attributes', 'manager_id'], formUserIds.first());
       }
 
       dispatch(save(saveData.toJS()));
