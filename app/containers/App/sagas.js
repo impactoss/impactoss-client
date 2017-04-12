@@ -42,6 +42,7 @@ import {
   makeSelectPathnameOnAuthChange,
   makeSelectPreviousPathname,
   getRequestedAt,
+  isSignedIn,
 } from 'containers/App/selectors';
 
 import {
@@ -58,19 +59,29 @@ import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
 export function* checkEntitiesSaga(payload) {
   // requestedSelector returns the times that entities where fetched from the API
   const requestedAt = yield select(getRequestedAt, { path: payload.path });
+
   // If haven't requested yet, do so now.
   if (!requestedAt) {
+    const signedIn = yield select(isSignedIn);
+
     try {
       // First record that we are requesting
       yield put(entitiesRequested(payload.path, Date.now()));
-      // Call the API, cancel on invalidate
-      const { response } = yield race({
-        response: call(apiRequest, 'get', payload.path),
-        cancel: take(INVALIDATE_ENTITIES), // will also reset entities requested
-      });
-      if (response) {
-      // Save response
-        yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path, Date.now()));
+      // check role to prevent requesting endpoints not authorised
+      // TODO check could be refactored
+      if (!signedIn && (payload.path === 'user_roles' || payload.path === 'users')) {
+        // store empty response so the app wont wait for the results
+        yield put(entitiesLoaded({}, payload.path, Date.now()));
+      } else {
+        // Call the API, cancel on invalidate
+        const { response } = yield race({
+          response: call(apiRequest, 'get', payload.path),
+          cancel: take(INVALIDATE_ENTITIES), // will also reset entities requested
+        });
+        if (response) {
+          // Save response
+          yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path, Date.now()));
+        }
       }
     } catch (err) {
       // Whoops Save error
