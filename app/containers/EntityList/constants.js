@@ -13,9 +13,9 @@ export const SAVE_EDITS = 'nmrf/EntityList/SAVE_EDITS';
 export const RESET_STATE = 'nmrf/EntityList/RESET_STATE';
 
 export const REDUCER_PATH = 'entityList';
-export const FILTER_FORM_MODEL = `${REDUCER_PATH}.filterForm.data`;
-export const EDIT_FORM_MODEL = `${REDUCER_PATH}.editForm.data`;
-export const LISTINGS_FORM_MODEL = `${REDUCER_PATH}.listingsForm.data`;
+export const FILTER_FORM_MODEL = `${REDUCER_PATH}.forms.filterData`;
+export const EDIT_FORM_MODEL = `${REDUCER_PATH}.forms.editData`;
+export const LISTINGS_FORM_MODEL = `${REDUCER_PATH}.forms.listingsData`;
 
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';

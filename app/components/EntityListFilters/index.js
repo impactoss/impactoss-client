@@ -7,8 +7,8 @@
 import React, { PropTypes } from 'react';
 import Immutable, { Map } from 'immutable';
 
-import FilterForm from 'components/FilterForm';
-import Option from 'components/FilterForm/Option';
+import FilterForm from 'containers/FilterForm';
+import Option from 'containers/FilterForm/Option';
 
 export default class EntityListFilters extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
@@ -55,6 +55,7 @@ export default class EntityListFilters extends React.Component { // eslint-disab
 
   render() {
     const { filterGroups, formOptions, onHideFilterForm, formModel } = this.props;
+    // console.log('formOptions', formOptions && formOptions.toJS())
     return (
       <div>
         { filterGroups &&

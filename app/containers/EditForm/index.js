@@ -15,6 +15,7 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
     onClose: PropTypes.func,
     title: PropTypes.string,
     populateForm: PropTypes.func.isRequired,
+    // resetForm: PropTypes.func.isRequired,
     submitLabel: PropTypes.string,
   }
 
@@ -27,6 +28,7 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
   }
 
   componentWillReceiveProps(nextProps) {
+    // console.log('componentWillReceiveProps', nextProps)
      // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
     if (!isEqual(nextProps.options.toJS(), this.props.options.toJS())) {
       this.props.populateForm(nextProps.model, nextProps.options);
@@ -59,6 +61,9 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
 }
 
 const mapDispatchToProps = (dispatch) => ({
+  resetForm: (model) => {
+    dispatch(formActions.reset(model));
+  },
   populateForm: (model, options) => {
     dispatch(formActions.load(model, Immutable.Map({
       values: options.map((option) => option.get('value')),

@@ -28,18 +28,6 @@ const initialState = fromJS({
   activePanel: FILTERS_PANEL,
 });
 
-const filterFormData = fromJS({
-  values: [],
-});
-
-const editFormData = fromJS({
-  values: [],
-});
-
-const listingsFormData = fromJS({
-  entities: {},
-});
-
 function entityListReducer(state = initialState, action) {
   switch (action.type) {
     case SHOW_PANEL:
@@ -61,17 +49,23 @@ function entityListReducer(state = initialState, action) {
   }
 }
 
+const filterFormInitial = fromJS({
+  values: [],
+});
+const editFormInitial = fromJS({
+  values: [],
+});
+const listingsFormInitial = fromJS({
+  entities: {},
+});
+
 export default combineReducers({
   page: entityListReducer,
-  filterForm: combineForms({
-    data: filterFormData,
-  }, 'entityList.filterForm'),
-  editForm: combineForms({
-    data: editFormData,
-  }, 'entityList.editForm'),
-  listingsForm: combineForms({
-    data: listingsFormData,
-  }, 'entityList.listingsForm'),
+  forms: combineForms({
+    filterData: filterFormInitial,
+    editData: editFormInitial,
+    listingsData: listingsFormInitial,
+  }, 'entityList.forms'),
 });
 
 // export default entityListFilterReducer;
