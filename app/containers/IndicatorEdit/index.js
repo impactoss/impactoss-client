@@ -26,7 +26,6 @@ import {
   getEntity,
   getEntities,
   isReady,
-  isUserManager,
 } from 'containers/App/selectors';
 
 import {
@@ -98,14 +97,14 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   renderUserControl = (users) => ({
     id: 'users',
     model: '.associatedUser',
-    label: 'Indicator manager',
+    label: 'Assigned user',
     controlType: 'multiselect',
     options: this.mapUserOptions(users),
   });
 
 
   render() {
-    const { indicator, dataReady, isManager } = this.props;
+    const { indicator, dataReady } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
@@ -210,7 +209,31 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                     this.props.actions ? this.renderActionControl(this.props.actions) : null,
                   ],
                   aside: [
-                    this.props.users && isManager ? this.renderUserControl(this.props.users) : null,
+                    this.props.users ? this.renderUserControl(this.props.users) : null,
+                    {
+                      id: 'start',
+                      controlType: 'input',
+                      label: 'Reporting due date',
+                      model: '.attributes.start_date',
+                    },
+                    {
+                      id: 'repeat',
+                      controlType: 'checkbox',
+                      label: 'Repeat?',
+                      model: '.attributes.repeat',
+                    },
+                    {
+                      id: 'frequency',
+                      controlType: 'input',
+                      label: 'Reporting frequency in months',
+                      model: '.attributes.frequency_months',
+                    },
+                    {
+                      id: 'end',
+                      controlType: 'input',
+                      label: 'Reporting end date',
+                      model: '.attributes.end_date',
+                    },
                   ],
                 },
               }}
@@ -231,7 +254,6 @@ IndicatorEdit.propTypes = {
   form: PropTypes.object,
   indicator: PropTypes.object,
   dataReady: PropTypes.bool,
-  isManager: PropTypes.bool,
   params: PropTypes.object,
   actions: PropTypes.object,
   users: PropTypes.object,
@@ -242,7 +264,6 @@ IndicatorEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isManager: isUserManager(state),
   page: pageSelector(state),
   form: formSelector(state),
   dataReady: isReady(state, { path: [
@@ -296,7 +317,7 @@ const mapStateToProps = (state, props) => ({
         path: 'user_roles',
         key: 'user_id',
         where: {
-          role_id: USER_ROLES.CONTRIBUTOR, // contributors only TODO: from constants
+          role_id: USER_ROLES.CONTRIBUTOR, // contributors only
         },
       },
     },
@@ -348,6 +369,13 @@ function mapDispatchToProps(dispatch, props) {
       const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));
       if (List.isList(formUserIds) && formUserIds.size) {
         saveData = saveData.setIn(['attributes', 'manager_id'], formUserIds.first());
+      }
+
+      // cleanup
+      if (!saveData.getIn(['attributes', 'repeat'])) {
+        saveData = saveData
+          .setIn(['attributes', 'frequency_months'], null)
+          .setIn(['attributes', 'end_date'], null);
       }
 
       dispatch(save(saveData.toJS()));

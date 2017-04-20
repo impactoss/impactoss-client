@@ -270,8 +270,9 @@ export function validateToken() {
   };
 }
 
-export function invalidateEntities() {
+export function invalidateEntities(path) {
   return {
     type: INVALIDATE_ENTITIES,
+    path,
   };
 }

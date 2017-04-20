@@ -53,6 +53,7 @@ const initialState = fromJS({
     recommendation_measures: null,
     recommendation_categories: null,
     progress_reports: null,
+    due_dates: null,
   },
   ready: { // Record the time that entities where returned from the server
     taxonomies: null,
@@ -69,6 +70,7 @@ const initialState = fromJS({
     recommendation_measures: null,
     recommendation_categories: null,
     progress_reports: null,
+    due_dates: null,
   },
   entities: {
     taxonomies: {},
@@ -85,6 +87,7 @@ const initialState = fromJS({
     recommendation_measures: {},
     recommendation_categories: {},
     progress_reports: {},
+    due_dates: {},
   },
   user: {
     attributes: null,
@@ -147,6 +150,12 @@ function appReducer(state = initialState, payload) {
         .setIn(['ready', payload.path], null);
     case INVALIDATE_ENTITIES:
       // reset requested to initial state
+      if (payload.path) {
+        return state
+          .setIn(['ready', payload.path], null) // should trigger new entity load
+          .setIn(['requested', payload.path], null)
+          .setIn(['entities', payload.path], fromJS({}));
+      }
       return state
         .set('ready', fromJS(initialState.toJS().ready)) // should trigger new entity load
         .set('requested', fromJS(initialState.toJS().requested)) // should trigger new entity load

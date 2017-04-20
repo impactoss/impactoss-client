@@ -70,7 +70,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
             <FormattedMessage {...messages.notFound} />
           </div>
         }
-        { report &&
+        { report && dataReady &&
           <Page
             title={pageTitle}
             actions={[
@@ -120,6 +120,11 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
                 },
                 body: {
                   main: [
+                    report.date ? {
+                      id: 'date',
+                      heading: 'Scheduled Date',
+                      value: report.date.attributes.due_date,
+                    } : null,
                     {
                       id: 'description',
                       heading: 'Description',
@@ -162,6 +167,7 @@ const mapStateToProps = (state, props) => ({
     'progress_reports',
     'users',
     'indicators',
+    'due_dates',
   ] }),
   report: getEntity(
     state,
@@ -182,6 +188,12 @@ const mapStateToProps = (state, props) => ({
           key: 'indicator_id',
           as: 'indicator',
         },
+        {
+          type: 'single',
+          path: 'due_dates',
+          key: 'due_date_id',
+          as: 'date',
+        },
       ],
     },
   ),
@@ -193,6 +205,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('progress_reports'));
       dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('due_dates'));
     },
   };
 }

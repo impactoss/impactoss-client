@@ -11,7 +11,9 @@ import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { browserHistory } from 'react-router';
 
-import { fromJS } from 'immutable';
+import { fromJS, List, Map } from 'immutable';
+
+import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -39,7 +41,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     this.props.loadEntitiesIfNeeded();
 
     if (this.props.dataReady) {
-      this.props.populateForm('reportEdit.form.data', this.props.report);
+      this.props.populateForm('reportEdit.form.data', this.getInitialFormData());
     }
   }
 
@@ -50,15 +52,53 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     }
 
     if (nextProps.dataReady && !this.props.dataReady) {
-      this.props.populateForm('reportEdit.form.data', nextProps.report);
+      this.props.populateForm('reportEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const { report } = props;
+    return Map({
+      id: report.id,
+      attributes: fromJS(report.attributes),
+      associatedDate: report && report.indicator && report.indicator.dates
+      ? Object.values(report.indicator.dates).reduce((options, date) => options.push(Map({
+        checked: report.attributes.due_date_id && report.attributes.due_date_id.toString() === date.id.toString(),
+        value: date.id,
+      })), List())
+      : List(),
+      // TODO allow single value for singleSelect
+    });
+  }
+
+  mapDateOptions = (dates, dateId) => Object.values(dates).reduce((options, date) => {
+    if (date.reportCount === 0 || (dateId && dateId.toString() === date.id.toString())) {
+      options.push({
+        value: { value: date.id },
+        label: date.attributes.due_date,
+      });
+    }
+    return options;
+  }, []);
+
+  renderDateControl = (dates, dateId) => ({
+    id: 'dates',
+    model: '.associatedDate',
+    label: 'Scheduled Date',
+    controlType: 'multiselect',
+    options: fromJS(this.mapDateOptions(dates, dateId)),
+  });
   render() {
     const { report, dataReady } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = this.props.page;
     const required = (val) => val && val.length;
+
+    const dateOptions = report && report.indicator && report.indicator.dates
+      ? this.renderDateControl(report.indicator.dates, report.attributes.due_date_id)
+      : null;
+
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
 
@@ -84,7 +124,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             <FormattedMessage {...messages.notFound} />
           </div>
         }
-        {report &&
+        {report && dataReady &&
           <Page
             title={pageTitle}
             actions={[
@@ -152,6 +192,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                 },
                 body: {
                   main: [
+                    dateOptions,
                     {
                       id: 'description',
                       controlType: 'textarea',
@@ -201,6 +242,8 @@ const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
     'progress_reports',
     'users',
+    'due_dates',
+    'indicators',
   ] }),
   report: getEntity(
     state,
@@ -208,12 +251,33 @@ const mapStateToProps = (state, props) => ({
       id: props.params.id,
       path: 'progress_reports',
       out: 'js',
-      extend: {
-        type: 'single',
-        path: 'users',
-        key: 'last_modified_user_id',
-        as: 'user',
-      },
+      extend: [
+        {
+          type: 'single',
+          path: 'users',
+          key: 'last_modified_user_id',
+          as: 'user',
+        },
+        {
+          type: 'single',
+          path: 'indicators',
+          key: 'indicator_id',
+          as: 'indicator',
+          extend: {
+            path: 'due_dates',
+            key: 'indicator_id',
+            reverse: true,
+            as: 'dates',
+            extend: {
+              type: 'count',
+              path: 'progress_reports',
+              key: 'due_date_id',
+              reverse: true,
+              as: 'reportCount',
+            },
+          },
+        },
+      ],
     },
   ),
 });
@@ -223,12 +287,22 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('progress_reports'));
+      dispatch(loadEntitiesIfNeeded('due_dates'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
     },
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, fromJS(formData)));
     },
     handleSubmit: (formData) => {
-      dispatch(save(formData.toJS()));
+      let saveData = formData;
+
+      // TODO: remove once have singleselect instead of multiselect
+      const formDateIds = getCheckedValuesFromOptions(formData.get('associatedDate'));
+      if (List.isList(formDateIds) && formDateIds.size) {
+        saveData = saveData.setIn(['attributes', 'due_date_id'], formDateIds.first());
+      }
+
+      dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
       // not really a dispatch function here, could be a member function instead

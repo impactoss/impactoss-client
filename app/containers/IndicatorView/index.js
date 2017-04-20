@@ -22,7 +22,7 @@ import {
   getEntity,
   getEntities,
   isReady,
-  isUserManager,
+  isUserContributor,
 } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -60,9 +60,13 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       label: report.attributes.title,
       linkTo: `/reports/${report.id}`,
     }))
+  mapDates = (dates) =>
+    Object.values(dates).map((date) => ({
+      label: date.attributes.due_date,
+    }))
 
   render() {
-    const { indicator, dataReady, isManager } = this.props;
+    const { indicator, dataReady, isContributor } = this.props;
     const reference = this.props.params.id;
     const status = indicator && find(PUBLISH_STATUSES, { value: indicator.attributes.draft });
 
@@ -71,7 +75,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       heading: 'Number',
       value: reference,
     }];
-    if (indicator && isManager) {
+    if (indicator && isContributor) {
       asideFields = asideFields.concat([
         {
           id: 'status',
@@ -90,7 +94,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         },
       ]);
     }
-    const pageActions = isManager
+    const pageActions = isContributor
     ? [
       {
         type: 'simple',
@@ -168,12 +172,38 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                       values: this.mapReports(this.props.reports),
                     },
                   ],
-                  aside: isManager
+                  aside: isContributor
                     ? [
                       {
                         id: 'manager',
-                        heading: 'Indicator manager',
+                        heading: 'Assigned user',
                         value: indicator.manager && indicator.manager.attributes.name,
+                      },
+                      {
+                        id: 'start',
+                        heading: 'Reporting due date',
+                        value: indicator.attributes.start_date,
+                      },
+                      {
+                        id: 'repeat',
+                        heading: 'Repeat?',
+                        value: indicator.attributes.repeat.toString(),
+                      },
+                      indicator.attributes.repeat ? {
+                        id: 'frequency',
+                        heading: 'Reporting frequency in months',
+                        value: indicator.attributes.frequency_months,
+                      } : null,
+                      indicator.attributes.repeat ? {
+                        id: 'end',
+                        heading: 'Reporting end date',
+                        value: indicator.attributes.end_date,
+                      } : null,
+                      {
+                        id: 'dates',
+                        heading: 'Scheduled report dates',
+                        type: 'list',
+                        values: this.mapDates(this.props.dates),
                       },
                     ]
                     : [],
@@ -191,9 +221,10 @@ IndicatorView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   indicator: PropTypes.object,
   dataReady: PropTypes.bool,
-  isManager: PropTypes.bool,
+  isContributor: PropTypes.bool,
   actions: PropTypes.object,
   reports: PropTypes.object,
+  dates: PropTypes.object,
   params: PropTypes.object,
 };
 
@@ -203,13 +234,14 @@ IndicatorView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
-  isManager: isUserManager(state),
+  isContributor: isUserContributor(state),
   dataReady: isReady(state, { path: [
     'measures',
     'users',
     'indicators',
     'measure_indicators',
     'progress_reports',
+    'due_dates',
   ] }),
   indicator: getEntity(
     state,
@@ -258,6 +290,20 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
+  // all connected due_dates
+  dates: getEntities(
+    state, {
+      path: 'due_dates',
+      out: 'js',
+      where: {
+        indicator_id: props.params.id,
+      },
+      without: {
+        path: 'progress_reports',
+        key: 'due_date_id',
+      },
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -269,6 +315,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('progress_reports'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+      dispatch(loadEntitiesIfNeeded('due_dates'));
     },
   };
 }

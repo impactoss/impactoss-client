@@ -41,12 +41,16 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
     </div>
   )
 
-  renderSection = (fields) => fields.map((field, index) => {
-    if (field.type === 'list') {
-      return this.renderList(field, index);
+  renderSection = (fields) => fields.reduce((result, field, index) => {
+    if (field) {
+      if (field.type === 'list') {
+        result.push(this.renderList(field, index));
+      } else {
+        result.push(this.renderField(field, index));
+      }
     }
-    return this.renderField(field, index);
-  })
+    return result;
+  }, [])
 
   render() {
     const { fields } = this.props;
