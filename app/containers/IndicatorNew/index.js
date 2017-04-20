@@ -14,7 +14,7 @@ import { Map, List } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { getEntities, isReady } from 'containers/App/selectors';
 
@@ -60,7 +60,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   renderUserControl = (users) => ({
     id: 'users',
     model: '.associatedUser',
-    label: 'Indicator manager',
+    label: 'Assigned user',
     controlType: 'multiselect',
     options: this.mapUserOptions(users),
   });
@@ -152,6 +152,30 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                   ],
                   aside: [
                     this.props.users ? this.renderUserControl(this.props.users) : null,
+                    {
+                      id: 'start',
+                      controlType: 'input',
+                      label: 'Reporting due date',
+                      model: '.attributes.start_date',
+                    },
+                    {
+                      id: 'repeat',
+                      controlType: 'checkbox',
+                      label: 'Repeat?',
+                      model: '.attributes.repeat',
+                    },
+                    {
+                      id: 'frequency',
+                      controlType: 'input',
+                      label: 'Reporting frequency in months',
+                      model: '.attributes.frequency_months',
+                    },
+                    {
+                      id: 'end',
+                      controlType: 'input',
+                      label: 'Reporting end date',
+                      model: '.attributes.end_date',
+                    },
                   ],
                 },
               }}
@@ -202,7 +226,7 @@ const mapStateToProps = (state) => ({
         path: 'user_roles',
         key: 'user_id',
         where: {
-          role_id: 2, // contributors only
+          role_id: USER_ROLES.CONTRIBUTOR, // contributors only TODO: from constants
         },
       },
     },
@@ -236,6 +260,14 @@ function mapDispatchToProps(dispatch) {
         const user = saveData.get('associatedUser').first();
         saveData = saveData.setIn(['attributes', 'manager_id'], user ? user.get('value') : null);
       }
+
+      // cleanup
+      if (!saveData.getIn(['attributes', 'repeat'])) {
+        saveData = saveData
+          .setIn(['attributes', 'frequency_months'], null)
+          .setIn(['attributes', 'end_date'], null);
+      }
+
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {

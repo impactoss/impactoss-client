@@ -47,6 +47,10 @@ const formData = fromJS({
     description: '',
     draft: true,
     manager_id: '',
+    frequency_months: '',
+    start_date: '',
+    repeat: false,
+    end_date: '',
   },
 });
 
