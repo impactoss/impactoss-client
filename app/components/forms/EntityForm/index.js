@@ -66,23 +66,28 @@ class EntityForm extends React.PureComponent { // eslint-disable-line react/pref
     );
   }
 
-  renderSection = (fields) => fields.map((field, index) => (
-    <Field key={index}>
-      <Label htmlFor={field.id}>
-        {`${field.label || startCase(field.id)} ${field.validators && field.validators.required ? '*' : ''}`}
-      </Label>
-      {this.renderField(field)}
-      {
-        field.errorMessages &&
-        <Errors
-          className="errors"
-          model={field.model}
-          show="touched"
-          messages={field.errorMessages}
-        />
-      }
-    </Field>
-  ))
+  renderSection = (fields) => fields.reduce((result, field, index) => {
+    if (field) {
+      result.push(
+        <Field key={index}>
+          <Label htmlFor={field.id}>
+            {`${field.label || startCase(field.id)} ${field.validators && field.validators.required ? '*' : ''}`}
+          </Label>
+          {this.renderField(field)}
+          {
+            field.errorMessages &&
+            <Errors
+              className="errors"
+              model={field.model}
+              show="touched"
+              messages={field.errorMessages}
+            />
+          }
+        </Field>
+      );
+    }
+    return result;
+  }, [])
 
 
   renderFieldChildren = (field) => {
