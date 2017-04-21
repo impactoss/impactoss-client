@@ -7,6 +7,10 @@ import {
 } from 'containers/App/actions';
 
 import {
+  hideEditForm,
+} from './actions';
+
+import {
   FILTER_FORM_MODEL,
   SAVE_EDITS,
 } from './constants';
@@ -35,6 +39,7 @@ export function* saveEdits({ data }) {
     // }}
     yield put(updateConnections(data));
   }
+  yield put(hideEditForm());
 }
 
 // Individual exports for testing

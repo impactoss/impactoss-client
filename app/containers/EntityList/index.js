@@ -92,10 +92,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             forEach(Array.isArray(this.props.location.query[filters.taxonomies.query])
               ? this.props.location.query[filters.taxonomies.query]
               : [this.props.location.query[filters.taxonomies.query]], (queryValue) => {
-              const value = parseInt(queryValue);
+              const value = parseInt(queryValue, 10);
               filterOptions.options[value] = {
                 label: taxonomy.categories[value].attributes.title || taxonomy.categories[value].attributes.name,
-                value: value,
+                value,
                 count: 0,
                 query: filters.taxonomies.query,
                 checked: true,
@@ -152,7 +152,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 value: taxonomy.id,
                 count: 1,
                 query: 'without',
-                checked: this.optionChecked('without', taxonomy.id)
+                checked: this.optionChecked('without', taxonomy.id),
               };
             }
           }
@@ -173,7 +173,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       if (this.anyOptionChecked(filters.connectedTaxonomies.query)) {
         // TODO check for checked connected taxonomies
       }
-
     } else {
       forEach(Object.values(entities), (entity) => {
         forEach(filters.connectedTaxonomies.connections, (connection) => {
@@ -227,14 +226,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           forEach(Array.isArray(this.props.location.query[option.query])
             ? this.props.location.query[option.query]
             : [this.props.location.query[option.query]], (queryValue) => {
-            const value = parseInt(queryValue);
+            const value = parseInt(queryValue, 10);
             const label = connections[option.path]
               && connections[option.path][value]
               ? connections[option.path][value].attributes.title
-              : value
+              : value;
             filterOptions.options[value] = {
               label,
-              value: value,
+              value,
               count: 0,
               query: option.query,
               checked: true,
