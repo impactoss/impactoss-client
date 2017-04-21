@@ -1,6 +1,10 @@
 import { takeLatest, put } from 'redux-saga/effects';
 // import { credentialsSelector } from './selectors';
-import { updateConnections, updateEntities, updateRouteQuery } from 'containers/App/actions';
+import {
+  updateConnections,
+  updateEntities,
+  updateRouteQuery,
+} from 'containers/App/actions';
 
 import {
   FILTER_FORM_MODEL,

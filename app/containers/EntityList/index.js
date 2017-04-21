@@ -614,10 +614,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       sortOrder
     );
 
-    const entitiesSelected = this.getEntitiesSelected();
-
     // map entities to entity list item data
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
+    const entitiesSelected = this.getEntitiesSelected();
 
     const filterListOption = {
       label: 'Filter list',

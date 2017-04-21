@@ -15,15 +15,13 @@ import {
   HIDE_EDIT_FORM,
   SHOW_PANEL,
   FILTERS_PANEL,
+  EDIT_PANEL,
   RESET_STATE,
+  LISTINGS_FORM_MODEL,
 } from './constants';
 
 const initialState = fromJS({
   activeFilterOption: null,
-  // {
-  //   group: 'taxonomies',
-  //   optionId: '6',
-  // },
   activeEditOption: null,
   activePanel: FILTERS_PANEL,
 });
@@ -47,6 +45,13 @@ function entityListReducer(state = initialState, action) {
       return action.payload.action === 'PUSH' ? initialState : state;
     case RESET_STATE:
       return initialState;
+    case 'rrf/change':
+      return action.model.substr(0, LISTINGS_FORM_MODEL.length) === LISTINGS_FORM_MODEL
+        ? state
+          .set('activePanel', EDIT_PANEL)
+          .set('activeFilterOption', null)
+          .set('activeEditOption', null)
+        : state;
     default:
       return state;
   }
@@ -59,7 +64,19 @@ const listingsFormInitial = fromJS({
   entities: {},
 });
 
-function formReducer(state = formInitial, action) {
+function filterFormReducer(state = formInitial, action) {
+  switch (action.type) {
+    case 'rrf/change':
+      return action.model.substr(0, LISTINGS_FORM_MODEL.length) === LISTINGS_FORM_MODEL
+        ? formInitial
+        : state;
+    case LOCATION_CHANGE:
+      return action.payload.action === 'PUSH' ? formInitial : state;
+    default:
+      return state;
+  }
+}
+function editFormReducer(state = formInitial, action) {
   switch (action.type) {
     case LOCATION_CHANGE:
       return action.payload.action === 'PUSH' ? formInitial : state;
@@ -82,8 +99,8 @@ function listingsFormReducer(state = listingsFormInitial, action) {
 export default combineReducers({
   page: entityListReducer,
   forms: combineForms({
-    filterData: formReducer,
-    editData: formReducer,
+    filterData: filterFormReducer,
+    editData: editFormReducer,
     listingsData: listingsFormReducer,
   }, 'entityList.forms'),
 });
