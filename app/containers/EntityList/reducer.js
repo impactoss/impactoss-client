@@ -31,7 +31,10 @@ const initialState = fromJS({
 function entityListReducer(state = initialState, action) {
   switch (action.type) {
     case SHOW_PANEL:
-      return state.set('activePanel', action.activePanel);
+      return state
+        .set('activePanel', action.activePanel)
+        .set('activeFilterOption', null)
+        .set('activeEditOption', null);
     case SHOW_FILTER_FORM:
       return state.set('activeFilterOption', action.option);
     case HIDE_FILTER_FORM:

@@ -15,7 +15,7 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
     onClose: PropTypes.func,
     title: PropTypes.string,
     populateForm: PropTypes.func.isRequired,
-    // resetForm: PropTypes.func.isRequired,
+    resetForm: PropTypes.func.isRequired,
     submitLabel: PropTypes.string,
   }
 
@@ -34,7 +34,11 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
       this.props.populateForm(nextProps.model, nextProps.options);
     }
   }
-
+  onClose = () => {
+    // console.log('onclose')
+    this.props.resetForm(this.props.model);
+    this.props.onClose();
+  }
   render() {
     return (
       <Form
@@ -45,7 +49,7 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
           <strong>{this.props.title}</strong>
         }
         { this.props.onClose &&
-          <button onClick={this.props.onClose}>close</button>
+          <button onClick={this.onClose}>close</button>
         }
         <MultiSelect
           model=".values"
