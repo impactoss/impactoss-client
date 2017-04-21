@@ -52,22 +52,37 @@ function entityListReducer(state = initialState, action) {
   }
 }
 
-const filterFormInitial = fromJS({
-  values: [],
-});
-const editFormInitial = fromJS({
+const formInitial = fromJS({
   values: [],
 });
 const listingsFormInitial = fromJS({
   entities: {},
 });
 
+function formReducer(state = formInitial, action) {
+  switch (action.type) {
+    case LOCATION_CHANGE:
+      return action.payload.action === 'PUSH' ? formInitial : state;
+    default:
+      return state;
+  }
+}
+
+function listingsFormReducer(state = listingsFormInitial, action) {
+  switch (action.type) {
+    case LOCATION_CHANGE:
+      return action.payload.action === 'PUSH' ? listingsFormInitial : state;
+    default:
+      return state;
+  }
+}
+
 export default combineReducers({
   page: entityListReducer,
   forms: combineForms({
-    filterData: filterFormInitial,
-    editData: editFormInitial,
-    listingsData: listingsFormInitial,
+    filterData: formReducer,
+    editData: formReducer,
+    listingsData: listingsFormReducer,
   }, 'entityList.forms'),
 });
 
