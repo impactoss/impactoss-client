@@ -70,6 +70,8 @@ function formReducer(state = formInitial, action) {
 
 function listingsFormReducer(state = listingsFormInitial, action) {
   switch (action.type) {
+    case SHOW_PANEL:
+      return action.activePanel === FILTERS_PANEL ? listingsFormInitial : state;
     case LOCATION_CHANGE:
       return action.payload.action === 'PUSH' ? listingsFormInitial : state;
     default:
