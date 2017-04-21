@@ -614,13 +614,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       sortOrder
     );
 
-    // const entitiesSelected = [];
-    // TODO filter for entities selected in list
-    const entitiesSelected = this.getEntitiesSelected(); // uncomment this for testing and temporarily assume all are selected
-    // console.log(entitiesSelected);
+    const entitiesSelected = this.getEntitiesSelected();
 
     // map entities to entity list item data
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
+
     const filterListOption = {
       label: 'Filter list',
       active: activePanel === FILTERS_PANEL,
@@ -855,6 +853,7 @@ const mapStateToProps = (state, props) => ({
 function mapDispatchToProps(dispatch, props) {
   return {
     onShowFilterForm: (option) => {
+      dispatch(hideFilterForm());
       dispatch(showFilterForm(option));
     },
     onHideFilterForm: (evt) => {

@@ -55,6 +55,7 @@ export default class EntityListFilters extends React.Component { // eslint-disab
 
   render() {
     const { filterGroups, formOptions, onHideFilterForm, formModel } = this.props;
+    // console.log('filterGroups', filterGroups && filterGroups.toJS())
     // console.log('formOptions', formOptions && formOptions.toJS())
     return (
       <div>

@@ -60,6 +60,18 @@ const makeSelectLocationState = () => {
   };
 };
 
+
+const selectLocation = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.get('locationBeforeTransitions');
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
 const makeSelectPathnameOnAuthChange = () => createSelector(
   getRoute,
   (routeState) => {
@@ -81,7 +93,6 @@ const makeSelectPreviousPathname = () => createSelector(
     }
   }
 );
-
 
 const getRequestedAt = createSelector(
   getGlobalRequested,
@@ -403,4 +414,5 @@ export {
   isUserManager,
   makeIsUserManager,
   isUserContributor,
+  selectLocation,
 };

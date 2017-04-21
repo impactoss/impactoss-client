@@ -4,7 +4,9 @@
 
 import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
 import { push } from 'react-router-redux';
-import collection from 'lodash/collection';
+import { reduce, keyBy } from 'lodash/collection';
+import { without } from 'lodash/array';
+
 import { browserHistory } from 'react-router';
 
 import {
@@ -19,6 +21,7 @@ import {
     INVALIDATE_ENTITIES,
     UPDATE_CONNECTIONS,
     UPDATE_ENTITIES,
+    UPDATE_ROUTE_QUERY,
 } from 'containers/App/constants';
 
 import {
@@ -43,6 +46,7 @@ import {
   makeSelectPreviousPathname,
   getRequestedAt,
   isSignedIn,
+  selectLocation,
 } from 'containers/App/selectors';
 
 import {
@@ -80,7 +84,7 @@ export function* checkEntitiesSaga(payload) {
         });
         if (response) {
           // Save response
-          yield put(entitiesLoaded(collection.keyBy(response.data, 'id'), payload.path, Date.now()));
+          yield put(entitiesLoaded(keyBy(response.data, 'id'), payload.path, Date.now()));
         }
       }
     } catch (err) {
@@ -330,7 +334,61 @@ export function* updateEntitiesSaga({ data }) {
     yield put(invalidateEntities());
   }
 }
+export function* updateRouteQuerySaga({ query, extend = true }) {
+  const location = yield select(selectLocation);
+  // figure out new query
+  // get old query or new query if not extending (replacing)
+  const queryPrevious = extend ? location.get('query').toJS() : {};
+  // and figure out new query
+  const queryNext = query.reduce((q, param) => {
+    const queryUpdated = q;
+    // if already set
+    if (queryUpdated[param.arg]) {
+      // if multiple values set
+      if (Array.isArray(queryUpdated[param.arg])) {
+        // add if not already present
+        if (param.add && queryUpdated[param.arg].indexOf(param.value.toString()) === -1) {
+          queryUpdated[param.arg].push(param.value);
+        }
+        // remove if present
+        if (extend && param.remove && queryUpdated[param.arg].indexOf(param.value.toString()) > -1) {
+          queryUpdated[param.arg] = without(queryUpdated[param.arg], param.value.toString());
+          // convert to single value if only one value left
+          if (queryUpdated[param.arg].length === 1) {
+            queryUpdated[param.arg] = queryUpdated[param.arg][0];
+          }
+        }
+      // if single value set
+      } else {
+        // add if not already present and convert to array
+        if (param.add && queryUpdated[param.arg] !== param.value.toString()) {
+          queryUpdated[param.arg] = [queryUpdated[param.arg], param.value];
+        }
+        // remove if present
+        if (extend && param.remove && queryUpdated[param.arg] === param.value.toString()) {
+          delete queryUpdated[param.arg];
+        }
+      }
+    // if not already set
+    } else if (param.add) {
+      queryUpdated[param.arg] = param.value;
+    }
+    return queryUpdated;
+  }, queryPrevious);
 
+  // convert to string
+  const queryNextString = reduce(queryNext, (result, value, key) => {
+    let params;
+    if (Array.isArray(value)) {
+      params = value.reduce((memo, val) => `${memo}${memo.length > 0 ? '&' : ''}${key}=${encodeURIComponent(val)}`, '');
+    } else {
+      params = `${key}=${encodeURIComponent(value)}`;
+    }
+    return `${result}${result.length > 0 ? '&' : ''}${params}`;
+  }, '');
+
+  yield browserHistory.replace(`${location.get('pathname')}?${queryNextString}`);
+}
 
 /**
  * Root saga manages watcher lifecycle
@@ -350,4 +408,5 @@ export default function* rootSaga() {
   yield takeEvery(UPDATE_ENTITIES, updateEntitiesSaga);
 
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
+  yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
 }

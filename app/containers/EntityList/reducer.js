@@ -35,11 +35,11 @@ function entityListReducer(state = initialState, action) {
     case SHOW_FILTER_FORM:
       return state.set('activeFilterOption', action.option);
     case HIDE_FILTER_FORM:
-      return state.set('activeFilterOption', fromJS(initialState.toJS().activeFilterOption));
+      return state.set('activeFilterOption', null);
     case SHOW_EDIT_FORM:
       return state.set('activeEditOption', action.option);
     case HIDE_EDIT_FORM:
-      return state.set('activeEditOption', fromJS(initialState.toJS().activeEditOption));
+      return state.set('activeEditOption', null);
     case LOCATION_CHANGE:
       return action.payload.action === 'PUSH' ? initialState : state;
     case RESET_STATE:
