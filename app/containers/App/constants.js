@@ -27,6 +27,7 @@ export const LOGOUT = 'nmrf/App/LOGOUT';
 export const LOGOUT_SUCCESS = 'nmrf/App/LOGOUT_SUCCESS';
 export const LOGOUT_ERROR = 'nmrf/App/LOGOUT_ERROR';
 export const VALIDATE_TOKEN = 'nmrf/App/VALIDATE_TOKEN';
+export const AUTHENTICATE_FORWARD = 'nmrf/App/AUTHENTICATE_FORWARD';
 
 export const ADD_ENTITY = 'nmrf/App/ADD_ENTITY';
 export const UPDATE_ENTITY = 'nmrf/App/UPDATE_ENTITY';

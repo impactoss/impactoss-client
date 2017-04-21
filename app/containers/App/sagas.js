@@ -14,14 +14,13 @@ import {
     SAVE_ENTITY,
     NEW_ENTITY,
     AUTHENTICATE,
-    AUTHENTICATE_SUCCESS,
     LOGOUT,
-    LOGOUT_SUCCESS,
     VALIDATE_TOKEN,
     INVALIDATE_ENTITIES,
     UPDATE_CONNECTIONS,
     UPDATE_ENTITIES,
     UPDATE_ROUTE_QUERY,
+    AUTHENTICATE_FORWARD,
 } from 'containers/App/constants';
 
 import {
@@ -39,6 +38,7 @@ import {
     saveSending,
     saveSuccess,
     saveError,
+    forwardOnAuthenticationChange,
 } from 'containers/App/actions';
 
 import {
@@ -103,6 +103,7 @@ export function* authenticateSaga(payload) {
     yield put(authenticateSending());
     const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
     yield put(authenticateSuccess(response.data));
+    yield put(forwardOnAuthenticationChange());
     yield put(invalidateEntities());
   } catch (err) {
     err.response.json = yield err.response.json();
@@ -132,6 +133,7 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', 'auth/sign_out');
     yield call(clearAuthValues);
     yield put(logoutSuccess());
+    yield put(forwardOnAuthenticationChange());
     yield put(invalidateEntities());
   } catch (err) {
     yield call(clearAuthValues);
@@ -398,9 +400,8 @@ export default function* rootSaga() {
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
-  yield takeLatest(AUTHENTICATE_SUCCESS, authChangeSaga);
   yield takeLatest(LOGOUT, logoutSaga);
-  yield takeLatest(LOGOUT_SUCCESS, authChangeSaga);
+  yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
 
   yield takeEvery(SAVE_ENTITY, saveEntitySaga);
   yield takeEvery(NEW_ENTITY, newEntitySaga);

@@ -42,6 +42,7 @@ import {
   UPDATE_CONNECTIONS,
   UPDATE_ENTITIES,
   UPDATE_ROUTE_QUERY,
+  AUTHENTICATE_FORWARD,
 } from './constants';
 
 
@@ -283,5 +284,11 @@ export function updateRouteQuery(query, replace) {
     type: UPDATE_ROUTE_QUERY,
     query,
     replace,
+  };
+}
+
+export function forwardOnAuthenticationChange() {
+  return {
+    type: AUTHENTICATE_FORWARD,
   };
 }
