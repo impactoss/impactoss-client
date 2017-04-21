@@ -85,55 +85,80 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       search: filters.taxonomies.search,
       options: {},
     };
+    if (entities.length === 0) {
+      if (this.anyOptionChecked(filters.taxonomies.query)) {
+        forEach(taxonomies, (taxonomy) => {
+          if (activeFilterOption.optionId === taxonomy.id) {
+            forEach(Array.isArray(this.props.location.query[filters.taxonomies.query])
+              ? this.props.location.query[filters.taxonomies.query]
+              : [this.props.location.query[filters.taxonomies.query]], (queryValue) => {
+              const value = parseInt(queryValue);
+              filterOptions.options[value] = {
+                label: taxonomy.categories[value].attributes.title || taxonomy.categories[value].attributes.name,
+                value: value,
+                count: 0,
+                query: filters.taxonomies.query,
+                checked: true,
+              };
+            });
+          }
+        });
+      } else {
+        // TODO check for checked without options
+      }
+    } else {
+      forEach(Object.values(entities), (entity) => {
+        // if entity has taxonomies
+        const taxonomyIds = []; // track taxonomies, so we can add without options for those not in here
 
-    forEach(Object.values(entities), (entity) => {
-      // if entity has taxonomies
-      const taxonomyIds = []; // track taxonomies, so we can add without options for those not in here
-
-      if (entity.taxonomies) {
-        // add categories from entities if not present otherwise increase count
-        const categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
-        forEach(categoryIds, (catId) => {
-          // get taxonomy for each category
-          const taxonomy = find(Object.values(taxonomies), (tax) =>
-            tax.categories && Object.keys(tax.categories).indexOf(catId.toString()) > -1
-          );
-          if (taxonomy) {
-            taxonomyIds.push(taxonomy.id); // tracking to identify missing taxonomies
-            // if taxonomy active add filter option
-            if (activeFilterOption.optionId === taxonomy.id.toString()) {
-              filterOptions.title = filterOptions.title || taxonomy.attributes.title;
-              // if category already added
-              if (filterOptions.options[catId]) {
-                filterOptions.options[catId].count += 1;
-              } else {
-                filterOptions.options[catId] = this.initURLOption({
-                  label: taxonomy.categories[catId].attributes.title || taxonomy.categories[catId].attributes.name,
-                  value: catId,
-                  count: 1,
-                  query: filters.taxonomies.query,
-                });
+        if (entity.taxonomies) {
+          // add categories from entities if not present otherwise increase count
+          const categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
+          forEach(categoryIds, (catId) => {
+            // get taxonomy for each category
+            const taxonomy = find(Object.values(taxonomies), (tax) =>
+              tax.categories && Object.keys(tax.categories).indexOf(catId.toString()) > -1
+            );
+            if (taxonomy) {
+              taxonomyIds.push(taxonomy.id); // tracking to identify missing taxonomies
+              // if taxonomy active add filter option
+              if (activeFilterOption.optionId === taxonomy.id.toString()) {
+                filterOptions.title = filterOptions.title || taxonomy.attributes.title;
+                // if category already added
+                if (filterOptions.options[catId]) {
+                  filterOptions.options[catId].count += 1;
+                } else {
+                  filterOptions.options[catId] = {
+                    label: taxonomy.categories[catId].attributes.title || taxonomy.categories[catId].attributes.name,
+                    value: catId,
+                    count: 1,
+                    query: filters.taxonomies.query,
+                    checked: this.optionChecked(filters.taxonomies.query, catId),
+                  };
+                }
               }
+            }
+          });
+        }
+
+        // add without option for those taxonomies not associated with entity
+        forEach(taxonomies, (taxonomy) => {
+          if (activeFilterOption.optionId === taxonomy.id && taxonomyIds.indexOf(taxonomy.id) === -1) {
+            if (filterOptions.options.without) {
+              filterOptions.options.without.count += 1;
+            } else {
+              filterOptions.options.without = {
+                label: `Without ${taxonomy.attributes.title}`,
+                value: taxonomy.id,
+                count: 1,
+                query: 'without',
+                checked: this.optionChecked('without', taxonomy.id)
+              };
             }
           }
         });
-      }
-      // add without option for those taxonomies not associated with entity
-      forEach(taxonomies, (taxonomy) => {
-        if (activeFilterOption.optionId === taxonomy.id && taxonomyIds.indexOf(taxonomy.id) === -1) {
-          if (filterOptions.options.without) {
-            filterOptions.options.without.count += 1;
-          } else {
-            filterOptions.options.without = this.initURLOption({
-              label: `Without ${taxonomy.attributes.title}`,
-              value: taxonomy.id,
-              count: 1,
-              query: 'without',
-            });
-          }
-        }
       });
-    });
+    }
     return filterOptions;
   }
   connectedTaxonomyFilterOptions = (entities) => {
@@ -144,40 +169,48 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       search: filters.connectedTaxonomies.search,
       options: {},
     };
-    forEach(Object.values(entities), (entity) => {
-      forEach(filters.connectedTaxonomies.connections, (connection) => {
-        // if entity has taxonomies
-        if (entity[connection.path]) { // recommendations stores recommendation_measures
-          // add categories from entities if not present otherwise increase count
-          const categoryIds = this.getConnectedCategoryIds(
-            entity,
-            connection,
-            connectedTaxonomies.taxonomies
-          );
+    if (entities.length === 0) {
+      if (this.anyOptionChecked(filters.connectedTaxonomies.query)) {
+        // TODO check for checked connected taxonomies
+      }
 
-          forEach(categoryIds, (catId) => {
-            // TODO: the taxonomy lookup can may be omitted as we already iterate over taxonomies above
-            const taxonomy = find(Object.values(connectedTaxonomies.taxonomies), (tax) =>
-              tax.categories && Object.keys(tax.categories).indexOf(catId.toString()) > -1
+    } else {
+      forEach(Object.values(entities), (entity) => {
+        forEach(filters.connectedTaxonomies.connections, (connection) => {
+          // if entity has taxonomies
+          if (entity[connection.path]) { // recommendations stores recommendation_measures
+            // add categories from entities if not present otherwise increase count
+            const categoryIds = this.getConnectedCategoryIds(
+              entity,
+              connection,
+              connectedTaxonomies.taxonomies
             );
-            if (taxonomy && activeFilterOption.optionId === taxonomy.id) {
-              filterOptions.title = filterOptions.title || taxonomy.attributes.title;
-              // if category already added
-              if (filterOptions.options[catId]) {
-                filterOptions.options[catId].count += 1;
-              } else {
-                filterOptions.options[catId] = this.initURLOption({
-                  label: taxonomy.categories[catId].attributes.title,
-                  value: `${connection.path}:${catId}`,
-                  count: 1,
-                  query: filters.connectedTaxonomies.query,
-                });
+
+            forEach(categoryIds, (catId) => {
+              // TODO: the taxonomy lookup can may be omitted as we already iterate over taxonomies above
+              const taxonomy = find(Object.values(connectedTaxonomies.taxonomies), (tax) =>
+                tax.categories && Object.keys(tax.categories).indexOf(catId.toString()) > -1
+              );
+              if (taxonomy && activeFilterOption.optionId === taxonomy.id) {
+                filterOptions.title = filterOptions.title || taxonomy.attributes.title;
+                // if category already added
+                if (filterOptions.options[catId]) {
+                  filterOptions.options[catId].count += 1;
+                } else {
+                  filterOptions.options[catId] = {
+                    label: taxonomy.categories[catId].attributes.title,
+                    value: `${connection.path}:${catId}`,
+                    count: 1,
+                    query: filters.connectedTaxonomies.query,
+                    checked: this.optionChecked(filters.connectedTaxonomies.query, `${connection.path}:${catId}`),
+                  };
+                }
               }
-            }
-          });
-        }
+            });
+          }
+        });
       });
-    });
+    }
     return filterOptions;
   }
 
@@ -188,52 +221,77 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       groupId: 'connections',
       options: {},
     };
-
-    forEach(Object.values(entities), (entity) => {
+    if (entities.length === 0) {
       forEach(filters.connections.options, (option) => {
-        // if option active
-        if (activeFilterOption.optionId === option.path) {
-          filterOptions.title = filterOptions.title || option.label;
-          filterOptions.search = filterOptions.search || option.search;
-          // if entity has connected entities
-          if (entity[option.path]) {
-            // add connected entities if not present otherwise increase count
-            const connectedIds = {
-              [option.path]: map(map(Object.values(entity[option.path]), 'attributes'), option.key),
+        if (this.anyOptionChecked(option.query)) {
+          forEach(Array.isArray(this.props.location.query[option.query])
+            ? this.props.location.query[option.query]
+            : [this.props.location.query[option.query]], (queryValue) => {
+            const value = parseInt(queryValue);
+            const label = connections[option.path]
+              && connections[option.path][value]
+              ? connections[option.path][value].attributes.title
+              : value
+            filterOptions.options[value] = {
+              label,
+              value: value,
+              count: 0,
+              query: option.query,
+              checked: true,
             };
-            forEach(connectedIds[option.path], (connectedId) => {
-              const connection = connections[option.path][connectedId];
-              // if not taxonomy already considered
-              if (connection) {
-                // if category already added
-                if (filterOptions.options[connectedId]) {
-                  filterOptions.options[connectedId].count += 1;
-                } else {
-                  filterOptions.options[connectedId] = this.initURLOption({
-                    label: connection.attributes.title || connection.attributes.name,
-                    value: connectedId,
-                    search: option.searchAttributes && option.searchAttributes.map((attribute) => connection.attributes[attribute]).join(),
-                    count: 1,
-                    query: option.query,
-                  });
-                }
-              }
-            });
-          } else if (filterOptions.options.without) {
-            // no connection present
-            // add without option
-            filterOptions.options.without.count += 1;
-          } else {
-            filterOptions.options.without = this.initURLOption({
-              label: `Without ${option.label}`,
-              value: option.query,
-              count: 1,
-              query: 'without',
-            });
-          }
-        } // if (filterOptions.options.connections.options[option.path].show) {
+          });
+        }
+        // TODO check for checked without options
       });
-    });
+    } else {
+      forEach(Object.values(entities), (entity) => {
+        forEach(filters.connections.options, (option) => {
+          // if option active
+          if (activeFilterOption.optionId === option.path) {
+            filterOptions.title = filterOptions.title || option.label;
+            filterOptions.search = filterOptions.search || option.search;
+            // if entity has connected entities
+            if (entity[option.path]) {
+              // add connected entities if not present otherwise increase count
+              const connectedIds = {
+                [option.path]: map(map(Object.values(entity[option.path]), 'attributes'), option.key),
+              };
+              forEach(connectedIds[option.path], (connectedId) => {
+                const connection = connections[option.path][connectedId];
+                // if not taxonomy already considered
+                if (connection) {
+                  // if category already added
+                  if (filterOptions.options[connectedId]) {
+                    filterOptions.options[connectedId].count += 1;
+                  } else {
+                    filterOptions.options[connectedId] = {
+                      label: connection.attributes.title || connection.attributes.name,
+                      value: connectedId,
+                      search: option.searchAttributes && option.searchAttributes.map((attribute) => connection.attributes[attribute]).join(),
+                      count: 1,
+                      query: option.query,
+                      checked: this.optionChecked(option.query, connectedId),
+                    };
+                  }
+                }
+              });
+            } else if (filterOptions.options.without) {
+              // no connection present
+              // add without option
+              filterOptions.options.without.count += 1;
+            } else {
+              filterOptions.options.without = {
+                label: `Without ${option.label}`,
+                value: option.query,
+                count: 1,
+                query: 'without',
+                checked: this.optionChecked('without', option.query),
+              };
+            }
+          } // if (filterOptions.options.connections.options[option.path].show) {
+        });
+      });
+    }
     return filterOptions;
   }
 
@@ -244,53 +302,75 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       groupId: 'attributes',
       options: {},
     };
-    forEach(Object.values(entities), (entity) => {
+    if (entities.length === 0) {
       forEach(filters.attributes.options, (option) => {
-        // the attribute option
-        if (activeFilterOption.optionId === option.attribute) {
-          filterOptions.title = filterOptions.title || option.label;
-          filterOptions.search = filterOptions.search || option.search;
-
-          if (typeof entity.attributes[option.attribute] !== 'undefined' && entity.attributes[option.attribute] !== null) {
-            // add connected entities if not present otherwise increase count
-            const value = entity.attributes[option.attribute].toString();
-            if (filterOptions.options[value]) {
-              filterOptions.options[value].count += 1;
-            } else if (option.options) {
-              const attribute = find(option.options, (o) => o.value.toString() === value);
-              filterOptions.options[value] = this.initURLOption({
-                label: attribute ? attribute.label : value,
-                value: `${option.attribute}:${value}`,
-                count: 1,
-                query: 'where',
-              });
-            } else if (option.extension && !!entity[option.extension.key]) {
-              const extension = Object.values(entity[option.extension.key])[0];
-              filterOptions.options[value] = this.initURLOption({
-                label: extension ? extension.attributes[option.extension.label] : value,
-                value: `${option.attribute}:${value}`,
-                count: 1,
-                query: 'where',
-              });
-            }
-          } else if (option.extension && option.extension.without) {
-            if (filterOptions.options.without) {
-              // no connection present
-              // add without option
-              filterOptions.options.without.count += 1;
-            } else {
-              filterOptions.options.without = this.initURLOption({
-                label: `Without ${option.label}`,
-                value: `${option.attribute}:null`,
-                count: 1,
-                query: 'where',
-              });
-            }
+        if (this.optionCheckedStart('where', `${option.attribute}:`)) {
+          if (option.options) {
+            forEach(option.options, (attribute) => {
+              if (attribute.value.toString() === this.props.location.query.where.split(':')[1]) {
+                filterOptions.options[attribute.value] = {
+                  label: attribute.label ? attribute.label : attribute.value,
+                  value: `${option.attribute}:${attribute.value}`,
+                  count: 0,
+                  query: 'where',
+                  checked: true,
+                };
+              }
+            });
           }
         }
       });
-    });
+    } else {
+      forEach(Object.values(entities), (entity) => {
+        forEach(filters.attributes.options, (option) => {
+          // the attribute option
+          if (activeFilterOption.optionId === option.attribute) {
+            filterOptions.title = filterOptions.title || option.label;
+            filterOptions.search = filterOptions.search || option.search;
 
+            if (typeof entity.attributes[option.attribute] !== 'undefined' && entity.attributes[option.attribute] !== null) {
+              // add connected entities if not present otherwise increase count
+              const value = entity.attributes[option.attribute].toString();
+              if (filterOptions.options[value]) {
+                filterOptions.options[value].count += 1;
+              } else if (option.options) {
+                const attribute = find(option.options, (o) => o.value.toString() === value);
+                filterOptions.options[value] = {
+                  label: attribute ? attribute.label : value,
+                  value: `${option.attribute}:${value}`,
+                  count: 1,
+                  query: 'where',
+                  checked: this.optionChecked('where', `${option.attribute}:${value}`),
+                };
+              } else if (option.extension && !!entity[option.extension.key]) {
+                const extension = Object.values(entity[option.extension.key])[0];
+                filterOptions.options[value] = {
+                  label: extension ? extension.attributes[option.extension.label] : value,
+                  value: `${option.attribute}:${value}`,
+                  count: 1,
+                  query: 'where',
+                  checked: this.optionChecked('where', `${option.attribute}:${value}`),
+                };
+              }
+            } else if (option.extension && option.extension.without) {
+              if (filterOptions.options.without) {
+                // no connection present
+                // add without option
+                filterOptions.options.without.count += 1;
+              } else {
+                filterOptions.options.without = {
+                  label: `Without ${option.label}`,
+                  value: `${option.attribute}:null`,
+                  count: 1,
+                  query: 'where',
+                  checked: this.optionChecked('where', `${option.attribute}:null`),
+                };
+              }
+            }
+          }
+        });
+      });
+    }
     return filterOptions;
   }
   makeActiveFilterOptions = (entities) => {
@@ -589,13 +669,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  initURLOption = (option) => ({
-    ...option,
-    checked: !!(
-      this.props.location.query[option.query]
-      && this.props.location.query[option.query].indexOf(option.value.toString()) > -1
-    ),
-  });
+  optionChecked = (query, value) => !!(this.props.location.query[query] && this.props.location.query[query].indexOf(value.toString()) > -1)
+  optionCheckedStart = (query, value) => !!(this.props.location.query[query] && this.props.location.query[query].substr(0, value.length) === value.toString())
+  anyOptionChecked = (query) => !!this.props.location.query[query]
 
   render() {
     const {
