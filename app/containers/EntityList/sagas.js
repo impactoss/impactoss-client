@@ -1,5 +1,7 @@
-import { takeLatest, put } from 'redux-saga/effects';
-// import { credentialsSelector } from './selectors';
+import { takeLatest, put, select } from 'redux-saga/effects';
+
+import { LOCATION_CHANGE } from 'react-router-redux';
+
 import {
   updateConnections,
   updateEntities,
@@ -7,7 +9,12 @@ import {
 } from 'containers/App/actions';
 
 import {
+  selectLocation,
+} from 'containers/App/selectors';
+
+import {
   hideEditForm,
+  resetState,
 } from './actions';
 
 import {
@@ -42,6 +49,14 @@ export function* saveEdits({ data }) {
   yield put(hideEditForm());
 }
 
+export function* locationChangeSaga() {
+  // reset list if path changed
+  const location = yield select(selectLocation);
+  if (location.get('pathname') !== location.get('pathnamePrevious')) {
+    yield put(resetState());
+  }
+}
+
 // Individual exports for testing
 export default function* entityList() {
   yield takeLatest(
@@ -50,4 +65,5 @@ export default function* entityList() {
   );
 
   yield takeLatest(SAVE_EDITS, saveEdits);
+  yield takeLatest(LOCATION_CHANGE, locationChangeSaga);
 }

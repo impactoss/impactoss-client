@@ -7,7 +7,7 @@
 import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
-import { LOCATION_CHANGE } from 'react-router-redux';
+
 import {
   SHOW_FILTER_FORM,
   HIDE_FILTER_FORM,
@@ -41,8 +41,6 @@ function entityListReducer(state = initialState, action) {
       return state.set('activeEditOption', action.option);
     case HIDE_EDIT_FORM:
       return state.set('activeEditOption', null);
-    case LOCATION_CHANGE:
-      return action.payload.action === 'PUSH' ? initialState : state;
     case RESET_STATE:
       return initialState;
     case 'rrf/change':
@@ -70,16 +68,16 @@ function filterFormReducer(state = formInitial, action) {
       return action.model.substr(0, LISTINGS_FORM_MODEL.length) === LISTINGS_FORM_MODEL
         ? formInitial
         : state;
-    case LOCATION_CHANGE:
-      return action.payload.action === 'PUSH' ? formInitial : state;
+    case RESET_STATE:
+      return formInitial;
     default:
       return state;
   }
 }
 function editFormReducer(state = formInitial, action) {
   switch (action.type) {
-    case LOCATION_CHANGE:
-      return action.payload.action === 'PUSH' ? formInitial : state;
+    case RESET_STATE:
+      return formInitial;
     default:
       return state;
   }
@@ -89,8 +87,8 @@ function listingsFormReducer(state = listingsFormInitial, action) {
   switch (action.type) {
     case SHOW_PANEL:
       return action.activePanel === FILTERS_PANEL ? listingsFormInitial : state;
-    case LOCATION_CHANGE:
-      return action.payload.action === 'PUSH' ? listingsFormInitial : state;
+    case RESET_STATE:
+      return listingsFormInitial;
     default:
       return state;
   }
