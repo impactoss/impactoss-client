@@ -33,9 +33,14 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
             <FormattedMessage {...messages.indicators} />
           </HeaderLink>
           {this.props.isSignedIn && this.props.isManager &&
-            <HeaderLink to="/users">
-              <FormattedMessage {...messages.users} />
-            </HeaderLink>
+            <span>
+              <HeaderLink to="/users">
+                <FormattedMessage {...messages.users} />
+              </HeaderLink>
+              <HeaderLink to="/pages">
+                <FormattedMessage {...messages.pages} />
+              </HeaderLink>
+            </span>
           }
           {this.props.isSignedIn &&
             <span>

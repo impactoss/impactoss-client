@@ -50,8 +50,8 @@ export default defineMessages({
     id: 'nmrf.components.Header.taxonomies',
     defaultMessage: 'Categories',
   },
-  recommendationNew: {
-    id: 'nmrf.components.Header.recommendationNew',
-    defaultMessage: 'Create a recommenation',
+  pages: {
+    id: 'nmrf.components.Header.pages',
+    defaultMessage: 'Pages',
   },
 });

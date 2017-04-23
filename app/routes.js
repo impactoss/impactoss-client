@@ -541,6 +541,80 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/pages',
+      name: 'pageList',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/PageList'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/pages/new',
+      name: 'pageNew',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/PageNew/reducer'),
+          import('containers/PageNew/sagas'),
+          import('containers/PageNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('pageNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/pages/:id',
+      name: 'pageView',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/PageView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/pages/edit/:id',
+      name: 'pageEdit',
+      onEnter: redirectIfNotPermitted,
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/PageEdit/reducer'),
+          import('containers/PageEdit/sagas'),
+          import('containers/PageEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('pageEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {

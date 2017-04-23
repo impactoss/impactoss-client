@@ -54,6 +54,7 @@ const initialState = fromJS({
     recommendation_categories: null,
     progress_reports: null,
     due_dates: null,
+    pages: null,
   },
   ready: { // Record the time that entities where returned from the server
     taxonomies: null,
@@ -71,6 +72,7 @@ const initialState = fromJS({
     recommendation_categories: null,
     progress_reports: null,
     due_dates: null,
+    pages: null,
   },
   entities: {
     taxonomies: {},
@@ -88,6 +90,7 @@ const initialState = fromJS({
     recommendation_categories: {},
     progress_reports: {},
     due_dates: {},
+    pages: {},
   },
   user: {
     attributes: null,
