@@ -8,10 +8,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { browserHistory } from 'react-router';
 import { find } from 'lodash/collection';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -29,15 +28,6 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-  }
-
-  handleEdit = () => {
-    browserHistory.push(`/reports/edit/${this.props.params.id}`);
-  }
-
-  handleClose = () => {
-    browserHistory.push(`/indicators/${this.props.report.indicator.id}`);
-    // TODO should be "go back" if history present or to reports list when not
   }
 
   render() {
@@ -77,12 +67,12 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
               {
                 type: 'simple',
                 title: 'Edit',
-                onClick: this.handleEdit,
+                onClick: this.props.handleEdit,
               },
               {
                 type: 'primary',
                 title: 'Close',
-                onClick: this.handleClose,
+                onClick: () => this.props.handleClose(this.props.report.indicator.id),
               },
             ]}
           >
@@ -153,6 +143,8 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
 
 ReportView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  handleClose: PropTypes.func,
+  handleEdit: PropTypes.func,
   report: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
@@ -206,6 +198,13 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('progress_reports'));
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('due_dates'));
+    },
+    handleEdit: () => {
+      dispatch(updatePath(`/reports/edit/${this.props.params.id}`));
+    },
+    handleClose: (indicatorId) => {
+      dispatch(updatePath(`/indicators/${indicatorId}`));
+      // TODO should be "go back" if history present or to reports list when not
     },
   };
 }

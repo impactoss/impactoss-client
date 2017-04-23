@@ -8,10 +8,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { browserHistory } from 'react-router';
 import { find } from 'lodash/collection';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -37,17 +36,6 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-  }
-  handleEdit = () => {
-    browserHistory.push(`/indicators/edit/${this.props.params.id}`);
-  }
-  handleNewReport = () => {
-    browserHistory.push(`/reports/new/${this.props.params.id}`);
-  }
-
-  handleClose = () => {
-    browserHistory.push('/indicators');
-    // TODO should be "go back" if history present or to indicators list when not
   }
 
   mapActions = (actions) =>
@@ -99,23 +87,23 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       {
         type: 'simple',
         title: 'Add progress report',
-        onClick: this.handleNewReport,
+        onClick: this.props.handleNewReport,
       },
       {
         type: 'simple',
         title: 'Edit',
-        onClick: this.handleEdit,
+        onClick: this.props.handleEdit,
       },
       {
         type: 'primary',
         title: 'Close',
-        onClick: this.handleClose,
+        onClick: this.props.handleClose,
       },
     ]
     : [{
       type: 'primary',
       title: 'Close',
-      onClick: this.handleClose,
+      onClick: this.props.handleClose,
     }];
 
     return (
@@ -219,6 +207,9 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
 
 IndicatorView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  handleEdit: PropTypes.func,
+  handleClose: PropTypes.func,
+  handleNewReport: PropTypes.func,
   indicator: PropTypes.object,
   dataReady: PropTypes.bool,
   isContributor: PropTypes.bool,
@@ -316,6 +307,16 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('progress_reports'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
       dispatch(loadEntitiesIfNeeded('due_dates'));
+    },
+    handleEdit: () => {
+      dispatch(updatePath(`/indicators/edit/${this.props.params.id}`));
+    },
+    handleNewReport: () => {
+      dispatch(updatePath(`/reports/new/${this.props.params.id}`));
+    },
+    handleClose: () => {
+      dispatch(updatePath('/indicators'));
+      // TODO should be "go back" if history present or to indicators list when not
     },
   };
 }

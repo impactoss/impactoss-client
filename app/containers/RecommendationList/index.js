@@ -7,12 +7,11 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { browserHistory } from 'react-router';
 
 import EntityList from 'containers/EntityList';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -156,7 +155,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       actions: [{
         type: 'primary',
         title: 'New recommendation',
-        onClick: () => browserHistory.push('/recommendations/new/'),
+        onClick: () => this.props.updatePath(),
       }],
     };
 
@@ -184,6 +183,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
 
 RecommendationList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  updatePath: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
 };
@@ -215,6 +215,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+    },
+    handleNew: () => {
+      dispatch(updatePath('/recommendations/new/'));
     },
   };
 }

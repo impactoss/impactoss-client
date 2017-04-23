@@ -8,7 +8,6 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Form } from 'react-redux-form/immutable';
 
-// import { updateQueryStringParams } from 'utils/history';
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
 import { pick } from 'lodash/object';
 import { getEntitySortIteratee } from 'utils/sort';

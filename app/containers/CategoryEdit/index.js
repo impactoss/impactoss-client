@@ -9,13 +9,12 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
-import { browserHistory } from 'react-router';
 
 import { Map, List, fromJS } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
-import { loadEntitiesIfNeeded, redirectIfNotPermitted } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -298,7 +297,7 @@ function mapDispatchToProps(dispatch) {
       // however
       // - this could in the future be moved to a saga or reducer
       // - also its nice to be next to handleSubmit
-      browserHistory.push(`/category/${reference}`);
+      dispatch(updatePath(`/category/${reference}`));
     },
   };
 }

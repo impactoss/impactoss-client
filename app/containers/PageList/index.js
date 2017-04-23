@@ -7,12 +7,11 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { browserHistory } from 'react-router';
 
 import EntityList from 'containers/EntityList';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -78,7 +77,7 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
       actions: [{
         type: 'primary',
         title: 'New page',
-        onClick: () => browserHistory.push('/pages/new/'),
+        onClick: () => this.props.handleNew,
       }],
     };
 
@@ -106,6 +105,7 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
 
 PageList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  handleNew: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
 };
@@ -123,6 +123,9 @@ function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('pages'));
+    },
+    handleNew: () => {
+      dispatch(updatePath('/pages/new/'));
     },
   };
 }

@@ -8,10 +8,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { browserHistory } from 'react-router';
 import { find } from 'lodash/collection';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -37,14 +36,6 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-  }
-  handleEdit = () => {
-    browserHistory.push(`/actions/edit/${this.props.params.id}`);
-  }
-
-  handleClose = () => {
-    browserHistory.push('/actions');
-    // TODO should be "go back" if history present or to actions list when not
   }
 
   mapIndicators = (indicators) =>
@@ -109,18 +100,18 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       {
         type: 'simple',
         title: 'Edit',
-        onClick: this.handleEdit,
+        onClick: () => this.props.handleEdit(this.props.params.id),
       },
       {
         type: 'primary',
         title: 'Close',
-        onClick: this.handleClose,
+        onClick: this.props.handleClose,
       },
     ]
     : [{
       type: 'primary',
       title: 'Close',
-      onClick: this.handleClose,
+      onClick: this.props.handleClose,
     }];
 
     return (
@@ -190,6 +181,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 
 ActionView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  handleEdit: PropTypes.func,
+  handleClose: PropTypes.func,
   action: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
@@ -297,6 +290,13 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+    },
+    handleEdit: (actionId) => {
+      dispatch(updatePath(`/actions/edit/${actionId}`));
+    },
+    handleClose: () => {
+      dispatch(updatePath('/actions'));
+      // TODO should be "go back" if history present or to actions list when not
     },
   };
 }

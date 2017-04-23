@@ -8,14 +8,13 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { browserHistory } from 'react-router';
 
 import { Map, List } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
-import { loadEntitiesIfNeeded, redirectIfNotPermitted } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
 import { getEntities, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
@@ -251,11 +250,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
-      browserHistory.push('/recommendations');
+      dispatch(updatePath('/recommendations'));
     },
   };
 }

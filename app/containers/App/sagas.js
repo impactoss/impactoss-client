@@ -21,6 +21,7 @@ import {
   UPDATE_ROUTE_QUERY,
   AUTHENTICATE_FORWARD,
   USER_ROLES,
+  UPDATE_PATH,
 } from 'containers/App/constants';
 
 import {
@@ -353,6 +354,7 @@ export function* updateEntitiesSaga({ data }) {
   }
 }
 export function* updateRouteQuerySaga({ query, extend = true }) {
+  // TODO consider using history.js's updateQueryStringParams
   const location = yield select(selectLocation);
   // figure out new query
   // get old query or new query if not extending (replacing)
@@ -408,6 +410,11 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
   yield put(push(`${location.get('pathname')}?${queryNextString}`));
 }
 
+export function* updatePathSaga({ path }) {
+  yield put(push(path));
+}
+
+
 /**
  * Root saga manages watcher lifecycle
  */
@@ -427,4 +434,5 @@ export default function* rootSaga() {
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
+  yield takeEvery(UPDATE_PATH, updatePathSaga);
 }

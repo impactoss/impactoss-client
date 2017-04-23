@@ -8,10 +8,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { browserHistory } from 'react-router';
 import { find } from 'lodash/collection';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -38,15 +37,6 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
       this.props.loadEntitiesIfNeeded();
     }
   }
-  handleEdit = () => {
-    browserHistory.push(`/pages/edit/${this.props.params.id}`);
-  }
-
-  handleClose = () => {
-    browserHistory.push('/pages');
-    // TODO should be "go back" if history present or to pages list when not
-  }
-
 
   render() {
     const { page, dataReady, isAdmin, isContributor } = this.props;
@@ -82,18 +72,18 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
       {
         type: 'simple',
         title: 'Edit',
-        onClick: this.handleEdit,
+        onClick: this.props.handleEdit,
       },
       {
         type: 'primary',
         title: 'Close',
-        onClick: this.handleClose,
+        onClick: this.props.handleClose,
       },
     ]
     : [{
       type: 'primary',
       title: 'Close',
-      onClick: this.handleClose,
+      onClick: this.props.handleClose,
     }];
 
     return (
@@ -152,6 +142,8 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
 
 PageView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  handleEdit: PropTypes.func,
+  handleClose: PropTypes.func,
   page: PropTypes.object,
   dataReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
@@ -196,6 +188,13 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
       dispatch(loadEntitiesIfNeeded('pages'));
+    },
+    handleEdit: () => {
+      dispatch(updatePath(`/pages/edit/${this.props.params.id}`));
+    },
+    handleClose: () => {
+      dispatch(updatePath('/pages'));
+      // TODO should be "go back" if history present or to pages list when not
     },
   };
 }

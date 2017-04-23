@@ -1,8 +1,9 @@
 import { takeLatest, put, take, cancel, call } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
-import { browserHistory } from 'react-router';
 
 import { updatePasswordRequest } from 'utils/entities-update';
+
+import { updatePath } from 'containers/App/actions';
 
 import {
   passwordSending,
@@ -24,7 +25,7 @@ export function* save({ data }) {
 
     yield put(passwordSuccess());
 
-    yield browserHistory.push(`users/${data.id}`);
+    yield put(updatePath(`users/${data.id}`));
   } catch (error) {
     error.response.json = yield error.response.json();
     yield put(passwordError(error));

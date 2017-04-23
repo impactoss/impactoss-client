@@ -7,10 +7,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { browserHistory } from 'react-router';
 
 // containers
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
   getEntity,
   isReady,
@@ -42,9 +41,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
     title: cat.attributes.title,
     linkTo: `/category/${cat.id}`,
   }))
-  handleNew = () => {
-    browserHistory.push(`/categories/${this.props.taxonomy.id}/new`);
-  }
+
   render() {
     const { taxonomy, dataReady, isManager } = this.props;
 
@@ -56,7 +53,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
       ? [{
         type: 'primary',
         title: '+ Add Category',
-        onClick: this.handleNew,
+        onClick: () => this.props.handleNew(this.props.taxonomy.id),
       }]
       : [];
 
@@ -90,6 +87,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
 
 TaxonomyCategories.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  handleNew: PropTypes.func,
   taxonomy: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
@@ -146,6 +144,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+    },
+    handleNew: (taxonomyId) => {
+      dispatch(updatePath(`/categories/${taxonomyId}/new`));
     },
   };
 }
