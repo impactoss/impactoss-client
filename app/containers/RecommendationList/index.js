@@ -155,7 +155,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       actions: [{
         type: 'primary',
         title: 'New recommendation',
-        onClick: () => this.props.updatePath(),
+        onClick: this.props.handleNew,
       }],
     };
 
@@ -183,7 +183,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
 
 RecommendationList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  updatePath: PropTypes.func,
+  handleNew: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
 };
