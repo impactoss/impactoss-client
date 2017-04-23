@@ -17,17 +17,17 @@ const pageSelector = createSelector(
 
 const filterFormSelector = createSelector(
   selectEntityListDomain,
-  (substate) => substate.get('filterForm').data // TODO WTF HTF GRR
+  (substate) => substate.get('forms').filterData // TODO WTF HTF GRR
 );
 
 const editFormSelector = createSelector(
   selectEntityListDomain,
-  (substate) => substate.get('editForm').data // TODO WTF HTF GRR
+  (substate) => substate.get('forms').editData // TODO WTF HTF GRR
 );
 
 const listingsFormSelector = createSelector(
   selectEntityListDomain,
-  (substate) => substate.get('listingsForm').data // TODO WTF HTF GRR
+  (substate) => substate.get('forms').listingsData // TODO WTF HTF GRR
 );
 
 // TODO enable better caching on this, it's expensive ish
@@ -53,20 +53,7 @@ const activePanelSelector = createSelector(
 
 const filtersCheckedSelector = createSelector(
   filterFormSelector,
-  // () => window.location.href,
-  // (formData, href) => {
-  (formData) => {
-    const values = formData.get('values').filter((value) => value.get('checked'));
-    // might want some intesection logic here, as this is going to replace all existing params ( but maybe that's ok )
-    // some way to remove all the existing params that we are using before appending
-    // SEE https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
-    // const url = new URL(href);
-    return values.reduce((URLParams, value) => {
-      URLParams.append(value.get('query'), value.get('value'));
-      return URLParams;
-    }, new URLSearchParams());
-    // }, new URLSearchParams(url.search));
-  }
+  (formData) => formData.get('values').filter((value) => value.get('checked'))
 );
 
 /**

@@ -1,19 +1,35 @@
-import { takeLatest, select, put } from 'redux-saga/effects';
-import { browserHistory } from 'react-router';
-// import { credentialsSelector } from './selectors';
-import { updateConnections, updateEntities } from 'containers/App/actions';
+import { takeLatest, put, select } from 'redux-saga/effects';
 
-import { filtersCheckedSelector } from './selectors';
+import { LOCATION_CHANGE } from 'react-router-redux';
+
+import {
+  updateConnections,
+  updateEntities,
+  updateRouteQuery,
+} from 'containers/App/actions';
+
+import {
+  selectLocation,
+} from 'containers/App/selectors';
+
+import {
+  hideEditForm,
+  resetState,
+} from './actions';
 
 import {
   FILTER_FORM_MODEL,
   SAVE_EDITS,
 } from './constants';
 
-export function* doFilter() {
-  const URLSearchParams = yield select(filtersCheckedSelector);
-  const location = browserHistory.getCurrentLocation();
-  browserHistory.replace(`${location.pathname}?${URLSearchParams.toString()}`);
+export function* updateQuery(args) {
+  const params = args.value.map((value) => ({
+    arg: value.get('query'),
+    value: value.get('value'),
+    add: value.get('checked'),
+    remove: !value.get('checked'),
+  })).toJS();
+  yield put(updateRouteQuery(params));
 }
 
 export function* saveEdits({ data }) {
@@ -30,14 +46,24 @@ export function* saveEdits({ data }) {
     // }}
     yield put(updateConnections(data));
   }
+  yield put(hideEditForm());
+}
+
+export function* locationChangeSaga() {
+  // reset list if path changed
+  const location = yield select(selectLocation);
+  if (location.get('pathname') !== location.get('pathnamePrevious')) {
+    yield put(resetState());
+  }
 }
 
 // Individual exports for testing
 export default function* entityList() {
   yield takeLatest(
     (action) => action.type === 'rrf/change' && action.model === `${FILTER_FORM_MODEL}.values`,
-    doFilter
+    updateQuery
   );
 
   yield takeLatest(SAVE_EDITS, saveEdits);
+  yield takeLatest(LOCATION_CHANGE, locationChangeSaga);
 }

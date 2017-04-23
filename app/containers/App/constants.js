@@ -27,6 +27,7 @@ export const LOGOUT = 'nmrf/App/LOGOUT';
 export const LOGOUT_SUCCESS = 'nmrf/App/LOGOUT_SUCCESS';
 export const LOGOUT_ERROR = 'nmrf/App/LOGOUT_ERROR';
 export const VALIDATE_TOKEN = 'nmrf/App/VALIDATE_TOKEN';
+export const AUTHENTICATE_FORWARD = 'nmrf/App/AUTHENTICATE_FORWARD';
 
 export const ADD_ENTITY = 'nmrf/App/ADD_ENTITY';
 export const UPDATE_ENTITY = 'nmrf/App/UPDATE_ENTITY';
@@ -53,6 +54,8 @@ export const ENTITIES_READY = 'nmrf/App/ENTITIES_READY';
 export const SAVE_SENDING = 'nmrf/App/SAVE_SENDING';
 export const SAVE_SUCCESS = 'nmrf/App/SAVE_SUCCESS';
 export const SAVE_ERROR = 'nmrf/App/SAVE_ERROR';
+
+export const UPDATE_ROUTE_QUERY = 'nmrf/App/UPDATE_ROUTE_QUERY';
 
 // TODO need to pull from an env file
 export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';

@@ -41,6 +41,8 @@ import {
   SAVE_ERROR,
   UPDATE_CONNECTIONS,
   UPDATE_ENTITIES,
+  UPDATE_ROUTE_QUERY,
+  AUTHENTICATE_FORWARD,
 } from './constants';
 
 
@@ -274,5 +276,19 @@ export function invalidateEntities(path) {
   return {
     type: INVALIDATE_ENTITIES,
     path,
+  };
+}
+
+export function updateRouteQuery(query, replace) {
+  return {
+    type: UPDATE_ROUTE_QUERY,
+    query,
+    replace,
+  };
+}
+
+export function forwardOnAuthenticationChange() {
+  return {
+    type: AUTHENTICATE_FORWARD,
   };
 }

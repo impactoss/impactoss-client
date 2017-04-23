@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
-import { Control, Fieldset } from 'react-redux-form/immutable';
+import { Control } from 'react-redux-form/immutable';
 
 import ListItem from './ListItem';
 
@@ -32,7 +32,9 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
         <table><tbody><tr>
           <td>
             {this.props.model && this.props.select &&
-              <Control.checkbox model=".selected" />
+              <Control.checkbox
+                model={`${this.props.model}.selected`}
+              />
             }
           </td>
           <td>
@@ -68,14 +70,7 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
   render() {
     return (
       <div>
-        {this.props.model &&
-          <Fieldset model={this.props.model} >
-            {this.renderListItem()}
-          </Fieldset>
-        }
-        {!this.props.model &&
-            this.renderListItem()
-        }
+        {this.renderListItem()}
       </div>
     );
   }
