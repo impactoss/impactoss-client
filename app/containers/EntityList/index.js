@@ -36,6 +36,12 @@ import {
 } from './filterOptionsFactory';
 
 import {
+  makeAttributeEditOptions,
+  makeConnectionEditOptions,
+  makeTaxonomyEditOptions,
+} from './editOptionsFactory';
+
+import {
   FILTER_FORM_MODEL,
   EDIT_FORM_MODEL,
   LISTINGS_FORM_MODEL,
@@ -64,9 +70,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   getEntitiesSelected = () => Object.values(pick(this.props.entities, this.props.entityIdsSelected));
 
   makeActiveFilterOptions = (entities) => {
-    const { activeFilterOption } = this.props;
     // create filterOptions
-    switch (activeFilterOption.group) {
+    switch (this.props.activeFilterOption.group) {
       case 'taxonomies':
         return makeTaxonomyFilterOptions(entities, this.props);
       case 'connectedTaxonomies':
@@ -240,127 +245,19 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     return editGroups;
   }
 
-  taxonomyEditOptions = (entitiesSelected) => {
-    const { taxonomies, activeEditOption } = this.props;
-
-    const editOptions = {
-      groupId: 'taxonomies',
-      search: true,
-      options: {},
-      selectedCount: entitiesSelected.length,
-    };
-    forEach(taxonomies, (taxonomy) => {
-      // if taxonomy active add filter option
-      if (activeEditOption.optionId === taxonomy.id) {
-        editOptions.title = taxonomy.attributes.title;
-        forEach(taxonomy.categories, (category) => {
-          const count = reduce(entitiesSelected, (counter, entity) => {
-            const categoryIds = entity.taxonomies
-              ? map(map(Object.values(entity.taxonomies), 'attributes'), (attribute) => attribute.category_id.toString())
-              : [];
-            return categoryIds && categoryIds.indexOf(category.id) > -1 ? counter + 1 : counter;
-          }, 0);
-          editOptions.options[category.id] = {
-            label: category.attributes.title,
-            value: category.id,
-            all: count === entitiesSelected.length,
-            none: count === 0,
-            some: count > 0 && count < entitiesSelected.length,
-            count,
-          };
-        });
-      }
-    });
-    return editOptions;
-  }
-  connectionEditOptions = (entitiesSelected) => {
-    const { edits, connections, activeEditOption } = this.props;
-
-    const editOptions = {
-      groupId: 'connections',
-      search: true,
-      options: {},
-      selectedCount: entitiesSelected.length,
-    };
-    // forEach(connections, (connection) => {
-    forEach(edits.connections.options, (option) => {
-      if (activeEditOption.optionId === option.path) {
-        editOptions.title = option.label;
-        editOptions.path = option.connectPath;
-        forEach(connections[option.path], (connection) => {
-          const count = reduce(entitiesSelected, (counter, entity) => {
-            const connectedIds = entity[option.path]
-              ? map(map(Object.values(entity[option.path]), 'attributes'), (attribute) => attribute[option.key].toString())
-              : null;
-            return connectedIds && connectedIds.indexOf(connection.id) > -1 ? counter + 1 : counter;
-          }, 0);
-          editOptions.options[connection.id] = {
-            label: connection.attributes.title,
-            value: connection.id,
-            all: count === entitiesSelected.length,
-            none: count === 0,
-            some: count > 0 && count < entitiesSelected.length,
-            count,
-          };
-        });
-      }
-    });
-    return editOptions;
-  }
-  attributeEditOptions = (entitiesSelected) => {
-    const { edits, activeEditOption } = this.props;
-
-    const editOptions = {
-      groupId: 'attributes',
-      search: true,
-      options: {},
-      selectedCount: entitiesSelected.length,
-    };
-    // forEach(connections, (connection) => {
-    forEach(edits.attributes.options, (option) => {
-      if (activeEditOption.optionId === option.attribute) {
-        editOptions.title = option.label;
-        forEach(option.options, (attributeOption) => {
-          const count = reduce(entitiesSelected, (counter, entity) =>
-            typeof entity.attributes[option.attribute] !== 'undefined'
-              && entity.attributes[option.attribute].toString() === attributeOption.value.toString()
-              ? counter + 1
-              : counter
-          , 0);
-          editOptions.options[attributeOption.value] = {
-            label: attributeOption.label,
-            value: attributeOption.value,
-            attribute: option.attribute,
-            all: count === entitiesSelected.length,
-            none: count === 0,
-            some: count > 0 && count < entitiesSelected.length,
-            count,
-          };
-        });
-      }
-    });
-    return editOptions;
-  }
-
   makeActiveEditOptions = (entitiesSelected) => {
-    const { activeEditOption } = this.props;
-    // iterate through entities and create filterOptions
-    // if taxonomy options
-    switch (activeEditOption.group) {
+    // create edit options
+    switch (this.props.activeEditOption.group) {
       case 'taxonomies':
-        return this.taxonomyEditOptions(entitiesSelected);
+        return makeTaxonomyEditOptions(entitiesSelected, this.props);
       case 'connections':
-        return this.connectionEditOptions(entitiesSelected);
+        return makeConnectionEditOptions(entitiesSelected, this.props);
       case 'attributes':
-        return this.attributeEditOptions(entitiesSelected);
+        return makeAttributeEditOptions(entitiesSelected, this.props);
       default:
         return null;
     }
   }
-
-  optionChecked = (query, value) => !!(this.props.location.query[query] && this.props.location.query[query].indexOf(value.toString()) > -1)
-  optionCheckedStart = (query, value) => !!(this.props.location.query[query] && this.props.location.query[query].substr(0, value.length) === value.toString())
-  anyOptionChecked = (query) => !!this.props.location.query[query]
 
   render() {
     const {
@@ -477,7 +374,6 @@ EntityList.propTypes = {
   connections: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   mapToEntityList: PropTypes.func.isRequired,
-  location: PropTypes.object.isRequired,
   // TODO: do not pass location directly but specific props, to allow multiple lists on same page
   header: PropTypes.object,
   sortBy: PropTypes.string,
