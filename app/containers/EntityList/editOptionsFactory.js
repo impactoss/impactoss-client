@@ -1,9 +1,20 @@
 import { find, forEach, map, reduce } from 'lodash/collection';
 
+export const makeActiveEditOptions = (entities, props) => {
+  // create edit options
+  switch (props.activeEditOption.group) {
+    case 'taxonomies':
+      return makeTaxonomyEditOptions(entities, props);
+    case 'connections':
+      return makeConnectionEditOptions(entities, props);
+    case 'attributes':
+      return makeAttributeEditOptions(entities, props);
+    default:
+      return null;
+  }
+};
 
-export const makeAttributeEditOptions = (entities, props) => {
-  const { edits, activeEditOption } = props;
-
+export const makeAttributeEditOptions = (entities, { edits, activeEditOption }) => {
   const editOptions = {
     groupId: 'attributes',
     search: true,
@@ -35,9 +46,7 @@ export const makeAttributeEditOptions = (entities, props) => {
   return editOptions;
 };
 
-export const makeTaxonomyEditOptions = (entities, props) => {
-  const { taxonomies, activeEditOption } = props;
-
+export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption }) => {
   const editOptions = {
     groupId: 'taxonomies',
     search: true,
@@ -68,9 +77,7 @@ export const makeTaxonomyEditOptions = (entities, props) => {
   return editOptions;
 };
 
-export const makeConnectionEditOptions = (entities, props) => {
-  const { edits, connections, activeEditOption } = props;
-
+export const makeConnectionEditOptions = (entities, { edits, connections, activeEditOption }) => {
   const editOptions = {
     groupId: 'connections',
     search: true,

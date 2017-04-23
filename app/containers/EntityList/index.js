@@ -28,18 +28,10 @@ import Container from 'components/basic/Container';
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
 
-import {
-  makeAttributeFilterOptions,
-  makeConnectionFilterOptions,
-  makeTaxonomyFilterOptions,
-  makeConnectedTaxonomyFilterOptions,
-} from './filterOptionsFactory';
-
-import {
-  makeAttributeEditOptions,
-  makeConnectionEditOptions,
-  makeTaxonomyEditOptions,
-} from './editOptionsFactory';
+import { makeFilterGroups } from './filterGroupsFactory';
+import { makeEditGroups } from './editGroupsFactory';
+import { makeActiveFilterOptions } from './filterOptionsFactory';
+import { makeActiveEditOptions } from './editOptionsFactory';
 
 import {
   FILTER_FORM_MODEL,
@@ -67,198 +59,6 @@ import {
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  getEntitiesSelected = () => Object.values(pick(this.props.entities, this.props.entityIdsSelected));
-
-  makeActiveFilterOptions = (entities) => {
-    // create filterOptions
-    switch (this.props.activeFilterOption.group) {
-      case 'taxonomies':
-        return makeTaxonomyFilterOptions(entities, this.props);
-      case 'connectedTaxonomies':
-        return makeConnectedTaxonomyFilterOptions(entities, this.props);
-      case 'connections':
-        return makeConnectionFilterOptions(entities, this.props);
-      case 'attributes':
-        return makeAttributeFilterOptions(entities, this.props);
-      default:
-        return null;
-    }
-  }
-
-  // figure out filter groups for filter panel
-  makeFilterGroups = () => {
-    const {
-      filters,
-      taxonomies,
-      connections,
-      connectedTaxonomies,
-      activeFilterOption,
-    } = this.props;
-
-    const filterGroups = {};
-
-    // taxonomy option group
-    if (filters.taxonomies && taxonomies) {
-      // first prepare taxonomy options
-      filterGroups.taxonomies = {
-        id: 'taxonomies', // filterGroupId
-        label: filters.taxonomies.label,
-        show: true,
-        options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
-          ...taxOptions,
-          [taxonomy.id]: {
-            id: taxonomy.id, // filterOptionId
-            label: taxonomy.attributes.title,
-            active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.id,
-          },
-        }), {}),
-      };
-    }
-
-    // connectedTaxonomies option group
-    if (filters.connectedTaxonomies && connectedTaxonomies.taxonomies) {
-      // first prepare taxonomy options
-      filterGroups.connectedTaxonomies = {
-        id: 'connectedTaxonomies', // filterGroupId
-        label: filters.connectedTaxonomies.label,
-        show: true,
-        options: reduce(Object.values(connectedTaxonomies.taxonomies), (taxOptions, taxonomy) => ({
-          ...taxOptions,
-          [taxonomy.id]: {
-            id: taxonomy.id, // filterOptionId
-            label: taxonomy.attributes.title,
-            active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.id,
-          },
-        }), {}),
-      };
-    }
-
-    // connections option group
-    if (filters.connections && connections) {
-      // first prepare taxonomy options
-      filterGroups.connections = {
-        id: 'connections', // filterGroupId
-        label: filters.connections.label,
-        show: true,
-        options: reduce(filters.connections.options, (options, option) => ({
-          ...options,
-          [option.path]: {
-            id: option.path, // filterOptionId
-            label: option.label,
-            active: !!activeFilterOption && activeFilterOption.optionId === option.path,
-          },
-        }), {}),
-      };
-    }
-
-    // attributes
-    if (filters.attributes) {
-      // first prepare taxonomy options
-      filterGroups.attributes = {
-        id: 'attributes', // filterGroupId
-        label: filters.attributes.label,
-        show: true,
-        options: reduce(filters.attributes.options, (options, option) => ({
-          ...options,
-          [option.attribute]: {
-            id: option.attribute, // filterOptionId
-            label: option.label,
-            active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
-          },
-        }), {}),
-      };
-    }
-
-    return filterGroups;
-  }
-
-  makeEditGroups = () => {
-    const {
-      edits,
-      taxonomies,
-      connections,
-      activeEditOption,
-    } = this.props;
-
-    const editGroups = {};
-
-    // taxonomy option group
-    if (edits.taxonomies && taxonomies) {
-      // first prepare taxonomy options
-      editGroups.taxonomies = {
-        id: 'taxonomies', // filterGroupId
-        label: edits.taxonomies.label,
-        show: true,
-        options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
-          ...taxOptions,
-          [taxonomy.id]: {
-            id: taxonomy.id, // filterOptionId
-            label: taxonomy.attributes.title,
-            path: edits.taxonomies.connectPath,
-            key: edits.taxonomies.key,
-            ownKey: edits.taxonomies.ownKey,
-            active: !!activeEditOption && activeEditOption.optionId === taxonomy.id,
-          },
-        }), {}),
-      };
-    }
-
-    // connections option group
-    if (edits.connections && connections) {
-      // first prepare taxonomy options
-      editGroups.connections = {
-        id: 'connections', // filterGroupId
-        label: edits.connections.label,
-        show: true,
-        options: reduce(edits.connections.options, (options, option) => ({
-          ...options,
-          [option.path]: {
-            id: option.path, // filterOptionId
-            label: option.label,
-            path: option.connectPath,
-            key: option.key,
-            ownKey: option.ownKey,
-            active: !!activeEditOption && activeEditOption.optionId === option.path,
-          },
-        }), {}),
-      };
-    }
-
-    // attributes
-    if (edits.attributes) {
-      // first prepare taxonomy options
-      editGroups.attributes = {
-        id: 'attributes', // filterGroupId
-        label: edits.attributes.label,
-        show: true,
-        options: reduce(edits.attributes.options, (options, option) => ({
-          ...options,
-          [option.attribute]: {
-            id: option.attribute, // filterOptionId
-            label: option.label,
-            active: !!activeEditOption && activeEditOption.optionId === option.attribute,
-          },
-        }), {}),
-      };
-    }
-
-    return editGroups;
-  }
-
-  makeActiveEditOptions = (entitiesSelected) => {
-    // create edit options
-    switch (this.props.activeEditOption.group) {
-      case 'taxonomies':
-        return makeTaxonomyEditOptions(entitiesSelected, this.props);
-      case 'connections':
-        return makeConnectionEditOptions(entitiesSelected, this.props);
-      case 'attributes':
-        return makeAttributeEditOptions(entitiesSelected, this.props);
-      default:
-        return null;
-    }
-  }
-
   render() {
     const {
       sortBy,
@@ -278,7 +78,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     // map entities to entity list item data
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
-    const entitiesSelected = this.getEntitiesSelected();
+    const entitiesSelected = Object.values(pick(this.props.entities, this.props.entityIdsSelected));
 
     const filterListOption = {
       label: 'Filter list',
@@ -311,8 +111,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             >
               { dataReady && activePanel === FILTERS_PANEL &&
                 <EntityListFilters
-                  filterGroups={fromJS(this.makeFilterGroups())}
-                  formOptions={activeFilterOption ? fromJS(this.makeActiveFilterOptions(entities)) : null}
+                  filterGroups={fromJS(makeFilterGroups(this.props))}
+                  formOptions={
+                    activeFilterOption
+                    ? fromJS(makeActiveFilterOptions(entities, this.props))
+                    : null
+                  }
                   formModel={FILTER_FORM_MODEL}
                   onShowFilterForm={this.props.onShowFilterForm}
                   onHideFilterForm={this.props.onHideFilterForm}
@@ -320,8 +124,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               }
               { dataReady && isManager && activePanel === EDIT_PANEL &&
                 <EntityListEdit
-                  editGroups={entitiesSelected.length ? fromJS(this.makeEditGroups()) : null}
-                  formOptions={activeEditOption && entitiesSelected.length ? fromJS(this.makeActiveEditOptions(entitiesSelected)) : null}
+                  editGroups={entitiesSelected.length ? fromJS(makeEditGroups(this.props)) : null}
+                  formOptions={
+                    activeEditOption && entitiesSelected.length
+                    ? fromJS(makeActiveEditOptions(entitiesSelected, this.props))
+                    : null
+                  }
                   formModel={EDIT_FORM_MODEL}
                   onShowEditForm={this.props.onShowEditForm}
                   onHideEditForm={this.props.onHideEditForm}
@@ -368,13 +176,7 @@ EntityList.propTypes = {
   // selects: PropTypes.object, // only used in mapStateToProps
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
-  filters: PropTypes.object,
-  edits: PropTypes.object,
-  taxonomies: PropTypes.object,
-  connections: PropTypes.object,
-  connectedTaxonomies: PropTypes.object,
   mapToEntityList: PropTypes.func.isRequired,
-  // TODO: do not pass location directly but specific props, to allow multiple lists on same page
   header: PropTypes.object,
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,

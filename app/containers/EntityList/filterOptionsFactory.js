@@ -1,9 +1,24 @@
 import { find, forEach, map } from 'lodash/collection';
 import { optionChecked, attributeOptionChecked } from './utils';
 
-export const makeAttributeFilterOptions = (entities, props) => {
-  const { filters, activeFilterOption } = props;
-  const locationQuery = props.location.query;
+export const makeActiveFilterOptions = (entities, props) => {
+  // create filterOptions
+  switch (props.activeFilterOption.group) {
+    case 'taxonomies':
+      return makeTaxonomyFilterOptions(entities, props);
+    case 'connectedTaxonomies':
+      return makeConnectedTaxonomyFilterOptions(entities, props);
+    case 'connections':
+      return makeConnectionFilterOptions(entities, props);
+    case 'attributes':
+      return makeAttributeFilterOptions(entities, props);
+    default:
+      return null;
+  }
+};
+
+export const makeAttributeFilterOptions = (entities, { filters, activeFilterOption, location }) => {
+  const locationQuery = location.query;
 
   const filterOptions = {
     groupId: 'attributes',
@@ -89,9 +104,8 @@ export const makeAttributeFilterOptions = (entities, props) => {
 //
 //
 //
-export const makeTaxonomyFilterOptions = (entities, props) => {
-  const { filters, taxonomies, activeFilterOption } = props;
-  const locationQuery = props.location.query;
+export const makeTaxonomyFilterOptions = (entities, { filters, taxonomies, activeFilterOption, location }) => {
+  const locationQuery = location.query;
 
   const filterOptions = {
     groupId: 'taxonomies',
@@ -181,9 +195,8 @@ export const makeTaxonomyFilterOptions = (entities, props) => {
 //
 //
 //
-export const makeConnectionFilterOptions = (entities, props) => {
-  const { filters, connections, activeFilterOption } = props;
-  const locationQuery = props.location.query;
+export const makeConnectionFilterOptions = (entities, { filters, connections, activeFilterOption, location }) => {
+  const locationQuery = location.query;
 
   const filterOptions = {
     groupId: 'connections',
@@ -300,9 +313,8 @@ const getConnectedCategoryIds = (entity, connection, taxonomy) => {
 };
 
 
-export const makeConnectedTaxonomyFilterOptions = (entities, props) => {
-  const { filters, connectedTaxonomies, activeFilterOption } = props;
-  const locationQuery = props.location.query;
+export const makeConnectedTaxonomyFilterOptions = (entities, { filters, connectedTaxonomies, activeFilterOption, location }) => {
+  const locationQuery = location.query;
 
   const filterOptions = {
     groupId: 'connectedTaxonomies',
