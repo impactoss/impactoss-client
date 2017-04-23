@@ -40,6 +40,7 @@ export default class MultiSelect extends React.Component {
   }
 
   onChange = (checked, theValue) => {
+// console.log('onchange', this.props.values, this.props.options)
     const originalValue = this.getOptionValue(theValue);
     const originalChecked = originalValue.has('checked') ? originalValue.get('checked') : false;
     const newValue = theValue
@@ -47,7 +48,7 @@ export default class MultiSelect extends React.Component {
       .set('hasChanged', checked !== originalChecked);
     const existingValueIndex = this.props.values.findIndex((v) => this.props.valueCompare(v, theValue));
     const nextValues = existingValueIndex >= 0 ? this.props.values.set(existingValueIndex, newValue) : this.props.values.push(newValue);
-
+// console.log('onchange', nextValues)
     this.props.onChange(nextValues);
   }
 
@@ -97,6 +98,7 @@ export default class MultiSelect extends React.Component {
 
   render() {
     const { options, values, valueCompare, threeState } = this.props;
+    // console.log(options, values)
     const checkboxes = options.map((option) => {
       const value = values.find((v) => valueCompare(option.get('value'), v));
       const initialValue = option.get('value');

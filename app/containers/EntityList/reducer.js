@@ -7,7 +7,7 @@
 import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
-import { LOCATION_CHANGE } from 'react-router-redux';
+
 import {
   SHOW_FILTER_FORM,
   HIDE_FILTER_FORM,
@@ -15,47 +15,80 @@ import {
   HIDE_EDIT_FORM,
   SHOW_PANEL,
   FILTERS_PANEL,
+  EDIT_PANEL,
   RESET_STATE,
+  LISTINGS_FORM_MODEL,
 } from './constants';
 
 const initialState = fromJS({
   activeFilterOption: null,
-  // {
-  //   group: 'taxonomies',
-  //   optionId: '6',
-  // },
   activeEditOption: null,
   activePanel: FILTERS_PANEL,
-});
-
-const filterFormData = fromJS({
-  values: [],
-});
-
-const editFormData = fromJS({
-  values: [],
-});
-
-const listingsFormData = fromJS({
-  entities: {},
 });
 
 function entityListReducer(state = initialState, action) {
   switch (action.type) {
     case SHOW_PANEL:
-      return state.set('activePanel', action.activePanel);
+      return state
+        .set('activePanel', action.activePanel)
+        .set('activeFilterOption', null)
+        .set('activeEditOption', null);
     case SHOW_FILTER_FORM:
       return state.set('activeFilterOption', action.option);
     case HIDE_FILTER_FORM:
-      return state.set('activeFilterOption', fromJS(initialState.toJS().activeFilterOption));
+      return state.set('activeFilterOption', null);
     case SHOW_EDIT_FORM:
       return state.set('activeEditOption', action.option);
     case HIDE_EDIT_FORM:
-      return state.set('activeEditOption', fromJS(initialState.toJS().activeEditOption));
-    case LOCATION_CHANGE:
-      return action.payload.action === 'PUSH' ? initialState : state;
+      return state.set('activeEditOption', null);
     case RESET_STATE:
       return initialState;
+    case 'rrf/change':
+      return action.model.substr(0, LISTINGS_FORM_MODEL.length) === LISTINGS_FORM_MODEL
+        ? state
+          .set('activePanel', EDIT_PANEL)
+          .set('activeFilterOption', null)
+          .set('activeEditOption', null)
+        : state;
+    default:
+      return state;
+  }
+}
+
+const formInitial = fromJS({
+  values: [],
+});
+const listingsFormInitial = fromJS({
+  entities: {},
+});
+
+function filterFormReducer(state = formInitial, action) {
+  switch (action.type) {
+    case 'rrf/change':
+      return action.model.substr(0, LISTINGS_FORM_MODEL.length) === LISTINGS_FORM_MODEL
+        ? formInitial
+        : state;
+    case RESET_STATE:
+      return formInitial;
+    default:
+      return state;
+  }
+}
+function editFormReducer(state = formInitial, action) {
+  switch (action.type) {
+    case RESET_STATE:
+      return formInitial;
+    default:
+      return state;
+  }
+}
+
+function listingsFormReducer(state = listingsFormInitial, action) {
+  switch (action.type) {
+    case SHOW_PANEL:
+      return action.activePanel === FILTERS_PANEL ? listingsFormInitial : state;
+    case RESET_STATE:
+      return listingsFormInitial;
     default:
       return state;
   }
@@ -63,15 +96,11 @@ function entityListReducer(state = initialState, action) {
 
 export default combineReducers({
   page: entityListReducer,
-  filterForm: combineForms({
-    data: filterFormData,
-  }, 'entityList.filterForm'),
-  editForm: combineForms({
-    data: editFormData,
-  }, 'entityList.editForm'),
-  listingsForm: combineForms({
-    data: listingsFormData,
-  }, 'entityList.listingsForm'),
+  forms: combineForms({
+    filterData: filterFormReducer,
+    editData: editFormReducer,
+    listingsData: listingsFormReducer,
+  }, 'entityList.forms'),
 });
 
 // export default entityListFilterReducer;

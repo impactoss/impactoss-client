@@ -12,7 +12,7 @@ const MultiSelectControl = (props) => {
       type="multiselect"
       model={model}
       component={MultiSelect}
-      multiple
+      // multiple
       mapProps={{
         values: (cprops) => cprops.viewValue,
         onChange: (cprops) => cprops.onChange,

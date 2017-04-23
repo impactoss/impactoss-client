@@ -28,6 +28,11 @@ import Container from 'components/basic/Container';
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
 
+import { makeFilterGroups } from './filterGroupsFactory';
+import { makeEditGroups } from './editGroupsFactory';
+import { makeActiveFilterOptions } from './filterOptionsFactory';
+import { makeActiveEditOptions } from './editOptionsFactory';
+
 import {
   FILTER_FORM_MODEL,
   EDIT_FORM_MODEL,
@@ -54,549 +59,6 @@ import {
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  getEntitiesSelected = () => Object.values(pick(this.props.entities, this.props.entityIdsSelected));
-
-  getConnectedCategoryIds = (entity, connection, taxonomies) => {
-    const connectionIds = map(map(Object.values(entity[connection.path]), 'attributes'), connection.key);
-    return reduce(Object.values(taxonomies), (ids, taxonomy) => {
-      const idsUpdated = ids;
-      if (taxonomy.categories) {
-        forEach(Object.values(taxonomy.categories), (category) => {
-          if (category[connection.path]) {
-            forEach(Object.values(category[connection.path]), (categoryAssociation) => {
-              if (connectionIds.indexOf(categoryAssociation.attributes[connection.key]) > -1) {
-                if (ids.indexOf(categoryAssociation.attributes.category_id) === -1) {
-                  idsUpdated.push(categoryAssociation.attributes.category_id);
-                }
-              }
-            });
-          }
-        });
-      }
-      return idsUpdated;
-    }, []);
-  }
-
-  taxonomyFilterOptions = (entities) => {
-    const { filters, taxonomies, activeFilterOption } = this.props;
-
-    const filterOptions = {
-      groupId: 'taxonomies',
-      search: filters.taxonomies.search,
-      options: {},
-    };
-
-    forEach(Object.values(entities), (entity) => {
-      // if entity has taxonomies
-      const taxonomyIds = []; // track taxonomies, so we can add without options for those not in here
-
-      if (entity.taxonomies) {
-        // add categories from entities if not present otherwise increase count
-        const categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
-        forEach(categoryIds, (catId) => {
-          // get taxonomy for each category
-          const taxonomy = find(Object.values(taxonomies), (tax) =>
-            tax.categories && Object.keys(tax.categories).indexOf(catId.toString()) > -1
-          );
-          if (taxonomy) {
-            taxonomyIds.push(taxonomy.id); // tracking to identify missing taxonomies
-            // if taxonomy active add filter option
-            if (activeFilterOption.optionId === taxonomy.id.toString()) {
-              filterOptions.title = filterOptions.title || taxonomy.attributes.title;
-              // if category already added
-              if (filterOptions.options[catId]) {
-                filterOptions.options[catId].count += 1;
-              } else {
-                filterOptions.options[catId] = this.initURLOption({
-                  label: taxonomy.categories[catId].attributes.title || taxonomy.categories[catId].attributes.name,
-                  value: catId,
-                  count: 1,
-                  query: filters.taxonomies.query,
-                });
-              }
-            }
-          }
-        });
-      }
-      // add without option for those taxonomies not associated with entity
-      forEach(taxonomies, (taxonomy) => {
-        if (activeFilterOption.optionId === taxonomy.id && taxonomyIds.indexOf(taxonomy.id) === -1) {
-          if (filterOptions.options.without) {
-            filterOptions.options.without.count += 1;
-          } else {
-            filterOptions.options.without = this.initURLOption({
-              label: `Without ${taxonomy.attributes.title}`,
-              value: taxonomy.id,
-              count: 1,
-              query: 'without',
-            });
-          }
-        }
-      });
-    });
-    return filterOptions;
-  }
-  connectedTaxonomyFilterOptions = (entities) => {
-    const { filters, connectedTaxonomies, activeFilterOption } = this.props;
-
-    const filterOptions = {
-      groupId: 'connectedTaxonomies',
-      search: filters.connectedTaxonomies.search,
-      options: {},
-    };
-    forEach(Object.values(entities), (entity) => {
-      forEach(filters.connectedTaxonomies.connections, (connection) => {
-        // if entity has taxonomies
-        if (entity[connection.path]) { // recommendations stores recommendation_measures
-          // add categories from entities if not present otherwise increase count
-          const categoryIds = this.getConnectedCategoryIds(
-            entity,
-            connection,
-            connectedTaxonomies.taxonomies
-          );
-
-          forEach(categoryIds, (catId) => {
-            // TODO: the taxonomy lookup can may be omitted as we already iterate over taxonomies above
-            const taxonomy = find(Object.values(connectedTaxonomies.taxonomies), (tax) =>
-              tax.categories && Object.keys(tax.categories).indexOf(catId.toString()) > -1
-            );
-            if (taxonomy && activeFilterOption.optionId === taxonomy.id) {
-              filterOptions.title = filterOptions.title || taxonomy.attributes.title;
-              // if category already added
-              if (filterOptions.options[catId]) {
-                filterOptions.options[catId].count += 1;
-              } else {
-                filterOptions.options[catId] = this.initURLOption({
-                  label: taxonomy.categories[catId].attributes.title,
-                  value: `${connection.path}:${catId}`,
-                  count: 1,
-                  query: filters.connectedTaxonomies.query,
-                });
-              }
-            }
-          });
-        }
-      });
-    });
-    return filterOptions;
-  }
-
-  connectionFilterOptions = (entities) => {
-    const { filters, connections, activeFilterOption } = this.props;
-
-    const filterOptions = {
-      groupId: 'connections',
-      options: {},
-    };
-
-    forEach(Object.values(entities), (entity) => {
-      forEach(filters.connections.options, (option) => {
-        // if option active
-        if (activeFilterOption.optionId === option.path) {
-          filterOptions.title = filterOptions.title || option.label;
-          filterOptions.search = filterOptions.search || option.search;
-          // if entity has connected entities
-          if (entity[option.path]) {
-            // add connected entities if not present otherwise increase count
-            const connectedIds = {
-              [option.path]: map(map(Object.values(entity[option.path]), 'attributes'), option.key),
-            };
-            forEach(connectedIds[option.path], (connectedId) => {
-              const connection = connections[option.path][connectedId];
-              // if not taxonomy already considered
-              if (connection) {
-                // if category already added
-                if (filterOptions.options[connectedId]) {
-                  filterOptions.options[connectedId].count += 1;
-                } else {
-                  filterOptions.options[connectedId] = this.initURLOption({
-                    label: connection.attributes.title || connection.attributes.name,
-                    value: connectedId,
-                    search: option.searchAttributes && option.searchAttributes.map((attribute) => connection.attributes[attribute]).join(),
-                    count: 1,
-                    query: option.query,
-                  });
-                }
-              }
-            });
-          } else if (filterOptions.options.without) {
-            // no connection present
-            // add without option
-            filterOptions.options.without.count += 1;
-          } else {
-            filterOptions.options.without = this.initURLOption({
-              label: `Without ${option.label}`,
-              value: option.query,
-              count: 1,
-              query: 'without',
-            });
-          }
-        } // if (filterOptions.options.connections.options[option.path].show) {
-      });
-    });
-    return filterOptions;
-  }
-
-  attributeFilterOptions = (entities) => {
-    const { filters, activeFilterOption } = this.props;
-
-    const filterOptions = {
-      groupId: 'attributes',
-      options: {},
-    };
-    forEach(Object.values(entities), (entity) => {
-      forEach(filters.attributes.options, (option) => {
-        // the attribute option
-        if (activeFilterOption.optionId === option.attribute) {
-          filterOptions.title = filterOptions.title || option.label;
-          filterOptions.search = filterOptions.search || option.search;
-
-          if (typeof entity.attributes[option.attribute] !== 'undefined' && entity.attributes[option.attribute] !== null) {
-            // add connected entities if not present otherwise increase count
-            const value = entity.attributes[option.attribute].toString();
-            if (filterOptions.options[value]) {
-              filterOptions.options[value].count += 1;
-            } else if (option.options) {
-              const attribute = find(option.options, (o) => o.value.toString() === value);
-              filterOptions.options[value] = this.initURLOption({
-                label: attribute ? attribute.label : value,
-                value: `${option.attribute}:${value}`,
-                count: 1,
-                query: 'where',
-              });
-            } else if (option.extension && !!entity[option.extension.key]) {
-              const extension = Object.values(entity[option.extension.key])[0];
-              filterOptions.options[value] = this.initURLOption({
-                label: extension ? extension.attributes[option.extension.label] : value,
-                value: `${option.attribute}:${value}`,
-                count: 1,
-                query: 'where',
-              });
-            }
-          } else if (option.extension && option.extension.without) {
-            if (filterOptions.options.without) {
-              // no connection present
-              // add without option
-              filterOptions.options.without.count += 1;
-            } else {
-              filterOptions.options.without = this.initURLOption({
-                label: `Without ${option.label}`,
-                value: `${option.attribute}:null`,
-                count: 1,
-                query: 'where',
-              });
-            }
-          }
-        }
-      });
-    });
-
-    return filterOptions;
-  }
-  makeActiveFilterOptions = (entities) => {
-    const { activeFilterOption } = this.props;
-    // create filterOptions
-    // if taxonomy options
-    switch (activeFilterOption.group) {
-      case 'taxonomies':
-        return this.taxonomyFilterOptions(entities);
-      case 'connectedTaxonomies':
-        return this.connectedTaxonomyFilterOptions(entities);
-      case 'connections':
-        return this.connectionFilterOptions(entities);
-      case 'attributes':
-        return this.attributeFilterOptions(entities);
-      default:
-        return null;
-    }
-  }
-
-  // figure out filter groups for filter panel
-  makeFilterGroups = () => {
-    const {
-      filters,
-      taxonomies,
-      connections,
-      connectedTaxonomies,
-      activeFilterOption,
-    } = this.props;
-
-    const filterGroups = {};
-
-    // taxonomy option group
-    if (filters.taxonomies && taxonomies) {
-      // first prepare taxonomy options
-      filterGroups.taxonomies = {
-        id: 'taxonomies', // filterGroupId
-        label: filters.taxonomies.label,
-        show: true,
-        options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
-          ...taxOptions,
-          [taxonomy.id]: {
-            id: taxonomy.id, // filterOptionId
-            label: taxonomy.attributes.title,
-            active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.id,
-          },
-        }), {}),
-      };
-    }
-
-    // connectedTaxonomies option group
-    if (filters.connectedTaxonomies && connectedTaxonomies.taxonomies) {
-      // first prepare taxonomy options
-      filterGroups.connectedTaxonomies = {
-        id: 'connectedTaxonomies', // filterGroupId
-        label: filters.connectedTaxonomies.label,
-        show: true,
-        options: reduce(Object.values(connectedTaxonomies.taxonomies), (taxOptions, taxonomy) => ({
-          ...taxOptions,
-          [taxonomy.id]: {
-            id: taxonomy.id, // filterOptionId
-            label: taxonomy.attributes.title,
-            active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.id,
-          },
-        }), {}),
-      };
-    }
-
-    // connections option group
-    if (filters.connections && connections) {
-      // first prepare taxonomy options
-      filterGroups.connections = {
-        id: 'connections', // filterGroupId
-        label: filters.connections.label,
-        show: true,
-        options: reduce(filters.connections.options, (options, option) => ({
-          ...options,
-          [option.path]: {
-            id: option.path, // filterOptionId
-            label: option.label,
-            active: !!activeFilterOption && activeFilterOption.optionId === option.path,
-          },
-        }), {}),
-      };
-    }
-
-    // attributes
-    if (filters.attributes) {
-      // first prepare taxonomy options
-      filterGroups.attributes = {
-        id: 'attributes', // filterGroupId
-        label: filters.attributes.label,
-        show: true,
-        options: reduce(filters.attributes.options, (options, option) => ({
-          ...options,
-          [option.attribute]: {
-            id: option.attribute, // filterOptionId
-            label: option.label,
-            active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
-          },
-        }), {}),
-      };
-    }
-
-    return filterGroups;
-  }
-
-  makeEditGroups = () => {
-    const {
-      edits,
-      taxonomies,
-      connections,
-      activeEditOption,
-    } = this.props;
-
-    const editGroups = {};
-
-    // taxonomy option group
-    if (edits.taxonomies && taxonomies) {
-      // first prepare taxonomy options
-      editGroups.taxonomies = {
-        id: 'taxonomies', // filterGroupId
-        label: edits.taxonomies.label,
-        show: true,
-        options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
-          ...taxOptions,
-          [taxonomy.id]: {
-            id: taxonomy.id, // filterOptionId
-            label: taxonomy.attributes.title,
-            path: edits.taxonomies.connectPath,
-            key: edits.taxonomies.key,
-            ownKey: edits.taxonomies.ownKey,
-            active: !!activeEditOption && activeEditOption.optionId === taxonomy.id,
-          },
-        }), {}),
-      };
-    }
-
-    // connections option group
-    if (edits.connections && connections) {
-      // first prepare taxonomy options
-      editGroups.connections = {
-        id: 'connections', // filterGroupId
-        label: edits.connections.label,
-        show: true,
-        options: reduce(edits.connections.options, (options, option) => ({
-          ...options,
-          [option.path]: {
-            id: option.path, // filterOptionId
-            label: option.label,
-            path: option.connectPath,
-            key: option.key,
-            ownKey: option.ownKey,
-            active: !!activeEditOption && activeEditOption.optionId === option.path,
-          },
-        }), {}),
-      };
-    }
-
-    // attributes
-    if (edits.attributes) {
-      // first prepare taxonomy options
-      editGroups.attributes = {
-        id: 'attributes', // filterGroupId
-        label: edits.attributes.label,
-        show: true,
-        options: reduce(edits.attributes.options, (options, option) => ({
-          ...options,
-          [option.attribute]: {
-            id: option.attribute, // filterOptionId
-            label: option.label,
-            active: !!activeEditOption && activeEditOption.optionId === option.attribute,
-          },
-        }), {}),
-      };
-    }
-
-    return editGroups;
-  }
-
-  taxonomyEditOptions = (entitiesSelected) => {
-    const { taxonomies, activeEditOption } = this.props;
-
-    const editOptions = {
-      groupId: 'taxonomies',
-      search: true,
-      options: {},
-      selectedCount: entitiesSelected.length,
-    };
-    forEach(taxonomies, (taxonomy) => {
-      // if taxonomy active add filter option
-      if (activeEditOption.optionId === taxonomy.id) {
-        editOptions.title = taxonomy.attributes.title;
-        forEach(taxonomy.categories, (category) => {
-          const count = reduce(entitiesSelected, (counter, entity) => {
-            const categoryIds = entity.taxonomies
-              ? map(map(Object.values(entity.taxonomies), 'attributes'), (attribute) => attribute.category_id.toString())
-              : [];
-            return categoryIds && categoryIds.indexOf(category.id) > -1 ? counter + 1 : counter;
-          }, 0);
-          editOptions.options[category.id] = {
-            label: category.attributes.title,
-            value: category.id,
-            all: count === entitiesSelected.length,
-            none: count === 0,
-            some: count > 0 && count < entitiesSelected.length,
-            count,
-          };
-        });
-      }
-    });
-    return editOptions;
-  }
-  connectionEditOptions = (entitiesSelected) => {
-    const { edits, connections, activeEditOption } = this.props;
-
-    const editOptions = {
-      groupId: 'connections',
-      search: true,
-      options: {},
-      selectedCount: entitiesSelected.length,
-    };
-    // forEach(connections, (connection) => {
-    forEach(edits.connections.options, (option) => {
-      if (activeEditOption.optionId === option.path) {
-        editOptions.title = option.label;
-        editOptions.path = option.connectPath;
-        forEach(connections[option.path], (connection) => {
-          const count = reduce(entitiesSelected, (counter, entity) => {
-            const connectedIds = entity[option.path]
-              ? map(map(Object.values(entity[option.path]), 'attributes'), (attribute) => attribute[option.key].toString())
-              : null;
-            return connectedIds && connectedIds.indexOf(connection.id) > -1 ? counter + 1 : counter;
-          }, 0);
-          editOptions.options[connection.id] = {
-            label: connection.attributes.title,
-            value: connection.id,
-            all: count === entitiesSelected.length,
-            none: count === 0,
-            some: count > 0 && count < entitiesSelected.length,
-            count,
-          };
-        });
-      }
-    });
-    return editOptions;
-  }
-  attributeEditOptions = (entitiesSelected) => {
-    const { edits, activeEditOption } = this.props;
-
-    const editOptions = {
-      groupId: 'attributes',
-      search: true,
-      options: {},
-      selectedCount: entitiesSelected.length,
-    };
-    // forEach(connections, (connection) => {
-    forEach(edits.attributes.options, (option) => {
-      if (activeEditOption.optionId === option.attribute) {
-        editOptions.title = option.label;
-        forEach(option.options, (attributeOption) => {
-          const count = reduce(entitiesSelected, (counter, entity) =>
-            typeof entity.attributes[option.attribute] !== 'undefined'
-              && entity.attributes[option.attribute].toString() === attributeOption.value.toString()
-              ? counter + 1
-              : counter
-          , 0);
-          editOptions.options[attributeOption.value] = {
-            label: attributeOption.label,
-            value: attributeOption.value,
-            attribute: option.attribute,
-            all: count === entitiesSelected.length,
-            none: count === 0,
-            some: count > 0 && count < entitiesSelected.length,
-            count,
-          };
-        });
-      }
-    });
-    return editOptions;
-  }
-
-  makeActiveEditOptions = (entitiesSelected) => {
-    const { activeEditOption } = this.props;
-    // iterate through entities and create filterOptions
-    // if taxonomy options
-    switch (activeEditOption.group) {
-      case 'taxonomies':
-        return this.taxonomyEditOptions(entitiesSelected);
-      case 'connections':
-        return this.connectionEditOptions(entitiesSelected);
-      case 'attributes':
-        return this.attributeEditOptions(entitiesSelected);
-      default:
-        return null;
-    }
-  }
-
-  initURLOption = (option) => ({
-    ...option,
-    checked: !!(
-      this.props.location.query[option.query]
-      && this.props.location.query[option.query].indexOf(option.value.toString()) > -1
-    ),
-  });
-
   render() {
     const {
       sortBy,
@@ -614,13 +76,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       sortOrder
     );
 
-    // const entitiesSelected = [];
-    // TODO filter for entities selected in list
-    const entitiesSelected = this.getEntitiesSelected(); // uncomment this for testing and temporarily assume all are selected
-    // console.log(entitiesSelected);
-
     // map entities to entity list item data
     const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
+    const entitiesSelected = Object.values(pick(this.props.entities, this.props.entityIdsSelected));
+
     const filterListOption = {
       label: 'Filter list',
       active: activePanel === FILTERS_PANEL,
@@ -652,8 +111,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             >
               { dataReady && activePanel === FILTERS_PANEL &&
                 <EntityListFilters
-                  filterGroups={fromJS(this.makeFilterGroups())}
-                  formOptions={activeFilterOption ? fromJS(this.makeActiveFilterOptions(entities)) : null}
+                  filterGroups={fromJS(makeFilterGroups(this.props))}
+                  formOptions={
+                    activeFilterOption
+                    ? fromJS(makeActiveFilterOptions(entities, this.props))
+                    : null
+                  }
                   formModel={FILTER_FORM_MODEL}
                   onShowFilterForm={this.props.onShowFilterForm}
                   onHideFilterForm={this.props.onHideFilterForm}
@@ -661,8 +124,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               }
               { dataReady && isManager && activePanel === EDIT_PANEL &&
                 <EntityListEdit
-                  editGroups={entitiesSelected.length ? fromJS(this.makeEditGroups()) : null}
-                  formOptions={activeEditOption && entitiesSelected.length ? fromJS(this.makeActiveEditOptions(entitiesSelected)) : null}
+                  editGroups={entitiesSelected.length ? fromJS(makeEditGroups(this.props)) : null}
+                  formOptions={
+                    activeEditOption && entitiesSelected.length
+                    ? fromJS(makeActiveEditOptions(entitiesSelected, this.props))
+                    : null
+                  }
                   formModel={EDIT_FORM_MODEL}
                   onShowEditForm={this.props.onShowEditForm}
                   onHideEditForm={this.props.onHideEditForm}
@@ -709,14 +176,7 @@ EntityList.propTypes = {
   // selects: PropTypes.object, // only used in mapStateToProps
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
-  filters: PropTypes.object,
-  edits: PropTypes.object,
-  taxonomies: PropTypes.object,
-  connections: PropTypes.object,
-  connectedTaxonomies: PropTypes.object,
   mapToEntityList: PropTypes.func.isRequired,
-  location: PropTypes.object.isRequired,
-  // TODO: do not pass location directly but specific props, to allow multiple lists on same page
   header: PropTypes.object,
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
@@ -855,6 +315,7 @@ const mapStateToProps = (state, props) => ({
 function mapDispatchToProps(dispatch, props) {
   return {
     onShowFilterForm: (option) => {
+      dispatch(hideFilterForm());
       dispatch(showFilterForm(option));
     },
     onHideFilterForm: (evt) => {
