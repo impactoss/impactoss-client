@@ -15,7 +15,7 @@ import { Map, List, fromJS } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, redirectIfNotPermitted } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -52,6 +52,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       this.props.loadEntitiesIfNeeded();
     }
     if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.redirectIfNotPermitted();
       this.props.populateForm('categoryEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
@@ -202,6 +203,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
 CategoryEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  redirectIfNotPermitted: PropTypes.func,
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
@@ -275,6 +277,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
+    },
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, fromJS(formData)));

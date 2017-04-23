@@ -10,10 +10,13 @@ import Helmet from 'react-helmet';
 // import { FormattedMessage } from 'react-intl';
 import { browserHistory } from 'react-router';
 
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
+import { redirectIfNotPermitted } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
+
+import { isReady } from 'containers/App/selectors';
 
 import pageNewSelector from './selectors';
 import messages from './messages';
@@ -21,7 +24,11 @@ import { save } from './actions';
 
 
 export class PageNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.redirectIfNotPermitted();
+    }
+  }
   render() {
     const { saveSending, saveError } = this.props.pageNew.page;
     const required = (val) => val && val.length;
@@ -116,9 +123,11 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
 }
 
 PageNew.propTypes = {
+  redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   pageNew: PropTypes.object,
+  dataReady: PropTypes.bool,
 };
 
 PageNew.contextTypes = {
@@ -127,10 +136,16 @@ PageNew.contextTypes = {
 
 const mapStateToProps = (state) => ({
   pageNew: pageNewSelector(state),
+  dataReady: isReady(state, { path: [
+    'user_roles',
+  ] }),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
+    },
     handleSubmit: (formData) => {
       // let saveData = formData;
 

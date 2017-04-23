@@ -7,38 +7,38 @@ import { push } from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
 
-import { browserHistory } from 'react-router';
-
 import {
-    LOAD_ENTITIES_IF_NEEDED,
-    SAVE_ENTITY,
-    NEW_ENTITY,
-    AUTHENTICATE,
-    LOGOUT,
-    VALIDATE_TOKEN,
-    INVALIDATE_ENTITIES,
-    UPDATE_CONNECTIONS,
-    UPDATE_ENTITIES,
-    UPDATE_ROUTE_QUERY,
-    AUTHENTICATE_FORWARD,
+  LOAD_ENTITIES_IF_NEEDED,
+  REDIRECT_IF_NOT_PERMITTED,
+  SAVE_ENTITY,
+  NEW_ENTITY,
+  AUTHENTICATE,
+  LOGOUT,
+  VALIDATE_TOKEN,
+  INVALIDATE_ENTITIES,
+  UPDATE_CONNECTIONS,
+  UPDATE_ENTITIES,
+  UPDATE_ROUTE_QUERY,
+  AUTHENTICATE_FORWARD,
+  USER_ROLES,
 } from 'containers/App/constants';
 
 import {
-    entitiesLoaded,
-    entitiesLoadingError,
-    authenticateSuccess,
-    authenticateSending,
-    authenticateError,
-    logoutSuccess,
-    entitiesRequested,
-    invalidateEntities,
-    updateEntity,
-    addEntity,
-    deleteEntity,
-    saveSending,
-    saveSuccess,
-    saveError,
-    forwardOnAuthenticationChange,
+  entitiesLoaded,
+  entitiesLoadingError,
+  authenticateSuccess,
+  authenticateSending,
+  authenticateError,
+  logoutSuccess,
+  entitiesRequested,
+  invalidateEntities,
+  updateEntity,
+  addEntity,
+  deleteEntity,
+  saveSending,
+  saveSuccess,
+  saveError,
+  forwardOnAuthenticationChange,
 } from 'containers/App/actions';
 
 import {
@@ -47,6 +47,7 @@ import {
   getRequestedAt,
   isSignedIn,
   selectLocation,
+  sessionUserRoles,
 } from 'containers/App/selectors';
 
 import {
@@ -92,6 +93,21 @@ export function* checkEntitiesSaga(payload) {
       yield put(entitiesLoadingError(err, payload.path));
       // Clear the request time on error, This will cause us to try again next time, which we probably want to do?
       yield put(entitiesRequested(payload.path, null));
+    }
+  }
+}
+/**
+ * Check if entities already present
+ */
+export function* checkRoleSaga({ role }) {
+  const signedIn = yield select(isSignedIn);
+  if (signedIn) {
+    const roleIds = yield select(sessionUserRoles);
+    if (!(roleIds.indexOf(role) > -1
+    || (role === USER_ROLES.MANAGER && roleIds.indexOf(USER_ROLES.ADMIN) > -1)
+    || (role === USER_ROLES.CONTRIBUTOR && (roleIds.indexOf(USER_ROLES.MANAGER) > -1 || roleIds.indexOf(USER_ROLES.ADMIN) > -1))
+    )) {
+      yield put(push('/notfound'));
     }
   }
 }
@@ -256,7 +272,7 @@ export function* saveEntitySaga({ data }) {
     }
 
     yield put(saveSuccess());
-    yield browserHistory.push(data.redirect);
+    yield put(push(data.redirect));
   } catch (error) {
     yield put(saveError('An error occurred saving all or parts of your changes. Please review carefully and try again. '));
     yield put(invalidateEntities());
@@ -313,7 +329,7 @@ export function* newEntitySaga({ data }) {
     }
 
     yield put(saveSuccess());
-    yield browserHistory.push(`${data.redirect}/${entityCreated.data.id}`);
+    yield put(push(`${data.redirect}/${entityCreated.data.id}`));
   } catch (error) {
     // console.error(error);
     yield put(saveError('An error occurred saving your data. Please review carefully and try again. '));
@@ -389,7 +405,7 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
     return `${result}${result.length > 0 ? '&' : ''}${params}`;
   }, '');
 
-  yield browserHistory.push(`${location.get('pathname')}?${queryNextString}`);
+  yield put(`${location.get('pathname')}?${queryNextString}`);
 }
 
 /**
@@ -409,5 +425,6 @@ export default function* rootSaga() {
   yield takeEvery(UPDATE_ENTITIES, updateEntitiesSaga);
 
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
+  yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
 }

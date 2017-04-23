@@ -15,7 +15,7 @@ import { Map, List } from 'immutable';
 import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, redirectIfNotPermitted } from 'containers/App/actions';
 import { getEntities, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
@@ -36,6 +36,9 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.redirectIfNotPermitted();
     }
   }
 
@@ -189,6 +192,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
 
 IndicatorNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   indicatorNew: PropTypes.object,
@@ -236,12 +240,12 @@ const mapStateToProps = (state) => ({
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      // dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
-      // dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      // dispatch(loadEntitiesIfNeeded('measure_categories'));
+    },
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
     handleSubmit: (formData) => {
       let saveData = formData;

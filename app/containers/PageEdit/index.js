@@ -13,9 +13,9 @@ import { browserHistory } from 'react-router';
 
 import { fromJS } from 'immutable';
 
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, redirectIfNotPermitted } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -49,6 +49,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     }
     // repopulate if new data becomes ready
     if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.redirectIfNotPermitted();
       this.props.populateForm('pageEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
@@ -176,6 +177,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
 
 PageEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  redirectIfNotPermitted: PropTypes.func,
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
@@ -221,6 +223,9 @@ function mapDispatchToProps(dispatch, props) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('pages'));
+    },
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
     },
     populateForm: (model, formData) => {
       // console.log('populateForm', formData)
