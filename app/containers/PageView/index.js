@@ -99,13 +99,13 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     return (
       <div>
         <Helmet
-          title={ page ? page.attributes.title : `${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={page ? page.attributes.title : `${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Page
-          title={ page ? page.attributes.title : this.context.intl.formatMessage(messages.loading)}
+          title={page ? page.attributes.title : this.context.intl.formatMessage(messages.loading)}
           actions={pageActions}
         >
           { !page && !dataReady &&
@@ -130,7 +130,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
                     },
                   ],
                   aside: asideFields,
-                } : null ,
+                } : null,
                 body: {
                   main: [
                     {
