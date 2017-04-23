@@ -405,7 +405,7 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
     return `${result}${result.length > 0 ? '&' : ''}${params}`;
   }, '');
 
-  yield put(`${location.get('pathname')}?${queryNextString}`);
+  yield put(push(`${location.get('pathname')}?${queryNextString}`));
 }
 
 /**
