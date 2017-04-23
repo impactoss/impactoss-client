@@ -25,23 +25,10 @@ const getGlobal = (state) => state.get('global');
 const getGlobalEntities = (state) => state.getIn(['global', 'entities']);
 const getGlobalRequested = (state) => state.getIn(['global', 'requested']);
 
-const makeSelectLoading = () => createSelector(
-  getGlobal,
-  (globalState) => globalState.get('loading')
-);
-
-const makeSelectError = () => createSelector(
-  getGlobal,
-  (globalState) => globalState.get('error')
-);
-
 const makeSelectAuth = () => createSelector(
   getGlobal,
   (globalState) => globalState.get('auth').toJS()
 );
-
-const makeSelectSignedIn = () => isSignedIn;
-const makeSelectSessionUserId = () => getSessionUserId;
 
 // makeSelectLocationState expects a plain JS object for the routing state
 const makeSelectLocationState = () => {
@@ -352,7 +339,6 @@ const isUserAdmin = createSelector(
   (userRoles) => userRoles.indexOf(USER_ROLES.ADMIN) > -1
 );
 
-const makeIsUserManager = () => isUserManager;
 const isUserManager = createSelector(
   sessionUserRoles,
   (userRoles) => userRoles.indexOf(USER_ROLES.MANAGER) > -1 || userRoles.indexOf(USER_ROLES.ADMIN) > -1
@@ -391,10 +377,7 @@ const getUser = createSelector(
 
 export {
   getGlobal,
-  makeSelectLoading,
-  makeSelectError,
   makeSelectLocationState,
-  makeSelectSignedIn,
   makeSelectAuth,
   makeSelectPathnameOnAuthChange,
   makeSelectPreviousPathname,
@@ -407,12 +390,10 @@ export {
   getUser,
   getSessionUser,
   isSignedIn,
-  makeSelectSessionUserId,
   getSessionUserId,
   sessionUserRoles,
   isUserAdmin,
   isUserManager,
-  makeIsUserManager,
   isUserContributor,
   selectLocation,
 };

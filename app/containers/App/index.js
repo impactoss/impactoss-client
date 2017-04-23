@@ -13,10 +13,14 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
 
 import Header from 'components/Header';
-import { makeSelectSignedIn, makeSelectSessionUserId, makeIsUserManager } from './selectors';
+import {
+  isSignedIn,
+  getSessionUserId,
+  isUserManager,
+  isReady,
+ } from './selectors';
 import { validateToken, loadEntitiesIfNeeded } from './actions';
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -35,6 +39,13 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     this.props.loadEntitiesIfNeeded();
   }
 
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+  }
+
   render() {
     return (
       <div>
@@ -49,10 +60,11 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 }
 
-const mapStateToProps = createStructuredSelector({
-  isManager: makeIsUserManager(),
-  isSignedIn: makeSelectSignedIn(),
-  userId: makeSelectSessionUserId(),
+const mapStateToProps = (state) => ({
+  dataReady: isReady(state, { path: 'user_roles' }),
+  isManager: isUserManager(state),
+  isSignedIn: isSignedIn(state),
+  userId: getSessionUserId(state),
 });
 
 export function mapDispatchToProps(dispatch) {
