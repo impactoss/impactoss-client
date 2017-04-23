@@ -21,6 +21,7 @@ import EntityView from 'components/views/EntityView';
 import {
   getEntity,
   isReady,
+  isUserAdmin,
   isUserContributor,
 } from 'containers/App/selectors';
 
@@ -48,7 +49,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
 
 
   render() {
-    const { page, dataReady, isContributor } = this.props;
+    const { page, dataReady, isAdmin, isContributor } = this.props;
     const reference = this.props.params.id;
     const status = page && find(PUBLISH_STATUSES, { value: page.attributes.draft });
 
@@ -76,7 +77,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
         },
       ]);
     }
-    const pageActions = isContributor
+    const pageActions = isAdmin
     ? [
       {
         type: 'simple',
@@ -98,13 +99,13 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={ page ? page.attributes.title : `${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Page
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={ page ? page.attributes.title : this.context.intl.formatMessage(messages.loading)}
           actions={pageActions}
         >
           { !page && !dataReady &&
@@ -120,12 +121,8 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
           { page &&
             <EntityView
               fields={{
-                header: {
+                header: isAdmin ? {
                   main: [
-                    {
-                      id: 'title',
-                      value: page.attributes.title,
-                    },
                     {
                       id: 'menu_title',
                       heading: 'Menu title',
@@ -133,12 +130,12 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
                     },
                   ],
                   aside: asideFields,
-                },
+                } : null ,
                 body: {
                   main: [
                     {
                       id: 'content',
-                      heading: 'Content',
+                      heading: isAdmin ? 'Content' : '',
                       value: page.attributes.content,
                     },
                   ],
@@ -157,6 +154,7 @@ PageView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   page: PropTypes.object,
   dataReady: PropTypes.bool,
+  isAdmin: PropTypes.bool,
   isContributor: PropTypes.bool,
   params: PropTypes.object,
 };
@@ -167,10 +165,12 @@ PageView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
+  isAdmin: isUserAdmin(state),
   isContributor: isUserContributor(state),
   dataReady: isReady(state, { path: [
     'pages',
     'users',
+    'user_roles',
   ] }),
   page: getEntity(
     state,
@@ -194,6 +194,7 @@ function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
       dispatch(loadEntitiesIfNeeded('pages'));
     },
   };

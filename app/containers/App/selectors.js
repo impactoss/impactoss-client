@@ -355,12 +355,12 @@ const isUserAdmin = createSelector(
 const makeIsUserManager = () => isUserManager;
 const isUserManager = createSelector(
   sessionUserRoles,
-  (userRoles) => userRoles.indexOf(USER_ROLES.MANAGER) > -1
+  (userRoles) => userRoles.indexOf(USER_ROLES.MANAGER) > -1 || userRoles.indexOf(USER_ROLES.ADMIN) > -1
 );
 
 const isUserContributor = createSelector(
   sessionUserRoles,
-  (userRoles) => userRoles.indexOf(USER_ROLES.CONTRIBUTOR) > -1
+  (userRoles) => userRoles.indexOf(USER_ROLES.CONTRIBUTOR) > -1 || userRoles.indexOf(USER_ROLES.MANAGER) > -1 || userRoles.indexOf(USER_ROLES.ADMIN) > -1
 );
 
 const getUserEntities = createSelector(
