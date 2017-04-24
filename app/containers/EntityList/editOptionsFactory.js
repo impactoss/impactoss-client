@@ -20,6 +20,8 @@ export const makeAttributeEditOptions = (entities, { edits, activeEditOption }) 
     search: true,
     options: {},
     selectedCount: entities.length,
+    multiple: false,
+    required: true,
   };
 
   const option = find(edits.attributes.options, (o) => o.attribute === activeEditOption.optionId);
@@ -52,11 +54,13 @@ export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption
     search: true,
     options: {},
     selectedCount: entities.length,
+    multiple: true,
   };
 
   const taxonomy = taxonomies[parseInt(activeEditOption.optionId, 10)];
   if (taxonomy) {
     editOptions.title = taxonomy.attributes.title;
+    editOptions.multiple = taxonomy.attributes.allow_multiple;
     forEach(taxonomy.categories, (category) => {
       const count = reduce(entities, (counter, entity) => {
         const categoryIds = entity.taxonomies
@@ -83,6 +87,7 @@ export const makeConnectionEditOptions = (entities, { edits, connections, active
     search: true,
     options: {},
     selectedCount: entities.length,
+    multiple: true,
   };
 
   const option = find(edits.connections.options, (o) => o.path === activeEditOption.optionId);

@@ -80,6 +80,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     model: '.associatedUser',
     label: 'Category manager',
     controlType: 'multiselect',
+    multiple: false,
     options: this.mapUserOptions(users),
   });
 

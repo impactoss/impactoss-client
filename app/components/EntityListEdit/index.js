@@ -81,6 +81,8 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
             model={formModel}
             title={formOptions.get('title')}
             options={this.getFormOptions(formOptions.get('options'))}
+            multiple={formOptions.get('multiple')}
+            required={formOptions.get('required')}
             onClose={onHideEditForm}
             onSubmit={onAssign}
           />

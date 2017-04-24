@@ -17,10 +17,14 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
     populateForm: PropTypes.func.isRequired,
     resetForm: PropTypes.func.isRequired,
     submitLabel: PropTypes.string,
+    multiple: PropTypes.bool,
+    required: PropTypes.bool,
   }
 
   static defaultProps = {
     submitLabel: 'Update',
+    multiple: true,
+    required: false,
   }
 
   componentWillMount() {
@@ -54,6 +58,8 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
         <MultiSelect
           model=".values"
           threeState
+          multiple={this.props.multiple}
+          required={this.props.required}
           options={this.props.options}
         />
         {this.props.onSubmit &&

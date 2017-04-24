@@ -64,6 +64,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     model: '.associatedUser',
     label: 'Assigned user',
     controlType: 'multiselect',
+    multiple: false,
     options: this.mapUserOptions(users),
   });
 

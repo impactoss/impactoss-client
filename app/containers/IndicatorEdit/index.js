@@ -99,6 +99,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     model: '.associatedUser',
     label: 'Assigned user',
     controlType: 'multiselect',
+    multiple: false,
     options: this.mapUserOptions(users),
   });
 

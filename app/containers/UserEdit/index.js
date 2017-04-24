@@ -103,6 +103,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     model: `.associatedTaxonomies.${tax.get('id')}`,
     label: tax.getIn(['attributes', 'title']),
     controlType: 'multiselect',
+    multiple: false,
     options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
   }), [])
 

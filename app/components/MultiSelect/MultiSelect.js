@@ -30,6 +30,8 @@ export default class MultiSelect extends React.Component {
     onChange: PropTypes.func.isRequired,
     valueCompare: PropTypes.func,
     threeState: PropTypes.bool,
+    multiple: PropTypes.bool,
+    required: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -37,19 +39,28 @@ export default class MultiSelect extends React.Component {
     initialValues: new Immutable.List(),
     valueCompare: (a, b) => a.get('value') === b.get('value'),
     threeState: false,
+    multiple: true,
+    required: false,
   }
 
-  onChange = (checked, theValue) => {
-// console.log('onchange', this.props.values, this.props.options)
-    const originalValue = this.getOptionValue(theValue);
-    const originalChecked = originalValue.has('checked') ? originalValue.get('checked') : false;
-    const newValue = theValue
-      .set('checked', checked)
-      .set('hasChanged', checked !== originalChecked);
-    const existingValueIndex = this.props.values.findIndex((v) => this.props.valueCompare(v, theValue));
-    const nextValues = existingValueIndex >= 0 ? this.props.values.set(existingValueIndex, newValue) : this.props.values.push(newValue);
-// console.log('onchange', nextValues)
-    this.props.onChange(nextValues);
+  getNextValues = (checked, theValue) => {
+    const { multiple, required, values, valueCompare } = this.props;
+    const otherCheckedValues = values.find((v) => v.get('checked') && !valueCompare(v, theValue));
+    // do not update if required and change would result in empty list
+    if (!checked && required && !otherCheckedValues) {
+      return values;
+    }
+    let nextValues = values;
+    const existingValueIndex = values.findIndex((v) => valueCompare(v, theValue));
+    if (!multiple && checked) {
+      // uncheck all other options
+      nextValues = nextValues.map((value, index) =>
+        existingValueIndex !== index ? value.set('checked', false).set('hasChanged', true) : value
+      );
+    }
+    const newValue = theValue.set('checked', checked).set('hasChanged', true);
+    // set current value, add if not present
+    return existingValueIndex > -1 ? nextValues.set(existingValueIndex, newValue) : nextValues.push(newValue);
   }
 
   getOptionValue = (value) => {
@@ -65,12 +76,13 @@ export default class MultiSelect extends React.Component {
     const label = option.get('label');
     const isThreeState = option.get('isThreeState');
     const id = `${checked}-${i}-${kebabCase(label)}`;
+
     return (
       <div key={id}>
         { isThreeState &&
           <IndeterminateCheckbox
             onChange={(status) => {
-              this.onChange(status, value);
+              this.props.onChange(this.getNextValues(status, value));
             }}
             value={value.get('label')}
             checked={checked}
@@ -84,7 +96,7 @@ export default class MultiSelect extends React.Component {
             checked={checked}
             onChange={(evt) => {
               if (evt && evt !== undefined) evt.stopPropagation();
-              this.onChange(evt.target.checked, value);
+              this.props.onChange(this.getNextValues(evt.target.checked, value));
             }}
           />
         }
