@@ -39,7 +39,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady) {
+    if (this.props.dataReady && this.props.indicator) {
       this.props.populateForm('indicatorEdit.form.data', this.getInitialFormData());
     }
   }
@@ -50,7 +50,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('indicatorEdit.form.data', this.getInitialFormData(nextProps));
     }

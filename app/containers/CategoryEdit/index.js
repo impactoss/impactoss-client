@@ -40,7 +40,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
-    if (this.props.dataReady) {
+    if (this.props.dataReady && this.props.category) {
       this.props.populateForm('categoryEdit.form.data', this.getInitialFormData());
     }
   }
@@ -50,7 +50,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.category) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('categoryEdit.form.data', this.getInitialFormData(nextProps));
     }

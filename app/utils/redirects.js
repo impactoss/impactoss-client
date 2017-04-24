@@ -41,7 +41,7 @@ function redirectIfNotPermitted(store, roleRequired) {
       || (roleRequired === USER_ROLES.CONTRIBUTOR && (roleIds.indexOf(USER_ROLES.MANAGER) > -1 || roleIds.indexOf(USER_ROLES.ADMIN) > -1))
       )) {
         replace({
-          pathname: '/notfound',
+          pathname: '/not-authorized',
         });
       }
     }

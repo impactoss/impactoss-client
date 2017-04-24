@@ -619,6 +619,14 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/not-authorized',
+      name: 'notauthorized',
+      getComponent(nextState, cb) {
+        import('containers/NotAuthorizedPage')
+        .then(loadModule(cb))
+        .catch(errorLoading);
+      },
+    }, {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {
