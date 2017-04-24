@@ -9,7 +9,7 @@ import Immutable, { Map } from 'immutable';
 
 import EditForm from 'containers/EditForm';
 import Option from 'containers/EditForm/Option';
-import { STATES as CHECKBOX_STATES } from 'components/IndeterminateCheckbox';
+import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 export default class EntityListEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
@@ -81,6 +81,8 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
             model={formModel}
             title={formOptions.get('title')}
             options={this.getFormOptions(formOptions.get('options'))}
+            multiple={formOptions.get('multiple')}
+            required={formOptions.get('required')}
             onClose={onHideEditForm}
             onSubmit={onAssign}
           />

@@ -12,7 +12,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List, fromJS } from 'immutable';
 
-import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
 
@@ -80,6 +80,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     model: '.associatedUser',
     label: 'Category manager',
     controlType: 'multiselect',
+    multiple: false,
     options: this.mapUserOptions(users),
   });
 

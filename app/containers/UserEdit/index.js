@@ -12,7 +12,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List, fromJS } from 'immutable';
 
-import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
@@ -103,6 +103,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     model: `.associatedTaxonomies.${tax.get('id')}`,
     label: tax.getIn(['attributes', 'title']),
     controlType: 'multiselect',
+    multiple: false,
     options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
   }), [])
 

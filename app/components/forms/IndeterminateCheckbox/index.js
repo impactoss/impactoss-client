@@ -27,10 +27,8 @@ export default class IndeterminateCheckbox extends React.Component {
   setIndeterminate = () => {
     switch (this.props.checked) {
       case STATES.checked:
-        this.inputRef.checked = true;
-        break;
       case STATES.unchecked:
-        this.inputRef.checked = false;
+        this.inputRef.checked = this.props.checked;
         break;
       default:
         this.inputRef.indeterminate = true;
@@ -49,10 +47,8 @@ export default class IndeterminateCheckbox extends React.Component {
           switch (this.props.checked) {
             case STATES.checked:
               return onChange(STATES.unchecked, value);
-            case STATES.indeterminate:
+            default: // STATES.unchecked or STATES.indeterminate
               return onChange(STATES.checked, value);
-            default: // STATES.unchecked:
-              return onChange(STATES.indeterminate, value);
           }
         }}
         {...props}

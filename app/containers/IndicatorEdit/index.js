@@ -12,7 +12,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List, fromJS } from 'immutable';
 
-import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
@@ -99,6 +99,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     model: '.associatedUser',
     label: 'Assigned user',
     controlType: 'multiselect',
+    multiple: false,
     options: this.mapUserOptions(users),
   });
 

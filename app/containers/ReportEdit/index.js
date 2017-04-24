@@ -12,7 +12,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { fromJS, List, Map } from 'immutable';
 
-import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 

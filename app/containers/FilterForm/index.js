@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { isEqual } from 'lodash/lang';
 import { Form, actions as formActions } from 'react-redux-form/immutable';
-import MultiSelect from 'components/MultiSelect';
+import MultiSelectControl from 'components/forms/MultiSelectControl';
 
 class FilterForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -43,7 +43,7 @@ class FilterForm extends React.Component { // eslint-disable-line react/prefer-s
       { this.props.title &&
         <strong>{this.props.title}</strong>
       }
-      <MultiSelect
+      <MultiSelectControl
         model=".values"
         options={this.props.options}
       />
