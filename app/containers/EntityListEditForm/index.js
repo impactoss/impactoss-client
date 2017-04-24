@@ -6,7 +6,7 @@ import { Form, actions as formActions } from 'react-redux-form/immutable';
 import MultiSelectControl from 'components/forms/MultiSelectControl';
 // import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
-class EditForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class EntityListEditForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     model: PropTypes.string.isRequired,
@@ -75,10 +75,8 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(formActions.reset(model));
   },
   populateForm: (model, options) => {
-    dispatch(formActions.load(model, Immutable.Map({
-      values: options.map((option) => option.get('value')),
-    })));
+    dispatch(formActions.load(model, options));
   },
 });
 
-export default connect(null, mapDispatchToProps)(EditForm);
+export default connect(null, mapDispatchToProps)(EntityListEditForm);

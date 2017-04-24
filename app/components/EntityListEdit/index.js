@@ -7,8 +7,8 @@
 import React, { PropTypes } from 'react';
 import Immutable, { Map } from 'immutable';
 
-import EditForm from 'containers/EditForm';
-import Option from 'containers/EditForm/Option';
+import EntityListEditForm from 'containers/EntityListEditForm';
+// import Option from 'containers/EntityListEditForm/Option';
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 export default class EntityListEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -23,11 +23,11 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
 
   getFormOptions = (formOptions) =>
     formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
-      value: Map({
-        checked: this.getCheckState(option),
-        value: option.get('value'),
-      }),
-      label: <Option label={option.get('label')} count={option.get('count')} />,
+      value: option.get('value'),
+      checked: this.getCheckState(option),
+      query: option.get('query'),
+      label: `${option.get('label')} (${option.get('count')})`,
+      // label: <Option label={option.get('label')} count={option.get('count')} />,
     }));
 
   getCheckState = (option) => {
@@ -77,7 +77,7 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
           editGroups.entrySeq().map(([groupId, group]) => this.renderEditGroup(group, groupId))
         }
         { formOptions &&
-          <EditForm
+          <EntityListEditForm
             model={formModel}
             title={formOptions.get('title')}
             options={this.getFormOptions(formOptions.get('options'))}

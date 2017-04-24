@@ -6,32 +6,15 @@ import { createSelector } from 'reselect';
 const selectReportEditDomain = (state) => state.get('reportEdit');
 
 /**
- * Other specific selectors
- */
-
-const pageSelector = createSelector(
-  selectReportEditDomain,
-  (substate) => substate.get('page').toJS()
- );
-const formSelector = createSelector(
-  selectReportEditDomain,
-  (substate) => substate.get('form')
- );
-
-
-/**
  * Default selector used by ReportEdit
  */
 
-const reportEditSelect = createSelector(
+const viewDomainSelect = createSelector(
   selectReportEditDomain,
   (substate) => substate.toJS()
 );
 
-export default reportEditSelect;
+export default viewDomainSelect;
 export {
   selectReportEditDomain,
-  reportEditSelect,
-  pageSelector,
-  formSelector,
 };

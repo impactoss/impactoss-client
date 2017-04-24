@@ -52,6 +52,8 @@ const formData = fromJS({
     repeat: false,
     end_date: '',
   },
+  associatedActions: [],
+  associatedUser: [],
 });
 
 export default combineReducers({

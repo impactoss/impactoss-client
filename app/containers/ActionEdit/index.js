@@ -28,9 +28,14 @@ import {
 } from 'containers/App/selectors';
 
 import {
-  pageSelector,
-  formSelector,
-} from './selectors';
+  taxonomyOptions,
+  entityOptions,
+  renderRecommendationControl,
+  renderIndicatorControl,
+  renderTaxonomyControl,
+} from 'utils/forms';
+
+import viewDomainSelect from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
@@ -64,79 +69,17 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     ? Map({
       id: action.id,
       attributes: fromJS(action.attributes),
-      associatedTaxonomies: taxonomies
-      ? taxonomies.reduce((values, tax) =>
-          values.set(
-            tax.get('id'),
-            tax.get('categories').reduce((option, entity) => option.push(Map({
-              checked: !!entity.get('associated'),
-              value: entity.get('id'),
-            })), List()))
-        , Map())
-      : Map(),
-      associatedRecommendations: recommendations
-      ? recommendations.reduce((option, entity) => option.push(Map({
-        checked: !!entity.get('associated'),
-        value: entity.get('id'),
-      })), List())
-      : List(),
-      associatedIndicators: indicators
-        ? indicators.reduce((option, entity) => option.push(Map({
-          checked: !!entity.get('associated'),
-          value: entity.get('id'),
-        })), List())
-        : List(),
+      associatedTaxonomies: taxonomyOptions(taxonomies),
+      associatedRecommendations: entityOptions(recommendations),
+      associatedIndicators: entityOptions(indicators),
     })
     : Map();
   }
 
-  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  mapRecommendationOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  mapIndicatorOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  // TODO this should be shared functionality
-  renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({
-    id: tax.get('id'),
-    model: `.associatedTaxonomies.${tax.get('id')}`,
-    label: tax.getIn(['attributes', 'title']),
-    controlType: 'multiselect',
-    options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
-  }), [])
-
-  // TODO this should be shared functionality
-  renderRecommendationControl = (recommendations) => ({
-    id: 'recommendations',
-    model: '.associatedRecommendations',
-    label: 'Recommendations',
-    controlType: 'multiselect',
-    options: this.mapRecommendationOptions(recommendations),
-  });
-
-  // TODO this should be shared functionality
-  renderIndicatorControl = (indicators) => ({
-    id: 'indicators',
-    model: '.associatedIndicators',
-    label: 'Indicators',
-    controlType: 'multiselect',
-    options: this.mapIndicatorOptions(indicators),
-  });
-
-
   render() {
-    const { action, dataReady } = this.props;
+    const { action, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = this.props.page;
+    const { saveSending, saveError } = viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -170,7 +113,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 type: 'primary',
                 title: 'Save',
                 onClick: () => this.props.handleSubmit(
-                  this.props.form.data,
+                  viewDomain.form.data,
                   this.props.taxonomies,
                   this.props.recommendations,
                   this.props.indicators
@@ -186,6 +129,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             }
             <EntityForm
               model="actionEdit.form.data"
+              formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 this.props.taxonomies,
@@ -240,10 +184,10 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                       controlType: 'textarea',
                       model: '.attributes.description',
                     },
-                    this.props.recommendations ? this.renderRecommendationControl(this.props.recommendations) : null,
-                    this.props.indicators ? this.renderIndicatorControl(this.props.indicators) : null,
+                    renderRecommendationControl(this.props.recommendations),
+                    renderIndicatorControl(this.props.indicators),
                   ],
-                  aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
+                  aside: renderTaxonomyControl(this.props.taxonomies),
                 },
               }}
             />
@@ -260,8 +204,7 @@ ActionEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  page: PropTypes.object,
-  form: PropTypes.object,
+  viewDomain: PropTypes.object,
   action: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
@@ -275,8 +218,7 @@ ActionEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  page: pageSelector(state),
-  form: formSelector(state),
+  viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'measures',
     'users',
@@ -420,15 +362,15 @@ function mapDispatchToProps(dispatch, props) {
       }, Map());
 
       saveData = saveData.set('recommendationMeasures', Map({
-        delete: associatedRecommendations.reduce((associatedIds, associatedId, recId) =>
-          !formRecommendationIds.includes(recId)
+        delete: associatedRecommendations.reduce((associatedIds, associatedId, id) =>
+          !formRecommendationIds.includes(id)
             ? associatedIds.push(associatedId)
             : associatedIds
         , List()),
-        create: formRecommendationIds.reduce((payloads, recId) =>
-          !associatedRecommendations.has(recId)
+        create: formRecommendationIds.reduce((payloads, id) =>
+          !associatedRecommendations.has(id)
             ? payloads.push(Map({
-              recommendation_id: recId,
+              recommendation_id: id,
               measure_id: formData.get('id'),
             }))
             : payloads
@@ -446,8 +388,8 @@ function mapDispatchToProps(dispatch, props) {
       }, Map());
 
       saveData = saveData.set('measureIndicators', Map({
-        delete: associatedIndicators.reduce((associatedIds, associatedId, recId) =>
-          !formIndicatorIds.includes(recId)
+        delete: associatedIndicators.reduce((associatedIds, associatedId, id) =>
+          !formIndicatorIds.includes(id)
             ? associatedIds.push(associatedId)
             : associatedIds
         , List()),
@@ -464,10 +406,6 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
       dispatch(updatePath(`/actions/${props.params.id}`));
     },
   };

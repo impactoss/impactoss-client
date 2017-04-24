@@ -14,11 +14,12 @@ import { Map, List, fromJS } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
+import { USER_ROLES } from 'containers/App/constants';
+
 import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
-import { USER_ROLES } from 'containers/App/constants';
 
 import {
   getEntity,
@@ -28,9 +29,11 @@ import {
 } from 'containers/App/selectors';
 
 import {
-  pageSelector,
-  formSelector,
-} from './selectors';
+  userOptions,
+  renderUserControl,
+} from 'utils/forms';
+
+import viewDomainSelect from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
@@ -58,41 +61,26 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { category } = props;
-    return Map({
+    const { category, users } = props;
+    return category
+    ? Map({
       id: category.id,
       attributes: fromJS(category.attributes),
-      associatedUser: category.attributes.manager_id ? List().push(Map({
-        value: category.attributes.manager_id.toString(),
-        checked: true,
-      })) : List(),
+      associatedUser: userOptions(users, category.attributes.manager_id),
       // TODO allow single value for singleSelect
-    });
+    })
+    : Map();
   }
 
-  mapUserOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'name']),
-  }));
-
-  renderUserControl = (users) => ({
-    id: 'users',
-    model: '.associatedUser',
-    label: 'Category manager',
-    controlType: 'multiselect',
-    multiple: false,
-    options: this.mapUserOptions(users),
-  });
-
   render() {
-    const { category, dataReady, isAdmin } = this.props;
+    const { category, dataReady, isAdmin, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = this.props.page;
+    const { saveSending, saveError } = viewDomain.page;
     const required = (val) => val && val.length;
 
     const mainAsideFields = [];
     if (dataReady && isAdmin && !!category.taxonomy.attributes.has_manager && this.props.users) {
-      mainAsideFields.push(this.renderUserControl(this.props.users));
+      mainAsideFields.push(renderUserControl(this.props.users, 'Category Manager', category.attributes.manager_id));
     }
 
     return (
@@ -125,7 +113,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               {
                 type: 'primary',
                 title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.form.data),
+                onClick: () => this.props.handleSubmit(viewDomain.form.data),
               },
             ]}
           >
@@ -137,6 +125,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             }
             <EntityForm
               model="categoryEdit.form.data"
+              formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={() => this.props.handleCancel(reference)}
               fields={{
@@ -207,8 +196,7 @@ CategoryEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  page: PropTypes.object,
-  form: PropTypes.object,
+  viewDomain: PropTypes.object,
   category: PropTypes.object,
   dataReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
@@ -222,8 +210,7 @@ CategoryEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isAdmin: isUserAdmin(state),
-  page: pageSelector(state),
-  form: formSelector(state),
+  viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'users',
     'user_roles',

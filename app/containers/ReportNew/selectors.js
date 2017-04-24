@@ -6,20 +6,15 @@ import { createSelector } from 'reselect';
 const selectReportNewDomain = () => (state) => state.get('reportNew');
 
 /**
- * Other specific selectors
- */
-
-
-/**
  * Default selector used by ReportNew
  */
 
-const reportNewSelector = createSelector(
+const viewDomainSelect = createSelector(
   selectReportNewDomain(),
   (substate) => substate.toJS()
 );
 
-export default reportNewSelector;
+export default viewDomainSelect;
 export {
   selectReportNewDomain,
 };

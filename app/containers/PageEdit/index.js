@@ -24,10 +24,7 @@ import {
   isReady,
 } from 'containers/App/selectors';
 
-import {
-  pageSelector,
-  formSelector,
-} from './selectors';
+import viewDomainSelect from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
@@ -60,9 +57,9 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
   }
 
   render() {
-    const { page, dataReady } = this.props;
+    const { page, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = this.props.pageData;
+    const { saveSending, saveError } = viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -95,7 +92,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
               {
                 type: 'primary',
                 title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.form.data),
+                onClick: () => this.props.handleSubmit(viewDomain.form.data),
               },
             ]}
           >
@@ -107,6 +104,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
             }
             <EntityForm
               model="pageEdit.form.data"
+              formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               fields={{
@@ -180,11 +178,10 @@ PageEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  pageData: PropTypes.object,
-  form: PropTypes.object,
-  page: PropTypes.object,
+  viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
+  page: PropTypes.object,
 };
 
 PageEdit.contextTypes = {
@@ -192,8 +189,7 @@ PageEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  pageData: pageSelector(state),
-  form: formSelector(state),
+  viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'users',
     'pages',
@@ -227,17 +223,12 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
     },
     populateForm: (model, formData) => {
-      // console.log('populateForm', formData)
       dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData) => {
       dispatch(save(formData.toJS()));
     },
     handleCancel: () => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
       dispatch(updatePath(`/pages/${props.params.id}`));
     },
   };

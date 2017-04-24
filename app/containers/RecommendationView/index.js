@@ -246,7 +246,7 @@ const mapStateToProps = (state, props) => ({
   ),
 });
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('measures'));
@@ -259,7 +259,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
     handleEdit: () => {
-      dispatch(updatePath(`/recommendations/edit/${this.props.params.id}`));
+      dispatch(updatePath(`/recommendations/edit/${props.params.id}`));
     },
     handleClose: () => {
       dispatch(updatePath('/recommendations'));

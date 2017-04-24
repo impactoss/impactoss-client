@@ -27,9 +27,13 @@ import {
 } from 'containers/App/selectors';
 
 import {
-  pageSelector,
-  formSelector,
-} from './selectors';
+  taxonomyOptions,
+  roleOptions,
+  renderRoleControl,
+  renderTaxonomyControl,
+} from 'utils/forms';
+
+import viewDomainSelect from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
@@ -60,57 +64,15 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     return Map({
       id: user.id,
       attributes: fromJS(user.attributes),
-      associatedTaxonomies: taxonomies
-      ? taxonomies.reduce((values, tax) =>
-          values.set(
-            tax.get('id'),
-            tax.get('categories').reduce((options, entity) => options.push(Map({
-              checked: !!entity.get('associated'),
-              value: entity.get('id'),
-            })), List()))
-        , Map())
-      : Map(),
-      associatedRoles: roles
-      ? roles.reduce((options, entity) => options.push(Map({
-        checked: !!entity.get('associated'),
-        value: entity.get('id'),
-      })), List())
-      : List(),
+      associatedTaxonomies: taxonomyOptions(taxonomies),
+      associatedRoles: roleOptions(roles),
     });
   }
 
-  mapRoleOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'friendly_name']),
-  }));
-
-  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  renderRoleControl = (roles) => ({
-    id: 'roles',
-    model: '.associatedRoles',
-    label: 'Roles',
-    controlType: 'multiselect',
-    options: this.mapRoleOptions(roles),
-  });
-
-  // TODO this should be shared functionality
-  renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({
-    id: tax.get('id'),
-    model: `.associatedTaxonomies.${tax.get('id')}`,
-    label: tax.getIn(['attributes', 'title']),
-    controlType: 'multiselect',
-    multiple: false,
-    options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
-  }), [])
-
   render() {
-    const { user, dataReady, isManager } = this.props;
+    const { user, dataReady, isManager, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = this.props.page;
+    const { saveSending, saveError } = viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -133,7 +95,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               type: 'primary',
               title: 'Save',
               onClick: () => this.props.handleSubmit(
-                this.props.form.data,
+                viewDomain.form.data,
                 this.props.taxonomies,
                 this.props.roles
               ),
@@ -159,6 +121,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           {user &&
             <EntityForm
               model="userEdit.form.data"
+              formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 this.props.taxonomies,
@@ -182,7 +145,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                   ],
                   aside: isManager
                     ? [
-                      this.props.roles ? this.renderRoleControl(this.props.roles) : null,
+                      renderRoleControl(this.props.roles),
                       {
                         id: 'no',
                         controlType: 'info',
@@ -215,7 +178,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                       },
                     },
                   ],
-                  aside: isManager && this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
+                  aside: isManager && renderTaxonomyControl(this.props.taxonomies),
                 },
               }}
             />
@@ -231,8 +194,7 @@ UserEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  page: PropTypes.object,
-  form: PropTypes.object,
+  viewDomain: PropTypes.object,
   user: PropTypes.object,
   roles: PropTypes.object,
   taxonomies: PropTypes.object,
@@ -247,8 +209,7 @@ UserEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isManager: isUserManager(state),
-  page: pageSelector(state),
-  form: formSelector(state),
+  viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'users',
     'roles',
@@ -379,10 +340,6 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
       dispatch(updatePath(`/users/${reference}`));
     },
   };

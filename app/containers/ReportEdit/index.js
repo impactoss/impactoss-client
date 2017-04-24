@@ -27,9 +27,11 @@ import {
 } from 'containers/App/selectors';
 
 import {
-  pageSelector,
-  formSelector,
-} from './selectors';
+  dateOptions,
+  renderDateControl,
+} from 'utils/forms';
+
+import viewDomainSelect from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
@@ -63,42 +65,21 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
       id: report.id,
       attributes: fromJS(report.attributes),
       associatedDate: report && report.indicator && report.indicator.dates
-      ? Object.values(report.indicator.dates).reduce((options, date) => options.push(Map({
-        checked: report.attributes.due_date_id && report.attributes.due_date_id.toString() === date.id.toString(),
-        value: date.id,
-      })), List())
+      ? dateOptions(fromJS(report.indicator.dates), report.attributes.due_date_id)
       : List(),
       // TODO allow single value for singleSelect
     });
   }
 
-  mapDateOptions = (dates, dateId) => Object.values(dates).reduce((options, date) => {
-    if (date.reportCount === 0 || (dateId && dateId.toString() === date.id.toString())) {
-      options.push({
-        value: { value: date.id },
-        label: date.attributes.due_date,
-      });
-    }
-    return options;
-  }, []);
-
-  renderDateControl = (dates, dateId) => ({
-    id: 'dates',
-    model: '.associatedDate',
-    label: 'Scheduled Date',
-    controlType: 'multiselect',
-    options: fromJS(this.mapDateOptions(dates, dateId)),
-  });
   render() {
-    const { report, dataReady } = this.props;
+    const { report, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = this.props.page;
+    const { saveSending, saveError } = viewDomain.page;
     const required = (val) => val && val.length;
 
-    const dateOptions = report && report.indicator && report.indicator.dates
-      ? this.renderDateControl(report.indicator.dates, report.attributes.due_date_id)
+    const dateControlOptions = report && report.indicator && report.indicator.dates
+      ? renderDateControl(fromJS(report.indicator.dates), report.attributes.due_date_id)
       : null;
-
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
 
@@ -136,7 +117,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
               {
                 type: 'primary',
                 title: 'Save',
-                onClick: () => this.props.handleSubmit(this.props.form.data),
+                onClick: () => this.props.handleSubmit(viewDomain.form.data),
               },
             ]}
           >
@@ -148,6 +129,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             }
             <EntityForm
               model="reportEdit.form.data"
+              formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={() => this.props.handleCancel(reference)}
               fields={{
@@ -192,7 +174,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                 },
                 body: {
                   main: [
-                    dateOptions,
+                    dateControlOptions,
                     {
                       id: 'description',
                       controlType: 'textarea',
@@ -226,8 +208,7 @@ ReportEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  page: PropTypes.object,
-  form: PropTypes.object,
+  viewDomain: PropTypes.object,
   report: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
@@ -238,8 +219,7 @@ ReportEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  page: pageSelector(state),
-  form: formSelector(state),
+  viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'progress_reports',
     'users',
@@ -274,7 +254,7 @@ const mapStateToProps = (state, props) => ({
               path: 'progress_reports',
               key: 'due_date_id',
               reverse: true,
-              as: 'reportCount',
+              as: 'count',
             },
           },
         },

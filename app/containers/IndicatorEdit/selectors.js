@@ -6,32 +6,15 @@ import { createSelector } from 'reselect';
 const selectIndicatorEditDomain = (state) => state.get('indicatorEdit');
 
 /**
- * Other specific selectors
- */
-
-const pageSelector = createSelector(
-  selectIndicatorEditDomain,
-  (substate) => substate.get('page').toJS()
- );
-const formSelector = createSelector(
-  selectIndicatorEditDomain,
-  (substate) => substate.get('form')
- );
-
-
-/**
  * Default selector used by IndicatorEdit
  */
 
-const indicatorEditSelect = createSelector(
+const viewDomainSelect = createSelector(
   selectIndicatorEditDomain,
   (substate) => substate.toJS()
 );
 
-export default indicatorEditSelect;
+export default viewDomainSelect;
 export {
   selectIndicatorEditDomain,
-  indicatorEditSelect,
-  pageSelector,
-  formSelector,
 };

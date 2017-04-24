@@ -11,7 +11,7 @@ export default class IndeterminateCheckbox extends React.Component {
   static propTypes = {
     checked: PropTypes.oneOf(Object.values(STATES)),
     onChange: PropTypes.func.isRequired,
-    value: PropTypes.string,
+    // value: PropTypes.string,
   }
 
   componentDidMount() {
@@ -36,7 +36,7 @@ export default class IndeterminateCheckbox extends React.Component {
   }
 
   render() {
-    const { onChange, value, checked, ...props } = this.props;
+    const { onChange, checked, ...props } = this.props;
     return (
       <input
         type="checkbox"
@@ -46,9 +46,9 @@ export default class IndeterminateCheckbox extends React.Component {
           if (evt && evt !== undefined) evt.preventDefault();
           switch (this.props.checked) {
             case STATES.checked:
-              return onChange(STATES.unchecked, value);
+              return onChange(STATES.unchecked);
             default: // STATES.unchecked or STATES.indeterminate
-              return onChange(STATES.checked, value);
+              return onChange(STATES.checked);
           }
         }}
         {...props}

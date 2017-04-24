@@ -17,7 +17,8 @@ import EntityForm from 'components/forms/EntityForm';
 
 import { isReady } from 'containers/App/selectors';
 
-import pageNewSelector from './selectors';
+import viewDomainSelect from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
 
@@ -29,7 +30,8 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
     }
   }
   render() {
-    const { saveSending, saveError } = this.props.pageNew.page;
+    const { viewDomain } = this.props;
+    const { saveSending, saveError } = viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -56,7 +58,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
                 type: 'primary',
                 title: 'Save',
                 onClick: () => this.props.handleSubmit(
-                  this.props.pageNew.form.data,
+                  viewDomain.form.data,
                 ),
               },
             ]
@@ -70,6 +72,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
           }
           <EntityForm
             model="pageNew.form.data"
+            formData={viewDomain.form.data}
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
             handleCancel={this.props.handleCancel}
             fields={{
@@ -125,7 +128,7 @@ PageNew.propTypes = {
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  pageNew: PropTypes.object,
+  viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
 };
 
@@ -134,7 +137,7 @@ PageNew.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  pageNew: pageNewSelector(state),
+  viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'user_roles',
   ] }),
@@ -146,15 +149,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
     },
     handleSubmit: (formData) => {
-      // let saveData = formData;
-
       dispatch(save(formData.toJS()));
     },
     handleCancel: () => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
       dispatch(updatePath('/pages'));
     },
   };

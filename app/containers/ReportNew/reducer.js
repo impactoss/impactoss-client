@@ -47,8 +47,10 @@ const formData = fromJS({
     description: '',
     document_url: '',
     document_public: true,
+    due_date_id: '',
     indicator_id: '',
   },
+  associatedDate: [],
 });
 
 export default combineReducers({

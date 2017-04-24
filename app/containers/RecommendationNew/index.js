@@ -20,7 +20,12 @@ import { getEntities, isReady } from 'containers/App/selectors';
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
 
-import recommendationNewSelector from './selectors';
+import {
+  renderActionControl,
+  renderTaxonomyControl,
+} from 'utils/forms';
+
+import viewDomainSelect from './selectors';
 import messages from './messages';
 import { save } from './actions';
 
@@ -41,37 +46,9 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     }
   }
 
-  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  mapActionOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  // TODO this should be shared functionality
-  renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({
-    id: tax.get('id'),
-    model: `.associatedTaxonomies.${tax.get('id')}`,
-    label: tax.getIn(['attributes', 'title']),
-    controlType: 'multiselect',
-    options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
-  }), [])
-
-  // TODO this should be shared functionality
-  renderActionControl = (actions) => ({
-    id: 'actions',
-    model: '.associatedActions',
-    label: 'Actions',
-    controlType: 'multiselect',
-    options: this.mapActionOptions(actions),
-  });
-
   render() {
-    const { dataReady } = this.props;
-    const { saveSending, saveError } = this.props.recommendationNew.page;
+    const { dataReady, viewDomain } = this.props;
+    const { saveSending, saveError } = viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -104,7 +81,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                   type: 'primary',
                   title: 'Save',
                   onClick: () => this.props.handleSubmit(
-                    this.props.recommendationNew.form.data
+                    viewDomain.form.data
                   ),
                 },
               ]
@@ -118,6 +95,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
             }
             <EntityForm
               model="recommendationNew.form.data"
+              formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               fields={{
@@ -152,9 +130,9 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                 },
                 body: {
                   main: [
-                    this.props.actions ? this.renderActionControl(this.props.actions) : null,
+                    renderActionControl(this.props.actions),
                   ],
-                  aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
+                  aside: renderTaxonomyControl(this.props.taxonomies),
                 },
               }}
             />
@@ -170,7 +148,7 @@ RecommendationNew.propTypes = {
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  recommendationNew: PropTypes.object,
+  viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   actions: PropTypes.object,
@@ -181,7 +159,7 @@ RecommendationNew.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  recommendationNew: recommendationNewSelector(state),
+  viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'categories',
     'taxonomies',
@@ -224,7 +202,7 @@ function mapDispatchToProps(dispatch) {
       // measureCategories
       if (formData.get('associatedTaxonomies')) {
         saveData = saveData.set(
-          'recommendationsCategories',
+          'recommendationCategories',
           formData.get('associatedTaxonomies')
           .map(getCheckedValuesFromOptions)
           .reduce((updates, formCategoryIds) => Map({

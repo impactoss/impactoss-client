@@ -4,12 +4,14 @@ import { Control } from 'react-redux-form/immutable';
 
 import MultiSelect, {
   getChangedOptions,
+  getCheckedOptions,
   getCheckedValuesFromOptions,
   getUncheckedValuesFromOptions,
 } from './MultiSelect';
 
 const MultiSelectControl = (props) => {
   const { model, options, valueCompare, threeState, multiple, required, ...otherProps } = props;
+  // console.log('MultiSelectControl', options.toJS())
   return (
     <Control
       type="multiselect"
@@ -44,6 +46,7 @@ export default MultiSelectControl;
 // Helper functions
 export {
   getChangedOptions,
+  getCheckedOptions,
   getCheckedValuesFromOptions,
   getUncheckedValuesFromOptions,
 };

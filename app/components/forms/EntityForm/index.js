@@ -32,7 +32,23 @@ const controls = {
 // These props will be omitted before being passed to the Control component
 const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
 
-class EntityForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class EntityForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
+
+  constructor() {
+    super();
+    this.state = {
+      multiselectOpen: null,
+    };
+  }
+
+
+  onLabelClick = (field) => {
+    if (field.controlType === 'multiselect') {
+      this.setState({
+        multiselectOpen: this.state.multiselectOpen !== field.id ? field.id : null,
+      });
+    }
+  }
 
   getFieldComponent = (field) => {
     if (field.component) {
@@ -52,9 +68,62 @@ class EntityForm extends React.PureComponent { // eslint-disable-line react/pref
     }
   }
 
+  renderFieldChildren = (field) => {
+    if (field.controlType === 'select' && field.options) { // handle known cases here
+      return field.options.map((option, i) =>
+        <option key={i} value={option.value} {...option.props}>{option.label}</option>);
+    }
+    if (field.controlType === 'info') { // handle known cases here
+      return field.displayValue;
+    }
+    return field.children || null; // enables passing children component, or null
+  }
+
+  renderMultiselectActiveOptions = (options, field) =>
+    options.map((option, i) => (
+      <li key={i}>
+        <a
+          href="#add"
+          onClick={(evt) => {
+            if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+            this.onLabelClick(field);
+          }}
+        >
+          {option.get('label')}
+        </a>
+      </li>
+    ));
+
   renderField = (field) => {
     const FieldComponent = this.getFieldComponent(field);
     const { id, model, ...props } = this.getControlProps(field);
+    if (field.controlType === 'multiselect' && this.state.multiselectOpen !== field.id) {
+      let activeOptions;
+      // use form data if already loaded
+      if (this.props.formData.hasIn(field.dataPath)) {
+        activeOptions = this.props.formData.getIn(field.dataPath).filter((o) => o.get('checked'));
+      // untile then use initial options
+      } else {
+        activeOptions = field.options.filter((o) => o.get('checked'));
+      }
+      return activeOptions.size > 0
+      ? (
+        <ul>
+          {this.renderMultiselectActiveOptions(activeOptions, field)}
+        </ul>
+      )
+      : (
+        <a
+          href="#add"
+          onClick={(evt) => {
+            if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+            this.onLabelClick(field);
+          }}
+        >
+          {`No ${field.label} yet. Click to add`}
+        </a>
+      );
+    }
     return (
       <FieldComponent
         id={id}
@@ -70,7 +139,7 @@ class EntityForm extends React.PureComponent { // eslint-disable-line react/pref
     if (field) {
       result.push(
         <Field key={index}>
-          <Label htmlFor={field.id}>
+          <Label htmlFor={field.id} onClick={() => this.onLabelClick(field)}>
             {`${field.label || startCase(field.id)} ${field.validators && field.validators.required ? '*' : ''}`}
           </Label>
           {this.renderField(field)}
@@ -89,17 +158,6 @@ class EntityForm extends React.PureComponent { // eslint-disable-line react/pref
     return result;
   }, [])
 
-
-  renderFieldChildren = (field) => {
-    if (field.controlType === 'select' && field.options) { // handle known cases here
-      return field.options.map((option, i) =>
-        <option key={i} value={option.value} {...option.props}>{option.label}</option>);
-    }
-    if (field.controlType === 'info') { // handle known cases here
-      return field.displayValue;
-    }
-    return field.children || null; // enables passing children component, or null
-  }
 
   render() {
     const { fields } = this.props;
@@ -162,6 +220,8 @@ EntityForm.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   model: PropTypes.string,
   fields: PropTypes.object,
+  formData: PropTypes.object,
 };
+
 
 export default EntityForm;

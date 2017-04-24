@@ -28,9 +28,13 @@ import {
 } from 'containers/App/selectors';
 
 import {
-  pageSelector,
-  formSelector,
-} from './selectors';
+  userOptions,
+  entityOptions,
+  renderActionControl,
+  renderUserControl,
+} from 'utils/forms';
+
+import viewDomainSelect from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
@@ -58,56 +62,22 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { actions, indicator } = props;
-    return Map({
+    const { actions, indicator, users } = props;
+    return indicator
+    ? Map({
       id: indicator.id,
       attributes: fromJS(indicator.attributes),
-      associatedActions: actions
-      ? actions.reduce((options, entity) => options.push(Map({
-        checked: !!entity.get('associated'),
-        value: entity.get('id'),
-      })), List())
-      : List(),
-      associatedUser: indicator.attributes.manager_id ? List([Map({
-        value: indicator.attributes.manager_id.toString(),
-        checked: true,
-      })]) : List(),
+      associatedActions: entityOptions(actions),
+      associatedUser: userOptions(users, indicator.attributes.manager_id),
       // TODO allow single value for singleSelect
-    });
+    })
+    : Map();
   }
 
-  mapActionOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  mapUserOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'name']),
-  }));
-
-  // TODO this should be shared functionality
-  renderActionControl = (actions) => ({
-    id: 'actions',
-    model: '.associatedActions',
-    label: 'Actions',
-    controlType: 'multiselect',
-    options: this.mapActionOptions(actions),
-  });
-  renderUserControl = (users) => ({
-    id: 'users',
-    model: '.associatedUser',
-    label: 'Assigned user',
-    controlType: 'multiselect',
-    multiple: false,
-    options: this.mapUserOptions(users),
-  });
-
-
   render() {
-    const { indicator, dataReady } = this.props;
+    const { indicator, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = this.props.page;
+    const { saveSending, saveError } = viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -141,7 +111,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                 type: 'primary',
                 title: 'Save',
                 onClick: () => this.props.handleSubmit(
-                  this.props.form.data,
+                  viewDomain.form.data,
                   this.props.actions,
                 ),
               },
@@ -155,6 +125,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             }
             <EntityForm
               model="indicatorEdit.form.data"
+              formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 this.props.actions
@@ -207,10 +178,10 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                       controlType: 'textarea',
                       model: '.attributes.description',
                     },
-                    this.props.actions ? this.renderActionControl(this.props.actions) : null,
+                    renderActionControl(this.props.actions),
                   ],
                   aside: [
-                    this.props.users ? this.renderUserControl(this.props.users) : null,
+                    renderUserControl(this.props.users, 'Assigned user', indicator.attributes.manager_id),
                     {
                       id: 'start',
                       controlType: 'input',
@@ -252,8 +223,7 @@ IndicatorEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  page: PropTypes.object,
-  form: PropTypes.object,
+  viewDomain: PropTypes.object,
   indicator: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
@@ -266,8 +236,7 @@ IndicatorEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  page: pageSelector(state),
-  form: formSelector(state),
+  viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'measures',
     'users',
@@ -386,10 +355,6 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
       dispatch(updatePath(`/indicators/${props.params.id}`));
     },
   };
