@@ -12,7 +12,7 @@ import { browserHistory } from 'react-router';
 
 import { Map, List } from 'immutable';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, redirectIfNotPermitted } from 'containers/App/actions';
 import { USER_ROLES } from 'containers/App/constants';
 
 import {
@@ -40,6 +40,9 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.redirectIfNotPermitted();
     }
   }
   mapUserOptions = (entities) => entities.toList().map((entity) => Map({
@@ -172,6 +175,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
 CategoryNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
@@ -224,6 +228,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+    },
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
     handleSubmit: (formData, taxonomyReference) => {
       let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomyReference);

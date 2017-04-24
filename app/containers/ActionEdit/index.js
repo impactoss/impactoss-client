@@ -15,9 +15,9 @@ import { Map, List, fromJS } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, redirectIfNotPermitted } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -52,6 +52,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     }
     // repopulate if new data becomes ready
     if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.redirectIfNotPermitted();
       this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
@@ -254,6 +255,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
 ActionEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  redirectIfNotPermitted: PropTypes.func,
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
@@ -368,6 +370,9 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
+    },
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, formData));

@@ -15,9 +15,9 @@ import { fromJS, List, Map } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, redirectIfNotPermitted } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -52,6 +52,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     }
 
     if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.redirectIfNotPermitted();
       this.props.populateForm('reportEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
@@ -222,6 +223,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
 
 ReportEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  redirectIfNotPermitted: PropTypes.func,
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
@@ -289,6 +291,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('progress_reports'));
       dispatch(loadEntitiesIfNeeded('due_dates'));
       dispatch(loadEntitiesIfNeeded('indicators'));
+    },
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR));
     },
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, fromJS(formData)));

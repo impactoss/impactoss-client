@@ -14,8 +14,8 @@ import { Map, List } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
-import { PUBLISH_STATUSES } from 'containers/App/constants';
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
+import { loadEntitiesIfNeeded, redirectIfNotPermitted } from 'containers/App/actions';
 import { getEntities, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
@@ -36,6 +36,9 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.redirectIfNotPermitted();
     }
   }
 
@@ -180,6 +183,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
 
 ActionNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   actionNew: PropTypes.object,
@@ -233,14 +237,13 @@ const mapStateToProps = (state) => ({
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      // dispatch(loadEntitiesIfNeeded('measures'));
-      // dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('indicators'));
-      // dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      // dispatch(loadEntitiesIfNeeded('measure_categories'));
+    },
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
     handleSubmit: (formData) => {
       let saveData = formData;
