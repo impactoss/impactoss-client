@@ -8,9 +8,8 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { browserHistory } from 'react-router';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityView from 'components/views/EntityView';
@@ -47,19 +46,6 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     return highestRole.attributes.friendly_name;
   }
 
-  handleEdit = () => {
-    browserHistory.push(`/users/edit/${this.props.user.id || this.props.user.attributes.id}`);
-  }
-
-  handleEditPassword = () => {
-    browserHistory.push(`/users/password/${this.props.user.id || this.props.user.attributes.id}`);
-  }
-
-  handleClose = () => {
-    browserHistory.push('/');
-    // TODO should be "go back" if history present or to categories list when not
-  }
-
   mapCategoryOptions = (categories) => categories
     ? Object.values(categories).map((cat) => ({
       label: cat.attributes.title,
@@ -93,17 +79,17 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
             {
               type: 'simple',
               title: 'Edit',
-              onClick: this.handleEdit,
+              onClick: () => this.props.handleEdit(this.props.user.id || this.props.user.attributes.id),
             },
             {
               type: 'simple',
               title: 'Change password',
-              onClick: this.handleEditPassword,
+              onClick: () => this.props.handleEditPassword(this.props.user.id || this.props.user.attributes.id),
             },
             {
               type: 'primary',
               title: 'Close',
-              onClick: this.handleClose,
+              onClick: this.props.handleClose,
             },
           ]}
         >
@@ -174,6 +160,9 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
 UserView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  handleEdit: PropTypes.func,
+  handleEditPassword: PropTypes.func,
+  handleClose: PropTypes.func,
   user: PropTypes.object,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -254,6 +243,16 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('user_categories'));
+    },
+    handleEdit: (userId) => {
+      dispatch(updatePath(`/users/edit/${userId}`));
+    },
+    handleEditPassword: (userId) => {
+      dispatch(updatePath(`/users/password/${userId}`));
+    },
+    handleClose: () => {
+      dispatch(updatePath('/'));
+      // TODO should be "go back" if history present or to categories list when not
     },
   };
 }

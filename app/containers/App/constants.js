@@ -57,6 +57,7 @@ export const SAVE_SUCCESS = 'nmrf/App/SAVE_SUCCESS';
 export const SAVE_ERROR = 'nmrf/App/SAVE_ERROR';
 
 export const UPDATE_ROUTE_QUERY = 'nmrf/App/UPDATE_ROUTE_QUERY';
+export const UPDATE_PATH = 'nmrf/App/UPDATE_PATH';
 
 // TODO need to pull from an env file
 export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';

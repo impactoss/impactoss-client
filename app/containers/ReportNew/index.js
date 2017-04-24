@@ -7,14 +7,13 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { browserHistory } from 'react-router';
 
 import { fromJS, Map, List } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/MultiSelect';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { getEntity, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
@@ -230,7 +229,7 @@ function mapDispatchToProps(dispatch) {
       // however
       // - this could in the future be moved to a saga or reducer
       // - also its nice to be next to handleSubmit
-      browserHistory.push(`/indicators/${indicatorReference}`);
+      dispatch(updatePath(`/indicators/${indicatorReference}`));
     },
   };
 }

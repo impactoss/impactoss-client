@@ -8,11 +8,11 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 // import { FormattedMessage } from 'react-intl';
-import { browserHistory } from 'react-router';
 
 import Page from 'components/Page';
 import SimpleForm from 'components/forms/SimpleForm';
 
+import { updatePath } from 'containers/App/actions';
 import userPasswordSelector from './selectors';
 import messages from './messages';
 import { save } from './actions';
@@ -138,11 +138,7 @@ export function mapDispatchToProps(dispatch) {
       dispatch(save(saveData));
     },
     handleCancel: (userId) => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
-      browserHistory.push(`/users/${userId}`);
+      dispatch(updatePath(`/users/${userId}`));
     },
   };
 }

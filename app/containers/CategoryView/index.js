@@ -8,9 +8,8 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { browserHistory } from 'react-router';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityView from 'components/views/EntityView';
@@ -35,15 +34,6 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     }
   }
 
-  handleEdit = () => {
-    browserHistory.push(`/category/edit/${this.props.params.id}`);
-  }
-
-  handleClose = () => {
-    browserHistory.push(`/categories/${this.props.category.taxonomy.id}`);
-    // TODO should be "go back" if history present or to categories list when not
-  }
-
   render() {
     const { category, dataReady, isManager } = this.props;
     const reference = this.props.params.id;
@@ -60,18 +50,18 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       {
         type: 'simple',
         title: 'Edit',
-        onClick: this.handleEdit,
+        onClick: () => this.props.handleEdit(this.props.params.id),
       },
       {
         type: 'primary',
         title: 'Close',
-        onClick: this.handleClose,
+        onClick: () => this.props.handleClose(this.props.category.taxonomy.id),
       },
     ]
     : [{
       type: 'primary',
       title: 'Close',
-      onClick: this.handleClose,
+      onClick: () => this.props.handleClose(this.props.category.taxonomy.id),
     }];
     return (
       <div>
@@ -156,6 +146,8 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
 
 CategoryView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  handleEdit: PropTypes.func,
+  handleClose: PropTypes.func,
   category: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
@@ -240,6 +232,13 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+    },
+    handleEdit: (categoryId) => {
+      dispatch(updatePath(`/category/edit/${categoryId}`));
+    },
+    handleClose: (taxonomyId) => {
+      dispatch(updatePath(`/categories/${taxonomyId}`));
+      // TODO should be "go back" if history present or to categories list when not
     },
   };
 }

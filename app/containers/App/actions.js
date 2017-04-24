@@ -43,6 +43,7 @@ import {
   UPDATE_CONNECTIONS,
   UPDATE_ENTITIES,
   UPDATE_ROUTE_QUERY,
+  UPDATE_PATH,
   AUTHENTICATE_FORWARD,
 } from './constants';
 
@@ -286,11 +287,18 @@ export function invalidateEntities(path) {
   };
 }
 
-export function updateRouteQuery(query, replace) {
+export function updateRouteQuery(query, extend) {
   return {
     type: UPDATE_ROUTE_QUERY,
     query,
-    replace,
+    extend,
+  };
+}
+
+export function updatePath(path) {
+  return {
+    type: UPDATE_PATH,
+    path,
   };
 }
 

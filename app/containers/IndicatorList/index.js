@@ -7,12 +7,11 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { browserHistory } from 'react-router';
 
 import EntityList from 'containers/EntityList';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -140,7 +139,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
       actions: [{
         type: 'primary',
         title: 'New indicator',
-        onClick: () => browserHistory.push('/indicators/new/'),
+        onClick: () => this.props.handleNew(),
       }],
     };
 
@@ -168,6 +167,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
 
 IndicatorList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  handleNew: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
 };
@@ -192,6 +192,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+    },
+    handleNew: () => {
+      dispatch(updatePath('/indicators/new/'));
     },
   };
 }

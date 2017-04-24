@@ -8,10 +8,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { browserHistory } from 'react-router';
 import { find } from 'lodash/collection';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
@@ -37,14 +36,6 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-  }
-  handleEdit = () => {
-    browserHistory.push(`/recommendations/edit/${this.props.params.id}`);
-  }
-
-  handleClose = () => {
-    browserHistory.push('/recommendations');
-    // TODO should be "go back" if history present or to actions list when not
   }
 
   mapActions = (actions) =>
@@ -105,18 +96,18 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       {
         type: 'simple',
         title: 'Edit',
-        onClick: this.handleEdit,
+        onClick: this.props.handleEdit,
       },
       {
         type: 'primary',
         title: 'Close',
-        onClick: this.handleClose,
+        onClick: this.props.handleClose,
       },
     ]
     : [{
       type: 'primary',
       title: 'Close',
-      onClick: this.handleClose,
+      onClick: this.props.handleClose,
     }];
 
 
@@ -176,6 +167,8 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
 
 RecommendationView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  handleEdit: PropTypes.func,
+  handleClose: PropTypes.func,
   recommendation: PropTypes.object,
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
@@ -264,6 +257,13 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+    },
+    handleEdit: () => {
+      dispatch(updatePath(`/recommendations/edit/${this.props.params.id}`));
+    },
+    handleClose: () => {
+      dispatch(updatePath('/recommendations'));
+      // TODO should be "go back" if history present or to actions list when not
     },
   };
 }

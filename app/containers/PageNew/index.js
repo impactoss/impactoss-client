@@ -8,10 +8,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 // import { FormattedMessage } from 'react-intl';
-import { browserHistory } from 'react-router';
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
-import { redirectIfNotPermitted } from 'containers/App/actions';
+import { redirectIfNotPermitted, updatePath } from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -156,7 +155,7 @@ function mapDispatchToProps(dispatch) {
       // however
       // - this could in the future be moved to a saga or reducer
       // - also its nice to be next to handleSubmit
-      browserHistory.push('/pages');
+      dispatch(updatePath('/pages'));
     },
   };
 }

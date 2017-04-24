@@ -8,10 +8,12 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 // import { FormattedMessage } from 'react-intl';
-import { browserHistory, Link } from 'react-router';
+import { Link } from 'react-router';
 
 import Page from 'components/Page';
 import SimpleForm from 'components/forms/SimpleForm';
+
+import { updatePath } from 'containers/App/actions';
 
 import userRegisterSelector from './selectors';
 import messages from './messages';
@@ -149,7 +151,7 @@ export function mapDispatchToProps(dispatch) {
       // however
       // - this could in the future be moved to a saga or reducer
       // - also its nice to be next to handleSubmit
-      browserHistory.push('/');
+      dispatch(updatePath('/'));
     },
   };
 }
