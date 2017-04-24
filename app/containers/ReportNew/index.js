@@ -10,7 +10,7 @@ import Helmet from 'react-helmet';
 
 import { fromJS, Map, List } from 'immutable';
 
-import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';

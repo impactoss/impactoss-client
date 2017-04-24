@@ -3,8 +3,8 @@ import Immutable from 'immutable';
 import { connect } from 'react-redux';
 import { isEqual } from 'lodash/lang';
 import { Form, actions as formActions } from 'react-redux-form/immutable';
-import MultiSelect from 'components/MultiSelect';
-// import { STATES as CHECKBOX_STATES } from 'components/IndeterminateCheckbox';
+import MultiSelectControl from 'components/forms/MultiSelectControl';
+// import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 class EditForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -55,7 +55,7 @@ class EditForm extends React.Component { // eslint-disable-line react/prefer-sta
         { this.props.onClose &&
           <button onClick={this.onClose}>close</button>
         }
-        <MultiSelect
+        <MultiSelectControl
           model=".values"
           threeState
           multiple={this.props.multiple}

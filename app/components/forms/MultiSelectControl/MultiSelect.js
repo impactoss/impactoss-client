@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import { kebabCase } from 'lodash/string';
-import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/IndeterminateCheckbox';
+import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 export const getChangedOptions = (options) =>
   options.filter((o) => o.get('hasChanged'));

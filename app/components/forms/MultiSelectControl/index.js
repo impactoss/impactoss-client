@@ -2,7 +2,11 @@ import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
 import { Control } from 'react-redux-form/immutable';
 
-import MultiSelect, { getChangedOptions, getCheckedValuesFromOptions, getUncheckedValuesFromOptions } from './MultiSelect';
+import MultiSelect, {
+  getChangedOptions,
+  getCheckedValuesFromOptions,
+  getUncheckedValuesFromOptions,
+} from './MultiSelect';
 
 const MultiSelectControl = (props) => {
   const { model, options, valueCompare, threeState, multiple, required, ...otherProps } = props;

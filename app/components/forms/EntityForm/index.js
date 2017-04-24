@@ -6,7 +6,7 @@ import Grid from 'grid-styled';
 
 import Row from 'components/basic/Row';
 import FormWrapper from 'components/basic/FormWrapper';
-import MultiSelect from 'components/MultiSelect';
+import MultiSelectControl from 'components/forms/MultiSelectControl';
 import FormHeader from '../FormHeader';
 import FormBody from '../FormBody';
 import FormFooter from '../FormFooter';
@@ -26,7 +26,7 @@ const controls = {
   file: Control.file,
   select: ControlSelect,
   button: Control.button,
-  multiselect: MultiSelect,
+  multiselect: MultiSelectControl,
 };
 
 // These props will be omitted before being passed to the Control component

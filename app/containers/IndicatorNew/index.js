@@ -11,7 +11,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { Map, List } from 'immutable';
 
-import { getCheckedValuesFromOptions } from 'components/MultiSelect';
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
