@@ -39,7 +39,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady) {
+    if (this.props.dataReady && this.props.action) {
       this.props.populateForm('actionEdit.form.data', this.getInitialFormData());
     }
   }
@@ -50,7 +50,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.action) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
     }
@@ -58,11 +58,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, recommendations, indicators } = props;
+    const { taxonomies, recommendations, indicators, action } = props;
 
-    return Map({
-      id: props.action.id,
-      attributes: fromJS(props.action.attributes),
+    return action
+    ? Map({
+      id: action.id,
+      attributes: fromJS(action.attributes),
       associatedTaxonomies: taxonomies
       ? taxonomies.reduce((values, tax) =>
           values.set(
@@ -85,7 +86,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           value: entity.get('id'),
         })), List())
         : List(),
-    });
+    })
+    : Map();
   }
 
   mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({

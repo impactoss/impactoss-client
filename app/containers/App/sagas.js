@@ -98,7 +98,7 @@ export function* checkEntitiesSaga(payload) {
   }
 }
 /**
- * Check if entities already present
+ * Check if user is authorized
  */
 export function* checkRoleSaga({ role }) {
   const signedIn = yield select(isSignedIn);
@@ -108,7 +108,7 @@ export function* checkRoleSaga({ role }) {
     || (role === USER_ROLES.MANAGER && roleIds.indexOf(USER_ROLES.ADMIN) > -1)
     || (role === USER_ROLES.CONTRIBUTOR && (roleIds.indexOf(USER_ROLES.MANAGER) > -1 || roleIds.indexOf(USER_ROLES.ADMIN) > -1))
     )) {
-      yield put(push('/notfound'));
+      yield put(push('/not-authorized'));
     }
   }
 }

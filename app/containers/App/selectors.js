@@ -243,6 +243,7 @@ const extendEntity = (state, entity, extendArgs) => {
       where: args.where || {}, // conditions for join
       extend: args.extend || null,
       connected: args.connected || null,
+      without: args.without || null,
     };
     if (extend.reverse) {
       // reverse: other entity pointing to entity

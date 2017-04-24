@@ -39,7 +39,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady) {
+    if (this.props.dataReady && this.props.recommendation) {
       this.props.populateForm('recommendationEdit.form.data', this.getInitialFormData());
     }
   }
@@ -50,7 +50,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.recommendation) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('recommendationEdit.form.data', this.getInitialFormData(nextProps));
     }
@@ -58,10 +58,10 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, actions } = props;
+    const { taxonomies, actions, recommendation } = props;
     return Map({
-      id: props.recommendation.id,
-      attributes: fromJS(props.recommendation.attributes),
+      id: recommendation.id,
+      attributes: fromJS(recommendation.attributes),
       associatedTaxonomies: taxonomies
       ? taxonomies.reduce((values, tax) =>
           values.set(

@@ -41,6 +41,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     label: entity.getIn(['attributes', 'due_date']),
   }));
 
+  // TODO use radio buttons
   renderDateControl = (dates) => ({
     id: 'dates',
     model: '.associatedDate',
@@ -55,6 +56,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     const indicatorReference = this.props.params.id;
     const required = (val) => val && val.length;
 
+    // TODO allow all past but only first upcoming due date
     const dateOptions = indicator && indicator.dates
       ? this.renderDateControl(indicator.dates)
       : null;

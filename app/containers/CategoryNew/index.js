@@ -45,7 +45,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     }
   }
   mapUserOptions = (entities) => entities.toList().map((entity) => Map({
-    value: entity.get('id'),
+    value: Map({ value: entity.get('id') }),
     label: entity.getIn(['attributes', 'name']),
   }));
   renderUserControl = (users) => ({
@@ -64,7 +64,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-
     if (taxonomy && taxonomy.attributes) {
       pageTitle = `${pageTitle} (${taxonomy.attributes.title})`;
     }

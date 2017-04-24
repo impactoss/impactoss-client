@@ -38,7 +38,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady) {
+    if (this.props.dataReady && this.props.user) {
       this.props.populateForm('userEdit.form.data', this.getInitialFormData());
     }
   }
@@ -48,18 +48,18 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.user) {
       this.props.populateForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, roles } = props;
+    const { taxonomies, roles, user } = props;
 
     return Map({
-      id: props.user.id,
-      attributes: fromJS(props.user.attributes),
+      id: user.id,
+      attributes: fromJS(user.attributes),
       associatedTaxonomies: taxonomies
       ? taxonomies.reduce((values, tax) =>
           values.set(

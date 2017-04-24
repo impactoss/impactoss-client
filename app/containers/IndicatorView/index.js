@@ -297,7 +297,7 @@ const mapStateToProps = (state, props) => ({
   ),
 });
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('measures'));
@@ -309,10 +309,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('due_dates'));
     },
     handleEdit: () => {
-      dispatch(updatePath(`/indicators/edit/${this.props.params.id}`));
+      dispatch(updatePath(`/indicators/edit/${props.params.id}`));
     },
     handleNewReport: () => {
-      dispatch(updatePath(`/reports/new/${this.props.params.id}`));
+      dispatch(updatePath(`/reports/new/${props.params.id}`));
     },
     handleClose: () => {
       dispatch(updatePath('/indicators'));

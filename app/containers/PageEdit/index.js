@@ -36,7 +36,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady) {
+    if (this.props.dataReady && this.props.page) {
       this.props.populateForm('pageEdit.form.data', this.getInitialFormData());
     }
   }
@@ -47,7 +47,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.page) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('pageEdit.form.data', this.getInitialFormData(nextProps));
     }

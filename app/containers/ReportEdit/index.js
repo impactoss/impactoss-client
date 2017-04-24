@@ -39,7 +39,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
-    if (this.props.dataReady) {
+    if (this.props.dataReady && this.props.report) {
       this.props.populateForm('reportEdit.form.data', this.getInitialFormData());
     }
   }
@@ -50,7 +50,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
       this.props.loadEntitiesIfNeeded();
     }
 
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.report) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('reportEdit.form.data', this.getInitialFormData(nextProps));
     }
