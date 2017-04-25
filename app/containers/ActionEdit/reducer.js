@@ -41,7 +41,6 @@ function actionEditReducer(state = initialState, action) {
   }
 }
 
-// tim: I don't know how to pull from the global state to set these now, It doesn't seem to be possible
 const formData = fromJS({
   id: '',
   attributes: {
@@ -49,6 +48,9 @@ const formData = fromJS({
     description: '',
     draft: '',
   },
+  associatedTaxonomies: {},
+  associatedRecommendations: [],
+  associatedIndicators: [],
 });
 
 export default combineReducers({

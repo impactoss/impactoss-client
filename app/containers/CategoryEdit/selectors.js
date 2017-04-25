@@ -6,32 +6,15 @@ import { createSelector } from 'reselect';
 const selectCategoryEditDomain = (state) => state.get('categoryEdit');
 
 /**
- * Other specific selectors
- */
-
-const pageSelector = createSelector(
-  selectCategoryEditDomain,
-  (substate) => substate.get('page').toJS()
- );
-const formSelector = createSelector(
-  selectCategoryEditDomain,
-  (substate) => substate.get('form')
- );
-
-
-/**
  * Default selector used by CategoryEdit
  */
 
-const categoryEditSelect = createSelector(
+const viewDomainSelect = createSelector(
   selectCategoryEditDomain,
   (substate) => substate.toJS()
 );
 
-export default categoryEditSelect;
+export default viewDomainSelect;
 export {
   selectCategoryEditDomain,
-  categoryEditSelect,
-  pageSelector,
-  formSelector,
 };

@@ -45,13 +45,15 @@ function reportEditReducer(state = initialState, action) {
 const formData = fromJS({
   id: '',
   attributes: {
-    draft: true,
+    draft: '',
     title: '',
     description: '',
     document_url: '',
-    document_public: true,
+    document_public: '',
     due_date_id: '',
+    indicator_id: '',
   },
+  associatedDate: [],
 });
 
 export default combineReducers({

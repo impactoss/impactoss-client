@@ -5,7 +5,7 @@ export const makeEditGroups = ({
   taxonomies,
   connections,
   activeEditOption,
-}) => {
+}, messages) => {
   const editGroups = {};
 
   // taxonomy option group
@@ -13,7 +13,7 @@ export const makeEditGroups = ({
     // first prepare taxonomy options
     editGroups.taxonomies = {
       id: 'taxonomies', // filterGroupId
-      label: edits.taxonomies.label,
+      label: messages.taxonomies,
       show: true,
       options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
         ...taxOptions,
@@ -34,7 +34,7 @@ export const makeEditGroups = ({
     // first prepare taxonomy options
     editGroups.connections = {
       id: 'connections', // filterGroupId
-      label: edits.connections.label,
+      label: messages.connections,
       show: true,
       options: reduce(edits.connections.options, (options, option) => ({
         ...options,
@@ -55,7 +55,7 @@ export const makeEditGroups = ({
     // first prepare taxonomy options
     editGroups.attributes = {
       id: 'attributes', // filterGroupId
-      label: edits.attributes.label,
+      label: messages.attributes,
       show: true,
       options: reduce(edits.attributes.options, (options, option) => ({
         ...options,

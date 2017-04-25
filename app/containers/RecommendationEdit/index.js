@@ -28,9 +28,13 @@ import {
 } from 'containers/App/selectors';
 
 import {
-  pageSelector,
-  formSelector,
-} from './selectors';
+  taxonomyOptions,
+  entityOptions,
+  renderActionControl,
+  renderTaxonomyControl,
+} from 'utils/forms';
+
+import viewDomainSelect from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
@@ -59,60 +63,20 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
     const { taxonomies, actions, recommendation } = props;
-    return Map({
+    return recommendation
+    ? Map({
       id: recommendation.id,
       attributes: fromJS(recommendation.attributes),
-      associatedTaxonomies: taxonomies
-      ? taxonomies.reduce((values, tax) =>
-          values.set(
-            tax.get('id'),
-            tax.get('categories').reduce((options, entity) => options.push(Map({
-              checked: !!entity.get('associated'),
-              value: entity.get('id'),
-            })), List()))
-        , Map())
-      : Map(),
-      associatedActions: actions
-      ? actions.reduce((options, entity) => options.push(Map({
-        checked: !!entity.get('associated'),
-        value: entity.get('id'),
-      })), List())
-      : List(),
-    });
-  }
-
-  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  mapActionOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  // TODO this should be shared functionality
-  renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({
-    id: tax.get('id'),
-    model: `.associatedTaxonomies.${tax.get('id')}`,
-    label: tax.getIn(['attributes', 'title']),
-    controlType: 'multiselect',
-    options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
-  }), [])
-
-  // TODO this should be shared functionality
-  renderActionControl = (actions) => ({
-    id: 'actions',
-    model: '.associatedActions',
-    label: 'Actions',
-    controlType: 'multiselect',
-    options: this.mapActionOptions(actions),
-  });
+      associatedTaxonomies: taxonomyOptions(taxonomies),
+      associatedActions: entityOptions(actions),
+    })
+    : Map();
+  };
 
   render() {
-    const { recommendation, dataReady } = this.props;
+    const { recommendation, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = this.props.page;
+    const { saveSending, saveError } = viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -146,7 +110,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                 type: 'primary',
                 title: 'Save',
                 onClick: () => this.props.handleSubmit(
-                  this.props.form.data,
+                  viewDomain.form.data,
                   this.props.taxonomies,
                   this.props.actions
                 ),
@@ -159,62 +123,65 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
             {saveError &&
               <p>{saveError}</p>
             }
-            <EntityForm
-              model="recommendationEdit.form.data"
-              handleSubmit={(formData) => this.props.handleSubmit(
-                formData,
-                this.props.taxonomies,
-                this.props.actions
-              )}
-              handleCancel={this.props.handleCancel}
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'title',
-                      controlType: 'input',
-                      model: '.attributes.title',
-                      validators: {
-                        required,
+            { dataReady &&
+              <EntityForm
+                model="recommendationEdit.form.data"
+                formData={viewDomain.form.data}
+                handleSubmit={(formData) => this.props.handleSubmit(
+                  formData,
+                  this.props.taxonomies,
+                  this.props.actions
+                )}
+                handleCancel={this.props.handleCancel}
+                fields={{
+                  header: {
+                    main: [
+                      {
+                        id: 'title',
+                        controlType: 'input',
+                        model: '.attributes.title',
+                        validators: {
+                          required,
+                        },
+                        errorMessages: {
+                          required: this.context.intl.formatMessage(messages.fieldRequired),
+                        },
                       },
-                      errorMessages: {
-                        required: this.context.intl.formatMessage(messages.fieldRequired),
+                    ],
+                    aside: [
+                      {
+                        id: 'number',
+                        controlType: 'input',
+                        model: '.attributes.number',
                       },
-                    },
-                  ],
-                  aside: [
-                    {
-                      id: 'number',
-                      controlType: 'input',
-                      model: '.attributes.number',
-                    },
-                    {
-                      id: 'status',
-                      controlType: 'select',
-                      model: '.attributes.draft',
-                      value: recommendation.attributes.draft,
-                      options: PUBLISH_STATUSES,
-                    },
-                    {
-                      id: 'updated',
-                      controlType: 'info',
-                      displayValue: recommendation.attributes.updated_at,
-                    },
-                    {
-                      id: 'updated_by',
-                      controlType: 'info',
-                      displayValue: recommendation.user && recommendation.user.attributes.name,
-                    },
-                  ],
-                },
-                body: {
-                  main: [
-                    this.props.actions ? this.renderActionControl(this.props.actions) : null,
-                  ],
-                  aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
-                },
-              }}
-            />
+                      {
+                        id: 'status',
+                        controlType: 'select',
+                        model: '.attributes.draft',
+                        value: recommendation.attributes.draft,
+                        options: PUBLISH_STATUSES,
+                      },
+                      {
+                        id: 'updated',
+                        controlType: 'info',
+                        displayValue: recommendation.attributes.updated_at,
+                      },
+                      {
+                        id: 'updated_by',
+                        controlType: 'info',
+                        displayValue: recommendation.user && recommendation.user.attributes.name,
+                      },
+                    ],
+                  },
+                  body: {
+                    main: [
+                      renderActionControl(this.props.actions),
+                    ],
+                    aside: renderTaxonomyControl(this.props.taxonomies),
+                  },
+                }}
+              />
+            }
           </Page>
         }
       </div>
@@ -228,8 +195,7 @@ RecommendationEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  page: PropTypes.object,
-  form: PropTypes.object,
+  viewDomain: PropTypes.object,
   recommendation: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
@@ -242,8 +208,7 @@ RecommendationEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  page: pageSelector(state),
-  form: formSelector(state),
+  viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'recommendations',
     'users',
@@ -385,10 +350,6 @@ function mapDispatchToProps(dispatch, props) {
       // dispatch(save(formData, props.params.id));
     },
     handleCancel: () => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
       dispatch(updatePath(`/recommendations/${props.params.id}`));
     },
   };

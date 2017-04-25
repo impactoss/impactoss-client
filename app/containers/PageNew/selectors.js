@@ -14,12 +14,12 @@ const selectPageNewDomain = () => (state) => state.get('pageNew');
  * Default selector used by PageNew
  */
 
-const pageNewSelector = createSelector(
+const viewDomainSelect = createSelector(
   selectPageNewDomain(),
   (substate) => substate.toJS()
 );
 
-export default pageNewSelector;
+export default viewDomainSelect;
 export {
   selectPageNewDomain,
 };

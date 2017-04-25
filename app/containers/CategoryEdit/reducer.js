@@ -41,7 +41,6 @@ function categoryEditReducer(state = initialState, action) {
   }
 }
 
-// tim: I don't know how to pull from the global state to set these now, It doesn't seem to be possible
 const formData = fromJS({
   id: '',
   attributes: {
@@ -50,8 +49,9 @@ const formData = fromJS({
     short_title: '',
     url: '',
     manager_id: '',
+    taxonomy_id: '',
   },
-  taxonomy_id: '',
+  associatedUser: [],
 });
 
 export default combineReducers({

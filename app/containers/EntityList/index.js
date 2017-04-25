@@ -56,6 +56,8 @@ import {
   saveEdits,
 } from './actions';
 
+import messages from './messages';
+
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
@@ -110,10 +112,27 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             >
               { dataReady && activePanel === FILTERS_PANEL &&
                 <EntityListFilters
-                  filterGroups={fromJS(makeFilterGroups(this.props))}
+                  filterGroups={
+                    fromJS(makeFilterGroups(
+                      this.props,
+                      {
+                        attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
+                        taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
+                        connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
+                        connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
+                      }
+                    ))
+                  }
                   formOptions={
                     activeFilterOption
-                    ? fromJS(makeActiveFilterOptions(entities, this.props))
+                    ? fromJS(makeActiveFilterOptions(
+                      entities,
+                      this.props,
+                      {
+                        titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
+                        without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
+                      }
+                    ))
                     : null
                   }
                   formModel={FILTER_FORM_MODEL}
@@ -123,10 +142,24 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               }
               { dataReady && isManager && activePanel === EDIT_PANEL &&
                 <EntityListEdit
-                  editGroups={entitiesSelected.length ? fromJS(makeEditGroups(this.props)) : null}
+                  editGroups={
+                    entitiesSelected.length
+                    ? fromJS(makeEditGroups(
+                      this.props,
+                      {
+                        attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
+                        taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
+                        connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
+                      }
+                    )) : null
+                  }
                   formOptions={
                     activeEditOption && entitiesSelected.length
-                    ? fromJS(makeActiveEditOptions(entitiesSelected, this.props))
+                    ? fromJS(makeActiveEditOptions(
+                      entitiesSelected,
+                      this.props,
+                      { title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.length} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}` }
+                    ))
                     : null
                   }
                   formModel={EDIT_FORM_MODEL}
@@ -194,6 +227,10 @@ EntityList.propTypes = {
 EntityList.defaultProps = {
   sortBy: 'id',
   sortOrder: 'desc',
+};
+
+EntityList.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
 };
 
 // attribute conditions

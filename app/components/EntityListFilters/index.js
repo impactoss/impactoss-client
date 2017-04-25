@@ -5,27 +5,32 @@
  */
 
 import React, { PropTypes } from 'react';
-import Immutable, { Map } from 'immutable';
+import { Map } from 'immutable';
 
-import FilterForm from 'containers/FilterForm';
-import Option from 'containers/FilterForm/Option';
+import EntityListFilterForm from 'containers/EntityListFilterForm';
+// import Option from 'containers/EntityListFilterForm/Option';
 
 export default class EntityListFilters extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
-    filterGroups: PropTypes.instanceOf(Immutable.Map),
+    filterGroups: PropTypes.instanceOf(Map),
     formOptions: PropTypes.object,
     onShowFilterForm: PropTypes.func.isRequired,
     onHideFilterForm: PropTypes.func.isRequired,
     formModel: PropTypes.string,
   };
 
-  getFormOptions(formOptions) {
-    // Display the options
-    return formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
-      value: option,
-      label: <Option label={option.get('label')} count={option.get('count')} />,
-    }));
-  }
+  // getFormOptions = (formOptions) =>
+  //   formOptions.toList().sortBy((option) => option.get('label'));
+  // getFormOptions(formOptions) {
+  //   // Display the options
+  //   return formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
+  //     value: option.get('value'),
+  //     checked: option.get('checked'),
+  //     query: option.get('query'),
+  //     label: `${option.get('label')} (${option.get('count')})`,
+  //     // label: <Option label={option.get('label')} count={option.get('count')} />,
+  //   }));
+  // }
 
   renderFilterGroup = (group, groupId) => (
     <div key={groupId}>
@@ -63,10 +68,10 @@ export default class EntityListFilters extends React.Component { // eslint-disab
           filterGroups.entrySeq().map(([groupId, group]) => this.renderFilterGroup(group, groupId))
         }
         { formOptions &&
-          <FilterForm
+          <EntityListFilterForm
             model={formModel}
             title={formOptions.get('title')}
-            options={this.getFormOptions(formOptions.get('options'))}
+            options={formOptions.get('options').toList()}
             onClose={onHideFilterForm}
           />
         }

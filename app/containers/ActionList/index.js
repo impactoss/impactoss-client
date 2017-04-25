@@ -14,6 +14,7 @@ import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 export class ActionList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -107,18 +108,16 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     // specify the filter and query options
     const filters = {
       attributes: {  // filter by attribute value
-        label: 'By attribute',
         options: [
           {
             search: false,
-            label: 'Status',
+            label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
           },
         ],
       },
       taxonomies: { // filter by each category
-        label: 'By category',
         query: 'cat',
         search: true,
         connected: {
@@ -128,10 +127,9 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         },
       },
       connections: { // filter by associated entity
-        label: 'By connection',
         options: [
           {
-            label: 'Indicators',
+            label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
             path: 'indicators', // filter by recommendation connection
             query: 'indicators',
             key: 'indicator_id',
@@ -143,7 +141,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             },
           },
           {
-            label: 'Recommendations',
+            label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
             path: 'recommendations', // filter by recommendation connection
             query: 'recommendations',
             key: 'recommendation_id',
@@ -158,12 +156,11 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         ],
       },
       connectedTaxonomies: { // filter by each category
-        label: 'By associated categories',
         query: 'catx',
         search: true,
         connections: [{
           path: 'recommendations', // filter by recommendation connection
-          title: 'Recommendations',
+          title: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
           key: 'recommendation_id',
           connected: {
             path: 'recommendation_measures',
@@ -181,16 +178,14 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
 
     const edits = {
       taxonomies: { // edit category
-        label: 'Update categories',
         connectPath: 'measure_categories',
         key: 'category_id',
         ownKey: 'measure_id',
       },
       connections: { // filter by associated entity
-        label: 'Update conections',
         options: [
           {
-            label: 'Indicators',
+            label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
             path: 'indicators',
             connectPath: 'measure_indicators',
             key: 'indicator_id',
@@ -198,7 +193,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             // search: true,
           },
           {
-            label: 'Recommendations',
+            label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
             path: 'recommendations',
             connectPath: 'recommendation_measures',
             key: 'recommendation_id',
@@ -209,16 +204,16 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         ],
       },
       attributes: {  // edit attribute value
-        label: 'Update attribute',
         options: [
           {
-            label: 'Status',
+            label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
           },
         ],
       },
     };
+
     const headerOptions = {
       title: this.context.intl.formatMessage(messages.header),
       actions: [{

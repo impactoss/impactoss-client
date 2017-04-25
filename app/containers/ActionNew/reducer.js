@@ -49,6 +49,7 @@ const formData = fromJS({
   },
   associatedTaxonomies: {},
   associatedRecommendations: [],
+  associatedIndicators: [],
 });
 
 export default combineReducers({

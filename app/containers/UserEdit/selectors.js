@@ -6,32 +6,15 @@ import { createSelector } from 'reselect';
 const selectUserEditDomain = (state) => state.get('userEdit');
 
 /**
- * Other specific selectors
- */
-
-const pageSelector = createSelector(
-  selectUserEditDomain,
-  (substate) => substate.get('page').toJS()
- );
-const formSelector = createSelector(
-  selectUserEditDomain,
-  (substate) => substate.get('form')
- );
-
-
-/**
  * Default selector used by UserEdit
  */
 
-const userEditSelect = createSelector(
+const viewDomainSelect = createSelector(
   selectUserEditDomain,
   (substate) => substate.toJS()
 );
 
-export default userEditSelect;
+export default viewDomainSelect;
 export {
   selectUserEditDomain,
-  userEditSelect,
-  pageSelector,
-  formSelector,
 };

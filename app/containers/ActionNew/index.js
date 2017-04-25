@@ -20,7 +20,13 @@ import { getEntities, isReady } from 'containers/App/selectors';
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
 
-import actionNewSelector from './selectors';
+import {
+  renderRecommendationControl,
+  renderIndicatorControl,
+  renderTaxonomyControl,
+} from 'utils/forms';
+
+import viewDomainSelect from './selectors';
 import messages from './messages';
 import { save } from './actions';
 
@@ -41,51 +47,9 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     }
   }
 
-  mapCategoryOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  mapRecommendationOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  mapIndicatorOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  // TODO this should be shared functionality
-  renderTaxonomyControl = (taxonomies) => taxonomies.reduce((controls, tax) => controls.concat({
-    id: tax.get('id'),
-    model: `.associatedTaxonomies.${tax.get('id')}`,
-    label: tax.getIn(['attributes', 'title']),
-    controlType: 'multiselect',
-    options: tax.get('categories') ? this.mapCategoryOptions(tax.get('categories')) : List(),
-  }), [])
-
-  // TODO this should be shared functionality
-  renderRecommendationControl = (recommendations) => ({
-    id: 'recommendations',
-    model: '.associatedRecommendations',
-    label: 'Recommendations',
-    controlType: 'multiselect',
-    options: this.mapRecommendationOptions(recommendations),
-  });
-
-  // TODO this should be shared functionality
-  renderIndicatorControl = (indicators) => ({
-    id: 'indicators',
-    model: '.associatedIndicators',
-    label: 'Indicators',
-    controlType: 'multiselect',
-    options: this.mapIndicatorOptions(indicators),
-  });
-
   render() {
-    const { dataReady } = this.props;
-    const { saveSending, saveError } = this.props.actionNew.page;
+    const { dataReady, viewDomain } = this.props;
+    const { saveSending, saveError } = viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -118,7 +82,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                   type: 'primary',
                   title: 'Save',
                   onClick: () => this.props.handleSubmit(
-                    this.props.actionNew.form.data,
+                    viewDomain.form.data,
                   ),
                 },
               ]
@@ -132,6 +96,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             }
             <EntityForm
               model="actionNew.form.data"
+              formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               fields={{
@@ -166,10 +131,10 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                       controlType: 'textarea',
                       model: '.attributes.description',
                     },
-                    this.props.recommendations ? this.renderRecommendationControl(this.props.recommendations) : null,
-                    this.props.indicators ? this.renderIndicatorControl(this.props.indicators) : null,
+                    renderRecommendationControl(this.props.recommendations),
+                    renderIndicatorControl(this.props.indicators),
                   ],
-                  aside: this.props.taxonomies ? this.renderTaxonomyControl(this.props.taxonomies) : null,
+                  aside: renderTaxonomyControl(this.props.taxonomies),
                 },
               }}
             />
@@ -185,7 +150,7 @@ ActionNew.propTypes = {
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  actionNew: PropTypes.object,
+  viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
@@ -197,7 +162,7 @@ ActionNew.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  actionNew: actionNewSelector(state),
+  viewDomain: viewDomainSelect(state),
   // all categories for all taggable taxonomies
   dataReady: isReady(state, { path: [
     'categories',

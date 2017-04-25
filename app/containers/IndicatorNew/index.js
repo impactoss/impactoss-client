@@ -20,7 +20,12 @@ import { getEntities, isReady } from 'containers/App/selectors';
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
 
-import indicatorNewSelector from './selectors';
+import {
+  renderActionControl,
+  renderUserControl,
+} from 'utils/forms';
+
+import viewDomainSelect from './selectors';
 import messages from './messages';
 import { save } from './actions';
 
@@ -41,36 +46,9 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     }
   }
 
-  mapActionOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'title']),
-  }));
-
-  mapUserOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'name']),
-  }));
-
-  // TODO this should be shared functionality
-  renderActionControl = (actions) => ({
-    id: 'actions',
-    model: '.associatedActions',
-    label: 'Actions',
-    controlType: 'multiselect',
-    options: this.mapActionOptions(actions),
-  });
-  renderUserControl = (users) => ({
-    id: 'users',
-    model: '.associatedUser',
-    label: 'Assigned user',
-    controlType: 'multiselect',
-    multiple: false,
-    options: this.mapUserOptions(users),
-  });
-
   render() {
-    const { dataReady } = this.props;
-    const { saveSending, saveError } = this.props.indicatorNew.page;
+    const { dataReady, viewDomain } = this.props;
+    const { saveSending, saveError } = viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -103,7 +81,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                   type: 'primary',
                   title: 'Save',
                   onClick: () => this.props.handleSubmit(
-                    this.props.indicatorNew.form.data,
+                    viewDomain.form.data,
                   ),
                 },
               ]
@@ -117,6 +95,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             }
             <EntityForm
               model="indicatorNew.form.data"
+              formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               fields={{
@@ -151,10 +130,10 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                       controlType: 'textarea',
                       model: '.attributes.description',
                     },
-                    this.props.actions ? this.renderActionControl(this.props.actions) : null,
+                    renderActionControl(this.props.actions),
                   ],
                   aside: [
-                    this.props.users ? this.renderUserControl(this.props.users) : null,
+                    renderUserControl(this.props.users, 'Assigned user'),
                     {
                       id: 'start',
                       controlType: 'input',
@@ -195,7 +174,7 @@ IndicatorNew.propTypes = {
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  indicatorNew: PropTypes.object,
+  viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   actions: PropTypes.object,
   users: PropTypes.object,
@@ -206,7 +185,7 @@ IndicatorNew.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  indicatorNew: indicatorNewSelector(state),
+  viewDomain: viewDomainSelect(state),
   // all categories for all taggable taxonomies
   dataReady: isReady(state, { path: [
     'measures',
@@ -260,9 +239,9 @@ function mapDispatchToProps(dispatch) {
         }));
       }
       // TODO: remove once have singleselect instead of multiselect
-      if (List.isList(saveData.get('associatedUser'))) {
-        const user = saveData.get('associatedUser').first();
-        saveData = saveData.setIn(['attributes', 'manager_id'], user ? user.get('value') : null);
+      const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));
+      if (List.isList(formUserIds) && formUserIds.size) {
+        saveData = saveData.setIn(['attributes', 'manager_id'], formUserIds.first());
       }
 
       // cleanup
@@ -275,10 +254,6 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
       dispatch(updatePath('/indicators'));
     },
   };

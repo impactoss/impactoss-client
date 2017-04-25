@@ -9,7 +9,9 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
-import { Map, List } from 'immutable';
+import { List } from 'immutable';
+
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
 import { USER_ROLES } from 'containers/App/constants';
@@ -24,7 +26,11 @@ import {
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
 
-import categoryNewSelector from './selectors';
+import {
+  renderUserControl,
+} from 'utils/forms';
+
+import viewDomainSelect from './selectors';
 import messages from './messages';
 import { save } from './actions';
 
@@ -44,25 +50,12 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       this.props.redirectIfNotPermitted();
     }
   }
-  mapUserOptions = (entities) => entities.toList().map((entity) => Map({
-    value: Map({ value: entity.get('id') }),
-    label: entity.getIn(['attributes', 'name']),
-  }));
-  renderUserControl = (users) => ({
-    id: 'users',
-    model: '.associatedUser',
-    label: 'Category manager',
-    controlType: 'multiselect',
-    multiple: false,
-    options: this.mapUserOptions(users),
-  });
 
   render() {
-    const { taxonomy, dataReady, isAdmin } = this.props;
-    const { saveSending, saveError } = this.props.categoryNew.page;
+    const { taxonomy, dataReady, isAdmin, viewDomain } = this.props;
+    const { saveSending, saveError } = viewDomain.page;
     const taxonomyReference = this.props.params.id;
     const required = (val) => val && val.length;
-
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (taxonomy && taxonomy.attributes) {
@@ -71,7 +64,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
     const mainAsideFields = [];
     if (dataReady && isAdmin && !!taxonomy.attributes.has_manager && this.props.users) {
-      mainAsideFields.push(this.renderUserControl(this.props.users));
+      mainAsideFields.push(renderUserControl(this.props.users, 'Category manager'));
     }
 
     return (
@@ -104,7 +97,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                   type: 'primary',
                   title: 'Save',
                   onClick: () => this.props.handleSubmit(
-                    this.props.categoryNew.form.data,
+                    viewDomain.form.data,
                     taxonomyReference
                   ),
                 },
@@ -120,6 +113,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
             <EntityForm
               model="categoryNew.form.data"
+              formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 taxonomyReference
@@ -179,7 +173,7 @@ CategoryNew.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
-  categoryNew: PropTypes.object,
+  viewDomain: PropTypes.object,
   taxonomy: PropTypes.object,
   params: PropTypes.object,
   users: PropTypes.object,
@@ -191,7 +185,7 @@ CategoryNew.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isAdmin: isUserAdmin(state),
-  categoryNew: categoryNewSelector(state),
+  viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'taxonomies',
     'users',
@@ -234,16 +228,13 @@ function mapDispatchToProps(dispatch) {
     handleSubmit: (formData, taxonomyReference) => {
       let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomyReference);
       // TODO: remove once have singleselect instead of multiselect
-      if (List.isList(saveData.get('associatedUser'))) {
-        saveData = saveData.setIn(['attributes', 'manager_id'], saveData.get('associatedUser').first());
+      const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));
+      if (List.isList(formUserIds) && formUserIds.size) {
+        saveData = saveData.setIn(['attributes', 'manager_id'], formUserIds.first());
       }
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (taxonomyReference) => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
       dispatch(updatePath(`/categories/${taxonomyReference}`));
     },
   };

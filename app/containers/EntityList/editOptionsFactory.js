@@ -1,20 +1,30 @@
 import { find, forEach, map, reduce } from 'lodash/collection';
+import { STATES as CHECKBOX } from 'components/forms/IndeterminateCheckbox';
 
-export const makeActiveEditOptions = (entities, props) => {
+export const checkedState = (count, length) => {
+  if (count === length) {
+    return CHECKBOX.CHECKED;
+  } else if (count < length && count > 0) {
+    return CHECKBOX.INDETERMINATE;
+  }
+  return CHECKBOX.UNCHECKED;
+};
+
+export const makeActiveEditOptions = (entities, props, messages) => {
   // create edit options
   switch (props.activeEditOption.group) {
     case 'taxonomies':
-      return makeTaxonomyEditOptions(entities, props);
+      return makeTaxonomyEditOptions(entities, props, messages);
     case 'connections':
-      return makeConnectionEditOptions(entities, props);
+      return makeConnectionEditOptions(entities, props, messages);
     case 'attributes':
-      return makeAttributeEditOptions(entities, props);
+      return makeAttributeEditOptions(entities, props, messages);
     default:
       return null;
   }
 };
 
-export const makeAttributeEditOptions = (entities, { edits, activeEditOption }) => {
+export const makeAttributeEditOptions = (entities, { edits, activeEditOption }, messages) => {
   const editOptions = {
     groupId: 'attributes',
     search: true,
@@ -26,7 +36,7 @@ export const makeAttributeEditOptions = (entities, { edits, activeEditOption }) 
 
   const option = find(edits.attributes.options, (o) => o.attribute === activeEditOption.optionId);
   if (option) {
-    editOptions.title = option.label;
+    editOptions.title = messages.title;
     forEach(option.options, (attributeOption) => {
       const count = reduce(entities, (counter, entity) =>
         typeof entity.attributes[option.attribute] !== 'undefined'
@@ -34,21 +44,20 @@ export const makeAttributeEditOptions = (entities, { edits, activeEditOption }) 
           ? counter + 1
           : counter
       , 0);
+
       editOptions.options[attributeOption.value] = {
         label: attributeOption.label,
         value: attributeOption.value,
         attribute: option.attribute,
-        all: count === entities.length,
-        none: count === 0,
-        some: count > 0 && count < entities.length,
-        count,
+        checked: checkedState(count, entities.length),
+        order: attributeOption.label,
       };
     });
   }
   return editOptions;
 };
 
-export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption }) => {
+export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption }, messages) => {
   const editOptions = {
     groupId: 'taxonomies',
     search: true,
@@ -59,7 +68,7 @@ export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption
 
   const taxonomy = taxonomies[parseInt(activeEditOption.optionId, 10)];
   if (taxonomy) {
-    editOptions.title = taxonomy.attributes.title;
+    editOptions.title = messages.title;
     editOptions.multiple = taxonomy.attributes.allow_multiple;
     forEach(taxonomy.categories, (category) => {
       const count = reduce(entities, (counter, entity) => {
@@ -68,20 +77,19 @@ export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption
           : [];
         return categoryIds && categoryIds.indexOf(category.id) > -1 ? counter + 1 : counter;
       }, 0);
+      const label = category.attributes.title || category.attributes.name;
       editOptions.options[category.id] = {
-        label: category.attributes.title,
+        label,
         value: category.id,
-        all: count === entities.length,
-        none: count === 0,
-        some: count > 0 && count < entities.length,
-        count,
+        checked: checkedState(count, entities.length),
+        order: label,
       };
     });
   }
   return editOptions;
 };
 
-export const makeConnectionEditOptions = (entities, { edits, connections, activeEditOption }) => {
+export const makeConnectionEditOptions = (entities, { edits, connections, activeEditOption }, messages) => {
   const editOptions = {
     groupId: 'connections',
     search: true,
@@ -92,7 +100,7 @@ export const makeConnectionEditOptions = (entities, { edits, connections, active
 
   const option = find(edits.connections.options, (o) => o.path === activeEditOption.optionId);
   if (option) {
-    editOptions.title = option.label;
+    editOptions.title = messages.title;
     editOptions.path = option.connectPath;
     forEach(connections[option.path], (connection) => {
       const count = reduce(entities, (counter, entity) => {
@@ -101,13 +109,15 @@ export const makeConnectionEditOptions = (entities, { edits, connections, active
           : null;
         return connectedIds && connectedIds.indexOf(connection.id) > -1 ? counter + 1 : counter;
       }, 0);
+      const reference = connection.attributes.number || connection.id;
       editOptions.options[connection.id] = {
-        label: connection.attributes.title,
+        label: {
+          reference,
+          main: connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name,
+        },
         value: connection.id,
-        all: count === entities.length,
-        none: count === 0,
-        some: count > 0 && count < entities.length,
-        count,
+        checked: checkedState(count, entities.length),
+        order: reference,
       };
     });
   }
