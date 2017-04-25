@@ -1,23 +1,25 @@
 import { find, forEach, map } from 'lodash/collection';
+import { upperFirst } from 'lodash/string';
+import { lowerCase } from 'utils/string';
 import { optionChecked, attributeOptionChecked } from './utils';
 
-export const makeActiveFilterOptions = (entities, props) => {
+export const makeActiveFilterOptions = (entities, props, messages) => {
   // create filterOptions
   switch (props.activeFilterOption.group) {
     case 'taxonomies':
-      return makeTaxonomyFilterOptions(entities, props);
+      return makeTaxonomyFilterOptions(entities, props, messages);
     case 'connectedTaxonomies':
-      return makeConnectedTaxonomyFilterOptions(entities, props);
+      return makeConnectedTaxonomyFilterOptions(entities, props, messages);
     case 'connections':
-      return makeConnectionFilterOptions(entities, props);
+      return makeConnectionFilterOptions(entities, props, messages);
     case 'attributes':
-      return makeAttributeFilterOptions(entities, props);
+      return makeAttributeFilterOptions(entities, props, messages);
     default:
       return null;
   }
 };
 
-export const makeAttributeFilterOptions = (entities, { filters, activeFilterOption, location }) => {
+export const makeAttributeFilterOptions = (entities, { filters, activeFilterOption, location }, messages) => {
   const locationQuery = location.query;
 
   const filterOptions = {
@@ -27,6 +29,8 @@ export const makeAttributeFilterOptions = (entities, { filters, activeFilterOpti
   // the attribute option
   const option = find(filters.attributes.options, (o) => o.attribute === activeFilterOption.optionId);
   if (option) {
+    filterOptions.title = `${messages.titlePrefix} ${lowerCase(option.label)}`;
+    // filterOptions.search = option.search;
     const locationQueryValue = locationQuery.where;
     if (entities.length === 0) {
       if (locationQueryValue && option.options) {
@@ -38,7 +42,7 @@ export const makeAttributeFilterOptions = (entities, { filters, activeFilterOpti
               forEach(option.options, (attribute) => {
                 if (attribute.value.toString() === locationAttribute) {
                   filterOptions.options[attribute.value] = {
-                    label: attribute.label ? attribute.label : attribute.value,
+                    label: attribute.label ? attribute.label : upperFirst(attribute.value),
                     value: `${option.attribute}:${attribute.value}`,
                     count: 0,
                     query: 'where',
@@ -52,8 +56,6 @@ export const makeAttributeFilterOptions = (entities, { filters, activeFilterOpti
       }
     } else {
       forEach(Object.values(entities), (entity) => {
-        // filterOptions.title = filterOptions.title || option.label;
-        // filterOptions.search = filterOptions.search || option.search;
         if (typeof entity.attributes[option.attribute] !== 'undefined' && entity.attributes[option.attribute] !== null) {
           const value = entity.attributes[option.attribute].toString();
           const queryValue = `${option.attribute}:${value}`;
@@ -61,7 +63,7 @@ export const makeAttributeFilterOptions = (entities, { filters, activeFilterOpti
           if (option.extension && !!entity[option.extension.key]) {
             const extension = Object.values(entity[option.extension.key])[0];
             filterOptions.options[value] = {
-              label: extension ? extension.attributes[option.extension.label] : value,
+              label: extension ? extension.attributes[option.extension.label] : upperFirst(value),
               value: queryValue,
               count: 1,
               query: 'where',
@@ -72,7 +74,7 @@ export const makeAttributeFilterOptions = (entities, { filters, activeFilterOpti
           } else if (option.options) {
             const attribute = find(option.options, (o) => o.value.toString() === value);
             filterOptions.options[value] = {
-              label: attribute ? attribute.label : value,
+              label: attribute ? attribute.label : upperFirst(value),
               value: queryValue,
               count: 1,
               query: 'where',
@@ -87,7 +89,7 @@ export const makeAttributeFilterOptions = (entities, { filters, activeFilterOpti
           } else {
             const queryValue = `${option.attribute}:null`;
             filterOptions.options.without = {
-              label: `Without ${option.label}`,
+              label: `${messages.without} ${lowerCase(option.label)}`,
               value: queryValue,
               count: 1,
               query: 'where',
@@ -104,7 +106,7 @@ export const makeAttributeFilterOptions = (entities, { filters, activeFilterOpti
 //
 //
 //
-export const makeTaxonomyFilterOptions = (entities, { filters, taxonomies, activeFilterOption, location }) => {
+export const makeTaxonomyFilterOptions = (entities, { filters, taxonomies, activeFilterOption, location }, messages) => {
   const locationQuery = location.query;
 
   const filterOptions = {
@@ -115,6 +117,7 @@ export const makeTaxonomyFilterOptions = (entities, { filters, taxonomies, activ
   // get the active taxonomy
   const taxonomy = taxonomies[parseInt(activeFilterOption.optionId, 10)];
   if (taxonomy) {
+    filterOptions.title = `${messages.titlePrefix} ${lowerCase(taxonomy.attributes.title)}`;
     if (entities.length === 0) {
       if (locationQuery[filters.taxonomies.query]) {
         const locationQueryValue = locationQuery[filters.taxonomies.query];
@@ -139,7 +142,7 @@ export const makeTaxonomyFilterOptions = (entities, { filters, taxonomies, activ
           if (!isNaN(parseFloat(queryValue)) && isFinite(queryValue) && taxonomy.id === queryValue) {
             const value = parseInt(queryValue, 10);
             filterOptions.options[value] = {
-              label: `Without ${taxonomy.attributes.title}`,
+              label: `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
               value,
               count: 0,
               query: 'without',
@@ -179,7 +182,7 @@ export const makeTaxonomyFilterOptions = (entities, { filters, taxonomies, activ
           filterOptions.options.without.count += 1;
         } else {
           filterOptions.options.without = {
-            label: `Without ${taxonomy.attributes.title}`,
+            label: `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
             value: taxonomy.id,
             count: 1,
             query: 'without',
@@ -195,7 +198,7 @@ export const makeTaxonomyFilterOptions = (entities, { filters, taxonomies, activ
 //
 //
 //
-export const makeConnectionFilterOptions = (entities, { filters, connections, activeFilterOption, location }) => {
+export const makeConnectionFilterOptions = (entities, { filters, connections, activeFilterOption, location }, messages) => {
   const locationQuery = location.query;
 
   const filterOptions = {
@@ -206,6 +209,7 @@ export const makeConnectionFilterOptions = (entities, { filters, connections, ac
   const option = find(filters.connections.options, (o) => o.path === activeFilterOption.optionId);
   // if option active
   if (option) {
+    filterOptions.title = `${messages.titlePrefix} ${lowerCase(option.label)}`;
     // if no entities found show any active options
     if (entities.length === 0) {
       if (locationQuery[option.query]) {
@@ -230,7 +234,7 @@ export const makeConnectionFilterOptions = (entities, { filters, connections, ac
         forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
           if (option.query === queryValue) {
             filterOptions.options[queryValue] = {
-              label: `Without ${option.label}`,
+              label: `${messages.without} ${lowerCase(option.label)}`,
               value: queryValue,
               count: 0,
               query: 'without',
@@ -241,8 +245,6 @@ export const makeConnectionFilterOptions = (entities, { filters, connections, ac
       }
     } else {
       forEach(Object.values(entities), (entity) => {
-        filterOptions.title = filterOptions.title || option.label;
-        filterOptions.search = filterOptions.search || option.search;
         // if entity has connected entities
         if (entity[option.path]) {
           // add connected entities if not present otherwise increase count
@@ -274,7 +276,7 @@ export const makeConnectionFilterOptions = (entities, { filters, connections, ac
           filterOptions.options.without.count += 1;
         } else {
           filterOptions.options.without = {
-            label: `Without ${option.label}`,
+            label: `${messages.without} ${lowerCase(option.label)}`,
             value: option.query,
             count: 1,
             query: 'without',
@@ -313,7 +315,7 @@ const getConnectedCategoryIds = (entity, connection, taxonomy) => {
 };
 
 
-export const makeConnectedTaxonomyFilterOptions = (entities, { filters, connectedTaxonomies, activeFilterOption, location }) => {
+export const makeConnectedTaxonomyFilterOptions = (entities, { filters, connectedTaxonomies, activeFilterOption, location }, messages) => {
   const locationQuery = location.query;
 
   const filterOptions = {
@@ -324,6 +326,7 @@ export const makeConnectedTaxonomyFilterOptions = (entities, { filters, connecte
 
   const taxonomy = connectedTaxonomies.taxonomies[parseInt(activeFilterOption.optionId, 10)];
   if (taxonomy) {
+    filterOptions.title = `${messages.titlePrefix} ${lowerCase(taxonomy.attributes.title)}`;
     const query = filters.connectedTaxonomies.query;
     const locationQueryValue = locationQuery[query];
     if (entities.length === 0) {
@@ -363,7 +366,6 @@ export const makeConnectedTaxonomyFilterOptions = (entities, { filters, connecte
             forEach(categoryIds, (categoryId) => {
               // if category of current taxonomy
               if (taxonomy.categories[categoryId]) {
-                // filterOptions.title = filterOptions.title || taxonomy.attributes.title;
                 // if category already added
                 if (filterOptions.options[categoryId]) {
                   filterOptions.options[categoryId].count += 1;

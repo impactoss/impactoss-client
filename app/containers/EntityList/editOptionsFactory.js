@@ -1,7 +1,6 @@
 import { find, forEach, map, reduce } from 'lodash/collection';
 import { STATES as CHECKBOX } from 'components/forms/IndeterminateCheckbox';
 
-
 export const checkedState = (count, length) => {
   if (count === length) {
     return CHECKBOX.CHECKED;
@@ -11,21 +10,21 @@ export const checkedState = (count, length) => {
   return CHECKBOX.UNCHECKED;
 };
 
-export const makeActiveEditOptions = (entities, props) => {
+export const makeActiveEditOptions = (entities, props, messages) => {
   // create edit options
   switch (props.activeEditOption.group) {
     case 'taxonomies':
-      return makeTaxonomyEditOptions(entities, props);
+      return makeTaxonomyEditOptions(entities, props, messages);
     case 'connections':
-      return makeConnectionEditOptions(entities, props);
+      return makeConnectionEditOptions(entities, props, messages);
     case 'attributes':
-      return makeAttributeEditOptions(entities, props);
+      return makeAttributeEditOptions(entities, props, messages);
     default:
       return null;
   }
 };
 
-export const makeAttributeEditOptions = (entities, { edits, activeEditOption }) => {
+export const makeAttributeEditOptions = (entities, { edits, activeEditOption }, messages) => {
   const editOptions = {
     groupId: 'attributes',
     search: true,
@@ -37,7 +36,7 @@ export const makeAttributeEditOptions = (entities, { edits, activeEditOption }) 
 
   const option = find(edits.attributes.options, (o) => o.attribute === activeEditOption.optionId);
   if (option) {
-    editOptions.title = option.label;
+    editOptions.title = messages.title;
     forEach(option.options, (attributeOption) => {
       const count = reduce(entities, (counter, entity) =>
         typeof entity.attributes[option.attribute] !== 'undefined'
@@ -58,7 +57,7 @@ export const makeAttributeEditOptions = (entities, { edits, activeEditOption }) 
   return editOptions;
 };
 
-export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption }) => {
+export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption }, messages) => {
   const editOptions = {
     groupId: 'taxonomies',
     search: true,
@@ -69,7 +68,7 @@ export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption
 
   const taxonomy = taxonomies[parseInt(activeEditOption.optionId, 10)];
   if (taxonomy) {
-    editOptions.title = taxonomy.attributes.title;
+    editOptions.title = messages.title;
     editOptions.multiple = taxonomy.attributes.allow_multiple;
     forEach(taxonomy.categories, (category) => {
       const count = reduce(entities, (counter, entity) => {
@@ -89,7 +88,7 @@ export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption
   return editOptions;
 };
 
-export const makeConnectionEditOptions = (entities, { edits, connections, activeEditOption }) => {
+export const makeConnectionEditOptions = (entities, { edits, connections, activeEditOption }, messages) => {
   const editOptions = {
     groupId: 'connections',
     search: true,
@@ -100,7 +99,7 @@ export const makeConnectionEditOptions = (entities, { edits, connections, active
 
   const option = find(edits.connections.options, (o) => o.path === activeEditOption.optionId);
   if (option) {
-    editOptions.title = option.label;
+    editOptions.title = messages.title;
     editOptions.path = option.connectPath;
     forEach(connections[option.path], (connection) => {
       const count = reduce(entities, (counter, entity) => {

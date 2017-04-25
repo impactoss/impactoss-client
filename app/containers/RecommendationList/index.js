@@ -14,6 +14,7 @@ import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 export class RecommendationList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -86,15 +87,16 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         label: 'By attribute',
         options: [
           {
-            label: 'Status',
+            search: false,
+            label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
           },
         ],
       },
       taxonomies: { // filter by each category
-        label: 'By category',
         query: 'cat',
+        search: true,
         connected: {
           path: 'recommendation_categories',
           key: 'recommendation_id',
@@ -102,10 +104,9 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         },
       },
       connections: { // filter by associated entity
-        label: 'By connection',
         options: [
           {
-            label: 'Actions',
+            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
             path: 'measures', // filter by recommendation connection
             query: 'actions',
             key: 'measure_id',
@@ -120,16 +121,14 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     };
     const edits = {
       taxonomies: { // edit category
-        label: 'Update categories',
         connectPath: 'recommendation_categories',
         key: 'category_id',
         ownKey: 'recommendation_id',
       },
       connections: { // filter by associated entity
-        label: 'Update connections',
         options: [
           {
-            label: 'Actions',
+            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
             path: 'measures',
             connectPath: 'recommendation_measures', // filter by recommendation connection
             key: 'measure_id',
@@ -140,10 +139,9 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         ],
       },
       attributes: {  // edit attribute value
-        label: 'Update attribute',
         options: [
           {
-            label: 'Status',
+            label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
           },

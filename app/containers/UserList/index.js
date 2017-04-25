@@ -13,6 +13,7 @@ import EntityList from 'containers/EntityList';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 export class UserList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -77,7 +78,6 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
     // specify the filter and query  options
     const filters = {
       taxonomies: { // filter by each category
-        label: 'By category',
         query: 'cat',
         search: true,
         connected: {
@@ -87,10 +87,9 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
         },
       },
       connections: { // filter by associated entity
-        label: 'By connection',
         options: [
           {
-            label: 'Roles',
+            label: this.context.intl.formatMessage(appMessages.entities.roles.plural),
             path: 'roles', // filter by user connection
             query: 'roles',
             key: 'role_id',
@@ -105,8 +104,9 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
     };
     const edits = {
       taxonomies: { // edit category
-        label: 'Update categories',
         connectPath: 'user_categories',
+        key: 'category_id',
+        ownKey: 'user_id',
       },
     };
     const headerOptions = {

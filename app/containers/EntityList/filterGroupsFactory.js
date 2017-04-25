@@ -7,7 +7,7 @@ export const makeFilterGroups = ({
   connections,
   connectedTaxonomies,
   activeFilterOption,
-}) => {
+}, messages) => {
   const filterGroups = {};
 
   // taxonomy option group
@@ -15,7 +15,7 @@ export const makeFilterGroups = ({
     // first prepare taxonomy options
     filterGroups.taxonomies = {
       id: 'taxonomies', // filterGroupId
-      label: filters.taxonomies.label,
+      label: messages.taxonomies,
       show: true,
       options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
         ...taxOptions,
@@ -33,7 +33,7 @@ export const makeFilterGroups = ({
     // first prepare taxonomy options
     filterGroups.connectedTaxonomies = {
       id: 'connectedTaxonomies', // filterGroupId
-      label: filters.connectedTaxonomies.label,
+      label: messages.connectedTaxonomies,
       show: true,
       options: reduce(Object.values(connectedTaxonomies.taxonomies), (taxOptions, taxonomy) => ({
         ...taxOptions,
@@ -51,7 +51,7 @@ export const makeFilterGroups = ({
     // first prepare taxonomy options
     filterGroups.connections = {
       id: 'connections', // filterGroupId
-      label: filters.connections.label,
+      label: messages.connections,
       show: true,
       options: reduce(filters.connections.options, (options, option) => ({
         ...options,
@@ -69,7 +69,7 @@ export const makeFilterGroups = ({
     // first prepare taxonomy options
     filterGroups.attributes = {
       id: 'attributes', // filterGroupId
-      label: filters.attributes.label,
+      label: messages.attributes,
       show: true,
       options: reduce(filters.attributes.options, (options, option) => ({
         ...options,

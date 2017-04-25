@@ -14,6 +14,7 @@ import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 export class IndicatorList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -74,15 +75,15 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         ],
       },
       attributes: {  // filter by attribute value
-        label: 'By attribute',
         options: [
           {
-            label: 'Status',
+            search: false,
+            label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
           },
           {
-            label: 'Manager',
+            label: this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
             attribute: 'manager_id',
             extension: {
               key: 'manager',
@@ -96,7 +97,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         label: 'By connection',
         options: [
           {
-            label: 'Actions',
+            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
             path: 'measures', // filter by indicator connection
             query: 'actions',
             key: 'measure_id',
@@ -111,10 +112,9 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
     };
     const edits = {
       connections: { // filter by associated entity
-        label: 'Update connections',
         options: [
           {
-            label: 'Actions',
+            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
             path: 'measures', // filter by recommendation connection
             connectPath: 'measure_indicators',
             key: 'measure_id',
@@ -124,10 +124,9 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         ],
       },
       attributes: {  // edit attribute value
-        label: 'Update attribute',
         options: [
           {
-            label: 'Status',
+            label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
           },
