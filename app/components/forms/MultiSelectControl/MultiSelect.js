@@ -113,7 +113,7 @@ export default class MultiSelect extends React.Component {
       const initialChecked = option.get('checked');
       const isThreeState = threeState && option.get('checked') === CHECKBOX_STATES.INDETERMINATE;
       return option.withMutations((o) =>
-        o.set('checked', value ? value.get('checked') : option.get('checked'))
+        o.set('checked', value ? value.get('checked') : false)
         .set('initialChecked', initialChecked)
         .set('isThreeState', isThreeState));
     })

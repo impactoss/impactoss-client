@@ -63,6 +63,7 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(formActions.reset(model));
   },
   populateForm: (model, options) => {
+    console.log('populateForm', options.toJS())
     dispatch(formActions.load(model, Map({ values: options })));
   },
 });
