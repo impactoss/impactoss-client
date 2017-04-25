@@ -1,15 +1,29 @@
 import { Map, List } from 'immutable';
 
 
-export const entityOption = (entity) => Map({
+export const entityOption = (entity, reference) => Map({
   value: entity.get('id'),
-  label: entity.getIn(['attributes', 'title']),
+  label: reference ? Map({
+    reference,
+    main: entity.getIn(['attributes', 'title']),
+  })
+  : entity.getIn(['attributes', 'title']),
   checked: !!entity.get('associated'),
+  order: reference || entity.getIn(['attributes', 'title']),
 });
 
-export const entityOptions = (entities) => entities
-  ? entities.reduce((options, entity) =>
-    options.push(entityOption(entity)), List())
+export const entityOptions = (entities, includeReference) => entities
+  ? entities.reduce((options, entity) => {
+    if (includeReference) {
+      return options.push(entityOption(
+        entity,
+        entity.hasIn(['attributes', 'number'])
+        ? entity.getIn(['attributes', 'number'])
+        : entity.get('id')
+      ));
+    }
+    return options.push(entityOption(entity));
+  }, List())
   : List();
 
 export const roleOption = (entity) => Map({
@@ -74,7 +88,7 @@ export const renderRecommendationControl = (entities) => entities
   dataPath: ['associatedRecommendations'],
   label: 'Recommendations',
   controlType: 'multiselect',
-  options: entityOptions(entities),
+  options: entityOptions(entities, true),
 }
 : null;
 

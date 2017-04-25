@@ -1,7 +1,9 @@
 import React, { PropTypes } from 'react';
 import { List } from 'immutable';
-import { kebabCase } from 'lodash/string';
+import { kebabCase, lowerCase } from 'lodash/string';
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
+
+import Option from './Option';
 
 export const getChangedOptions = (options) =>
   options.filter((o) => o.get('hasChanged'));
@@ -22,9 +24,9 @@ export const getUncheckedValuesFromOptions = (options, onlyChanged = false) => {
 };
 
 const sortValues = {
-  [CHECKBOX_STATES.CHECKED]: 1,
+  [CHECKBOX_STATES.CHECKED]: -1,
   [CHECKBOX_STATES.INDETERMINATE]: 0,
-  [CHECKBOX_STATES.UNCHECKED]: -1,
+  [CHECKBOX_STATES.UNCHECKED]: 1,
 };
 
 export default class MultiSelect extends React.Component {
@@ -43,6 +45,17 @@ export default class MultiSelect extends React.Component {
     threeState: false,
     multiple: true,
     required: false,
+  }
+
+  getOrder = (option) => {
+    if (typeof option.get('order') !== 'undefined') {
+      return lowerCase(option.get('order').toString());
+    } else if (typeof option.get('label') === 'string') {
+      return lowerCase(option.get('label'));
+    } else if (option.hasIn(['label', 'main'])) {
+      return lowerCase(option.getIn(['label', 'main']).toString());
+    }
+    return 'zzzzzzzzz';
   }
 
   getNextValues = (checked, option) => {
@@ -73,7 +86,8 @@ export default class MultiSelect extends React.Component {
 
   renderCheckbox = (option, i) => {
     const checked = option.get('checked');
-    const label = option.get('label');
+    // TODO consider isImmutable (need to upgrade to immutable v4)
+    const label = typeof option.get('label') === 'string' ? option.get('label') : option.get('label').toJS();
     const isThreeState = option.get('isThreeState');
     const id = `${checked}-${i}-${kebabCase(option.get('value'))}`;
     return (
@@ -99,29 +113,47 @@ export default class MultiSelect extends React.Component {
           />
         }
         <label htmlFor={id} >
-          {label}
+          {typeof label === 'string' &&
+            <Option label={label} />
+          }
+          {typeof label === 'object' &&
+            <Option
+              bold={label.bold || checked}
+              reference={label.reference && label.reference.toString()}
+              label={label.main}
+              count={label.count && option.get('count')}
+            />
+          }
         </label>
       </div>
     );
   }
 
-
   render() {
     const { options, values, threeState } = this.props;
     const checkboxes = options.map((option) => {
       const value = values.find((v) => option.get('value') === v.get('value'));
-      const initialChecked = option.get('checked');
-      const isThreeState = threeState && option.get('checked') === CHECKBOX_STATES.INDETERMINATE;
       return option.withMutations((o) =>
         o.set('checked', value ? value.get('checked') : false)
-        .set('initialChecked', initialChecked)
-        .set('isThreeState', isThreeState));
+        .set('initialChecked', option.get('checked'))
+        .set('isThreeState', threeState && option.get('checked') === CHECKBOX_STATES.INDETERMINATE)
+        .set('order', this.getOrder(option))
+      );
     })
     .sort((a, b) => {
-      const aSort = sortValues[a.get('initialChecked')];
-      const bSort = sortValues[b.get('initialChecked')];
-      if (aSort > bSort) return -1;
-      if (aSort < bSort) return 1;
+      const aSort = a.get('order');
+      const bSort = b.get('order');
+      // first check for 0 order
+      if (aSort === '0' && aSort < bSort) return -1;
+      if (bSort === '0' && bSort < aSort) return 1;
+      // then check checked state
+      const aSortChecked = sortValues[a.get('initialChecked')];
+      const bSortChecked = sortValues[b.get('initialChecked')];
+      if (aSortChecked < bSortChecked) return -1;
+      if (aSortChecked > bSortChecked) return 1;
+      // if same checked state, sort by order value
+      if (aSort < bSort) return -1;
+      if (aSort > bSort) return 1;
       return 0;
     });
 

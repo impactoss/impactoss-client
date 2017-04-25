@@ -50,7 +50,7 @@ export const makeAttributeEditOptions = (entities, { edits, activeEditOption }, 
         value: attributeOption.value,
         attribute: option.attribute,
         checked: checkedState(count, entities.length),
-        count,
+        order: attributeOption.label,
       };
     });
   }
@@ -77,11 +77,12 @@ export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption
           : [];
         return categoryIds && categoryIds.indexOf(category.id) > -1 ? counter + 1 : counter;
       }, 0);
+      const label = category.attributes.title || category.attributes.name;
       editOptions.options[category.id] = {
-        label: category.attributes.title,
+        label,
         value: category.id,
         checked: checkedState(count, entities.length),
-        count,
+        order: label,
       };
     });
   }
@@ -108,11 +109,15 @@ export const makeConnectionEditOptions = (entities, { edits, connections, active
           : null;
         return connectedIds && connectedIds.indexOf(connection.id) > -1 ? counter + 1 : counter;
       }, 0);
+      const reference = connection.attributes.number || connection.id;
       editOptions.options[connection.id] = {
-        label: connection.attributes.title,
+        label: {
+          reference,
+          main: connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name,
+        },
         value: connection.id,
         checked: checkedState(count, entities.length),
-        count,
+        order: reference,
       };
     });
   }
