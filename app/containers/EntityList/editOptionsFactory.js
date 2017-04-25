@@ -1,4 +1,15 @@
 import { find, forEach, map, reduce } from 'lodash/collection';
+import { STATES as CHECKBOX } from 'components/forms/IndeterminateCheckbox';
+
+
+export const checkedState = (count, length) => {
+  if (count === length) {
+    return CHECKBOX.CHECKED;
+  } else if (count < length && count > 0) {
+    return CHECKBOX.INDETERMINATE;
+  }
+  return CHECKBOX.UNCHECKED;
+};
 
 export const makeActiveEditOptions = (entities, props) => {
   // create edit options
@@ -34,13 +45,12 @@ export const makeAttributeEditOptions = (entities, { edits, activeEditOption }) 
           ? counter + 1
           : counter
       , 0);
+
       editOptions.options[attributeOption.value] = {
         label: attributeOption.label,
         value: attributeOption.value,
         attribute: option.attribute,
-        all: count === entities.length,
-        none: count === 0,
-        some: count > 0 && count < entities.length,
+        checked: checkedState(count, entities.length),
         count,
       };
     });
@@ -71,9 +81,7 @@ export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption
       editOptions.options[category.id] = {
         label: category.attributes.title,
         value: category.id,
-        all: count === entities.length,
-        none: count === 0,
-        some: count > 0 && count < entities.length,
+        checked: checkedState(count, entities.length),
         count,
       };
     });
@@ -104,9 +112,7 @@ export const makeConnectionEditOptions = (entities, { edits, connections, active
       editOptions.options[connection.id] = {
         label: connection.attributes.title,
         value: connection.id,
-        all: count === entities.length,
-        none: count === 0,
-        some: count > 0 && count < entities.length,
+        checked: checkedState(count, entities.length),
         count,
       };
     });

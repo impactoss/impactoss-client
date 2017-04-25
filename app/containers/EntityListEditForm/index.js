@@ -1,16 +1,15 @@
 import React, { PropTypes } from 'react';
-import Immutable from 'immutable';
+import { Map, List } from 'immutable';
 import { connect } from 'react-redux';
 import { isEqual } from 'lodash/lang';
 import { Form, actions as formActions } from 'react-redux-form/immutable';
 import MultiSelectControl from 'components/forms/MultiSelectControl';
-// import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 class EntityListEditForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     model: PropTypes.string.isRequired,
-    options: PropTypes.instanceOf(Immutable.List),
+    options: PropTypes.instanceOf(List),
     onSubmit: PropTypes.func,
     onClose: PropTypes.func,
     title: PropTypes.string,
@@ -32,7 +31,6 @@ class EntityListEditForm extends React.Component { // eslint-disable-line react/
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('componentWillReceiveProps', nextProps)
      // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
     if (!isEqual(nextProps.options.toJS(), this.props.options.toJS())) {
       this.props.populateForm(nextProps.model, nextProps.options);
@@ -75,7 +73,7 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(formActions.reset(model));
   },
   populateForm: (model, options) => {
-    dispatch(formActions.load(model, options));
+    dispatch(formActions.load(model, Map({ values: options })));
   },
 });
 

@@ -5,15 +5,14 @@
  */
 
 import React, { PropTypes } from 'react';
-import Immutable, { Map } from 'immutable';
+import { Map } from 'immutable';
 
 import EntityListEditForm from 'containers/EntityListEditForm';
 // import Option from 'containers/EntityListEditForm/Option';
-import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 export default class EntityListEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
-    editGroups: PropTypes.instanceOf(Immutable.Map),
+    editGroups: PropTypes.instanceOf(Map),
     formOptions: PropTypes.object,
     onShowEditForm: PropTypes.func.isRequired,
     onHideEditForm: PropTypes.func.isRequired,
@@ -21,24 +20,8 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
     onAssign: PropTypes.func.isRequired,
   };
 
-  getFormOptions = (formOptions) =>
-    formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
-      value: option.get('value'),
-      checked: this.getCheckState(option),
-      query: option.get('query'),
-      label: `${option.get('label')} (${option.get('count')})`,
-      // label: <Option label={option.get('label')} count={option.get('count')} />,
-    }));
-
-  getCheckState = (option) => {
-    if (option.get('all')) {
-      return CHECKBOX_STATES.checked;
-    }
-    if (option.get('none')) {
-      return CHECKBOX_STATES.unchecked;
-    }
-    return CHECKBOX_STATES.indeterminate;
-  }
+  // getFormOptions = (formOptions) =>
+  //   formOptions.toList().sortBy((option) => option.get('label'));
 
   renderEditGroup = (group, groupId) => (
     <div key={groupId}>
@@ -50,7 +33,6 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
               <button
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  // Here we are recording the path to the "edit options" that we want to display within this.props.editOptions
                   this.props.onShowEditForm({
                     group: group.get('id'),
                     optionId: option.get('id'),
@@ -80,7 +62,7 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
           <EntityListEditForm
             model={formModel}
             title={formOptions.get('title')}
-            options={this.getFormOptions(formOptions.get('options'))}
+            options={formOptions.get('options').toList()}
             multiple={formOptions.get('multiple')}
             required={formOptions.get('required')}
             onClose={onHideEditForm}

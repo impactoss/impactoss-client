@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import Immutable from 'immutable';
+import { Map, List } from 'immutable';
 import { connect } from 'react-redux';
 import { isEqual } from 'lodash/lang';
 import { Form, actions as formActions } from 'react-redux-form/immutable';
@@ -9,7 +9,7 @@ class EntityListFilterForm extends React.Component { // eslint-disable-line reac
 
   static propTypes = {
     model: PropTypes.string.isRequired,
-    options: PropTypes.instanceOf(Immutable.List),
+    options: PropTypes.instanceOf(List),
     handleSubmit: PropTypes.func,
     onClose: PropTypes.func,
     title: PropTypes.string,
@@ -63,8 +63,7 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(formActions.reset(model));
   },
   populateForm: (model, options) => {
-    // console.log('populateForm', model, options.toJS());
-    dispatch(formActions.load(model, options));
+    dispatch(formActions.load(model, Map({ values: options })));
   },
 });
 

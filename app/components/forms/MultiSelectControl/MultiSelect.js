@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import Immutable from 'immutable';
+import { List } from 'immutable';
 import { kebabCase } from 'lodash/string';
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
@@ -22,16 +22,16 @@ export const getUncheckedValuesFromOptions = (options, onlyChanged = false) => {
 };
 
 const sortValues = {
-  [CHECKBOX_STATES.checked]: 1,
-  [CHECKBOX_STATES.indeterminate]: 0,
-  [CHECKBOX_STATES.unchecked]: -1,
+  [CHECKBOX_STATES.CHECKED]: 1,
+  [CHECKBOX_STATES.INDETERMINATE]: 0,
+  [CHECKBOX_STATES.UNCHECKED]: -1,
 };
 
 export default class MultiSelect extends React.Component {
 
   static propTypes = {
-    options: PropTypes.instanceOf(Immutable.List),
-    values: PropTypes.instanceOf(Immutable.List),
+    options: PropTypes.instanceOf(List),
+    values: PropTypes.instanceOf(List),
     onChange: PropTypes.func.isRequired,
     threeState: PropTypes.bool,
     multiple: PropTypes.bool,
@@ -39,7 +39,7 @@ export default class MultiSelect extends React.Component {
   }
 
   static defaultProps = {
-    values: new Immutable.List(),
+    values: new List(),
     threeState: false,
     multiple: true,
     required: false,
@@ -47,12 +47,16 @@ export default class MultiSelect extends React.Component {
 
   getNextValues = (checked, option) => {
     const { multiple, required, values } = this.props;
-    // console.log('getNextValues', values.toJS())
-    const otherCheckedValues = values.find((v) => v.get('checked') && !v.get('value') === option.get('value'));
+
     // do not update if required and change would result in empty list
-    if (!checked && required && !otherCheckedValues) {
-      return values;
+    if (!checked && required) {
+      const otherCheckedValues = values.find((v) => v.get('checked') && !v.get('value') === option.get('value'));
+      if (!otherCheckedValues) {
+        return values;
+      }
     }
+
+    // uncheck all others if single mode (!multiple)
     let nextValues = values;
     const existingValueIndex = values.findIndex((v) => v.get('value') === option.get('value'));
     if (!multiple && checked) {
@@ -61,13 +65,13 @@ export default class MultiSelect extends React.Component {
         existingValueIndex !== index ? value.set('checked', false).set('hasChanged', true) : value
       );
     }
+    // set new value
     const newValue = option.set('checked', checked).set('hasChanged', true);
     // set current value, add if not present
     return existingValueIndex > -1 ? nextValues.set(existingValueIndex, newValue) : nextValues.push(newValue);
   }
 
   renderCheckbox = (option, i) => {
-    // console.log('renderCheckbox', option.toJS())
     const checked = option.get('checked');
     const label = option.get('label');
     const isThreeState = option.get('isThreeState');
@@ -78,8 +82,8 @@ export default class MultiSelect extends React.Component {
           <IndeterminateCheckbox
             id={id}
             checked={checked}
-            onChange={(status) => {
-              this.props.onChange(this.getNextValues(status, option));
+            onChange={(checkedState) => {
+              this.props.onChange(this.getNextValues(checkedState, option));
             }}
           />
         }
@@ -104,13 +108,12 @@ export default class MultiSelect extends React.Component {
 
   render() {
     const { options, values, threeState } = this.props;
-    // console.log('render', options.toJS(), values.toJS())
     const checkboxes = options.map((option) => {
       const value = values.find((v) => option.get('value') === v.get('value'));
       const initialChecked = option.get('checked');
-      const isThreeState = threeState && option.get('checked') === CHECKBOX_STATES.indeterminate;
+      const isThreeState = threeState && option.get('checked') === CHECKBOX_STATES.INDETERMINATE;
       return option.withMutations((o) =>
-        o.set('checked', value ? value.get('checked') : false)
+        o.set('checked', value ? value.get('checked') : option.get('checked'))
         .set('initialChecked', initialChecked)
         .set('isThreeState', isThreeState));
     })
@@ -121,7 +124,7 @@ export default class MultiSelect extends React.Component {
       if (aSort < bSort) return 1;
       return 0;
     });
-    //
+
     return (
       <div>
         {checkboxes && checkboxes.map(this.renderCheckbox)}

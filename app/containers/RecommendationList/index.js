@@ -126,7 +126,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         ownKey: 'recommendation_id',
       },
       connections: { // filter by associated entity
-        label: 'Update conections',
+        label: 'Update connections',
         options: [
           {
             label: 'Actions',

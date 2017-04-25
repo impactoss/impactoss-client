@@ -187,7 +187,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         ownKey: 'measure_id',
       },
       connections: { // filter by associated entity
-        label: 'Update conections',
+        label: 'Update connections',
         options: [
           {
             label: 'Indicators',
