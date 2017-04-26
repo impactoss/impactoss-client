@@ -6,9 +6,11 @@
 
 import React, { PropTypes } from 'react';
 import { Map } from 'immutable';
+import styled from 'styled-components';
 
-import EntityListEditForm from 'containers/EntityListEditForm';
-// import Option from 'containers/EntityListEditForm/Option';
+import EntityListForm from 'containers/EntityListForm';
+
+const Component = styled.div``;
 
 export default class EntityListEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
@@ -19,9 +21,6 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
     formModel: PropTypes.string,
     onAssign: PropTypes.func.isRequired,
   };
-
-  // getFormOptions = (formOptions) =>
-  //   formOptions.toList().sortBy((option) => option.get('label'));
 
   renderEditGroup = (group, groupId) => (
     <div key={groupId}>
@@ -54,22 +53,34 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
   render() {
     const { editGroups, formOptions, onHideEditForm, formModel, onAssign } = this.props;
     return (
-      <div>
+      <Component>
         { editGroups &&
           editGroups.entrySeq().map(([groupId, group]) => this.renderEditGroup(group, groupId))
         }
         { formOptions &&
-          <EntityListEditForm
+          <EntityListForm
             model={formModel}
             title={formOptions.get('title')}
             options={formOptions.get('options').toList()}
             multiple={formOptions.get('multiple')}
             required={formOptions.get('required')}
-            onClose={onHideEditForm}
             onSubmit={onAssign}
+            buttons={[
+              {
+                type: 'simple',
+                title: 'Cancel',
+                onClick: onHideEditForm,
+              },
+              {
+                type: 'primary',
+                title: 'Assign',
+                submit: true,
+                // TODO consider making button inactive when form unchanged
+              },
+            ]}
           />
         }
-      </div>
+      </Component>
     );
   }
 }

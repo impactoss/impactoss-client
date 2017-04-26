@@ -14,7 +14,7 @@ export default styled(Link)`
   font-weight: bold;
   font-size: 16px;
   border-right: 1px solid;
-  color: #000;
+  color: #fff;
 
   &:active {
     background: #41ADDD;

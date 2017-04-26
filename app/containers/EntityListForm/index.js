@@ -1,0 +1,159 @@
+import React, { PropTypes } from 'react';
+import { Map, List } from 'immutable';
+import { connect } from 'react-redux';
+import { isEqual } from 'lodash/lang';
+import { Form, actions as formActions } from 'react-redux-form/immutable';
+import styled from 'styled-components';
+
+import MultiSelectControl from 'components/forms/MultiSelectControl';
+
+import PrimaryAction from 'components/basic/Button/PrimaryAction';
+import SimpleAction from 'components/basic/Button/SimpleAction';
+
+const ButtonGroup = styled.div`
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    text-align:right;
+  }
+`;
+
+const FormWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: 300px;
+  background: #fff;
+  overflow: none;
+`;
+const FormHeader = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #ddd;
+  height: 50px;
+`;
+const FormFooter = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ddd;
+  height: 50px;
+`;
+const FormMain = styled.div`
+  position: absolute;
+  top: 50px;
+  bottom: 50px;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+`;
+
+
+class EntityListForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
+
+  static propTypes = {
+    model: PropTypes.string.isRequired,
+    options: PropTypes.instanceOf(List),
+    onSubmit: PropTypes.func,
+    title: PropTypes.string,
+    populateForm: PropTypes.func.isRequired,
+    multiple: PropTypes.bool,
+    required: PropTypes.bool,
+    buttons: PropTypes.object,
+  }
+
+  static defaultProps = {
+    multiple: true,
+    required: false,
+  }
+
+  componentWillMount() {
+    this.props.populateForm(this.props.model, this.getInitialFormData());
+  }
+
+  componentWillReceiveProps(nextProps) {
+     // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
+    if (!isEqual(nextProps.options.toJS(), this.props.options.toJS())) {
+      this.props.populateForm(nextProps.model, this.getInitialFormData(nextProps));
+    }
+  }
+
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const { options } = props;
+    return options;
+  }
+
+  renderButton = (action, i) => {
+    if (action.type === 'primary') {
+      return (
+        <PrimaryAction
+          key={i}
+          onClick={action.onClick && (() => action.onClick())}
+          type={action.submit ? 'submit' : 'button'}
+        >
+          {action.title}
+        </PrimaryAction>
+      );
+    }
+    return (
+      <SimpleAction
+        key={i}
+        onClick={action.onClick && (() => action.onClick())}
+        type={action.submit ? 'submit' : 'button'}
+      >
+        {action.title}
+      </SimpleAction>
+    );
+  }
+
+  render() {
+    return (
+      <FormWrapper>
+        <Form
+          model={this.props.model}
+          onSubmit={this.props.onSubmit}
+        >
+          <FormHeader>
+            { this.props.title &&
+              <strong>{this.props.title}</strong>
+            }
+          </FormHeader>
+          <FormMain>
+            <MultiSelectControl
+              model=".values"
+              threeState
+              multiple={this.props.multiple}
+              required={this.props.required}
+              options={this.props.options}
+            />
+          </FormMain>
+          <FormFooter>
+            { this.props.buttons &&
+              <ButtonGroup>
+                {
+                  this.props.buttons.map((action, i) => (
+                    this.renderButton(action, i)
+                  ))
+                }
+              </ButtonGroup>
+            }
+          </FormFooter>
+        </Form>
+      </FormWrapper>
+    );
+  }
+}
+
+const mapDispatchToProps = (dispatch) => ({
+  // resetForm: (model) => {
+  //   dispatch(formActions.reset(model));
+  // },
+  populateForm: (model, options) => {
+    dispatch(formActions.load(model, Map({ values: options })));
+  },
+});
+
+export default connect(null, mapDispatchToProps)(EntityListForm);
