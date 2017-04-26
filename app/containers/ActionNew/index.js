@@ -14,11 +14,18 @@ import { Map, List } from 'immutable';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
-import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
-import { getEntities, isReady } from 'containers/App/selectors';
+
+import {
+  loadEntitiesIfNeeded,
+  redirectIfNotPermitted,
+  updatePath,
+  updateEntityForm,
+} from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
+
+import { getEntities, isReady } from 'containers/App/selectors';
 
 import {
   renderRecommendationControl,
@@ -99,6 +106,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
+              handleUpdate={this.props.handleUpdate}
               fields={{
                 header: {
                   main: [
@@ -150,6 +158,7 @@ ActionNew.propTypes = {
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
@@ -253,6 +262,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleCancel: () => {
       dispatch(updatePath('/actions'));
+    },
+    handleUpdate: (formData) => {
+      dispatch(updateEntityForm(formData));
     },
   };
 }

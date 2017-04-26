@@ -45,6 +45,7 @@ import {
   UPDATE_ROUTE_QUERY,
   UPDATE_PATH,
   AUTHENTICATE_FORWARD,
+  UPDATE_ENTITY_FORM,
 } from './constants';
 
 
@@ -305,5 +306,12 @@ export function updatePath(path) {
 export function forwardOnAuthenticationChange() {
   return {
     type: AUTHENTICATE_FORWARD,
+  };
+}
+
+export function updateEntityForm(data) {
+  return {
+    type: UPDATE_ENTITY_FORM,
+    data,
   };
 }

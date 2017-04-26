@@ -10,7 +10,12 @@ import Helmet from 'react-helmet';
 // import { FormattedMessage } from 'react-intl';
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
-import { redirectIfNotPermitted, updatePath } from 'containers/App/actions';
+
+import {
+  redirectIfNotPermitted,
+  updatePath,
+  updateEntityForm,
+} from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -75,6 +80,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
             formData={viewDomain.form.data}
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
             handleCancel={this.props.handleCancel}
+            handleUpdate={this.props.handleUpdate}
             fields={{
               header: {
                 main: [
@@ -128,6 +134,7 @@ PageNew.propTypes = {
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
 };
@@ -153,6 +160,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleCancel: () => {
       dispatch(updatePath('/pages'));
+    },
+    handleUpdate: (formData) => {
+      dispatch(updateEntityForm(formData));
     },
   };
 }

@@ -13,8 +13,14 @@ import { List } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
 import { USER_ROLES } from 'containers/App/constants';
+
+import {
+  loadEntitiesIfNeeded,
+  redirectIfNotPermitted,
+  updatePath,
+  updateEntityForm,
+} from 'containers/App/actions';
 
 import {
   getEntity,
@@ -119,6 +125,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                 taxonomyReference
               )}
               handleCancel={() => this.props.handleCancel(taxonomyReference)}
+              handleUpdate={this.props.handleUpdate}
               fields={{
                 header: {
                   main: [
@@ -171,6 +178,7 @@ CategoryNew.propTypes = {
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
   viewDomain: PropTypes.object,
@@ -236,6 +244,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleCancel: (taxonomyReference) => {
       dispatch(updatePath(`/categories/${taxonomyReference}`));
+    },
+    handleUpdate: (formData) => {
+      dispatch(updateEntityForm(formData));
     },
   };
 }

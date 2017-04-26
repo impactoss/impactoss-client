@@ -77,7 +77,7 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
       actions: [{
         type: 'primary',
         title: 'New page',
-        onClick: () => this.props.handleNew,
+        onClick: () => this.props.handleNew(),
       }],
     };
 

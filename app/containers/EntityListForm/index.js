@@ -7,49 +7,15 @@ import styled from 'styled-components';
 
 import MultiSelectControl from 'components/forms/MultiSelectControl';
 
-import PrimaryAction from 'components/basic/Button/PrimaryAction';
-import SimpleAction from 'components/basic/Button/SimpleAction';
-
-const ButtonGroup = styled.div`
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    text-align:right;
-  }
-`;
-
 const FormWrapper = styled.div`
   position: absolute;
   top: 0;
   bottom: 0;
   left: 100%;
-  width: 300px;
+  min-width: 300px;
   background: #fff;
-  overflow: none;
+  overflow: hidden;
 `;
-const FormHeader = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #ddd;
-  height: 50px;
-`;
-const FormFooter = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #ddd;
-  height: 50px;
-`;
-const FormMain = styled.div`
-  position: absolute;
-  top: 50px;
-  bottom: 50px;
-  left: 0;
-  right: 0;
-  overflow-y: auto;
-`;
-
 
 class EntityListForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -61,7 +27,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
     populateForm: PropTypes.func.isRequired,
     multiple: PropTypes.bool,
     required: PropTypes.bool,
-    buttons: PropTypes.object,
+    buttons: PropTypes.array,
   }
 
   static defaultProps = {
@@ -86,29 +52,6 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
     return options;
   }
 
-  renderButton = (action, i) => {
-    if (action.type === 'primary') {
-      return (
-        <PrimaryAction
-          key={i}
-          onClick={action.onClick && (() => action.onClick())}
-          type={action.submit ? 'submit' : 'button'}
-        >
-          {action.title}
-        </PrimaryAction>
-      );
-    }
-    return (
-      <SimpleAction
-        key={i}
-        onClick={action.onClick && (() => action.onClick())}
-        type={action.submit ? 'submit' : 'button'}
-      >
-        {action.title}
-      </SimpleAction>
-    );
-  }
-
   render() {
     return (
       <FormWrapper>
@@ -116,31 +59,15 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
           model={this.props.model}
           onSubmit={this.props.onSubmit}
         >
-          <FormHeader>
-            { this.props.title &&
-              <strong>{this.props.title}</strong>
-            }
-          </FormHeader>
-          <FormMain>
-            <MultiSelectControl
-              model=".values"
-              threeState
-              multiple={this.props.multiple}
-              required={this.props.required}
-              options={this.props.options}
-            />
-          </FormMain>
-          <FormFooter>
-            { this.props.buttons &&
-              <ButtonGroup>
-                {
-                  this.props.buttons.map((action, i) => (
-                    this.renderButton(action, i)
-                  ))
-                }
-              </ButtonGroup>
-            }
-          </FormFooter>
+          <MultiSelectControl
+            model=".values"
+            threeState
+            multiple={this.props.multiple}
+            required={this.props.required}
+            options={this.props.options}
+            title={this.props.title}
+            buttons={this.props.buttons}
+          />
         </Form>
       </FormWrapper>
     );

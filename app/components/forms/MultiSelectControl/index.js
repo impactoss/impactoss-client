@@ -10,7 +10,16 @@ import MultiSelect, {
 } from './MultiSelect';
 
 const MultiSelectControl = (props) => {
-  const { model, options, threeState, multiple, required, ...otherProps } = props;
+  const {
+    model,
+    options,
+    threeState,
+    multiple,
+    required,
+    title,
+    buttons,
+     ...otherProps
+  } = props;
   return (
     <Control
       type="multiselect"
@@ -25,6 +34,8 @@ const MultiSelectControl = (props) => {
         threeState,
         multiple,
         required,
+        buttons,
+        title,
       }}
       {...otherProps}
     />
@@ -37,7 +48,8 @@ MultiSelectControl.propTypes = {
   multiple: PropTypes.bool,
   required: PropTypes.bool,
   options: PropTypes.instanceOf(List),
-  valueCompare: PropTypes.func,
+  title: PropTypes.string,
+  buttons: PropTypes.array,
 };
 
 export default MultiSelectControl;

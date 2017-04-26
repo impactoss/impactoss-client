@@ -1,9 +1,43 @@
 import React, { PropTypes } from 'react';
 import { List } from 'immutable';
 import { kebabCase, lowerCase } from 'lodash/string';
+import styled from 'styled-components';
+
+import PrimaryAction from 'components/basic/Button/PrimaryAction';
+import SimpleAction from 'components/basic/Button/SimpleAction';
+
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import Option from './Option';
+
+const ButtonGroup = styled.div`
+  text-align:right;
+`;
+const ControlWrapper = styled.div``;
+const ControlHeader = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #ddd;
+  height: 50px;
+`;
+const ControlFooter = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ddd;
+  height: 50px;
+`;
+const ControlMain = styled.div`
+  position: absolute;
+  top: 50px;
+  bottom: 50px;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+`;
 
 export const getChangedOptions = (options) =>
   options.filter((o) => o.get('hasChanged'));
@@ -38,6 +72,8 @@ export default class MultiSelect extends React.Component {
     threeState: PropTypes.bool,
     multiple: PropTypes.bool,
     required: PropTypes.bool,
+    title: PropTypes.string,
+    buttons: PropTypes.array,
   }
 
   static defaultProps = {
@@ -128,7 +164,28 @@ export default class MultiSelect extends React.Component {
       </div>
     );
   }
-
+  renderButton = (action, i) => {
+    if (action.type === 'primary') {
+      return (
+        <PrimaryAction
+          key={i}
+          onClick={action.onClick && (() => action.onClick())}
+          type={action.submit ? 'submit' : 'button'}
+        >
+          {action.title}
+        </PrimaryAction>
+      );
+    }
+    return (
+      <SimpleAction
+        key={i}
+        onClick={action.onClick && (() => action.onClick())}
+        type={action.submit ? 'submit' : 'button'}
+      >
+        {action.title}
+      </SimpleAction>
+    );
+  }
   render() {
     const { options, values, threeState } = this.props;
     const checkboxes = options.map((option) => {
@@ -158,9 +215,27 @@ export default class MultiSelect extends React.Component {
     });
 
     return (
-      <div>
-        {checkboxes && checkboxes.map(this.renderCheckbox)}
-      </div>
+      <ControlWrapper>
+        <ControlHeader>
+          { this.props.title &&
+            <strong>{this.props.title}</strong>
+          }
+        </ControlHeader>
+        <ControlMain>
+          {checkboxes && checkboxes.map(this.renderCheckbox)}
+        </ControlMain>
+        <ControlFooter>
+          { this.props.buttons &&
+            <ButtonGroup>
+              {
+                this.props.buttons.map((action, i) => (
+                  this.renderButton(action, i)
+                ))
+              }
+            </ButtonGroup>
+          }
+        </ControlFooter>
+      </ControlWrapper>
     );
   }
 }

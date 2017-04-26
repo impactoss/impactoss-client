@@ -8,7 +8,6 @@ const selectActionEditDomain = (state) => state.get('actionEdit');
 /**
  * Default selector used by ActionEdit
  */
-
 const viewDomainSelect = createSelector(
   selectActionEditDomain,
   (substate) => substate.toJS()

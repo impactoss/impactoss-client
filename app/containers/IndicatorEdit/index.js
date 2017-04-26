@@ -16,7 +16,12 @@ import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
-import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  redirectIfNotPermitted,
+  updatePath,
+  updateEntityForm,
+} from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -131,6 +136,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                 this.props.actions
               )}
               handleCancel={this.props.handleCancel}
+              handleUpdate={this.props.handleUpdate}
               fields={{
                 header: {
                   main: [
@@ -223,6 +229,7 @@ IndicatorEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   indicator: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -356,6 +363,9 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleCancel: () => {
       dispatch(updatePath(`/indicators/${props.params.id}`));
+    },
+    handleUpdate: (formData) => {
+      dispatch(updateEntityForm(formData));
     },
   };
 }
