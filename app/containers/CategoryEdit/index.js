@@ -16,7 +16,12 @@ import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl
 
 import { USER_ROLES } from 'containers/App/constants';
 
-import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  redirectIfNotPermitted,
+  updatePath,
+  updateEntityForm,
+} from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -128,6 +133,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={() => this.props.handleCancel(reference)}
+              handleUpdate={this.props.handleUpdate}
               fields={{
                 header: {
                   main: [
@@ -196,6 +202,7 @@ CategoryEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   category: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -281,11 +288,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
       dispatch(updatePath(`/category/${reference}`));
+    },
+    handleUpdate: (formData) => {
+      dispatch(updateEntityForm(formData));
     },
   };
 }

@@ -14,7 +14,12 @@ import { fromJS } from 'immutable';
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
-import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  redirectIfNotPermitted,
+  updatePath,
+  updateEntityForm,
+} from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -107,6 +112,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
+              handleUpdate={this.props.handleUpdate}
               fields={{
                 header: {
                   main: [
@@ -178,6 +184,7 @@ PageEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
@@ -230,6 +237,9 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleCancel: () => {
       dispatch(updatePath(`/pages/${props.params.id}`));
+    },
+    handleUpdate: (formData) => {
+      dispatch(updateEntityForm(formData));
     },
   };
 }

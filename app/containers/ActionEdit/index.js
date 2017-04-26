@@ -16,7 +16,12 @@ import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
-import { loadEntitiesIfNeeded, redirectIfNotPermitted, updatePath } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  redirectIfNotPermitted,
+  updatePath,
+  updateEntityForm,
+} from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -36,7 +41,6 @@ import {
 } from 'utils/forms';
 
 import viewDomainSelect from './selectors';
-
 import messages from './messages';
 import { save } from './actions';
 
@@ -137,6 +141,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 this.props.indicators
               )}
               handleCancel={this.props.handleCancel}
+              handleUpdate={this.props.handleUpdate}
               fields={{
                 header: {
                   main: [
@@ -204,6 +209,7 @@ ActionEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   action: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -407,6 +413,9 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleCancel: () => {
       dispatch(updatePath(`/actions/${props.params.id}`));
+    },
+    handleUpdate: (formData) => {
+      dispatch(updateEntityForm(formData));
     },
   };
 }

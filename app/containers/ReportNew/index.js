@@ -13,7 +13,13 @@ import { List } from 'immutable';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { PUBLISH_STATUSES } from 'containers/App/constants';
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+
+import {
+  loadEntitiesIfNeeded,
+  updatePath,
+  updateEntityForm,
+} from 'containers/App/actions';
+
 import { getEntity, isReady } from 'containers/App/selectors';
 
 import Page from 'components/Page';
@@ -99,6 +105,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                 indicatorReference
               )}
               handleCancel={() => this.props.handleCancel(indicatorReference)}
+              handleUpdate={this.props.handleUpdate}
               fields={{
                 header: {
                   main: [
@@ -158,6 +165,7 @@ ReportNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   indicator: PropTypes.object,
@@ -216,6 +224,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleCancel: (indicatorReference) => {
       dispatch(updatePath(`/indicators/${indicatorReference}`));
+    },
+    handleUpdate: (formData) => {
+      dispatch(updateEntityForm(formData));
     },
   };
 }

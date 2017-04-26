@@ -3,6 +3,9 @@ import { omit } from 'lodash/object';
 import { startCase } from 'lodash/string';
 import { Control, Form, Errors } from 'react-redux-form/immutable';
 import Grid from 'grid-styled';
+import styled from 'styled-components';
+
+import { lowerCase } from 'utils/string';
 
 import Row from 'components/basic/Row';
 import FormWrapper from 'components/basic/FormWrapper';
@@ -32,6 +35,19 @@ const controls = {
 // These props will be omitted before being passed to the Control component
 const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
 
+const MultiSelectWrapper = styled.div`
+  position: absolute;
+  top: 30px;
+  right: 0;
+  height:300px;
+  width: 100%;
+  min-width: 300px;
+  background: #fff;
+  overflow: hidden;
+  display: block;
+  z-index: 10;
+`;
+
 class EntityForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor() {
@@ -41,12 +57,31 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     };
   }
 
-
   onLabelClick = (field) => {
     if (field.controlType === 'multiselect') {
       this.setState({
         multiselectOpen: this.state.multiselectOpen !== field.id ? field.id : null,
       });
+    }
+  }
+  onCloseMultiSelect = () => {
+    this.setState({
+      multiselectOpen: null,
+    });
+  }
+  onMultiSelectItemRemove = (option, field) => {
+    const fieldData = this.props.formData.getIn(field.dataPath);
+    const formDataUpdated = this.props.formData.setIn(
+      field.dataPath,
+      fieldData.map((d) => {
+        if (option.get('value') === d.get('value')) {
+          return d.set('checked', false);
+        }
+        return d;
+      })
+    );
+    if (this.props.handleUpdate) {
+      this.props.handleUpdate(formDataUpdated);
     }
   }
 
@@ -80,24 +115,29 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   }
 
   renderMultiselectActiveOptions = (options, field) =>
-    options.map((option, i) => (
-      <li key={i}>
-        <a
-          href="#add"
-          onClick={(evt) => {
-            if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-            this.onLabelClick(field);
-          }}
-        >
-          {option.get('label')}
-        </a>
-      </li>
-    ));
+    options.map((option, i) => {
+      // TODO consider isImmutable (need to upgrade to immutable v4)
+      const label = typeof option.get('label') === 'string' ? option.get('label') : option.get('label').toJS();
+      return (
+        <li key={i}>
+          {`${typeof label === 'object' ? label.main : label} `}
+          <a
+            href="#remove"
+            onClick={(evt) => {
+              if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+              this.onMultiSelectItemRemove(option, field);
+            }}
+          >
+            X
+          </a>
+        </li>
+      );
+    });
 
   renderField = (field) => {
     const FieldComponent = this.getFieldComponent(field);
     const { id, model, ...props } = this.getControlProps(field);
-    if (field.controlType === 'multiselect' && this.state.multiselectOpen !== field.id) {
+    if (field.controlType === 'multiselect') {
       let activeOptions;
       // use form data if already loaded
       if (this.props.formData.hasIn(field.dataPath)) {
@@ -106,22 +146,41 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       } else {
         activeOptions = field.options.filter((o) => o.get('checked'));
       }
-      return activeOptions.size > 0
-      ? (
-        <ul>
-          {this.renderMultiselectActiveOptions(activeOptions, field)}
-        </ul>
-      )
-      : (
-        <a
-          href="#add"
-          onClick={(evt) => {
-            if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-            this.onLabelClick(field);
-          }}
-        >
-          {`No ${field.label} yet. Click to add`}
-        </a>
+      return (
+        <div>
+          {
+            activeOptions.size > 0
+            ? (
+              <ul>{this.renderMultiselectActiveOptions(activeOptions, field)}</ul>
+            )
+            : (
+              <a
+                href="#add"
+                onClick={(evt) => {
+                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                  this.onLabelClick(field);
+                }}
+              >{`Without ${lowerCase(field.label)}. Click to add`}</a>
+            )
+          }
+          { this.state.multiselectOpen === id &&
+            <MultiSelectWrapper>
+              <FieldComponent
+                id={id}
+                model={model || `.${id}`}
+                title={`Update ${lowerCase(field.label)}`}
+                buttons={[
+                  {
+                    type: 'primary',
+                    title: 'Close',
+                    onClick: this.onCloseMultiSelect,
+                  },
+                ]}
+                {...props}
+              />
+            </MultiSelectWrapper>
+          }
+        </div>
       );
     }
     return (
@@ -218,6 +277,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
 EntityForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func,
   model: PropTypes.string,
   fields: PropTypes.object,
   formData: PropTypes.object,

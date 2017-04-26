@@ -14,7 +14,11 @@ import { Map, List, fromJS } from 'immutable';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  updatePath,
+  updateEntityForm,
+} from 'containers/App/actions';
 
 import Page from 'components/Page';
 import EntityForm from 'components/forms/EntityForm';
@@ -128,6 +132,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 this.props.roles
               )}
               handleCancel={() => this.props.handleCancel(reference)}
+              handleUpdate={this.props.handleUpdate}
               fields={{
                 header: {
                   main: [
@@ -194,6 +199,7 @@ UserEdit.propTypes = {
   populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   user: PropTypes.object,
   roles: PropTypes.object,
@@ -341,6 +347,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleCancel: (reference) => {
       dispatch(updatePath(`/users/${reference}`));
+    },
+    handleUpdate: (formData) => {
+      dispatch(updateEntityForm(formData));
     },
   };
 }
