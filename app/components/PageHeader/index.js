@@ -2,10 +2,10 @@ import React, { PropTypes } from 'react';
 import styled from 'styled-components';
 import Grid from 'grid-styled';
 
-import Row from 'components/basic/Row';
+import PrimaryAction from 'components/basic/Button/PrimaryAction';
+import SimpleAction from 'components/basic/Button/SimpleAction';
+
 import H1 from './H1';
-import PrimaryAction from './PrimaryAction';
-import SimpleAction from './SimpleAction';
 
 const Styled = styled.div`
   padding:40px 0;
@@ -18,14 +18,7 @@ const ButtonGroup = styled.div`
 
 class PageHeader extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
-  renderAction = (action, i) => {
-    if (action.type === 'simple') {
-      return (
-        <SimpleAction key={i} onClick={() => action.onClick()}>
-          {action.title}
-        </SimpleAction>
-      );
-    }
+  renderButton = (action, i) => {
     if (action.type === 'primary') {
       return (
         <PrimaryAction key={i} onClick={() => action.onClick()}>
@@ -33,28 +26,30 @@ class PageHeader extends React.Component { // eslint-disable-line react/prefer-s
         </PrimaryAction>
       );
     }
-    return null;
+    return (
+      <SimpleAction key={i} onClick={() => action.onClick()}>
+        {action.title}
+      </SimpleAction>
+    );
   }
 
   render() {
     return (
       <Styled>
-        <Row>
-          <Grid sm={1 / 2} >
-            <H1>{this.props.title}</H1>
-          </Grid>
-          <Grid sm={1 / 2}>
-            { this.props.actions &&
-              <ButtonGroup>
-                {
-                  this.props.actions.map((action, i) => (
-                    this.renderAction(action, i)
-                  ))
-                }
-              </ButtonGroup>
-            }
-          </Grid>
-        </Row>
+        <Grid sm={1 / 2} >
+          <H1>{this.props.title}</H1>
+        </Grid>
+        <Grid sm={1 / 2}>
+          { this.props.actions &&
+            <ButtonGroup>
+              {
+                this.props.actions.map((action, i) => (
+                  this.renderButton(action, i)
+                ))
+              }
+            </ButtonGroup>
+          }
+        </Grid>
       </Styled>
     );
   }

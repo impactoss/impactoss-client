@@ -10,19 +10,18 @@ import { Form } from 'react-redux-form/immutable';
 
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
 import { pick } from 'lodash/object';
-import { getEntitySortIteratee } from 'utils/sort';
 import { Map, List, fromJS } from 'immutable';
+import styled from 'styled-components';
 
-import Grid from 'grid-styled';
+import { getEntitySortIteratee } from 'utils/sort';
 
 import Loading from 'components/Loading';
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListFilters from 'components/EntityListFilters';
 import EntityListEdit from 'components/EntityListEdit';
-
 import PageHeader from 'components/PageHeader';
 import EntityListItem from 'components/EntityListItem';
-import Row from 'components/basic/Row';
+import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
 import Container from 'components/basic/Container';
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
@@ -57,6 +56,10 @@ import {
 } from './actions';
 
 import messages from './messages';
+
+const Styled = styled.div`
+  padding:0 20px;
+`;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -104,101 +107,101 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     ];
 
     return (
-      <Container>
-        <Row>
-          <Grid sm={1 / 4}>
-            <EntityListSidebar
-              options={panelSwitchOptions}
-            >
-              { dataReady && activePanel === FILTERS_PANEL &&
-                <EntityListFilters
-                  filterGroups={
-                    fromJS(makeFilterGroups(
-                      this.props,
-                      {
-                        attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
-                        taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
-                        connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
-                        connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
-                      }
-                    ))
+      <div>
+        <EntityListSidebar
+          options={panelSwitchOptions}
+        >
+          { dataReady && activePanel === FILTERS_PANEL &&
+            <EntityListFilters
+              filterGroups={
+                fromJS(makeFilterGroups(
+                  this.props,
+                  {
+                    attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
+                    taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
+                    connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
+                    connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
                   }
-                  formOptions={
-                    activeFilterOption
-                    ? fromJS(makeActiveFilterOptions(
-                      entities,
-                      this.props,
-                      {
-                        titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
-                        without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
-                      }
-                    ))
-                    : null
-                  }
-                  formModel={FILTER_FORM_MODEL}
-                  onShowFilterForm={this.props.onShowFilterForm}
-                  onHideFilterForm={this.props.onHideFilterForm}
-                />
+                ))
               }
-              { dataReady && isManager && activePanel === EDIT_PANEL &&
-                <EntityListEdit
-                  editGroups={
-                    entitiesSelected.length
-                    ? fromJS(makeEditGroups(
-                      this.props,
-                      {
-                        attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
-                        taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
-                        connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
-                      }
-                    )) : null
+              formOptions={
+                activeFilterOption
+                ? fromJS(makeActiveFilterOptions(
+                  entities,
+                  this.props,
+                  {
+                    titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
+                    without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
                   }
-                  formOptions={
-                    activeEditOption && entitiesSelected.length
-                    ? fromJS(makeActiveEditOptions(
-                      entitiesSelected,
-                      this.props,
-                      { title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.length} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}` }
-                    ))
-                    : null
-                  }
-                  formModel={EDIT_FORM_MODEL}
-                  onShowEditForm={this.props.onShowEditForm}
-                  onHideEditForm={this.props.onHideEditForm}
-                  onAssign={(associations) => this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
-                />
+                ))
+                : null
               }
-            </EntityListSidebar>
-          </Grid>
-          <Grid sm={3 / 4}>
-            <PageHeader
-              title={this.props.header.title}
-              actions={
-                isManager
-                ? this.props.header.actions
-                : []
-              }
+              formModel={FILTER_FORM_MODEL}
+              onShowFilterForm={this.props.onShowFilterForm}
+              onHideFilterForm={this.props.onHideFilterForm}
             />
-            { !dataReady &&
-              <div>
-                <Loading />
-              </div>
-            }
-            { dataReady &&
-              <Form model={LISTINGS_FORM_MODEL}>
-                {entitiesList.map((entity, i) =>
-                  <EntityListItem
-                    key={i}
-                    model={`.entities.${entity.id}`}
-                    select={isManager}
-                    {...entity}
-                  />
-                )}
-              </Form>
-            }
-          </Grid>
-        </Row>
-      </Container>
+          }
+          { dataReady && isManager && activePanel === EDIT_PANEL &&
+            <EntityListEdit
+              editGroups={
+                entitiesSelected.length
+                ? fromJS(makeEditGroups(
+                  this.props,
+                  {
+                    attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
+                    taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
+                    connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
+                  }
+                )) : null
+              }
+              formOptions={
+                activeEditOption && entitiesSelected.length
+                ? fromJS(makeActiveEditOptions(
+                  entitiesSelected,
+                  this.props,
+                  { title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.length} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}` }
+                ))
+                : null
+              }
+              formModel={EDIT_FORM_MODEL}
+              onShowEditForm={this.props.onShowEditForm}
+              onHideEditForm={this.props.onHideEditForm}
+              onAssign={(associations) => this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
+            />
+          }
+        </EntityListSidebar>
+        <ContainerWithSidebar>
+          <Container>
+            <Styled>
+              <PageHeader
+                title={this.props.header.title}
+                actions={
+                  isManager
+                  ? this.props.header.actions
+                  : []
+                }
+              />
+              { !dataReady &&
+                <div>
+                  <Loading />
+                </div>
+              }
+              { dataReady &&
+                <Form model={LISTINGS_FORM_MODEL}>
+                  {entitiesList.map((entity, i) =>
+                    <EntityListItem
+                      key={i}
+                      model={`.entities.${entity.id}`}
+                      select={isManager}
+                      {...entity}
+                    />
+                  )}
+                </Form>
+              }
+            </Styled>
+          </Container>
+        </ContainerWithSidebar>
+      </div>
     );
   }
 }

@@ -7,8 +7,7 @@
 import React, { PropTypes } from 'react';
 import { Map } from 'immutable';
 
-import EntityListFilterForm from 'containers/EntityListFilterForm';
-// import Option from 'containers/EntityListFilterForm/Option';
+import EntityListForm from 'containers/EntityListForm';
 
 export default class EntityListFilters extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
@@ -18,19 +17,6 @@ export default class EntityListFilters extends React.Component { // eslint-disab
     onHideFilterForm: PropTypes.func.isRequired,
     formModel: PropTypes.string,
   };
-
-  // getFormOptions = (formOptions) =>
-  //   formOptions.toList().sortBy((option) => option.get('label'));
-  // getFormOptions(formOptions) {
-  //   // Display the options
-  //   return formOptions.toList().sortBy((option) => option.get('label')).map((option) => Map({
-  //     value: option.get('value'),
-  //     checked: option.get('checked'),
-  //     query: option.get('query'),
-  //     label: `${option.get('label')} (${option.get('count')})`,
-  //     // label: <Option label={option.get('label')} count={option.get('count')} />,
-  //   }));
-  // }
 
   renderFilterGroup = (group, groupId) => (
     <div key={groupId}>
@@ -60,19 +46,24 @@ export default class EntityListFilters extends React.Component { // eslint-disab
 
   render() {
     const { filterGroups, formOptions, onHideFilterForm, formModel } = this.props;
-    // console.log('filterGroups', filterGroups && filterGroups.toJS())
-    // console.log('formOptions', formOptions && formOptions.toJS())
+
     return (
       <div>
         { filterGroups &&
           filterGroups.entrySeq().map(([groupId, group]) => this.renderFilterGroup(group, groupId))
         }
         { formOptions &&
-          <EntityListFilterForm
+          <EntityListForm
             model={formModel}
             title={formOptions.get('title')}
             options={formOptions.get('options').toList()}
-            onClose={onHideFilterForm}
+            buttons={[
+              {
+                type: 'simple',
+                title: 'Close',
+                onClick: onHideFilterForm,
+              },
+            ]}
           />
         }
       </div>

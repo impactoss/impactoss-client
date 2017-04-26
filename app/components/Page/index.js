@@ -1,15 +1,18 @@
 import React, { PropTypes } from 'react';
 
 import Container from 'components/basic/Container';
+import ContainerWrapper from 'components/basic/Container/ContainerWrapper';
 import PageHeader from 'components/PageHeader';
 
 class Page extends React.Component { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
-      <Container>
-        <PageHeader title={this.props.title} actions={this.props.actions} />
-        {this.props.children}
-      </Container>
+      <ContainerWrapper>
+        <Container>
+          <PageHeader title={this.props.title} actions={this.props.actions} />
+          {this.props.children}
+        </Container>
+      </ContainerWrapper>
     );
   }
 }

@@ -13,6 +13,7 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
 
 import Header from 'components/Header';
 import {
@@ -22,6 +23,15 @@ import {
   isReady,
  } from './selectors';
 import { validateToken, loadEntitiesIfNeeded } from './actions';
+
+const Main = styled.div`
+  position: absolute;
+  top: 100px;
+  left: 0;
+  right: 0;
+  bottom:0;
+  overflow: hidden;
+`;
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -54,7 +64,9 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           isManager={this.props.isManager}
           userId={this.props.userId}
         />
-        {React.Children.toArray(this.props.children)}
+        <Main>
+          {React.Children.toArray(this.props.children)}
+        </Main>
       </div>
     );
   }
