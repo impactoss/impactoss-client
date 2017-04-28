@@ -74,8 +74,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       id: action.id,
       attributes: fromJS(action.attributes),
       associatedTaxonomies: taxonomyOptions(taxonomies),
-      associatedRecommendations: entityOptions(recommendations),
-      associatedIndicators: entityOptions(indicators),
+      associatedRecommendations: entityOptions(recommendations, true),
+      associatedIndicators: entityOptions(indicators, true),
     })
     : Map();
   }

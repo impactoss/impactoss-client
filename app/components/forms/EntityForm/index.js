@@ -41,7 +41,7 @@ const MultiSelectWrapper = styled.div`
   right: 0;
   height:300px;
   width: 100%;
-  min-width: 300px;
+  min-width: 350px;
   background: #fff;
   overflow: hidden;
   display: block;
@@ -115,24 +115,20 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   }
 
   renderMultiselectActiveOptions = (options, field) =>
-    options.map((option, i) => {
-      // TODO consider isImmutable (need to upgrade to immutable v4)
-      const label = typeof option.get('label') === 'string' ? option.get('label') : option.get('label').toJS();
-      return (
-        <li key={i}>
-          {`${typeof label === 'object' ? label.main : label} `}
-          <a
-            href="#remove"
-            onClick={(evt) => {
-              if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-              this.onMultiSelectItemRemove(option, field);
-            }}
-          >
-            X
-          </a>
-        </li>
-      );
-    });
+    options.map((option, i) => (
+      <li key={i}>
+        {`${option.get('label')} `}
+        <a
+          href="#remove"
+          onClick={(evt) => {
+            if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+            this.onMultiSelectItemRemove(option, field);
+          }}
+        >
+          X
+        </a>
+      </li>
+    ));
 
   renderField = (field) => {
     const FieldComponent = this.getFieldComponent(field);

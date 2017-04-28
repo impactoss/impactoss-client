@@ -3,11 +3,8 @@ import { Map, List } from 'immutable';
 
 export const entityOption = (entity, reference) => Map({
   value: entity.get('id'),
-  label: reference ? Map({
-    reference,
-    main: entity.getIn(['attributes', 'title']),
-  })
-  : entity.getIn(['attributes', 'title']),
+  label: entity.getIn(['attributes', 'title']),
+  reference,
   checked: !!entity.get('associated'),
   order: reference || entity.getIn(['attributes', 'title']),
 });
@@ -29,6 +26,7 @@ export const entityOptions = (entities, includeReference) => entities
 export const roleOption = (entity) => Map({
   value: entity.get('id'),
   label: entity.getIn(['attributes', 'friendly_name']),
+  search: entity.getIn(['attributes', 'name']),
   checked: !!entity.get('associated'),
 });
 
