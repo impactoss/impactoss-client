@@ -72,7 +72,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     ? Map({
       id: indicator.id,
       attributes: fromJS(indicator.attributes),
-      associatedActions: entityOptions(actions),
+      associatedActions: entityOptions(actions, true),
       associatedUser: userOptions(users, indicator.attributes.manager_id),
       // TODO allow single value for singleSelect
     })

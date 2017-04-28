@@ -73,7 +73,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       id: recommendation.id,
       attributes: fromJS(recommendation.attributes),
       associatedTaxonomies: taxonomyOptions(taxonomies),
-      associatedActions: entityOptions(actions),
+      associatedActions: entityOptions(actions, true),
     })
     : Map();
   };

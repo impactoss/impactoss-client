@@ -20,7 +20,26 @@ const ControlHeader = styled.div`
   left: 0;
   right: 0;
   background: #ddd;
-  height: 50px;
+  height: 40px;
+  padding: 5px;
+`;
+const ControlSearch = styled.div`
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  background: #fff;
+  height: 40px;
+  padding: 5px 10px;
+  border-left: 1px solid #E0E1E2;
+  border-right: 1px solid #E0E1E2;
+`;
+const Search = styled.input`
+  background:#ffffff;
+  width:100%;
+  border:1px solid #E0E1E2;
+  color:#000;
+  padding:5px;
 `;
 const ControlFooter = styled.div`
   position: absolute;
@@ -32,11 +51,14 @@ const ControlFooter = styled.div`
 `;
 const ControlMain = styled.div`
   position: absolute;
-  top: 50px;
+  top: 80px;
   bottom: 50px;
   left: 0;
   right: 0;
   overflow-y: auto;
+  padding:10px;
+  border-left: 1px solid #E0E1E2;
+  border-right: 1px solid #E0E1E2;
 `;
 
 export const getChangedOptions = (options) =>
@@ -75,6 +97,7 @@ export default class MultiSelect extends React.Component {
     required: PropTypes.bool,
     title: PropTypes.string,
     buttons: PropTypes.array,
+    filter: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -82,6 +105,21 @@ export default class MultiSelect extends React.Component {
     threeState: false,
     multiple: true,
     required: false,
+    filter: true,
+  }
+
+  constructor() {
+    super();
+    this.state = {
+      query: null,
+    };
+  }
+
+  onFilter = (evt) => {
+    if (evt && evt !== undefined) evt.stopPropagation();
+    this.setState({
+      query: evt.target.value,
+    });
   }
 
   getOrder = (option) => {
@@ -89,8 +127,6 @@ export default class MultiSelect extends React.Component {
       return lowerCase(option.get('order').toString());
     } else if (typeof option.get('label') === 'string') {
       return lowerCase(option.get('label'));
-    } else if (option.hasIn(['label', 'main'])) {
-      return lowerCase(option.getIn(['label', 'main']).toString());
     }
     return 'zzzzzzzzz';
   }
@@ -124,7 +160,6 @@ export default class MultiSelect extends React.Component {
   renderCheckbox = (option, i) => {
     const checked = option.get('checked');
     // TODO consider isImmutable (need to upgrade to immutable v4)
-    const label = typeof option.get('label') === 'string' ? option.get('label') : option.get('label').toJS();
     const isThreeState = option.get('isThreeState');
     const id = `${checked}-${i}-${kebabCase(option.get('value'))}`;
     return (
@@ -150,26 +185,21 @@ export default class MultiSelect extends React.Component {
           />
         }
         <label htmlFor={id} >
-          {typeof label === 'string' &&
-            <Option label={label} />
-          }
-          {typeof label === 'object' &&
-            <Option
-              bold={label.bold || checked}
-              reference={label.reference && label.reference.toString()}
-              label={label.main}
-              count={label.count && option.get('count')}
-            />
-          }
+          <Option
+            bold={option.get('labelBold') || checked}
+            reference={option.get('reference') && option.get('reference').toString()}
+            label={option.get('label')}
+            count={option.get('showCount') && option.get('count')}
+          />
         </label>
       </div>
     );
   }
 
   renderCancel = (onCancel) => (
-    <a href="#close" onClick={() => onCancel()} >
+    <SimpleAction onClick={onCancel} >
       X
-    </a>
+    </SimpleAction>
   );
 
   renderButton = (action, i) => {
@@ -196,7 +226,9 @@ export default class MultiSelect extends React.Component {
   }
   render() {
     const { options, values, threeState } = this.props;
-    const checkboxes = options.map((option) => {
+
+    // prepare checkboxes
+    let checkboxes = options.map((option) => {
       const value = values.find((v) => option.get('value') === v.get('value'));
       return option.withMutations((o) =>
         o.set('checked', value ? value.get('checked') : false)
@@ -204,8 +236,28 @@ export default class MultiSelect extends React.Component {
         .set('isThreeState', threeState && option.get('checked') === CHECKBOX_STATES.INDETERMINATE)
         .set('order', this.getOrder(option))
       );
-    })
-    .sort((a, b) => {
+    });
+
+    // filter checkboxes if needed
+    // match multiple words
+    // see http://stackoverflow.com/questions/5421952/how-to-match-multiple-words-in-regex
+    if (this.props.filter && this.state.query) {
+      try {
+        const regex = this.state.query.split(' ').reduce((memo, str) => `${memo}(?=.*\\b${str})`, '');
+        const pattern = new RegExp(regex, 'i');
+        checkboxes = checkboxes.filter((option) =>
+          pattern.test(option.get('value'))
+          || pattern.test(option.get('label'))
+          || pattern.test(option.get('reference'))
+          || pattern.test(option.get('search'))
+        );
+      } catch (e) {
+        // nothing
+      }
+    }
+
+    // sort checkboxes
+    checkboxes = checkboxes.sort((a, b) => {
       const aSort = a.get('order');
       const bSort = b.get('order');
       // first check for 0 order
@@ -221,7 +273,6 @@ export default class MultiSelect extends React.Component {
       if (aSort > bSort) return 1;
       return 0;
     });
-
     return (
       <ControlWrapper>
         <ControlHeader>
@@ -232,6 +283,11 @@ export default class MultiSelect extends React.Component {
             this.renderCancel(this.props.onCancel)
           }
         </ControlHeader>
+        { this.props.filter &&
+          <ControlSearch>
+            <Search id="search" onChange={this.onFilter} placeholder="Filter options" />
+          </ControlSearch>
+        }
         <ControlMain>
           {checkboxes && checkboxes.map(this.renderCheckbox)}
         </ControlMain>

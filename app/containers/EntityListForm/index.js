@@ -12,7 +12,7 @@ const FormWrapper = styled.div`
   top: 0;
   bottom: 0;
   left: 100%;
-  min-width: 300px;
+  min-width: 350px;
   background: #fff;
   overflow: hidden;
 `;
