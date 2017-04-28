@@ -75,6 +75,7 @@ export default class MultiSelect extends React.Component {
     required: PropTypes.bool,
     title: PropTypes.string,
     buttons: PropTypes.array,
+    filter: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -82,6 +83,21 @@ export default class MultiSelect extends React.Component {
     threeState: false,
     multiple: true,
     required: false,
+    filter: true,
+  }
+
+  constructor() {
+    super();
+    this.state = {
+      query: null,
+    };
+  }
+
+  onFilter = (evt) => {
+    if (evt && evt !== undefined) evt.stopPropagation();
+    this.setState({
+      query: evt.target.value,
+    });
   }
 
   getOrder = (option) => {
@@ -196,7 +212,9 @@ export default class MultiSelect extends React.Component {
   }
   render() {
     const { options, values, threeState } = this.props;
-    const checkboxes = options.map((option) => {
+
+    // prepare checkboxes
+    let checkboxes = options.map((option) => {
       const value = values.find((v) => option.get('value') === v.get('value'));
       return option.withMutations((o) =>
         o.set('checked', value ? value.get('checked') : false)
@@ -204,8 +222,27 @@ export default class MultiSelect extends React.Component {
         .set('isThreeState', threeState && option.get('checked') === CHECKBOX_STATES.INDETERMINATE)
         .set('order', this.getOrder(option))
       );
-    })
-    .sort((a, b) => {
+    });
+
+    // filter checkboxes if needed
+    // match multiple words
+    // see http://stackoverflow.com/questions/5421952/how-to-match-multiple-words-in-regex
+    if (this.props.filter && this.state.query) {
+      try {
+        const regex = this.state.query.split(' ').reduce((memo, str) => `${memo}(?=.*\\b${str})`, '');
+        const pattern = new RegExp(regex, 'i');
+        checkboxes = checkboxes.filter((option) => {
+          let label = typeof option.get('label') === 'string' ? option.get('label') : option.get('label').toJS();
+          if (typeof label === 'object') label = label.main;
+          return pattern.test(label);
+        });
+      } catch (e) {
+        // nothing
+      }
+    }
+
+    // sort checkboxes
+    checkboxes = checkboxes.sort((a, b) => {
       const aSort = a.get('order');
       const bSort = b.get('order');
       // first check for 0 order
@@ -221,7 +258,6 @@ export default class MultiSelect extends React.Component {
       if (aSort > bSort) return 1;
       return 0;
     });
-
     return (
       <ControlWrapper>
         <ControlHeader>
@@ -230,6 +266,9 @@ export default class MultiSelect extends React.Component {
           }
           { this.props.onCancel &&
             this.renderCancel(this.props.onCancel)
+          }
+          { this.props.filter &&
+            <input id="search" onChange={this.onFilter} placeholder="filter" />
           }
         </ControlHeader>
         <ControlMain>
