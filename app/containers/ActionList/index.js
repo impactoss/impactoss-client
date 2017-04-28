@@ -110,7 +110,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       attributes: {  // filter by attribute value
         options: [
           {
-            search: false,
+            filter: false,
             label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
@@ -119,7 +119,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       },
       taxonomies: { // filter by each category
         query: 'cat',
-        search: true,
+        filter: true,
         connected: {
           path: 'measure_categories',
           key: 'measure_id',
@@ -133,7 +133,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             path: 'indicators', // filter by recommendation connection
             query: 'indicators',
             key: 'indicator_id',
-            search: true,
+            filter: true,
             connected: {
               path: 'measure_indicators',
               key: 'measure_id',
@@ -156,7 +156,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       },
       connectedTaxonomies: { // filter by each category
         query: 'catx',
-        search: true,
+        filter: true,
         connections: [{
           path: 'recommendations', // filter by recommendation connection
           title: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
@@ -180,25 +180,25 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         connectPath: 'measure_categories',
         key: 'category_id',
         ownKey: 'measure_id',
+        filter: true,
       },
       connections: { // filter by associated entity
         options: [
           {
+            filter: true,
             label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
             path: 'indicators',
             connectPath: 'measure_indicators',
             key: 'indicator_id',
             ownKey: 'measure_id',
-            // search: true,
           },
           {
+            filter: true,
             label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
             path: 'recommendations',
             connectPath: 'recommendation_measures',
             key: 'recommendation_id',
             ownKey: 'measure_id',
-            // search: true,
-            // searchAttributes: ['number'],
           },
         ],
       },
@@ -208,6 +208,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
+            filter: false,
           },
         ],
       },

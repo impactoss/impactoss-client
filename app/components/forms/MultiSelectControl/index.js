@@ -18,6 +18,7 @@ const MultiSelectControl = (props) => {
     required,
     title,
     buttons,
+    filter,
      ...otherProps
   } = props;
   return (
@@ -36,6 +37,7 @@ const MultiSelectControl = (props) => {
         required,
         buttons,
         title,
+        filter,
       }}
       {...otherProps}
     />
@@ -47,6 +49,7 @@ MultiSelectControl.propTypes = {
   threeState: PropTypes.bool,
   multiple: PropTypes.bool,
   required: PropTypes.bool,
+  filter: PropTypes.bool,
   options: PropTypes.instanceOf(List),
   title: PropTypes.string,
   buttons: PropTypes.array,

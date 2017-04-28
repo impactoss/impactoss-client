@@ -87,7 +87,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         label: 'By attribute',
         options: [
           {
-            search: false,
+            filter: false,
             label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
@@ -96,7 +96,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       },
       taxonomies: { // filter by each category
         query: 'cat',
-        search: true,
+        filter: true,
         connected: {
           path: 'recommendation_categories',
           key: 'recommendation_id',
@@ -106,6 +106,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       connections: { // filter by associated entity
         options: [
           {
+            filter: true,
             label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
             path: 'measures', // filter by recommendation connection
             query: 'actions',
@@ -124,6 +125,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         connectPath: 'recommendation_categories',
         key: 'category_id',
         ownKey: 'recommendation_id',
+        filter: true,
       },
       connections: { // filter by associated entity
         options: [
@@ -133,7 +135,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             connectPath: 'recommendation_measures', // filter by recommendation connection
             key: 'measure_id',
             ownKey: 'recommendation_id',
-            // search: true,
+            filter: true,
 
           },
         ],
@@ -144,6 +146,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
+            filter: false,
           },
         ],
       },

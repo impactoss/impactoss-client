@@ -28,12 +28,14 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
     populateForm: PropTypes.func.isRequired,
     multiple: PropTypes.bool,
     required: PropTypes.bool,
+    filter: PropTypes.bool,
     buttons: PropTypes.array,
   }
 
   static defaultProps = {
     multiple: true,
     required: false,
+    filter: true,
   }
 
   componentWillMount() {
@@ -69,6 +71,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
             title={this.props.title}
             onCancel={this.props.onCancel}
             buttons={this.props.buttons}
+            filter={this.props.filter}
           />
         </Form>
       </FormWrapper>

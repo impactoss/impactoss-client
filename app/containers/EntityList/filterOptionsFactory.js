@@ -30,7 +30,7 @@ export const makeAttributeFilterOptions = (entities, { filters, activeFilterOpti
   const option = find(filters.attributes.options, (o) => o.attribute === activeFilterOption.optionId);
   if (option) {
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(option.label)}`;
-    // filterOptions.search = option.search;
+    filterOptions.filter = option.filter;
     const locationQueryValue = locationQuery.where;
     if (entities.length === 0) {
       if (locationQueryValue && option.options) {
@@ -120,7 +120,7 @@ export const makeTaxonomyFilterOptions = (entities, { filters, taxonomies, activ
 
   const filterOptions = {
     groupId: 'taxonomies',
-    search: filters.taxonomies.search,
+    filter: filters.taxonomies.filter,
     options: {},
   };
   // get the active taxonomy
@@ -229,6 +229,7 @@ export const makeConnectionFilterOptions = (entities, { filters, connections, ac
   // if option active
   if (option) {
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(option.label)}`;
+    filterOptions.filter = option.filter;
     // if no entities found show any active options
     if (entities.length === 0) {
       if (locationQuery[option.query]) {
@@ -348,7 +349,7 @@ export const makeConnectedTaxonomyFilterOptions = (entities, { filters, connecte
 
   const filterOptions = {
     groupId: 'connectedTaxonomies',
-    search: filters.connectedTaxonomies.search,
+    filter: filters.connectedTaxonomies.filter,
     options: {},
   };
 
