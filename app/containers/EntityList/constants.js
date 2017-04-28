@@ -15,7 +15,7 @@ export const RESET_STATE = 'nmrf/EntityList/RESET_STATE';
 export const REDUCER_PATH = 'entityList';
 export const FILTER_FORM_MODEL = `${REDUCER_PATH}.forms.filterData`;
 export const EDIT_FORM_MODEL = `${REDUCER_PATH}.forms.editData`;
-export const LISTINGS_FORM_MODEL = `${REDUCER_PATH}.forms.listingsData`;
+export const SELECTION_FORM_MODEL = `${REDUCER_PATH}.forms.selectionData`;
 
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';

@@ -64,7 +64,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       });
     }
   }
-  onCloseMultiSelect = () => {
+  onCloseMultiselect = () => {
     this.setState({
       multiselectOpen: null,
     });
@@ -169,11 +169,12 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                 id={id}
                 model={model || `.${id}`}
                 title={`Update ${lowerCase(field.label)}`}
+                onCancel={this.onCloseMultiselect}
                 buttons={[
                   {
                     type: 'primary',
                     title: 'Close',
-                    onClick: this.onCloseMultiSelect,
+                    onClick: this.onCloseMultiselect,
                   },
                 ]}
                 {...props}

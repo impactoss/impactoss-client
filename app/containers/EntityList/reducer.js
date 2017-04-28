@@ -17,7 +17,7 @@ import {
   FILTERS_PANEL,
   EDIT_PANEL,
   RESET_STATE,
-  LISTINGS_FORM_MODEL,
+  SELECTION_FORM_MODEL,
 } from './constants';
 
 const initialState = fromJS({
@@ -35,16 +35,15 @@ function entityListReducer(state = initialState, action) {
         .set('activeEditOption', null);
     case SHOW_FILTER_FORM:
       return state.set('activeFilterOption', action.option);
-    case HIDE_FILTER_FORM:
-      return state.set('activeFilterOption', null);
     case SHOW_EDIT_FORM:
       return state.set('activeEditOption', action.option);
+    case HIDE_FILTER_FORM:
     case HIDE_EDIT_FORM:
-      return state.set('activeEditOption', null);
     case RESET_STATE:
       return initialState;
     case 'rrf/change':
-      return action.model.substr(0, LISTINGS_FORM_MODEL.length) === LISTINGS_FORM_MODEL
+      // if selection changes
+      return action.model.substr(0, SELECTION_FORM_MODEL.length) === SELECTION_FORM_MODEL
         ? state
           .set('activePanel', EDIT_PANEL)
           .set('activeFilterOption', null)
@@ -58,14 +57,14 @@ function entityListReducer(state = initialState, action) {
 const formInitial = fromJS({
   values: [],
 });
-const listingsFormInitial = fromJS({
+const selectionFormInitial = fromJS({
   entities: {},
 });
 
 function filterFormReducer(state = formInitial, action) {
   switch (action.type) {
     case 'rrf/change':
-      return action.model.substr(0, LISTINGS_FORM_MODEL.length) === LISTINGS_FORM_MODEL
+      return action.model.substr(0, SELECTION_FORM_MODEL.length) === SELECTION_FORM_MODEL
         ? formInitial
         : state;
     case RESET_STATE:
@@ -83,12 +82,12 @@ function editFormReducer(state = formInitial, action) {
   }
 }
 
-function listingsFormReducer(state = listingsFormInitial, action) {
+function selectionFormReducer(state = selectionFormInitial, action) {
   switch (action.type) {
     case SHOW_PANEL:
-      return action.activePanel === FILTERS_PANEL ? listingsFormInitial : state;
+      return action.activePanel === FILTERS_PANEL ? selectionFormInitial : state;
     case RESET_STATE:
-      return listingsFormInitial;
+      return selectionFormInitial;
     default:
       return state;
   }
@@ -99,7 +98,7 @@ export default combineReducers({
   forms: combineForms({
     filterData: filterFormReducer,
     editData: editFormReducer,
-    listingsData: listingsFormReducer,
+    selectionData: selectionFormReducer,
   }, 'entityList.forms'),
 });
 

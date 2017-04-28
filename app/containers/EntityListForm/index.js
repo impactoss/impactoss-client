@@ -23,6 +23,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
     model: PropTypes.string.isRequired,
     options: PropTypes.instanceOf(List),
     onSubmit: PropTypes.func,
+    onCancel: PropTypes.func,
     title: PropTypes.string,
     populateForm: PropTypes.func.isRequired,
     multiple: PropTypes.bool,
@@ -66,6 +67,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
             required={this.props.required}
             options={this.props.options}
             title={this.props.title}
+            onCancel={this.props.onCancel}
             buttons={this.props.buttons}
           />
         </Form>

@@ -34,7 +34,7 @@ import { makeActiveEditOptions } from './editOptionsFactory';
 import {
   FILTER_FORM_MODEL,
   EDIT_FORM_MODEL,
-  LISTINGS_FORM_MODEL,
+  SELECTION_FORM_MODEL,
   FILTERS_PANEL,
   EDIT_PANEL,
 } from './constants';
@@ -187,7 +187,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 </div>
               }
               { dataReady &&
-                <Form model={LISTINGS_FORM_MODEL}>
+                <Form model={SELECTION_FORM_MODEL}>
                   {entitiesList.map((entity, i) =>
                     <EntityListItem
                       key={i}

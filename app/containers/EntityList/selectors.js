@@ -25,14 +25,14 @@ const editFormSelector = createSelector(
   (substate) => substate.get('forms').editData // TODO WTF HTF GRR
 );
 
-const listingsFormSelector = createSelector(
+const selectionFormSelector = createSelector(
   selectEntityListDomain,
-  (substate) => substate.get('forms').listingsData // TODO WTF HTF GRR
+  (substate) => substate.get('forms').selectionData // TODO WTF HTF GRR
 );
 
 // TODO enable better caching on this, it's expensive ish
 const entitiesSelectedSelector = createSelector(
-    listingsFormSelector,
+    selectionFormSelector,
     (form) => form.get('entities').reduce((selected, entity, id) => entity.get('selected') ? selected.concat(id) : selected, [])
 );
 
@@ -75,6 +75,6 @@ export {
   activeEditOptionSelector,
   filtersCheckedSelector,
   activePanelSelector,
-  listingsFormSelector,
+  selectionFormSelector,
   entitiesSelectedSelector,
 };

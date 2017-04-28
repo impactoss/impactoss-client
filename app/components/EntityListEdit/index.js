@@ -65,6 +65,7 @@ export default class EntityListEdit extends React.Component { // eslint-disable-
             multiple={formOptions.get('multiple')}
             required={formOptions.get('required')}
             onSubmit={onAssign}
+            onCancel={onHideEditForm}
             buttons={[
               {
                 type: 'simple',

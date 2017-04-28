@@ -69,6 +69,7 @@ export default class MultiSelect extends React.Component {
     options: PropTypes.instanceOf(List),
     values: PropTypes.instanceOf(List),
     onChange: PropTypes.func.isRequired,
+    onCancel: PropTypes.func,
     threeState: PropTypes.bool,
     multiple: PropTypes.bool,
     required: PropTypes.bool,
@@ -164,6 +165,13 @@ export default class MultiSelect extends React.Component {
       </div>
     );
   }
+
+  renderCancel = (onCancel) => (
+    <a href="#close" onClick={() => onCancel()} >
+      X
+    </a>
+  );
+
   renderButton = (action, i) => {
     if (action.type === 'primary') {
       return (
@@ -219,6 +227,9 @@ export default class MultiSelect extends React.Component {
         <ControlHeader>
           { this.props.title &&
             <strong>{this.props.title}</strong>
+          }
+          { this.props.onCancel &&
+            this.renderCancel(this.props.onCancel)
           }
         </ControlHeader>
         <ControlMain>

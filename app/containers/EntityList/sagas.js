@@ -13,6 +13,7 @@ import {
 } from 'containers/App/selectors';
 
 import {
+  hideFilterForm,
   hideEditForm,
   resetState,
 } from './actions';
@@ -30,6 +31,7 @@ export function* updateQuery(args) {
     remove: !value.get('checked'),
   })).toJS();
   yield put(updateRouteQuery(params));
+  yield put(hideFilterForm());
 }
 
 export function* saveEdits({ data }) {
