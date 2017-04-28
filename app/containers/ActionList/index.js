@@ -146,7 +146,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             query: 'recommendations',
             key: 'recommendation_id',
             search: true,
-            searchAttributes: ['number'],
             connected: {
               path: 'recommendation_measures',
               key: 'measure_id',
