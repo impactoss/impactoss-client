@@ -53,7 +53,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     const edit = {
       type: 'simple',
       title: 'Edit',
-      onClick: () => this.props.handleEdit(),
+      onClick: () => this.props.handleEdit(userId),
     };
     const close = {
       type: 'primary',
