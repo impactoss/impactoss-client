@@ -51,7 +51,7 @@ const ControlFooter = styled.div`
 `;
 const ControlMain = styled.div`
   position: absolute;
-  top: 80px;
+  top: ${(props) => props.filter ? '80px' : '40px'};
   bottom: 50px;
   left: 0;
   right: 0;
@@ -288,7 +288,7 @@ export default class MultiSelect extends React.Component {
             <Search id="search" onChange={this.onFilter} placeholder="Filter options" />
           </ControlSearch>
         }
-        <ControlMain>
+        <ControlMain filter={this.props.filter} >
           {checkboxes && checkboxes.map(this.renderCheckbox)}
         </ControlMain>
         <ControlFooter>

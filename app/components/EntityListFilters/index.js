@@ -57,6 +57,7 @@ export default class EntityListFilters extends React.Component { // eslint-disab
             model={formModel}
             title={formOptions.get('title')}
             options={formOptions.get('options').toList()}
+            filter={formOptions.get('filter')}
             onCancel={onHideFilterForm}
             buttons={[
               {

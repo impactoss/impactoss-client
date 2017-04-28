@@ -79,7 +79,7 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
     const filters = {
       taxonomies: { // filter by each category
         query: 'cat',
-        search: true,
+        filter: true,
         connected: {
           path: 'user_categories',
           key: 'user_id',
@@ -93,6 +93,7 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
             path: 'roles', // filter by user connection
             query: 'roles',
             key: 'role_id',
+            filter: false,
             connected: {
               path: 'user_roles',
               key: 'user_id',
@@ -107,6 +108,7 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
         connectPath: 'user_categories',
         key: 'category_id',
         ownKey: 'user_id',
+        filter: true,
       },
     };
     const headerOptions = {

@@ -77,12 +77,13 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
       attributes: {  // filter by attribute value
         options: [
           {
-            search: false,
+            filter: false,
             label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
           },
           {
+            filter: true,
             label: this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
             attribute: 'manager_id',
             extension: {
@@ -119,7 +120,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
             connectPath: 'measure_indicators',
             key: 'measure_id',
             ownKey: 'indicator_id',
-            // search: true,
+            filter: true,
           },
         ],
       },
@@ -129,6 +130,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
             label: this.context.intl.formatMessage(appMessages.attributes.draft),
             attribute: 'draft',
             options: PUBLISH_STATUSES,
+            filter: false,
           },
         ],
       },

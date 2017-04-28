@@ -37,6 +37,7 @@ export const makeAttributeEditOptions = (entities, { edits, activeEditOption }, 
   const option = find(edits.attributes.options, (o) => o.attribute === activeEditOption.optionId);
   if (option) {
     editOptions.title = messages.title;
+    editOptions.filter = option.filter;
     forEach(option.options, (attributeOption) => {
       const count = reduce(entities, (counter, entity) =>
         typeof entity.attributes[option.attribute] !== 'undefined'
@@ -70,6 +71,7 @@ export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption
   if (taxonomy) {
     editOptions.title = messages.title;
     editOptions.multiple = taxonomy.attributes.allow_multiple;
+    editOptions.filter = taxonomy.attributes.filter;
     forEach(taxonomy.categories, (category) => {
       const count = reduce(entities, (counter, entity) => {
         const categoryIds = entity.taxonomies
@@ -102,6 +104,7 @@ export const makeConnectionEditOptions = (entities, { edits, connections, active
   if (option) {
     editOptions.title = messages.title;
     editOptions.path = option.connectPath;
+    editOptions.filter = option.filter;
     forEach(connections[option.path], (connection) => {
       const count = reduce(entities, (counter, entity) => {
         const connectedIds = entity[option.path]
