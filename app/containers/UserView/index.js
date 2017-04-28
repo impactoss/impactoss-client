@@ -19,6 +19,7 @@ import {
   getEntities,
   isReady,
   isUserManager,
+  getSessionUserId,
 } from 'containers/App/selectors';
 
 import messages from './messages';
@@ -45,6 +46,33 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     , null);
     return highestRole.attributes.friendly_name;
   }
+
+  pageActions = () => {
+    const userId = this.props.user.id || this.props.user.attributes.id;
+
+    const edit = {
+      type: 'simple',
+      title: 'Edit',
+      onClick: () => this.props.handleEdit(),
+    };
+    const close = {
+      type: 'primary',
+      title: 'Close',
+      onClick: this.props.handleClose,
+    };
+    if (userId === this.props.sessionUserId) {
+      return [
+        edit,
+        {
+          type: 'simple',
+          title: 'Change password',
+          onClick: () => this.props.handleEditPassword(userId),
+        },
+        close,
+      ];
+    }
+    return [edit, close];
+  };
 
   mapCategoryOptions = (categories) => categories
     ? Object.values(categories).map((cat) => ({
@@ -75,23 +103,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
         />
         <Page
           title={this.context.intl.formatMessage(messages.pageTitle)}
-          actions={[
-            {
-              type: 'simple',
-              title: 'Edit',
-              onClick: () => this.props.handleEdit(this.props.user.id || this.props.user.attributes.id),
-            },
-            {
-              type: 'simple',
-              title: 'Change password',
-              onClick: () => this.props.handleEditPassword(this.props.user.id || this.props.user.attributes.id),
-            },
-            {
-              type: 'primary',
-              title: 'Close',
-              onClick: this.props.handleClose,
-            },
-          ]}
+          actions={user ? this.pageActions() : []}
         >
           { !user && !dataReady &&
             <div>
@@ -167,6 +179,7 @@ UserView.propTypes = {
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
+  sessionUserId: PropTypes.string,
 };
 
 UserView.contextTypes = {
@@ -182,6 +195,7 @@ const mapStateToProps = (state, props) => ({
     'taxonomies',
     'user_categories',
   ] }),
+  sessionUserId: getSessionUserId(state),
   user: getUser(
     state,
     {
