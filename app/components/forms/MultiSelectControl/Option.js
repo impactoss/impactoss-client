@@ -23,7 +23,7 @@ const Option = (props) => (
       </Reference>
     }
     {props.label}
-    { props.count &&
+    { typeof props.count !== 'undefined' &&
       <Count>
         {props.count}
       </Count>

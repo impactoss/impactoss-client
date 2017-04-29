@@ -8,6 +8,8 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
+import { pick } from 'lodash/object';
+
 import { Map, List, fromJS } from 'immutable';
 import styled from 'styled-components';
 
@@ -73,6 +75,8 @@ const ListEntitiesSelectAll = styled.div`
 `;
 const ListEntitiesMain = styled.div`
 `;
+const ListEntitiesEmpty = styled.div`
+`;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -88,15 +92,15 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       entityIdsSelected,
     } = this.props;
     // sorted entities
-    const entities = this.props.entities && orderBy(
+    const entitiesSorted = this.props.entities && orderBy(
       this.props.entities,
       getEntitySortIteratee(sortBy),
       sortOrder
     );
 
     // map entities to entity list item data
-    const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
-    const entitiesSelected = entityIdsSelected.map((id) => this.props.entities[id]);
+    const entitiesList = Object.values(entitiesSorted).map(this.props.mapToEntityList);
+    const entitiesSelected = Object.values(pick(this.props.entities, entityIdsSelected));
 
     const filterListOption = {
       label: 'Filter list',
@@ -121,9 +125,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     ];
 
     let allChecked = CHECKBOX_STATES.INDETERMINATE;
-    if (entityIdsSelected.length === 0) {
+    if (entitiesSelected.length === 0) {
       allChecked = CHECKBOX_STATES.UNCHECKED;
-    } else if (entities.length > 0 && entityIdsSelected.length === entities.length) {
+    } else if (entitiesSorted.length > 0 && entitiesSelected.length === entitiesSorted.length) {
       allChecked = CHECKBOX_STATES.CHECKED;
     }
     return (
@@ -147,7 +151,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               formOptions={
                 activeFilterOption
                 ? fromJS(makeActiveFilterOptions(
-                  entities,
+                  entitiesSorted,
                   this.props,
                   {
                     titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
@@ -161,25 +165,24 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               onHideFilterForm={this.props.onHideFilterForm}
             />
           }
-          { dataReady && isManager && activePanel === EDIT_PANEL &&
+          { dataReady && isManager && activePanel === EDIT_PANEL && entitiesSelected.length > 0 &&
             <EntityListEdit
               editGroups={
-                entityIdsSelected.length
-                ? fromJS(makeEditGroups(
+                fromJS(makeEditGroups(
                   this.props,
                   {
                     attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
                     taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
                     connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
                   }
-                )) : null
+                ))
               }
               formOptions={
-                activeEditOption && entityIdsSelected.length
+                activeEditOption
                 ? fromJS(makeActiveEditOptions(
                   entitiesSelected,
                   this.props,
-                  { title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entityIdsSelected.length} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}` }
+                  { title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.length} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}` }
                 ))
                 : null
               }
@@ -188,6 +191,16 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               onHideEditForm={this.props.onHideEditForm}
               onAssign={(associations) => this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
             />
+          }
+          { dataReady && isManager && activePanel === EDIT_PANEL && entitiesSorted.length === 0 &&
+            <ListEntitiesEmpty>
+               No entities found
+            </ListEntitiesEmpty>
+          }
+          { dataReady && isManager && activePanel === EDIT_PANEL && entitiesSelected.length === 0 && entitiesSorted.length > 0 &&
+            <ListEntitiesEmpty>
+              Please select one or more entities for edit options
+            </ListEntitiesEmpty>
           }
         </EntityListSidebar>
         <ContainerWithSidebar>
@@ -221,15 +234,27 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     </ListEntitiesSelectAll>
                   </ListEntitiesHeader>
                   <ListEntitiesMain>
-                    {entitiesList.map((entity, i) =>
-                      <EntityListItem
-                        key={i}
-                        select={isManager}
-                        checked={entityIdsSelected.indexOf(entity.id) > -1}
-                        onSelect={(checked) => this.props.onEntitySelect(entity.id, checked)}
-                        {...entity}
-                      />
-                    )}
+                    { entitiesSorted.length === 0 && this.props.location.query &&
+                      <ListEntitiesEmpty>
+                        No results matched your search
+                      </ListEntitiesEmpty>
+                    }
+                    { entitiesSorted.length === 0 && !this.props.location.query &&
+                      <ListEntitiesEmpty>
+                        No entities yet
+                      </ListEntitiesEmpty>
+                    }
+                    { entitiesSorted.length > 0 &&
+                      entitiesList.map((entity, i) =>
+                        <EntityListItem
+                          key={i}
+                          select={isManager}
+                          checked={entitiesSelected.map((e) => e.id).indexOf(entity.id) > -1}
+                          onSelect={(checked) => this.props.onEntitySelect(entity.id, checked)}
+                          {...entity}
+                        />
+                      )
+                    }
                   </ListEntitiesMain>
                 </ListEntities>
               }
@@ -262,6 +287,7 @@ EntityList.propTypes = {
   handleEditSubmit: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,
+  location: PropTypes.object,
 };
 
 EntityList.defaultProps = {

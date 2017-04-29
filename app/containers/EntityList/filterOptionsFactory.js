@@ -199,7 +199,7 @@ export const makeTaxonomyFilterOptions = (entities, { filters, taxonomies, activ
         } else {
           filterOptions.options.without = {
             label: `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
-            labelcount: true,
+            showCount: true,
             labelBold: true,
             value: taxonomy.id,
             count: 1,
