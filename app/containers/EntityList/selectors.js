@@ -17,23 +17,12 @@ const pageSelector = createSelector(
 
 const filterFormSelector = createSelector(
   selectEntityListDomain,
-  (substate) => substate.get('forms').filterData // TODO WTF HTF GRR
+  (substate) => substate.get('forms').filterData
 );
 
 const editFormSelector = createSelector(
   selectEntityListDomain,
-  (substate) => substate.get('forms').editData // TODO WTF HTF GRR
-);
-
-const selectionFormSelector = createSelector(
-  selectEntityListDomain,
-  (substate) => substate.get('forms').selectionData // TODO WTF HTF GRR
-);
-
-// TODO enable better caching on this, it's expensive ish
-const entitiesSelectedSelector = createSelector(
-    selectionFormSelector,
-    (form) => form.get('entities').reduce((selected, entity, id) => entity.get('selected') ? selected.concat(id) : selected, [])
+  (substate) => substate.get('forms').editData
 );
 
 const activeFilterOptionSelector = createSelector(
@@ -49,6 +38,11 @@ const activeEditOptionSelector = createSelector(
 const activePanelSelector = createSelector(
   pageSelector,
   (pageState) => pageState.get('activePanel')
+);
+
+const entitiesSelectedSelector = createSelector(
+  pageSelector,
+  (pageState) => pageState.get('entitiesSelected').toJS()
 );
 
 const filtersCheckedSelector = createSelector(
@@ -75,6 +69,5 @@ export {
   activeEditOptionSelector,
   filtersCheckedSelector,
   activePanelSelector,
-  selectionFormSelector,
   entitiesSelectedSelector,
 };

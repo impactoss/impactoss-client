@@ -11,11 +11,11 @@ export const SHOW_EDIT_FORM = 'nmrf/EntityList/SHOW_EDIT_FORM';
 export const HIDE_EDIT_FORM = 'nmrf/EntityList/HIDE_EDIT_FORM';
 export const SAVE_EDITS = 'nmrf/EntityList/SAVE_EDITS';
 export const RESET_STATE = 'nmrf/EntityList/RESET_STATE';
+export const ENTITY_SELECTED = 'nmrf/EntityList/ENTITY_SELECTED';
 
 export const REDUCER_PATH = 'entityList';
-export const FILTER_FORM_MODEL = `${REDUCER_PATH}.forms.filterData`;
-export const EDIT_FORM_MODEL = `${REDUCER_PATH}.forms.editData`;
-export const SELECTION_FORM_MODEL = `${REDUCER_PATH}.forms.selectionData`;
+export const FILTER_FORM_MODEL = 'entityList.forms.filterData';
+export const EDIT_FORM_MODEL = 'entityList.forms.editData';
 
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';

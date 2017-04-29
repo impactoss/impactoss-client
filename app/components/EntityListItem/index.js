@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
-import { Control } from 'react-redux-form/immutable';
 
 import ListItem from './ListItem';
 
@@ -13,13 +12,15 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
     status: PropTypes.string,
     children: PropTypes.object,
     side: PropTypes.object,
-    model: PropTypes.string,
     select: PropTypes.bool,
+    checked: PropTypes.bool,
+    onSelect: PropTypes.func,
   }
 
   static defaultProps = {
     children: null,
     side: null,
+    checked: false,
   }
 
   renderListItem = () => {
@@ -31,9 +32,11 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
       <ListItem>
         <table><tbody><tr>
           <td>
-            {this.props.model && this.props.select &&
-              <Control.checkbox
-                model={`${this.props.model}.selected`}
+            {this.props.select &&
+              <input
+                type="checkbox"
+                checked={this.props.checked}
+                onChange={(evt) => this.props.onSelect(evt.target.checked)}
               />
             }
           </td>

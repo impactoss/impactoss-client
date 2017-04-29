@@ -12,6 +12,7 @@ import {
   SHOW_PANEL,
   SAVE_EDITS,
   RESET_STATE,
+  ENTITY_SELECTED,
 } from './constants';
 
 export function showFilterForm(option) {
@@ -57,5 +58,12 @@ export function saveEdits(data) {
 export function resetState() {
   return {
     type: RESET_STATE,
+  };
+}
+
+export function selectEntity(data) {
+  return {
+    type: ENTITY_SELECTED,
+    data,
   };
 }
