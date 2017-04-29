@@ -18,6 +18,7 @@ import {
   EDIT_PANEL,
   RESET_STATE,
   ENTITY_SELECTED,
+  ENTITIES_SELECT,
 } from './constants';
 
 const initialState = fromJS({
@@ -50,12 +51,18 @@ function entityListReducer(state = initialState, action) {
     case RESET_STATE:
       return initialState;
     case ENTITY_SELECTED: {
-      const entityId = action.data.id;
       const selected = state.get('entitiesSelected');
       return state
         .set('entitiesSelected', action.data.checked
-          ? selected.push(entityId)
-          : selected.filterNot((id) => id === entityId))
+          ? selected.push(action.data.id)
+          : selected.filterNot((id) => id === action.data.id))
+        .set('activePanel', EDIT_PANEL)
+        .set('activeFilterOption', null)
+        .set('activeEditOption', null);
+    }
+    case ENTITIES_SELECT: {
+      return state
+        .set('entitiesSelected', fromJS(action.ids))
         .set('activePanel', EDIT_PANEL)
         .set('activeFilterOption', null)
         .set('activeEditOption', null);

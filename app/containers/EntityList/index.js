@@ -21,6 +21,7 @@ import PageHeader from 'components/PageHeader';
 import EntityListItem from 'components/EntityListItem';
 import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
 import Container from 'components/basic/Container';
+import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
 
@@ -51,6 +52,7 @@ import {
   showPanel,
   saveEdits,
   selectEntity,
+  selectEntities,
 } from './actions';
 
 import messages from './messages';
@@ -118,6 +120,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       filterListOption,
     ];
 
+    let allChecked = CHECKBOX_STATES.INDETERMINATE;
+    if (entityIdsSelected.length === 0) {
+      allChecked = CHECKBOX_STATES.UNCHECKED;
+    } else if (entities.length > 0 && entityIdsSelected.length === entities.length) {
+      allChecked = CHECKBOX_STATES.CHECKED;
+    }
     return (
       <div>
         <EntityListSidebar
@@ -203,14 +211,21 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   <ListEntitiesTopFilters />
                   <ListEntitiesHeader>
                     <ListEntitiesHeaderOptions />
-                    <ListEntitiesSelectAll />
+                    <ListEntitiesSelectAll>
+                      <IndeterminateCheckbox
+                        checked={allChecked}
+                        onChange={(checked) => {
+                          this.props.onEntitySelectAll(checked ? Object.keys(this.props.entities) : []);
+                        }}
+                      />
+                    </ListEntitiesSelectAll>
                   </ListEntitiesHeader>
                   <ListEntitiesMain>
                     {entitiesList.map((entity, i) =>
                       <EntityListItem
                         key={i}
                         select={isManager}
-                        checked={this.props.entityIdsSelected.indexOf(entity.id) > -1}
+                        checked={entityIdsSelected.indexOf(entity.id) > -1}
                         onSelect={(checked) => this.props.onEntitySelect(entity.id, checked)}
                         {...entity}
                       />
@@ -246,6 +261,7 @@ EntityList.propTypes = {
   entityIdsSelected: PropTypes.array,
   handleEditSubmit: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
+  onEntitySelectAll: PropTypes.func.isRequired,
 };
 
 EntityList.defaultProps = {
@@ -489,6 +505,9 @@ function mapDispatchToProps(dispatch, props) {
     },
     onEntitySelect: (id, checked) => {
       dispatch(selectEntity({ id, checked }));
+    },
+    onEntitySelectAll: (ids) => {
+      dispatch(selectEntities(ids));
     },
   };
 }
