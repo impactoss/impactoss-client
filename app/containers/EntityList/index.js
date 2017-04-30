@@ -9,11 +9,14 @@ import { connect } from 'react-redux';
 
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
 import { pick } from 'lodash/object';
+import { upperFirst } from 'lodash/string';
+import { cloneDeep } from 'lodash/lang';
 
 import { Map, List, fromJS } from 'immutable';
 import styled from 'styled-components';
 
 import { getEntitySortIteratee } from 'utils/sort';
+import { lowerCase } from 'utils/string';
 
 import Loading from 'components/Loading';
 import PageHeader from 'components/PageHeader';
@@ -78,7 +81,20 @@ const ListEntitiesMain = styled.div`
 `;
 const ListEntitiesEmpty = styled.div`
 `;
-
+const Tag = styled.button`
+  display: inline-block;
+  background: #ccc;
+  padding: 1px 6px;
+  margin: 0 3px;
+  border-radius: 3px;
+  font-size: 0.8em;
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+const Button = styled(Tag)`
+  cursor: pointer;
+`;
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   getConnectedCounts = (entity, connectionOptions) => {
     const counts = [];
@@ -149,6 +165,220 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       connectedCounts: filters.connections ? this.getConnectedCounts(entity, filters.connections.options) : [],
     };
   };
+
+  renderCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQuery, onClick, messagesRendered) => {
+    const tags = [];
+    if (locationQuery[taxonomyFilters.query]) {
+      const locationQueryValue = locationQuery[taxonomyFilters.query];
+      forEach(taxonomies, (taxonomy) => {
+        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+          const value = parseInt(queryValue, 10);
+          if (taxonomy.categories[value]) {
+            const category = taxonomy.categories[value];
+            let label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
+              ? category.attributes.short_title
+              : category.attributes.title || category.attributes.name);
+            label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
+            tags.push({
+              label: `${label} X`,
+              onClick: () => onClick({
+                value,
+                query: taxonomyFilters.query,
+                checked: false,
+              }),
+            });
+          }
+        });
+      });
+    }
+    if (locationQuery.without) {
+      const locationQueryValue = locationQuery.without;
+      forEach(taxonomies, (taxonomy) => {
+        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+          // numeric means taxonomy
+          if (!isNaN(parseFloat(queryValue)) && isFinite(queryValue) && taxonomy.id === queryValue) {
+            const value = parseInt(queryValue, 10);
+            tags.push({
+              label: `${messagesRendered.without} ${lowerCase(taxonomy.attributes.title)} X`,
+              onClick: () => onClick({
+                value,
+                query: 'without',
+                checked: false,
+              }),
+            });
+          }
+        });
+      });
+    }
+    return (
+      <span>
+        {
+          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
+        }
+      </span>
+    );
+  };
+  renderCurrentConnectedTaxonomyFilters = (taxonomyFilters, connectedTaxonomies, locationQuery, onClick) => {
+    const tags = [];
+    if (locationQuery[taxonomyFilters.query]) {
+      const locationQueryValue = locationQuery[taxonomyFilters.query];
+      forEach(connectedTaxonomies, (taxonomy) => {
+        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+          const valueSplit = queryValue.split(':');
+          if (valueSplit.length > 0) {
+            const value = parseInt(valueSplit[1], 10);
+            if (taxonomy.categories[value]) {
+              const category = taxonomy.categories[value];
+              let label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
+                ? category.attributes.short_title
+                : category.attributes.title || category.attributes.name);
+              label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
+              tags.push({
+                label: `${label} X`,
+                onClick: () => onClick({
+                  value: queryValue,
+                  query: taxonomyFilters.query,
+                  checked: false,
+                }),
+              });
+            }
+          }
+        });
+      });
+    }
+    return (
+      <span>
+        {
+          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
+        }
+      </span>
+    );
+  };
+  renderCurrentConnectionFilters = (connectionFiltersOptions, connections, locationQuery, onClick, messagesRendered) => {
+    const tags = [];
+    forEach(connectionFiltersOptions, (option) => {
+      if (locationQuery[option.query] && connections[option.path]) {
+        const locationQueryValue = locationQuery[option.query];
+        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+          const value = parseInt(queryValue, 10);
+          const connection = connections[option.path][value];
+          let label = connection
+              ? connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name
+              : upperFirst(value);
+          label = label.length > 20 ? `${label.substring(0, 20)}...` : label;
+          tags.push({
+            label: `${label} X`,
+            onClick: () => onClick({
+              value,
+              query: option.query,
+              checked: false,
+            }),
+          });
+        });
+      }
+    });
+
+    if (locationQuery.without) {
+      const locationQueryValue = locationQuery.without;
+      forEach(connectionFiltersOptions, (option) => {
+        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+          // numeric means taxonomy
+          if (option.query === queryValue) {
+            tags.push({
+              label: `${messagesRendered.without} ${lowerCase(option.label)} X`,
+              onClick: () => onClick({
+                value: queryValue,
+                query: 'without',
+                checked: false,
+              }),
+            });
+          }
+        });
+      });
+    }
+    return (
+      <span>
+        {
+          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
+        }
+      </span>
+    );
+  };
+  renderCurrentAttributeFilters = (attributeFiltersOptions, locationQuery, onClick) => {
+    const tags = [];
+    if (locationQuery.where) {
+      const locationQueryValue = locationQuery.where;
+      forEach(attributeFiltersOptions, (option) => {
+        if (locationQueryValue) {
+          forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+            const valueSplit = queryValue.split(':');
+            if (valueSplit[0] === option.attribute && valueSplit.length > 0) {
+              const value = valueSplit[1];
+              if (option.extension) {
+                tags.push({
+                  label: `${option.label}:${value} X`,
+                  onClick: () => onClick({
+                    value: queryValue,
+                    query: 'where',
+                    checked: false,
+                  }),
+                });
+              } else if (option.options) {
+                const attribute = find(option.options, (o) => o.value.toString() === value);
+                let label = attribute ? attribute.label : upperFirst(value);
+                label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
+                tags.push({
+                  label: `${label} X`,
+                  onClick: () => onClick({
+                    value: queryValue,
+                    query: 'where',
+                    checked: false,
+                  }),
+                });
+              }
+            }
+          });
+        }
+      });
+    }
+    return (
+      <span>
+        {
+          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
+        }
+      </span>
+    );
+  };
+
+  renderCurrentFilters = ({
+    filters,
+    taxonomies,
+    connections,
+    connectedTaxonomies,
+    location,
+    onTagClick,
+  },
+  messagesRendered
+  ) => {
+    const locationQuery = location.query;
+
+    return (
+      <div>
+        { filters.taxonomies && taxonomies &&
+          this.renderCurrentTaxonomyFilters(filters.taxonomies, taxonomies, locationQuery, onTagClick, messagesRendered)
+        }
+        { filters.connectedTaxonomies && connectedTaxonomies.taxonomies &&
+          this.renderCurrentConnectedTaxonomyFilters(filters.connectedTaxonomies, connectedTaxonomies.taxonomies, locationQuery, onTagClick)
+        }
+        { filters.connections && connections &&
+          this.renderCurrentConnectionFilters(filters.connections.options, connections, locationQuery, onTagClick, messagesRendered)
+        }
+        { filters.attributes &&
+          this.renderCurrentAttributeFilters(filters.attributes.options, locationQuery, onTagClick)
+        }
+      </div>
+    );
+  }
 
   render() {
     const {
@@ -294,7 +524,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               }
               { dataReady &&
                 <ListEntities>
-                  <ListEntitiesTopFilters />
+                  <ListEntitiesTopFilters>
+                    {this.renderCurrentFilters(
+                      this.props,
+                      {
+                        without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
+                      }
+                    )}
+                  </ListEntitiesTopFilters>
                   <ListEntitiesHeaderOptions />
                   <ListEntitiesHeader>
                     <ListEntitiesSelectAll>
@@ -433,9 +670,8 @@ const getConnectedQuery = (props) => {
           props.filters.connectedTaxonomies.connections,
           (connection) => connection.path === pathValue[0]
         );
-        // console.log(connection)
         if (connectedTaxonomy) {
-          const condition = connectedTaxonomy.connected;
+          const condition = cloneDeep(connectedTaxonomy.connected);
           condition.connected.where = {
             [condition.connected.whereKey]: pathValue[1],
           };

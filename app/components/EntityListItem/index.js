@@ -52,17 +52,17 @@ const Tag = styled.button`
     opacity: 0.8;
   }
 `;
-const Count = styled.span`
-  display: inline-block;
-  background: #eee;
-  color: #333;
-  padding: 1px 6px;
-  margin: 0 3px;
-  border-radius: 999px;
-  font-size: 0.8em;
-`;
 const Button = styled(Tag)`
   cursor: pointer;
+`;
+const Count = styled.span`
+display: inline-block;
+background: #eee;
+color: #333;
+padding: 1px 6px;
+margin: 0 3px;
+border-radius: 999px;
+font-size: 0.8em;
 `;
 
 export default class EntityListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
