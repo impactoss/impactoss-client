@@ -1,71 +1,130 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
+import styled from 'styled-components';
 
 import ListItem from './ListItem';
+
+const ListItemTable = styled.table`
+  width: 100%;
+`;
+const ColSelect = styled.td`
+  width: 30px;
+`;
+const ColMain = styled.td`
+`;
+const Main = styled.div`
+  position: relative;
+`;
+const Status = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-weight: bold;
+  font-size: 0.8em;
+  color: #666;
+  text-transform: uppercase;
+`;
+const Tag = styled.button`
+  display: inline-block;
+  background: #ccc;
+  padding: 1px 6px;
+  margin: 0 3px;
+  border-radius: 3px;
+  font-size: 0.8em;
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+const Count = styled.span`
+  display: inline-block;
+  background: #eee;
+  color: #333;
+  padding: 1px 6px;
+  margin: 0 3px;
+  border-radius: 999px;
+  font-size: 0.8em;
+`;
+const Button = styled(Tag)`
+  cursor: pointer;
+`;
 
 export default class EntityListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
-    title: PropTypes.string.isRequired,
-    linkTo: PropTypes.string,
-    reference: PropTypes.string,
-    status: PropTypes.string,
-    children: PropTypes.object,
-    side: PropTypes.object,
+    entity: PropTypes.object.isRequired,
+    // children: PropTypes.object,
+    // side: PropTypes.object,
     select: PropTypes.bool,
     checked: PropTypes.bool,
     onSelect: PropTypes.func,
   }
 
   static defaultProps = {
-    children: null,
-    side: null,
+    // children: null,
+    // side: null,
     checked: false,
   }
 
   renderListItem = () => {
-    const title = this.props.linkTo
-      ? <strong><Link to={this.props.linkTo}>{this.props.title}</Link></strong>
-      : <strong>{this.props.title}</strong>;
+    const { entity } = this.props;
+
+    const title = entity.linkTo
+      ? <strong><Link to={entity.linkTo}>{entity.title}</Link></strong>
+      : <strong>{entity.title}</strong>;
 
     return (
       <ListItem>
-        <table><tbody><tr>
-          <td>
-            {this.props.select &&
+        <ListItemTable><tbody><tr>
+          {this.props.select &&
+            <ColSelect>
               <input
                 type="checkbox"
                 checked={this.props.checked}
                 onChange={(evt) => this.props.onSelect(evt.target.checked)}
               />
-            }
-          </td>
-          <td>
-            <div>
-              {this.props.reference &&
-                <div>{this.props.reference}</div>
+            </ColSelect>
+          }
+          <ColMain>
+            <Main>
+              {entity.reference &&
+                <div>{entity.reference}</div>
+              }
+              {entity.status &&
+                <Status>{entity.status}</Status>
               }
               <div>
                 {title}
-                {this.props.status &&
-                  <span>{` (${this.props.status})`}</span>
+              </div>
+              <div>
+                { entity.tags && entity.tags.length > 0 &&
+                  <span>
+                    Categories:
+                    {
+                      entity.tags.map((tag, i) => {
+                        if (tag.onClick) {
+                          return (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>);
+                        }
+                        return (<Tag key={i}>{tag.label}</Tag>);
+                      })
+                    }
+                  </span>
+                }
+                { entity.connectedCounts && entity.connectedCounts.length > 0 &&
+                  <span>
+                    {
+                      entity.connectedCounts.map((count, i) => (
+                        <span key={i}>
+                          {count.option.label}
+                          <Count>{count.count}</Count>
+                        </span>
+                      ))
+                    }
+                  </span>
                 }
               </div>
-            </div>
-            {this.props.children &&
-            <div>
-              {this.props.children}
-            </div>
-            }
-          </td>
-          <td>
-            {this.props.side &&
-              <span>
-                {this.props.side}
-              </span>
-            }
-          </td>
-        </tr></tbody></table>
+            </Main>
+          </ColMain>
+        </tr></tbody></ListItemTable>
       </ListItem>
     );
   }

@@ -13,6 +13,7 @@ export const SAVE_EDITS = 'nmrf/EntityList/SAVE_EDITS';
 export const RESET_STATE = 'nmrf/EntityList/RESET_STATE';
 export const ENTITY_SELECTED = 'nmrf/EntityList/ENTITY_SELECTED';
 export const ENTITIES_SELECT = 'nmrf/EntityList/ENTITIES_SELECT';
+export const UPDATE_QUERY = 'nmrf/EntityList/UPDATE_QUERY';
 
 export const REDUCER_PATH = 'entityList';
 export const FILTER_FORM_MODEL = 'entityList.forms.filterData';

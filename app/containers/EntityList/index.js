@@ -16,10 +16,10 @@ import styled from 'styled-components';
 import { getEntitySortIteratee } from 'utils/sort';
 
 import Loading from 'components/Loading';
+import PageHeader from 'components/PageHeader';
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListFilters from 'components/EntityListFilters';
 import EntityListEdit from 'components/EntityListEdit';
-import PageHeader from 'components/PageHeader';
 import EntityListItem from 'components/EntityListItem';
 import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
 import Container from 'components/basic/Container';
@@ -55,6 +55,7 @@ import {
   saveEdits,
   selectEntity,
   selectEntities,
+  updateQuery,
 } from './actions';
 
 import messages from './messages';
@@ -79,6 +80,74 @@ const ListEntitiesEmpty = styled.div`
 `;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  getConnectedCounts = (entity, connectionOptions) => {
+    const counts = [];
+    forEach(connectionOptions, (option) => {
+      if (entity[option.path] && Object.keys(entity[option.path]).length > 0) {
+        counts.push({
+          count: Object.keys(entity[option.path]).length,
+          option: {
+            label: option.label,
+          },
+        });
+      }
+    });
+    return counts;
+  };
+  getEntityTags = (entity, taxonomies, query, onClick) => {
+    const tags = [];
+    if (entity.taxonomies) {
+      const categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
+      forEach(taxonomies, (tax) => {
+        forEach(tax.categories, (category, catId) => {
+          if (categoryIds && categoryIds.indexOf(parseInt(catId, 10)) > -1) {
+            const label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
+              ? category.attributes.short_title
+              : category.attributes.title);
+            if (query && onClick) {
+              tags.push({
+                label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
+                onClick: () => onClick({
+                  value: catId,
+                  query,
+                  checked: true,
+                }),
+              });
+            } else {
+              tags.push({
+                label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
+              });
+            }
+          }
+        });
+      });
+    }
+    return tags;
+  };
+
+  mapToEntityList = (entity, props) => {
+    const {
+      taxonomies,
+      entityLinkTo,
+      filters,
+      onTagClick,
+    } = props;
+
+    return {
+      id: entity.id,
+      title: entity.attributes.name || entity.attributes.title,
+      reference: entity.attributes.number || entity.id,
+      linkTo: `${entityLinkTo}${entity.id}`,
+      status: entity.attributes.draft ? 'draft' : null,
+      updated: entity.attributes.updated_at,
+      tags: this.getEntityTags(entity,
+        taxonomies,
+        filters.taxonomies && filters.taxonomies.query,
+        filters.taxonomies && onTagClick
+      ),
+      connectedCounts: filters.connections ? this.getConnectedCounts(entity, filters.connections.options) : [],
+    };
+  };
 
   render() {
     const {
@@ -97,9 +166,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       getEntitySortIteratee(sortBy),
       sortOrder
     );
-
-    // map entities to entity list item data
-    const entitiesList = Object.values(entitiesSorted).map(this.props.mapToEntityList);
     const entitiesSelected = Object.values(pick(this.props.entities, entityIdsSelected));
 
     const filterListOption = {
@@ -129,6 +195,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       allChecked = CHECKBOX_STATES.UNCHECKED;
     } else if (entitiesSorted.length > 0 && entitiesSelected.length === entitiesSorted.length) {
       allChecked = CHECKBOX_STATES.CHECKED;
+    }
+    let listHeaderLabel = this.props.entityTitle.plural;
+    if (entitiesSelected.length === 1) {
+      listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.single} selected`;
+    } else if (entitiesSelected.length > 1) {
+      listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
     }
     return (
       <div>
@@ -222,15 +294,26 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               { dataReady &&
                 <ListEntities>
                   <ListEntitiesTopFilters />
+                  <ListEntitiesHeaderOptions />
                   <ListEntitiesHeader>
-                    <ListEntitiesHeaderOptions />
                     <ListEntitiesSelectAll>
-                      <IndeterminateCheckbox
-                        checked={allChecked}
-                        onChange={(checked) => {
-                          this.props.onEntitySelectAll(checked ? Object.keys(this.props.entities) : []);
-                        }}
-                      />
+                      { isManager &&
+                        <span>
+                          <IndeterminateCheckbox
+                            id="select-all"
+                            checked={allChecked}
+                            onChange={(checked) => {
+                              this.props.onEntitySelectAll(checked ? Object.keys(this.props.entities) : []);
+                            }}
+                          />
+                          <label htmlFor="select-all">
+                            {listHeaderLabel}
+                          </label>
+                        </span>
+                      }
+                      { !isManager &&
+                        <span>{listHeaderLabel}</span>
+                      }
                     </ListEntitiesSelectAll>
                   </ListEntitiesHeader>
                   <ListEntitiesMain>
@@ -245,13 +328,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                       </ListEntitiesEmpty>
                     }
                     { entitiesSorted.length > 0 &&
-                      entitiesList.map((entity, i) =>
+                      entitiesSorted.map((entity, i) =>
                         <EntityListItem
                           key={i}
                           select={isManager}
                           checked={entitiesSelected.map((e) => e.id).indexOf(entity.id) > -1}
                           onSelect={(checked) => this.props.onEntitySelect(entity.id, checked)}
-                          {...entity}
+                          entity={this.mapToEntityList(entity, this.props)}
                         />
                       )
                     }
@@ -268,10 +351,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
 EntityList.propTypes = {
   entities: PropTypes.object.isRequired,
-  // selects: PropTypes.object, // only used in mapStateToProps
+  filters: PropTypes.object,
+  taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
-  mapToEntityList: PropTypes.func.isRequired,
   header: PropTypes.object,
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
@@ -282,12 +365,15 @@ EntityList.propTypes = {
   onShowEditForm: PropTypes.func.isRequired,
   onHideEditForm: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,
+  onTagClick: PropTypes.func.isRequired,
   activePanel: PropTypes.string,
   entityIdsSelected: PropTypes.array,
   handleEditSubmit: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,
   location: PropTypes.object,
+  entityTitle: PropTypes.object, // single/plural
+  entityLinkTo: PropTypes.string,
 };
 
 EntityList.defaultProps = {
@@ -534,6 +620,9 @@ function mapDispatchToProps(dispatch, props) {
     },
     onEntitySelectAll: (ids) => {
       dispatch(selectEntities(ids));
+    },
+    onTagClick: (value) => {
+      dispatch(updateQuery(fromJS([value])));
     },
   };
 }

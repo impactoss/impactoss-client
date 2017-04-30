@@ -21,6 +21,7 @@ import {
 import {
   FILTER_FORM_MODEL,
   SAVE_EDITS,
+  UPDATE_QUERY,
 } from './constants';
 
 export function* updateQuery(args) {
@@ -66,6 +67,7 @@ export default function* entityList() {
       action.model === `${FILTER_FORM_MODEL}.values` && action.type === 'rrf/change',
     updateQuery
   );
+  yield takeLatest(UPDATE_QUERY, updateQuery);
 
   yield takeLatest(SAVE_EDITS, saveEdits);
   yield takeLatest(LOCATION_CHANGE, locationChangeSaga);

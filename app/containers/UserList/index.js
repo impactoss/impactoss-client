@@ -29,13 +29,6 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
     }
   }
 
-  mapToEntityList = ({ id, attributes }) => ({
-    id,
-    title: attributes.name,
-    linkTo: `/users/${id}`,
-    reference: id,
-  })
-
   render() {
     const { dataReady } = this.props;
 
@@ -126,12 +119,16 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
         />
         <EntityList
           location={this.props.location}
-          mapToEntityList={this.mapToEntityList}
           selects={selects}
           filters={filters}
           edits={edits}
           header={headerOptions}
           dataReady={dataReady}
+          entityTitle={{
+            single: this.context.intl.formatMessage(appMessages.entities.users.single),
+            plural: this.context.intl.formatMessage(appMessages.entities.users.plural),
+          }}
+          entityLinkTo="/users/"
         />
       </div>
     );
