@@ -125,7 +125,7 @@ export const makeTaxonomyFilterOptions = (entities, { filters, taxonomies, activ
   };
   // get the active taxonomy
   const taxonomy = taxonomies[parseInt(activeFilterOption.optionId, 10)];
-  if (taxonomy) {
+  if (taxonomy && taxonomy.categories) {
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(taxonomy.attributes.title)}`;
     if (entities.length === 0) {
       if (locationQuery[filters.taxonomies.query]) {
@@ -165,48 +165,49 @@ export const makeTaxonomyFilterOptions = (entities, { filters, taxonomies, activ
       }
     } else {
       forEach(Object.values(entities), (entity) => {
+        const taxCategoryIds = [];
         // if entity has taxonomies
         if (entity.taxonomies) {
           // add categories from entities if not present otherwise increase count
           const categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
-          forEach(categoryIds, (catId) => {
-            // if category is of current taxonomy
-            if (taxonomy.categories && Object.keys(taxonomy.categories).indexOf(catId.toString()) > -1) {
-              // if taxonomy active add filter option
-              if (activeFilterOption.optionId === taxonomy.id.toString()) {
-                filterOptions.title = filterOptions.title || taxonomy.attributes.title;
-                // if category already added
-                if (filterOptions.options[catId]) {
-                  filterOptions.options[catId].count += 1;
-                } else {
-                  const label = taxonomy.categories[catId].attributes.title || taxonomy.categories[catId].attributes.name;
-                  filterOptions.options[catId] = {
-                    label,
-                    reference: null,
-                    showCount: true,
-                    value: catId,
-                    count: 1,
-                    query: filters.taxonomies.query,
-                    checked: optionChecked(locationQuery[filters.taxonomies.query], catId),
-                    order: label,
-                  };
-                }
+          forEach(taxonomy.categories, (cat, catId) => {
+            // if entity has category of active taxonomy
+            if (categoryIds && categoryIds.indexOf(parseInt(catId, 10)) > -1) {
+              taxCategoryIds.push(catId);
+              // if category already added
+              if (filterOptions.options[catId]) {
+                filterOptions.options[catId].count += 1;
+              } else {
+                const label = cat.attributes.title || cat.attributes.name;
+                filterOptions.options[catId] = {
+                  label,
+                  reference: null,
+                  showCount: true,
+                  value: catId,
+                  count: 1,
+                  query: filters.taxonomies.query,
+                  checked: optionChecked(locationQuery[filters.taxonomies.query], catId),
+                  order: label,
+                };
               }
             }
           });
-        } else if (filterOptions.options.without) {
-          filterOptions.options.without.count += 1;
-        } else {
-          filterOptions.options.without = {
-            label: `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
-            showCount: true,
-            labelBold: true,
-            value: taxonomy.id,
-            count: 1,
-            query: 'without',
-            checked: optionChecked(locationQuery.without, taxonomy.id),
-            order: 0,
-          };
+        }
+        if (taxCategoryIds.length === 0) {
+          if (filterOptions.options.without) {
+            filterOptions.options.without.count += 1;
+          } else {
+            filterOptions.options.without = {
+              label: `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
+              showCount: true,
+              labelBold: true,
+              value: taxonomy.id,
+              count: 1,
+              query: 'without',
+              checked: optionChecked(locationQuery.without, taxonomy.id),
+              order: 0,
+            };
+          }
         }
       });  // for each entities
     }
@@ -267,6 +268,7 @@ export const makeConnectionFilterOptions = (entities, { filters, connections, ac
       }
     } else {
       forEach(Object.values(entities), (entity) => {
+        const optionConnectedIds = [];
         // if entity has connected entities
         if (entity[option.path]) {
           // add connected entities if not present otherwise increase count
@@ -277,6 +279,7 @@ export const makeConnectionFilterOptions = (entities, { filters, connections, ac
             const connection = connections[option.path][connectedId];
             // if not taxonomy already considered
             if (connection) {
+              optionConnectedIds.push(connectedId);
               // if category already added
               if (filterOptions.options[connectedId]) {
                 filterOptions.options[connectedId].count += 1;
@@ -296,21 +299,24 @@ export const makeConnectionFilterOptions = (entities, { filters, connections, ac
               }
             }
           });
-        } else if (filterOptions.options.without) {
-          // no connection present
-          // add without option
-          filterOptions.options.without.count += 1;
-        } else {
-          filterOptions.options.without = {
-            label: `${messages.without} ${lowerCase(option.label)}`,
-            showCount: true,
-            labelBold: true,
-            value: option.query,
-            count: 1,
-            query: 'without',
-            checked: optionChecked(locationQuery.without, option.query),
-            order: 0,
-          };
+        }
+        if (optionConnectedIds.length === 0) {
+          if (filterOptions.options.without) {
+            // no connection present
+            // add without option
+            filterOptions.options.without.count += 1;
+          } else {
+            filterOptions.options.without = {
+              label: `${messages.without} ${lowerCase(option.label)}`,
+              showCount: true,
+              labelBold: true,
+              value: option.query,
+              count: 1,
+              query: 'without',
+              checked: optionChecked(locationQuery.without, option.query),
+              order: 0,
+            };
+          }
         }
       });  // for each entities
     }
