@@ -15,6 +15,18 @@ const ColMain = styled.td`
 const Main = styled.div`
   position: relative;
 `;
+const ReferenceLink = styled(Link)`
+  color: #888;
+  font-weight: bold;
+  text-decoration: none;
+  display: block;
+`;
+const TitleLink = styled(Link)`
+  font-weight: bold;
+  text-decoration: none;
+  display: block;
+  padding: 5px 0;
+`;
 const Status = styled.div`
   position: absolute;
   top: 0;
@@ -23,6 +35,11 @@ const Status = styled.div`
   font-size: 0.8em;
   color: #666;
   text-transform: uppercase;
+`;
+const Updated = styled.span`
+  font-size: 0.8em;
+  color: #999;
+  padding-left: 10px;
 `;
 const Tag = styled.button`
   display: inline-block;
@@ -68,10 +85,6 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
   renderListItem = () => {
     const { entity } = this.props;
 
-    const title = entity.linkTo
-      ? <strong><Link to={entity.linkTo}>{entity.title}</Link></strong>
-      : <strong>{entity.title}</strong>;
-
     return (
       <ListItem>
         <ListItemTable><tbody><tr>
@@ -87,14 +100,12 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
           <ColMain>
             <Main>
               {entity.reference &&
-                <div>{entity.reference}</div>
+                <ReferenceLink to={entity.linkTo}>{entity.reference}</ReferenceLink>
               }
               {entity.status &&
                 <Status>{entity.status}</Status>
               }
-              <div>
-                {title}
-              </div>
+              <TitleLink to={entity.linkTo}>{entity.title}</TitleLink>
               <div>
                 { entity.tags && entity.tags.length > 0 &&
                   <span>
@@ -120,6 +131,11 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
                       ))
                     }
                   </span>
+                }
+                { entity.updated &&
+                  <Updated>
+                    {entity.updated}
+                  </Updated>
                 }
               </div>
             </Main>

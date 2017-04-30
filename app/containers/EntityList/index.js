@@ -131,6 +131,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       entityLinkTo,
       filters,
       onTagClick,
+      isManager,
     } = props;
 
     return {
@@ -139,7 +140,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       reference: entity.attributes.number || entity.id,
       linkTo: `${entityLinkTo}${entity.id}`,
       status: entity.attributes.draft ? 'draft' : null,
-      updated: entity.attributes.updated_at,
+      updated: isManager ? entity.attributes.updated_at : null,
       tags: this.getEntityTags(entity,
         taxonomies,
         filters.taxonomies && filters.taxonomies.query,
