@@ -191,7 +191,7 @@ export default class MultiSelect extends React.Component {
         <label htmlFor={id} >
           <Option
             bold={option.get('labelBold') || checked}
-            reference={option.get('reference') && option.get('reference').toString()}
+            reference={typeof option.get('reference') !== 'undefined' && option.get('reference') !== null ? option.get('reference').toString() : ''}
             label={option.get('label')}
             count={option.get('showCount') && option.get('count')}
           />
