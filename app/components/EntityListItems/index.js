@@ -95,6 +95,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
       entities,
       entitiesSelected,
       isSelect,
+      expand,
     } = this.props;
 
     // console.log('List:render', entities, childList)
@@ -109,6 +110,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
               checked={isSelect && entitiesSelected.map((e) => e.id).indexOf(entity.id) > -1}
               onSelect={(checked) => this.props.onEntitySelect(entity.id, checked)}
               entity={this.mapToEntityListItem(entity, this.props)}
+              expand={expand}
             />
           )
         }
@@ -128,6 +130,7 @@ EntityListItems.propTypes = {
   filters: PropTypes.object,
   onTagClick: PropTypes.func,
   childList: PropTypes.string,
+  expand: PropTypes.string,
 };
 
 export default EntityListItems;

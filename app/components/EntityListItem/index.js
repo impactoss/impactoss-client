@@ -80,16 +80,15 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
   static propTypes = {
     entity: PropTypes.object.isRequired,
     children: PropTypes.object,
-    // side: PropTypes.object,
     select: PropTypes.bool,
     checked: PropTypes.bool,
     onSelect: PropTypes.func,
+    expand: PropTypes.string,
   }
 
   static defaultProps = {
-    // children: null,
-    // side: null,
     checked: false,
+    expand: null,
   }
 
   renderListItem = () => {
@@ -154,7 +153,7 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
               </tr></tbody></table>
             </Main>
           </ColMain>
-          { this.props.entity.children &&
+          { this.props.expand && this.props.entity.children &&
             <ColChildren>
               <EntityListChildItems
                 entities={this.props.entity.children.entities}
@@ -165,6 +164,7 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
                 entityLinkTo={this.props.entity.children.entityLinkTo}
                 onEntitySelect={this.props.entity.children.onEntitySelect}
                 filters={null}
+                expand={this.props.expand}
               />
             </ColChildren>
           }

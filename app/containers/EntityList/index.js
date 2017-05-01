@@ -71,9 +71,24 @@ const ListEntities = styled.div`
 `;
 const ListEntitiesTopFilters = styled.div`
 `;
-const ListEntitiesHeader = styled.div`
+const ListEntitiesHeaderOptionLinks = styled.div`
+  float:right;
+`;
+const ListEntitiesHeaderOptionLink = styled.button`
+  font-weight: bold;
+  color: #EB6E51;
+  font-size: 0.9;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 const ListEntitiesHeaderOptions = styled.div`
+`;
+const ListEntitiesHeader = styled.div`
+  clear: both;
+  background: #ccc
+  padding: 2px 5px ;
 `;
 const ListEntitiesSelectAll = styled.div`
 `;
@@ -364,6 +379,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     } else if (entitiesSelected.length > 1) {
       listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
     }
+
     return (
       <div>
         <EntityListSidebar
@@ -463,7 +479,15 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                       }
                     )}
                   </ListEntitiesTopFilters>
-                  <ListEntitiesHeaderOptions />
+                  <ListEntitiesHeaderOptions>
+                    <ListEntitiesHeaderOptionLinks>
+                      { this.props.childList &&
+                        <ListEntitiesHeaderOptionLink onClick={() => this.props.onExpand(this.props.expand !== 'all', 'all')}>
+                          {`${(!this.props.expand) || this.props.expand !== 'all' ? 'Implementation Plan View' : 'List View'}`}
+                        </ListEntitiesHeaderOptionLink>
+                      }
+                    </ListEntitiesHeaderOptionLinks>
+                  </ListEntitiesHeaderOptions>
                   <ListEntitiesHeader>
                     <ListEntitiesSelectAll>
                       { isManager &&
@@ -508,6 +532,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                         filters={this.props.filters}
                         onTagClick={this.props.onTagClick}
                         childList={this.props.childList}
+                        expand={this.props.expand}
                       />
                     }
                   </ListEntitiesMain>
@@ -538,6 +563,7 @@ EntityList.propTypes = {
   onHideEditForm: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,
+  onExpand: PropTypes.func.isRequired,
   activePanel: PropTypes.string,
   entityIdsSelected: PropTypes.array,
   handleEditSubmit: PropTypes.func.isRequired,
@@ -547,6 +573,7 @@ EntityList.propTypes = {
   entityTitle: PropTypes.object, // single/plural
   entityLinkTo: PropTypes.string,
   childList: PropTypes.string,
+  expand: PropTypes.string,
 };
 
 EntityList.defaultProps = {
@@ -800,6 +827,16 @@ function mapDispatchToProps(dispatch, props) {
     },
     onTagClick: (value) => {
       dispatch(updateQuery(fromJS([value])));
+    },
+    onExpand: (bool, value) => {
+      dispatch(updateQuery(fromJS([
+        {
+          query: 'expand',
+          value,
+          replace: bool,
+          checked: bool,
+        },
+      ])));
     },
   };
 }

@@ -17,16 +17,18 @@ import { isReady } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 import messages from './messages';
 
+const expand = (props) => props.location.query.expand;
+
 export class ActionList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    this.props.loadEntitiesIfNeeded();
+    this.props.loadEntitiesIfNeeded(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
-      this.props.loadEntitiesIfNeeded();
+      this.props.loadEntitiesIfNeeded(nextProps);
     }
   }
 
@@ -55,7 +57,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             key: 'measure_id',
             reverse: true,
             as: 'indicators',
-            extend: {
+            extend: expand(this.props) ? {
               path: 'indicators',
               key: 'indicator_id',
               as: 'child',
@@ -85,7 +87,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
                   type: 'count',
                 },
               ],
-            },
+            } : null,
           },
         ],
       },
@@ -267,6 +269,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           }}
           entityLinkTo="/actions/"
           childList="indicators"
+          expand={expand(this.props)}
         />
       </div>
     );
@@ -284,25 +287,40 @@ ActionList.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  dataReady: isReady(state, { path: [
-    'measures',
-    'measure_categories',
-    'users',
-    'taxonomies',
-    'categories',
-    'recommendations',
-    'recommendation_measures',
-    'recommendation_categories',
-    'indicators',
-    'measure_indicators',
-    'due_dates',
-    'progress_reports',
-  ] }),
+const mapStateToProps = (state, props) => ({
+  dataReady: isReady(state, {
+    path: expand(props)
+      ? [
+        'measures',
+        'measure_categories',
+        'users',
+        'taxonomies',
+        'categories',
+        'recommendations',
+        'recommendation_measures',
+        'recommendation_categories',
+        'indicators',
+        'measure_indicators',
+        'due_dates',
+        'progress_reports',
+      ]
+      : [
+        'measures',
+        'measure_categories',
+        'users',
+        'taxonomies',
+        'categories',
+        'recommendations',
+        'recommendation_measures',
+        'recommendation_categories',
+        'indicators',
+        'measure_indicators',
+      ],
+  }),
 });
 function mapDispatchToProps(dispatch) {
   return {
-    loadEntitiesIfNeeded: () => {
+    loadEntitiesIfNeeded: (props) => {
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('users'));
@@ -313,9 +331,11 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
-      dispatch(loadEntitiesIfNeeded('progress_reports'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+      if (expand(props)) {
+        dispatch(loadEntitiesIfNeeded('due_dates'));
+        dispatch(loadEntitiesIfNeeded('progress_reports'));
+      }
     },
     handleNew: () => {
       dispatch(updatePath('/actions/new/'));

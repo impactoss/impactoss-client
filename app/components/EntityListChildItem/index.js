@@ -77,6 +77,7 @@ export default class EntityListChildItem extends React.PureComponent { // eslint
 
   static propTypes = {
     entity: PropTypes.object.isRequired,
+    expand: PropTypes.string,
   }
 
   renderListItem = () => {
@@ -132,15 +133,17 @@ export default class EntityListChildItem extends React.PureComponent { // eslint
               </tr></tbody></table>
             </Main>
           </ColMain>
-          <ColChildren>
-            { this.props.entity.reportChildren &&
-              <EntityListChildReportItems
-                reports={this.props.entity.reportChildren.reports}
-                dates={this.props.entity.reportChildren.dates}
-                entityLinkTo={this.props.entity.reportChildren.entityLinkTo}
-              />
-            }
-          </ColChildren>
+          { this.props.expand === 'all' &&
+            <ColChildren>
+              { this.props.entity.reportChildren &&
+                <EntityListChildReportItems
+                  reports={this.props.entity.reportChildren.reports}
+                  dates={this.props.entity.reportChildren.dates}
+                  entityLinkTo={this.props.entity.reportChildren.entityLinkTo}
+                />
+              }
+            </ColChildren>
+          }
         </tr></tbody></ListItemTable>
       </ListItem>
     );

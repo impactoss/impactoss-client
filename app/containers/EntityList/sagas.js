@@ -27,7 +27,8 @@ import {
 export function* updateQuery(args) {
   const params = args.value.map((value) => ({
     arg: value.get('query'),
-    value: value.get('value'),
+    value: value.get('value') || 1,
+    replace: value.get('replace'),
     add: value.get('checked'),
     remove: !value.get('checked'),
   })).toJS();

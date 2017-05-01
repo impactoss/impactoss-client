@@ -69,7 +69,7 @@ export class EntityListChildItems extends React.PureComponent { // eslint-disabl
   };
 
   render() {
-    const { entities } = this.props;
+    const { entities, expand } = this.props;
 
     return (
       <div>
@@ -78,6 +78,7 @@ export class EntityListChildItems extends React.PureComponent { // eslint-disabl
             <EntityListChildItem
               key={i}
               entity={this.mapToEntityListItem(entity, this.props)}
+              expand={expand}
             />
           )
         }
@@ -92,7 +93,7 @@ EntityListChildItems.propTypes = {
   taxonomies: PropTypes.object,
   entityLinkTo: PropTypes.string,
   filters: PropTypes.object,
-  // childList: PropTypes.string,
+  expand: PropTypes.string,
 };
 
 export default EntityListChildItems;
