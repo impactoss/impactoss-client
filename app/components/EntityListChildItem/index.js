@@ -2,6 +2,9 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import styled from 'styled-components';
 
+import EntityListChildReportItems from 'components/EntityListChildReportItems';
+
+
 const ListItem = styled.div`
 `;
 
@@ -9,6 +12,10 @@ const ListItemTable = styled.table`
   width: 100%;
 `;
 const ColMain = styled.td`
+  vertical-align: top;
+`;
+const ColChildren = styled.td`
+  width: 200px;
   vertical-align: top;
 `;
 const Main = styled.div`
@@ -125,13 +132,22 @@ export default class EntityListChildItem extends React.PureComponent { // eslint
               </tr></tbody></table>
             </Main>
           </ColMain>
+          <ColChildren>
+            { this.props.entity.reportChildren &&
+              <EntityListChildReportItems
+                reports={this.props.entity.reportChildren.reports}
+                dates={this.props.entity.reportChildren.dates}
+                entityLinkTo={this.props.entity.reportChildren.entityLinkTo}
+              />
+            }
+          </ColChildren>
         </tr></tbody></ListItemTable>
       </ListItem>
     );
   }
 
   render() {
-    // console.log('Item:render', this.props.entity, this.props.entity.children)
+    // console.log('Item:render', this.props.entity)
 
     return (
       <div>

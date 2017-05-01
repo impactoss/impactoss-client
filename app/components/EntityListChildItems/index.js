@@ -46,7 +46,6 @@ export class EntityListChildItems extends React.PureComponent { // eslint-disabl
       entityLinkTo,
       filters,
       showDate,
-      childList,
     } = props;
 
     return {
@@ -55,21 +54,17 @@ export class EntityListChildItems extends React.PureComponent { // eslint-disabl
       reference: entity.attributes.number || entity.id,
       linkTo: `${entityLinkTo}${entity.id}`,
       status: entity.attributes.draft ? 'draft' : null,
-      updated: showDate ? entity.attributes.updated_at : null,
+      updated: showDate ? entity.attributes.updated_at.split('T')[0] : null,
       tags: taxonomies
         ? this.getEntityTags(entity, taxonomies)
         : [],
       connectedCounts: filters && filters.connections ? this.getConnectedCounts(entity, filters.connections.options) : [],
-      children: childList ? {
-        entities: entity[childList] ? Object.values(entity[childList]).reduce((memo, children) => {
-          if (children.child) {
-            memo.push(children.child);
-          }
-          return memo;
-        }, []) : [],
-        showDate,
-        entityLinkTo: `/${childList}/`,
-      } : null,
+      reportChildren: entity.reports || entity.dates
+        ? {
+          reports: entity.reports ? Object.values(entity.reports) : [],
+          dates: entity.dates ? Object.values(entity.dates) : [],
+          entityLinkTo: '/reports/',
+        } : null,
     };
   };
 
@@ -97,7 +92,7 @@ EntityListChildItems.propTypes = {
   taxonomies: PropTypes.object,
   entityLinkTo: PropTypes.string,
   filters: PropTypes.object,
-  childList: PropTypes.string,
+  // childList: PropTypes.string,
 };
 
 export default EntityListChildItems;

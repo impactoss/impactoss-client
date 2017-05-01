@@ -18,7 +18,7 @@ const ColMain = styled.td`
   vertical-align: top;
 `;
 const ColChildren = styled.td`
-  width: 400px;
+  width: 450px;
   vertical-align: top;
 `;
 const Main = styled.div`

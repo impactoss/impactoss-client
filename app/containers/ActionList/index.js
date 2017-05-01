@@ -65,11 +65,17 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
                   path: 'progress_reports',
                   key: 'indicator_id',
                   reverse: true,
+                  as: 'reports',
                 },
                 {
                   path: 'due_dates',
                   key: 'indicator_id',
                   reverse: true,
+                  as: 'dates',
+                  without: {
+                    path: 'progress_reports',
+                    key: 'due_date_id',
+                  },
                 },
                 {
                   path: 'measure_indicators',
