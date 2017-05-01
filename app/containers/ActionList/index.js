@@ -30,14 +30,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  mapToEntityList = ({ id, attributes }) => ({
-    id,
-    title: attributes.title,
-    linkTo: `/actions/${id}`,
-    reference: id,
-    status: attributes.draft ? 'draft' : null,
-  })
-
   render() {
     const { dataReady } = this.props;
 
@@ -145,7 +137,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             path: 'recommendations', // filter by recommendation connection
             query: 'recommendations',
             key: 'recommendation_id',
-            search: true,
+            filter: true,
             connected: {
               path: 'recommendation_measures',
               key: 'measure_id',
@@ -233,12 +225,16 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         />
         <EntityList
           location={this.props.location}
-          mapToEntityList={this.mapToEntityList}
           selects={selects}
           filters={filters}
           edits={edits}
           header={headerOptions}
           dataReady={dataReady}
+          entityTitle={{
+            single: this.context.intl.formatMessage(appMessages.entities.measures.single),
+            plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+          }}
+          entityLinkTo="/actions/"
         />
       </div>
     );

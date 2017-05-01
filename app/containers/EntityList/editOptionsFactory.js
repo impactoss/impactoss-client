@@ -114,10 +114,8 @@ export const makeConnectionEditOptions = (entities, { edits, connections, active
       }, 0);
       const reference = connection.attributes.number || connection.id;
       editOptions.options[connection.id] = {
-        label: {
-          reference,
-          main: connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name,
-        },
+        label: connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name,
+        reference,
         value: connection.id,
         checked: checkedState(count, entities.length),
         order: reference,

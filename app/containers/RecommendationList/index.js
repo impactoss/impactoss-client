@@ -29,14 +29,6 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     }
   }
 
-  mapToEntityList = ({ id, attributes }) => ({
-    id,
-    title: attributes.title,
-    linkTo: `/recommendations/${id}`,
-    reference: id,
-    status: attributes.draft ? 'draft' : null,
-  })
-
   render() {
     const { dataReady } = this.props;
 
@@ -170,12 +162,16 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         />
         <EntityList
           location={this.props.location}
-          mapToEntityList={this.mapToEntityList}
           selects={selects}
           filters={filters}
           edits={edits}
           header={headerOptions}
           dataReady={dataReady}
+          entityTitle={{
+            single: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
+            plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+          }}
+          entityLinkTo="/recommendations/"
         />
       </div>
     );

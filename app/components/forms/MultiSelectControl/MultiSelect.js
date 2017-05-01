@@ -136,7 +136,9 @@ export default class MultiSelect extends React.Component {
 
     // do not update if required and change would result in empty list
     if (!checked && required) {
-      const otherCheckedValues = values.find((v) => v.get('checked') && !v.get('value') === option.get('value'));
+      const otherCheckedValues = values.find((v) =>
+        v.get('checked') && !(v.get('value') === option.get('value') && v.get('query') === option.get('query'))
+      );
       if (!otherCheckedValues) {
         return values;
       }
@@ -144,7 +146,9 @@ export default class MultiSelect extends React.Component {
 
     // uncheck all others if single mode (!multiple)
     let nextValues = values;
-    const existingValueIndex = values.findIndex((v) => v.get('value') === option.get('value'));
+    const existingValueIndex = values.findIndex((v) =>
+      v.get('value') === option.get('value') && v.get('query') === option.get('query')
+    );
     if (!multiple && checked) {
       // uncheck all other options
       nextValues = nextValues.map((value, index) =>
@@ -161,7 +165,7 @@ export default class MultiSelect extends React.Component {
     const checked = option.get('checked');
     // TODO consider isImmutable (need to upgrade to immutable v4)
     const isThreeState = option.get('isThreeState');
-    const id = `${checked}-${i}-${kebabCase(option.get('value'))}`;
+    const id = `${checked}-${i}-${kebabCase(option.get('value'))}-${kebabCase(option.get('query'))}`;
     return (
       <div key={id}>
         { isThreeState &&
@@ -187,7 +191,7 @@ export default class MultiSelect extends React.Component {
         <label htmlFor={id} >
           <Option
             bold={option.get('labelBold') || checked}
-            reference={option.get('reference') && option.get('reference').toString()}
+            reference={typeof option.get('reference') !== 'undefined' && option.get('reference') !== null ? option.get('reference').toString() : ''}
             label={option.get('label')}
             count={option.get('showCount') && option.get('count')}
           />
@@ -229,7 +233,7 @@ export default class MultiSelect extends React.Component {
 
     // prepare checkboxes
     let checkboxes = options.map((option) => {
-      const value = values.find((v) => option.get('value') === v.get('value'));
+      const value = values.find((v) => option.get('value') === v.get('value') && option.get('query') === v.get('query'));
       return option.withMutations((o) =>
         o.set('checked', value ? value.get('checked') : false)
         .set('initialChecked', option.get('checked'))

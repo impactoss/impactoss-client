@@ -30,14 +30,6 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
     }
   }
 
-  mapToEntityList = ({ id, attributes }) => ({
-    id,
-    title: attributes.title,
-    linkTo: `/indicators/${id}`,
-    reference: id,
-    status: attributes.draft ? 'draft' : null,
-  })
-
   render() {
     const { dataReady } = this.props;
 
@@ -154,12 +146,16 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         />
         <EntityList
           location={this.props.location}
-          mapToEntityList={this.mapToEntityList}
           selects={selects}
           filters={filters}
           edits={edits}
           header={headerOptions}
           dataReady={dataReady}
+          entityTitle={{
+            single: this.context.intl.formatMessage(appMessages.entities.indicators.single),
+            plural: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+          }}
+          entityLinkTo="/indicators/"
         />
       </div>
     );

@@ -6,23 +6,27 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Form } from 'react-redux-form/immutable';
 
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
 import { pick } from 'lodash/object';
+import { upperFirst } from 'lodash/string';
+import { cloneDeep } from 'lodash/lang';
+
 import { Map, List, fromJS } from 'immutable';
 import styled from 'styled-components';
 
 import { getEntitySortIteratee } from 'utils/sort';
+import { lowerCase } from 'utils/string';
 
 import Loading from 'components/Loading';
+import PageHeader from 'components/PageHeader';
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListFilters from 'components/EntityListFilters';
 import EntityListEdit from 'components/EntityListEdit';
-import PageHeader from 'components/PageHeader';
 import EntityListItem from 'components/EntityListItem';
 import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
 import Container from 'components/basic/Container';
+import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
 
@@ -34,7 +38,6 @@ import { makeActiveEditOptions } from './editOptionsFactory';
 import {
   FILTER_FORM_MODEL,
   EDIT_FORM_MODEL,
-  SELECTION_FORM_MODEL,
   FILTERS_PANEL,
   EDIT_PANEL,
 } from './constants';
@@ -53,15 +56,329 @@ import {
   hideFilterForm,
   showPanel,
   saveEdits,
+  selectEntity,
+  selectEntities,
+  updateQuery,
 } from './actions';
 
 import messages from './messages';
 
+
 const Styled = styled.div`
   padding:0 20px;
 `;
-
+const ListEntities = styled.div`
+`;
+const ListEntitiesTopFilters = styled.div`
+`;
+const ListEntitiesHeader = styled.div`
+`;
+const ListEntitiesHeaderOptions = styled.div`
+`;
+const ListEntitiesSelectAll = styled.div`
+`;
+const ListEntitiesMain = styled.div`
+`;
+const ListEntitiesEmpty = styled.div`
+`;
+const Tag = styled.button`
+  display: inline-block;
+  background: #ccc;
+  padding: 1px 6px;
+  margin: 0 3px;
+  border-radius: 3px;
+  font-size: 0.8em;
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+const Button = styled(Tag)`
+  cursor: pointer;
+`;
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  getConnectedCounts = (entity, connectionOptions) => {
+    const counts = [];
+    forEach(connectionOptions, (option) => {
+      if (entity[option.path] && Object.keys(entity[option.path]).length > 0) {
+        counts.push({
+          count: Object.keys(entity[option.path]).length,
+          option: {
+            label: option.label,
+          },
+        });
+      }
+    });
+    return counts;
+  };
+  getEntityTags = (entity, taxonomies, query, onClick) => {
+    const tags = [];
+    if (entity.taxonomies) {
+      const categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
+      forEach(taxonomies, (tax) => {
+        forEach(tax.categories, (category, catId) => {
+          if (categoryIds && categoryIds.indexOf(parseInt(catId, 10)) > -1) {
+            const label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
+              ? category.attributes.short_title
+              : category.attributes.title);
+            if (query && onClick) {
+              tags.push({
+                label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
+                onClick: () => onClick({
+                  value: catId,
+                  query,
+                  checked: true,
+                }),
+              });
+            } else {
+              tags.push({
+                label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
+              });
+            }
+          }
+        });
+      });
+    }
+    return tags;
+  };
+
+  mapToEntityList = (entity, props) => {
+    const {
+      taxonomies,
+      entityLinkTo,
+      filters,
+      onTagClick,
+      isManager,
+    } = props;
+
+    return {
+      id: entity.id,
+      title: entity.attributes.name || entity.attributes.title,
+      reference: entity.attributes.number || entity.id,
+      linkTo: `${entityLinkTo}${entity.id}`,
+      status: entity.attributes.draft ? 'draft' : null,
+      updated: isManager ? entity.attributes.updated_at : null,
+      tags: this.getEntityTags(entity,
+        taxonomies,
+        filters.taxonomies && filters.taxonomies.query,
+        filters.taxonomies && onTagClick
+      ),
+      connectedCounts: filters.connections ? this.getConnectedCounts(entity, filters.connections.options) : [],
+    };
+  };
+
+  renderCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQuery, onClick, messagesRendered) => {
+    const tags = [];
+    if (locationQuery[taxonomyFilters.query]) {
+      const locationQueryValue = locationQuery[taxonomyFilters.query];
+      forEach(taxonomies, (taxonomy) => {
+        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+          const value = parseInt(queryValue, 10);
+          if (taxonomy.categories[value]) {
+            const category = taxonomy.categories[value];
+            let label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
+              ? category.attributes.short_title
+              : category.attributes.title || category.attributes.name);
+            label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
+            tags.push({
+              label: `${label} X`,
+              onClick: () => onClick({
+                value,
+                query: taxonomyFilters.query,
+                checked: false,
+              }),
+            });
+          }
+        });
+      });
+    }
+    if (locationQuery.without) {
+      const locationQueryValue = locationQuery.without;
+      forEach(taxonomies, (taxonomy) => {
+        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+          // numeric means taxonomy
+          if (!isNaN(parseFloat(queryValue)) && isFinite(queryValue) && taxonomy.id === queryValue) {
+            const value = parseInt(queryValue, 10);
+            tags.push({
+              label: `${messagesRendered.without} ${lowerCase(taxonomy.attributes.title)} X`,
+              onClick: () => onClick({
+                value,
+                query: 'without',
+                checked: false,
+              }),
+            });
+          }
+        });
+      });
+    }
+    return (
+      <span>
+        {
+          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
+        }
+      </span>
+    );
+  };
+  renderCurrentConnectedTaxonomyFilters = (taxonomyFilters, connectedTaxonomies, locationQuery, onClick) => {
+    const tags = [];
+    if (locationQuery[taxonomyFilters.query]) {
+      const locationQueryValue = locationQuery[taxonomyFilters.query];
+      forEach(connectedTaxonomies, (taxonomy) => {
+        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+          const valueSplit = queryValue.split(':');
+          if (valueSplit.length > 0) {
+            const value = parseInt(valueSplit[1], 10);
+            if (taxonomy.categories[value]) {
+              const category = taxonomy.categories[value];
+              let label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
+                ? category.attributes.short_title
+                : category.attributes.title || category.attributes.name);
+              label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
+              tags.push({
+                label: `${label} X`,
+                onClick: () => onClick({
+                  value: queryValue,
+                  query: taxonomyFilters.query,
+                  checked: false,
+                }),
+              });
+            }
+          }
+        });
+      });
+    }
+    return (
+      <span>
+        {
+          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
+        }
+      </span>
+    );
+  };
+  renderCurrentConnectionFilters = (connectionFiltersOptions, connections, locationQuery, onClick, messagesRendered) => {
+    const tags = [];
+    forEach(connectionFiltersOptions, (option) => {
+      if (locationQuery[option.query] && connections[option.path]) {
+        const locationQueryValue = locationQuery[option.query];
+        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+          const value = parseInt(queryValue, 10);
+          const connection = connections[option.path][value];
+          let label = connection
+              ? connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name
+              : upperFirst(value);
+          label = label.length > 20 ? `${label.substring(0, 20)}...` : label;
+          tags.push({
+            label: `${label} X`,
+            onClick: () => onClick({
+              value,
+              query: option.query,
+              checked: false,
+            }),
+          });
+        });
+      }
+    });
+
+    if (locationQuery.without) {
+      const locationQueryValue = locationQuery.without;
+      forEach(connectionFiltersOptions, (option) => {
+        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+          // numeric means taxonomy
+          if (option.query === queryValue) {
+            tags.push({
+              label: `${messagesRendered.without} ${lowerCase(option.label)} X`,
+              onClick: () => onClick({
+                value: queryValue,
+                query: 'without',
+                checked: false,
+              }),
+            });
+          }
+        });
+      });
+    }
+    return (
+      <span>
+        {
+          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
+        }
+      </span>
+    );
+  };
+  renderCurrentAttributeFilters = (attributeFiltersOptions, locationQuery, onClick) => {
+    const tags = [];
+    if (locationQuery.where) {
+      const locationQueryValue = locationQuery.where;
+      forEach(attributeFiltersOptions, (option) => {
+        if (locationQueryValue) {
+          forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+            const valueSplit = queryValue.split(':');
+            if (valueSplit[0] === option.attribute && valueSplit.length > 0) {
+              const value = valueSplit[1];
+              if (option.extension) {
+                tags.push({
+                  label: `${option.label}:${value} X`,
+                  onClick: () => onClick({
+                    value: queryValue,
+                    query: 'where',
+                    checked: false,
+                  }),
+                });
+              } else if (option.options) {
+                const attribute = find(option.options, (o) => o.value.toString() === value);
+                let label = attribute ? attribute.label : upperFirst(value);
+                label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
+                tags.push({
+                  label: `${label} X`,
+                  onClick: () => onClick({
+                    value: queryValue,
+                    query: 'where',
+                    checked: false,
+                  }),
+                });
+              }
+            }
+          });
+        }
+      });
+    }
+    return (
+      <span>
+        {
+          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
+        }
+      </span>
+    );
+  };
+
+  renderCurrentFilters = ({
+    filters,
+    taxonomies,
+    connections,
+    connectedTaxonomies,
+    location,
+    onTagClick,
+  },
+  messagesRendered
+  ) => {
+    const locationQuery = location.query;
+
+    return (
+      <div>
+        { filters.taxonomies && taxonomies &&
+          this.renderCurrentTaxonomyFilters(filters.taxonomies, taxonomies, locationQuery, onTagClick, messagesRendered)
+        }
+        { filters.connectedTaxonomies && connectedTaxonomies.taxonomies &&
+          this.renderCurrentConnectedTaxonomyFilters(filters.connectedTaxonomies, connectedTaxonomies.taxonomies, locationQuery, onTagClick)
+        }
+        { filters.connections && connections &&
+          this.renderCurrentConnectionFilters(filters.connections.options, connections, locationQuery, onTagClick, messagesRendered)
+        }
+        { filters.attributes &&
+          this.renderCurrentAttributeFilters(filters.attributes.options, locationQuery, onTagClick)
+        }
+      </div>
+    );
+  }
 
   render() {
     const {
@@ -72,17 +389,15 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       activePanel,
       dataReady,
       isManager,
+      entityIdsSelected,
     } = this.props;
     // sorted entities
-    const entities = this.props.entities && orderBy(
+    const entitiesSorted = this.props.entities && orderBy(
       this.props.entities,
       getEntitySortIteratee(sortBy),
       sortOrder
     );
-
-    // map entities to entity list item data
-    const entitiesList = Object.values(entities).map(this.props.mapToEntityList);
-    const entitiesSelected = Object.values(pick(this.props.entities, this.props.entityIdsSelected));
+    const entitiesSelected = Object.values(pick(this.props.entities, entityIdsSelected));
 
     const filterListOption = {
       label: 'Filter list',
@@ -106,6 +421,18 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       filterListOption,
     ];
 
+    let allChecked = CHECKBOX_STATES.INDETERMINATE;
+    if (entitiesSelected.length === 0) {
+      allChecked = CHECKBOX_STATES.UNCHECKED;
+    } else if (entitiesSorted.length > 0 && entitiesSelected.length === entitiesSorted.length) {
+      allChecked = CHECKBOX_STATES.CHECKED;
+    }
+    let listHeaderLabel = this.props.entityTitle.plural;
+    if (entitiesSelected.length === 1) {
+      listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.single} selected`;
+    } else if (entitiesSelected.length > 1) {
+      listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
+    }
     return (
       <div>
         <EntityListSidebar
@@ -127,7 +454,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               formOptions={
                 activeFilterOption
                 ? fromJS(makeActiveFilterOptions(
-                  entities,
+                  entitiesSorted,
                   this.props,
                   {
                     titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
@@ -141,21 +468,20 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               onHideFilterForm={this.props.onHideFilterForm}
             />
           }
-          { dataReady && isManager && activePanel === EDIT_PANEL &&
+          { dataReady && isManager && activePanel === EDIT_PANEL && entitiesSelected.length > 0 &&
             <EntityListEdit
               editGroups={
-                entitiesSelected.length
-                ? fromJS(makeEditGroups(
+                fromJS(makeEditGroups(
                   this.props,
                   {
                     attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
                     taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
                     connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
                   }
-                )) : null
+                ))
               }
               formOptions={
-                activeEditOption && entitiesSelected.length
+                activeEditOption
                 ? fromJS(makeActiveEditOptions(
                   entitiesSelected,
                   this.props,
@@ -168,6 +494,16 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               onHideEditForm={this.props.onHideEditForm}
               onAssign={(associations) => this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
             />
+          }
+          { dataReady && isManager && activePanel === EDIT_PANEL && entitiesSorted.length === 0 &&
+            <ListEntitiesEmpty>
+               No entities found
+            </ListEntitiesEmpty>
+          }
+          { dataReady && isManager && activePanel === EDIT_PANEL && entitiesSelected.length === 0 && entitiesSorted.length > 0 &&
+            <ListEntitiesEmpty>
+              Please select one or more entities for edit options
+            </ListEntitiesEmpty>
           }
         </EntityListSidebar>
         <ContainerWithSidebar>
@@ -187,16 +523,61 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 </div>
               }
               { dataReady &&
-                <Form model={SELECTION_FORM_MODEL}>
-                  {entitiesList.map((entity, i) =>
-                    <EntityListItem
-                      key={i}
-                      model={`.entities.${entity.id}`}
-                      select={isManager}
-                      {...entity}
-                    />
-                  )}
-                </Form>
+                <ListEntities>
+                  <ListEntitiesTopFilters>
+                    {this.renderCurrentFilters(
+                      this.props,
+                      {
+                        without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
+                      }
+                    )}
+                  </ListEntitiesTopFilters>
+                  <ListEntitiesHeaderOptions />
+                  <ListEntitiesHeader>
+                    <ListEntitiesSelectAll>
+                      { isManager &&
+                        <span>
+                          <IndeterminateCheckbox
+                            id="select-all"
+                            checked={allChecked}
+                            onChange={(checked) => {
+                              this.props.onEntitySelectAll(checked ? Object.keys(this.props.entities) : []);
+                            }}
+                          />
+                          <label htmlFor="select-all">
+                            {listHeaderLabel}
+                          </label>
+                        </span>
+                      }
+                      { !isManager &&
+                        <span>{listHeaderLabel}</span>
+                      }
+                    </ListEntitiesSelectAll>
+                  </ListEntitiesHeader>
+                  <ListEntitiesMain>
+                    { entitiesSorted.length === 0 && this.props.location.query &&
+                      <ListEntitiesEmpty>
+                        No results matched your search
+                      </ListEntitiesEmpty>
+                    }
+                    { entitiesSorted.length === 0 && !this.props.location.query &&
+                      <ListEntitiesEmpty>
+                        No entities yet
+                      </ListEntitiesEmpty>
+                    }
+                    { entitiesSorted.length > 0 &&
+                      entitiesSorted.map((entity, i) =>
+                        <EntityListItem
+                          key={i}
+                          select={isManager}
+                          checked={entitiesSelected.map((e) => e.id).indexOf(entity.id) > -1}
+                          onSelect={(checked) => this.props.onEntitySelect(entity.id, checked)}
+                          entity={this.mapToEntityList(entity, this.props)}
+                        />
+                      )
+                    }
+                  </ListEntitiesMain>
+                </ListEntities>
               }
             </Styled>
           </Container>
@@ -208,10 +589,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
 EntityList.propTypes = {
   entities: PropTypes.object.isRequired,
-  // selects: PropTypes.object, // only used in mapStateToProps
+  filters: PropTypes.object,
+  taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
-  mapToEntityList: PropTypes.func.isRequired,
   header: PropTypes.object,
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
@@ -222,9 +603,15 @@ EntityList.propTypes = {
   onShowEditForm: PropTypes.func.isRequired,
   onHideEditForm: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,
+  onTagClick: PropTypes.func.isRequired,
   activePanel: PropTypes.string,
   entityIdsSelected: PropTypes.array,
   handleEditSubmit: PropTypes.func.isRequired,
+  onEntitySelect: PropTypes.func.isRequired,
+  onEntitySelectAll: PropTypes.func.isRequired,
+  location: PropTypes.object,
+  entityTitle: PropTypes.object, // single/plural
+  entityLinkTo: PropTypes.string,
 };
 
 EntityList.defaultProps = {
@@ -283,9 +670,8 @@ const getConnectedQuery = (props) => {
           props.filters.connectedTaxonomies.connections,
           (connection) => connection.path === pathValue[0]
         );
-        // console.log(connection)
         if (connectedTaxonomy) {
-          const condition = connectedTaxonomy.connected;
+          const condition = cloneDeep(connectedTaxonomy.connected);
           condition.connected.where = {
             [condition.connected.whereKey]: pathValue[1],
           };
@@ -465,6 +851,15 @@ function mapDispatchToProps(dispatch, props) {
       }
 
       dispatch(saveEdits(saveData.toJS()));
+    },
+    onEntitySelect: (id, checked) => {
+      dispatch(selectEntity({ id, checked }));
+    },
+    onEntitySelectAll: (ids) => {
+      dispatch(selectEntities(ids));
+    },
+    onTagClick: (value) => {
+      dispatch(updateQuery(fromJS([value])));
     },
   };
 }

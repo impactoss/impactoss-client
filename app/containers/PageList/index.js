@@ -14,6 +14,7 @@ import { PUBLISH_STATUSES } from 'containers/App/constants';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 export class PageList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -28,14 +29,6 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
       this.props.loadEntitiesIfNeeded();
     }
   }
-
-  mapToEntityList = ({ id, attributes }) => ({
-    id,
-    title: attributes.title,
-    linkTo: `/pages/${id}`,
-    reference: id,
-    status: attributes.draft ? 'draft' : null,
-  })
 
   render() {
     const { dataReady } = this.props;
@@ -93,12 +86,16 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
         />
         <EntityList
           location={this.props.location}
-          mapToEntityList={this.mapToEntityList}
           selects={selects}
           filters={filters}
           edits={edits}
           header={headerOptions}
           dataReady={dataReady}
+          entityTitle={{
+            single: this.context.intl.formatMessage(appMessages.entities.pages.single),
+            plural: this.context.intl.formatMessage(appMessages.entities.pages.plural),
+          }}
+          entityLinkTo="/pages/"
         />
       </div>
     );

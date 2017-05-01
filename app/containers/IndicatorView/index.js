@@ -50,7 +50,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     }))
   mapDates = (dates) =>
     Object.values(dates).map((date) => ({
-      label: date.attributes.due_date,
+      label: `${date.attributes.due_date}${date.attributes.due ? ' [due]' : ''}${date.attributes.overdue ? ' [overdue]' : ''}`,
     }))
 
   render() {
