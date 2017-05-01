@@ -21,9 +21,9 @@ import { lowerCase } from 'utils/string';
 import Loading from 'components/Loading';
 import PageHeader from 'components/PageHeader';
 import EntityListSidebar from 'components/EntityListSidebar';
-import EntityListFilters from 'components/EntityListFilters';
-import EntityListEdit from 'components/EntityListEdit';
-import EntityListItem from 'components/EntityListItem';
+import EntityListSidebarFilters from 'components/EntityListSidebarFilters';
+import EntityListSidebarEdit from 'components/EntityListSidebarEdit';
+import EntityListItems from 'components/EntityListItems';
 import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
 import Container from 'components/basic/Container';
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
@@ -96,75 +96,6 @@ const Button = styled(Tag)`
   cursor: pointer;
 `;
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  getConnectedCounts = (entity, connectionOptions) => {
-    const counts = [];
-    forEach(connectionOptions, (option) => {
-      if (entity[option.path] && Object.keys(entity[option.path]).length > 0) {
-        counts.push({
-          count: Object.keys(entity[option.path]).length,
-          option: {
-            label: option.label,
-          },
-        });
-      }
-    });
-    return counts;
-  };
-  getEntityTags = (entity, taxonomies, query, onClick) => {
-    const tags = [];
-    if (entity.taxonomies) {
-      const categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
-      forEach(taxonomies, (tax) => {
-        forEach(tax.categories, (category, catId) => {
-          if (categoryIds && categoryIds.indexOf(parseInt(catId, 10)) > -1) {
-            const label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
-              ? category.attributes.short_title
-              : category.attributes.title);
-            if (query && onClick) {
-              tags.push({
-                label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
-                onClick: () => onClick({
-                  value: catId,
-                  query,
-                  checked: true,
-                }),
-              });
-            } else {
-              tags.push({
-                label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
-              });
-            }
-          }
-        });
-      });
-    }
-    return tags;
-  };
-
-  mapToEntityList = (entity, props) => {
-    const {
-      taxonomies,
-      entityLinkTo,
-      filters,
-      onTagClick,
-      isManager,
-    } = props;
-
-    return {
-      id: entity.id,
-      title: entity.attributes.name || entity.attributes.title,
-      reference: entity.attributes.number || entity.id,
-      linkTo: `${entityLinkTo}${entity.id}`,
-      status: entity.attributes.draft ? 'draft' : null,
-      updated: isManager ? entity.attributes.updated_at : null,
-      tags: this.getEntityTags(entity,
-        taxonomies,
-        filters.taxonomies && filters.taxonomies.query,
-        filters.taxonomies && onTagClick
-      ),
-      connectedCounts: filters.connections ? this.getConnectedCounts(entity, filters.connections.options) : [],
-    };
-  };
 
   renderCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQuery, onClick, messagesRendered) => {
     const tags = [];
@@ -439,7 +370,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           options={panelSwitchOptions}
         >
           { dataReady && activePanel === FILTERS_PANEL &&
-            <EntityListFilters
+            <EntityListSidebarFilters
               filterGroups={
                 fromJS(makeFilterGroups(
                   this.props,
@@ -469,7 +400,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             />
           }
           { dataReady && isManager && activePanel === EDIT_PANEL && entitiesSelected.length > 0 &&
-            <EntityListEdit
+            <EntityListSidebarEdit
               editGroups={
                 fromJS(makeEditGroups(
                   this.props,
@@ -566,15 +497,18 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                       </ListEntitiesEmpty>
                     }
                     { entitiesSorted.length > 0 &&
-                      entitiesSorted.map((entity, i) =>
-                        <EntityListItem
-                          key={i}
-                          select={isManager}
-                          checked={entitiesSelected.map((e) => e.id).indexOf(entity.id) > -1}
-                          onSelect={(checked) => this.props.onEntitySelect(entity.id, checked)}
-                          entity={this.mapToEntityList(entity, this.props)}
-                        />
-                      )
+                      <EntityListItems
+                        entities={entitiesSorted}
+                        entitiesSelected={entitiesSelected}
+                        isSelect={isManager}
+                        showDate={isManager}
+                        onEntitySelect={this.props.onEntitySelect}
+                        taxonomies={this.props.taxonomies}
+                        entityLinkTo={this.props.entityLinkTo}
+                        filters={this.props.filters}
+                        onTagClick={this.props.onTagClick}
+                        childList={this.props.childList}
+                      />
                     }
                   </ListEntitiesMain>
                 </ListEntities>
@@ -612,6 +546,7 @@ EntityList.propTypes = {
   location: PropTypes.object,
   entityTitle: PropTypes.object, // single/plural
   entityLinkTo: PropTypes.string,
+  childList: PropTypes.string,
 };
 
 EntityList.defaultProps = {
@@ -721,13 +656,18 @@ const mapStateToProps = (state, props) => ({
     ? getEntities(state, props.selects.taxonomies)
     : null,
   connections: props.selects && props.selects.connections
-    ? reduce(props.selects.connections.options, (result, path) => ({
-      ...result,
-      [path]: getEntities(state, {
-        out: 'js',
-        path,
-      }),
-    }), {})
+    ? reduce(props.selects.connections.options, (result, option) => {
+      const path = typeof option === 'string' ? option : option.path;
+      const extend = typeof option === 'string' ? [] : option.extend;
+      return {
+        ...result,
+        [path]: getEntities(state, {
+          out: 'js',
+          path,
+          extend,
+        }),
+      };
+    }, {})
     : null,
   connectedTaxonomies: props.selects && props.selects.connectedTaxonomies
   ? reduce(props.selects.connectedTaxonomies.options, (result, select) => ({

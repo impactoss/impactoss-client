@@ -9,7 +9,7 @@ import { Map } from 'immutable';
 
 import EntityListForm from 'containers/EntityListForm';
 
-export default class EntityListFilters extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListSidebarFilters extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     filterGroups: PropTypes.instanceOf(Map),
     formOptions: PropTypes.object,

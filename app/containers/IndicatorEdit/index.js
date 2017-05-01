@@ -193,6 +193,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                       controlType: 'input',
                       label: 'Reporting due date',
                       model: '.attributes.start_date',
+                      placeholder: 'YYYY-MM-DD',
                     },
                     {
                       id: 'repeat',
@@ -211,6 +212,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                       controlType: 'input',
                       label: 'Reporting end date',
                       model: '.attributes.end_date',
+                      placeholder: 'YYYY-MM-DD',
                     },
                   ],
                 },
