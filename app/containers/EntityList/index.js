@@ -21,8 +21,8 @@ import { lowerCase } from 'utils/string';
 import Loading from 'components/Loading';
 import PageHeader from 'components/PageHeader';
 import EntityListSidebar from 'components/EntityListSidebar';
-import EntityListFilters from 'components/EntityListFilters';
-import EntityListEdit from 'components/EntityListEdit';
+import EntityListSidebarFilters from 'components/EntityListSidebarFilters';
+import EntityListSidebarEdit from 'components/EntityListSidebarEdit';
 import EntityListItems from 'components/EntityListItems';
 import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
 import Container from 'components/basic/Container';
@@ -370,7 +370,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           options={panelSwitchOptions}
         >
           { dataReady && activePanel === FILTERS_PANEL &&
-            <EntityListFilters
+            <EntityListSidebarFilters
               filterGroups={
                 fromJS(makeFilterGroups(
                   this.props,
@@ -400,7 +400,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             />
           }
           { dataReady && isManager && activePanel === EDIT_PANEL && entitiesSelected.length > 0 &&
-            <EntityListEdit
+            <EntityListSidebarEdit
               editGroups={
                 fromJS(makeEditGroups(
                   this.props,

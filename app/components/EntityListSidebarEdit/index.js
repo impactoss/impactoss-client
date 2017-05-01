@@ -12,7 +12,7 @@ import EntityListForm from 'containers/EntityListForm';
 
 const Component = styled.div``;
 
-export default class EntityListEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListSidebarEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     editGroups: PropTypes.instanceOf(Map),
     formOptions: PropTypes.object,

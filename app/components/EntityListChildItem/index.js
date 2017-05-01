@@ -20,9 +20,10 @@ const ReferenceLink = styled(Link)`
   font-weight: bold;
   text-decoration: none;
   display: block;
+  font-size:0.9em;
 `;
 const TitleLink = styled(Link)`
-  font-weight: bold;
+  font-size:0.9em;
   text-decoration: none;
   display: block;
   padding: 5px 0;
