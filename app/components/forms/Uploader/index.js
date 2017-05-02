@@ -1,34 +1,53 @@
 import React from 'react';
 import ReactS3Uploader from 'react-s3-uploader';
-
-// TODO put in helper
-const getPathFromUrl = (url) => url.split(/[?#]/)[0];
+import { getPathFromUrl } from 'utils/string';
+import { API_ENDPOINT, SIGNING_URL_ENDPOINT } from 'containers/App/constants';
 
 class Uploader extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
-  onUploadFinish = (signedUrl) => {
-    this.props.onChange(getPathFromUrl(signedUrl.signedUrl));
+  state = {
+    progress: null,
+    error: null,
   }
 
-  onUploadProgress = () => {
-    // TODO: handle upload progress -- note int is parameter with value of progress
+  onUploadFinish = ({ signedUrl }) => {
+    this.props.onChange(getPathFromUrl(signedUrl));
   }
 
-  onUploadError = () => {
-    // TODO: handle error
+  onUploadProgress = (progress) => {
+    this.setState({
+      progress,
+    });
+  }
+
+  onUploadError = (error) => {
+    this.setState({
+      error,
+    });
   }
 
   render() {
     return (
-      <ReactS3Uploader
-        signingUrl="/s3/sign"
-        signingUrlMethod="GET"
-        signingUrlWithCredentials
-        onProgress={this.onUploadProgress}
-        onError={this.onUploadError}
-        onFinish={this.onUploadFinish}
-        server="https://undp-sadata-staging.herokuapp.com"
-      />
+      <div>
+        <ReactS3Uploader
+          signingUrl={SIGNING_URL_ENDPOINT}
+          signingUrlMethod="GET"
+          signingUrlWithCredentials
+          onProgress={this.onUploadProgress}
+          onError={this.onUploadError}
+          onFinish={this.onUploadFinish}
+          server={API_ENDPOINT}
+          scrubFilename={(filename) => filename.replace(/(\.[\w\d_-]+)$/i, `_${Date.now()}$1`)}
+        />
+        {
+          this.state.progress &&
+          this.state.progress
+        }
+        {
+          this.state.error &&
+          this.state.error
+        }
+      </div>
     );
   }
 }
