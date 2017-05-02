@@ -10,6 +10,7 @@ import { lowerCase } from 'utils/string';
 import Row from 'components/basic/Row';
 import FormWrapper from 'components/basic/FormWrapper';
 import MultiSelectControl from 'components/forms/MultiSelectControl';
+import Uploader from 'components/forms/Uploader';
 import FormHeader from '../FormHeader';
 import FormBody from '../FormBody';
 import FormFooter from '../FormFooter';
@@ -178,6 +179,14 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             </MultiSelectWrapper>
           }
         </div>
+      );
+    }
+    if (field.controlType === 'uploader') {
+      return (
+        <Control.input
+          model={model}
+          component={Uploader}
+        />
       );
     }
     return (
