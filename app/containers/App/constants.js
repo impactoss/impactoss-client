@@ -64,3 +64,4 @@ export const UPDATE_ENTITY_FORM = 'nmrf/App/UPDATE_ENTITY_FORM';
 
 // TODO need to pull from an env file
 export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';
+export const SIGNING_URL_ENDPOINT = '/s3/sign';
