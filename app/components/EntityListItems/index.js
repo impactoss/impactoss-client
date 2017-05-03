@@ -8,7 +8,8 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
   getConnectedCounts = (entity, connectionOptions) => {
     const counts = [];
     forEach(connectionOptions, (option) => {
-      if (entity[option.path] && Object.keys(entity[option.path]).length > 0) {
+      const expandable = typeof option.expandable !== 'undefined' ? option.expandable : false
+      if (!expandable && entity[option.path] && Object.keys(entity[option.path]).length > 0) {
         counts.push({
           count: Object.keys(entity[option.path]).length,
           option: {
@@ -52,14 +53,17 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
   };
 
   mapToEntityListItem = (entity, props) => {
+    expand: PropTypes.number,
+    expandable: PropTypes.bool,
+    getExpandedColumns: PropTypes.array,
+    getExpandableColumns: PropTypes.array,
     const {
       taxonomies,
       entityLinkTo,
       filters,
       onTagClick,
       showDate,
-      childList,
-      onEntitySelect,
+
     } = props;
 
     return {
@@ -76,17 +80,8 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
           filters.taxonomies && onTagClick)
         : [],
       connectedCounts: filters && filters.connections ? this.getConnectedCounts(entity, filters.connections.options) : [],
-      children: childList ? {
-        entities: entity[childList] ? Object.values(entity[childList]).reduce((memo, children) => {
-          if (children.child) {
-            memo.push(children.child);
-          }
-          return memo;
-        }, []) : [],
-        showDate,
-        entityLinkTo: `/${childList}/`,
-        onEntitySelect,
-      } : null,
+      expandableColumns: entity.expandableColumns,
+      expandedColumns: entity.expandedColumns,
     };
   };
 
@@ -95,7 +90,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
       entities,
       entitiesSelected,
       isSelect,
-      expand,
+      onEntitySelect,
     } = this.props;
 
     // console.log('List:render', entities, childList)
@@ -108,9 +103,8 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
               key={i}
               select={isSelect}
               checked={isSelect && entitiesSelected.map((e) => e.id).indexOf(entity.id) > -1}
-              onSelect={(checked) => this.props.onEntitySelect(entity.id, checked)}
+              onSelect={(checked) => onEntitySelect(entity.id, checked)}
               entity={this.mapToEntityListItem(entity, this.props)}
-              expand={expand}
             />
           )
         }
@@ -122,15 +116,17 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
 EntityListItems.propTypes = {
   entities: PropTypes.array.isRequired,
   entitiesSelected: PropTypes.array,
-  showDate: PropTypes.bool,
   isSelect: PropTypes.bool,
   onEntitySelect: PropTypes.func.isRequired,
+  showDate: PropTypes.bool,
   taxonomies: PropTypes.object,
   entityLinkTo: PropTypes.string,
   filters: PropTypes.object,
   onTagClick: PropTypes.func,
-  childList: PropTypes.string,
-  expand: PropTypes.string,
+  expand: PropTypes.number,
+  expandable: PropTypes.bool,
+  getExpandedColumns: PropTypes.array,
+  getExpandableColumns: PropTypes.array,
 };
 
 export default EntityListItems;

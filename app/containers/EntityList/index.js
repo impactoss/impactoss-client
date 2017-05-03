@@ -110,8 +110,13 @@ const Tag = styled.button`
 const Button = styled(Tag)`
   cursor: pointer;
 `;
-export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+const ListEntitiesHeaderOptionGroup = styled.span`
+`;
 
+export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  renderGroupingOptions = () => {
+    return 'TODO list group options'
+  }
   renderCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQuery, onClick, messagesRendered) => {
     const tags = [];
     if (locationQuery[taxonomyFilters.query]) {
@@ -379,7 +384,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     } else if (entitiesSelected.length > 1) {
       listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
     }
-
     return (
       <div>
         <EntityListSidebar
@@ -480,10 +484,15 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     )}
                   </ListEntitiesTopFilters>
                   <ListEntitiesHeaderOptions>
+                    <ListEntitiesHeaderOptionGroup>
+                      {
+                        this.renderGroupingOptions()
+                      }
+                    </ListEntitiesHeaderOptionGroup>
                     <ListEntitiesHeaderOptionLinks>
-                      { this.props.childList &&
-                        <ListEntitiesHeaderOptionLink onClick={() => this.props.onExpand(this.props.expand !== 'all', 'all')}>
-                          {`${(!this.props.expand) || this.props.expand !== 'all' ? 'Implementation Plan View' : 'List View'}`}
+                      { this.props.expandable &&
+                        <ListEntitiesHeaderOptionLink onClick={() => this.props.onExpand(this.props.expand !== 'all', this.props.expandableColumns.length)}>
+                          {`${(!this.props.expand) || this.props.expand >= this.props.expandableColumns.length ? 'Implementation Plan View' : 'List View'}`}
                         </ListEntitiesHeaderOptionLink>
                       }
                     </ListEntitiesHeaderOptionLinks>
@@ -531,8 +540,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                         entityLinkTo={this.props.entityLinkTo}
                         filters={this.props.filters}
                         onTagClick={this.props.onTagClick}
-                        childList={this.props.childList}
+                        expandable={this.props.expandable}
                         expand={this.props.expand}
+                        getExpandableColumns={this.getExpandableColumns}
                       />
                     }
                   </ListEntitiesMain>
@@ -572,8 +582,9 @@ EntityList.propTypes = {
   location: PropTypes.object,
   entityTitle: PropTypes.object, // single/plural
   entityLinkTo: PropTypes.string,
-  childList: PropTypes.string,
-  expand: PropTypes.string,
+  expandable: PropTypes.bool,
+  expandableColumns: PropTypes.array,
+  expand: PropTypes.number,
 };
 
 EntityList.defaultProps = {
@@ -685,13 +696,11 @@ const mapStateToProps = (state, props) => ({
   connections: props.selects && props.selects.connections
     ? reduce(props.selects.connections.options, (result, option) => {
       const path = typeof option === 'string' ? option : option.path;
-      const extend = typeof option === 'string' ? [] : option.extend;
       return {
         ...result,
         [path]: getEntities(state, {
           out: 'js',
           path,
-          extend,
         }),
       };
     }, {})

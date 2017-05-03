@@ -7,6 +7,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import styled from 'styled-components';
 
 import EntityList from 'containers/EntityList';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
@@ -19,6 +20,20 @@ import messages from './messages';
 
 const expand = (props) => props.location.query.expand;
 
+const ColExpand = styled.td`
+  width: 150px;
+  vertical-align: top;
+  border-left: 1px solid #F1F3F3;
+`;
+const Count = styled.div`
+  display: inline-block;
+  background: #eee;
+  color: #333;
+  padding: 1px 6px;
+  margin: 0 3px;
+  border-radius: 999px;
+  font-size: 0.8em;
+`;
 export class ActionList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
@@ -51,18 +66,24 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             key: 'measure_id',
             reverse: true,
             as: 'recommendations',
+            extend: {
+              path: 'recommendations',
+              key: 'recommendation_id',
+              as: 'recommendation',
+              type: 'single',
+            }
           },
           {
             path: 'measure_indicators',
             key: 'measure_id',
             reverse: true,
             as: 'indicators',
-            extend: expand(this.props) ? {
+            extend: {
               path: 'indicators',
               key: 'indicator_id',
-              as: 'child',
+              as: 'indicator',
               type: 'single',
-              extend: [
+              extend: expand(this.props) ? [
                 {
                   path: 'progress_reports',
                   key: 'indicator_id',
@@ -83,11 +104,33 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
                   path: 'measure_indicators',
                   key: 'indicator_id',
                   reverse: true,
-                  as: 'measureCount',
-                  type: 'count',
+                  as: 'measures',
+                  extend: {
+                    path: 'measures',
+                    key: 'measure_id',
+                    as: 'measure',
+                    type: 'single',
+                  },
+                },
+              ] : [
+                {
+                  path: 'progress_reports',
+                  key: 'indicator_id',
+                  reverse: true,
+                  as: 'reports',
+                },
+                {
+                  path: 'due_dates',
+                  key: 'indicator_id',
+                  reverse: true,
+                  as: 'dates',
+                  without: {
+                    path: 'progress_reports',
+                    key: 'due_date_id',
+                  },
                 },
               ],
-            } : null,
+            },
           },
         ],
       },
@@ -130,6 +173,20 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       },
     };
 
+    const expandableColumns = [
+      {
+        label: 'Indicators',
+        path: 'indicators'
+        getColumn: this.getIndicatorColumn,
+        getEntities: this.getIndicators,
+      },
+      {
+        label: "Progress reports",
+        getColumn: this.getReportColumn,
+        getEntities: this.getReports,
+      }
+    ];
+
     // specify the filter and query options
     const filters = {
       attributes: {  // filter by attribute value
@@ -159,6 +216,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             query: 'indicators',
             key: 'indicator_id',
             filter: true,
+            expandable: true,
             connected: {
               path: 'measure_indicators',
               key: 'measure_id',
@@ -268,7 +326,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
           }}
           entityLinkTo="/actions/"
-          childList="indicators"
+          expandable={true}
+          expandableColumns={expandableColumns}
           expand={expand(this.props)}
         />
       </div>
@@ -302,7 +361,6 @@ const mapStateToProps = (state, props) => ({
         'indicators',
         'measure_indicators',
         'due_dates',
-        'progress_reports',
       ]
       : [
         'measures',
@@ -315,6 +373,7 @@ const mapStateToProps = (state, props) => ({
         'recommendation_categories',
         'indicators',
         'measure_indicators',
+        'progress_reports',
       ],
   }),
 });
@@ -332,9 +391,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+      dispatch(loadEntitiesIfNeeded('progress_reports'));
       if (expand(props)) {
         dispatch(loadEntitiesIfNeeded('due_dates'));
-        dispatch(loadEntitiesIfNeeded('progress_reports'));
       }
     },
     handleNew: () => {
