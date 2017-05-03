@@ -187,7 +187,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                     },
                     {
                       id: 'document_url',
-                      controlType: 'input',
+                      controlType: 'uploader',
                       model: '.attributes.document_url',
                     },
                     {
