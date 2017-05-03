@@ -30,14 +30,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  mapToEntityList = ({ id, attributes }) => ({
-    id,
-    title: attributes.title,
-    linkTo: `/actions/${id}`,
-    reference: id,
-    status: attributes.draft ? 'draft' : null,
-  })
-
   render() {
     const { dataReady } = this.props;
 
@@ -63,6 +55,37 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             key: 'measure_id',
             reverse: true,
             as: 'indicators',
+            extend: {
+              path: 'indicators',
+              key: 'indicator_id',
+              as: 'child',
+              type: 'single',
+              extend: [
+                {
+                  path: 'progress_reports',
+                  key: 'indicator_id',
+                  reverse: true,
+                  as: 'reports',
+                },
+                {
+                  path: 'due_dates',
+                  key: 'indicator_id',
+                  reverse: true,
+                  as: 'dates',
+                  without: {
+                    path: 'progress_reports',
+                    key: 'due_date_id',
+                  },
+                },
+                {
+                  path: 'measure_indicators',
+                  key: 'indicator_id',
+                  reverse: true,
+                  as: 'measureCount',
+                  type: 'count',
+                },
+              ],
+            },
           },
         ],
       },
@@ -145,7 +168,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             path: 'recommendations', // filter by recommendation connection
             query: 'recommendations',
             key: 'recommendation_id',
-            search: true,
+            filter: true,
             connected: {
               path: 'recommendation_measures',
               key: 'measure_id',
@@ -233,12 +256,17 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         />
         <EntityList
           location={this.props.location}
-          mapToEntityList={this.mapToEntityList}
           selects={selects}
           filters={filters}
           edits={edits}
           header={headerOptions}
           dataReady={dataReady}
+          entityTitle={{
+            single: this.context.intl.formatMessage(appMessages.entities.measures.single),
+            plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+          }}
+          entityLinkTo="/actions/"
+          childList="indicators"
         />
       </div>
     );
@@ -268,6 +296,8 @@ const mapStateToProps = (state) => ({
     'recommendation_categories',
     'indicators',
     'measure_indicators',
+    'due_dates',
+    'progress_reports',
   ] }),
 });
 function mapDispatchToProps(dispatch) {
@@ -283,6 +313,8 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      dispatch(loadEntitiesIfNeeded('due_dates'));
+      dispatch(loadEntitiesIfNeeded('progress_reports'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
     handleNew: () => {

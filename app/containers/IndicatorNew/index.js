@@ -147,6 +147,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                       controlType: 'input',
                       label: 'Reporting due date',
                       model: '.attributes.start_date',
+                      placeholder: 'YYYY-MM-DD',
                     },
                     {
                       id: 'repeat',
@@ -165,6 +166,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                       controlType: 'input',
                       label: 'Reporting end date',
                       model: '.attributes.end_date',
+                      placeholder: 'YYYY-MM-DD',
                     },
                   ],
                 },

@@ -86,6 +86,13 @@ export function mapDispatchToProps(dispatch) {
     },
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('user_roles'));
+      // dispatch(loadEntitiesIfNeeded('taxonomies'));
+      // dispatch(loadEntitiesIfNeeded('categories'));
+      // dispatch(loadEntitiesIfNeeded('measures'));
+      // dispatch(loadEntitiesIfNeeded('measure_categories'));
+      // dispatch(loadEntitiesIfNeeded('recommendations'));
+      // dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      // dispatch(loadEntitiesIfNeeded('recommendation_categories'));
     },
   };
 }

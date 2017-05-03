@@ -2,7 +2,8 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import styled from 'styled-components';
 
-import EntityListChildItems from 'components/EntityListChildItems';
+import EntityListChildReportItems from 'components/EntityListChildReportItems';
+
 
 const ListItem = styled.div`
 `;
@@ -10,15 +11,11 @@ const ListItem = styled.div`
 const ListItemTable = styled.table`
   width: 100%;
 `;
-const ColSelect = styled.td`
-  width: 30px;
-  background: #fff;
-`;
 const ColMain = styled.td`
   vertical-align: top;
 `;
 const ColChildren = styled.td`
-  width: 450px;
+  width: 200px;
   vertical-align: top;
 `;
 const Main = styled.div`
@@ -30,9 +27,10 @@ const ReferenceLink = styled(Link)`
   font-weight: bold;
   text-decoration: none;
   display: block;
+  font-size:0.9em;
 `;
 const TitleLink = styled(Link)`
-  font-weight: bold;
+  font-size:0.9em;
   text-decoration: none;
   display: block;
   padding: 5px 0;
@@ -75,21 +73,10 @@ border-radius: 999px;
 font-size: 0.8em;
 `;
 
-export default class EntityListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListChildItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     entity: PropTypes.object.isRequired,
-    children: PropTypes.object,
-    // side: PropTypes.object,
-    select: PropTypes.bool,
-    checked: PropTypes.bool,
-    onSelect: PropTypes.func,
-  }
-
-  static defaultProps = {
-    // children: null,
-    // side: null,
-    checked: false,
   }
 
   renderListItem = () => {
@@ -101,15 +88,6 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
           <ColMain>
             <Main>
               <table><tbody><tr>
-                {this.props.select &&
-                  <ColSelect>
-                    <input
-                      type="checkbox"
-                      checked={this.props.checked}
-                      onChange={(evt) => this.props.onSelect(evt.target.checked)}
-                    />
-                  </ColSelect>
-                }
                 <td>
                   {entity.reference &&
                     <ReferenceLink to={entity.linkTo}>{entity.reference}</ReferenceLink>
@@ -154,27 +132,22 @@ export default class EntityListItem extends React.PureComponent { // eslint-disa
               </tr></tbody></table>
             </Main>
           </ColMain>
-          { this.props.entity.children &&
-            <ColChildren>
-              <EntityListChildItems
-                entities={this.props.entity.children.entities}
-                entitiesSelected={[]}
-                showDate={this.props.entity.children.showDate}
-                isSelect={false}
-                taxonomies={null}
-                entityLinkTo={this.props.entity.children.entityLinkTo}
-                onEntitySelect={this.props.entity.children.onEntitySelect}
-                filters={null}
+          <ColChildren>
+            { this.props.entity.reportChildren &&
+              <EntityListChildReportItems
+                reports={this.props.entity.reportChildren.reports}
+                dates={this.props.entity.reportChildren.dates}
+                entityLinkTo={this.props.entity.reportChildren.entityLinkTo}
               />
-            </ColChildren>
-          }
+            }
+          </ColChildren>
         </tr></tbody></ListItemTable>
       </ListItem>
     );
   }
 
   render() {
-    // console.log('Item:render', this.props.entity, this.props.entity.children)
+    // console.log('Item:render', this.props.entity)
 
     return (
       <div>

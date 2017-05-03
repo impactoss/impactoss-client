@@ -260,7 +260,7 @@ const mapStateToProps = (state, props) => ({
               path: 'progress_reports',
               key: 'due_date_id',
               reverse: true,
-              as: 'count',
+              as: 'reportCount',
             },
           },
         },
@@ -290,6 +290,8 @@ function mapDispatchToProps(dispatch) {
       const formDateIds = getCheckedValuesFromOptions(formData.get('associatedDate'));
       if (List.isList(formDateIds) && formDateIds.size) {
         saveData = saveData.setIn(['attributes', 'due_date_id'], formDateIds.first());
+      } else {
+        saveData = saveData.setIn(['attributes', 'due_date_id'], null);
       }
 
       dispatch(save(saveData.toJS()));

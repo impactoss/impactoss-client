@@ -13,45 +13,18 @@ export default class IndeterminateCheckbox extends React.Component {
     onChange: PropTypes.func.isRequired,
   }
 
-  componentDidMount() {
-    this.setIndeterminate();
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.checked !== this.props.checked) {
-      this.setIndeterminate();
-    }
-  }
-
-  setIndeterminate = () => {
-    switch (this.props.checked) {
-      case STATES.CHECKED:
-      case STATES.UNCHECKED:
-        this.inputRef.checked = this.props.checked;
-        break;
-      default:
-        this.inputRef.indeterminate = true;
-    }
-  }
-
   render() {
     const { onChange, checked, ...props } = this.props;
+    /* eslint-disable no-param-reassign */
     return (
       <input
         type="checkbox"
-        ref={(ref) => { if (ref) this.inputRef = ref; }}
-        checked={checked}
-        onChange={(evt) => {
-          if (evt && evt !== undefined) evt.preventDefault();
-          switch (this.props.checked) {
-            case STATES.CHECKED:
-              return onChange(STATES.UNCHECKED);
-            default: // STATES.UNCHECKED or STATES.INDETERMINATE
-              return onChange(STATES.CHECKED);
-          }
-        }}
+        ref={(ref) => { if (ref) ref.indeterminate = checked === STATES.INDETERMINATE; }}
+        checked={!!checked}
+        onChange={(evt) => onChange(evt.target.checked)}
         {...props}
       />
     );
+    /* eslint-enable no-param-reassign */
   }
 }

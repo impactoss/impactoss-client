@@ -4,7 +4,7 @@
 *
 */
 
-import { fromJS } from 'immutable';
+import { fromJS, List } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 
@@ -17,38 +17,56 @@ import {
   FILTERS_PANEL,
   EDIT_PANEL,
   RESET_STATE,
-  SELECTION_FORM_MODEL,
+  ENTITY_SELECTED,
+  ENTITIES_SELECT,
 } from './constants';
 
 const initialState = fromJS({
   activeFilterOption: null,
   activeEditOption: null,
   activePanel: FILTERS_PANEL,
+  entitiesSelected: [],
 });
 
 function entityListReducer(state = initialState, action) {
   switch (action.type) {
-    case SHOW_PANEL:
-      return state
+    case SHOW_PANEL: {
+      const updated = state
         .set('activePanel', action.activePanel)
         .set('activeFilterOption', null)
         .set('activeEditOption', null);
+      // reset selected if filters panel activated
+      return action.activePanel === FILTERS_PANEL
+        ? updated.set('entitiesSelected', List())
+        : updated;
+    }
     case SHOW_FILTER_FORM:
       return state.set('activeFilterOption', action.option);
+    case HIDE_FILTER_FORM:
+      return state.set('activeFilterOption', null);
     case SHOW_EDIT_FORM:
       return state.set('activeEditOption', action.option);
-    case HIDE_FILTER_FORM:
     case HIDE_EDIT_FORM:
+      return state.set('activeEditOption', null);
     case RESET_STATE:
       return initialState;
-    case 'rrf/change':
-      // if selection changes
-      return action.model.substr(0, SELECTION_FORM_MODEL.length) === SELECTION_FORM_MODEL
-        ? state
-          .set('activePanel', EDIT_PANEL)
-          .set('activeFilterOption', null)
-          .set('activeEditOption', null)
-        : state;
+    case ENTITY_SELECTED: {
+      const selected = state.get('entitiesSelected');
+      return state
+        .set('entitiesSelected', action.data.checked
+          ? selected.push(action.data.id)
+          : selected.filterNot((id) => id === action.data.id))
+        .set('activePanel', EDIT_PANEL)
+        .set('activeFilterOption', null)
+        .set('activeEditOption', null);
+    }
+    case ENTITIES_SELECT: {
+      return state
+        .set('entitiesSelected', fromJS(action.ids))
+        .set('activePanel', EDIT_PANEL)
+        .set('activeFilterOption', null)
+        .set('activeEditOption', null);
+    }
     default:
       return state;
   }
@@ -57,16 +75,10 @@ function entityListReducer(state = initialState, action) {
 const formInitial = fromJS({
   values: [],
 });
-const selectionFormInitial = fromJS({
-  entities: {},
-});
 
 function filterFormReducer(state = formInitial, action) {
   switch (action.type) {
-    case 'rrf/change':
-      return action.model.substr(0, SELECTION_FORM_MODEL.length) === SELECTION_FORM_MODEL
-        ? formInitial
-        : state;
+    case ENTITY_SELECTED:
     case RESET_STATE:
       return formInitial;
     default:
@@ -82,24 +94,10 @@ function editFormReducer(state = formInitial, action) {
   }
 }
 
-function selectionFormReducer(state = selectionFormInitial, action) {
-  switch (action.type) {
-    case SHOW_PANEL:
-      return action.activePanel === FILTERS_PANEL ? selectionFormInitial : state;
-    case RESET_STATE:
-      return selectionFormInitial;
-    default:
-      return state;
-  }
-}
-
 export default combineReducers({
   page: entityListReducer,
   forms: combineForms({
     filterData: filterFormReducer,
     editData: editFormReducer,
-    selectionData: selectionFormReducer,
   }, 'entityList.forms'),
 });
-
-// export default entityListFilterReducer;

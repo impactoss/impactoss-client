@@ -197,6 +197,13 @@ const mapStateToProps = (state, props) => ({
           path: 'progress_reports',
           key: 'due_date_id',
         },
+        extend: {
+          type: 'count',
+          path: 'progress_reports',
+          key: 'due_date_id',
+          reverse: true,
+          as: 'reportCount',
+        },
       },
     },
   ),
@@ -205,9 +212,9 @@ const mapStateToProps = (state, props) => ({
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
       dispatch(loadEntitiesIfNeeded('progress_reports'));
+      dispatch(loadEntitiesIfNeeded('due_dates'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
     },
     handleSubmit: (formData, indicatorReference) => {
       let saveData = formData;

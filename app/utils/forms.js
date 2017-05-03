@@ -55,7 +55,7 @@ export const dateOption = (entity, activeDateId) => Map({
 export const dateOptions = (entities, activeDateId) => entities
   ? entities.reduce((options, entity) => {
     // only allow active and those that are not associated
-    if ((entity.has('count') && entity.get('count') === 0)
+    if ((entity.has('reportCount') && entity.get('reportCount') === 0)
     || (activeDateId ? activeDateId.toString() === entity.get('id') : false)) {
       return options.push(dateOption(entity, activeDateId));
     }
