@@ -60,6 +60,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
       showDate,
       childList,
       onEntitySelect,
+      expand,
     } = props;
 
     return {
@@ -76,17 +77,18 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
           filters.taxonomies && onTagClick)
         : [],
       connectedCounts: filters && filters.connections ? this.getConnectedCounts(entity, filters.connections.options) : [],
-      children: childList ? {
-        entities: entity[childList] ? Object.values(entity[childList]).reduce((memo, children) => {
-          if (children.child) {
-            memo.push(children.child);
-          }
-          return memo;
-        }, []) : [],
-        showDate,
-        entityLinkTo: `/${childList}/`,
-        onEntitySelect,
-      } : null,
+      // expandables:
+      // children: childList ? {
+      //   entities: entity[childList] ? Object.values(entity[childList]).reduce((memo, children) => {
+      //     if (children.child) {
+      //       memo.push(children.child);
+      //     }
+      //     return memo;
+      //   }, []) : [],
+      //   showDate,
+      //   entityLinkTo: `/${childList}/`,
+      //   onEntitySelect,
+      // } : null,
     };
   };
 
