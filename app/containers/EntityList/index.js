@@ -7,9 +7,8 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 
-import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
+import { orderBy, reduce } from 'lodash/collection';
 import { pick } from 'lodash/object';
-import { cloneDeep } from 'lodash/lang';
 
 import { Map, List, fromJS } from 'immutable';
 import styled from 'styled-components';
@@ -31,6 +30,11 @@ import { makeEditGroups } from './editGroupsFactory';
 import { makeActiveFilterOptions } from './filterOptionsFactory';
 import { makeActiveEditOptions } from './editOptionsFactory';
 import { makeCurrentFilters } from './filtersFactory';
+import {
+  getAttributeQuery,
+  getConnectedQuery,
+  getWithoutQuery,
+} from './entityQueries';
 
 import {
   FILTER_FORM_MODEL,
@@ -334,86 +338,6 @@ EntityList.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-// attribute conditions
-// query:"where=att1:value+att2:value"
-const getAttributeQuery = (props) =>
-  asArray(props.location.query.where).reduce((result, item) => {
-    const r = result;
-    const keyValue = item.split(':');
-    r[keyValue[0]] = keyValue[1];
-    return r;
-  }, {});
-
-const asArray = (v) => Array.isArray(v) ? v : [v];
-
-// associative conditions
-const getConnectedQuery = (props) => {
-  const connected = [];
-  forEach(props.location.query, (value, queryKey) => {
-    // filter by associated category
-    // "cat=1+2+3" catids regardless of taxonomy
-    if (props.filters.taxonomies && queryKey === props.filters.taxonomies.query) {
-      const condition = props.filters.taxonomies.connected;
-      condition.where = asArray(value).map((catId) => ({
-        [condition.whereKey]: catId,
-      })); // eg { category_id: 3 }
-      connected.push(condition);
-    // filter by associated entity
-    // "recommendations=1+2" recommendationids
-    } else if (props.filters.connections && map(props.filters.connections.options, 'query').indexOf(queryKey) > -1) {
-      const connectedEntity = find(
-        props.filters.connections.options,
-        { query: queryKey }
-      );
-      if (connectedEntity) {
-        const condition = connectedEntity.connected;
-        condition.where = asArray(value).map((connectionId) => ({
-          [condition.whereKey]: connectionId,
-        })); // eg { recommendation_id: 3 }
-        connected.push(condition);
-      }
-    // filter by associated category of associated entity
-    // query:"catx=recommendations:1" entitypath:catids regardless of taxonomy
-    } else if (props.filters.connectedTaxonomies && queryKey === props.filters.connectedTaxonomies.query) {
-      asArray(value).forEach((val) => {
-        const pathValue = val.split(':');
-        const connectedTaxonomy = find(
-          props.filters.connectedTaxonomies.connections,
-          (connection) => connection.path === pathValue[0]
-        );
-        if (connectedTaxonomy) {
-          const condition = cloneDeep(connectedTaxonomy.connected);
-          condition.connected.where = {
-            [condition.connected.whereKey]: pathValue[1],
-          };
-          connected.push(condition);
-        }
-      });
-    }
-  });
-  return connected;
-};
-
-// absent taxonomy conditions
-// query:"without=1+2+3+actions" either tax-id (numeric) or table path
-const getWithoutQuery = (props) =>
-  asArray(props.location.query.without).map((pathOrTax) => {
-    // check numeric ? taxonomy filter : related entity filter
-    if (!isNaN(parseFloat(pathOrTax)) && isFinite(pathOrTax)) {
-      return {
-        taxonomyId: pathOrTax,
-        path: props.filters.taxonomies.connected.path,
-        key: props.filters.taxonomies.connected.key,
-      };
-    }
-    if (props.filters.connections.options) {
-      // related entity filter
-      const connection = find(props.filters.connections.options, { query: pathOrTax });
-      return connection ? connection.connected : {};
-    }
-    return {};
-  });
-
 const mapStateToProps = (state, props) => ({
   isManager: isUserManager(state),
   activeFilterOption: activeFilterOptionSelector(state),
@@ -423,9 +347,15 @@ const mapStateToProps = (state, props) => ({
   entities: getEntities(state, {
     out: 'js',
     path: props.selects.entities.path,
-    where: props.location.query && props.location.query.where ? getAttributeQuery(props) : null,
-    connected: props.filters && props.location.query ? getConnectedQuery(props) : null,
-    without: props.location.query && props.location.query.without ? getWithoutQuery(props) : null,
+    where: props.location.query && props.location.query.where
+      ? getAttributeQuery(props.location.query.where)
+      : null,
+    connected: props.filters && props.location.query
+      ? getConnectedQuery(props.location.query, props.filters)
+      : null,
+    without: props.location.query && props.location.query.without
+      ? getWithoutQuery(props.location.query.without, props.filters)
+      : null,
     extend: props.selects.entities.extensions,
   }),
   taxonomies: props.selects && props.selects.taxonomies
