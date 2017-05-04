@@ -22,31 +22,36 @@ const Header = styled.div`
 `;
 const Main = styled.div``;
 
+const Button = styled.button`
+  font-weight:${(props) => props.active ? 'bold' : 'normal'};
+`;
+
 const ListEntitiesEmpty = styled.div``;
 
 export default class EntityListSidebar extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
-    options: PropTypes.array,
-    isFilterPanel: PropTypes.bool,
-    isEditPanel: PropTypes.bool,
+    canEdit: PropTypes.bool,
     hasEntities: PropTypes.bool,
     hasSelected: PropTypes.bool,
     panelGroups: PropTypes.object,
     formOptions: PropTypes.object,
     formModel: PropTypes.string,
+    filtersPanel: PropTypes.string,
+    editPanel: PropTypes.string,
+    activePanel: PropTypes.string,
     onShowForm: PropTypes.func.isRequired,
     onHideForm: PropTypes.func.isRequired,
     onAssign: PropTypes.func.isRequired,
+    onPanelSelect: PropTypes.func.isRequired,
   };
 
-  renderOptions = () => this.props.options.map((option, key) =>
-    (<button key={key} onClick={option.onClick}>{option.label}</button>)
-  );
+  getSidebarOptions= (filtersPanel, editPanel) => ([
+    { label: 'Filter list', panel: filtersPanel },
+    { label: 'Edit list', panel: editPanel },
+  ]);
 
   render() {
     const {
-      isFilterPanel,
-      isEditPanel,
       panelGroups,
       formOptions,
       formModel,
@@ -55,15 +60,33 @@ export default class EntityListSidebar extends React.Component { // eslint-disab
       onAssign,
       hasEntities,
       hasSelected,
+      canEdit,
+      filtersPanel,
+      editPanel,
+      activePanel,
+      onPanelSelect,
     } = this.props;
 
     return (
       <Component>
         <Header>
-          {this.renderOptions()}
+          {canEdit && this.getSidebarOptions(filtersPanel, editPanel).map((option, key) =>
+            (
+              <Button
+                key={key}
+                active={option.panel === activePanel}
+                onClick={() => onPanelSelect(option.panel)}
+              >
+                {option.label}
+              </Button>
+            )
+          )}
+          {!canEdit &&
+            <strong>Filter List</strong>
+          }
         </Header>
         <Main>
-          { isFilterPanel &&
+          { activePanel === filtersPanel &&
             <EntityListSidebarFilters
               filterGroups={panelGroups}
               formOptions={formOptions}
@@ -72,7 +95,7 @@ export default class EntityListSidebar extends React.Component { // eslint-disab
               onHideFilterForm={onHideForm}
             />
           }
-          { isEditPanel && hasSelected && hasEntities &&
+          { activePanel === editPanel && hasSelected && hasEntities &&
             <EntityListSidebarEdit
               editGroups={panelGroups}
               formOptions={formOptions}
@@ -82,12 +105,12 @@ export default class EntityListSidebar extends React.Component { // eslint-disab
               onAssign={onAssign}
             />
           }
-          { isEditPanel && !hasEntities &&
+          { activePanel === editPanel && !hasEntities &&
             <ListEntitiesEmpty>
                No entities found
             </ListEntitiesEmpty>
           }
-          { isEditPanel && hasEntities && !hasSelected &&
+          { activePanel === editPanel && hasEntities && !hasSelected &&
             <ListEntitiesEmpty>
               Please select one or more entities for edit options
             </ListEntitiesEmpty>

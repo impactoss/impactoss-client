@@ -111,17 +111,6 @@ const ListEntitiesHeaderOptionGroup = styled.span`
 `;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  getSidebarListOption = (label, onPanelSelect, activePanel, panel) => ({
-    label,
-    active: activePanel === panel,
-    onClick: () => onPanelSelect(panel),
-  });
-  getSidebarOptions= ({ onPanelSelect, activePanel, isManager }) => isManager
-    ? [
-      this.getSidebarListOption('Filter list', onPanelSelect, activePanel, FILTERS_PANEL),
-      this.getSidebarListOption('Edit list', onPanelSelect, activePanel, EDIT_PANEL),
-    ]
-    : [this.getSidebarListOption('Filter list', onPanelSelect, activePanel, FILTERS_PANEL)];
 
   getSidebarGroups = ({ activePanel, dataReady, isManager }, hasSelected) => {
     if (dataReady && activePanel === FILTERS_PANEL) {
@@ -164,6 +153,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       dataReady,
       isManager,
       entityIdsSelected,
+      onPanelSelect,
     } = this.props;
     // sorted entities
     const entitiesSorted = this.props.entities && orderBy(
@@ -185,13 +175,16 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     } else if (entitiesSelected.length > 1) {
       listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
     }
+
     return (
       <div>
         { dataReady &&
           <EntityListSidebar
-            options={this.getSidebarOptions(this.props)}
-            isFilterPanel={activePanel === FILTERS_PANEL}
-            isEditPanel={activePanel === EDIT_PANEL && isManager}
+            onPanelSelect={onPanelSelect}
+            canEdit={isManager}
+            filtersPanel={FILTERS_PANEL}
+            editPanel={EDIT_PANEL}
+            activePanel={activePanel}
             panelGroups={this.getSidebarGroups(this.props, entitiesSelected.length > 0)}
             formOptions={this.getSidebarFormOptions(this.props, entitiesSorted, entitiesSelected)}
             formModel={activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL}
@@ -323,6 +316,7 @@ EntityList.propTypes = {
   handleEditSubmit: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,
+  onPanelSelect: PropTypes.func.isRequired,
   location: PropTypes.object,
   entityTitle: PropTypes.object, // single/plural
   entityLinkTo: PropTypes.string,
