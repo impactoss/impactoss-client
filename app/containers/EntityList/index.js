@@ -25,10 +25,10 @@ import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/for
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
 
-import { makeFilterGroups } from './filterGroupsFactory';
-import { makeEditGroups } from './editGroupsFactory';
-import { makeActiveFilterOptions } from './filterOptionsFactory';
-import { makeActiveEditOptions } from './editOptionsFactory';
+import {
+  FILTERS_PANEL,
+} from 'containers/App/constants';
+
 import { makeCurrentFilters } from './filtersFactory';
 import {
   getAttributeQuery,
@@ -36,25 +36,18 @@ import {
   getWithoutQuery,
 } from './entityQueries';
 
+
 import {
   FILTER_FORM_MODEL,
   EDIT_FORM_MODEL,
-  FILTERS_PANEL,
-  EDIT_PANEL,
 } from './constants';
 
 import {
-  activeFilterOptionSelector,
-  activeEditOptionSelector,
   activePanelSelector,
   entitiesSelectedSelector,
 } from './selectors';
 
 import {
-  showEditForm,
-  hideEditForm,
-  showFilterForm,
-  hideFilterForm,
   showPanel,
   saveEdits,
   selectEntity,
@@ -115,88 +108,78 @@ const ListEntitiesHeaderOptionGroup = styled.span`
 `;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  getSidebarGroups = ({ activePanel, dataReady, isManager }, hasSelected) => {
-    if (dataReady && activePanel === FILTERS_PANEL) {
-      return makeFilterGroups(this.props, {
-        attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
-        taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
-        connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
-        connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
-      });
-    } else if (dataReady && activePanel === EDIT_PANEL && isManager && hasSelected) {
-      return makeEditGroups(this.props, {
-        attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
-        taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
-        connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
-      });
-    }
-    return null;
-  }
-  getSidebarFormOptions = (props, entitiesSorted, entitiesSelected) => {
-    if (props.activePanel === FILTERS_PANEL && props.activeFilterOption) {
-      return makeActiveFilterOptions(entitiesSorted, props, {
-        titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
-        without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
-      });
-    } else if (props.isManager && props.activePanel === EDIT_PANEL && props.activeEditOption && entitiesSelected.length > 0) {
-      return makeActiveEditOptions(entitiesSelected, this.props, {
-        title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.length} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}`,
-      });
-    }
-    return null;
-  }
+  // TODO figure out why component updates when child component (sidebar option) internal state changes
+  //    possibly due to form model changes
+  //    consider moving form reducer to sidebar or use local form
+  // shouldComponentUpdate(nextProps) {
+  //   const s_p = JSON.stringify(this.props)
+  //   const s_np = JSON.stringify(nextProps)
+  //   return s_np !== s_p
+  // }
   renderGroupingOptions = () => 'TODO list group options';
 
   render() {
     const {
       sortBy,
       sortOrder,
-      activeEditOption,
       activePanel,
       dataReady,
       isManager,
       entityIdsSelected,
       onPanelSelect,
+      filters,
+      edits,
+      location,
+      taxonomies,
+      connections,
+      connectedTaxonomies,
     } = this.props;
+
     // sorted entities
-    const entitiesSorted = this.props.entities && orderBy(
-      this.props.entities,
-      getEntitySortIteratee(sortBy),
-      sortOrder
-    );
-    const entitiesSelected = Object.values(pick(this.props.entities, entityIdsSelected));
+    const entitiesSorted = dataReady && this.props.entities
+        ? orderBy(
+          this.props.entities,
+          getEntitySortIteratee(sortBy),
+          sortOrder
+        )
+        : [];
+
+    const entitiesSelected = dataReady ? Object.values(pick(this.props.entities, entityIdsSelected)) : [];
 
     let allChecked = CHECKBOX_STATES.INDETERMINATE;
-    if (entitiesSelected.length === 0) {
-      allChecked = CHECKBOX_STATES.UNCHECKED;
-    } else if (entitiesSorted.length > 0 && entitiesSelected.length === entitiesSorted.length) {
-      allChecked = CHECKBOX_STATES.CHECKED;
-    }
     let listHeaderLabel = this.props.entityTitle.plural;
-    if (entitiesSelected.length === 1) {
-      listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.single} selected`;
-    } else if (entitiesSelected.length > 1) {
-      listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
+
+    if (dataReady) {
+      if (entitiesSelected.length === 0) {
+        allChecked = CHECKBOX_STATES.UNCHECKED;
+      } else if (entitiesSorted.length > 0 && entitiesSelected.length === entitiesSorted.length) {
+        allChecked = CHECKBOX_STATES.CHECKED;
+      }
+      if (entitiesSelected.length === 1) {
+        listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.single} selected`;
+      } else if (entitiesSelected.length > 1) {
+        listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
+      }
     }
 
     return (
       <div>
         { dataReady &&
           <EntityListSidebar
+            filters={filters}
+            edits={edits}
+            taxonomies={taxonomies}
+            connections={connections}
+            connectedTaxonomies={connectedTaxonomies}
+            entitiesSorted={entitiesSorted}
+            entitiesSelected={entitiesSelected}
+            location={location}
             onPanelSelect={onPanelSelect}
             canEdit={isManager}
-            filtersPanel={FILTERS_PANEL}
-            editPanel={EDIT_PANEL}
             activePanel={activePanel}
-            panelGroups={this.getSidebarGroups(this.props, entitiesSelected.length > 0)}
-            formOptions={this.getSidebarFormOptions(this.props, entitiesSorted, entitiesSelected)}
             formModel={activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL}
-            onShowForm={activePanel === FILTERS_PANEL ? this.props.onShowFilterForm : this.props.onShowEditForm}
-            onHideForm={activePanel === FILTERS_PANEL ? this.props.onHideFilterForm : this.props.onHideEditForm}
-            onAssign={(associations) => this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
-            hasSelected={entitiesSelected && entitiesSelected.length > 0}
-            hasEntities={entitiesSorted && entitiesSorted.length > 0}
+            onAssign={(associations, activeEditOption) =>
+              this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
           />
         }
         <ContainerWithSidebar>
@@ -300,33 +283,33 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 }
 
 EntityList.propTypes = {
-  entities: PropTypes.object.isRequired,
   filters: PropTypes.object,
-  taxonomies: PropTypes.object,
+  edits: PropTypes.object,
   dataReady: PropTypes.bool,
-  isManager: PropTypes.bool,
   header: PropTypes.object,
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
-  activeEditOption: PropTypes.object,
-  onShowFilterForm: PropTypes.func.isRequired,
-  onHideFilterForm: PropTypes.func.isRequired,
-  onShowEditForm: PropTypes.func.isRequired,
-  onHideEditForm: PropTypes.func.isRequired,
-  onTagClick: PropTypes.func.isRequired,
-  onExpand: PropTypes.func.isRequired,
-  activePanel: PropTypes.string,
-  entityIdsSelected: PropTypes.array,
-  handleEditSubmit: PropTypes.func.isRequired,
-  onEntitySelect: PropTypes.func.isRequired,
-  onEntitySelectAll: PropTypes.func.isRequired,
-  onPanelSelect: PropTypes.func.isRequired,
   location: PropTypes.object,
   entityTitle: PropTypes.object, // single/plural
   entityLinkTo: PropTypes.string,
   expandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
   expand: PropTypes.number,
+  // select props
+  isManager: PropTypes.bool,
+  activePanel: PropTypes.string,
+  entityIdsSelected: PropTypes.array,
+  entities: PropTypes.object.isRequired,
+  taxonomies: PropTypes.object,
+  connections: PropTypes.object,
+  connectedTaxonomies: PropTypes.object,
+  // dispatch props
+  onPanelSelect: PropTypes.func.isRequired,
+  handleEditSubmit: PropTypes.func.isRequired,
+  onEntitySelect: PropTypes.func.isRequired,
+  onEntitySelectAll: PropTypes.func.isRequired,
+  onTagClick: PropTypes.func.isRequired,
+  onExpand: PropTypes.func.isRequired,
 };
 
 EntityList.defaultProps = {
@@ -340,8 +323,6 @@ EntityList.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isManager: isUserManager(state),
-  activeFilterOption: activeFilterOptionSelector(state),
-  activeEditOption: activeEditOptionSelector(state),
   activePanel: activePanelSelector(state),
   entityIdsSelected: entitiesSelectedSelector(state),
   entities: getEntities(state, {
@@ -383,21 +364,6 @@ const mapStateToProps = (state, props) => ({
 
 function mapDispatchToProps(dispatch, props) {
   return {
-    onShowFilterForm: (option) => {
-      dispatch(hideFilterForm());
-      dispatch(showFilterForm(option));
-    },
-    onHideFilterForm: (evt) => {
-      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-      dispatch(hideFilterForm());
-    },
-    onShowEditForm: (option) => {
-      dispatch(showEditForm(option));
-    },
-    onHideEditForm: (evt) => {
-      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-      dispatch(hideEditForm());
-    },
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));
     },

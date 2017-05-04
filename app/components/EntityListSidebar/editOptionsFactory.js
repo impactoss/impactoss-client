@@ -10,21 +10,21 @@ export const checkedState = (count, length) => {
   return CHECKBOX.UNCHECKED;
 };
 
-export const makeActiveEditOptions = (entities, props, messages) => {
+export const makeActiveEditOptions = (entities, edits, activeEditOption, taxonomies, connections, messages) => {
   // create edit options
-  switch (props.activeEditOption.group) {
+  switch (activeEditOption.group) {
     case 'taxonomies':
-      return makeTaxonomyEditOptions(entities, props, messages);
+      return makeTaxonomyEditOptions(entities, taxonomies, activeEditOption, messages);
     case 'connections':
-      return makeConnectionEditOptions(entities, props, messages);
+      return makeConnectionEditOptions(entities, edits, connections, activeEditOption, messages);
     case 'attributes':
-      return makeAttributeEditOptions(entities, props, messages);
+      return makeAttributeEditOptions(entities, edits, activeEditOption, messages);
     default:
       return null;
   }
 };
 
-export const makeAttributeEditOptions = (entities, { edits, activeEditOption }, messages) => {
+export const makeAttributeEditOptions = (entities, edits, activeEditOption, messages) => {
   const editOptions = {
     groupId: 'attributes',
     search: true,
@@ -58,7 +58,7 @@ export const makeAttributeEditOptions = (entities, { edits, activeEditOption }, 
   return editOptions;
 };
 
-export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption }, messages) => {
+export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, messages) => {
   const editOptions = {
     groupId: 'taxonomies',
     search: true,
@@ -91,7 +91,7 @@ export const makeTaxonomyEditOptions = (entities, { taxonomies, activeEditOption
   return editOptions;
 };
 
-export const makeConnectionEditOptions = (entities, { edits, connections, activeEditOption }, messages) => {
+export const makeConnectionEditOptions = (entities, edits, connections, activeEditOption, messages) => {
   const editOptions = {
     groupId: 'connections',
     search: true,

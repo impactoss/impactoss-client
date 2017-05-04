@@ -25,16 +25,6 @@ const editFormSelector = createSelector(
   (substate) => substate.get('forms').editData
 );
 
-const activeFilterOptionSelector = createSelector(
-  pageSelector,
-  (pageState) => pageState.get('activeFilterOption')
-);
-
-const activeEditOptionSelector = createSelector(
-  pageSelector,
-  (pageState) => pageState.get('activeEditOption')
-);
-
 const activePanelSelector = createSelector(
   pageSelector,
   (pageState) => pageState.get('activePanel')
@@ -65,8 +55,6 @@ export {
   entityListSelect,
   editFormSelector,
   filterFormSelector,
-  activeFilterOptionSelector,
-  activeEditOptionSelector,
   filtersCheckedSelector,
   activePanelSelector,
   entitiesSelectedSelector,

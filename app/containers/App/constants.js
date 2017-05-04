@@ -39,17 +39,6 @@ export const NEW_ENTITY = 'nmrf/App/NEW_ENTITY';
 export const UPDATE_CONNECTIONS = 'nmrf/App/UPDATE_CONNECTIONS';
 export const UPDATE_ENTITIES = 'nmrf/App/UPDATE_ENTITIES';
 
-export const PUBLISH_STATUSES = [
-  { value: true, label: 'Draft' },
-  { value: false, label: 'Public' },
-];
-
-export const USER_ROLES = {
-  ADMIN: 1,
-  MANAGER: 2,
-  CONTRIBUTOR: 3,
-};
-
 export const ENTITIES_READY = 'nmrf/App/ENTITIES_READY';
 
 export const SAVE_SENDING = 'nmrf/App/SAVE_SENDING';
@@ -61,6 +50,20 @@ export const UPDATE_PATH = 'nmrf/App/UPDATE_PATH';
 
 export const SAVE_ENTITY_FORM = 'nmrf/App/SAVE_ENTITY_FORM';
 export const UPDATE_ENTITY_FORM = 'nmrf/App/UPDATE_ENTITY_FORM';
+
+export const PUBLISH_STATUSES = [
+  { value: true, label: 'Draft' },
+  { value: false, label: 'Public' },
+];
+
+export const USER_ROLES = {
+  ADMIN: 1,
+  MANAGER: 2,
+  CONTRIBUTOR: 3,
+};
+
+export const FILTERS_PANEL = 'filters';
+export const EDIT_PANEL = 'edit';
 
 // TODO need to pull from an env file
 export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';
