@@ -1,7 +1,14 @@
 import React, { PropTypes } from 'react';
+import styled from 'styled-components';
 
-import EntityListChildReportItem from 'components/EntityListChildReportItem';
-import EntityListChildDateItem from 'components/EntityListChildDateItem';
+import EntityListChildReportItem from './EntityListChildReportItem';
+import EntityListChildDateItem from './EntityListChildDateItem';
+
+const ChildItems = styled.span`
+  display: inline-block;
+  width: 50%;
+  vertical-align: top;
+`;
 
 export class EntityListChildReportItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -17,7 +24,7 @@ export class EntityListChildReportItems extends React.PureComponent { // eslint-
     const { reports, dates, entityLinkTo } = this.props;
 
     return (
-      <div>
+      <ChildItems>
         { dates && dates.length > 0 &&
           <EntityListChildDateItem
             date={dates[0]}
@@ -31,7 +38,7 @@ export class EntityListChildReportItems extends React.PureComponent { // eslint-
             />
           )
         }
-      </div>
+      </ChildItems>
     );
   }
 }

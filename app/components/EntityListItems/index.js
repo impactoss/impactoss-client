@@ -1,14 +1,15 @@
 import React, { PropTypes } from 'react';
 import { map, forEach } from 'lodash/collection';
 
-import EntityListItem from 'components/EntityListItem';
+import EntityListItem from './EntityListItem';
+import EntityListChildItems from './EntityListChildItems';
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   getConnectedCounts = (entity, connectionOptions) => {
     const counts = [];
     forEach(connectionOptions, (option) => {
-      const expandable = typeof option.expandable !== 'undefined' ? option.expandable : false
+      const expandable = typeof option.expandable !== 'undefined' ? option.expandable : false;
       if (!expandable && entity[option.path] && Object.keys(entity[option.path]).length > 0) {
         counts.push({
           count: Object.keys(entity[option.path]).length,
@@ -53,17 +54,16 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
   };
 
   mapToEntityListItem = (entity, props) => {
-    expand: PropTypes.number,
-    expandable: PropTypes.bool,
-    getExpandedColumns: PropTypes.array,
-    getExpandableColumns: PropTypes.array,
     const {
       taxonomies,
       entityLinkTo,
       filters,
       onTagClick,
       showDate,
-
+      expand,
+      expandable,
+      expandableColumns,
+      onExpand,
     } = props;
 
     return {
@@ -80,8 +80,15 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
           filters.taxonomies && onTagClick)
         : [],
       connectedCounts: filters && filters.connections ? this.getConnectedCounts(entity, filters.connections.options) : [],
-      expandableColumns: entity.expandableColumns,
-      expandedColumns: entity.expandedColumns,
+      expandables: expandable && !expand
+        ? expandableColumns.map((column, i) => ({
+          type: column.type,
+          label: column.label,
+          count: column.getCount && column.getCount(entity),
+          info: column.getInfo && column.getInfo(entity),
+          onClick: () => onExpand(true, i + 1),
+        }))
+        : [],
     };
   };
 
@@ -91,21 +98,38 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
       entitiesSelected,
       isSelect,
       onEntitySelect,
+      expand,
+      expandable,
+      expandableColumns,
+      showDate,
+      onExpand,
     } = this.props;
-
-    // console.log('List:render', entities, childList)
 
     return (
       <div>
         {
           entities.map((entity, i) =>
-            <EntityListItem
-              key={i}
-              select={isSelect}
-              checked={isSelect && entitiesSelected.map((e) => e.id).indexOf(entity.id) > -1}
-              onSelect={(checked) => onEntitySelect(entity.id, checked)}
-              entity={this.mapToEntityListItem(entity, this.props)}
-            />
+            <div key={i}>
+              <EntityListItem
+                select={isSelect}
+                checked={isSelect && entitiesSelected.map((e) => e.id).indexOf(entity.id) > -1}
+                onSelect={(checked) => onEntitySelect(entity.id, checked)}
+                entity={this.mapToEntityListItem(entity, this.props)}
+                expand={expand}
+              />
+              {expandable && expand > 0 && expandableColumns.length > 0 &&
+                <EntityListChildItems
+                  entities={expandableColumns[0].getEntities(entity)}
+                  showDate={showDate}
+                  entityLinkTo={expandableColumns[0].entityLinkTo}
+                  taxonomies={null}
+                  expand={expand - 1}
+                  expandable={expandableColumns.length > 1}
+                  expandableColumns={expandableColumns.length > 1 ? [expandableColumns[1]] : null}
+                  onExpand={onExpand}
+                />
+              }
+            </div>
           )
         }
       </div>
@@ -123,10 +147,10 @@ EntityListItems.propTypes = {
   entityLinkTo: PropTypes.string,
   filters: PropTypes.object,
   onTagClick: PropTypes.func,
+  onExpand: PropTypes.func,
   expand: PropTypes.number,
   expandable: PropTypes.bool,
-  getExpandedColumns: PropTypes.array,
-  getExpandableColumns: PropTypes.array,
+  expandableColumns: PropTypes.array,
 };
 
 export default EntityListItems;

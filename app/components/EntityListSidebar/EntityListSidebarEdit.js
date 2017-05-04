@@ -5,7 +5,7 @@
  */
 
 import React, { PropTypes } from 'react';
-import { Map } from 'immutable';
+import { fromJS } from 'immutable';
 import styled from 'styled-components';
 
 import EntityListForm from 'containers/EntityListForm';
@@ -14,7 +14,7 @@ const Component = styled.div``;
 
 export default class EntityListSidebarEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
-    editGroups: PropTypes.instanceOf(Map),
+    editGroups: PropTypes.object,
     formOptions: PropTypes.object,
     onShowEditForm: PropTypes.func.isRequired,
     onHideEditForm: PropTypes.func.isRequired,
@@ -51,7 +51,10 @@ export default class EntityListSidebarEdit extends React.Component { // eslint-d
   );
 
   render() {
-    const { editGroups, formOptions, onHideEditForm, formModel, onAssign } = this.props;
+    const { onHideEditForm, formModel, onAssign } = this.props;
+    const editGroups = fromJS(this.props.editGroups);
+    const formOptions = fromJS(this.props.formOptions);
+
     return (
       <Component>
         { editGroups &&
