@@ -13,13 +13,10 @@ import {
 } from 'containers/App/selectors';
 
 import {
-  hideFilterForm,
-  hideEditForm,
   resetState,
 } from './actions';
 
 import {
-  FILTER_FORM_MODEL,
   SAVE_EDITS,
   UPDATE_QUERY,
 } from './constants';
@@ -33,7 +30,6 @@ export function* updateQuery(args) {
     remove: !value.get('checked'),
   })).toJS();
   yield put(updateRouteQuery(params));
-  yield put(hideFilterForm());
 }
 
 export function* saveEdits({ data }) {
@@ -50,7 +46,6 @@ export function* saveEdits({ data }) {
     // }}
     yield put(updateConnections(data));
   }
-  yield put(hideEditForm());
 }
 
 export function* locationChangeSaga() {
@@ -62,12 +57,6 @@ export function* locationChangeSaga() {
 }
 
 export default function* entityList() {
-  // filter form changed
-  yield takeLatest(
-    (action) =>
-      action.model === `${FILTER_FORM_MODEL}.values` && action.type === 'rrf/change',
-    updateQuery
-  );
   yield takeLatest(UPDATE_QUERY, updateQuery);
 
   yield takeLatest(SAVE_EDITS, saveEdits);

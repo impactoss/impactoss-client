@@ -1,10 +1,9 @@
 import { createSelector } from 'reselect';
-import { REDUCER_PATH } from './constants';
 
 /**
  * Direct selector to the actionEdit state domain
  */
-const selectEntityListDomain = (state) => state.get(REDUCER_PATH);
+const selectEntityListDomain = (state) => state.get('entityList');
 
 /**
  * Other specific selectors
@@ -15,16 +14,6 @@ const pageSelector = createSelector(
    (substate) => substate.get('page')
 );
 
-const filterFormSelector = createSelector(
-  selectEntityListDomain,
-  (substate) => substate.get('forms').filterData
-);
-
-const editFormSelector = createSelector(
-  selectEntityListDomain,
-  (substate) => substate.get('forms').editData
-);
-
 const activePanelSelector = createSelector(
   pageSelector,
   (pageState) => pageState.get('activePanel')
@@ -33,11 +22,6 @@ const activePanelSelector = createSelector(
 const entitiesSelectedSelector = createSelector(
   pageSelector,
   (pageState) => pageState.get('entitiesSelected').toJS()
-);
-
-const filtersCheckedSelector = createSelector(
-  filterFormSelector,
-  (formData) => formData.get('values').filter((value) => value.get('checked'))
 );
 
 /**
@@ -53,9 +37,6 @@ export default entityListSelect;
 export {
   selectEntityListDomain,
   entityListSelect,
-  editFormSelector,
-  filterFormSelector,
-  filtersCheckedSelector,
   activePanelSelector,
   entitiesSelectedSelector,
 };

@@ -25,22 +25,12 @@ import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/for
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
 
-import {
-  FILTERS_PANEL,
-} from 'containers/App/constants';
-
 import { makeCurrentFilters } from './filtersFactory';
 import {
   getAttributeQuery,
   getConnectedQuery,
   getWithoutQuery,
 } from './entityQueries';
-
-
-import {
-  FILTER_FORM_MODEL,
-  EDIT_FORM_MODEL,
-} from './constants';
 
 import {
   activePanelSelector,
@@ -177,7 +167,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             onPanelSelect={onPanelSelect}
             canEdit={isManager}
             activePanel={activePanel}
-            formModel={activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL}
             onAssign={(associations, activeEditOption) =>
               this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
           />

@@ -6,7 +6,6 @@
 
 import { fromJS, List } from 'immutable';
 import { combineReducers } from 'redux-immutable';
-import { combineForms } from 'react-redux-form/immutable';
 
 import {
   FILTERS_PANEL,
@@ -54,32 +53,6 @@ function entityListReducer(state = initialState, action) {
   }
 }
 
-const formInitial = fromJS({
-  values: [],
-});
-
-function filterFormReducer(state = formInitial, action) {
-  switch (action.type) {
-    case ENTITY_SELECTED:
-    case RESET_STATE:
-      return formInitial;
-    default:
-      return state;
-  }
-}
-function editFormReducer(state = formInitial, action) {
-  switch (action.type) {
-    case RESET_STATE:
-      return formInitial;
-    default:
-      return state;
-  }
-}
-
 export default combineReducers({
   page: entityListReducer,
-  forms: combineForms({
-    filterData: filterFormReducer,
-    editData: editFormReducer,
-  }, 'entityList.forms'),
 });

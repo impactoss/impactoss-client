@@ -11,6 +11,11 @@ import {
   EDIT_PANEL,
 } from 'containers/App/constants';
 
+import {
+  FILTER_FORM_MODEL,
+  EDIT_FORM_MODEL,
+} from 'containers/EntityListForm/constants';
+
 import EntityListSidebarFilters from './EntityListSidebarFilters';
 import EntityListSidebarEdit from './EntityListSidebarEdit';
 
@@ -48,7 +53,16 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       activeOption: null,
     };
   }
+  componentWillMount() {
+    this.setState({ activeOption: null });
+  }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.activePanel !== this.props.activePanel || nextProps.location.key !== this.props.location.key) {
+      // close and reset option panel
+      this.setState({ activeOption: null });
+    }
+  }
   onShowForm = (option) => {
     this.setState({ activeOption: option });
   };
@@ -72,7 +86,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       connectedTaxonomies,
       entitiesSorted,
       entitiesSelected,
-      formModel,
       onAssign,
       canEdit,
       activePanel,
@@ -82,6 +95,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     const activeOption = this.state.activeOption;
     const hasSelected = entitiesSelected && entitiesSelected.length > 0;
     const hasEntities = entitiesSorted && entitiesSorted.length > 0;
+    const formModel = activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL;
 
     let panelGroups = null;
     let formOptions = null;
@@ -174,7 +188,11 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
               formModel={formModel}
               onShowEditForm={this.onShowForm}
               onHideEditForm={this.onHideForm}
-              onAssign={(associations) => onAssign(associations, activeOption)}
+              onAssign={(associations) => {
+                // close and reset option panel
+                this.setState({ activeOption: null });
+                onAssign(associations, activeOption);
+              }}
             />
           }
           { activePanel === EDIT_PANEL && !hasEntities &&
@@ -202,7 +220,6 @@ EntityListSidebar.propTypes = {
   connectedTaxonomies: PropTypes.object,
   entitiesSorted: PropTypes.array,
   entitiesSelected: PropTypes.array,
-  formModel: PropTypes.string,
   activePanel: PropTypes.string,
   onAssign: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,
