@@ -80,7 +80,7 @@ EntityListChildItems.propTypes = {
   expand: PropTypes.number,
   expandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
-  onExpand: PropTypes.function,
+  onExpand: PropTypes.func,
 };
 
 export default EntityListChildItems;
