@@ -7,6 +7,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { forEach } from 'lodash/collection';
 
 import EntityList from 'containers/EntityList';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
@@ -16,6 +17,8 @@ import { isReady } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
+
+const expand = (props) => props.location.query.expand;
 
 export class ActionList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -30,8 +33,84 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
+  getReports = (indicator) => indicator.reports
+    ? Object.values(indicator.reports)
+    : [];
+  getDates = (indicator) => indicator.dates
+    ? Object.values(indicator.dates)
+    : [];
+  getIndicators = (action) => action.indicators
+    ? Object.values(action.indicators).map((indicatorAssociation) => indicatorAssociation.indicator)
+    : [];
+
+  getReportCount = (actionOrIndicator) => {
+    let count = 0;
+    // test action:  return sum of reports for all indicators
+    if (actionOrIndicator.indicators) {
+      count = Object.values(actionOrIndicator.indicators).reduce((counter, indicatorAssociation) =>
+        counter + (indicatorAssociation.indicator.reports
+          ? Object.keys(indicatorAssociation.indicator.reports).length
+          : 0
+        )
+      , 0);
+    }
+    // test indicator: return number of reports for each indicator
+    if (actionOrIndicator.reports) {
+      count = Object.keys(actionOrIndicator.reports).length;
+    }
+    return count;
+  }
+  getReportInfo = (actionOrIndicator) => {
+    const info = [];
+    let due = 0;
+    let overdue = 0;
+    // test action:  return sum of reports for all indicators
+    if (actionOrIndicator.indicators) {
+      forEach(actionOrIndicator.indicators, (indicatorAssociation) => {
+        if (indicatorAssociation.indicator.dates) {
+          forEach(indicatorAssociation.indicator.dates, (date) => {
+            due += date.attributes.due ? 1 : 0;
+            overdue += date.attributes.overdue ? 1 : 0;
+          });
+        }
+      });
+    }
+    // test indicator: return number of reports for each indicator
+    if (actionOrIndicator.dates) {
+      forEach(actionOrIndicator.dates, (date) => {
+        due += date.attributes.due ? 1 : 0;
+        overdue += date.attributes.overdue ? 1 : 0;
+      });
+    }
+    if (due) info.push(`${due} reports due`);
+    if (overdue) info.push(`${overdue} reports overdue`);
+    return info;
+  }
+  getIndicatorCount = (action) => action.indicators
+    ? Object.keys(action.indicators).length
+    : 0;
+
   render() {
     const { dataReady } = this.props;
+
+    const expandableColumns = [
+      {
+        label: 'Indicators',
+        type: 'indicators',
+        getCount: this.getIndicatorCount,
+        getEntities: this.getIndicators,
+        entityLinkTo: '/indicators/',
+      },
+      {
+        label: 'Progress reports',
+        type: 'reports',
+        getCount: this.getReportCount,
+        getInfo: this.getReportInfo,
+        getReports: this.getReports,
+        getDates: this.getDates,
+        entityLinkTo: '/reports/',
+      },
+    ];
 
     // define selects for getEntities
     const selects = {
@@ -49,6 +128,12 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             key: 'measure_id',
             reverse: true,
             as: 'recommendations',
+            extend: {
+              path: 'recommendations',
+              key: 'recommendation_id',
+              as: 'recommendation',
+              type: 'single',
+            },
           },
           {
             path: 'measure_indicators',
@@ -58,9 +143,9 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             extend: {
               path: 'indicators',
               key: 'indicator_id',
-              as: 'child',
+              as: 'indicator',
               type: 'single',
-              extend: [
+              extend: expand(this.props) ? [
                 {
                   path: 'progress_reports',
                   key: 'indicator_id',
@@ -81,8 +166,30 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
                   path: 'measure_indicators',
                   key: 'indicator_id',
                   reverse: true,
-                  as: 'measureCount',
-                  type: 'count',
+                  as: 'measures',
+                  extend: {
+                    path: 'measures',
+                    key: 'measure_id',
+                    as: 'measure',
+                    type: 'single',
+                  },
+                },
+              ] : [
+                {
+                  path: 'progress_reports',
+                  key: 'indicator_id',
+                  reverse: true,
+                  as: 'reports',
+                },
+                {
+                  path: 'due_dates',
+                  key: 'indicator_id',
+                  reverse: true,
+                  as: 'dates',
+                  without: {
+                    path: 'progress_reports',
+                    key: 'due_date_id',
+                  },
                 },
               ],
             },
@@ -157,6 +264,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             query: 'indicators',
             key: 'indicator_id',
             filter: true,
+            expandable: true,
             connected: {
               path: 'measure_indicators',
               key: 'measure_id',
@@ -266,7 +374,9 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
           }}
           entityLinkTo="/actions/"
-          childList="indicators"
+          expand={expand(this.props) ? parseInt(expand(this.props), 10) : 0}
+          expandable
+          expandableColumns={expandableColumns}
         />
       </div>
     );
@@ -297,7 +407,6 @@ const mapStateToProps = (state) => ({
     'indicators',
     'measure_indicators',
     'due_dates',
-    'progress_reports',
   ] }),
 });
 function mapDispatchToProps(dispatch) {
@@ -313,9 +422,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
-      dispatch(loadEntitiesIfNeeded('progress_reports'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+      dispatch(loadEntitiesIfNeeded('progress_reports'));
+      dispatch(loadEntitiesIfNeeded('due_dates'));
     },
     handleNew: () => {
       dispatch(updatePath('/actions/new/'));

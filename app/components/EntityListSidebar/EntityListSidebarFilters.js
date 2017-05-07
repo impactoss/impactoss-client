@@ -5,13 +5,13 @@
  */
 
 import React, { PropTypes } from 'react';
-import { Map } from 'immutable';
+import { fromJS } from 'immutable';
 
 import EntityListForm from 'containers/EntityListForm';
 
 export default class EntityListSidebarFilters extends React.Component { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
-    filterGroups: PropTypes.instanceOf(Map),
+    filterGroups: PropTypes.object,
     formOptions: PropTypes.object,
     onShowFilterForm: PropTypes.func.isRequired,
     onHideFilterForm: PropTypes.func.isRequired,
@@ -45,8 +45,9 @@ export default class EntityListSidebarFilters extends React.Component { // eslin
   );
 
   render() {
-    const { filterGroups, formOptions, onHideFilterForm, formModel } = this.props;
-
+    const { onHideFilterForm, formModel } = this.props;
+    const filterGroups = fromJS(this.props.filterGroups);
+    const formOptions = fromJS(this.props.formOptions);
     return (
       <div>
         { filterGroups &&

@@ -9,20 +9,16 @@ import { connect } from 'react-redux';
 
 import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
 import { pick } from 'lodash/object';
-import { upperFirst } from 'lodash/string';
 import { cloneDeep } from 'lodash/lang';
 
 import { Map, List, fromJS } from 'immutable';
 import styled from 'styled-components';
 
 import { getEntitySortIteratee } from 'utils/sort';
-import { lowerCase } from 'utils/string';
 
 import Loading from 'components/Loading';
 import PageHeader from 'components/PageHeader';
 import EntityListSidebar from 'components/EntityListSidebar';
-import EntityListSidebarFilters from 'components/EntityListSidebarFilters';
-import EntityListSidebarEdit from 'components/EntityListSidebarEdit';
 import EntityListItems from 'components/EntityListItems';
 import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
 import Container from 'components/basic/Container';
@@ -34,6 +30,7 @@ import { makeFilterGroups } from './filterGroupsFactory';
 import { makeEditGroups } from './editGroupsFactory';
 import { makeActiveFilterOptions } from './filterOptionsFactory';
 import { makeActiveEditOptions } from './editOptionsFactory';
+import { makeCurrentFilters } from './filtersFactory';
 
 import {
   FILTER_FORM_MODEL,
@@ -71,9 +68,24 @@ const ListEntities = styled.div`
 `;
 const ListEntitiesTopFilters = styled.div`
 `;
-const ListEntitiesHeader = styled.div`
+const ListEntitiesHeaderOptionLinks = styled.div`
+  float:right;
+`;
+const ListEntitiesHeaderOptionLink = styled.button`
+  font-weight: bold;
+  color: #EB6E51;
+  font-size: 0.9;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 const ListEntitiesHeaderOptions = styled.div`
+`;
+const ListEntitiesHeader = styled.div`
+  clear: both;
+  background: #ccc
+  padding: 2px 5px ;
 `;
 const ListEntitiesSelectAll = styled.div`
 `;
@@ -95,227 +107,58 @@ const Tag = styled.button`
 const Button = styled(Tag)`
   cursor: pointer;
 `;
+const ListEntitiesHeaderOptionGroup = styled.span`
+`;
+
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  getSidebarListOption = (label, onPanelSelect, activePanel, panel) => ({
+    label,
+    active: activePanel === panel,
+    onClick: () => onPanelSelect(panel),
+  });
+  getSidebarOptions= ({ onPanelSelect, activePanel, isManager }) => isManager
+    ? [
+      this.getSidebarListOption('Filter list', onPanelSelect, activePanel, FILTERS_PANEL),
+      this.getSidebarListOption('Edit list', onPanelSelect, activePanel, EDIT_PANEL),
+    ]
+    : [this.getSidebarListOption('Filter list', onPanelSelect, activePanel, FILTERS_PANEL)];
 
-  renderCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQuery, onClick, messagesRendered) => {
-    const tags = [];
-    if (locationQuery[taxonomyFilters.query]) {
-      const locationQueryValue = locationQuery[taxonomyFilters.query];
-      forEach(taxonomies, (taxonomy) => {
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
-          const value = parseInt(queryValue, 10);
-          if (taxonomy.categories[value]) {
-            const category = taxonomy.categories[value];
-            let label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
-              ? category.attributes.short_title
-              : category.attributes.title || category.attributes.name);
-            label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
-            tags.push({
-              label: `${label} X`,
-              onClick: () => onClick({
-                value,
-                query: taxonomyFilters.query,
-                checked: false,
-              }),
-            });
-          }
-        });
+  getSidebarGroups = ({ activePanel, dataReady, isManager }, hasSelected) => {
+    if (dataReady && activePanel === FILTERS_PANEL) {
+      return makeFilterGroups(this.props, {
+        attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
+        taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
+        connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
+        connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
+      });
+    } else if (dataReady && activePanel === EDIT_PANEL && isManager && hasSelected) {
+      return makeEditGroups(this.props, {
+        attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
+        taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
+        connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
       });
     }
-    if (locationQuery.without) {
-      const locationQueryValue = locationQuery.without;
-      forEach(taxonomies, (taxonomy) => {
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
-          // numeric means taxonomy
-          if (!isNaN(parseFloat(queryValue)) && isFinite(queryValue) && taxonomy.id === queryValue) {
-            const value = parseInt(queryValue, 10);
-            tags.push({
-              label: `${messagesRendered.without} ${lowerCase(taxonomy.attributes.title)} X`,
-              onClick: () => onClick({
-                value,
-                query: 'without',
-                checked: false,
-              }),
-            });
-          }
-        });
-      });
-    }
-    return (
-      <span>
-        {
-          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
-        }
-      </span>
-    );
-  };
-  renderCurrentConnectedTaxonomyFilters = (taxonomyFilters, connectedTaxonomies, locationQuery, onClick) => {
-    const tags = [];
-    if (locationQuery[taxonomyFilters.query]) {
-      const locationQueryValue = locationQuery[taxonomyFilters.query];
-      forEach(connectedTaxonomies, (taxonomy) => {
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
-          const valueSplit = queryValue.split(':');
-          if (valueSplit.length > 0) {
-            const value = parseInt(valueSplit[1], 10);
-            if (taxonomy.categories[value]) {
-              const category = taxonomy.categories[value];
-              let label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
-                ? category.attributes.short_title
-                : category.attributes.title || category.attributes.name);
-              label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
-              tags.push({
-                label: `${label} X`,
-                onClick: () => onClick({
-                  value: queryValue,
-                  query: taxonomyFilters.query,
-                  checked: false,
-                }),
-              });
-            }
-          }
-        });
-      });
-    }
-    return (
-      <span>
-        {
-          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
-        }
-      </span>
-    );
-  };
-  renderCurrentConnectionFilters = (connectionFiltersOptions, connections, locationQuery, onClick, messagesRendered) => {
-    const tags = [];
-    forEach(connectionFiltersOptions, (option) => {
-      if (locationQuery[option.query] && connections[option.path]) {
-        const locationQueryValue = locationQuery[option.query];
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
-          const value = parseInt(queryValue, 10);
-          const connection = connections[option.path][value];
-          let label = connection
-              ? connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name
-              : upperFirst(value);
-          label = label.length > 20 ? `${label.substring(0, 20)}...` : label;
-          tags.push({
-            label: `${label} X`,
-            onClick: () => onClick({
-              value,
-              query: option.query,
-              checked: false,
-            }),
-          });
-        });
-      }
-    });
-
-    if (locationQuery.without) {
-      const locationQueryValue = locationQuery.without;
-      forEach(connectionFiltersOptions, (option) => {
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
-          // numeric means taxonomy
-          if (option.query === queryValue) {
-            tags.push({
-              label: `${messagesRendered.without} ${lowerCase(option.label)} X`,
-              onClick: () => onClick({
-                value: queryValue,
-                query: 'without',
-                checked: false,
-              }),
-            });
-          }
-        });
-      });
-    }
-    return (
-      <span>
-        {
-          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
-        }
-      </span>
-    );
-  };
-  renderCurrentAttributeFilters = (attributeFiltersOptions, locationQuery, onClick) => {
-    const tags = [];
-    if (locationQuery.where) {
-      const locationQueryValue = locationQuery.where;
-      forEach(attributeFiltersOptions, (option) => {
-        if (locationQueryValue) {
-          forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
-            const valueSplit = queryValue.split(':');
-            if (valueSplit[0] === option.attribute && valueSplit.length > 0) {
-              const value = valueSplit[1];
-              if (option.extension) {
-                tags.push({
-                  label: `${option.label}:${value} X`,
-                  onClick: () => onClick({
-                    value: queryValue,
-                    query: 'where',
-                    checked: false,
-                  }),
-                });
-              } else if (option.options) {
-                const attribute = find(option.options, (o) => o.value.toString() === value);
-                let label = attribute ? attribute.label : upperFirst(value);
-                label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
-                tags.push({
-                  label: `${label} X`,
-                  onClick: () => onClick({
-                    value: queryValue,
-                    query: 'where',
-                    checked: false,
-                  }),
-                });
-              }
-            }
-          });
-        }
-      });
-    }
-    return (
-      <span>
-        {
-          tags.map((tag, i) => (<Button key={i} onClick={tag.onClick}>{tag.label}</Button>))
-        }
-      </span>
-    );
-  };
-
-  renderCurrentFilters = ({
-    filters,
-    taxonomies,
-    connections,
-    connectedTaxonomies,
-    location,
-    onTagClick,
-  },
-  messagesRendered
-  ) => {
-    const locationQuery = location.query;
-
-    return (
-      <div>
-        { filters.taxonomies && taxonomies &&
-          this.renderCurrentTaxonomyFilters(filters.taxonomies, taxonomies, locationQuery, onTagClick, messagesRendered)
-        }
-        { filters.connectedTaxonomies && connectedTaxonomies.taxonomies &&
-          this.renderCurrentConnectedTaxonomyFilters(filters.connectedTaxonomies, connectedTaxonomies.taxonomies, locationQuery, onTagClick)
-        }
-        { filters.connections && connections &&
-          this.renderCurrentConnectionFilters(filters.connections.options, connections, locationQuery, onTagClick, messagesRendered)
-        }
-        { filters.attributes &&
-          this.renderCurrentAttributeFilters(filters.attributes.options, locationQuery, onTagClick)
-        }
-      </div>
-    );
+    return null;
   }
+  getSidebarFormOptions = (props, entitiesSorted, entitiesSelected) => {
+    if (props.activePanel === FILTERS_PANEL && props.activeFilterOption) {
+      return makeActiveFilterOptions(entitiesSorted, props, {
+        titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
+        without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
+      });
+    } else if (props.isManager && props.activePanel === EDIT_PANEL && props.activeEditOption && entitiesSelected.length > 0) {
+      return makeActiveEditOptions(entitiesSelected, this.props, {
+        title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.length} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}`,
+      });
+    }
+    return null;
+  }
+  renderGroupingOptions = () => 'TODO list group options';
 
   render() {
     const {
       sortBy,
       sortOrder,
-      activeFilterOption,
       activeEditOption,
       activePanel,
       dataReady,
@@ -329,28 +172,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       sortOrder
     );
     const entitiesSelected = Object.values(pick(this.props.entities, entityIdsSelected));
-
-    const filterListOption = {
-      label: 'Filter list',
-      active: activePanel === FILTERS_PANEL,
-      onClick: () => {
-        this.props.onPanelSelect(FILTERS_PANEL);
-      },
-    };
-    const panelSwitchOptions = isManager
-    ? [
-      filterListOption,
-      {
-        label: 'Edit list',
-        active: activePanel === EDIT_PANEL,
-        onClick: () => {
-          this.props.onPanelSelect(EDIT_PANEL);
-        },
-      },
-    ]
-    : [
-      filterListOption,
-    ];
 
     let allChecked = CHECKBOX_STATES.INDETERMINATE;
     if (entitiesSelected.length === 0) {
@@ -366,77 +187,21 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     }
     return (
       <div>
-        <EntityListSidebar
-          options={panelSwitchOptions}
-        >
-          { dataReady && activePanel === FILTERS_PANEL &&
-            <EntityListSidebarFilters
-              filterGroups={
-                fromJS(makeFilterGroups(
-                  this.props,
-                  {
-                    attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
-                    taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
-                    connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
-                    connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
-                  }
-                ))
-              }
-              formOptions={
-                activeFilterOption
-                ? fromJS(makeActiveFilterOptions(
-                  entitiesSorted,
-                  this.props,
-                  {
-                    titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
-                    without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
-                  }
-                ))
-                : null
-              }
-              formModel={FILTER_FORM_MODEL}
-              onShowFilterForm={this.props.onShowFilterForm}
-              onHideFilterForm={this.props.onHideFilterForm}
-            />
-          }
-          { dataReady && isManager && activePanel === EDIT_PANEL && entitiesSelected.length > 0 &&
-            <EntityListSidebarEdit
-              editGroups={
-                fromJS(makeEditGroups(
-                  this.props,
-                  {
-                    attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
-                    taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
-                    connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
-                  }
-                ))
-              }
-              formOptions={
-                activeEditOption
-                ? fromJS(makeActiveEditOptions(
-                  entitiesSelected,
-                  this.props,
-                  { title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.length} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}` }
-                ))
-                : null
-              }
-              formModel={EDIT_FORM_MODEL}
-              onShowEditForm={this.props.onShowEditForm}
-              onHideEditForm={this.props.onHideEditForm}
-              onAssign={(associations) => this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
-            />
-          }
-          { dataReady && isManager && activePanel === EDIT_PANEL && entitiesSorted.length === 0 &&
-            <ListEntitiesEmpty>
-               No entities found
-            </ListEntitiesEmpty>
-          }
-          { dataReady && isManager && activePanel === EDIT_PANEL && entitiesSelected.length === 0 && entitiesSorted.length > 0 &&
-            <ListEntitiesEmpty>
-              Please select one or more entities for edit options
-            </ListEntitiesEmpty>
-          }
-        </EntityListSidebar>
+        { dataReady &&
+          <EntityListSidebar
+            options={this.getSidebarOptions(this.props)}
+            isFilterPanel={activePanel === FILTERS_PANEL}
+            isEditPanel={activePanel === EDIT_PANEL && isManager}
+            panelGroups={this.getSidebarGroups(this.props, entitiesSelected.length > 0)}
+            formOptions={this.getSidebarFormOptions(this.props, entitiesSorted, entitiesSelected)}
+            formModel={activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL}
+            onShowForm={activePanel === FILTERS_PANEL ? this.props.onShowFilterForm : this.props.onShowEditForm}
+            onHideForm={activePanel === FILTERS_PANEL ? this.props.onHideFilterForm : this.props.onHideEditForm}
+            onAssign={(associations) => this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
+            hasSelected={entitiesSelected && entitiesSelected.length > 0}
+            hasEntities={entitiesSorted && entitiesSorted.length > 0}
+          />
+        }
         <ContainerWithSidebar>
           <Container>
             <Styled>
@@ -456,14 +221,27 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               { dataReady &&
                 <ListEntities>
                   <ListEntitiesTopFilters>
-                    {this.renderCurrentFilters(
-                      this.props,
-                      {
-                        without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
-                      }
+                    { makeCurrentFilters(this.props, this.context.intl.formatMessage(messages.filterFormWithoutPrefix)).map((filter, i) =>
+                      (<Button key={i} onClick={filter.onClick}>{filter.label}</Button>)
                     )}
                   </ListEntitiesTopFilters>
-                  <ListEntitiesHeaderOptions />
+                  <ListEntitiesHeaderOptions>
+                    <ListEntitiesHeaderOptionGroup>
+                      { this.renderGroupingOptions() }
+                    </ListEntitiesHeaderOptionGroup>
+                    <ListEntitiesHeaderOptionLinks>
+                      { this.props.expandable &&
+                        <ListEntitiesHeaderOptionLink
+                          onClick={() => this.props.onExpand(
+                            this.props.expand < this.props.expandableColumns.length,
+                            this.props.expandableColumns.length
+                          )}
+                        >
+                          {`${(!this.props.expand) || this.props.expand < this.props.expandableColumns.length ? 'Implementation Plan View' : 'List View'}`}
+                        </ListEntitiesHeaderOptionLink>
+                      }
+                    </ListEntitiesHeaderOptionLinks>
+                  </ListEntitiesHeaderOptions>
                   <ListEntitiesHeader>
                     <ListEntitiesSelectAll>
                       { isManager &&
@@ -507,7 +285,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                         entityLinkTo={this.props.entityLinkTo}
                         filters={this.props.filters}
                         onTagClick={this.props.onTagClick}
-                        childList={this.props.childList}
+                        onExpand={this.props.onExpand}
+                        expand={this.props.expand}
+                        expandable={this.props.expandable}
+                        expandableColumns={this.props.expandableColumns}
                       />
                     }
                   </ListEntitiesMain>
@@ -530,14 +311,13 @@ EntityList.propTypes = {
   header: PropTypes.object,
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
-  activeFilterOption: PropTypes.object,
   activeEditOption: PropTypes.object,
   onShowFilterForm: PropTypes.func.isRequired,
   onHideFilterForm: PropTypes.func.isRequired,
   onShowEditForm: PropTypes.func.isRequired,
   onHideEditForm: PropTypes.func.isRequired,
-  onPanelSelect: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,
+  onExpand: PropTypes.func.isRequired,
   activePanel: PropTypes.string,
   entityIdsSelected: PropTypes.array,
   handleEditSubmit: PropTypes.func.isRequired,
@@ -546,7 +326,9 @@ EntityList.propTypes = {
   location: PropTypes.object,
   entityTitle: PropTypes.object, // single/plural
   entityLinkTo: PropTypes.string,
-  childList: PropTypes.string,
+  expandable: PropTypes.bool,
+  expandableColumns: PropTypes.array,
+  expand: PropTypes.number,
 };
 
 EntityList.defaultProps = {
@@ -658,13 +440,11 @@ const mapStateToProps = (state, props) => ({
   connections: props.selects && props.selects.connections
     ? reduce(props.selects.connections.options, (result, option) => {
       const path = typeof option === 'string' ? option : option.path;
-      const extend = typeof option === 'string' ? [] : option.extend;
       return {
         ...result,
         [path]: getEntities(state, {
           out: 'js',
           path,
-          extend,
         }),
       };
     }, {})
@@ -800,6 +580,16 @@ function mapDispatchToProps(dispatch, props) {
     },
     onTagClick: (value) => {
       dispatch(updateQuery(fromJS([value])));
+    },
+    onExpand: (bool, value) => {
+      dispatch(updateQuery(fromJS([
+        {
+          query: 'expand',
+          value,
+          replace: bool,
+          checked: bool,
+        },
+      ])));
     },
   };
 }

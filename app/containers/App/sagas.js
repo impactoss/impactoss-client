@@ -362,8 +362,8 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
   // and figure out new query
   const queryNext = query.reduce((q, param) => {
     const queryUpdated = q;
-    // if already set
-    if (queryUpdated[param.arg]) {
+    // if already set and not replacing
+    if (queryUpdated[param.arg] && !param.replace) {
       // if multiple values set
       if (Array.isArray(queryUpdated[param.arg])) {
         // add if not already present
@@ -389,8 +389,8 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
           delete queryUpdated[param.arg];
         }
       }
-    // if not already set
-    } else if (param.add) {
+    // if not already set or replacing
+    } else if (param.add || param.replace) {
       queryUpdated[param.arg] = param.value;
     }
     return queryUpdated;
