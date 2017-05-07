@@ -117,16 +117,21 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   ) => {
     const group = locationQueryGroup || UNGROUP;
 
-    const options = makeGroupOptions(filters, taxonomies, connectedTaxonomies, 'Group by category');
+    const options = makeGroupOptions(filters, taxonomies, connectedTaxonomies, group, locationQueryGroup ? 'X Reset' : 'Group by category');
 
     return options.length > 1
     ? (
       <select onChange={(event) => onGroupSelect(event.target.value)} value={group} >
-        {
-          options.map((option, i) =>
-            (<option key={i} value={option.value} default={option.default}>{option.label}</option>)
-          )
-        }
+        { options.map((option, i) => (
+          <option
+            key={i}
+            value={option.value}
+            default={option.default}
+            disabled={option.disabled}
+          >
+            {option.label}
+          </option>)
+        )}
       </select>
     )
     : null;

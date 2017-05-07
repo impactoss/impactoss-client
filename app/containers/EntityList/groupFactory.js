@@ -6,12 +6,13 @@ import isNumber from 'utils/is-number';
 
 import { UNGROUP } from './constants';
 
-export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies, messageUngroup) => {
+export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies, group, messageUngroup) => {
   let options = [
     {
       value: UNGROUP,
       label: messageUngroup,
       default: true,
+      disabled: group === UNGROUP,
     },
   ];
 
@@ -21,6 +22,7 @@ export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies, messa
     options = options.concat(Object.values(taxonomies).map((taxonomy) => ({
       value: taxonomy.id, // filterOptionId
       label: taxonomy.attributes.title,
+      disabled: group === taxonomy.id,
     })));
   }
   // connectedTaxonomies options
@@ -29,6 +31,7 @@ export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies, messa
     options = options.concat(Object.values(connectedTaxonomies.taxonomies).map((taxonomy) => ({
       value: `x:${taxonomy.id}`, // filterOptionId
       label: taxonomy.attributes.title,
+      disabled: group === `x:${taxonomy.id}`,
     })));
   }
   return options;
