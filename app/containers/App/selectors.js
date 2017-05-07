@@ -19,6 +19,9 @@ import { reduce } from 'lodash/collection';
 
 import { USER_ROLES } from 'containers/App/constants';
 
+import asArray from 'utils/as-array';
+
+
 // high level state selects
 const getRoute = (state) => state.get('route');
 const getGlobal = (state) => state.get('global');
@@ -88,7 +91,7 @@ const getRequestedAt = createSelector(
 );
 
 const isReady = (state, { path }) =>
-  reduce(Array.isArray(path) ? path : [path],
+  reduce(asArray(path),
     (areReady, readyPath) => areReady && !!state.getIn(['global', 'ready', readyPath]),
     true
   );
@@ -134,7 +137,7 @@ const getEntitiesWithout = createSelector(
   (state, { without }) => without,
   (state, entities, without) => without
     ? entities.filter((entity) =>
-      reduce(Array.isArray(without) ? without : [without], (passing, condition) => {
+      reduce(asArray(without), (passing, condition) => {
         // check for taxonomies
         if (condition.taxonomyId) {
           // get all associations for entity and store category count for given taxonomy
@@ -178,12 +181,12 @@ const getEntitiesIfConnected = createSelector(
   (state, { connected }) => connected,
   (state, entities, connected) => connected
     ? entities.filter((entity) => reduce(
-      Array.isArray(connected) ? connected : [connected], // allows multiple connections
+      asArray(connected), // allows multiple connections
       (passing, argsConnected) => {
         if (argsConnected.connected || argsConnected.where) {
           const where = argsConnected.where || {};
           return passing && reduce(
-            Array.isArray(where) ? where : [where],
+            asArray(where),
             (passingWhere, whereArgs) => { // and multiple wheres
               // TODO if passingWhere is false we don't need to do any more work
               const connections = getEntitiesIfConnected(state, {
@@ -231,7 +234,7 @@ const getEntities = createSelector(
 // helper: allows to extend entity by joining it with related entities,
 //   calls getEntities recursively
 const extendEntity = (state, entity, extendArgs) => {
-  const argsArray = Array.isArray(extendArgs) ? extendArgs : [extendArgs];
+  const argsArray = asArray(extendArgs);
   let result = entity;
   argsArray.forEach((args) => {
     const extend = {

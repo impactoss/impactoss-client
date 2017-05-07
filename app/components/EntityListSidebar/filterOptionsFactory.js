@@ -2,6 +2,7 @@ import { find, forEach, map } from 'lodash/collection';
 import { upperFirst } from 'lodash/string';
 import { lowerCase } from 'utils/string';
 import isNumber from 'utils/is-number';
+import asArray from 'utils/as-array';
 import { getConnectedCategoryIds } from 'utils/entities';
 import { optionChecked, attributeOptionChecked } from './utils';
 
@@ -37,7 +38,7 @@ export const makeAttributeFilterOptions = (entities, filters, activeFilterOption
     const locationQueryValue = locationQuery.where;
     if (entities.length === 0) {
       if (locationQueryValue && option.options) {
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+        forEach(asArray(locationQueryValue), (queryValue) => {
           if (attributeOptionChecked(queryValue, option.attribute)) {
             const locationQueryValueAttribute = queryValue.split(':');
             if (locationQueryValueAttribute.length > 1) {
@@ -133,7 +134,7 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeF
     if (entities.length === 0) {
       if (locationQuery[filters.taxonomies.query]) {
         const locationQueryValue = locationQuery[filters.taxonomies.query];
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+        forEach(asArray(locationQueryValue), (queryValue) => {
           const value = parseInt(queryValue, 10);
           if (taxonomy.categories[value]) {
             filterOptions.options[value] = {
@@ -150,7 +151,7 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeF
       // check for checked without options
       if (locationQuery.without) {
         const locationQueryValue = locationQuery.without;
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+        forEach(asArray(locationQueryValue), (queryValue) => {
           // numeric means taxonomy
           if (isNumber(queryValue) && taxonomy.id === queryValue) {
             const value = parseInt(queryValue, 10);
@@ -238,7 +239,7 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
     if (entities.length === 0) {
       if (locationQuery[option.query]) {
         const locationQueryValue = locationQuery[option.query];
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+        forEach(asArray(locationQueryValue), (queryValue) => {
           const value = parseInt(queryValue, 10);
           filterOptions.options[value] = {
             label: connections[option.path] && connections[option.path][value]
@@ -255,7 +256,7 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
       // also check for active without options
       if (locationQuery.without) {
         const locationQueryValue = locationQuery.without;
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+        forEach(asArray(locationQueryValue), (queryValue) => {
           if (option.query === queryValue) {
             filterOptions.options[queryValue] = {
               label: `${messages.without} ${lowerCase(option.label)}`,
@@ -344,7 +345,7 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
     const locationQueryValue = locationQuery[query];
     if (entities.length === 0) {
       if (locationQueryValue) {
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+        forEach(asArray(locationQueryValue), (queryValue) => {
           const locationQueryValueCategory = queryValue.split(':');
           if (locationQueryValueCategory.length > 1) {
             forEach(filters.connectedTaxonomies.connections, (connection) => {

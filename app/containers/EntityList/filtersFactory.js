@@ -3,6 +3,8 @@ import { upperFirst } from 'lodash/string';
 
 import { lowerCase } from 'utils/string';
 import isNumber from 'utils/is-number';
+import asArray from 'utils/as-array';
+
 
 export const makeCurrentFilters = ({
   filters,
@@ -58,7 +60,7 @@ export const getCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQ
   if (locationQuery[taxonomyFilters.query]) {
     const locationQueryValue = locationQuery[taxonomyFilters.query];
     forEach(taxonomies, (taxonomy) => {
-      forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+      forEach(asArray(locationQueryValue), (queryValue) => {
         const value = parseInt(queryValue, 10);
         if (taxonomy.categories[value]) {
           const category = taxonomy.categories[value];
@@ -81,7 +83,7 @@ export const getCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQ
   if (locationQuery.without) {
     const locationQueryValue = locationQuery.without;
     forEach(taxonomies, (taxonomy) => {
-      forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+      forEach(asArray(locationQueryValue), (queryValue) => {
         // numeric means taxonomy
         if (isNumber(queryValue) && taxonomy.id === queryValue) {
           const value = parseInt(queryValue, 10);
@@ -104,7 +106,7 @@ export const getCurrentConnectedTaxonomyFilters = (taxonomyFilters, connectedTax
   if (locationQuery[taxonomyFilters.query]) {
     const locationQueryValue = locationQuery[taxonomyFilters.query];
     forEach(connectedTaxonomies, (taxonomy) => {
-      forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+      forEach(asArray(locationQueryValue), (queryValue) => {
         const valueSplit = queryValue.split(':');
         if (valueSplit.length > 0) {
           const value = parseInt(valueSplit[1], 10);
@@ -134,7 +136,7 @@ export const getCurrentConnectionFilters = (connectionFiltersOptions, connection
   forEach(connectionFiltersOptions, (option) => {
     if (locationQuery[option.query] && connections[option.path]) {
       const locationQueryValue = locationQuery[option.query];
-      forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+      forEach(asArray(locationQueryValue), (queryValue) => {
         const value = parseInt(queryValue, 10);
         const connection = connections[option.path][value];
         let label = connection
@@ -156,7 +158,7 @@ export const getCurrentConnectionFilters = (connectionFiltersOptions, connection
   if (locationQuery.without) {
     const locationQueryValue = locationQuery.without;
     forEach(connectionFiltersOptions, (option) => {
-      forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+      forEach(asArray(locationQueryValue), (queryValue) => {
         // numeric means taxonomy
         if (option.query === queryValue) {
           tags.push({
@@ -179,7 +181,7 @@ export const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuer
     const locationQueryValue = locationQuery.where;
     forEach(attributeFiltersOptions, (option) => {
       if (locationQueryValue) {
-        forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
+        forEach(asArray(locationQueryValue), (queryValue) => {
           const valueSplit = queryValue.split(':');
           if (valueSplit[0] === option.attribute && valueSplit.length > 0) {
             const value = valueSplit[1];
