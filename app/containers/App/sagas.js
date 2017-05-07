@@ -391,7 +391,11 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
       }
     // if not already set or replacing
     } else if (param.add || param.replace) {
-      queryUpdated[param.arg] = param.value;
+      if (param.remove) {
+        delete queryUpdated[param.arg];
+      } else {
+        queryUpdated[param.arg] = param.value;
+      }
     }
     return queryUpdated;
   }, queryPrevious);

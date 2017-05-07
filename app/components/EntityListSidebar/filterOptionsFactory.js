@@ -1,7 +1,10 @@
 import { find, forEach, map } from 'lodash/collection';
 import { upperFirst } from 'lodash/string';
 import { lowerCase } from 'utils/string';
+import isNumber from 'utils/is-number';
+import { getConnectedCategoryIds } from 'utils/entities';
 import { optionChecked, attributeOptionChecked } from './utils';
+
 
 export const makeActiveFilterOptions = (entities, filters, activeFilterOption, location, taxonomies, connections, connectedTaxonomies, messages) => {
   // create filterOptions
@@ -149,7 +152,7 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeF
         const locationQueryValue = locationQuery.without;
         forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
           // numeric means taxonomy
-          if (!isNaN(parseFloat(queryValue)) && isFinite(queryValue) && taxonomy.id === queryValue) {
+          if (isNumber(queryValue) && taxonomy.id === queryValue) {
             const value = parseInt(queryValue, 10);
             filterOptions.options[value] = {
               label: `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
@@ -324,31 +327,6 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
   return filterOptions;
 };
 
-// get connected category ids for taxonomy
-const getConnectedCategoryIds = (entity, connection, taxonomy) => {
-  const categoryIds = [];
-  if (taxonomy.categories) {
-    // the associated entities ids, eg recommendation ids
-    const connectionIds = map(map(Object.values(entity[connection.path]), 'attributes'), connection.key);
-    // for each category of active taxonomy
-    forEach(Object.values(taxonomy.categories), (category) => {
-      // we have saved the associated entities, eg recommendations
-      if (category[connection.path]) {
-        // for each category-entitiy-connection, eg recommendation_categories
-        forEach(Object.values(category[connection.path]), (categoryConnection) => {
-          // if connection exists and category not previously recorded (through other connection)
-          if (connectionIds.indexOf(categoryConnection.attributes[connection.key]) > -1
-          && categoryIds.indexOf(categoryConnection.attributes.category_id) === -1) {
-            // remember category
-            categoryIds.push(categoryConnection.attributes.category_id);
-          }
-        });
-      }
-    });
-  }
-  return categoryIds;
-};
-
 
 export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedTaxonomies, activeFilterOption, location, messages) => {
   const locationQuery = location.query;
@@ -373,8 +351,11 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
               if (connection.path === locationQueryValueCategory[0]) {
                 const categoryId = parseInt(locationQueryValueCategory[1], 10);
                 if (taxonomy.categories[categoryId]) {
+                  const cat = taxonomy.categories[categoryId];
+                  const label = cat.attributes.title || cat.attributes.name;
+
                   filterOptions.options[categoryId] = {
-                    label: taxonomy.categories[categoryId].attributes.title,
+                    label,
                     showCount: true,
                     value: `${connection.path}:${categoryId}`,
                     count: 0,

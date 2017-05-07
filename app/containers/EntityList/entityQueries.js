@@ -1,7 +1,7 @@
 import { find, map, forEach } from 'lodash/collection';
 import { cloneDeep } from 'lodash/lang';
-
-const asArray = (v) => Array.isArray(v) ? v : [v];
+import isNumber from 'utils/is-number';
+import asArray from 'utils/as-array';
 
 // attribute conditions
 // query:"where=att1:value+att2:value"
@@ -67,7 +67,7 @@ export const getConnectedQuery = (locationQuery, filters) => {
 export const getWithoutQuery = (queryWithout, filters) =>
   asArray(queryWithout).map((pathOrTax) => {
     // check numeric ? taxonomy filter : related entity filter
-    if (!isNaN(parseFloat(pathOrTax)) && isFinite(pathOrTax)) {
+    if (isNumber(pathOrTax)) {
       return {
         taxonomyId: pathOrTax,
         path: filters.taxonomies.connected.path,

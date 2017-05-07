@@ -27,6 +27,11 @@ import { getEntities, isUserManager } from 'containers/App/selectors';
 
 import { makeCurrentFilters } from './filtersFactory';
 import {
+  makeEntityGroups,
+  makeGroupOptions,
+} from './groupFactory';
+
+import {
   getAttributeQuery,
   getConnectedQuery,
   getWithoutQuery,
@@ -43,18 +48,20 @@ import {
   selectEntity,
   selectEntities,
   updateQuery,
+  updateGroup,
 } from './actions';
 
-import messages from './messages';
+import {
+  UNGROUP,
+} from './constants';
 
+import messages from './messages';
 
 const Styled = styled.div`
   padding:0 20px;
 `;
-const ListEntities = styled.div`
-`;
-const ListEntitiesTopFilters = styled.div`
-`;
+const ListEntities = styled.div``;
+const ListEntitiesTopFilters = styled.div``;
 const ListEntitiesHeaderOptionLinks = styled.div`
   float:right;
 `;
@@ -67,19 +74,15 @@ const ListEntitiesHeaderOptionLink = styled.button`
     opacity: 0.8;
   }
 `;
-const ListEntitiesHeaderOptions = styled.div`
-`;
+const ListEntitiesHeaderOptions = styled.div``;
 const ListEntitiesHeader = styled.div`
   clear: both;
   background: #ccc
   padding: 2px 5px ;
 `;
-const ListEntitiesSelectAll = styled.div`
-`;
-const ListEntitiesMain = styled.div`
-`;
-const ListEntitiesEmpty = styled.div`
-`;
+const ListEntitiesSelectAll = styled.div``;
+const ListEntitiesMain = styled.div``;
+const ListEntitiesEmpty = styled.div``;
 const Tag = styled.button`
   display: inline-block;
   background: #ccc;
@@ -94,8 +97,7 @@ const Tag = styled.button`
 const Button = styled(Tag)`
   cursor: pointer;
 `;
-const ListEntitiesHeaderOptionGroup = styled.span`
-`;
+const ListEntitiesHeaderOptionGroup = styled.span``;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   // TODO figure out why component updates when child component (sidebar option) internal state changes
@@ -106,7 +108,29 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   //   const s_np = JSON.stringify(nextProps)
   //   return s_np !== s_p
   // }
-  renderGroupingOptions = () => 'TODO list group options';
+  renderGroupingOptions = (
+    onGroupSelect,
+    locationQueryGroup,
+    filters,
+    taxonomies,
+    connectedTaxonomies,
+  ) => {
+    const group = locationQueryGroup || UNGROUP;
+
+    const options = makeGroupOptions(filters, taxonomies, connectedTaxonomies, 'Group by category');
+
+    return options.length > 1
+    ? (
+      <select onChange={(event) => onGroupSelect(event.target.value)} value={group} >
+        {
+          options.map((option, i) =>
+            (<option key={i} value={option.value} default={option.default}>{option.label}</option>)
+          )
+        }
+      </select>
+    )
+    : null;
+  };
 
   render() {
     const {
@@ -127,13 +151,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     // sorted entities
     const entitiesSorted = dataReady && this.props.entities
-        ? orderBy(
-          this.props.entities,
-          getEntitySortIteratee(sortBy),
-          sortOrder
-        )
+        ? orderBy(this.props.entities, getEntitySortIteratee(sortBy), sortOrder)
         : [];
+    // grouped entities
+    const entitiesGrouped = dataReady && this.props.entities
+      ? makeEntityGroups(entitiesSorted, taxonomies, connectedTaxonomies, filters, location.query.group)
+      : [];
 
+    // selected entities
     const entitiesSelected = dataReady ? Object.values(pick(this.props.entities, entityIdsSelected)) : [];
 
     let allChecked = CHECKBOX_STATES.INDETERMINATE;
@@ -196,7 +221,15 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   </ListEntitiesTopFilters>
                   <ListEntitiesHeaderOptions>
                     <ListEntitiesHeaderOptionGroup>
-                      { this.renderGroupingOptions() }
+                      {
+                        this.renderGroupingOptions(
+                          this.props.onGroupSelect,
+                          location.query.group,
+                          filters,
+                          taxonomies,
+                          connectedTaxonomies
+                        )
+                      }
                     </ListEntitiesHeaderOptionGroup>
                     <ListEntitiesHeaderOptionLinks>
                       { this.props.expandable &&
@@ -233,32 +266,41 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     </ListEntitiesSelectAll>
                   </ListEntitiesHeader>
                   <ListEntitiesMain>
-                    { entitiesSorted.length === 0 && this.props.location.query &&
+                    { entitiesSorted.length === 0 && location.query &&
                       <ListEntitiesEmpty>
                         No results matched your search
                       </ListEntitiesEmpty>
                     }
-                    { entitiesSorted.length === 0 && !this.props.location.query &&
+                    { entitiesSorted.length === 0 && !location.query &&
                       <ListEntitiesEmpty>
                         No entities yet
                       </ListEntitiesEmpty>
                     }
                     { entitiesSorted.length > 0 &&
-                      <EntityListItems
-                        entities={entitiesSorted}
-                        entitiesSelected={entitiesSelected}
-                        isSelect={isManager}
-                        showDate={isManager}
-                        onEntitySelect={this.props.onEntitySelect}
-                        taxonomies={this.props.taxonomies}
-                        entityLinkTo={this.props.entityLinkTo}
-                        filters={this.props.filters}
-                        onTagClick={this.props.onTagClick}
-                        onExpand={this.props.onExpand}
-                        expand={this.props.expand}
-                        expandable={this.props.expandable}
-                        expandableColumns={this.props.expandableColumns}
-                      />
+                      <div>
+                        { entitiesGrouped.map((entityGroup, i) => (
+                          <div key={i}>
+                            { entityGroup.label &&
+                              <h1>{entityGroup.label}</h1>
+                            }
+                            <EntityListItems
+                              entities={entityGroup.entities}
+                              entitiesSelected={entitiesSelected}
+                              isSelect={isManager}
+                              showDate={isManager}
+                              onEntitySelect={this.props.onEntitySelect}
+                              taxonomies={taxonomies}
+                              entityLinkTo={this.props.entityLinkTo}
+                              filters={filters}
+                              onTagClick={this.props.onTagClick}
+                              onExpand={this.props.onExpand}
+                              expand={this.props.expand}
+                              expandable={this.props.expandable}
+                              expandableColumns={this.props.expandableColumns}
+                            />
+                          </div>
+                        ))}
+                      </div>
                     }
                   </ListEntitiesMain>
                 </ListEntities>
@@ -285,10 +327,10 @@ EntityList.propTypes = {
   expandableColumns: PropTypes.array,
   expand: PropTypes.number,
   // select props
-  isManager: PropTypes.bool,
   activePanel: PropTypes.string,
-  entityIdsSelected: PropTypes.array,
+  isManager: PropTypes.bool,
   entities: PropTypes.object.isRequired,
+  entityIdsSelected: PropTypes.array,
   taxonomies: PropTypes.object,
   connections: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
@@ -299,6 +341,7 @@ EntityList.propTypes = {
   onEntitySelectAll: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,
   onExpand: PropTypes.func.isRequired,
+  onGroupSelect: PropTypes.func.isRequired,
 };
 
 EntityList.defaultProps = {
@@ -355,6 +398,33 @@ function mapDispatchToProps(dispatch, props) {
   return {
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));
+    },
+    onEntitySelect: (id, checked) => {
+      dispatch(selectEntity({ id, checked }));
+    },
+    onEntitySelectAll: (ids) => {
+      dispatch(selectEntities(ids));
+    },
+    onTagClick: (value) => {
+      dispatch(updateQuery(fromJS([value])));
+    },
+    onExpand: (bool, value) => {
+      dispatch(updateQuery(fromJS([
+        {
+          query: 'expand',
+          value,
+          replace: bool,
+          checked: bool,
+        },
+      ])));
+    },
+    onGroupSelect: (value) => {
+      dispatch(updateGroup(fromJS([
+        {
+          query: 'group',
+          value,
+        },
+      ])));
     },
     handleEditSubmit: (formData, selectedEntities, activeEditOption) => {
       const entities = fromJS(selectedEntities);
@@ -450,25 +520,6 @@ function mapDispatchToProps(dispatch, props) {
       }
 
       dispatch(saveEdits(saveData.toJS()));
-    },
-    onEntitySelect: (id, checked) => {
-      dispatch(selectEntity({ id, checked }));
-    },
-    onEntitySelectAll: (ids) => {
-      dispatch(selectEntities(ids));
-    },
-    onTagClick: (value) => {
-      dispatch(updateQuery(fromJS([value])));
-    },
-    onExpand: (bool, value) => {
-      dispatch(updateQuery(fromJS([
-        {
-          query: 'expand',
-          value,
-          replace: bool,
-          checked: bool,
-        },
-      ])));
     },
   };
 }

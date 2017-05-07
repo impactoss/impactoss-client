@@ -2,7 +2,7 @@ import { find, forEach } from 'lodash/collection';
 import { upperFirst } from 'lodash/string';
 
 import { lowerCase } from 'utils/string';
-
+import isNumber from 'utils/is-number';
 
 export const makeCurrentFilters = ({
   filters,
@@ -83,7 +83,7 @@ export const getCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQ
     forEach(taxonomies, (taxonomy) => {
       forEach(Array.isArray(locationQueryValue) ? locationQueryValue : [locationQueryValue], (queryValue) => {
         // numeric means taxonomy
-        if (!isNaN(parseFloat(queryValue)) && isFinite(queryValue) && taxonomy.id === queryValue) {
+        if (isNumber(queryValue) && taxonomy.id === queryValue) {
           const value = parseInt(queryValue, 10);
           tags.push({
             label: `${withoutMessage} ${lowerCase(taxonomy.attributes.title)} X`,
