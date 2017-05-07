@@ -22,6 +22,21 @@ theme.palette = {
   alert: coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-fff2ce'),
   success: coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-c8e6c9'),
   grayscale: ['#212121', '#616161', '#9e9e9e', '#bdbdbd', '#e0e0e0', '#ffffff'],
+  taxonomies: ['#41addd', '#004812', '#007061', '#00A88F', '#9EE6DA', '#6FB43F', '#0293D0', '#40D7FF'],
+  taxonomiesHover: ['#41addd', '#004812', '#007061', '#00A88F', '#9EE6DA', '#6FB43F', '#0293D0', '#40D7FF'],
+  // 0: default/fallback
+  // 1: Human Rights Body
+  // 2: UN session
+  // 3: Human right
+  // 4: Affected persons
+  // 5: Thematic cluster
+  // 6: Organisation
+  // 7: SDGs
+  actions: ['#FF9B69'],
+  actionsHover: ['#FF9B69'],
+  indicators: ['#EB6E51'],
+  indicatorsHover: ['#EB6E51'],
+  recommendationsHover: ['#FAA335'],
 };
 theme.reversePalette = reversePalette(theme.palette);
 
