@@ -1,11 +1,12 @@
 import { reduce } from 'lodash/collection';
 
-export const makeEditGroups = ({
+export const makeEditGroups = (
   edits,
   taxonomies,
   connections,
   activeEditOption,
-}, messages) => {
+  messages
+) => {
   const editGroups = {};
 
   // taxonomy option group

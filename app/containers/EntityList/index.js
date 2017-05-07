@@ -7,9 +7,8 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 
-import { orderBy, find, map, forEach, reduce } from 'lodash/collection';
+import { orderBy, reduce } from 'lodash/collection';
 import { pick } from 'lodash/object';
-import { cloneDeep } from 'lodash/lang';
 
 import { Map, List, fromJS } from 'immutable';
 import styled from 'styled-components';
@@ -26,48 +25,43 @@ import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/for
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
 
-import { makeFilterGroups } from './filterGroupsFactory';
-import { makeEditGroups } from './editGroupsFactory';
-import { makeActiveFilterOptions } from './filterOptionsFactory';
-import { makeActiveEditOptions } from './editOptionsFactory';
 import { makeCurrentFilters } from './filtersFactory';
+import {
+  makeEntityGroups,
+  makeGroupOptions,
+} from './groupFactory';
 
 import {
-  FILTER_FORM_MODEL,
-  EDIT_FORM_MODEL,
-  FILTERS_PANEL,
-  EDIT_PANEL,
-} from './constants';
+  getAttributeQuery,
+  getConnectedQuery,
+  getWithoutQuery,
+} from './entityQueries';
 
 import {
-  activeFilterOptionSelector,
-  activeEditOptionSelector,
   activePanelSelector,
   entitiesSelectedSelector,
 } from './selectors';
 
 import {
-  showEditForm,
-  hideEditForm,
-  showFilterForm,
-  hideFilterForm,
   showPanel,
   saveEdits,
   selectEntity,
   selectEntities,
   updateQuery,
+  updateGroup,
 } from './actions';
 
-import messages from './messages';
+import {
+  UNGROUP,
+} from './constants';
 
+import messages from './messages';
 
 const Styled = styled.div`
   padding:0 20px;
 `;
-const ListEntities = styled.div`
-`;
-const ListEntitiesTopFilters = styled.div`
-`;
+const ListEntities = styled.div``;
+const ListEntitiesTopFilters = styled.div``;
 const ListEntitiesHeaderOptionLinks = styled.div`
   float:right;
 `;
@@ -80,19 +74,15 @@ const ListEntitiesHeaderOptionLink = styled.button`
     opacity: 0.8;
   }
 `;
-const ListEntitiesHeaderOptions = styled.div`
-`;
+const ListEntitiesHeaderOptions = styled.div``;
 const ListEntitiesHeader = styled.div`
   clear: both;
   background: #ccc
   padding: 2px 5px ;
 `;
-const ListEntitiesSelectAll = styled.div`
-`;
-const ListEntitiesMain = styled.div`
-`;
-const ListEntitiesEmpty = styled.div`
-`;
+const ListEntitiesSelectAll = styled.div``;
+const ListEntitiesMain = styled.div``;
+const ListEntitiesEmpty = styled.div``;
 const Tag = styled.button`
   display: inline-block;
   background: #ccc;
@@ -107,99 +97,108 @@ const Tag = styled.button`
 const Button = styled(Tag)`
   cursor: pointer;
 `;
-const ListEntitiesHeaderOptionGroup = styled.span`
-`;
+const ListEntitiesHeaderOptionGroup = styled.span``;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  getSidebarListOption = (label, onPanelSelect, activePanel, panel) => ({
-    label,
-    active: activePanel === panel,
-    onClick: () => onPanelSelect(panel),
-  });
-  getSidebarOptions= ({ onPanelSelect, activePanel, isManager }) => isManager
-    ? [
-      this.getSidebarListOption('Filter list', onPanelSelect, activePanel, FILTERS_PANEL),
-      this.getSidebarListOption('Edit list', onPanelSelect, activePanel, EDIT_PANEL),
-    ]
-    : [this.getSidebarListOption('Filter list', onPanelSelect, activePanel, FILTERS_PANEL)];
+  // TODO figure out why component updates when child component (sidebar option) internal state changes
+  //    possibly due to form model changes
+  //    consider moving form reducer to sidebar or use local form
+  // shouldComponentUpdate(nextProps) {
+  //   const s_p = JSON.stringify(this.props)
+  //   const s_np = JSON.stringify(nextProps)
+  //   return s_np !== s_p
+  // }
+  renderGroupingOptions = (
+    onGroupSelect,
+    locationQueryGroup,
+    filters,
+    taxonomies,
+    connectedTaxonomies,
+  ) => {
+    const group = locationQueryGroup || UNGROUP;
 
-  getSidebarGroups = ({ activePanel, dataReady, isManager }, hasSelected) => {
-    if (dataReady && activePanel === FILTERS_PANEL) {
-      return makeFilterGroups(this.props, {
-        attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
-        taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
-        connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
-        connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
-      });
-    } else if (dataReady && activePanel === EDIT_PANEL && isManager && hasSelected) {
-      return makeEditGroups(this.props, {
-        attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
-        taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
-        connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
-      });
-    }
-    return null;
-  }
-  getSidebarFormOptions = (props, entitiesSorted, entitiesSelected) => {
-    if (props.activePanel === FILTERS_PANEL && props.activeFilterOption) {
-      return makeActiveFilterOptions(entitiesSorted, props, {
-        titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
-        without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
-      });
-    } else if (props.isManager && props.activePanel === EDIT_PANEL && props.activeEditOption && entitiesSelected.length > 0) {
-      return makeActiveEditOptions(entitiesSelected, this.props, {
-        title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.length} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}`,
-      });
-    }
-    return null;
-  }
-  renderGroupingOptions = () => 'TODO list group options';
+    const options = makeGroupOptions(filters, taxonomies, connectedTaxonomies, group, locationQueryGroup ? 'X Reset' : 'Group by category');
+
+    return options.length > 1
+    ? (
+      <select onChange={(event) => onGroupSelect(event.target.value)} value={group} >
+        { options.map((option, i) => (
+          <option
+            key={i}
+            value={option.value}
+            default={option.default}
+            disabled={option.disabled}
+          >
+            {option.label}
+          </option>)
+        )}
+      </select>
+    )
+    : null;
+  };
 
   render() {
     const {
       sortBy,
       sortOrder,
-      activeEditOption,
       activePanel,
       dataReady,
       isManager,
       entityIdsSelected,
+      onPanelSelect,
+      filters,
+      edits,
+      location,
+      taxonomies,
+      connections,
+      connectedTaxonomies,
     } = this.props;
+
     // sorted entities
-    const entitiesSorted = this.props.entities && orderBy(
-      this.props.entities,
-      getEntitySortIteratee(sortBy),
-      sortOrder
-    );
-    const entitiesSelected = Object.values(pick(this.props.entities, entityIdsSelected));
+    const entitiesSorted = dataReady && this.props.entities
+        ? orderBy(this.props.entities, getEntitySortIteratee(sortBy), sortOrder)
+        : [];
+    // grouped entities
+    const entitiesGrouped = dataReady && this.props.entities
+      ? makeEntityGroups(entitiesSorted, taxonomies, connectedTaxonomies, filters, location.query.group)
+      : [];
+
+    // selected entities
+    const entitiesSelected = dataReady ? Object.values(pick(this.props.entities, entityIdsSelected)) : [];
 
     let allChecked = CHECKBOX_STATES.INDETERMINATE;
-    if (entitiesSelected.length === 0) {
-      allChecked = CHECKBOX_STATES.UNCHECKED;
-    } else if (entitiesSorted.length > 0 && entitiesSelected.length === entitiesSorted.length) {
-      allChecked = CHECKBOX_STATES.CHECKED;
-    }
     let listHeaderLabel = this.props.entityTitle.plural;
-    if (entitiesSelected.length === 1) {
-      listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.single} selected`;
-    } else if (entitiesSelected.length > 1) {
-      listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
+
+    if (dataReady) {
+      if (entitiesSelected.length === 0) {
+        allChecked = CHECKBOX_STATES.UNCHECKED;
+      } else if (entitiesSorted.length > 0 && entitiesSelected.length === entitiesSorted.length) {
+        allChecked = CHECKBOX_STATES.CHECKED;
+      }
+      if (entitiesSelected.length === 1) {
+        listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.single} selected`;
+      } else if (entitiesSelected.length > 1) {
+        listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
+      }
     }
+
     return (
       <div>
         { dataReady &&
           <EntityListSidebar
-            options={this.getSidebarOptions(this.props)}
-            isFilterPanel={activePanel === FILTERS_PANEL}
-            isEditPanel={activePanel === EDIT_PANEL && isManager}
-            panelGroups={this.getSidebarGroups(this.props, entitiesSelected.length > 0)}
-            formOptions={this.getSidebarFormOptions(this.props, entitiesSorted, entitiesSelected)}
-            formModel={activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL}
-            onShowForm={activePanel === FILTERS_PANEL ? this.props.onShowFilterForm : this.props.onShowEditForm}
-            onHideForm={activePanel === FILTERS_PANEL ? this.props.onHideFilterForm : this.props.onHideEditForm}
-            onAssign={(associations) => this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
-            hasSelected={entitiesSelected && entitiesSelected.length > 0}
-            hasEntities={entitiesSorted && entitiesSorted.length > 0}
+            filters={filters}
+            edits={edits}
+            taxonomies={taxonomies}
+            connections={connections}
+            connectedTaxonomies={connectedTaxonomies}
+            entitiesSorted={entitiesSorted}
+            entitiesSelected={entitiesSelected}
+            location={location}
+            onPanelSelect={onPanelSelect}
+            canEdit={isManager}
+            activePanel={activePanel}
+            onAssign={(associations, activeEditOption) =>
+              this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
           />
         }
         <ContainerWithSidebar>
@@ -227,7 +226,15 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   </ListEntitiesTopFilters>
                   <ListEntitiesHeaderOptions>
                     <ListEntitiesHeaderOptionGroup>
-                      { this.renderGroupingOptions() }
+                      {
+                        this.renderGroupingOptions(
+                          this.props.onGroupSelect,
+                          location.query.group,
+                          filters,
+                          taxonomies,
+                          connectedTaxonomies
+                        )
+                      }
                     </ListEntitiesHeaderOptionGroup>
                     <ListEntitiesHeaderOptionLinks>
                       { this.props.expandable &&
@@ -264,32 +271,41 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     </ListEntitiesSelectAll>
                   </ListEntitiesHeader>
                   <ListEntitiesMain>
-                    { entitiesSorted.length === 0 && this.props.location.query &&
+                    { entitiesSorted.length === 0 && location.query &&
                       <ListEntitiesEmpty>
                         No results matched your search
                       </ListEntitiesEmpty>
                     }
-                    { entitiesSorted.length === 0 && !this.props.location.query &&
+                    { entitiesSorted.length === 0 && !location.query &&
                       <ListEntitiesEmpty>
                         No entities yet
                       </ListEntitiesEmpty>
                     }
                     { entitiesSorted.length > 0 &&
-                      <EntityListItems
-                        entities={entitiesSorted}
-                        entitiesSelected={entitiesSelected}
-                        isSelect={isManager}
-                        showDate={isManager}
-                        onEntitySelect={this.props.onEntitySelect}
-                        taxonomies={this.props.taxonomies}
-                        entityLinkTo={this.props.entityLinkTo}
-                        filters={this.props.filters}
-                        onTagClick={this.props.onTagClick}
-                        onExpand={this.props.onExpand}
-                        expand={this.props.expand}
-                        expandable={this.props.expandable}
-                        expandableColumns={this.props.expandableColumns}
-                      />
+                      <div>
+                        { entitiesGrouped.map((entityGroup, i) => (
+                          <div key={i}>
+                            { entityGroup.label &&
+                              <h1>{entityGroup.label}</h1>
+                            }
+                            <EntityListItems
+                              entities={entityGroup.entities}
+                              entitiesSelected={entitiesSelected}
+                              isSelect={isManager}
+                              showDate={isManager}
+                              onEntitySelect={this.props.onEntitySelect}
+                              taxonomies={taxonomies}
+                              entityLinkTo={this.props.entityLinkTo}
+                              filters={filters}
+                              onTagClick={this.props.onTagClick}
+                              onExpand={this.props.onExpand}
+                              expand={this.props.expand}
+                              expandable={this.props.expandable}
+                              expandableColumns={this.props.expandableColumns}
+                            />
+                          </div>
+                        ))}
+                      </div>
                     }
                   </ListEntitiesMain>
                 </ListEntities>
@@ -303,32 +319,34 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 }
 
 EntityList.propTypes = {
-  entities: PropTypes.object.isRequired,
   filters: PropTypes.object,
-  taxonomies: PropTypes.object,
+  edits: PropTypes.object,
   dataReady: PropTypes.bool,
-  isManager: PropTypes.bool,
   header: PropTypes.object,
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
-  activeEditOption: PropTypes.object,
-  onShowFilterForm: PropTypes.func.isRequired,
-  onHideFilterForm: PropTypes.func.isRequired,
-  onShowEditForm: PropTypes.func.isRequired,
-  onHideEditForm: PropTypes.func.isRequired,
-  onTagClick: PropTypes.func.isRequired,
-  onExpand: PropTypes.func.isRequired,
-  activePanel: PropTypes.string,
-  entityIdsSelected: PropTypes.array,
-  handleEditSubmit: PropTypes.func.isRequired,
-  onEntitySelect: PropTypes.func.isRequired,
-  onEntitySelectAll: PropTypes.func.isRequired,
   location: PropTypes.object,
   entityTitle: PropTypes.object, // single/plural
   entityLinkTo: PropTypes.string,
   expandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
   expand: PropTypes.number,
+  // select props
+  activePanel: PropTypes.string,
+  isManager: PropTypes.bool,
+  entities: PropTypes.object.isRequired,
+  entityIdsSelected: PropTypes.array,
+  taxonomies: PropTypes.object,
+  connections: PropTypes.object,
+  connectedTaxonomies: PropTypes.object,
+  // dispatch props
+  onPanelSelect: PropTypes.func.isRequired,
+  handleEditSubmit: PropTypes.func.isRequired,
+  onEntitySelect: PropTypes.func.isRequired,
+  onEntitySelectAll: PropTypes.func.isRequired,
+  onTagClick: PropTypes.func.isRequired,
+  onExpand: PropTypes.func.isRequired,
+  onGroupSelect: PropTypes.func.isRequired,
 };
 
 EntityList.defaultProps = {
@@ -340,98 +358,22 @@ EntityList.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-// attribute conditions
-// query:"where=att1:value+att2:value"
-const getAttributeQuery = (props) =>
-  asArray(props.location.query.where).reduce((result, item) => {
-    const r = result;
-    const keyValue = item.split(':');
-    r[keyValue[0]] = keyValue[1];
-    return r;
-  }, {});
-
-const asArray = (v) => Array.isArray(v) ? v : [v];
-
-// associative conditions
-const getConnectedQuery = (props) => {
-  const connected = [];
-  forEach(props.location.query, (value, queryKey) => {
-    // filter by associated category
-    // "cat=1+2+3" catids regardless of taxonomy
-    if (props.filters.taxonomies && queryKey === props.filters.taxonomies.query) {
-      const condition = props.filters.taxonomies.connected;
-      condition.where = asArray(value).map((catId) => ({
-        [condition.whereKey]: catId,
-      })); // eg { category_id: 3 }
-      connected.push(condition);
-    // filter by associated entity
-    // "recommendations=1+2" recommendationids
-    } else if (props.filters.connections && map(props.filters.connections.options, 'query').indexOf(queryKey) > -1) {
-      const connectedEntity = find(
-        props.filters.connections.options,
-        { query: queryKey }
-      );
-      if (connectedEntity) {
-        const condition = connectedEntity.connected;
-        condition.where = asArray(value).map((connectionId) => ({
-          [condition.whereKey]: connectionId,
-        })); // eg { recommendation_id: 3 }
-        connected.push(condition);
-      }
-    // filter by associated category of associated entity
-    // query:"catx=recommendations:1" entitypath:catids regardless of taxonomy
-    } else if (props.filters.connectedTaxonomies && queryKey === props.filters.connectedTaxonomies.query) {
-      asArray(value).forEach((val) => {
-        const pathValue = val.split(':');
-        const connectedTaxonomy = find(
-          props.filters.connectedTaxonomies.connections,
-          (connection) => connection.path === pathValue[0]
-        );
-        if (connectedTaxonomy) {
-          const condition = cloneDeep(connectedTaxonomy.connected);
-          condition.connected.where = {
-            [condition.connected.whereKey]: pathValue[1],
-          };
-          connected.push(condition);
-        }
-      });
-    }
-  });
-  return connected;
-};
-
-// absent taxonomy conditions
-// query:"without=1+2+3+actions" either tax-id (numeric) or table path
-const getWithoutQuery = (props) =>
-  asArray(props.location.query.without).map((pathOrTax) => {
-    // check numeric ? taxonomy filter : related entity filter
-    if (!isNaN(parseFloat(pathOrTax)) && isFinite(pathOrTax)) {
-      return {
-        taxonomyId: pathOrTax,
-        path: props.filters.taxonomies.connected.path,
-        key: props.filters.taxonomies.connected.key,
-      };
-    }
-    if (props.filters.connections.options) {
-      // related entity filter
-      const connection = find(props.filters.connections.options, { query: pathOrTax });
-      return connection ? connection.connected : {};
-    }
-    return {};
-  });
-
 const mapStateToProps = (state, props) => ({
   isManager: isUserManager(state),
-  activeFilterOption: activeFilterOptionSelector(state),
-  activeEditOption: activeEditOptionSelector(state),
   activePanel: activePanelSelector(state),
   entityIdsSelected: entitiesSelectedSelector(state),
   entities: getEntities(state, {
     out: 'js',
     path: props.selects.entities.path,
-    where: props.location.query && props.location.query.where ? getAttributeQuery(props) : null,
-    connected: props.filters && props.location.query ? getConnectedQuery(props) : null,
-    without: props.location.query && props.location.query.without ? getWithoutQuery(props) : null,
+    where: props.location.query && props.location.query.where
+      ? getAttributeQuery(props.location.query.where)
+      : null,
+    connected: props.filters && props.location.query
+      ? getConnectedQuery(props.location.query, props.filters)
+      : null,
+    without: props.location.query && props.location.query.without
+      ? getWithoutQuery(props.location.query.without, props.filters)
+      : null,
     extend: props.selects.entities.extensions,
   }),
   taxonomies: props.selects && props.selects.taxonomies
@@ -459,23 +401,35 @@ const mapStateToProps = (state, props) => ({
 
 function mapDispatchToProps(dispatch, props) {
   return {
-    onShowFilterForm: (option) => {
-      dispatch(hideFilterForm());
-      dispatch(showFilterForm(option));
-    },
-    onHideFilterForm: (evt) => {
-      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-      dispatch(hideFilterForm());
-    },
-    onShowEditForm: (option) => {
-      dispatch(showEditForm(option));
-    },
-    onHideEditForm: (evt) => {
-      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-      dispatch(hideEditForm());
-    },
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));
+    },
+    onEntitySelect: (id, checked) => {
+      dispatch(selectEntity({ id, checked }));
+    },
+    onEntitySelectAll: (ids) => {
+      dispatch(selectEntities(ids));
+    },
+    onTagClick: (value) => {
+      dispatch(updateQuery(fromJS([value])));
+    },
+    onExpand: (bool, value) => {
+      dispatch(updateQuery(fromJS([
+        {
+          query: 'expand',
+          value,
+          replace: bool,
+          checked: bool,
+        },
+      ])));
+    },
+    onGroupSelect: (value) => {
+      dispatch(updateGroup(fromJS([
+        {
+          query: 'group',
+          value,
+        },
+      ])));
     },
     handleEditSubmit: (formData, selectedEntities, activeEditOption) => {
       const entities = fromJS(selectedEntities);
@@ -571,25 +525,6 @@ function mapDispatchToProps(dispatch, props) {
       }
 
       dispatch(saveEdits(saveData.toJS()));
-    },
-    onEntitySelect: (id, checked) => {
-      dispatch(selectEntity({ id, checked }));
-    },
-    onEntitySelectAll: (ids) => {
-      dispatch(selectEntities(ids));
-    },
-    onTagClick: (value) => {
-      dispatch(updateQuery(fromJS([value])));
-    },
-    onExpand: (bool, value) => {
-      dispatch(updateQuery(fromJS([
-        {
-          query: 'expand',
-          value,
-          replace: bool,
-          checked: bool,
-        },
-      ])));
     },
   };
 }

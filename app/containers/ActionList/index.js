@@ -48,7 +48,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     // test action:  return sum of reports for all indicators
     if (actionOrIndicator.indicators) {
       count = Object.values(actionOrIndicator.indicators).reduce((counter, indicatorAssociation) =>
-        counter + (indicatorAssociation.indicator.reports
+        counter + (indicatorAssociation.indicator && indicatorAssociation.indicator.reports
           ? Object.keys(indicatorAssociation.indicator.reports).length
           : 0
         )
@@ -67,7 +67,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     // test action:  return sum of reports for all indicators
     if (actionOrIndicator.indicators) {
       forEach(actionOrIndicator.indicators, (indicatorAssociation) => {
-        if (indicatorAssociation.indicator.dates) {
+        if (indicatorAssociation.indicator && indicatorAssociation.indicator.dates) {
           forEach(indicatorAssociation.indicator.dates, (date) => {
             due += date.attributes.due ? 1 : 0;
             overdue += date.attributes.overdue ? 1 : 0;
@@ -406,7 +406,9 @@ const mapStateToProps = (state) => ({
     'recommendation_categories',
     'indicators',
     'measure_indicators',
+    'user_roles',
     'due_dates',
+    'progress_reports',
   ] }),
 });
 function mapDispatchToProps(dispatch) {

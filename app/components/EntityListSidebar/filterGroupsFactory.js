@@ -1,13 +1,14 @@
 import { reduce } from 'lodash/collection';
 
 // figure out filter groups for filter panel
-export const makeFilterGroups = ({
+export const makeFilterGroups = (
   filters,
   taxonomies,
   connections,
   connectedTaxonomies,
   activeFilterOption,
-}, messages) => {
+  messages
+) => {
   const filterGroups = {};
 
   // taxonomy option group

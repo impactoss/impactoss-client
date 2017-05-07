@@ -59,7 +59,7 @@ EntityListItem.propTypes = {
   entity: PropTypes.object.isRequired,
   select: PropTypes.bool,
   checked: PropTypes.bool,
-  expand: PropTypes.bool,
+  expand: PropTypes.number,
   onSelect: PropTypes.func,
 };
 
