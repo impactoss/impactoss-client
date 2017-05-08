@@ -38,7 +38,7 @@ theme.palette = {
   // 3:  medium grey 1 (AA conform)
   // 4:  medium grey 2 (AA large conform)
   grayscale: coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad'),
-  // 0:  lightest grey (background colour)
+  // 0:  lightest grey (background colour) - also used in global-styles.js
   // 1:  light grey (light lines, navigation filter panel)
   // 2:  grey 1 (grey pattern)
   // 3:  grey 2 (icons light)
@@ -64,7 +64,7 @@ theme.reversePalette = reversePalette(theme.palette);
 
 // fonts
 theme.fonts = {
-  primary: 'Roboto, Helvetica, sans-serif',
+  primary: 'Roboto, Helvetica, sans-serif', // also used in global-styles.js
   secondary: 'Rubik, Roboto, Helvetica, sans-serif',
   pre: 'Consolas, Liberation Mono, Menlo, Courier, monospace',
   quote: 'Georgia, serif',
