@@ -22,6 +22,10 @@ export default defineMessages({
     id: 'app.containers.UserLogin.header',
     defaultMessage: 'Required',
   },
+  resetPasswordLink: {
+    id: 'app.containers.UserLogin.resetPasswordLink',
+    defaultMessage: 'Reset password',
+  },
   fields: {
     email: {
       placeholder: {

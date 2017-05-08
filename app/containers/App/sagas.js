@@ -22,6 +22,7 @@ import {
   AUTHENTICATE_FORWARD,
   USER_ROLES,
   UPDATE_PATH,
+  RESET_PASSWORD,
 } from 'containers/App/constants';
 
 import {
@@ -125,6 +126,25 @@ export function* authenticateSaga(payload) {
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
+  }
+}
+
+export function* resetSaga(payload) {
+  const { email } = payload.data;
+
+  try {
+    // yield put(authenticateSending());
+    // const response = yield call(apiRequest, 'post', 'auth/password', {
+    yield call(apiRequest, 'post', 'auth/password', {
+      email,
+      edirect_url: '//sadata-test.s3-website-ap-southeast-2.amazonaws.com/login/', // TODO WIP
+    });
+    // yield put(authenticateSuccess(response.data));
+    // yield put(forwardOnAuthenticationChange());
+    // yield put(invalidateEntities());
+  } catch (err) {
+    err.response.json = yield err.response.json();
+    // yield put(authenticateError(err));
   }
 }
 
@@ -426,6 +446,7 @@ export default function* rootSaga() {
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
+  yield takeLatest(RESET_PASSWORD, resetSaga);
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
 
