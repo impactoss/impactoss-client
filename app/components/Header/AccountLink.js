@@ -10,7 +10,6 @@ export default styled.a`
   cursor: pointer;
   outline: 0;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  border-right: 1px solid;
   font-size: 14px;
   color: #fff;
   background: #D66149;
@@ -18,5 +17,8 @@ export default styled.a`
   &:hover {
     background: #EB6E51;
     color: #FFF;
+  }
+  &:first-child {
+    border-right: 1px solid #EB6E51;
   }
 `;

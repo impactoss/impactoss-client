@@ -5,8 +5,7 @@ export default styled.div`
   top:0;
   left:0;
   right:0;
-  height:120px;
+  height:115px;
   background: #182635;
   color: #ddd;
-  text-align: center;
 `;

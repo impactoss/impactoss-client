@@ -4,7 +4,7 @@
  *
  */
 
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
@@ -15,7 +15,7 @@ import {
   isUserManager,
   isReady,
   getEntities,
- } from './selectors';
+} from './selectors';
 import { validateToken, loadEntitiesIfNeeded, updatePath } from './actions';
 
 import messages from './messages';
@@ -23,7 +23,7 @@ import messages from './messages';
 
 const Main = styled.div`
   position: absolute;
-  top: 120px;
+  top: 115px;
   left: 0;
   right: 0;
   bottom:0;
@@ -33,17 +33,18 @@ const Main = styled.div`
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
-    children: React.PropTypes.node,
-    isUserSignedIn: React.PropTypes.bool,
-    isManager: React.PropTypes.bool,
-    userId: React.PropTypes.string,
-    pages: React.PropTypes.object,
-    validateToken: React.PropTypes.func,
-    loadEntitiesIfNeeded: React.PropTypes.func,
-    onPageLink: React.PropTypes.func,
+    children: PropTypes.node,
+    isUserSignedIn: PropTypes.bool,
+    isManager: PropTypes.bool,
+    userId: PropTypes.string,
+    pages: PropTypes.object,
+    validateToken: PropTypes.func,
+    loadEntitiesIfNeeded: PropTypes.func,
+    onPageLink: PropTypes.func,
+    location: PropTypes.object.isRequired,
   };
   static contextTypes = {
-    intl: React.PropTypes.object.isRequired,
+    intl: PropTypes.object.isRequired,
   };
 
   componentWillMount() {
@@ -63,11 +64,13 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       path: `/pages/${page.id}`,
       title: page.attributes.menu_title || page.attributes.title,
     }));
-  prepareMainMenuItems = (isManager) => {
+
+  prepareMainMenuItems = (isManager, currentPath) => {
     let navItems = ([
       {
         path: '/categories',
         title: this.context.intl.formatMessage(messages.entities.taxonomies.plural),
+        active: currentPath.startsWith('/category'),
       },
       {
         path: '/recommendations',
@@ -98,15 +101,16 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   render() {
-    const { pages, onPageLink, isUserSignedIn, isManager } = this.props;
+    const { pages, onPageLink, isUserSignedIn, isManager, location } = this.props;
     return (
       <div>
         <Header
           isSignedIn={isUserSignedIn}
           userId={this.props.userId}
           pages={pages && this.preparePageMenuPages(pages)}
-          navItems={this.prepareMainMenuItems(isUserSignedIn && isManager)}
+          navItems={this.prepareMainMenuItems(isUserSignedIn && isManager, location.pathname)}
           onPageLink={onPageLink}
+          currentPath={location.pathname}
         />
         <Main>
           {React.Children.toArray(this.props.children)}

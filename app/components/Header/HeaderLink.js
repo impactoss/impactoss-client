@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export default styled.a`
   display: inline-flex;
-  padding: 0.25em 1em;
+  padding: 0.5em 1.5em;
   text-decoration: none;
   -webkit-font-smoothing: antialiased;
   -webkit-touch-callout: none;
@@ -11,12 +11,10 @@ export default styled.a`
   outline: 0;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: bold;
-  font-size: 16px;
-  border-right: 1px solid;
-  color: #fff;
+  font-size: 0.8em;
+  color:${(props) => props.active ? '#EB6E51' : '#DDE0E0'};
 
-  &:active {
-    background: #41ADDD;
-    color: #FFF;
+  &:hover {
+    color: #EB6E51;
   }
 `;

@@ -5,6 +5,9 @@ import messages from './messages';
 
 import HeaderComponent from './HeaderComponent';
 import Top from './Top';
+import Brand from './Brand';
+import AppTitle from './AppTitle';
+import Claim from './Claim';
 import PageNav from './PageNav';
 import PageLink from './PageLink';
 import AccountNav from './AccountNav';
@@ -17,6 +20,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
   static propTypes = {
     isSignedIn: React.PropTypes.bool,
     userId: React.PropTypes.string,
+    currentPath: React.PropTypes.string,
     pages: React.PropTypes.array,
     navItems: React.PropTypes.array,
     onPageLink: React.PropTypes.func,
@@ -28,11 +32,19 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
   }
 
   render() {
-    const { pages, navItems, isSignedIn } = this.props;
+    const { pages, navItems, isSignedIn, currentPath } = this.props;
 
     return (
       <HeaderComponent>
         <Top>
+          <Brand href={'/'} onClick={(evt) => this.onClick(evt, '/')}>
+            <AppTitle>
+              <FormattedMessage {...messages.appTitle} />
+            </AppTitle>
+            <Claim>
+              <FormattedMessage {...messages.claim} />
+            </Claim>
+          </Brand>
           <AccountNav>
             {isSignedIn &&
               <span>
@@ -61,7 +73,12 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
           <PageNav>
             { pages &&
               pages.map((page, i) => (
-                <PageLink key={i} href={page.path} onClick={(evt) => this.onClick(evt, page.path)}>
+                <PageLink
+                  key={i}
+                  href={page.path}
+                  active={page.active || currentPath === page.path}
+                  onClick={(evt) => this.onClick(evt, page.path)}
+                >
                   {page.title}
                 </PageLink>
               ))
@@ -69,12 +86,14 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
           </PageNav>
         </Top>
         <NavBar>
-          <HeaderLink href={'/'} onClick={(evt) => this.onClick(evt, '/')}>
-            <FormattedMessage {...messages.home} />
-          </HeaderLink>
           { navItems &&
             navItems.map((item, i) => (
-              <HeaderLink key={i} href={item.path} onClick={(evt) => this.onClick(evt, item.path)}>
+              <HeaderLink
+                key={i}
+                href={item.path}
+                active={item.active || currentPath.startsWith(item.path)}
+                onClick={(evt) => this.onClick(evt, item.path)}
+              >
                 {item.title}
               </HeaderLink>
             ))
