@@ -16,7 +16,7 @@ export default defineMessages({
   },
   claim: {
     id: 'nmrf.components.Header.claim',
-    defaultMessage: 'Samoas\'s home of human rights implementation',
+    defaultMessage: 'Samoa\'s home of human rights implementation',
   },
   login: {
     id: 'nmrf.components.Header.login',
