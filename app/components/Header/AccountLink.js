@@ -10,13 +10,13 @@ export default styled.a`
   cursor: pointer;
   outline: 0;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: bold;
-  font-size: 16px;
   border-right: 1px solid;
+  font-size: 14px;
   color: #fff;
+  background: #D66149;
 
-  &:active {
-    background: #41ADDD;
+  &:hover {
+    background: #EB6E51;
     color: #FFF;
   }
 `;
