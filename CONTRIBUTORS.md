@@ -2,6 +2,7 @@
 - tmfrnz
 - tim-field
 - tony-luisi 
+- dmprk
 
 ### `react-boilerplate`
 - mxstbr
