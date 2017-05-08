@@ -8,10 +8,10 @@
    SAVE,
  } from './constants';
 
- export function save(data, id) {
+ export function save(data, dueDateIdUnchecked) {
    return {
      type: SAVE,
      data,
-     id,
+     dueDateIdUnchecked,
    };
  }

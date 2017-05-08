@@ -12,7 +12,10 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { fromJS, List, Map } from 'immutable';
 
-import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+import {
+  getCheckedValuesFromOptions,
+  getUncheckedValuesFromOptions,
+} from 'components/forms/MultiSelectControl';
 
 import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
@@ -285,6 +288,7 @@ function mapDispatchToProps(dispatch) {
     },
     handleSubmit: (formData) => {
       let saveData = formData;
+      let dueDateIdUnchecked = null;
 
       // TODO: remove once have singleselect instead of multiselect
       const formDateIds = getCheckedValuesFromOptions(formData.get('associatedDate'));
@@ -293,8 +297,12 @@ function mapDispatchToProps(dispatch) {
       } else {
         saveData = saveData.setIn(['attributes', 'due_date_id'], null);
       }
+      const uncheckedFormDateIds = getUncheckedValuesFromOptions(formData.get('associatedDate'));
+      if (List.isList(uncheckedFormDateIds) && uncheckedFormDateIds.size) {
+        dueDateIdUnchecked = uncheckedFormDateIds.first();
+      }
 
-      dispatch(save(saveData.toJS()));
+      dispatch(save(saveData.toJS(), dueDateIdUnchecked));
     },
     handleCancel: (reference) => {
       dispatch(updatePath(`/reports/${reference}`));

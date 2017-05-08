@@ -1,7 +1,7 @@
 import { take, put, cancel, takeLatest } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
-import { newEntity } from 'containers/App/actions';
+import { newEntity, dueDateAssigned } from 'containers/App/actions';
 import { SAVE } from './constants';
 
 export function* save({ data }) {
@@ -10,6 +10,9 @@ export function* save({ data }) {
     entity: data,
     redirect: '/reports',
   }));
+  if (data.attributes.due_date_id) {
+    yield put(dueDateAssigned(data.attributes.due_date_id));
+  }
 }
 
 export function* defaultSaga() {
