@@ -83,6 +83,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       {
         path: '/indicators',
         title: this.context.intl.formatMessage(messages.entities.indicators.plural),
+        active: currentPath.startsWith('/reports'),
       },
     ]);
     if (isManager) {
