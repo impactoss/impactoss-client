@@ -162,8 +162,19 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('measures')); // kick off loading although not needed
-      dispatch(loadEntitiesIfNeeded('recommendations')); // kick off loading although not needed
+      // kick off loading although not needed
+      dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('roles'));
+      dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      dispatch(loadEntitiesIfNeeded('due_dates'));
+      dispatch(loadEntitiesIfNeeded('progress_reports'));
     },
   };
 }

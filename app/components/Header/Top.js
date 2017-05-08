@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 
 export default styled.div`
-  height:35px;
+  height:80px;
   color: #ddd;
-  text-align: center;
 `;

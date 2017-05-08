@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export default styled.a`
   display: inline-flex;
-  padding: 0.5em 1.5em;
+  padding: 0.25em 1em;
   text-decoration: none;
   -webkit-font-smoothing: antialiased;
   -webkit-touch-callout: none;
@@ -10,11 +10,11 @@ export default styled.a`
   cursor: pointer;
   outline: 0;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: bold;
-  font-size: 0.8em;
-  color:${(props) => props.active ? '#EB6E51' : '#DDE0E0'};
+  font-size: 14px;
+  color: #929A9D;
+  color:${(props) => props.active ? '#FFF' : '#929A9D'};
 
   &:hover {
-    color: #EB6E51;
+    color: #FFF;
   }
 `;
