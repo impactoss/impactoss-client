@@ -1,3 +1,22 @@
+/**
+*
+* Icons definition file used by Icon component (/components/Icon)
+*
+* for each icon one or more SVG-paths are required and optionally also the viewport size (defaults to 24px)
+* iconName: {
+*   size: 24,
+*   paths: ['s v g', 'p a t h s'],
+* }
+*
+* when omitting the size, the paths can also be given:
+* iconName: {
+*   paths: ['s v g', 'p a t h s'],
+* }
+* can be given as
+* iconName: ['s v g', 'p a t h s'],
+*
+*/
+
 const icons = {
   home: {
     size: 1024,

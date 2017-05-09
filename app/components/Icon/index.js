@@ -5,19 +5,19 @@ import SVG from './SVG';
 
 class Icon extends React.PureComponent {
   render() {
-    const { name, title, size, palette, paletteIndex, color } = this.props;
+    const { name, title, size, palette, paletteIndex, color, iconSize } = this.props;
     const icon = icons[name];
     if (icon) {
-      const iconSize = icon.size || parseFloat(size);
+      const iSize = icon.size || iconSize;
       const iconPaths = icon.paths || icon;
       return (
         <SVG
-          viewBox={`0 0 ${iconSize} ${iconSize}`}
+          viewBox={`0 0 ${iSize} ${iSize}`}
           preserveAspectRatio="xMidYMid meet"
           role="img"
           palette={palette}
           paletteIndex={paletteIndex}
-          size={size || `${iconSize}px`}
+          size={size || `${iSize}px`}
           color={color}
         >
           <title>{title || `Icon: ${name}`}</title>
@@ -37,12 +37,14 @@ Icon.propTypes = {
   palette: React.PropTypes.string,
   paletteIndex: React.PropTypes.number,
   size: React.PropTypes.string,
+  iconSize: React.PropTypes.number,
   color: React.PropTypes.string,
 };
 Icon.defaultProps = {
   name: 'home',
   title: 'home',
   size: '24px',
+  iconSize: 24,
 };
 
 
