@@ -17,6 +17,7 @@ import { Link } from 'react-router';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 
+import Icon from 'components/Icon';
 import Button from 'components/basic/Button';
 import Page from 'components/Page';
 import TaxonomyList from 'components/TaxonomyList';
@@ -93,6 +94,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             <h2>
               <FormattedMessage {...messages.actionsExplore} />
             </h2>
+            <Icon name="actions" size="4em" />
             <p>
               <FormattedMessage {...messages.actionsExploreContent} />
             </p>

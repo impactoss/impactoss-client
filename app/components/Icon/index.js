@@ -5,23 +5,28 @@ import SVG from './SVG';
 
 function Icon(props) {
   // var SVG = IconFactory(icons)
-
-  return props.name && icons[props.name] ? (
-    <SVG
-      viewBox="0 0 1024 1024"
-      preserveAspectRatio="xMidYMid meet"
-      role="img"
-      palette={props.palette}
-      paletteIndex={props.paletteIndex}
-      size={props.size}
-      color={props.color}
-    >
-      <title>{props.title || `Icon: ${props.name}`}</title>
-      {
-        icons[props.name].map((path, index) => <path d={path} key={index}></path>)
-      }
-    </SVG>
-  ) : null;
+  const icon = icons[props.name];
+  if (icon) {
+    const iconSize = icon.size || parseFloat(props.size);
+    const iconPaths = icon.paths || icon;
+    return (
+      <SVG
+        viewBox={`0 0 ${iconSize} ${iconSize}`}
+        preserveAspectRatio="xMidYMid meet"
+        role="img"
+        palette={props.palette}
+        paletteIndex={props.paletteIndex}
+        size={props.size || `${iconSize}px`}
+        color={props.color}
+      >
+        <title>{props.title || `Icon: ${props.name}`}</title>
+        {
+          iconPaths.map((path, index) => (<path d={path} key={index}></path>))
+        }
+      </SVG>
+    );
+  }
+  return null;
 }
 
 Icon.propTypes = {
@@ -31,6 +36,11 @@ Icon.propTypes = {
   paletteIndex: React.PropTypes.number,
   size: React.PropTypes.string,
   color: React.PropTypes.string,
+};
+Icon.defaultTypes = {
+  name: 'home',
+  title: 'home',
+  size: '24px',
 };
 
 
