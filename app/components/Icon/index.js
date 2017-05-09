@@ -3,30 +3,32 @@ import icons from 'themes/icons';
 
 import SVG from './SVG';
 
-function Icon(props) {
-  // var SVG = IconFactory(icons)
-  const icon = icons[props.name];
-  if (icon) {
-    const iconSize = icon.size || parseFloat(props.size);
-    const iconPaths = icon.paths || icon;
-    return (
-      <SVG
-        viewBox={`0 0 ${iconSize} ${iconSize}`}
-        preserveAspectRatio="xMidYMid meet"
-        role="img"
-        palette={props.palette}
-        paletteIndex={props.paletteIndex}
-        size={props.size || `${iconSize}px`}
-        color={props.color}
-      >
-        <title>{props.title || `Icon: ${props.name}`}</title>
-        {
-          iconPaths.map((path, index) => (<path d={path} key={index}></path>))
-        }
-      </SVG>
-    );
+class Icon extends React.PureComponent {
+  render() {
+    const { name, title, size, palette, paletteIndex, color } = this.props;
+    const icon = icons[name];
+    if (icon) {
+      const iconSize = icon.size || parseFloat(size);
+      const iconPaths = icon.paths || icon;
+      return (
+        <SVG
+          viewBox={`0 0 ${iconSize} ${iconSize}`}
+          preserveAspectRatio="xMidYMid meet"
+          role="img"
+          palette={palette}
+          paletteIndex={paletteIndex}
+          size={size || `${iconSize}px`}
+          color={color}
+        >
+          <title>{title || `Icon: ${name}`}</title>
+          {
+            iconPaths.map((path, index) => (<path d={path} key={index}></path>))
+          }
+        </SVG>
+      );
+    }
+    return null;
   }
-  return null;
 }
 
 Icon.propTypes = {
@@ -37,7 +39,7 @@ Icon.propTypes = {
   size: React.PropTypes.string,
   color: React.PropTypes.string,
 };
-Icon.defaultTypes = {
+Icon.defaultProps = {
   name: 'home',
   title: 'home',
   size: '24px',
