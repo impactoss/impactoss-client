@@ -418,7 +418,6 @@ export function* updatePathSaga({ path }) {
   yield put(push(path));
 }
 
-
 /**
  * Root saga manages watcher lifecycle
  */

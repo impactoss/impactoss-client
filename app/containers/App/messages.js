@@ -6,6 +6,16 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  app: {
+    title: {
+      id: 'app.containers.App.app.title',
+      defaultMessage: 'Sadata',
+    },
+    claim: {
+      id: 'app.containers.App.app.claim',
+      defaultMessage: 'Samoa\'s home of human rights implementation',
+    },
+  },
   attributes: {
     draft: {
       id: 'app.containers.App.attributes.draft',

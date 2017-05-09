@@ -38,6 +38,8 @@ export const SAVE_ENTITY = 'nmrf/App/SAVE_ENTITY';
 export const NEW_ENTITY = 'nmrf/App/NEW_ENTITY';
 export const UPDATE_CONNECTIONS = 'nmrf/App/UPDATE_CONNECTIONS';
 export const UPDATE_ENTITIES = 'nmrf/App/UPDATE_ENTITIES';
+export const DUEDATE_ASSIGNED = 'nmrf/App/DUEDATE_ASSIGNED';
+export const DUEDATE_UNASSIGNED = 'nmrf/App/DUEDATE_UNASSIGNED';
 
 export const ENTITIES_READY = 'nmrf/App/ENTITIES_READY';
 

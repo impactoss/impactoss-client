@@ -253,6 +253,8 @@ function mapDispatchToProps(dispatch) {
       const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));
       if (List.isList(formUserIds) && formUserIds.size) {
         saveData = saveData.setIn(['attributes', 'manager_id'], formUserIds.first());
+      } else {
+        saveData = saveData.setIn(['attributes', 'manager_id'], null);
       }
 
       // cleanup

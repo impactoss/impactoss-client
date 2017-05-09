@@ -46,6 +46,8 @@ import {
   UPDATE_PATH,
   AUTHENTICATE_FORWARD,
   UPDATE_ENTITY_FORM,
+  DUEDATE_ASSIGNED,
+  DUEDATE_UNASSIGNED,
 } from './constants';
 
 
@@ -313,5 +315,19 @@ export function updateEntityForm(data) {
   return {
     type: UPDATE_ENTITY_FORM,
     data,
+  };
+}
+
+export function dueDateAssigned(id) {
+  return {
+    type: DUEDATE_ASSIGNED,
+    id,
+  };
+}
+
+export function dueDateUnassigned(id) {
+  return {
+    type: DUEDATE_UNASSIGNED,
+    id,
   };
 }

@@ -26,6 +26,8 @@ import {
   DELETE_ENTITY,
   ENTITIES_REQUESTED,
   INVALIDATE_ENTITIES,
+  DUEDATE_ASSIGNED,
+  DUEDATE_UNASSIGNED,
 } from './constants';
 
 // The initial state of the App
@@ -154,15 +156,39 @@ function appReducer(state = initialState, payload) {
     case INVALIDATE_ENTITIES:
       // reset requested to initial state
       if (payload.path) {
+        // reset a specific entity table
         return state
           .setIn(['ready', payload.path], null) // should trigger new entity load
           .setIn(['requested', payload.path], null)
           .setIn(['entities', payload.path], fromJS({}));
       }
+      // reset all entities
       return state
         .set('ready', fromJS(initialState.toJS().ready)) // should trigger new entity load
         .set('requested', fromJS(initialState.toJS().requested)) // should trigger new entity load
         .set('entities', fromJS(initialState.toJS().entities));
+    case DUEDATE_ASSIGNED:
+      if (payload.id) {
+        const date = state.getIn(['entities', 'due_dates', payload.id.toString()]);
+        if (date) {
+          // check
+          return state
+            .setIn(['entities', 'due_dates', payload.id.toString(), 'attributes', 'due'], false)
+            .setIn(['entities', 'due_dates', payload.id.toString(), 'attributes', 'overdue'], false)
+            .setIn(['entities', 'due_dates', payload.id.toString(), 'attributes', 'has_progress_report'], true);
+        }
+        return state;
+      }
+      return state;
+    case DUEDATE_UNASSIGNED:
+      // reset due_date to get updated virtual fields: due, overdue, and has_progress_reports
+      // while the overdue and has_progress_reports fields would be trivial to set client-side, the due field
+      // is dependent on the server configuration (look-ahead-period) that is best not stored also on the client
+      // TODO instead of reloading all due dates we could alternatively only request a new version of the due_date in question
+      return state
+        .setIn(['ready', 'due_dates'], null) // should trigger new entity load
+        .setIn(['requested', 'due_dates'], null)
+        .setIn(['entities', 'due_dates'], fromJS({}));
     default:
       return state;
   }

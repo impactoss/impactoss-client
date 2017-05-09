@@ -1,5 +1,8 @@
 ### `hr-nmrf-client`
 - tmfrnz
+- tim-field
+- tony-luisi 
+- dmprk
 
 ### `react-boilerplate`
 - mxstbr
