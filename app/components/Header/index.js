@@ -1,19 +1,34 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
+import Logo from './Logo';
 import messages from './messages';
 
-import HeaderComponent from './HeaderComponent';
-import Top from './Top';
+import Banner from './Banner';
 import Brand from './Brand';
-import AppTitle from './AppTitle';
-import Claim from './Claim';
-import PageNav from './PageNav';
-import PageLink from './PageLink';
-import AccountNav from './AccountNav';
-import AccountLink from './AccountLink';
-import NavBar from './NavBar';
-import HeaderLink from './HeaderLink';
+import BrandText from './BrandText';
+import BrandTitle from './BrandTitle';
+import BrandClaim from './BrandClaim';
+import NavPages from './NavPages';
+import LinkPage from './LinkPage';
+import NavAccount from './NavAccount';
+import LinkAccount from './LinkAccount';
+import NavMain from './NavMain';
+import LinkMain from './LinkMain';
+
+import logo from './logo.png';
+
+const Styled = styled.div`
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:115px;
+  background-color: ${palette('primary', 2)};
+`;
+
 
 class Header extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -26,73 +41,76 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
     const { pages, navItems, isSignedIn, currentPath, showBrand } = this.props;
 
     return (
-      <HeaderComponent>
-        <Top>
+      <Styled>
+        <Banner showPattern={showBrand}>
           { showBrand &&
             <Brand href={'/'} onClick={(evt) => this.onClick(evt, '/')}>
-              <AppTitle>
-                <FormattedMessage {...messages.appTitle} />
-              </AppTitle>
-              <Claim>
-                <FormattedMessage {...messages.claim} />
-              </Claim>
+              <Logo src={logo} alt="logo" />
+              <BrandText>
+                <BrandTitle>
+                  <FormattedMessage {...messages.appTitle} />
+                </BrandTitle>
+                <BrandClaim>
+                  <FormattedMessage {...messages.claim} />
+                </BrandClaim>
+              </BrandText>
             </Brand>
           }
-          <AccountNav>
+          <NavAccount>
             {isSignedIn &&
               <span>
-                <AccountLink href={'/logout'} onClick={(evt) => this.onClick(evt, '/logout')}>
+                <LinkAccount href={'/logout'} onClick={(evt) => this.onClick(evt, '/logout')}>
                   <FormattedMessage {...messages.logout} />
-                </AccountLink>
-                <AccountLink
+                </LinkAccount>
+                <LinkAccount
                   href={`/users/${this.props.userId}`}
                   onClick={(evt) => this.onClick(evt, `/users/${this.props.userId}`)}
                 >
                   <FormattedMessage {...messages.user} />
-                </AccountLink>
+                </LinkAccount>
               </span>
             }
             {!isSignedIn &&
               <span>
-                <AccountLink href={'/login'} onClick={(evt) => this.onClick(evt, '/login')}>
+                <LinkAccount href={'/login'} onClick={(evt) => this.onClick(evt, '/login')}>
                   <FormattedMessage {...messages.login} />
-                </AccountLink>
-                <AccountLink href={'/register'} onClick={(evt) => this.onClick(evt, '/register')}>
+                </LinkAccount>
+                <LinkAccount href={'/register'} onClick={(evt) => this.onClick(evt, '/register')}>
                   <FormattedMessage {...messages.register} />
-                </AccountLink>
+                </LinkAccount>
               </span>
             }
-          </AccountNav>
-          <PageNav>
+          </NavAccount>
+          <NavPages>
             { pages &&
               pages.map((page, i) => (
-                <PageLink
+                <LinkPage
                   key={i}
                   href={page.path}
                   active={page.active || currentPath === page.path}
                   onClick={(evt) => this.onClick(evt, page.path)}
                 >
                   {page.title}
-                </PageLink>
+                </LinkPage>
               ))
             }
-          </PageNav>
-        </Top>
-        <NavBar>
+          </NavPages>
+        </Banner>
+        <NavMain hasBorder={!showBrand}>
           { navItems &&
             navItems.map((item, i) => (
-              <HeaderLink
+              <LinkMain
                 key={i}
                 href={item.path}
                 active={item.active || currentPath.startsWith(item.path)}
                 onClick={(evt) => this.onClick(evt, item.path)}
               >
                 {item.title}
-              </HeaderLink>
+              </LinkMain>
             ))
           }
-        </NavBar>
-      </HeaderComponent>
+        </NavMain>
+      </Styled>
     );
   }
 }
@@ -103,7 +121,7 @@ Header.propTypes = {
   currentPath: React.PropTypes.string,
   pages: React.PropTypes.array,
   navItems: React.PropTypes.array,
-  onPageLink: React.PropTypes.func,
+  onPageLink: React.PropTypes.func.isRequired,
   showBrand: React.PropTypes.bool, // not shown on home page
 };
 

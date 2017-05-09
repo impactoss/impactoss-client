@@ -32,21 +32,6 @@ const Main = styled.div`
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  static propTypes = {
-    children: PropTypes.node,
-    isUserSignedIn: PropTypes.bool,
-    isManager: PropTypes.bool,
-    userId: PropTypes.string,
-    pages: PropTypes.object,
-    validateToken: PropTypes.func,
-    loadEntitiesIfNeeded: PropTypes.func,
-    onPageLink: PropTypes.func,
-    location: PropTypes.object.isRequired,
-  };
-  static contextTypes = {
-    intl: PropTypes.object.isRequired,
-  };
-
   componentWillMount() {
     this.props.validateToken();
     this.props.loadEntitiesIfNeeded();
@@ -122,6 +107,21 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 }
 
+App.propTypes = {
+  children: PropTypes.node,
+  isUserSignedIn: PropTypes.bool,
+  isManager: PropTypes.bool,
+  userId: PropTypes.string,
+  pages: PropTypes.object,
+  validateToken: PropTypes.func,
+  loadEntitiesIfNeeded: PropTypes.func,
+  onPageLink: PropTypes.func.isRequired,
+  location: PropTypes.object.isRequired,
+};
+App.contextTypes = {
+  intl: PropTypes.object.isRequired,
+};
+
 const mapStateToProps = (state) => ({
   dataReady: isReady(state, { path: [
     'user_roles',
@@ -154,5 +154,6 @@ export function mapDispatchToProps(dispatch) {
     },
   };
 }
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
