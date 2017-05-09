@@ -41,8 +41,7 @@ Icon.propTypes = {
   color: React.PropTypes.string,
 };
 Icon.defaultProps = {
-  name: 'home',
-  title: 'home',
+  name: 'placeholder',
   size: '24px',
   iconSize: 24,
 };
