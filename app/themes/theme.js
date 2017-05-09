@@ -83,4 +83,8 @@ theme.transitions = {
   mouseOver: '0.2s',
 };
 
+theme.patterns = {
+  header: {},
+};
+
 export default theme;

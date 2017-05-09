@@ -112,6 +112,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           navItems={this.prepareMainMenuItems(isUserSignedIn && isManager, location.pathname)}
           onPageLink={onPageLink}
           currentPath={location.pathname}
+          showBrand={location.pathname !== '/'}
         />
         <Main>
           {React.Children.toArray(this.props.children)}

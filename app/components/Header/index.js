@@ -17,34 +17,27 @@ import HeaderLink from './HeaderLink';
 
 class Header extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
-  static propTypes = {
-    isSignedIn: React.PropTypes.bool,
-    userId: React.PropTypes.string,
-    currentPath: React.PropTypes.string,
-    pages: React.PropTypes.array,
-    navItems: React.PropTypes.array,
-    onPageLink: React.PropTypes.func,
-  }
-
   onClick = (evt, path) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.props.onPageLink(path);
   }
 
   render() {
-    const { pages, navItems, isSignedIn, currentPath } = this.props;
+    const { pages, navItems, isSignedIn, currentPath, showBrand } = this.props;
 
     return (
       <HeaderComponent>
         <Top>
-          <Brand href={'/'} onClick={(evt) => this.onClick(evt, '/')}>
-            <AppTitle>
-              <FormattedMessage {...messages.appTitle} />
-            </AppTitle>
-            <Claim>
-              <FormattedMessage {...messages.claim} />
-            </Claim>
-          </Brand>
+          { showBrand &&
+            <Brand href={'/'} onClick={(evt) => this.onClick(evt, '/')}>
+              <AppTitle>
+                <FormattedMessage {...messages.appTitle} />
+              </AppTitle>
+              <Claim>
+                <FormattedMessage {...messages.claim} />
+              </Claim>
+            </Brand>
+          }
           <AccountNav>
             {isSignedIn &&
               <span>
@@ -103,5 +96,19 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
     );
   }
 }
+
+Header.propTypes = {
+  isSignedIn: React.PropTypes.bool,
+  userId: React.PropTypes.string,
+  currentPath: React.PropTypes.string,
+  pages: React.PropTypes.array,
+  navItems: React.PropTypes.array,
+  onPageLink: React.PropTypes.func,
+  showBrand: React.PropTypes.bool, // not shown on home page
+};
+
+Header.defaultProps = {
+  showBrand: true,
+};
 
 export default Header;
