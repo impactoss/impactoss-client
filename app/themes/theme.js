@@ -27,6 +27,7 @@ theme.palette = {
   // 3: main header colour, lighter
   // 4: white
   primary: coolorsToHex('https://coolors.co/eb6e51-d66149-182635-34404d-ffffff'),
+
   // secondary palette
   // 0: secondary colour, light
   // 1: secondary colour, lighter
@@ -34,6 +35,7 @@ theme.palette = {
   // 3: white/placeholder
   // 4: white/placeholder
   secondary: coolorsToHex('https://coolors.co/ff9b69-ffb996-162331-ffffff-ffffff'),
+
   // greyscale
   // 0:  darkest (sadata black)
   // 1:  dark (sadata dark grey)
@@ -41,12 +43,15 @@ theme.palette = {
   // 3:  medium grey 1 (AA conform)
   // 4:  medium grey 2 (AA large conform on white)
   greyscaleDark: coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395'),
+
+  // greyscale
   // 0:  lightest grey (background colour) - also used in global-styles.js
   // 1:  light grey (light lines, navigation filter panel)
   // 2:  grey 1 (grey pattern)
   // 3:  grey 2 (icons light)
   // 4:  grey 3 (dark lines)
   greyscaleLight: coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad'),
+
   // taxonomy/category colours
   // 0: default/fallback
   // 1: Human Rights Body
@@ -58,6 +63,7 @@ theme.palette = {
   // 7: SDGs
   taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4'],
   taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#65C99B', '#238680', '#4EA53C', '#006096', '#178EC1'],
+
   // other entities
   actions: ['#FFC107'],
   actionsHover: ['#F2B200'],
@@ -65,6 +71,7 @@ theme.palette = {
   indicatorsHover: ['#D66149'],
   recommendations: ['#FF9B69'],
   recommendationsHover: ['#F48B5D'],
+
   // other palettes
   danger: coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478'),
   alert: coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-fff2ce'),

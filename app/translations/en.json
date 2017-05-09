@@ -1,1 +1,5 @@
-[]
+{
+  "app.containers.App.app.title" : "Sadata",
+  "app.containers.App.app.claim" : "Samoa's home of human rights implementation",
+  "app.containers.HomePage.intro" : "Welcome to Sadata, this is the introductory text that provides the user with some context and a brief overview about this site and its purpose. Two or three sentences will likely be sufficient to provide the user with some guidance. By the way, all text bits including this intro text can be updated in or added to the translations file"
+}

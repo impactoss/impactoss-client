@@ -3,9 +3,10 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import Logo from './Logo';
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
+import Logo from './Logo';
 import Banner from './Banner';
 import Brand from './Brand';
 import BrandText from './BrandText';
@@ -21,7 +22,7 @@ import LinkMain from './LinkMain';
 import logo from './logo.png';
 
 const Styled = styled.div`
-  position:absolute;
+  position: ${(props) => props.isHome ? 'relative' : 'absolute'};
   top:0;
   left:0;
   right:0;
@@ -38,20 +39,20 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
   }
 
   render() {
-    const { pages, navItems, isSignedIn, currentPath, showBrand } = this.props;
+    const { pages, navItems, isSignedIn, currentPath, isHome } = this.props;
 
     return (
-      <Styled>
-        <Banner showPattern={showBrand}>
-          { showBrand &&
+      <Styled isHome={isHome}>
+        <Banner showPattern={!isHome}>
+          { !isHome &&
             <Brand href={'/'} onClick={(evt) => this.onClick(evt, '/')}>
               <Logo src={logo} alt="logo" />
               <BrandText>
                 <BrandTitle>
-                  <FormattedMessage {...messages.appTitle} />
+                  <FormattedMessage {...appMessages.app.title} />
                 </BrandTitle>
                 <BrandClaim>
-                  <FormattedMessage {...messages.claim} />
+                  <FormattedMessage {...appMessages.app.claim} />
                 </BrandClaim>
               </BrandText>
             </Brand>
@@ -96,7 +97,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
             }
           </NavPages>
         </Banner>
-        <NavMain hasBorder={!showBrand}>
+        <NavMain hasBorder={isHome}>
           { navItems &&
             navItems.map((item, i) => (
               <LinkMain
@@ -122,11 +123,11 @@ Header.propTypes = {
   pages: React.PropTypes.array,
   navItems: React.PropTypes.array,
   onPageLink: React.PropTypes.func.isRequired,
-  showBrand: React.PropTypes.bool, // not shown on home page
+  isHome: React.PropTypes.bool, // not shown on home page
 };
 
 Header.defaultProps = {
-  showBrand: true,
+  isHome: true,
 };
 
 export default Header;

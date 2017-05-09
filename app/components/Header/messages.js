@@ -10,14 +10,6 @@ export default defineMessages({
     id: 'nmrf.components.Header.home',
     defaultMessage: 'Home',
   },
-  appTitle: {
-    id: 'nmrf.components.Header.appTitle',
-    defaultMessage: 'Sadata',
-  },
-  claim: {
-    id: 'nmrf.components.Header.claim',
-    defaultMessage: 'Samoa\'s home of human rights implementation',
-  },
   login: {
     id: 'nmrf.components.Header.login',
     defaultMessage: 'Login',

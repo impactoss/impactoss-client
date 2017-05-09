@@ -22,8 +22,9 @@ import messages from './messages';
 
 
 const Main = styled.div`
-  position: absolute;
-  top: 115px;
+  position: ${(props) => props.isHome ? 'relative' : 'absolute'};
+  top: ${(props) => props.isHome ? 0 : '115px'};
+  overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
   left: 0;
   right: 0;
   bottom:0;
@@ -97,9 +98,9 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           navItems={this.prepareMainMenuItems(isUserSignedIn && isManager, location.pathname)}
           onPageLink={onPageLink}
           currentPath={location.pathname}
-          showBrand={location.pathname !== '/'}
+          isHome={location.pathname === '/'}
         />
-        <Main>
+        <Main isHome={location.pathname === '/'}>
           {React.Children.toArray(this.props.children)}
         </Main>
       </div>

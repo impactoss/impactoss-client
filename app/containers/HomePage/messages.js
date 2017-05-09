@@ -14,13 +14,9 @@ export default defineMessages({
     id: 'app.container.HomePage.metaDescription',
     defaultMessage: 'Home page description',
   },
-  header: {
-    id: 'app.containers.HomePage.header',
-    defaultMessage: 'Sadate Home',
-  },
   intro: {
     id: 'app.containers.HomePage.intro',
-    defaultMessage: 'Welcome to Sadata, Samoa`s home of Human Rights implmentation.',
+    defaultMessage: 'Welcome to Sadata, this is the introductory text that provides the user with some context and a brief overview about this site and its purpose. Two or three sentences will likely be sufficient to provide the user with some guidance.',
   },
   categoriesExplore: {
     id: 'app.containers.HomePage.categoriesExplore',

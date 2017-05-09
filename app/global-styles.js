@@ -51,5 +51,10 @@ injectGlobal`
     margin-bottom: 10px;
   }
 
+  p {
+    margin-top: 0;
+    margin-bottom:10px;
+  }
+
 
 `;
