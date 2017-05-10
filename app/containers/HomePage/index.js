@@ -9,20 +9,22 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { Link } from 'react-router';
 
 import {
   getEntities,
   isReady,
 } from 'containers/App/selectors';
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
-import Button from 'components/basic/Button';
+import Button from 'components/buttons/Button';
+import ButtonPrimary from 'components/buttons/ButtonPrimary';
 import Section from 'components/basic/Section';
 import Container from 'components/basic/Container';
 import Icon from 'components/Icon';
+import Loading from 'components/Loading';
 import TaxonomyList from 'components/TaxonomyList';
 import NormalImg from 'components/Img';
+import Footer from 'components/Footer';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -31,6 +33,7 @@ import graphicHome from './graphicHome.png';
 
 const GraphicHome = styled(NormalImg)`
   width: 200px;
+  height: 200px;
 `;
 
 const SectionTop = styled(Section)`
@@ -39,7 +42,59 @@ const SectionTop = styled(Section)`
   margin-top: -115px;
   padding-top: 130px;
 `;
-
+const ButtonIconOnly = styled(Button)`
+  color: ${palette('primary', 0)};
+  &:hover {
+    color: ${palette('primary', 1)};
+  }
+`;
+const ButtonIconWrap = styled.div`
+padding-top: 2em;
+`;
+const ButtonIconAbove = styled(Button)`
+  color: ${palette('primary', 4)};
+  &:hover {
+    color: ${palette('primary', 4)};
+    opacity: 0.95;
+  }
+`;
+const ButtonIconAboveMore = styled(Button)`
+  color: ${palette('primary', 0)};
+  &:hover {
+    color: ${palette('primary', 1)};
+  }
+  min-width: 200px;
+  margin: 0 30px;
+`;
+const ButtonIconAboveWrap = styled.div`
+  padding-top: 1em;
+  text-align: center;
+  font-size: 1.7em;
+`;
+const SectionCategories = styled(Section)`
+`;
+const SectionAction = styled(Section)`
+  color: ${palette('primary', 4)};
+  background-color: ${palette('primary', 0)};
+`;
+const SectionMore = styled(Section)`
+  color: ${palette('greyscaleDark', 3)};
+  background-color: ${palette('primary', 4)};
+`;
+// text-align: center;
+const SectionTitle = styled.h2`
+  margin-bottom: 1em;
+`;
+const SectionLead = styled.p`
+  font-size: 1.25em;
+`;
+const TaxonomySlider = styled.div`
+  min-height: 6em;
+  padding-top: 2em;
+`;
+const TopActions = styled.div`
+  padding-top: 2em;
+`;
 const Title = styled.h1`
   color:${palette('primary', 0)}
   font-family: ${(props) => props.theme.fonts.secondary};
@@ -86,8 +141,23 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
       users: !!tax.attributes.tags_users,
     },
   }))
+
+
+  preparePageMenuPages = (pages) =>
+    Object.values(pages).map((page) => ({
+      path: `/pages/${page.id}`,
+      title: page.attributes.menu_title || page.attributes.title,
+    }));
+
+  // scrollToSection = (section) => {
+  scrollToSection = () => {
+    // TODO in page scroll
+    // console.log('scrollToSection', section)
+  }
+
+
   render() {
-    const { dataReady } = this.props;
+    const { dataReady, onPageLink, pages } = this.props;
 
     const taxonomies = this.mapToTaxonomyList(this.props.taxonomies);
 
@@ -110,71 +180,102 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           <Intro>
             <FormattedMessage {...messages.intro} />
           </Intro>
-        </SectionTop>
-        <Section>
-          <Container>
+          <TopActions>
             <div>
-              <h2>
-                <FormattedMessage {...messages.categoriesExplore} />
-              </h2>
-              <p>
-                <FormattedMessage {...messages.categoriesExploreContent} />
-              </p>
+              <ButtonPrimary onClick={() => this.scrollToSection('categories')}>
+                <FormattedMessage {...messages.explore} />
+              </ButtonPrimary>
+            </div>
+            <ButtonIconWrap>
+              <ButtonIconOnly onClick={() => this.scrollToSection('categories')}>
+                <Icon name="arrowDown" size={'2.5em'} />
+              </ButtonIconOnly>
+            </ButtonIconWrap>
+          </TopActions>
+        </SectionTop>
+        <SectionCategories>
+          <Container>
+            <SectionTitle>
+              <FormattedMessage {...messages.exploreCategories} />
+            </SectionTitle>
+            <SectionLead>
+              <FormattedMessage {...messages.exploreCategoriesLead} />
+            </SectionLead>
+            <TaxonomySlider>
               { !dataReady &&
-                <div>
-                  <FormattedMessage {...messages.loading} />
-                </div>
+                <Loading />
               }
               { dataReady && taxonomies &&
                 <TaxonomyList
                   taxonomies={taxonomies}
                 />
               }
-            </div>
-            <hr />
-            <div>
-              <h2>
-                <FormattedMessage {...messages.actionsExplore} />
-              </h2>
-              <Icon name="actions" size="4em" />
-              <p>
-                <FormattedMessage {...messages.actionsExploreContent} />
-              </p>
-              <Link to={'/actions'}>
-                <Button>
-                  <FormattedMessage {...messages.actionsExploreLink} />
-                </Button>
-              </Link>
-            </div>
-            <hr />
-            <div>
-              <h2>
-                <FormattedMessage {...messages.moreExplore} />
-              </h2>
-              <p>
-                <FormattedMessage {...messages.moreExploreContent} />
-              </p>
-              <Link to={'/recommendations'}>
-                <Button>
-                  <FormattedMessage {...messages.recommendationsExploreLink} />
-                </Button>
-              </Link>
-              <Link to={'/indicators'}>
-                <Button>
-                  <FormattedMessage {...messages.indicatorsExploreLink} />
-                </Button>
-              </Link>
-            </div>
+            </TaxonomySlider>
           </Container>
-        </Section>
+        </SectionCategories>
+        <SectionAction>
+          <Container>
+            <SectionTitle>
+              <FormattedMessage {...messages.exploreActions} />
+            </SectionTitle>
+            <SectionLead>
+              <FormattedMessage {...messages.exploreActionsLead} />
+            </SectionLead>
+            <ButtonIconAboveWrap>
+              <ButtonIconAbove onClick={() => onPageLink('/actions')}>
+                <div>
+                  <Icon name="actions" size={'4em'} />
+                </div>
+                <div>
+                  <FormattedMessage {...messages.exploreActionsLink} />
+                </div>
+              </ButtonIconAbove>
+            </ButtonIconAboveWrap>
+          </Container>
+        </SectionAction>
+        <SectionMore>
+          <Container>
+            <SectionTitle>
+              <FormattedMessage {...messages.exploreMore} />
+            </SectionTitle>
+            <SectionLead>
+              <FormattedMessage {...messages.exploreMoreLead} />
+            </SectionLead>
+            <ButtonIconAboveWrap>
+              <ButtonIconAboveMore onClick={() => onPageLink('/recommendations')}>
+                <div>
+                  <Icon name="recommendations" size={'3.5em'} />
+                </div>
+                <div>
+                  <FormattedMessage {...appMessages.entities.recommendations.plural} />
+                </div>
+              </ButtonIconAboveMore>
+              <ButtonIconAboveMore onClick={() => onPageLink('/indicators')}>
+                <div>
+                  <Icon name="indicators" size={'3.5em'} />
+                </div>
+                <div>
+                  <FormattedMessage {...appMessages.entities.indicators.plural} />
+                </div>
+              </ButtonIconAboveMore>
+            </ButtonIconAboveWrap>
+          </Container>
+        </SectionMore>
+        <Footer
+          pages={pages && this.preparePageMenuPages(pages)}
+          onPageLink={onPageLink}
+        />
       </div>
     );
   }
 }
+
 HomePage.propTypes = {
-  loadEntitiesIfNeeded: PropTypes.func,
+  loadEntitiesIfNeeded: PropTypes.func.isRequired,
+  onPageLink: PropTypes.func.isRequired,
   taxonomies: PropTypes.object,
-  dataReady: PropTypes.bool,
+  dataReady: PropTypes.bool.isRequired,
+  pages: PropTypes.object,
 };
 
 HomePage.contextTypes = {
@@ -185,6 +286,7 @@ const mapStateToProps = (state) => ({
   dataReady: isReady(state, { path: [
     'taxonomies',
     'categories',
+    'pages',
   ] }),
   taxonomies: getEntities(
     state,
@@ -200,6 +302,14 @@ const mapStateToProps = (state) => ({
       out: 'js',
     },
   ),
+  pages: getEntities(
+    state,
+    {
+      path: 'pages',
+      where: { draft: false },
+      out: 'js',
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -207,6 +317,7 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('pages'));
       // kick off loading although not needed
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
@@ -220,6 +331,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('due_dates'));
       dispatch(loadEntitiesIfNeeded('progress_reports'));
+    },
+    onPageLink: (path) => {
+      dispatch(updatePath(path));
     },
   };
 }
