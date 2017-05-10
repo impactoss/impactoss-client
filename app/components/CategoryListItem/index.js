@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import { Link } from 'react-router';
 
 export default class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -11,11 +10,11 @@ export default class CategoryListItem extends React.PureComponent { // eslint-di
     const { category } = this.props;
     return (
       <div>
-        <h3>
-          <Link to={category.linkTo}>
+        <div>
+          <button onClick={() => category.onLink()}>
             {`${category.title}`}
-          </Link>
-        </h3>
+          </button>
+        </div>
       </div>
     );
   }
