@@ -10,6 +10,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
 import { mapToTaxonomyList } from 'utils/taxonomies';
+import Loading from 'components/Loading';
 
 // containers
 import {
@@ -21,10 +22,13 @@ import {
   getEntities,
   isReady,
 } from 'containers/App/selectors';
+import { CONTENT_LIST } from 'containers/App/constants';
 
 // components
-import Page from 'components/Page';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
 import TaxonomyList from 'components/TaxonomyList';
+import ContentLead from 'components/basic/ContentLead';
 
 // relative
 import messages from './messages';
@@ -47,25 +51,30 @@ export class Taxonomies extends React.PureComponent { // eslint-disable-line rea
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${this.context.intl.formatMessage(messages.title)}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.pageTitle)}
-        >
+        <Content>
+          <ContentHeader
+            type={CONTENT_LIST}
+            icon="categories"
+            supTitle={this.context.intl.formatMessage(messages.supTitle)}
+            title={this.context.intl.formatMessage(messages.title)}
+          />
+          <ContentLead>
+            <FormattedMessage {...messages.lead} />
+          </ContentLead>
           { !dataReady &&
-            <div>
-              <FormattedMessage {...messages.loading} />
-            </div>
+            <Loading />
           }
           { dataReady &&
             <TaxonomyList
               taxonomies={mapToTaxonomyList(taxonomies, onPageLink)}
             />
           }
-        </Page>
+        </Content>
       </div>
     );
   }

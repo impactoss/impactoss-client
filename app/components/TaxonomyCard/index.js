@@ -69,12 +69,13 @@ const TaxTaggingIcon = styled.span`
 
 
 class TaxonomyCard extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  getTaxTitle = (id, count) => {
-    const title = count === 1
-      ? this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single)
-      : this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
-    return `${count} ${title}`;
-  }
+  // const title = count === 1
+  //   ? this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single)
+  //   : this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+  // return `${count} ${title}`;
+  getTaxTitle = (id) =>
+    this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+
   render() {
     const { taxonomy } = this.props;
     return (
