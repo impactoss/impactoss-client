@@ -6,21 +6,21 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
 
+import { Map, List, fromJS } from 'immutable';
 import { orderBy, reduce } from 'lodash/collection';
 import { pick } from 'lodash/object';
 
-import { Map, List, fromJS } from 'immutable';
-import styled from 'styled-components';
-
 import { getEntitySortIteratee } from 'utils/sort';
 
+import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
+import Container from 'components/basic/Container';
+import Sidebar from 'components/basic/Sidebar';
 import Loading from 'components/Loading';
 import PageHeader from 'components/PageHeader';
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListItems from 'components/EntityListItems';
-import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
-import Container from 'components/basic/Container';
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
@@ -182,25 +182,28 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       }
     }
 
+
     return (
       <div>
-        { dataReady &&
-          <EntityListSidebar
-            filters={filters}
-            edits={edits}
-            taxonomies={taxonomies}
-            connections={connections}
-            connectedTaxonomies={connectedTaxonomies}
-            entitiesSorted={entitiesSorted}
-            entitiesSelected={entitiesSelected}
-            location={location}
-            onPanelSelect={onPanelSelect}
-            canEdit={isManager}
-            activePanel={activePanel}
-            onAssign={(associations, activeEditOption) =>
-              this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
-          />
-        }
+        <Sidebar>
+          { dataReady &&
+            <EntityListSidebar
+              filters={filters}
+              edits={edits}
+              taxonomies={taxonomies}
+              connections={connections}
+              connectedTaxonomies={connectedTaxonomies}
+              entitiesSorted={entitiesSorted}
+              entitiesSelected={entitiesSelected}
+              location={location}
+              onPanelSelect={onPanelSelect}
+              canEdit={isManager}
+              activePanel={activePanel}
+              onAssign={(associations, activeEditOption) =>
+                this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
+            />
+          }
+        </Sidebar>
         <ContainerWithSidebar>
           <Container>
             <Styled>

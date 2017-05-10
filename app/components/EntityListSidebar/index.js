@@ -26,13 +26,7 @@ import { makeActiveEditOptions } from './editOptionsFactory';
 
 import messages from './messages';
 
-const Component = styled.div`
-  position: absolute;
-  top:0;
-  width:300px;
-  bottom:0;
-  background:#fff;
-  z-index:100;
+const Styled = styled.div`
 `;
 const Header = styled.div`
   background: #ccc;
@@ -154,7 +148,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       }
     }
     return (
-      <Component>
+      <Styled>
         <Header>
           {canEdit && this.getSidebarOptions().map((option, key) =>
             (
@@ -206,7 +200,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             </ListEntitiesEmpty>
           }
         </Main>
-      </Component>
+      </Styled>
     );
   }
 }

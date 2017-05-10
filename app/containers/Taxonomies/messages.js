@@ -6,9 +6,17 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
-  pageTitle: {
-    id: 'app.containers.Taxonomies.pageTitle',
+  title: {
+    id: 'app.containers.Taxonomies.title',
+    defaultMessage: 'Explore by category',
+  },
+  supTitle: {
+    id: 'app.containers.Taxonomies.supTitle',
     defaultMessage: 'Categories',
+  },
+  lead: {
+    id: 'app.containers.Taxonomies.lead',
+    defaultMessage: 'UN recommendations and government actions have been categorised across multiple groupings to facilitate implementation and analysis.',
   },
   metaDescription: {
     id: 'app.containers.Taxonomies.metaDescription',
@@ -21,9 +29,5 @@ export default defineMessages({
   notFound: {
     id: 'app.containers.Taxonomies.notFound',
     defaultMessage: 'Sorry no categories found',
-  },
-  loading: {
-    id: 'app.containers.Taxonomies.loading',
-    defaultMessage: 'Loading data...',
   },
 });

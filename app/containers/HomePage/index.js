@@ -10,6 +10,8 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import { mapToTaxonomyList } from 'utils/taxonomies';
+
 import {
   getEntities,
   isReady,
@@ -32,8 +34,8 @@ import messages from './messages';
 import graphicHome from './graphicHome.png';
 
 const GraphicHome = styled(NormalImg)`
-  width: 200px;
-  height: 200px;
+  width: 100%;
+  margin-bottom: -2em;
 `;
 
 const SectionTop = styled(Section)`
@@ -72,6 +74,7 @@ const ButtonIconAboveWrap = styled.div`
   font-size: 1.7em;
 `;
 const SectionCategories = styled(Section)`
+  padding-bottom: 8em;
 `;
 const SectionAction = styled(Section)`
   color: ${palette('primary', 4)};
@@ -130,18 +133,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
       this.props.loadEntitiesIfNeeded();
     }
   }
-  mapToTaxonomyList = (taxonomies) => Object.values(taxonomies).map((tax) => ({
-    id: tax.id,
-    title: tax.attributes.title,
-    count: tax.count,
-    linkTo: `/categories/${tax.id}`,
-    tags: {
-      recommendations: !!tax.attributes.tags_recommendations,
-      actions: !!tax.attributes.tags_measures,
-      users: !!tax.attributes.tags_users,
-    },
-  }))
-
 
   preparePageMenuPages = (pages) =>
     Object.values(pages).map((page) => ({
@@ -157,9 +148,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 
 
   render() {
-    const { dataReady, onPageLink, pages } = this.props;
-
-    const taxonomies = this.mapToTaxonomyList(this.props.taxonomies);
+    const { dataReady, onPageLink, pages, taxonomies } = this.props;
 
     return (
       <div>
@@ -205,9 +194,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               { !dataReady &&
                 <Loading />
               }
-              { dataReady && taxonomies &&
+              { dataReady &&
                 <TaxonomyList
-                  taxonomies={taxonomies}
+                  taxonomies={mapToTaxonomyList(taxonomies, onPageLink)}
                 />
               }
             </TaxonomySlider>

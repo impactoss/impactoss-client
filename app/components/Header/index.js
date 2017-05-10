@@ -19,7 +19,7 @@ import LinkAccount from './LinkAccount';
 import NavMain from './NavMain';
 import LinkMain from './LinkMain';
 
-import logo from './logo.png';
+import logo from './sadataLogo.png';
 
 const Styled = styled.div`
   position: ${(props) => props.isHome ? 'relative' : 'absolute'};
