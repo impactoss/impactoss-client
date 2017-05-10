@@ -20,7 +20,6 @@ import { validateToken, loadEntitiesIfNeeded, updatePath } from './actions';
 
 import messages from './messages';
 
-
 const Main = styled.div`
   position: ${(props) => props.isHome ? 'relative' : 'absolute'};
   top: ${(props) => props.isHome ? 0 : '115px'};

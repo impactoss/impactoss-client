@@ -58,6 +58,11 @@ export const PUBLISH_STATUSES = [
   { value: false, label: 'Public' },
 ];
 
+export const DOC_PUBLISH_STATUSES = [
+  { value: true, label: 'Public' },
+  { value: false, label: 'Private' },
+];
+
 export const USER_ROLES = {
   ADMIN: 1,
   MANAGER: 2,
@@ -66,6 +71,9 @@ export const USER_ROLES = {
 
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';
+
+export const CONTENT_LIST = 'list';
+export const CONTENT_SINGLE = 'single';
 
 // TODO need to pull from an env file
 export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';

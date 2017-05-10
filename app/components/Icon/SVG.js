@@ -8,8 +8,8 @@ const SVG = styled.svg`
   display: inline-flex;
   align-self: center;
   position:relative;
-  bottom: ${(props) => (parseFloat(props.size) / 16) + props.size.split(/[0-9]+/)[1]};
-  margin-right:${(props) => (parseFloat(props.size) / 4) + props.size.split(/[0-9]+/)[1]};
+  bottom: ${(props) => props.withText ? (parseFloat(props.size) / 8) + props.size.split(/[0-9]+/)[1] : 0};
+  margin-right:${(props) => props.withText ? (parseFloat(props.size) / 4) + props.size.split(/[0-9]+/)[1] : 0};
 `;
 
 SVG.defaultProps = {

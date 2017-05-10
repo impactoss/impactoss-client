@@ -6,23 +6,40 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+
+import {
+  mapToCategoryList,
+  mapToTaxonomyList,
+  getCategoryMaxCount,
+} from 'utils/taxonomies';
 
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
-  getEntity,
+  getEntities,
   isReady,
   isUserManager,
 } from 'containers/App/selectors';
+import { CONTENT_LIST } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 // components
-import Page from 'components/Page';
-import CategoryList from 'components/CategoryList';
+import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
+import Container from 'components/basic/Container';
+import Sidebar from 'components/basic/Sidebar';
+import Loading from 'components/Loading';
 
+import ContentHeader from 'components/ContentHeader';
+import CategoryList from 'components/CategoryList';
+import TaxonomySidebar from 'components/TaxonomySidebar';
 
 // relative
 import messages from './messages';
+
+const Content = styled.div`
+  padding: 0 4em;
+`;
 
 export class TaxonomyCategories extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -36,50 +53,95 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
       this.props.loadEntitiesIfNeeded();
     }
   }
-  mapToCategoryList = (categories) => categories && Object.values(categories).map((cat) => ({
-    id: cat.id,
-    title: cat.attributes.title,
-    linkTo: `/category/${cat.id}`,
-  }))
+  getTaxTitle = (id) =>
+    this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
 
+  getCountAttributes = (taxonomy) => {
+    const attributes = [];
+    if (taxonomy.attributes.tags_measures) {
+      attributes.push({
+        attribute: 'actions',
+        label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+      });
+    }
+    if (taxonomy.attributes.tags_recommendations) {
+      attributes.push({
+        attribute: 'recommendations',
+        label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+      });
+    }
+    return attributes;
+  }
+
+  getListColumns = (taxonomy, categories, countAttributes) => {
+    const TITLE_COL_RATIO = 0.4;
+    const columns = [
+      {
+        type: 'title',
+        header: this.context.intl.formatMessage(appMessages.entities.taxonomies[taxonomy.id].single),
+        width: TITLE_COL_RATIO * 100,
+      },
+    ];
+    return columns.concat(countAttributes.map((attribute, i) => ({
+      type: 'count',
+      header: attribute.label,
+      width: ((1 - TITLE_COL_RATIO) / countAttributes.length) * 100,
+      maxCount: getCategoryMaxCount(categories, attribute.attribute),
+      countsIndex: i,
+      entity: attribute.attribute,
+    })));
+  }
   render() {
-    const { taxonomy, dataReady, isManager } = this.props;
+    const { taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
 
-    const pageTitle = dataReady
-      ? `${this.context.intl.formatMessage(messages.pageTitle)} for ${taxonomy.attributes.title}`
-      : this.context.intl.formatMessage(messages.pageTitle);
+    const taxonomy = dataReady ? taxonomies[parseInt(params.id, 10)] : null;
+    const pageTitle = dataReady ? this.getTaxTitle(taxonomy.id) : '';
 
     const pageActions = dataReady && isManager
       ? [{
         type: 'primary',
         title: '+ Add Category',
-        onClick: () => this.props.handleNew(this.props.taxonomy.id),
+        onClick: () => this.props.handleNew(taxonomy.id),
       }]
-      : [];
+      : null;
+
+    const countAttributes = dataReady ? this.getCountAttributes(taxonomy) : [];
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${this.context.intl.formatMessage(messages.supTitle)}: ${pageTitle}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Page
-          title={pageTitle}
-          actions={pageActions}
-        >
-          { !dataReady &&
-            <div>
-              <FormattedMessage {...messages.loading} />
-            </div>
-          }
-          { dataReady &&
-            <CategoryList
-              categories={this.mapToCategoryList(taxonomy.categories)}
-            />
-          }
-        </Page>
+        <Sidebar>
+          <TaxonomySidebar
+            taxonomies={mapToTaxonomyList(taxonomies, onPageLink, params.id, false)}
+          />
+        </Sidebar>
+        <ContainerWithSidebar>
+          <Container>
+            <Content>
+              <ContentHeader
+                type={CONTENT_LIST}
+                icon="categories"
+                supTitle={this.context.intl.formatMessage(messages.supTitle)}
+                title={pageTitle}
+                actions={pageActions}
+              />
+              { !dataReady &&
+                <Loading />
+              }
+              { dataReady &&
+                <CategoryList
+                  columns={this.getListColumns(taxonomy, categories, countAttributes)}
+                  categories={mapToCategoryList(categories, onPageLink, countAttributes)}
+                />
+              }
+            </Content>
+          </Container>
+        </ContainerWithSidebar>
       </div>
     );
   }
@@ -87,10 +149,13 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
 
 TaxonomyCategories.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  onPageLink: PropTypes.func,
   handleNew: PropTypes.func,
-  taxonomy: PropTypes.object,
+  taxonomies: PropTypes.object,
+  categories: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
+  params: PropTypes.object,
 };
 
 TaxonomyCategories.contextTypes = {
@@ -103,35 +168,39 @@ const mapStateToProps = (state, props) => ({
     'categories',
     'taxonomies',
   ] }),
-  taxonomy: getEntity(
+  taxonomies: getEntities(
     state,
     {
-      id: props.params.id,
       path: 'taxonomies',
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-        extend: [
-          {
-            type: 'count',
-            path: 'recommendation_categories',
-            key: 'category_id',
-            reverse: true,
-            out: 'js',
-            as: 'recommendation_count',
-          },
-          {
-            type: 'count',
-            path: 'measure_categories',
-            key: 'category_id',
-            reverse: true,
-            out: 'js',
-            as: 'action_count',
-          },
-        ],
-      },
       out: 'js',
+    },
+  ),
+  categories: getEntities(
+    state,
+    {
+      out: 'js',
+      path: 'categories',
+      where: {
+        taxonomy_id: props.params.id,
+      },
+      extend: [
+        {
+          type: 'count',
+          path: 'recommendation_categories',
+          key: 'category_id',
+          reverse: true,
+          out: 'js',
+          as: 'recommendations',
+        },
+        {
+          type: 'count',
+          path: 'measure_categories',
+          key: 'category_id',
+          reverse: true,
+          out: 'js',
+          as: 'actions',
+        },
+      ],
     }
   ),
 });
@@ -147,6 +216,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleNew: (taxonomyId) => {
       dispatch(updatePath(`/categories/${taxonomyId}/new`));
+    },
+    onPageLink: (path) => {
+      dispatch(updatePath(path));
     },
   };
 }

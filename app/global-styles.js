@@ -13,6 +13,7 @@ injectGlobal`
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.428571429;
+    color: #344547;
   }
 
   #app {
@@ -22,10 +23,11 @@ injectGlobal`
   }
 
   a {
-    color: #000;
+    color: #eb6e51;
+    text-decoration: none;
 
     &:hover {
-      color: #EB6E51;
+      color: #d66149;
     }
   }
 

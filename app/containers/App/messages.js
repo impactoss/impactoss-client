@@ -118,6 +118,66 @@ export default defineMessages({
         id: 'app.containers.App.entities.taxonomies.plural',
         defaultMessage: 'Categories',
       },
+      1: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.1.single',
+          defaultMessage: 'Human rights body',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.1.plural',
+          defaultMessage: 'Human rights bodies',
+        },
+      },
+      2: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.2.single',
+          defaultMessage: 'UN session',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.2.plural',
+          defaultMessage: 'UN sessions',
+        },
+      },
+      3: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.3.single',
+          defaultMessage: 'Human right',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.3.plural',
+          defaultMessage: 'Human rights',
+        },
+      },
+      4: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.4.single',
+          defaultMessage: 'Affected persons',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.4.plural',
+          defaultMessage: 'Affected persons',
+        },
+      },
+      5: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.5.single',
+          defaultMessage: 'Thematic cluster',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.5.plural',
+          defaultMessage: 'Thematic clusters',
+        },
+      },
+      6: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.6.single',
+          defaultMessage: 'Organisation',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.6.plural',
+          defaultMessage: 'Organisations',
+        },
+      },
     },
     due_dates: {
       single: {
