@@ -73,6 +73,7 @@ class Footer extends React.Component { // eslint-disable-line react/prefer-state
                   <FormattedMessage {...messages.disclaimer} />
                   <div>
                     <FooterContact
+                      target="_blank"
                       href={`mailto:${this.context.intl.formatMessage(messages.contact.email)}`}
                       title={this.context.intl.formatMessage(messages.contact.anchor)}
                     >
@@ -91,7 +92,8 @@ class Footer extends React.Component { // eslint-disable-line react/prefer-state
                   <FormattedMessage {...messages.project.text} />
                   <div>
                     <FooterProjectLink
-                      href={`mailto:${this.context.intl.formatMessage(messages.project.url)}`}
+                      target="_blank"
+                      href={this.context.intl.formatMessage(messages.project.url)}
                       title={this.context.intl.formatMessage(messages.project.anchor)}
                     >
                       <FormattedMessage {...messages.project.anchor} />
