@@ -167,6 +167,11 @@ const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
     'categories',
     'taxonomies',
+    'recommendation_categories',
+    'recommendations',
+    'measure_categories',
+    'measures',
+    'user_roles',
   ] }),
   taxonomies: getEntities(
     state,
@@ -189,16 +194,24 @@ const mapStateToProps = (state, props) => ({
           path: 'recommendation_categories',
           key: 'category_id',
           reverse: true,
-          out: 'js',
           as: 'recommendations',
+          connected: {
+            path: 'recommendations',
+            key: 'recommendation_id',
+            forward: true,
+          },
         },
         {
           type: 'count',
           path: 'measure_categories',
           key: 'category_id',
           reverse: true,
-          out: 'js',
           as: 'actions',
+          connected: {
+            path: 'measures',
+            key: 'measure_id',
+            forward: true,
+          },
         },
       ],
     }
@@ -211,7 +224,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
     handleNew: (taxonomyId) => {

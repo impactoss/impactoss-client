@@ -255,7 +255,7 @@ const mapStateToProps = (state, props) => ({
         path: 'user_roles',
         key: 'user_id',
         where: {
-          role_id: USER_ROLES.MANAGER, // managers only TODO: from constants
+          role_id: USER_ROLES.MANAGER, // managers only
         },
       },
     },

@@ -183,22 +183,37 @@ const getEntitiesIfConnected = createSelector(
     ? entities.filter((entity) => reduce(
       asArray(connected), // allows multiple connections
       (passing, argsConnected) => {
-        if (argsConnected.connected || argsConnected.where) {
+        if (argsConnected.key || argsConnected.connected || argsConnected.where) {
           const where = argsConnected.where || {};
           return passing && reduce(
             asArray(where),
             (passingWhere, whereArgs) => { // and multiple wheres
               // TODO if passingWhere is false we don't need to do any more work
-              const connections = getEntitiesIfConnected(state, {
-                path: argsConnected.path, // path of associative table
-                where: {
-                  ...whereArgs,
-                  [argsConnected.key]: argsConnected.attribute
-                    ? entity.getIn(['attributes', argsConnected.attribute])
-                    : entity.get('id'),
-                },
-                connected: argsConnected.connected || null,
-              });
+              let connections;
+              if (argsConnected.forward) {
+                // forward: entity pointing to other entity
+                const key = entity.getIn(['attributes', argsConnected.key]);
+                connections = getEntitiesIfConnected(state, {
+                  path: argsConnected.path, // path of associative table
+                  where: {
+                    ...whereArgs,
+                    id: !!key && key.toString(),
+                  },
+                  connected: argsConnected.connected || null,
+                });
+              } else {
+                // other entity pointing to entity
+                connections = getEntitiesIfConnected(state, {
+                  path: argsConnected.path, // path of associative table
+                  where: {
+                    ...whereArgs,
+                    [argsConnected.key]: argsConnected.attribute
+                      ? entity.getIn(['attributes', argsConnected.attribute])
+                      : entity.get('id'),
+                  },
+                  connected: argsConnected.connected || null,
+                });
+              }
               return passingWhere && connections && connections.size; // association present
             },
             true
