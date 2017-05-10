@@ -8,7 +8,11 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
 
-import { mapToCategoryList, mapToTaxonomyList } from 'utils/taxonomies';
+import {
+  mapToCategoryList,
+  mapToTaxonomyList,
+  getCategoryMaxCount,
+} from 'utils/taxonomies';
 
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
@@ -34,7 +38,7 @@ import TaxonomySidebar from 'components/TaxonomySidebar';
 import messages from './messages';
 
 const Content = styled.div`
-  padding:0 20px;
+  padding: 0 4em;
 `;
 
 export class TaxonomyCategories extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -52,6 +56,41 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
   getTaxTitle = (id) =>
     this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
 
+  getCountAttributes = (taxonomy) => {
+    const attributes = [];
+    if (taxonomy.attributes.tags_measures) {
+      attributes.push({
+        attribute: 'actions',
+        label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+      });
+    }
+    if (taxonomy.attributes.tags_recommendations) {
+      attributes.push({
+        attribute: 'recommendations',
+        label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+      });
+    }
+    return attributes;
+  }
+
+  getListColumns = (taxonomy, categories, countAttributes) => {
+    const TITLE_COL_RATIO = 0.4;
+    const columns = [
+      {
+        type: 'title',
+        header: this.context.intl.formatMessage(appMessages.entities.taxonomies[taxonomy.id].single),
+        width: TITLE_COL_RATIO * 100,
+      },
+    ];
+    return columns.concat(countAttributes.map((attribute, i) => ({
+      type: 'count',
+      header: attribute.label,
+      width: ((1 - TITLE_COL_RATIO) / countAttributes.length) * 100,
+      maxCount: getCategoryMaxCount(categories, attribute.attribute),
+      countsIndex: i,
+      entity: attribute.attribute,
+    })));
+  }
   render() {
     const { taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
 
@@ -65,6 +104,8 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
         onClick: () => this.props.handleNew(taxonomy.id),
       }]
       : null;
+
+    const countAttributes = dataReady ? this.getCountAttributes(taxonomy) : [];
 
     return (
       <div>
@@ -94,7 +135,8 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
               }
               { dataReady &&
                 <CategoryList
-                  categories={mapToCategoryList(categories, onPageLink)}
+                  columns={this.getListColumns(taxonomy, categories, countAttributes)}
+                  categories={mapToCategoryList(categories, onPageLink, countAttributes)}
                 />
               }
             </Content>
@@ -113,7 +155,7 @@ TaxonomyCategories.propTypes = {
   categories: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
-  params: PropTypes.string,
+  params: PropTypes.object,
 };
 
 TaxonomyCategories.contextTypes = {
@@ -148,7 +190,7 @@ const mapStateToProps = (state, props) => ({
           key: 'category_id',
           reverse: true,
           out: 'js',
-          as: 'recommendation_count',
+          as: 'recommendations',
         },
         {
           type: 'count',
@@ -156,7 +198,7 @@ const mapStateToProps = (state, props) => ({
           key: 'category_id',
           reverse: true,
           out: 'js',
-          as: 'action_count',
+          as: 'actions',
         },
       ],
     }

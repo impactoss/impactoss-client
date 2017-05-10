@@ -1,3 +1,5 @@
+import { reduce } from 'lodash/collection';
+
 export const getTaxonomyTagList = (taxonomy) => {
   const tags = [];
   if (taxonomy.attributes.tags_recommendations) {
@@ -22,8 +24,22 @@ export const mapToTaxonomyList = (taxonomies, onLink, active, tags = true) => Ob
   active: active === tax.id,
 }));
 
-export const mapToCategoryList = (categories, onLink) => Object.values(categories).map((cat) => ({
+export const getCategoryMaxCount = (categories, attribute) =>
+  reduce(categories, (countsMemo, cat) => {
+    if (cat[attribute]) {
+      return cat[attribute] > countsMemo
+        ? cat[attribute]
+        : countsMemo;
+    }
+    return countsMemo;
+  }, 0);
+
+
+export const mapToCategoryList = (categories, onLink, countAttributes) => Object.values(categories).map((cat) => ({
   id: cat.id,
   title: cat.attributes.title,
   onLink: () => onLink(`/category/${cat.id}`),
+  counts: countAttributes
+    ? countAttributes.map((countAttribute) => cat[countAttribute.attribute])
+    : null,
 }));

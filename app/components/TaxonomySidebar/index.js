@@ -9,7 +9,7 @@ import TaxonomySidebarItem from 'components/TaxonomySidebarItem';
 import messages from './messages';
 
 const Top = styled.div`
-  padding: 2em 2em;
+  padding: 3em 2em 1em;
   background-color: ${palette('greyscaleLight', 2)}
 `;
 
