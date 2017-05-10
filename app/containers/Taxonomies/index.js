@@ -9,8 +9,14 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
+import { mapToTaxonomyList } from 'utils/taxonomies';
+
 // containers
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  updatePath,
+} from 'containers/App/actions';
+
 import {
   getEntities,
   isReady,
@@ -35,20 +41,8 @@ export class Taxonomies extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  mapToTaxonomyList = (taxonomies) => Object.values(taxonomies).map((tax) => ({
-    id: tax.id,
-    title: tax.attributes.title,
-    count: tax.count,
-    linkTo: `/categories/${tax.id}`,
-    tags: {
-      recommendations: !!tax.attributes.tags_recommendations,
-      actions: !!tax.attributes.tags_measures,
-      users: !!tax.attributes.tags_users,
-    },
-  }))
-
   render() {
-    const { dataReady } = this.props;
+    const { dataReady, taxonomies, onPageLink } = this.props;
 
     return (
       <div>
@@ -68,7 +62,7 @@ export class Taxonomies extends React.PureComponent { // eslint-disable-line rea
           }
           { dataReady &&
             <TaxonomyList
-              taxonomies={this.mapToTaxonomyList(this.props.taxonomies)}
+              taxonomies={mapToTaxonomyList(taxonomies, onPageLink)}
             />
           }
         </Page>
@@ -79,6 +73,7 @@ export class Taxonomies extends React.PureComponent { // eslint-disable-line rea
 
 Taxonomies.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  onPageLink: PropTypes.func,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
 };
@@ -115,6 +110,9 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
+    },
+    onPageLink: (path) => {
+      dispatch(updatePath(path));
     },
   };
 }

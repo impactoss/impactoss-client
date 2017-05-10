@@ -14,10 +14,12 @@ const Styled = styled(Button)`
   width: 100%;
   max-width: 300px;
   background-color: ${palette('primary', 4)};
-  margin-bottom:${(props) => props.theme.gutter}px;
-  color: ${palette('greyscaleDark', 1)};
+  margin-bottom:${(props) => 2 * props.theme.gutter}px;
+  color: ${palette('greyscaleDark', 2)};
+  box-shadow: 0px 0px 1px 0px rgba(0,0,0,0.2);
   &:hover {
-    color: ${palette('greyscaleDark', 3)};
+    color: ${palette('greyscaleDark', 0)};
+    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.2);
   }
 `;
 const Top = styled.div`
@@ -67,7 +69,12 @@ const TaxTaggingIcon = styled.span`
 
 
 class TaxonomyCard extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  getTaxTitle = (id, count) => {
+    const title = count === 1
+      ? this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single)
+      : this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+    return `${count} ${title}`;
+  }
   render() {
     const { taxonomy } = this.props;
     return (
@@ -83,7 +90,7 @@ class TaxonomyCard extends React.PureComponent { // eslint-disable-line react/pr
         </Top>
         <Bottom>
           <TaxTitle>
-            {`${taxonomy.count} ${taxonomy.title}`}
+            {this.getTaxTitle(taxonomy.id, taxonomy.count)}
           </TaxTitle>
           { taxonomy.tags &&
             <div>

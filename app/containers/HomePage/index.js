@@ -10,6 +10,8 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import { mapToTaxonomyList } from 'utils/taxonomies';
+
 import {
   getEntities,
   isReady,
@@ -32,8 +34,8 @@ import messages from './messages';
 import graphicHome from './graphicHome.png';
 
 const GraphicHome = styled(NormalImg)`
-  width: 200px;
-  height: 200px;
+  width: 100%;
+  margin-bottom: -2em;
 `;
 
 const SectionTop = styled(Section)`
@@ -72,6 +74,7 @@ const ButtonIconAboveWrap = styled.div`
   font-size: 1.7em;
 `;
 const SectionCategories = styled(Section)`
+  padding-bottom: 8em;
 `;
 const SectionAction = styled(Section)`
   color: ${palette('primary', 4)};
@@ -130,31 +133,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
       this.props.loadEntitiesIfNeeded();
     }
   }
-  getTaxonomyTagList = (taxonomy) => {
-    const tags = [];
-    if (taxonomy.attributes.tags_recommendations) {
-      tags.push({
-        type: 'recommendations',
-        icon: 'recommendations',
-      });
-    }
-    if (taxonomy.attributes.tags_measures) {
-      tags.push({
-        type: 'measures',
-        icon: 'actions',
-      });
-    }
-    return tags;
-  }
-  mapToTaxonomyList = (taxonomies) => Object.values(taxonomies).map((tax) => ({
-    id: tax.id,
-    title: tax.count === 1
-      ? tax.attributes.title
-      : this.context.intl.formatMessage(appMessages.entities.taxonomies[tax.id].plural),
-    count: tax.count,
-    onLink: () => this.props.onPageLink(`/categories/${tax.id}`),
-    tags: this.getTaxonomyTagList(tax),
-  }))
+
   preparePageMenuPages = (pages) =>
     Object.values(pages).map((page) => ({
       path: `/pages/${page.id}`,
@@ -217,7 +196,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               }
               { dataReady &&
                 <TaxonomyList
-                  taxonomies={this.mapToTaxonomyList(taxonomies)}
+                  taxonomies={mapToTaxonomyList(taxonomies, onPageLink)}
                 />
               }
             </TaxonomySlider>
