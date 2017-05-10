@@ -10,7 +10,6 @@ const Button = styled.button`
   padding: 6px 12px;
   cursor:pointer;
   font-size:1em;
-  font-weight:bold;
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
@@ -23,10 +22,9 @@ const Button = styled.button`
   user-select: none;
   background-image: none;
   border: none;
-  color: ${palette('greyscaleDark', 3)}
+  color: ${palette('greyscaleDark', 3)};
   &:hover {
-    color: ${palette('greyscaleDark', 2)}
-    background-color: ${palette('primary', 4)}
+    color: ${palette('greyscaleDark', 2)};
   }
 `;
 

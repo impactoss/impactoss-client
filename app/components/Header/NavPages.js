@@ -1,6 +1,7 @@
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 export default styled.div`
   float:right;
-  background: #444;
+  background-color: ${palette('primary', 2)};
 `;

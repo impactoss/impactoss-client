@@ -20,10 +20,10 @@ import { validateToken, loadEntitiesIfNeeded, updatePath } from './actions';
 
 import messages from './messages';
 
-
 const Main = styled.div`
-  position: absolute;
-  top: 115px;
+  position: ${(props) => props.isHome ? 'relative' : 'absolute'};
+  top: ${(props) => props.isHome ? 0 : '115px'};
+  overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
   left: 0;
   right: 0;
   bottom:0;
@@ -31,21 +31,6 @@ const Main = styled.div`
 `;
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  static propTypes = {
-    children: PropTypes.node,
-    isUserSignedIn: PropTypes.bool,
-    isManager: PropTypes.bool,
-    userId: PropTypes.string,
-    pages: PropTypes.object,
-    validateToken: PropTypes.func,
-    loadEntitiesIfNeeded: PropTypes.func,
-    onPageLink: PropTypes.func,
-    location: PropTypes.object.isRequired,
-  };
-  static contextTypes = {
-    intl: PropTypes.object.isRequired,
-  };
 
   componentWillMount() {
     this.props.validateToken();
@@ -112,14 +97,30 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           navItems={this.prepareMainMenuItems(isUserSignedIn && isManager, location.pathname)}
           onPageLink={onPageLink}
           currentPath={location.pathname}
+          isHome={location.pathname === '/'}
         />
-        <Main>
+        <Main isHome={location.pathname === '/'}>
           {React.Children.toArray(this.props.children)}
         </Main>
       </div>
     );
   }
 }
+
+App.propTypes = {
+  children: PropTypes.node,
+  isUserSignedIn: PropTypes.bool,
+  isManager: PropTypes.bool,
+  userId: PropTypes.string,
+  pages: PropTypes.object,
+  validateToken: PropTypes.func,
+  loadEntitiesIfNeeded: PropTypes.func,
+  onPageLink: PropTypes.func.isRequired,
+  location: PropTypes.object.isRequired,
+};
+App.contextTypes = {
+  intl: PropTypes.object.isRequired,
+};
 
 const mapStateToProps = (state) => ({
   dataReady: isReady(state, { path: [
@@ -153,5 +154,6 @@ export function mapDispatchToProps(dispatch) {
     },
   };
 }
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

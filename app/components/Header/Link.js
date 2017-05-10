@@ -9,16 +9,4 @@ export default styled.a`
   user-select: none;
   cursor: pointer;
   outline: 0;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  color: #fff;
-  background: #D66149;
-
-  &:hover {
-    background: #EB6E51;
-    color: #FFF;
-  }
-  &:first-child {
-    border-right: 1px solid #EB6E51;
-  }
 `;
