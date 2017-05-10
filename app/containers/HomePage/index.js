@@ -19,7 +19,7 @@ import {
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import Button from 'components/buttons/Button';
-import ButtonPrimary from 'components/buttons/ButtonPrimary';
+import ButtonHero from 'components/buttons/ButtonHero';
 import Section from 'components/basic/Section';
 import Container from 'components/basic/Container';
 import Icon from 'components/Icon';
@@ -171,9 +171,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           </Intro>
           <TopActions>
             <div>
-              <ButtonPrimary onClick={() => this.scrollToSection('categories')}>
+              <ButtonHero onClick={() => this.scrollToSection('categories')}>
                 <FormattedMessage {...messages.explore} />
-              </ButtonPrimary>
+              </ButtonHero>
             </div>
             <ButtonIconWrap>
               <ButtonIconOnly onClick={() => this.scrollToSection('categories')}>

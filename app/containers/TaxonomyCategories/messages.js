@@ -10,6 +10,10 @@ export default defineMessages({
     id: 'app.containers.TaxonomyCategories.supTitle',
     defaultMessage: 'Categories',
   },
+  add: {
+    id: 'app.containers.TaxonomyCategories.add',
+    defaultMessage: 'Add category',
+  },
   metaDescription: {
     id: 'app.containers.TaxonomyCategories.metaDescription',
     defaultMessage: 'Categories overview',

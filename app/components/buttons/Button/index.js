@@ -3,7 +3,6 @@
  */
 
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 const Button = styled.button`
   display: inline-block;
@@ -22,10 +21,6 @@ const Button = styled.button`
   user-select: none;
   background-image: none;
   border: none;
-  color: ${palette('greyscaleDark', 3)};
-  &:hover {
-    color: ${palette('greyscaleDark', 2)};
-  }
 `;
 
 export default Button;

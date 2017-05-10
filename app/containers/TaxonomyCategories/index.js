@@ -95,12 +95,12 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
     const { taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
 
     const taxonomy = dataReady ? taxonomies[parseInt(params.id, 10)] : null;
-    const pageTitle = dataReady ? this.getTaxTitle(taxonomy.id) : '';
+    const contentTitle = dataReady ? this.getTaxTitle(taxonomy.id) : '';
 
     const pageActions = dataReady && isManager
       ? [{
-        type: 'primary',
-        title: '+ Add Category',
+        type: 'add',
+        title: this.context.intl.formatMessage(messages.add),
         onClick: () => this.props.handleNew(taxonomy.id),
       }]
       : null;
@@ -110,7 +110,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.supTitle)}: ${pageTitle}`}
+          title={`${this.context.intl.formatMessage(messages.supTitle)}: ${contentTitle}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
@@ -127,7 +127,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
                 type={CONTENT_LIST}
                 icon="categories"
                 supTitle={this.context.intl.formatMessage(messages.supTitle)}
-                title={pageTitle}
+                title={contentTitle}
                 actions={pageActions}
               />
               { !dataReady &&
