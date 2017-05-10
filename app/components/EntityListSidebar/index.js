@@ -27,7 +27,6 @@ import { makeActiveEditOptions } from './editOptionsFactory';
 import messages from './messages';
 
 const Styled = styled.div`
-  position: relative;
 `;
 const Header = styled.div`
   background: #ccc;

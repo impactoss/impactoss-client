@@ -8,6 +8,5 @@ const Sidebar = styled.div`
   bottom:0;
   background-color: ${palette('primary', 4)};
   z-index:100;
-  overflow: auto;
 `;
 export default Sidebar;
