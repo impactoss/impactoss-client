@@ -130,19 +130,31 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
       this.props.loadEntitiesIfNeeded();
     }
   }
+  getTaxonomyTagList = (taxonomy) => {
+    const tags = [];
+    if (taxonomy.attributes.tags_recommendations) {
+      tags.push({
+        type: 'recommendations',
+        icon: 'recommendations',
+      });
+    }
+    if (taxonomy.attributes.tags_measures) {
+      tags.push({
+        type: 'measures',
+        icon: 'actions',
+      });
+    }
+    return tags;
+  }
   mapToTaxonomyList = (taxonomies) => Object.values(taxonomies).map((tax) => ({
     id: tax.id,
-    title: tax.attributes.title,
+    title: tax.count === 1
+      ? tax.attributes.title
+      : this.context.intl.formatMessage(appMessages.entities.taxonomies[tax.id].plural),
     count: tax.count,
-    linkTo: `/categories/${tax.id}`,
-    tags: {
-      recommendations: !!tax.attributes.tags_recommendations,
-      actions: !!tax.attributes.tags_measures,
-      users: !!tax.attributes.tags_users,
-    },
+    onLink: () => this.props.onPageLink(`/categories/${tax.id}`),
+    tags: this.getTaxonomyTagList(tax),
   }))
-
-
   preparePageMenuPages = (pages) =>
     Object.values(pages).map((page) => ({
       path: `/pages/${page.id}`,
@@ -157,9 +169,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 
 
   render() {
-    const { dataReady, onPageLink, pages } = this.props;
-
-    const taxonomies = this.mapToTaxonomyList(this.props.taxonomies);
+    const { dataReady, onPageLink, pages, taxonomies } = this.props;
 
     return (
       <div>
@@ -205,9 +215,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               { !dataReady &&
                 <Loading />
               }
-              { dataReady && taxonomies &&
+              { dataReady &&
                 <TaxonomyList
-                  taxonomies={taxonomies}
+                  taxonomies={this.mapToTaxonomyList(taxonomies)}
                 />
               }
             </TaxonomySlider>

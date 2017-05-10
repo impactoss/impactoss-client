@@ -1,21 +1,26 @@
 import React, { PropTypes } from 'react';
+import Grid from 'grid-styled';
 
-import Container from 'components/basic/Container';
-import TaxonomyListItem from 'components/TaxonomyListItem';
+import Component from 'components/basic/Component';
+import Row from 'components/basic/Row';
+import TaxonomyCard from 'components/TaxonomyCard';
 
 class TaxonomyList extends React.Component { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { taxonomies } = this.props;
 
     return (
-      <Container>
-        {taxonomies.map((taxonomy, i) =>
-          <TaxonomyListItem
-            key={i}
-            taxonomy={taxonomy}
-          />
-        )}
-      </Container>
+      <Component>
+        <Row>
+          {taxonomies.map((taxonomy, i) =>
+            <Grid key={i} sm={1 / 4}>
+              <TaxonomyCard
+                taxonomy={taxonomy}
+              />
+            </Grid>
+          )}
+        </Row>
+      </Component>
     );
   }
 }
