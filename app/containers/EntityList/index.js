@@ -18,12 +18,14 @@ import ContainerWithSidebar from 'components/basic/Container/ContainerWithSideba
 import Container from 'components/basic/Container';
 import Sidebar from 'components/basic/Sidebar';
 import Loading from 'components/Loading';
-import PageHeader from 'components/PageHeader';
+import ContentHeader from 'components/ContentHeader';
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListItems from 'components/EntityListItems';
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
+
+import { CONTENT_LIST } from 'containers/App/constants';
 
 import { makeCurrentFilters } from './filtersFactory';
 import {
@@ -57,8 +59,8 @@ import {
 
 import messages from './messages';
 
-const Styled = styled.div`
-  padding:0 20px;
+const Content = styled.div`
+  padding: 0 4em;
 `;
 const ListEntities = styled.div``;
 const ListEntitiesTopFilters = styled.div``;
@@ -181,7 +183,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
       }
     }
+    let contentTitle = this.props.header.title;
+    if (dataReady) {
+      contentTitle = `${entitiesSorted.length} ${entitiesSorted.length === 1 ? this.props.entityTitle.single : this.props.entityTitle.plural}`;
+    }
 
+    const pageActions = dataReady && isManager
+      ? this.props.header.actions
+      : null;
 
     return (
       <div>
@@ -206,14 +215,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         </Sidebar>
         <ContainerWithSidebar>
           <Container>
-            <Styled>
-              <PageHeader
-                title={this.props.header.title}
-                actions={
-                  isManager
-                  ? this.props.header.actions
-                  : []
-                }
+            <Content>
+              <ContentHeader
+                type={CONTENT_LIST}
+                icon={this.props.header.icon}
+                supTitle={this.props.header.supTitle}
+                title={contentTitle}
+                actions={pageActions}
               />
               { !dataReady &&
                 <div>
@@ -313,7 +321,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   </ListEntitiesMain>
                 </ListEntities>
               }
-            </Styled>
+            </Content>
           </Container>
         </ContainerWithSidebar>
       </div>

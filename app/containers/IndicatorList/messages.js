@@ -8,18 +8,14 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   pageTitle: {
     id: 'app.container.IndicatorList.pageTitle',
-    defaultMessage: 'Indicators',
+    defaultMessage: 'Indicators overview',
   },
   metaDescription: {
     id: 'app.container.IndicatorList.metaDescription',
     defaultMessage: 'Indicators page description',
   },
-  header: {
-    id: 'app.containers.IndicatorList.header',
-    defaultMessage: 'Indicators',
-  },
-  loading: {
-    id: 'app.containers.IndicatorList.loading',
-    defaultMessage: 'Loading data...',
+  add: {
+    id: 'app.containers.IndicatorList.add',
+    defaultMessage: 'Add indicator',
   },
 });

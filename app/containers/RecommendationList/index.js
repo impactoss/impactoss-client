@@ -143,12 +143,14 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         ],
       },
     };
+
     const headerOptions = {
-      title: this.context.intl.formatMessage(messages.header),
+      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      icon: 'recommendations',
       actions: [{
-        type: 'primary',
-        title: 'New recommendation',
-        onClick: this.props.handleNew,
+        type: 'add',
+        title: this.context.intl.formatMessage(messages.add),
+        onClick: () => this.props.handleNew(),
       }],
     };
 

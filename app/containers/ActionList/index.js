@@ -346,10 +346,11 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     };
 
     const headerOptions = {
-      title: this.context.intl.formatMessage(messages.header),
+      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      icon: 'actions',
       actions: [{
-        type: 'primary',
-        title: 'New action',
+        type: 'add',
+        title: this.context.intl.formatMessage(messages.add),
         onClick: () => this.props.handleNew(),
       }],
     };

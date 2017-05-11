@@ -105,8 +105,8 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
       },
     };
     const headerOptions = {
-      title: this.context.intl.formatMessage(messages.header),
-      actions: [],
+      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      icon: 'users',
     };
 
     return (

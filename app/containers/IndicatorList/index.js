@@ -128,10 +128,11 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
       },
     };
     const headerOptions = {
-      title: this.context.intl.formatMessage(messages.header),
+      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      icon: 'indicators',
       actions: [{
-        type: 'primary',
-        title: 'New indicator',
+        type: 'add',
+        title: this.context.intl.formatMessage(messages.add),
         onClick: () => this.props.handleNew(),
       }],
     };
