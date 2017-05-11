@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Map, List } from 'immutable';
+import { Map, fromJS } from 'immutable';
 import { connect } from 'react-redux';
 import { isEqual } from 'lodash/lang';
 import { Form, actions as formActions } from 'react-redux-form/immutable';
@@ -20,58 +20,44 @@ const FormWrapper = styled.div`
 class EntityListForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
+    populateForm: PropTypes.func.isRequired,
     model: PropTypes.string.isRequired,
-    options: PropTypes.instanceOf(List),
+    formOptions: PropTypes.object,
     onSubmit: PropTypes.func,
     onCancel: PropTypes.func,
-    title: PropTypes.string,
-    populateForm: PropTypes.func.isRequired,
-    multiple: PropTypes.bool,
-    required: PropTypes.bool,
-    filter: PropTypes.bool,
     buttons: PropTypes.array,
   }
 
-  static defaultProps = {
-    multiple: true,
-    required: false,
-    filter: true,
-  }
-
   componentWillMount() {
-    this.props.populateForm(this.props.model, this.getInitialFormData());
+    this.props.populateForm(this.props.model, this.props.formOptions.options);
   }
 
   componentWillReceiveProps(nextProps) {
      // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
-    if (!isEqual(nextProps.options.toJS(), this.props.options.toJS())) {
-      this.props.populateForm(nextProps.model, this.getInitialFormData(nextProps));
+    if (!isEqual(nextProps.formOptions.options, this.props.formOptions.options)) {
+      this.props.populateForm(nextProps.model, nextProps.formOptions.options);
     }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { options } = props;
-    return options;
-  }
-
   render() {
+    const { model, onSubmit, onCancel, buttons, formOptions } = this.props;
+
     return (
       <FormWrapper>
         <Form
-          model={this.props.model}
-          onSubmit={this.props.onSubmit}
+          model={model}
+          onSubmit={onSubmit}
         >
           <MultiSelectControl
             model=".values"
             threeState
-            multiple={this.props.multiple}
-            required={this.props.required}
-            options={this.props.options}
-            title={this.props.title}
-            onCancel={this.props.onCancel}
-            buttons={this.props.buttons}
-            filter={this.props.filter}
+            title={formOptions.title}
+            options={fromJS(formOptions.options).toList()}
+            multiple={formOptions.multiple}
+            required={formOptions.required}
+            filter={formOptions.filter}
+            onCancel={onCancel}
+            buttons={buttons}
           />
         </Form>
       </FormWrapper>
@@ -84,7 +70,7 @@ const mapDispatchToProps = (dispatch) => ({
   //   dispatch(formActions.reset(model));
   // },
   populateForm: (model, options) => {
-    dispatch(formActions.load(model, Map({ values: options })));
+    dispatch(formActions.load(model, Map({ values: fromJS(options).toList() })));
   },
 });
 

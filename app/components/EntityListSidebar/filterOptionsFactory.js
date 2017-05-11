@@ -29,6 +29,9 @@ export const makeAttributeFilterOptions = (entities, filters, activeFilterOption
   const filterOptions = {
     groupId: 'attributes',
     options: {},
+    multiple: true,
+    required: false,
+    filter: true,
   };
   // the attribute option
   const option = find(filters.attributes.options, (o) => o.attribute === activeFilterOption.optionId);
@@ -126,6 +129,8 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeF
     groupId: 'taxonomies',
     filter: filters.taxonomies.filter,
     options: {},
+    multiple: true,
+    required: false,
   };
   // get the active taxonomy
   const taxonomy = taxonomies[parseInt(activeFilterOption.optionId, 10)];
@@ -228,6 +233,9 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
   const filterOptions = {
     groupId: 'connections',
     options: {},
+    multiple: true,
+    required: false,
+    filter: true,
   };
   // get the active option
   const option = find(filters.connections.options, (o) => o.path === activeFilterOption.optionId);
@@ -336,6 +344,8 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
     groupId: 'connectedTaxonomies',
     filter: filters.connectedTaxonomies.filter,
     options: {},
+    multiple: true,
+    required: false,
   };
 
   const taxonomy = connectedTaxonomies.taxonomies[parseInt(activeFilterOption.optionId, 10)];

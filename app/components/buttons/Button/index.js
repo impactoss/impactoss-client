@@ -7,7 +7,7 @@ import styled from 'styled-components';
 const Button = styled.button`
   display: inline-block;
   padding: 6px 12px;
-  cursor:pointer;
+  cursor:${(props) => props.disabled ? 'default' : 'pointer'};
   font-size:1em;
   text-align: center;
   white-space: nowrap;

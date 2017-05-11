@@ -55,6 +55,13 @@ MultiSelectControl.propTypes = {
   buttons: PropTypes.array,
 };
 
+MultiSelectControl.defaultProps = {
+  filter: true,
+  multiple: true,
+  required: false,
+  threeState: false,
+};
+
 export default MultiSelectControl;
 // Helper functions
 export {

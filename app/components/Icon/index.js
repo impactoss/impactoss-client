@@ -49,6 +49,8 @@ Icon.propTypes = {
 Icon.defaultProps = {
   name: 'placeholder',
   iconSize: 24,
+  textLeft: false,
+  textRight: false,
 };
 
 

@@ -6,8 +6,18 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   header: {
-    id: 'app.containers.EntityListFilters.header',
-    defaultMessage: 'Filter List',
+    filter: {
+      id: 'app.containers.EntityListFilters.header.filter',
+      defaultMessage: 'Filter List',
+    },
+    filterButton: {
+      id: 'app.containers.EntityListFilters.header.filterButton',
+      defaultMessage: 'Filter',
+    },
+    editButton: {
+      id: 'app.containers.EntityListFilters.header.editButton',
+      defaultMessage: 'Edit',
+    },
   },
   filterGroupLabel: {
     attributes: {
