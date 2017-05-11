@@ -28,6 +28,7 @@ import appMessages from 'containers/App/messages';
 import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
 import Container from 'components/basic/Container';
 import Sidebar from 'components/basic/Sidebar';
+import Scrollable from 'components/basic/Scrollable';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
@@ -116,9 +117,11 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
           ]}
         />
         <Sidebar>
-          <TaxonomySidebar
-            taxonomies={mapToTaxonomyList(taxonomies, onPageLink, params.id, false)}
-          />
+          <Scrollable>
+            <TaxonomySidebar
+              taxonomies={mapToTaxonomyList(taxonomies, onPageLink, params.id, false)}
+            />
+          </Scrollable>
         </Sidebar>
         <ContainerWithSidebar>
           <Container>

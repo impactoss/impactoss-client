@@ -16,8 +16,12 @@ import {
   EDIT_FORM_MODEL,
 } from 'containers/EntityListForm/constants';
 
+import Scrollable from 'components/basic/Scrollable';
+
 import EntityListSidebarFilters from './EntityListSidebarFilters';
 import EntityListSidebarEdit from './EntityListSidebarEdit';
+import EntityListSidebarFiltersForm from './EntityListSidebarFiltersForm';
+import EntityListSidebarEditForm from './EntityListSidebarEditForm';
 
 import { makeFilterGroups } from './filterGroupsFactory';
 import { makeEditGroups } from './editGroupsFactory';
@@ -149,57 +153,67 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     }
     return (
       <Styled>
-        <Header>
-          {canEdit && this.getSidebarOptions().map((option, key) =>
-            (
-              <Button
-                key={key}
-                active={option.panel === activePanel}
-                onClick={() => onPanelSelect(option.panel)}
-              >
-                {option.label}
-              </Button>
-            )
-          )}
-          {!canEdit &&
-            <strong>Filter List</strong>
-          }
-        </Header>
-        <Main>
-          { activePanel === FILTERS_PANEL &&
-            <EntityListSidebarFilters
-              filterGroups={panelGroups}
-              formOptions={formOptions}
-              formModel={formModel}
-              onShowFilterForm={this.onShowForm}
-              onHideFilterForm={this.onHideForm}
-            />
-          }
-          { activePanel === EDIT_PANEL && hasSelected && hasEntities &&
-            <EntityListSidebarEdit
-              editGroups={panelGroups}
-              formOptions={formOptions}
-              formModel={formModel}
-              onShowEditForm={this.onShowForm}
-              onHideEditForm={this.onHideForm}
-              onAssign={(associations) => {
-                // close and reset option panel
-                this.setState({ activeOption: null });
-                onAssign(associations, activeOption);
-              }}
-            />
-          }
-          { activePanel === EDIT_PANEL && !hasEntities &&
-            <ListEntitiesEmpty>
-               No entities found
-            </ListEntitiesEmpty>
-          }
-          { activePanel === EDIT_PANEL && hasEntities && !hasSelected &&
-            <ListEntitiesEmpty>
-              Please select one or more entities for edit options
-            </ListEntitiesEmpty>
-          }
-        </Main>
+        <Scrollable>
+          <Header>
+            {canEdit && this.getSidebarOptions().map((option, key) =>
+              (
+                <Button
+                  key={key}
+                  active={option.panel === activePanel}
+                  onClick={() => onPanelSelect(option.panel)}
+                >
+                  {option.label}
+                </Button>
+              )
+            )}
+            {!canEdit &&
+              <strong>Filter List</strong>
+            }
+          </Header>
+          <Main>
+            { activePanel === FILTERS_PANEL &&
+              <EntityListSidebarFilters
+                filterGroups={panelGroups}
+                onShowFilterForm={this.onShowForm}
+              />
+            }
+            { activePanel === EDIT_PANEL && hasSelected && hasEntities &&
+              <EntityListSidebarEdit
+                editGroups={panelGroups}
+                onShowEditForm={this.onShowForm}
+              />
+            }
+            { activePanel === EDIT_PANEL && !hasEntities &&
+              <ListEntitiesEmpty>
+                 No entities found
+              </ListEntitiesEmpty>
+            }
+            { activePanel === EDIT_PANEL && hasEntities && !hasSelected &&
+              <ListEntitiesEmpty>
+                Please select one or more entities for edit options
+              </ListEntitiesEmpty>
+            }
+          </Main>
+        </Scrollable>
+        { formOptions && activePanel === FILTERS_PANEL &&
+          <EntityListSidebarFiltersForm
+            formOptions={formOptions}
+            formModel={formModel}
+            onHideFilterForm={this.onHideForm}
+          />
+        }
+        { formOptions && activePanel === EDIT_PANEL && hasSelected && hasEntities &&
+          <EntityListSidebarEditForm
+            formOptions={formOptions}
+            formModel={formModel}
+            onHideEditForm={this.onHideForm}
+            onAssign={(associations) => {
+              // close and reset option panel
+              this.setState({ activeOption: null });
+              onAssign(associations, activeOption);
+            }}
+          />
+        }
       </Styled>
     );
   }
