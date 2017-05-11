@@ -4,7 +4,7 @@ import Component from 'components/basic/Component';
 
 import EntityListItemMainBottomTaxonomies from './EntityListItemMainBottomTaxonomies';
 import EntityListItemMainBottomConnections from './EntityListItemMainBottomConnections';
-import EntityListItemMainBottomUpdated from './EntityListItemMainBottomUpdated';
+import EntityListItemMainBottomTargetDate from './EntityListItemMainBottomTargetDate';
 
 export default class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
@@ -22,8 +22,8 @@ export default class EntityListItemMainBottom extends React.PureComponent { // e
         { entity.connectedCounts && entity.connectedCounts.length > 0 &&
           <EntityListItemMainBottomConnections connections={entity.connectedCounts} />
         }
-        { entity.updated &&
-          <EntityListItemMainBottomUpdated updated={entity.updated} />
+        { entity.targetDate &&
+          <EntityListItemMainBottomTargetDate date={entity.targetDate} />
         }
       </Component>
     );

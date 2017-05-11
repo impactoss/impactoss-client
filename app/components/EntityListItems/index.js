@@ -15,6 +15,8 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
           count: Object.keys(entity[option.path]).length,
           option: {
             label: option.label,
+            icon: option.path === 'measures' ? 'actions' : option.path,
+            style: option.path === 'measures' ? 'actions' : option.path,
           },
         });
       }
@@ -35,6 +37,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
             if (query && onClick) {
               tags.push({
                 taxId: tax.id,
+                title: category.attributes.title,
                 label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
                 onClick: () => onClick({
                   value: catId,
@@ -45,6 +48,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
             } else {
               tags.push({
                 taxId: tax.id,
+                title: category.attributes.title,
                 label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
               });
             }
