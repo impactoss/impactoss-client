@@ -141,7 +141,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                     },
                     {
                       id: 'document_url',
-                      controlType: 'input',
+                      controlType: 'uploader',
                       model: '.attributes.document_url',
                     },
                     {
