@@ -183,7 +183,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
       }
     }
-    let contentTitle = this.props.header.title;
+    let contentTitle = this.props.entityTitle.plural;
     if (dataReady) {
       contentTitle = `${entitiesSorted.length} ${entitiesSorted.length === 1 ? this.props.entityTitle.single : this.props.entityTitle.plural}`;
     }
