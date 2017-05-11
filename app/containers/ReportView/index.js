@@ -16,6 +16,7 @@ import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 import Page from 'components/Page';
 import EntityView from 'components/views/EntityView';
+import DocumentView from 'components/DocumentView';
 
 import {
   getEntity,
@@ -34,7 +35,6 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     const { report, dataReady } = this.props;
     const reference = this.props.params.id;
     const status = report && find(PUBLISH_STATUSES, { value: report.attributes.draft });
-    const statusDoc = report && find(PUBLISH_STATUSES, { value: report.attributes.document_public });
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
 
@@ -123,12 +123,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
                     {
                       id: 'document_url',
                       heading: 'Document URL',
-                      value: report.attributes.document_url,
-                    },
-                    {
-                      id: 'document_public',
-                      heading: 'Document public',
-                      value: statusDoc && statusDoc.label,
+                      value: <DocumentView url={report.attributes.document_url} status={report.attributes.document_public} />,
                     },
                   ],
                 },

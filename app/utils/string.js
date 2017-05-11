@@ -4,3 +4,5 @@ export const lowerCase = (str) =>
   lcase(str).replace('un', 'UN').replace('hr', 'HR').replace('upr', 'UPR');
 
 export const getPathFromUrl = (url) => url.split(/[?#]/)[0];
+
+export const getFilenameFromUrl = (url) => url.split('/').pop();
