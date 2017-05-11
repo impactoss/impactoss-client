@@ -17,9 +17,7 @@ import SupTitle from 'components/SupTitle';
 import EntityListForm from 'containers/EntityListForm';
 import appMessages from 'containers/App/messages';
 
-import EntityListSidebarFilters from './EntityListSidebarFilters';
-import EntityListSidebarEdit from './EntityListSidebarEdit';
-// import EntityListSidebarEditForm from './EntityListSidebarEditForm';
+import EntityListSidebarGroups from './EntityListSidebarGroups';
 
 import { makeFilterGroups } from './filterGroupsFactory';
 import { makeEditGroups } from './editGroupsFactory';
@@ -56,7 +54,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     }
   }
   onShowForm = (option) => {
-    this.setState({ activeOption: option });
+    this.setState({ activeOption: option.active ? null : option });
   };
 
   onHideForm = (evt) => {
@@ -169,16 +167,10 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             }
           </Header>
           <Main>
-            { activePanel === FILTERS_PANEL &&
-              <EntityListSidebarFilters
-                filterGroups={panelGroups}
-                onShowFilterForm={this.onShowForm}
-              />
-            }
-            { activePanel === EDIT_PANEL && hasSelected && hasEntities &&
-              <EntityListSidebarEdit
-                editGroups={panelGroups}
-                onShowEditForm={this.onShowForm}
+            { (activePanel === FILTERS_PANEL || (activePanel === EDIT_PANEL && hasSelected && hasEntities)) &&
+              <EntityListSidebarGroups
+                groups={panelGroups}
+                onShowForm={this.onShowForm}
               />
             }
             { activePanel === EDIT_PANEL && !hasEntities &&

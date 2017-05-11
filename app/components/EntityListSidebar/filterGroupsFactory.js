@@ -18,11 +18,13 @@ export const makeFilterGroups = (
       id: 'taxonomies', // filterGroupId
       label: messages.taxonomies,
       show: true,
+      icon: 'categories',
       options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
         ...taxOptions,
         [taxonomy.id]: {
           id: taxonomy.id, // filterOptionId
           label: taxonomy.attributes.title,
+          icon: `taxonomy_${taxonomy.id}`,
           active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.id,
         },
       }), {}),
@@ -36,11 +38,13 @@ export const makeFilterGroups = (
       id: 'connectedTaxonomies', // filterGroupId
       label: messages.connectedTaxonomies,
       show: true,
+      icon: 'connectedCategories',
       options: reduce(Object.values(connectedTaxonomies.taxonomies), (taxOptions, taxonomy) => ({
         ...taxOptions,
         [taxonomy.id]: {
           id: taxonomy.id, // filterOptionId
           label: taxonomy.attributes.title,
+          icon: `taxonomy_${taxonomy.id}`,
           active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.id,
         },
       }), {}),
@@ -59,6 +63,7 @@ export const makeFilterGroups = (
         [option.path]: {
           id: option.path, // filterOptionId
           label: option.label,
+          icon: option.path === 'measures' ? 'actions' : option.path,
           active: !!activeFilterOption && activeFilterOption.optionId === option.path,
         },
       }), {}),
