@@ -17,7 +17,7 @@ import {
   getUncheckedValuesFromOptions,
 } from 'components/forms/MultiSelectControl';
 
-import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
+import { DOC_PUBLISH_STATUSES, PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
 import {
   loadEntitiesIfNeeded,
@@ -197,7 +197,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                       id: 'document_public',
                       controlType: 'select',
                       model: '.attributes.document_public',
-                      options: PUBLISH_STATUSES,
+                      options: DOC_PUBLISH_STATUSES,
                     },
                   ],
                 },
