@@ -67,4 +67,13 @@ export default defineMessages({
     id: 'app.containers.EntityListFilter.editFormTitlePostfix',
     defaultMessage: 'selected',
   },
+  entitiesNotFound: {
+    id: 'app.containers.EntityListFilter.entitiesNotFound',
+    defaultMessage: 'No entities found',
+  },
+  entitiesNotSelected: {
+    id: 'app.containers.EntityListFilter.entitiesNotSelected',
+    defaultMessage: 'Please select one or more entities from the list to see the available edit options',
+  },
+
 });

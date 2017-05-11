@@ -4,6 +4,7 @@
  *
  */
 import React, { PropTypes } from 'react';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
@@ -33,7 +34,9 @@ const Header = styled.div`
   background-color: ${palette('greyscaleLight', 2)}
 `;
 
-const ListEntitiesEmpty = styled.div``;
+const ListEntitiesEmpty = styled.div`
+  padding: 3em 2em 1em;
+`;
 
 export class EntityListSidebar extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -175,12 +178,12 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             }
             { activePanel === EDIT_PANEL && !hasEntities &&
               <ListEntitiesEmpty>
-                 No entities found
+                <FormattedMessage {...messages.entitiesNotFound} />
               </ListEntitiesEmpty>
             }
             { activePanel === EDIT_PANEL && hasEntities && !hasSelected &&
               <ListEntitiesEmpty>
-                Please select one or more entities for edit options
+                <FormattedMessage {...messages.entitiesNotSelected} />
               </ListEntitiesEmpty>
             }
           </Main>
