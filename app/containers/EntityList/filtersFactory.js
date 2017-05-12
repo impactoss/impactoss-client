@@ -196,6 +196,7 @@ export const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuer
           if (valueSplit[0] === option.attribute && valueSplit.length > 0) {
             const value = valueSplit[1];
             if (option.extension) {
+              // TODO: show display value not query queryValue
               tags.push({
                 label: `${option.label}:${value}`,
                 type: 'attributes',
