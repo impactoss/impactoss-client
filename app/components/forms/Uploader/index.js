@@ -35,6 +35,11 @@ class Uploader extends React.Component { // eslint-disable-line react/prefer-sta
     this.props.onChange(null);
   }
 
+  modifyFileType = (file, next) => {
+    const newFile = new File([file.slice()], file.name, { type: 'application/octet-stream' });
+    next(newFile);
+  }
+
   render() {
     return (
       <span>
@@ -55,6 +60,7 @@ class Uploader extends React.Component { // eslint-disable-line react/prefer-sta
             onError={this.onUploadError}
             onFinish={this.onUploadFinish}
             server={API_ENDPOINT}
+            preprocess={this.modifyFileType}
             scrubFilename={(filename) => filename.replace(/(\.[\w\d_-]+)$/i, `_${Date.now()}$1`)}
           />
         }
