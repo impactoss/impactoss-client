@@ -12,8 +12,8 @@ const ButtonFilterTagInverse = styled(Button)`
   font-size: 0.85em;
   border: 1px solid;
   &:hover {
-    color: ${(props) => palette(props.paletteHover, props.taxId || 0)};
-    background-color: ${palette('greyscaleLight', 2)};
+    color: ${(props) => palette(props.paletteHover, props.pIndex || 0)};
+    background-color: ${palette('greyscaleLight', 0)};
   }
 `;
 

@@ -122,7 +122,9 @@ export const getCurrentConnectedTaxonomyFilters = (taxonomyFilters, connectedTax
               : category.attributes.title || category.attributes.name);
             label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
             tags.push({
-              label: `${label} X`,
+              label,
+              type: 'taxonomies',
+              id: taxonomy.id,
               onClick: () => onClick({
                 value: queryValue,
                 query: taxonomyFilters.query,
@@ -149,7 +151,8 @@ export const getCurrentConnectionFilters = (connectionFiltersOptions, connection
             : upperFirst(value);
         label = label.length > 20 ? `${label.substring(0, 20)}...` : label;
         tags.push({
-          label: `${label} X`,
+          label,
+          type: option.path === 'measures' ? 'actions' : option.path,
           onClick: () => onClick({
             value,
             query: option.query,
@@ -167,7 +170,9 @@ export const getCurrentConnectionFilters = (connectionFiltersOptions, connection
         // numeric means taxonomy
         if (option.query === queryValue) {
           tags.push({
-            label: `${withoutMessage} ${lowerCase(option.label)} X`,
+            label: `${withoutMessage} ${lowerCase(option.label)}`,
+            type: option.path === 'measures' ? 'actions' : option.path,
+            without: true,
             onClick: () => onClick({
               value: queryValue,
               query: 'without',
