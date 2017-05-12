@@ -197,7 +197,8 @@ export const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuer
             const value = valueSplit[1];
             if (option.extension) {
               tags.push({
-                label: `${option.label}:${value} X`,
+                label: `${option.label}:${value}`,
+                type: 'attributes',
                 onClick: () => onClick({
                   value: queryValue,
                   query: 'where',
@@ -209,7 +210,8 @@ export const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuer
               let label = attribute ? attribute.label : upperFirst(value);
               label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
               tags.push({
-                label: `${label} X`,
+                label,
+                type: 'attributes',
                 onClick: () => onClick({
                   value: queryValue,
                   query: 'where',
