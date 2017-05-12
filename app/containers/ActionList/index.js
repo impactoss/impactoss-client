@@ -237,6 +237,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
 
     // specify the filter and query options
     const filters = {
+      search: ['title'],
       attributes: {  // filter by attribute value
         options: [
           {

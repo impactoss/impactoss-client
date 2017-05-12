@@ -226,10 +226,45 @@ const getEntitiesIfConnected = createSelector(
   : entities  // !connected
 );
 
+// check if entities have connections with other entities via associative table
+const getEntitiesSearch = createSelector(
+  (state) => state,
+  getEntitiesIfConnected,
+  (state, { search }) => search,
+  (state, entities, search) => {
+    if (search) {
+      // match multiple words
+      // see http://stackoverflow.com/questions/5421952/how-to-match-multiple-words-in-regex
+      const regex = reduce(search.query.split(' '), (memo, str) =>
+        `${memo}(?=.*\\b${str})`
+      , '');
+      return entities.filter((entity) => {
+        // prep searchtarget, incl id
+        const entityId = entity.get('id').toString();
+        let searchTarget = reduce(search.fields, (targetMemo, field) =>
+          `${targetMemo} ${entity.getIn(['attributes', field])}`
+        , entityId);
+        searchTarget = searchTarget
+          .replace(/[āĀ]/, 'a')
+          .replace(/[ēĒ]/, 'e')
+          .replace(/[īĪ]/, 'i')
+          .replace(/[ōŌ]/, 'o')
+          .replace(/[ūŪ]/, 'u');
+        try {
+          const pattern = new RegExp(regex, 'i');
+          return pattern.test(searchTarget);
+        } catch (e) {
+          return true;
+        }
+      });
+    }
+    return entities;  // !search
+  }
+);
 
 const getEntities = createSelector(
   (state) => state,
-  getEntitiesIfConnected,
+  getEntitiesSearch,
   (state, { out }) => out,
   (state, { extend }) => extend,
   (state, entities, out, extend) => {

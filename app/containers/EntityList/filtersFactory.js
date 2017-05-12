@@ -69,7 +69,9 @@ export const getCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQ
             : category.attributes.title || category.attributes.name);
           label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
           tags.push({
-            label: `${label} X`,
+            label,
+            type: 'taxonomies',
+            id: taxonomy.id,
             onClick: () => onClick({
               value,
               query: taxonomyFilters.query,
@@ -88,7 +90,10 @@ export const getCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQ
         if (isNumber(queryValue) && taxonomy.id === queryValue) {
           const value = parseInt(queryValue, 10);
           tags.push({
-            label: `${withoutMessage} ${lowerCase(taxonomy.attributes.title)} X`,
+            label: `${withoutMessage} ${lowerCase(taxonomy.attributes.title)}`,
+            type: 'taxonomies',
+            id: taxonomy.id,
+            without: true,
             onClick: () => onClick({
               value,
               query: 'without',

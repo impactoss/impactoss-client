@@ -59,6 +59,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
 
     // specify the filter and query  options
     const filters = {
+      search: ['title'],
       keyword: {
         attributes: [
           'id',

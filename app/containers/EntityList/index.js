@@ -7,6 +7,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import { Map, List, fromJS } from 'immutable';
 import { orderBy, reduce } from 'lodash/collection';
@@ -17,6 +18,9 @@ import { getEntitySortIteratee } from 'utils/sort';
 import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
 import Container from 'components/basic/Container';
 import Sidebar from 'components/basic/Sidebar';
+import Icon from 'components/Icon';
+import ButtonFilterTag from 'components/buttons/ButtonFilterTag';
+import ButtonFilterTagInverse from 'components/buttons/ButtonFilterTagInverse';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import EntityListSidebar from 'components/EntityListSidebar';
@@ -63,7 +67,25 @@ const Content = styled.div`
   padding: 0 4em;
 `;
 const ListEntities = styled.div``;
-const ListEntitiesTopFilters = styled.div``;
+const ListEntitiesTopFilters = styled.div`
+  display: block;
+  width: 100%;
+  background-color: ${palette('primary', 4)};
+  color: ${palette('greyscaleDark', 2)};
+  padding: 5px;
+  border: 1px solid ${palette('greyscaleLight', 2)};
+  margin-bottom: 10px;
+  min-height: 24px;
+  border-radius: 5px;
+`;
+const Search = styled.input`
+  background-color: ${palette('primary', 4)};
+  display: block;
+  width: 100%;
+  border:none;
+  padding:3px;
+`;
+
 const ListEntitiesHeaderOptionLinks = styled.div`
   float:right;
 `;
@@ -85,23 +107,10 @@ const ListEntitiesHeader = styled.div`
 const ListEntitiesSelectAll = styled.div``;
 const ListEntitiesMain = styled.div``;
 const ListEntitiesEmpty = styled.div``;
-const Tag = styled.button`
-  display: inline-block;
-  background: #ccc;
-  padding: 1px 6px;
-  margin: 0 3px;
-  border-radius: 3px;
-  font-size: 0.8em;
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-const Button = styled(Tag)`
-  cursor: pointer;
-`;
 const ListEntitiesHeaderOptionGroup = styled.span``;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
   // TODO figure out why component updates when child component (sidebar option) internal state changes
   //    possibly due to form model changes
   //    consider moving form reducer to sidebar or use local form
@@ -110,6 +119,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   //   const s_np = JSON.stringify(nextProps)
   //   return s_np !== s_p
   // }
+
   renderGroupingOptions = (
     onGroupSelect,
     locationQueryGroup,
@@ -224,16 +234,51 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 actions={pageActions}
               />
               { !dataReady &&
-                <div>
-                  <Loading />
-                </div>
+                <Loading />
               }
               { dataReady &&
                 <ListEntities>
                   <ListEntitiesTopFilters>
-                    { makeCurrentFilters(this.props, this.context.intl.formatMessage(messages.filterFormWithoutPrefix)).map((filter, i) =>
-                      (<Button key={i} onClick={filter.onClick}>{filter.label}</Button>)
-                    )}
+                    {
+                      makeCurrentFilters(
+                        this.props,
+                        this.context.intl.formatMessage(messages.filterFormWithoutPrefix)
+                      ).map((filter, i) => filter.without
+                        ? (
+                          <ButtonFilterTagInverse
+                            key={i}
+                            onClick={filter.onClick}
+                            palette={filter.type}
+                            paletteHover={`${filter.type}Hover`}
+                            pIndex={parseInt(filter.id, 10) || 0}
+                          >
+                            {filter.label}
+                            <Icon name="removeSmall" text textRight />
+                          </ButtonFilterTagInverse>
+                        )
+                        : (
+                          <ButtonFilterTag
+                            key={i}
+                            onClick={filter.onClick}
+                            palette={filter.type}
+                            paletteHover={`${filter.type}Hover`}
+                            pIndex={parseInt(filter.id, 10) || 0}
+                          >
+                            {filter.label}
+                            <Icon name="removeSmall" text textRight />
+                          </ButtonFilterTag>
+                        )
+                      )
+                    }
+                    <Search
+                      id="search"
+                      value={location.query.search || ''}
+                      onChange={(evt) => {
+                        if (evt && evt !== undefined) evt.stopPropagation();
+                        this.props.onSearch(evt.target.value);
+                      }}
+                      placeholder={this.context.intl.formatMessage(messages.searchPlaceholder)}
+                    />
                   </ListEntitiesTopFilters>
                   <ListEntitiesHeaderOptions>
                     <ListEntitiesHeaderOptionGroup>
@@ -359,6 +404,7 @@ EntityList.propTypes = {
   onTagClick: PropTypes.func.isRequired,
   onExpand: PropTypes.func.isRequired,
   onGroupSelect: PropTypes.func.isRequired,
+  onSearch: PropTypes.func.isRequired,
 };
 
 EntityList.defaultProps = {
@@ -385,6 +431,12 @@ const mapStateToProps = (state, props) => ({
       : null,
     without: props.location.query && props.location.query.without
       ? getWithoutQuery(props.location.query.without, props.filters)
+      : null,
+    search: props.location.query && props.location.query.search
+      ? {
+        query: props.location.query.search,
+        fields: props.filters.search,
+      }
       : null,
     extend: props.selects.entities.extensions,
   }),
@@ -432,6 +484,16 @@ function mapDispatchToProps(dispatch, props) {
           value,
           replace: bool,
           checked: bool,
+        },
+      ])));
+    },
+    onSearch: (value) => {
+      dispatch(updateQuery(fromJS([
+        {
+          query: 'search',
+          value,
+          replace: true,
+          checked: value !== '',
         },
       ])));
     },

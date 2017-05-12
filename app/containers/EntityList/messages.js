@@ -10,4 +10,8 @@ export default defineMessages({
     id: 'app.containers.EntityQuery.filterFormWithoutPrefix',
     defaultMessage: 'Without',
   },
+  searchPlaceholder: {
+    id: 'app.containers.EntityQuery.searchPlaceholder',
+    defaultMessage: 'Filter by keyword',
+  },
 });

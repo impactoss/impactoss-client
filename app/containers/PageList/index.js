@@ -42,6 +42,7 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
 
     // specify the filter and query  options
     const filters = {
+      search: ['title'],
       attributes: {  // filter by attribute value
         label: 'By attribute',
         options: [

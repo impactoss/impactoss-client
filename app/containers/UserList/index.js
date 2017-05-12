@@ -70,6 +70,7 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
 
     // specify the filter and query  options
     const filters = {
+      search: ['name'],
       taxonomies: { // filter by each category
         query: 'cat',
         filter: true,
