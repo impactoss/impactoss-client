@@ -36,6 +36,7 @@ class Uploader extends React.Component { // eslint-disable-line react/prefer-sta
   }
 
   modifyFileType = (file, next) => {
+    // This is to enable files to download by default, instead of potentially opening in browser
     const newFile = new File([file.slice()], file.name, { type: 'application/octet-stream' });
     next(newFile);
   }
