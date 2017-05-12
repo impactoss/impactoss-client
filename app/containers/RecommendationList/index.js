@@ -69,7 +69,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     };
 
     const filters = {
-      search: ['no', 'title'],
+      search: ['number', 'title'],
       attributes: {  // filter by attribute value
         label: 'By attribute',
         options: [

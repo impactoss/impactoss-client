@@ -228,6 +228,7 @@
     "querystring": "^0.2.0",
     "re-reselect": "^0.1.0",
     "react": "15.4.1",
+    "react-debounce-input": "^3.0.0",
     "react-dom": "15.4.1",
     "react-helmet": "3.2.2",
     "react-intl": "2.1.5",

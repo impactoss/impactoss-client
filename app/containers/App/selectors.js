@@ -20,7 +20,7 @@ import { reduce } from 'lodash/collection';
 import { USER_ROLES } from 'containers/App/constants';
 
 import asArray from 'utils/as-array';
-
+import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
 
 // high level state selects
 const getRoute = (state) => state.get('route');
@@ -226,6 +226,14 @@ const getEntitiesIfConnected = createSelector(
   : entities  // !connected
 );
 
+// prep searchtarget, incl id
+const prepareEntitySearchTarget = (entity, fields) =>
+  reduce(
+    fields,
+    (target, field) => `${target} ${cleanupSearchTarget(entity.getIn(['attributes', field]))}`,
+    entity.get('id')
+  );
+
 // check if entities have connections with other entities via associative table
 const getEntitiesSearch = createSelector(
   (state) => state,
@@ -233,30 +241,14 @@ const getEntitiesSearch = createSelector(
   (state, { search }) => search,
   (state, entities, search) => {
     if (search) {
-      // match multiple words
-      // see http://stackoverflow.com/questions/5421952/how-to-match-multiple-words-in-regex
-      const regex = reduce(search.query.split(' '), (memo, str) =>
-        `${memo}(?=.*\\b${str})`
-      , '');
-      return entities.filter((entity) => {
-        // prep searchtarget, incl id
-        const entityId = entity.get('id').toString();
-        let searchTarget = reduce(search.fields, (targetMemo, field) =>
-          `${targetMemo} ${entity.getIn(['attributes', field])}`
-        , entityId);
-        searchTarget = searchTarget
-          .replace(/[āĀ]/, 'a')
-          .replace(/[ēĒ]/, 'e')
-          .replace(/[īĪ]/, 'i')
-          .replace(/[ōŌ]/, 'o')
-          .replace(/[ūŪ]/, 'u');
-        try {
-          const pattern = new RegExp(regex, 'i');
-          return pattern.test(searchTarget);
-        } catch (e) {
-          return true;
-        }
-      });
+      try {
+        const regex = new RegExp(regExMultipleWords(search.query), 'i');
+        return entities.filter((entity) =>
+          regex.test(prepareEntitySearchTarget(entity, search.fields))
+        );
+      } catch (e) {
+        return entities;
+      }
     }
     return entities;  // !search
   }
