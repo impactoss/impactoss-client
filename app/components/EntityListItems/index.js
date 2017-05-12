@@ -109,6 +109,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
       expandableColumns,
       showDate,
       onExpand,
+      entityIcon,
     } = this.props;
 
     return (
@@ -122,6 +123,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
                 onSelect={(checked) => onEntitySelect(entity.id, checked)}
                 entity={this.mapToEntityListItem(entity, this.props)}
                 expand={expand}
+                entityIcon={entityIcon}
               />
               {expandable && expand > 0 && expandableColumns.length > 0 &&
                 <EntityListChildItems
@@ -157,6 +159,7 @@ EntityListItems.propTypes = {
   expand: PropTypes.number,
   expandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
+  entityIcon: PropTypes.string,
 };
 
 export default EntityListItems;

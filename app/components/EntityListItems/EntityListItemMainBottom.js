@@ -1,10 +1,15 @@
 import React, { PropTypes } from 'react';
+import styled from 'styled-components';
 
 import Component from 'components/basic/Component';
 
 import EntityListItemMainBottomTaxonomies from './EntityListItemMainBottomTaxonomies';
 import EntityListItemMainBottomConnections from './EntityListItemMainBottomConnections';
 import EntityListItemMainBottomTargetDate from './EntityListItemMainBottomTargetDate';
+
+const Styled = styled(Component)`
+  min-height: 2em;
+`;
 
 export default class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
@@ -15,7 +20,7 @@ export default class EntityListItemMainBottom extends React.PureComponent { // e
     const { entity } = this.props;
 
     return (
-      <Component>
+      <Styled>
         { entity.tags && entity.tags.length > 0 &&
           <EntityListItemMainBottomTaxonomies tags={entity.tags} />
         }
@@ -25,7 +30,7 @@ export default class EntityListItemMainBottom extends React.PureComponent { // e
         { entity.targetDate &&
           <EntityListItemMainBottomTargetDate date={entity.targetDate} />
         }
-      </Component>
+      </Styled>
     );
   }
 }

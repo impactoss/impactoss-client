@@ -1,10 +1,12 @@
 import React, { PropTypes } from 'react';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 const Select = styled.div`
   display: table-cell;
   width: 30px;
-  background: #fff;
+  background-color: ${palette('primary', 4)};
+  padding: 5px;
 `;
 
 export default class EntityListItemSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

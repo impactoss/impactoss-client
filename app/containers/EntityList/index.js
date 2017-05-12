@@ -313,6 +313,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                               expand={this.props.expand}
                               expandable={this.props.expandable}
                               expandableColumns={this.props.expandableColumns}
+                              entityIcon={this.props.header.icon}
                             />
                           </div>
                         ))}

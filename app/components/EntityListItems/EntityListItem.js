@@ -27,6 +27,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       checked,
       onSelect,
       expand,
+      entityIcon,
     } = this.props;
 
     return (
@@ -35,7 +36,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
           {select &&
             <EntityListItemSelect checked={checked} onSelect={onSelect} />
           }
-          <EntityListItemMain entity={entity} />
+          <EntityListItemMain entity={entity} entityIcon={entityIcon}/>
           {entity.expandables &&
             entity.expandables.map((expandable, i) =>
               <EntityListItemExpandable
@@ -61,6 +62,7 @@ EntityListItem.propTypes = {
   checked: PropTypes.bool,
   expand: PropTypes.number,
   onSelect: PropTypes.func,
+  entityIcon: PropTypes.string,
 };
 
 EntityListItem.defaultProps = {
