@@ -18,13 +18,11 @@ import { getEntitySortIteratee } from 'utils/sort';
 import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
 import Container from 'components/basic/Container';
 import Sidebar from 'components/basic/Sidebar';
-import Icon from 'components/Icon';
-import ButtonFilterTag from 'components/buttons/ButtonFilterTag';
-import ButtonFilterTagInverse from 'components/buttons/ButtonFilterTagInverse';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListItems from 'components/EntityListItems';
+import EntityListSearch from 'components/EntityListSearch';
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
@@ -67,24 +65,6 @@ const Content = styled.div`
   padding: 0 4em;
 `;
 const ListEntities = styled.div``;
-const ListEntitiesTopFilters = styled.div`
-  display: block;
-  width: 100%;
-  background-color: ${palette('primary', 4)};
-  color: ${palette('greyscaleDark', 2)};
-  padding: 5px;
-  border: 1px solid ${palette('greyscaleLight', 2)};
-  margin-bottom: 10px;
-  min-height: 24px;
-  border-radius: 5px;
-`;
-const Search = styled.input`
-  background-color: ${palette('primary', 4)};
-  display: block;
-  width: 100%;
-  border:none;
-  padding:3px;
-`;
 
 const ListEntitiesHeaderOptionLinks = styled.div`
   float:right;
@@ -238,48 +218,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               }
               { dataReady &&
                 <ListEntities>
-                  <ListEntitiesTopFilters>
-                    {
-                      makeCurrentFilters(
-                        this.props,
-                        this.context.intl.formatMessage(messages.filterFormWithoutPrefix)
-                      ).map((filter, i) => filter.without
-                        ? (
-                          <ButtonFilterTagInverse
-                            key={i}
-                            onClick={filter.onClick}
-                            palette={filter.type}
-                            paletteHover={`${filter.type}Hover`}
-                            pIndex={parseInt(filter.id, 10) || 0}
-                          >
-                            {filter.label}
-                            <Icon name="removeSmall" text textRight />
-                          </ButtonFilterTagInverse>
-                        )
-                        : (
-                          <ButtonFilterTag
-                            key={i}
-                            onClick={filter.onClick}
-                            palette={filter.type}
-                            paletteHover={`${filter.type}Hover`}
-                            pIndex={parseInt(filter.id, 10) || 0}
-                          >
-                            {filter.label}
-                            <Icon name="removeSmall" text textRight />
-                          </ButtonFilterTag>
-                        )
-                      )
-                    }
-                    <Search
-                      id="search"
-                      value={location.query.search || ''}
-                      onChange={(evt) => {
-                        if (evt && evt !== undefined) evt.stopPropagation();
-                        this.props.onSearch(evt.target.value);
-                      }}
-                      placeholder={this.context.intl.formatMessage(messages.searchPlaceholder)}
-                    />
-                  </ListEntitiesTopFilters>
+                  <EntityListSearch
+                    filters={makeCurrentFilters(this.props, this.context.intl.formatMessage(messages.filterFormWithoutPrefix))}
+                    searchQuery={location.query.search || ''}
+                    onSearch={this.props.onSearch}
+                  />
                   <ListEntitiesHeaderOptions>
                     <ListEntitiesHeaderOptionGroup>
                       {

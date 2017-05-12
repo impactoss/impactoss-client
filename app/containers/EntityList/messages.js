@@ -1,17 +1,13 @@
 /*
- * EntityQuery Messages
+ * EntityList Messages
  *
- * This contains all the text for the EntityQuery component.
+ * This contains all the text for the EntityList component.
  */
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   filterFormWithoutPrefix: {
-    id: 'app.containers.EntityQuery.filterFormWithoutPrefix',
+    id: 'app.containers.EntityList.filterFormWithoutPrefix',
     defaultMessage: 'Without',
-  },
-  searchPlaceholder: {
-    id: 'app.containers.EntityQuery.searchPlaceholder',
-    defaultMessage: 'Filter by keyword',
   },
 });

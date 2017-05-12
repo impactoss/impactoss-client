@@ -33,7 +33,6 @@ const Header = styled.div`
   padding: 3em 2em 1em;
   background-color: ${palette('greyscaleLight', 2)}
 `;
-
 const ListEntitiesEmpty = styled.div`
   padding: 3em 2em 1em;
 `;
