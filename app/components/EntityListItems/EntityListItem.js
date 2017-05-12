@@ -36,7 +36,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
           {select &&
             <EntityListItemSelect checked={checked} onSelect={onSelect} />
           }
-          <EntityListItemMain entity={entity} entityIcon={entityIcon}/>
+          <EntityListItemMain entity={entity} entityIcon={entityIcon} />
           {entity.expandables &&
             entity.expandables.map((expandable, i) =>
               <EntityListItemExpandable

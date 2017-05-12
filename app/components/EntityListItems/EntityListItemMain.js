@@ -26,7 +26,7 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
     const { entity, entityIcon } = this.props;
     return (
       <Main>
-        <EntityListItemMainTop entity={entity} entityIcon={entityIcon}/>
+        <EntityListItemMainTop entity={entity} entityIcon={entityIcon} />
         <Clear />
         <EntityListItemMainTitle to={entity.linkTo}>
           {entity.title}
