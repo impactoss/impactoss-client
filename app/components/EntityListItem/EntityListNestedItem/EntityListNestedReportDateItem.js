@@ -15,7 +15,7 @@ const DueDate = styled.div`
 `;
 
 
-export default class EntityListChildDateItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListNestedReportDateItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     date: PropTypes.object.isRequired,

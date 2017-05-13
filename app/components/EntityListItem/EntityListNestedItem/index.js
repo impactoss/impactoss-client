@@ -3,12 +3,12 @@ import styled from 'styled-components';
 
 import Component from 'components/basic/Component';
 
-import EntityListItemMain from './EntityListItemMain';
-import EntityListItemExpandable from './EntityListItemExpandable';
+import EntityListItemMain from '../EntityListItemMain';
+import EntityListItemExpandable from '../EntityListItemExpandable';
 
 const ItemWrapper = styled.span`
   display: inline-block;
-  width:${(props) => props.expand ? '50%' : '100%'};
+  width:${(props) => props.expandNo ? '50%' : '100%'};
 `;
 
 const Item = styled(Component)`
@@ -17,21 +17,21 @@ const Item = styled(Component)`
   width:100%;
 `;
 
-export default class EntityListChildItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListNestedItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     entity: PropTypes.object.isRequired,
-    expand: PropTypes.number,
+    expandNo: PropTypes.number,
   }
 
   render() {
     const {
       entity,
-      expand,
+      expandNo,
     } = this.props;
 
     return (
-      <ItemWrapper expand={expand}>
+      <ItemWrapper expandNo={expandNo}>
         <Item>
           <EntityListItemMain entity={entity} />
           {entity.expandables &&

@@ -38,7 +38,7 @@ const Status = styled.div`
   text-transform: uppercase;
 `;
 
-export default class EntityListChildReportItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListNestedReportItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     report: PropTypes.object.isRequired,

@@ -7,6 +7,7 @@ const Select = styled.div`
   width: 30px;
   background-color: ${palette('primary', 4)};
   padding: 5px;
+  text-align: center;
 `;
 
 export default class EntityListItemSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

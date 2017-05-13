@@ -10,4 +10,12 @@ export default defineMessages({
     id: 'app.containers.EntityList.filterFormWithoutPrefix',
     defaultMessage: 'Without',
   },
+  listEmpty: {
+    id: 'app.containers.EntityList.listEmpty',
+    defaultMessage: 'No entities in database',
+  },
+  listEmptyAfterQuery: {
+    id: 'app.containers.EntityList.listEmptyAfterQuery',
+    defaultMessage: 'We are sorry, no results matched your search!',
+  },
 });

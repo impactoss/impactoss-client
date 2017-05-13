@@ -1,22 +1,27 @@
 import React, { PropTypes } from 'react';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
-import EntityListChildItem from './EntityListChildItem';
-import EntityListChildReportItems from './EntityListChildReportItems';
+import EntityListNestedItem from 'components/EntityListItem/EntityListNestedItem';
+import EntityListNestedReportList from './EntityListNestedReportList';
 
-const ChildItems = styled.span`
+const Styled = styled.span`
   display: inline-block;
   width: 50%;
   vertical-align: top;
 `;
-
-export class EntityListChildItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+const ItemWrapper = styled.div`
+  border-top: 1px solid;
+  padding: ${(props) => props.separated ? '0.5em 0 5em' : '0'};
+  border-color: ${(props) => props.separated ? palette('greyscaleDark', 4) : 'transparent'}
+`;
+export class EntityListNestedList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   mapToEntityListItem = (entity, props) => {
     const {
       entityLinkTo,
-      expand,
-      expandable,
+      expandNo,
+      isExpandable,
       expandableColumns,
       showDate,
       onExpand,
@@ -29,13 +34,13 @@ export class EntityListChildItems extends React.PureComponent { // eslint-disabl
       linkTo: `${entityLinkTo}${entity.id}`,
       status: entity.attributes.draft ? 'draft' : null,
       updated: showDate ? entity.attributes.updated_at.split('T')[0] : null,
-      expandables: expandable && !expand
-        ? expandableColumns.map((column, i) => ({
+      expandables: isExpandable && !expandNo
+        ? expandableColumns.map((column) => ({
           type: column.type,
           label: column.label,
           count: column.getCount && column.getCount(entity),
           info: column.getInfo && column.getInfo(entity),
-          onClick: () => onExpand(true, i + 2),
+          onClick: () => onExpand(),
         }))
         : [],
     };
@@ -44,43 +49,43 @@ export class EntityListChildItems extends React.PureComponent { // eslint-disabl
   render() {
     const {
       entities,
-      expand,
-      expandable,
+      expandNo,
+      isExpandable,
       expandableColumns,
     } = this.props;
 
     return (
-      <ChildItems>
+      <Styled>
         {
           entities.map((entity, i) =>
-            <div key={i}>
-              <EntityListChildItem
+            <ItemWrapper key={i} separated={expandNo && i > 0}>
+              <EntityListNestedItem
                 entity={this.mapToEntityListItem(entity, this.props)}
-                expand={expand}
+                expandNo={expandNo}
               />
-              {expandable && expand > 0 && expandableColumns.length > 0 &&
-                <EntityListChildReportItems
+              {isExpandable && expandNo > 0 && expandableColumns.length > 0 &&
+                <EntityListNestedReportList
                   reports={expandableColumns[0].getReports(entity)}
                   dates={expandableColumns[0].getDates(entity)}
                   entityLinkTo={expandableColumns[0].entityLinkTo}
                 />
               }
-            </div>
+            </ItemWrapper>
           )
         }
-      </ChildItems>
+      </Styled>
     );
   }
 }
 
-EntityListChildItems.propTypes = {
+EntityListNestedList.propTypes = {
   entities: PropTypes.array.isRequired,
   showDate: PropTypes.bool,
   entityLinkTo: PropTypes.string,
-  expand: PropTypes.number,
-  expandable: PropTypes.bool,
+  expandNo: PropTypes.number,
+  isExpandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
   onExpand: PropTypes.func,
 };
 
-export default EntityListChildItems;
+export default EntityListNestedList;

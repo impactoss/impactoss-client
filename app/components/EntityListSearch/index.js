@@ -16,6 +16,9 @@ import DebounceInput from 'react-debounce-input';
 import messages from './messages';
 
 const Styled = styled.div`
+  padding: 0 0 1em;
+`;
+const TagSearch = styled.div`
   display:flex;
   flex-direction:row;
   width: 100%;
@@ -61,47 +64,49 @@ export class EntityListSearch extends React.Component { // eslint-disable-line r
     //   this.inputNode.focus()
     // }}
     return (
-      <Styled active={this.state.active} >
-        <Tags>
-          {
-            filters.map((filter, i) => filter.without
-              ? (
-                <ButtonFilterTagInverse
-                  key={i}
-                  onClick={filter.onClick}
-                  palette={filter.type}
-                  paletteHover={`${filter.type}Hover`}
-                  pIndex={parseInt(filter.id, 10) || 0}
-                >
-                  {filter.label}
-                  <Icon name="removeSmall" text textRight />
-                </ButtonFilterTagInverse>
+      <Styled>
+        <TagSearch active={this.state.active} >
+          <Tags>
+            {
+              filters.map((filter, i) => filter.without
+                ? (
+                  <ButtonFilterTagInverse
+                    key={i}
+                    onClick={filter.onClick}
+                    palette={filter.type}
+                    paletteHover={`${filter.type}Hover`}
+                    pIndex={parseInt(filter.id, 10) || 0}
+                  >
+                    {filter.label}
+                    <Icon name="removeSmall" text textRight />
+                  </ButtonFilterTagInverse>
+                )
+                : (
+                  <ButtonFilterTag
+                    key={i}
+                    onClick={filter.onClick}
+                    palette={filter.type}
+                    paletteHover={`${filter.type}Hover`}
+                    pIndex={parseInt(filter.id, 10) || 0}
+                  >
+                    {filter.label}
+                    <Icon name="removeSmall" text textRight />
+                  </ButtonFilterTag>
+                )
               )
-              : (
-                <ButtonFilterTag
-                  key={i}
-                  onClick={filter.onClick}
-                  palette={filter.type}
-                  paletteHover={`${filter.type}Hover`}
-                  pIndex={parseInt(filter.id, 10) || 0}
-                >
-                  {filter.label}
-                  <Icon name="removeSmall" text textRight />
-                </ButtonFilterTag>
-              )
-            )
-          }
-        </Tags>
-        <Search
-          id="search"
-          minLength={1}
-          debounceTimeout={300}
-          value={searchQuery || ''}
-          onChange={(e) => onSearch(e.target.value)}
-          onFocus={() => this.setState({ active: true })}
-          onBlur={() => this.setState({ active: false })}
-          placeholder={this.context.intl.formatMessage(messages.searchPlaceholder)}
-        />
+            }
+          </Tags>
+          <Search
+            id="search"
+            minLength={1}
+            debounceTimeout={300}
+            value={searchQuery || ''}
+            onChange={(e) => onSearch(e.target.value)}
+            onFocus={() => this.setState({ active: true })}
+            onBlur={() => this.setState({ active: false })}
+            placeholder={this.context.intl.formatMessage(messages.searchPlaceholder)}
+          />
+        </TagSearch>
       </Styled>
     );
   }

@@ -12,7 +12,7 @@ import ButtonPrimary from 'components/buttons/ButtonPrimary';
 import ButtonText from 'components/buttons/ButtonText';
 
 const Styled = styled.div`
-  padding: 3em 0 2em;
+  padding: 3em 0 1em;
 `;
 
 const Title = styled.h1`

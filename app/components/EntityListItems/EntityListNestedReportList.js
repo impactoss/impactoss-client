@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react';
 import styled from 'styled-components';
 
-import EntityListChildReportItem from './EntityListChildReportItem';
-import EntityListChildDateItem from './EntityListChildDateItem';
+import EntityListNestedReportItem from 'components/EntityListItem/EntityListNestedItem/EntityListNestedReportItem';
+import EntityListNestedReportDateItem from 'components/EntityListItem/EntityListNestedItem/EntityListNestedReportDateItem';
 
 const ChildItems = styled.span`
   display: inline-block;
@@ -10,7 +10,7 @@ const ChildItems = styled.span`
   vertical-align: top;
 `;
 
-export class EntityListChildReportItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class EntityListNestedReportList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   mapToEntityListItem = (entity, entityLinkTo) => ({
     id: entity.id,
@@ -26,13 +26,13 @@ export class EntityListChildReportItems extends React.PureComponent { // eslint-
     return (
       <ChildItems>
         { dates && dates.length > 0 &&
-          <EntityListChildDateItem
+          <EntityListNestedReportDateItem
             date={dates[0]}
           />
         }
         {
           reports.map((report, i) =>
-            <EntityListChildReportItem
+            <EntityListNestedReportItem
               key={i}
               report={this.mapToEntityListItem(report, entityLinkTo)}
             />
@@ -43,10 +43,10 @@ export class EntityListChildReportItems extends React.PureComponent { // eslint-
   }
 }
 
-EntityListChildReportItems.propTypes = {
+EntityListNestedReportList.propTypes = {
   reports: PropTypes.array,
   dates: PropTypes.array,
   entityLinkTo: PropTypes.string,
 };
 
-export default EntityListChildReportItems;
+export default EntityListNestedReportList;

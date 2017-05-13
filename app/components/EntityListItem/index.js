@@ -8,13 +8,13 @@ import EntityListItemSelect from './EntityListItemSelect';
 import EntityListItemExpandable from './EntityListItemExpandable';
 
 
-const ItemWrapper = styled.span`
+const Styled = styled.span`
   display: inline-block;
-  width: ${(props) => props.expand ? '50%' : '100%'};
+  width: ${(props) => props.expandNo ? '50%' : '100%'};
   vertical-align: top;
 `;
 const Item = styled(Component)`
-  padding: 1px 0;
+  padding: '1px 0';
   display: table;
   width:100%;
 `;
@@ -26,12 +26,12 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       select,
       checked,
       onSelect,
-      expand,
+      expandNo,
       entityIcon,
     } = this.props;
 
     return (
-      <ItemWrapper expand={expand}>
+      <Styled expandNo={expandNo}>
         <Item>
           {select &&
             <EntityListItemSelect checked={checked} onSelect={onSelect} />
@@ -50,7 +50,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
             )
           }
         </Item>
-      </ItemWrapper>
+      </Styled>
     );
   }
 }
@@ -60,14 +60,14 @@ EntityListItem.propTypes = {
   entity: PropTypes.object.isRequired,
   select: PropTypes.bool,
   checked: PropTypes.bool,
-  expand: PropTypes.number,
+  expandNo: PropTypes.number,
   onSelect: PropTypes.func,
   entityIcon: PropTypes.string,
 };
 
 EntityListItem.defaultProps = {
   checked: false,
-  expand: null,
+  expandNo: null,
 };
 
 export default EntityListItem;

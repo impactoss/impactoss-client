@@ -4,17 +4,9 @@ import { lowerCase } from 'utils/string';
 import { getConnectedCategoryIds } from 'utils/entities';
 import isNumber from 'utils/is-number';
 
-import { UNGROUP } from './constants';
 
-export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies, group, messageUngroup) => {
-  let options = [
-    {
-      value: UNGROUP,
-      label: messageUngroup,
-      default: true,
-      disabled: group === UNGROUP,
-    },
-  ];
+export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies) => {
+  let options = [];
 
   // taxonomy options
   if (filters.taxonomies && taxonomies) {
@@ -22,7 +14,6 @@ export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies, group
     options = options.concat(Object.values(taxonomies).map((taxonomy) => ({
       value: taxonomy.id, // filterOptionId
       label: taxonomy.attributes.title,
-      disabled: group === taxonomy.id,
     })));
   }
   // connectedTaxonomies options
@@ -31,29 +22,27 @@ export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies, group
     options = options.concat(Object.values(connectedTaxonomies.taxonomies).map((taxonomy) => ({
       value: `x:${taxonomy.id}`, // filterOptionId
       label: taxonomy.attributes.title,
-      disabled: group === `x:${taxonomy.id}`,
     })));
   }
   return options;
 };
 
 export const makeEntityGroups = (entitiesSorted, taxonomies, connectedTaxonomies, filters, locationQueryGroup) => {
-  let groups = [{ entities: entitiesSorted }];
   if (locationQueryGroup) {
     if (isNumber(locationQueryGroup)) {
       const taxonomy = taxonomies[parseInt(locationQueryGroup, 10)];
-      groups = makeTaxonomyGroups(entitiesSorted, taxonomy);
-    } else {
-      const locationQueryGroupSplit = locationQueryGroup.split(':');
-      if (locationQueryGroupSplit.length > 1) {
-        const taxonomy = connectedTaxonomies.taxonomies[parseInt(locationQueryGroupSplit[1], 10)];
-        if (taxonomy) {
-          groups = makeConnectedTaxonomyGroups(entitiesSorted, taxonomy, filters);
-        }
+      return makeTaxonomyGroups(entitiesSorted, taxonomy);
+    }
+    const locationQueryGroupSplit = locationQueryGroup.split(':');
+    if (locationQueryGroupSplit.length > 1) {
+      const taxonomy = connectedTaxonomies.taxonomies[parseInt(locationQueryGroupSplit[1], 10)];
+      if (taxonomy) {
+        return makeConnectedTaxonomyGroups(entitiesSorted, taxonomy, filters);
       }
     }
+    return [{ entities: entitiesSorted }];
   }
-  return groups;
+  return [{ entities: entitiesSorted }];
 };
 
 export const makeTaxonomyGroups = (entities, taxonomy) => {
