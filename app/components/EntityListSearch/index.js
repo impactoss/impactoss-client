@@ -94,7 +94,6 @@ export class EntityListSearch extends React.Component { // eslint-disable-line r
         </Tags>
         <Search
           id="search"
-          autoFocus
           minLength={1}
           debounceTimeout={300}
           value={searchQuery || ''}
