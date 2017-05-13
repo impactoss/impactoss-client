@@ -7,7 +7,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 import { Map, List, fromJS } from 'immutable';
 import { orderBy, reduce } from 'lodash/collection';
