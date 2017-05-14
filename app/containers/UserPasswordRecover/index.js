@@ -1,6 +1,6 @@
 /*
  *
- * UserPasswordReset
+ * UserPasswordRecover
  *
  */
 
@@ -15,11 +15,11 @@ import SimpleForm from 'components/forms/SimpleForm';
 
 import { updatePath } from 'containers/App/actions';
 
-import { reset } from './actions';
-import makeUserPasswordResetSelector from './selectors';
+import { recover } from './actions';
+import makeUserPasswordRecoverSelector from './selectors';
 import messages from './messages';
 
-export class UserPasswordReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class UserPasswordRecover extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const required = (val) => val && val.length;
 
@@ -45,38 +45,26 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
               },
               {
                 type: 'primary',
-                title: 'Reset',
+                title: 'Recover',
                 onClick: () => this.props.handleSubmit(
-                  this.props.userPasswordReset.form.data
+                  this.props.userPasswordRecover.form.data
                 ),
               },
             ]
           }
         >
-          { this.props.userPasswordReset.form &&
+          { this.props.userPasswordRecover.form &&
             <SimpleForm
-              model="userPasswordReset.form.data"
+              model="userPasswordRecover.form.data"
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
-              labels={{ submit: 'Reset password' }}
+              labels={{ submit: 'Recover password' }}
               fields={[
                 {
-                  id: 'password',
+                  id: 'email',
                   controlType: 'input',
-                  model: '.password',
-                  placeholder: this.context.intl.formatMessage(messages.fields.password.placeholder),
-                  validators: {
-                    required,
-                  },
-                  errorMessages: {
-                    required: this.context.intl.formatMessage(messages.fieldRequired),
-                  },
-                },
-                {
-                  id: 'passwordConfirmation',
-                  controlType: 'input',
-                  model: '.passwordConfirmation',
-                  placeholder: this.context.intl.formatMessage(messages.fields.passwordConfirmation.placeholder),
+                  model: '.email',
+                  placeholder: this.context.intl.formatMessage(messages.fields.email.placeholder),
                   validators: {
                     required,
                   },
@@ -93,24 +81,24 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
   }
 }
 
-UserPasswordReset.propTypes = {
-  userPasswordReset: PropTypes.object.isRequired,
+UserPasswordRecover.propTypes = {
+  userPasswordRecover: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
 };
 
-UserPasswordReset.contextTypes = {
+UserPasswordRecover.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({
-  userPasswordReset: makeUserPasswordResetSelector(),
+  userPasswordRecover: makeUserPasswordRecoverSelector(),
 });
 
 export function mapDispatchToProps(dispatch) {
   return {
     handleSubmit: (formData) => {
-      dispatch(reset(formData.toJS()));
+      dispatch(recover(formData.toJS()));
     },
     handleCancel: () => {
       dispatch(updatePath('/'));
@@ -118,4 +106,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserPasswordReset);
+export default connect(mapStateToProps, mapDispatchToProps)(UserPasswordRecover);

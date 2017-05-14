@@ -23,10 +23,16 @@ export default defineMessages({
     defaultMessage: 'Required',
   },
   fields: {
-    email: {
+    password: {
       placeholder: {
-        id: 'app.containers.UserPasswordReset.fields.email.placeholder',
-        defaultMessage: 'Email address',
+        id: 'app.containers.UserPasswordReset.fields.password.placeholder',
+        defaultMessage: 'Password',
+      },
+    },
+    passwordConfirmation: {
+      placeholder: {
+        id: 'app.containers.UserPasswordReset.fields.passwordConfirmation.placeholder',
+        defaultMessage: 'Confirm Password',
       },
     },
   },

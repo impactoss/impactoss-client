@@ -22,9 +22,13 @@ export default defineMessages({
     id: 'app.containers.UserLogin.header',
     defaultMessage: 'Required',
   },
-  resetPasswordLink: {
-    id: 'app.containers.UserLogin.resetPasswordLink',
-    defaultMessage: 'Reset password',
+  registerLink: {
+    id: 'app.containers.UserLogin.registerLink',
+    defaultMessage: 'Do not have an account? Register here',
+  },
+  recoverPasswordLink: {
+    id: 'app.containers.UserLogin.recoverPasswordLink',
+    defaultMessage: 'Forgot your password? Recover',
   },
   fields: {
     email: {

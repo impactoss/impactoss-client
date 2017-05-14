@@ -22,7 +22,8 @@ import {
   AUTHENTICATE_FORWARD,
   USER_ROLES,
   UPDATE_PATH,
-  RESET_PASSWORD,
+  // RESET_PASSWORD,
+  RECOVER_PASSWORD,
 } from 'containers/App/constants';
 
 import {
@@ -128,23 +129,48 @@ export function* authenticateSaga(payload) {
     yield put(authenticateError(err));
   }
 }
+// moved to UserPasswordReset
+//
+// export function* resetSaga(payload) {
+//   const { password, passwordConfirmation } = payload.data;
+//   try {
+//     const location = yield select(selectLocation);
+//     const query = location.get('query');
+//     yield call(
+//       apiRequest,
+//       'put',
+//       'auth/password',
+//       {
+//         password,
+//         password_confirmation: passwordConfirmation,
+//       },
+//       {
+//         client: query.get('client_id'),
+//         reset_password: query.get('reset_password'),
+//         'access-token': query.get('token'),
+//         uid: query.get('uid'),
+//         expiry: query.get('expiry'),
+//       }
+//     );
+//     yield put(push('/login'));
+//   } catch (err) {
+//     err.response.json = yield err.response.json();
+//     // yield put(authenticateError(err));
+//   }
+// }
 
-export function* resetSaga(payload) {
+export function* recoverSaga(payload) {
+  // TODO messages
   const { email } = payload.data;
-
   try {
-    // yield put(authenticateSending());
-    // const response = yield call(apiRequest, 'post', 'auth/password', {
     yield call(apiRequest, 'post', 'auth/password', {
       email,
-      edirect_url: '//sadata-test.s3-website-ap-southeast-2.amazonaws.com/login/', // TODO WIP
+      redirect_url: `${window.location.origin}/resetpassword`, // TODO WIP
     });
-    // yield put(authenticateSuccess(response.data));
-    // yield put(forwardOnAuthenticationChange());
-    // yield put(invalidateEntities());
+    // forward to login
+    yield put(push('/login'));
   } catch (err) {
     err.response.json = yield err.response.json();
-    // yield put(authenticateError(err));
   }
 }
 
@@ -446,7 +472,8 @@ export default function* rootSaga() {
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
-  yield takeLatest(RESET_PASSWORD, resetSaga);
+  // yield takeLatest(RESET_PASSWORD, resetSaga);
+  yield takeLatest(RECOVER_PASSWORD, recoverSaga);
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
 

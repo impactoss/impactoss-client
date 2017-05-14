@@ -7,9 +7,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-// import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
-import { Link } from 'react-router';
 
 import Page from 'components/Page';
 import SimpleForm from 'components/forms/SimpleForm';
@@ -61,7 +59,6 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               <p key={i}>{errorMessage}</p>
             )
           }
-          <Link to="register">Do not have an account? Register here</Link>
           { this.props.userLogin.form &&
             <SimpleForm
               model="userLogin.form.data"
@@ -94,12 +91,18 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                   },
                 },
                 {
-                  id: 'passwordReset',
+                  id: 'register',
                   controlType: 'link',
-                  path: '/login/reset/',
                   label: false,
-                  text: this.context.intl.formatMessage(messages.resetPasswordLink),
-                  onClick: this.props.handleReset,
+                  text: this.context.intl.formatMessage(messages.registerLink),
+                  onClick: () => this.props.handleLink('/register'),
+                },
+                {
+                  id: 'passwordRecover',
+                  controlType: 'link',
+                  label: false,
+                  text: this.context.intl.formatMessage(messages.recoverPasswordLink),
+                  onClick: () => this.props.handleLink('/recoverpassword'),
                 },
               ]}
             />
@@ -115,7 +118,7 @@ UserLogin.propTypes = {
   authentication: PropTypes.object,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleReset: PropTypes.func.isRequired,
+  handleLink: PropTypes.func.isRequired,
 };
 
 UserLogin.contextTypes = {
@@ -135,8 +138,8 @@ export function mapDispatchToProps(dispatch) {
     handleCancel: () => {
       dispatch(updatePath('/'));
     },
-    handleReset: () => {
-      dispatch(updatePath('/login/reset/'));
+    handleLink: (path) => {
+      dispatch(updatePath(path));
     },
   };
 }

@@ -49,6 +49,7 @@ import {
   DUEDATE_ASSIGNED,
   DUEDATE_UNASSIGNED,
   RESET_PASSWORD,
+  RECOVER_PASSWORD,
 } from './constants';
 
 
@@ -241,6 +242,12 @@ export function authenticate(data) {
 export function resetPassword(data) {
   return {
     type: RESET_PASSWORD,
+    data,
+  };
+}
+export function recoverPassword(data) {
+  return {
+    type: RECOVER_PASSWORD,
     data,
   };
 }
