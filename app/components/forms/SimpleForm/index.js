@@ -10,6 +10,7 @@ import FormBody from '../FormBody';
 import FormFooter from '../FormFooter';
 import ControlInfo from '../ControlInfo';
 import ControlInput from '../ControlInput';
+import ControlLink from '../ControlLink';
 import ControlTextArea from '../ControlTextArea';
 import ControlSelect from '../ControlSelect';
 import Label from '../Label';
@@ -24,6 +25,7 @@ const controls = {
   file: Control.file,
   select: ControlSelect,
   button: Control.button,
+  link: ControlLink,
 };
 
 // These props will be omitted before being passed to the Control component
@@ -65,9 +67,11 @@ class SimpleForm extends React.PureComponent { // eslint-disable-line react/pref
 
   renderSection = (fields) => fields.map((field, index) => (
     <Field key={index}>
-      <Label htmlFor={field.id}>
-        {`${field.label || startCase(field.id)} ${field.validators && field.validators.required ? '*' : ''}`}
-      </Label>
+      { field.label !== false &&
+        <Label htmlFor={field.id}>
+          {`${field.label || startCase(field.id)} ${field.validators && field.validators.required ? '*' : ''}`}
+        </Label>
+      }
       {this.renderField(field)}
       {
         field.errorMessages &&

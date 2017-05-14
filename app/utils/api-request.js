@@ -62,12 +62,13 @@ function addAuthHeaders(headers = {}) {
 }
 
 
-function getHeaders() {
+function getHeaders(headers = {}) {
   return addAuthHeaders({
     // and always add these headers
     Accept: 'application/json',
     'Content-Type': 'application/json',
     'If-Modified-Since': 'Mon, 26 Jul 1997 05:00:00 GMT', // Bust IE Cache
+    ...headers,
   });
 }
 
@@ -84,8 +85,8 @@ export function isSignedIn() {
   return !!get(KEY_ACCESS_TOKEN);
 }
 
-export default function apiRequest(method, action, params = {}) {
-  const headers = getHeaders();
+export default function apiRequest(method, action, params = {}, headerArgs = {}) {
+  const headers = getHeaders(headerArgs);
   let url = `${API_ENDPOINT}/${action}`;
   let options = {
     method,

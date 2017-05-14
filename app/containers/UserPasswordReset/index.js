@@ -1,27 +1,26 @@
 /*
  *
- * UserLogin
+ * UserPasswordReset
  *
  */
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+// import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 
 import Page from 'components/Page';
 import SimpleForm from 'components/forms/SimpleForm';
 
 import { updatePath } from 'containers/App/actions';
-import { makeSelectAuth } from 'containers/App/selectors';
 
-import { login } from './actions';
-import makeUserLoginSelector from './selectors';
+import { reset } from './actions';
+import makeUserPasswordResetSelector from './selectors';
 import messages from './messages';
 
-export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class UserPasswordReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { error, messages: message } = this.props.authentication;
     const required = (val) => val && val.length;
 
     return (
@@ -46,38 +45,21 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               },
               {
                 type: 'primary',
-                title: 'Login',
+                title: 'Reset',
                 onClick: () => this.props.handleSubmit(
-                  this.props.userLogin.form.data
+                  this.props.userPasswordReset.form.data
                 ),
               },
             ]
           }
         >
-          {error &&
-            message.map((errorMessage, i) =>
-              <p key={i}>{errorMessage}</p>
-            )
-          }
-          { this.props.userLogin.form &&
+          { this.props.userPasswordReset.form &&
             <SimpleForm
-              model="userLogin.form.data"
+              model="userPasswordReset.form.data"
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
-              labels={{ submit: 'Log in' }}
+              labels={{ submit: 'Reset password' }}
               fields={[
-                {
-                  id: 'email',
-                  controlType: 'input',
-                  model: '.email',
-                  placeholder: this.context.intl.formatMessage(messages.fields.email.placeholder),
-                  validators: {
-                    required,
-                  },
-                  errorMessages: {
-                    required: this.context.intl.formatMessage(messages.fieldRequired),
-                  },
-                },
                 {
                   id: 'password',
                   controlType: 'input',
@@ -91,18 +73,16 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                   },
                 },
                 {
-                  id: 'register',
-                  controlType: 'link',
-                  label: false,
-                  text: this.context.intl.formatMessage(messages.registerLink),
-                  onClick: () => this.props.handleLink('/register'),
-                },
-                {
-                  id: 'passwordRecover',
-                  controlType: 'link',
-                  label: false,
-                  text: this.context.intl.formatMessage(messages.recoverPasswordLink),
-                  onClick: () => this.props.handleLink('/recoverpassword'),
+                  id: 'passwordConfirmation',
+                  controlType: 'input',
+                  model: '.passwordConfirmation',
+                  placeholder: this.context.intl.formatMessage(messages.fields.passwordConfirmation.placeholder),
+                  validators: {
+                    required,
+                  },
+                  errorMessages: {
+                    required: this.context.intl.formatMessage(messages.fieldRequired),
+                  },
                 },
               ]}
             />
@@ -113,35 +93,29 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
   }
 }
 
-UserLogin.propTypes = {
-  userLogin: PropTypes.object.isRequired,
-  authentication: PropTypes.object,
+UserPasswordReset.propTypes = {
+  userPasswordReset: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleLink: PropTypes.func.isRequired,
 };
 
-UserLogin.contextTypes = {
+UserPasswordReset.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({
-  userLogin: makeUserLoginSelector(),
-  authentication: makeSelectAuth(),
+  userPasswordReset: makeUserPasswordResetSelector(),
 });
 
 export function mapDispatchToProps(dispatch) {
   return {
     handleSubmit: (formData) => {
-      dispatch(login(formData.toJS()));
+      dispatch(reset(formData.toJS()));
     },
     handleCancel: () => {
       dispatch(updatePath('/'));
     },
-    handleLink: (path) => {
-      dispatch(updatePath(path));
-    },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserLogin);
+export default connect(mapStateToProps, mapDispatchToProps)(UserPasswordReset);

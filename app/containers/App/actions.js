@@ -48,6 +48,8 @@ import {
   UPDATE_ENTITY_FORM,
   DUEDATE_ASSIGNED,
   DUEDATE_UNASSIGNED,
+  RESET_PASSWORD,
+  RECOVER_PASSWORD,
 } from './constants';
 
 
@@ -233,6 +235,19 @@ export function authenticateSending(sending) {
 export function authenticate(data) {
   return {
     type: AUTHENTICATE,
+    data,
+  };
+}
+
+export function resetPassword(data) {
+  return {
+    type: RESET_PASSWORD,
+    data,
+  };
+}
+export function recoverPassword(data) {
+  return {
+    type: RECOVER_PASSWORD,
     data,
   };
 }
