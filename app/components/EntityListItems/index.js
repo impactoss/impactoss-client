@@ -15,7 +15,7 @@ const Styled = styled.div`
 const ItemWrapper = styled.div`
   border-top: 1px solid;
   padding: ${(props) => props.separated ? '0.5em 0 2.5em' : '0'};
-  border-color: ${(props) => props.separated ? palette('greyscaleDark', 4) : 'transparent'}
+  border-color: ${(props) => props.separated ? palette('greyscaleLight', 4) : 'transparent'}
 `;
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
