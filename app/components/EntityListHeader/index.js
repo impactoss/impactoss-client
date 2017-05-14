@@ -61,8 +61,8 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
     const firstColumn = columns.shift();
     return (
       <Styled>
-        { columns.length && this.renderFirstColumn(firstColumn) }
-        { columns.length &&
+        { firstColumn && this.renderFirstColumn(firstColumn) }
+        { columns.length > 0 &&
           <ColumnNestedWrap width={1 - firstColumn.width}>
             { columns.map((col, i) => this.renderColumn(col, i)) }
           </ColumnNestedWrap>
