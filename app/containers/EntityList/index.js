@@ -112,11 +112,15 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           }
         // else if !nested // isExpand
         } else if (isExpand) {
-          width = 0.5;
-        } else if (expandNo === i) {
-          width = 0.34;
-        } else {
-          width = 0.5;
+          if (exCols.length > 1) {
+            width = 0.5;
+          }
+        } else if (exCols.length > 1) {
+          if (expandNo === i) {
+            width = 0.34;
+          } else {
+            width = 0.5;
+          }
         }
 
         return {
