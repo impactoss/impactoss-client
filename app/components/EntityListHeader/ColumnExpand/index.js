@@ -5,9 +5,9 @@ import { palette } from 'styled-theme';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 
+
 const Styled = styled(Button)`
-  flex: ${(props) => props.colWidth ? '0 1 auto' : 1};
-  width: ${(props) => props.colWidth || 'auto'};
+  width:${(props) => props.width * 100}%;
   display: inline-block;
   padding: 0.25em 1em;
   border-right: 1px solid ${palette('greyscaleLight', 2)};
@@ -29,11 +29,11 @@ const IconWrap = styled.div`
 class ColumnExpand extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { isExpand, label, colWidth, onExpand } = this.props;
+    const { isExpand, label, width, onExpand } = this.props;
     return (
       <Styled
         onClick={onExpand}
-        colWidth={colWidth}
+        width={width}
       >
         <Label>{label}</Label>
         <IconWrap>
@@ -52,11 +52,10 @@ ColumnExpand.propTypes = {
   isExpand: PropTypes.bool,
   onExpand: PropTypes.func,
   label: PropTypes.string,
-  colWidth: PropTypes.string,
+  width: PropTypes.number,
 };
 ColumnExpand.defaultProps = {
   label: 'label',
-  colWidth: '100%',
 };
 
 export default ColumnExpand;

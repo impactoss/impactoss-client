@@ -26,7 +26,6 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
       showDate,
       onExpand,
     } = props;
-
     return {
       id: entity.id,
       title: entity.attributes.name || entity.attributes.title,

@@ -38,7 +38,11 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     ? Object.values(indicator.dates)
     : [];
   getIndicators = (action) => action.indicators
-    ? Object.values(action.indicators).map((indicatorAssociation) => indicatorAssociation.indicator)
+    ? Object.values(action.indicators).reduce((memo, indicatorAssociation) =>
+      indicatorAssociation.indicator
+        ? memo.concat([indicatorAssociation.indicator])
+        : memo
+    , [])
     : [];
 
   getReportCount = (actionOrIndicator) => {

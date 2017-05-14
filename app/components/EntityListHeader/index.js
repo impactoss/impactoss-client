@@ -2,63 +2,71 @@ import React, { PropTypes } from 'react';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import Column from './Column';
 import ColumnSelect from './ColumnSelect';
 import ColumnExpand from './ColumnExpand';
 
 const Styled = styled.div`
   width:100%;
   background-color: ${palette('greyscaleLight', 1)};
-  display: flex;
-  flex-direction: row;
 `;
-
-const Column = styled.div`
-  width:${(props) => props.colWidth || 100}%;
+const ColumnNestedWrap = styled.div`
+  width:${(props) => props.width * 100}%;
+  background-color: ${palette('greyscaleLight', 1)};
   display: inline-block;
-  padding: 0.25em 1em;
-  border-right: 1px solid ${palette('greyscaleLight', 2)};
-  font-size: 0.85em;
-  &:last-child {
-    border-right: none;
-  }
 `;
 
 class EntityListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  renderColumn = (col, i) => {
+  renderFirstColumn = (col) => {
     const { isSelected, onSelect } = this.props;
-    if (col.isSelect && i === 0) {
+    if (col.isSelect) {
       return (
         <ColumnSelect
-          key={i}
           isSelected={isSelected}
           onSelect={onSelect}
           label={col.label}
-          colWidth={col.width === 'fixed' ? '50%' : null}
+          width={col.width}
         />
       );
     }
-    if (!col.isSelect && col.isExpandable) {
+    return (
+      <Column width={col.width}>
+        {col.label}
+      </Column>
+    );
+  }
+  renderColumn = (col, i) => {
+    if (col.isExpandable) {
       return (
         <ColumnExpand
           key={i}
           isExpand={col.isExpand}
           onExpand={col.onExpand}
           label={col.label}
-          colWidth={col.width === 'fixed' ? '150px' : null}
+          width={col.width}
         />
       );
     }
     return (
-      <Column key={i} colWidth={col.width}>
+      <Column
+        key={i}
+        width={col.width}
+      >
         {col.label}
       </Column>
     );
   }
   render() {
     const { columns } = this.props;
+    const firstColumn = columns.shift();
     return (
       <Styled>
-        { columns.map((col, i) => this.renderColumn(col, i)) }
+        { columns.length && this.renderFirstColumn(firstColumn) }
+        { columns.length &&
+          <ColumnNestedWrap width={1 - firstColumn.width}>
+            { columns.map((col, i) => this.renderColumn(col, i)) }
+          </ColumnNestedWrap>
+        }
       </Styled>
     );
   }

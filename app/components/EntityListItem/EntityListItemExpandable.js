@@ -3,13 +3,12 @@ import styled from 'styled-components';
 
 import Component from 'components/basic/Component';
 
-const Expandable = styled(Component)`
-  display: table-cell;
+const Styled = styled(Component)`
   background: #fff;
   display: table-cell;
   text-align: center;
   cursor: pointer;
-  width: 150px;
+  width:${(props) => props.width * 100}%;
   border-left: 2px solid #F1F3F3;
   vertical-align: top;
 `;
@@ -34,6 +33,7 @@ export default class EntityListItemExpandable extends React.PureComponent { // e
     count: PropTypes.number,
     info: PropTypes.array,
     onClick: PropTypes.func,
+    width: PropTypes.number,
   }
 
   static defaultProps = {
@@ -46,10 +46,11 @@ export default class EntityListItemExpandable extends React.PureComponent { // e
       onClick,
       info,
       label,
+      width,
     } = this.props;
 
     return (
-      <Expandable onClick={onClick}>
+      <Styled width={width} onClick={onClick}>
         <div>{label}</div>
         <Count>{count}</Count>
         { info &&
@@ -57,7 +58,7 @@ export default class EntityListItemExpandable extends React.PureComponent { // e
             (<Info key={i}>{infoLine}</Info>)
           )
         }
-      </Expandable>
+      </Styled>
     );
   }
 }

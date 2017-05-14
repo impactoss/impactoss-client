@@ -1,18 +1,11 @@
 import React, { PropTypes } from 'react';
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 import IndeterminateCheckbox from 'components/forms/IndeterminateCheckbox';
+import Column from '../Column';
 
-const Styled = styled.div`
-  flex: ${(props) => props.colWidth ? '0 1 auto' : 1};
-  width: ${(props) => props.colWidth || 'auto'};
+const Styled = styled(Column)`
   padding: 0.25em 0;
-  border-right: 1px solid ${palette('greyscaleLight', 2)};
-  font-size: 0.85em;
-  &:last-child {
-    border-right: none;
-  }
 `;
 const CheckboxWrap = styled.div`
   width: 30px;
@@ -31,9 +24,11 @@ const Label = styled.label`
 class ColumnSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { isSelected, onSelect, label, colWidth } = this.props;
+    const { isSelected, onSelect, width, label } = this.props;
     return (
-      <Styled colWidth={colWidth}>
+      <Styled
+        width={width}
+      >
         <CheckboxWrap>
           <Checkbox
             id="select-all"
@@ -50,7 +45,7 @@ ColumnSelect.propTypes = {
   isSelected: PropTypes.bool,
   onSelect: PropTypes.func,
   label: PropTypes.string,
-  colWidth: PropTypes.string,
+  width: PropTypes.number,
 };
 ColumnSelect.defaultProps = {
   label: 'label',
