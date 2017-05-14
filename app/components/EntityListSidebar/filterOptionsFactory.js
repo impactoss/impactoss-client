@@ -29,6 +29,9 @@ export const makeAttributeFilterOptions = (entities, filters, activeFilterOption
   const filterOptions = {
     groupId: 'attributes',
     options: {},
+    multiple: true,
+    required: false,
+    filter: true,
   };
   // the attribute option
   const option = find(filters.attributes.options, (o) => o.attribute === activeFilterOption.optionId);
@@ -65,7 +68,9 @@ export const makeAttributeFilterOptions = (entities, filters, activeFilterOption
           const value = entity.attributes[option.attribute].toString();
           const queryValue = `${option.attribute}:${value}`;
           // add connected entities if not present otherwise increase count
-          if (option.extension && !!entity[option.extension.key]) {
+          if (filterOptions.options[value]) {
+            filterOptions.options[value].count += 1;
+          } else if (option.extension && !!entity[option.extension.key]) {
             const extension = Object.values(entity[option.extension.key])[0];
             filterOptions.options[value] = {
               label: extension ? extension.attributes[option.extension.label] : upperFirst(value),
@@ -76,8 +81,6 @@ export const makeAttributeFilterOptions = (entities, filters, activeFilterOption
               checked: optionChecked(locationQueryValue, queryValue),
               order: extension ? extension.attributes[option.extension.label] : value,
             };
-          } else if (filterOptions.options[value]) {
-            filterOptions.options[value].count += 1;
           } else if (option.options) {
             const attribute = find(option.options, (o) => o.value.toString() === value);
             const label = attribute ? attribute.label : upperFirst(value);
@@ -126,6 +129,8 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeF
     groupId: 'taxonomies',
     filter: filters.taxonomies.filter,
     options: {},
+    multiple: true,
+    required: false,
   };
   // get the active taxonomy
   const taxonomy = taxonomies[parseInt(activeFilterOption.optionId, 10)];
@@ -228,6 +233,9 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
   const filterOptions = {
     groupId: 'connections',
     options: {},
+    multiple: true,
+    required: false,
+    filter: true,
   };
   // get the active option
   const option = find(filters.connections.options, (o) => o.path === activeFilterOption.optionId);
@@ -336,6 +344,8 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
     groupId: 'connectedTaxonomies',
     filter: filters.connectedTaxonomies.filter,
     options: {},
+    multiple: true,
+    required: false,
   };
 
   const taxonomy = connectedTaxonomies.taxonomies[parseInt(activeFilterOption.optionId, 10)];

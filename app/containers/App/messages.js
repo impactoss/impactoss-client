@@ -16,6 +16,20 @@ export default defineMessages({
       defaultMessage: 'Samoa\'s home of human rights implementation',
     },
   },
+  buttons: {
+    cancel: {
+      id: 'app.containers.App.buttons.cancel',
+      defaultMessage: 'Cancel',
+    },
+    close: {
+      id: 'app.containers.App.buttons.close',
+      defaultMessage: 'close',
+    },
+    assign: {
+      id: 'app.containers.App.buttons.assign',
+      defaultMessage: 'assign',
+    },
+  },
   attributes: {
     draft: {
       id: 'app.containers.App.attributes.draft',

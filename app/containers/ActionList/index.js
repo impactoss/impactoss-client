@@ -18,8 +18,6 @@ import { isReady } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 import messages from './messages';
 
-const expand = (props) => props.location.query.expand;
-
 export class ActionList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
@@ -40,7 +38,11 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     ? Object.values(indicator.dates)
     : [];
   getIndicators = (action) => action.indicators
-    ? Object.values(action.indicators).map((indicatorAssociation) => indicatorAssociation.indicator)
+    ? Object.values(action.indicators).reduce((memo, indicatorAssociation) =>
+      indicatorAssociation.indicator
+        ? memo.concat([indicatorAssociation.indicator])
+        : memo
+    , [])
     : [];
 
   getReportCount = (actionOrIndicator) => {
@@ -82,8 +84,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         overdue += date.attributes.overdue ? 1 : 0;
       });
     }
-    if (due) info.push(`${due} reports due`);
-    if (overdue) info.push(`${overdue} reports overdue`);
+    if (due) info.push(`${due} due`);
+    if (overdue) info.push(`${overdue} overdue`);
     return info;
   }
   getIndicatorCount = (action) => action.indicators
@@ -91,8 +93,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     : 0;
 
   render() {
-    const { dataReady } = this.props;
-
+    const { dataReady, location } = this.props;
+    const expandNo = location.query.expand;
     const expandableColumns = [
       {
         label: 'Indicators',
@@ -100,6 +102,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         getCount: this.getIndicatorCount,
         getEntities: this.getIndicators,
         entityLinkTo: '/indicators/',
+        icon: 'indicators',
       },
       {
         label: 'Progress reports',
@@ -109,6 +112,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         getReports: this.getReports,
         getDates: this.getDates,
         entityLinkTo: '/reports/',
+        icon: 'reminder',
       },
     ];
 
@@ -145,7 +149,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
               key: 'indicator_id',
               as: 'indicator',
               type: 'single',
-              extend: expand(this.props) ? [
+              extend: expandNo ? [
                 {
                   path: 'progress_reports',
                   key: 'indicator_id',
@@ -237,6 +241,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
 
     // specify the filter and query options
     const filters = {
+      search: ['title'],
       attributes: {  // filter by attribute value
         options: [
           {
@@ -346,10 +351,11 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     };
 
     const headerOptions = {
-      title: this.context.intl.formatMessage(messages.header),
+      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      icon: 'actions',
       actions: [{
-        type: 'primary',
-        title: 'New action',
+        type: 'add',
+        title: this.context.intl.formatMessage(messages.add),
         onClick: () => this.props.handleNew(),
       }],
     };
@@ -374,8 +380,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
           }}
           entityLinkTo="/actions/"
-          expand={expand(this.props) ? parseInt(expand(this.props), 10) : 0}
-          expandable
+          expandNo={expandNo ? parseInt(expandNo, 10) : 0}
+          isExpandable
           expandableColumns={expandableColumns}
         />
       </div>

@@ -42,6 +42,7 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
 
     // specify the filter and query  options
     const filters = {
+      search: ['title'],
       attributes: {  // filter by attribute value
         label: 'By attribute',
         options: [
@@ -68,10 +69,11 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
       },
     };
     const headerOptions = {
-      title: this.context.intl.formatMessage(messages.header),
+      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      icon: 'pages',
       actions: [{
-        type: 'primary',
-        title: 'New page',
+        type: 'add',
+        title: this.context.intl.formatMessage(messages.add),
         onClick: () => this.props.handleNew(),
       }],
     };

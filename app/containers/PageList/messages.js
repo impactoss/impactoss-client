@@ -8,18 +8,14 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   pageTitle: {
     id: 'app.container.PageList.pageTitle',
-    defaultMessage: 'Pages',
+    defaultMessage: 'Pages overview',
   },
   metaDescription: {
     id: 'app.container.PageList.metaDescription',
     defaultMessage: 'Pages page description',
   },
-  header: {
-    id: 'app.containers.PageList.header',
-    defaultMessage: 'Pages',
-  },
-  loading: {
-    id: 'app.containers.PageList.loading',
-    defaultMessage: 'Loading data...',
+  add: {
+    id: 'app.containers.PageList.add',
+    defaultMessage: 'Add page',
   },
 });

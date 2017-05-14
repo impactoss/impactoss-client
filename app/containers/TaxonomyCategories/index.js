@@ -28,6 +28,7 @@ import appMessages from 'containers/App/messages';
 import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
 import Container from 'components/basic/Container';
 import Sidebar from 'components/basic/Sidebar';
+import Scrollable from 'components/basic/Scrollable';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
@@ -95,12 +96,12 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
     const { taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
 
     const taxonomy = dataReady ? taxonomies[parseInt(params.id, 10)] : null;
-    const pageTitle = dataReady ? this.getTaxTitle(taxonomy.id) : '';
+    const contentTitle = dataReady ? this.getTaxTitle(taxonomy.id) : '';
 
     const pageActions = dataReady && isManager
       ? [{
-        type: 'primary',
-        title: '+ Add Category',
+        type: 'add',
+        title: this.context.intl.formatMessage(messages.add),
         onClick: () => this.props.handleNew(taxonomy.id),
       }]
       : null;
@@ -110,15 +111,17 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.supTitle)}: ${pageTitle}`}
+          title={`${this.context.intl.formatMessage(messages.supTitle)}: ${contentTitle}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Sidebar>
-          <TaxonomySidebar
-            taxonomies={mapToTaxonomyList(taxonomies, onPageLink, params.id, false)}
-          />
+          <Scrollable>
+            <TaxonomySidebar
+              taxonomies={mapToTaxonomyList(taxonomies, onPageLink, params.id, false)}
+            />
+          </Scrollable>
         </Sidebar>
         <ContainerWithSidebar>
           <Container>
@@ -127,7 +130,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
                 type={CONTENT_LIST}
                 icon="categories"
                 supTitle={this.context.intl.formatMessage(messages.supTitle)}
-                title={pageTitle}
+                title={contentTitle}
                 actions={pageActions}
               />
               { !dataReady &&
@@ -167,6 +170,11 @@ const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
     'categories',
     'taxonomies',
+    'recommendation_categories',
+    'recommendations',
+    'measure_categories',
+    'measures',
+    'user_roles',
   ] }),
   taxonomies: getEntities(
     state,
@@ -189,16 +197,24 @@ const mapStateToProps = (state, props) => ({
           path: 'recommendation_categories',
           key: 'category_id',
           reverse: true,
-          out: 'js',
           as: 'recommendations',
+          connected: {
+            path: 'recommendations',
+            key: 'recommendation_id',
+            forward: true,
+          },
         },
         {
           type: 'count',
           path: 'measure_categories',
           key: 'category_id',
           reverse: true,
-          out: 'js',
           as: 'actions',
+          connected: {
+            path: 'measures',
+            key: 'measure_id',
+            forward: true,
+          },
         },
       ],
     }
@@ -211,7 +227,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
     handleNew: (taxonomyId) => {

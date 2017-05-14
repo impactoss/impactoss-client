@@ -65,6 +65,8 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
     options: {},
     selectedCount: entities.length,
     multiple: true,
+    required: false,
+    filter: true,
   };
 
   const taxonomy = taxonomies[parseInt(activeEditOption.optionId, 10)];
@@ -98,6 +100,8 @@ export const makeConnectionEditOptions = (entities, edits, connections, activeEd
     options: {},
     selectedCount: entities.length,
     multiple: true,
+    required: false,
+    filter: true,
   };
 
   const option = find(edits.connections.options, (o) => o.path === activeEditOption.optionId);

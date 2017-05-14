@@ -8,18 +8,14 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   pageTitle: {
     id: 'app.container.ActionList.pageTitle',
-    defaultMessage: 'Actions',
+    defaultMessage: 'Actions overview',
   },
   metaDescription: {
     id: 'app.container.ActionList.metaDescription',
     defaultMessage: 'Actions page description',
   },
-  header: {
-    id: 'app.containers.ActionList.header',
-    defaultMessage: 'Actions',
-  },
-  loading: {
-    id: 'app.containers.ActionList.loading',
-    defaultMessage: 'Loading actions...',
+  add: {
+    id: 'app.containers.ActionList.add',
+    defaultMessage: 'Add action',
   },
 });

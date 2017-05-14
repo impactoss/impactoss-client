@@ -8,7 +8,7 @@ import TaxonomySidebarItem from 'components/TaxonomySidebarItem';
 
 import messages from './messages';
 
-const Top = styled.div`
+const Header = styled.div`
   padding: 3em 2em 1em;
   background-color: ${palette('greyscaleLight', 2)}
 `;
@@ -19,9 +19,9 @@ class TaxonomySidebar extends React.Component { // eslint-disable-line react/pre
 
     return (
       <Component>
-        <Top>
+        <Header>
           <SupTitle title={this.context.intl.formatMessage(messages.title)} />
-        </Top>
+        </Header>
         {taxonomies.map((taxonomy, i) =>
           <TaxonomySidebarItem key={i} taxonomy={taxonomy} />
         )}

@@ -6,6 +6,7 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Map, List, fromJS } from 'immutable';
@@ -18,12 +19,17 @@ import ContainerWithSidebar from 'components/basic/Container/ContainerWithSideba
 import Container from 'components/basic/Container';
 import Sidebar from 'components/basic/Sidebar';
 import Loading from 'components/Loading';
-import PageHeader from 'components/PageHeader';
+import ContentHeader from 'components/ContentHeader';
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListItems from 'components/EntityListItems';
-import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
+import EntityListSearch from 'components/EntityListSearch';
+import EntityListOptions from 'components/EntityListOptions';
+import EntityListHeader from 'components/EntityListHeader';
+import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
+
+import { CONTENT_LIST } from 'containers/App/constants';
 
 import { makeCurrentFilters } from './filtersFactory';
 import {
@@ -51,55 +57,23 @@ import {
   updateGroup,
 } from './actions';
 
-import {
-  UNGROUP,
-} from './constants';
-
 import messages from './messages';
 
-const Styled = styled.div`
-  padding:0 20px;
+const Content = styled.div`
+  padding: 0 4em;
 `;
+
+
 const ListEntities = styled.div``;
-const ListEntitiesTopFilters = styled.div``;
-const ListEntitiesHeaderOptionLinks = styled.div`
-  float:right;
+const ListEntitiesMain = styled.div`
+  padding-top: 0.5em;
 `;
-const ListEntitiesHeaderOptionLink = styled.button`
-  font-weight: bold;
-  color: #EB6E51;
-  font-size: 0.9;
-  cursor: pointer;
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-const ListEntitiesHeaderOptions = styled.div``;
-const ListEntitiesHeader = styled.div`
-  clear: both;
-  background: #ccc
-  padding: 2px 5px ;
-`;
-const ListEntitiesSelectAll = styled.div``;
-const ListEntitiesMain = styled.div``;
 const ListEntitiesEmpty = styled.div``;
-const Tag = styled.button`
-  display: inline-block;
-  background: #ccc;
-  padding: 1px 6px;
-  margin: 0 3px;
-  border-radius: 3px;
-  font-size: 0.8em;
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-const Button = styled(Tag)`
-  cursor: pointer;
-`;
-const ListEntitiesHeaderOptionGroup = styled.span``;
+const ListEntitiesGroup = styled.div``;
+const ListEntitiesGroupHeader = styled.h3``;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
   // TODO figure out why component updates when child component (sidebar option) internal state changes
   //    possibly due to form model changes
   //    consider moving form reducer to sidebar or use local form
@@ -108,35 +82,55 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   //   const s_np = JSON.stringify(nextProps)
   //   return s_np !== s_p
   // }
-  renderGroupingOptions = (
-    onGroupSelect,
-    locationQueryGroup,
-    filters,
-    taxonomies,
-    connectedTaxonomies,
-  ) => {
-    const group = locationQueryGroup || UNGROUP;
 
-    const options = makeGroupOptions(filters, taxonomies, connectedTaxonomies, group, locationQueryGroup ? 'X Reset' : 'Group by category');
+  getHeaderColumns = (label, isSelect, isExpandable, expandNo, expandableColumns, handleExpandLink) => {
+    // TODO figure out a betterway to determine column widths. this is terrible
+    let width = 1;
+    // if nested
+    if (isExpandable && expandableColumns.length > 0) {
+      width = expandNo > 0 ? 0.5 : 0.66;
+    }
+    const columns = [{
+      label,
+      isSelect,
+      width,
+    }];
+    if (isExpandable) {
+      const exColumns = expandableColumns.map((col, i, exCols) => {
+        const isExpand = expandNo > i;
+        width = 1;
+        // if nested
+        if (exCols.length > i + 1) {
+          // if nested && nestedExpanded
+          if (expandNo > i + 1) {
+            width = 0.5;
+          // else if nested && !nestedExpanded
+          } else if (isExpand) {
+            width = 0.66;
+          } else {
+            width = 0.5;
+          }
+        // else if !nested // isExpand
+        } else if (isExpand) {
+          width = 0.5;
+        } else if (expandNo === i) {
+          width = 0.34;
+        } else {
+          width = 0.5;
+        }
 
-    return options.length > 1
-    ? (
-      <select onChange={(event) => onGroupSelect(event.target.value)} value={group} >
-        { options.map((option, i) => (
-          <option
-            key={i}
-            value={option.value}
-            default={option.default}
-            disabled={option.disabled}
-          >
-            {option.label}
-          </option>)
-        )}
-      </select>
-    )
-    : null;
-  };
-
+        return {
+          label: col.label,
+          isExpandable: true,
+          isExpand,
+          onExpand: () => handleExpandLink(isExpand ? i : i + 1),
+          width,
+        };
+      });
+      return columns.concat(exColumns);
+    }
+    return columns;
+  }
   render() {
     const {
       sortBy,
@@ -181,7 +175,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
       }
     }
+    let contentTitle = this.props.entityTitle.plural;
+    if (dataReady) {
+      contentTitle = `${entitiesSorted.length} ${entitiesSorted.length === 1 ? this.props.entityTitle.single : this.props.entityTitle.plural}`;
+    }
 
+    const pageActions = dataReady && isManager
+      ? this.props.header.actions
+      : null;
 
     return (
       <div>
@@ -206,114 +207,98 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         </Sidebar>
         <ContainerWithSidebar>
           <Container>
-            <Styled>
-              <PageHeader
-                title={this.props.header.title}
-                actions={
-                  isManager
-                  ? this.props.header.actions
-                  : []
-                }
+            <Content>
+              <ContentHeader
+                type={CONTENT_LIST}
+                icon={this.props.header.icon}
+                supTitle={this.props.header.supTitle}
+                title={contentTitle}
+                actions={pageActions}
               />
               { !dataReady &&
-                <div>
-                  <Loading />
-                </div>
+                <Loading />
               }
               { dataReady &&
                 <ListEntities>
-                  <ListEntitiesTopFilters>
-                    { makeCurrentFilters(this.props, this.context.intl.formatMessage(messages.filterFormWithoutPrefix)).map((filter, i) =>
-                      (<Button key={i} onClick={filter.onClick}>{filter.label}</Button>)
+                  <EntityListSearch
+                    filters={makeCurrentFilters(this.props, this.context.intl.formatMessage(messages.filterFormWithoutPrefix))}
+                    searchQuery={location.query.search || ''}
+                    onSearch={this.props.onSearch}
+                  />
+                  <EntityListOptions
+                    groupSelectValue={location.query.group}
+                    groupOptions={makeGroupOptions(filters, taxonomies, connectedTaxonomies)}
+                    onGroupSelect={this.props.onGroupSelect}
+                    expandLink={this.props.isExpandable
+                      ? {
+                        expanded: this.props.expandNo === this.props.expandableColumns.length,
+                        collapsed: this.props.expandNo === 0,
+                        onClick: () => this.props.handleExpandLink(
+                          this.props.expandNo < this.props.expandableColumns.length
+                          ? this.props.expandableColumns.length
+                          : 0
+                        ),
+                      }
+                      : null
+                    }
+                  />
+                  <EntityListHeader
+                    columns={this.getHeaderColumns(
+                      listHeaderLabel,
+                      isManager,
+                      this.props.isExpandable,
+                      this.props.expandNo,
+                      this.props.expandableColumns,
+                      this.props.handleExpandLink
                     )}
-                  </ListEntitiesTopFilters>
-                  <ListEntitiesHeaderOptions>
-                    <ListEntitiesHeaderOptionGroup>
-                      {
-                        this.renderGroupingOptions(
-                          this.props.onGroupSelect,
-                          location.query.group,
-                          filters,
-                          taxonomies,
-                          connectedTaxonomies
-                        )
-                      }
-                    </ListEntitiesHeaderOptionGroup>
-                    <ListEntitiesHeaderOptionLinks>
-                      { this.props.expandable &&
-                        <ListEntitiesHeaderOptionLink
-                          onClick={() => this.props.onExpand(
-                            this.props.expand < this.props.expandableColumns.length,
-                            this.props.expandableColumns.length
-                          )}
-                        >
-                          {`${(!this.props.expand) || this.props.expand < this.props.expandableColumns.length ? 'Implementation Plan View' : 'List View'}`}
-                        </ListEntitiesHeaderOptionLink>
-                      }
-                    </ListEntitiesHeaderOptionLinks>
-                  </ListEntitiesHeaderOptions>
-                  <ListEntitiesHeader>
-                    <ListEntitiesSelectAll>
-                      { isManager &&
-                        <span>
-                          <IndeterminateCheckbox
-                            id="select-all"
-                            checked={allChecked}
-                            onChange={(checked) => {
-                              this.props.onEntitySelectAll(checked ? Object.keys(this.props.entities) : []);
-                            }}
-                          />
-                          <label htmlFor="select-all">
-                            {listHeaderLabel}
-                          </label>
-                        </span>
-                      }
-                      { !isManager &&
-                        <span>{listHeaderLabel}</span>
-                      }
-                    </ListEntitiesSelectAll>
-                  </ListEntitiesHeader>
+                    isSelect={isManager}
+                    isSelected={allChecked}
+                    onSelect={(checked) => {
+                      this.props.onEntitySelectAll(checked ? Object.keys(this.props.entities) : []);
+                    }}
+                  />
                   <ListEntitiesMain>
                     { entitiesSorted.length === 0 && location.query &&
                       <ListEntitiesEmpty>
-                        No results matched your search
+                        <FormattedMessage {...messages.listEmptyAfterQuery} />
                       </ListEntitiesEmpty>
                     }
                     { entitiesSorted.length === 0 && !location.query &&
                       <ListEntitiesEmpty>
-                        No entities yet
+                        <FormattedMessage {...messages.listEmpty} />
                       </ListEntitiesEmpty>
                     }
                     { entitiesSorted.length > 0 &&
-                      <div>
-                        { entitiesGrouped.map((entityGroup, i) => (
-                          <div key={i}>
-                            { entityGroup.label &&
-                              <h1>{entityGroup.label}</h1>
-                            }
-                            <EntityListItems
-                              entities={entityGroup.entities}
-                              entitiesSelected={entitiesSelected}
-                              isSelect={isManager}
-                              showDate={isManager}
-                              onEntitySelect={this.props.onEntitySelect}
-                              taxonomies={taxonomies}
-                              entityLinkTo={this.props.entityLinkTo}
-                              filters={filters}
-                              onTagClick={this.props.onTagClick}
-                              onExpand={this.props.onExpand}
-                              expand={this.props.expand}
-                              expandable={this.props.expandable}
-                              expandableColumns={this.props.expandableColumns}
-                            />
-                          </div>
-                        ))}
-                      </div>
+                      entitiesGrouped.map((entityGroup, i) => (
+                        <ListEntitiesGroup key={i}>
+                          { location.query.group && entityGroup.label &&
+                            <ListEntitiesGroupHeader>
+                              {entityGroup.label}
+                            </ListEntitiesGroupHeader>
+                          }
+                          <EntityListItems
+                            taxonomies={taxonomies}
+                            filters={filters}
+                            entities={entityGroup.entities}
+                            entitiesSelected={entitiesSelected}
+                            entityIcon={this.props.header.icon}
+                            entityLinkTo={this.props.entityLinkTo}
+                            isSelect={isManager}
+                            showDate={isManager}
+                            onTagClick={this.props.onTagClick}
+                            onEntitySelect={this.props.onEntitySelect}
+                            expandNo={this.props.expandNo}
+                            isExpandable={this.props.isExpandable}
+                            expandableColumns={this.props.expandableColumns}
+                            onExpand={this.props.handleExpandLink}
+                          />
+                        </ListEntitiesGroup>
+                      ))
                     }
                   </ListEntitiesMain>
                 </ListEntities>
               }
-            </Styled>
+            </Content>
           </Container>
         </ContainerWithSidebar>
       </div>
@@ -331,9 +316,9 @@ EntityList.propTypes = {
   location: PropTypes.object,
   entityTitle: PropTypes.object, // single/plural
   entityLinkTo: PropTypes.string,
-  expandable: PropTypes.bool,
+  isExpandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
-  expand: PropTypes.number,
+  expandNo: PropTypes.number,
   // select props
   activePanel: PropTypes.string,
   isManager: PropTypes.bool,
@@ -348,13 +333,15 @@ EntityList.propTypes = {
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,
-  onExpand: PropTypes.func.isRequired,
+  handleExpandLink: PropTypes.func.isRequired,
   onGroupSelect: PropTypes.func.isRequired,
+  onSearch: PropTypes.func.isRequired,
 };
 
 EntityList.defaultProps = {
   sortBy: 'id',
   sortOrder: 'desc',
+  expandNo: 0,
 };
 
 EntityList.contextTypes = {
@@ -376,6 +363,12 @@ const mapStateToProps = (state, props) => ({
       : null,
     without: props.location.query && props.location.query.without
       ? getWithoutQuery(props.location.query.without, props.filters)
+      : null,
+    search: props.location.query && props.location.query.search
+      ? {
+        query: props.location.query.search,
+        fields: props.filters.search,
+      }
       : null,
     extend: props.selects.entities.extensions,
   }),
@@ -416,13 +409,23 @@ function mapDispatchToProps(dispatch, props) {
     onTagClick: (value) => {
       dispatch(updateQuery(fromJS([value])));
     },
-    onExpand: (bool, value) => {
+    handleExpandLink: (expandNoNew) => {
+      // default expand by 1
+      const value = typeof expandNoNew !== 'undefined' ? expandNoNew : props.expandNo + 1;
+      dispatch(updateQuery(fromJS([{
+        query: 'expand',
+        value,
+        replace: true,
+        checked: value > 0,
+      }])));
+    },
+    onSearch: (value) => {
       dispatch(updateQuery(fromJS([
         {
-          query: 'expand',
+          query: 'search',
           value,
-          replace: bool,
-          checked: bool,
+          replace: true,
+          checked: value !== '',
         },
       ])));
     },

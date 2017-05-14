@@ -69,7 +69,9 @@ export const getCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQ
             : category.attributes.title || category.attributes.name);
           label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
           tags.push({
-            label: `${label} X`,
+            label,
+            type: 'taxonomies',
+            id: taxonomy.id,
             onClick: () => onClick({
               value,
               query: taxonomyFilters.query,
@@ -88,7 +90,10 @@ export const getCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQ
         if (isNumber(queryValue) && taxonomy.id === queryValue) {
           const value = parseInt(queryValue, 10);
           tags.push({
-            label: `${withoutMessage} ${lowerCase(taxonomy.attributes.title)} X`,
+            label: `${withoutMessage} ${lowerCase(taxonomy.attributes.title)}`,
+            type: 'taxonomies',
+            id: taxonomy.id,
+            without: true,
             onClick: () => onClick({
               value,
               query: 'without',
@@ -117,7 +122,9 @@ export const getCurrentConnectedTaxonomyFilters = (taxonomyFilters, connectedTax
               : category.attributes.title || category.attributes.name);
             label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
             tags.push({
-              label: `${label} X`,
+              label,
+              type: 'taxonomies',
+              id: taxonomy.id,
               onClick: () => onClick({
                 value: queryValue,
                 query: taxonomyFilters.query,
@@ -144,7 +151,8 @@ export const getCurrentConnectionFilters = (connectionFiltersOptions, connection
             : upperFirst(value);
         label = label.length > 20 ? `${label.substring(0, 20)}...` : label;
         tags.push({
-          label: `${label} X`,
+          label,
+          type: option.path === 'measures' ? 'actions' : option.path,
           onClick: () => onClick({
             value,
             query: option.query,
@@ -162,7 +170,9 @@ export const getCurrentConnectionFilters = (connectionFiltersOptions, connection
         // numeric means taxonomy
         if (option.query === queryValue) {
           tags.push({
-            label: `${withoutMessage} ${lowerCase(option.label)} X`,
+            label: `${withoutMessage} ${lowerCase(option.label)}`,
+            type: option.path === 'measures' ? 'actions' : option.path,
+            without: true,
             onClick: () => onClick({
               value: queryValue,
               query: 'without',
@@ -186,8 +196,10 @@ export const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuer
           if (valueSplit[0] === option.attribute && valueSplit.length > 0) {
             const value = valueSplit[1];
             if (option.extension) {
+              // TODO: show display value not query queryValue
               tags.push({
-                label: `${option.label}:${value} X`,
+                label: `${option.label}:${value}`,
+                type: 'attributes',
                 onClick: () => onClick({
                   value: queryValue,
                   query: 'where',
@@ -199,7 +211,8 @@ export const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuer
               let label = attribute ? attribute.label : upperFirst(value);
               label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
               tags.push({
-                label: `${label} X`,
+                label,
+                type: 'attributes',
                 onClick: () => onClick({
                   value: queryValue,
                   query: 'where',

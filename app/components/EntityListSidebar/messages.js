@@ -6,8 +6,18 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   header: {
-    id: 'app.containers.EntityListFilters.header',
-    defaultMessage: 'Filter List',
+    filter: {
+      id: 'app.containers.EntityListFilters.header.filter',
+      defaultMessage: 'Filter List',
+    },
+    filterButton: {
+      id: 'app.containers.EntityListFilters.header.filterButton',
+      defaultMessage: 'Filter',
+    },
+    editButton: {
+      id: 'app.containers.EntityListFilters.header.editButton',
+      defaultMessage: 'Edit',
+    },
   },
   filterGroupLabel: {
     attributes: {
@@ -57,4 +67,13 @@ export default defineMessages({
     id: 'app.containers.EntityListFilter.editFormTitlePostfix',
     defaultMessage: 'selected',
   },
+  entitiesNotFound: {
+    id: 'app.containers.EntityListFilter.entitiesNotFound',
+    defaultMessage: 'No entities found',
+  },
+  entitiesNotSelected: {
+    id: 'app.containers.EntityListFilter.entitiesNotSelected',
+    defaultMessage: 'Please select one or more entities from the list to see the available edit options',
+  },
+
 });

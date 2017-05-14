@@ -16,11 +16,13 @@ export const makeEditGroups = (
       id: 'taxonomies', // filterGroupId
       label: messages.taxonomies,
       show: true,
+      icon: 'categories',
       options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
         ...taxOptions,
         [taxonomy.id]: {
           id: taxonomy.id, // filterOptionId
           label: taxonomy.attributes.title,
+          icon: `taxonomy_${taxonomy.id}`,
           path: edits.taxonomies.connectPath,
           key: edits.taxonomies.key,
           ownKey: edits.taxonomies.ownKey,
@@ -45,6 +47,7 @@ export const makeEditGroups = (
           path: option.connectPath,
           key: option.key,
           ownKey: option.ownKey,
+          icon: option.path === 'measures' ? 'actions' : option.path,
           active: !!activeEditOption && activeEditOption.optionId === option.path,
         },
       }), {}),

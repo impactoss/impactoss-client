@@ -18,7 +18,7 @@ class SupTitle extends React.Component { // eslint-disable-line react/prefer-sta
     return (
       <Styled>
         { icon &&
-          <Icon name={icon} withText />
+          <Icon name={icon} text textLeft />
         }
         { title }
       </Styled>

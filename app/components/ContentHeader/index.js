@@ -7,11 +7,12 @@ import { CONTENT_LIST } from 'containers/App/constants';
 import Row from 'components/basic/Row';
 import SupTitle from 'components/SupTitle';
 
-import PrimaryAction from 'components/basic/Button/PrimaryAction';
-import SimpleAction from 'components/basic/Button/SimpleAction';
+import ButtonPrimaryIcon from 'components/buttons/ButtonPrimaryIcon';
+import ButtonPrimary from 'components/buttons/ButtonPrimary';
+import ButtonText from 'components/buttons/ButtonText';
 
 const Styled = styled.div`
-  padding: 3em 0 2em;
+  padding: 3em 0 1em;
 `;
 
 const Title = styled.h1`
@@ -20,6 +21,9 @@ const Title = styled.h1`
 `;
 
 const ButtonGroup = styled.div`
+  vertical-align: middle;
+  margin-top: 10px;
+  height: 2.6em;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     text-align:right;
   }
@@ -28,18 +32,36 @@ const ButtonGroup = styled.div`
 class ContentHeader extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   renderButton = (action, i) => {
-    if (action.type === 'primary') {
-      return (
-        <PrimaryAction key={i} onClick={() => action.onClick()}>
-          {action.title}
-        </PrimaryAction>
-      );
+    switch (action.type) {
+      case 'primary' :
+        return (
+          <ButtonPrimary key={i} onClick={() => action.onClick()}>
+            {action.title}
+          </ButtonPrimary>
+        );
+      case 'add' :
+        return (
+          <ButtonPrimaryIcon
+            key={i}
+            onClick={() => action.onClick()}
+            icon="add"
+            title={action.title}
+          />
+        );
+      case 'textPrimary' :
+        return (
+          <ButtonText key={i} onClick={() => action.onClick()} primary>
+            {action.title}
+          </ButtonText>
+        );
+      case 'text' :
+      default :
+        return (
+          <ButtonText key={i} onClick={() => action.onClick()}>
+            {action.title}
+          </ButtonText>
+        );
     }
-    return (
-      <SimpleAction key={i} onClick={() => action.onClick()}>
-        {action.title}
-      </SimpleAction>
-    );
   }
 
   render() {

@@ -15,4 +15,3 @@ export const ENTITY_SELECTED = 'nmrf/EntityList/ENTITY_SELECTED';
 export const ENTITIES_SELECT = 'nmrf/EntityList/ENTITIES_SELECT';
 export const UPDATE_QUERY = 'nmrf/EntityList/UPDATE_QUERY';
 export const UPDATE_GROUP = 'nmrf/EntityList/UPDATE_GROUP';
-export const UNGROUP = 'nmrf/EntityList/UNGROUP';

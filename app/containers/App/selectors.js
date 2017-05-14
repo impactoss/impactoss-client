@@ -20,7 +20,7 @@ import { reduce } from 'lodash/collection';
 import { USER_ROLES } from 'containers/App/constants';
 
 import asArray from 'utils/as-array';
-
+import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
 
 // high level state selects
 const getRoute = (state) => state.get('route');
@@ -183,22 +183,37 @@ const getEntitiesIfConnected = createSelector(
     ? entities.filter((entity) => reduce(
       asArray(connected), // allows multiple connections
       (passing, argsConnected) => {
-        if (argsConnected.connected || argsConnected.where) {
+        if (argsConnected.key || argsConnected.connected || argsConnected.where) {
           const where = argsConnected.where || {};
           return passing && reduce(
             asArray(where),
             (passingWhere, whereArgs) => { // and multiple wheres
               // TODO if passingWhere is false we don't need to do any more work
-              const connections = getEntitiesIfConnected(state, {
-                path: argsConnected.path, // path of associative table
-                where: {
-                  ...whereArgs,
-                  [argsConnected.key]: argsConnected.attribute
-                    ? entity.getIn(['attributes', argsConnected.attribute])
-                    : entity.get('id'),
-                },
-                connected: argsConnected.connected || null,
-              });
+              let connections;
+              if (argsConnected.forward) {
+                // forward: entity pointing to other entity
+                const key = entity.getIn(['attributes', argsConnected.key]);
+                connections = getEntitiesIfConnected(state, {
+                  path: argsConnected.path, // path of associative table
+                  where: {
+                    ...whereArgs,
+                    id: !!key && key.toString(),
+                  },
+                  connected: argsConnected.connected || null,
+                });
+              } else {
+                // other entity pointing to entity
+                connections = getEntitiesIfConnected(state, {
+                  path: argsConnected.path, // path of associative table
+                  where: {
+                    ...whereArgs,
+                    [argsConnected.key]: argsConnected.attribute
+                      ? entity.getIn(['attributes', argsConnected.attribute])
+                      : entity.get('id'),
+                  },
+                  connected: argsConnected.connected || null,
+                });
+              }
               return passingWhere && connections && connections.size; // association present
             },
             true
@@ -211,10 +226,37 @@ const getEntitiesIfConnected = createSelector(
   : entities  // !connected
 );
 
+// prep searchtarget, incl id
+const prepareEntitySearchTarget = (entity, fields) =>
+  reduce(
+    fields,
+    (target, field) => `${target} ${cleanupSearchTarget(entity.getIn(['attributes', field]))}`,
+    entity.get('id')
+  );
+
+// check if entities have connections with other entities via associative table
+const getEntitiesSearch = createSelector(
+  (state) => state,
+  getEntitiesIfConnected,
+  (state, { search }) => search,
+  (state, entities, search) => {
+    if (search) {
+      try {
+        const regex = new RegExp(regExMultipleWords(search.query), 'i');
+        return entities.filter((entity) =>
+          regex.test(prepareEntitySearchTarget(entity, search.fields))
+        );
+      } catch (e) {
+        return entities;
+      }
+    }
+    return entities;  // !search
+  }
+);
 
 const getEntities = createSelector(
   (state) => state,
-  getEntitiesIfConnected,
+  getEntitiesSearch,
   (state, { out }) => out,
   (state, { extend }) => extend,
   (state, entities, out, extend) => {

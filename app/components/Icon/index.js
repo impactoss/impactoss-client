@@ -5,7 +5,7 @@ import SVG from './SVG';
 
 class Icon extends React.PureComponent {
   render() {
-    const { name, title, size, palette, paletteIndex, color, iconSize, withText } = this.props;
+    const { name, title, size, palette, paletteIndex, color, iconSize, text, textRight, textLeft } = this.props;
     const icon = icons[name];
     if (icon) {
       const iSize = icon.size || iconSize;
@@ -19,7 +19,9 @@ class Icon extends React.PureComponent {
           paletteIndex={paletteIndex}
           size={size || `${iSize}px`}
           color={color}
-          withText={withText}
+          text={text}
+          textLeft={textLeft}
+          textRight={textRight}
         >
           <title>{title || `Icon: ${name}`}</title>
           {
@@ -40,12 +42,15 @@ Icon.propTypes = {
   size: React.PropTypes.string,
   iconSize: React.PropTypes.number,
   color: React.PropTypes.string,
-  withText: React.PropTypes.bool,
+  text: React.PropTypes.bool,
+  textLeft: React.PropTypes.bool,
+  textRight: React.PropTypes.bool,
 };
 Icon.defaultProps = {
   name: 'placeholder',
-  size: '24px',
   iconSize: 24,
+  textLeft: false,
+  textRight: false,
 };
 
 
