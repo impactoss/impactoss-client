@@ -25,9 +25,9 @@ export class EntityListNestedReportList extends React.PureComponent { // eslint-
 
     return (
       <ChildItems>
-        { dates && dates.length > 0 &&
+        { dates &&
           <EntityListNestedReportDateItem
-            date={dates[0]}
+            dates={dates}
           />
         }
         {

@@ -21,18 +21,21 @@ const Item = styled(Component)`
 const MainWrapper = styled(Component)`
   display: table-cell;
   width: ${(props) => props.width * 100}%;
+  border-right: 1px solid ${(props) => props.width < 1 ? palette('greyscaleLight', 0) : 'transparent'};
 `;
 export default class EntityListNestedItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     entity: PropTypes.object.isRequired,
     expandNo: PropTypes.number,
+    entityIcon: PropTypes.string,
   }
 
   render() {
     const {
       entity,
       expandNo,
+      entityIcon,
     } = this.props;
 
     const widthMain = entity.expandables ? 0.66 : 1;
@@ -41,7 +44,11 @@ export default class EntityListNestedItem extends React.PureComponent { // eslin
       <Styled expandNo={expandNo}>
         <Item>
           <MainWrapper width={widthMain} >
-            <EntityListItemMain entity={entity} />
+            <EntityListItemMain
+              entity={entity}
+              entityIcon={entityIcon}
+              nested
+            />
           </MainWrapper>
           {entity.expandables &&
             entity.expandables.map((expandable, i, list) =>
@@ -52,6 +59,7 @@ export default class EntityListNestedItem extends React.PureComponent { // eslin
                 count={expandable.count}
                 info={expandable.info}
                 onClick={expandable.onClick}
+                entityIcon={expandable.icon}
                 width={(1 - 0.66) / list.length}
               />
             )

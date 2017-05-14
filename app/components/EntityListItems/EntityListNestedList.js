@@ -11,9 +11,10 @@ const Styled = styled.span`
   vertical-align: top;
 `;
 const ItemWrapper = styled.div`
-  border-top: 1px solid;
-  padding: ${(props) => props.separated ? '0.5em 0 5em' : '0'};
-  border-color: ${(props) => props.separated ? palette('greyscaleDark', 4) : 'transparent'}
+  border-top: ${(props) => props.separated ? '1px solid' : 'none'};
+  border-top-color: ${(props) => props.separated ? palette('greyscaleDark', 4) : 'transparent'}
+  padding: ${(props) => props.separated ? '0.5em 0 3em' : '0 0 1em'};
+  border-bottom: 1px solid transparent;
 `;
 export class EntityListNestedList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -39,6 +40,7 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
           label: column.label,
           count: column.getCount && column.getCount(entity),
           info: column.getInfo && column.getInfo(entity),
+          icon: column.icon,
           onClick: () => onExpand(),
         }))
         : [],
@@ -51,6 +53,7 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
       expandNo,
       isExpandable,
       expandableColumns,
+      entityIcon,
     } = this.props;
 
     return (
@@ -60,6 +63,7 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
             <ItemWrapper key={i} separated={expandNo && i > 0}>
               <EntityListNestedItem
                 entity={this.mapToEntityListItem(entity, this.props)}
+                entityIcon={entityIcon}
                 expandNo={expandNo}
               />
               {isExpandable && expandNo > 0 && expandableColumns.length > 0 &&
@@ -85,6 +89,7 @@ EntityListNestedList.propTypes = {
   isExpandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
   onExpand: PropTypes.func,
+  entityIcon: PropTypes.string,
 };
 
 export default EntityListNestedList;

@@ -103,6 +103,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
       expandables: isExpandable && !expandNo
         ? expandableColumns.map((column, i) => ({
           type: column.type,
+          icon: column.icon,
           label: column.label,
           count: column.getCount && column.getCount(entity),
           info: column.getInfo && column.getInfo(entity),
@@ -150,6 +151,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
                 <EntityListNestedList
                   entities={expandableColumns[0].getEntities(entity)}
                   entityLinkTo={expandableColumns[0].entityLinkTo}
+                  entityIcon={expandableColumns[0].icon}
                   showDate={showDate}
                   expandNo={expandNo - 1}
                   isExpandable={expandableColumns.length > 1}

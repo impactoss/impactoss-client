@@ -1,17 +1,8 @@
-import { Link } from 'react-router';
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
-const EntityListItemMainTitle = styled(Link)`
-  font-weight: 500;
-  text-decoration: none;
-  display: block;
-  padding: 3px 0 8px;
-  font-size: 1.1em;
-  color: ${palette('greyscaleDark', 0)};
-  &:hover {
-    color: ${palette('greyscaleDark', 2)};
-  }
+const EntityListItemMainTitle = styled.div`
+  font-weight: ${(props) => props.nested ? 'normal' : 500};
+  font-size: ${(props) => props.nested ? '1em' : '1.1em'};
 `;
 
 export default EntityListItemMainTitle;

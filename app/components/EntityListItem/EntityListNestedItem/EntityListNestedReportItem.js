@@ -1,41 +1,38 @@
 import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
+import Clear from 'components/basic/Clear';
+
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
-const ListItem = styled.div`
-`;
-
-const ListItemTable = styled.table`
-  width: 100%;
-`;
-const ColMain = styled.td`
-  vertical-align: top;
-`;
-const Main = styled.div`
+const Styled = styled(Link)`
+  padding: 5px 10px;
   position: relative;
-  background: #fff;
-`;
-const ReferenceLink = styled(Link)`
-  color: #888;
-  font-weight: bold;
-  text-decoration: none;
+  background-color: ${palette('primary', 4)};
+  margin-top: 1px;
   display: block;
-  font-size:0.9em;
+  color: ${palette('greyscaleDark', 4)};
+  &:hover {
+    color: ${palette('greyscaleDark', 2)};
+  }
 `;
-const TitleLink = styled(Link)`
-  font-size:0.9em;
-  text-decoration: none;
-  display: block;
-  padding: 5px 0;
+const Top = styled.div`
 `;
 const Status = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
+  float: right;
   font-weight: bold;
   font-size: 0.8em;
-  color: #666;
   text-transform: uppercase;
+`;
+const Reference = styled.div`
+  float:left;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 0.9em;
+`;
+const Title = styled.div`
+  font-size: 0.8em;
+  text-decoration: none;
 `;
 
 export default class EntityListNestedReportItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -44,35 +41,23 @@ export default class EntityListNestedReportItem extends React.PureComponent { //
     report: PropTypes.object.isRequired,
   }
 
-  renderListItem = () => {
+
+  render() {
     const { report } = this.props;
 
     return (
-      <ListItem>
-        <ListItemTable><tbody><tr>
-          <ColMain>
-            <Main>
-              {report.reference &&
-                <ReferenceLink to={report.linkTo}>{report.reference}</ReferenceLink>
-              }
-              {report.status &&
-                <Status>{report.status}</Status>
-              }
-              <TitleLink to={report.linkTo}>{report.title}</TitleLink>
-            </Main>
-          </ColMain>
-        </tr></tbody></ListItemTable>
-      </ListItem>
-    );
-  }
-
-  render() {
-    // console.log('Item:render', this.props.entity)
-
-    return (
-      <div>
-        {this.renderListItem()}
-      </div>
+      <Styled to={report.linkTo}>
+        <Top>
+          {report.reference &&
+            <Reference>{report.reference}</Reference>
+          }
+          {report.status &&
+            <Status>{report.status}</Status>
+          }
+        </Top>
+        <Clear />
+        <Title to={report.linkTo}>{report.title}</Title>
+      </Styled>
     );
   }
 }

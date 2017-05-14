@@ -7,9 +7,7 @@ import EntityListItemMainBottomTaxonomies from './EntityListItemMainBottomTaxono
 import EntityListItemMainBottomConnections from './EntityListItemMainBottomConnections';
 import EntityListItemMainBottomTargetDate from './EntityListItemMainBottomTargetDate';
 
-const Styled = styled(Component)`
-  min-height: 2em;
-`;
+const Styled = styled(Component)``;
 
 export default class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {

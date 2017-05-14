@@ -84,8 +84,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         overdue += date.attributes.overdue ? 1 : 0;
       });
     }
-    if (due) info.push(`${due} reports due`);
-    if (overdue) info.push(`${overdue} reports overdue`);
+    if (due) info.push(`${due} due`);
+    if (overdue) info.push(`${overdue} overdue`);
     return info;
   }
   getIndicatorCount = (action) => action.indicators

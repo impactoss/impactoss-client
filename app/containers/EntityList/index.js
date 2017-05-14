@@ -65,7 +65,9 @@ const Content = styled.div`
 
 
 const ListEntities = styled.div``;
-const ListEntitiesMain = styled.div``;
+const ListEntitiesMain = styled.div`
+  padding-top: 0.5em;
+`;
 const ListEntitiesEmpty = styled.div``;
 const ListEntitiesGroup = styled.div``;
 const ListEntitiesGroupHeader = styled.h3``;

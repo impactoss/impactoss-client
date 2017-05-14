@@ -13,6 +13,7 @@ const Styled = styled.span`
   display: inline-block;
   width: ${(props) => props.expandNo ? '50%' : '100%'};
   vertical-align: top;
+
 `;
 const Item = styled(Component)`
   display: table;
@@ -22,6 +23,8 @@ const Item = styled(Component)`
 const MainWrapper = styled(Component)`
   display: table-cell;
   width: ${(props) => props.width * 100}%;
+  border-right: 1px solid ${(props) => props.width < 1 ? palette('greyscaleLight', 0) : 'transparent'};
+
 `;
 const MainInnerWrapper = styled(Component)`
   display: table;
@@ -58,6 +61,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
                 key={i}
                 label={expandable.label}
                 type={expandable.type}
+                entityIcon={expandable.icon}
                 count={expandable.count}
                 info={expandable.info}
                 onClick={expandable.onClick}
