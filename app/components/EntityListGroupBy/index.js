@@ -49,7 +49,7 @@ export class EntityListGroupBy extends React.Component { // eslint-disable-line 
       }].concat(this.props.options);
     return (
       <Styled>
-        { options && options.length > 1 &&
+        { options && options.length > 0 &&
           <span>
             <Label htmlFor="select">
               <FormattedMessage {...messages.groupBy} />
