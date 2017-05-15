@@ -12,10 +12,12 @@ import { find } from 'lodash/collection';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { CONTENT_SINGLE, PUBLISH_STATUSES } from 'containers/App/constants';
 
-import Page from 'components/Page';
-import EntityView from 'components/views/EntityView';
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
+import EntityView from 'components/EntityView';
 
 import {
   getEntity,
@@ -67,22 +69,19 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
         },
       ]);
     }
-    const pageActions = isAdmin
+    const buttons = isAdmin
     ? [
       {
-        type: 'simple',
-        title: 'Edit',
+        type: 'edit',
         onClick: this.props.handleEdit,
       },
       {
-        type: 'primary',
-        title: 'Close',
+        type: 'close',
         onClick: this.props.handleClose,
       },
     ]
     : [{
-      type: 'primary',
-      title: 'Close',
+      type: 'close',
       onClick: this.props.handleClose,
     }];
 
@@ -94,14 +93,14 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Page
-          title={page ? page.attributes.title : this.context.intl.formatMessage(messages.loading)}
-          actions={pageActions}
-        >
+        <Content>
+          <ContentHeader
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            type={CONTENT_SINGLE}
+            buttons={buttons}
+          />
           { !page && !dataReady &&
-            <div>
-              <FormattedMessage {...messages.loading} />
-            </div>
+            <Loading />
           }
           { !page && dataReady &&
             <div>
@@ -134,7 +133,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
               }}
             />
           }
-        </Page>
+        </Content>
       </div>
     );
   }

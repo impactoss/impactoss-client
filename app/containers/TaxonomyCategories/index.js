@@ -98,7 +98,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
     const taxonomy = dataReady ? taxonomies[parseInt(params.id, 10)] : null;
     const contentTitle = dataReady ? this.getTaxTitle(taxonomy.id) : '';
 
-    const pageActions = dataReady && isManager
+    const buttons = dataReady && isManager
       ? [{
         type: 'add',
         title: this.context.intl.formatMessage(messages.add),
@@ -131,7 +131,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
                 icon="categories"
                 supTitle={this.context.intl.formatMessage(messages.supTitle)}
                 title={contentTitle}
-                actions={pageActions}
+                buttons={buttons}
               />
               { !dataReady &&
                 <Loading />

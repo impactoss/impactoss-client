@@ -184,7 +184,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       contentTitle = `${entitiesSorted.length} ${entitiesSorted.length === 1 ? this.props.entityTitle.single : this.props.entityTitle.plural}`;
     }
 
-    const pageActions = dataReady && isManager
+    const buttons = dataReady && isManager
       ? this.props.header.actions
       : null;
 
@@ -217,7 +217,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 icon={this.props.header.icon}
                 supTitle={this.props.header.supTitle}
                 title={contentTitle}
-                actions={pageActions}
+                buttons={buttons}
               />
               { !dataReady &&
                 <Loading />

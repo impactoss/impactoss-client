@@ -18,8 +18,4 @@ export default defineMessages({
     id: 'app.containers.ReportView.notFound',
     defaultMessage: 'Sorry no progress report found',
   },
-  loading: {
-    id: 'app.containers.ReportView.loading',
-    defaultMessage: 'Loading data...',
-  },
 });

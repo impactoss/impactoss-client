@@ -6,8 +6,9 @@ import ButtonPrimary from 'components/buttons/ButtonPrimary';
 import Icon from 'components/Icon';
 
 const Button = styled(ButtonPrimary)`
-  padding: 0.5em 1em 0.5em 1.25em;
+  padding: 0.25em 1em 0.25em 1.25em;
   width: ${(props) => props.fullWidth ? '100%' : 'auto'};
+  min-height: 3em;
   text-align: ${(props) => props.align};
   text-transform: ${(props) => props.strong ? 'uppercase' : 'none'};
   font-weight: ${(props) => props.strong ? 'bold' : 'normal'};
@@ -25,6 +26,7 @@ class ButtonPrimaryIcon extends React.Component { // eslint-disable-line react/p
         inactive={inactive}
         align={align}
         strong={strong}
+        title={title}
       >
         { iconRight &&
           <span>{title}</span>
