@@ -95,7 +95,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={page ? page.attributes.title : this.context.intl.formatMessage(messages.loading)}
             type={CONTENT_SINGLE}
             buttons={buttons}
           />
