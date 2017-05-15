@@ -12,11 +12,11 @@ export default defineMessages({
   },
   login: {
     id: 'nmrf.components.Header.login',
-    defaultMessage: 'Login',
+    defaultMessage: 'Sign in',
   },
   logout: {
     id: 'nmrf.components.Header.logout',
-    defaultMessage: 'Logout',
+    defaultMessage: 'Sign out',
   },
   user: {
     id: 'nmrf.components.Header.user',

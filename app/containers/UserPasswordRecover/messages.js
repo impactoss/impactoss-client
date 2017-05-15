@@ -8,7 +8,7 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   pageTitle: {
     id: 'app.container.UserPasswordRecover.pageTitle',
-    defaultMessage: 'Recover Password',
+    defaultMessage: 'Recover password',
   },
   metaDescription: {
     id: 'app.container.UserPasswordRecover.metaDescription',
@@ -16,7 +16,7 @@ export default defineMessages({
   },
   header: {
     id: 'nmrf.containers.UserPasswordRecover.header',
-    defaultMessage: 'Recover Password',
+    defaultMessage: 'Recover password',
   },
   fieldRequired: {
     id: 'app.containers.UserPasswordRecover.header',
@@ -33,5 +33,9 @@ export default defineMessages({
   submit: {
     id: 'nmrf.containers.UserPasswordRecover.submit',
     defaultMessage: 'Recover',
+  },
+  loginLink: {
+    id: 'app.containers.UserPasswordRecover.loginLink',
+    defaultMessage: 'Back to sign in page',
   },
 });

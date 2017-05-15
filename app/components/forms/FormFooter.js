@@ -1,8 +1,8 @@
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 const FormFooter = styled.div`
-  min-height:100px;
-  border-top:1px solid;
+  border-top:1px solid ${palette('greyscaleLight', 2)};
   text-align:right;
 `;
 

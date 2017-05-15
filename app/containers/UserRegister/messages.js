@@ -18,9 +18,13 @@ export default defineMessages({
     id: 'app.containers.UserRegister.header',
     defaultMessage: 'Register',
   },
-  fieldRequired: {
-    id: 'app.containers.UserRegister.header',
-    defaultMessage: 'Required',
+  loginLinkBefore: {
+    id: 'app.containers.UserLogin.loginLinkBefore',
+    defaultMessage: 'Already have an account? ',
+  },
+  loginLink: {
+    id: 'app.containers.UserLogin.loginLink',
+    defaultMessage: 'Sign in here',
   },
   fields: {
     name: {

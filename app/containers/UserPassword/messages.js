@@ -18,10 +18,6 @@ export default defineMessages({
     id: 'app.containers.UserPassword.header',
     defaultMessage: 'Change Password',
   },
-  fieldRequired: {
-    id: 'app.containers.UserPassword.header',
-    defaultMessage: 'Required',
-  },
   fields: {
     password: {
       placeholder: {

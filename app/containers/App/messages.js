@@ -30,6 +30,12 @@ export default defineMessages({
       defaultMessage: 'assign',
     },
   },
+  forms: {
+    fieldRequired: {
+      id: 'app.containers.App.forms.fieldRequired',
+      defaultMessage: 'This field cannot be empty',
+    },
+  },
   attributes: {
     draft: {
       id: 'app.containers.App.attributes.draft',
