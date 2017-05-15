@@ -5,19 +5,30 @@
  */
 
 import React, { PropTypes } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { createStructuredSelector } from 'reselect';
+import styled from 'styled-components';
 
-import Page from 'components/Page';
-import SimpleForm from 'components/forms/SimpleForm';
+import Icon from 'components/Icon';
+import ContentNarrow from 'components/ContentNarrow';
+import ContentHeader from 'components/ContentHeader';
+import AuthForm from 'components/forms/AuthForm';
+import A from 'components/basic/A';
 
 import { updatePath } from 'containers/App/actions';
 import { makeSelectAuth } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
+import messages from './messages';
+
 import { login } from './actions';
 import makeUserLoginSelector from './selectors';
-import messages from './messages';
+
+const BottomLinks = styled.div`
+  padding: 2em 0;
+`;
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -35,36 +46,21 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
             },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.pageTitle)}
-          actions={
-            [
-              {
-                type: 'simple',
-                title: 'Cancel',
-                onClick: this.props.handleCancel,
-              },
-              {
-                type: 'primary',
-                title: 'Login',
-                onClick: () => this.props.handleSubmit(
-                  this.props.userLogin.form.data
-                ),
-              },
-            ]
-          }
-        >
+        <ContentNarrow>
+          <ContentHeader
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+          />
           {error &&
             message.map((errorMessage, i) =>
               <p key={i}>{errorMessage}</p>
             )
           }
           { this.props.userLogin.form &&
-            <SimpleForm
+            <AuthForm
               model="userLogin.form.data"
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
-              labels={{ submit: 'Log in' }}
+              labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
               fields={[
                 {
                   id: 'email',
@@ -75,39 +71,53 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                     required,
                   },
                   errorMessages: {
-                    required: this.context.intl.formatMessage(messages.fieldRequired),
+                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
                   },
                 },
                 {
                   id: 'password',
                   controlType: 'input',
                   model: '.password',
+                  type: 'password',
                   placeholder: this.context.intl.formatMessage(messages.fields.password.placeholder),
                   validators: {
                     required,
                   },
                   errorMessages: {
-                    required: this.context.intl.formatMessage(messages.fieldRequired),
+                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
                   },
-                },
-                {
-                  id: 'register',
-                  controlType: 'link',
-                  label: false,
-                  text: this.context.intl.formatMessage(messages.registerLink),
-                  onClick: () => this.props.handleLink('/register'),
-                },
-                {
-                  id: 'passwordRecover',
-                  controlType: 'link',
-                  label: false,
-                  text: this.context.intl.formatMessage(messages.recoverPasswordLink),
-                  onClick: () => this.props.handleLink('/recoverpassword'),
                 },
               ]}
             />
           }
-        </Page>
+          <BottomLinks>
+            <p>
+              <FormattedMessage {...messages.registerLinkBefore} />
+              <A
+                href="/register"
+                onClick={(evt) => {
+                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                  this.props.handleLink('/register');
+                }}
+              >
+                <FormattedMessage {...messages.registerLink} />
+                <Icon name="arrowRight" text textRight size="1em" />
+              </A>
+            </p>
+            <p>
+              <A
+                href="/recoverpassword"
+                onClick={(evt) => {
+                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                  this.props.handleLink('/recoverpassword');
+                }}
+              >
+                <FormattedMessage {...messages.recoverPasswordLink} />
+                <Icon name="arrowRight" text textRight size="1em" />
+              </A>
+            </p>
+          </BottomLinks>
+        </ContentNarrow>
       </div>
     );
   }

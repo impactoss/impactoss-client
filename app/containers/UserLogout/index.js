@@ -33,7 +33,6 @@ export class UserLogout extends React.PureComponent { // eslint-disable-line rea
         />
         <Page
           title={this.context.intl.formatMessage(messages.pageTitle)}
-          actions={[]}
         >
           <FormattedMessage {...messages.header} />
         </Page>
@@ -52,13 +51,11 @@ UserLogout.contextTypes = {
 
 export function mapDispatchToProps(dispatch) {
   return {
-    doLogout: (evt) => {
-      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    doLogout: () => {
       dispatch(logout());
     },
   };
 }
-
 
 // Wrap the component to inject dispatch and state into it
 export default connect(null, mapDispatchToProps)(UserLogout);

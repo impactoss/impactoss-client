@@ -5,25 +5,33 @@
  */
 
 import React, { PropTypes } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-// import { FormattedMessage } from 'react-intl';
-import { Link } from 'react-router';
+import styled from 'styled-components';
 
-import Page from 'components/Page';
-import SimpleForm from 'components/forms/SimpleForm';
+import Icon from 'components/Icon';
+import ContentNarrow from 'components/ContentNarrow';
+import ContentHeader from 'components/ContentHeader';
+import AuthForm from 'components/forms/AuthForm';
+import A from 'components/basic/A';
 
 import { updatePath } from 'containers/App/actions';
 
-import userRegisterSelector from './selectors';
+import appMessages from 'containers/App/messages';
 import messages from './messages';
-import { register } from './actions';
 
+import { register } from './actions';
+import userRegisterSelector from './selectors';
+
+const BottomLinks = styled.div`
+  padding: 2em 0;
+`;
 
 export class UserRegister extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    // const { email, password, passwordConfirmation, name, register: { error, messages: message } } = this.props.UserRegister;
-    const { registerSending, registerError } = this.props.userRegister.page;
+    // const { registerSending, registerError } = this.props.userRegister.page;
+    const { registerError } = this.props.userRegister.page;
     const required = (val) => val && val.length;
 
     return (
@@ -37,38 +45,19 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
             },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.pageTitle)}
-          actions={
-            [
-              {
-                type: 'simple',
-                title: 'Cancel',
-                onClick: this.props.handleCancel,
-              },
-              {
-                type: 'primary',
-                title: 'Register',
-                onClick: () => this.props.handleSubmit(
-                  this.props.userRegister.form.data
-                ),
-              },
-            ]
-          }
-        >
-          {registerSending &&
-            <p>Registering</p>
-          }
+        <ContentNarrow>
+          <ContentHeader
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+          />
           {registerError &&
             <p>{registerError}</p>
           }
-          <Link to="login">Already have an account? Log in here</Link>
           { this.props.userRegister.form &&
-            <SimpleForm
+            <AuthForm
               model="userRegister.form.data"
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
-              labels={{ submit: 'Register' }}
+              labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
               fields={[
                 {
                   id: 'name',
@@ -79,7 +68,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
                     required,
                   },
                   errorMessages: {
-                    required: this.context.intl.formatMessage(messages.fieldRequired),
+                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
                   },
                 },
                 {
@@ -91,37 +80,54 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
                     required,
                   },
                   errorMessages: {
-                    required: this.context.intl.formatMessage(messages.fieldRequired),
+                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
                   },
                 },
                 {
                   id: 'password',
                   controlType: 'input',
+                  type: 'password',
                   model: '.attributes.password',
                   placeholder: this.context.intl.formatMessage(messages.fields.password.placeholder),
                   validators: {
                     required,
                   },
                   errorMessages: {
-                    required: this.context.intl.formatMessage(messages.fieldRequired),
+                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
                   },
                 },
                 {
                   id: 'passwordConfirmation',
                   controlType: 'input',
+                  type: 'password',
                   model: '.attributes.passwordConfirmation',
                   placeholder: this.context.intl.formatMessage(messages.fields.passwordConfirmation.placeholder),
                   validators: {
                     required,
                   },
                   errorMessages: {
-                    required: this.context.intl.formatMessage(messages.fieldRequired),
+                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
                   },
                 },
               ]}
             />
           }
-        </Page>
+          <BottomLinks>
+            <p>
+              <FormattedMessage {...messages.loginLinkBefore} />
+              <A
+                href="/login"
+                onClick={(evt) => {
+                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                  this.props.handleLink('/login');
+                }}
+              >
+                <FormattedMessage {...messages.loginLink} />
+                <Icon name="arrowRight" text textRight size="1em" />
+              </A>
+            </p>
+          </BottomLinks>
+        </ContentNarrow>
       </div>
     );
   }
@@ -131,6 +137,7 @@ UserRegister.propTypes = {
   userRegister: PropTypes.object,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleLink: PropTypes.func.isRequired,
 };
 
 UserRegister.contextTypes = {
@@ -147,11 +154,10 @@ export function mapDispatchToProps(dispatch) {
       dispatch(register(formData.toJS()));
     },
     handleCancel: () => {
-      // not really a dispatch function here, could be a member function instead
-      // however
-      // - this could in the future be moved to a saga or reducer
-      // - also its nice to be next to handleSubmit
       dispatch(updatePath('/'));
+    },
+    handleLink: (path) => {
+      dispatch(updatePath(path));
     },
   };
 }

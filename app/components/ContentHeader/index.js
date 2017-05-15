@@ -15,9 +15,13 @@ const Styled = styled.div`
   padding: 3em 0 1em;
 `;
 
-const Title = styled.h1`
+const TitleLarge = styled.h1`
   line-height: 1;
   margin-top: 10px;
+`;
+const TitleMedium = styled.h3`
+  line-height: 1;
+  margin-top: 0;
 `;
 
 const ButtonGroup = styled.div`
@@ -71,14 +75,16 @@ class ContentHeader extends React.Component { // eslint-disable-line react/prefe
         { type === CONTENT_LIST &&
           <SupTitle icon={icon} title={supTitle} />
         }
-        { !actions &&
-          <Title>{title}</Title>
-        }
-        { actions &&
-          <Row>
-            <Grid sm={1 / 2} >
-              <Title>{title}</Title>
-            </Grid>
+        <Row>
+          <Grid sm={actions ? 1 / 2 : 1}>
+            { type === CONTENT_LIST &&
+              <TitleLarge>{title}</TitleLarge>
+            }
+            { type !== CONTENT_LIST &&
+              <TitleMedium>{title}</TitleMedium>
+            }
+          </Grid>
+          { actions &&
             <Grid sm={1 / 2}>
               <ButtonGroup>
                 {
@@ -88,8 +94,8 @@ class ContentHeader extends React.Component { // eslint-disable-line react/prefe
                 }
               </ButtonGroup>
             </Grid>
-          </Row>
-        }
+          }
+        </Row>
       </Styled>
     );
   }

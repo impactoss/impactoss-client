@@ -3,12 +3,13 @@
  */
 
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 const A = styled.a`
-  color: #41addd;
+  color: ${palette('primary', 0)};
 
   &:hover {
-    color: #6cc0e5;
+    color: ${palette('primary', 1)};
   }
 `;
 

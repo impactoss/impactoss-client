@@ -18,10 +18,6 @@ export default defineMessages({
     id: 'nmrf.containers.UserPasswordReset.header',
     defaultMessage: 'Reset Password',
   },
-  fieldRequired: {
-    id: 'app.containers.UserPasswordReset.header',
-    defaultMessage: 'Required',
-  },
   fields: {
     password: {
       placeholder: {
