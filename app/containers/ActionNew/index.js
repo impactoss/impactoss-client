@@ -8,67 +8,263 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { Control, Form } from 'react-redux-form/immutable';
-import { PUBLISH_STATUSES } from 'containers/App/constants';
-import { createStructuredSelector } from 'reselect';
-import makeSelectActionNew from './selectors';
+
+import { Map, List } from 'immutable';
+
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+
+import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
+
+import {
+  loadEntitiesIfNeeded,
+  redirectIfNotPermitted,
+  updatePath,
+  updateEntityForm,
+} from 'containers/App/actions';
+
+import Page from 'components/Page';
+import EntityForm from 'components/forms/EntityForm';
+
+import { getEntities, isReady } from 'containers/App/selectors';
+
+import {
+  renderRecommendationControl,
+  renderIndicatorControl,
+  renderTaxonomyControl,
+} from 'utils/forms';
+
+import viewDomainSelect from './selectors';
 import messages from './messages';
 import { save } from './actions';
 
+
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
+  componentWillMount() {
+    this.props.loadEntitiesIfNeeded();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.redirectIfNotPermitted();
+    }
+  }
+
   render() {
-    const { saveSending, saveError } = this.props.ActionNew.page;
+    const { dataReady, viewDomain } = this.props;
+    const { saveSending, saveError } = viewDomain.page;
+    const required = (val) => val && val.length;
+
     return (
       <div>
         <Helmet
-          title="ActionNew"
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
           meta={[
-            { name: 'description', content: 'Description of ActionNew' },
+            {
+              name: 'description',
+              content: this.context.intl.formatMessage(messages.metaDescription),
+            },
           ]}
         />
-        <FormattedMessage {...messages.header} />
-        <Form
-          model="actionNew.form.action"
-          onSubmit={this.props.handleSubmit}
-        >
-          <label htmlFor="title">Title:</label>
-          <Control.text id="title" model=".title" />
-          <label htmlFor="description">Description:</label>
-          <Control.textarea id="description" model=".description" />
-          <label htmlFor="status">Status:</label>
-          <Control.select id="status" model=".draft">
-            {PUBLISH_STATUSES.map((status) =>
-              <option key={status.value} value={status.value}>{status.label}</option>
-            )}
-          </Control.select>
-          <button type="submit">Save</button>
-        </Form>
-        {saveSending &&
-          <p>Saving Action</p>
+        { !dataReady &&
+          <div>
+            <FormattedMessage {...messages.loading} />
+          </div>
         }
-        {saveError &&
-          <p>{saveError}</p>
+        {dataReady &&
+          <Page
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            actions={
+              [
+                {
+                  type: 'simple',
+                  title: 'Cancel',
+                  onClick: this.props.handleCancel,
+                },
+                {
+                  type: 'primary',
+                  title: 'Save',
+                  onClick: () => this.props.handleSubmit(
+                    viewDomain.form.data,
+                  ),
+                },
+              ]
+            }
+          >
+            {saveSending &&
+              <p>Saving Action</p>
+            }
+            {saveError &&
+              <p>{saveError}</p>
+            }
+            <EntityForm
+              model="actionNew.form.data"
+              formData={viewDomain.form.data}
+              handleSubmit={(formData) => this.props.handleSubmit(formData)}
+              handleCancel={this.props.handleCancel}
+              handleUpdate={this.props.handleUpdate}
+              fields={{
+                header: {
+                  main: [
+                    {
+                      id: 'title',
+                      controlType: 'input',
+                      model: '.attributes.title',
+                      placeholder: this.context.intl.formatMessage(messages.fields.title.placeholder),
+                      validators: {
+                        required,
+                      },
+                      errorMessages: {
+                        required: this.context.intl.formatMessage(messages.fieldRequired),
+                      },
+                    },
+                  ],
+                  aside: [
+                    {
+                      id: 'status',
+                      controlType: 'select',
+                      model: '.attributes.draft',
+                      options: PUBLISH_STATUSES,
+                    },
+                  ],
+                },
+                body: {
+                  main: [
+                    {
+                      id: 'description',
+                      controlType: 'textarea',
+                      model: '.attributes.description',
+                    },
+                    renderRecommendationControl(this.props.recommendations),
+                    renderIndicatorControl(this.props.indicators),
+                  ],
+                  aside: renderTaxonomyControl(this.props.taxonomies),
+                },
+              }}
+            />
+          </Page>
         }
-
       </div>
     );
   }
 }
 
 ActionNew.propTypes = {
+  loadEntitiesIfNeeded: PropTypes.func,
+  redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
-  ActionNew: PropTypes.object,
+  handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
+  viewDomain: PropTypes.object,
+  dataReady: PropTypes.bool,
+  taxonomies: PropTypes.object,
+  recommendations: PropTypes.object,
+  indicators: PropTypes.object,
 };
 
-const mapStateToProps = createStructuredSelector({
-  ActionNew: makeSelectActionNew(),
+ActionNew.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  viewDomain: viewDomainSelect(state),
+  // all categories for all taggable taxonomies
+  dataReady: isReady(state, { path: [
+    'categories',
+    'taxonomies',
+    'recommendations',
+    'indicators',
+  ] }),
+  taxonomies: getEntities(
+    state,
+    {
+      path: 'taxonomies',
+      where: {
+        tags_measures: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+      },
+    },
+  ),
+  // all recommendations,
+  recommendations: getEntities(
+    state, {
+      path: 'recommendations',
+    },
+  ),
+  // all indicators,
+  indicators: getEntities(
+    state, {
+      path: 'indicators',
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch,
+    loadEntitiesIfNeeded: () => {
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
+    },
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+    },
     handleSubmit: (formData) => {
-      dispatch(save(formData));
+      let saveData = formData;
+
+      // measureCategories
+      if (formData.get('associatedTaxonomies')) {
+        saveData = saveData.set(
+          'measureCategories',
+          formData.get('associatedTaxonomies')
+          .map(getCheckedValuesFromOptions)
+          .reduce((updates, formCategoryIds) => Map({
+            delete: List(),
+            create: updates.get('create').concat(formCategoryIds.map((id) => Map({
+              category_id: id,
+            }))),
+          }), Map({ delete: List(), create: List() }))
+        );
+      }
+
+      // recommendations
+      if (formData.get('associatedRecommendations')) {
+        saveData = saveData.set('recommendationMeasures', Map({
+          delete: List(),
+          create: getCheckedValuesFromOptions(formData.get('associatedRecommendations'))
+          .map((id) => Map({
+            recommendation_id: id,
+          })),
+        }));
+      }
+
+      // indicators
+      if (formData.get('associatedIndicators')) {
+        saveData = saveData.set('measureIndicators', Map({
+          delete: List(),
+          create: getCheckedValuesFromOptions(formData.get('associatedIndicators'))
+          .map((id) => Map({
+            indicator_id: id,
+          })),
+        }));
+      }
+
+      dispatch(save(saveData.toJS()));
+    },
+    handleCancel: () => {
+      dispatch(updatePath('/actions'));
+    },
+    handleUpdate: (formData) => {
+      dispatch(updateEntityForm(formData));
     },
   };
 }

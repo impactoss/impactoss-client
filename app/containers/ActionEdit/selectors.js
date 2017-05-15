@@ -6,27 +6,14 @@ import { createSelector } from 'reselect';
 const selectActionEditDomain = (state) => state.get('actionEdit');
 
 /**
- * Other specific selectors
- */
-
-const pageSelector = createSelector(
-  selectActionEditDomain,
-  (substate) => substate.get('page').toJS()
- );
-
-
-/**
  * Default selector used by ActionEdit
  */
-
-const actionEditSelect = createSelector(
+const viewDomainSelect = createSelector(
   selectActionEditDomain,
   (substate) => substate.toJS()
 );
 
-export default actionEditSelect;
+export default viewDomainSelect;
 export {
   selectActionEditDomain,
-  actionEditSelect,
-  pageSelector,
 };

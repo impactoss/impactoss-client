@@ -6,20 +6,15 @@ import { createSelector } from 'reselect';
 const selectActionNewDomain = () => (state) => state.get('actionNew');
 
 /**
- * Other specific selectors
- */
-
-
-/**
  * Default selector used by ActionNew
  */
 
-const makeSelectActionNew = () => createSelector(
+const viewDomainSelect = createSelector(
   selectActionNewDomain(),
   (substate) => substate.toJS()
 );
 
-export default makeSelectActionNew;
+export default viewDomainSelect;
 export {
   selectActionNewDomain,
 };

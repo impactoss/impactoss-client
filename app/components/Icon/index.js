@@ -3,25 +3,35 @@ import icons from 'themes/icons';
 
 import SVG from './SVG';
 
-function Icon(props) {
-  // var SVG = IconFactory(icons)
-
-  return props.name && icons[props.name] ? (
-    <SVG
-      viewBox="0 0 1024 1024"
-      preserveAspectRatio="xMidYMid meet"
-      role="img"
-      palette={props.palette}
-      paletteIndex={props.paletteIndex}
-      size={props.size}
-      color={props.color}
-    >
-      <title>{props.title || `Icon: ${props.name}`}</title>
-      {
-        icons[props.name].map((path, index) => <path d={path} key={index}></path>)
-      }
-    </SVG>
-  ) : null;
+class Icon extends React.PureComponent {
+  render() {
+    const { name, title, size, palette, paletteIndex, color, iconSize, text, textRight, textLeft } = this.props;
+    const icon = icons[name];
+    if (icon) {
+      const iSize = icon.size || iconSize;
+      const iconPaths = icon.paths || icon;
+      return (
+        <SVG
+          viewBox={`0 0 ${iSize} ${iSize}`}
+          preserveAspectRatio="xMidYMid meet"
+          role="img"
+          palette={palette}
+          paletteIndex={paletteIndex}
+          size={size || `${iSize}px`}
+          color={color}
+          text={text}
+          textLeft={textLeft}
+          textRight={textRight}
+        >
+          <title>{title || `Icon: ${name}`}</title>
+          {
+            iconPaths.map((path, index) => (<path d={path} key={index}></path>))
+          }
+        </SVG>
+      );
+    }
+    return null;
+  }
 }
 
 Icon.propTypes = {
@@ -30,7 +40,17 @@ Icon.propTypes = {
   palette: React.PropTypes.string,
   paletteIndex: React.PropTypes.number,
   size: React.PropTypes.string,
+  iconSize: React.PropTypes.number,
   color: React.PropTypes.string,
+  text: React.PropTypes.bool,
+  textLeft: React.PropTypes.bool,
+  textRight: React.PropTypes.bool,
+};
+Icon.defaultProps = {
+  name: 'placeholder',
+  iconSize: 24,
+  textLeft: false,
+  textRight: false,
 };
 
 

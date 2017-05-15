@@ -6,9 +6,17 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  pageTitle: {
+    id: 'app.container.ActionEdit.pageTitle',
+    defaultMessage: 'Edit Action',
+  },
+  metaDescription: {
+    id: 'app.container.ActionEdit.metaDescription',
+    defaultMessage: 'Edit Action page description',
+  },
   header: {
     id: 'app.containers.ActionEdit.header',
-    defaultMessage: 'This is ActionEdit container !',
+    defaultMessage: 'Edit Action',
   },
   notFound: {
     id: 'app.containers.ActionEdit.notFound',
@@ -17,5 +25,9 @@ export default defineMessages({
   loading: {
     id: 'app.containers.ActionEdit.loading',
     defaultMessage: 'Loading action...',
+  },
+  fieldRequired: {
+    id: 'app.containers.ActionNew.header',
+    defaultMessage: 'Required',
   },
 });

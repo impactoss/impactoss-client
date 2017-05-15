@@ -8,47 +8,35 @@ import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 
-import {
-  SAVE_SENDING,
-  SAVE_SUCCESS,
-  SAVE_ERROR,
-} from './constants';
+import { entityEditReducer } from 'components/forms/EntityForm/utils';
+import { LOCATION_CHANGE } from 'react-router-redux';
+import { UPDATE_ENTITY_FORM } from 'containers/App/constants';
 
-const initialState = fromJS({
-  saveSending: false,
-  saveSuccess: false,
-  saveError: false,
+const formInitial = fromJS({
+  attributes: {
+    title: '',
+    description: '',
+    draft: true,
+  },
+  associatedTaxonomies: {},
+  associatedRecommendations: [],
+  associatedIndicators: [],
 });
 
-function actionNewReducer(state = initialState, action) {
+function formReducer(state = formInitial, action) {
   switch (action.type) {
-    case SAVE_SENDING:
-      return state
-        .set('saveSending', true)
-        .set('saveSuccess', false)
-        .set('saveError', false);
-    case SAVE_SUCCESS:
-      return state
-        .set('saveSending', false)
-        .set('saveSuccess', true);
-    case SAVE_ERROR:
-      return state
-        .set('saveSending', false)
-        .set('saveError', action.error);
+    case UPDATE_ENTITY_FORM:
+      return action.data;
+    case LOCATION_CHANGE:
+      return formInitial;
     default:
       return state;
   }
 }
 
-const actionForm = fromJS({
-  title: '',
-  description: '',
-  draft: true,
-});
-
 export default combineReducers({
-  page: actionNewReducer,
+  page: entityEditReducer,
   form: combineForms({
-    action: actionForm,
+    data: formReducer,
   }, 'actionNew.form'),
 });

@@ -10,10 +10,6 @@ export default defineMessages({
     id: 'nmrf.components.Header.home',
     defaultMessage: 'Home',
   },
-  other: {
-    id: 'nmrf.components.Header.other',
-    defaultMessage: 'Other Page',
-  },
   login: {
     id: 'nmrf.components.Header.login',
     defaultMessage: 'Login',
@@ -22,16 +18,12 @@ export default defineMessages({
     id: 'nmrf.components.Header.logout',
     defaultMessage: 'Logout',
   },
+  user: {
+    id: 'nmrf.components.Header.user',
+    defaultMessage: 'User profile',
+  },
   register: {
     id: 'nmrf.components.Header.register',
     defaultMessage: 'Register',
-  },
-  actions: {
-    id: 'nmrf.components.Header.actions',
-    defaultMessage: 'Actions',
-  },
-  recommendationNew: {
-    id: 'nmrf.components.Header.recommendationNew',
-    defaultMessage: 'Create a recommenation',
   },
 });

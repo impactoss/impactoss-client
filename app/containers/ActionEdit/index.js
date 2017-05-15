@@ -8,93 +8,195 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { Control, Form, actions as formActions } from 'react-redux-form/immutable';
-// import { actions as formActions } from 'react-redux-form';
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { actions as formActions } from 'react-redux-form/immutable';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { Map, List, fromJS } from 'immutable';
+
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+
+import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
 import {
-  makeEntityMapSelector,
-  makeEntitiesReadySelector,
+  loadEntitiesIfNeeded,
+  redirectIfNotPermitted,
+  updatePath,
+  updateEntityForm,
+} from 'containers/App/actions';
+
+import Page from 'components/Page';
+import EntityForm from 'components/forms/EntityForm';
+
+import {
+  getEntity,
+  getEntities,
+  isReady,
 } from 'containers/App/selectors';
 
 import {
-  pageSelector,
-} from './selectors';
+  taxonomyOptions,
+  entityOptions,
+  renderRecommendationControl,
+  renderIndicatorControl,
+  renderTaxonomyControl,
+} from 'utils/forms';
 
+import viewDomainSelect from './selectors';
 import messages from './messages';
 import { save } from './actions';
 
-const populateForm = (action) =>
-  formActions.load('actionEdit.form.action', action.get('attributes'));
-
-export class ActionEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class ActionEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    const { dispatch } = this.props;
-
-    dispatch(loadEntitiesIfNeeded('actions'));
-
-    if (this.props.action && this.props.actionsReady) {
-      dispatch(populateForm(this.props.action));
+    this.props.loadEntitiesIfNeeded();
+    if (this.props.dataReady && this.props.action) {
+      this.props.populateForm('actionEdit.form.data', this.getInitialFormData());
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    const { dispatch } = this.props;
-
-    if (nextProps.action && nextProps.actionsReady && !this.props.actionsReady) {
-      dispatch(populateForm(nextProps.action));
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
+    // repopulate if new data becomes ready
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.action) {
+      this.props.redirectIfNotPermitted();
+      this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const { taxonomies, recommendations, indicators, action } = props;
+
+    return action
+    ? Map({
+      id: action.id,
+      attributes: fromJS(action.attributes),
+      associatedTaxonomies: taxonomyOptions(taxonomies),
+      associatedRecommendations: entityOptions(recommendations, true),
+      associatedIndicators: entityOptions(indicators, true),
+    })
+    : Map();
+  }
 
   render() {
-    const { action, actionsReady } = this.props;
-    const { saveSending, saveError } = this.props.page;
+    const { action, dataReady, viewDomain } = this.props;
+    const reference = this.props.params.id;
+    const { saveSending, saveError } = viewDomain.page;
+    const required = (val) => val && val.length;
+
     return (
       <div>
         <Helmet
-          title="ActionEdit"
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
-            { name: 'description', content: 'Description of ActionEdit' },
+            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <FormattedMessage {...messages.header} />
-        { !action && !actionsReady &&
+        { !action && !dataReady &&
           <div>
             <FormattedMessage {...messages.loading} />
           </div>
         }
-        { !action && actionsReady &&
+        { !action && dataReady && !saveError &&
           <div>
             <FormattedMessage {...messages.notFound} />
           </div>
         }
         {action &&
-          <Form
-            model="actionEdit.form.action"
-            onSubmit={this.props.handleSubmit}
+          <Page
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            actions={[
+              {
+                type: 'simple',
+                title: 'Cancel',
+                onClick: this.props.handleCancel,
+              },
+              {
+                type: 'primary',
+                title: 'Save',
+                onClick: () => this.props.handleSubmit(
+                  viewDomain.form.data,
+                  this.props.taxonomies,
+                  this.props.recommendations,
+                  this.props.indicators
+                ),
+              },
+            ]}
           >
-            <label htmlFor="title">Title:</label>
-            <Control.text id="title" model=".title" />
-            <label htmlFor="description">Description:</label>
-            <Control.textarea id="description" model=".description" />
-            <label htmlFor="status">Status:</label>
-            <Control.select id="status" model=".draft" value={action && action.draft}>
-              {PUBLISH_STATUSES.map((status) =>
-                <option key={status.value} value={status.value}>{status.label}</option>
+            {saveSending &&
+              <p>Saving</p>
+            }
+            {saveError &&
+              <p>{saveError}</p>
+            }
+            <EntityForm
+              model="actionEdit.form.data"
+              formData={viewDomain.form.data}
+              handleSubmit={(formData) => this.props.handleSubmit(
+                formData,
+                this.props.taxonomies,
+                this.props.recommendations,
+                this.props.indicators
               )}
-            </Control.select>
-            <button type="submit">Save</button>
-            </Form>
-          }
-        {saveSending &&
-          <p>Saving</p>
-        }
-        {saveError &&
-          <p>{saveError}</p>
+              handleCancel={this.props.handleCancel}
+              handleUpdate={this.props.handleUpdate}
+              fields={{
+                header: {
+                  main: [
+                    {
+                      id: 'title',
+                      controlType: 'input',
+                      model: '.attributes.title',
+                      validators: {
+                        required,
+                      },
+                      errorMessages: {
+                        required: this.context.intl.formatMessage(messages.fieldRequired),
+                      },
+                    },
+                  ],
+                  aside: [
+                    {
+                      id: 'no',
+                      controlType: 'info',
+                      displayValue: reference,
+                    },
+                    {
+                      id: 'status',
+                      controlType: 'select',
+                      model: '.attributes.draft',
+                      value: action.draft,
+                      options: PUBLISH_STATUSES,
+                    },
+                    {
+                      id: 'updated',
+                      controlType: 'info',
+                      displayValue: action.attributes.updated_at,
+                    },
+                    {
+                      id: 'updated_by',
+                      controlType: 'info',
+                      displayValue: action.user && action.user.attributes.name,
+                    },
+                  ],
+                },
+                body: {
+                  main: [
+                    {
+                      id: 'description',
+                      controlType: 'textarea',
+                      model: '.attributes.description',
+                    },
+                    renderRecommendationControl(this.props.recommendations),
+                    renderIndicatorControl(this.props.indicators),
+                  ],
+                  aside: renderTaxonomyControl(this.props.taxonomies),
+                },
+              }}
+            />
+          </Page>
         }
       </div>
     );
@@ -102,34 +204,220 @@ export class ActionEdit extends React.PureComponent { // eslint-disable-line rea
 }
 
 ActionEdit.propTypes = {
-  dispatch: PropTypes.func,
+  loadEntitiesIfNeeded: PropTypes.func,
+  redirectIfNotPermitted: PropTypes.func,
+  populateForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
-  page: PropTypes.object,
+  handleCancel: PropTypes.func.isRequired,
+  handleUpdate: PropTypes.func.isRequired,
+  viewDomain: PropTypes.object,
   action: PropTypes.object,
-  actionsReady: PropTypes.bool,
+  dataReady: PropTypes.bool,
+  params: PropTypes.object,
+  taxonomies: PropTypes.object,
+  recommendations: PropTypes.object,
+  indicators: PropTypes.object,
 };
 
-const makeMapStateToProps = () => {
-  const getEntity = makeEntityMapSelector();
-  const entitiesReady = makeEntitiesReadySelector();
-  const mapStateToProps = (state, props) => ({
-    action: getEntity(state, { id: props.params.id, path: 'actions' }),
-    actionsReady: entitiesReady(state, { path: 'actions' }),
-    page: pageSelector(state),
-  });
-  return mapStateToProps;
+ActionEdit.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
 };
+
+const mapStateToProps = (state, props) => ({
+  viewDomain: viewDomainSelect(state),
+  dataReady: isReady(state, { path: [
+    'measures',
+    'users',
+    'categories',
+    'taxonomies',
+    'recommendations',
+    'recommendation_measures',
+    'measure_categories',
+    'indicators',
+    'measure_indicators',
+  ] }),
+  action: getEntity(
+    state,
+    {
+      id: props.params.id,
+      path: 'measures',
+      out: 'js',
+      extend: {
+        type: 'single',
+        path: 'users',
+        key: 'last_modified_user_id',
+        as: 'user',
+      },
+    },
+  ),
+  // all categories for all taggable taxonomies, listing connection if any
+  taxonomies: getEntities(
+    state,
+    {
+      path: 'taxonomies',
+      where: {
+        tags_measures: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+        extend: {
+          as: 'associated',
+          path: 'measure_categories',
+          key: 'category_id',
+          reverse: true,
+          where: {
+            measure_id: props.params.id,
+          },
+        },
+      },
+    },
+  ),
+  // all recommendations, listing connection if any
+  recommendations: getEntities(
+    state,
+    {
+      path: 'recommendations',
+      extend: {
+        as: 'associated',
+        path: 'recommendation_measures',
+        key: 'recommendation_id',
+        reverse: true,
+        where: {
+          measure_id: props.params.id,
+        },
+      },
+    },
+  ),
+  indicators: getEntities(
+    state,
+    {
+      path: 'indicators',
+      extend: {
+        as: 'associated',
+        path: 'measure_indicators',
+        key: 'indicator_id',
+        reverse: true,
+        where: {
+          measure_id: props.params.id,
+        },
+      },
+    },
+  ),
+});
 
 function mapDispatchToProps(dispatch, props) {
   return {
-    dispatch,
-    onComponentWillMount: () => {
-      dispatch(loadEntitiesIfNeeded('actions'));
+    loadEntitiesIfNeeded: () => {
+      dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('users'));
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('measure_indicators'));
     },
-    handleSubmit: (formData) => {
-      dispatch(save(formData, props.params.id));
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+    },
+    populateForm: (model, formData) => {
+      dispatch(formActions.load(model, formData));
+    },
+
+    handleSubmit: (formData, taxonomies, recommendations, indicators) => {
+      let saveData = formData.set('measureCategories', taxonomies.reduce((updates, tax, taxId) => {
+        const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
+
+        // store associated cats as { [cat.id]: [association.id], ... }
+        // then we can use keys for creating new associations and values for deleting
+        const associatedCategories = tax.get('categories').reduce((catsAssociated, cat) => {
+          if (cat.get('associated')) {
+            return catsAssociated.set(cat.get('id'), cat.get('associated').keySeq().first());
+          }
+          return catsAssociated;
+        }, Map());
+
+        return Map({
+          delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) =>
+            !formCategoryIds.includes(catId)
+              ? associatedIds.push(associatedId)
+              : associatedIds
+          , List())),
+          create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) =>
+            !associatedCategories.has(catId)
+              ? payloads.push(Map({
+                category_id: catId,
+                measure_id: formData.get('id'),
+              }))
+              : payloads
+          , List())),
+        });
+      }, Map({ delete: List(), create: List() })));
+
+      // recommendations
+      const formRecommendationIds = getCheckedValuesFromOptions(formData.get('associatedRecommendations'));
+      // store associated recs as { [rec.id]: [association.id], ... }
+      const associatedRecommendations = recommendations.reduce((recsAssociated, rec) => {
+        if (rec.get('associated')) {
+          return recsAssociated.set(rec.get('id'), rec.get('associated').keySeq().first());
+        }
+        return recsAssociated;
+      }, Map());
+
+      saveData = saveData.set('recommendationMeasures', Map({
+        delete: associatedRecommendations.reduce((associatedIds, associatedId, id) =>
+          !formRecommendationIds.includes(id)
+            ? associatedIds.push(associatedId)
+            : associatedIds
+        , List()),
+        create: formRecommendationIds.reduce((payloads, id) =>
+          !associatedRecommendations.has(id)
+            ? payloads.push(Map({
+              recommendation_id: id,
+              measure_id: formData.get('id'),
+            }))
+            : payloads
+        , List()),
+      }));
+
+      // indicators
+      const formIndicatorIds = getCheckedValuesFromOptions(formData.get('associatedIndicators'));
+      // store associated recs as { [rec.id]: [association.id], ... }
+      const associatedIndicators = indicators.reduce((indicatorsAssociated, indicator) => {
+        if (indicator.get('associated')) {
+          return indicatorsAssociated.set(indicator.get('id'), indicator.get('associated').keySeq().first());
+        }
+        return indicatorsAssociated;
+      }, Map());
+
+      saveData = saveData.set('measureIndicators', Map({
+        delete: associatedIndicators.reduce((associatedIds, associatedId, id) =>
+          !formIndicatorIds.includes(id)
+            ? associatedIds.push(associatedId)
+            : associatedIds
+        , List()),
+        create: formIndicatorIds.reduce((payloads, id) =>
+          !associatedIndicators.has(id)
+            ? payloads.push(Map({
+              indicator_id: id,
+              measure_id: formData.get('id'),
+            }))
+            : payloads
+        , List()),
+      }));
+
+      dispatch(save(saveData.toJS()));
+    },
+    handleCancel: () => {
+      dispatch(updatePath(`/actions/${props.params.id}`));
+    },
+    handleUpdate: (formData) => {
+      dispatch(updateEntityForm(formData));
     },
   };
 }
 
-export default connect(makeMapStateToProps, mapDispatchToProps)(ActionEdit);
+export default connect(mapStateToProps, mapDispatchToProps)(ActionEdit);

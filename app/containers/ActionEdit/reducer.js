@@ -3,55 +3,40 @@
 * ActionEdit reducer
 *
 */
-
 import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 
-import {
-  SAVE_SENDING,
-  SAVE_ERROR,
-  SAVE_SUCCESS,
-} from './constants';
+import { entityEditReducer } from 'components/forms/EntityForm/utils';
+import { LOCATION_CHANGE } from 'react-router-redux';
+import { UPDATE_ENTITY_FORM } from 'containers/App/constants';
 
-const initialState = fromJS({
-  id: null,
-  saveSending: false,
-  saveSuccess: false,
-  saveError: false,
-  actionNotFound: false,
+const formInitial = fromJS({
+  id: '',
+  attributes: {
+    title: '',
+    description: '',
+    draft: '',
+  },
+  associatedTaxonomies: {},
+  associatedRecommendations: [],
+  associatedIndicators: [],
 });
 
-function actionEditReducer(state = initialState, action) {
+function formReducer(state = formInitial, action) {
   switch (action.type) {
-    case SAVE_SENDING:
-      return state
-        .set('saveSending', true)
-        .set('saveSuccess', false)
-        .set('saveError', false);
-    case SAVE_SUCCESS:
-      return state
-        .set('saveSending', false)
-        .set('saveSuccess', true);
-    case SAVE_ERROR:
-      return state
-        .set('saveSending', false)
-        .set('saveError', action.error);
+    case UPDATE_ENTITY_FORM:
+      return action.data;
+    case LOCATION_CHANGE:
+      return formInitial;
     default:
       return state;
   }
 }
 
-// tim: I don't know how to pull from the global state to set these now, It doesn't seem to be possible
-const actionForm = fromJS({
-  title: '',
-  description: '',
-  draft: '',
-});
-
 export default combineReducers({
-  page: actionEditReducer,
+  page: entityEditReducer,
   form: combineForms({
-    action: actionForm,
+    data: formReducer,
   }, 'actionEdit.form'),
 });

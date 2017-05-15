@@ -6,6 +6,14 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  pageTitle: {
+    id: 'app.container.ActionView.pageTitle',
+    defaultMessage: 'Action',
+  },
+  metaDescription: {
+    id: 'app.container.ActionView.metaDescription',
+    defaultMessage: 'Action page description',
+  },
   header: {
     id: 'app.containers.ActionView.header',
     defaultMessage: 'Action',
