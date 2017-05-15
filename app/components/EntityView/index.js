@@ -10,8 +10,8 @@ import ViewWrapper from 'components/basic/ViewWrapper';
 import Grid from 'grid-styled';
 
 import Row from 'components/basic/Row';
-import ViewHeader from '../ViewHeader';
-import ViewBody from '../ViewBody';
+import ViewHeader from './ViewHeader';
+import ViewBody from './ViewBody';
 // import ViewFooter from './ViewFooter';
 
 

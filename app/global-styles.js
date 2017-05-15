@@ -41,12 +41,15 @@ injectGlobal`
     font-size: 1.7em;
   }
   h4 {
-    font-size: 1.25em;
+    font-size: 1.5em;
   }
   h5 {
+    font-size: 1.25em;
+  }
+  h6 {
     font-size: 1em;
   }
-  h1, h2, h3, h4, h5 {
+  h1, h2, h3, h4, h5, h6 {
     line-height: 1.1;
     font-weight: bold;
     margin-top: 20px;

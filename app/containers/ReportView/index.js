@@ -12,10 +12,12 @@ import { find } from 'lodash/collection';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { CONTENT_SINGLE, PUBLISH_STATUSES } from 'containers/App/constants';
 
-import Page from 'components/Page';
-import EntityView from 'components/views/EntityView';
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
+import EntityView from 'components/EntityView';
 import DocumentView from 'components/DocumentView';
 
 import {
@@ -37,9 +39,8 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     const status = report && find(PUBLISH_STATUSES, { value: report.attributes.draft });
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-
-    if (report) {
-      pageTitle = `${pageTitle} (Indicator: ${report.attributes.indicator_id})`;
+    if (report && dataReady) {
+      pageTitle = `${pageTitle} for indicator: ${report.attributes.indicator_id}`;
     }
 
     return (
@@ -50,32 +51,31 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !report && !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { !report && dataReady &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        { report && dataReady &&
-          <Page
+        <Content>
+          <ContentHeader
             title={pageTitle}
-            actions={[
+            type={CONTENT_SINGLE}
+            icon="report"
+            buttons={[
               {
-                type: 'simple',
-                title: 'Edit',
+                type: 'edit',
                 onClick: this.props.handleEdit,
               },
               {
-                type: 'primary',
-                title: 'Close',
+                type: 'close',
                 onClick: () => this.props.handleClose(this.props.report.indicator.id),
               },
             ]}
-          >
+          />
+          { !report && !dataReady &&
+            <Loading />
+          }
+          { !report && dataReady &&
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          }
+          { report && dataReady &&
             <EntityView
               fields={{
                 header: {
@@ -129,8 +129,8 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
                 },
               }}
             />
-          </Page>
-        }
+          }
+        </Content>
       </div>
     );
   }

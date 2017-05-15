@@ -22,8 +22,8 @@ export default defineMessages({
     id: 'app.containers.IndicatorView.notFound',
     defaultMessage: 'Sorry no indicator found',
   },
-  loading: {
-    id: 'app.containers.IndicatorView.loading',
-    defaultMessage: 'Loading indicator...',
+  addReport: {
+    id: 'app.containers.IndicatorView.addReport',
+    defaultMessage: 'Add report',
   },
 });

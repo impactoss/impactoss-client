@@ -9,10 +9,14 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
+import { CONTENT_SINGLE } from 'containers/App/constants';
+
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
-import Page from 'components/Page';
-import EntityView from 'components/views/EntityView';
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
+import EntityView from 'components/EntityView';
 
 import {
   getEntity,
@@ -45,24 +49,22 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         value: category.manager && category.manager.attributes.name,
       });
     }
-    const pageActions = dataReady && isManager
+    const buttons = dataReady && isManager
     ? [
       {
-        type: 'simple',
-        title: 'Edit',
+        type: 'edit',
         onClick: () => this.props.handleEdit(this.props.params.id),
       },
       {
-        type: 'primary',
-        title: 'Close',
+        type: 'close',
         onClick: () => this.props.handleClose(this.props.category.taxonomy.id),
       },
     ]
     : [{
-      type: 'primary',
-      title: 'Close',
+      type: 'close',
       onClick: () => this.props.handleClose(this.props.category.taxonomy.id),
     }];
+
     return (
       <div>
         <Helmet
@@ -71,14 +73,15 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.pageTitle)}
-          actions={pageActions}
-        >
+        <Content>
+          <ContentHeader
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            type={CONTENT_SINGLE}
+            icon="categories"
+            buttons={buttons}
+          />
           { !category && !dataReady &&
-            <div>
-              <FormattedMessage {...messages.loading} />
-            </div>
+            <Loading />
           }
           { !category && dataReady &&
             <div>
@@ -138,7 +141,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
               }}
             />
           }
-        </Page>
+        </Content>
       </div>
     );
   }

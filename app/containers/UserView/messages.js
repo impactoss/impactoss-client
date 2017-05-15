@@ -18,8 +18,8 @@ export default defineMessages({
     id: 'app.containers.UserView.notFound',
     defaultMessage: 'Sorry no user found',
   },
-  loading: {
-    id: 'app.containers.UserView.loading',
-    defaultMessage: 'Loading user...',
+  editPassword: {
+    id: 'app.containers.UserView.editPassword',
+    defaultMessage: 'Change password',
   },
 });

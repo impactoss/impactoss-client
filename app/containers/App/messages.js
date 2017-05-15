@@ -23,11 +23,19 @@ export default defineMessages({
     },
     close: {
       id: 'app.containers.App.buttons.close',
-      defaultMessage: 'close',
+      defaultMessage: 'Close',
+    },
+    add: {
+      id: 'app.containers.App.buttons.add',
+      defaultMessage: 'Add',
+    },
+    edit: {
+      id: 'app.containers.App.buttons.edit',
+      defaultMessage: 'Edit',
     },
     assign: {
       id: 'app.containers.App.buttons.assign',
-      defaultMessage: 'assign',
+      defaultMessage: 'Assign',
     },
   },
   forms: {

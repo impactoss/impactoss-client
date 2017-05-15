@@ -22,8 +22,4 @@ export default defineMessages({
     id: 'app.containers.ActionView.notFound',
     defaultMessage: 'Sorry no action found',
   },
-  loading: {
-    id: 'app.containers.ActionView.loading',
-    defaultMessage: 'Loading action...',
-  },
 });

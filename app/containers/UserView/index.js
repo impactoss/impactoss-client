@@ -11,8 +11,12 @@ import { FormattedMessage } from 'react-intl';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
-import Page from 'components/Page';
-import EntityView from 'components/views/EntityView';
+import { CONTENT_SINGLE } from 'containers/App/constants';
+
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
+import EntityView from 'components/EntityView';
 
 import {
   getUser,
@@ -47,27 +51,24 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     return highestRole.attributes.friendly_name;
   }
 
-  pageActions = () => {
+  getButtons = () => {
     const userId = this.props.user.id || this.props.user.attributes.id;
-
     const edit = {
-      type: 'simple',
-      title: 'Edit',
+      type: 'edit',
       onClick: () => this.props.handleEdit(userId),
     };
     const close = {
-      type: 'primary',
-      title: 'Close',
+      type: 'close',
       onClick: this.props.handleClose,
     };
     if (userId === this.props.sessionUserId) {
       return [
-        edit,
         {
-          type: 'simple',
-          title: 'Change password',
+          type: 'edit',
+          title: this.context.intl.formatMessage(messages.editPassword),
           onClick: () => this.props.handleEditPassword(userId),
         },
+        edit,
         close,
       ];
     }
@@ -101,14 +102,15 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.pageTitle)}
-          actions={user ? this.pageActions() : []}
-        >
+        <Content>
+          <ContentHeader
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            type={CONTENT_SINGLE}
+            icon="users"
+            buttons={user && this.getButtons()}
+          />
           { !user && !dataReady &&
-            <div>
-              <FormattedMessage {...messages.loading} />
-            </div>
+            <Loading />
           }
           { !user && dataReady &&
             <div>
@@ -164,7 +166,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
               }}
             />
           }
-        </Page>
+        </Content>
       </div>
     );
   }

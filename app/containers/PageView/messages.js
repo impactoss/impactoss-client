@@ -22,8 +22,4 @@ export default defineMessages({
     id: 'app.containers.PageView.notFound',
     defaultMessage: 'Sorry no page found',
   },
-  loading: {
-    id: 'app.containers.PageView.loading',
-    defaultMessage: 'Loading page...',
-  },
 });

@@ -12,10 +12,12 @@ import { find } from 'lodash/collection';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { CONTENT_SINGLE, PUBLISH_STATUSES } from 'containers/App/constants';
 
-import Page from 'components/Page';
-import EntityView from 'components/views/EntityView';
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
+import EntityView from 'components/EntityView';
 
 import {
   getEntity,
@@ -95,22 +97,19 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       ]);
     }
 
-    const pageActions = isManager
+    const buttons = isManager
     ? [
       {
-        type: 'simple',
-        title: 'Edit',
+        type: 'edit',
         onClick: () => this.props.handleEdit(this.props.params.id),
       },
       {
-        type: 'primary',
-        title: 'Close',
+        type: 'close',
         onClick: this.props.handleClose,
       },
     ]
     : [{
-      type: 'primary',
-      title: 'Close',
+      type: 'close',
       onClick: this.props.handleClose,
     }];
 
@@ -122,14 +121,15 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.pageTitle)}
-          actions={pageActions}
-        >
+        <Content>
+          <ContentHeader
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            type={CONTENT_SINGLE}
+            icon="actions"
+            buttons={buttons}
+          />
           { !action && !dataReady &&
-            <div>
-              <FormattedMessage {...messages.loading} />
-            </div>
+            <Loading />
           }
           { !action && dataReady &&
             <div>
@@ -173,7 +173,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
               }}
             />
           }
-        </Page>
+        </Content>
       </div>
     );
   }
