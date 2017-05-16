@@ -5,14 +5,14 @@ import DownloadFile from 'components/DownloadFile';
 
 import messages from './messages';
 
-const DocumentView = ({ status, url }) => {
-  const publicDoc = status;
+const DocumentView = ({ status, url, isManager }) => {
+  const visibleDoc = status || isManager;
   return (
     <span>
-      {url && publicDoc &&
+      {url && visibleDoc &&
         <DownloadFile url={url} />
       }
-      {url && !publicDoc &&
+      {url && !visibleDoc &&
         <FormattedMessage {...messages.privateFile} />
       }
       {!url &&
@@ -25,6 +25,7 @@ const DocumentView = ({ status, url }) => {
 DocumentView.propTypes = {
   url: React.PropTypes.string,
   status: React.PropTypes.bool,
+  isManager: React.PropTypes.bool,
 };
 
 export default DocumentView;

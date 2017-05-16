@@ -8,11 +8,10 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { find } from 'lodash/collection';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
-import { CONTENT_SINGLE, PUBLISH_STATUSES } from 'containers/App/constants';
+import { CONTENT_SINGLE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -26,6 +25,7 @@ import {
   isUserContributor,
 } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 export class IndicatorView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -40,6 +40,133 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     }
   }
 
+  getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          type: 'title',
+          value: entity.attributes.title,
+          isManager,
+        },
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = (entity, isContributor) => {
+    if (!isContributor) {
+      return [
+        {
+          fields: [
+            {
+              type: 'referenceStatus',
+              fields: [
+                {
+                  id: 'reference',
+                  value: entity.id,
+                  large: true,
+                },
+              ],
+            },
+          ],
+        },
+      ];
+    }
+    return [
+      {
+        fields: [
+          {
+            type: 'referenceStatus',
+            fields: [
+              {
+                type: 'reference',
+                value: entity.id,
+              },
+              {
+                type: 'status',
+                value: entity.attributes.draft,
+              },
+            ],
+          },
+          {
+            type: 'meta',
+            fields: [
+              {
+                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
+                value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+              },
+              {
+                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
+                value: entity.user && entity.user.attributes.name,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+
+  getBodyMainFields = (entity, actions, reports) => ([
+    {
+      fields: [
+        {
+          type: 'description',
+          value: entity.attributes.description,
+        },
+        {
+          type: 'list',
+          label: this.context.intl.formatMessage(appMessages.entities.progress_reports.plural),
+          values: this.mapReports(reports),
+          showEmpty: this.context.intl.formatMessage(appMessages.entities.progress_reports.empty),
+        },
+      ],
+    },
+    {
+      label: 'Connections',
+      icon: 'connections',
+      fields: [
+        {
+          type: 'list',
+          label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+          entityType: 'actions',
+          values: this.mapActions(actions),
+        },
+      ],
+    },
+  ]);
+
+  getBodyAsideFields = (entity, dates) => ([ // fieldGroups
+    { // fieldGroup
+      label: this.context.intl.formatMessage(messages.groupReporting),
+      type: 'dark',
+      icon: 'reminder',
+      fields: [
+        {
+          label: this.context.intl.formatMessage(appMessages.entities.due_dates.plural),
+          type: 'schedule',
+          values: this.mapDates(dates),
+          showEmpty: this.context.intl.formatMessage(appMessages.entities.due_dates.empty),
+        },
+        {
+          label: this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
+          type: 'manager',
+          value: entity.manager && entity.manager.attributes.name,
+          showEmpty: this.context.intl.formatMessage(appMessages.attributes.manager_id.indicatorsEmpty),
+        },
+      ],
+    },
+  ]);
+
+  getFields = (entity, isContributor, actions, reports, dates) => ({
+    header: {
+      main: this.getHeaderMainFields(entity, isContributor),
+      aside: this.getHeaderAsideFields(entity, isContributor),
+    },
+    body: {
+      main: this.getBodyMainFields(entity, actions, reports),
+      aside: isContributor ? this.getBodyAsideFields(entity, dates) : null,
+    },
+  });
+
   mapActions = (actions) =>
     Object.values(actions).map((action) => ({
       label: action.attributes.title,
@@ -52,38 +179,14 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     }))
   mapDates = (dates) =>
     Object.values(dates).map((date) => ({
-      label: `${date.attributes.due_date}${date.attributes.due ? ' [due]' : ''}${date.attributes.overdue ? ' [overdue]' : ''}`,
+      label: this.context.intl.formatDate(new Date(date.attributes.due_date)),
+      due: date.attributes.due,
+      overdue: date.attributes.overdue,
     }))
 
   render() {
-    const { indicator, dataReady, isContributor } = this.props;
-    const reference = this.props.params.id;
-    const status = indicator && find(PUBLISH_STATUSES, { value: indicator.attributes.draft });
+    const { indicator, dataReady, isContributor, actions, reports, dates } = this.props;
 
-    let asideFields = indicator && [{
-      id: 'number',
-      heading: 'Number',
-      value: reference,
-    }];
-    if (indicator && isContributor) {
-      asideFields = asideFields.concat([
-        {
-          id: 'status',
-          heading: 'Status',
-          value: status && status.label,
-        },
-        {
-          id: 'updated',
-          heading: 'Updated At',
-          value: indicator.attributes.updated_at,
-        },
-        {
-          id: 'updated_by',
-          heading: 'Updated By',
-          value: indicator.user && indicator.user.attributes.name,
-        },
-      ]);
-    }
     const buttons = isContributor
     ? [
       {
@@ -108,7 +211,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
@@ -128,75 +231,9 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          { indicator &&
+          { indicator && dataReady &&
             <EntityView
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'title',
-                      value: indicator.attributes.title,
-                    },
-                  ],
-                  aside: asideFields,
-                },
-                body: {
-                  main: [
-                    {
-                      id: 'description',
-                      heading: 'Description',
-                      value: indicator.attributes.description,
-                    },
-                    {
-                      id: 'actions',
-                      heading: 'Actions',
-                      type: 'list',
-                      values: this.mapActions(this.props.actions),
-                    },
-                    {
-                      id: 'reports',
-                      heading: 'Progress reports',
-                      type: 'list',
-                      values: this.mapReports(this.props.reports),
-                    },
-                  ],
-                  aside: isContributor
-                    ? [
-                      {
-                        id: 'manager',
-                        heading: 'Assigned user',
-                        value: indicator.manager && indicator.manager.attributes.name,
-                      },
-                      {
-                        id: 'start',
-                        heading: 'Reporting due date',
-                        value: indicator.attributes.start_date,
-                      },
-                      {
-                        id: 'repeat',
-                        heading: 'Repeat?',
-                        value: indicator.attributes.repeat.toString(),
-                      },
-                      indicator.attributes.repeat ? {
-                        id: 'frequency',
-                        heading: 'Reporting frequency in months',
-                        value: indicator.attributes.frequency_months,
-                      } : null,
-                      indicator.attributes.repeat ? {
-                        id: 'end',
-                        heading: 'Reporting end date',
-                        value: indicator.attributes.end_date,
-                      } : null,
-                      {
-                        id: 'dates',
-                        heading: 'Scheduled report dates',
-                        type: 'list',
-                        values: this.mapDates(this.props.dates),
-                      },
-                    ]
-                    : [],
-                },
-              }}
+              fields={this.getFields(indicator, isContributor, actions, reports, dates)}
             />
           }
         </Content>

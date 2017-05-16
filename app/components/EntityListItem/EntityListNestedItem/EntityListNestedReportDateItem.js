@@ -1,12 +1,12 @@
 import React, { PropTypes } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, FormattedDate } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import Icon from 'components/Icon';
 
-import messages from './messages';
+import appMessages from 'containers/App/messages';
 
 const Styled = styled.div`
   position: relative;
@@ -57,17 +57,17 @@ export default class EntityListNestedReportDateItem extends React.PureComponent 
             </IconWrap>
             <Status>
               { dates[0].attributes.overdue &&
-                <FormattedMessage {...messages.overdue} />
+                <FormattedMessage {...appMessages.entities.due_dates.overdue} />
               }
               { dates[0].attributes.due &&
-                <FormattedMessage {...messages.due} />
+                <FormattedMessage {...appMessages.entities.due_dates.due} />
               }
               { !dates[0].attributes.due && !dates[0].attributes.overdue &&
-                <FormattedMessage {...messages.scheduled} />
+                <FormattedMessage {...appMessages.entities.due_dates.scheduled} />
               }
             </Status>
             <DueDate overdue={dates[0].attributes.overdue}>
-              {dates[0].attributes.due_date}
+              <FormattedDate value={new Date(dates[0].attributes.due_date)} />
             </DueDate>
           </span>
         }
@@ -77,7 +77,7 @@ export default class EntityListNestedReportDateItem extends React.PureComponent 
               <Icon name="reminder" />
             </IconWrapUnscheduled>
             <Status unscheduled>
-              <FormattedMessage {...messages.noDate} />
+              <FormattedMessage {...appMessages.entities.due_dates.empty} />
             </Status>
           </span>
         }

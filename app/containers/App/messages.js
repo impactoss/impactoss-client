@@ -49,6 +49,50 @@ export default defineMessages({
       id: 'app.containers.App.attributes.draft',
       defaultMessage: 'Status',
     },
+    title: {
+      id: 'app.containers.App.attributes.title',
+      defaultMessage: 'Title',
+    },
+    description: {
+      id: 'app.containers.App.attributes.description',
+      defaultMessage: 'Content',
+    },
+    short_title: {
+      id: 'app.containers.App.attributes.short_title',
+      defaultMessage: 'Short title',
+    },
+    reference: {
+      id: 'app.containers.App.attributes.reference',
+      defaultMessage: 'No',
+    },
+    status: {
+      id: 'app.containers.App.attributes.status',
+      defaultMessage: 'Status',
+    },
+    url: {
+      id: 'app.containers.App.attributes.url',
+      defaultMessage: 'Website',
+    },
+    date: {
+      id: 'app.containers.App.attributes.date',
+      defaultMessage: 'Date',
+    },
+    target_date: {
+      id: 'app.containers.App.attributes.target_date',
+      defaultMessage: 'Target date',
+    },
+    targetDateEmpty: {
+      id: 'app.containers.App.attributes.targetDateEmpty',
+      defaultMessage: 'No target date set',
+    },
+    document_url: {
+      id: 'app.containers.App.attributes.document_url',
+      defaultMessage: 'Attached document',
+    },
+    documentEmpty: {
+      id: 'app.containers.App.attributes.documentEmpty',
+      defaultMessage: 'No document attaced yet',
+    },
     manager_id: {
       indicators: {
         id: 'app.containers.App.attributes.manager_id.indicators',
@@ -57,6 +101,28 @@ export default defineMessages({
       categories: {
         id: 'app.containers.App.attributes.manager_id.categories',
         defaultMessage: 'Category manager',
+      },
+      categoriesEmpty: {
+        id: 'app.containers.App.attributes.manager_id.categoriesEmpty',
+        defaultMessage: 'No category manager assigned',
+      },
+      indicatorsEmpty: {
+        id: 'app.containers.App.attributes.manager_id.indicatorsEmpty',
+        defaultMessage: 'No indicator reporter assigned',
+      },
+    },
+    meta: {
+      title: {
+        id: 'app.containers.App.attributes.meta.title',
+        defaultMessage: 'Meta',
+      },
+      updated_by: {
+        id: 'app.containers.App.attributes.meta.updated_by',
+        defaultMessage: 'Updated by',
+      },
+      updated_at: {
+        id: 'app.containers.App.attributes.meta.updated_at',
+        defaultMessage: 'Last updated',
       },
     },
   },
@@ -136,6 +202,14 @@ export default defineMessages({
         id: 'app.containers.App.entities.progress_reports.plural',
         defaultMessage: 'Progress reports',
       },
+      empty: {
+        id: 'app.containers.App.entities.progress_reports.empty',
+        defaultMessage: 'No reports yet',
+      },
+      unscheduled: {
+        id: 'app.containers.App.entities.progress_reports.unscheduled',
+        defaultMessage: 'Extraordinary (no due date assigned)',
+      },
     },
     taxonomies: {
       single: {
@@ -155,6 +229,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.1.plural',
           defaultMessage: 'Human rights bodies',
         },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.1.empty',
+          defaultMessage: 'No human rights body assigned yet',
+        },
       },
       2: {
         single: {
@@ -164,6 +242,10 @@ export default defineMessages({
         plural: {
           id: 'app.containers.App.entities.taxonomies.2.plural',
           defaultMessage: 'UN sessions',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.2.empty',
+          defaultMessage: 'No UN session assigned yet',
         },
       },
       3: {
@@ -175,6 +257,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.3.plural',
           defaultMessage: 'Human rights',
         },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.3.empty',
+          defaultMessage: 'No human right assigned yet',
+        },
       },
       4: {
         single: {
@@ -184,6 +270,10 @@ export default defineMessages({
         plural: {
           id: 'app.containers.App.entities.taxonomies.4.plural',
           defaultMessage: 'Affected persons',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.4.empty',
+          defaultMessage: 'No affected persons assigned yet',
         },
       },
       5: {
@@ -195,6 +285,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.5.plural',
           defaultMessage: 'Thematic clusters',
         },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.5.empty',
+          defaultMessage: 'No thematic cluster assigned yet',
+        },
       },
       6: {
         single: {
@@ -204,6 +298,10 @@ export default defineMessages({
         plural: {
           id: 'app.containers.App.entities.taxonomies.6.plural',
           defaultMessage: 'Organisations',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.5.empty',
+          defaultMessage: 'No organisation assigned yet',
         },
       },
     },
@@ -215,6 +313,22 @@ export default defineMessages({
       plural: {
         id: 'app.containers.App.entities.due_dates.plural',
         defaultMessage: 'Due dates',
+      },
+      empty: {
+        id: 'app.containers.App.entities.due_dates.empty',
+        defaultMessage: 'No report scheduled',
+      },
+      overdue: {
+        id: 'app.containers.App.entities.due_dates.overdue',
+        defaultMessage: 'Report overdue',
+      },
+      due: {
+        id: 'app.containers.App.entities.due_dates.due',
+        defaultMessage: 'Report due',
+      },
+      scheduled: {
+        id: 'app.containers.App.entities.due_dates.due',
+        defaultMessage: 'Report scheduled',
       },
     },
     categories: {

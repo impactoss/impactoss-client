@@ -24,6 +24,7 @@ import {
   isUserManager,
 } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 export class CategoryView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -37,18 +38,22 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       this.props.loadEntitiesIfNeeded();
     }
   }
-
+  getCategoryShortTitle = (category) => {
+    const title = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
+      ? category.attributes.short_title
+      : category.attributes.title);
+    return title.length > 10 ? `${title.substring(0, 10)}...` : title;
+  }
+  getCategoryAnchor = (url) => {
+    const urlNoProtocol = url.replace(/^https?:\/\//i, '');
+    return urlNoProtocol.length > 40
+      ? `${urlNoProtocol.substring(0, 40)}...`
+      : urlNoProtocol;
+  }
   render() {
     const { category, dataReady, isManager } = this.props;
     const reference = this.props.params.id;
-    const mainAsideFields = [];
-    if (dataReady && isManager && !!category.taxonomy.attributes.has_manager) {
-      mainAsideFields.push({
-        id: 'manager',
-        heading: 'Category manager',
-        value: category.manager && category.manager.attributes.name,
-      });
-    }
+
     const buttons = dataReady && isManager
     ? [
       {
@@ -64,6 +69,103 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       type: 'close',
       onClick: () => this.props.handleClose(this.props.category.taxonomy.id),
     }];
+
+    const mainAsideFields = dataReady
+    ? [
+      {
+        type: 'dark',
+        fields: [
+          {
+            type: 'link',
+            value: category.attributes.url,
+            anchor: this.getCategoryAnchor(category.attributes.url),
+          },
+        ],
+      },
+    ]
+    : null;
+    if (dataReady
+      && isManager
+      && !!category.taxonomy.attributes.has_manager
+    ) {
+      mainAsideFields.push({
+        type: 'dark',
+        fields: [{
+          type: 'manager',
+          value: category.manager && category.manager.attributes.name,
+          showEmpty: this.context.intl.formatMessage(appMessages.attributes.manager_id.categoriesEmpty),
+        }],
+      });
+    }
+
+    const fields = dataReady ? {
+      header: {
+        main: [ // fieldGroups
+          { // fieldGroup
+            fields: [
+              {
+                type: 'title',
+                value: category.attributes.title,
+                isManager,
+              },
+              {
+                type: 'short_title',
+                value: this.getCategoryShortTitle(category),
+                taxonomyId: category.attributes.taxonomy_id,
+              },
+            ],
+          },
+        ],
+        aside: isManager
+        ? [
+          {
+            fields: [
+              {
+                type: 'referenceStatus',
+                fields: [
+                  {
+                    type: 'reference',
+                    value: reference,
+                    large: true,
+                  },
+                  // {
+                  //   type: 'status',
+                  //   value: true,
+                  // },
+                ],
+              },
+              {
+                type: 'meta',
+                fields: [
+                  {
+                    label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
+                    value: this.context.intl.formatDate(new Date(category.attributes.updated_at)),
+                  },
+                  {
+                    label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
+                    value: category.user && category.user.attributes.name,
+                  },
+                ],
+              },
+            ],
+          },
+        ]
+        : null,
+      },
+      body: {
+        main: {
+          fields: [
+            {
+              type: 'description',
+              value: category.attributes.description,
+            },
+          ],
+        },
+        aside: mainAsideFields,
+      },
+    }
+    : null;
+
 
     return (
       <div>
@@ -89,57 +191,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             </div>
           }
           { category && dataReady &&
-            <EntityView
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'title',
-                      value: category.attributes.title,
-                    },
-                  ],
-                  aside: isManager
-                  ? [
-                    {
-                      id: 'number',
-                      heading: 'Number',
-                      value: reference,
-                    },
-                    {
-                      id: 'updated',
-                      heading: 'Updated At',
-                      value: category.attributes.updated_at,
-                    },
-                    {
-                      id: 'updated_by',
-                      heading: 'Updated By',
-                      value: category.user && category.user.attributes.name,
-                    },
-                  ]
-                  : [],
-                },
-                body: {
-                  main: [
-                    {
-                      id: 'description',
-                      heading: 'Description',
-                      value: category.attributes.description,
-                    },
-                    {
-                      id: 'short_title',
-                      heading: 'Short title',
-                      value: category.attributes.short_title,
-                    },
-                    {
-                      id: 'url',
-                      heading: 'URL',
-                      value: category.attributes.url,
-                    },
-                  ],
-                  aside: mainAsideFields,
-                },
-              }}
-            />
+            <EntityView fields={fields} />
           }
         </Content>
       </div>

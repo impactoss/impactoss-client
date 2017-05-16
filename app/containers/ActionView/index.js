@@ -8,11 +8,10 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { find } from 'lodash/collection';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
-import { CONTENT_SINGLE, PUBLISH_STATUSES } from 'containers/App/constants';
+import { CONTENT_SINGLE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -26,6 +25,7 @@ import {
   isUserManager,
 } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 export class ActionView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -39,6 +39,132 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       this.props.loadEntitiesIfNeeded();
     }
   }
+  getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          type: 'title',
+          value: entity.attributes.title,
+          isManager,
+        },
+      ],
+    },
+  ]);
+  getHeaderAsideFields = (entity, isManager) => {
+    if (!isManager) {
+      return [
+        {
+          fields: [
+            {
+              type: 'referenceStatus',
+              fields: [
+                {
+                  id: 'reference',
+                  value: entity.id,
+                  large: true,
+                },
+              ],
+            },
+          ],
+        },
+      ];
+    }
+    return [
+      {
+        fields: [
+          {
+            type: 'referenceStatus',
+            fields: [
+              {
+                type: 'reference',
+                value: entity.id,
+              },
+              {
+                type: 'status',
+                value: entity.attributes.draft,
+              },
+            ],
+          },
+          {
+            type: 'meta',
+            fields: [
+              {
+                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
+                value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+              },
+              {
+                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
+                value: entity.user && entity.user.attributes.name,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+  getBodyMainFields = (entity, recommendations, indicators) => ([
+    {
+      fields: [
+        {
+          type: 'description',
+          value: entity.attributes.description,
+        },
+      ],
+    },
+    {
+      label: 'Connections',
+      icon: 'connections',
+      fields: [
+        {
+          type: 'list',
+          label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+          entityType: 'recommendations',
+          values: this.mapRecommendations(recommendations),
+        },
+        {
+          type: 'list',
+          label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+          entityType: 'indicators',
+          values: this.mapIndicators(indicators),
+        },
+      ],
+    },
+  ]);
+  getBodyAsideFields = (entity, taxonomies) => ([ // fieldGroups
+    {
+      type: 'dark',
+      fields: [
+        {
+          type: 'date',
+          value: entity.attributes.target_date && this.context.intl.formatDate(new Date(entity.attributes.target_date)),
+          label: this.context.intl.formatMessage(appMessages.attributes.target_date),
+          showEmpty: this.context.intl.formatMessage(appMessages.attributes.targetDateEmpty),
+        },
+      ],
+    },
+    { // fieldGroup
+      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
+      icon: 'categories',
+      fields: Object.values(taxonomies).map((taxonomy) => ({
+        type: 'list',
+        label: this.context.intl.formatMessage(appMessages.entities.taxonomies[taxonomy.id].plural),
+        entityType: 'taxonomies',
+        id: taxonomy.id,
+        values: this.mapCategoryOptions(taxonomy.categories),
+      })),
+    },
+  ]);
+
+  getFields = (entity, isManager, recommendations, indicators, taxonomies) => ({
+    header: {
+      main: this.getHeaderMainFields(entity, isManager),
+      aside: this.getHeaderAsideFields(entity, isManager),
+    },
+    body: {
+      main: this.getBodyMainFields(entity, recommendations, indicators),
+      aside: this.getBodyAsideFields(entity, taxonomies),
+    },
+  });
 
   mapIndicators = (indicators) =>
     Object.values(indicators).map((indicator) => ({
@@ -59,43 +185,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     }))
     : []
 
-  renderTaxonomyLists = (taxonomies) =>
-    Object.values(taxonomies).map((taxonomy) => ({
-      id: taxonomy.id,
-      heading: taxonomy.attributes.title,
-      type: 'list',
-      values: this.mapCategoryOptions(taxonomy.categories),
-    }))
-
   render() {
-    const { action, dataReady, isManager } = this.props;
-    const reference = this.props.params.id;
-    const status = action && find(PUBLISH_STATUSES, { value: action.attributes.draft });
-
-    let asideFields = action && [{
-      id: 'number',
-      heading: 'Number',
-      value: reference,
-    }];
-    if (action && isManager) {
-      asideFields = asideFields.concat([
-        {
-          id: 'status',
-          heading: 'Status',
-          value: status && status.label,
-        },
-        {
-          id: 'updated',
-          heading: 'Updated At',
-          value: action.attributes.updated_at,
-        },
-        {
-          id: 'updated_by',
-          heading: 'Updated By',
-          value: action.user && action.user.attributes.name,
-        },
-      ]);
-    }
+    const { action, dataReady, isManager, recommendations, indicators, taxonomies } = this.props;
 
     const buttons = isManager
     ? [
@@ -116,7 +207,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
@@ -138,39 +229,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           }
           { action && dataReady &&
             <EntityView
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'title',
-                      value: action.attributes.title,
-                    },
-                  ],
-                  aside: asideFields,
-                },
-                body: {
-                  main: [
-                    {
-                      id: 'description',
-                      heading: 'Description',
-                      value: action.attributes.description,
-                    },
-                    {
-                      id: 'recommendations',
-                      heading: 'Recommendations',
-                      type: 'list',
-                      values: this.mapRecommendations(this.props.recommendations),
-                    },
-                    {
-                      id: 'indicators',
-                      heading: 'Indicators',
-                      type: 'list',
-                      values: this.mapIndicators(this.props.indicators),
-                    },
-                  ],
-                  aside: this.renderTaxonomyLists(this.props.taxonomies),
-                },
-              }}
+              fields={this.getFields(action, isManager, recommendations, indicators, taxonomies)}
             />
           }
         </Content>

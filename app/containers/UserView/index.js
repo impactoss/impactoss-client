@@ -26,6 +26,7 @@ import {
   getSessionUserId,
 } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 export class UserView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -39,16 +40,6 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-  }
-
-  // only show the highest rated role (lower role ids means higher)
-  getUserRole = (roles) => {
-    const highestRole = Object.values(roles).reduce((currentHighestRole, role) =>
-      !currentHighestRole || role.role.id < currentHighestRole.id
-      ? role.role
-      : currentHighestRole
-    , null);
-    return highestRole.attributes.friendly_name;
   }
 
   getButtons = () => {
@@ -75,6 +66,117 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     return [edit, close];
   };
 
+  getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          type: 'title',
+          value: entity.attributes.name,
+          isManager,
+        },
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = (entity, isManager) => {
+    if (!isManager) {
+      return [
+        {
+          fields: [
+            {
+              type: 'referenceRole',
+              fields: [
+                {
+                  id: 'reference',
+                  value: entity.id,
+                  large: true,
+                },
+              ],
+            },
+          ],
+        },
+      ];
+    }
+    return [
+      {
+        fields: [
+          {
+            type: 'referenceRole',
+            fields: [
+              {
+                type: 'reference',
+                value: entity.id,
+              },
+              {
+                type: 'role',
+                value: entity.roles && this.getUserRole(entity.roles),
+                showEmpty: 'User',
+              },
+            ],
+          },
+          {
+            type: 'meta',
+            fields: [
+              {
+                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
+                value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+              },
+              {
+                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
+                value: entity.user && entity.user.attributes.name,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+  getBodyMainFields = (entity) => ([
+    {
+      fields: [
+        {
+          value: entity.attributes.email,
+          label: 'Email',
+        },
+      ],
+    },
+  ]);
+
+  getBodyAsideFields = (entity, isManager, taxonomies) => ([ // fieldGroups
+    { // fieldGroup
+      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
+      icon: 'categories',
+      fields: !isManager ? null : Object.values(taxonomies).map((taxonomy) => ({
+        type: 'list',
+        label: this.context.intl.formatMessage(appMessages.entities.taxonomies[taxonomy.id].plural),
+        entityType: 'taxonomies',
+        id: taxonomy.id,
+        values: this.mapCategoryOptions(taxonomy.categories),
+        showEmpty: this.context.intl.formatMessage(appMessages.entities.taxonomies[taxonomy.id].empty),
+      })),
+    },
+  ]);
+  getFields = (entity, isManager, taxonomies) => ({
+    header: {
+      main: this.getHeaderMainFields(entity, isManager),
+      aside: this.getHeaderAsideFields(entity, isManager),
+    },
+    body: {
+      main: this.getBodyMainFields(entity),
+      aside: this.getBodyAsideFields(entity, isManager, taxonomies),
+    },
+  });
+
+  // only show the highest rated role (lower role ids means higher)
+  getUserRole = (roles) => {
+    const highestRole = Object.values(roles).reduce((currentHighestRole, role) =>
+      !currentHighestRole || role.role.id < currentHighestRole.id
+      ? role.role
+      : currentHighestRole
+    , null);
+    return highestRole.attributes.friendly_name;
+  }
+
   mapCategoryOptions = (categories) => categories
     ? Object.values(categories).map((cat) => ({
       label: cat.attributes.title,
@@ -82,18 +184,9 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     }))
     : []
 
-  renderTaxonomyLists = (taxonomies) =>
-    Object.values(taxonomies).map((taxonomy) => ({
-      id: taxonomy.id,
-      heading: taxonomy.attributes.title,
-      type: 'list',
-      values: this.mapCategoryOptions(taxonomy.categories),
-    }))
-
   render() {
-    const { user, dataReady, isManager } = this.props;
-    const reference = user && user.id;
-    // dataReady && console.log(this.props.taxonomies)
+    const { user, dataReady, isManager, taxonomies } = this.props;
+
     return (
       <div>
         <Helmet
@@ -119,51 +212,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
           }
           { user && dataReady &&
             <EntityView
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'name',
-                      heading: 'Name',
-                      value: user.attributes.name,
-                    },
-                  ],
-                  aside: isManager
-                  ? [
-                    {
-                      id: 'role',
-                      heading: 'Role',
-                      value: user.roles ? this.getUserRole(user.roles) : 'User',
-                    },
-                    {
-                      id: 'number',
-                      heading: 'Number',
-                      value: reference,
-                    },
-                    {
-                      id: 'updated',
-                      heading: 'Updated At',
-                      value: user.attributes.updated_at,
-                    },
-                    {
-                      id: 'updated_by',
-                      heading: 'Updated By',
-                      value: user.user && user.user.attributes.name,
-                    },
-                  ]
-                  : [],
-                },
-                body: {
-                  main: [
-                    {
-                      id: 'email',
-                      heading: 'Email',
-                      value: user.attributes.email,
-                    },
-                  ],
-                  aside: isManager ? this.renderTaxonomyLists(this.props.taxonomies) : [],
-                },
-              }}
+              fields={this.getFields(user, isManager, taxonomies)}
             />
           }
         </Content>

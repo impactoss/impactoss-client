@@ -15,7 +15,7 @@ export class EntityListNestedReportList extends React.PureComponent { // eslint-
   mapToEntityListItem = (entity, entityLinkTo) => ({
     id: entity.id,
     title: entity.attributes.name || entity.attributes.title,
-    reference: entity.attributes.updated_at.split('T')[0],
+    reference: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
     linkTo: `${entityLinkTo}${entity.id}`,
     status: entity.attributes.draft ? 'draft' : null,
   });
@@ -47,6 +47,9 @@ EntityListNestedReportList.propTypes = {
   reports: PropTypes.array,
   dates: PropTypes.array,
   entityLinkTo: PropTypes.string,
+};
+EntityListNestedReportList.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
 };
 
 export default EntityListNestedReportList;
