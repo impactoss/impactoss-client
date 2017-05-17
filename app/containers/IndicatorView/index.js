@@ -53,7 +53,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   ]);
 
   getHeaderAsideFields = (entity, isContributor) => {
-    if (!isContributor) {
+    if (isContributor) {
       return [
         {
           fields: [
@@ -61,9 +61,25 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
               type: 'referenceStatus',
               fields: [
                 {
-                  id: 'reference',
+                  type: 'reference',
                   value: entity.id,
-                  large: true,
+                },
+                {
+                  type: 'status',
+                  value: entity.attributes.draft,
+                },
+              ],
+            },
+            {
+              type: 'meta',
+              fields: [
+                {
+                  label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
+                  value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+                },
+                {
+                  label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
+                  value: entity.user && entity.user.attributes.name,
                 },
               ],
             },
@@ -80,23 +96,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
               {
                 type: 'reference',
                 value: entity.id,
-              },
-              {
-                type: 'status',
-                value: entity.attributes.draft,
-              },
-            ],
-          },
-          {
-            type: 'meta',
-            fields: [
-              {
-                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-                value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
-              },
-              {
-                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-                value: entity.user && entity.user.attributes.name,
+                large: true,
               },
             ],
           },

@@ -59,7 +59,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
               type: 'referenceStatus',
               fields: [
                 {
-                  id: 'reference',
+                  type: 'reference',
                   value: entity.id,
                   large: true,
                 },
@@ -125,7 +125,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
       fields: [
         {
           type: 'date',
-          value: entity.date.attributes.due_date && this.context.intl.formatDate(new Date(entity.date.attributes.due_date)),
+          value: entity.date && entity.date.attributes.due_date && this.context.intl.formatDate(new Date(entity.date.attributes.due_date)),
           label: this.context.intl.formatMessage(appMessages.entities.due_dates.single),
           showEmpty: this.context.intl.formatMessage(appMessages.entities.progress_reports.unscheduled),
         },
@@ -164,16 +164,24 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
             title={pageTitle}
             type={CONTENT_SINGLE}
             icon="report"
-            buttons={[
-              {
-                type: 'edit',
-                onClick: this.props.handleEdit,
-              },
-              {
-                type: 'close',
-                onClick: () => this.props.handleClose(this.props.report.indicator.id),
-              },
-            ]}
+            buttons={isContributor
+              ? [
+                {
+                  type: 'edit',
+                  onClick: this.props.handleEdit,
+                },
+                {
+                  type: 'close',
+                  onClick: () => this.props.handleClose(this.props.report.indicator.id),
+                },
+              ]
+              : [
+                {
+                  type: 'close',
+                  onClick: () => this.props.handleClose(this.props.report.indicator.id),
+                },
+              ]
+             }
           />
           { !report && !dataReady &&
             <Loading />

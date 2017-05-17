@@ -59,7 +59,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
               type: 'referenceStatus',
               fields: [
                 {
-                  id: 'reference',
+                  type: 'reference',
                   value: entity.id,
                   large: true,
                 },

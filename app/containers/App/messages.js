@@ -91,7 +91,7 @@ export default defineMessages({
     },
     documentEmpty: {
       id: 'app.containers.App.attributes.documentEmpty',
-      defaultMessage: 'No document attaced yet',
+      defaultMessage: 'No document attached yet',
     },
     manager_id: {
       indicators: {

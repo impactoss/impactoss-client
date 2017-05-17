@@ -42,11 +42,11 @@ const ToggleAllItems = styled(Button)`
 `;
 
 const Main = styled(Section)`
-  width: ${(props) => props.aside ? '66%' : '100%'};
+  width: ${(props) => props.aside ? '70%' : '100%'};
 `;
 // TODO improve styling
 const Aside = styled(Section)`
-  width: 34%;
+  width: 30%;
   border-left: 1px solid ${palette('greyscaleLight', 0)};
   margin: 0 -1px;
 `;

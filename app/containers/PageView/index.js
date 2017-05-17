@@ -61,7 +61,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
               type: 'referenceStatus',
               fields: [
                 {
-                  id: 'reference',
+                  type: 'reference',
                   value: entity.id,
                   large: true,
                 },
