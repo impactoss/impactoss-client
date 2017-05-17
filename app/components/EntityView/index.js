@@ -20,6 +20,7 @@ import A from 'components/basic/A';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import DocumentView from 'components/DocumentView';
+import EntityListItems from 'components/EntityListItems';
 
 import ViewWrapper from './ViewWrapper';
 import ViewPanel from './ViewPanel';
@@ -191,6 +192,36 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
           </DotWrapper>
         }
       </ListLabel>
+      {field.values.map((value, i) => (
+        <ListItem key={i}>
+          {value.linkTo
+            ? <ListLink key={i} to={value.linkTo}>{value.label}</ListLink>
+            : <p>{value.label}</p>
+          }
+        </ListItem>
+      ))}
+      { (!field.values || field.values.length === 0) &&
+        <EmptyHint>{field.showEmpty}</EmptyHint>
+      }
+    </ValueWrap>
+  );
+  renderConnections = (field) => (
+    <ValueWrap>
+      <ListLabel>
+        {field.label}
+        {field.entityType &&
+          <DotWrapper>
+            <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
+          </DotWrapper>
+        }
+      </ListLabel>
+      <EntityListItems
+        entities={field.values}
+        entityIcon={field.icon}
+        entityLinkTo={field.entityPath}
+        taxonomies={field.taxonomies}
+        filters={field.relatedFilters}
+      />
       {field.values.map((value, i) => (
         <ListItem key={i}>
           {value.linkTo
@@ -450,8 +481,8 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
           return this.renderSchedule(field);
         case 'download':
           return this.renderDownload(field);
-        // case 'connections':
-        //   return this.renderConnections(field);
+        case 'connections':
+          return this.renderConnections(field);
         // case 'reports':
         //   return this.renderCategories(field);
         case 'text':

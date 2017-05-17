@@ -15,7 +15,7 @@ const Styled = styled.div`
 const ItemWrapper = styled.div`
   border-top: 1px solid;
   padding: ${(props) => props.separated ? '0.5em 0 2.5em' : '0'};
-  border-color: ${(props) => props.separated ? palette('greyscaleLight', 4) : 'transparent'}
+  border-color: ${(props) => props.separated ? palette('greyscaleLight', 4) : palette('greyscaleLight', 0)};
 `;
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -85,7 +85,6 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
       expandableColumns,
       onExpand,
     } = props;
-
     return {
       id: entity.id,
       title: entity.attributes.name || entity.attributes.title,
@@ -93,7 +92,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
       linkTo: `${entityLinkTo}${entity.id}`,
       status: entity.attributes.draft ? 'draft' : null,
       updated: showDate ? entity.attributes.updated_at.split('T')[0] : null,
-      tags: taxonomies
+      tags: filters && taxonomies
         ? this.getEntityTags(entity,
           taxonomies,
           filters.taxonomies && filters.taxonomies.query,
@@ -109,7 +108,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
           info: column.getInfo && column.getInfo(entity),
           onClick: () => onExpand(expandNo > i ? i : i + 1),
         }))
-        : [],
+        : null,
     };
   };
 
@@ -171,7 +170,7 @@ EntityListItems.propTypes = {
   entities: PropTypes.array.isRequired,
   entitiesSelected: PropTypes.array,
   isSelect: PropTypes.bool,
-  onEntitySelect: PropTypes.func.isRequired,
+  onEntitySelect: PropTypes.func,
   showDate: PropTypes.bool,
   taxonomies: PropTypes.object,
   entityLinkTo: PropTypes.string,

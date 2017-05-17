@@ -20,6 +20,7 @@ import EntityView from 'components/EntityView';
 
 import {
   getEntity,
+  getEntities,
   isReady,
   isUserManager,
 } from 'containers/App/selectors';
@@ -38,6 +39,198 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       this.props.loadEntitiesIfNeeded();
     }
   }
+  getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          type: 'title',
+          value: entity.attributes.title,
+          isManager,
+        },
+        {
+          type: 'short_title',
+          value: this.getCategoryShortTitle(entity),
+          taxonomyId: entity.attributes.taxonomy_id,
+        },
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = (entity, isManager) => !isManager
+    ? null
+    : [
+      {
+        fields: [
+          {
+            type: 'referenceStatus',
+            fields: [
+              {
+                type: 'reference',
+                value: entity.id,
+                large: true,
+              },
+            ],
+          },
+          {
+            type: 'meta',
+            fields: [
+              {
+                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
+                value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+              },
+              {
+                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
+                value: entity.user && entity.user.attributes.name,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+  getBodyMainFields = (entity, recommendations, actions, taxonomies) => {
+    const fields = [];
+    if (entity.attributes.description && entity.attributes.description.trim().length > 0) {
+      fields.push({
+        fields: [
+          {
+            type: 'description',
+            value: entity.attributes.description,
+          },
+        ],
+      });
+    }
+    fields.push({
+      label: 'Connections',
+      icon: 'connections',
+      fields: [
+        {
+          type: 'connections',
+          label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+          entityType: 'recommendations',
+          values: Object.values(recommendations),
+          icon: 'recommendations',
+          entityPath: '/recommendations/',
+          taxonomies,
+          relatedFilters: {
+            taxonomies: { // filter by each category
+              query: 'cat',
+              filter: true,
+              connected: {
+                path: 'recommendation_categories',
+                key: 'recommendation_id',
+                whereKey: 'category_id',
+              },
+            },
+            connections: { // filter by associated entity
+              options: [
+                {
+                  filter: true,
+                  label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+                  path: 'measures', // filter by recommendation connection
+                  query: 'actions',
+                  key: 'measure_id',
+                  connected: {
+                    path: 'recommendation_measures',
+                    key: 'recommendation_id',
+                    whereKey: 'measure_id',
+                  },
+                },
+              ],
+            },
+          },
+        },
+        {
+          type: 'connections',
+          label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+          entityType: 'actions',
+          values: Object.values(actions),
+          icon: 'actions',
+          entityPath: '/actions/',
+          taxonomies,
+          relatedFilters: {
+            taxonomies: { // filter by each category
+              query: 'cat',
+              filter: true,
+              connected: {
+                path: 'measure_categories',
+                key: 'measure_id',
+                whereKey: 'category_id',
+              },
+            },
+            connections: { // filter by associated entity
+              options: [
+                {
+                  label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+                  path: 'recommendations', // filter by recommendation connection
+                  query: 'recommendations',
+                  key: 'recommendation_id',
+                  filter: true,
+                  connected: {
+                    path: 'recommendation_measures',
+                    key: 'measure_id',
+                    whereKey: 'recommendation_id',
+                  },
+                },
+                {
+                  label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+                  path: 'indicators', // filter by recommendation connection
+                  query: 'indicators',
+                  key: 'indicator_id',
+                  filter: true,
+                  connected: {
+                    path: 'measure_indicators',
+                    key: 'measure_id',
+                    whereKey: 'indicator_id',
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    });
+    return fields;
+  };
+
+  getBodyAsideFields = (entity, isManager) => {
+    const fields = [];
+    if (entity.attributes.url && entity.attributes.url.trim().length > 0) {
+      fields.push({
+        type: 'dark',
+        fields: [
+          {
+            type: 'link',
+            value: entity.attributes.url,
+            anchor: this.getCategoryAnchor(entity.attributes.url),
+          },
+        ],
+      });
+    }
+    if (isManager && !!entity.taxonomy.attributes.has_manager) {
+      fields.push({
+        type: 'dark',
+        fields: [{
+          type: 'manager',
+          value: entity.manager && entity.manager.attributes.name,
+          showEmpty: this.context.intl.formatMessage(appMessages.attributes.manager_id.categoriesEmpty),
+        }],
+      });
+    }
+    return fields;
+  }
+
+  getFields = (entity, isManager, recommendations, actions, taxonomies) => ({
+    header: {
+      main: this.getHeaderMainFields(entity, isManager),
+      aside: this.getHeaderAsideFields(entity, isManager),
+    },
+    body: {
+      main: this.getBodyMainFields(entity, recommendations, actions, taxonomies),
+      aside: this.getBodyAsideFields(entity, isManager),
+    },
+  });
+
   getCategoryShortTitle = (category) => {
     const title = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
       ? category.attributes.short_title
@@ -51,8 +244,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       : urlNoProtocol;
   }
   render() {
-    const { category, dataReady, isManager } = this.props;
-    const reference = this.props.params.id;
+    const { category, dataReady, isManager, recommendations, actions, taxonomies } = this.props;
 
     const buttons = dataReady && isManager
     ? [
@@ -70,107 +262,10 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       onClick: () => this.props.handleClose(this.props.category.taxonomy.id),
     }];
 
-    const mainAsideFields = dataReady
-    ? [
-      {
-        type: 'dark',
-        fields: [
-          {
-            type: 'link',
-            value: category.attributes.url,
-            anchor: this.getCategoryAnchor(category.attributes.url),
-          },
-        ],
-      },
-    ]
-    : null;
-    if (dataReady
-      && isManager
-      && !!category.taxonomy.attributes.has_manager
-    ) {
-      mainAsideFields.push({
-        type: 'dark',
-        fields: [{
-          type: 'manager',
-          value: category.manager && category.manager.attributes.name,
-          showEmpty: this.context.intl.formatMessage(appMessages.attributes.manager_id.categoriesEmpty),
-        }],
-      });
-    }
-
-    const fields = dataReady ? {
-      header: {
-        main: [ // fieldGroups
-          { // fieldGroup
-            fields: [
-              {
-                type: 'title',
-                value: category.attributes.title,
-                isManager,
-              },
-              {
-                type: 'short_title',
-                value: this.getCategoryShortTitle(category),
-                taxonomyId: category.attributes.taxonomy_id,
-              },
-            ],
-          },
-        ],
-        aside: isManager
-        ? [
-          {
-            fields: [
-              {
-                type: 'referenceStatus',
-                fields: [
-                  {
-                    type: 'reference',
-                    value: reference,
-                    large: true,
-                  },
-                  // {
-                  //   type: 'status',
-                  //   value: true,
-                  // },
-                ],
-              },
-              {
-                type: 'meta',
-                fields: [
-                  {
-                    label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-                    value: this.context.intl.formatDate(new Date(category.attributes.updated_at)),
-                  },
-                  {
-                    label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-                    value: category.user && category.user.attributes.name,
-                  },
-                ],
-              },
-            ],
-          },
-        ]
-        : null,
-      },
-      body: {
-        main: {
-          fields: [
-            {
-              type: 'description',
-              value: category.attributes.description,
-            },
-          ],
-        },
-        aside: mainAsideFields,
-      },
-    }
-    : null;
-
-
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
@@ -191,7 +286,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             </div>
           }
           { category && dataReady &&
-            <EntityView fields={fields} />
+            <EntityView fields={this.getFields(category, isManager, recommendations, actions, taxonomies)} />
           }
         </Content>
       </div>
@@ -207,6 +302,9 @@ CategoryView.propTypes = {
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   isManager: PropTypes.bool,
+  actions: PropTypes.object,
+  recommendations: PropTypes.object,
+  taxonomies: PropTypes.object,
 };
 
 CategoryView.contextTypes = {
@@ -218,11 +316,15 @@ const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
     'categories',
     'users',
+    'user_roles',
     'taxonomies',
-    'recommendation_categories',
-    'measure_categories',
-    'measures',
     'recommendations',
+    'recommendation_measures',
+    'recommendation_categories',
+    'measures',
+    'measure_indicators',
+    'measure_categories',
+    'indicators',
   ] }),
   category: getEntity(
     state,
@@ -248,30 +350,95 @@ const mapStateToProps = (state, props) => ({
           path: 'taxonomies',
           key: 'taxonomy_id',
           as: 'taxonomy',
-        }, {
-          path: 'measure_categories',
-          key: 'category_id',
+        },
+      ],
+    },
+  ),
+  recommendations: getEntities(
+    state, {
+      path: 'recommendations',
+      out: 'js',
+      connected: {
+        path: 'recommendation_categories',
+        key: 'recommendation_id',
+        where: {
+          category_id: props.params.id,
+        },
+      },
+      extend: [
+        {
+          path: 'recommendation_categories',
+          key: 'recommendation_id',
           reverse: true,
-          as: 'actions',
-          extend: {
-            type: 'single',
+          as: 'taxonomies',
+        },
+        {
+          path: 'recommendation_measures',
+          key: 'recommendation_id',
+          reverse: true,
+          as: 'measures',
+          connected: {
             path: 'measures',
             key: 'measure_id',
-            as: 'action',
-          },
-        }, {
-          path: 'recommendation_categories',
-          key: 'category_id',
-          reverse: true,
-          as: 'recommendations',
-          extend: {
-            type: 'single',
-            path: 'recommendations',
-            key: 'recommendation_id',
-            as: 'recommendation',
+            forward: true,
           },
         },
       ],
+    },
+  ),
+  // all connected actions
+  actions: getEntities(
+    state, {
+      path: 'measures',
+      out: 'js',
+      connected: {
+        path: 'measure_categories',
+        key: 'measure_id',
+        where: {
+          category_id: props.params.id,
+        },
+      },
+      extend: [
+        {
+          path: 'measure_categories',
+          key: 'measure_id',
+          reverse: true,
+          as: 'taxonomies',
+        },
+        {
+          path: 'recommendation_measures',
+          key: 'measure_id',
+          reverse: true,
+          as: 'recommendations',
+          connected: {
+            path: 'recommendations',
+            key: 'recommendation_id',
+            forward: true,
+          },
+        },
+        {
+          path: 'measure_indicators',
+          key: 'measure_id',
+          reverse: true,
+          as: 'indicators',
+          connected: {
+            path: 'indicators',
+            key: 'indicator_id',
+            forward: true,
+          },
+        },
+      ],
+    },
+  ),
+  taxonomies: getEntities(
+    state, { // filter by each category
+      out: 'js',
+      path: 'taxonomies',
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+      },
     },
   ),
 });
@@ -281,11 +448,14 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
     handleEdit: (categoryId) => {
