@@ -104,15 +104,20 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
             key: 'indicator_id',
             reverse: true,
             as: 'measures',
-            extend: {
+            // extend: {
+            //   path: 'measures',
+            //   key: 'measure_id',
+            //   as: 'measure',
+            //   type: 'single',
+            // },
+            connected: {
               path: 'measures',
               key: 'measure_id',
-              as: 'measure',
-              type: 'single',
+              forward: true,
             },
           },
           {
-            single: true,
+            type: 'single',
             path: 'users',
             key: 'manager_id',
             as: 'manager',
