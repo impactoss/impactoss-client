@@ -26,7 +26,7 @@ export function* save({ data }) {
 
     yield put(passwordSuccess());
 
-    yield put(updatePath(`users/${data.id}`));
+    yield put(updatePath(`/users/${data.id}`));
     yield put(formActions.reset('userPassword.form.data'));
   } catch (error) {
     error.response.json = yield error.response.json();
