@@ -555,7 +555,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   renderManager = (field) => (
     <FieldWrap>
       <Label>
-        {this.context.intl.formatMessage(appMessages.attributes.manager_id.categories)}
+        {field.label || this.context.intl.formatMessage(appMessages.attributes.manager_id.categories)}
       </Label>
       { field.value &&
         <Manager>{field.value}</Manager>
@@ -569,7 +569,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   renderDownload = (field) => (
     <FieldWrap>
       <LabelLarge>
-        {this.context.intl.formatMessage(appMessages.attributes.document_url)}
+        {field.label || this.context.intl.formatMessage(appMessages.attributes.document_url)}
       </LabelLarge>
       { field.value &&
         <DocumentWrap>
