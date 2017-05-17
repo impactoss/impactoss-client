@@ -60,24 +60,24 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
           <NavAccount>
             {isSignedIn &&
               <span>
-                <LinkAccount href={'/logout'} onClick={(evt) => this.onClick(evt, '/logout')}>
-                  <FormattedMessage {...messages.logout} />
-                </LinkAccount>
                 <LinkAccount
                   href={`/users/${this.props.userId}`}
                   onClick={(evt) => this.onClick(evt, `/users/${this.props.userId}`)}
                 >
                   <FormattedMessage {...messages.user} />
                 </LinkAccount>
+                <LinkAccount href={'/logout'} onClick={(evt) => this.onClick(evt, '/logout')}>
+                  <FormattedMessage {...messages.logout} />
+                </LinkAccount>
               </span>
             }
             {!isSignedIn &&
               <span>
-                <LinkAccount href={'/login'} onClick={(evt) => this.onClick(evt, '/login')}>
-                  <FormattedMessage {...messages.login} />
-                </LinkAccount>
                 <LinkAccount href={'/register'} onClick={(evt) => this.onClick(evt, '/register')}>
                   <FormattedMessage {...messages.register} />
+                </LinkAccount>
+                <LinkAccount href={'/login'} onClick={(evt) => this.onClick(evt, '/login')}>
+                  <FormattedMessage {...messages.login} />
                 </LinkAccount>
               </span>
             }
