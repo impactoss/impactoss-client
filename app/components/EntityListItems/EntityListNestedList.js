@@ -24,7 +24,6 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
       expandNo,
       isExpandable,
       expandableColumns,
-      showDate,
       onExpand,
     } = props;
     return {
@@ -33,7 +32,6 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
       reference: entity.attributes.number || entity.id,
       linkTo: `${entityLinkTo}${entity.id}`,
       status: entity.attributes.draft ? 'draft' : null,
-      updated: showDate ? entity.attributes.updated_at.split('T')[0] : null,
       expandables: isExpandable && !expandNo
         ? expandableColumns.map((column) => ({
           type: column.type,
@@ -83,7 +81,6 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
 
 EntityListNestedList.propTypes = {
   entities: PropTypes.array.isRequired,
-  showDate: PropTypes.bool,
   entityLinkTo: PropTypes.string,
   expandNo: PropTypes.number,
   isExpandable: PropTypes.bool,

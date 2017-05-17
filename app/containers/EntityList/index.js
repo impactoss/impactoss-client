@@ -282,13 +282,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                           }
                           <EntityListItems
                             taxonomies={taxonomies}
-                            filters={filters}
+                            associations={filters}
                             entities={entityGroup.entities}
                             entitiesSelected={entitiesSelected}
                             entityIcon={this.props.header.icon}
                             entityLinkTo={this.props.entityLinkTo}
                             isSelect={isManager}
-                            showDate={isManager}
                             onTagClick={this.props.onTagClick}
                             onEntitySelect={this.props.onEntitySelect}
                             expandNo={this.props.expandNo}

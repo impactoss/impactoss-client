@@ -8,11 +8,10 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { find } from 'lodash/collection';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
-import { CONTENT_SINGLE, PUBLISH_STATUSES } from 'containers/App/constants';
+import { CONTENT_SINGLE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -26,6 +25,7 @@ import {
   isUserManager,
 } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 export class ActionView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -39,18 +39,156 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       this.props.loadEntitiesIfNeeded();
     }
   }
+  getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          type: 'title',
+          value: entity.attributes.title,
+          isManager,
+        },
+      ],
+    },
+  ]);
+  getHeaderAsideFields = (entity, isManager) => {
+    if (!isManager) {
+      return [
+        {
+          fields: [
+            {
+              type: 'referenceStatus',
+              fields: [
+                {
+                  type: 'reference',
+                  value: entity.id,
+                  large: true,
+                },
+              ],
+            },
+          ],
+        },
+      ];
+    }
+    return [
+      {
+        fields: [
+          {
+            type: 'referenceStatus',
+            fields: [
+              {
+                type: 'reference',
+                value: entity.id,
+              },
+              {
+                type: 'status',
+                value: entity.attributes.draft,
+              },
+            ],
+          },
+          {
+            type: 'meta',
+            fields: [
+              {
+                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
+                value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+              },
+              {
+                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
+                value: entity.user && entity.user.attributes.name,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+  }
+  getBodyMainFields = (entity, recommendations, indicators, recTaxonomies) => {
+    const fields = [];
+    if (entity.attributes.description && entity.attributes.description.trim().length > 0) {
+      fields.push({
+        fields: [
+          {
+            type: 'description',
+            value: entity.attributes.description,
+          },
+        ],
+      });
+    }
+    const connectionGroup = {
+      label: 'Connections',
+      icon: 'connections',
+      fields: [
+        {
+          type: 'connections',
+          label: `${Object.values(recommendations).length} ${this.context.intl.formatMessage(Object.values(recommendations).length === 1 ? appMessages.entities.recommendations.single : appMessages.entities.recommendations.plural)}`,
+          entityType: 'recommendations',
+          values: Object.values(recommendations),
+          icon: 'recommendations',
+          entityPath: '/recommendations/',
+          taxonomies: recTaxonomies,
+          connectionOptions: [
+            {
+              label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+              path: 'measures', // filter by recommendation connection
+            },
+          ],
+        },
+        {
+          type: 'connections',
+          label: `${Object.values(indicators).length} ${this.context.intl.formatMessage(Object.values(indicators).length === 1 ? appMessages.entities.indicators.single : appMessages.entities.indicators.plural)}`,
+          entityType: 'indicators',
+          values: Object.values(indicators),
+          icon: 'indicators',
+          entityPath: '/indicators/',
+          taxonomies: null,
+          connectionOptions: [
+            {
+              label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+              path: 'measures',
+            },
+          ],
+        },
+      ],
+    };
+    fields.push(connectionGroup);
+    return fields;
+  };
 
-  mapIndicators = (indicators) =>
-    Object.values(indicators).map((indicator) => ({
-      label: indicator.attributes.title,
-      linkTo: `/indicators/${indicator.id}`,
-    }))
+  getBodyAsideFields = (entity, taxonomies) => ([ // fieldGroups
+    {
+      type: 'dark',
+      fields: [
+        {
+          type: 'date',
+          value: entity.attributes.target_date && this.context.intl.formatDate(new Date(entity.attributes.target_date)),
+          label: this.context.intl.formatMessage(appMessages.attributes.target_date),
+          showEmpty: this.context.intl.formatMessage(appMessages.attributes.targetDateEmpty),
+        },
+      ],
+    },
+    { // fieldGroup
+      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
+      icon: 'categories',
+      fields: Object.values(taxonomies).map((taxonomy) => ({
+        type: 'list',
+        label: this.context.intl.formatMessage(appMessages.entities.taxonomies[taxonomy.id].plural),
+        entityType: 'taxonomies',
+        id: taxonomy.id,
+        values: this.mapCategoryOptions(taxonomy.categories),
+      })),
+    },
+  ]);
 
-  mapRecommendations = (recommendations) =>
-    Object.values(recommendations).map((recommendation) => ({
-      label: recommendation.attributes.title,
-      linkTo: `/recommendations/${recommendation.id}`,
-    }))
+  getFields = (entity, isManager, recommendations, indicators, taxonomies, recTaxonomies) => ({
+    header: {
+      main: this.getHeaderMainFields(entity, isManager),
+      aside: this.getHeaderAsideFields(entity, isManager),
+    },
+    body: {
+      main: this.getBodyMainFields(entity, recommendations, indicators, recTaxonomies),
+      aside: this.getBodyAsideFields(entity, taxonomies),
+    },
+  });
 
   mapCategoryOptions = (categories) => categories
     ? Object.values(categories).map((cat) => ({
@@ -59,43 +197,16 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     }))
     : []
 
-  renderTaxonomyLists = (taxonomies) =>
-    Object.values(taxonomies).map((taxonomy) => ({
-      id: taxonomy.id,
-      heading: taxonomy.attributes.title,
-      type: 'list',
-      values: this.mapCategoryOptions(taxonomy.categories),
-    }))
-
   render() {
-    const { action, dataReady, isManager } = this.props;
-    const reference = this.props.params.id;
-    const status = action && find(PUBLISH_STATUSES, { value: action.attributes.draft });
-
-    let asideFields = action && [{
-      id: 'number',
-      heading: 'Number',
-      value: reference,
-    }];
-    if (action && isManager) {
-      asideFields = asideFields.concat([
-        {
-          id: 'status',
-          heading: 'Status',
-          value: status && status.label,
-        },
-        {
-          id: 'updated',
-          heading: 'Updated At',
-          value: action.attributes.updated_at,
-        },
-        {
-          id: 'updated_by',
-          heading: 'Updated By',
-          value: action.user && action.user.attributes.name,
-        },
-      ]);
-    }
+    const {
+      action,
+      dataReady,
+      isManager,
+      recommendations,
+      indicators,
+      taxonomies,
+      recTaxonomies,
+    } = this.props;
 
     const buttons = isManager
     ? [
@@ -116,7 +227,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
@@ -138,39 +249,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           }
           { action && dataReady &&
             <EntityView
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'title',
-                      value: action.attributes.title,
-                    },
-                  ],
-                  aside: asideFields,
-                },
-                body: {
-                  main: [
-                    {
-                      id: 'description',
-                      heading: 'Description',
-                      value: action.attributes.description,
-                    },
-                    {
-                      id: 'recommendations',
-                      heading: 'Recommendations',
-                      type: 'list',
-                      values: this.mapRecommendations(this.props.recommendations),
-                    },
-                    {
-                      id: 'indicators',
-                      heading: 'Indicators',
-                      type: 'list',
-                      values: this.mapIndicators(this.props.indicators),
-                    },
-                  ],
-                  aside: this.renderTaxonomyLists(this.props.taxonomies),
-                },
-              }}
+              fields={this.getFields(action, isManager, recommendations, indicators, taxonomies, recTaxonomies)}
             />
           }
         </Content>
@@ -187,6 +266,7 @@ ActionView.propTypes = {
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   taxonomies: PropTypes.object,
+  recTaxonomies: PropTypes.object,
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
   params: PropTypes.object,
@@ -209,6 +289,7 @@ const mapStateToProps = (state, props) => ({
     'measure_categories',
     'indicators',
     'measure_indicators',
+    'recommendation_categories',
   ] }),
   action: getEntity(
     state,
@@ -247,6 +328,20 @@ const mapStateToProps = (state, props) => ({
       out: 'js',
     },
   ),
+  recTaxonomies: getEntities(
+    state, {
+      out: 'js',
+      path: 'taxonomies',
+      where: {
+        tags_recommendations: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+      },
+    },
+  ),
   // all connected recommendations
   recommendations: getEntities(
     state, {
@@ -259,6 +354,25 @@ const mapStateToProps = (state, props) => ({
           measure_id: props.params.id,
         },
       },
+      extend: [
+        {
+          path: 'recommendation_categories',
+          key: 'recommendation_id',
+          reverse: true,
+          as: 'taxonomies',
+        },
+        {
+          path: 'recommendation_measures',
+          key: 'recommendation_id',
+          reverse: true,
+          as: 'measures',
+          connected: {
+            path: 'measures',
+            key: 'measure_id',
+            forward: true,
+          },
+        },
+      ],
     },
   ),
   // all connected indicators
@@ -273,6 +387,19 @@ const mapStateToProps = (state, props) => ({
           measure_id: props.params.id,
         },
       },
+      extend: [
+        {
+          path: 'measure_indicators',
+          key: 'indicator_id',
+          reverse: true,
+          as: 'measures',
+          connected: {
+            path: 'measures',
+            key: 'measure_id',
+            forward: true,
+          },
+        },
+      ],
     },
   ),
 });
@@ -287,6 +414,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('user_roles'));

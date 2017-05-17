@@ -22,8 +22,8 @@ const Item = styled(Component)`
 `;
 const MainWrapper = styled(Component)`
   display: table-cell;
-  width: ${(props) => props.width * 100}%;
-  border-right: 1px solid ${(props) => props.width < 1 ? palette('greyscaleLight', 0) : 'transparent'};
+  width: ${(props) => props.expandables ? 66 : 100}%;
+  border-right: 1px solid ${(props) => props.expandables ? palette('greyscaleLight', 0) : 'transparent'};
 
 `;
 const MainInnerWrapper = styled(Component)`
@@ -41,13 +41,10 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       expandNo,
       entityIcon,
     } = this.props;
-
-    const widthMain = entity.expandables ? 0.66 : 1;
-
     return (
       <Styled expandNo={expandNo}>
         <Item>
-          <MainWrapper width={widthMain} >
+          <MainWrapper expandables={entity.expandables} >
             <MainInnerWrapper>
               {select &&
                 <EntityListItemSelect checked={checked} onSelect={onSelect} />
