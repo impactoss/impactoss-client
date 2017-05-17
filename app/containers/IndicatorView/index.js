@@ -105,7 +105,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     ];
   }
 
-  getBodyMainFields = (entity, actions, reports, actionTaxonomies) => ([
+  getBodyMainFields = (entity, actions, reports, actionTaxonomies, isContributor) => ([
     {
       fields: [
         {
@@ -113,10 +113,17 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
           value: entity.attributes.description,
         },
         {
-          type: 'list',
+          type: 'reports',
           label: this.context.intl.formatMessage(appMessages.entities.progress_reports.plural),
           values: this.mapReports(reports),
           showEmpty: this.context.intl.formatMessage(appMessages.entities.progress_reports.empty),
+          button: isContributor
+            ? {
+              type: 'add',
+              title: this.context.intl.formatMessage(messages.addReport),
+              onClick: this.props.handleNewReport,
+            }
+            : null,
         },
       ],
     },
@@ -174,7 +181,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       aside: this.getHeaderAsideFields(entity, isContributor),
     },
     body: {
-      main: this.getBodyMainFields(entity, actions, reports, actionTaxonomies),
+      main: this.getBodyMainFields(entity, actions, reports, actionTaxonomies, isContributor),
       aside: isContributor ? this.getBodyAsideFields(entity, dates) : null,
     },
   });
@@ -182,6 +189,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   mapReports = (reports) =>
     Object.values(reports).map((report) => ({
       label: report.attributes.title,
+      dueDate: report.due_date ? this.context.intl.formatDate(new Date(report.due_date.attributes.due_date)) : null,
       linkTo: `/reports/${report.id}`,
     }))
   mapDates = (dates) =>
@@ -197,7 +205,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     const buttons = isContributor
     ? [
       {
-        type: 'add',
+        type: 'text',
         title: this.context.intl.formatMessage(messages.addReport),
         onClick: this.props.handleNewReport,
       },
@@ -371,6 +379,12 @@ const mapStateToProps = (state, props) => ({
       out: 'js',
       where: {
         indicator_id: props.params.id,
+      },
+      extend: {
+        path: 'due_dates',
+        key: 'due_date_id',
+        type: 'single',
+        as: 'due_date',
       },
     },
   ),

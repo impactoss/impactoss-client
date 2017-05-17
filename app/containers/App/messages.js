@@ -127,6 +127,14 @@ export default defineMessages({
     },
   },
   entities: {
+    showAll: {
+      id: 'app.containers.App.entities.showAll',
+      defaultMessage: 'Show all',
+    },
+    showLess: {
+      id: 'app.containers.App.entities.showLess',
+      defaultMessage: 'Show less',
+    },
     recommendations: {
       single: {
         id: 'app.containers.App.entities.recommendations.single',
@@ -221,6 +229,14 @@ export default defineMessages({
       unscheduled: {
         id: 'app.containers.App.entities.progress_reports.unscheduled',
         defaultMessage: 'Extraordinary (no due date assigned)',
+      },
+      showAll: {
+        id: 'app.containers.App.entities.progress_reports.showAll',
+        defaultMessage: 'Show all reports',
+      },
+      showLess: {
+        id: 'app.containers.App.entities.progress_reports.showLess',
+        defaultMessage: 'Show less reports',
       },
     },
     taxonomies: {
@@ -341,6 +357,14 @@ export default defineMessages({
       scheduled: {
         id: 'app.containers.App.entities.due_dates.due',
         defaultMessage: 'Report scheduled',
+      },
+      showAll: {
+        id: 'app.containers.App.entities.due_dates.showAll',
+        defaultMessage: 'Show all dates',
+      },
+      showLess: {
+        id: 'app.containers.App.entities.due_dates.showLess',
+        defaultMessage: 'Show less dates',
       },
     },
     categories: {

@@ -21,6 +21,7 @@ import asArray from 'utils/as-array';
 import A from 'components/basic/A';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
+import ButtonFactory from 'components/buttons/ButtonFactory';
 import DocumentView from 'components/DocumentView';
 import EntityListItems from 'components/EntityListItems';
 
@@ -76,12 +77,22 @@ const GroupIcon = styled.div`
   top: 0;
   color: ${palette('greyscaleDark', 4)}
 `;
+const ButtonWrap = styled.div`
+  position: absolute;
+  right: 0;
+  top: 0;
+`;
 const FieldIcon = styled.div`
   position: absolute;
   top: 0;
   right: 0;
   color: ${palette('greyscaleDark', 4)}
 `;
+const ListItemIcon = styled(FieldIcon)`
+  top: 0.5em;
+  color: ${palette('greyscaleLight', 4)}
+`;
+
 const ReferenceWrap = styled.span`
   display: inline-block;
   min-width: 100px;
@@ -151,18 +162,39 @@ const ListLink = styled(Link)`
   color: ${palette('greyscaleDark', 1)};
   display: block;
 `;
+const ReportListLink = styled(ListLink)`
+  font-weight: 500;
+  font-size: 1.2em;
+  color: ${palette('greyscaleDark', 1)};
+  display: block;
+`;
+const ReportDueDate = styled.div`
+  color: ${palette('greyscaleDark', 4)};
+  display: block;
+`;
 const ListLabel = styled(Label)`
   padding-bottom: 8px;
   border-bottom: 1px solid ${palette('greyscaleLight', 0)};
 `;
-const ConnectionListLabel = styled(ListLabel)`
-  padding-bottom: 1em;
+const LabelLarge = styled(ListLabel)`
+  padding-bottom: 0.85em;
   border-bottom: none;
   font-size: 1.8em;
   color: ${palette('greyscaleDark', 0)};
 `;
+const DocumentWrap = styled.div`
+  display: block;
+  border-bottom: 1px solid ${palette('greyscaleLight', 0)};
+  border-top: 1px solid ${palette('greyscaleLight', 0)};
+  padding: 1em 0;
+`;
 const ListItem = styled.div`
   padding: 1em 0 0;
+`;
+const ReportListItem = styled(ListItem)`
+  padding: 1.25em 0;
+  border-top: 1px solid ${palette('greyscaleLight', 0)};
+  position: relative;
 `;
 const Dot = styled.div`
   background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
@@ -188,7 +220,8 @@ const EntityListItemsWrap = styled.div`
 `;
 
 const DATEMAX = 3;
-const CONNECTIONMAX = 5;
+const CONNECTIONMAX = 3;
+const REPORTSMAX = 5;
 
 class EntityView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -196,6 +229,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
     super();
     this.state = {
       showAllDates: false,
+      showAllReports: false,
       showAllConnections: [],
     };
   }
@@ -213,7 +247,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
       {field.values.map((value, i) => (
         <ListItem key={i}>
           {value.linkTo
-            ? <ListLink key={i} to={value.linkTo}>{value.label}</ListLink>
+            ? <ListLink to={value.linkTo}>{value.label}</ListLink>
             : <p>{value.label}</p>
           }
         </ListItem>
@@ -223,18 +257,73 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
       }
     </FieldWrap>
   );
+  renderReports = (field) => {
+    const sortedValues = orderBy(field.values, getEntitySortIteratee('id'), 'asc');
+    return (
+      <FieldWrap>
+        <LabelLarge>
+          {field.label}
+        </LabelLarge>
+        { field.button &&
+          <ButtonWrap>
+            <ButtonFactory button={field.button} />
+          </ButtonWrap>
+        }
+        <EntityListItemsWrap>
+          { sortedValues.map((value, i) => (this.state.showAllReports || i < REPORTSMAX) && (
+            <ReportListLink key={i} to={value.linkTo}>
+              <ReportListItem>
+                <ListItemIcon>
+                  <Icon name="report" />
+                </ListItemIcon>
+                { value.dueDate &&
+                  <ReportDueDate>
+                    {value.dueDate}
+                  </ReportDueDate>
+                }
+                { !value.dueDate &&
+                  <ReportDueDate>
+                    <FormattedMessage {...appMessages.entities.progress_reports.unscheduled} />
+                  </ReportDueDate>
+                }
+                {value.label}
+              </ReportListItem>
+            </ReportListLink>
+          ))}
+        </EntityListItemsWrap>
+        { field.values && field.values.length > REPORTSMAX &&
+          <ToggleAllItems
+            onClick={() =>
+              this.setState({ showAllReports: !this.state.showAllReports })
+            }
+          >
+            { this.state.showAllReports &&
+              <FormattedMessage {...appMessages.entities.progress_reports.showLess} />
+            }
+            { !this.state.showAllReports &&
+              <FormattedMessage {...appMessages.entities.progress_reports.showAll} />
+            }
+          </ToggleAllItems>
+        }
+        { (!field.values || field.values.length === 0) &&
+          <EmptyHint>{field.showEmpty}</EmptyHint>
+        }
+      </FieldWrap>
+    );
+  };
+
   renderConnections = (field) => {
     const sortedValues = orderBy(field.values, getEntitySortIteratee('id'), 'desc');
     return (
       <FieldWrap>
-        <ConnectionListLabel>
+        <LabelLarge>
           {field.label}
           {field.entityType &&
             <DotWrapper>
               <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
             </DotWrapper>
           }
-        </ConnectionListLabel>
+        </LabelLarge>
         <EntityListItemsWrap>
           <EntityListItems
             entities={this.state.showAllConnections.indexOf(field.entityType) >= 0
@@ -262,10 +351,10 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
             }
           >
             { this.state.showAllConnections.indexOf(field.entityType) >= 0 &&
-              <span>Show less</span>
+              <FormattedMessage {...appMessages.entities.showLess} />
             }
             { this.state.showAllConnections.indexOf(field.entityType) < 0 &&
-              <span>Show all</span>
+              <FormattedMessage {...appMessages.entities.showAll} />
             }
           </ToggleAllItems>
         }
@@ -306,10 +395,10 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
           }
         >
           { this.state.showAllDates &&
-            <span>Show less</span>
+            <FormattedMessage {...appMessages.entities.due_dates.showLess} />
           }
           { !this.state.showAllDates &&
-            <span>Show all</span>
+            <FormattedMessage {...appMessages.entities.due_dates.showAll} />
           }
         </ToggleAllItems>
       }
@@ -479,11 +568,13 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
 
   renderDownload = (field) => (
     <FieldWrap>
-      <Label>
+      <LabelLarge>
         {this.context.intl.formatMessage(appMessages.attributes.document_url)}
-      </Label>
+      </LabelLarge>
       { field.value &&
-        <DocumentView url={field.value} isManager={field.isManager} status={field.public} />
+        <DocumentWrap>
+          <DocumentView url={field.value} isManager={field.isManager} status={field.public} />
+        </DocumentWrap>
       }
       { !field.value &&
         <EmptyHint>{field.showEmpty}</EmptyHint>
@@ -523,8 +614,8 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
           return this.renderDownload(field);
         case 'connections':
           return this.renderConnections(field);
-        // case 'reports':
-        //   return this.renderCategories(field);
+        case 'reports':
+          return this.renderReports(field);
         case 'text':
         default:
           return this.renderText(field);

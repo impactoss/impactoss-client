@@ -148,7 +148,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (report && dataReady) {
-      pageTitle = `${pageTitle} for indicator: ${report.attributes.indicator_id}`;
+      pageTitle = `${pageTitle} for indicator ${report.attributes.indicator_id}`;
     }
 
     return (

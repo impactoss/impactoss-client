@@ -9,13 +9,7 @@ import Row from 'components/basic/Row';
 import SupTitle from 'components/SupTitle';
 import Icon from 'components/Icon';
 
-import ButtonPrimaryIcon from 'components/buttons/ButtonPrimaryIcon';
-import ButtonPrimary from 'components/buttons/ButtonPrimary';
-import ButtonText from 'components/buttons/ButtonText';
-import ButtonIconPrimary from 'components/buttons/ButtonIconPrimary';
-
-import appMessages from 'containers/App/messages';
-
+import ButtonFactory from 'components/buttons/ButtonFactory';
 
 const Styled = styled.div`
   padding: 3em 0 1em;
@@ -51,52 +45,6 @@ const ButtonGroup = styled.div`
 
 class ContentHeader extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
-  renderButton = (action) => {
-    switch (action.type) {
-      case 'primary' :
-        return (
-          <ButtonPrimary onClick={() => action.onClick()}>
-            {action.title}
-          </ButtonPrimary>
-        );
-      case 'add' :
-        return (
-          <ButtonPrimaryIcon
-            onClick={() => action.onClick()}
-            icon="add"
-            title={action.title || this.context.intl.formatMessage(appMessages.buttons.add)}
-          />
-        );
-      case 'edit' :
-        return (
-          <ButtonText onClick={() => action.onClick()}>
-            {action.title || this.context.intl.formatMessage(appMessages.buttons.edit)}
-          </ButtonText>
-        );
-      case 'close' :
-        return (
-          <ButtonIconPrimary
-            onClick={() => action.onClick()}
-            title={action.title || this.context.intl.formatMessage(appMessages.buttons.close)}
-          >
-            <Icon name="close" />
-          </ButtonIconPrimary>
-        );
-      case 'textPrimary' :
-        return (
-          <ButtonText onClick={() => action.onClick()} primary>
-            {action.title}
-          </ButtonText>
-        );
-      case 'text' :
-      default :
-        return (
-          <ButtonText onClick={() => action.onClick()}>
-            {action.title}
-          </ButtonText>
-        );
-    }
-  }
   renderTitle = (type, title, icon) => {
     switch (type) {
       case CONTENT_LIST:
@@ -129,7 +77,7 @@ class ContentHeader extends React.Component { // eslint-disable-line react/prefe
                 {
                   buttons.map((button, i) => (
                     <ButtonWrap key={i}>
-                      { this.renderButton(button, i) }
+                      <ButtonFactory button={button} />
                     </ButtonWrap>
                   ))
                 }
@@ -148,9 +96,6 @@ ContentHeader.propTypes = {
   supTitle: PropTypes.string,
   icon: PropTypes.string,
   type: PropTypes.string,
-};
-ContentHeader.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
 };
 
 export default ContentHeader;
