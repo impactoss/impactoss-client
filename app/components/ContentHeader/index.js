@@ -12,7 +12,7 @@ import Icon from 'components/Icon';
 import ButtonPrimaryIcon from 'components/buttons/ButtonPrimaryIcon';
 import ButtonPrimary from 'components/buttons/ButtonPrimary';
 import ButtonText from 'components/buttons/ButtonText';
-import ButtonIcon from 'components/buttons/ButtonIcon';
+import ButtonIconPrimary from 'components/buttons/ButtonIconPrimary';
 
 import appMessages from 'containers/App/messages';
 
@@ -69,20 +69,18 @@ class ContentHeader extends React.Component { // eslint-disable-line react/prefe
         );
       case 'edit' :
         return (
-          <ButtonPrimaryIcon
-            onClick={() => action.onClick()}
-            icon="edit"
-            title={action.title || this.context.intl.formatMessage(appMessages.buttons.edit)}
-          />
+          <ButtonText onClick={() => action.onClick()}>
+            {action.title || this.context.intl.formatMessage(appMessages.buttons.edit)}
+          </ButtonText>
         );
       case 'close' :
         return (
-          <ButtonIcon
+          <ButtonIconPrimary
             onClick={() => action.onClick()}
             title={action.title || this.context.intl.formatMessage(appMessages.buttons.close)}
           >
             <Icon name="close" />
-          </ButtonIcon>
+          </ButtonIconPrimary>
         );
       case 'textPrimary' :
         return (
