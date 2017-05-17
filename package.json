@@ -225,7 +225,6 @@
     "ip": "1.1.4",
     "lodash": "4.17.2",
     "minimist": "1.2.0",
-    "pngquant": "^1.3.0",
     "querystring": "^0.2.0",
     "re-reselect": "^0.1.0",
     "react": "15.4.1",
