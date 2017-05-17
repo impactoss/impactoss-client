@@ -72,6 +72,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
         {
           type: 'title',
           value: entity.attributes.name,
+          label: this.context.intl.formatMessage(appMessages.attributes.name),
           isManager,
         },
       ],
@@ -110,7 +111,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
               {
                 type: 'role',
                 value: entity.roles && this.getUserRole(entity.roles),
-                showEmpty: 'User',
+                showEmpty: this.context.intl.formatMessage(appMessages.entities.user_roles.defaultRole),
               },
             ],
           },
@@ -135,8 +136,9 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     {
       fields: [
         {
+          type: 'email',
           value: entity.attributes.email,
-          label: 'Email',
+          label: this.context.intl.formatMessage(appMessages.attributes.email),
         },
       ],
     },

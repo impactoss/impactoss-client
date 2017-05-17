@@ -63,7 +63,15 @@ export default defineMessages({
     },
     reference: {
       id: 'app.containers.App.attributes.reference',
-      defaultMessage: 'No',
+      defaultMessage: 'No.',
+    },
+    name: {
+      id: 'app.containers.App.attributes.name',
+      defaultMessage: 'User name',
+    },
+    email: {
+      id: 'app.containers.App.attributes.email',
+      defaultMessage: 'Email address',
     },
     status: {
       id: 'app.containers.App.attributes.status',
@@ -211,6 +219,20 @@ export default defineMessages({
       plural: {
         id: 'app.containers.App.entities.users.plural',
         defaultMessage: 'Users',
+      },
+    },
+    user_roles: {
+      single: {
+        id: 'app.containers.App.entities.user_roles.single',
+        defaultMessage: 'Role',
+      },
+      plural: {
+        id: 'app.containers.App.entities.user_roles.plural',
+        defaultMessage: 'Roles',
+      },
+      defaultRole: {
+        id: 'app.containers.App.entities.user_roles.defaultRole',
+        defaultMessage: 'User',
       },
     },
     progress_reports: {

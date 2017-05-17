@@ -447,7 +447,17 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
         {field.label || this.context.intl.formatMessage(appMessages.attributes.url)}
       </Label>
       <Url target="_blank" href={field.value}>
-        {field.anchor}
+        {field.anchor || field.value}
+      </Url>
+    </FieldWrap>
+  );
+  renderEmail = (field) => (
+    <FieldWrap>
+      <Label>
+        {field.label || this.context.intl.formatMessage(appMessages.attributes.url)}
+      </Label>
+      <Url target="_blank" href={`mailto:${field.value}`}>
+        {field.value}
       </Url>
     </FieldWrap>
   );
@@ -511,13 +521,9 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   renderRole = (field) => (
     <StatusWrap>
       <Label>
-        {field.label || 'Role'}
+        {field.label || this.context.intl.formatMessage(appMessages.entities.user_roles.single)}
       </Label>
-      <Status>
-        {
-          field.value // TODO
-        }
-      </Status>
+      <Status>{field.value || field.showEmpty}</Status>
     </StatusWrap>
   );
   renderReferenceStatus = (field) => (
@@ -600,6 +606,8 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
           return this.renderReferenceRole(field);
         case 'link':
           return this.renderLink(field);
+        case 'email':
+          return this.renderEmail(field);
         case 'date':
           return this.renderDate(field);
         case 'manager':
