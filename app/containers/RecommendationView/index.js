@@ -118,6 +118,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
           icon: 'actions',
           entityPath: '/actions/',
           taxonomies: actionTaxonomies,
+          showEmpty: this.context.intl.formatMessage(appMessages.entities.measures.empty),
           connectionOptions: [{
             label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
             path: 'recommendations',

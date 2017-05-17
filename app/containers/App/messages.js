@@ -144,6 +144,10 @@ export default defineMessages({
         id: 'app.containers.App.entities.recommendations.pluralLong',
         defaultMessage: 'HR body recommendations',
       },
+      empty: {
+        id: 'app.containers.App.entities.recommendations.empty',
+        defaultMessage: 'No recommendations yet',
+      },
     },
     measures: {
       single: {
@@ -162,6 +166,10 @@ export default defineMessages({
         id: 'app.containers.App.entities.actions.pluralLong',
         defaultMessage: 'Government actions',
       },
+      empty: {
+        id: 'app.containers.App.entities.measures.empty',
+        defaultMessage: 'No actions yet',
+      },
     },
     indicators: {
       single: {
@@ -171,6 +179,10 @@ export default defineMessages({
       plural: {
         id: 'app.containers.App.entities.indicators.plural',
         defaultMessage: 'Indicators',
+      },
+      empty: {
+        id: 'app.containers.App.entities.indicators.empty',
+        defaultMessage: 'No indicators yet',
       },
     },
     pages: {

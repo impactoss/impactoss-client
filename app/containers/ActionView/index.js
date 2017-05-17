@@ -126,6 +126,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           icon: 'recommendations',
           entityPath: '/recommendations/',
           taxonomies: recTaxonomies,
+          showEmpty: this.context.intl.formatMessage(appMessages.entities.recommendations.empty),
           connectionOptions: [
             {
               label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
@@ -141,6 +142,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           icon: 'indicators',
           entityPath: '/indicators/',
           taxonomies: null,
+          showEmpty: this.context.intl.formatMessage(appMessages.entities.indicators.empty),
           connectionOptions: [
             {
               label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
