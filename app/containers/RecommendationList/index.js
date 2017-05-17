@@ -48,6 +48,11 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             key: 'recommendation_id',
             reverse: true,
             as: 'measures',
+            connected: {
+              path: 'measures',
+              key: 'measure_id',
+              forward: true,
+            },
           },
         ],
       },

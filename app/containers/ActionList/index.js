@@ -132,11 +132,16 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             key: 'measure_id',
             reverse: true,
             as: 'recommendations',
-            extend: {
+            // extend: {
+            //   path: 'recommendations',
+            //   key: 'recommendation_id',
+            //   as: 'recommendation',
+            //   type: 'single',
+            // },
+            connected: {
               path: 'recommendations',
               key: 'recommendation_id',
-              as: 'recommendation',
-              type: 'single',
+              forward: true,
             },
           },
           {
@@ -144,6 +149,11 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             key: 'measure_id',
             reverse: true,
             as: 'indicators',
+            connected: {
+              path: 'indicators',
+              key: 'indicator_id',
+              forward: true,
+            },
             extend: {
               path: 'indicators',
               key: 'indicator_id',
