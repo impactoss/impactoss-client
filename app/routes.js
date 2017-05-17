@@ -589,6 +589,7 @@ export default function createRoutes(store) {
     }, {
       path: '/pages',
       name: 'pageList',
+      onEnter: redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/PageList'),
