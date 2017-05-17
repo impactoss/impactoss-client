@@ -26,4 +26,8 @@ export default defineMessages({
     id: 'app.containers.IndicatorView.addReport',
     defaultMessage: 'Add report',
   },
+  groupReporting: {
+    id: 'app.containers.IndicatorView.groupReporting',
+    defaultMessage: 'Progress report schedule',
+  },
 });

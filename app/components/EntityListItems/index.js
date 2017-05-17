@@ -15,7 +15,7 @@ const Styled = styled.div`
 const ItemWrapper = styled.div`
   border-top: 1px solid;
   padding: ${(props) => props.separated ? '0.5em 0 2.5em' : '0'};
-  border-color: ${(props) => props.separated ? palette('greyscaleLight', 4) : 'transparent'}
+  border-color: ${(props) => props.separated ? palette('greyscaleLight', 4) : palette('greyscaleLight', 0)};
 `;
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -77,29 +77,27 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
     const {
       taxonomies,
       entityLinkTo,
-      filters,
+      associations,
       onTagClick,
-      showDate,
       expandNo,
       isExpandable,
       expandableColumns,
       onExpand,
     } = props;
-
     return {
       id: entity.id,
       title: entity.attributes.name || entity.attributes.title,
       reference: entity.attributes.number || entity.id,
       linkTo: `${entityLinkTo}${entity.id}`,
       status: entity.attributes.draft ? 'draft' : null,
-      updated: showDate ? entity.attributes.updated_at.split('T')[0] : null,
+      targetDate: entity.attributes.target_date ? this.context.intl.formatDate(new Date(entity.attributes.target_date)) : null,
       tags: taxonomies
         ? this.getEntityTags(entity,
           taxonomies,
-          filters.taxonomies && filters.taxonomies.query,
-          filters.taxonomies && onTagClick)
+          associations.taxonomies && associations.taxonomies.query,
+          associations.taxonomies && onTagClick)
         : [],
-      connectedCounts: filters && filters.connections ? this.getConnectedCounts(entity, filters.connections.options) : [],
+      connectedCounts: associations && associations.connections ? this.getConnectedCounts(entity, associations.connections.options) : [],
       expandables: isExpandable && !expandNo
         ? expandableColumns.map((column, i) => ({
           type: column.type,
@@ -109,7 +107,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
           info: column.getInfo && column.getInfo(entity),
           onClick: () => onExpand(expandNo > i ? i : i + 1),
         }))
-        : [],
+        : null,
     };
   };
 
@@ -122,7 +120,6 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
       expandNo,
       isExpandable,
       expandableColumns,
-      showDate,
       onExpand,
       entityIcon,
     } = this.props;
@@ -152,7 +149,6 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
                   entities={expandableColumns[0].getEntities(entity)}
                   entityLinkTo={expandableColumns[0].entityLinkTo}
                   entityIcon={expandableColumns[0].icon}
-                  showDate={showDate}
                   expandNo={expandNo - 1}
                   isExpandable={expandableColumns.length > 1}
                   expandableColumns={expandableColumns.length > 1 ? [expandableColumns[1]] : null}
@@ -171,17 +167,20 @@ EntityListItems.propTypes = {
   entities: PropTypes.array.isRequired,
   entitiesSelected: PropTypes.array,
   isSelect: PropTypes.bool,
-  onEntitySelect: PropTypes.func.isRequired,
-  showDate: PropTypes.bool,
+  onEntitySelect: PropTypes.func,
   taxonomies: PropTypes.object,
   entityLinkTo: PropTypes.string,
-  filters: PropTypes.object,
+  associations: PropTypes.object,
   onTagClick: PropTypes.func,
   onExpand: PropTypes.func,
   expandNo: PropTypes.number,
   isExpandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
   entityIcon: PropTypes.string,
+};
+
+EntityListItems.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
 };
 
 export default EntityListItems;
