@@ -102,34 +102,58 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       },
     ];
   }
-  getBodyMainFields = (entity, recommendations, indicators) => ([
-    {
-      fields: [
-        {
-          type: 'description',
-          value: entity.attributes.description,
-        },
-      ],
-    },
-    {
+  getBodyMainFields = (entity, recommendations, indicators, recTaxonomies) => {
+    const fields = [];
+    if (entity.attributes.description && entity.attributes.description.trim().length > 0) {
+      fields.push({
+        fields: [
+          {
+            type: 'description',
+            value: entity.attributes.description,
+          },
+        ],
+      });
+    }
+    const connectionGroup = {
       label: 'Connections',
       icon: 'connections',
       fields: [
         {
-          type: 'list',
-          label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+          type: 'connections',
+          label: `${Object.values(recommendations).length} ${this.context.intl.formatMessage(Object.values(recommendations).length === 1 ? appMessages.entities.recommendations.single : appMessages.entities.recommendations.plural)}`,
           entityType: 'recommendations',
-          values: this.mapRecommendations(recommendations),
+          values: Object.values(recommendations),
+          icon: 'recommendations',
+          entityPath: '/recommendations/',
+          taxonomies: recTaxonomies,
+          connectionOptions: [
+            {
+              label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+              path: 'measures', // filter by recommendation connection
+            },
+          ],
         },
         {
-          type: 'list',
-          label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+          type: 'connections',
+          label: `${Object.values(indicators).length} ${this.context.intl.formatMessage(Object.values(indicators).length === 1 ? appMessages.entities.indicators.single : appMessages.entities.indicators.plural)}`,
           entityType: 'indicators',
-          values: this.mapIndicators(indicators),
+          values: Object.values(indicators),
+          icon: 'indicators',
+          entityPath: '/indicators/',
+          taxonomies: null,
+          connectionOptions: [
+            {
+              label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+              path: 'measures',
+            },
+          ],
         },
       ],
-    },
-  ]);
+    };
+    fields.push(connectionGroup);
+    return fields;
+  };
+
   getBodyAsideFields = (entity, taxonomies) => ([ // fieldGroups
     {
       type: 'dark',
@@ -155,28 +179,16 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     },
   ]);
 
-  getFields = (entity, isManager, recommendations, indicators, taxonomies) => ({
+  getFields = (entity, isManager, recommendations, indicators, taxonomies, recTaxonomies) => ({
     header: {
       main: this.getHeaderMainFields(entity, isManager),
       aside: this.getHeaderAsideFields(entity, isManager),
     },
     body: {
-      main: this.getBodyMainFields(entity, recommendations, indicators),
+      main: this.getBodyMainFields(entity, recommendations, indicators, recTaxonomies),
       aside: this.getBodyAsideFields(entity, taxonomies),
     },
   });
-
-  mapIndicators = (indicators) =>
-    Object.values(indicators).map((indicator) => ({
-      label: indicator.attributes.title,
-      linkTo: `/indicators/${indicator.id}`,
-    }))
-
-  mapRecommendations = (recommendations) =>
-    Object.values(recommendations).map((recommendation) => ({
-      label: recommendation.attributes.title,
-      linkTo: `/recommendations/${recommendation.id}`,
-    }))
 
   mapCategoryOptions = (categories) => categories
     ? Object.values(categories).map((cat) => ({
@@ -186,7 +198,15 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     : []
 
   render() {
-    const { action, dataReady, isManager, recommendations, indicators, taxonomies } = this.props;
+    const {
+      action,
+      dataReady,
+      isManager,
+      recommendations,
+      indicators,
+      taxonomies,
+      recTaxonomies,
+    } = this.props;
 
     const buttons = isManager
     ? [
@@ -229,7 +249,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           }
           { action && dataReady &&
             <EntityView
-              fields={this.getFields(action, isManager, recommendations, indicators, taxonomies)}
+              fields={this.getFields(action, isManager, recommendations, indicators, taxonomies, recTaxonomies)}
             />
           }
         </Content>
@@ -246,6 +266,7 @@ ActionView.propTypes = {
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   taxonomies: PropTypes.object,
+  recTaxonomies: PropTypes.object,
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
   params: PropTypes.object,
@@ -268,6 +289,7 @@ const mapStateToProps = (state, props) => ({
     'measure_categories',
     'indicators',
     'measure_indicators',
+    'recommendation_categories',
   ] }),
   action: getEntity(
     state,
@@ -306,6 +328,20 @@ const mapStateToProps = (state, props) => ({
       out: 'js',
     },
   ),
+  recTaxonomies: getEntities(
+    state, {
+      out: 'js',
+      path: 'taxonomies',
+      where: {
+        tags_recommendations: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+      },
+    },
+  ),
   // all connected recommendations
   recommendations: getEntities(
     state, {
@@ -318,6 +354,25 @@ const mapStateToProps = (state, props) => ({
           measure_id: props.params.id,
         },
       },
+      extend: [
+        {
+          path: 'recommendation_categories',
+          key: 'recommendation_id',
+          reverse: true,
+          as: 'taxonomies',
+        },
+        {
+          path: 'recommendation_measures',
+          key: 'recommendation_id',
+          reverse: true,
+          as: 'measures',
+          connected: {
+            path: 'measures',
+            key: 'measure_id',
+            forward: true,
+          },
+        },
+      ],
     },
   ),
   // all connected indicators
@@ -332,6 +387,19 @@ const mapStateToProps = (state, props) => ({
           measure_id: props.params.id,
         },
       },
+      extend: [
+        {
+          path: 'measure_indicators',
+          key: 'indicator_id',
+          reverse: true,
+          as: 'measures',
+          connected: {
+            path: 'measures',
+            key: 'measure_id',
+            forward: true,
+          },
+        },
+      ],
     },
   ),
 });
@@ -346,6 +414,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('user_roles'));

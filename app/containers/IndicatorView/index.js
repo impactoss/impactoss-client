@@ -105,7 +105,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     ];
   }
 
-  getBodyMainFields = (entity, actions, reports) => ([
+  getBodyMainFields = (entity, actions, reports, actionTaxonomies) => ([
     {
       fields: [
         {
@@ -125,10 +125,21 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       icon: 'connections',
       fields: [
         {
-          type: 'list',
-          label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+          type: 'connections',
+          label: `${Object.values(actions).length} ${this.context.intl.formatMessage(Object.values(actions).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
           entityType: 'actions',
-          values: this.mapActions(actions),
+          values: Object.values(actions),
+          icon: 'actions',
+          entityPath: '/actions/',
+          taxonomies: actionTaxonomies,
+          connectionOptions: [{
+            label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+            path: 'recommendations',
+          },
+          {
+            label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+            path: 'indicators',
+          }],
         },
       ],
     },
@@ -156,22 +167,17 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     },
   ]);
 
-  getFields = (entity, isContributor, actions, reports, dates) => ({
+  getFields = (entity, isContributor, actions, reports, dates, actionTaxonomies) => ({
     header: {
       main: this.getHeaderMainFields(entity, isContributor),
       aside: this.getHeaderAsideFields(entity, isContributor),
     },
     body: {
-      main: this.getBodyMainFields(entity, actions, reports),
+      main: this.getBodyMainFields(entity, actions, reports, actionTaxonomies),
       aside: isContributor ? this.getBodyAsideFields(entity, dates) : null,
     },
   });
 
-  mapActions = (actions) =>
-    Object.values(actions).map((action) => ({
-      label: action.attributes.title,
-      linkTo: `/actions/${action.id}`,
-    }))
   mapReports = (reports) =>
     Object.values(reports).map((report) => ({
       label: report.attributes.title,
@@ -185,7 +191,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     }))
 
   render() {
-    const { indicator, dataReady, isContributor, actions, reports, dates } = this.props;
+    const { indicator, dataReady, isContributor, actions, reports, dates, actionTaxonomies } = this.props;
 
     const buttons = isContributor
     ? [
@@ -233,7 +239,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
           }
           { indicator && dataReady &&
             <EntityView
-              fields={this.getFields(indicator, isContributor, actions, reports, dates)}
+              fields={this.getFields(indicator, isContributor, actions, reports, dates, actionTaxonomies)}
             />
           }
         </Content>
@@ -252,6 +258,7 @@ IndicatorView.propTypes = {
   isContributor: PropTypes.bool,
   actions: PropTypes.object,
   reports: PropTypes.object,
+  actionTaxonomies: PropTypes.object,
   dates: PropTypes.object,
   params: PropTypes.object,
 };
@@ -270,6 +277,11 @@ const mapStateToProps = (state, props) => ({
     'measure_indicators',
     'progress_reports',
     'due_dates',
+    'taxonomies',
+    'categories',
+    'recommendations',
+    'recommendation_measures',
+    'measure_categories',
   ] }),
   indicator: getEntity(
     state,
@@ -293,7 +305,20 @@ const mapStateToProps = (state, props) => ({
       ],
     },
   ),
-
+  actionTaxonomies: getEntities(
+    state, {
+      out: 'js',
+      path: 'taxonomies',
+      where: {
+        tags_measures: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+      },
+    },
+  ),
   // all connected actions
   actions: getEntities(
     state, {
@@ -306,6 +331,36 @@ const mapStateToProps = (state, props) => ({
           indicator_id: props.params.id,
         },
       },
+      extend: [
+        {
+          path: 'measure_categories',
+          key: 'measure_id',
+          reverse: true,
+          as: 'taxonomies',
+        },
+        {
+          path: 'recommendation_measures',
+          key: 'measure_id',
+          reverse: true,
+          as: 'recommendations',
+          connected: {
+            path: 'recommendations',
+            key: 'recommendation_id',
+            forward: true,
+          },
+        },
+        {
+          path: 'measure_indicators',
+          key: 'measure_id',
+          reverse: true,
+          as: 'indicators',
+          connected: {
+            path: 'indicators',
+            key: 'indicator_id',
+            forward: true,
+          },
+        },
+      ],
     },
   ),
   // all connected reports
@@ -337,13 +392,18 @@ const mapStateToProps = (state, props) => ({
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('progress_reports'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
       dispatch(loadEntitiesIfNeeded('due_dates'));
+      dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      dispatch(loadEntitiesIfNeeded('categories'));
+      dispatch(loadEntitiesIfNeeded('user_roles'));
     },
     handleEdit: () => {
       dispatch(updatePath(`/indicators/edit/${props.params.id}`));

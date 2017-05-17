@@ -7,7 +7,8 @@ import React from 'react';
 import { Link } from 'react-router';
 import { FormattedMessage } from 'react-intl';
 import ReactMarkdown from 'react-markdown';
-import { find } from 'lodash/collection';
+import { orderBy, find } from 'lodash/collection';
+import { without } from 'lodash/array';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -15,6 +16,7 @@ import { palette } from 'styled-theme';
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
+import { getEntitySortIteratee } from 'utils/sort';
 import asArray from 'utils/as-array';
 import A from 'components/basic/A';
 import Icon from 'components/Icon';
@@ -29,14 +31,16 @@ const Section = styled.div`
   display: inline-block;
   vertical-align: top;
 `;
-const ToggleAllDates = styled(Button)`
-  padding: 0;
+const ToggleAllItems = styled(Button)`
+  padding: 0.5em 0;
+  font-weight: bold;
   font-size: 0.85em;
   color: ${palette('primary', 0)};
   &:hover {
     color: ${palette('primary', 1)};
   }
 `;
+
 const Main = styled(Section)`
   width: ${(props) => props.aside ? '66%' : '100%'};
 `;
@@ -62,7 +66,7 @@ const FieldGroupLabel = styled.div`
 const Field = styled.div`
   padding: 20px 0;
 `;
-const ValueWrap = styled.div`
+const FieldWrap = styled.div`
   display: block;
   position: relative;
 `;
@@ -151,6 +155,12 @@ const ListLabel = styled(Label)`
   padding-bottom: 8px;
   border-bottom: 1px solid ${palette('greyscaleLight', 0)};
 `;
+const ConnectionListLabel = styled(ListLabel)`
+  padding-bottom: 1em;
+  border-bottom: none;
+  font-size: 1.8em;
+  color: ${palette('greyscaleDark', 0)};
+`;
 const ListItem = styled.div`
   padding: 1em 0 0;
 `;
@@ -173,17 +183,25 @@ const ScheduleItem = styled.div`
   font-weight: bold;
   color:  ${(props) => props.overdue ? palette('primary', 0) : palette('greyscaleDark', 2)};
 `;
+const EntityListItemsWrap = styled.div`
+  border-bottom: 1px solid ${palette('greyscaleLight', 0)};
+`;
+
+const DATEMAX = 3;
+const CONNECTIONMAX = 5;
+
 class EntityView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   constructor() {
     super();
     this.state = {
       showAllDates: false,
+      showAllConnections: [],
     };
   }
 
   renderList = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       <ListLabel>
         {field.label}
         {field.entityType &&
@@ -203,45 +221,67 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
       { (!field.values || field.values.length === 0) &&
         <EmptyHint>{field.showEmpty}</EmptyHint>
       }
-    </ValueWrap>
+    </FieldWrap>
   );
-  renderConnections = (field) => (
-    <ValueWrap>
-      <ListLabel>
-        {field.label}
-        {field.entityType &&
-          <DotWrapper>
-            <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
-          </DotWrapper>
-        }
-      </ListLabel>
-      <EntityListItems
-        entities={field.values}
-        entityIcon={field.icon}
-        entityLinkTo={field.entityPath}
-        taxonomies={field.taxonomies}
-        filters={field.relatedFilters}
-      />
-      {field.values.map((value, i) => (
-        <ListItem key={i}>
-          {value.linkTo
-            ? <ListLink key={i} to={value.linkTo}>{value.label}</ListLink>
-            : <p>{value.label}</p>
+  renderConnections = (field) => {
+    const sortedValues = orderBy(field.values, getEntitySortIteratee('id'), 'desc');
+    return (
+      <FieldWrap>
+        <ConnectionListLabel>
+          {field.label}
+          {field.entityType &&
+            <DotWrapper>
+              <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
+            </DotWrapper>
           }
-        </ListItem>
-      ))}
-      { (!field.values || field.values.length === 0) &&
-        <EmptyHint>{field.showEmpty}</EmptyHint>
-      }
-    </ValueWrap>
-  );
+        </ConnectionListLabel>
+        <EntityListItemsWrap>
+          <EntityListItems
+            entities={this.state.showAllConnections.indexOf(field.entityType) >= 0
+              ? sortedValues
+              : (sortedValues.slice(0, CONNECTIONMAX))
+            }
+            entityIcon={field.icon}
+            entityLinkTo={field.entityPath}
+            taxonomies={field.taxonomies}
+            associations={{
+              connections: { // filter by associated entity
+                options: field.connectionOptions,
+              },
+            }}
+          />
+        </EntityListItemsWrap>
+        { sortedValues.length > CONNECTIONMAX &&
+          <ToggleAllItems
+            onClick={() =>
+              this.setState({
+                showAllConnections: this.state.showAllConnections.indexOf(field.entityType) >= 0
+                  ? without(this.state.showAllConnections, field.entityType)
+                  : this.state.showAllConnections.concat([field.entityType]),
+              })
+            }
+          >
+            { this.state.showAllConnections.indexOf(field.entityType) >= 0 &&
+              <span>Show less</span>
+            }
+            { this.state.showAllConnections.indexOf(field.entityType) < 0 &&
+              <span>Show all</span>
+            }
+          </ToggleAllItems>
+        }
+        { (!field.values || field.values.length === 0) &&
+          <EmptyHint>{field.showEmpty}</EmptyHint>
+        }
+      </FieldWrap>
+    );
+  };
   renderSchedule = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       <Label>
         {field.label}
       </Label>
       {
-        field.values.map((value, i) => (this.state.showAllDates || i < 3) && (
+        field.values.map((value, i) => (this.state.showAllDates || i < DATEMAX) && (
           <ScheduleItem key={i} overdue={value.overdue}>
             {value.label}
             {
@@ -259,8 +299,8 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
           </ScheduleItem>
         ))
       }
-      { field.values && field.values.length > 3 &&
-        <ToggleAllDates
+      { field.values && field.values.length > DATEMAX &&
+        <ToggleAllItems
           onClick={() =>
             this.setState({ showAllDates: !this.state.showAllDates })
           }
@@ -271,59 +311,59 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
           { !this.state.showAllDates &&
             <span>Show all</span>
           }
-        </ToggleAllDates>
+        </ToggleAllItems>
       }
       { (!field.values || field.values.length === 0) &&
         <EmptyHint>{field.showEmpty}</EmptyHint>
       }
-    </ValueWrap>
+    </FieldWrap>
   );
   renderText = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       <Label>
         {field.label}
       </Label>
       <p>{field.value}</p>
-    </ValueWrap>
+    </FieldWrap>
   );
   renderTitle = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       {field.isManager &&
         <Label>
           {field.label || this.context.intl.formatMessage(appMessages.attributes.title)}
         </Label>
       }
       <Title>{field.value}</Title>
-    </ValueWrap>
+    </FieldWrap>
   );
   renderShortTitle = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       <Label>
         {field.label || this.context.intl.formatMessage(appMessages.attributes.short_title)}
       </Label>
       <ShortTitleTag pIndex={field.taxonomyId}>{field.value}</ShortTitleTag>
-    </ValueWrap>
+    </FieldWrap>
   );
   renderDescription = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       <Label>
         {field.label || this.context.intl.formatMessage(appMessages.attributes.description)}
       </Label>
       <ReactMarkdown source={field.value} />
-    </ValueWrap>
+    </FieldWrap>
   );
   renderLink = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       <Label>
         {field.label || this.context.intl.formatMessage(appMessages.attributes.url)}
       </Label>
       <Url target="_blank" href={field.value}>
         {field.anchor}
       </Url>
-    </ValueWrap>
+    </FieldWrap>
   );
   renderDate = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       <FieldIcon>
         <Icon name="calendar" />
       </FieldIcon>
@@ -338,10 +378,10 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
       { !field.value &&
         <EmptyHint>{field.showEmpty}</EmptyHint>
       }
-    </ValueWrap>
+    </FieldWrap>
   );
   renderMeta = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       <Label>
         {field.label || this.context.intl.formatMessage(appMessages.attributes.meta.title)}
       </Label>
@@ -352,7 +392,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
           </MetaField>
         ))
       }
-    </ValueWrap>
+    </FieldWrap>
   );
   renderReference = (field) => (
     <ReferenceWrap>
@@ -392,7 +432,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
     </StatusWrap>
   );
   renderReferenceStatus = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       {
         field.fields.map((rsField, i) => (
           <span key={i}>
@@ -405,10 +445,10 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
           </span>
         ))
       }
-    </ValueWrap>
+    </FieldWrap>
   );
   renderReferenceRole = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       {
         field.fields.map((rsField, i) => (
           <span key={i}>
@@ -421,10 +461,10 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
           </span>
         ))
       }
-    </ValueWrap>
+    </FieldWrap>
   );
   renderManager = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       <Label>
         {this.context.intl.formatMessage(appMessages.attributes.manager_id.categories)}
       </Label>
@@ -434,11 +474,11 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
       { !field.value &&
         <EmptyHint>{field.showEmpty}</EmptyHint>
       }
-    </ValueWrap>
+    </FieldWrap>
   );
 
   renderDownload = (field) => (
-    <ValueWrap>
+    <FieldWrap>
       <Label>
         {this.context.intl.formatMessage(appMessages.attributes.document_url)}
       </Label>
@@ -448,7 +488,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
       { !field.value &&
         <EmptyHint>{field.showEmpty}</EmptyHint>
       }
-    </ValueWrap>
+    </FieldWrap>
   )
   renderField = (field) => {
     if (field.value

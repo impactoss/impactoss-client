@@ -105,24 +105,27 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     ];
   }
 
-  getBodyMainFields = (entity, actions) => ([
-    // {
-    //   fields: [
-    //     {
-    //       type: 'description',
-    //       value: entity.attributes.description,
-    //     },
-    //   ],
-    // },
+  getBodyMainFields = (entity, actions, actionTaxonomies) => ([
     {
       label: 'Connections',
       icon: 'connections',
       fields: [
         {
-          type: 'list',
-          label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+          type: 'connections',
+          label: `${Object.values(actions).length} ${this.context.intl.formatMessage(Object.values(actions).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
           entityType: 'actions',
-          values: this.mapActions(actions),
+          values: Object.values(actions),
+          icon: 'actions',
+          entityPath: '/actions/',
+          taxonomies: actionTaxonomies,
+          connectionOptions: [{
+            label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+            path: 'recommendations',
+          },
+          {
+            label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+            path: 'indicators',
+          }],
         },
       ],
     },
@@ -142,13 +145,13 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       })),
     },
   ]);
-  getFields = (entity, isManager, actions, taxonomies) => ({
+  getFields = (entity, isManager, actions, taxonomies, actionTaxonomies) => ({
     header: {
       main: this.getHeaderMainFields(entity, isManager),
       aside: this.getHeaderAsideFields(entity, isManager),
     },
     body: {
-      main: this.getBodyMainFields(entity, actions),
+      main: this.getBodyMainFields(entity, actions, actionTaxonomies),
       aside: this.getBodyAsideFields(taxonomies),
     },
   });
@@ -167,7 +170,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     : []
 
   render() {
-    const { recommendation, dataReady, isManager, actions, taxonomies } = this.props;
+    const { recommendation, dataReady, isManager, actions, taxonomies, actionTaxonomies } = this.props;
     const buttons = isManager
     ? [
       {
@@ -210,7 +213,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
           }
           { recommendation && dataReady &&
             <EntityView
-              fields={this.getFields(recommendation, isManager, actions, taxonomies)}
+              fields={this.getFields(recommendation, isManager, actions, taxonomies, actionTaxonomies)}
             />
           }
         </Content>
@@ -226,6 +229,7 @@ RecommendationView.propTypes = {
   recommendation: PropTypes.object,
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
+  actionTaxonomies: PropTypes.object,
   actions: PropTypes.object,
   params: PropTypes.object,
   isManager: PropTypes.bool,
@@ -246,6 +250,9 @@ const mapStateToProps = (state, props) => ({
     'measures',
     'recommendation_measures',
     'recommendation_categories',
+    'measure_categories',
+    'measure_indicators',
+    'indicators',
   ] }),
   recommendation: getEntity(
     state,
@@ -284,6 +291,20 @@ const mapStateToProps = (state, props) => ({
       out: 'js',
     },
   ),
+  actionTaxonomies: getEntities(
+    state, {
+      out: 'js',
+      path: 'taxonomies',
+      where: {
+        tags_measures: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+      },
+    },
+  ),
   // all connected actions
   actions: getEntities(
     state, {
@@ -296,6 +317,36 @@ const mapStateToProps = (state, props) => ({
           recommendation_id: props.params.id,
         },
       },
+      extend: [
+        {
+          path: 'measure_categories',
+          key: 'measure_id',
+          reverse: true,
+          as: 'taxonomies',
+        },
+        {
+          path: 'recommendation_measures',
+          key: 'measure_id',
+          reverse: true,
+          as: 'recommendations',
+          connected: {
+            path: 'recommendations',
+            key: 'recommendation_id',
+            forward: true,
+          },
+        },
+        {
+          path: 'measure_indicators',
+          key: 'measure_id',
+          reverse: true,
+          as: 'indicators',
+          connected: {
+            path: 'indicators',
+            key: 'indicator_id',
+            forward: true,
+          },
+        },
+      ],
     },
   ),
 });
@@ -310,6 +361,9 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
+      dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
     handleEdit: () => {

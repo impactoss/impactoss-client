@@ -100,96 +100,48 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         ],
       });
     }
-    fields.push({
+    const connectionGroup = {
       label: 'Connections',
       icon: 'connections',
-      fields: [
-        {
-          type: 'connections',
+      fields: [],
+    };
+    if (entity.taxonomy.attributes.tags_recommendations) {
+      connectionGroup.fields.push({
+        type: 'connections',
+        label: `${Object.values(recommendations).length} ${this.context.intl.formatMessage(Object.values(recommendations).length === 1 ? appMessages.entities.recommendations.single : appMessages.entities.recommendations.plural)}`,
+        entityType: 'recommendations',
+        values: Object.values(recommendations),
+        icon: 'recommendations',
+        entityPath: '/recommendations/',
+        taxonomies,
+        connectionOptions: [
+          {
+            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+            path: 'measures',
+          },
+        ],
+      });
+    }
+    if (entity.taxonomy.attributes.tags_measures) {
+      connectionGroup.fields.push({
+        type: 'connections',
+        label: `${Object.values(actions).length} ${this.context.intl.formatMessage(Object.values(actions).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
+        entityType: 'actions',
+        values: Object.values(actions),
+        icon: 'actions',
+        entityPath: '/actions/',
+        taxonomies,
+        connectionOptions: [{
           label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
-          entityType: 'recommendations',
-          values: Object.values(recommendations),
-          icon: 'recommendations',
-          entityPath: '/recommendations/',
-          taxonomies,
-          relatedFilters: {
-            taxonomies: { // filter by each category
-              query: 'cat',
-              filter: true,
-              connected: {
-                path: 'recommendation_categories',
-                key: 'recommendation_id',
-                whereKey: 'category_id',
-              },
-            },
-            connections: { // filter by associated entity
-              options: [
-                {
-                  filter: true,
-                  label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-                  path: 'measures', // filter by recommendation connection
-                  query: 'actions',
-                  key: 'measure_id',
-                  connected: {
-                    path: 'recommendation_measures',
-                    key: 'recommendation_id',
-                    whereKey: 'measure_id',
-                  },
-                },
-              ],
-            },
-          },
+          path: 'recommendations',
         },
         {
-          type: 'connections',
-          label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-          entityType: 'actions',
-          values: Object.values(actions),
-          icon: 'actions',
-          entityPath: '/actions/',
-          taxonomies,
-          relatedFilters: {
-            taxonomies: { // filter by each category
-              query: 'cat',
-              filter: true,
-              connected: {
-                path: 'measure_categories',
-                key: 'measure_id',
-                whereKey: 'category_id',
-              },
-            },
-            connections: { // filter by associated entity
-              options: [
-                {
-                  label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
-                  path: 'recommendations', // filter by recommendation connection
-                  query: 'recommendations',
-                  key: 'recommendation_id',
-                  filter: true,
-                  connected: {
-                    path: 'recommendation_measures',
-                    key: 'measure_id',
-                    whereKey: 'recommendation_id',
-                  },
-                },
-                {
-                  label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
-                  path: 'indicators', // filter by recommendation connection
-                  query: 'indicators',
-                  key: 'indicator_id',
-                  filter: true,
-                  connected: {
-                    path: 'measure_indicators',
-                    key: 'measure_id',
-                    whereKey: 'indicator_id',
-                  },
-                },
-              ],
-            },
-          },
-        },
-      ],
-    });
+          label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+          path: 'indicators',
+        }],
+      });
+    }
+    fields.push(connectionGroup);
     return fields;
   };
 
@@ -431,7 +383,7 @@ const mapStateToProps = (state, props) => ({
     },
   ),
   taxonomies: getEntities(
-    state, { // filter by each category
+    state, {
       out: 'js',
       path: 'taxonomies',
       extend: {

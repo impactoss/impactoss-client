@@ -302,7 +302,6 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
                   reference,
                   showCount: true,
                   value: connectedId,
-                  search: option.searchAttributes && option.searchAttributes.map((attribute) => connection.attributes[attribute]).join(),
                   count: 1,
                   query: option.query,
                   checked: optionChecked(locationQuery[option.query], connectedId),
