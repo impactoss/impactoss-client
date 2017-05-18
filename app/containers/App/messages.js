@@ -53,9 +53,17 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.title',
       defaultMessage: 'Enter title',
     },
+    short_title: {
+      id: 'app.containers.App.placeholders.title',
+      defaultMessage: 'Abbr.',
+    },
     description: {
       id: 'app.containers.App.placeholders.description',
       defaultMessage: 'Enter content',
+    },
+    url: {
+      id: 'app.containers.App.placeholders.url',
+      defaultMessage: 'Enter full URL',
     },
   },
   attributes: {
