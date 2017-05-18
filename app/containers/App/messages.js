@@ -48,6 +48,16 @@ export default defineMessages({
       defaultMessage: 'This field cannot be empty',
     },
   },
+  placeholders: {
+    title: {
+      id: 'app.containers.App.placeholders.title',
+      defaultMessage: 'Enter title',
+    },
+    description: {
+      id: 'app.containers.App.placeholders.description',
+      defaultMessage: 'Enter content',
+    },
+  },
   attributes: {
     draft: {
       id: 'app.containers.App.attributes.draft',
