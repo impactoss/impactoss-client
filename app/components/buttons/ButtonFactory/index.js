@@ -28,6 +28,18 @@ class ButtonFactory extends React.Component { // eslint-disable-line react/prefe
             title={button.title || this.context.intl.formatMessage(appMessages.buttons.add)}
           />
         );
+      case 'save' :
+        return (
+          <ButtonText primary onClick={() => button.onClick()}>
+            {button.title || this.context.intl.formatMessage(appMessages.buttons.save)}
+          </ButtonText>
+        );
+      case 'cancel' :
+        return (
+          <ButtonText onClick={() => button.onClick()}>
+            {button.title || this.context.intl.formatMessage(appMessages.buttons.cancel)}
+          </ButtonText>
+        );
       case 'edit' :
         return (
           <ButtonText onClick={() => button.onClick()}>

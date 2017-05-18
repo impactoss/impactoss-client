@@ -21,6 +21,10 @@ export default defineMessages({
       id: 'app.containers.App.buttons.cancel',
       defaultMessage: 'Cancel',
     },
+    save: {
+      id: 'app.containers.App.buttons.save',
+      defaultMessage: 'Save',
+    },
     close: {
       id: 'app.containers.App.buttons.close',
       defaultMessage: 'Close',
@@ -221,20 +225,16 @@ export default defineMessages({
         defaultMessage: 'Users',
       },
     },
-    user_roles: {
-      single: {
-        id: 'app.containers.App.entities.user_roles.single',
-        defaultMessage: 'Role',
-      },
-      plural: {
-        id: 'app.containers.App.entities.user_roles.plural',
-        defaultMessage: 'Roles',
-      },
-      defaultRole: {
-        id: 'app.containers.App.entities.user_roles.defaultRole',
-        defaultMessage: 'User',
-      },
-    },
+    // user_roles: {
+    //   single: {
+    //     id: 'app.containers.App.entities.user_roles.single',
+    //     defaultMessage: 'Role',
+    //   },
+    //   plural: {
+    //     id: 'app.containers.App.entities.user_roles.plural',
+    //     defaultMessage: 'Roles',
+    //   },
+    // },
     progress_reports: {
       single: {
         id: 'app.containers.App.entities.progress_reports.single',
@@ -407,6 +407,10 @@ export default defineMessages({
       plural: {
         id: 'app.containers.App.entities.roles.plural',
         defaultMessage: 'User roles',
+      },
+      defaultRole: {
+        id: 'app.containers.App.entities.user_roles.defaultRole',
+        defaultMessage: 'No role assigned',
       },
     },
   },

@@ -23,18 +23,6 @@ export const entityOptions = (entities, includeReference) => entities
   }, List())
   : List();
 
-export const roleOption = (entity) => Map({
-  value: entity.get('id'),
-  label: entity.getIn(['attributes', 'friendly_name']),
-  search: entity.getIn(['attributes', 'name']),
-  checked: !!entity.get('associated'),
-});
-
-export const roleOptions = (entities) => entities
-  ? entities.reduce((options, entity) =>
-    options.push(roleOption(entity)), List())
-  : List();
-
 export const userOption = (entity, activeUserId) => Map({
   value: entity.get('id'),
   label: entity.getIn(['attributes', 'name']),
@@ -98,18 +86,6 @@ export const renderIndicatorControl = (entities) => entities
   label: 'Indicators',
   controlType: 'multiselect',
   options: entityOptions(entities),
-}
-: null;
-
-
-export const renderRoleControl = (entities) => entities
-? {
-  id: 'roles',
-  model: '.associatedRoles',
-  dataPath: ['associatedRoles'],
-  label: 'Roles',
-  controlType: 'multiselect',
-  options: roleOptions(entities),
 }
 : null;
 

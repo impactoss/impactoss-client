@@ -111,7 +111,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
               {
                 type: 'role',
                 value: entity.roles && this.getUserRole(entity.roles),
-                showEmpty: this.context.intl.formatMessage(appMessages.entities.user_roles.defaultRole),
+                showEmpty: this.context.intl.formatMessage(appMessages.entities.roles.defaultRole),
               },
             ],
           },
@@ -158,14 +158,14 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
       })),
     },
   ]);
-  getFields = (entity, isManager, taxonomies) => ({
+  getFields = (entity, isManager) => ({ // taxonomies
     header: {
       main: this.getHeaderMainFields(entity, isManager),
       aside: this.getHeaderAsideFields(entity, isManager),
     },
     body: {
       main: this.getBodyMainFields(entity),
-      aside: this.getBodyAsideFields(entity, isManager, taxonomies),
+      aside: null, // this.getBodyAsideFields(entity, isManager, taxonomies),
     },
   });
 
@@ -213,9 +213,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
             </div>
           }
           { user && dataReady &&
-            <EntityView
-              fields={this.getFields(user, isManager, taxonomies)}
-            />
+            <EntityView fields={this.getFields(user, isManager, taxonomies)} />
           }
         </Content>
       </div>

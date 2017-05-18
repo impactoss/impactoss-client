@@ -7,7 +7,7 @@ import DownloadFile from 'components/DownloadFile';
 
 import { API_ENDPOINT, SIGNING_URL_ENDPOINT } from 'containers/App/constants';
 
-class Uploader extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class Upload extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   state = {
     progress: null,
@@ -77,9 +77,9 @@ class Uploader extends React.Component { // eslint-disable-line react/prefer-sta
   }
 }
 
-Uploader.propTypes = {
+Upload.propTypes = {
   onChange: React.PropTypes.func,
   value: React.PropTypes.string,
 };
 
-export default Uploader;
+export default Upload;
