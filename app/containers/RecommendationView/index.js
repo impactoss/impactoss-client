@@ -79,7 +79,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
             fields: [
               {
                 type: 'reference',
-                value: entity.id,
+                value: entity.attributes.number,
               },
               {
                 type: 'status',
