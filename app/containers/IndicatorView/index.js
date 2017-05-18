@@ -155,7 +155,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
 
   getBodyAsideFields = (entity, dates) => ([ // fieldGroups
     { // fieldGroup
-      label: this.context.intl.formatMessage(messages.groupReporting),
+      label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
       type: 'dark',
       icon: 'reminder',
       fields: [

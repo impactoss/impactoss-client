@@ -119,7 +119,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               controlType: 'select',
               model: '.attributes.draft',
               label: this.context.intl.formatMessage(appMessages.attributes.draft),
-              value: entity.draft,
+              value: entity.attributes.draft,
               options: PUBLISH_STATUSES,
             },
           ],

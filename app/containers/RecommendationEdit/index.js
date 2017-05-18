@@ -123,7 +123,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               controlType: 'select',
               model: '.attributes.draft',
               label: this.context.intl.formatMessage(appMessages.attributes.draft),
-              value: entity.draft,
+              value: entity.attributes.draft,
               options: PUBLISH_STATUSES,
             },
           ],

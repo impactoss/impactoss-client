@@ -115,6 +115,22 @@ export default defineMessages({
       id: 'app.containers.App.attributes.target_date',
       defaultMessage: 'Target date',
     },
+    start_date: {
+      id: 'app.containers.App.attributes.start_date',
+      defaultMessage: 'Date (start date)',
+    },
+    end_date: {
+      id: 'app.containers.App.attributes.end_date',
+      defaultMessage: 'End date',
+    },
+    frequency_months: {
+      id: 'app.containers.App.attributes.frequency_months',
+      defaultMessage: 'Reporting frequency',
+    },
+    repeat: {
+      id: 'app.containers.App.attributes.repeat',
+      defaultMessage: 'Repeat?',
+    },
     targetDateEmpty: {
       id: 'app.containers.App.attributes.targetDateEmpty',
       defaultMessage: 'No target date set',
@@ -247,16 +263,6 @@ export default defineMessages({
         defaultMessage: 'Users',
       },
     },
-    // user_roles: {
-    //   single: {
-    //     id: 'app.containers.App.entities.user_roles.single',
-    //     defaultMessage: 'Role',
-    //   },
-    //   plural: {
-    //     id: 'app.containers.App.entities.user_roles.plural',
-    //     defaultMessage: 'Roles',
-    //   },
-    // },
     progress_reports: {
       single: {
         id: 'app.containers.App.entities.progress_reports.single',
@@ -419,6 +425,10 @@ export default defineMessages({
       showLess: {
         id: 'app.containers.App.entities.due_dates.showLess',
         defaultMessage: 'Show less dates',
+      },
+      schedule: {
+        id: 'app.containers.App.entities.due_dates.schedule',
+        defaultMessage: 'Progress report schedule',
       },
     },
     categories: {
