@@ -81,16 +81,11 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     {
       fields: [
         {
-          controlType: 'combo',
-          fields: [
-            {
-              id: 'status',
-              controlType: 'select',
-              model: '.attributes.draft',
-              label: this.context.intl.formatMessage(appMessages.attributes.draft),
-              options: PUBLISH_STATUSES,
-            },
-          ],
+          id: 'status',
+          controlType: 'select',
+          model: '.attributes.draft',
+          label: this.context.intl.formatMessage(appMessages.attributes.draft),
+          options: PUBLISH_STATUSES,
         },
       ],
     },
