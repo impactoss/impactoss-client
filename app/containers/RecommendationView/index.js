@@ -107,7 +107,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
 
   getBodyMainFields = (entity, actions, actionTaxonomies) => ([
     {
-      label: 'Connections',
+      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
         {

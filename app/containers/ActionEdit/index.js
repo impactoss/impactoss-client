@@ -151,6 +151,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           model: '.attributes.description',
           label: this.context.intl.formatMessage(appMessages.attributes.description),
         },
+      ],
+    },
+    {
+      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
+      icon: 'connections',
+      fields: [
         renderRecommendationControl(recommendations),
         renderIndicatorControl(indicators),
       ],

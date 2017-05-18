@@ -12,9 +12,18 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List, fromJS } from 'immutable';
 
+import {
+  taxonomyOptions,
+  entityOptions,
+  renderActionControl,
+  renderTaxonomyControl,
+  validateRequired,
+} from 'utils/forms';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 import {
   loadEntitiesIfNeeded,
@@ -23,24 +32,18 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import Page from 'components/Page';
-import EntityForm from 'components/forms/EntityForm';
-
 import {
   getEntity,
   getEntities,
   isReady,
 } from 'containers/App/selectors';
 
-import {
-  taxonomyOptions,
-  entityOptions,
-  renderActionControl,
-  renderTaxonomyControl,
-} from 'utils/forms';
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
+import EntityForm from 'components/forms/EntityForm';
 
 import viewDomainSelect from './selectors';
-
 import messages from './messages';
 import { save } from './actions';
 
@@ -78,11 +81,96 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     : Map();
   };
 
+  getHeaderMainFields = () => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          id: 'title',
+          controlType: 'title',
+          model: '.attributes.title',
+          label: this.context.intl.formatMessage(appMessages.attributes.title),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = (entity) => ([
+    {
+      fields: [
+        {
+          controlType: 'combo',
+          fields: [
+            {
+              id: 'number',
+              controlType: 'short',
+              model: '.attributes.number',
+              label: this.context.intl.formatMessage(appMessages.attributes.reference),
+            },
+            {
+              id: 'status',
+              controlType: 'select',
+              model: '.attributes.draft',
+              label: this.context.intl.formatMessage(appMessages.attributes.draft),
+              value: entity.draft,
+              options: PUBLISH_STATUSES,
+            },
+          ],
+        },
+        {
+          controlType: 'info',
+          type: 'meta',
+          fields: [
+            {
+              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
+              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+            },
+            {
+              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
+              value: entity.user && entity.user.attributes.name,
+            },
+          ],
+        },
+      ],
+    },
+  ]);
+  getBodyMainFields = (actions) => ([
+    {
+      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
+      icon: 'connections',
+      fields: [
+        renderActionControl(actions),
+      ],
+    },
+  ]);
+
+  getBodyAsideFields = (entity, taxonomies) => ([ // fieldGroups
+    { // fieldGroup
+      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
+      icon: 'categories',
+      fields: renderTaxonomyControl(taxonomies),
+    },
+  ]);
+
+  getFields = (entity, taxonomies, actions) => ({ // isManager, taxonomies,
+    header: {
+      main: this.getHeaderMainFields(),
+      aside: this.getHeaderAsideFields(entity),
+    },
+    body: {
+      main: this.getBodyMainFields(actions),
+      aside: this.getBodyAsideFields(entity, taxonomies),
+    },
+  })
   render() {
-    const { recommendation, dataReady, viewDomain } = this.props;
+    const { recommendation, dataReady, viewDomain, actions, taxonomies } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
-    const required = (val) => val && val.length;
 
     return (
       <div>
@@ -92,104 +180,55 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !recommendation && !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { !recommendation && dataReady &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        {recommendation &&
-          <Page
+        <Content>
+          <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
-            actions={[
-              {
-                type: 'simple',
-                title: 'Cancel',
+            type={CONTENT_SINGLE}
+            icon="recommendations"
+            buttons={
+              recommendation && dataReady ? [{
+                type: 'cancel',
                 onClick: this.props.handleCancel,
               },
               {
-                type: 'primary',
-                title: 'Save',
+                type: 'save',
                 onClick: () => this.props.handleSubmit(
                   viewDomain.form.data,
-                  this.props.taxonomies,
-                  this.props.actions
+                  taxonomies,
+                  actions,
                 ),
-              },
-            ]}
-          >
-            {saveSending &&
-              <p>Saving</p>
+              }] : null
             }
-            {saveError &&
-              <p>{saveError}</p>
-            }
-            { dataReady &&
-              <EntityForm
-                model="recommendationEdit.form.data"
-                formData={viewDomain.form.data}
-                handleSubmit={(formData) => this.props.handleSubmit(
-                  formData,
-                  this.props.taxonomies,
-                  this.props.actions
-                )}
-                handleCancel={this.props.handleCancel}
-                handleUpdate={this.props.handleUpdate}
-                fields={{
-                  header: {
-                    main: [
-                      {
-                        id: 'title',
-                        controlType: 'input',
-                        model: '.attributes.title',
-                        validators: {
-                          required,
-                        },
-                        errorMessages: {
-                          required: this.context.intl.formatMessage(messages.fieldRequired),
-                        },
-                      },
-                    ],
-                    aside: [
-                      {
-                        id: 'number',
-                        controlType: 'input',
-                        model: '.attributes.number',
-                      },
-                      {
-                        id: 'status',
-                        controlType: 'select',
-                        model: '.attributes.draft',
-                        value: recommendation.attributes.draft,
-                        options: PUBLISH_STATUSES,
-                      },
-                      {
-                        id: 'updated',
-                        controlType: 'info',
-                        displayValue: recommendation.attributes.updated_at,
-                      },
-                      {
-                        id: 'updated_by',
-                        controlType: 'info',
-                        displayValue: recommendation.user && recommendation.user.attributes.name,
-                      },
-                    ],
-                  },
-                  body: {
-                    main: [
-                      renderActionControl(this.props.actions),
-                    ],
-                    aside: renderTaxonomyControl(this.props.taxonomies),
-                  },
-                }}
-              />
-            }
-          </Page>
-        }
+          />
+          {saveSending &&
+            <p>Saving</p>
+          }
+          {saveError &&
+            <p>{saveError}</p>
+          }
+          { !recommendation && !dataReady &&
+            <Loading />
+          }
+          { !recommendation && dataReady && !saveError &&
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          }
+          {recommendation && dataReady &&
+            <EntityForm
+              model="recommendationEdit.form.data"
+              formData={viewDomain.form.data}
+              handleSubmit={(formData) => this.props.handleSubmit(
+                formData,
+                taxonomies,
+                actions
+              )}
+              handleCancel={this.props.handleCancel}
+              handleUpdate={this.props.handleUpdate}
+              fields={this.getFields(recommendation, taxonomies, actions)}
+            />
+          }
+        </Content>
       </div>
     );
   }

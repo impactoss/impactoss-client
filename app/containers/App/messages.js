@@ -261,6 +261,16 @@ export default defineMessages({
         defaultMessage: 'Show less reports',
       },
     },
+    connections: {
+      single: {
+        id: 'app.containers.App.entities.connections.single',
+        defaultMessage: 'Connection',
+      },
+      plural: {
+        id: 'app.containers.App.entities.connections.plural',
+        defaultMessage: 'Connections',
+      },
+    },
     taxonomies: {
       single: {
         id: 'app.containers.App.entities.taxonomies.single',

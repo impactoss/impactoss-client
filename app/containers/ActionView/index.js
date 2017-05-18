@@ -115,7 +115,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       });
     }
     const connectionGroup = {
-      label: 'Connections',
+      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
         {
