@@ -12,9 +12,16 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List, fromJS } from 'immutable';
 
+import {
+  userOptions,
+  renderUserControl,
+  validateRequired,
+} from 'utils/forms';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 import {
   loadEntitiesIfNeeded,
@@ -23,9 +30,6 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import Page from 'components/Page';
-import EntityForm from 'components/forms/EntityForm';
-
 import {
   getEntity,
   getEntities,
@@ -33,10 +37,10 @@ import {
   isUserAdmin,
 } from 'containers/App/selectors';
 
-import {
-  userOptions,
-  renderUserControl,
-} from 'utils/forms';
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
+import EntityForm from 'components/forms/EntityForm';
 
 import viewDomainSelect from './selectors';
 
@@ -77,16 +81,107 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     : Map();
   }
 
+  getHeaderMainFields = () => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          id: 'title',
+          controlType: 'title',
+          model: '.attributes.title',
+          label: this.context.intl.formatMessage(appMessages.attributes.title),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+        {
+          id: 'short_title',
+          controlType: 'short',
+          model: '.attributes.short_title',
+          label: this.context.intl.formatMessage(appMessages.attributes.short_title),
+        },
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = (entity) => ([
+    {
+      fields: [
+        {
+          controlType: 'info',
+          type: 'reference',
+          value: entity.id,
+        },
+        {
+          controlType: 'info',
+          type: 'meta',
+          fields: [
+            {
+              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
+              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+            },
+            {
+              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
+              value: entity.user && entity.user.attributes.name,
+            },
+          ],
+        },
+      ],
+    },
+  ]);
+  getBodyMainFields = () => ([
+    {
+      fields: [
+        {
+          id: 'description',
+          controlType: 'markdown',
+          model: '.attributes.description',
+          label: this.context.intl.formatMessage(appMessages.attributes.description),
+        },
+      ],
+    },
+  ]);
+  getBodyAsideFields = (entity, users, isAdmin) => {
+    const fields = []; // fieldGroups
+    fields.push({
+      fields: [{
+        id: 'url',
+        controlType: 'url',
+        model: '.attributes.url',
+        label: this.context.intl.formatMessage(appMessages.attributes.url),
+      }],
+    });
+    if (isAdmin && !!entity.taxonomy.attributes.has_manager) {
+      fields.push({
+        fields: [
+          renderUserControl(
+            users,
+            this.context.intl.formatMessage(appMessages.attributes.manager_id.categories),
+            entity.attributes.manager_id
+          ),
+        ],
+      });
+    }
+    return fields;
+  }
+
+  getFields = (entity, users, isAdmin) => ({ // isManager, taxonomies,
+    header: {
+      main: this.getHeaderMainFields(),
+      aside: this.getHeaderAsideFields(entity),
+    },
+    body: {
+      main: this.getBodyMainFields(),
+      aside: this.getBodyAsideFields(entity, users, isAdmin),
+    },
+  })
+
   render() {
-    const { category, dataReady, isAdmin, viewDomain } = this.props;
+    const { category, dataReady, isAdmin, viewDomain, users } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
-    const required = (val) => val && val.length;
-
-    const mainAsideFields = [];
-    if (dataReady && isAdmin && !!category.taxonomy.attributes.has_manager && this.props.users) {
-      mainAsideFields.push(renderUserControl(this.props.users, 'Category Manager', category.attributes.manager_id));
-    }
 
     return (
       <div>
@@ -96,101 +191,47 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !category && !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { !category && dataReady && !saveError &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        {category && dataReady &&
-          <Page
+        <Content>
+          <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
-            actions={[
-              {
-                type: 'simple',
-                title: 'Cancel',
+            type={CONTENT_SINGLE}
+            icon="categories"
+            buttons={
+              category && dataReady ? [{
+                type: 'cancel',
                 onClick: () => this.props.handleCancel(reference),
               },
               {
-                type: 'primary',
-                title: 'Save',
+                type: 'save',
                 onClick: () => this.props.handleSubmit(viewDomain.form.data),
-              },
-            ]}
-          >
-            {saveSending &&
-              <p>Saving</p>
+              }] : null
             }
-            {saveError &&
-              <p>{saveError}</p>
-            }
+          />
+          {saveSending &&
+            <p>Saving</p>
+          }
+          {saveError &&
+            <p>{saveError}</p>
+          }
+          { !category && !dataReady &&
+            <Loading />
+          }
+          { !category && dataReady && !saveError &&
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          }
+          {category && dataReady &&
             <EntityForm
               model="categoryEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'title',
-                      controlType: 'input',
-                      model: '.attributes.title',
-                      validators: {
-                        required,
-                      },
-                      errorMessages: {
-                        required: this.context.intl.formatMessage(messages.fieldRequired),
-                      },
-                    },
-                  ],
-                  aside: [
-                    {
-                      id: 'no',
-                      controlType: 'info',
-                      displayValue: reference,
-                    },
-                    {
-                      id: 'updated',
-                      controlType: 'info',
-                      displayValue: category.attributes.updated_at,
-                    },
-                    {
-                      id: 'updated_by',
-                      controlType: 'info',
-                      displayValue: category.user && category.user.attributes.name,
-                    },
-                  ],
-                },
-                body: {
-                  main: [
-                    {
-                      id: 'description',
-                      controlType: 'textarea',
-                      model: '.attributes.description',
-                    },
-                    {
-                      id: 'short_title',
-                      controlType: 'input',
-                      model: '.attributes.short_title',
-                    },
-                    {
-                      id: 'url',
-                      controlType: 'input',
-                      model: '.attributes.url',
-                    },
-                  ],
-                  aside: mainAsideFields,
-                },
-              }}
+              fields={this.getFields(category, users, isAdmin)}
             />
-          </Page>
-        }
+          }
+        </Content>
       </div>
     );
   }

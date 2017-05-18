@@ -31,6 +31,7 @@ import Aside from '../Aside';
 import Main from '../Main';
 import FormFieldWrap from '../FormFieldWrap';
 import ControlTitle from '../ControlTitle';
+import ControlShort from '../ControlShort';
 import ControlInput from '../ControlInput';
 import ControlTextArea from '../ControlTextArea';
 import ControlSelect from '../ControlSelect';
@@ -113,7 +114,9 @@ const MultiSelectWithoutLink = styled(A)`
 
 const controls = {
   input: ControlInput,
+  url: ControlInput,
   title: ControlTitle,
+  short: ControlShort,
   textarea: ControlTextArea,
   markdown: MarkdownControl,
   date: DateControl,

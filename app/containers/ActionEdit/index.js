@@ -88,7 +88,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     { // fieldGroup
       fields: [
         {
-          id: 'name',
+          id: 'title',
           controlType: 'title',
           model: '.attributes.title',
           label: this.context.intl.formatMessage(appMessages.attributes.title),
