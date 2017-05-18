@@ -65,6 +65,10 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.url',
       defaultMessage: 'Enter full URL',
     },
+    number: {
+      id: 'app.containers.App.placeholders.number',
+      defaultMessage: 'ID',
+    },
   },
   attributes: {
     draft: {

@@ -111,6 +111,12 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               controlType: 'short',
               model: '.attributes.number',
               label: this.context.intl.formatMessage(appMessages.attributes.reference),
+              validators: {
+                required: validateRequired,
+              },
+              errorMessages: {
+                required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+              },
             },
             {
               id: 'status',
