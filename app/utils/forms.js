@@ -125,3 +125,5 @@ export const renderTaxonomyControl = (taxonomies) => taxonomies
   options: entityOptions(tax.get('categories')),
 }), [])
 : [];
+
+export const validateRequired = (val) => val && val.length;

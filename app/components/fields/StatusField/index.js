@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { find } from 'lodash/collection';
 
 import appMessages from 'containers/App/messages';
 

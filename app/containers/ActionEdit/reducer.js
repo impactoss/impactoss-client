@@ -17,6 +17,7 @@ const formInitial = fromJS({
     title: '',
     description: '',
     draft: '',
+    target_date: '',
   },
   associatedTaxonomies: {},
   associatedRecommendations: [],

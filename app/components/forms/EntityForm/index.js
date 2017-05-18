@@ -11,8 +11,10 @@ import { lowerCase } from 'utils/string';
 
 import appMessages from 'containers/App/messages';
 
+import A from 'components/basic/A';
 import Icon from 'components/Icon';
 import FieldFactory from 'components/fields/FieldFactory';
+import Button from 'components/buttons/Button';
 import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
 import FieldGroupLabel from 'components/fields/FieldGroupLabel';
 import GroupIcon from 'components/fields/GroupIcon';
@@ -34,11 +36,15 @@ import ControlTextArea from '../ControlTextArea';
 import ControlSelect from '../ControlSelect';
 import ButtonCancel from '../ButtonCancel';
 import ButtonSubmit from '../ButtonSubmit';
+import MarkdownControl from '../MarkdownControl';
+import DateControl from '../DateControl';
 import Required from '../Required';
+
+import messages from './messages';
 
 const MultiSelectWrapper = styled.div`
   position: absolute;
-  top: 30px;
+  top: 38px;
   right: 0;
   height:300px;
   width: 100%;
@@ -48,17 +54,69 @@ const MultiSelectWrapper = styled.div`
   display: block;
   z-index: 10;
 `;
-const MultiSelectLabel = styled.button`
-  color: ${palette('greyscaleDark', 4)};
+const MultiSelectFieldWrapper = styled.div`
+  position: relative;
+`;
+const MultiselectActiveOptions = styled.div`
+  position: relative;
+`;
+const MultiselectActiveOptionList = styled.div`
+  position: relative;
+`;
+const MultiselectActiveOptionListItem = styled.div`
+  position: relative;
   font-weight: 500;
-  font-size: 0.85em;
+  background-color: ${palette('primary', 4)};
+  border-bottom: 1px solid ${palette('greyscaleLight', 1)};
+  padding: 12px 0 12px 16px;
+`;
+const MultiselectActiveOptionRemove = styled(Button)`
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: block;
+  padding: 12px 16px 0 0;
+  &:hover {
+    color: ${palette('primary', 0)}
+  }
+`;
+const MultiSelectDropdownIcon = styled.div`
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 12px 16px 0 0;
+`;
+const MultiSelectDropdown = styled(Button)`
+  position: relative;
   width: 100%;
+  font-size: 0.85em;
+  text-align: left;
+  color: ${palette('greyscaleDark', 0)};
+  background-color: ${palette('greyscaleLight', 1)};
+  &:hover {
+    color: ${palette('greyscaleDark', 0)}
+    background-color: ${palette('greyscaleLight', 2)}
+  }
+  padding: 12px 0 12px 16px;
+`;
+
+const MultiSelectWithout = styled.div`
+  padding: 12px 0 12px 16px;
+  color: ${palette('greyscaleDark', 3)};
+`;
+const MultiSelectWithoutLink = styled(A)`
+  color: ${palette('greyscaleDark', 3)};
+  &:hover {
+    color: ${palette('primary', 0)};
+  }
 `;
 
 const controls = {
   input: ControlInput,
   title: ControlTitle,
   textarea: ControlTextArea,
+  markdown: MarkdownControl,
+  date: DateControl,
   select: ControlSelect,
   radio: Control.radio,
   checkbox: Control.checkbox,
@@ -138,18 +196,18 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     const { id, model, ...controlProps } = this.getControlProps(field);
 
     return (
-      <div>
-        <MultiSelectLabel
+      <MultiSelectFieldWrapper>
+        <MultiSelectDropdown
           onClick={(evt) => {
             if (evt !== undefined && evt.preventDefault) evt.preventDefault();
             this.onToggleMultiselect(field);
           }}
         >
           { field.label }
-          { field.validators && field.validators.required &&
-            <Required>*</Required>
-          }
-        </MultiSelectLabel>
+          <MultiSelectDropdownIcon>
+            <Icon name={this.state.multiselectOpen === id ? 'dropdownClose' : 'dropdownOpen'} />
+          </MultiSelectDropdownIcon>
+        </MultiSelectDropdown>
         { this.renderMultiselectActiveOptions(field, formData) }
         { this.state.multiselectOpen === id &&
           <MultiSelectWrapper>
@@ -169,46 +227,51 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             />
           </MultiSelectWrapper>
         }
-      </div>
+      </MultiSelectFieldWrapper>
     );
   }
   renderMultiselectActiveOptions = (field, formData) => {
     const options = this.getMultiSelectActiveOptions(field, formData);
     return (
-      <div>
+      <MultiselectActiveOptions>
         {
           options.size > 0
           ? (
-            <ul>
+            <MultiselectActiveOptionList>
               { options.map((option, i) => (
-                <li key={i}>
+                <MultiselectActiveOptionListItem key={i}>
                   {`${option.get('label')} `}
-                  <a
-                    href="#remove"
+                  <MultiselectActiveOptionRemove
                     onClick={(evt) => {
                       if (evt !== undefined && evt.preventDefault) evt.preventDefault();
                       this.onMultiSelectItemRemove(option, field);
                     }}
                   >
-                    X
-                  </a>
-                </li>
+                    <Icon name="removeSmall" />
+                  </MultiselectActiveOptionRemove>
+                </MultiselectActiveOptionListItem>
               )) }
-            </ul>
+            </MultiselectActiveOptionList>
           )
           : (
-            <a
-              href="#add"
-              onClick={(evt) => {
-                if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                this.onToggleMultiselect(field);
-              }}
-            >
-              {`Without ${lowerCase(field.label)}. Click to add`}
-            </a>
+            <MultiSelectWithout>
+              <FormattedMessage
+                {...messages.empty}
+                values={{ entities: lowerCase(field.label) }}
+              />
+              <MultiSelectWithoutLink
+                href="#add"
+                onClick={(evt) => {
+                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                  this.onToggleMultiselect(field);
+                }}
+              >
+                <FormattedMessage {...messages.emptyLink} />
+              </MultiSelectWithoutLink>
+            </MultiSelectWithout>
           )
         }
-      </div>
+      </MultiselectActiveOptions>
     );
   }
   renderFieldChildren = (field) => {
@@ -380,6 +443,8 @@ EntityForm.propTypes = {
   fields: PropTypes.object,
   formData: PropTypes.object,
 };
-
+// EntityForm.controlTypes = {
+//   intl: PropTypes.object.isRequired,
+// };
 
 export default EntityForm;

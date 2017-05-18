@@ -14,6 +14,7 @@ import { map } from 'lodash/collection';
 
 import {
   taxonomyOptions,
+  validateRequired,
   // renderTaxonomyControl,
 } from 'utils/forms';
 
@@ -26,7 +27,7 @@ import {
   getUser,
   getEntities,
   isReady,
-  // isUserManager,
+  isUserManager,
 } from 'containers/App/selectors';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
@@ -83,7 +84,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           model: '.attributes.name',
           label: this.context.intl.formatMessage(appMessages.attributes.name),
           validators: {
-            required: this.validateRequired,
+            required: validateRequired,
           },
           errorMessages: {
             required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
@@ -122,9 +123,21 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     }
     return 0;
   }
-  getHeaderAsideFields = (entity, roles) => ([
+  // only show the highest rated role (lower role ids means higher)
+  getHighestUserRoleLabel = (roles) => {
+    if (roles) {
+      const highestRole = Object.values(roles).reduce((currentHighestRole, role) =>
+        !currentHighestRole || role.role.id < currentHighestRole.id
+        ? role.role
+        : currentHighestRole
+      , null);
+      return highestRole.attributes.friendly_name;
+    }
+    return this.context.intl.formatMessage(appMessages.entities.roles.defaultRole);
+  }
+  getHeaderAsideFields = (entity, roles, isManager) => ([
     {
-      fields: [
+      fields: isManager ? [
         {
           controlType: 'combo',
           fields: [
@@ -157,6 +170,22 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             },
           ],
         },
+      ]
+      : [
+        {
+          controlType: 'info',
+          type: 'referenceRole',
+          fields: [
+            {
+              type: 'reference',
+              value: entity.id,
+            },
+            {
+              type: 'role',
+              value: this.getHighestUserRoleLabel(entity.roles),
+            },
+          ],
+        },
       ],
     },
   ]);
@@ -170,7 +199,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           model: '.attributes.email',
           label: this.context.intl.formatMessage(appMessages.attributes.email),
           validators: {
-            required: this.validateRequired,
+            required: validateRequired,
           },
           errorMessages: {
             required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
@@ -188,10 +217,10 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   //   },
   // ]);
 
-  getFields = (entity, roles) => ({ // isManager, taxonomies,
+  getFields = (entity, roles, isManager) => ({ // isManager, taxonomies,
     header: {
       main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity, roles),
+      aside: this.getHeaderAsideFields(entity, roles, isManager),
     },
     body: {
       main: this.getBodyMainFields(),
@@ -199,10 +228,8 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     },
   })
 
-  validateRequired = (val) => val && val.length;
-
   render() {
-    const { user, dataReady, viewDomain, taxonomies, roles } = this.props;
+    const { user, dataReady, viewDomain, taxonomies, roles, isManager } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -261,7 +288,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               )}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(user, roles)}
+              fields={this.getFields(user, roles, isManager)}
             />
           }
         </Content>
@@ -281,7 +308,7 @@ UserEdit.propTypes = {
   roles: PropTypes.object,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
-  // isManager: PropTypes.bool,
+  isManager: PropTypes.bool,
   params: PropTypes.object,
 };
 
@@ -290,7 +317,7 @@ UserEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  // isManager: isUserManager(state),
+  isManager: isUserManager(state),
   viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'users',
