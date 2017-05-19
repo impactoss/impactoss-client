@@ -139,6 +139,18 @@ export default defineMessages({
       id: 'app.containers.App.attributes.document_url',
       defaultMessage: 'Attached document',
     },
+    document_upload: {
+      id: 'app.containers.App.attributes.document_upload',
+      defaultMessage: 'Upload document',
+    },
+    document_uploading: {
+      id: 'app.containers.App.attributes.document_uploading',
+      defaultMessage: 'Uploading document',
+    },
+    document_public: {
+      id: 'app.containers.App.attributes.document_public',
+      defaultMessage: 'Document status',
+    },
     documentEmpty: {
       id: 'app.containers.App.attributes.documentEmpty',
       defaultMessage: 'No document attached yet',
@@ -279,6 +291,10 @@ export default defineMessages({
       unscheduled: {
         id: 'app.containers.App.entities.progress_reports.unscheduled',
         defaultMessage: 'Extraordinary (no due date assigned)',
+      },
+      unscheduled_short: {
+        id: 'app.containers.App.entities.progress_reports.unscheduled',
+        defaultMessage: 'Extraordinary',
       },
       showAll: {
         id: 'app.containers.App.entities.progress_reports.showAll',

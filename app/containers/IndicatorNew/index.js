@@ -183,7 +183,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="indicators"
             buttons={
               dataReady ? [{
                 type: 'cancel',

@@ -39,6 +39,7 @@ import ButtonCancel from '../ButtonCancel';
 import ButtonSubmit from '../ButtonSubmit';
 import MarkdownControl from '../MarkdownControl';
 import DateControl from '../DateControl';
+import RadioControl from '../RadioControl';
 import Required from '../Required';
 
 import messages from './messages';
@@ -121,7 +122,7 @@ const controls = {
   markdown: MarkdownControl,
   date: DateControl,
   select: ControlSelect,
-  radio: Control.radio,
+  radio: RadioControl,
   checkbox: Control.checkbox,
   button: Control.button,
   file: UploadControl,

@@ -40,16 +40,16 @@ export const dateOption = (entity, activeDateId) => Map({
   checked: activeDateId ? entity.get('id') === activeDateId.toString() : false,
 });
 
-export const dateOptions = (entities, activeDateId) => entities
-  ? entities.reduce((options, entity) => {
-    // only allow active and those that are not associated
-    if ((entity.has('reportCount') && entity.get('reportCount') === 0)
-    || (activeDateId ? activeDateId.toString() === entity.get('id') : false)) {
-      return options.push(dateOption(entity, activeDateId));
-    }
-    return options;
-  }, List())
-  : List();
+// export const dateOptions = (entities, activeDateId) => entities
+//   ? entities.reduce((options, entity) => {
+//     // only allow active and those that are not associated
+//     if ((entity.has('reportCount') && entity.get('reportCount') === 0)
+//     || (activeDateId ? activeDateId.toString() === entity.get('id') : false)) {
+//       return options.push(dateOption(entity, activeDateId));
+//     }
+//     return options;
+//   }, List())
+//   : List();
 
 export const taxonomyOptions = (taxonomies) => taxonomies
   ? taxonomies.reduce((values, tax) =>
@@ -101,18 +101,17 @@ export const renderUserControl = (entities, label, activeUserId) => entities
 }
 : null;
 
-  // TODO use radio buttons
-export const renderDateControl = (dates, activeDateId) => dates
-? {
-  id: 'dates',
-  model: '.associatedDate',
-  dataPath: ['associatedDate'],
-  label: 'Scheduled Date',
-  controlType: 'multiselect',
-  multiple: false,
-  options: dateOptions(dates, activeDateId),
-}
-: null;
+//   // TODO use radio buttons
+// export const renderDateControl = (dates, activeDateId) => dates
+// ? {
+//   id: 'dates',
+//   model: '.associatedDate',
+//   dataPath: ['associatedDate'],
+//   label: 'Scheduled Date',
+//   controlType: 'radio',
+//   options: dateOptions(dates, activeDateId),
+// }
+// : null;
 
 export const renderTaxonomyControl = (taxonomies) => taxonomies
 ? taxonomies.reduce((controls, tax) => controls.concat({

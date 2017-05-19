@@ -23,7 +23,6 @@ const formInitial = fromJS({
     due_date_id: '',
     indicator_id: '',
   },
-  associatedDate: [],
 });
 
 function formReducer(state = formInitial, action) {

@@ -230,7 +230,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="indicators"
             buttons={
               indicator && dataReady ? [{
                 type: 'cancel',

@@ -10,14 +10,14 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { fromJS, List, Map } from 'immutable';
+import { fromJS, Map } from 'immutable';
 
 import {
-  getCheckedValuesFromOptions,
-  getUncheckedValuesFromOptions,
-} from 'components/forms/MultiSelectControl';
+  validateRequired,
+} from 'utils/forms';
 
-import { DOC_PUBLISH_STATUSES, PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
+import { DOC_PUBLISH_STATUSES, PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 import {
   loadEntitiesIfNeeded,
@@ -26,18 +26,15 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import Page from 'components/Page';
-import EntityForm from 'components/forms/EntityForm';
-
 import {
   getEntity,
   isReady,
 } from 'containers/App/selectors';
 
-import {
-  dateOptions,
-  renderDateControl,
-} from 'utils/forms';
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
+import EntityForm from 'components/forms/EntityForm';
 
 import viewDomainSelect from './selectors';
 import messages from './messages';
@@ -68,32 +65,167 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
     const { report } = props;
+    if (!report.attributes.due_date_id) {
+      report.attributes.due_date_id = 0;
+    }
     return Map({
       id: report.id,
       attributes: fromJS(report.attributes),
-      associatedDate: report && report.indicator && report.indicator.dates
-      ? dateOptions(fromJS(report.indicator.dates), report.attributes.due_date_id)
-      : List(),
-      // TODO allow single value for singleSelect
     });
   }
 
+  getHeaderMainFields = () => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          id: 'title',
+          controlType: 'title',
+          model: '.attributes.title',
+          label: this.context.intl.formatMessage(appMessages.attributes.title),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = (entity) => ([
+    {
+      fields: [
+        {
+          controlType: 'combo',
+          fields: [
+            {
+              controlType: 'info',
+              type: 'reference',
+              value: entity.id,
+            },
+            {
+              id: 'status',
+              controlType: 'select',
+              model: '.attributes.draft',
+              label: this.context.intl.formatMessage(appMessages.attributes.draft),
+              value: entity.attributes.draft,
+              options: PUBLISH_STATUSES,
+            },
+          ],
+        },
+        {
+          controlType: 'info',
+          type: 'meta',
+          fields: [
+            {
+              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
+              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+            },
+            {
+              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
+              value: entity.user && entity.user.attributes.name,
+            },
+          ],
+        },
+      ],
+    },
+  ]);
+
+  getBodyMainFields = (entity) => ([
+    {
+      fields: [
+        {
+          id: 'description',
+          controlType: 'markdown',
+          model: '.attributes.description',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
+          label: this.context.intl.formatMessage(appMessages.attributes.description),
+        },
+        {
+          id: 'document_url',
+          controlType: 'uploader',
+          model: '.attributes.document_url',
+          label: this.context.intl.formatMessage(appMessages.attributes.document_url),
+        },
+        {
+          id: 'document_public',
+          controlType: 'select',
+          model: '.attributes.document_public',
+          options: DOC_PUBLISH_STATUSES,
+          value: entity.attributes.document_public,
+          label: this.context.intl.formatMessage(appMessages.attributes.document_public),
+        },
+      ],
+    },
+  ]);
+  getDateOptions = (dates, activeDateId) => {
+    const dateOptions = [
+      {
+        value: 0,
+        label: this.context.intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short),
+        checked: activeDateId === null || activeDateId === 0 || activeDateId === '',
+      },
+    ];
+    return Object.values(dates).reduce((memo, date) => {
+      // only allow active and those that are not associated
+      if ((typeof date.reportCount !== 'undefined' && date.reportCount === 0)
+      || (activeDateId ? activeDateId.toString() === date.id : false)) {
+        const label =
+          `${this.context.intl.formatDate(new Date(date.attributes.due_date))} ${
+            date.attributes.overdue ? this.context.intl.formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
+            date.attributes.due ? this.context.intl.formatMessage(appMessages.entities.due_dates.due) : ''}`;
+        return memo.concat([
+          {
+            value: parseInt(date.id, 10),
+            label,
+            highlight: date.attributes.overdue,
+            checked: activeDateId ? date.id === activeDateId : false,
+          },
+        ]);
+      }
+      return memo;
+    }, dateOptions);
+  }
+  getBodyAsideFields = (entity) => ([ // fieldGroups
+    { // fieldGroup
+      label: this.context.intl.formatMessage(appMessages.entities.due_dates.single),
+      icon: 'calendar',
+      fields: entity.indicator && entity.indicator.dates
+        ? [{
+          id: 'due_date_id',
+          controlType: 'radio',
+          model: '.attributes.due_date_id',
+          options: this.getDateOptions(entity.indicator.dates, entity.attributes.due_date_id),
+          value: entity.attributes.due_date_id || 0,
+          hints: {
+            1: this.context.intl.formatMessage(appMessages.entities.due_dates.empty),
+          },
+        }]
+        : [],
+    },
+  ]);
+
+  getFields = (entity) => ({ // isManager, taxonomies,
+    header: {
+      main: this.getHeaderMainFields(),
+      aside: this.getHeaderAsideFields(entity),
+    },
+    body: {
+      main: this.getBodyMainFields(entity),
+      aside: this.getBodyAsideFields(entity),
+    },
+  })
   render() {
     const { report, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
-    const required = (val) => val && val.length;
-
-    const dateControlOptions = report && report.indicator && report.indicator.dates
-      ? renderDateControl(fromJS(report.indicator.dates), report.attributes.due_date_id)
-      : null;
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-
-    if (report) {
-      pageTitle = `${pageTitle} (Indicator: ${report.attributes.indicator_id})`;
+    if (report && dataReady) {
+      pageTitle = `${pageTitle} for indicator ${report.attributes.indicator_id}`;
     }
-
     return (
       <div>
         <Helmet
@@ -102,109 +234,47 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !report && !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { !report && dataReady && !saveError &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        {report && dataReady &&
-          <Page
+        <Content>
+          <ContentHeader
             title={pageTitle}
-            actions={[
-              {
-                type: 'simple',
-                title: 'Cancel',
+            type={CONTENT_SINGLE}
+            icon="reports"
+            buttons={
+              report && dataReady ? [{
+                type: 'cancel',
                 onClick: () => this.props.handleCancel(reference),
               },
               {
-                type: 'primary',
-                title: 'Save',
-                onClick: () => this.props.handleSubmit(viewDomain.form.data),
-              },
-            ]}
-          >
-            {saveSending &&
-              <p>Saving</p>
+                type: 'save',
+                onClick: () => this.props.handleSubmit(viewDomain.form.data, report.attributes.due_date_id),
+              }] : null
             }
-            {saveError &&
-              <p>{saveError}</p>
-            }
+          />
+          {saveSending &&
+            <p>Saving Action</p>
+          }
+          {saveError &&
+            <p>{saveError}</p>
+          }
+          { !report && !dataReady &&
+            <Loading />
+          }
+          { !report && dataReady && !saveError &&
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          }
+          {dataReady &&
             <EntityForm
               model="reportEdit.form.data"
               formData={viewDomain.form.data}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, report.attributes.due_date_id)}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'title',
-                      controlType: 'input',
-                      model: '.attributes.title',
-                      validators: {
-                        required,
-                      },
-                      errorMessages: {
-                        required: this.context.intl.formatMessage(messages.fieldRequired),
-                      },
-                    },
-                  ],
-                  aside: [
-                    {
-                      id: 'no',
-                      controlType: 'info',
-                      displayValue: reference,
-                    },
-                    {
-                      id: 'status',
-                      controlType: 'select',
-                      model: '.attributes.draft',
-                      value: report.draft,
-                      options: PUBLISH_STATUSES,
-                    },
-                    {
-                      id: 'updated',
-                      controlType: 'info',
-                      displayValue: report.attributes.updated_at,
-                    },
-                    {
-                      id: 'updated_by',
-                      controlType: 'info',
-                      displayValue: report.user && report.user.attributes.name,
-                    },
-                  ],
-                },
-                body: {
-                  main: [
-                    dateControlOptions,
-                    {
-                      id: 'description',
-                      controlType: 'textarea',
-                      model: '.attributes.description',
-                    },
-                    {
-                      id: 'document_url',
-                      controlType: 'uploader',
-                      model: '.attributes.document_url',
-                    },
-                    {
-                      id: 'document_public',
-                      controlType: 'select',
-                      model: '.attributes.document_public',
-                      options: DOC_PUBLISH_STATUSES,
-                    },
-                  ],
-                },
-              }}
+              fields={this.getFields(report)}
             />
-          </Page>
-        }
+          }
+        </Content>
       </div>
     );
   }
@@ -286,23 +356,19 @@ function mapDispatchToProps(dispatch) {
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, fromJS(formData)));
     },
-    handleSubmit: (formData) => {
+    handleSubmit: (formData, previousDateAssigned) => {
       let saveData = formData;
-      let dueDateIdUnchecked = null;
 
-      // TODO: remove once have singleselect instead of multiselect
-      const formDateIds = getCheckedValuesFromOptions(formData.get('associatedDate'));
-      if (List.isList(formDateIds) && formDateIds.size) {
-        saveData = saveData.setIn(['attributes', 'due_date_id'], formDateIds.first());
-      } else {
+      const dateAssigned = formData.getIn(['attributes', 'due_date_id']);
+      if (dateAssigned === 0) {
         saveData = saveData.setIn(['attributes', 'due_date_id'], null);
       }
-      const uncheckedFormDateIds = getUncheckedValuesFromOptions(formData.get('associatedDate'));
-      if (List.isList(uncheckedFormDateIds) && uncheckedFormDateIds.size) {
-        dueDateIdUnchecked = uncheckedFormDateIds.first();
-      }
-
-      dispatch(save(saveData.toJS(), dueDateIdUnchecked));
+      dispatch(save(
+        saveData.toJS(),
+        previousDateAssigned && previousDateAssigned !== dateAssigned
+          ? previousDateAssigned
+          : null
+      ));
     },
     handleCancel: (reference) => {
       dispatch(updatePath(`/reports/${reference}`));
