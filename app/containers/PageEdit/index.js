@@ -11,8 +11,12 @@ import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { fromJS } from 'immutable';
+import {
+  validateRequired,
+} from 'utils/forms';
 
-import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 import {
   loadEntitiesIfNeeded,
@@ -21,13 +25,15 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import Page from 'components/Page';
-import EntityForm from 'components/forms/EntityForm';
-
 import {
   getEntity,
   isReady,
 } from 'containers/App/selectors';
+
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
+import EntityForm from 'components/forms/EntityForm';
 
 import viewDomainSelect from './selectors';
 
@@ -61,11 +67,103 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     return fromJS(page);
   }
 
+  getHeaderMainFields = () => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          id: 'title',
+          controlType: 'title',
+          model: '.attributes.title',
+          label: this.context.intl.formatMessage(appMessages.attributes.title),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+        {
+          id: 'menuTitle',
+          controlType: 'short',
+          model: '.attributes.menu_title',
+          label: this.context.intl.formatMessage(appMessages.attributes.menu_title),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = (entity) => ([
+    {
+      fields: [
+        {
+          controlType: 'combo',
+          fields: [
+            {
+              controlType: 'info',
+              type: 'reference',
+              value: entity.id,
+            },
+            {
+              id: 'status',
+              controlType: 'select',
+              model: '.attributes.draft',
+              label: this.context.intl.formatMessage(appMessages.attributes.draft),
+              options: PUBLISH_STATUSES,
+            },
+          ],
+        },
+        {
+          controlType: 'info',
+          type: 'meta',
+          fields: [
+            {
+              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
+              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+            },
+            {
+              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
+              value: entity.user && entity.user.attributes.name,
+            },
+          ],
+        },
+      ],
+    },
+  ]);
+
+  getBodyMainFields = () => ([
+    {
+      fields: [
+        {
+          id: 'description',
+          controlType: 'markdown',
+          model: '.attributes.content',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
+          label: this.context.intl.formatMessage(appMessages.attributes.description),
+        },
+      ],
+    },
+  ]);
+
+  getFields = (entity) => ({ // isManager, taxonomies,
+    header: {
+      main: this.getHeaderMainFields(),
+      aside: this.getHeaderAsideFields(entity),
+    },
+    body: {
+      main: this.getBodyMainFields(entity),
+    },
+  })
   render() {
     const { page, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
-    const required = (val) => val && val.length;
 
     return (
       <div>
@@ -75,104 +173,47 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !page && !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        { !page && dataReady && !saveError &&
-          <div>
-            <FormattedMessage {...messages.notFound} />
-          </div>
-        }
-        {page &&
-          <Page
+        <Content>
+          <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
-            actions={[
-              {
-                type: 'simple',
-                title: 'Cancel',
+            type={CONTENT_SINGLE}
+            icon="categories"
+            buttons={
+              page && dataReady ? [{
+                type: 'cancel',
                 onClick: this.props.handleCancel,
               },
               {
-                type: 'primary',
-                title: 'Save',
+                type: 'save',
                 onClick: () => this.props.handleSubmit(viewDomain.form.data),
-              },
-            ]}
-          >
-            {saveSending &&
-              <p>Saving</p>
+              }] : null
             }
-            {saveError &&
-              <p>{saveError}</p>
-            }
+          />
+          {saveSending &&
+            <p>Saving</p>
+          }
+          {saveError &&
+            <p>{saveError}</p>
+          }
+          { !page && !dataReady &&
+            <Loading />
+          }
+          { !page && dataReady && !saveError &&
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          }
+          {page && dataReady &&
             <EntityForm
               model="pageEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'title',
-                      controlType: 'input',
-                      model: '.attributes.title',
-                      validators: {
-                        required,
-                      },
-                      errorMessages: {
-                        required: this.context.intl.formatMessage(messages.fieldRequired),
-                      },
-                    },
-                    {
-                      id: 'menuTitle',
-                      controlType: 'input',
-                      label: 'Menu title',
-                      model: '.attributes.menu_title',
-                    },
-                  ],
-                  aside: [
-                    {
-                      id: 'no',
-                      controlType: 'info',
-                      displayValue: reference,
-                    },
-                    {
-                      id: 'status',
-                      controlType: 'select',
-                      model: '.attributes.draft',
-                      value: page.draft,
-                      options: PUBLISH_STATUSES,
-                    },
-                    {
-                      id: 'updated',
-                      controlType: 'info',
-                      displayValue: page.attributes.updated_at,
-                    },
-                    {
-                      id: 'updated_by',
-                      controlType: 'info',
-                      displayValue: page.user && page.user.attributes.name,
-                    },
-                  ],
-                },
-                body: {
-                  main: [
-                    {
-                      id: 'content',
-                      controlType: 'textarea',
-                      model: '.attributes.content',
-                    },
-                  ],
-                  aside: [],
-                },
-              }}
+              fields={this.getFields(page)}
             />
-          </Page>
-        }
+          }
+        </Content>
       </div>
     );
   }

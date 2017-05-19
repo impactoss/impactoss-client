@@ -57,6 +57,10 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.title',
       defaultMessage: 'Abbr.',
     },
+    menu_title: {
+      id: 'app.containers.App.placeholders.title',
+      defaultMessage: '',
+    },
     description: {
       id: 'app.containers.App.placeholders.description',
       defaultMessage: 'Enter content',
@@ -86,6 +90,10 @@ export default defineMessages({
     short_title: {
       id: 'app.containers.App.attributes.short_title',
       defaultMessage: 'Short title',
+    },
+    menu_title: {
+      id: 'app.containers.App.attributes.menu_title',
+      defaultMessage: 'Menu title',
     },
     reference: {
       id: 'app.containers.App.attributes.reference',
