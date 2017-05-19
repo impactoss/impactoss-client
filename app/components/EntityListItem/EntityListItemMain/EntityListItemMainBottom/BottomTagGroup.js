@@ -3,7 +3,7 @@ import { palette } from 'styled-theme';
 
 const BottomTagGroup = styled.span`
   display: inline-block;
-  color: ${palette('greyscaleLight', 3)};
+  color: ${palette('light', 3)};
   margin-right: 1em;
 `;
 

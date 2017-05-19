@@ -6,7 +6,7 @@ import Icon from 'components/Icon';
 
 const Styled = styled.span`
   text-transform: uppercase;
-  color: ${palette('greyscaleDark', 3)}
+  color: ${palette('dark', 3)}
   font-weight: bold;
 `;
 

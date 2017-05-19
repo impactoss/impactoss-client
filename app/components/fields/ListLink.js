@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 const ListLink = styled(Link)`
   font-weight: bold;
   font-size: 1.2em;
-  color: ${palette('greyscaleDark', 1)};
+  color: ${palette('dark', 1)};
   display: block;
 `;
 

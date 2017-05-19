@@ -5,7 +5,7 @@ import Section from './Section';
 
 const Aside = styled(Section)`
   width: 30%;
-  border-left: 1px solid ${palette('greyscaleLight', 0)};
+  border-left: 1px solid ${palette('light', 0)};
   margin: 0 -1px;
 `;
 

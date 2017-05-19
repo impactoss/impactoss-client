@@ -12,7 +12,7 @@ const Styled = styled.button`
   display: block;
   margin-bottom: 2px;
   &:hover {
-    color: ${palette('greyscaleDark', 3)};
+    color: ${palette('dark', 3)};
   }
 `;
 const Column = styled.div`

@@ -7,7 +7,7 @@ const EntityListItemMainTopStatus = styled.div`
   font-weight: bold;
   font-size: 0.8em;
   text-transform: uppercase;
-  color: ${palette('greyscaleDark', 4)};
+  color: ${palette('dark', 4)};
 `;
 
 export default EntityListItemMainTopStatus;

@@ -7,7 +7,7 @@ const Styled = styled.div`
   width: 100%
   height: 3px;
   position: relative;
-  background-color: ${palette('greyscaleLight', 4)};
+  background-color: ${palette('light', 4)};
 `;
 const Bar = styled.div`
   display: block;

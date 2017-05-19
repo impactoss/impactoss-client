@@ -11,18 +11,18 @@ const Styled = styled(Component)`
   text-align: center;
   cursor: pointer;
   width:${(props) => props.width * 100}%;
-  border-right: 1px solid ${palette('greyscaleLight', 0)};
+  border-right: 1px solid ${palette('light', 0)};
   vertical-align: top;
   padding: 5px 10px;
 `;
 const Top = styled.div`
   float: right;
-  color: ${palette('greyscaleLight', 3)};
+  color: ${palette('light', 3)};
 `;
 
 const Count = styled.div`
   display: inline-block;
-  background-color: ${(props) => props.count ? palette(props.type, 0) : palette('greyscaleLight', 4)};
+  background-color: ${(props) => props.count ? palette(props.type, 0) : palette('light', 4)};
   color: ${palette('primary', 4)};
   padding: 2px 8px;
   border-radius: 999px;

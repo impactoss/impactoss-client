@@ -5,7 +5,7 @@ import Label from './Label';
 
 const ListLabel = styled(Label)`
   padding-bottom: 8px;
-  border-bottom: 1px solid ${palette('greyscaleLight', 0)};
+  border-bottom: 1px solid ${palette('light', 0)};
 `;
 
 export default ListLabel;

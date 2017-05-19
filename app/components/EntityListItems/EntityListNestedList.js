@@ -12,7 +12,7 @@ const Styled = styled.span`
 `;
 const ItemWrapper = styled.div`
   border-top: ${(props) => props.separated ? '1px solid' : 'none'};
-  border-top-color: ${(props) => props.separated ? palette('greyscaleDark', 4) : 'transparent'}
+  border-top-color: ${(props) => props.separated ? palette('dark', 4) : 'transparent'}
   padding: ${(props) => props.separated ? '0.5em 0 3em' : '0 0 1em'};
   border-bottom: 1px solid transparent;
 `;

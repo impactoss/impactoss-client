@@ -7,7 +7,7 @@ import Icon from 'components/Icon';
 
 const Date = styled.span`
   font-size: 0.8em;
-  color: ${palette('greyscaleLight', 3)};
+  color: ${palette('light', 3)};
 `;
 
 export default class EntityListItemMainBottomTargetDate extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

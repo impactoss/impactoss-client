@@ -1,15 +1,13 @@
 import React, { PropTypes } from 'react';
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 import ButtonPrimaryIcon from 'components/buttons/ButtonPrimaryIcon';
 
 const Styled = styled.div`
-  border-radius: 999px;
+  // border-radius: 999px;
   position: relative;
-  display: block;
-  background-color: ${palette('greyscaleLight', 1)}
-  height: 46px;
+  // display: block;
+  height: 50px;
 `;
 
 const ButtonActive = styled.span`

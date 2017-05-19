@@ -18,14 +18,14 @@ const Styled = styled.div`
   display: inline-block;
 `;
 const Label = styled.label`
-  color: ${palette('greyscaleDark', 3)};
+  color: ${palette('dark', 3)};
   padding: 0 0.5em 0 0;
 `;
 const Select = styled.select`
   font-weight: ${(props) => props.active ? 'bold' : 'normal'};
 `;
 const Option = styled.option`
-  color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 4) : palette('greyscaleDark', 2)};
+  color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 4) : palette('dark', 2)};
   background-color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 0) : palette('primary', 4)};
 `;
 const Reset = styled(ButtonSimple)`

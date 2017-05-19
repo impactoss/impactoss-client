@@ -12,12 +12,12 @@ import { palette } from 'styled-theme';
 import Icon from 'components/Icon';
 
 const Styled = styled.div`
-  color: ${palette('greyscaleDark', 2)};
-  background-color: ${palette('greyscaleLight', 1)};
+  color: ${palette('dark', 2)};
+  background-color: ${palette('light', 1)};
   padding: 0.5em 2em;
 `;
 const Right = styled.div`
-  color: ${palette('greyscaleDark', 4)};
+  color: ${palette('dark', 4)};
   float:right;
 `;
 

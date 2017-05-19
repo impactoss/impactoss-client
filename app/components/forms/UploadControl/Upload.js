@@ -28,7 +28,7 @@ const Remove = styled(ButtonIcon)`
   right: 0;
   top: 0;
   padding: 1em 0.75em;
-  color: ${palette('greyscaleDark', 2)};
+  color: ${palette('dark', 2)};
   &:hover {
     color: ${palette('primary', 0)};
   }

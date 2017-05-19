@@ -30,7 +30,7 @@ const TitleSmall = styled.h4`
   display: inline-block;
 `;
 const TitleIconWrap = styled.span`
-  color: ${palette('greyscaleDark', 4)};
+  color: ${palette('dark', 4)};
 `;
 const ButtonWrap = styled.span`
   padding: 0 0.5em;

@@ -12,14 +12,14 @@ const Styled = styled(Button)`
   padding: 1em;
   width: 100%;
   background-color: ${(props) => props.active ? palette('primary', 0) : palette('primary', 4)};
-  color:  ${(props) => props.active ? palette('primary', 4) : palette('greyscaleDark', 2)};
+  color:  ${(props) => props.active ? palette('primary', 4) : palette('dark', 2)};
   padding: 0.5em;
   &:hover {
-    color: ${(props) => props.active ? palette('primary', 4) : palette('greyscaleDark', 0)};
+    color: ${(props) => props.active ? palette('primary', 4) : palette('dark', 0)};
     background-color: ${(props) => props.active ? palette('primary', 1) : palette('primary', 4)};
   }
   text-align: left;
-  border-bottom: 1px solid ${palette('greyscaleLight', 0)}
+  border-bottom: 1px solid ${palette('light', 0)}
 `;
 
 const TaxTitle = styled.span`

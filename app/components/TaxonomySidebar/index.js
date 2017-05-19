@@ -10,7 +10,7 @@ import messages from './messages';
 
 const Header = styled.div`
   padding: 3em 2em 1em;
-  background-color: ${palette('greyscaleLight', 2)}
+  background-color: ${palette('light', 2)}
 `;
 
 class TaxonomySidebar extends React.Component { // eslint-disable-line react/prefer-stateless-function
