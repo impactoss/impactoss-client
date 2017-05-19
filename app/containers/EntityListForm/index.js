@@ -41,7 +41,6 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
 
   render() {
     const { model, onSubmit, onCancel, buttons, formOptions } = this.props;
-console.log(this.props)
     return (
       <FormWrapper>
         <Form

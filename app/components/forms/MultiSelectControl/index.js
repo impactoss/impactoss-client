@@ -56,6 +56,7 @@ MultiSelectControl.propTypes = {
   options: PropTypes.instanceOf(List),
   title: PropTypes.string,
   buttons: PropTypes.array,
+  onCancel: PropTypes.func,
 };
 
 MultiSelectControl.defaultProps = {

@@ -14,7 +14,7 @@ import Option from './Option';
 
 
 const OptionWrapper = styled.div`
-  padding: 1em;
+  padding: 0.5em 1em;
   border-bottom: 1px solid ${palette('light', 1)};
   display: table;
   width: 100%;
@@ -27,7 +27,7 @@ const CheckboxWrapper = styled.div`
   display: table-cell;
   vertical-align:middle;
   width: 10px;
-  padding-top: 5px;
+  padding-top: 3px;
 `;
 const OptionLabel = styled.label`
   display: table-cell;
@@ -202,26 +202,26 @@ export default class MultiSelect extends React.Component {
     return (
       <OptionWrapper key={id}>
         <CheckboxWrapper>
-        { isThreeState &&
-          <IndeterminateCheckbox
-            id={id}
-            checked={checked}
-            onChange={(checkedState) => {
-              this.props.onChange(this.getNextValues(checkedState, option));
-            }}
-          />
-        }
-        { !isThreeState &&
-          <input
-            id={id}
-            type="checkbox"
-            checked={checked}
-            onChange={(evt) => {
-              if (evt && evt !== undefined) evt.stopPropagation();
-              this.props.onChange(this.getNextValues(evt.target.checked, option));
-            }}
-          />
-        }
+          { isThreeState &&
+            <IndeterminateCheckbox
+              id={id}
+              checked={checked}
+              onChange={(checkedState) => {
+                this.props.onChange(this.getNextValues(checkedState, option));
+              }}
+            />
+          }
+          { !isThreeState &&
+            <input
+              id={id}
+              type="checkbox"
+              checked={checked}
+              onChange={(evt) => {
+                if (evt && evt !== undefined) evt.stopPropagation();
+                this.props.onChange(this.getNextValues(evt.target.checked, option));
+              }}
+            />
+          }
         </CheckboxWrapper>
         <OptionLabel htmlFor={id} >
           <Option

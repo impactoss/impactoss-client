@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 import ButtonPrimaryIcon from 'components/buttons/ButtonPrimaryIcon';
 
