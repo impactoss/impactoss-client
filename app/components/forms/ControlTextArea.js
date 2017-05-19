@@ -1,13 +1,15 @@
 import { Control } from 'react-redux-form/immutable';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 const ControlTextArea = styled(Control.textarea)`
-  background:#ffffff;
-  width:100%;
-  border:1px solid #E0E1E2;
-  min-height:5em;
-  color:#000;
-  padding:5px;
+  background-color: ${palette('primary', 4)};
+  width: 100%;
+  border: 1px solid ${palette('greyscaleLight', 1)};;
+  min-height: 20em;
+  color: ${palette('greyscaleDark', 0)};
+  padding: 0.7em;
+  border-radius: 0.5em;
 `;
 
 export default ControlTextArea;

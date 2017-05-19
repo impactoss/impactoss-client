@@ -59,6 +59,12 @@ export const PUBLISH_STATUSES = [
   { value: true, label: 'Draft' },
   { value: false, label: 'Public' },
 ];
+export const REPORT_FREQUENCIES = [
+  { value: 1, label: 'Monthly' },
+  { value: 3, label: 'Quarterly' },
+  { value: 6, label: 'Semiannual' },
+  { value: 12, label: 'Annual' },
+];
 
 export const DOC_PUBLISH_STATUSES = [
   { value: true, label: 'Public' },

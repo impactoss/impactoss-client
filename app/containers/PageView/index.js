@@ -45,7 +45,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
       fields: [
         {
           type: 'title',
-          label: 'Menu title',
+          label: this.context.intl.formatMessage(appMessages.attributes.menu_title),
           value: entity.attributes.menu_title,
           isManager: isContributor,
         },
@@ -116,10 +116,12 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
   ]);
 
   getFields = (entity, isContributor) => ({
-    header: {
-      main: this.getHeaderMainFields(entity, isContributor),
-      aside: this.getHeaderAsideFields(entity, isContributor),
-    },
+    header: isContributor
+      ? {
+        main: this.getHeaderMainFields(entity, isContributor),
+        aside: this.getHeaderAsideFields(entity, isContributor),
+      }
+      : null,
     body: {
       main: this.getBodyMainFields(entity, isContributor),
     },

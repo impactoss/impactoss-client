@@ -1,0 +1,37 @@
+import React, { PropTypes } from 'react';
+import { find } from 'lodash/collection';
+
+import appMessages from 'containers/App/messages';
+
+import { PUBLISH_STATUSES } from 'containers/App/constants';
+
+import Label from 'components/fields/Label';
+import FieldWrapInline from 'components/fields/FieldWrapInline';
+import Status from 'components/fields/Status';
+
+class StatusField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  render() {
+    const { field } = this.props;
+    return (
+      <FieldWrapInline>
+        <Label>
+          {field.label || this.context.intl.formatMessage(appMessages.attributes.status)}
+        </Label>
+        <Status>
+          {
+            find(PUBLISH_STATUSES, { value: field.value }).label
+          }
+        </Status>
+      </FieldWrapInline>
+    );
+  }
+}
+
+StatusField.propTypes = {
+  field: PropTypes.object.isRequired,
+};
+StatusField.contextTypes = {
+  intl: React.PropTypes.object.isRequired,
+};
+
+export default StatusField;

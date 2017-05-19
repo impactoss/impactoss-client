@@ -7,13 +7,18 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
 
 import { List } from 'immutable';
 
+import {
+  renderUserControl,
+  validateRequired,
+} from 'utils/forms';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 import {
   loadEntitiesIfNeeded,
@@ -29,12 +34,10 @@ import {
   isUserAdmin,
 } from 'containers/App/selectors';
 
-import Page from 'components/Page';
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
-
-import {
-  renderUserControl,
-} from 'utils/forms';
 
 import viewDomainSelect from './selectors';
 import messages from './messages';
@@ -57,20 +60,90 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     }
   }
 
+  getHeaderMainFields = () => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          id: 'title',
+          controlType: 'title',
+          model: '.attributes.title',
+          label: this.context.intl.formatMessage(appMessages.attributes.title),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+        {
+          id: 'short_title',
+          controlType: 'short',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.short_title),
+          model: '.attributes.short_title',
+          label: this.context.intl.formatMessage(appMessages.attributes.short_title),
+        },
+      ],
+    },
+  ]);
+
+
+  getBodyMainFields = () => ([
+    {
+      fields: [
+        {
+          id: 'description',
+          controlType: 'markdown',
+          model: '.attributes.description',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
+          label: this.context.intl.formatMessage(appMessages.attributes.description),
+        },
+      ],
+    },
+  ]);
+
+  getBodyAsideFields = (users, isAdmin, taxonomy) => {
+    const fields = []; // fieldGroups
+    fields.push({
+      fields: [{
+        id: 'url',
+        controlType: 'url',
+        model: '.attributes.url',
+        placeholder: this.context.intl.formatMessage(appMessages.placeholders.url),
+        label: this.context.intl.formatMessage(appMessages.attributes.url),
+      }],
+    });
+    if (isAdmin && !!taxonomy.attributes.has_manager) {
+      fields.push({
+        fields: [
+          renderUserControl(
+            users,
+            this.context.intl.formatMessage(appMessages.attributes.manager_id.categories)
+          ),
+        ],
+      });
+    }
+    return fields;
+  }
+
+  getFields = (users, isAdmin, taxonomy) => ({ // isManager, taxonomies,
+    header: {
+      main: this.getHeaderMainFields(),
+    },
+    body: {
+      main: this.getBodyMainFields(),
+      aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
+    },
+  })
+
   render() {
-    const { taxonomy, dataReady, isAdmin, viewDomain } = this.props;
+    const { taxonomy, dataReady, isAdmin, viewDomain, users } = this.props;
     const { saveSending, saveError } = viewDomain.page;
     const taxonomyReference = this.props.params.id;
-    const required = (val) => val && val.length;
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (taxonomy && taxonomy.attributes) {
       pageTitle = `${pageTitle} (${taxonomy.attributes.title})`;
-    }
-
-    const mainAsideFields = [];
-    if (dataReady && isAdmin && !!taxonomy.attributes.has_manager && this.props.users) {
-      mainAsideFields.push(renderUserControl(this.props.users, 'Category manager'));
     }
 
     return (
@@ -84,39 +157,35 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             },
           ]}
         />
-        { !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        {dataReady &&
-          <Page
+        <Content>
+          <ContentHeader
             title={pageTitle}
-            actions={
-              [
-                {
-                  type: 'simple',
-                  title: 'Cancel',
-                  onClick: () => this.props.handleCancel(taxonomyReference),
-                },
-                {
-                  type: 'primary',
-                  title: 'Save',
-                  onClick: () => this.props.handleSubmit(
-                    viewDomain.form.data,
-                    taxonomyReference
-                  ),
-                },
-              ]
+            type={CONTENT_SINGLE}
+            icon="actions"
+            buttons={
+              dataReady ? [{
+                type: 'cancel',
+                onClick: () => this.props.handleCancel(taxonomyReference),
+              },
+              {
+                type: 'save',
+                onClick: () => this.props.handleSubmit(
+                  viewDomain.form.data,
+                  taxonomyReference
+                ),
+              }] : null
             }
-          >
-            {saveSending &&
-              <p>Saving Category</p>
-            }
-            {saveError &&
-              <p>{saveError}</p>
-            }
-
+          />
+          { !dataReady &&
+            <Loading />
+          }
+          {saveSending &&
+            <p>Saving Category</p>
+          }
+          {saveError &&
+            <p>{saveError}</p>
+          }
+          {dataReady &&
             <EntityForm
               model="categoryNew.form.data"
               formData={viewDomain.form.data}
@@ -126,48 +195,10 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               )}
               handleCancel={() => this.props.handleCancel(taxonomyReference)}
               handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'title',
-                      controlType: 'input',
-                      model: '.attributes.title',
-                      placeholder: this.context.intl.formatMessage(messages.fields.title.placeholder),
-                      validators: {
-                        required,
-                      },
-                      errorMessages: {
-                        required: this.context.intl.formatMessage(messages.fieldRequired),
-                      },
-                    },
-                  ],
-                  aside: [],
-                },
-                body: {
-                  main: [
-                    {
-                      id: 'description',
-                      controlType: 'textarea',
-                      model: '.attributes.description',
-                    },
-                    {
-                      id: 'short_title',
-                      controlType: 'input',
-                      model: '.attributes.short_title',
-                    },
-                    {
-                      id: 'url',
-                      controlType: 'input',
-                      model: '.attributes.url',
-                    },
-                  ],
-                  aside: mainAsideFields,
-                },
-              }}
+              fields={this.getFields(users, isAdmin, taxonomy)}
             />
-          </Page>
-        }
+          }
+        </Content>
       </div>
     );
   }

@@ -8,11 +8,12 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
-import { List } from 'immutable';
+import {
+  validateRequired,
+} from 'utils/forms';
 
-import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
-
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { DOC_PUBLISH_STATUSES, PUBLISH_STATUSES, CONTENT_SINGLE } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 import {
   loadEntitiesIfNeeded,
@@ -22,12 +23,10 @@ import {
 
 import { getEntity, isReady } from 'containers/App/selectors';
 
-import Page from 'components/Page';
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
-
-import {
-  renderDateControl,
-} from 'utils/forms';
 
 import viewDomainSelect from './selectors';
 import messages from './messages';
@@ -46,17 +45,133 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     }
   }
 
+  getHeaderMainFields = () => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          id: 'title',
+          controlType: 'title',
+          model: '.attributes.title',
+          label: this.context.intl.formatMessage(appMessages.attributes.title),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = () => ([
+    {
+      fields: [
+        {
+          id: 'status',
+          controlType: 'select',
+          model: '.attributes.draft',
+          label: this.context.intl.formatMessage(appMessages.attributes.draft),
+          value: true,
+          options: PUBLISH_STATUSES,
+        },
+      ],
+    },
+  ]);
+
+  getBodyMainFields = () => ([
+    {
+      fields: [
+        {
+          id: 'description',
+          controlType: 'markdown',
+          model: '.attributes.description',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
+          label: this.context.intl.formatMessage(appMessages.attributes.description),
+        },
+        {
+          id: 'document_url',
+          controlType: 'uploader',
+          model: '.attributes.document_url',
+          label: this.context.intl.formatMessage(appMessages.attributes.document_url),
+        },
+        {
+          id: 'document_public',
+          controlType: 'select',
+          model: '.attributes.document_public',
+          options: DOC_PUBLISH_STATUSES,
+          value: true,
+          label: this.context.intl.formatMessage(appMessages.attributes.document_public),
+        },
+      ],
+    },
+  ]);
+  getDateOptions = (dates) => {
+    const dateOptions = [
+      {
+        value: 0,
+        label: this.context.intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short),
+        checked: true,
+      },
+    ];
+    return dates
+      ? Object.values(dates).reduce((memo, date) => {
+        // only allow active and those that are not associated
+        if (typeof date.reportCount !== 'undefined' && date.reportCount === 0) {
+          const label =
+            `${this.context.intl.formatDate(new Date(date.attributes.due_date))} ${
+              date.attributes.overdue ? this.context.intl.formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
+              date.attributes.due ? this.context.intl.formatMessage(appMessages.entities.due_dates.due) : ''}`;
+          return memo.concat([
+            {
+              value: parseInt(date.id, 10),
+              label,
+              highlight: date.attributes.overdue,
+              checked: false,
+            },
+          ]);
+        }
+        return memo;
+      }, dateOptions)
+    : dateOptions;
+  }
+  getBodyAsideFields = (indicator) => ([ // fieldGroups
+    { // fieldGroup
+      label: this.context.intl.formatMessage(appMessages.entities.due_dates.single),
+      icon: 'calendar',
+      fields: indicator
+        ? [{
+          id: 'due_date_id',
+          controlType: 'radio',
+          model: '.attributes.due_date_id',
+          options: this.getDateOptions(indicator.dates),
+          value: 0,
+          hints: {
+            1: this.context.intl.formatMessage(appMessages.entities.due_dates.empty),
+          },
+        }]
+        : [],
+    },
+  ]);
+
+  getFields = (indicator) => ({ // isManager, taxonomies,
+    header: {
+      main: this.getHeaderMainFields(),
+      aside: this.getHeaderAsideFields(),
+    },
+    body: {
+      main: this.getBodyMainFields(),
+      aside: this.getBodyAsideFields(indicator),
+    },
+  })
   render() {
     const { dataReady, indicator, viewDomain } = this.props;
     const { saveSending, saveError } = viewDomain.page;
     const indicatorReference = this.props.params.id;
-    const required = (val) => val && val.length;
-
-    // TODO allow all past but only first upcoming due date
-    const dateOptions = indicator && renderDateControl(indicator.get('dates'));
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-    pageTitle = `${pageTitle} (Indicator: ${indicatorReference})`;
+    pageTitle = `${pageTitle} for indicator ${indicatorReference}`;
 
     return (
       <div>
@@ -69,34 +184,32 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
             },
           ]}
         />
-        {dataReady &&
-          <Page
+        <Content>
+          <ContentHeader
             title={pageTitle}
-            actions={
-              [
-                {
-                  type: 'simple',
-                  title: 'Cancel',
-                  onClick: () => this.props.handleCancel(indicatorReference),
-                },
-                {
-                  type: 'primary',
-                  title: 'Save',
-                  onClick: () => this.props.handleSubmit(
-                    viewDomain.form.data,
-                    indicatorReference
-                  ),
-                },
-              ]
+            type={CONTENT_SINGLE}
+            icon="reports"
+            buttons={
+              dataReady ? [{
+                type: 'cancel',
+                onClick: () => this.props.handleCancel(indicatorReference),
+              },
+              {
+                type: 'save',
+                onClick: () => this.props.handleSubmit(viewDomain.form.data, indicatorReference),
+              }] : null
             }
-          >
-            {saveSending &&
-              <p>Saving Report</p>
-            }
-            {saveError &&
-              <p>{saveError}</p>
-            }
-
+          />
+          {saveSending &&
+            <p>Saving Action</p>
+          }
+          {saveError &&
+            <p>{saveError}</p>
+          }
+          { !dataReady &&
+            <Loading />
+          }
+          {dataReady &&
             <EntityForm
               model="reportNew.form.data"
               formData={viewDomain.form.data}
@@ -106,56 +219,10 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               )}
               handleCancel={() => this.props.handleCancel(indicatorReference)}
               handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'title',
-                      controlType: 'input',
-                      model: '.attributes.title',
-                      placeholder: this.context.intl.formatMessage(messages.fields.title.placeholder),
-                      validators: {
-                        required,
-                      },
-                      errorMessages: {
-                        required: this.context.intl.formatMessage(messages.fieldRequired),
-                      },
-                    },
-                  ],
-                  aside: [
-                    {
-                      id: 'status',
-                      controlType: 'select',
-                      model: '.attributes.draft',
-                      options: PUBLISH_STATUSES,
-                    },
-                  ],
-                },
-                body: {
-                  main: [
-                    dateOptions,
-                    {
-                      id: 'description',
-                      controlType: 'textarea',
-                      model: '.attributes.description',
-                    },
-                    {
-                      id: 'document_url',
-                      controlType: 'uploader',
-                      model: '.attributes.document_url',
-                    },
-                    {
-                      id: 'document_public',
-                      controlType: 'select',
-                      model: '.attributes.document_public',
-                      options: PUBLISH_STATUSES,
-                    },
-                  ],
-                },
-              }}
+              fields={this.getFields(indicator)}
             />
-          </Page>
-        }
+          }
+        </Content>
       </div>
     );
   }
@@ -221,10 +288,9 @@ function mapDispatchToProps(dispatch) {
 
       saveData = saveData.setIn(['attributes', 'indicator_id'], indicatorReference);
 
-      // TODO: remove once have singleselect instead of multiselect
-      const formDateIds = getCheckedValuesFromOptions(formData.get('associatedDate'));
-      if (List.isList(formDateIds) && formDateIds.size) {
-        saveData = saveData.setIn(['attributes', 'due_date_id'], formDateIds.first());
+      const dateAssigned = formData.getIn(['attributes', 'due_date_id']);
+      if (dateAssigned === 0) {
+        saveData = saveData.setIn(['attributes', 'due_date_id'], null);
       }
 
       dispatch(save(saveData.toJS()));

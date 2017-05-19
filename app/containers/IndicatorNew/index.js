@@ -7,13 +7,19 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
 
 import { Map, List } from 'immutable';
 
+import {
+  renderActionControl,
+  renderUserControl,
+  validateRequired,
+} from 'utils/forms';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES, REPORT_FREQUENCIES, CONTENT_SINGLE } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 import {
   loadEntitiesIfNeeded,
@@ -22,15 +28,12 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import Page from 'components/Page';
-import EntityForm from 'components/forms/EntityForm';
-
 import { getEntities, isReady } from 'containers/App/selectors';
 
-import {
-  renderActionControl,
-  renderUserControl,
-} from 'utils/forms';
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
+import EntityForm from 'components/forms/EntityForm';
 
 import viewDomainSelect from './selectors';
 import messages from './messages';
@@ -53,10 +56,117 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     }
   }
 
+  getHeaderMainFields = () => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          id: 'title',
+          controlType: 'title',
+          model: '.attributes.title',
+          label: this.context.intl.formatMessage(appMessages.attributes.title),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = () => ([
+    {
+      fields: [
+        {
+          id: 'status',
+          controlType: 'select',
+          model: '.attributes.draft',
+          label: this.context.intl.formatMessage(appMessages.attributes.draft),
+          value: true,
+          options: PUBLISH_STATUSES,
+        },
+      ],
+    },
+  ]);
+
+  getBodyMainFields = (actions) => ([
+    {
+      fields: [
+        {
+          id: 'description',
+          controlType: 'markdown',
+          model: '.attributes.description',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
+          label: this.context.intl.formatMessage(appMessages.attributes.description),
+        },
+      ],
+    },
+    {
+      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
+      icon: 'connections',
+      fields: [
+        renderActionControl(actions),
+      ],
+    },
+  ]);
+
+  getBodyAsideFields = (users) => ([ // fieldGroups
+    { // fieldGroup
+      label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
+      icon: 'reminder',
+      fields: [
+        {
+          id: 'start_date',
+          controlType: 'date',
+          model: '.attributes.start_date',
+          label: this.context.intl.formatMessage(appMessages.attributes.start_date),
+          placeholder: 'YYYY-MM-DD',
+        },
+        {
+          id: 'repeat',
+          controlType: 'checkbox',
+          model: '.attributes.repeat',
+          label: this.context.intl.formatMessage(appMessages.attributes.repeat),
+        },
+        {
+          id: 'frequency',
+          controlType: 'select',
+          label: this.context.intl.formatMessage(appMessages.attributes.frequency_months),
+          model: '.attributes.frequency_months',
+          options: REPORT_FREQUENCIES,
+          value: 1,
+        },
+        {
+          id: 'end_date',
+          controlType: 'date',
+          model: '.attributes.end_date',
+          label: this.context.intl.formatMessage(appMessages.attributes.end_date),
+          placeholder: 'YYYY-MM-DD',
+        },
+        renderUserControl(
+          users,
+          this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
+        ),
+      ],
+    },
+  ]);
+
+  getFields = (actions, users) => ({ // isManager, taxonomies,
+    header: {
+      main: this.getHeaderMainFields(),
+      aside: this.getHeaderAsideFields(),
+    },
+    body: {
+      main: this.getBodyMainFields(actions),
+      aside: this.getBodyAsideFields(users),
+    },
+  })
+
   render() {
-    const { dataReady, viewDomain } = this.props;
+    const { dataReady, viewDomain, actions, users } = this.props;
     const { saveSending, saveError } = viewDomain.page;
-    const required = (val) => val && val.length;
 
     return (
       <div>
@@ -69,111 +179,44 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             },
           ]}
         />
-        { !dataReady &&
-          <div>
-            <FormattedMessage {...messages.loading} />
-          </div>
-        }
-        {dataReady &&
-          <Page
+        <Content>
+          <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
-            actions={
-              [
-                {
-                  type: 'simple',
-                  title: 'Cancel',
-                  onClick: this.props.handleCancel,
-                },
-                {
-                  type: 'primary',
-                  title: 'Save',
-                  onClick: () => this.props.handleSubmit(
-                    viewDomain.form.data,
-                  ),
-                },
-              ]
+            type={CONTENT_SINGLE}
+            icon="indicators"
+            buttons={
+              dataReady ? [{
+                type: 'cancel',
+                onClick: this.props.handleCancel,
+              },
+              {
+                type: 'save',
+                onClick: () => this.props.handleSubmit(
+                  viewDomain.form.data,
+                ),
+              }] : null
             }
-          >
-            {saveSending &&
-              <p>Saving Indicator</p>
-            }
-            {saveError &&
-              <p>{saveError}</p>
-            }
+          />
+          { !dataReady &&
+            <Loading />
+          }
+          {saveSending &&
+            <p>Saving Action</p>
+          }
+          {saveError &&
+            <p>{saveError}</p>
+          }
+          {dataReady &&
             <EntityForm
               model="indicatorNew.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: [
-                    {
-                      id: 'title',
-                      controlType: 'input',
-                      model: '.attributes.title',
-                      placeholder: this.context.intl.formatMessage(messages.fields.title.placeholder),
-                      validators: {
-                        required,
-                      },
-                      errorMessages: {
-                        required: this.context.intl.formatMessage(messages.fieldRequired),
-                      },
-                    },
-                  ],
-                  aside: [
-                    {
-                      id: 'status',
-                      controlType: 'select',
-                      model: '.attributes.draft',
-                      options: PUBLISH_STATUSES,
-                    },
-                  ],
-                },
-                body: {
-                  main: [
-                    {
-                      id: 'description',
-                      controlType: 'textarea',
-                      model: '.attributes.description',
-                    },
-                    renderActionControl(this.props.actions),
-                  ],
-                  aside: [
-                    renderUserControl(this.props.users, 'Assigned user'),
-                    {
-                      id: 'start',
-                      controlType: 'input',
-                      label: 'Reporting due date',
-                      model: '.attributes.start_date',
-                      placeholder: 'YYYY-MM-DD',
-                    },
-                    {
-                      id: 'repeat',
-                      controlType: 'checkbox',
-                      label: 'Repeat?',
-                      model: '.attributes.repeat',
-                    },
-                    {
-                      id: 'frequency',
-                      controlType: 'input',
-                      label: 'Reporting frequency in months',
-                      model: '.attributes.frequency_months',
-                    },
-                    {
-                      id: 'end',
-                      controlType: 'input',
-                      label: 'Reporting end date',
-                      model: '.attributes.end_date',
-                      placeholder: 'YYYY-MM-DD',
-                    },
-                  ],
-                },
-              }}
+              fields={this.getFields(actions, users)}
             />
-          </Page>
-        }
+          }
+        </Content>
       </div>
     );
   }

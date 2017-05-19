@@ -7,20 +7,25 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-// import { FormattedMessage } from 'react-intl';
 
-import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
+import {
+  validateRequired,
+} from 'utils/forms';
+
+import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
 } from 'containers/App/actions';
-
-import Page from 'components/Page';
-import EntityForm from 'components/forms/EntityForm';
-
 import { isReady } from 'containers/App/selectors';
+
+import Loading from 'components/Loading';
+import Content from 'components/Content';
+import ContentHeader from 'components/ContentHeader';
+import EntityForm from 'components/forms/EntityForm';
 
 import viewDomainSelect from './selectors';
 
@@ -34,10 +39,79 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
       this.props.redirectIfNotPermitted();
     }
   }
+
+  getHeaderMainFields = () => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        {
+          id: 'title',
+          controlType: 'title',
+          model: '.attributes.title',
+          label: this.context.intl.formatMessage(appMessages.attributes.title),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+        {
+          id: 'menuTitle',
+          controlType: 'short',
+          model: '.attributes.menu_title',
+          label: this.context.intl.formatMessage(appMessages.attributes.menu_title),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = () => ([
+    {
+      fields: [
+        {
+          id: 'status',
+          controlType: 'select',
+          model: '.attributes.draft',
+          label: this.context.intl.formatMessage(appMessages.attributes.draft),
+          options: PUBLISH_STATUSES,
+        },
+      ],
+    },
+  ]);
+
+  getBodyMainFields = () => ([
+    {
+      fields: [
+        {
+          id: 'description',
+          controlType: 'markdown',
+          model: '.attributes.content',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
+          label: this.context.intl.formatMessage(appMessages.attributes.description),
+        },
+      ],
+    },
+  ]);
+
+  getFields = () => ({
+    header: {
+      main: this.getHeaderMainFields(),
+      aside: this.getHeaderAsideFields(),
+    },
+    body: {
+      main: this.getBodyMainFields(),
+    },
+  })
   render() {
-    const { viewDomain } = this.props;
+    const { viewDomain, dataReady } = this.props;
     const { saveSending, saveError } = viewDomain.page;
-    const required = (val) => val && val.length;
 
     return (
       <div>
@@ -50,81 +124,42 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
             },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.pageTitle)}
-          actions={
-            [
-              {
-                type: 'simple',
-                title: 'Cancel',
+        <Content>
+          <ContentHeader
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+            type={CONTENT_SINGLE}
+            icon="categories"
+            buttons={
+              dataReady ? [{
+                type: 'cancel',
                 onClick: this.props.handleCancel,
               },
               {
-                type: 'primary',
-                title: 'Save',
-                onClick: () => this.props.handleSubmit(
-                  viewDomain.form.data,
-                ),
-              },
-            ]
-          }
-        >
+                type: 'save',
+                onClick: () => this.props.handleSubmit(viewDomain.form.data),
+              }] : null
+            }
+          />
           {saveSending &&
-            <p>Saving Page</p>
+            <p>Saving</p>
           }
           {saveError &&
             <p>{saveError}</p>
           }
-          <EntityForm
-            model="pageNew.form.data"
-            formData={viewDomain.form.data}
-            handleSubmit={(formData) => this.props.handleSubmit(formData)}
-            handleCancel={this.props.handleCancel}
-            handleUpdate={this.props.handleUpdate}
-            fields={{
-              header: {
-                main: [
-                  {
-                    id: 'title',
-                    controlType: 'input',
-                    model: '.attributes.title',
-                    placeholder: this.context.intl.formatMessage(messages.fields.title.placeholder),
-                    validators: {
-                      required,
-                    },
-                    errorMessages: {
-                      required: this.context.intl.formatMessage(messages.fieldRequired),
-                    },
-                  },
-                  {
-                    id: 'menuTitle',
-                    controlType: 'input',
-                    label: 'Menu title',
-                    model: '.attributes.menu_title',
-                  },
-                ],
-                aside: [
-                  {
-                    id: 'status',
-                    controlType: 'select',
-                    model: '.attributes.draft',
-                    options: PUBLISH_STATUSES,
-                  },
-                ],
-              },
-              body: {
-                main: [
-                  {
-                    id: 'content',
-                    controlType: 'textarea',
-                    model: '.attributes.content',
-                  },
-                ],
-                aside: [],
-              },
-            }}
-          />
-        </Page>
+          { !dataReady &&
+            <Loading />
+          }
+          {dataReady &&
+            <EntityForm
+              model="pageNew.form.data"
+              formData={viewDomain.form.data}
+              handleSubmit={(formData) => this.props.handleSubmit(formData)}
+              handleCancel={this.props.handleCancel}
+              handleUpdate={this.props.handleUpdate}
+              fields={this.getFields()}
+            />
+          }
+        </Content>
       </div>
     );
   }

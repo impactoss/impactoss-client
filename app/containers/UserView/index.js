@@ -88,9 +88,12 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
               type: 'referenceRole',
               fields: [
                 {
-                  id: 'reference',
+                  type: 'reference',
                   value: entity.id,
-                  large: true,
+                },
+                {
+                  type: 'role',
+                  value: this.getHighestUserRoleLabel(entity.roles),
                 },
               ],
             },
@@ -110,8 +113,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
               },
               {
                 type: 'role',
-                value: entity.roles && this.getUserRole(entity.roles),
-                showEmpty: this.context.intl.formatMessage(appMessages.entities.user_roles.defaultRole),
+                value: this.getHighestUserRoleLabel(entity.roles),
               },
             ],
           },
@@ -158,27 +160,29 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
       })),
     },
   ]);
-  getFields = (entity, isManager, taxonomies) => ({
+  getFields = (entity, isManager) => ({ // taxonomies
     header: {
       main: this.getHeaderMainFields(entity, isManager),
       aside: this.getHeaderAsideFields(entity, isManager),
     },
     body: {
       main: this.getBodyMainFields(entity),
-      aside: this.getBodyAsideFields(entity, isManager, taxonomies),
+      aside: null, // this.getBodyAsideFields(entity, isManager, taxonomies),
     },
   });
 
   // only show the highest rated role (lower role ids means higher)
-  getUserRole = (roles) => {
-    const highestRole = Object.values(roles).reduce((currentHighestRole, role) =>
-      !currentHighestRole || role.role.id < currentHighestRole.id
-      ? role.role
-      : currentHighestRole
-    , null);
-    return highestRole.attributes.friendly_name;
+  getHighestUserRoleLabel = (roles) => {
+    if (roles) {
+      const highestRole = Object.values(roles).reduce((currentHighestRole, role) =>
+        !currentHighestRole || role.role.id < currentHighestRole.id
+        ? role.role
+        : currentHighestRole
+      , null);
+      return highestRole.attributes.friendly_name;
+    }
+    return this.context.intl.formatMessage(appMessages.entities.roles.defaultRole);
   }
-
   mapCategoryOptions = (categories) => categories
     ? Object.values(categories).map((cat) => ({
       label: cat.attributes.title,
@@ -213,9 +217,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
             </div>
           }
           { user && dataReady &&
-            <EntityView
-              fields={this.getFields(user, isManager, taxonomies)}
-            />
+            <EntityView fields={this.getFields(user, isManager, taxonomies)} />
           }
         </Content>
       </div>

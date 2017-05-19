@@ -21,6 +21,10 @@ export default defineMessages({
       id: 'app.containers.App.buttons.cancel',
       defaultMessage: 'Cancel',
     },
+    save: {
+      id: 'app.containers.App.buttons.save',
+      defaultMessage: 'Save',
+    },
     close: {
       id: 'app.containers.App.buttons.close',
       defaultMessage: 'Close',
@@ -44,6 +48,32 @@ export default defineMessages({
       defaultMessage: 'This field cannot be empty',
     },
   },
+  placeholders: {
+    title: {
+      id: 'app.containers.App.placeholders.title',
+      defaultMessage: 'Enter title',
+    },
+    short_title: {
+      id: 'app.containers.App.placeholders.title',
+      defaultMessage: 'Abbr.',
+    },
+    menu_title: {
+      id: 'app.containers.App.placeholders.title',
+      defaultMessage: '',
+    },
+    description: {
+      id: 'app.containers.App.placeholders.description',
+      defaultMessage: 'Enter content',
+    },
+    url: {
+      id: 'app.containers.App.placeholders.url',
+      defaultMessage: 'Enter full URL',
+    },
+    number: {
+      id: 'app.containers.App.placeholders.number',
+      defaultMessage: 'ID',
+    },
+  },
   attributes: {
     draft: {
       id: 'app.containers.App.attributes.draft',
@@ -60,6 +90,10 @@ export default defineMessages({
     short_title: {
       id: 'app.containers.App.attributes.short_title',
       defaultMessage: 'Short title',
+    },
+    menu_title: {
+      id: 'app.containers.App.attributes.menu_title',
+      defaultMessage: 'Menu title',
     },
     reference: {
       id: 'app.containers.App.attributes.reference',
@@ -89,6 +123,22 @@ export default defineMessages({
       id: 'app.containers.App.attributes.target_date',
       defaultMessage: 'Target date',
     },
+    start_date: {
+      id: 'app.containers.App.attributes.start_date',
+      defaultMessage: 'Date (start date)',
+    },
+    end_date: {
+      id: 'app.containers.App.attributes.end_date',
+      defaultMessage: 'End date',
+    },
+    frequency_months: {
+      id: 'app.containers.App.attributes.frequency_months',
+      defaultMessage: 'Reporting frequency',
+    },
+    repeat: {
+      id: 'app.containers.App.attributes.repeat',
+      defaultMessage: 'Repeat?',
+    },
     targetDateEmpty: {
       id: 'app.containers.App.attributes.targetDateEmpty',
       defaultMessage: 'No target date set',
@@ -96,6 +146,18 @@ export default defineMessages({
     document_url: {
       id: 'app.containers.App.attributes.document_url',
       defaultMessage: 'Attached document',
+    },
+    document_upload: {
+      id: 'app.containers.App.attributes.document_upload',
+      defaultMessage: 'Upload document',
+    },
+    document_uploading: {
+      id: 'app.containers.App.attributes.document_uploading',
+      defaultMessage: 'Uploading document',
+    },
+    document_public: {
+      id: 'app.containers.App.attributes.document_public',
+      defaultMessage: 'Document status',
     },
     documentEmpty: {
       id: 'app.containers.App.attributes.documentEmpty',
@@ -221,20 +283,6 @@ export default defineMessages({
         defaultMessage: 'Users',
       },
     },
-    user_roles: {
-      single: {
-        id: 'app.containers.App.entities.user_roles.single',
-        defaultMessage: 'Role',
-      },
-      plural: {
-        id: 'app.containers.App.entities.user_roles.plural',
-        defaultMessage: 'Roles',
-      },
-      defaultRole: {
-        id: 'app.containers.App.entities.user_roles.defaultRole',
-        defaultMessage: 'User',
-      },
-    },
     progress_reports: {
       single: {
         id: 'app.containers.App.entities.progress_reports.single',
@@ -252,6 +300,10 @@ export default defineMessages({
         id: 'app.containers.App.entities.progress_reports.unscheduled',
         defaultMessage: 'Extraordinary (no due date assigned)',
       },
+      unscheduled_short: {
+        id: 'app.containers.App.entities.progress_reports.unscheduled',
+        defaultMessage: 'Extraordinary',
+      },
       showAll: {
         id: 'app.containers.App.entities.progress_reports.showAll',
         defaultMessage: 'Show all reports',
@@ -259,6 +311,16 @@ export default defineMessages({
       showLess: {
         id: 'app.containers.App.entities.progress_reports.showLess',
         defaultMessage: 'Show less reports',
+      },
+    },
+    connections: {
+      single: {
+        id: 'app.containers.App.entities.connections.single',
+        defaultMessage: 'Connection',
+      },
+      plural: {
+        id: 'app.containers.App.entities.connections.plural',
+        defaultMessage: 'Connections',
       },
     },
     taxonomies: {
@@ -388,6 +450,10 @@ export default defineMessages({
         id: 'app.containers.App.entities.due_dates.showLess',
         defaultMessage: 'Show less dates',
       },
+      schedule: {
+        id: 'app.containers.App.entities.due_dates.schedule',
+        defaultMessage: 'Progress report schedule',
+      },
     },
     categories: {
       single: {
@@ -407,6 +473,10 @@ export default defineMessages({
       plural: {
         id: 'app.containers.App.entities.roles.plural',
         defaultMessage: 'User roles',
+      },
+      defaultRole: {
+        id: 'app.containers.App.entities.user_roles.defaultRole',
+        defaultMessage: 'No role assigned',
       },
     },
   },
