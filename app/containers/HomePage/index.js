@@ -81,7 +81,7 @@ const SectionAction = styled(Section)`
   background-color: ${palette('primary', 0)};
 `;
 const SectionMore = styled(Section)`
-  color: ${palette('greyscaleDark', 3)};
+  color: ${palette('dark', 3)};
   background-color: ${palette('primary', 4)};
 `;
 // text-align: center;

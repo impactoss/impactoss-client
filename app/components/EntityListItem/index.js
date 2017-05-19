@@ -23,7 +23,7 @@ const Item = styled(Component)`
 const MainWrapper = styled(Component)`
   display: table-cell;
   width: ${(props) => props.expandables ? 66 : 100}%;
-  border-right: 1px solid ${(props) => props.expandables ? palette('greyscaleLight', 0) : 'transparent'};
+  border-right: 1px solid ${(props) => props.expandables ? palette('light', 0) : 'transparent'};
 
 `;
 const MainInnerWrapper = styled(Component)`

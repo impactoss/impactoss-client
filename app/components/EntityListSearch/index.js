@@ -23,10 +23,10 @@ const TagSearch = styled.div`
   flex-direction:row;
   width: 100%;
   background-color: ${palette('primary', 4)};
-  color: ${palette('greyscaleDark', 2)};
+  color: ${palette('dark', 2)};
   padding: 7px;
-  border: 1px solid ${(props) => props.active ? palette('greyscaleLight', 4) : palette('greyscaleLight', 2)};
-  box-shadow: 0 0 3px 0 ${(props) => props.active ? palette('greyscaleDark', 2) : 'transparent'};
+  border: 1px solid ${(props) => props.active ? palette('light', 4) : palette('light', 2)};
+  box-shadow: 0 0 3px 0 ${(props) => props.active ? palette('dark', 2) : 'transparent'};
   margin-bottom: 10px;
   min-height: 36px;
   border-radius: 5px;

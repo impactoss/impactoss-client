@@ -13,16 +13,16 @@ import Button from 'components/buttons/Button';
 import Icon from 'components/Icon';
 
 const Styled = styled(Button)`
-  color: ${(props) => props.active ? palette('primary', 4) : palette('greyscaleDark', 1)};
-  background-color: ${(props) => props.active ? palette('greyscaleDark', 1) : 'transparent'};
+  color: ${(props) => props.active ? palette('primary', 4) : palette('dark', 1)};
+  background-color: ${(props) => props.active ? palette('dark', 2) : 'transparent'};
   font-weight: bold;
   padding: 0.75em 2em;
   width: 100%;
   text-align: left;
-  border-bottom: 1px solid ${palette('greyscaleLight', 0)};
+  border-bottom: 1px solid ${palette('light', 0)};
   &:hover {
-    color: ${(props) => props.active ? palette('primary', 4) : palette('greyscaleDark', 3)};
-    background-color: ${(props) => props.active ? palette('greyscaleDark', 2) : 'transparent'};
+    color: ${(props) => props.active ? palette('primary', 4) : palette('dark', 3)};
+    background-color: ${(props) => props.active ? palette('dark', 2) : 'transparent'};
   }
 `;
 const Label = styled.span`
@@ -31,7 +31,7 @@ const Label = styled.span`
   top: 2px;
 `;
 const IconWrapper = styled.span`
-  color: ${palette('greyscaleLight', 3)};
+  color: ${palette('light', 3)};
   vertical-align: middle;
   float: right;
   padding: 0 5px;

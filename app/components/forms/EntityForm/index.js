@@ -69,7 +69,7 @@ const MultiselectActiveOptionListItem = styled.div`
   position: relative;
   font-weight: 500;
   background-color: ${palette('primary', 4)};
-  border-bottom: 1px solid ${palette('greyscaleLight', 1)};
+  border-bottom: 1px solid ${palette('light', 1)};
   padding: 12px 0 12px 16px;
 `;
 const MultiselectActiveOptionRemove = styled(Button)`
@@ -93,21 +93,21 @@ const MultiSelectDropdown = styled(Button)`
   width: 100%;
   font-size: 0.85em;
   text-align: left;
-  color: ${palette('greyscaleDark', 0)};
-  background-color: ${palette('greyscaleLight', 1)};
+  color: ${palette('dark', 0)};
+  background-color: ${palette('light', 1)};
   &:hover {
-    color: ${palette('greyscaleDark', 0)}
-    background-color: ${palette('greyscaleLight', 2)}
+    color: ${palette('dark', 0)}
+    background-color: ${palette('light', 2)}
   }
   padding: 12px 0 12px 16px;
 `;
 
 const MultiSelectWithout = styled.div`
   padding: 12px 0 12px 16px;
-  color: ${palette('greyscaleDark', 3)};
+  color: ${palette('dark', 3)};
 `;
 const MultiSelectWithoutLink = styled(A)`
-  color: ${palette('greyscaleDark', 3)};
+  color: ${palette('dark', 3)};
   &:hover {
     color: ${palette('primary', 0)};
   }

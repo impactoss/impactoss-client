@@ -8,7 +8,7 @@ const ButtonText = styled(Button)`
   text-transform: uppercase;
   font-size: 1.2em;
   padding: 10px 12px;
-  color: ${(props) => props.primary ? palette('primary', 0) : palette('greyscaleDark', 3)};
+  color: ${(props) => props.primary ? palette('primary', 0) : palette('dark', 3)};
   &:hover {
     color: ${(props) => props.primary ? palette('primary', 1) : palette('primary', 0)};
   }

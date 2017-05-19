@@ -42,7 +42,7 @@ theme.palette = {
   // 2:  almost dark (sadata medium grey)
   // 3:  medium grey 1 (AA conform)
   // 4:  medium grey 2 (AA large conform on white)
-  greyscaleDark: coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395'),
+  dark: coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395'),
 
   // greyscale
   // 0:  lightest grey (background colour) - also used in global-styles.js
@@ -50,7 +50,7 @@ theme.palette = {
   // 2:  grey 1 (grey pattern)
   // 3:  grey 2 (icons light)
   // 4:  grey 3 (dark lines)
-  greyscaleLight: coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad'),
+  light: coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad'),
 
   // taxonomy/category colours
   // 0: default/fallback

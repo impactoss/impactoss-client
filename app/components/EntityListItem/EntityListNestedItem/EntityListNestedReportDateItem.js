@@ -13,17 +13,17 @@ const Styled = styled.div`
   font-weight: bold;
   padding: 5px 10px;
   background-color: ${palette('primary', 4)};
-  color:  ${(props) => props.overdue ? palette('primary', 0) : palette('greyscaleLight', 4)};
+  color:  ${(props) => props.overdue ? palette('primary', 0) : palette('light', 4)};
 `;
 const Status = styled.div`
   font-size: 1.2em;
-  color:  ${(props) => props.unscheduled ? palette('greyscaleLight', 3) : 'inherit'};
+  color:  ${(props) => props.unscheduled ? palette('light', 3) : 'inherit'};
 `;
 const DueDate = styled.div`
 `;
 const IconWrap = styled.div`
   color: ${palette('primary', 4)};
-  background-color:  ${(props) => props.overdue ? palette('primary', 0) : palette('greyscaleLight', 4)};
+  background-color:  ${(props) => props.overdue ? palette('primary', 0) : palette('light', 4)};
   position: absolute;
   top: 0;
   right: 0;
@@ -33,7 +33,7 @@ const IconWrap = styled.div`
   padding: 4px;
 `;
 const IconWrapUnscheduled = styled(IconWrap)`
-  color: ${palette('greyscaleLight', 3)};
+  color: ${palette('light', 3)};
   background-color: transparent;
 `;
 

@@ -18,9 +18,9 @@ const EntityListItemMainTitleWrap = styled(Link)`
   text-decoration: none;
   display: block;
   padding: 3px 0 8px;
-  color: ${palette('greyscaleDark', 0)};
+  color: ${palette('dark', 0)};
   &:hover {
-    color: ${palette('greyscaleDark', 2)};
+    color: ${palette('dark', 2)};
   }
 `;
 

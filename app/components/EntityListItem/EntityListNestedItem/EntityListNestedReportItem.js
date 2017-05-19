@@ -11,9 +11,9 @@ const Styled = styled(Link)`
   background-color: ${palette('primary', 4)};
   margin-top: 1px;
   display: block;
-  color: ${palette('greyscaleDark', 4)};
+  color: ${palette('dark', 4)};
   &:hover {
-    color: ${palette('greyscaleDark', 2)};
+    color: ${palette('dark', 2)};
   }
 `;
 const Top = styled.div`

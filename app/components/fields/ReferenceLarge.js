@@ -5,7 +5,7 @@ import Reference from 'components/fields/Reference';
 
 const ReferenceLarge = styled(Reference)`
   font-size: 2em;
-  color: ${palette('greyscaleDark', 4)}
+  color: ${palette('dark', 4)}
 `;
 
 

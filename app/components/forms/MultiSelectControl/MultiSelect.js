@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { List } from 'immutable';
 import { kebabCase, lowerCase } from 'lodash/string';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import PrimaryAction from 'components/basic/Button/PrimaryAction';
 import SimpleAction from 'components/basic/Button/SimpleAction';
@@ -19,26 +20,27 @@ const ControlHeader = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  background: #ddd;
-  height: 40px;
-  padding: 5px;
+  background-color: ${palette('dark', 2)};
+  color: ${palette('primary', 4)};
+  height: 60px;
+  padding: 2.25em 1em 0;
 `;
 const ControlSearch = styled.div`
   position: absolute;
-  top: 40px;
+  top: 60px;
   left: 0;
   right: 0;
-  background: #fff;
+  background: ${palette('primary', 4)};
   height: 40px;
-  padding: 5px 10px;
-  border-left: 1px solid #E0E1E2;
-  border-right: 1px solid #E0E1E2;
+  padding: 1em;
+  border-left: ${palette('light', 2)};
+  border-right: ${palette('light', 2)};
 `;
 const Search = styled.input`
-  background:#ffffff;
+  background: ${palette('primary', 4)};
   width:100%;
-  border:1px solid #E0E1E2;
-  color:#000;
+  border:1px solid ${palette('light', 1)};
+  color: ${palette('dark', 4)};
   padding:5px;
 `;
 const ControlFooter = styled.div`
@@ -46,19 +48,20 @@ const ControlFooter = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  background: #ddd;
+  border: 1px solid ${palette('light', 2)};
+  background-color: ${palette('light', 0)};
   height: 50px;
 `;
 const ControlMain = styled.div`
   position: absolute;
-  top: ${(props) => props.filter ? '80px' : '40px'};
+  top: ${(props) => props.filter ? '100px' : '60px'};
   bottom: 50px;
   left: 0;
   right: 0;
   overflow-y: auto;
-  padding:10px;
-  border-left: 1px solid #E0E1E2;
-  border-right: 1px solid #E0E1E2;
+  padding:1em;
+  border-left: 1px solid ${palette('light', 2)};
+  border-right: 1px solid ${palette('light', 2)};
 `;
 
 export const getChangedOptions = (options) =>
@@ -280,9 +283,7 @@ export default class MultiSelect extends React.Component {
     return (
       <ControlWrapper>
         <ControlHeader>
-          { this.props.title &&
-            <strong>{this.props.title}</strong>
-          }
+          { this.props.title }
           { this.props.onCancel &&
             this.renderCancel(this.props.onCancel)
           }

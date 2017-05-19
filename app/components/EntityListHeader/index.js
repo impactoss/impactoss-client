@@ -8,11 +8,11 @@ import ColumnExpand from './ColumnExpand';
 
 const Styled = styled.div`
   width:100%;
-  background-color: ${palette('greyscaleLight', 1)};
+  background-color: ${palette('light', 1)};
 `;
 const ColumnNestedWrap = styled.div`
   width:${(props) => props.width * 100}%;
-  background-color: ${palette('greyscaleLight', 1)};
+  background-color: ${palette('light', 1)};
   display: inline-block;
 `;
 

@@ -23,9 +23,9 @@ const Button = styled.button`
   user-select: none;
   background-image: none;
   border: none;
-  color: ${palette('greyscaleDark', 3)}
+  color: ${palette('dark', 3)}
   &:hover {
-    color: ${palette('greyscaleDark', 2)}
+    color: ${palette('dark', 2)}
     background-color: ${palette('primary', 4)}
   }
 `;

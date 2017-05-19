@@ -13,7 +13,7 @@ const ButtonFilterTagInverse = styled(Button)`
   border: 1px solid;
   &:hover {
     color: ${(props) => palette(props.paletteHover, props.pIndex || 0)};
-    background-color: ${palette('greyscaleLight', 0)};
+    background-color: ${palette('light', 0)};
   }
 `;
 

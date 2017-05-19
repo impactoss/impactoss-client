@@ -5,6 +5,6 @@ const GroupIcon = styled.div`
   position: absolute;
   right: 0;
   top: 0;
-  color: ${palette('greyscaleDark', 4)}
+  color: ${palette('dark', 4)}
 `;
 export default GroupIcon;
