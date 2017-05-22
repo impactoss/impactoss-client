@@ -140,10 +140,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
       title: page.attributes.menu_title || page.attributes.title,
     }));
 
-  // scrollToSection = (section) => {
-  scrollToSection = () => {
-    // TODO in page scroll
-    // console.log('scrollToSection', section)
+  scrollToComponent = (ref) => {
+    const target = this[ref].getBoundingClientRect().top;
+    window.scrollTo(0, window.scrollY + target);
   }
 
 
@@ -171,18 +170,18 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           </Intro>
           <TopActions>
             <div>
-              <ButtonHero onClick={() => this.scrollToSection('categories')}>
+              <ButtonHero onClick={() => this.scrollToComponent('SectionCategories')}>
                 <FormattedMessage {...messages.explore} />
               </ButtonHero>
             </div>
             <ButtonIconWrap>
-              <ButtonIconOnly onClick={() => this.scrollToSection('categories')}>
+              <ButtonIconOnly onClick={() => this.scrollToComponent('SectionCategories')}>
                 <Icon name="arrowDown" size={'2.5em'} />
               </ButtonIconOnly>
             </ButtonIconWrap>
           </TopActions>
         </SectionTop>
-        <SectionCategories>
+        <SectionCategories innerRef={(node) => { this.SectionCategories = node; }}>
           <Container>
             <SectionTitle>
               <FormattedMessage {...messages.exploreCategories} />
