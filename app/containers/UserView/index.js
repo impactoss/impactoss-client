@@ -160,14 +160,14 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
       })),
     },
   ]);
-  getFields = (entity, isManager) => ({ // taxonomies
+  getFields = (entity, isManager, taxonomies) => ({
     header: {
       main: this.getHeaderMainFields(entity, isManager),
       aside: this.getHeaderAsideFields(entity, isManager),
     },
     body: {
       main: this.getBodyMainFields(entity),
-      aside: null, // this.getBodyAsideFields(entity, isManager, taxonomies),
+      aside: this.getBodyAsideFields(entity, isManager, taxonomies),
     },
   });
 

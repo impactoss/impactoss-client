@@ -10,7 +10,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, List, fromJS } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 import {
   taxonomyOptions,
@@ -21,7 +21,10 @@ import {
   validateRequired,
 } from 'utils/forms';
 
-import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+import {
+  getCategoryUpdatesFromFormData,
+  getConnectionUpdatesFromFormData,
+} from 'utils/entities';
 
 import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -385,86 +388,35 @@ function mapDispatchToProps(dispatch, props) {
     },
 
     handleSubmit: (formData, taxonomies, recommendations, indicators) => {
-      let saveData = formData.set('measureCategories', taxonomies.reduce((updates, tax, taxId) => {
-        const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
-
-        // store associated cats as { [cat.id]: [association.id], ... }
-        // then we can use keys for creating new associations and values for deleting
-        const associatedCategories = tax.get('categories').reduce((catsAssociated, cat) => {
-          if (cat.get('associated')) {
-            return catsAssociated.set(cat.get('id'), cat.get('associated').keySeq().first());
-          }
-          return catsAssociated;
-        }, Map());
-
-        return Map({
-          delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) =>
-            !formCategoryIds.includes(catId)
-              ? associatedIds.push(associatedId)
-              : associatedIds
-          , List())),
-          create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) =>
-            !associatedCategories.has(catId)
-              ? payloads.push(Map({
-                category_id: catId,
-                measure_id: formData.get('id'),
-              }))
-              : payloads
-          , List())),
-        });
-      }, Map({ delete: List(), create: List() })));
-
-      // recommendations
-      const formRecommendationIds = getCheckedValuesFromOptions(formData.get('associatedRecommendations'));
-      // store associated recs as { [rec.id]: [association.id], ... }
-      const associatedRecommendations = recommendations.reduce((recsAssociated, rec) => {
-        if (rec.get('associated')) {
-          return recsAssociated.set(rec.get('id'), rec.get('associated').keySeq().first());
-        }
-        return recsAssociated;
-      }, Map());
-
-      saveData = saveData.set('recommendationMeasures', Map({
-        delete: associatedRecommendations.reduce((associatedIds, associatedId, id) =>
-          !formRecommendationIds.includes(id)
-            ? associatedIds.push(associatedId)
-            : associatedIds
-        , List()),
-        create: formRecommendationIds.reduce((payloads, id) =>
-          !associatedRecommendations.has(id)
-            ? payloads.push(Map({
-              recommendation_id: id,
-              measure_id: formData.get('id'),
-            }))
-            : payloads
-        , List()),
-      }));
-
-      // indicators
-      const formIndicatorIds = getCheckedValuesFromOptions(formData.get('associatedIndicators'));
-      // store associated recs as { [rec.id]: [association.id], ... }
-      const associatedIndicators = indicators.reduce((indicatorsAssociated, indicator) => {
-        if (indicator.get('associated')) {
-          return indicatorsAssociated.set(indicator.get('id'), indicator.get('associated').keySeq().first());
-        }
-        return indicatorsAssociated;
-      }, Map());
-
-      saveData = saveData.set('measureIndicators', Map({
-        delete: associatedIndicators.reduce((associatedIds, associatedId, id) =>
-          !formIndicatorIds.includes(id)
-            ? associatedIds.push(associatedId)
-            : associatedIds
-        , List()),
-        create: formIndicatorIds.reduce((payloads, id) =>
-          !associatedIndicators.has(id)
-            ? payloads.push(Map({
-              indicator_id: id,
-              measure_id: formData.get('id'),
-            }))
-            : payloads
-        , List()),
-      }));
+      const saveData = formData
+        .set(
+          'measureCategories',
+          getCategoryUpdatesFromFormData({
+            formData,
+            taxonomies,
+            createKey: 'measure_id',
+          })
+        )
+        .set(
+          'recommendationMeasures',
+          getConnectionUpdatesFromFormData({
+            formData,
+            connections: recommendations,
+            connectionAttribute: 'associatedRecommendations',
+            createConnectionKey: 'recommendation_id',
+            createKey: 'measure_id',
+          })
+        )
+        .set(
+          'measureIndicators',
+          getConnectionUpdatesFromFormData({
+            formData,
+            connections: indicators,
+            connectionAttribute: 'associatedIndicators',
+            createConnectionKey: 'indicator_id',
+            createKey: 'measure_id',
+          })
+        );
 
       dispatch(save(saveData.toJS()));
     },

@@ -20,6 +20,10 @@ import {
   validateRequired,
 } from 'utils/forms';
 
+import {
+  getConnectionUpdatesFromFormData,
+} from 'utils/entities';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { PUBLISH_STATUSES, USER_ROLES, REPORT_FREQUENCIES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -368,32 +372,17 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData, actions) => {
-      // actions
-      const formActionIds = getCheckedValuesFromOptions(formData.get('associatedActions'));
-      // store associated Actions as { [action.id]: [association.id], ... }
-      const associatedActions = actions.reduce((actionsAssociated, action) => {
-        if (action.get('associated')) {
-          return actionsAssociated.set(action.get('id'), action.get('associated').keySeq().first());
-        }
-        return actionsAssociated;
-      }, Map());
-
-
-      let saveData = formData.set('measureIndicators', Map({
-        delete: associatedActions.reduce((associatedIds, associatedId, id) =>
-          !formActionIds.includes(id)
-            ? associatedIds.push(associatedId)
-            : associatedIds
-        , List()),
-        create: formActionIds.reduce((payloads, id) =>
-          !associatedActions.has(id)
-            ? payloads.push(Map({
-              measure_id: id,
-              indicator_id: formData.get('id'),
-            }))
-            : payloads
-        , List()),
-      }));
+      let saveData = formData
+        .set(
+          'measureIndicators',
+          getConnectionUpdatesFromFormData({
+            formData,
+            connections: actions,
+            connectionAttribute: 'associatedActions',
+            createConnectionKey: 'indicator_id',
+            createKey: 'measure_id',
+          })
+        );
 
       // TODO: remove once have singleselect instead of multiselect
       const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));

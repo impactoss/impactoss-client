@@ -15,14 +15,19 @@ import { map } from 'lodash/collection';
 import {
   taxonomyOptions,
   validateRequired,
-  // renderTaxonomyControl,
+  renderTaxonomyControl,
 } from 'utils/forms';
+
+import {
+  getCategoryUpdatesFromFormData,
+} from 'utils/entities';
 
 import {
   loadEntitiesIfNeeded,
   updatePath,
   updateEntityForm,
 } from 'containers/App/actions';
+
 import {
   getUser,
   getEntities,
@@ -32,8 +37,6 @@ import {
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
-
-import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -209,22 +212,22 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     },
   ]);
 
-  // getBodyAsideFields = (entity, isManager, taxonomies) => ([ // fieldGroups
-  //   !isManager ? null : { // fieldGroup
-  //     label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
-  //     icon: 'categories',
-  //     fields: renderTaxonomyControl(taxonomies),
-  //   },
-  // ]);
+  getBodyAsideFields = (entity, isManager, taxonomies) => ([ // fieldGroups
+    !isManager ? null : { // fieldGroup
+      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
+      icon: 'categories',
+      fields: renderTaxonomyControl(taxonomies),
+    },
+  ]);
 
-  getFields = (entity, roles, isManager) => ({ // isManager, taxonomies,
+  getFields = (entity, roles, isManager, taxonomies) => ({
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(entity, roles, isManager),
     },
     body: {
       main: this.getBodyMainFields(),
-      aside: null, // this.getBodyAsideFields(entity, isManager, taxonomies),
+      aside: this.getBodyAsideFields(entity, isManager, taxonomies),
     },
   })
 
@@ -288,7 +291,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               )}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(user, roles, isManager)}
+              fields={this.getFields(user, roles, isManager, taxonomies)}
             />
           }
         </Content>
@@ -400,34 +403,15 @@ function mapDispatchToProps(dispatch) {
       dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData, taxonomies, roleOptions, previousRoles) => {
-      let saveData = formData.set('userCategories', taxonomies.reduce((updates, tax, taxId) => {
-        const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
-
-        // store associated cats as { [cat.id]: [association.id], ... }
-        // then we can use keys for creating new associations and values for deleting
-        const associatedCategories = tax.get('categories').reduce((catsAssociated, cat) => {
-          if (cat.get('associated')) {
-            return catsAssociated.set(cat.get('id'), cat.get('associated').keySeq().first());
-          }
-          return catsAssociated;
-        }, Map());
-
-        return Map({
-          delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) =>
-            !formCategoryIds.includes(catId)
-              ? associatedIds.push(associatedId)
-              : associatedIds
-          , List())),
-          create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) =>
-            !associatedCategories.has(catId)
-              ? payloads.push(Map({
-                category_id: catId,
-                user_id: formData.get('id'),
-              }))
-              : payloads
-          , List())),
-        });
-      }, Map({ delete: List(), create: List() })));
+      let saveData = formData
+        .set(
+          'userCategories',
+          getCategoryUpdatesFromFormData({
+            formData,
+            taxonomies,
+            createKey: 'user_id',
+          })
+        );
 
       // roles
       // higher is actually lower
@@ -452,6 +436,7 @@ function mapDispatchToProps(dispatch) {
             : memo
         , List()),
       }));
+
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
