@@ -126,3 +126,10 @@ export const renderTaxonomyControl = (taxonomies) => taxonomies
 : [];
 
 export const validateRequired = (val) => val && val.length;
+
+export const validateDateFormat = (val) => {
+  if (!val) return true;
+  // yyyy-mm-dd
+  const dateformat = /^\d{4}[-](0?[1-9]|1[012])[-](0?[1-9]|[12][0-9]|3[01])$/;
+  return val.match(dateformat);
+};

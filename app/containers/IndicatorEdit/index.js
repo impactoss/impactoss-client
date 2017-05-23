@@ -18,6 +18,7 @@ import {
   renderActionControl,
   renderUserControl,
   validateRequired,
+  validateDateFormat,
 } from 'utils/forms';
 
 import {
@@ -177,6 +178,12 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           model: '.attributes.start_date',
           label: this.context.intl.formatMessage(appMessages.attributes.start_date),
           placeholder: 'YYYY-MM-DD',
+          validators: {
+            date: validateDateFormat,
+          },
+          errorMessages: {
+            date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
+          },
         },
         {
           id: 'repeat',
@@ -199,6 +206,12 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           model: '.attributes.end_date',
           label: this.context.intl.formatMessage(appMessages.attributes.end_date),
           placeholder: 'YYYY-MM-DD',
+          validators: {
+            date: validateDateFormat,
+          },
+          errorMessages: {
+            date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
+          },
         },
         renderUserControl(
           users,
