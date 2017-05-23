@@ -253,6 +253,7 @@ const mapStateToProps = (state, props) => ({
   indicator: getEntity(
     state,
     {
+      out: 'js',
       id: props.params.id,
       path: 'indicators',
       extend: {
