@@ -115,10 +115,12 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
         checked: true,
       },
     ];
+    let excludeCount = 0;
     return dates
-      ? Object.values(dates).reduce((memo, date) => {
+      ? Object.values(dates).reduce((memo, date, i) => {
         // only allow active and those that are not associated
-        if (typeof date.reportCount !== 'undefined' && date.reportCount === 0) {
+        if (i - excludeCount < 1 && typeof date.reportCount !== 'undefined' && date.reportCount === 0) {
+          if (date.attributes.overdue) excludeCount += 1;
           const label =
             `${this.context.intl.formatDate(new Date(date.attributes.due_date))} ${
               date.attributes.overdue ? this.context.intl.formatMessage(appMessages.entities.due_dates.overdue) : ''} ${

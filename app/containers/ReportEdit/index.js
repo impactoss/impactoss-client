@@ -168,10 +168,12 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         checked: activeDateId === null || activeDateId === 0 || activeDateId === '',
       },
     ];
-    return Object.values(dates).reduce((memo, date) => {
+    let excludeCount = 0;
+    return Object.values(dates).reduce((memo, date, i) => {
       // only allow active and those that are not associated
-      if ((typeof date.reportCount !== 'undefined' && date.reportCount === 0)
-      || (activeDateId ? activeDateId.toString() === date.id : false)) {
+      if (i - excludeCount < 1
+      && ((typeof date.reportCount !== 'undefined' && date.reportCount === 0) || (activeDateId ? activeDateId.toString() === date.id : false))) {
+        if (date.attributes.overdue || (activeDateId && activeDateId.toString() === date.id)) excludeCount += 1;
         const label =
           `${this.context.intl.formatDate(new Date(date.attributes.due_date))} ${
             date.attributes.overdue ? this.context.intl.formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
