@@ -86,7 +86,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       fields: [
         {
           id: 'title',
-          controlType: 'title',
+          controlType: 'titleText',
           model: '.attributes.title',
           label: this.context.intl.formatMessage(appMessages.attributes.title),
           validators: {

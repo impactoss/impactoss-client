@@ -44,7 +44,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     { // fieldGroup
       fields: [
         {
-          type: 'title',
+          type: 'titleText',
           value: entity.attributes.title,
           isManager,
         },

@@ -87,7 +87,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       fields: [
         {
           id: 'title',
-          controlType: 'title',
+          controlType: 'titleText',
           model: '.attributes.title',
           label: this.context.intl.formatMessage(appMessages.attributes.title),
           validators: {
