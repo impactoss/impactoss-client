@@ -19,6 +19,7 @@ import {
   renderIndicatorControl,
   renderTaxonomyControl,
   validateRequired,
+  validateDateFormat,
 } from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
@@ -171,6 +172,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
         model: '.attributes.target_date',
         label: this.context.intl.formatMessage(appMessages.attributes.target_date),
         placeholder: 'YYYY-MM-DD',
+        validators: {
+          date: validateDateFormat,
+        },
+        errorMessages: {
+          date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
+        },
       }],
     },
     { // fieldGroup

@@ -47,6 +47,10 @@ export default defineMessages({
       id: 'app.containers.App.forms.fieldRequired',
       defaultMessage: 'This field cannot be empty',
     },
+    dateFormatError: {
+      id: 'app.containers.App.forms.dateFormatError',
+      defaultMessage: 'Please enter the date in the required format: YYYY-MM-DD',
+    },
   },
   placeholders: {
     title: {

@@ -14,6 +14,7 @@ import {
   renderActionControl,
   renderUserControl,
   validateRequired,
+  validateDateFormat,
 } from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
@@ -123,6 +124,12 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
           model: '.attributes.start_date',
           label: this.context.intl.formatMessage(appMessages.attributes.start_date),
           placeholder: 'YYYY-MM-DD',
+          validators: {
+            date: validateDateFormat,
+          },
+          errorMessages: {
+            date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
+          },
         },
         {
           id: 'repeat',
@@ -144,6 +151,12 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
           model: '.attributes.end_date',
           label: this.context.intl.formatMessage(appMessages.attributes.end_date),
           placeholder: 'YYYY-MM-DD',
+          validators: {
+            date: validateDateFormat,
+          },
+          errorMessages: {
+            date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
+          },
         },
         renderUserControl(
           users,
