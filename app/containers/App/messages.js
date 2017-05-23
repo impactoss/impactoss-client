@@ -97,6 +97,10 @@ export default defineMessages({
     },
     reference: {
       id: 'app.containers.App.attributes.reference',
+      defaultMessage: 'Reference',
+    },
+    id: {
+      id: 'app.containers.App.attributes.id',
       defaultMessage: 'No.',
     },
     name: {

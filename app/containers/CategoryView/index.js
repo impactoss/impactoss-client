@@ -68,6 +68,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                 type: 'reference',
                 value: entity.id,
                 large: true,
+                label: this.context.intl.formatMessage(appMessages.attributes.id),
               },
             ],
           },

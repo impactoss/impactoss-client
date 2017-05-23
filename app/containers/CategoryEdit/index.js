@@ -113,6 +113,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           controlType: 'info',
           type: 'reference',
           value: entity.id,
+          label: this.context.intl.formatMessage(appMessages.attributes.id),
         },
         {
           controlType: 'info',

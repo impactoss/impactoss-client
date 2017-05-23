@@ -78,6 +78,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
               {
                 type: 'reference',
                 value: entity.id,
+                label: this.context.intl.formatMessage(appMessages.attributes.id),
               },
               {
                 type: 'status',

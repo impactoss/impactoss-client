@@ -63,6 +63,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                 {
                   type: 'reference',
                   value: entity.id,
+                  label: this.context.intl.formatMessage(appMessages.attributes.id),
                 },
                 {
                   type: 'status',
@@ -97,6 +98,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                 type: 'reference',
                 value: entity.id,
                 large: true,
+                label: this.context.intl.formatMessage(appMessages.attributes.id),
               },
             ],
           },
