@@ -85,4 +85,5 @@ export const CONTENT_SINGLE = 'single';
 
 // TODO need to pull from an env file
 export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';
+// export const API_ENDPOINT = 'https://sadata-production.herokuapp.com';
 export const SIGNING_URL_ENDPOINT = '/s3/sign';
