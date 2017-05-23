@@ -19,6 +19,7 @@ import ScheduleField from 'components/fields/ScheduleField';
 import StatusField from 'components/fields/StatusField';
 import TextField from 'components/fields/TextField';
 import TitleField from 'components/fields/TitleField';
+import TitleTextField from 'components/fields/TitleTextField';
 import TitleShortField from 'components/fields/TitleShortField';
 
 class FieldFactory extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -31,6 +32,8 @@ class FieldFactory extends React.Component { // eslint-disable-line react/prefer
       switch (field.type) {
         case 'title':
           return (<TitleField field={field} />);
+        case 'titleText':
+          return (<TitleTextField field={field} />);
         case 'short_title':
           return (<TitleShortField field={field} />);
         case 'meta':

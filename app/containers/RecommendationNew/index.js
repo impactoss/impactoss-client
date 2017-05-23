@@ -61,7 +61,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       fields: [
         {
           id: 'title',
-          controlType: 'title',
+          controlType: 'titleText',
           model: '.attributes.title',
           label: this.context.intl.formatMessage(appMessages.attributes.title),
           placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),

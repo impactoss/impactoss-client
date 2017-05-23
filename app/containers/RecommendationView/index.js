@@ -44,7 +44,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     { // fieldGroup
       fields: [
         {
-          type: 'title',
+          type: 'titleText',
           value: entity.attributes.title,
           isManager,
         },

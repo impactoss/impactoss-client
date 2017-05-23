@@ -31,6 +31,7 @@ import Aside from '../Aside';
 import Main from '../Main';
 import FormFieldWrap from '../FormFieldWrap';
 import ControlTitle from '../ControlTitle';
+import ControlTitleText from '../ControlTitleText';
 import ControlShort from '../ControlShort';
 import ControlInput from '../ControlInput';
 import ControlTextArea from '../ControlTextArea';
@@ -117,6 +118,7 @@ const controls = {
   input: ControlInput,
   url: ControlInput,
   title: ControlTitle,
+  titleText: ControlTitleText,
   short: ControlShort,
   textarea: ControlTextArea,
   markdown: MarkdownControl,
