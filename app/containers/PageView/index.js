@@ -62,6 +62,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
               fields: [
                 {
                   type: 'reference',
+                  label: this.context.intl.formatMessage(appMessages.attributes.id),
                   value: entity.id,
                   large: true,
                 },
@@ -79,6 +80,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
             fields: [
               {
                 type: 'reference',
+                label: this.context.intl.formatMessage(appMessages.attributes.id),
                 value: entity.id,
               },
               {

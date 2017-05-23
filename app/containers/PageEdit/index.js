@@ -109,6 +109,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
               controlType: 'info',
               type: 'reference',
               value: entity.id,
+              label: this.context.intl.formatMessage(appMessages.attributes.id),
             },
             {
               id: 'status',

@@ -113,6 +113,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               controlType: 'info',
               type: 'reference',
               value: entity.id,
+              label: this.context.intl.formatMessage(appMessages.attributes.id),
             },
             {
               id: 'status',

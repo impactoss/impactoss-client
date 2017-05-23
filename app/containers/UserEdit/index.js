@@ -144,6 +144,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             {
               controlType: 'info',
               type: 'reference',
+              label: this.context.intl.formatMessage(appMessages.attributes.id),
               value: entity.id,
             },
             {
@@ -179,6 +180,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             {
               type: 'reference',
               value: entity.id,
+              label: this.context.intl.formatMessage(appMessages.attributes.id),
             },
             {
               type: 'role',

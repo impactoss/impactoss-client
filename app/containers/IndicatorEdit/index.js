@@ -111,6 +111,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               controlType: 'info',
               type: 'reference',
               value: entity.id,
+              label: this.context.intl.formatMessage(appMessages.attributes.id),
             },
             {
               id: 'status',
