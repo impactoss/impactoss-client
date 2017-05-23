@@ -71,6 +71,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
     const { actions, indicator, users } = props;
+    indicator.attributes.frequency_months = indicator.attributes.frequency_months || 1;
     return indicator
     ? Map({
       id: indicator.id,
