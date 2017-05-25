@@ -10,7 +10,7 @@ import EntityListNestedList from './EntityListNestedList';
 import EntityListNestedReportList from './EntityListNestedReportList';
 
 const Styled = styled.div`
-  padding: ${(props) => props.separated ? '1em 0 0' : '0'};
+  padding: ${(props) => props.separated ? '1em 0 2em' : '0 0 2em'};
 `;
 const ItemWrapper = styled.div`
   border-top: 1px solid;

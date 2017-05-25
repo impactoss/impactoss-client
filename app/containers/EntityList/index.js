@@ -70,7 +70,15 @@ const ListEntitiesMain = styled.div`
 `;
 const ListEntitiesEmpty = styled.div``;
 const ListEntitiesGroup = styled.div``;
-const ListEntitiesGroupHeader = styled.h3``;
+const ListEntitiesGroupHeader = styled.h3`
+  margin-top: 30px;
+`;
+const ListEntitiesSubGroup = styled.div``;
+const ListEntitiesSubGroupHeader = styled.h5`
+  margin-top: 12px;
+  font-weight: normal;
+  margin-bottom: 20px;
+`;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -156,11 +164,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     const entitiesSorted = dataReady && this.props.entities
         ? orderBy(this.props.entities, getEntitySortIteratee(sortBy), sortOrder)
         : [];
-    // grouped entities
-    const entitiesGrouped = dataReady && this.props.entities
-      ? makeEntityGroups(entitiesSorted, taxonomies, connectedTaxonomies, filters, location.query.group)
-      : [];
-
     // selected entities
     const entitiesSelected = dataReady ? Object.values(pick(this.props.entities, entityIdsSelected)) : [];
 
@@ -230,9 +233,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     onSearch={this.props.onSearch}
                   />
                   <EntityListOptions
-                    groupSelectValue={location.query.group}
                     groupOptions={makeGroupOptions(filters, taxonomies, connectedTaxonomies)}
+                    groupSelectValue={location.query.group}
+                    subgroupSelectValue={location.query.subgroup}
                     onGroupSelect={this.props.onGroupSelect}
+                    onSubgroupSelect={this.props.onSubgroupSelect}
                     expandLink={this.props.isExpandable
                       ? {
                         expanded: this.props.expandNo === this.props.expandableColumns.length,
@@ -273,28 +278,51 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                       </ListEntitiesEmpty>
                     }
                     { entitiesSorted.length > 0 &&
-                      entitiesGrouped.map((entityGroup, i) => (
+                      makeEntityGroups(
+                        entitiesSorted,
+                        taxonomies,
+                        connectedTaxonomies,
+                        filters,
+                        location.query.group
+                      ).map((entityGroup, i) => (
                         <ListEntitiesGroup key={i}>
                           { location.query.group && entityGroup.label &&
                             <ListEntitiesGroupHeader>
                               {entityGroup.label}
                             </ListEntitiesGroupHeader>
                           }
-                          <EntityListItems
-                            taxonomies={taxonomies}
-                            associations={filters}
-                            entities={entityGroup.entities}
-                            entitiesSelected={entitiesSelected}
-                            entityIcon={this.props.header.icon}
-                            entityLinkTo={this.props.entityLinkTo}
-                            isSelect={isManager}
-                            onTagClick={this.props.onTagClick}
-                            onEntitySelect={this.props.onEntitySelect}
-                            expandNo={this.props.expandNo}
-                            isExpandable={this.props.isExpandable}
-                            expandableColumns={this.props.expandableColumns}
-                            onExpand={this.props.handleExpandLink}
-                          />
+                          {
+                            makeEntityGroups(
+                              entityGroup.entities,
+                              taxonomies,
+                              connectedTaxonomies,
+                              filters,
+                              location.query.subgroup
+                            ).map((entitySubGroup, j) => (
+                              <ListEntitiesSubGroup key={j}>
+                                { location.query.subgroup && entitySubGroup.label &&
+                                  <ListEntitiesSubGroupHeader>
+                                    {entitySubGroup.label}
+                                  </ListEntitiesSubGroupHeader>
+                                }
+                                <EntityListItems
+                                  taxonomies={taxonomies}
+                                  associations={filters}
+                                  entities={entitySubGroup.entities}
+                                  entitiesSelected={entitiesSelected}
+                                  entityIcon={this.props.header.icon}
+                                  entityLinkTo={this.props.entityLinkTo}
+                                  isSelect={isManager}
+                                  onTagClick={this.props.onTagClick}
+                                  onEntitySelect={this.props.onEntitySelect}
+                                  expandNo={this.props.expandNo}
+                                  isExpandable={this.props.isExpandable}
+                                  expandableColumns={this.props.expandableColumns}
+                                  onExpand={this.props.handleExpandLink}
+                                />
+                              </ListEntitiesSubGroup>
+                            ))
+                          }
                         </ListEntitiesGroup>
                       ))
                     }
@@ -338,6 +366,7 @@ EntityList.propTypes = {
   onTagClick: PropTypes.func.isRequired,
   handleExpandLink: PropTypes.func.isRequired,
   onGroupSelect: PropTypes.func.isRequired,
+  onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
 };
 
@@ -436,6 +465,22 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updateGroup(fromJS([
         {
           query: 'group',
+          value,
+        },
+      ])));
+      if (value === '') {
+        dispatch(updateGroup(fromJS([
+          {
+            query: 'subgroup',
+            value,
+          },
+        ])));
+      }
+    },
+    onSubgroupSelect: (value) => {
+      dispatch(updateGroup(fromJS([
+        {
+          query: 'subgroup',
           value,
         },
       ])));
