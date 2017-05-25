@@ -47,11 +47,12 @@ export class EntityListOptions extends React.Component { // eslint-disable-line 
       expandLink,
     } = this.props;
     const subgroupOptions = filter(groupOptions, (option) => option.value !== groupSelectValue);
+    const groupOptionsFiltered = filter(groupOptions, (option) => option.value !== subgroupSelectValue);
     return (
       <Styled>
         <EntityListGroupBy
           value={groupSelectValue}
-          options={groupOptions}
+          options={groupOptionsFiltered}
           onChange={onGroupSelect}
         />
         { groupSelectValue && subgroupOptions.length > 0 &&
