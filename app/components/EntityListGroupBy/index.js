@@ -34,12 +34,13 @@ const Reset = styled(ButtonSimple)`
   &:hover {
     color: ${palette('primary', 1)};
   }
+  margin-right: 20px;
 `;
 
 export class EntityListGroupBy extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { onChange, value } = this.props;
+    const { onChange, value, isSubgroup } = this.props;
     const options = value && value !== ''
       ? this.props.options
       : [{
@@ -52,7 +53,12 @@ export class EntityListGroupBy extends React.Component { // eslint-disable-line 
         { options && options.length > 0 &&
           <span>
             <Label htmlFor="select">
-              <FormattedMessage {...messages.groupBy} />
+              { !isSubgroup &&
+                <FormattedMessage {...messages.groupBy} />
+              }
+              { isSubgroup &&
+                <FormattedMessage {...messages.subgroupBy} />
+              }
             </Label>
             <Select
               id="select"
@@ -69,8 +75,8 @@ export class EntityListGroupBy extends React.Component { // eslint-disable-line 
                   active={option.value === value}
                 >
                   {option.label}
-                </Option>)
-              )}
+                </Option>
+              ))}
             </Select>
             { value !== '' &&
               <Reset
@@ -91,6 +97,7 @@ EntityListGroupBy.propTypes = {
   value: PropTypes.string,
   options: PropTypes.array,
   onChange: PropTypes.func,
+  isSubgroup: PropTypes.bool,
 };
 
 EntityListGroupBy.defaultProps = {
