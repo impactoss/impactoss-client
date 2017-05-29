@@ -117,6 +117,17 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
             },
           },
           {
+            path: 'sdgtarget_indicators',
+            key: 'indicator_id',
+            reverse: true,
+            as: 'sdgtargets',
+            connected: {
+              path: 'sdgtargets',
+              key: 'sdgtarget_id',
+              forward: true,
+            },
+          },
+          {
             type: 'single',
             path: 'users',
             key: 'manager_id',
@@ -141,7 +152,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         ],
       },
       connections: {
-        options: ['measures'],
+        options: ['measures', 'sdgtargets'],
       },
       connectedTaxonomies: { // filter by each category
         options: [
@@ -163,13 +174,31 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
               },
             },
           },
+          {
+            out: 'js',
+            path: 'taxonomies',
+            where: {
+              tags_sdgtargets: true,
+            },
+            extend: {
+              path: 'categories',
+              key: 'taxonomy_id',
+              reverse: true,
+              extend: {
+                path: 'sdgtarget_categories',
+                key: 'category_id',
+                reverse: true,
+                as: 'sdgtargets',
+              },
+            },
+          },
         ],
       },
     };
 
     // specify the filter and query  options
     const filters = {
-      search: ['title'],
+      search: ['title', 'reference'],
       keyword: {
         attributes: [
           'id',
@@ -211,26 +240,54 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
               whereKey: 'measure_id',
             },
           },
+          {
+            label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+            path: 'sdgtargets', // filter by indicator connection
+            query: 'sdgtargets',
+            key: 'sdgtarget_id',
+            connected: {
+              path: 'sdgtarget_indicators',
+              key: 'indicator_id',
+              whereKey: 'sdgtarget_id',
+            },
+          },
         ],
       },
       connectedTaxonomies: { // filter by each category
         query: 'catx',
         filter: true,
-        connections: [{
-          path: 'measures', // filter by recommendation connection
-          title: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-          key: 'measure_id',
-          connected: {
-            path: 'measure_indicators',
-            key: 'indicator_id',
+        connections: [
+          {
+            path: 'measures', // filter by recommendation connection
+            title: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+            key: 'measure_id',
             connected: {
-              path: 'measure_categories',
-              key: 'measure_id',
-              attribute: 'measure_id',
-              whereKey: 'category_id',
+              path: 'measure_indicators',
+              key: 'indicator_id',
+              connected: {
+                path: 'measure_categories',
+                key: 'measure_id',
+                attribute: 'measure_id',
+                whereKey: 'category_id',
+              },
             },
           },
-        }],
+          {
+            path: 'sdgtargets', // filter by recommendation connection
+            title: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+            key: 'sdgtarget_id',
+            connected: {
+              path: 'sdgtarget_indicators',
+              key: 'indicator_id',
+              connected: {
+                path: 'sdgtarget_categories',
+                key: 'sdgtarget_id',
+                attribute: 'sdgtarget_id',
+                whereKey: 'category_id',
+              },
+            },
+          },
+        ],
       },
     };
     const edits = {
@@ -241,6 +298,14 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
             path: 'measures', // filter by recommendation connection
             connectPath: 'measure_indicators',
             key: 'measure_id',
+            ownKey: 'indicator_id',
+            filter: true,
+          },
+          {
+            label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+            path: 'sdgtargets', // filter by recommendation connection
+            connectPath: 'sdgtarget_indicators',
+            key: 'sdgtarget_id',
             ownKey: 'indicator_id',
             filter: true,
           },
@@ -316,6 +381,9 @@ const mapStateToProps = (state) => ({
     'measures',
     'measure_indicators',
     'measure_categories',
+    'sdgtargets',
+    'sdgtarget_indicators',
+    'sdgtarget_categories',
     'user_roles',
     'due_dates',
     'progress_reports',
@@ -331,6 +399,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('sdgtargets'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
       dispatch(loadEntitiesIfNeeded('progress_reports'));
       dispatch(loadEntitiesIfNeeded('due_dates'));

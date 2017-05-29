@@ -66,6 +66,10 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         title: this.context.intl.formatMessage(messages.entities.measures.plural),
       },
       {
+        path: '/sdgtargets',
+        title: this.context.intl.formatMessage(messages.entities.sdgtargets.plural),
+      },
+      {
         path: '/indicators',
         title: this.context.intl.formatMessage(messages.entities.indicators.plural),
         active: currentPath.startsWith('/reports'),

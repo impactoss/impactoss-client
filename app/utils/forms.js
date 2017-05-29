@@ -66,6 +66,16 @@ export const renderActionControl = (entities) => entities
   options: entityOptions(entities),
 }
 : null;
+export const renderSdgTargetControl = (entities) => entities
+? {
+  id: 'sdgtargets',
+  model: '.associatedSdgTargets',
+  dataPath: ['associatedSdgTargets'],
+  label: 'SDG targets',
+  controlType: 'multiselect',
+  options: entityOptions(entities),
+}
+: null;
 
 export const renderRecommendationControl = (entities) => entities
 ? {

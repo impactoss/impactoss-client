@@ -71,6 +71,12 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
         label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
       });
     }
+    if (taxonomy.attributes.tags_sdgtargets) {
+      attributes.push({
+        attribute: 'sdgtargets',
+        label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+      });
+    }
     return attributes;
   }
 
@@ -174,6 +180,8 @@ const mapStateToProps = (state, props) => ({
     'recommendations',
     'measure_categories',
     'measures',
+    'sdgtarget_categories',
+    'sdgtargets',
     'user_roles',
   ] }),
   taxonomies: getEntities(
@@ -216,6 +224,18 @@ const mapStateToProps = (state, props) => ({
             forward: true,
           },
         },
+        {
+          type: 'count',
+          path: 'sdgtarget_categories',
+          key: 'category_id',
+          reverse: true,
+          as: 'sdgtargets',
+          connected: {
+            path: 'sdgtargets',
+            key: 'sdgtarget_id',
+            forward: true,
+          },
+        },
       ],
     }
   ),
@@ -230,6 +250,8 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
+      dispatch(loadEntitiesIfNeeded('sdgtargets'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
     handleNew: (taxonomyId) => {
