@@ -292,6 +292,80 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/sdgtargets',
+      name: 'sdgtargetList',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetList'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/sdgtargets/new',
+      name: 'sdgtargetNew',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetNew/reducer'),
+          import('containers/SdgTargetNew/sagas'),
+          import('containers/SdgTargetNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('sdgtargetNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/sdgtargets/:id',
+      name: 'sdgtargetView',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/sdgtargets/edit/:id',
+      name: 'sdgtargetEdit',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetEdit/reducer'),
+          import('containers/SdgTargetEdit/sagas'),
+          import('containers/SdgTargetEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('sdgtargetEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/recommendations',
       name: 'recommendationList',
       getComponent(nextState, cb) {

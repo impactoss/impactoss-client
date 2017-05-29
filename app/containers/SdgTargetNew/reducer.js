@@ -1,8 +1,8 @@
 /*
-*
-* IndicatorEdit reducer
-*
-*/
+ *
+ * SdgTargetNew reducer
+ *
+ */
 
 import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
@@ -13,21 +13,14 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 import { UPDATE_ENTITY_FORM } from 'containers/App/constants';
 
 const formInitial = fromJS({
-  id: '',
   attributes: {
     title: '',
     description: '',
-    draft: '',
-    manager_id: '',
-    frequency_months: '',
-    start_date: '',
-    repeat: '',
-    end_date: '',
+    draft: true,
     reference: '',
   },
-  associatedSdgTargets: [],
-  associatedActions: [],
-  associatedUser: [],
+  associatedTaxonomies: {},
+  associatedIndicators: [],
 });
 
 function formReducer(state = formInitial, action) {
@@ -45,5 +38,5 @@ export default combineReducers({
   page: entityEditReducer,
   form: combineForms({
     data: formReducer,
-  }, 'indicatorEdit.form'),
+  }, 'sdgtargetNew.form'),
 });

@@ -107,6 +107,10 @@ export default defineMessages({
       id: 'app.containers.App.attributes.id',
       defaultMessage: 'No.',
     },
+    idOrRef: {
+      id: 'app.containers.App.attributes.idOrRef',
+      defaultMessage: 'No./Ref.',
+    },
     name: {
       id: 'app.containers.App.attributes.name',
       defaultMessage: 'User name',
@@ -245,16 +249,30 @@ export default defineMessages({
         defaultMessage: 'Actions',
       },
       singleLong: {
-        id: 'app.containers.App.entities.actions.singleLong',
+        id: 'app.containers.App.entities.measures.singleLong',
         defaultMessage: 'Government action',
       },
       pluralLong: {
-        id: 'app.containers.App.entities.actions.pluralLong',
+        id: 'app.containers.App.entities.measures.pluralLong',
         defaultMessage: 'Government actions',
       },
       empty: {
         id: 'app.containers.App.entities.measures.empty',
         defaultMessage: 'No actions yet',
+      },
+    },
+    sdgtargets: {
+      single: {
+        id: 'app.containers.App.entities.sdgtargets.single',
+        defaultMessage: 'SDG target',
+      },
+      plural: {
+        id: 'app.containers.App.entities.sdgtargets.plural',
+        defaultMessage: 'SDG targets',
+      },
+      empty: {
+        id: 'app.containers.App.entities.sdgtargets.empty',
+        defaultMessage: 'No SDG targets yet',
       },
     },
     indicators: {
@@ -420,8 +438,22 @@ export default defineMessages({
           defaultMessage: 'Organisations',
         },
         empty: {
-          id: 'app.containers.App.entities.taxonomies.5.empty',
+          id: 'app.containers.App.entities.taxonomies.6.empty',
           defaultMessage: 'No organisation assigned yet',
+        },
+      },
+      7: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.7.single',
+          defaultMessage: 'SDG',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.7.plural',
+          defaultMessage: 'SDGs',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.7.empty',
+          defaultMessage: 'No SDG assigned yet',
         },
       },
     },
