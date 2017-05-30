@@ -443,6 +443,12 @@ function mapDispatchToProps(dispatch, props) {
       }
 
       // cleanup
+      // do not store reference when same as db id
+      if (saveData.getIn(['attributes', 'reference']) === props.params.id) {
+        saveData = saveData
+          .setIn(['attributes', 'reference'], null);
+      }
+      // do not store repeat fields when not repeat
       if (!saveData.getIn(['attributes', 'repeat'])) {
         saveData = saveData
           .setIn(['attributes', 'frequency_months'], null)
