@@ -14,6 +14,12 @@ export const getTaxonomyTagList = (taxonomy) => {
       icon: 'actions',
     });
   }
+  if (taxonomy.attributes.tags_sdgtargets) {
+    tags.push({
+      type: 'sdgtargets',
+      icon: 'sdgtargets',
+    });
+  }
   return tags;
 };
 export const mapToTaxonomyList = (taxonomies, onLink, active, tags = true) => Object.values(taxonomies).map((tax) => ({

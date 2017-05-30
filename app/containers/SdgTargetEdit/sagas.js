@@ -8,9 +8,9 @@ import { SAVE } from './constants';
 
 export function* save({ data }) {
   yield put(saveEntity({
-    path: 'sdgtarget',
+    path: 'sdgtargets',
     entity: data,
-    redirect: `/sdgtarget/${data.id}`,
+    redirect: `/sdgtargets/${data.id}`,
   }));
 }
 
