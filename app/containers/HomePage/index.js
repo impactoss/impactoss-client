@@ -32,6 +32,7 @@ import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import graphicHome from './graphicHome.png';
+import { scrollToComponent } from 'utils/scroll-to-component';
 
 const GraphicHome = styled(NormalImg)`
   width: 100%;
@@ -140,11 +141,10 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
       title: page.attributes.menu_title || page.attributes.title,
     }));
 
-  scrollToComponent = (ref) => {
-    const target = this[ref].getBoundingClientRect().top;
-    window.scrollTo(0, window.scrollY + target);
-  }
-
+  // scrollToComponent = (ref) => {
+  //   const targetY = this[ref].getBoundingClientRect().top;
+  //   ScrollToY.scrollToY(targetY);
+  // };  
 
   render() {
     const { dataReady, onPageLink, pages, taxonomies } = this.props;
@@ -170,12 +170,12 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           </Intro>
           <TopActions>
             <div>
-              <ButtonHero onClick={() => this.scrollToComponent('SectionCategories')}>
+              <ButtonHero onClick={() => scrollToComponent(this['SectionCategories'])}>
                 <FormattedMessage {...messages.explore} />
               </ButtonHero>
             </div>
             <ButtonIconWrap>
-              <ButtonIconOnly onClick={() => this.scrollToComponent('SectionCategories')}>
+              <ButtonIconOnly onClick={() => scrollToComponent(this['SectionCategories'])}>
                 <Icon name="arrowDown" size={'2.5em'} />
               </ButtonIconOnly>
             </ButtonIconWrap>
