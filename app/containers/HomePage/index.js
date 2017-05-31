@@ -17,6 +17,7 @@ import {
   isReady,
 } from 'containers/App/selectors';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { scrollToComponent } from 'utils/scroll-to-component';
 
 import Button from 'components/buttons/Button';
 import ButtonHero from 'components/buttons/ButtonHero';
@@ -32,7 +33,6 @@ import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import graphicHome from './graphicHome.png';
-import { scrollToComponent } from 'utils/scroll-to-component';
 
 const GraphicHome = styled(NormalImg)`
   width: 100%;
@@ -141,11 +141,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
       title: page.attributes.menu_title || page.attributes.title,
     }));
 
-  // scrollToComponent = (ref) => {
-  //   const targetY = this[ref].getBoundingClientRect().top;
-  //   ScrollToY.scrollToY(targetY);
-  // };  
-
   render() {
     const { dataReady, onPageLink, pages, taxonomies } = this.props;
 
@@ -170,12 +165,12 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           </Intro>
           <TopActions>
             <div>
-              <ButtonHero onClick={() => scrollToComponent(this['SectionCategories'])}>
+              <ButtonHero onClick={() => scrollToComponent(this.SectionCategories)}>
                 <FormattedMessage {...messages.explore} />
               </ButtonHero>
             </div>
             <ButtonIconWrap>
-              <ButtonIconOnly onClick={() => scrollToComponent(this['SectionCategories'])}>
+              <ButtonIconOnly onClick={() => scrollToComponent(this.SectionCategories)}>
                 <Icon name="arrowDown" size={'2.5em'} />
               </ButtonIconOnly>
             </ButtonIconWrap>
