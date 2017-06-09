@@ -17,6 +17,7 @@ import {
   isReady,
 } from 'containers/App/selectors';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { scrollToComponent } from 'utils/scroll-to-component';
 
 import Button from 'components/buttons/Button';
 import ButtonHero from 'components/buttons/ButtonHero';
@@ -140,12 +141,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
       title: page.attributes.menu_title || page.attributes.title,
     }));
 
-  scrollToComponent = (ref) => {
-    const target = this[ref].getBoundingClientRect().top;
-    window.scrollTo(0, window.scrollY + target);
-  }
-
-
   render() {
     const { dataReady, onPageLink, pages, taxonomies } = this.props;
 
@@ -170,12 +165,12 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           </Intro>
           <TopActions>
             <div>
-              <ButtonHero onClick={() => this.scrollToComponent('SectionCategories')}>
+              <ButtonHero onClick={() => scrollToComponent(this.SectionCategories)}>
                 <FormattedMessage {...messages.explore} />
               </ButtonHero>
             </div>
             <ButtonIconWrap>
-              <ButtonIconOnly onClick={() => this.scrollToComponent('SectionCategories')}>
+              <ButtonIconOnly onClick={() => scrollToComponent(this.SectionCategories)}>
                 <Icon name="arrowDown" size={'2.5em'} />
               </ButtonIconOnly>
             </ButtonIconWrap>
