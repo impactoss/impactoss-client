@@ -9,11 +9,11 @@ export default defineMessages({
   app: {
     title: {
       id: 'app.containers.App.app.title',
-      defaultMessage: 'Sadata',
+      defaultMessage: 'New Zealand\'s National Plan of Action',
     },
     claim: {
       id: 'app.containers.App.app.claim',
-      defaultMessage: 'Samoa\'s home of human rights implementation',
+      defaultMessage: 'Mahere Rautāki a Motu',
     },
   },
   buttons: {
@@ -375,85 +375,99 @@ export default defineMessages({
       2: {
         single: {
           id: 'app.containers.App.entities.taxonomies.2.single',
-          defaultMessage: 'UN session',
+          defaultMessage: 'Cycle',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.2.plural',
-          defaultMessage: 'UN sessions',
+          defaultMessage: 'Cycles',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.2.empty',
-          defaultMessage: 'No UN session assigned yet',
+          defaultMessage: 'No cycle assigned yet',
         },
       },
       3: {
         single: {
           id: 'app.containers.App.entities.taxonomies.3.single',
-          defaultMessage: 'Human right',
+          defaultMessage: 'SDG',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.3.plural',
-          defaultMessage: 'Human rights',
+          defaultMessage: 'SDGs',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.3.empty',
-          defaultMessage: 'No human right assigned yet',
+          defaultMessage: 'No SDG assigned yet',
         },
       },
       4: {
         single: {
           id: 'app.containers.App.entities.taxonomies.4.single',
-          defaultMessage: 'Affected persons',
+          defaultMessage: 'Recommending state',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.4.plural',
-          defaultMessage: 'Affected persons',
+          defaultMessage: 'Recommending states',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.4.empty',
-          defaultMessage: 'No affected persons assigned yet',
+          defaultMessage: 'No recommending state assigned/not applicable',
         },
       },
       5: {
         single: {
           id: 'app.containers.App.entities.taxonomies.5.single',
-          defaultMessage: 'Thematic cluster',
+          defaultMessage: 'Issue',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.5.plural',
-          defaultMessage: 'Thematic clusters',
+          defaultMessage: 'Issues',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.5.empty',
-          defaultMessage: 'No thematic cluster assigned yet',
+          defaultMessage: 'No issue assigned yet',
         },
       },
       6: {
         single: {
           id: 'app.containers.App.entities.taxonomies.6.single',
-          defaultMessage: 'Organisation',
+          defaultMessage: 'Population group',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.6.plural',
-          defaultMessage: 'Organisations',
+          defaultMessage: 'Population groups',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.6.empty',
-          defaultMessage: 'No organisation assigned yet',
+          defaultMessage: 'No population group assigned yet',
         },
       },
       7: {
         single: {
           id: 'app.containers.App.entities.taxonomies.7.single',
-          defaultMessage: 'SDG',
+          defaultMessage: 'SMART criterion',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.7.plural',
-          defaultMessage: 'SDGs',
+          defaultMessage: 'SMART criteria',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.7.empty',
-          defaultMessage: 'No SDG assigned yet',
+          defaultMessage: 'No SMART criterion assigned yet',
+        },
+      },
+      8: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.8.single',
+          defaultMessage: 'Government agency',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.8.plural',
+          defaultMessage: 'Government agencies',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.8.empty',
+          defaultMessage: 'No Government agency assigned yet',
         },
       },
     },

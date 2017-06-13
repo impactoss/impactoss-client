@@ -13,11 +13,11 @@ export default defineMessages({
   contact: {
     email: {
       id: 'nmrf.components.Footer.contact.email',
-      defaultMessage: 'contact@sadata.ws',
+      defaultMessage: 'infoline@hrc.co.nz',
     },
     anchor: {
       id: 'nmrf.components.Footer.contact.anchor',
-      defaultMessage: 'contact@sadata.ws',
+      defaultMessage: 'infoline@hrc.co.nz',
     },
   },
   responsible: {

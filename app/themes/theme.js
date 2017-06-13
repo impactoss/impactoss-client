@@ -26,7 +26,7 @@ theme.palette = {
   // 2: main header colour
   // 3: main header colour, lighter
   // 4: white
-  primary: coolorsToHex('https://coolors.co/eb6e51-d66149-182635-34404d-ffffff'),
+  primary: coolorsToHex('https://coolors.co/53830B-456D09-026B9F-027DBB-ffffff'),
 
   // secondary palette
   // 0: secondary colour, light
@@ -34,7 +34,7 @@ theme.palette = {
   // 2: secondary header colour, darker
   // 3: white/placeholder
   // 4: white/placeholder
-  secondary: coolorsToHex('https://coolors.co/ff9b69-ffb996-162331-ffffff-ffffff'),
+  secondary: coolorsToHex('https://coolors.co/98CE46-B6F754-014E75-ffffff-ffffff'),
 
   // greyscale
   // 0:  darkest (sadata black)
@@ -55,14 +55,15 @@ theme.palette = {
   // taxonomy/category colours
   // 0: default/fallback
   // 1: Human Rights Body
-  // 2: UN session
-  // 3: Human right
-  // 4: Affected persons
-  // 5: Thematic cluster
-  // 6: Organisation
-  // 7: SDGs
-  taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF'],
-  taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#65C99B', '#238680', '#4EA53C', '#006096', '#178EC1', '#08C4F8'],
+  // 2: Cycle
+  // 3: SDGs
+  // 4: Country
+  // 5: Issue
+  // 6: Group
+  // 7: SMART
+  // 8: Agency
+  taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF', '#40D7FF'],
+  taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#65C99B', '#238680', '#4EA53C', '#006096', '#178EC1', '#08C4F8', '#08C4F8'],
 
   // other entities
   actions: ['#FFC107'],
