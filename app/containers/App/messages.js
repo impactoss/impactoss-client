@@ -375,29 +375,29 @@ export default defineMessages({
       2: {
         single: {
           id: 'app.containers.App.entities.taxonomies.2.single',
-          defaultMessage: 'UN session',
+          defaultMessage: 'Cycle',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.2.plural',
-          defaultMessage: 'UN sessions',
+          defaultMessage: 'Cycles',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.2.empty',
-          defaultMessage: 'No UN session assigned yet',
+          defaultMessage: 'No cycle assigned yet',
         },
       },
       3: {
         single: {
           id: 'app.containers.App.entities.taxonomies.3.single',
-          defaultMessage: 'Human right',
+          defaultMessage: 'Human rights issue',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.3.plural',
-          defaultMessage: 'Human rights',
+          defaultMessage: 'Human rights issues',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.3.empty',
-          defaultMessage: 'No human right assigned yet',
+          defaultMessage: 'No human rights issue assigned yet',
         },
       },
       4: {

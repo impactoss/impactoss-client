@@ -255,6 +255,27 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/actions/import',
+      name: 'actionImport',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ActionImport/reducer'),
+          import('containers/ActionImport/sagas'),
+          import('containers/ActionImport'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('actionImport', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/actions/:id',
       name: 'actionView',
       getComponent(nextState, cb) {

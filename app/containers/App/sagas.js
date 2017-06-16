@@ -416,7 +416,9 @@ export function* newEntitySaga({ data }) {
     }
 
     yield put(saveSuccess());
-    yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+    if (data.redirect) {
+      yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+    }
   } catch (error) {
     // console.error(error);
     yield put(saveError('An error occurred saving your data. Please review carefully and try again. '));
