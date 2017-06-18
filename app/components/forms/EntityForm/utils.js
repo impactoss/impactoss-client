@@ -41,7 +41,7 @@ export const entityImportReducer = (state = initialState, action) => {
       return initialState;
     case SAVE_SENDING:
       return state
-        .set('saveSending', action)
+        .set('saveSending', action);
     case SAVE_SUCCESS:
       return state
         .set('saveSuccess', action);

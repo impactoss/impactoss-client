@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { FormattedMessage } from 'react-intl';
+// import { FormattedMessage } from 'react-intl';
 import { Form } from 'react-redux-form/immutable';
 // import { Form, Errors } from 'react-redux-form/immutable';
 import CsvDownloader from 'react-csv-downloader';
@@ -12,7 +12,7 @@ import { map } from 'lodash/collection';
 // import asArray from 'utils/as-array';
 // import { lowerCase } from 'utils/string';
 //
-import appMessages from 'containers/App/messages';
+// import appMessages from 'containers/App/messages';
 
 // import Icon from 'components/Icon';
 // import FieldFactory from 'components/fields/FieldFactory';
@@ -24,14 +24,12 @@ import Field from 'components/fields/Field';
 import ProgressBar from 'components/ProgressBar';
 
 import DocumentWrap from 'components/fields/DocumentWrap';
-import Main from '../Main';
 import FileSelectControl from '../FileSelectControl';
 // import ErrorWrapper from '../ErrorWrapper';
 import FormWrapper from '../FormWrapper';
 import FormBody from '../FormBody';
 import FormFieldWrap from '../FormFieldWrap';
 import ButtonCancel from '../ButtonCancel';
-import ButtonSubmit from '../ButtonSubmit';
 // import Required from '../Required';
 
 // import messages from './messages';
@@ -65,7 +63,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
       this.setState({
         succeeded: {},
         failed: {},
-      })
+      });
     } else {
       if (nextProps.saveSuccess) {
         const timestamp = nextProps.saveSuccess.data.timestamp;
@@ -80,7 +78,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
   getControlProps = (field) => omit(field, nonControlProps);
 
   render() {
-    const { model, handleSubmit, handleCancel, handleReset, fieldModel, template, formData} = this.props;
+    const { model, handleSubmit, handleCancel, handleReset, fieldModel, template, formData } = this.props;
     const { failed, succeeded } = this.state;
 
     const field = {
@@ -92,8 +90,8 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
     const { id, ...props } = this.getControlProps(field);
 
     const progress = formData.get('import')
-    ? ((Object.keys(failed).length + Object.keys(succeeded).length) / formData.get('import').rows.length) * 100
-    : null
+      ? ((Object.keys(failed).length + Object.keys(succeeded).length) / formData.get('import').rows.length) * 100
+      : null;
 
     return (
       <div>
@@ -143,13 +141,11 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                       { Object.keys(failed).length > 0 &&
                         <div>
                           <p>Failed rows:</p>
-                          { map(failed, (error, i) => {
-                            return (
-                              <p key={i}>
-                                {JSON.stringify(error.data.entity.attributes)}
-                              </p>
-                            );
-                          })}
+                          { map(failed, (error, i) => (
+                            <p key={i}>
+                              {JSON.stringify(error.data.entity.attributes)}
+                            </p>
+                          ))}
                         </div>
                       }
                     </div>
@@ -180,14 +176,14 @@ ImportEntitiesForm.propTypes = {
   model: PropTypes.string,
   fieldModel: PropTypes.string,
   formData: PropTypes.object,
-  saveSuccess: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.object
-  ]),
-  saveError: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.object
-  ]),
+  // saveSuccess: PropTypes.oneOfType([
+  //   PropTypes.bool,
+  //   PropTypes.object,
+  // ]),
+  // saveError: PropTypes.oneOfType([
+  //   PropTypes.bool,
+  //   PropTypes.object,
+  // ]),
   template: PropTypes.object,
 };
 

@@ -39,7 +39,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
   }
 
   render() {
-    const { dataReady, viewDomain } = this.props;
+    const { viewDomain } = this.props;
     return (
       <div>
         <Helmet

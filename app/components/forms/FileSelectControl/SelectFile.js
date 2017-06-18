@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import FileReaderInput from 'react-file-reader-input';
 import Baby from 'babyparse';
-import { map } from 'lodash/collection';
 
 // import appMessages from 'containers/App/messages';
 
