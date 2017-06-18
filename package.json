@@ -232,7 +232,6 @@
     "react-csv-downloader": "^0.1.4",
     "react-debounce-input": "^3.0.0",
     "react-dom": "15.4.1",
-    "react-file-input": "^0.2.5",
     "react-file-reader-input": "^1.1.0",
     "react-helmet": "3.2.2",
     "react-intl": "2.1.5",

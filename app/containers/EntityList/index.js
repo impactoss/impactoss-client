@@ -144,7 +144,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     return columns;
   }
   render() {
-    console.log('render list')
     const {
       sortBy,
       sortOrder,

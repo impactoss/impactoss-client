@@ -8,39 +8,26 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
-import { Map, List, fromJS } from 'immutable';
+import { fromJS } from 'immutable';
+
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+// import appMessages from 'containers/App/messages';
 
 import {
-  renderRecommendationControl,
-  renderIndicatorControl,
-  renderTaxonomyControl,
-  validateRequired,
-  validateDateFormat,
-} from 'utils/forms';
-
-import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
-
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
-import appMessages from 'containers/App/messages';
-
-import {
-  loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
 } from 'containers/App/actions';
 
-import { getEntities, isReady } from 'containers/App/selectors';
+import { isReady } from 'containers/App/selectors';
 
-import Loading from 'components/Loading';
+// import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import ImportEntitiesForm from 'components/forms/ImportEntitiesForm';
 
 import viewDomainSelect from './selectors';
 import messages from './messages';
-import { save } from './actions';
-
+import { save, resetForm } from './actions';
 
 export class ActionImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -52,9 +39,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
   }
 
   render() {
-    const { viewDomain } = this.props;
-    const { saveSending, saveError } = viewDomain.page;
-
+    const { dataReady, viewDomain } = this.props;
     return (
       <div>
         <Helmet
@@ -71,25 +56,26 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="actions"
+            buttons={[{
+              type: 'cancel',
+              onClick: this.props.handleCancel,
+            }]}
           />
-          {saveSending &&
-            <p>Importing Actions</p>
-          }
-          {saveError &&
-            <p>{saveError}</p>
-          }
           <ImportEntitiesForm
             model="actionImport.form.data"
             formData={viewDomain.form.data}
             fieldModel="import"
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
             handleCancel={this.props.handleCancel}
+            handleReset={this.props.handleReset}
+            saveSuccess={viewDomain.page.saveSuccess}
+            saveError={viewDomain.page.saveError}
             template={{
-              filename: 'actions_import.csv',
+              filename: 'actions_template.csv',
               data: [{
-                title: 'text (required)',
-                description: 'text',
-                target_date: 'date',
+                title: 'Title | text (required)',
+                description: 'Description | text (markdown supported)',
+                target_date: 'Target Date | date (TODO: format)',
               }],
             }}
           />
@@ -103,6 +89,7 @@ ActionImport.propTypes = {
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleReset: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
 };
@@ -124,16 +111,18 @@ function mapDispatchToProps(dispatch) {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
     handleSubmit: (formData) => {
-      if(formData.get('import') !== null) {
-        let saveData = formData.get('import').rows;
-        fromJS(formData.get('import').rows).map((row) => {
+      if (formData.get('import') !== null) {
+        fromJS(formData.get('import').rows).forEach((row) => {
           const attributes = row.set('draft', true).toJS();
-          dispatch(save({attributes}));
-        })
+          dispatch(save({ attributes }));
+        });
       }
     },
     handleCancel: () => {
       dispatch(updatePath('/actions'));
+    },
+    handleReset: () => {
+      dispatch(resetForm());
     },
   };
 }

@@ -6244,10 +6244,6 @@ react-dom@15.4.1, react-dom@^15.0.1:
     loose-envify "^1.1.0"
     object-assign "^4.1.0"
 
-react-file-input@^0.2.5:
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/react-file-input/-/react-file-input-0.2.5.tgz#a355367d9323d5c6352ddd3cd7ec3582e5c9b245"
-
 react-file-reader-input@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/react-file-reader-input/-/react-file-reader-input-1.1.0.tgz#7b03c41e701f244f9026c3bd42b941078f5dfc32"

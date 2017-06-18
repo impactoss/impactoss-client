@@ -201,7 +201,6 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     : []
 
   render() {
-    console.log('render view')
     const {
       action,
       dataReady,

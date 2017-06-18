@@ -1,5 +1,5 @@
 import { take, put, cancel, takeEvery } from 'redux-saga/effects';
-import { push, LOCATION_CHANGE } from 'react-router-redux';
+import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { newEntity } from 'containers/App/actions';
 
@@ -10,6 +10,7 @@ export function* save({ data }) {
     path: 'measures',
     entity: data,
     redirect: false,
+    timestamp: Date.now(),
   }));
 }
 

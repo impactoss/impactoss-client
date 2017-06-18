@@ -8,15 +8,19 @@ import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 
-import { entitySaveReducer } from 'components/forms/EntityForm/utils';
+import { entityImportReducer } from 'components/forms/EntityForm/utils';
 import { LOCATION_CHANGE } from 'react-router-redux';
+import {
+  RESET_FORM,
+} from './constants';
 
 const formInitial = fromJS({
-  import:null
+  import: null,
 });
 
 function formReducer(state = formInitial, action) {
   switch (action.type) {
+    case RESET_FORM:
     case LOCATION_CHANGE:
       return formInitial;
     default:
@@ -25,7 +29,7 @@ function formReducer(state = formInitial, action) {
 }
 
 export default combineReducers({
-  page: entitySaveReducer,
+  page: entityImportReducer, // TODO: reset_form should also reset page?
   form: combineForms({
     data: formReducer,
   }, 'actionImport.form'),
