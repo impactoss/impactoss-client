@@ -46,9 +46,9 @@ const SectionTop = styled(Section)`
   padding-top: 130px;
 `;
 const ButtonIconOnly = styled(Button)`
-  color: ${palette('primary', 0)};
+  color: ${palette('primary', 1)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('primary', 0)};
   }
 `;
 const ButtonIconWrap = styled.div`
@@ -62,9 +62,9 @@ const ButtonIconAbove = styled(Button)`
   }
 `;
 const ButtonIconAboveMore = styled(Button)`
-  color: ${palette('primary', 0)};
+  color: ${palette('primary', 1)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('primary', 0)};
   }
   min-width: 200px;
   margin: 0 30px;
@@ -79,7 +79,7 @@ const SectionCategories = styled(Section)`
 `;
 const SectionAction = styled(Section)`
   color: ${palette('primary', 4)};
-  background-color: ${palette('primary', 0)};
+  background-color: ${palette('primary', 1)};
 `;
 const SectionMore = styled(Section)`
   color: ${palette('dark', 3)};
@@ -100,16 +100,16 @@ const TopActions = styled.div`
   padding-top: 2em;
 `;
 const Title = styled.h1`
-  color:${palette('primary', 0)}
-  font-family: ${(props) => props.theme.fonts.secondary};
+  color:${palette('headerBrand', 0)}
+  font-family: ${(props) => props.theme.fonts.headerBrandMain};
   text-transform: uppercase;
   margin-bottom:0;
   font-size: 2.8em
 `;
 
 const Claim = styled.p`
-  color: ${palette('secondary', 0)};
-  font-family: ${(props) => props.theme.fonts.secondary};
+  color: ${palette('headerBrand', 1)};
+  font-family: ${(props) => props.theme.fonts.headerBrandClaim};
   font-size: 1.25em;
   width: 40%;
   margin-left: auto;

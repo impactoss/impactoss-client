@@ -4,7 +4,7 @@ import { palette } from 'styled-theme';
 import Button from '../Button';
 
 // eslint-disable no-nested-ternary
-const ButtonCategoryTag = styled(Button)`
+const ButtonTagCategory = styled(Button)`
   color: ${palette('primary', 4)};
   background-color: ${(props) => palette('taxonomies', props.taxId || 0)};
   padding: 1px 6px;
@@ -21,4 +21,4 @@ const ButtonCategoryTag = styled(Button)`
   }
 `;
 
-export default ButtonCategoryTag;
+export default ButtonTagCategory;

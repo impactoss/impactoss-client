@@ -11,7 +11,7 @@ import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
 import DocumentView from 'components/DocumentView';
 import DocumentWrap from 'components/fields/DocumentWrap';
-import ButtonIcon from 'components/buttons/ButtonIcon';
+import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 
 import ProgressBar from 'components/ProgressBar';
 
@@ -23,19 +23,19 @@ const DocumentWrapEdit = styled(DocumentWrap)`
   padding: 1em 0.75em;
 `;
 
-const Remove = styled(ButtonIcon)`
+const Remove = styled(ButtonFlatIconOnly)`
   position: absolute;
   right: 0;
   top: 0;
   padding: 1em 0.75em;
   color: ${palette('dark', 2)};
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${palette('primary', 1)};
   }
 `;
 
 const Uploading = styled.div`
-  color: ${palette('primary', 0)};
+  color: ${palette('primary', 1)};
   font-weight: bold;
   font-size: 1.2em;
 `;
@@ -47,7 +47,7 @@ const ReactS3UploaderLabelWrap = styled.label`
   vertical-align: middle;
   display: inline-block;
   color: ${palette('primary', 4)};
-  background-color: ${palette('primary', 0)};
+  background-color: ${palette('primary', 1)};
   border-radius: 999px;
   cursor:pointer;
   padding: 0.5em 1em 0.5em 1.25em;
@@ -55,7 +55,7 @@ const ReactS3UploaderLabelWrap = styled.label`
   width: auto;
   &:hover {
     color: ${palette('primary', 4)};
-    background-color: ${palette('primary', 1)};
+    background-color: ${palette('primary', 0)};
   }
 `;
 

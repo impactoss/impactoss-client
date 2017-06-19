@@ -13,7 +13,7 @@ const Hint = styled.div`
 // see also ScheduleItem
 const Label = styled.label`
   font-weight: bold;
-  color:  ${(props) => props.highlight ? palette('primary', 0) : palette('dark', 2)};
+  color:  ${(props) => props.highlight ? palette('primary', 1) : palette('dark', 2)};
 `;
 const LabelInner = styled.span`
   padding-left: 5px;

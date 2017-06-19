@@ -9,8 +9,8 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import Icon from 'components/Icon';
-import ButtonFilterTag from 'components/buttons/ButtonFilterTag';
-import ButtonFilterTagInverse from 'components/buttons/ButtonFilterTagInverse';
+import ButtonTagFilter from 'components/buttons/ButtonTagFilter';
+import ButtonTagFilterInverse from 'components/buttons/ButtonTagFilterInverse';
 import DebounceInput from 'react-debounce-input';
 
 import messages from './messages';
@@ -70,7 +70,7 @@ export class EntityListSearch extends React.Component { // eslint-disable-line r
             {
               filters.map((filter, i) => filter.without
                 ? (
-                  <ButtonFilterTagInverse
+                  <ButtonTagFilterInverse
                     key={i}
                     onClick={filter.onClick}
                     palette={filter.type}
@@ -79,10 +79,10 @@ export class EntityListSearch extends React.Component { // eslint-disable-line r
                   >
                     {filter.label}
                     <Icon name="removeSmall" text textRight />
-                  </ButtonFilterTagInverse>
+                  </ButtonTagFilterInverse>
                 )
                 : (
-                  <ButtonFilterTag
+                  <ButtonTagFilter
                     key={i}
                     onClick={filter.onClick}
                     palette={filter.type}
@@ -91,7 +91,7 @@ export class EntityListSearch extends React.Component { // eslint-disable-line r
                   >
                     {filter.label}
                     <Icon name="removeSmall" text textRight />
-                  </ButtonFilterTag>
+                  </ButtonTagFilter>
                 )
               )
             }

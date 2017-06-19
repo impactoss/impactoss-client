@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import Button from 'components/basic/Button';
+import Button from 'components/buttons/Button';
 
 const ButtonForm = styled(Button)`
   font-weight: bold;

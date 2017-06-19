@@ -14,7 +14,7 @@ const Bar = styled.div`
   width: ${(props) => props.progress}%
   height: 3px;
   position: relative;
-  background-color: ${palette('primary', 0)};
+  background-color: ${palette('primary', 1)};
 `;
 const ProgressBar = ({ progress }) => (
   <Styled>

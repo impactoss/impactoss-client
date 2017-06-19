@@ -13,7 +13,7 @@ const Styled = styled.div`
   font-weight: bold;
   padding: 5px 10px;
   background-color: ${palette('primary', 4)};
-  color:  ${(props) => props.overdue ? palette('primary', 0) : palette('light', 4)};
+  color:  ${(props) => props.overdue ? palette('reports', 0) : palette('light', 4)};
 `;
 const Status = styled.div`
   font-size: 1.2em;
@@ -23,7 +23,7 @@ const DueDate = styled.div`
 `;
 const IconWrap = styled.div`
   color: ${palette('primary', 4)};
-  background-color:  ${(props) => props.overdue ? palette('primary', 0) : palette('light', 4)};
+  background-color:  ${(props) => props.overdue ? palette('reports', 0) : palette('light', 4)};
   position: absolute;
   top: 0;
   right: 0;
