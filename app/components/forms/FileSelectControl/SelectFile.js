@@ -8,13 +8,13 @@ import Baby from 'babyparse';
 // import appMessages from 'containers/App/messages';
 
 import Icon from 'components/Icon';
-import ButtonText from 'components/buttons/ButtonText';
-import ButtonIcon from 'components/buttons/ButtonIcon';
-import ButtonIconPrimary from 'components/buttons/ButtonIconPrimary';
+import ButtonFlat from 'components/buttons/ButtonFlat';
+import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
+import ButtonDefaultWithIcon from 'components/buttons/ButtonDefaultWithIcon';
 
 import DocumentWrap from 'components/fields/DocumentWrap';
 
-const Remove = styled(ButtonIcon)`
+const Remove = styled(ButtonFlatIconOnly)`
   position: absolute;
   right: 0;
   top: 0;
@@ -24,7 +24,7 @@ const Remove = styled(ButtonIcon)`
     color: ${palette('primary', 0)};
   }
 `;
-const ImportButton = styled(ButtonText)`
+const ImportButton = styled(ButtonFlat)`
   position: absolute;
   right: 3em;
   top: 0.5em;
@@ -93,10 +93,10 @@ class SelectFile extends React.Component { // eslint-disable-line react/prefer-s
             accept={this.props.accept}
             onChange={this.handleChange}
           >
-            <ButtonIconPrimary type="button">
+            <ButtonDefaultWithIcon type="button">
               Select File
               <Icon name="add" text textRight />
-            </ButtonIconPrimary>
+            </ButtonDefaultWithIcon>
           </FileReaderInput>
         }
       </Styled>
