@@ -93,10 +93,7 @@ class SelectFile extends React.Component { // eslint-disable-line react/prefer-s
             accept={this.props.accept}
             onChange={this.handleChange}
           >
-            <ButtonDefaultWithIcon type="button">
-              Select File
-              <Icon name="add" text textRight />
-            </ButtonDefaultWithIcon>
+            <ButtonDefaultWithIcon type="button" title="Select File" icon="add" />
           </FileReaderInput>
         }
       </Styled>
