@@ -3,7 +3,7 @@ import { palette } from 'styled-theme';
 
 import Button from '../Button';
 
-const ButtonFilterTag = styled(Button)`
+const ButtonTagFilter = styled(Button)`
   color: ${palette('primary', 4)};
   background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
   padding: 1px 6px;
@@ -16,4 +16,4 @@ const ButtonFilterTag = styled(Button)`
   }
 `;
 
-export default ButtonFilterTag;
+export default ButtonTagFilter;

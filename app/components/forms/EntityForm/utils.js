@@ -13,7 +13,7 @@ const initialState = fromJS({
   saveError: false,
 });
 
-export const entityEditReducer = (state = initialState, action) => {
+export const entitySaveReducer = (state = initialState, action) => {
   switch (action.type) {
     case SAVE_SENDING:
       return state

@@ -3,5 +3,5 @@ import { palette } from 'styled-theme';
 
 export default styled.div`
   float:right;
-  background-color: ${palette('primary', 2)};
+  background-color: ${palette('headerNavPages', 0)};
 `;

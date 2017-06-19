@@ -1,5 +1,4 @@
 import coolorsToHex from 'coolors-to-hex';
-import { reversePalette } from 'styled-theme/composer';
 
 const theme = {};
 
@@ -11,46 +10,57 @@ theme.breakpoints = {
   large: '1200px',
 };
 
+// global color palettes
+// primary color palette: dark to light
+// 0: main colour, darker, used for links and navigation elements, hover
+// 1: main colour, used for links and navigation elements
+// 2: main colour, light
+// 3: main colour, lighter (UNUSED)
+// 4: white
+const primary = coolorsToHex('https://coolors.co/456D09-53830B-98CE46-B6F754-ffffff');
+  // secondary color palette: dark to light
+  // 0: dark header colour, darker
+  // 1: dark header colour
+  // 2: dark header colour, lighter (UNUSED)
+  // 3: white/placeholder
+  // 4: white/placeholder
+const secondary = coolorsToHex('https://coolors.co/014E75-026B9F-027DBB-ffffff-ffffff');
+// dark grayscale: dark to light
+// 0:  darkest
+// 1:  darker
+// 2:  dark
+// 3:  medium gray 1 (AA conform)
+// 4:  medium gray 2 (AA large conform on white)
+const dark = coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395');
+// light grayscale: light to dark
+// 0:  lightest gray (background colour) - also used in global-styles.js
+// 1:  light gray (light lines, navigation filter panel)
+// 2:  gray 1 (gray pattern)
+// 3:  gray 2 (icons light)
+// 4:  gray 3 (dark lines)
+const light = coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad');
 
-// styled-theme settings https://github.com/diegohaz/styled-theme
+// other palettes (not currently used)
+const danger = coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478');
+const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-fff2ce');
+const success = coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-c8e6c9');
 
 // colour palettes, usage:
 //   import { palette } from 'styled-theme';
 //   color: ${palette('primary', 0)}
+// styled-theme settings https://github.com/diegohaz/styled-theme
 theme.palette = {
-  // theme colours
-  //
-  // primary palette
-  // 0: main colour, used for links and navigation elements
-  // 1: main colour, darker, used for links and navigation elements, hover
-  // 2: main header colour
-  // 3: main header colour, lighter
-  // 4: white
-  primary: coolorsToHex('https://coolors.co/53830B-456D09-026B9F-027DBB-ffffff'),
 
-  // secondary palette
-  // 0: secondary colour, light
-  // 1: secondary colour, lighter
-  // 2: secondary header colour, darker
-  // 3: white/placeholder
-  // 4: white/placeholder
-  secondary: coolorsToHex('https://coolors.co/98CE46-B6F754-014E75-ffffff-ffffff'),
+  // global theme colours
+  primary,
+  secondary,
+  dark,
+  light,
 
-  // greyscale
-  // 0:  darkest (sadata black)
-  // 1:  dark (sadata dark grey)
-  // 2:  almost dark (sadata medium grey)
-  // 3:  medium grey 1 (AA conform)
-  // 4:  medium grey 2 (AA large conform on white)
-  dark: coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395'),
-
-  // greyscale
-  // 0:  lightest grey (background colour) - also used in global-styles.js
-  // 1:  light grey (light lines, navigation filter panel)
-  // 2:  grey 1 (grey pattern)
-  // 3:  grey 2 (icons light)
-  // 4:  grey 3 (dark lines)
-  light: coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad'),
+  // other palettes (not currently used)
+  danger,
+  success,
+  alert,
 
   // taxonomy/category colours
   // 0: default/fallback
@@ -79,12 +89,78 @@ theme.palette = {
   attributes: ['#6C787A'],
   attributesHover: ['#4A595C'],
 
-  // other palettes
-  danger: coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478'),
-  alert: coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-fff2ce'),
-  success: coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-c8e6c9'),
+
+  //
+  // HEADER "PALETTES" //////////////////////////////////////////////////////////////
+  //
+
+  // header: [ '#bg' ],
+  header: [secondary[1]],
+
+  // headerBrand: [ '#title', '#claim' ],
+  headerBrand: [primary[1], primary[2]],
+  headerBrandHover: [primary[1], primary[2]], // WARNING component sets opacity
+
+  // headerNavPages: [ '#bg' ],
+  headerNavPages: [secondary[1]],
+  // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
+  headerNavPagesItem: [light[3], light[2], 'transparent', 'transparent'],
+  headerNavPagesItemHover: [primary[4], primary[4], 'transparent', 'transparent'],
+
+  // headerNavAccount: [ '#bg' ],
+  headerNavAccount: ['transparent'],
+  // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border' ]
+  headerNavAccountItem: [primary[4], primary[4], primary[0], primary[0], primary[1]],
+  headerNavAccountItemHover: [primary[4], primary[4], primary[1], primary[1], primary[1]],
+
+  // headerNavMain: [ '#bg', '#border'  ],
+  headerNavMain: [secondary[1], secondary[0]],
+  // headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
+  headerNavMainItem: [light[2], primary[0], 'transparent', 'transparent'],
+  headerNavMainItemHover: [primary[1], primary[1], 'transparent', 'transparent'],
+
+  //
+  // SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
+  //
+  // aside: ['#bg']
+  aside: [primary[4]],
+
+  // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
+  // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
+  asideCatNavItem: [dark[2], primary[4], primary[4], primary[1], light[0]],
+  asideCatNavItemHover: [dark[0], primary[4], primary[4], primary[0], light[0]],
+
+  // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
+  // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
+  asideListItem: [dark[1], primary[4], primary[4], dark[2], light[0]],
+  asideListItemHover: [dark[3], primary[4], primary[4], dark[2], light[0]],
+
+  //
+  // BUTTONS / LINKS
+  //
+  // button: ['#colorPrimary', '#colorSecondary'],
+  buttonFlat: [primary[1], dark[3]],
+  buttonFlatHover: [primary[0], primary[1]],
+  // buttonDefault: ['#text', '#bg'],
+  buttonDefault: [primary[4], primary[1]],
+  buttonDefaultHover: [primary[4], primary[0]],
+  // buttonPrimary: ['#text', '#bg', '#border'],
+  buttonDefaultIconOnly: [primary[4], primary[1], primary[1]],
+  buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],
+  // buttonSecondary: ['#text', '#bg'],
+  buttonSecondary: [secondary[4], secondary[1]],
+  buttonSecondaryHover: [secondary[4], secondary[0]],
+  // buttonToggleInactive: ['#color', '#bg'],
+  buttonToggleInactive: [dark[1], light[1]],
+  buttonToggleInactiveHover: [dark[1], primary[4]],
+  // links
+  // also see global-styles.js for default link "a"
+  linkDefault: [primary[1]],
+  linkDefaultHover: [primary[0]],
+  linkSecondary: [secondary[1]],
+  linkSecondaryHover: [secondary[0]],
+
 };
-theme.reversePalette = reversePalette(theme.palette);
 
 // fonts
 theme.fonts = {
@@ -92,11 +168,15 @@ theme.fonts = {
   secondary: 'Rubik, Helvetica, Arial, sans-serif', // used for brand title, claim, nav items, buttons and labels
   pre: 'Consolas, Liberation Mono, Menlo, Courier, monospace',
   quote: 'Georgia, serif',
+  headerBrandMain: 'Rubik, Helvetica, Arial, sans-serif',
+  headerBrandClaim: 'Rubik, Helvetica, Arial, sans-serif',
 };
 
 // sizes
 theme.sizes = {
-  h1: '2em',
+  // also see global-styles.js for other sizes
+  headerBrandMain: '2.6em',
+  headerBrandClaim: '0.85em',
 };
 
 // end styled-theme settings

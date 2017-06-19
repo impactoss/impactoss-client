@@ -27,7 +27,7 @@ const Styled = styled.div`
   left:0;
   right:0;
   height:115px;
-  background-color: ${palette('primary', 2)};
+  background-color: ${palette('header', 0)};
 `;
 
 

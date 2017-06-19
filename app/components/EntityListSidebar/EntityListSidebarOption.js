@@ -12,17 +12,19 @@ import { palette } from 'styled-theme';
 import Button from 'components/buttons/Button';
 import Icon from 'components/Icon';
 
+// TODO compare TaxonomySidebarItem
 const Styled = styled(Button)`
-  color: ${(props) => props.active ? palette('primary', 4) : palette('dark', 1)};
-  background-color: ${(props) => props.active ? palette('dark', 2) : 'transparent'};
   font-weight: bold;
   padding: 0.75em 2em;
   width: 100%;
   text-align: left;
-  border-bottom: 1px solid ${palette('light', 0)};
+  color:  ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
+  background-color: ${(props) => props.active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
+  border-bottom: 1px solid ${palette('asideListItem', 4)};
   &:hover {
-    color: ${(props) => props.active ? palette('primary', 4) : palette('dark', 3)};
-    background-color: ${(props) => props.active ? palette('dark', 2) : 'transparent'};
+    color: ${(props) => props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0)};
+    background-color: ${(props) => props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2)};
+    border-bottom-color: ${palette('asideListItemHover', 4)}
   }
 `;
 const Label = styled.span`

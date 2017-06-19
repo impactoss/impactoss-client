@@ -8,7 +8,7 @@ import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 
-import { entityEditReducer } from 'components/forms/EntityForm/utils';
+import { entitySaveReducer } from 'components/forms/EntityForm/utils';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import { UPDATE_ENTITY_FORM } from 'containers/App/constants';
 
@@ -35,7 +35,7 @@ function formReducer(state = formInitial, action) {
 }
 
 export default combineReducers({
-  page: entityEditReducer,
+  page: entitySaveReducer,
   form: combineForms({
     data: formReducer,
   }, 'recommendationEdit.form'),

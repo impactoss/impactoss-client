@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import styled from 'styled-components';
 
-import ButtonPrimaryIcon from 'components/buttons/ButtonPrimaryIcon';
+import ButtonDefaultWithIcon from 'components/buttons/ButtonDefaultWithIcon';
 
 const Styled = styled.div`
   // border-radius: 999px;
@@ -41,7 +41,7 @@ class ButtonToggle extends React.Component { // eslint-disable-line react/prefer
                   left={i === 0}
                   right={i === 1}
                 >
-                  <ButtonPrimaryIcon
+                  <ButtonDefaultWithIcon
                     icon={option.icon}
                     iconRight={i !== 0}
                     title={option.label}
@@ -59,7 +59,7 @@ class ButtonToggle extends React.Component { // eslint-disable-line react/prefer
                 left={i === 0}
                 right={i === 1}
               >
-                <ButtonPrimaryIcon
+                <ButtonDefaultWithIcon
                   icon={option.icon}
                   iconRight={i !== 0}
                   title={option.label}

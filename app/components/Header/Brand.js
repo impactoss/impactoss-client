@@ -6,11 +6,9 @@ export default styled.a`
   top:0;
   left:0;
   text-decoration:none;
-  color:${palette('primary', 0)}
-  font-family: ${(props) => props.theme.fonts.secondary};
-
+  color:${palette('headerBrand', 0)};
   &:hover {
-    color:${palette('primary', 0)}
+    color:${palette('headerBrandHover', 0)};
     opacity: 0.95;
   }
 `;

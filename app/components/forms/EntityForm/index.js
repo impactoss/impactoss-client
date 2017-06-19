@@ -80,7 +80,7 @@ const MultiselectActiveOptionRemove = styled(Button)`
   display: block;
   padding: 12px 16px 0 0;
   &:hover {
-    color: ${palette('primary', 0)}
+    color: ${palette('primary', 1)}
   }
 `;
 const MultiSelectDropdownIcon = styled.div`
@@ -110,7 +110,7 @@ const MultiSelectWithout = styled.div`
 const MultiSelectWithoutLink = styled(A)`
   color: ${palette('dark', 3)};
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${palette('linkDefault', 1)};
   }
 `;
 

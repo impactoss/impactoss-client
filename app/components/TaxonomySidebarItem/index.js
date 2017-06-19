@@ -7,19 +7,20 @@ import Button from 'components/buttons/Button';
 
 import appMessages from 'containers/App/messages';
 
-
+// TODO compare EntityListSidebarOption
 const Styled = styled(Button)`
   padding: 1em;
   width: 100%;
-  background-color: ${(props) => props.active ? palette('primary', 0) : palette('primary', 4)};
-  color:  ${(props) => props.active ? palette('primary', 4) : palette('dark', 2)};
   padding: 0.5em;
-  &:hover {
-    color: ${(props) => props.active ? palette('primary', 4) : palette('dark', 0)};
-    background-color: ${(props) => props.active ? palette('primary', 1) : palette('primary', 4)};
-  }
   text-align: left;
-  border-bottom: 1px solid ${palette('light', 0)}
+  color:  ${(props) => props.active ? palette('asideCatNavItem', 1) : palette('asideCatNavItem', 0)};
+  background-color: ${(props) => props.active ? palette('asideCatNavItem', 3) : palette('asideCatNavItem', 2)};
+  border-bottom: 1px solid ${palette('asideCatNavItem', 4)};
+  &:hover {
+    color: ${(props) => props.active ? palette('asideCatNavItemHover', 1) : palette('asideCatNavItemHover', 0)};
+    background-color: ${(props) => props.active ? palette('asideCatNavItemHover', 3) : palette('asideCatNavItemHover', 2)};
+    border-bottom-color: ${palette('asideCatNavItemHover', 4)}
+  }
 `;
 
 const TaxTitle = styled.span`
