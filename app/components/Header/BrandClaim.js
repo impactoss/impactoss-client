@@ -2,8 +2,14 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 export default styled.div`
-  font-size: 0.85em;
+  display: inline-block;
   padding: 2px 5px;
-  color: ${palette('secondary', 0)};
-  background-color: ${palette('primary', 2)};
+  font-family: ${(props) => props.theme.fonts.headerBrandClaim};
+  font-size: ${(props) => props.theme.sizes.headerBrandClaim};
+  background-color: ${palette('header', 0)};
+  color: ${palette('headerBrand', 1)};
+  &:hover {
+    color:${palette('headerBrandHover', 1)}
+    opacity: 0.95;
+  }
 `;

@@ -16,7 +16,7 @@ import LinkPage from './LinkPage';
 import BrandTitle from './BrandTitle';
 
 const Styled = styled.div`
-  background-color: ${palette('primary', 2)};
+  background-color: ${palette('secondary', 1)};
   color: ${palette('primary', 4)};
 `;
 const Main = styled.div`

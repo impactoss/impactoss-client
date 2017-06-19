@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import ButtonPrimary from '../ButtonPrimary';
+import ButtonDefault from '../ButtonDefault';
 
-const ButtonHero = styled(ButtonPrimary)`
+const ButtonHero = styled(ButtonDefault)`
   font-size: 1.25em;
 `;
 
