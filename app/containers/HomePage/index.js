@@ -100,16 +100,16 @@ const TopActions = styled.div`
   padding-top: 2em;
 `;
 const Title = styled.h1`
-  color:${palette('primary', 1)}
-  font-family: ${(props) => props.theme.fonts.secondary};
+  color:${palette('headerBrand', 0)}
+  font-family: ${(props) => props.theme.fonts.headerBrandMain};
   text-transform: uppercase;
   margin-bottom:0;
   font-size: 2.8em
 `;
 
 const Claim = styled.p`
-  color: ${palette('primary', 2)};
-  font-family: ${(props) => props.theme.fonts.secondary};
+  color: ${palette('headerBrand', 1)};
+  font-family: ${(props) => props.theme.fonts.headerBrandClaim};
   font-size: 1.25em;
   width: 40%;
   margin-left: auto;
