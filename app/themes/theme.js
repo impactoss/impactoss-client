@@ -11,34 +11,34 @@ theme.breakpoints = {
 };
 
 // global color palettes
-// primary palette
-// 0: main colour, used for links and navigation elements
-// 1: main colour, darker, used for links and navigation elements, hover
-// 2: main header colour
-// 3: main header colour, lighter
+// primary color palette: dark to light
+// 0: main colour, darker, used for links and navigation elements, hover
+// 1: main colour, used for links and navigation elements
+// 2: main colour, light
+// 3: main colour, lighter (UNUSED)
 // 4: white
-const primary = coolorsToHex('https://coolors.co/eb6e51-d66149-182635-34404d-ffffff');
-  // secondary palette
-  // 0: secondary colour, light
-  // 1: secondary colour, lighter
-  // 2: secondary header colour, darker
+const primary = coolorsToHex('https://coolors.co/d66149-eb6e51-ff9b69-ffb996-ffffff');
+  // secondary color palette: dark to light
+  // 0: dark header colour, darker
+  // 1: dark header colour
+  // 2: dark header colour, lighter (UNUSED)
   // 3: white/placeholder
   // 4: white/placeholder
-const secondary = coolorsToHex('https://coolors.co/ff9b69-ffb996-162331-ffffff-ffffff');
-// grayscale
+const secondary = coolorsToHex('https://coolors.co/162331-182635-34404d-ffffff-ffffff');
+// dark grayscale: dark to light
 // 0:  darkest
 // 1:  darker
 // 2:  dark
 // 3:  medium gray 1 (AA conform)
 // 4:  medium gray 2 (AA large conform on white)
-const darkGrays = coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395');
-// grayscale
+const dark = coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395');
+// light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js
 // 1:  light gray (light lines, navigation filter panel)
 // 2:  gray 1 (gray pattern)
 // 3:  gray 2 (icons light)
 // 4:  gray 3 (dark lines)
-const lightGrays = coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad');
+const light = coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad');
 
 // other palettes (not currently used)
 const danger = coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478');
@@ -53,10 +53,10 @@ theme.palette = {
   // global theme colours
   primary,
   secondary,
-  dark: darkGrays,
-  light: lightGrays,
+  dark,
+  light,
 
-  // other palettes
+  // other palettes (not currently used)
   danger,
   success,
   alert,
@@ -93,63 +93,70 @@ theme.palette = {
   //
 
   // header: [ '#bg' ],
-  header: ['#bg'],
+  header: [secondary[1]],
 
   // headerBrand: [ '#title', '#claim' ],
-  headerBrand: ['#eb6e51', '#claim'],
-  headerBrandHover: ['#title', '#claim'],
+  headerBrand: [primary[1], primary[2]],
+  headerBrandHover: [primary[1], primary[2]], // WARNING component sets opacity
 
   // headerNavPages: [ '#bg' ],
-  headerNavPages: ['#bg'],
+  headerNavPages: [secondary[1]],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
-  headerNavPagesItem: ['#color', '#colorActive', '#bg', '#bgActive'],
-  headerNavPagesItemHover: ['#color', '#eb6e51', '#bg', '#bgactive'],
+  headerNavPagesItem: [light[3], light[2], 'transparent', 'transparent'],
+  headerNavPagesItemHover: [primary[4], primary[4], 'transparent', 'transparent'],
 
   // headerNavAccount: [ '#bg' ],
-  headerNavAccount: ['#bg'],
-  // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive' ]
-  headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
-  headerNavAccountItemHover: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
+  headerNavAccount: ['transparent'],
+  // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border' ]
+  headerNavAccountItem: [primary[4], primary[4], primary[0], primary[0], primary[1]],
+  headerNavAccountItemHover: [primary[4], primary[4], primary[1], primary[1], primary[1]],
 
-  // headerNavMain: [ '#bg' ],
-  headerNavMain: ['#bg'],
+  // headerNavMain: [ '#bg', '#border'  ],
+  headerNavMain: [secondary[1], secondary[0]],
   // headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
-  headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
-  headerNavMainItemHover: ['#color', '#colorActive', '#bg', '#bgActive'],
+  headerNavMainItem: [light[2], primary[0], 'transparent', 'transparent'],
+  headerNavMainItemHover: [primary[1], primary[1], 'transparent', 'transparent'],
 
   //
+  // SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
+  //
+  // aside: ['#bg']
+  aside: [primary[4]],
+
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
-  //
-  // asideCatNav: ['#bg']
-  asideCatNav: ['#bg'],
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
-  asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
-  asideCatNavItemHover: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
+  asideCatNavItem: [dark[2], primary[4], primary[4], primary[1], light[0]],
+  asideCatNavItemHover: [dark[0], primary[4], primary[4], primary[0], light[0]],
 
-  //
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
-  //
-  // asideCatNav: ['#bg']
-  asideList: ['#bg'],
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
-  asideListItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
-  asideListItemHover: ['#color', '#active', '#bg', '#bgactive', '#border'],
+  asideListItem: [dark[1], primary[4], primary[4], dark[2], light[0]],
+  asideListItemHover: [dark[3], primary[4], primary[4], dark[2], light[0]],
 
   //
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary'],
-  buttonFlat: ['#colorPrimary', '#colorSecondary'],
-  buttonFlatHover: ['#colorPrimary', '#colorSecondary'],
+  buttonFlat: [primary[1], dark[3]],
+  buttonFlatHover: [primary[0], primary[1]],
   // buttonDefault: ['#text', '#bg'],
-  buttonDefault: ['#colorPrimary', '#colorSecondary', '#bgPrimary', '#bgSecondary'],
-  buttonDefaultHover: ['#colorPrimary', '#colorSecondary', '#bgPrimary', '#bgSecondary'],
+  buttonDefault: [primary[4], primary[1]],
+  buttonDefaultHover: [primary[4], primary[0]],
   // buttonPrimary: ['#text', '#bg', '#border'],
-  buttonIconDefault: ['#color', '#bg', '#border'],
-  buttonIconDefaultHover: ['#color', '#bg', '#border'],
+  buttonDefaultIconOnly: [primary[4], primary[1], primary[1]],
+  buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],
+  // buttonSecondary: ['#text', '#bg'],
+  buttonSecondary: [secondary[4], secondary[1]],
+  buttonSecondaryHover: [secondary[4], secondary[0]],
+  // buttonToggleInactive: ['#color', '#bg'],
+  buttonToggleInactive: [dark[1], light[1]],
+  buttonToggleInactiveHover: [dark[1], primary[4]],
   // links
-  link: ['#colorPrimary', '#colorSecondary'],
-  linkHover: ['#colorPrimary', '#colorSecondary'],
+  // also see global-styles.js for default link "a"
+  linkDefault: [primary[1]],
+  linkDefaultHover: [primary[0]],
+  linkSecondary: [secondary[1]],
+  linkSecondaryHover: [secondary[0]],
 
 };
 
@@ -165,9 +172,9 @@ theme.fonts = {
 
 // sizes
 theme.sizes = {
-  h1: '2em',
-  headerBrandMain: '2em',
-  headerBrandClaim: '1em',
+  // also see global-styles.js for other sizes
+  headerBrandMain: '2.6em',
+  headerBrandClaim: '0.85em',
 };
 
 // end styled-theme settings

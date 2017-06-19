@@ -26,9 +26,9 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
   top: 0.5em;
   font-weight: bold;
   padding: 0 0.5em;
-  color: ${palette('primary', 0)};
+  color: ${palette('linkDefault', 0)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('linkDefaultHover', 0)};
   }
   &:last-child {
     padding: 0 0 0 0.5em;

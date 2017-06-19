@@ -2,10 +2,10 @@ import React, { PropTypes } from 'react';
 import styled from 'styled-components';
 // import { palette } from 'styled-theme';
 
-import ButtonPrimary from 'components/buttons/ButtonPrimary';
+import ButtonDefault from 'components/buttons/ButtonDefault';
 import Icon from 'components/Icon';
 
-const Button = styled(ButtonPrimary)`
+const Button = styled(ButtonDefault)`
   padding: 0.25em 1em 0.25em 1.25em;
   width: ${(props) => props.fullWidth ? '100%' : 'auto'};
   min-height: 3em;
@@ -14,7 +14,7 @@ const Button = styled(ButtonPrimary)`
   font-weight: ${(props) => props.strong ? 'bold' : 'normal'};
 `;
 
-class ButtonPrimaryIcon extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class ButtonDefaultWithIcon extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     const { icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong } = this.props;
@@ -39,7 +39,7 @@ class ButtonPrimaryIcon extends React.Component { // eslint-disable-line react/p
     );
   }
 }
-ButtonPrimaryIcon.propTypes = {
+ButtonDefaultWithIcon.propTypes = {
   title: PropTypes.string.isRequired,
   icon: PropTypes.string,
   onClick: PropTypes.func,
@@ -51,7 +51,7 @@ ButtonPrimaryIcon.propTypes = {
   align: PropTypes.string,
 };
 
-ButtonPrimaryIcon.defaultProps = {
+ButtonDefaultWithIcon.defaultProps = {
   iconRight: true,
   fullWidth: false,
   disabled: false,
@@ -60,4 +60,4 @@ ButtonPrimaryIcon.defaultProps = {
   align: 'center',
 };
 
-export default ButtonPrimaryIcon;
+export default ButtonDefaultWithIcon;

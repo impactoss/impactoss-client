@@ -6,5 +6,6 @@ export default styled.div`
   text-align: center;
   border-top: 1px solid;
   border-bottom: 1px solid;
-  border-color: ${(props) => props.hasBorder ? palette('secondary', 2) : 'transparent'};
+  border-color: ${(props) => props.hasBorder ? palette('headerNavMain', 1) : 'transparent'};
+  background-color: ${palette('headerNavMain', 0)};
 `;

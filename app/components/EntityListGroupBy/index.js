@@ -27,13 +27,13 @@ const Select = styled.select`
 `;
 const Option = styled.option`
   color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 4) : palette('dark', 2)};
-  background-color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 0) : palette('primary', 4)};
+  background-color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 1) : palette('primary', 4)};
 `;
-// color: ${palette('primary', 0)};
+// color: ${palette('primary', 1)};
 const Reset = styled(ButtonSimple)`
   padding: 0 0.5em;
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${palette('primary', 1)};
   }
   margin-right: 20px;
   font-weight: bold;

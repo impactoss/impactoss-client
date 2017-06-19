@@ -3,7 +3,7 @@ import { palette } from 'styled-theme';
 
 import Button from '../Button';
 
-const ButtonFilterTagInverse = styled(Button)`
+const ButtonTagFilterInverse = styled(Button)`
   color: ${(props) => palette(props.palette, props.pIndex || 0)};
   background-color: ${palette('primary', 4)};
   padding: 1px 6px;
@@ -17,4 +17,4 @@ const ButtonFilterTagInverse = styled(Button)`
   }
 `;
 
-export default ButtonFilterTagInverse;
+export default ButtonTagFilterInverse;

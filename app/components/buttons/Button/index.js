@@ -13,7 +13,6 @@ const Button = styled.button`
   vertical-align: middle;
   -ms-touch-action: manipulation;
   touch-action: manipulation;
-  cursor: pointer;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;

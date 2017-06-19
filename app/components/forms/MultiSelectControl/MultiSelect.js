@@ -6,7 +6,7 @@ import { palette } from 'styled-theme';
 
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
-import ButtonText from 'components/buttons/ButtonText';
+import ButtonFlat from 'components/buttons/ButtonFlat';
 
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
@@ -50,7 +50,7 @@ const HeaderButton = styled(Button)`
   bottom:0;
   padding-right:;
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${palette('primary', 1)};
   }
 `;
 
@@ -242,14 +242,14 @@ export default class MultiSelect extends React.Component {
   );
 
   renderButton = (action, i) => (
-    <ButtonText
+    <ButtonFlat
       primary={action.type === 'primary'}
       key={i}
       onClick={action.onClick && (() => action.onClick())}
       type={action.submit ? 'submit' : 'button'}
     >
       {action.title}
-    </ButtonText>
+    </ButtonFlat>
   );
 
   render() {

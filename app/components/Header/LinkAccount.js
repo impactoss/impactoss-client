@@ -4,14 +4,22 @@ import { palette } from 'styled-theme';
 import Link from './Link';
 
 export default styled(Link)`
-  color:${palette('primary', 4)};
-  background-color:${palette('primary', 1)};
-
+  color:${(props) => props.active ? palette('headerNavAccountItem', 1) : palette('headerNavAccountItem', 0)};
+  background-color:${(props) => props.active ? palette('headerNavAccountItem', 3) : palette('headerNavAccountItem', 2)};
   &:hover {
-    background-color:${palette('primary', 0)};
-    color:${palette('primary', 4)};
+    color:${(props) => props.active ? palette('headerNavAccountItemHover', 1) : palette('headerNavAccountItemHover', 0)};
+    background-color:${(props) => props.active ? palette('headerNavAccountItemHover', 3) : palette('headerNavAccountItemHover', 2)};
   }
-  &:first-child {
-    border-right: 1px solid ${palette('primary', 0)};
+
+  border-right: 1px solid ${palette('headerNavAccountItem', 4)};
+  &:hover {
+    border-right: 1px solid ${palette('headerNavAccountItemHover', 4)};
+  }
+
+  &:last-child {
+    border-right: none;
+    &:hover {
+      border-right: none;
+    }
   }
 `;
