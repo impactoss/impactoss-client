@@ -1,5 +1,4 @@
 import coolorsToHex from 'coolors-to-hex';
-import { reversePalette } from 'styled-theme/composer';
 
 const theme = {};
 
@@ -11,46 +10,56 @@ theme.breakpoints = {
   large: '1200px',
 };
 
-
-// styled-theme settings https://github.com/diegohaz/styled-theme
-
-// colour palettes, usage:
-//   import { palette } from 'styled-theme';
-//   color: ${palette('primary', 0)}
-theme.palette = {
-  // theme colours
-  //
-  // primary palette
-  // 0: main colour, used for links and navigation elements
-  // 1: main colour, darker, used for links and navigation elements, hover
-  // 2: main header colour
-  // 3: main header colour, lighter
-  // 4: white
-  primary: coolorsToHex('https://coolors.co/eb6e51-d66149-182635-34404d-ffffff'),
-
+// global color palettes
+// primary palette
+// 0: main colour, used for links and navigation elements
+// 1: main colour, darker, used for links and navigation elements, hover
+// 2: main header colour
+// 3: main header colour, lighter
+// 4: white
+const primary = coolorsToHex('https://coolors.co/eb6e51-d66149-182635-34404d-ffffff');
   // secondary palette
   // 0: secondary colour, light
   // 1: secondary colour, lighter
   // 2: secondary header colour, darker
   // 3: white/placeholder
   // 4: white/placeholder
-  secondary: coolorsToHex('https://coolors.co/ff9b69-ffb996-162331-ffffff-ffffff'),
+const secondary = coolorsToHex('https://coolors.co/ff9b69-ffb996-162331-ffffff-ffffff');
+// grayscale
+// 0:  darkest
+// 1:  darker
+// 2:  dark
+// 3:  medium gray 1 (AA conform)
+// 4:  medium gray 2 (AA large conform on white)
+const darkGrays = coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395');
+// grayscale
+// 0:  lightest gray (background colour) - also used in global-styles.js
+// 1:  light gray (light lines, navigation filter panel)
+// 2:  gray 1 (gray pattern)
+// 3:  gray 2 (icons light)
+// 4:  gray 3 (dark lines)
+const lightGrays = coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad');
 
-  // greyscale
-  // 0:  darkest (sadata black)
-  // 1:  dark (sadata dark grey)
-  // 2:  almost dark (sadata medium grey)
-  // 3:  medium grey 1 (AA conform)
-  // 4:  medium grey 2 (AA large conform on white)
-  dark: coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395'),
+// other palettes (not currently used)
+const danger = coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478');
+const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-fff2ce');
+const success = coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-c8e6c9');
 
-  // greyscale
-  // 0:  lightest grey (background colour) - also used in global-styles.js
-  // 1:  light grey (light lines, navigation filter panel)
-  // 2:  grey 1 (grey pattern)
-  // 3:  grey 2 (icons light)
-  // 4:  grey 3 (dark lines)
-  light: coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad'),
+// colour palettes, usage:
+//   import { palette } from 'styled-theme';
+//   color: ${palette('primary', 0)}
+// styled-theme settings https://github.com/diegohaz/styled-theme
+theme.palette = {
+  // global theme colours
+  primary,
+  secondary,
+  dark: darkGrays,
+  light: lightGrays,
+
+  // other palettes
+  danger,
+  success,
+  alert,
 
   // taxonomy/category colours
   // 0: default/fallback
@@ -78,12 +87,71 @@ theme.palette = {
   attributes: ['#6C787A'],
   attributesHover: ['#4A595C'],
 
-  // other palettes
-  danger: coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478'),
-  alert: coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-fff2ce'),
-  success: coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-c8e6c9'),
+
+  //
+  // HEADER "PALETTES" //////////////////////////////////////////////////////////////
+  //
+
+  // header: [ '#bg' ],
+  header: ['#bg'],
+
+  // headerBrand: [ '#title', '#claim' ],
+  headerBrand: ['#eb6e51', '#claim'],
+  headerBrandHover: ['#title', '#claim'],
+
+  // headerNavPages: [ '#bg' ],
+  headerNavPages: ['#bg'],
+  // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
+  headerNavPagesItem: ['#color', '#colorActive', '#bg', '#bgActive'],
+  headerNavPagesItemHover: ['#color', '#eb6e51', '#bg', '#bgactive'],
+
+  // headerNavAccount: [ '#bg' ],
+  headerNavAccount: ['#bg'],
+  // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive' ]
+  headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
+  headerNavAccountItemHover: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
+
+  // headerNavMain: [ '#bg' ],
+  headerNavMain: ['#bg'],
+  // headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
+  headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
+  headerNavMainItemHover: ['#color', '#colorActive', '#bg', '#bgActive'],
+
+  //
+  // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
+  //
+  // asideCatNav: ['#bg']
+  asideCatNav: ['#bg'],
+  // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
+  asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
+  asideCatNavItemHover: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
+
+  //
+  // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
+  //
+  // asideCatNav: ['#bg']
+  asideList: ['#bg'],
+  // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
+  asideListItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
+  asideListItemHover: ['#color', '#active', '#bg', '#bgactive', '#border'],
+
+  //
+  // BUTTONS / LINKS
+  //
+  // button: ['#colorPrimary', '#colorSecondary'],
+  buttonFlat: ['#colorPrimary', '#colorSecondary'],
+  buttonFlatHover: ['#colorPrimary', '#colorSecondary'],
+  // buttonDefault: ['#text', '#bg'],
+  buttonDefault: ['#colorPrimary', '#colorSecondary', '#bgPrimary', '#bgSecondary'],
+  buttonDefaultHover: ['#colorPrimary', '#colorSecondary', '#bgPrimary', '#bgSecondary'],
+  // buttonPrimary: ['#text', '#bg', '#border'],
+  buttonIconDefault: ['#color', '#bg', '#border'],
+  buttonIconDefaultHover: ['#color', '#bg', '#border'],
+  // links
+  link: ['#colorPrimary', '#colorSecondary'],
+  linkHover: ['#colorPrimary', '#colorSecondary'],
+
 };
-theme.reversePalette = reversePalette(theme.palette);
 
 // fonts
 theme.fonts = {
@@ -91,11 +159,15 @@ theme.fonts = {
   secondary: 'Rubik, Helvetica, Arial, sans-serif', // used for brand title, claim, nav items, buttons and labels
   pre: 'Consolas, Liberation Mono, Menlo, Courier, monospace',
   quote: 'Georgia, serif',
+  headerBrandMain: 'Rubik, Helvetica, Arial, sans-serif',
+  headerBrandClaim: 'Rubik, Helvetica, Arial, sans-serif',
 };
 
 // sizes
 theme.sizes = {
   h1: '2em',
+  headerBrandMain: '2em',
+  headerBrandClaim: '1em',
 };
 
 // end styled-theme settings

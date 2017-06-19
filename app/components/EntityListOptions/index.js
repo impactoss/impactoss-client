@@ -19,7 +19,7 @@ const Styled = styled.div`
   padding: 0.5em 0;
   position: relative;
 `;
-
+// TODO treat as regular link
 const ListEntitiesHeaderOptionLink = styled(Button)`
   position: absolute;
   right: 0;

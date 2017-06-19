@@ -9,8 +9,6 @@ import Helmet from 'react-helmet';
 
 import { logout } from 'containers/App/actions';
 
-import Page from 'components/Page';
-
 import messages from './messages';
 
 export class UserLogout extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -31,11 +29,6 @@ export class UserLogout extends React.PureComponent { // eslint-disable-line rea
             },
           ]}
         />
-        <Page
-          title={this.context.intl.formatMessage(messages.pageTitle)}
-        >
-          <FormattedMessage {...messages.header} />
-        </Page>
       </div>
     );
   }
