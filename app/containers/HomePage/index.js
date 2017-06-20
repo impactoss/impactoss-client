@@ -42,7 +42,7 @@ import messages from './messages';
 const SectionTop = styled(Section)`
   text-align: center;
   min-height: 100vH;
-  margin-top: -115px;
+  margin-top: -150px;
   padding-top: 130px;
 `;
 const ButtonIconOnly = styled(Button)`
