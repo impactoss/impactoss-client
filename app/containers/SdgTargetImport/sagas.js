@@ -7,7 +7,7 @@ import { SAVE } from './constants';
 
 export function* save({ data }) {
   yield put(newEntity({
-    path: 'measures',
+    path: 'sdgtargets',
     entity: data,
     redirect: false,
     timestamp: Date.now(),

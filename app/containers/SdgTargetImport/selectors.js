@@ -3,10 +3,10 @@ import { createSelector } from 'reselect';
 /**
  * Direct selector to the actionImport state domain
  */
-const selectViewDomain = () => (state) => state.get('actionImport');
+const selectViewDomain = () => (state) => state.get('sdgtargetImport');
 
 /**
- * Default selector used by ActionImport
+ * Default selector used by SdgTargetImport
  */
 
 const viewDomainSelect = createSelector(

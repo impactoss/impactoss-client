@@ -76,7 +76,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
                 title: 'Title | text (required)',
                 number: 'Reference | text (required)',
                 accepted: 'Accepted | boolean (true/false)',
-                response: 'Response | text',
+                response: 'Response | text (markdown supported)',
               }],
             }}
           />

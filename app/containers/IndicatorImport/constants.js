@@ -1,8 +1,8 @@
 /*
  *
- * ActionImport constants
+ * IndicatorImport constants
  *
  */
 
-export const SAVE = 'nmrf/ActionImport/SAVE';
-export const RESET_FORM = 'nmrf/ActionImport/RESET_FORM';
+export const SAVE = 'nmrf/IndicatorImport/SAVE';
+export const RESET_FORM = 'nmrf/IndicatorImport/RESET_FORM';

@@ -1,6 +1,6 @@
 /*
  *
- * ActionImport
+ * SdgTargetImport
  *
  */
 
@@ -29,7 +29,7 @@ import viewDomainSelect from './selectors';
 import messages from './messages';
 import { save, resetForm } from './actions';
 
-export class ActionImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class SdgTargetImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
@@ -55,14 +55,14 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="sdgtargets"
             buttons={[{
               type: 'cancel',
               onClick: this.props.handleCancel,
             }]}
           />
           <ImportEntitiesForm
-            model="actionImport.form.data"
+            model="sdgtargetImport.form.data"
             formData={viewDomain.form.data}
             fieldModel="import"
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
@@ -71,11 +71,11 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             saveSuccess={viewDomain.page.saveSuccess}
             saveError={viewDomain.page.saveError}
             template={{
-              filename: 'actions_template.csv',
+              filename: 'sdgtargets_template.csv',
               data: [{
                 title: 'Title | text (required)',
+                reference: 'Reference | text',
                 description: 'Description | text (markdown supported)',
-                target_date: 'Target Date | date (TODO: format)',
               }],
             }}
           />
@@ -85,7 +85,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
   }
 }
 
-ActionImport.propTypes = {
+SdgTargetImport.propTypes = {
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
@@ -94,7 +94,7 @@ ActionImport.propTypes = {
   dataReady: PropTypes.bool,
 };
 
-ActionImport.contextTypes = {
+SdgTargetImport.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
@@ -119,7 +119,7 @@ function mapDispatchToProps(dispatch) {
       }
     },
     handleCancel: () => {
-      dispatch(updatePath('/actions'));
+      dispatch(updatePath('/sdgtargets'));
     },
     handleReset: () => {
       dispatch(resetForm());
@@ -127,4 +127,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionImport);
+export default connect(mapStateToProps, mapDispatchToProps)(SdgTargetImport);

@@ -1,6 +1,6 @@
 /*
  *
- * ActionImport reducer
+ * SdgTargetImport reducer
  *
  */
 
@@ -32,5 +32,5 @@ export default combineReducers({
   page: entityImportReducer, // TODO: reset_form should also reset page?
   form: combineForms({
     data: formReducer,
-  }, 'actionImport.form'),
+  }, 'sdgtargetImport.form'),
 });

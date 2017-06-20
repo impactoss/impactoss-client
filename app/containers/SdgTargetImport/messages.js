@@ -1,21 +1,21 @@
 /*
- * ActionImport Messages
+ * SdgTargetImport Messages
  *
- * This contains all the text for the ActionImport component.
+ * This contains all the text for the SdgTargetImport component.
  */
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.ActionImport.pageTitle',
-    defaultMessage: 'Import Actions',
+    id: 'app.container.SdgTargetImport.pageTitle',
+    defaultMessage: 'Import SdgTargets',
   },
   metaDescription: {
-    id: 'app.container.ActionImport.metaDescription',
-    defaultMessage: 'Import Actions page description',
+    id: 'app.container.SdgTargetImport.metaDescription',
+    defaultMessage: 'Import SdgTargets page description',
   },
   header: {
-    id: 'app.containers.ActionImport.header',
-    defaultMessage: 'Import Actions',
+    id: 'app.containers.SdgTargetImport.header',
+    defaultMessage: 'Import SdgTargets',
   },
 });
