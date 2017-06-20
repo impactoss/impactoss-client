@@ -74,7 +74,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
               filename: 'recommendations_template.csv',
               data: [{
                 title: 'Title | text (required)',
-                number: 'Reference | text (required)',
+                reference: 'Reference | text (required)',
                 accepted: 'Accepted | boolean (true/false)',
                 response: 'Response | text (markdown supported)',
               }],
