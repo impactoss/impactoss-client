@@ -89,7 +89,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       },
     ];
 
-  getBodyMainFields = (entity, recommendations, actions, taxonomies) => {
+  getBodyMainFields = (entity, recommendations, actions, taxonomies, sdgtargets) => {
     const fields = [];
     if (entity.attributes.description && entity.attributes.description.trim().length > 0) {
       fields.push({
@@ -142,6 +142,21 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         }],
       });
     }
+    if (entity.taxonomy.attributes.tags_sdgtargets) {
+      connectionGroup.fields.push({
+        type: 'connections',
+        label: `${Object.values(sdgtargets).length} ${this.context.intl.formatMessage(Object.values(sdgtargets).length === 1 ? appMessages.entities.sdgtargets.single : appMessages.entities.sdgtargets.plural)}`,
+        entityType: 'sdgtargets',
+        values: Object.values(sdgtargets),
+        icon: 'sdgtargets',
+        entityPath: '/sdgtargets/',
+        taxonomies,
+        connectionOptions: [{
+          label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+          path: 'indicators',
+        }],
+      });
+    }
     fields.push(connectionGroup);
     return fields;
   };
@@ -173,13 +188,13 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     return fields;
   }
 
-  getFields = (entity, isManager, recommendations, actions, taxonomies) => ({
+  getFields = (entity, isManager, recommendations, actions, taxonomies, sdgtargets) => ({
     header: {
       main: this.getHeaderMainFields(entity, isManager),
       aside: this.getHeaderAsideFields(entity, isManager),
     },
     body: {
-      main: this.getBodyMainFields(entity, recommendations, actions, taxonomies),
+      main: this.getBodyMainFields(entity, recommendations, actions, taxonomies, sdgtargets),
       aside: this.getBodyAsideFields(entity, isManager),
     },
   });
@@ -197,7 +212,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       : urlNoProtocol;
   }
   render() {
-    const { category, dataReady, isManager, recommendations, actions, taxonomies } = this.props;
+    const { category, dataReady, isManager, recommendations, actions, taxonomies, sdgtargets } = this.props;
 
     const buttons = dataReady && isManager
     ? [
@@ -239,7 +254,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             </div>
           }
           { category && dataReady &&
-            <EntityView fields={this.getFields(category, isManager, recommendations, actions, taxonomies)} />
+            <EntityView fields={this.getFields(category, isManager, recommendations, actions, taxonomies, sdgtargets)} />
           }
         </Content>
       </div>
@@ -258,6 +273,7 @@ CategoryView.propTypes = {
   actions: PropTypes.object,
   recommendations: PropTypes.object,
   taxonomies: PropTypes.object,
+  sdgtargets: PropTypes.object,
 };
 
 CategoryView.contextTypes = {
@@ -277,6 +293,9 @@ const mapStateToProps = (state, props) => ({
     'measures',
     'measure_indicators',
     'measure_categories',
+    'sdgtargets',
+    'sdgtarget_indicators',
+    'sdgtarget_categories',
     'indicators',
   ] }),
   category: getEntity(
@@ -383,6 +402,39 @@ const mapStateToProps = (state, props) => ({
       ],
     },
   ),
+  // all connected actions
+  sdgtargets: getEntities(
+    state, {
+      path: 'sdgtargets',
+      out: 'js',
+      connected: {
+        path: 'sdgtarget_categories',
+        key: 'sdgtarget_id',
+        where: {
+          category_id: props.params.id,
+        },
+      },
+      extend: [
+        {
+          path: 'sdgtarget_categories',
+          key: 'sdgtarget_id',
+          reverse: true,
+          as: 'taxonomies',
+        },
+        {
+          path: 'sdgtarget_indicators',
+          key: 'sdgtarget_id',
+          reverse: true,
+          as: 'indicators',
+          connected: {
+            path: 'indicators',
+            key: 'indicator_id',
+            forward: true,
+          },
+        },
+      ],
+    },
+  ),
   taxonomies: getEntities(
     state, {
       out: 'js',
@@ -401,10 +453,13 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('sdgtargets'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));

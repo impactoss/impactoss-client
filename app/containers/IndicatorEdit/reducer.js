@@ -23,7 +23,9 @@ const formInitial = fromJS({
     start_date: '',
     repeat: '',
     end_date: '',
+    reference: '',
   },
+  associatedSdgTargets: [],
   associatedActions: [],
   associatedUser: [],
 });

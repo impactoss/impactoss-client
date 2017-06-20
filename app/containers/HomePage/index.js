@@ -17,6 +17,7 @@ import {
   isReady,
 } from 'containers/App/selectors';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { scrollToComponent } from 'utils/scroll-to-component';
 
 import Button from 'components/buttons/Button';
 import ButtonHero from 'components/buttons/ButtonHero';
@@ -45,9 +46,9 @@ const SectionTop = styled(Section)`
   padding-top: 130px;
 `;
 const ButtonIconOnly = styled(Button)`
-  color: ${palette('primary', 0)};
+  color: ${palette('primary', 1)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('primary', 0)};
   }
 `;
 const ButtonIconWrap = styled.div`
@@ -61,9 +62,9 @@ const ButtonIconAbove = styled(Button)`
   }
 `;
 const ButtonIconAboveMore = styled(Button)`
-  color: ${palette('primary', 0)};
+  color: ${palette('primary', 1)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('primary', 0)};
   }
   min-width: 200px;
   margin: 0 30px;
@@ -78,7 +79,7 @@ const SectionCategories = styled(Section)`
 `;
 const SectionAction = styled(Section)`
   color: ${palette('primary', 4)};
-  background-color: ${palette('primary', 0)};
+  background-color: ${palette('primary', 1)};
 `;
 const SectionMore = styled(Section)`
   color: ${palette('dark', 3)};
@@ -99,7 +100,7 @@ const TopActions = styled.div`
   padding-top: 2em;
 `;
 const Title = styled.h1`
-  color:${palette('primary', 0)}
+  color:${palette('primary', 1)}
   font-family: ${(props) => props.theme.fonts.secondary};
   text-transform: uppercase;
   margin-bottom:0;
@@ -107,7 +108,7 @@ const Title = styled.h1`
 `;
 
 const Claim = styled.p`
-  color: ${palette('secondary', 0)};
+  color: ${palette('primary', 2)};
   font-family: ${(props) => props.theme.fonts.secondary};
   font-size: 1.25em;
   width: 40%;
@@ -140,12 +141,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
       title: page.attributes.menu_title || page.attributes.title,
     }));
 
-  scrollToComponent = (ref) => {
-    const target = this[ref].getBoundingClientRect().top;
-    window.scrollTo(0, window.scrollY + target);
-  }
-
-
   render() {
     const { dataReady, onPageLink, pages, taxonomies } = this.props;
 
@@ -170,12 +165,12 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           </Intro>
           <TopActions>
             <div>
-              <ButtonHero onClick={() => this.scrollToComponent('SectionCategories')}>
+              <ButtonHero onClick={() => scrollToComponent(this.SectionCategories)}>
                 <FormattedMessage {...messages.explore} />
               </ButtonHero>
             </div>
             <ButtonIconWrap>
-              <ButtonIconOnly onClick={() => this.scrollToComponent('SectionCategories')}>
+              <ButtonIconOnly onClick={() => scrollToComponent(this.SectionCategories)}>
                 <Icon name="arrowDown" size={'2.5em'} />
               </ButtonIconOnly>
             </ButtonIconWrap>

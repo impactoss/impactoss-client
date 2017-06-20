@@ -9,6 +9,10 @@ export default defineMessages({
     id: 'app.containers.EntityListGroup.groupBy',
     defaultMessage: 'Group by',
   },
+  subgroupBy: {
+    id: 'app.containers.EntityListGroup.subgroupBy',
+    defaultMessage: 'Subgroup by',
+  },
   placeholder: {
     id: 'app.containers.EntityListGroup.placeholder',
     defaultMessage: 'Select category',

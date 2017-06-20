@@ -3,6 +3,9 @@ coverage
 build
 node_modules
 stats.json
+functions
+firebase.json
+.firebaserc
 
 # Cruft
 .DS_Store

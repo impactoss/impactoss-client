@@ -10,7 +10,7 @@ import EntityListNestedList from './EntityListNestedList';
 import EntityListNestedReportList from './EntityListNestedReportList';
 
 const Styled = styled.div`
-  padding: ${(props) => props.separated ? '1em 0 0' : '0'};
+  padding: ${(props) => props.separated ? '1em 0 2em' : '0 0 2em'};
 `;
 const ItemWrapper = styled.div`
   border-top: 1px solid;
@@ -87,7 +87,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
     return {
       id: entity.id,
       title: entity.attributes.name || entity.attributes.title,
-      reference: entity.attributes.number || entity.id,
+      reference: entity.attributes.number || entity.attributes.reference || entity.id,
       linkTo: `${entityLinkTo}${entity.id}`,
       status: entity.attributes.draft ? 'draft' : null,
       targetDate: entity.attributes.target_date ? this.context.intl.formatDate(new Date(entity.attributes.target_date)) : null,

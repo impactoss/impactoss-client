@@ -3,10 +3,10 @@ import React, { PropTypes } from 'react';
 import Icon from 'components/Icon';
 import appMessages from 'containers/App/messages';
 
-import ButtonPrimaryIcon from '../ButtonPrimaryIcon';
-import ButtonPrimary from '../ButtonPrimary';
-import ButtonText from '../ButtonText';
-import ButtonIconPrimary from '../ButtonIconPrimary';
+import ButtonDefaultWithIcon from '../ButtonDefaultWithIcon';
+import ButtonDefault from '../ButtonDefault';
+import ButtonFlat from '../ButtonFlat';
+import ButtonDefaultIconOnly from '../ButtonDefaultIconOnly';
 
 class ButtonFactory extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -16,13 +16,13 @@ class ButtonFactory extends React.Component { // eslint-disable-line react/prefe
     switch (button.type) {
       case 'primary' :
         return (
-          <ButtonPrimary onClick={() => button.onClick()}>
+          <ButtonDefault onClick={() => button.onClick()}>
             {button.title}
-          </ButtonPrimary>
+          </ButtonDefault>
         );
       case 'add' :
         return (
-          <ButtonPrimaryIcon
+          <ButtonDefaultWithIcon
             onClick={() => button.onClick()}
             icon="add"
             title={button.title || this.context.intl.formatMessage(appMessages.buttons.add)}
@@ -30,43 +30,43 @@ class ButtonFactory extends React.Component { // eslint-disable-line react/prefe
         );
       case 'save' :
         return (
-          <ButtonText primary onClick={() => button.onClick()}>
+          <ButtonFlat primary onClick={() => button.onClick()}>
             {button.title || this.context.intl.formatMessage(appMessages.buttons.save)}
-          </ButtonText>
+          </ButtonFlat>
         );
       case 'cancel' :
         return (
-          <ButtonText onClick={() => button.onClick()}>
+          <ButtonFlat onClick={() => button.onClick()}>
             {button.title || this.context.intl.formatMessage(appMessages.buttons.cancel)}
-          </ButtonText>
+          </ButtonFlat>
         );
       case 'edit' :
         return (
-          <ButtonText onClick={() => button.onClick()}>
+          <ButtonFlat onClick={() => button.onClick()}>
             {button.title || this.context.intl.formatMessage(appMessages.buttons.edit)}
-          </ButtonText>
+          </ButtonFlat>
         );
       case 'close' :
         return (
-          <ButtonIconPrimary
+          <ButtonDefaultIconOnly
             onClick={() => button.onClick()}
             title={button.title || this.context.intl.formatMessage(appMessages.buttons.close)}
           >
             <Icon name="close" />
-          </ButtonIconPrimary>
+          </ButtonDefaultIconOnly>
         );
       case 'textPrimary' :
         return (
-          <ButtonText onClick={() => button.onClick()} primary>
+          <ButtonFlat onClick={() => button.onClick()} primary>
             {button.title}
-          </ButtonText>
+          </ButtonFlat>
         );
       case 'text' :
       default :
         return (
-          <ButtonText onClick={() => button.onClick()}>
+          <ButtonFlat onClick={() => button.onClick()}>
             {button.title}
-          </ButtonText>
+          </ButtonFlat>
         );
     }
   }

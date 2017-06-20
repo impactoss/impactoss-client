@@ -62,8 +62,8 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
               fields: [
                 {
                   type: 'reference',
-                  value: entity.id,
-                  label: this.context.intl.formatMessage(appMessages.attributes.id),
+                  value: entity.attributes.reference || entity.id,
+                  label: this.context.intl.formatMessage(appMessages.attributes.idOrRef),
                 },
                 {
                   type: 'status',
@@ -96,9 +96,9 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
             fields: [
               {
                 type: 'reference',
-                value: entity.id,
                 large: true,
-                label: this.context.intl.formatMessage(appMessages.attributes.id),
+                value: entity.attributes.reference || entity.id,
+                label: this.context.intl.formatMessage(appMessages.attributes.idOrRef),
               },
             ],
           },
@@ -107,7 +107,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     ];
   }
 
-  getBodyMainFields = (entity, actions, reports, actionTaxonomies, isContributor) => ([
+  getBodyMainFields = (entity, actions, reports, sdgtargets, actionTaxonomies, sdgtargetTaxonomies, isContributor) => ([
     {
       fields: [
         {
@@ -151,6 +151,20 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
             path: 'indicators',
           }],
         },
+        {
+          type: 'connections',
+          label: `${Object.values(sdgtargets).length} ${this.context.intl.formatMessage(Object.values(sdgtargets).length === 1 ? appMessages.entities.sdgtargets.single : appMessages.entities.sdgtargets.plural)}`,
+          entityType: 'sdgtargets',
+          values: Object.values(sdgtargets),
+          icon: 'sdgtargets',
+          entityPath: '/sdgtargets/',
+          taxonomies: sdgtargetTaxonomies,
+          showEmpty: this.context.intl.formatMessage(appMessages.entities.sdgtargets.empty),
+          connectionOptions: [{
+            label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+            path: 'indicators',
+          }],
+        },
       ],
     },
   ]);
@@ -177,13 +191,13 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     },
   ]);
 
-  getFields = (entity, isContributor, actions, reports, dates, actionTaxonomies) => ({
+  getFields = (entity, isContributor, actions, sdgtargets, reports, dates, actionTaxonomies, sdgtargetTaxonomies) => ({
     header: {
       main: this.getHeaderMainFields(entity, isContributor),
       aside: this.getHeaderAsideFields(entity, isContributor),
     },
     body: {
-      main: this.getBodyMainFields(entity, actions, reports, actionTaxonomies, isContributor),
+      main: this.getBodyMainFields(entity, actions, reports, sdgtargets, actionTaxonomies, sdgtargetTaxonomies, isContributor),
       aside: isContributor ? this.getBodyAsideFields(entity, dates) : null,
     },
   });
@@ -202,7 +216,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     }))
 
   render() {
-    const { indicator, dataReady, isContributor, actions, reports, dates, actionTaxonomies } = this.props;
+    const { indicator, dataReady, isContributor, actions, sdgtargets, reports, dates, actionTaxonomies, sdgtargetTaxonomies } = this.props;
 
     const buttons = isContributor
     ? [
@@ -250,7 +264,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
           }
           { indicator && dataReady &&
             <EntityView
-              fields={this.getFields(indicator, isContributor, actions, reports, dates, actionTaxonomies)}
+              fields={this.getFields(indicator, isContributor, actions, sdgtargets, reports, dates, actionTaxonomies, sdgtargetTaxonomies)}
             />
           }
         </Content>
@@ -268,8 +282,10 @@ IndicatorView.propTypes = {
   dataReady: PropTypes.bool,
   isContributor: PropTypes.bool,
   actions: PropTypes.object,
+  sdgtargets: PropTypes.object,
   reports: PropTypes.object,
   actionTaxonomies: PropTypes.object,
+  sdgtargetTaxonomies: PropTypes.object,
   dates: PropTypes.object,
   params: PropTypes.object,
 };
@@ -283,9 +299,11 @@ const mapStateToProps = (state, props) => ({
   isContributor: isUserContributor(state),
   dataReady: isReady(state, { path: [
     'measures',
+    'sdgtargets',
     'users',
     'indicators',
     'measure_indicators',
+    'sdgtarget_indicators',
     'progress_reports',
     'due_dates',
     'taxonomies',
@@ -330,6 +348,20 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
+  sdgtargetTaxonomies: getEntities(
+    state, {
+      out: 'js',
+      path: 'taxonomies',
+      where: {
+        tags_sdgtargets: true,
+      },
+      extend: {
+        path: 'categories',
+        key: 'taxonomy_id',
+        reverse: true,
+      },
+    },
+  ),
   // all connected actions
   actions: getEntities(
     state, {
@@ -363,6 +395,38 @@ const mapStateToProps = (state, props) => ({
         {
           path: 'measure_indicators',
           key: 'measure_id',
+          reverse: true,
+          as: 'indicators',
+          connected: {
+            path: 'indicators',
+            key: 'indicator_id',
+            forward: true,
+          },
+        },
+      ],
+    },
+  ),
+  sdgtargets: getEntities(
+    state, {
+      path: 'sdgtargets',
+      out: 'js',
+      connected: {
+        path: 'sdgtarget_indicators',
+        key: 'sdgtarget_id',
+        where: {
+          indicator_id: props.params.id,
+        },
+      },
+      extend: [
+        {
+          path: 'sdgtarget_categories',
+          key: 'sdgtarget_id',
+          reverse: true,
+          as: 'taxonomies',
+        },
+        {
+          path: 'sdgtarget_indicators',
+          key: 'sdgtarget_id',
           reverse: true,
           as: 'indicators',
           connected: {
@@ -416,6 +480,9 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('measure_categories'));
+      dispatch(loadEntitiesIfNeeded('sdgtargets'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));

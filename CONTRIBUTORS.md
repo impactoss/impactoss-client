@@ -3,6 +3,7 @@
 - tim-field
 - tony-luisi 
 - dmprk
+- dankerk
 
 ### `react-boilerplate`
 - mxstbr

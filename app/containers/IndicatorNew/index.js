@@ -81,6 +81,13 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     {
       fields: [
         {
+          id: 'number',
+          controlType: 'short',
+          model: '.attributes.reference',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.number),
+          label: this.context.intl.formatMessage(appMessages.attributes.reference),
+        },
+        {
           id: 'status',
           controlType: 'select',
           model: '.attributes.draft',

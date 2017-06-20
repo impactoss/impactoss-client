@@ -16,6 +16,7 @@ import {
   userOptions,
   entityOptions,
   renderActionControl,
+  renderSdgTargetControl,
   renderUserControl,
   validateRequired,
   validateDateFormat,
@@ -75,13 +76,15 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { actions, indicator, users } = props;
+    const { actions, indicator, users, sdgtargets } = props;
     indicator.attributes.frequency_months = indicator.attributes.frequency_months || 1;
+    indicator.attributes.reference = indicator.attributes.reference || indicator.id;
     return indicator
     ? Map({
       id: indicator.id,
       attributes: fromJS(indicator.attributes),
       associatedActions: entityOptions(actions, true),
+      associatedSdgTargets: entityOptions(sdgtargets, true),
       associatedUser: userOptions(users, indicator.attributes.manager_id),
       // TODO allow single value for singleSelect
     })
@@ -114,10 +117,10 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           controlType: 'combo',
           fields: [
             {
-              controlType: 'info',
-              type: 'reference',
-              value: entity.id,
-              label: this.context.intl.formatMessage(appMessages.attributes.id),
+              id: 'number',
+              controlType: 'short',
+              model: '.attributes.reference',
+              label: this.context.intl.formatMessage(appMessages.attributes.reference),
             },
             {
               id: 'status',
@@ -147,7 +150,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (actions) => ([
+  getBodyMainFields = (actions, sdgtargets) => ([
     {
       fields: [
         {
@@ -163,6 +166,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       icon: 'connections',
       fields: [
         renderActionControl(actions),
+        renderSdgTargetControl(sdgtargets),
       ],
     },
   ]);
@@ -222,19 +226,19 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getFields = (entity, actions, users) => ({ // isManager, taxonomies,
+  getFields = (entity, actions, sdgtargets, users) => ({ // isManager, taxonomies,
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(entity),
     },
     body: {
-      main: this.getBodyMainFields(actions),
+      main: this.getBodyMainFields(actions, sdgtargets),
       aside: this.getBodyAsideFields(entity, users),
     },
   })
 
   render() {
-    const { indicator, dataReady, viewDomain, actions, users } = this.props;
+    const { indicator, dataReady, viewDomain, actions, users, sdgtargets } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -257,7 +261,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(viewDomain.form.data, actions),
+                onClick: () => this.props.handleSubmit(viewDomain.form.data, actions, sdgtargets),
               }] : null
             }
           />
@@ -279,10 +283,10 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             <EntityForm
               model="indicatorEdit.form.data"
               formData={viewDomain.form.data}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, actions)}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, actions, sdgtargets)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(indicator, actions, users)}
+              fields={this.getFields(indicator, actions, sdgtargets, users)}
             />
           }
         </Content>
@@ -303,6 +307,7 @@ IndicatorEdit.propTypes = {
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   actions: PropTypes.object,
+  sdgtargets: PropTypes.object,
   users: PropTypes.object,
 };
 
@@ -314,10 +319,12 @@ const mapStateToProps = (state, props) => ({
   viewDomain: viewDomainSelect(state),
   dataReady: isReady(state, { path: [
     'measures',
+    'sdgtargets',
     'users',
     'user_roles',
     'indicators',
     'measure_indicators',
+    'sdgtarget_indicators',
   ] }),
 
   indicator: getEntity(
@@ -353,6 +360,22 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
+  // all recommendations, listing connection if any
+  sdgtargets: getEntities(
+    state,
+    {
+      path: 'sdgtargets',
+      extend: {
+        as: 'associated',
+        path: 'sdgtarget_indicators',
+        key: 'sdgtarget_id',
+        reverse: true,
+        where: {
+          indicator_id: props.params.id,
+        },
+      },
+    },
+  ),
 
   // all users of role contributor
   users: getEntities(
@@ -374,10 +397,12 @@ function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('sdgtargets'));
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
@@ -386,7 +411,7 @@ function mapDispatchToProps(dispatch, props) {
       // console.log('populateForm', formData)
       dispatch(formActions.load(model, formData));
     },
-    handleSubmit: (formData, actions) => {
+    handleSubmit: (formData, actions, sdgtargets) => {
       let saveData = formData
         .set(
           'measureIndicators',
@@ -396,6 +421,16 @@ function mapDispatchToProps(dispatch, props) {
             connectionAttribute: 'associatedActions',
             createConnectionKey: 'indicator_id',
             createKey: 'measure_id',
+          })
+        )
+        .set(
+          'sdgtargetIndicators',
+          getConnectionUpdatesFromFormData({
+            formData,
+            connections: sdgtargets,
+            connectionAttribute: 'associatedSdgTargets',
+            createConnectionKey: 'indicator_id',
+            createKey: 'sdgtarget_id',
           })
         );
 
@@ -408,6 +443,12 @@ function mapDispatchToProps(dispatch, props) {
       }
 
       // cleanup
+      // do not store reference when same as db id
+      if (saveData.getIn(['attributes', 'reference']) === props.params.id) {
+        saveData = saveData
+          .setIn(['attributes', 'reference'], null);
+      }
+      // do not store repeat fields when not repeat
       if (!saveData.getIn(['attributes', 'repeat'])) {
         saveData = saveData
           .setIn(['attributes', 'frequency_months'], null)

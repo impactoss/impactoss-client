@@ -5,6 +5,7 @@
  */
 import React, { PropTypes } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { find } from 'lodash/collection';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -26,20 +27,23 @@ const Select = styled.select`
 `;
 const Option = styled.option`
   color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 4) : palette('dark', 2)};
-  background-color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 0) : palette('primary', 4)};
+  background-color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 1) : palette('primary', 4)};
 `;
+// color: ${palette('primary', 1)};
 const Reset = styled(ButtonSimple)`
   padding: 0 0.5em;
-  color: ${palette('primary', 0)};
   &:hover {
     color: ${palette('primary', 1)};
   }
+  margin-right: 20px;
+  font-weight: bold;
 `;
 
 export class EntityListGroupBy extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { onChange, value } = this.props;
+    const { onChange, value, isSubgroup } = this.props;
+    const optionActive = find(this.props.options, (option) => option.value === value);
     const options = value && value !== ''
       ? this.props.options
       : [{
@@ -52,32 +56,40 @@ export class EntityListGroupBy extends React.Component { // eslint-disable-line 
         { options && options.length > 0 &&
           <span>
             <Label htmlFor="select">
-              <FormattedMessage {...messages.groupBy} />
+              { !isSubgroup &&
+                <FormattedMessage {...messages.groupBy} />
+              }
+              { isSubgroup &&
+                <FormattedMessage {...messages.subgroupBy} />
+              }
             </Label>
-            <Select
-              id="select"
-              onChange={(event) => onChange(event.target.value === value ? '' : event.target.value)}
-              value={value}
-              active={value !== ''}
-            >
-              { options.map((option, i) => (
-                <Option
-                  key={i}
-                  value={option.value}
-                  isPlaceholder={option.value === ''}
-                  default={option.default}
-                  active={option.value === value}
-                >
-                  {option.label}
-                </Option>)
-              )}
-            </Select>
+            { value === '' &&
+              <Select
+                id="select"
+                onChange={(event) => onChange(event.target.value === value ? '' : event.target.value)}
+                value={value}
+                active={value !== ''}
+              >
+                { options.map((option, i) => (
+                  <Option
+                    key={i}
+                    value={option.value}
+                    isPlaceholder={option.value === ''}
+                    default={option.default}
+                    active={option.value === value}
+                  >
+                    {option.label}
+                  </Option>
+                ))}
+              </Select>
+            }
             { value !== '' &&
               <Reset
                 title={this.context.intl.formatMessage(messages.reset)}
                 onClick={() => onChange('')}
               >
-                <Icon name="removeSmall" text />
+                {optionActive.label}
+                <Icon name="removeSmall" text textRight />
               </Reset>
             }
           </span>
@@ -91,6 +103,7 @@ EntityListGroupBy.propTypes = {
   value: PropTypes.string,
   options: PropTypes.array,
   onChange: PropTypes.func,
+  isSubgroup: PropTypes.bool,
 };
 
 EntityListGroupBy.defaultProps = {
