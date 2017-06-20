@@ -53,21 +53,24 @@ import {
 } from './constants';
 
 
-export function saveSending() {
+export function saveSending(data) {
   return {
     type: SAVE_SENDING,
+    data,
   };
 }
 
-export function saveSuccess() {
+export function saveSuccess(data) {
   return {
     type: SAVE_SUCCESS,
+    data,
   };
 }
 
-export function saveError(error) {
+export function saveError(error, data) {
   return {
     type: SAVE_ERROR,
+    data,
     error,
   };
 }

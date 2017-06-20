@@ -286,6 +286,10 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'sdgtargets',
       actions: [{
+        type: 'text',
+        title: 'Import',
+        onClick: () => this.props.handleImport(),
+      }, {
         type: 'add',
         title: this.context.intl.formatMessage(messages.add),
         onClick: () => this.props.handleNew(),
@@ -324,6 +328,7 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
 SdgTargetList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
+  handleImport: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
 };
@@ -362,6 +367,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleNew: () => {
       dispatch(updatePath('/sdgtargets/new/'));
+    },
+    handleImport: () => {
+      dispatch(updatePath('/sdgtargets/import/'));
     },
   };
 }

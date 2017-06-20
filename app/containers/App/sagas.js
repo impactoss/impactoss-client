@@ -249,7 +249,7 @@ export function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
 
 export function* saveEntitySaga({ data }) {
   try {
-    yield put(saveSending());
+    yield put(saveSending(data));
     // update entity attributes
     const entityUpdated = yield call(updateEntityRequest, data.path, data.entity);
     // and on the client
@@ -338,17 +338,17 @@ export function* saveEntitySaga({ data }) {
       });
     }
 
-    yield put(saveSuccess());
+    yield put(saveSuccess(data));
     yield put(push(data.redirect));
   } catch (error) {
-    yield put(saveError('An error occurred saving all or parts of your changes. Please review carefully and try again. '));
+    yield put(saveError('Error saving data', data));
     yield put(invalidateEntities());
   }
 }
 
 export function* newEntitySaga({ data }) {
   try {
-    yield put(saveSending());
+    yield put(saveSending(data));
     // update entity attributes
     // on the server
     const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
@@ -415,11 +415,13 @@ export function* newEntitySaga({ data }) {
       });
     }
 
-    yield put(saveSuccess());
-    yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+    yield put(saveSuccess(data));
+    if (data.redirect) {
+      yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+    }
   } catch (error) {
     // console.error(error);
-    yield put(saveError('An error occurred saving your data. Please review carefully and try again. '));
+    yield put(saveError('Error saving data', data));
     yield put(invalidateEntities());
   }
 }
@@ -428,14 +430,14 @@ export function* newEntitySaga({ data }) {
 // WARNING untested =)
 export function* updateEntitiesSaga({ data }) {
   try {
-    yield put(saveSending());
+    yield put(saveSending(data));
     // on the server
     const entitiesUpdated = yield call(updateEntitiesRequest, data.path, data.entities);
     // // and on the client
     yield entitiesUpdated.map((entity) => put(updateEntity(data.path, entity.data)));
-    yield put(saveSuccess());
+    yield put(saveSuccess(data));
   } catch (error) {
-    yield put(saveError('An error occurred saving all or parts of your changes. Please review carefully and try again. '));
+    yield put(saveError('Error saving data', data));
     yield put(invalidateEntities());
   }
 }
@@ -517,8 +519,8 @@ export default function* rootSaga() {
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
 
-  yield takeLatest(SAVE_ENTITY, saveEntitySaga);
-  yield takeLatest(NEW_ENTITY, newEntitySaga);
+  yield takeEvery(SAVE_ENTITY, saveEntitySaga);
+  yield takeEvery(NEW_ENTITY, newEntitySaga);
   yield takeEvery(UPDATE_CONNECTIONS, updateConnectionsSaga);
   yield takeEvery(UPDATE_ENTITIES, updateEntitiesSaga);
 

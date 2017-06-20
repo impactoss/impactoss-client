@@ -428,7 +428,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             </FormPanel>
           }
           <FormFooter>
-            <ButtonCancel onClick={handleCancel}>
+            <ButtonCancel type="button" onClick={handleCancel}>
               <FormattedMessage {...appMessages.buttons.cancel} />
             </ButtonCancel>
             <ButtonSubmit type="submit">
