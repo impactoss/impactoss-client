@@ -10,16 +10,16 @@ injectGlobal`
   }
   body {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.428571429;
-    color: #344547;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #21282B;
   }
   textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
   #app {
-    background-color: #F1F3F3;
+    background-color: #F5F6F6;
     min-height: 100%;
     min-width: 100%;
   }
@@ -34,7 +34,7 @@ injectGlobal`
   }
 
   h1 {
-    font-size: 2.6em;
+    font-size: 2.8em;
   }
   h2 {
     font-size: 2.15em;

@@ -17,28 +17,39 @@ theme.breakpoints = {
 // 2: main colour, light
 // 3: main colour, lighter (UNUSED)
 // 4: white
-const primary = coolorsToHex('https://coolors.co/456D09-53830B-98CE46-B6F754-ffffff');
+const primary = coolorsToHex('https://coolors.co/328236-388e3c-3d9e42-44af49-ffffff');
   // secondary color palette: dark to light
   // 0: dark header colour, darker
   // 1: dark header colour
   // 2: dark header colour, lighter (UNUSED)
   // 3: white/placeholder
   // 4: white/placeholder
-const secondary = coolorsToHex('https://coolors.co/014E75-026B9F-027DBB-ffffff-ffffff');
+const secondary = coolorsToHex('https://coolors.co/01527A-015C89-026b9f-027dbb-ffffff');
+
 // dark grayscale: dark to light
-// 0:  darkest
-// 1:  darker
-// 2:  dark
+// 0:  off black
+// 1:  off black lighter
+// 2:  charcoal
+// 3:  light charcoal
+// 4:  white
+const darker = coolorsToHex('https://coolors.co/191e21-21282b-293135-384349-ffffff');
+
+// dark grayscale: dark to light
+// 0:  darkest gray
+// 1:  dark gray
+// 2:  gray
 // 3:  medium gray 1 (AA conform)
 // 4:  medium gray 2 (AA large conform on white)
-const dark = coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395');
+const dark = coolorsToHex('https://coolors.co/3e4b51-47545b-56656d-6a7880-8b969c');
+
 // light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js
 // 1:  light gray (light lines, navigation filter panel)
 // 2:  gray 1 (gray pattern)
 // 3:  gray 2 (icons light)
 // 4:  gray 3 (dark lines)
-const light = coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad');
+const light = coolorsToHex('https://coolors.co/f5f6f6-eaeced-dbdfe0-bbc1c2-aeb6b7');
+
 
 // other palettes (not currently used)
 const danger = coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478');
@@ -54,6 +65,7 @@ theme.palette = {
   // global theme colours
   primary,
   secondary,
+  darker,
   dark,
   light,
 
@@ -95,29 +107,29 @@ theme.palette = {
   //
 
   // header: [ '#bg' ],
-  header: [secondary[1]],
+  header: [secondary[3]],
 
   // headerBrand: [ '#title', '#claim' ],
   headerBrand: [primary[4], primary[4]],
   headerBrandHover: [primary[4], primary[4]], // WARNING component sets opacity
 
   // headerNavPages: [ '#bg' ],
-  headerNavPages: [secondary[1]],
+  headerNavPages: ['transparent'],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
-  headerNavPagesItem: [light[3], light[2], 'transparent', 'transparent'],
-  headerNavPagesItemHover: [primary[4], primary[4], 'transparent', 'transparent'],
+  headerNavPagesItem: [primary[4], primary[4], 'transparent', secondary[0]],
+  headerNavPagesItemHover: [primary[4], primary[4], secondary[1], secondary[1]],
 
   // headerNavAccount: [ '#bg' ],
   headerNavAccount: ['transparent'],
   // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border' ]
-  headerNavAccountItem: [primary[4], primary[4], secondary[0], secondary[0], secondary[1]],
-  headerNavAccountItemHover: [primary[4], primary[4], secondary[2], secondary[2], secondary[1]],
+  headerNavAccountItem: [primary[4], primary[4], secondary[2], secondary[1], secondary[1]],
+  headerNavAccountItemHover: [primary[4], primary[4], secondary[1], secondary[1], secondary[1]],
 
   // headerNavMain: [ '#bg', '#border'  ],
-  headerNavMain: [secondary[1], secondary[0]],
+  headerNavMain: [secondary[3], secondary[2]],
   // headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
-  headerNavMainItem: [primary[4], primary[4], 'transparent', secondary[0]],
-  headerNavMainItemHover: [primary[4], primary[4], secondary[0], secondary[0]],
+  headerNavMainItem: [primary[4], primary[4], 'transparent', secondary[2]],
+  headerNavMainItemHover: [primary[4], primary[4], secondary[2], secondary[2]],
 
   //
   // SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
@@ -127,13 +139,13 @@ theme.palette = {
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
-  asideCatNavItem: [dark[2], primary[4], primary[4], primary[1], light[0]],
-  asideCatNavItemHover: [dark[0], primary[4], primary[4], primary[0], light[0]],
+  asideCatNavItem: [dark[2], primary[4], primary[4], primary[1], light[1]],
+  asideCatNavItemHover: [dark[2], primary[4], light[0], primary[0], light[1]],
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
-  asideListItem: [dark[1], primary[4], primary[4], dark[2], light[0]],
-  asideListItemHover: [dark[3], primary[4], primary[4], dark[2], light[0]],
+  asideListItem: [dark[2], primary[4], primary[4], dark[2], light[1]],
+  asideListItemHover: [dark[2], primary[4], light[1], dark[1], light[2]],
 
   //
   // BUTTONS / LINKS
@@ -155,10 +167,10 @@ theme.palette = {
   buttonToggleInactiveHover: [dark[1], primary[4]],
   // links
   // also see global-styles.js for default link "a"
-  linkDefault: [primary[1]],
-  linkDefaultHover: [primary[0]],
-  linkSecondary: [secondary[1]],
-  linkSecondaryHover: [secondary[0]],
+  linkDefault: [secondary[3]],
+  linkDefaultHover: [secondary[2]],
+  linkSecondary: [secondary[3]],
+  linkSecondaryHover: [secondary[2]],
 
 };
 
@@ -175,7 +187,7 @@ theme.fonts = {
 // sizes
 theme.sizes = {
   // also see global-styles.js for other sizes
-  headerBrandMain: '1.85em',
+  headerBrandMain: '1.6em',
   headerBrandClaim: '1.6em',
 };
 
