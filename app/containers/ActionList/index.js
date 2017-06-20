@@ -364,6 +364,10 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'actions',
       actions: [{
+        type: 'text',
+        title: 'Import',
+        onClick: () => this.props.handleImport(),
+      }, {
         type: 'add',
         title: this.context.intl.formatMessage(messages.add),
         onClick: () => this.props.handleNew(),
@@ -402,6 +406,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
 ActionList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
+  handleImport: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
 };
@@ -446,6 +451,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleNew: () => {
       dispatch(updatePath('/actions/new/'));
+    },
+    handleImport: () => {
+      dispatch(updatePath('/actions/import/'));
     },
   };
 }

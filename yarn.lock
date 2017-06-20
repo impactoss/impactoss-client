@@ -1094,6 +1094,10 @@ babylon@^6.11.0, babylon@^6.13.0:
   version "6.14.1"
   resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.14.1.tgz#956275fab72753ad9b3435d7afe58f8bf0a29815"
 
+babyparse@^0.4.6:
+  version "0.4.6"
+  resolved "https://registry.yarnpkg.com/babyparse/-/babyparse-0.4.6.tgz#8ff29b62d1e600c0654afd63457f97fa2c36e9c1"
+
 balanced-match@^0.4.1, balanced-match@^0.4.2:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-0.4.2.tgz#cb3f3e3c732dc0f01ee70b403f302e61d7709838"
@@ -6214,6 +6218,13 @@ react-addons-test-utils@15.4.1:
   version "15.4.1"
   resolved "https://registry.yarnpkg.com/react-addons-test-utils/-/react-addons-test-utils-15.4.1.tgz#1e4caab151bf27cce26df5f9cb714f4fd8359ae1"
 
+react-csv-downloader@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/react-csv-downloader/-/react-csv-downloader-0.1.4.tgz#1bbea104bfeeca7c0bb31fcfdd77f57d5de1d450"
+  dependencies:
+    react "^15.0.1"
+    react-dom "^15.0.1"
+
 react-debounce-input@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/react-debounce-input/-/react-debounce-input-3.0.0.tgz#9bb897f52942878b193671ffda812317ec731a8a"
@@ -6225,13 +6236,17 @@ react-deep-force-update@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/react-deep-force-update/-/react-deep-force-update-1.0.1.tgz#f911b5be1d2a6fe387507dd6e9a767aa2924b4c7"
 
-react-dom@15.4.1:
+react-dom@15.4.1, react-dom@^15.0.1:
   version "15.4.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-15.4.1.tgz#d54c913261aaedb17adc20410d029dcc18a1344a"
   dependencies:
     fbjs "^0.8.1"
     loose-envify "^1.1.0"
     object-assign "^4.1.0"
+
+react-file-reader-input@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-file-reader-input/-/react-file-reader-input-1.1.0.tgz#7b03c41e701f244f9026c3bd42b941078f5dfc32"
 
 react-helmet@3.2.2:
   version "3.2.2"
@@ -6338,7 +6353,7 @@ react-transform-hmr@^1.0.3:
     global "^4.3.0"
     react-proxy "^1.1.7"
 
-react@15.4.1:
+react@15.4.1, react@^15.0.1:
   version "15.4.1"
   resolved "https://registry.yarnpkg.com/react/-/react-15.4.1.tgz#498e918602677a3983cd0fd206dfe700389a0dd6"
   dependencies:

@@ -255,6 +255,27 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/actions/import',
+      name: 'actionImport',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ActionImport/reducer'),
+          import('containers/ActionImport/sagas'),
+          import('containers/ActionImport'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('actionImport', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/actions/:id',
       name: 'actionView',
       getComponent(nextState, cb) {
@@ -322,6 +343,27 @@ export default function createRoutes(store) {
 
         importModules.then(([reducer, sagas, component]) => {
           injectReducer('sdgtargetNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/sdgtargets/import',
+      name: 'sdgtargetImport',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetImport/reducer'),
+          import('containers/SdgTargetImport/sagas'),
+          import('containers/SdgTargetImport'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('sdgtargetImport', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });
@@ -402,6 +444,27 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/recommendations/import',
+      name: 'recommendationImport',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/RecommendationImport/reducer'),
+          import('containers/RecommendationImport/sagas'),
+          import('containers/RecommendationImport'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('recommendationImport', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/recommendations/:id',
       name: 'recommendationView',
       getComponent(nextState, cb) {
@@ -469,6 +532,27 @@ export default function createRoutes(store) {
 
         importModules.then(([reducer, sagas, component]) => {
           injectReducer('indicatorNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/indicators/import',
+      name: 'indicatorImport',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorImport/reducer'),
+          import('containers/IndicatorImport/sagas'),
+          import('containers/IndicatorImport'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('indicatorImport', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });

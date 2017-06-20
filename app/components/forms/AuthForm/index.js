@@ -68,7 +68,7 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
             { fields && this.renderBody(fields) }
           </FormBody>
           <FormFooter>
-            <ButtonCancel onClick={handleCancel}>
+            <ButtonCancel type="button" onClick={handleCancel}>
               <FormattedMessage {...appMessages.buttons.cancel} />
             </ButtonCancel>
             <ButtonSubmit type="submit">

@@ -135,7 +135,7 @@ export const renderTaxonomyControl = (taxonomies) => taxonomies
 }), [])
 : [];
 
-export const validateRequired = (val) => val && val.length;
+export const validateRequired = (val) => val !== null && val && val.length;
 
 export const validateDateFormat = (val) => {
   if (!val) return true;
