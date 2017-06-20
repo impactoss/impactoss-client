@@ -19,14 +19,14 @@ import LinkAccount from './LinkAccount';
 import NavMain from './NavMain';
 import LinkMain from './LinkMain';
 
-import logo from './sadataLogo.png';
+import logo from './logo.png';
 
 const Styled = styled.div`
   position: ${(props) => props.isHome ? 'relative' : 'absolute'};
   top:0;
   left:0;
   right:0;
-  height:115px;
+  height:150px;
   background-color: ${palette('header', 0)};
 `;
 
@@ -97,7 +97,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
             }
           </NavPages>
         </Banner>
-        <NavMain hasBorder={isHome}>
+        <NavMain hasBorder>
           { navItems &&
             navItems.map((item, i) => (
               <LinkMain
