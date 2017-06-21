@@ -67,7 +67,19 @@ export default defineMessages({
     },
     description: {
       id: 'app.containers.App.placeholders.description',
-      defaultMessage: 'Enter content',
+      defaultMessage: 'Enter description',
+    },
+    outcome: {
+      id: 'app.containers.App.placeholders.outcome',
+      defaultMessage: 'Enter desired outcome',
+    },
+    indicator_summary: {
+      id: 'app.containers.App.attributes.indicator_summary',
+      defaultMessage: 'Enter indicator summary',
+    },
+    target_date_comment: {
+      id: 'app.containers.App.attributes.target_date_comment',
+      defaultMessage: 'Additional information',
     },
     url: {
       id: 'app.containers.App.placeholders.url',
@@ -89,7 +101,19 @@ export default defineMessages({
     },
     description: {
       id: 'app.containers.App.attributes.description',
-      defaultMessage: 'Content',
+      defaultMessage: 'Description',
+    },
+    outcome: {
+      id: 'app.containers.App.attributes.outcome',
+      defaultMessage: 'Desired outcome',
+    },
+    indicator_summary: {
+      id: 'app.containers.App.attributes.indicator_summary',
+      defaultMessage: 'Indicator summary',
+    },
+    target_date_comment: {
+      id: 'app.containers.App.attributes.target_date_comment',
+      defaultMessage: 'Target date comment',
     },
     short_title: {
       id: 'app.containers.App.attributes.short_title',
