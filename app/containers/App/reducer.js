@@ -11,6 +11,7 @@
  */
 
 import { fromJS } from 'immutable';
+
 import { checkErrorMessagesExist } from 'utils/request';
 import { isSignedIn } from 'utils/api-request';
 import {
@@ -30,6 +31,30 @@ import {
   DUEDATE_UNASSIGNED,
 } from './constants';
 
+const initialTables = [
+  'taxonomies',
+  'categories',
+  'roles',
+  'users',
+  'user_categories',
+  'user_roles',
+  'indicators',
+  'measures',
+  'measure_categories',
+  'measure_indicators',
+  'sdgtargets',
+  'sdgtarget_categories',
+  'sdgtarget_indicators',
+  'sdgtarget_measures',
+  'sdgtarget_recommendations',
+  'recommendations',
+  'recommendation_measures',
+  'recommendation_categories',
+  'progress_reports',
+  'due_dates',
+  'pages',
+];
+
 // The initial state of the App
 const initialState = fromJS({
   server: {
@@ -40,69 +65,13 @@ const initialState = fromJS({
     error: false,
     messages: [],
   },
-  requested: { // Record the time that entities where requested from the server
-    taxonomies: null,
-    categories: null,
-    roles: null,
-    users: null,
-    user_categories: null,
-    user_roles: null,
-    indicators: null,
-    measures: null,
-    measure_categories: null,
-    measure_indicators: null,
-    sdgtargets: null,
-    sdgtarget_categories: null,
-    sdgtarget_indicators: null,
-    recommendations: null,
-    recommendation_measures: null,
-    recommendation_categories: null,
-    progress_reports: null,
-    due_dates: null,
-    pages: null,
-  },
-  ready: { // Record the time that entities where returned from the server
-    taxonomies: null,
-    categories: null,
-    roles: null,
-    users: null,
-    user_categories: null,
-    user_roles: null,
-    indicators: null,
-    measures: null,
-    measure_categories: null,
-    measure_indicators: null,
-    sdgtargets: null,
-    sdgtarget_categories: null,
-    sdgtarget_indicators: null,
-    recommendations: null,
-    recommendation_measures: null,
-    recommendation_categories: null,
-    progress_reports: null,
-    due_dates: null,
-    pages: null,
-  },
-  entities: {
-    taxonomies: {},
-    categories: {},
-    roles: {},
-    users: {},
-    user_categories: {},
-    user_roles: {},
-    indicators: {},
-    measures: {},
-    measure_categories: {},
-    measure_indicators: {},
-    sdgtargets: {},
-    sdgtarget_categories: {},
-    sdgtarget_indicators: {},
-    recommendations: {},
-    recommendation_measures: {},
-    recommendation_categories: {},
-    progress_reports: {},
-    due_dates: {},
-    pages: {},
-  },
+  /* eslint-disable no-param-reassign */
+  // Record the time that entities where requested from the server
+  requested: initialTables.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  // Record the time that entities where returned from the server
+  ready: initialTables.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  entities: initialTables.reduce((memo, table) => { memo[table] = {}; return memo; }, {}),
+  /* eslint-enable no-param-reassign */
   user: {
     attributes: null,
     isSignedIn: isSignedIn(),
