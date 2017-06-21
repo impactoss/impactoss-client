@@ -69,10 +69,6 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.reference',
       defaultMessage: 'ID',
     },
-    referenceOptional: {
-      id: 'app.containers.App.placeholders.referenceOptional',
-      defaultMessage: 'ID',
-    },
     description: {
       id: 'app.containers.App.placeholders.description',
       defaultMessage: 'Enter description',
@@ -135,9 +131,13 @@ export default defineMessages({
       id: 'app.containers.App.attributes.reference',
       defaultMessage: 'Reference',
     },
+    referenceDefault: {
+      id: 'app.containers.App.attributes.referenceDefault',
+      defaultMessage: 'Reference (leave blank to use database id)',
+    },
     referenceOptional: {
       id: 'app.containers.App.attributes.referenceOptional',
-      defaultMessage: 'Reference (leave blank to use database id)',
+      defaultMessage: 'Reference (optional)',
     },
     id: {
       id: 'app.containers.App.attributes.id',

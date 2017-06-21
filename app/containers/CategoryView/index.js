@@ -39,39 +39,35 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       this.props.loadEntitiesIfNeeded();
     }
   }
-  getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        {
-          type: 'title',
-          value: entity.attributes.title,
-          isManager,
-        },
-        {
-          type: 'short_title',
-          value: this.getCategoryShortTitle(entity),
-          taxonomyId: entity.attributes.taxonomy_id,
-        },
-      ],
-    },
-  ]);
+  getHeaderMainFields = (entity, isManager) => {
+    const fields = [];
+
+    if (entity.attributes.reference && entity.attributes.reference.trim() !== '') {
+      fields.push({
+        type: 'reference',
+        value: entity.attributes.reference,
+        large: true,
+        label: isManager ? this.context.intl.formatMessage(appMessages.attributes.id) : null,
+      });
+    }
+    fields.push({
+      type: 'title',
+      value: entity.attributes.title,
+      isManager,
+    });
+    fields.push({
+      type: 'short_title',
+      value: this.getCategoryShortTitle(entity),
+      taxonomyId: entity.attributes.taxonomy_id,
+    });
+    return { fields };
+  };
 
   getHeaderAsideFields = (entity, isManager) => !isManager
     ? null
     : [
       {
         fields: [
-          {
-            type: 'referenceStatus',
-            fields: [
-              {
-                type: 'reference',
-                value: entity.id,
-                large: true,
-                label: this.context.intl.formatMessage(appMessages.attributes.id),
-              },
-            ],
-          },
           {
             type: 'meta',
             fields: [

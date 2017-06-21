@@ -64,6 +64,13 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     { // fieldGroup
       fields: [
         {
+          id: 'number',
+          controlType: 'short',
+          model: '.attributes.reference',
+          label: this.context.intl.formatMessage(appMessages.attributes.referenceOptional),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
+        },
+        {
           id: 'title',
           controlType: 'title',
           model: '.attributes.title',
@@ -79,9 +86,9 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         {
           id: 'short_title',
           controlType: 'short',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.short_title),
           model: '.attributes.short_title',
           label: this.context.intl.formatMessage(appMessages.attributes.short_title),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.short_title),
         },
       ],
     },
@@ -95,8 +102,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
           id: 'description',
           controlType: 'markdown',
           model: '.attributes.description',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
           label: this.context.intl.formatMessage(appMessages.attributes.description),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
         },
       ],
     },

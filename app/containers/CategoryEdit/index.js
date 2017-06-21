@@ -89,7 +89,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           controlType: 'short',
           model: '.attributes.reference',
           label: this.context.intl.formatMessage(appMessages.attributes.referenceOptional),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.referenceOptional),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
         },
         {
           id: 'title',
@@ -333,13 +333,6 @@ function mapDispatchToProps(dispatch) {
         saveData = saveData.setIn(['attributes', 'manager_id'], formUserIds.first());
       } else {
         saveData = saveData.setIn(['attributes', 'manager_id'], null);
-      }
-      // default to database id
-      const formRef = formData.getIn(['attributes','reference'])
-        ? formData.getIn(['attributes','reference']).trim()
-        : ''
-      if(formRef === '') {
-        saveData = saveData.setIn(['attributes','reference'], formData.get('id'));
       }
       dispatch(save(saveData.toJS()));
     },
