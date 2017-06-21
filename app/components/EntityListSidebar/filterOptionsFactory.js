@@ -347,7 +347,7 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
     required: false,
   };
 
-  const taxonomy = connectedTaxonomies.taxonomies[parseInt(activeFilterOption.optionId, 10)];
+  const taxonomy = connectedTaxonomies[parseInt(activeFilterOption.optionId, 10)];
   if (taxonomy) {
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(taxonomy.attributes.title)}`;
     const query = filters.connectedTaxonomies.query;

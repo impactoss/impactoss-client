@@ -178,7 +178,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
         label: this.context.intl.formatMessage(appMessages.attributes.target_date),
         showEmpty: this.context.intl.formatMessage(appMessages.attributes.targetDateEmpty),
       },
-    ]
+    ];
     if (entity.attributes.target_date_comment && entity.attributes.target_date_comment.trim().length > 0) {
       targetDateGroup.push({
         type: 'text',
