@@ -18,6 +18,7 @@ import {
   renderRecommendationControl,
   renderIndicatorControl,
   renderTaxonomyControl,
+  renderSdgTargetControl,
   validateRequired,
   validateDateFormat,
 } from 'utils/forms';
@@ -75,7 +76,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, recommendations, indicators, action } = props;
+    const { taxonomies, recommendations, indicators, action, sdgtargets } = props;
 
     return action
     ? Map({
@@ -84,17 +85,25 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRecommendations: entityOptions(recommendations, true),
       associatedIndicators: entityOptions(indicators, true),
+      associatedSdgTargets: entityOptions(sdgtargets, true),
     })
     : Map();
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
+  getHeaderMainFields = (entity) => ([ // fieldGroups
     { // fieldGroup
       fields: [
+        {
+          controlType: 'info',
+          type: 'reference',
+          value: entity.id,
+          label: this.context.intl.formatMessage(appMessages.attributes.id),
+        },
         {
           id: 'title',
           controlType: 'title',
           model: '.attributes.title',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
           label: this.context.intl.formatMessage(appMessages.attributes.title),
           validators: {
             required: validateRequired,
@@ -111,23 +120,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     {
       fields: [
         {
-          controlType: 'combo',
-          fields: [
-            {
-              controlType: 'info',
-              type: 'reference',
-              value: entity.id,
-              label: this.context.intl.formatMessage(appMessages.attributes.id),
-            },
-            {
-              id: 'status',
-              controlType: 'select',
-              model: '.attributes.draft',
-              label: this.context.intl.formatMessage(appMessages.attributes.draft),
-              value: entity.attributes.draft,
-              options: PUBLISH_STATUSES,
-            },
-          ],
+          id: 'status',
+          controlType: 'select',
+          model: '.attributes.draft',
+          label: this.context.intl.formatMessage(appMessages.attributes.draft),
+          value: entity.attributes.draft,
+          options: PUBLISH_STATUSES,
         },
         {
           controlType: 'info',
@@ -147,14 +145,29 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     },
   ]);
 
-  getBodyMainFields = (recommendations, indicators) => ([
+  getBodyMainFields = (recommendations, indicators, sdgtargets) => ([
     {
       fields: [
         {
           id: 'description',
           controlType: 'markdown',
           model: '.attributes.description',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
           label: this.context.intl.formatMessage(appMessages.attributes.description),
+        },
+        {
+          id: 'outcome',
+          controlType: 'markdown',
+          model: '.attributes.outcome',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.outcome),
+          label: this.context.intl.formatMessage(appMessages.attributes.outcome),
+        },
+        {
+          id: 'indicator_summary',
+          controlType: 'markdown',
+          model: '.attributes.indicator_summary',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.indicator_summary),
+          label: this.context.intl.formatMessage(appMessages.attributes.indicator_summary),
         },
       ],
     },
@@ -163,6 +176,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       icon: 'connections',
       fields: [
         renderRecommendationControl(recommendations),
+        renderSdgTargetControl(sdgtargets),
         renderIndicatorControl(indicators),
       ],
     },
@@ -182,6 +196,13 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
         errorMessages: {
           date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
         },
+      },
+      {
+        id: 'target_date_comment',
+        controlType: 'textarea',
+        model: '.attributes.target_date_comment',
+        label: this.context.intl.formatMessage(appMessages.attributes.target_date_comment),
+        placeholder: this.context.intl.formatMessage(appMessages.placeholders.target_date_comment),
       }],
     },
     { // fieldGroup
@@ -191,19 +212,19 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     },
   ]);
 
-  getFields = (entity, taxonomies, recommendations, indicators) => ({ // isManager, taxonomies,
+  getFields = (entity, taxonomies, recommendations, indicators, sdgtargets) => ({ // isManager, taxonomies,
     header: {
-      main: this.getHeaderMainFields(),
+      main: this.getHeaderMainFields(entity),
       aside: this.getHeaderAsideFields(entity),
     },
     body: {
-      main: this.getBodyMainFields(recommendations, indicators),
+      main: this.getBodyMainFields(recommendations, indicators, sdgtargets),
       aside: this.getBodyAsideFields(entity, taxonomies),
     },
   })
 
   render() {
-    const { action, dataReady, viewDomain, recommendations, indicators, taxonomies } = this.props;
+    const { action, dataReady, viewDomain, recommendations, indicators, taxonomies, sdgtargets } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -231,7 +252,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                   viewDomain.form.data,
                   taxonomies,
                   recommendations,
-                  indicators
+                  indicators,
+                  sdgtargets
                 ),
               }] : null
             }
@@ -258,11 +280,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 formData,
                 taxonomies,
                 recommendations,
-                indicators
+                indicators,
+                sdgtargets
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(action, taxonomies, recommendations, indicators)}
+              fields={this.getFields(action, taxonomies, recommendations, indicators, sdgtargets)}
             />
           }
         </Content>
@@ -285,6 +308,7 @@ ActionEdit.propTypes = {
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
+  sdgtargets: PropTypes.object,
 };
 
 ActionEdit.contextTypes = {
@@ -303,6 +327,7 @@ const mapStateToProps = (state, props) => ({
     'measure_categories',
     'indicators',
     'measure_indicators',
+    'sdgtargets',
   ] }),
   action: getEntity(
     state,
@@ -358,6 +383,22 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
+  // all recommendations, listing connection if any
+  sdgtargets: getEntities(
+    state,
+    {
+      path: 'sdgtargets',
+      extend: {
+        as: 'associated',
+        path: 'sdgtarget_measures',
+        key: 'sdgtarget_id',
+        reverse: true,
+        where: {
+          measure_id: props.params.id,
+        },
+      },
+    },
+  ),
   indicators: getEntities(
     state,
     {
@@ -387,6 +428,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      dispatch(loadEntitiesIfNeeded('sdgtargets'));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
@@ -395,7 +437,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.load(model, formData));
     },
 
-    handleSubmit: (formData, taxonomies, recommendations, indicators) => {
+    handleSubmit: (formData, taxonomies, recommendations, indicators, sdgtargets) => {
       const saveData = formData
         .set(
           'measureCategories',
@@ -412,6 +454,16 @@ function mapDispatchToProps(dispatch, props) {
             connections: recommendations,
             connectionAttribute: 'associatedRecommendations',
             createConnectionKey: 'recommendation_id',
+            createKey: 'measure_id',
+          })
+        )
+        .set(
+          'sdgtargetMeasures',
+          getConnectionUpdatesFromFormData({
+            formData,
+            connections: sdgtargets,
+            connectionAttribute: 'associatedSdgTargets',
+            createConnectionKey: 'sdgtarget_id',
             createKey: 'measure_id',
           })
         )

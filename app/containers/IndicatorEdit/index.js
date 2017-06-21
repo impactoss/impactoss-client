@@ -419,8 +419,8 @@ function mapDispatchToProps(dispatch, props) {
             formData,
             connections: actions,
             connectionAttribute: 'associatedActions',
-            createConnectionKey: 'indicator_id',
-            createKey: 'measure_id',
+            createConnectionKey: 'measure_id',
+            createKey: 'indicator_id',
           })
         )
         .set(
@@ -429,8 +429,8 @@ function mapDispatchToProps(dispatch, props) {
             formData,
             connections: sdgtargets,
             connectionAttribute: 'associatedSdgTargets',
-            createConnectionKey: 'indicator_id',
-            createKey: 'sdgtarget_id',
+            createConnectionKey: 'sdgtarget_id',
+            createKey: 'indicator_id',
           })
         );
 

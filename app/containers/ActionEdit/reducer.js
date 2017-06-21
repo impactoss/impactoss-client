@@ -18,10 +18,14 @@ const formInitial = fromJS({
     description: '',
     draft: '',
     target_date: '',
+    target_date_comment: '',
+    outcome: '',
+    indicator_summary: '',
   },
   associatedTaxonomies: {},
   associatedRecommendations: [],
   associatedIndicators: [],
+  associatedSdgTargets: [],
 });
 
 function formReducer(state = formInitial, action) {
