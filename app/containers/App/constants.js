@@ -83,6 +83,31 @@ export const EDIT_PANEL = 'edit';
 export const CONTENT_LIST = 'list';
 export const CONTENT_SINGLE = 'single';
 
+export const DB_TABLES = [
+  'taxonomies',
+  'categories',
+  'roles',
+  'users',
+  'user_categories',
+  'user_roles',
+  'indicators',
+  'measures',
+  'measure_categories',
+  'measure_indicators',
+  'sdgtargets',
+  'sdgtarget_categories',
+  'sdgtarget_indicators',
+  'sdgtarget_measures',
+  'sdgtarget_recommendations',
+  'recommendations',
+  'recommendation_measures',
+  'recommendation_categories',
+  'progress_reports',
+  'due_dates',
+  'pages',
+];
+
+
 // TODO need to pull from an env file
 export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';
 // export const API_ENDPOINT = 'https://sadata-production.herokuapp.com';

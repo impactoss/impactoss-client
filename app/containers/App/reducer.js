@@ -29,31 +29,8 @@ import {
   INVALIDATE_ENTITIES,
   DUEDATE_ASSIGNED,
   DUEDATE_UNASSIGNED,
+  DB_TABLES,
 } from './constants';
-
-const initialTables = [
-  'taxonomies',
-  'categories',
-  'roles',
-  'users',
-  'user_categories',
-  'user_roles',
-  'indicators',
-  'measures',
-  'measure_categories',
-  'measure_indicators',
-  'sdgtargets',
-  'sdgtarget_categories',
-  'sdgtarget_indicators',
-  'sdgtarget_measures',
-  'sdgtarget_recommendations',
-  'recommendations',
-  'recommendation_measures',
-  'recommendation_categories',
-  'progress_reports',
-  'due_dates',
-  'pages',
-];
 
 // The initial state of the App
 const initialState = fromJS({
@@ -67,10 +44,10 @@ const initialState = fromJS({
   },
   /* eslint-disable no-param-reassign */
   // Record the time that entities where requested from the server
-  requested: initialTables.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  requested: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
   // Record the time that entities where returned from the server
-  ready: initialTables.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
-  entities: initialTables.reduce((memo, table) => { memo[table] = {}; return memo; }, {}),
+  ready: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  entities: DB_TABLES.reduce((memo, table) => { memo[table] = {}; return memo; }, {}),
   /* eslint-enable no-param-reassign */
   user: {
     attributes: null,
