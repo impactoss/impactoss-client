@@ -296,7 +296,7 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
               if (filterOptions.options[connectedId]) {
                 filterOptions.options[connectedId].count += 1;
               } else {
-                const reference = connection.attributes.number || connection.id;
+                const reference = connection.attributes.reference || connection.id;
                 filterOptions.options[connectedId] = {
                   label: connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name,
                   reference,

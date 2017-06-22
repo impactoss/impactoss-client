@@ -29,7 +29,7 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
     return {
       id: entity.id,
       title: entity.attributes.name || entity.attributes.title,
-      reference: entity.attributes.number || entity.id,
+      reference: entity.attributes.reference || entity.id,
       linkTo: `${entityLinkTo}${entity.id}`,
       status: entity.attributes.draft ? 'draft' : null,
       expandables: isExpandable && !expandNo

@@ -116,7 +116,7 @@ export const makeConnectionEditOptions = (entities, edits, connections, activeEd
           : null;
         return connectedIds && connectedIds.indexOf(connection.id) > -1 ? counter + 1 : counter;
       }, 0);
-      const reference = connection.attributes.number || connection.id;
+      const reference = connection.attributes.reference || connection.id;
       editOptions.options[connection.id] = {
         label: connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name,
         reference,

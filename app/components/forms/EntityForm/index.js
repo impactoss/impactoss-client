@@ -49,7 +49,7 @@ const MultiSelectWrapper = styled.div`
   position: absolute;
   top: 38px;
   right: 0;
-  height:300px;
+  height:400px;
   width: 100%;
   min-width: 350px;
   background: #fff;

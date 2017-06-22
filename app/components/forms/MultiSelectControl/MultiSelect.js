@@ -84,7 +84,7 @@ const ControlFooter = styled.div`
 `;
 const ControlMain = styled.div`
   position: absolute;
-  top: ${(props) => props.filter ? '150px' : '60px'};
+  top: ${(props) => props.filter ? '115px' : '60px'};
   bottom: 50px;
   left: 0;
   right: 0;

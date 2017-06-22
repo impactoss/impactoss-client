@@ -14,8 +14,8 @@ export const entityOptions = (entities, includeReference) => entities
     if (includeReference) {
       return options.push(entityOption(
         entity,
-        entity.hasIn(['attributes', 'number'])
-        ? entity.getIn(['attributes', 'number'])
+        entity.hasIn(['attributes', 'reference'])
+        ? entity.getIn(['attributes', 'reference'])
         : entity.get('id')
       ));
     }
