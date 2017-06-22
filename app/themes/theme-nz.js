@@ -94,7 +94,7 @@ theme.palette = {
     '#00bcd4',
     '#027DBB',
     '#01527A',
-    '#6A7880'
+    '#6A7880',
   ],
   taxonomiesHover: [
     '#DBDCDD',
@@ -106,7 +106,7 @@ theme.palette = {
     '#006096',
     '#026B9F',
     '#014A6F',
-    '#014A6F'
+    '#014A6F',
   ],
 
   // other entities
