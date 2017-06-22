@@ -40,9 +40,9 @@ export const getCategoryMaxCount = (categories, attribute) =>
     return countsMemo;
   }, 0);
 
-
 export const mapToCategoryList = (categories, onLink, countAttributes) => Object.values(categories).map((cat) => ({
   id: cat.id,
+  reference: cat.attributes.reference && cat.attributes.reference.trim() !== '' ? cat.attributes.reference : null,
   title: cat.attributes.title,
   onLink: () => onLink(`/category/${cat.id}`),
   counts: countAttributes
