@@ -77,16 +77,37 @@ theme.palette = {
   // taxonomy/category colours
   // 0: default/fallback
   // 1: Human Rights Body
-  // 2: Cycle
-  // 3: SDGs
-  // 4: Country
+  // 2: UN session
+  // 3: Country
+  // 4: SDGs
   // 5: Issue
-  // 6: Group
+  // 6: Population group
   // 7: SMART
   // 8: Agency
-  // 9: ?
-  taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#00AEEF', '#26938C', '#e91e63', '#00bcd4', '#027DBB', '#01527A', '#6A7880'],
-  taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#0099D1', '#238680', '#4EA53C', '#006096', '#026B9F', '#014A6F', '#014A6F'],
+  taxonomies: [
+    '#E8EAEB',
+    '#6B3285',
+    '#5149AD',
+    '#26938C',
+    '#00AEEF',
+    '#e91e63',
+    '#00bcd4',
+    '#027DBB',
+    '#01527A',
+    '#6A7880'
+  ],
+  taxonomiesHover: [
+    '#DBDCDD',
+    '#622E79',
+    '#4A439E',
+    '#238680',
+    '#0099D1',
+    '#4EA53C',
+    '#006096',
+    '#026B9F',
+    '#014A6F',
+    '#014A6F'
+  ],
 
   // other entities
   actions: ['#FC9F00'],
