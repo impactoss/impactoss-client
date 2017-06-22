@@ -13,6 +13,7 @@ const Styled = styled(Button)`
   width: 100%;
   padding: 0.5em;
   text-align: left;
+  font-size: 0.85em;
   color:  ${(props) => props.active ? palette('asideCatNavItem', 1) : palette('asideCatNavItem', 0)};
   background-color: ${(props) => props.active ? palette('asideCatNavItem', 3) : palette('asideCatNavItem', 2)};
   border-bottom: 1px solid ${palette('asideCatNavItem', 4)};
