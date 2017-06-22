@@ -90,7 +90,6 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
       reference: entity.attributes.reference || entity.id,
       linkTo: `${entityLinkTo}${entity.id}`,
       status: entity.attributes.draft ? 'draft' : null,
-      targetDate: entity.attributes.target_date ? this.context.intl.formatDate(new Date(entity.attributes.target_date)) : null,
       tags: taxonomies
         ? this.getEntityTags(entity,
           taxonomies,

@@ -6,7 +6,7 @@ import ButtonDefault from 'components/buttons/ButtonDefault';
 import Icon from 'components/Icon';
 
 const Button = styled(ButtonDefault)`
-  padding: 0.25em 1em 0.25em 1.25em;
+  padding: 0.25em 0.75em;
   width: ${(props) => props.fullWidth ? '100%' : 'auto'};
   min-height: 3em;
   text-align: ${(props) => props.align};
