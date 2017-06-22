@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
 import EntityList from 'containers/EntityList';
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -78,6 +78,12 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       attributes: {  // filter by attribute value
         label: 'By attribute',
         options: [
+          {
+            filter: false,
+            label: this.context.intl.formatMessage(appMessages.attributes.accepted),
+            attribute: 'accepted',
+            options: ACCEPTED_STATUSES,
+          },
           {
             filter: false,
             label: this.context.intl.formatMessage(appMessages.attributes.draft),
