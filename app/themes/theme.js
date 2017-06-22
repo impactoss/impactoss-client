@@ -65,11 +65,12 @@ theme.palette = {
   // 0: default/fallback
   // 1: Human Rights Body
   // 2: UN session
-  // 3: Human right
-  // 4: Affected persons
-  // 5: Thematic cluster
-  // 6: Organisation
-  // 7: SDGs
+  // 3: Country
+  // 4: SDGs
+  // 5: Issue
+  // 6: Population group
+  // 7: SMART
+  // 8: Organisation
   taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF'],
   taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#65C99B', '#238680', '#4EA53C', '#006096', '#178EC1', '#08C4F8'],
 

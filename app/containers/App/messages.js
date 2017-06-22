@@ -445,29 +445,29 @@ export default defineMessages({
       3: {
         single: {
           id: 'app.containers.App.entities.taxonomies.3.single',
-          defaultMessage: 'SDG',
+          defaultMessage: 'Recommending state',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.3.plural',
-          defaultMessage: 'SDGs',
+          defaultMessage: 'Recommending states',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.3.empty',
-          defaultMessage: 'No SDG assigned yet',
+          defaultMessage: 'No recommending state assigned/not applicable',
         },
       },
       4: {
         single: {
           id: 'app.containers.App.entities.taxonomies.4.single',
-          defaultMessage: 'Recommending state',
+          defaultMessage: 'SDG',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.4.plural',
-          defaultMessage: 'Recommending states',
+          defaultMessage: 'SDGs',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.4.empty',
-          defaultMessage: 'No recommending state assigned/not applicable',
+          defaultMessage: 'No SDG assigned yet',
         },
       },
       5: {
