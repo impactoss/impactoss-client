@@ -12,6 +12,7 @@ const Button = styled(ButtonDefault)`
   text-align: ${(props) => props.align};
   text-transform: ${(props) => props.strong ? 'uppercase' : 'none'};
   font-weight: ${(props) => props.strong ? 'bold' : 'normal'};
+  font-size: 0.85em;
 `;
 
 class ButtonDefaultWithIcon extends React.Component { // eslint-disable-line react/prefer-stateless-function

@@ -6,7 +6,8 @@ import { palette } from 'styled-theme';
 
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
-import ButtonFlat from 'components/buttons/ButtonFlat';
+import ButtonCancel from 'components/buttons/ButtonCancel';
+import ButtonSubmit from 'components/buttons/ButtonSubmit';
 
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
@@ -241,16 +242,25 @@ export default class MultiSelect extends React.Component {
     </HeaderButton>
   );
 
-  renderButton = (action, i) => (
-    <ButtonFlat
-      primary={action.type === 'primary'}
-      key={i}
-      onClick={action.onClick && (() => action.onClick())}
-      type={action.submit ? 'submit' : 'button'}
-    >
-      {action.title}
-    </ButtonFlat>
-  );
+  renderButton = (action, i) => action.submit
+    ? (
+      <ButtonSubmit
+        key={i}
+        onClick={action.onClick && (() => action.onClick())}
+        type="submit"
+      >
+        {action.title}
+      </ButtonSubmit>
+    )
+    : (
+      <ButtonCancel
+        key={i}
+        onClick={action.onClick && (() => action.onClick())}
+        type="button"
+      >
+        {action.title}
+      </ButtonCancel>
+    );
 
   render() {
     const { options, values, threeState } = this.props;
