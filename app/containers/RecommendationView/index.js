@@ -118,6 +118,10 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
             path: 'recommendations',
           },
           {
+            label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+            path: 'sdgtargets',
+          },
+          {
             label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
             path: 'indicators',
           }],
@@ -248,6 +252,8 @@ const mapStateToProps = (state, props) => ({
     'measure_categories',
     'measure_indicators',
     'indicators',
+    'sdgtargets',
+    'sdgtarget_measures',
   ] }),
   recommendation: getEntity(
     state,
@@ -341,6 +347,17 @@ const mapStateToProps = (state, props) => ({
             forward: true,
           },
         },
+        {
+          path: 'sdgtarget_indicators',
+          key: 'measure_id',
+          reverse: true,
+          as: 'sdgtargets',
+          connected: {
+            path: 'sdgtargets',
+            key: 'sdgtarget_id',
+            forward: true,
+          },
+        },
       ],
     },
   ),
@@ -359,6 +376,8 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      dispatch(loadEntitiesIfNeeded('sdgtargets'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
     handleEdit: () => {

@@ -318,6 +318,16 @@ export function* saveEntitySaga({ data }) {
       });
     }
 
+    // update sdgtarget-action connections
+    if (data.entity.sdgtargetActions) {
+      yield call(updateConnectionsSaga, {
+        data: {
+          path: 'sdgtarget_measures',
+          updates: data.entity.sdgtargetActions,
+        },
+      });
+    }
+
     // update action-category connections
     if (data.entity.sdgtargetCategories) {
       yield call(updateConnectionsSaga, {
@@ -392,6 +402,16 @@ export function* newEntitySaga({ data }) {
         path: 'sdgtarget_indicators',
         updates: data.entity.sdgtargetIndicators,
         keyPair: ['indicator_id', 'sdgtarget_id'],
+      });
+    }
+
+    // update sdgtarget-indicator connections
+    if (data.entity.sdgtargetActions) {
+      yield call(createConnectionsSaga, {
+        entityId: entityCreated.data.id,
+        path: 'sdgtarget_measures',
+        updates: data.entity.sdgtargetActions,
+        keyPair: ['measure_id', 'sdgtarget_id'],
       });
     }
 

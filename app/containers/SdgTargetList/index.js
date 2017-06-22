@@ -191,10 +191,43 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
               ],
             },
           },
+          {
+            path: 'sdgtarget_measures',
+            key: 'sdgtarget_id',
+            reverse: true,
+            as: 'measures',
+            connected: {
+              path: 'measures',
+              key: 'measure_id',
+              forward: true,
+            },
+          },
         ],
       },
       connections: {
-        options: ['indicators'],
+        options: ['indicators', 'measures'],
+      },
+      connectedTaxonomies: { // filter by each category
+        options: [
+          {
+            out: 'js',
+            path: 'taxonomies',
+            where: {
+              tags_measures: true,
+            },
+            extend: {
+              path: 'categories',
+              key: 'taxonomy_id',
+              reverse: true,
+              extend: {
+                path: 'measure_categories',
+                key: 'category_id',
+                reverse: true,
+                as: 'measures',
+              },
+            },
+          },
+        ],
       },
       taxonomies: { // filter by each category
         out: 'js',
@@ -212,7 +245,7 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
 
     // specify the filter and query options
     const filters = {
-      search: ['title'],
+      search: ['reference', 'title'],
       attributes: {  // filter by attribute value
         options: [
           {
@@ -247,6 +280,39 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
               whereKey: 'indicator_id',
             },
           },
+          {
+            filter: true,
+            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+            path: 'measures', // filter by recommendation connection
+            query: 'actions',
+            key: 'measure_id',
+            connected: {
+              path: 'sdgtarget_measures',
+              key: 'sdgtarget_id',
+              whereKey: 'measure_id',
+            },
+          },
+        ],
+      },
+      connectedTaxonomies: { // filter by each category
+        query: 'catx',
+        filter: true,
+        connections: [
+          {
+            path: 'measures', // filter by recommendation connection
+            title: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+            key: 'measure_id',
+            connected: {
+              path: 'measure_indicators',
+              key: 'indicator_id',
+              connected: {
+                path: 'measure_categories',
+                key: 'measure_id',
+                attribute: 'measure_id',
+                whereKey: 'category_id',
+              },
+            },
+          },
         ],
       },
     };
@@ -267,6 +333,15 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
             connectPath: 'sdgtarget_indicators',
             key: 'indicator_id',
             ownKey: 'sdgtarget_id',
+          },
+          {
+            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+            path: 'measures',
+            connectPath: 'sdgtarget_measures', // filter by recommendation connection
+            key: 'measure_id',
+            ownKey: 'sdgtarget_id',
+            filter: true,
+
           },
         ],
       },
@@ -341,6 +416,9 @@ const mapStateToProps = (state) => ({
     'categories',
     'indicators',
     'sdgtarget_indicators',
+    'measures',
+    'sdgtarget_measures',
+    'measure_categories',
     'user_roles',
     'due_dates',
     'progress_reports',
@@ -356,6 +434,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
+      dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_measures'));
+      dispatch(loadEntitiesIfNeeded('measure_categories'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
       dispatch(loadEntitiesIfNeeded('progress_reports'));
       dispatch(loadEntitiesIfNeeded('due_dates'));
