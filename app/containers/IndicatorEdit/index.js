@@ -78,7 +78,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     const props = nextProps || this.props;
     const { actions, indicator, users, sdgtargets } = props;
     indicator.attributes.frequency_months = indicator.attributes.frequency_months || 1;
-    indicator.attributes.reference = indicator.attributes.reference || indicator.id;
+
     return indicator
     ? Map({
       id: indicator.id,
@@ -95,10 +95,18 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     { // fieldGroup
       fields: [
         {
+          id: 'reference',
+          controlType: 'short',
+          model: '.attributes.reference',
+          label: this.context.intl.formatMessage(appMessages.attributes.referenceDefault),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
+        },
+        {
           id: 'title',
           controlType: 'titleText',
           model: '.attributes.title',
           label: this.context.intl.formatMessage(appMessages.attributes.title),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
           validators: {
             required: validateRequired,
           },
@@ -114,23 +122,12 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     {
       fields: [
         {
-          controlType: 'combo',
-          fields: [
-            {
-              id: 'number',
-              controlType: 'short',
-              model: '.attributes.reference',
-              label: this.context.intl.formatMessage(appMessages.attributes.reference),
-            },
-            {
-              id: 'status',
-              controlType: 'select',
-              model: '.attributes.draft',
-              label: this.context.intl.formatMessage(appMessages.attributes.draft),
-              value: entity.attributes.draft,
-              options: PUBLISH_STATUSES,
-            },
-          ],
+          id: 'status',
+          controlType: 'select',
+          model: '.attributes.draft',
+          label: this.context.intl.formatMessage(appMessages.attributes.draft),
+          value: entity.attributes.draft,
+          options: PUBLISH_STATUSES,
         },
         {
           controlType: 'info',
@@ -158,6 +155,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           controlType: 'markdown',
           model: '.attributes.description',
           label: this.context.intl.formatMessage(appMessages.attributes.description),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
         },
       ],
     },
@@ -443,10 +441,10 @@ function mapDispatchToProps(dispatch, props) {
       }
 
       // cleanup
-      // do not store reference when same as db id
-      if (saveData.getIn(['attributes', 'reference']) === props.params.id) {
-        saveData = saveData
-          .setIn(['attributes', 'reference'], null);
+      // default to database id
+      const formRef = formData.getIn(['attributes', 'reference']) || '';
+      if (formRef.trim() === '') {
+        saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
       }
       // do not store repeat fields when not repeat
       if (!saveData.getIn(['attributes', 'repeat'])) {
@@ -454,7 +452,6 @@ function mapDispatchToProps(dispatch, props) {
           .setIn(['attributes', 'frequency_months'], null)
           .setIn(['attributes', 'end_date'], null);
       }
-
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {

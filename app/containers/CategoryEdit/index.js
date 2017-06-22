@@ -85,7 +85,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     { // fieldGroup
       fields: [
         {
-          id: 'number',
+          id: 'reference',
           controlType: 'short',
           model: '.attributes.reference',
           label: this.context.intl.formatMessage(appMessages.attributes.referenceOptional),
