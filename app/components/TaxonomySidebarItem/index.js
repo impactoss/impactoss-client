@@ -11,7 +11,7 @@ import appMessages from 'containers/App/messages';
 const Styled = styled(Button)`
   padding: 1em;
   width: 100%;
-  padding: 0.5em;
+  padding: 1em 0.5em 0.5em;
   text-align: left;
   font-size: 0.85em;
   color:  ${(props) => props.active ? palette('asideCatNavItem', 1) : palette('asideCatNavItem', 0)};
@@ -28,7 +28,7 @@ const TaxTitle = styled.span`
   font-weight: bold;
 `;
 const TaxIcon = styled.span`
-  padding: 0 1.5em;
+  padding: 0 1em 0 0.75em;
 `;
 
 class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -41,7 +41,7 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
     return (
       <Styled onClick={() => taxonomy.onLink()} active={taxonomy.active}>
         <TaxIcon>
-          <Icon name={`taxonomy_${taxonomy.id}`} size="3em" />
+          <Icon name={`taxonomy_${taxonomy.id}`} size="2em" />
         </TaxIcon>
         <TaxTitle>
           {this.getTaxTitle(taxonomy.id)}
