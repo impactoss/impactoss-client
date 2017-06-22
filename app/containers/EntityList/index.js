@@ -160,11 +160,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     } = this.props;
 
     // do not list 'own' taxonomies in connected taxonomies
-    const connectedTaxonomies = reduce(this.props.connectedTaxonomies, (filteredTaxonomies, tax, key) =>
-      Object.keys(taxonomies).indexOf(key) < 0
-        ? Object.assign(filteredTaxonomies, { [key]: tax })
-        : filteredTaxonomies
-    , {});
+    console.log(this.props.connectedTaxonomies, taxonomies);
+    const connectedTaxonomies = dataReady && this.props.connectedTaxonomies && taxonomies
+    ? reduce(this.props.connectedTaxonomies, (filteredTaxonomies, tax, key) =>
+        Object.keys(taxonomies).indexOf(key) < 0
+          ? Object.assign(filteredTaxonomies, { [key]: tax })
+          : filteredTaxonomies
+      , {})
+    : this.props.connectedTaxonomies;
 
     // sorted entities
     const entitiesSorted = dataReady && this.props.entities
