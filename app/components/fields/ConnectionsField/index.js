@@ -39,20 +39,22 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
           }
         </LabelLarge>
         <EntityListItemsWrap>
-          <EntityListItems
-            entities={this.state.showAllConnections.indexOf(field.entityType) >= 0
-              ? sortedValues
-              : (sortedValues.slice(0, CONNECTIONMAX))
-            }
-            entityIcon={field.icon}
-            entityLinkTo={field.entityPath}
-            taxonomies={field.taxonomies}
-            associations={{
-              connections: { // filter by associated entity
-                options: field.connectionOptions,
-              },
-            }}
-          />
+          { field.values.length > 0 &&
+            <EntityListItems
+              entities={this.state.showAllConnections.indexOf(field.entityType) >= 0
+                ? sortedValues
+                : (sortedValues.slice(0, CONNECTIONMAX))
+              }
+              entityIcon={field.icon}
+              entityLinkTo={field.entityPath}
+              taxonomies={field.taxonomies}
+              associations={{
+                connections: { // filter by associated entity
+                  options: field.connectionOptions,
+                },
+              }}
+            />
+          }
         </EntityListItemsWrap>
         { sortedValues.length > CONNECTIONMAX &&
           <ToggleAllItems

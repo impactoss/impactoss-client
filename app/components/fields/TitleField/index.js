@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
 
-import appMessages from 'containers/App/messages';
+// import appMessages from 'containers/App/messages';
 
 import FieldWrap from 'components/fields/FieldWrap';
-import Label from 'components/fields/Label';
+// import Label from 'components/fields/Label';
 import Title from 'components/fields/Title';
 
 class TitleField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -11,11 +11,6 @@ class TitleField extends React.PureComponent { // eslint-disable-line react/pref
     const { field } = this.props;
     return (
       <FieldWrap>
-        {field.isManager &&
-          <Label>
-            {field.label || this.context.intl.formatMessage(appMessages.attributes.title)}
-          </Label>
-        }
         <Title>{field.value}</Title>
       </FieldWrap>
     );

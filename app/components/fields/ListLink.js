@@ -1,11 +1,10 @@
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
+// import { palette } from 'styled-theme';
 import { Link } from 'react-router';
 const ListLink = styled(Link)`
-  font-weight: bold;
-  font-size: 1.2em;
-  color: ${palette('dark', 1)};
+  font-size: 1em;
   display: block;
+  line-height: 1.3;
 `;
 
 export default ListLink;

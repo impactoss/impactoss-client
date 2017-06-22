@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react';
 
-import appMessages from 'containers/App/messages';
-
-import Label from 'components/fields/Label';
+// import appMessages from 'containers/App/messages';
+//
+// import Label from 'components/fields/Label';
 import Reference from 'components/fields/Reference';
 import ReferenceLarge from 'components/fields/ReferenceLarge';
 import FieldWrapInline from 'components/fields/FieldWrapInline';
@@ -12,9 +12,6 @@ class ReferenceField extends React.PureComponent { // eslint-disable-line react/
     const { field } = this.props;
     return (
       <FieldWrapInline>
-        <Label>
-          {field.label || this.context.intl.formatMessage(appMessages.attributes.reference)}
-        </Label>
         { field.large &&
           <ReferenceLarge>{field.value}</ReferenceLarge>
         }

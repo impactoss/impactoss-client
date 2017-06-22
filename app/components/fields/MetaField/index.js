@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
 
-import appMessages from 'containers/App/messages';
+// import appMessages from 'containers/App/messages';
 
 import FieldWrap from 'components/fields/FieldWrap';
-import Label from 'components/fields/Label';
+// import Label from 'components/fields/Label';
 import Meta from 'components/fields/Meta';
 
 class MetaField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -11,9 +11,6 @@ class MetaField extends React.PureComponent { // eslint-disable-line react/prefe
     const { field } = this.props;
     return (
       <FieldWrap>
-        <Label>
-          {field.label || this.context.intl.formatMessage(appMessages.attributes.meta.title)}
-        </Label>
         {
           field.fields.map((metaField, i) => (
             <Meta key={i}>

@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import styled from 'styled-components';
 
 import FieldWrap from 'components/fields/FieldWrap';
 import ListItem from 'components/fields/ListItem';
@@ -8,11 +9,15 @@ import EmptyHint from 'components/fields/EmptyHint';
 import Dot from 'components/fields/Dot';
 import DotWrapper from 'components/fields/DotWrapper';
 
+const Styled = styled(FieldWrap)`
+  padding: 20px 0;
+`;
+
 class ListField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { field } = this.props;
     return (
-      <FieldWrap>
+      <Styled>
         <ListLabel>
           {field.label}
           {field.entityType &&
@@ -32,7 +37,7 @@ class ListField extends React.PureComponent { // eslint-disable-line react/prefe
         { (!field.values || field.values.length === 0) &&
           <EmptyHint>{field.showEmpty}</EmptyHint>
         }
-      </FieldWrap>
+      </Styled>
     );
   }
 }

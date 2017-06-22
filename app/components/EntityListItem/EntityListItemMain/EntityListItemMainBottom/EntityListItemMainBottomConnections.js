@@ -7,13 +7,16 @@ import BottomTagGroup from './BottomTagGroup';
 
 const Count = styled.span`
   display: inline-block;
-  padding: 3px 7px;
   position: relative;
-  top: -2px;
   border-radius: 999px;
   font-size: 0.8em;
   background-color: ${(props) => palette(props.pIndex, 0)};
   color: ${palette('primary', 4)};
+  height: 1.8em;
+  min-width: 1.8em;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 1.8em;
 `;
 
 export default class EntityListItemMainBottomConnections extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

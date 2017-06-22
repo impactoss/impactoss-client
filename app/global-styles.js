@@ -25,11 +25,11 @@ injectGlobal`
   }
 
   a {
-    color: #eb6e51;
+    color: #027dbb;
     text-decoration: none;
 
     &:hover {
-      color: #d66149;
+      color: #026B9F;
     }
   }
 
