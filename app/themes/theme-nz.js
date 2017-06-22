@@ -84,22 +84,23 @@ theme.palette = {
   // 6: Group
   // 7: SMART
   // 8: Agency
-  taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF', '#40D7FF'],
-  taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#65C99B', '#238680', '#4EA53C', '#006096', '#178EC1', '#08C4F8', '#08C4F8'],
+  // 9: ?
+  taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#00AEEF', '#26938C', '#e91e63', '#00bcd4', '#027DBB', '#01527A', '#6A7880'],
+  taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#0099D1', '#238680', '#4EA53C', '#006096', '#026B9F', '#014A6F', '#014A6F'],
 
   // other entities
-  actions: ['#FFC107'],
-  actionsHover: ['#F2B200'],
-  sdgtargets: ['#40D7FF'],
-  sdgtargetsHover: ['#08C4F8'],
-  indicators: ['#EB6E51'],
-  indicatorsHover: ['#D66149'],
-  reports: ['#EB6E51'],
+  actions: ['#FC9F00'],
+  actionsHover: ['#DB8B00'],
+  sdgtargets: ['#00AEEF'],
+  sdgtargetsHover: ['#0099D1'],
+  indicators: ['#DB153D'],
+  indicatorsHover: ['#BF1234'],
+  reports: ['#CC2E41'],
   reportsHover: ['#D66149'],
-  recommendations: ['#FF9B69'],
-  recommendationsHover: ['#F48B5D'],
-  attributes: ['#6C787A'],
-  attributesHover: ['#4A595C'],
+  recommendations: ['#44AF49'],
+  recommendationsHover: ['#3D9E42'],
+  attributes: ['#56656D'],
+  attributesHover: ['#47545B'],
 
 
   //

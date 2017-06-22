@@ -12,7 +12,7 @@ import { palette } from 'styled-theme';
 import Icon from 'components/Icon';
 
 const Styled = styled.div`
-  color: ${palette('dark', 2)};
+  color: ${palette('dark', 3)};
   background-color: ${palette('light', 1)};
   padding: 0.5em 2em;
 `;

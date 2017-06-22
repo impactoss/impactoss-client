@@ -14,7 +14,7 @@ import Icon from 'components/Icon';
 
 // TODO compare TaxonomySidebarItem
 const Styled = styled(Button)`
-  font-weight: bold;
+  font-weight: 600;
   padding: 0.75em 2em;
   width: 100%;
   text-align: left;
