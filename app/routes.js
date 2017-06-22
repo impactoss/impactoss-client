@@ -576,10 +576,10 @@ export default function createRoutes(store) {
       onEnter: (nextState, replace) => replace('/categories/1'),
     }, {
       path: '/categories/:id', // the taxonomy id
-      name: 'taxonomyCategories',
+      name: 'categoryList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/TaxonomyCategories'),
+          import('containers/CategoryList'),
         ]);
 
         const renderRoute = loadModule(cb);

@@ -32,7 +32,7 @@ import Scrollable from 'components/basic/Scrollable';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
-import CategoryList from 'components/CategoryList';
+import CategoryListItems from 'components/CategoryListItems';
 import TaxonomySidebar from 'components/TaxonomySidebar';
 
 // relative
@@ -42,7 +42,7 @@ const Content = styled.div`
   padding: 0 4em;
 `;
 
-export class TaxonomyCategories extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   // make sure to load all data from server
   componentWillMount() {
@@ -143,7 +143,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
                 <Loading />
               }
               { dataReady &&
-                <CategoryList
+                <CategoryListItems
                   columns={this.getListColumns(taxonomy, categories, countAttributes)}
                   categories={mapToCategoryList(categories, onPageLink, countAttributes)}
                 />
@@ -156,7 +156,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
   }
 }
 
-TaxonomyCategories.propTypes = {
+CategoryList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onPageLink: PropTypes.func,
   handleNew: PropTypes.func,
@@ -167,7 +167,7 @@ TaxonomyCategories.propTypes = {
   params: PropTypes.object,
 };
 
-TaxonomyCategories.contextTypes = {
+CategoryList.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
@@ -263,4 +263,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TaxonomyCategories);
+export default connect(mapStateToProps, mapDispatchToProps)(CategoryList);
