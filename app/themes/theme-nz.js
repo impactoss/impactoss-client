@@ -17,7 +17,7 @@ theme.breakpoints = {
 // 2: main colour, light
 // 3: main colour, lighter (UNUSED)
 // 4: white
-const primary = coolorsToHex('https://coolors.co/328236-388e3c-3d9e42-44af49-ffffff');
+const primary = coolorsToHex('https://coolors.co/048e47-099b50-07aa51-09b757-ffffff');
   // secondary color palette: dark to light
   // 0: dark header colour, darker
   // 1: dark header colour
@@ -86,40 +86,40 @@ theme.palette = {
   // 8: Agency
   taxonomies: [
     '#E8EAEB',
-    '#6B3285',
-    '#5149AD',
-    '#26938C',
+    '#6444AF',
+    '#88338E',
+    '#C27DE0',
     '#00AEEF',
-    '#e91e63',
-    '#00bcd4',
+    '#00A088',
+    '#00C4B3',
     '#027DBB',
     '#01527A',
-    '#6A7880',
+    '#ffffff',
   ],
   taxonomiesHover: [
     '#DBDCDD',
-    '#622E79',
-    '#4A439E',
-    '#238680',
+    '#523890',
+    '#924598',
+    '#B172CC',
     '#0099D1',
-    '#4EA53C',
-    '#006096',
+    '#00927C',
+    '#00B3A3',
     '#026B9F',
     '#014A6F',
     '#014A6F',
   ],
 
   // other entities
-  actions: ['#FC9F00'],
-  actionsHover: ['#DB8B00'],
+  actions: ['#F9C907'],
+  actionsHover: ['#E3B707'],
   sdgtargets: ['#00AEEF'],
-  sdgtargetsHover: ['#0099D1'],
+  sdgtargetsHover: ['#009FDA'],
   indicators: ['#DB153D'],
-  indicatorsHover: ['#BF1234'],
-  reports: ['#CC2E41'],
-  reportsHover: ['#D66149'],
-  recommendations: ['#44AF49'],
-  recommendationsHover: ['#3D9E42'],
+  indicatorsHover: ['#C81438'],
+  reports: ['#DB153D'],
+  reportsHover: ['#C81438'],
+  recommendations: ['#027DBB'],
+  recommendationsHover: ['#026B9F'],
   attributes: ['#56656D'],
   attributesHover: ['#47545B'],
 
@@ -167,7 +167,7 @@ theme.palette = {
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
   asideListItem: [dark[2], primary[4], primary[4], dark[2], light[1]],
-  asideListItemHover: [dark[2], primary[4], light[1], dark[1], light[2]],
+  asideListItemHover: [dark[2], primary[4], light[0], dark[1], light[2]],
 
   //
   // BUTTONS / LINKS
