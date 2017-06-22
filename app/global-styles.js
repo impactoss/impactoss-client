@@ -34,7 +34,7 @@ injectGlobal`
   }
 
   h1 {
-    font-size: 2.8em;
+    font-size: 2.5em;
   }
   h2 {
     font-size: 2.15em;
