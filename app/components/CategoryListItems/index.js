@@ -9,7 +9,7 @@ const CategoryListBody = styled.div`
   padding-top: 1em
 `;
 
-class CategoryList extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class CategoryListItems extends React.Component { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { categories, columns } = this.props;
 
@@ -30,9 +30,9 @@ class CategoryList extends React.Component { // eslint-disable-line react/prefer
   }
 }
 
-CategoryList.propTypes = {
+CategoryListItems.propTypes = {
   categories: PropTypes.array,
   columns: PropTypes.array,
 };
 
-export default CategoryList;
+export default CategoryListItems;

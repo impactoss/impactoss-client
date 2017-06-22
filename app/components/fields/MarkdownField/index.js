@@ -6,7 +6,7 @@ import appMessages from 'containers/App/messages';
 import FieldWrap from 'components/fields/FieldWrap';
 import Label from 'components/fields/Label';
 
-class DescriptionField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class MarkdownField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { field } = this.props;
     return (
@@ -20,11 +20,11 @@ class DescriptionField extends React.PureComponent { // eslint-disable-line reac
   }
 }
 
-DescriptionField.propTypes = {
+MarkdownField.propTypes = {
   field: PropTypes.object.isRequired,
 };
-DescriptionField.contextTypes = {
+MarkdownField.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-export default DescriptionField;
+export default MarkdownField;

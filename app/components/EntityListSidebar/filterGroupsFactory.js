@@ -32,14 +32,14 @@ export const makeFilterGroups = (
   }
 
   // connectedTaxonomies option group
-  if (filters.connectedTaxonomies && connectedTaxonomies.taxonomies) {
+  if (filters.connectedTaxonomies) {
     // first prepare taxonomy options
     filterGroups.connectedTaxonomies = {
       id: 'connectedTaxonomies', // filterGroupId
       label: messages.connectedTaxonomies,
       show: true,
       icon: 'connectedCategories',
-      options: reduce(Object.values(connectedTaxonomies.taxonomies), (taxOptions, taxonomy) => ({
+      options: reduce(Object.values(connectedTaxonomies), (taxOptions, taxonomy) => ({
         ...taxOptions,
         [taxonomy.id]: {
           id: taxonomy.id, // filterOptionId

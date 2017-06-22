@@ -17,10 +17,15 @@ const formInitial = fromJS({
     title: '',
     description: '',
     draft: true,
+    target_date: '',
+    target_date_comment: '',
+    outcome: '',
+    indicator_summary: '',
   },
   associatedTaxonomies: {},
   associatedRecommendations: [],
   associatedIndicators: [],
+  associatedSdgTargets: [],
 });
 
 function formReducer(state = formInitial, action) {

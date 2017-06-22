@@ -12,6 +12,7 @@ import { Map, List } from 'immutable';
 
 import {
   renderRecommendationControl,
+  renderSdgTargetControl,
   renderIndicatorControl,
   renderTaxonomyControl,
   validateRequired,
@@ -92,7 +93,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (recommendations, indicators) => ([
+  getBodyMainFields = (recommendations, indicators, sdgtargets) => ([
     {
       fields: [
         {
@@ -102,6 +103,20 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
           label: this.context.intl.formatMessage(appMessages.attributes.description),
         },
+        {
+          id: 'outcome',
+          controlType: 'markdown',
+          model: '.attributes.outcome',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.outcome),
+          label: this.context.intl.formatMessage(appMessages.attributes.outcome),
+        },
+        {
+          id: 'indicator_summary',
+          controlType: 'markdown',
+          model: '.attributes.indicator_summary',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.indicator_summary),
+          label: this.context.intl.formatMessage(appMessages.attributes.indicator_summary),
+        },
       ],
     },
     {
@@ -109,6 +124,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       icon: 'connections',
       fields: [
         renderRecommendationControl(recommendations),
+        renderSdgTargetControl(sdgtargets),
         renderIndicatorControl(indicators),
       ],
     },
@@ -128,6 +144,13 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
         errorMessages: {
           date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
         },
+      },
+      {
+        id: 'target_date_comment',
+        controlType: 'textarea',
+        model: '.attributes.target_date_comment',
+        label: this.context.intl.formatMessage(appMessages.attributes.target_date_comment),
+        placeholder: this.context.intl.formatMessage(appMessages.placeholders.target_date_comment),
       }],
     },
     { // fieldGroup
@@ -137,18 +160,18 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     },
   ]);
 
-  getFields = (taxonomies, recommendations, indicators) => ({ // isManager, taxonomies,
+  getFields = (taxonomies, recommendations, indicators, sdgtargets) => ({ // isManager, taxonomies,
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(),
     },
     body: {
-      main: this.getBodyMainFields(recommendations, indicators),
+      main: this.getBodyMainFields(recommendations, indicators, sdgtargets),
       aside: this.getBodyAsideFields(taxonomies),
     },
   })
   render() {
-    const { dataReady, viewDomain, recommendations, indicators, taxonomies } = this.props;
+    const { dataReady, viewDomain, recommendations, indicators, taxonomies, sdgtargets } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -196,7 +219,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(taxonomies, recommendations, indicators)}
+              fields={this.getFields(taxonomies, recommendations, indicators, sdgtargets)}
             />
           }
         </Content>
@@ -216,6 +239,7 @@ ActionNew.propTypes = {
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
+  sdgtargets: PropTypes.object,
 };
 
 ActionNew.contextTypes = {
@@ -230,6 +254,7 @@ const mapStateToProps = (state) => ({
     'taxonomies',
     'recommendations',
     'indicators',
+    'sdgtargets',
   ] }),
   taxonomies: getEntities(
     state,
@@ -257,6 +282,12 @@ const mapStateToProps = (state) => ({
       path: 'indicators',
     },
   ),
+  // all indicators,
+  sdgtargets: getEntities(
+    state, {
+      path: 'sdgtargets',
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -266,6 +297,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('sdgtargets'));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
@@ -306,6 +338,17 @@ function mapDispatchToProps(dispatch) {
           create: getCheckedValuesFromOptions(formData.get('associatedIndicators'))
           .map((id) => Map({
             indicator_id: id,
+          })),
+        }));
+      }
+
+      // sdgtargets
+      if (formData.get('associatedSdgTargets')) {
+        saveData = saveData.set('sdgtargetMeasures', Map({
+          delete: List(),
+          create: getCheckedValuesFromOptions(formData.get('associatedSdgTargets'))
+          .map((id) => Map({
+            sdgtarget_id: id,
           })),
         }));
       }

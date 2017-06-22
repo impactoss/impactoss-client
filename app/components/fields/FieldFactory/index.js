@@ -3,7 +3,7 @@ import Field from 'components/fields/Field';
 
 import ConnectionsField from 'components/fields/ConnectionsField';
 import DateField from 'components/fields/DateField';
-import DescriptionField from 'components/fields/DescriptionField';
+import MarkdownField from 'components/fields/MarkdownField';
 import DownloadField from 'components/fields/DownloadField';
 import EmailField from 'components/fields/EmailField';
 import LinkField from 'components/fields/LinkField';
@@ -56,14 +56,15 @@ class FieldFactory extends React.Component { // eslint-disable-line react/prefer
           return (<DateField field={field} />);
         case 'manager':
           return (<ManagerField field={field} />);
-        case 'description':
-          return (<DescriptionField field={field} />);
         case 'list':
           return (<ListField field={field} />);
         case 'schedule':
           return (<ScheduleField field={field} />);
         case 'download':
           return (<DownloadField field={field} />);
+        case 'description':
+        case 'markdown':
+          return (<MarkdownField field={field} />);
         case 'connections':
           return (<ConnectionsField field={field} />);
         case 'reports':

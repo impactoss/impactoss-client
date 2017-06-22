@@ -17,9 +17,9 @@ export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies) => {
     })));
   }
   // connectedTaxonomies options
-  if (filters.connectedTaxonomies && connectedTaxonomies.taxonomies) {
+  if (filters.connectedTaxonomies && connectedTaxonomies) {
     // first prepare taxonomy options
-    options = options.concat(Object.values(connectedTaxonomies.taxonomies).map((taxonomy) => ({
+    options = options.concat(Object.values(connectedTaxonomies).map((taxonomy) => ({
       value: `x:${taxonomy.id}`, // filterOptionId
       label: taxonomy.attributes.title,
     })));
@@ -35,7 +35,7 @@ export const makeEntityGroups = (entitiesSorted, taxonomies, connectedTaxonomies
     }
     const locationQueryGroupSplit = locationQueryGroup.split(':');
     if (locationQueryGroupSplit.length > 1) {
-      const taxonomy = connectedTaxonomies.taxonomies[parseInt(locationQueryGroupSplit[1], 10)];
+      const taxonomy = connectedTaxonomies[parseInt(locationQueryGroupSplit[1], 10)];
       if (taxonomy) {
         return makeConnectedTaxonomyGroups(entitiesSorted, taxonomy, filters);
       }

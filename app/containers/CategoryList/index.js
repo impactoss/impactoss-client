@@ -32,7 +32,7 @@ import Scrollable from 'components/basic/Scrollable';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
-import CategoryList from 'components/CategoryList';
+import CategoryListItems from 'components/CategoryListItems';
 import TaxonomySidebar from 'components/TaxonomySidebar';
 
 // relative
@@ -42,7 +42,7 @@ const Content = styled.div`
   padding: 0 4em;
 `;
 
-export class TaxonomyCategories extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   // make sure to load all data from server
   componentWillMount() {
@@ -59,12 +59,6 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
 
   getCountAttributes = (taxonomy) => {
     const attributes = [];
-    if (taxonomy.attributes.tags_measures) {
-      attributes.push({
-        attribute: 'actions',
-        label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-      });
-    }
     if (taxonomy.attributes.tags_recommendations) {
       attributes.push({
         attribute: 'recommendations',
@@ -75,6 +69,12 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
       attributes.push({
         attribute: 'sdgtargets',
         label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+      });
+    }
+    if (taxonomy.attributes.tags_measures) {
+      attributes.push({
+        attribute: 'actions',
+        label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
       });
     }
     return attributes;
@@ -100,9 +100,9 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
   }
   render() {
     const { taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
-
-    const taxonomy = dataReady ? taxonomies[parseInt(params.id, 10)] : null;
-    const contentTitle = dataReady ? this.getTaxTitle(taxonomy.id) : '';
+    const reference = typeof params.id !== 'undefined' ? parseInt(params.id, 10) : 1;
+    const contentTitle = this.getTaxTitle(reference);
+    const taxonomy = dataReady ? taxonomies[reference] : null;
 
     const buttons = dataReady && isManager
       ? [{
@@ -125,7 +125,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
         <Sidebar>
           <Scrollable>
             <TaxonomySidebar
-              taxonomies={mapToTaxonomyList(taxonomies, onPageLink, params.id, false)}
+              taxonomies={mapToTaxonomyList(taxonomies, onPageLink, reference, false)}
             />
           </Scrollable>
         </Sidebar>
@@ -143,7 +143,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
                 <Loading />
               }
               { dataReady &&
-                <CategoryList
+                <CategoryListItems
                   columns={this.getListColumns(taxonomy, categories, countAttributes)}
                   categories={mapToCategoryList(categories, onPageLink, countAttributes)}
                 />
@@ -156,7 +156,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
   }
 }
 
-TaxonomyCategories.propTypes = {
+CategoryList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onPageLink: PropTypes.func,
   handleNew: PropTypes.func,
@@ -167,7 +167,7 @@ TaxonomyCategories.propTypes = {
   params: PropTypes.object,
 };
 
-TaxonomyCategories.contextTypes = {
+CategoryList.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
@@ -197,7 +197,7 @@ const mapStateToProps = (state, props) => ({
       out: 'js',
       path: 'categories',
       where: {
-        taxonomy_id: props.params.id,
+        taxonomy_id: typeof props.params.id !== 'undefined' ? props.params.id : 1,
       },
       extend: [
         {
@@ -263,4 +263,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TaxonomyCategories);
+export default connect(mapStateToProps, mapDispatchToProps)(CategoryList);

@@ -15,7 +15,9 @@ import { UPDATE_ENTITY_FORM } from 'containers/App/constants';
 const formInitial = fromJS({
   attributes: {
     title: '',
-    number: '',
+    reference: '',
+    accepted: true,
+    response: '',
     draft: true,
   },
   associatedTaxonomies: {},

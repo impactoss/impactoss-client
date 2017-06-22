@@ -50,15 +50,15 @@ class SelectFile extends React.Component { // eslint-disable-line react/prefer-s
     results.forEach((result) => {
       const [evt, file] = result;
       // try {
-      const parsed = Baby.parse(evt.target.result, { header: true });
+      const parsed = Baby.parse(evt.target.result, { header: true, skipEmptyLines: true });
       if (parsed && parsed.errors && parsed.errors.length === 0) {
         this.props.onChange({
           rows: parsed.data,
           meta: parsed.meta,
           file,
         });
-        // } else {
-          // console.log('error')
+      //  } else {
+      //    console.log('error')
       }
       // }
       // catch (err) {

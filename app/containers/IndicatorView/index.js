@@ -44,6 +44,12 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     { // fieldGroup
       fields: [
         {
+          type: 'reference',
+          value: entity.attributes.reference,
+          large: true,
+          label: this.context.intl.formatMessage(appMessages.attributes.reference),
+        },
+        {
           type: 'titleText',
           value: entity.attributes.title,
           isManager,
@@ -58,18 +64,8 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         {
           fields: [
             {
-              type: 'referenceStatus',
-              fields: [
-                {
-                  type: 'reference',
-                  value: entity.attributes.reference || entity.id,
-                  label: this.context.intl.formatMessage(appMessages.attributes.idOrRef),
-                },
-                {
-                  type: 'status',
-                  value: entity.attributes.draft,
-                },
-              ],
+              type: 'status',
+              value: entity.attributes.draft,
             },
             {
               type: 'meta',

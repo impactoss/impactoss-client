@@ -85,10 +85,18 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     { // fieldGroup
       fields: [
         {
+          id: 'reference',
+          controlType: 'short',
+          model: '.attributes.reference',
+          label: this.context.intl.formatMessage(appMessages.attributes.referenceOptional),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
+        },
+        {
           id: 'title',
           controlType: 'title',
           model: '.attributes.title',
           label: this.context.intl.formatMessage(appMessages.attributes.title),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
           validators: {
             required: validateRequired,
           },
@@ -100,6 +108,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           id: 'short_title',
           controlType: 'short',
           model: '.attributes.short_title',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.short_title),
           label: this.context.intl.formatMessage(appMessages.attributes.short_title),
         },
       ],
@@ -109,12 +118,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        {
-          controlType: 'info',
-          type: 'reference',
-          value: entity.id,
-          label: this.context.intl.formatMessage(appMessages.attributes.id),
-        },
         {
           controlType: 'info',
           type: 'meta',
@@ -140,6 +143,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           controlType: 'markdown',
           model: '.attributes.description',
           label: this.context.intl.formatMessage(appMessages.attributes.description),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
         },
       ],
     },
@@ -152,6 +156,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         controlType: 'url',
         model: '.attributes.url',
         label: this.context.intl.formatMessage(appMessages.attributes.url),
+        placeholder: this.context.intl.formatMessage(appMessages.placeholders.url),
       }],
     });
     if (isAdmin && !!entity.taxonomy.attributes.has_manager) {

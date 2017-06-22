@@ -18,7 +18,7 @@ import {
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE, ACCEPTED_STATUSES } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -60,6 +60,19 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     { // fieldGroup
       fields: [
         {
+          id: 'reference',
+          controlType: 'short',
+          model: '.attributes.reference',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
+          label: this.context.intl.formatMessage(appMessages.attributes.reference),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+        {
           id: 'title',
           controlType: 'titleText',
           model: '.attributes.title',
@@ -80,19 +93,6 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     {
       fields: [
         {
-          id: 'number',
-          controlType: 'short',
-          model: '.attributes.number',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.number),
-          label: this.context.intl.formatMessage(appMessages.attributes.reference),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
           id: 'status',
           controlType: 'select',
           model: '.attributes.draft',
@@ -103,6 +103,24 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     },
   ]);
   getBodyMainFields = (actions) => ([
+    {
+      fields: [
+        {
+          id: 'accepted',
+          controlType: 'select',
+          model: '.attributes.accepted',
+          label: this.context.intl.formatMessage(appMessages.attributes.accepted),
+          options: ACCEPTED_STATUSES,
+        },
+        {
+          id: 'response',
+          controlType: 'markdown',
+          model: '.attributes.response',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.response),
+          label: this.context.intl.formatMessage(appMessages.attributes.response),
+        },
+      ],
+    },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
