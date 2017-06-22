@@ -145,6 +145,17 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             },
           },
           {
+            path: 'sdgtarget_measures',
+            key: 'measure_id',
+            reverse: true,
+            as: 'sdgtargets',
+            connected: {
+              path: 'sdgtargets',
+              key: 'sdgtarget_id',
+              forward: true,
+            },
+          },
+          {
             path: 'measure_indicators',
             key: 'measure_id',
             reverse: true,
@@ -211,7 +222,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         ],
       },
       connections: {
-        options: ['indicators', 'recommendations'],
+        options: ['indicators', 'recommendations', 'sdgtargets'],
       },
       taxonomies: { // filter by each category
         out: 'js',
@@ -242,6 +253,24 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
                 key: 'category_id',
                 reverse: true,
                 as: 'recommendations',
+              },
+            },
+          },
+          {
+            out: 'js',
+            path: 'taxonomies',
+            where: {
+              tags_sdgtargets: true,
+            },
+            extend: {
+              path: 'categories',
+              key: 'taxonomy_id',
+              reverse: true,
+              extend: {
+                path: 'sdgtarget_categories',
+                key: 'category_id',
+                reverse: true,
+                as: 'sdgtargets',
               },
             },
           },
@@ -298,26 +327,55 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
               whereKey: 'recommendation_id',
             },
           },
+          {
+            label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+            path: 'sdgtargets', // filter by recommendation connection
+            query: 'sdgtargets',
+            key: 'sdgtarget_id',
+            filter: true,
+            connected: {
+              path: 'sdgtarget_measures',
+              key: 'measure_id',
+              whereKey: 'sdgtarget_id',
+            },
+          },
         ],
       },
       connectedTaxonomies: { // filter by each category
         query: 'catx',
         filter: true,
-        connections: [{
-          path: 'recommendations', // filter by recommendation connection
-          title: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
-          key: 'recommendation_id',
-          connected: {
-            path: 'recommendation_measures',
-            key: 'measure_id',
+        connections: [
+          {
+            path: 'recommendations', // filter by recommendation connection
+            title: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+            key: 'recommendation_id',
             connected: {
-              path: 'recommendation_categories',
-              key: 'recommendation_id',
-              attribute: 'recommendation_id',
-              whereKey: 'category_id',
+              path: 'recommendation_measures',
+              key: 'measure_id',
+              connected: {
+                path: 'recommendation_categories',
+                key: 'recommendation_id',
+                attribute: 'recommendation_id',
+                whereKey: 'category_id',
+              },
             },
           },
-        }],
+          {
+            path: 'sdgtargets', // filter by recommendation connection
+            title: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+            key: 'sdgtarget_id',
+            connected: {
+              path: 'sdgtarget_measures',
+              key: 'measure_id',
+              connected: {
+                path: 'sdgtarget_categories',
+                key: 'sdgtarget_id',
+                attribute: 'sdgtarget_id',
+                whereKey: 'category_id',
+              },
+            },
+          },
+        ],
       },
     };
 
@@ -344,6 +402,14 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             path: 'recommendations',
             connectPath: 'recommendation_measures',
             key: 'recommendation_id',
+            ownKey: 'measure_id',
+          },
+          {
+            filter: true,
+            label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+            path: 'sdgtargets',
+            connectPath: 'sdgtargets_measures',
+            key: 'sdgtarget_id',
             ownKey: 'measure_id',
           },
         ],

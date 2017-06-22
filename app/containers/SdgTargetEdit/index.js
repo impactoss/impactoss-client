@@ -15,6 +15,7 @@ import { Map, fromJS } from 'immutable';
 import {
   taxonomyOptions,
   entityOptions,
+  renderActionControl,
   renderIndicatorControl,
   renderTaxonomyControl,
   validateRequired,
@@ -73,7 +74,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, indicators, sdgtarget } = props;
+    const { taxonomies, indicators, sdgtarget, actions } = props;
 
     return sdgtarget
     ? Map({
@@ -81,6 +82,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
       attributes: fromJS(sdgtarget.attributes),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedIndicators: entityOptions(indicators, true),
+      associatedActions: entityOptions(actions, true),
     })
     : Map();
   }
@@ -88,6 +90,19 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
+        {
+          id: 'reference',
+          controlType: 'short',
+          model: '.attributes.reference',
+          label: this.context.intl.formatMessage(appMessages.attributes.reference),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
         {
           id: 'title',
           controlType: 'titleText',
@@ -108,29 +123,12 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
     {
       fields: [
         {
-          controlType: 'combo',
-          fields: [
-            {
-              id: 'number',
-              controlType: 'short',
-              model: '.attributes.reference',
-              label: this.context.intl.formatMessage(appMessages.attributes.reference),
-              validators: {
-                required: validateRequired,
-              },
-              errorMessages: {
-                required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-              },
-            },
-            {
-              id: 'status',
-              controlType: 'select',
-              model: '.attributes.draft',
-              label: this.context.intl.formatMessage(appMessages.attributes.draft),
-              value: entity.attributes.draft,
-              options: PUBLISH_STATUSES,
-            },
-          ],
+          id: 'status',
+          controlType: 'select',
+          model: '.attributes.draft',
+          label: this.context.intl.formatMessage(appMessages.attributes.draft),
+          value: entity.attributes.draft,
+          options: PUBLISH_STATUSES,
         },
         {
           controlType: 'info',
@@ -150,11 +148,12 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (indicators) => ([
+  getBodyMainFields = (indicators, actions) => ([
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
+        renderActionControl(actions),
         renderIndicatorControl(indicators),
       ],
     },
@@ -168,19 +167,19 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getFields = (entity, taxonomies, indicators) => ({ // isManager, taxonomies,
+  getFields = (entity, taxonomies, indicators, actions) => ({ // isManager, taxonomies,
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(entity),
     },
     body: {
-      main: this.getBodyMainFields(indicators),
+      main: this.getBodyMainFields(indicators, actions),
       aside: this.getBodyAsideFields(entity, taxonomies),
     },
   })
 
   render() {
-    const { sdgtarget, dataReady, viewDomain, indicators, taxonomies } = this.props;
+    const { sdgtarget, dataReady, viewDomain, indicators, taxonomies, actions } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -207,7 +206,8 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
                 onClick: () => this.props.handleSubmit(
                   viewDomain.form.data,
                   taxonomies,
-                  indicators
+                  indicators,
+                  actions
                 ),
               }] : null
             }
@@ -233,11 +233,12 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 taxonomies,
-                indicators
+                indicators,
+                actions
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(sdgtarget, taxonomies, indicators)}
+              fields={this.getFields(sdgtarget, taxonomies, indicators, actions)}
             />
           }
         </Content>
@@ -259,6 +260,7 @@ SdgTargetEdit.propTypes = {
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   indicators: PropTypes.object,
+  actions: PropTypes.object,
 };
 
 SdgTargetEdit.contextTypes = {
@@ -275,6 +277,8 @@ const mapStateToProps = (state, props) => ({
     'sdgtarget_categories',
     'indicators',
     'sdgtarget_indicators',
+    'measures',
+    'sdgtarget_measures',
   ] }),
   sdgtarget: getEntity(
     state,
@@ -329,6 +333,21 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
+  actions: getEntities(
+    state,
+    {
+      path: 'measures',
+      extend: {
+        as: 'associated',
+        path: 'sdgtarget_measures',
+        key: 'measure_id',
+        reverse: true,
+        where: {
+          sdgtarget_id: props.params.id,
+        },
+      },
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -338,10 +357,11 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
-
       dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
+      dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_measures'));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
@@ -350,13 +370,23 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.load(model, formData));
     },
 
-    handleSubmit: (formData, taxonomies, indicators) => {
+    handleSubmit: (formData, taxonomies, indicators, actions) => {
       const saveData = formData
         .set(
           'sdgtargetCategories',
           getCategoryUpdatesFromFormData({
             formData,
             taxonomies,
+            createKey: 'sdgtarget_id',
+          })
+        )
+        .set(
+          'sdgtargetActions',
+          getConnectionUpdatesFromFormData({
+            formData,
+            connections: actions,
+            connectionAttribute: 'associatedActions',
+            createConnectionKey: 'measure_id',
             createKey: 'sdgtarget_id',
           })
         )

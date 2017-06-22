@@ -47,9 +47,11 @@ const Count = styled.div`
 `;
 const Title = styled.span`
   font-size: 1.1em;
-  padding-bottom: 3px;
-  border-bottom: 1px solid;
   line-height: 1.6;
+`;
+const Reference = styled.span`
+  padding-right: 0.5em;
+  opacity:0.6;
 `;
 
 class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -58,6 +60,9 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
       case ('title'):
         return (
           <Title>
+            { category.reference &&
+              <Reference>{category.reference}</Reference>
+            }
             {category.title}
           </Title>
         );

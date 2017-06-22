@@ -61,6 +61,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
           controlType: 'short',
           model: '.attributes.menu_title',
           label: this.context.intl.formatMessage(appMessages.attributes.menu_title),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.menu_title),
           validators: {
             required: validateRequired,
           },
@@ -90,11 +91,11 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
     {
       fields: [
         {
-          id: 'description',
+          id: 'content',
           controlType: 'markdown',
           model: '.attributes.content',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.content),
+          label: this.context.intl.formatMessage(appMessages.attributes.content),
         },
       ],
     },

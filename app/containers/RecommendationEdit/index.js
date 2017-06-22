@@ -25,7 +25,7 @@ import {
   getConnectionUpdatesFromFormData,
 } from 'utils/entities';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE, ACCEPTED_STATUSES } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -88,6 +88,18 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     { // fieldGroup
       fields: [
         {
+          id: 'reference',
+          controlType: 'short',
+          model: '.attributes.reference',
+          label: this.context.intl.formatMessage(appMessages.attributes.reference),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+        {
           id: 'title',
           controlType: 'titleText',
           model: '.attributes.title',
@@ -107,29 +119,12 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     {
       fields: [
         {
-          controlType: 'combo',
-          fields: [
-            {
-              id: 'number',
-              controlType: 'short',
-              model: '.attributes.number',
-              label: this.context.intl.formatMessage(appMessages.attributes.reference),
-              validators: {
-                required: validateRequired,
-              },
-              errorMessages: {
-                required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-              },
-            },
-            {
-              id: 'status',
-              controlType: 'select',
-              model: '.attributes.draft',
-              label: this.context.intl.formatMessage(appMessages.attributes.draft),
-              value: entity.attributes.draft,
-              options: PUBLISH_STATUSES,
-            },
-          ],
+          id: 'status',
+          controlType: 'select',
+          model: '.attributes.draft',
+          label: this.context.intl.formatMessage(appMessages.attributes.draft),
+          value: entity.attributes.draft,
+          options: PUBLISH_STATUSES,
         },
         {
           controlType: 'info',
@@ -149,6 +144,24 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     },
   ]);
   getBodyMainFields = (actions) => ([
+    {
+      fields: [
+        {
+          id: 'accepted',
+          controlType: 'select',
+          model: '.attributes.accepted',
+          label: this.context.intl.formatMessage(appMessages.attributes.accepted),
+          options: ACCEPTED_STATUSES,
+        },
+        {
+          id: 'response',
+          controlType: 'markdown',
+          model: '.attributes.response',
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.response),
+          label: this.context.intl.formatMessage(appMessages.attributes.response),
+        },
+      ],
+    },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',

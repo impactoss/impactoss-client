@@ -19,7 +19,7 @@ class StatusField extends React.PureComponent { // eslint-disable-line react/pre
         </Label>
         <Status>
           {
-            find(PUBLISH_STATUSES, { value: field.value }).label
+            find(field.options || PUBLISH_STATUSES, { value: field.value }).label
           }
         </Status>
       </FieldWrapInline>

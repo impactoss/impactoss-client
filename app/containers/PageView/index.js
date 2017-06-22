@@ -40,54 +40,31 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     }
   }
 
-  getHeaderMainFields = (entity, isContributor) => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        {
-          type: 'title',
-          label: this.context.intl.formatMessage(appMessages.attributes.menu_title),
-          value: entity.attributes.menu_title,
-          isManager: isContributor,
-        },
-      ],
-    },
-  ]);
-  getHeaderAsideFields = (entity, isContributor) => {
-    if (!isContributor) {
-      return [
-        {
-          fields: [
-            {
-              type: 'referenceStatus',
-              fields: [
-                {
-                  type: 'reference',
-                  label: this.context.intl.formatMessage(appMessages.attributes.id),
-                  value: entity.id,
-                  large: true,
-                },
-              ],
-            },
-          ],
-        },
-      ];
+  getHeaderMainFields = (entity, isContributor) => {
+    const fields = [];
+    if (isContributor) {
+      fields.push({
+        type: 'reference',
+        label: this.context.intl.formatMessage(appMessages.attributes.id),
+        value: entity.id,
+      });
     }
-    return [
+    fields.push({
+      type: 'title',
+      label: this.context.intl.formatMessage(appMessages.attributes.menu_title),
+      value: entity.attributes.menu_title,
+      isManager: isContributor,
+    });
+    return [{ fields }];
+  };
+  getHeaderAsideFields = (entity, isContributor) => !isContributor
+    ? null
+    : [
       {
         fields: [
           {
-            type: 'referenceStatus',
-            fields: [
-              {
-                type: 'reference',
-                label: this.context.intl.formatMessage(appMessages.attributes.id),
-                value: entity.id,
-              },
-              {
-                type: 'status',
-                value: entity.attributes.draft,
-              },
-            ],
+            type: 'status',
+            value: entity.attributes.draft,
           },
           {
             type: 'meta',
@@ -105,7 +82,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
         ],
       },
     ];
-  }
+
   getBodyMainFields = (entity) => ([
     {
       fields: [

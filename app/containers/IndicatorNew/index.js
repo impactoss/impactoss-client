@@ -12,6 +12,7 @@ import { Map, List } from 'immutable';
 
 import {
   renderActionControl,
+  renderSdgTargetControl,
   renderUserControl,
   validateRequired,
   validateDateFormat,
@@ -61,6 +62,13 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     { // fieldGroup
       fields: [
         {
+          id: 'reference',
+          controlType: 'short',
+          model: '.attributes.reference',
+          label: this.context.intl.formatMessage(appMessages.attributes.referenceDefault),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
+        },
+        {
           id: 'title',
           controlType: 'titleText',
           model: '.attributes.title',
@@ -81,13 +89,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     {
       fields: [
         {
-          id: 'number',
-          controlType: 'short',
-          model: '.attributes.reference',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.number),
-          label: this.context.intl.formatMessage(appMessages.attributes.reference),
-        },
-        {
           id: 'status',
           controlType: 'select',
           model: '.attributes.draft',
@@ -99,15 +100,15 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getBodyMainFields = (actions) => ([
+  getBodyMainFields = (actions, sdgtargets) => ([
     {
       fields: [
         {
           id: 'description',
           controlType: 'markdown',
           model: '.attributes.description',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
           label: this.context.intl.formatMessage(appMessages.attributes.description),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
         },
       ],
     },
@@ -116,6 +117,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       icon: 'connections',
       fields: [
         renderActionControl(actions),
+        renderSdgTargetControl(sdgtargets),
       ],
     },
   ]);
@@ -173,19 +175,19 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getFields = (actions, users) => ({ // isManager, taxonomies,
+  getFields = (actions, users, sdgtargets) => ({ // isManager, taxonomies,
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(),
     },
     body: {
-      main: this.getBodyMainFields(actions),
+      main: this.getBodyMainFields(actions, sdgtargets),
       aside: this.getBodyAsideFields(users),
     },
   })
 
   render() {
-    const { dataReady, viewDomain, actions, users } = this.props;
+    const { dataReady, viewDomain, actions, users, sdgtargets } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -233,7 +235,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(actions, users)}
+              fields={this.getFields(actions, users, sdgtargets)}
             />
           }
         </Content>
@@ -251,6 +253,7 @@ IndicatorNew.propTypes = {
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   actions: PropTypes.object,
+  sdgtargets: PropTypes.object,
   users: PropTypes.object,
 };
 
@@ -265,12 +268,20 @@ const mapStateToProps = (state) => ({
     'measures',
     'users',
     'user_roles',
+    'sdgtargets',
   ] }),
 
   // all actions,
   actions: getEntities(
     state, {
       path: 'measures',
+    },
+  ),
+
+  // all sdgtargets,
+  sdgtargets: getEntities(
+    state, {
+      path: 'sdgtargets',
     },
   ),
 
@@ -296,6 +307,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('measures'));
       dispatch(loadEntitiesIfNeeded('users'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+      dispatch(loadEntitiesIfNeeded('sdgtargets'));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
@@ -312,6 +324,15 @@ function mapDispatchToProps(dispatch) {
           })),
         }));
       }
+      if (formData.get('associatedSdgTargets')) {
+        saveData = saveData.set('sdgtargetIndicators', Map({
+          delete: List(),
+          create: getCheckedValuesFromOptions(formData.get('associatedSdgTargets'))
+          .map((id) => Map({
+            sdgtarget_id: id,
+          })),
+        }));
+      }
       // TODO: remove once have singleselect instead of multiselect
       const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));
       if (List.isList(formUserIds) && formUserIds.size) {
@@ -321,6 +342,11 @@ function mapDispatchToProps(dispatch) {
       }
 
       // cleanup
+      // default to database id
+      const formRef = formData.getIn(['attributes', 'reference']) || '';
+      if (formRef.trim() === '') {
+        saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
+      }
       if (!saveData.getIn(['attributes', 'repeat'])) {
         saveData = saveData
           .setIn(['attributes', 'frequency_months'], null)

@@ -43,6 +43,10 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
     { // fieldGroup
       fields: [
         {
+          type: 'reference',
+          value: entity.attributes.reference,
+        },
+        {
           type: 'title',
           value: entity.attributes.title,
           isManager,
@@ -50,40 +54,14 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
       ],
     },
   ]);
-  getHeaderAsideFields = (entity, isManager) => {
-    if (!isManager) {
-      return [
-        {
-          fields: [
-            {
-              type: 'referenceStatus',
-              fields: [
-                {
-                  type: 'reference',
-                  value: entity.attributes.reference.toString(),
-                  large: true,
-                },
-              ],
-            },
-          ],
-        },
-      ];
-    }
-    return [
+  getHeaderAsideFields = (entity, isManager) => !isManager
+    ? null
+    : [
       {
         fields: [
           {
-            type: 'referenceStatus',
-            fields: [
-              {
-                type: 'reference',
-                value: entity.attributes.reference,
-              },
-              {
-                type: 'status',
-                value: entity.attributes.draft,
-              },
-            ],
+            type: 'status',
+            value: entity.attributes.draft,
           },
           {
             type: 'meta',
@@ -101,8 +79,8 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
         ],
       },
     ];
-  }
-  getBodyMainFields = (entity, indicators) => {
+
+  getBodyMainFields = (entity, indicators, actions) => {
     const fields = [];
     if (entity.attributes.description && entity.attributes.description.trim().length > 0) {
       fields.push({
@@ -118,6 +96,30 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
+        {
+          type: 'connections',
+          label: `${Object.values(actions).length} ${this.context.intl.formatMessage(Object.values(actions).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
+          entityType: 'actions',
+          values: Object.values(actions),
+          icon: 'actions',
+          entityPath: '/actions/',
+          taxonomies: null,
+          showEmpty: this.context.intl.formatMessage(appMessages.entities.measures.empty),
+          connectionOptions: [
+            {
+              label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+              path: 'recommendations',
+            },
+            {
+              label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+              path: 'sdgtargets',
+            },
+            {
+              label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+              path: 'indicators',
+            },
+          ],
+        },
         {
           type: 'connections',
           label: `${Object.values(indicators).length} ${this.context.intl.formatMessage(Object.values(indicators).length === 1 ? appMessages.entities.indicators.single : appMessages.entities.indicators.plural)}`,
@@ -154,13 +156,13 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
     },
   ]);
 
-  getFields = (entity, isManager, indicators, taxonomies) => ({
+  getFields = (entity, isManager, indicators, taxonomies, actions) => ({
     header: {
       main: this.getHeaderMainFields(entity, isManager),
       aside: this.getHeaderAsideFields(entity, isManager),
     },
     body: {
-      main: this.getBodyMainFields(entity, indicators),
+      main: this.getBodyMainFields(entity, indicators, actions),
       aside: this.getBodyAsideFields(entity, taxonomies),
     },
   });
@@ -179,6 +181,7 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
       isManager,
       indicators,
       taxonomies,
+      actions,
     } = this.props;
 
     const buttons = isManager
@@ -222,7 +225,7 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
           }
           { sdgtarget && dataReady &&
             <EntityView
-              fields={this.getFields(sdgtarget, isManager, indicators, taxonomies)}
+              fields={this.getFields(sdgtarget, isManager, indicators, taxonomies, actions)}
             />
           }
         </Content>
@@ -240,6 +243,7 @@ SdgTargetView.propTypes = {
   isManager: PropTypes.bool,
   taxonomies: PropTypes.object,
   indicators: PropTypes.object,
+  actions: PropTypes.object,
   params: PropTypes.object,
 };
 
@@ -258,6 +262,11 @@ const mapStateToProps = (state, props) => ({
     'sdgtarget_categories',
     'indicators',
     'sdgtarget_indicators',
+    'measure_indicators',
+    'measures',
+    'sdgtarget_measures',
+    'recommendations',
+    'recommendation_measures',
   ] }),
   sdgtarget: getEntity(
     state,
@@ -323,6 +332,61 @@ const mapStateToProps = (state, props) => ({
       ],
     },
   ),
+  // all connected actions
+  actions: getEntities(
+    state, {
+      path: 'measures',
+      out: 'js',
+      connected: {
+        path: 'sdgtarget_measures',
+        key: 'measure_id',
+        where: {
+          sdgtarget_id: props.params.id,
+        },
+      },
+      extend: [
+        {
+          path: 'measure_categories',
+          key: 'measure_id',
+          reverse: true,
+          as: 'taxonomies',
+        },
+        {
+          path: 'recommendation_measures',
+          key: 'measure_id',
+          reverse: true,
+          as: 'recommendations',
+          connected: {
+            path: 'recommendations',
+            key: 'recommendation_id',
+            forward: true,
+          },
+        },
+        {
+          path: 'sdgtarget_measures',
+          key: 'measure_id',
+          reverse: true,
+          as: 'sdgtargets',
+          connected: {
+            path: 'sdgtargets',
+            key: 'sdgtarget_id',
+            forward: true,
+          },
+        },
+        {
+          path: 'measure_indicators',
+          key: 'measure_id',
+          reverse: true,
+          as: 'indicators',
+          connected: {
+            path: 'indicators',
+            key: 'indicator_id',
+            forward: true,
+          },
+        },
+      ],
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -336,6 +400,11 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
+      dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      dispatch(loadEntitiesIfNeeded('measures'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_measures'));
+      dispatch(loadEntitiesIfNeeded('recommendations'));
+      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
     },
     handleEdit: (sdgtargetId) => {
       dispatch(updatePath(`/sdgtargets/edit/${sdgtargetId}`));

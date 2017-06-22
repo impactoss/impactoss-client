@@ -16,7 +16,9 @@ const formInitial = fromJS({
   id: '',
   attributes: {
     title: '',
-    number: '',
+    reference: '',
+    accepted: '',
+    response: '',
     draft: '',
   },
   associatedTaxonomies: {},

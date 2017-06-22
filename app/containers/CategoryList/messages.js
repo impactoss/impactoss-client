@@ -7,19 +7,19 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   supTitle: {
-    id: 'app.containers.TaxonomyCategories.supTitle',
+    id: 'app.containers.CategoryList.supTitle',
     defaultMessage: 'Categories',
   },
   add: {
-    id: 'app.containers.TaxonomyCategories.add',
+    id: 'app.containers.CategoryList.add',
     defaultMessage: 'Add category',
   },
   metaDescription: {
-    id: 'app.containers.TaxonomyCategories.metaDescription',
+    id: 'app.containers.CategoryList.metaDescription',
     defaultMessage: 'Categories overview',
   },
   notFound: {
-    id: 'app.containers.TaxonomyCategories.notFound',
+    id: 'app.containers.CategoryList.notFound',
     defaultMessage: 'Sorry no categories found',
   },
 });

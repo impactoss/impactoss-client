@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import A from 'components/basic/A';
-import ControlTextArea from '../ControlTextArea';
+import ControlTextAreaLarge from '../ControlTextAreaLarge';
 import messages from './messages';
 
 const MarkdownHint = styled.div`
@@ -15,11 +15,12 @@ const MarkdownHint = styled.div`
 export class MarkdownControl extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { model } = this.props;
+    const { model, ...props } = this.props;
     return (
       <span>
-        <ControlTextArea
+        <ControlTextAreaLarge
           model={model}
+          {...props}
         />
         <MarkdownHint>
           <A

@@ -21,6 +21,7 @@ const formInitial = fromJS({
     url: '',
     manager_id: '',
     taxonomy_id: '',
+    reference: '',
   },
   associatedUser: [],
 });

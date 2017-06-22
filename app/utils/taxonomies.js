@@ -22,12 +22,12 @@ export const getTaxonomyTagList = (taxonomy) => {
   }
   return tags;
 };
-export const mapToTaxonomyList = (taxonomies, onLink, active, tags = true) => Object.values(taxonomies).map((tax) => ({
+export const mapToTaxonomyList = (taxonomies, onLink, activeId, tags = true) => Object.values(taxonomies).map((tax) => ({
   id: tax.id,
   count: tax.count,
   onLink: () => onLink(`/categories/${tax.id}`),
   tags: tags ? getTaxonomyTagList(tax) : null,
-  active: active === tax.id,
+  active: parseInt(activeId, 10) === parseInt(tax.id, 10),
 }));
 
 export const getCategoryMaxCount = (categories, attribute) =>
@@ -40,9 +40,9 @@ export const getCategoryMaxCount = (categories, attribute) =>
     return countsMemo;
   }, 0);
 
-
 export const mapToCategoryList = (categories, onLink, countAttributes) => Object.values(categories).map((cat) => ({
   id: cat.id,
+  reference: cat.attributes.reference && cat.attributes.reference.trim() !== '' ? cat.attributes.reference : null,
   title: cat.attributes.title,
   onLink: () => onLink(`/category/${cat.id}`),
   counts: countAttributes

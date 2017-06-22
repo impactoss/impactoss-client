@@ -11,6 +11,7 @@ import Helmet from 'react-helmet';
 import { Map, List } from 'immutable';
 
 import {
+  renderActionControl,
   renderIndicatorControl,
   renderTaxonomyControl,
   validateRequired,
@@ -60,6 +61,19 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
     { // fieldGroup
       fields: [
         {
+          id: 'reference',
+          controlType: 'short',
+          model: '.attributes.reference',
+          label: this.context.intl.formatMessage(appMessages.attributes.reference),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
+          validators: {
+            required: validateRequired,
+          },
+          errorMessages: {
+            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
+          },
+        },
+        {
           id: 'title',
           controlType: 'titleText',
           model: '.attributes.title',
@@ -80,19 +94,6 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
     {
       fields: [
         {
-          id: 'number',
-          controlType: 'short',
-          model: '.attributes.reference',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.number),
-          label: this.context.intl.formatMessage(appMessages.attributes.reference),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
           id: 'status',
           controlType: 'select',
           model: '.attributes.draft',
@@ -103,7 +104,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getBodyMainFields = (indicators) => ([
+  getBodyMainFields = (indicators, actions) => ([
     {
       fields: [
         {
@@ -119,6 +120,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
+        renderActionControl(actions),
         renderIndicatorControl(indicators),
       ],
     },
@@ -132,18 +134,18 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getFields = (taxonomies, indicators) => ({ // isManager, taxonomies,
+  getFields = (taxonomies, indicators, actions) => ({ // isManager, taxonomies,
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(),
     },
     body: {
-      main: this.getBodyMainFields(indicators),
+      main: this.getBodyMainFields(indicators, actions),
       aside: this.getBodyAsideFields(taxonomies),
     },
   })
   render() {
-    const { dataReady, viewDomain, indicators, taxonomies } = this.props;
+    const { dataReady, viewDomain, indicators, taxonomies, actions } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -191,7 +193,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(taxonomies, indicators)}
+              fields={this.getFields(taxonomies, indicators, actions)}
             />
           }
         </Content>
@@ -210,6 +212,7 @@ SdgTargetNew.propTypes = {
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   indicators: PropTypes.object,
+  actions: PropTypes.object,
 };
 
 SdgTargetNew.contextTypes = {
@@ -223,6 +226,7 @@ const mapStateToProps = (state) => ({
     'categories',
     'taxonomies',
     'indicators',
+    'measures',
   ] }),
   taxonomies: getEntities(
     state,
@@ -244,6 +248,12 @@ const mapStateToProps = (state) => ({
       path: 'indicators',
     },
   ),
+  // all actions,
+  actions: getEntities(
+    state, {
+      path: 'measures',
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -252,6 +262,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('categories'));
       dispatch(loadEntitiesIfNeeded('taxonomies'));
       dispatch(loadEntitiesIfNeeded('indicators'));
+      dispatch(loadEntitiesIfNeeded('measures'));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
@@ -281,6 +292,16 @@ function mapDispatchToProps(dispatch) {
           create: getCheckedValuesFromOptions(formData.get('associatedIndicators'))
           .map((id) => Map({
             indicator_id: id,
+          })),
+        }));
+      }
+      // actions
+      if (formData.get('associatedActions')) {
+        saveData = saveData.set('sdgtargetActions', Map({
+          delete: List(),
+          create: getCheckedValuesFromOptions(formData.get('associatedActions'))
+          .map((id) => Map({
+            measure_id: id,
           })),
         }));
       }
