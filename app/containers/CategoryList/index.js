@@ -59,12 +59,6 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
 
   getCountAttributes = (taxonomy) => {
     const attributes = [];
-    if (taxonomy.attributes.tags_measures) {
-      attributes.push({
-        attribute: 'actions',
-        label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-      });
-    }
     if (taxonomy.attributes.tags_recommendations) {
       attributes.push({
         attribute: 'recommendations',
@@ -75,6 +69,12 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       attributes.push({
         attribute: 'sdgtargets',
         label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+      });
+    }
+    if (taxonomy.attributes.tags_measures) {
+      attributes.push({
+        attribute: 'actions',
+        label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
       });
     }
     return attributes;

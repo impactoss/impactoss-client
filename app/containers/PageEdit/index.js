@@ -67,9 +67,15 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     return fromJS(page);
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
+  getHeaderMainFields = (entity) => ([ // fieldGroups
     { // fieldGroup
       fields: [
+        {
+          controlType: 'info',
+          type: 'reference',
+          value: entity.id,
+          label: this.context.intl.formatMessage(appMessages.attributes.id),
+        },
         {
           id: 'title',
           controlType: 'title',
@@ -103,22 +109,11 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     {
       fields: [
         {
-          controlType: 'combo',
-          fields: [
-            {
-              controlType: 'info',
-              type: 'reference',
-              value: entity.id,
-              label: this.context.intl.formatMessage(appMessages.attributes.id),
-            },
-            {
-              id: 'status',
-              controlType: 'select',
-              model: '.attributes.draft',
-              label: this.context.intl.formatMessage(appMessages.attributes.draft),
-              options: PUBLISH_STATUSES,
-            },
-          ],
+          id: 'status',
+          controlType: 'select',
+          model: '.attributes.draft',
+          label: this.context.intl.formatMessage(appMessages.attributes.draft),
+          options: PUBLISH_STATUSES,
         },
         {
           controlType: 'info',
@@ -154,7 +149,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
 
   getFields = (entity) => ({ // isManager, taxonomies,
     header: {
-      main: this.getHeaderMainFields(),
+      main: this.getHeaderMainFields(entity),
       aside: this.getHeaderAsideFields(entity),
     },
     body: {
