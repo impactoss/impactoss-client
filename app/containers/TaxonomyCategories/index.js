@@ -100,9 +100,9 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
   }
   render() {
     const { taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
-
-    const taxonomy = dataReady ? taxonomies[parseInt(params.id, 10)] : null;
-    const contentTitle = dataReady ? this.getTaxTitle(taxonomy.id) : '';
+    const reference = typeof params.id !== 'undefined' ? parseInt(params.id, 10) : 1;
+    const contentTitle = this.getTaxTitle(reference);
+    const taxonomy = dataReady ? taxonomies[reference] : null;
 
     const buttons = dataReady && isManager
       ? [{
@@ -125,7 +125,7 @@ export class TaxonomyCategories extends React.PureComponent { // eslint-disable-
         <Sidebar>
           <Scrollable>
             <TaxonomySidebar
-              taxonomies={mapToTaxonomyList(taxonomies, onPageLink, params.id, false)}
+              taxonomies={mapToTaxonomyList(taxonomies, onPageLink, reference, false)}
             />
           </Scrollable>
         </Sidebar>
@@ -197,7 +197,7 @@ const mapStateToProps = (state, props) => ({
       out: 'js',
       path: 'categories',
       where: {
-        taxonomy_id: props.params.id,
+        taxonomy_id: typeof props.params.id !== 'undefined' ? props.params.id : 1,
       },
       extend: [
         {

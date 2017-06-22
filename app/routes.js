@@ -573,19 +573,7 @@ export default function createRoutes(store) {
     }, {
       path: '/categories',
       name: 'taxonomies',
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/Taxonomies'),
-        ]);
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([component]) => {
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
+      onEnter: (nextState, replace) => replace('/categories/1'),
     }, {
       path: '/categories/:id', // the taxonomy id
       name: 'taxonomyCategories',

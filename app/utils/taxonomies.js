@@ -22,12 +22,12 @@ export const getTaxonomyTagList = (taxonomy) => {
   }
   return tags;
 };
-export const mapToTaxonomyList = (taxonomies, onLink, active, tags = true) => Object.values(taxonomies).map((tax) => ({
+export const mapToTaxonomyList = (taxonomies, onLink, activeId, tags = true) => Object.values(taxonomies).map((tax) => ({
   id: tax.id,
   count: tax.count,
   onLink: () => onLink(`/categories/${tax.id}`),
   tags: tags ? getTaxonomyTagList(tax) : null,
-  active: active === tax.id,
+  active: parseInt(activeId, 10) === parseInt(tax.id, 10),
 }));
 
 export const getCategoryMaxCount = (categories, attribute) =>
