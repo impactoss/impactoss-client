@@ -74,7 +74,7 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
               filename: 'sdgtargets_template.csv',
               data: [{
                 title: 'Title | text (required)',
-                reference: 'Reference | text',
+                reference: 'Reference | text (required)',
                 description: 'Description | text (markdown supported)',
               }],
             }}
