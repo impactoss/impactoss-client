@@ -94,6 +94,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           controlType: 'short',
           model: '.attributes.menu_title',
           label: this.context.intl.formatMessage(appMessages.attributes.menu_title),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.menu_title),
           validators: {
             required: validateRequired,
           },
@@ -137,11 +138,11 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     {
       fields: [
         {
-          id: 'description',
+          id: 'content',
           controlType: 'markdown',
           model: '.attributes.content',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
+          placeholder: this.context.intl.formatMessage(appMessages.placeholders.content),
+          label: this.context.intl.formatMessage(appMessages.attributes.content),
         },
       ],
     },

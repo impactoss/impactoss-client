@@ -63,7 +63,7 @@ export default defineMessages({
     },
     menu_title: {
       id: 'app.containers.App.placeholders.title',
-      defaultMessage: '',
+      defaultMessage: 'Menu',
     },
     reference: {
       id: 'app.containers.App.placeholders.reference',
@@ -72,6 +72,10 @@ export default defineMessages({
     description: {
       id: 'app.containers.App.placeholders.description',
       defaultMessage: 'Enter description',
+    },
+    content: {
+      id: 'app.containers.App.placeholders.content',
+      defaultMessage: 'Enter content',
     },
     response: {
       id: 'app.containers.App.placeholders.response',
@@ -110,6 +114,10 @@ export default defineMessages({
     description: {
       id: 'app.containers.App.attributes.description',
       defaultMessage: 'Description',
+    },
+    content: {
+      id: 'app.containers.App.attributes.content',
+      defaultMessage: 'Content',
     },
     accepted: {
       id: 'app.containers.App.attributes.accepted',
