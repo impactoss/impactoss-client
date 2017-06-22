@@ -11,7 +11,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { CONTENT_SINGLE, ACCEPTED_STATUSES } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -44,6 +44,11 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     { // fieldGroup
       fields: [
         {
+          type: 'reference',
+          large: true,
+          value: entity.attributes.reference,
+        },
+        {
           type: 'titleText',
           value: entity.attributes.title,
           isManager,
@@ -52,40 +57,14 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     },
   ]);
 
-  getHeaderAsideFields = (entity, isManager) => {
-    if (!isManager) {
-      return [
-        {
-          fields: [
-            {
-              type: 'referenceStatus',
-              fields: [
-                {
-                  type: 'reference',
-                  value: entity.attributes.number.toString(),
-                  large: true,
-                },
-              ],
-            },
-          ],
-        },
-      ];
-    }
-    return [
+  getHeaderAsideFields = (entity, isManager) => !isManager
+    ? null
+    : [
       {
         fields: [
           {
-            type: 'referenceStatus',
-            fields: [
-              {
-                type: 'reference',
-                value: entity.attributes.number,
-              },
-              {
-                type: 'status',
-                value: entity.attributes.draft,
-              },
-            ],
+            type: 'status',
+            value: entity.attributes.draft,
           },
           {
             type: 'meta',
@@ -103,9 +82,24 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
         ],
       },
     ];
-  }
+
 
   getBodyMainFields = (entity, actions, actionTaxonomies) => ([
+    {
+      fields: [
+        {
+          type: 'status',
+          label: this.context.intl.formatMessage(appMessages.attributes.accepted),
+          value: entity.attributes.accepted,
+          options: ACCEPTED_STATUSES,
+        },
+        {
+          type: 'markdown',
+          label: this.context.intl.formatMessage(appMessages.attributes.response),
+          value: entity.attributes.response,
+        },
+      ],
+    },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',

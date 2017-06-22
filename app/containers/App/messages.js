@@ -73,6 +73,10 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.description',
       defaultMessage: 'Enter description',
     },
+    response: {
+      id: 'app.containers.App.placeholders.response',
+      defaultMessage: 'Enter response comment',
+    },
     outcome: {
       id: 'app.containers.App.placeholders.outcome',
       defaultMessage: 'Enter desired outcome',
@@ -106,6 +110,14 @@ export default defineMessages({
     description: {
       id: 'app.containers.App.attributes.description',
       defaultMessage: 'Description',
+    },
+    accepted: {
+      id: 'app.containers.App.attributes.accepted',
+      defaultMessage: 'Government response',
+    },
+    response: {
+      id: 'app.containers.App.attributes.response',
+      defaultMessage: 'Government response comment',
     },
     outcome: {
       id: 'app.containers.App.attributes.outcome',

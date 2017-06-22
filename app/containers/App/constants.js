@@ -59,6 +59,10 @@ export const PUBLISH_STATUSES = [
   { value: true, label: 'Draft' },
   { value: false, label: 'Public' },
 ];
+export const ACCEPTED_STATUSES = [
+  { value: true, label: 'Accepted' },
+  { value: false, label: 'Noted' },
+];
 export const REPORT_FREQUENCIES = [
   { value: 1, label: 'Monthly' },
   { value: 3, label: 'Quarterly' },
