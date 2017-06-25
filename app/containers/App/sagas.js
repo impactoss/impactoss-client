@@ -7,6 +7,8 @@ import { push } from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
 
+import asArray from 'utils/as-array';
+
 import {
   LOAD_ENTITIES_IF_NEEDED,
   REDIRECT_IF_NOT_PERMITTED,
@@ -468,7 +470,7 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
   // get old query or new query if not extending (replacing)
   const queryPrevious = extend ? location.get('query').toJS() : {};
   // and figure out new query
-  const queryNext = query.reduce((q, param) => {
+  const queryNext = asArray(query).reduce((q, param) => {
     const queryUpdated = q;
     // if already set and not replacing
     if (queryUpdated[param.arg] && !param.replace) {

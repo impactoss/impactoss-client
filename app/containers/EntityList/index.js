@@ -6,12 +6,13 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { FormattedMessage } from 'react-intl';
+// import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Map, List, fromJS } from 'immutable';
-import { orderBy, reduce } from 'lodash/collection';
-import { pick } from 'lodash/object';
+import { orderBy, reduce, filter, map } from 'lodash/collection';
+import { flatten } from 'lodash/array';
+import { range } from 'lodash/util';
 
 import { getEntitySortIteratee } from 'utils/sort';
 
@@ -21,10 +22,11 @@ import Sidebar from 'components/basic/Sidebar';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import EntityListSidebar from 'components/EntityListSidebar';
-import EntityListItems from 'components/EntityListItems';
+import EntityListGroups from 'components/EntityListGroups';
 import EntityListSearch from 'components/EntityListSearch';
 import EntityListOptions from 'components/EntityListOptions';
 import EntityListHeader from 'components/EntityListHeader';
+import EntityListFooter from 'components/EntityListFooter';
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import { getEntities, isUserManager } from 'containers/App/selectors';
@@ -33,8 +35,9 @@ import { CONTENT_LIST } from 'containers/App/constants';
 
 import { makeCurrentFilters } from './filtersFactory';
 import {
-  makeEntityGroups,
   makeGroupOptions,
+  groupEntities,
+  getGroupedEntitiesForPage,
 } from './groupFactory';
 
 import {
@@ -55,6 +58,7 @@ import {
   selectEntities,
   updateQuery,
   updateGroup,
+  updatePage,
 } from './actions';
 
 import messages from './messages';
@@ -62,23 +66,7 @@ import messages from './messages';
 const Content = styled.div`
   padding: 0 4em;
 `;
-
-
 const ListEntities = styled.div``;
-const ListEntitiesMain = styled.div`
-  padding-top: 0.5em;
-`;
-const ListEntitiesEmpty = styled.div``;
-const ListEntitiesGroup = styled.div``;
-const ListEntitiesGroupHeader = styled.h3`
-  margin-top: 30px;
-`;
-const ListEntitiesSubGroup = styled.div``;
-const ListEntitiesSubGroupHeader = styled.h5`
-  margin-top: 12px;
-  font-weight: normal;
-  margin-bottom: 20px;
-`;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -90,7 +78,20 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   //   const s_np = JSON.stringify(nextProps)
   //   return s_np !== s_p
   // }
-
+  // shouldComponentUpdate(nextProps) {
+  //   console.log('-------------------------')
+  //   console.log('componentWillReceiveProps')
+  //   console.log(nextProps.entities === this.props.entities, 'immutable map equal')
+  //   const update = JSON.stringify(this.props) !== JSON.stringify(nextProps);
+  //   console.log(!update, 'stringified objects equal')
+  //   return update
+  // }
+  // componentWillReceiveProps(nextProps) {
+  //   console.log('-------------------------')
+  //   console.log('componentWillReceiveProps')
+  //   console.log(nextProps.entities === this.props.entities, 'immutable map equal')
+  //   console.log(JSON.stringify(nextProps.entities) === JSON.stringify(this.props.entities), 'stringified objects equal')
+  // }
   getHeaderColumns = (label, isSelect, isExpandable, expandNo, expandableColumns, handleExpandLink) => {
     // TODO figure out a betterway to determine column widths. this is terrible
     let width = 1;
@@ -143,6 +144,54 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     }
     return columns;
   }
+
+  getPager = (totalItems, currentPg, pageSz) => {
+    // default to first page
+    const currentPage = currentPg || 1;
+    // default page size is 10
+    const pageSize = pageSz || 20;
+
+    // calculate total pages
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    // less than 5 total pages so show all
+    let startPage = 1;
+    let endPage = totalPages;
+    if (totalPages > 5) {
+      // more than 5 total pages so calculate start and end pages
+      if (currentPage <= 3) {
+        startPage = 1;
+        endPage = 5;
+      } else if (currentPage + 2 >= totalPages) {
+        startPage = totalPages - 4;
+        endPage = totalPages;
+      } else {
+        startPage = currentPage - 2;
+        endPage = currentPage + 2;
+      }
+    }
+
+    // calculate start and end item indexes
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = Math.min((startIndex + pageSize) - 1, totalItems - 1);
+
+    // create an array of pages to ng-repeat in the pager control
+    const pages = range(startPage, endPage + 1);
+
+    // return object with all pager properties required by the view
+    return {
+      totalItems,
+      currentPage,
+      pageSize,
+      totalPages,
+      startPage,
+      endPage,
+      startIndex,
+      endIndex,
+      pages,
+    };
+  }
+
   render() {
     const {
       sortBy,
@@ -161,27 +210,44 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     // do not list 'own' taxonomies in connected taxonomies
     const connectedTaxonomies = dataReady && this.props.connectedTaxonomies && taxonomies
-    ? reduce(this.props.connectedTaxonomies, (filteredTaxonomies, tax, key) =>
-        Object.keys(taxonomies).indexOf(key) < 0
-          ? Object.assign(filteredTaxonomies, { [key]: tax })
-          : filteredTaxonomies
-      , {})
-    : this.props.connectedTaxonomies;
+      ? reduce(this.props.connectedTaxonomies, (filteredTaxonomies, tax, key) =>
+          Object.keys(taxonomies).indexOf(key) < 0
+            ? Object.assign(filteredTaxonomies, { [key]: tax })
+            : filteredTaxonomies
+        , {})
+      : this.props.connectedTaxonomies;
 
     // sorted entities
     const entitiesSorted = dataReady && this.props.entities
-        ? orderBy(this.props.entities, getEntitySortIteratee(sortBy), sortOrder)
-        : [];
-    // selected entities
-    const entitiesSelected = dataReady ? Object.values(pick(this.props.entities, entityIdsSelected)) : [];
+      ? orderBy(this.props.entities, getEntitySortIteratee(sortBy), sortOrder)
+      : [];
 
+    // grouping and paging
+    const entitiesGrouped = entitiesSorted.length > 0
+      ? groupEntities(entitiesSorted, taxonomies, connectedTaxonomies, filters, location.query)
+      : [];
+    const entitiesGroupedFlattened = flatten(entitiesGrouped.map((group, gIndex) => group.entitiesGrouped
+      ? flatten(group.entitiesGrouped.map((subgroup, sgIndex) =>
+        subgroup.entities.map((entity) => ({ group: gIndex, subgroup: sgIndex, entity }))
+      ))
+      : group.entities.map((entity) => ({ group: gIndex, entity }))
+    ));
+    // get new pager object for specified page
+    const pager = this.getPager(entitiesGroupedFlattened.length, parseInt(location.query.page, 10));
+    // get new page of items from items array
+    const pageItems = entitiesGroupedFlattened.slice(pager.startIndex, pager.endIndex + 1);
+    const entitiesGroupedPaged = getGroupedEntitiesForPage(pageItems, entitiesGrouped);
+    // console.log('entitiesGrouped', entitiesGrouped)
+    // console.log('entitiesGroupedPaged', entitiesGroupedPaged)
+
+    // selected entities
+    const entitiesSelected = dataReady ? filter(pageItems, (entity) => entityIdsSelected.indexOf(entity.id) >= 0) : [];
     let allChecked = CHECKBOX_STATES.INDETERMINATE;
     let listHeaderLabel = this.props.entityTitle.plural;
-
     if (dataReady) {
       if (entitiesSelected.length === 0) {
         allChecked = CHECKBOX_STATES.UNCHECKED;
-      } else if (entitiesSorted.length > 0 && entitiesSelected.length === entitiesSorted.length) {
+      } else if (pageItems.length > 0 && entitiesSelected.length === pageItems.length) {
         allChecked = CHECKBOX_STATES.CHECKED;
       }
       if (entitiesSelected.length === 1) {
@@ -190,14 +256,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
       }
     }
-    let contentTitle = this.props.entityTitle.plural;
-    if (dataReady) {
-      contentTitle = `${entitiesSorted.length} ${entitiesSorted.length === 1 ? this.props.entityTitle.single : this.props.entityTitle.plural}`;
-    }
-
-    const buttons = dataReady && isManager
-      ? this.props.header.actions
-      : null;
 
     return (
       <div>
@@ -210,7 +268,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               connections={connections}
               connectedTaxonomies={connectedTaxonomies}
               entitiesSorted={entitiesSorted}
-              entitiesSelected={entitiesSelected}
+              entityIdsSelected={entityIdsSelected}
               location={location}
               onPanelSelect={onPanelSelect}
               canEdit={isManager}
@@ -227,8 +285,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 type={CONTENT_LIST}
                 icon={this.props.header.icon}
                 supTitle={this.props.header.supTitle}
-                title={contentTitle}
-                buttons={buttons}
+                title={dataReady
+                  ? `${entitiesSorted.length} ${entitiesSorted.length === 1 ? this.props.entityTitle.single : this.props.entityTitle.plural}`
+                  : this.props.entityTitle.plural
+                }
+                buttons={dataReady && isManager
+                  ? this.props.header.actions
+                  : null
+                }
               />
               { !dataReady &&
                 <Loading />
@@ -242,6 +306,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   />
                   <EntityListOptions
                     groupOptions={makeGroupOptions(filters, taxonomies, connectedTaxonomies)}
+                    subgroupOptions={makeGroupOptions(filters, taxonomies)}
                     groupSelectValue={location.query.group}
                     subgroupSelectValue={location.query.subgroup}
                     onGroupSelect={this.props.onGroupSelect}
@@ -271,70 +336,31 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     isSelect={isManager}
                     isSelected={allChecked}
                     onSelect={(checked) => {
-                      this.props.onEntitySelectAll(checked ? Object.keys(this.props.entities) : []);
+                      this.props.onEntitySelectAll(checked ? map(pageItems, (item) => item.entity.id) : []);
                     }}
                   />
-                  <ListEntitiesMain>
-                    { entitiesSorted.length === 0 && location.query &&
-                      <ListEntitiesEmpty>
-                        <FormattedMessage {...messages.listEmptyAfterQuery} />
-                      </ListEntitiesEmpty>
-                    }
-                    { entitiesSorted.length === 0 && !location.query &&
-                      <ListEntitiesEmpty>
-                        <FormattedMessage {...messages.listEmpty} />
-                      </ListEntitiesEmpty>
-                    }
-                    { entitiesSorted.length > 0 &&
-                      makeEntityGroups(
-                        entitiesSorted,
-                        taxonomies,
-                        connectedTaxonomies,
-                        filters,
-                        location.query.group
-                      ).map((entityGroup, i) => (
-                        <ListEntitiesGroup key={i}>
-                          { location.query.group && entityGroup.label &&
-                            <ListEntitiesGroupHeader>
-                              {entityGroup.label}
-                            </ListEntitiesGroupHeader>
-                          }
-                          {
-                            makeEntityGroups(
-                              entityGroup.entities,
-                              taxonomies,
-                              connectedTaxonomies,
-                              filters,
-                              location.query.subgroup
-                            ).map((entitySubGroup, j) => (
-                              <ListEntitiesSubGroup key={j}>
-                                { location.query.subgroup && entitySubGroup.label &&
-                                  <ListEntitiesSubGroupHeader>
-                                    {entitySubGroup.label}
-                                  </ListEntitiesSubGroupHeader>
-                                }
-                                <EntityListItems
-                                  taxonomies={taxonomies}
-                                  associations={filters}
-                                  entities={entitySubGroup.entities}
-                                  entitiesSelected={entitiesSelected}
-                                  entityIcon={this.props.header.icon}
-                                  entityLinkTo={this.props.entityLinkTo}
-                                  isSelect={isManager}
-                                  onTagClick={this.props.onTagClick}
-                                  onEntitySelect={this.props.onEntitySelect}
-                                  expandNo={this.props.expandNo}
-                                  isExpandable={this.props.isExpandable}
-                                  expandableColumns={this.props.expandableColumns}
-                                  onExpand={this.props.handleExpandLink}
-                                />
-                              </ListEntitiesSubGroup>
-                            ))
-                          }
-                        </ListEntitiesGroup>
-                      ))
-                    }
-                  </ListEntitiesMain>
+                  <EntityListGroups
+                    entitiesGrouped={entitiesGroupedPaged}
+                    entitiesSorted={entitiesSorted}
+                    entityIdsSelected={entityIdsSelected}
+                    taxonomies={taxonomies}
+                    connectedTaxonomies={connectedTaxonomies}
+                    filters={filters}
+                    locationQuery={location.query}
+                    header={this.props.header}
+                    entityLinkTo={this.props.entityLinkTo}
+                    isManager={this.props.isManager}
+                    onTagClick={this.props.onTagClick}
+                    onEntitySelect={this.props.onEntitySelect}
+                    expandNo={this.props.expandNo}
+                    isExpandable={this.props.isExpandable}
+                    expandableColumns={this.props.expandableColumns}
+                    handleExpandLink={this.props.handleExpandLink}
+                  />
+                  <EntityListFooter
+                    pager={pager}
+                    onPageSelect={this.props.onPageSelect}
+                  />
                 </ListEntities>
               }
             </Content>
@@ -376,6 +402,7 @@ EntityList.propTypes = {
   onGroupSelect: PropTypes.func.isRequired,
   onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
+  onPageSelect: PropTypes.func.isRequired,
 };
 
 EntityList.defaultProps = {
@@ -491,6 +518,9 @@ function mapDispatchToProps(dispatch, props) {
           value,
         },
       ])));
+    },
+    onPageSelect: (page) => {
+      dispatch(updatePage(page));
     },
     handleEditSubmit: (formData, selectedEntities, activeEditOption) => {
       const entities = fromJS(selectedEntities);

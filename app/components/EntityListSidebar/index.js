@@ -8,6 +8,9 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import { filter } from 'lodash/collection';
+import { isEqual } from 'lodash/lang';
+
 import { FILTERS_PANEL, EDIT_PANEL } from 'containers/App/constants';
 import { FILTER_FORM_MODEL, EDIT_FORM_MODEL } from 'containers/EntityListForm/constants';
 
@@ -55,6 +58,21 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       this.setState({ activeOption: null });
     }
   }
+  shouldComponentUpdate(nextProps, nextState) {
+    // console.log('EntityListSidebar.shouldComponentUpdate')
+    // console.log('props isEqual', isEqual(this.props, nextProps))
+    return !isEqual(this.props.location, nextProps.location)
+      || !isEqual(this.props.filters, nextProps.filters)
+      || !isEqual(this.props.edits, nextProps.edits)
+      || !isEqual(this.props.taxonomies, nextProps.taxonomies)
+      || !isEqual(this.props.connections, nextProps.connections)
+      || !isEqual(this.props.connectedTaxonomies, nextProps.connectedTaxonomies)
+      || !isEqual(this.props.entitiesSorted, nextProps.entitiesSorted)
+      || !isEqual(this.props.entityIdsSelected, nextProps.entityIdsSelected)
+      || this.props.activePanel !== nextProps.activePanel
+      || !isEqual(this.state, nextState);
+  }
+
   onShowForm = (option) => {
     this.setState({ activeOption: option.active ? null : option });
   };
@@ -97,6 +115,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   }
 
   render() {
+    // console.log('EntityListSidebar.render')
     const {
       filters,
       edits,
@@ -104,13 +123,15 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       connections,
       connectedTaxonomies,
       entitiesSorted,
-      entitiesSelected,
+      entityIdsSelected,
       onAssign,
       canEdit,
       activePanel,
       onPanelSelect,
       location,
     } = this.props;
+
+    const entitiesSelected = filter(entitiesSorted, (entity) => entityIdsSelected.indexOf(entity.id) >= 0);
 
     const activeOption = this.state.activeOption;
     const hasSelected = entitiesSelected && entitiesSelected.length > 0;
@@ -216,7 +237,7 @@ EntityListSidebar.propTypes = {
   connections: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   entitiesSorted: PropTypes.array,
-  entitiesSelected: PropTypes.array,
+  entityIdsSelected: PropTypes.array,
   activePanel: PropTypes.string,
   onAssign: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,

@@ -348,7 +348,7 @@ const mapStateToProps = (state, props) => ({
           },
         },
         {
-          path: 'sdgtarget_indicators',
+          path: 'sdgtarget_measures',
           key: 'measure_id',
           reverse: true,
           as: 'sdgtargets',
@@ -377,7 +377,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('sdgtargets'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_measures'));
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
     handleEdit: () => {

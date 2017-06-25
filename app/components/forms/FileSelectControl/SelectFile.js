@@ -43,7 +43,7 @@ const Styled = styled.div`
 `;
 
 
-class SelectFile extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class SelectFile extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   handleChange = (e, results) => {
     // todo: limit to 1 file?

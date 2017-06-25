@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { isEqual } from 'lodash/lang';
 
 import Component from 'components/basic/Component';
 
@@ -32,6 +33,12 @@ const MainInnerWrapper = styled(Component)`
 `;
 
 class EntityListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  shouldComponentUpdate(nextProps) {
+    return !isEqual(this.props.entity, nextProps.entity)
+      || this.props.select !== nextProps.select
+      || this.props.checked !== nextProps.checked
+      || this.props.expandNo !== nextProps.expandNo;
+  }
   render() {
     const {
       entity,
@@ -41,6 +48,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       expandNo,
       entityIcon,
     } = this.props;
+
     return (
       <Styled expandNo={expandNo}>
         <Item>

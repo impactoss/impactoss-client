@@ -12,6 +12,7 @@ import {
   ENTITIES_SELECT,
   UPDATE_QUERY,
   UPDATE_GROUP,
+  PAGE_CHANGE,
 } from './constants';
 
 export function showPanel(activePanel) {
@@ -59,5 +60,12 @@ export function updateGroup(value) {
   return {
     type: UPDATE_GROUP,
     value,
+  };
+}
+
+export function updatePage(page) {
+  return {
+    type: PAGE_CHANGE,
+    page,
   };
 }

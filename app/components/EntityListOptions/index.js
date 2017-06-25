@@ -6,9 +6,10 @@
 import React, { PropTypes } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { filter } from 'lodash/collection';
-
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+
+import { isEqual } from 'lodash/lang';
 
 import Button from 'components/buttons/Button';
 import EntityListGroupBy from 'components/EntityListGroupBy';
@@ -35,9 +36,13 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
   }
 `;
 
-export class EntityListOptions extends React.Component { // eslint-disable-line react/prefer-stateless-function
-
+export class EntityListOptions extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  shouldComponentUpdate(nextProps) {
+    return !isEqual(this.props, nextProps);
+  }
   render() {
+    // console.log('EntityListOptions.render')
+
     const {
       groupSelectValue,
       subgroupSelectValue,
@@ -46,7 +51,7 @@ export class EntityListOptions extends React.Component { // eslint-disable-line 
       onSubgroupSelect,
       expandLink,
     } = this.props;
-    const subgroupOptions = filter(groupOptions, (option) => option.value !== groupSelectValue);
+    const subgroupOptions = filter(this.props.subgroupOptions, (option) => option.value !== groupSelectValue);
     const groupOptionsFiltered = filter(groupOptions, (option) => option.value !== subgroupSelectValue);
     return (
       <Styled>
@@ -86,6 +91,7 @@ EntityListOptions.propTypes = {
   groupSelectValue: PropTypes.string,
   subgroupSelectValue: PropTypes.string,
   groupOptions: PropTypes.array,
+  subgroupOptions: PropTypes.array,
   onGroupSelect: PropTypes.func,
   onSubgroupSelect: PropTypes.func,
   expandLink: PropTypes.object,

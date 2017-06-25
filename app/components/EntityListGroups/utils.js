@@ -1,39 +1,9 @@
-import { forEach, map, orderBy, find } from 'lodash/collection';
+import { forEach, map, orderBy } from 'lodash/collection';
 import { lowerCase as loCase } from 'lodash/string';
 import { lowerCase } from 'utils/string';
 import { getConnectedCategoryIds } from 'utils/entities';
 import isNumber from 'utils/is-number';
 
-
-export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies) => {
-  let options = [];
-
-  // taxonomy options
-  if (filters.taxonomies && taxonomies) {
-    // first prepare taxonomy options
-    options = options.concat(Object.values(taxonomies).map((taxonomy) => ({
-      value: taxonomy.id, // filterOptionId
-      label: taxonomy.attributes.title,
-    })));
-  }
-  // connectedTaxonomies options
-  if (filters.connectedTaxonomies && connectedTaxonomies) {
-    // first prepare taxonomy options
-    options = options.concat(Object.values(connectedTaxonomies).map((taxonomy) => ({
-      value: `x:${taxonomy.id}`, // filterOptionId
-      label: taxonomy.attributes.title,
-    })));
-  }
-  return options;
-};
-
-export const groupEntities = (entitiesSorted, taxonomies, connectedTaxonomies, filters, groups) =>
-  map(makeEntityGroups(entitiesSorted, taxonomies, connectedTaxonomies, filters, groups.group), (entityGroup) => groups.subgroup
-    ? Object.assign(entityGroup, {
-      entitiesGrouped: makeEntityGroups(entityGroup.entities, taxonomies, connectedTaxonomies, filters, groups.subgroup),
-    })
-    : entityGroup
-  );
 
 export const makeEntityGroups = (entitiesSorted, taxonomies, connectedTaxonomies, filters, locationQueryGroup) => {
   if (locationQueryGroup) {
@@ -55,6 +25,7 @@ export const makeEntityGroups = (entitiesSorted, taxonomies, connectedTaxonomies
 
 export const makeTaxonomyGroups = (entities, taxonomy) => {
   const groups = {};
+
   forEach(Object.values(entities), (entity) => {
     const taxCategoryIds = [];
     // if entity has taxonomies
@@ -74,7 +45,6 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
               label,
               entities: [entity],
               order: loCase(label),
-              id: catId,
             };
           }
         }
@@ -88,7 +58,6 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
           label: `Without ${lowerCase(taxonomy.attributes.title)}`, // `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
           entities: [entity],
           order: 'zzzzzzzz',
-          id: 'without',
         };
       }
     }
@@ -123,7 +92,6 @@ export const makeConnectedTaxonomyGroups = (entities, taxonomy, filters) => {
                 label,
                 entities: [entity],
                 order: loCase(label),
-                id: catId,
               };
             }
           }
@@ -137,7 +105,6 @@ export const makeConnectedTaxonomyGroups = (entities, taxonomy, filters) => {
             label: `Without ${lowerCase(taxonomy.attributes.title)}`, // `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
             entities: [entity],
             order: 'zzzzzzzzz',
-            id: 'without',
           };
         }
       }
@@ -145,58 +112,3 @@ export const makeConnectedTaxonomyGroups = (entities, taxonomy, filters) => {
   });  // for each entities
   return orderBy(Object.values(groups), 'order');
 };
-
-export const getGroupedEntitiesForPage = (pageItems, entitiesGrouped) => pageItems.reduce((groups, item) => {
-  // figure out 1st level group and existing targetGroup
-  const group = entitiesGrouped[item.group];
-  const targetGroup = find(groups, { id: group.id });
-  const entity = item.entity;
-  // if subgroup
-  if (group.entitiesGrouped) {
-    const subgroup = group.entitiesGrouped[item.subgroup];
-    // create 1st level targetGroup if not exists
-    if (!targetGroup) {
-      // also create 2nd level targetGroup if required
-      groups.push({
-        entitiesGrouped: [{
-          entities: [entity],
-          label: subgroup.label,
-          order: subgroup.order,
-          id: subgroup.id,
-        }],
-        label: group.label,
-        order: group.order,
-        id: group.id,
-      });
-    } else {
-      // 1st level targetGroup already exists
-      const targetSubgroup = find(targetGroup.entitiesGrouped, { id: subgroup.id });
-      // create 2nd level targetGroup if not exists
-      if (!targetSubgroup) {
-        // create subgroup
-        targetGroup.entitiesGrouped.push({
-          entities: [entity],
-          label: subgroup.label,
-          order: subgroup.order,
-          id: subgroup.id,
-        });
-      } else {
-        // add to existing subgroup
-        targetSubgroup.entities.push(entity);
-      }
-    }
-  // no subgroups
-  } else if (!targetGroup) {
-    // create without 2nd level targetGroup
-    groups.push({
-      entities: [entity],
-      label: group.label,
-      order: group.order,
-      id: group.id,
-    });
-  } else {
-    // add to group
-    targetGroup.entities.push(entity);
-  }
-  return groups;
-}, []);

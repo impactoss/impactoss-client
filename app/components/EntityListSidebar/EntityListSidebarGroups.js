@@ -13,7 +13,7 @@ import EntityListSidebarOption from './EntityListSidebarOption';
 
 const Styled = styled.div``;
 
-export default class EntityListSidebarGroups extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     groups: PropTypes.object,
     onShowForm: PropTypes.func.isRequired,

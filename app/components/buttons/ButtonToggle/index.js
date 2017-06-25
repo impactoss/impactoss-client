@@ -27,7 +27,7 @@ const ButtonInactive = styled.span`
   z-index: 1;
 `;
 
-class ButtonToggle extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class ButtonToggle extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { options, activePanel, onSelect } = this.props;
     if (options.length === 2) {

@@ -14,7 +14,7 @@ const Button = styled(ButtonDefault)`
   font-weight: ${(props) => props.strong ? 'bold' : 'normal'};
 `;
 
-class ButtonDefaultWithIcon extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     const { icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong } = this.props;

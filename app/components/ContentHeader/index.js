@@ -43,7 +43,7 @@ const ButtonGroup = styled.div`
   }
 `;
 
-class ContentHeader extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class ContentHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   renderTitle = (type, title, icon) => {
     switch (type) {
