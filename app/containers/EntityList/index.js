@@ -241,7 +241,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     // console.log('entitiesGroupedPaged', entitiesGroupedPaged)
 
     // selected entities
-    const entitiesSelected = dataReady ? filter(Object.values(pageItems), (item) => entityIdsSelected.indexOf(item.entity.id) >= 0) : [];
+    const entitiesSelected = dataReady ? map(filter(Object.values(pageItems), (item) => entityIdsSelected.indexOf(item.entity.id) >= 0), 'entity') : [];
     let allChecked = CHECKBOX_STATES.INDETERMINATE;
     let listHeaderLabel = this.props.entityTitle.plural;
     if (dataReady) {
