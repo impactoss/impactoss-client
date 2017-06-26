@@ -9,7 +9,7 @@ const CategoryListBody = styled.div`
   padding-top: 1em
 `;
 
-class CategoryListItems extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class CategoryListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { categories, columns } = this.props;
 

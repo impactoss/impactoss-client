@@ -6,8 +6,9 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
+// import Perf from 'react-addons-perf';
 
+import styled from 'styled-components';
 import Header from 'components/Header';
 import {
   isSignedIn,
@@ -91,6 +92,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   render() {
+    // window.Perf = Perf;
     const { pages, onPageLink, isUserSignedIn, isManager, location } = this.props;
     return (
       <div>

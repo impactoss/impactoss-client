@@ -8,7 +8,7 @@ import ButtonDefault from '../ButtonDefault';
 import ButtonFlat from '../ButtonFlat';
 import ButtonDefaultIconOnly from '../ButtonDefaultIconOnly';
 
-class ButtonFactory extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class ButtonFactory extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     const { button } = this.props;

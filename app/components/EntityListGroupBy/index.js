@@ -39,7 +39,7 @@ const Reset = styled(ButtonSimple)`
   font-weight: bold;
 `;
 
-export class EntityListGroupBy extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export class EntityListGroupBy extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     const { onChange, value, isSubgroup } = this.props;

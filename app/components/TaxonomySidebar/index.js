@@ -13,7 +13,7 @@ const Header = styled.div`
   background-color: ${palette('light', 2)}
 `;
 
-class TaxonomySidebar extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { taxonomies } = this.props;
 

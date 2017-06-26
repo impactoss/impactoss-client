@@ -8,7 +8,7 @@ import FieldGroupLabel from 'components/fields/FieldGroupLabel';
 import GroupIcon from 'components/fields/GroupIcon';
 import Label from 'components/fields/Label';
 
-class FieldGroup extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class FieldGroup extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { group } = this.props;
     return (

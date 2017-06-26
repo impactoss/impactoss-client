@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { isEqual } from 'lodash/lang';
 
 import Component from 'components/basic/Component';
 import Clear from 'components/basic/Clear';
@@ -25,11 +26,14 @@ const EntityListItemMainTitleWrap = styled(Link)`
 `;
 
 export default class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   static propTypes = {
     entity: PropTypes.object.isRequired,
     entityIcon: PropTypes.string,
     nested: PropTypes.bool,
+  }
+  shouldComponentUpdate(nextProps) {
+    // console.log('props isEqual', isEqual(this.props, nextProps))
+    return !isEqual(this.props.entity, nextProps.entity);
   }
 
   render() {

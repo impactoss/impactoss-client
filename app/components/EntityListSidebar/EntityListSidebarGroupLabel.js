@@ -21,7 +21,7 @@ const Right = styled.div`
   float:right;
 `;
 
-export default class EntityListSidebarGroupLabel extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListSidebarGroupLabel extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     label: PropTypes.string.isRequired,
     icon: PropTypes.string,

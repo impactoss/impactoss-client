@@ -60,8 +60,8 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         options: ['measures'],
       },
       taxonomies: { // filter by each category
-        out: 'js',
         path: 'taxonomies',
+        out: 'js',
         where: {
           tags_recommendations: true,
         },

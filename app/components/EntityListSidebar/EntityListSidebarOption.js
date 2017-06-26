@@ -50,7 +50,7 @@ const DotWrapper = styled.div`
   float: right;
 `;
 
-class EntityListSidebarOption extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class EntityListSidebarOption extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   renderDot = (groupId, optionId) => {
     switch (groupId) {

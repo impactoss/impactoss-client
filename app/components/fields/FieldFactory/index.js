@@ -22,7 +22,7 @@ import TitleField from 'components/fields/TitleField';
 import TitleTextField from 'components/fields/TitleTextField';
 import TitleShortField from 'components/fields/TitleShortField';
 
-class FieldFactory extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class FieldFactory extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   renderField = (field) => {
     if (field.value
       || (field.values && field.values.length)

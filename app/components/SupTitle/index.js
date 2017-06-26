@@ -11,7 +11,7 @@ const Styled = styled.span`
 `;
 
 
-class SupTitle extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class SupTitle extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { icon, title } = this.props;
 

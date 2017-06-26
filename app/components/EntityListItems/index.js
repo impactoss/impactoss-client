@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import { map, forEach } from 'lodash/collection';
+// import { isEqual } from 'lodash/lang';
 
 import EntityListItem from 'components/EntityListItem';
 
@@ -19,7 +20,16 @@ const ItemWrapper = styled.div`
 `;
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  // shouldComponentUpdate(nextProps) {
+  //   // console.log('props isEqual', isEqual(this.props, nextProps))
+  //   return !isEqual(this.props.entities, nextProps.entities)
+  //     || !isEqual(this.props.entityIdsSelected, nextProps.entityIdsSelected)
+  //     || !isEqual(this.props.taxonomies, nextProps.taxonomies)
+  //     || !isEqual(this.props.associations, nextProps.associations)
+  //     || this.props.isSelect !== nextProps.isSelect
+  //     || this.props.checked !== nextProps.checked
+  //     || this.props.expandNo !== nextProps.expandNo;
+  // }
   getConnectedCounts = (entity, connectionOptions) => {
     const counts = [];
     forEach(connectionOptions, (option) => {
@@ -114,7 +124,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
   render() {
     const {
       entities,
-      entitiesSelected,
+      entityIdsSelected,
       isSelect,
       onEntitySelect,
       expandNo,
@@ -131,7 +141,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
             <ItemWrapper key={i} separated={expandNo}>
               <EntityListItem
                 select={isSelect}
-                checked={isSelect && entitiesSelected.map((e) => e.id).indexOf(entity.id) > -1}
+                checked={isSelect && entityIdsSelected.indexOf(entity.id) > -1}
                 onSelect={(checked) => onEntitySelect(entity.id, checked)}
                 entity={this.mapToEntityListItem(entity, this.props)}
                 expandNo={expandNo}
@@ -165,17 +175,17 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
 
 EntityListItems.propTypes = {
   entities: PropTypes.array.isRequired,
-  entitiesSelected: PropTypes.array,
+  expandableColumns: PropTypes.array,
+  entityIdsSelected: PropTypes.array,
+  taxonomies: PropTypes.object,
+  associations: PropTypes.object,
   isSelect: PropTypes.bool,
   onEntitySelect: PropTypes.func,
-  taxonomies: PropTypes.object,
   entityLinkTo: PropTypes.string,
-  associations: PropTypes.object,
   onTagClick: PropTypes.func,
   onExpand: PropTypes.func,
   expandNo: PropTypes.number,
   isExpandable: PropTypes.bool,
-  expandableColumns: PropTypes.array,
   entityIcon: PropTypes.string,
 };
 
