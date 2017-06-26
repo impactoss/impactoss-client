@@ -3,7 +3,6 @@
  * EntityList
  *
  */
-
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 // import { FormattedMessage } from 'react-intl';
@@ -12,8 +11,8 @@ import styled from 'styled-components';
 import { Map, List, fromJS } from 'immutable';
 import { orderBy, reduce, filter, map } from 'lodash/collection';
 import { flatten } from 'lodash/array';
-import { range } from 'lodash/util';
 
+import { jumpToComponent } from 'utils/scroll-to-component';
 import { getEntitySortIteratee } from 'utils/sort';
 
 import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
@@ -51,6 +50,9 @@ import {
   entitiesSelectedSelector,
 } from './selectors';
 
+import { getPager } from './pagination';
+import { getHeaderColumns } from './header';
+
 import {
   showPanel,
   saveEdits,
@@ -67,6 +69,7 @@ const Content = styled.div`
   padding: 0 4em;
 `;
 const ListEntities = styled.div``;
+const ListWrapper = styled.div``;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -92,106 +95,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   //   console.log(nextProps.entities === this.props.entities, 'immutable map equal')
   //   console.log(JSON.stringify(nextProps.entities) === JSON.stringify(this.props.entities), 'stringified objects equal')
   // }
-  getHeaderColumns = (label, isSelect, isExpandable, expandNo, expandableColumns, handleExpandLink) => {
-    // TODO figure out a betterway to determine column widths. this is terrible
-    let width = 1;
-    // if nested
-    if (isExpandable && expandableColumns.length > 0) {
-      width = expandNo > 0 ? 0.5 : 0.66;
-    }
-    const columns = [{
-      label,
-      isSelect,
-      width,
-    }];
-    if (isExpandable) {
-      const exColumns = expandableColumns.map((col, i, exCols) => {
-        const isExpand = expandNo > i;
-        width = 1;
-        // if nested
-        if (exCols.length > i + 1) {
-          // if nested && nestedExpanded
-          if (expandNo > i + 1) {
-            width = 0.5;
-          // else if nested && !nestedExpanded
-          } else if (isExpand) {
-            width = 0.66;
-          } else {
-            width = 0.5;
-          }
-        // else if !nested // isExpand
-        } else if (isExpand) {
-          if (exCols.length > 1) {
-            width = 0.5;
-          }
-        } else if (exCols.length > 1) {
-          if (expandNo === i) {
-            width = 0.34;
-          } else {
-            width = 0.5;
-          }
-        }
-
-        return {
-          label: col.label,
-          isExpandable: true,
-          isExpand,
-          onExpand: () => handleExpandLink(isExpand ? i : i + 1),
-          width,
-        };
-      });
-      return columns.concat(exColumns);
-    }
-    return columns;
+  scrollToTop = () => {
+    jumpToComponent(
+      this.ScrollTarget,
+      this.ScrollReference,
+      this.ScrollContainer
+    );
   }
-
-  getPager = (totalItems, currentPg, pageSz) => {
-    // default to first page
-    const currentPage = currentPg || 1;
-    // default page size is 10
-    const pageSize = pageSz || 20;
-
-    // calculate total pages
-    const totalPages = Math.ceil(totalItems / pageSize);
-
-    // less than 5 total pages so show all
-    let startPage = 1;
-    let endPage = totalPages;
-    if (totalPages > 5) {
-      // more than 5 total pages so calculate start and end pages
-      if (currentPage <= 3) {
-        startPage = 1;
-        endPage = 5;
-      } else if (currentPage + 2 >= totalPages) {
-        startPage = totalPages - 4;
-        endPage = totalPages;
-      } else {
-        startPage = currentPage - 2;
-        endPage = currentPage + 2;
-      }
-    }
-
-    // calculate start and end item indexes
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = Math.min((startIndex + pageSize) - 1, totalItems - 1);
-
-    // create an array of pages to ng-repeat in the pager control
-    const pages = range(startPage, endPage + 1);
-
-    // return object with all pager properties required by the view
-    return {
-      totalItems,
-      currentPage,
-      pageSize,
-      totalPages,
-      startPage,
-      endPage,
-      startIndex,
-      endIndex,
-      pages,
-    };
-  }
-
   render() {
     const {
       sortBy,
@@ -233,7 +143,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       : group.entities.map((entity) => ({ group: gIndex, entity }))
     ));
     // get new pager object for specified page
-    const pager = this.getPager(entitiesGroupedFlattened.length, parseInt(location.query.page, 10));
+    const pager = getPager(entitiesGroupedFlattened.length, location.query.page && parseInt(location.query.page, 10));
     // get new page of items from items array
     const pageItems = entitiesGroupedFlattened.slice(pager.startIndex, pager.endIndex + 1);
     const entitiesGroupedPaged = getGroupedEntitiesForPage(pageItems, entitiesGrouped);
@@ -278,8 +188,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             />
           }
         </Sidebar>
-        <ContainerWithSidebar>
-          <Container>
+        <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }}>
+          <Container innerRef={(node) => { this.ScrollReference = node; }}>
             <Content>
               <ContentHeader
                 type={CONTENT_LIST}
@@ -324,43 +234,48 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                       : null
                     }
                   />
-                  <EntityListHeader
-                    columns={this.getHeaderColumns(
-                      listHeaderLabel,
-                      isManager,
-                      this.props.isExpandable,
-                      this.props.expandNo,
-                      this.props.expandableColumns,
-                      this.props.handleExpandLink
-                    )}
-                    isSelect={isManager}
-                    isSelected={allChecked}
-                    onSelect={(checked) => {
-                      this.props.onEntitySelectAll(checked ? map(pageItems, (item) => item.entity.id) : []);
-                    }}
-                  />
-                  <EntityListGroups
-                    entitiesGrouped={entitiesGroupedPaged}
-                    entitiesSorted={entitiesSorted}
-                    entityIdsSelected={entityIdsSelected}
-                    taxonomies={taxonomies}
-                    connectedTaxonomies={connectedTaxonomies}
-                    filters={filters}
-                    locationQuery={location.query}
-                    header={this.props.header}
-                    entityLinkTo={this.props.entityLinkTo}
-                    isManager={this.props.isManager}
-                    onTagClick={this.props.onTagClick}
-                    onEntitySelect={this.props.onEntitySelect}
-                    expandNo={this.props.expandNo}
-                    isExpandable={this.props.isExpandable}
-                    expandableColumns={this.props.expandableColumns}
-                    handleExpandLink={this.props.handleExpandLink}
-                  />
-                  <EntityListFooter
-                    pager={pager}
-                    onPageSelect={this.props.onPageSelect}
-                  />
+                  <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
+                    <EntityListHeader
+                      columns={getHeaderColumns(
+                        listHeaderLabel,
+                        isManager,
+                        this.props.isExpandable,
+                        this.props.expandNo,
+                        this.props.expandableColumns,
+                        this.props.handleExpandLink
+                      )}
+                      isSelect={isManager}
+                      isSelected={allChecked}
+                      onSelect={(checked) => {
+                        this.props.onEntitySelectAll(checked ? map(pageItems, (item) => item.entity.id) : []);
+                      }}
+                    />
+                    <EntityListGroups
+                      entitiesGrouped={entitiesGroupedPaged}
+                      entitiesSorted={entitiesSorted}
+                      entityIdsSelected={entityIdsSelected}
+                      taxonomies={taxonomies}
+                      connectedTaxonomies={connectedTaxonomies}
+                      filters={filters}
+                      locationQuery={location.query}
+                      header={this.props.header}
+                      entityLinkTo={this.props.entityLinkTo}
+                      isManager={this.props.isManager}
+                      onTagClick={this.props.onTagClick}
+                      onEntitySelect={this.props.onEntitySelect}
+                      expandNo={this.props.expandNo}
+                      isExpandable={this.props.isExpandable}
+                      expandableColumns={this.props.expandableColumns}
+                      handleExpandLink={this.props.handleExpandLink}
+                    />
+                    <EntityListFooter
+                      pager={pager}
+                      onPageSelect={(page) => {
+                        this.scrollToTop();
+                        this.props.onPageSelect(page);
+                      }}
+                    />
+                  </ListWrapper>
                 </ListEntities>
               }
             </Content>
