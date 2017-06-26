@@ -28,5 +28,5 @@ export const scrollToY = (scrollTargetY, speed = 2000) => {
 export const jumpToComponent = (target, scrollReference, scrollContainer) => {
   const targetTop = target.getBoundingClientRect().top;
   const refTop = scrollReference.getBoundingClientRect().top;
-  const scrollContainer.scrollTop = targetTop - refTop; // eslint-disable-line no-param-reassign
+  scrollContainer.scrollTop = targetTop - refTop; // eslint-disable-line no-param-reassign
 };
