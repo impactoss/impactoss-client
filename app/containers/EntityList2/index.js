@@ -5,11 +5,12 @@
  */
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+
 // import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Map, List, fromJS } from 'immutable';
-import { orderBy, reduce, filter, map } from 'lodash/collection';
+import { orderBy, filter, map } from 'lodash/collection';
 import { flatten } from 'lodash/array';
 
 import { jumpToComponent } from 'utils/scroll-to-component';
@@ -20,29 +21,34 @@ import Container from 'components/basic/Container';
 import Sidebar from 'components/basic/Sidebar';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
-import EntityListSidebar from 'components/EntityListSidebar';
+import EntityListSidebar from 'components/EntityListSidebar2';
 import EntityListGroups from 'components/EntityListGroups';
 import EntityListSearch from 'components/EntityListSearch';
-import EntityListOptions from 'components/EntityListOptions';
+// import EntityListOptions from 'components/EntityListOptions';
 import EntityListHeader from 'components/EntityListHeader';
 import EntityListFooter from 'components/EntityListFooter';
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
-import { getEntities, isUserManager } from 'containers/App/selectors';
+import { isUserManager } from 'containers/App/selectors';
 
 import { CONTENT_LIST } from 'containers/App/constants';
 
 import { makeCurrentFilters } from './filtersFactory';
+
 import {
-  makeGroupOptions,
+  // makeGroupOptions,
   groupEntities,
   getGroupedEntitiesForPage,
 } from './groupFactory';
 
 import {
-  getAttributeQuery,
-  getConnectedQuery,
-  getWithoutQuery,
+  // getAttributeQuery,
+  // getConnectedQuery,
+  // getWithoutQuery,
+  joinEntities,
+  filterEntities,
+  joinTaxonomies,
+  filterTaxonomies,
 } from './entityQueries';
 
 import {
@@ -113,25 +119,72 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       onPanelSelect,
       filters,
       edits,
-      location,
-      taxonomies,
+      relationships,
       connections,
+      entityCategories,
+      entityConnections,
+      categories,
+      location,
     } = this.props;
 
+    // location = this.props.location //|| this.props.location.toJS()
     // do not list 'own' taxonomies in connected taxonomies
-    const connectedTaxonomies = dataReady && this.props.connectedTaxonomies && taxonomies
-      ? reduce(this.props.connectedTaxonomies, (filteredTaxonomies, tax, key) =>
-          Object.keys(taxonomies).indexOf(key) < 0
-            ? Object.assign(filteredTaxonomies, { [key]: tax })
-            : filteredTaxonomies
-        , {})
-      : this.props.connectedTaxonomies;
+    let entities = this.props.entities || null;
+    if (entities) {
+      if (location.query) {
+        entities = filterEntities({
+          entities,
+          filters,
+          query: location.query,
+        });
+      }
+      if (relationships.entities) {
+        entities = joinEntities({
+          entityTable: entities,
+          relationships: relationships.entities,
+          entityCategoryJoinTable: entityCategories,
+          entityConnectionJoinTables: entityConnections,
+          connectionTables: connections,
+        });
+      }
+      entities = entities.toJS();
+      // console.log(entities)
+    }
+    let taxonomies = this.props.taxonomies || null;
+    if (taxonomies) {
+      if (relationships.taxonomies.where) {
+        taxonomies = filterTaxonomies({
+          taxonomies,
+          condition: relationships.taxonomies.where,
+        });
+      }
+      // console.log(taxonomies.toJS())
+      // console.log(categories)
+      if (relationships.taxonomies) {
+        taxonomies = joinTaxonomies({
+          taxonomyTable: taxonomies,
+          categoryTable: categories,
+        });
+      }
+      taxonomies = taxonomies.toJS();
+    }
+
+
+    const connectedTaxonomies = null;
+    // const connectedTaxonomies = dataReady && this.props.connectedTaxonomies && taxonomies
+    //   ? reduce(this.props.connectedTaxonomies, (filteredTaxonomies, tax, key) =>
+    //       Object.keys(taxonomies).indexOf(key) < 0
+    //         ? Object.assign(filteredTaxonomies, { [key]: tax })
+    //         : filteredTaxonomies
+    //     , {})
+    //   : this.props.connectedTaxonomies;
 
     // sorted entities
-    const entitiesSorted = dataReady && this.props.entities
-      ? orderBy(this.props.entities, getEntitySortIteratee(sortBy), sortOrder)
-      : [];
 
+    const entitiesSorted = dataReady && entities
+      ? orderBy(entities, getEntitySortIteratee(sortBy), sortOrder)
+      : [];
+    // console.log('entitiesSorted', entitiesSorted)
     // grouping and paging
     const entitiesGrouped = entitiesSorted.length > 0
       ? groupEntities(entitiesSorted, taxonomies, connectedTaxonomies, filters, location.query)
@@ -148,7 +201,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     const pageItems = entitiesGroupedFlattened.slice(pager.startIndex, pager.endIndex + 1);
     const entitiesGroupedPaged = getGroupedEntitiesForPage(pageItems, entitiesGrouped);
     // console.log('entitiesGrouped', entitiesGrouped)
-    // console.log('entitiesGroupedPaged', entitiesGroupedPaged)
 
     // selected entities
     const entitiesSelected = dataReady ? map(filter(Object.values(pageItems), (item) => entityIdsSelected.indexOf(item.entity.id) >= 0), 'entity') : [];
@@ -174,9 +226,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             <EntityListSidebar
               filters={filters}
               edits={edits}
-              taxonomies={taxonomies}
-              connections={connections}
-              connectedTaxonomies={connectedTaxonomies}
+              taxonomies={null}
+              connections={null}
+              connectedTaxonomies={null}
               entitiesSorted={entitiesSorted}
               entityIdsSelected={entityIdsSelected}
               location={location}
@@ -214,26 +266,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     searchQuery={location.query.search || ''}
                     onSearch={this.props.onSearch}
                   />
-                  <EntityListOptions
-                    groupOptions={makeGroupOptions(filters, taxonomies, connectedTaxonomies)}
-                    subgroupOptions={makeGroupOptions(filters, taxonomies)}
-                    groupSelectValue={location.query.group}
-                    subgroupSelectValue={location.query.subgroup}
-                    onGroupSelect={this.props.onGroupSelect}
-                    onSubgroupSelect={this.props.onSubgroupSelect}
-                    expandLink={this.props.isExpandable
-                      ? {
-                        expanded: this.props.expandNo === this.props.expandableColumns.length,
-                        collapsed: this.props.expandNo === 0,
-                        onClick: () => this.props.handleExpandLink(
-                          this.props.expandNo < this.props.expandableColumns.length
-                          ? this.props.expandableColumns.length
-                          : 0
-                        ),
-                      }
-                      : null
-                    }
-                  />
+                  <div>EntityListOptions</div>
                   <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
                     <EntityListHeader
                       columns={getHeaderColumns(
@@ -293,20 +326,26 @@ EntityList.propTypes = {
   header: PropTypes.object,
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
-  location: PropTypes.object,
+  location: PropTypes.object.isRequired,
   entityTitle: PropTypes.object, // single/plural
   entityLinkTo: PropTypes.string,
+  // path: PropTypes.string,
   isExpandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
   expandNo: PropTypes.number,
-  // select props
+  // state props
   activePanel: PropTypes.string,
   isManager: PropTypes.bool,
-  entities: PropTypes.object.isRequired,
   entityIdsSelected: PropTypes.array,
-  taxonomies: PropTypes.object,
-  connections: PropTypes.object,
-  connectedTaxonomies: PropTypes.object,
+  // select props
+  entities: PropTypes.instanceOf(Map),
+  entityCategories: PropTypes.instanceOf(Map),
+  taxonomies: PropTypes.instanceOf(Map),
+  categories: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
+  entityConnections: PropTypes.instanceOf(Map),
+  relationships: PropTypes.object,
+
   // dispatch props
   onPanelSelect: PropTypes.func.isRequired,
   handleEditSubmit: PropTypes.func.isRequired,
@@ -314,8 +353,8 @@ EntityList.propTypes = {
   onEntitySelectAll: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,
   handleExpandLink: PropTypes.func.isRequired,
-  onGroupSelect: PropTypes.func.isRequired,
-  onSubgroupSelect: PropTypes.func.isRequired,
+  // onGroupSelect: PropTypes.func.isRequired,
+  // onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
 };
@@ -330,54 +369,10 @@ EntityList.contextTypes = {
   intl: React.PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = (state) => ({
   isManager: isUserManager(state),
   activePanel: activePanelSelector(state),
   entityIdsSelected: entitiesSelectedSelector(state),
-  // entities: {},
-  // taxonomies: null,
-  // connections: null,
-  // connectedTaxonomies: null,
-  entities: getEntities(state, {
-    out: 'js',
-    path: props.selects.entities.path,
-    where: props.location.query && props.location.query.where
-      ? getAttributeQuery(props.location.query.where)
-      : null,
-    connected: props.filters && props.location.query
-      ? getConnectedQuery(props.location.query, props.filters)
-      : null,
-    without: props.location.query && props.location.query.without
-      ? getWithoutQuery(props.location.query.without, props.filters)
-      : null,
-    search: props.location.query && props.location.query.search
-      ? {
-        query: props.location.query.search,
-        fields: props.filters.search,
-      }
-      : null,
-    extend: props.selects.entities.extensions,
-  }),
-  taxonomies: props.selects && props.selects.taxonomies
-    ? getEntities(state, props.selects.taxonomies)
-    : null,
-  connections: props.selects && props.selects.connections
-    ? reduce(props.selects.connections.options, (result, option) => {
-      const path = typeof option === 'string' ? option : option.path;
-      return {
-        ...result,
-        [path]: getEntities(state, {
-          out: 'js',
-          path,
-        }),
-      };
-    }, {})
-    : null,
-  connectedTaxonomies: props.selects && props.selects.connectedTaxonomies
-  ? reduce(props.selects.connectedTaxonomies.options, (memo, select) =>
-    Object.assign({}, memo, getEntities(state, select))
-  , {})
-  : null,
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -457,7 +452,7 @@ function mapDispatchToProps(dispatch, props) {
           const newValue = creates.first(); // take the first TODO multiselect should be run in single value mode and only return 1 value
           saveData = saveData
             .set('attributes', true)
-            .set('path', props.selects.entities.path)
+            .set('path', props.path)
             .set('entities', entities.reduce((updatedEntities, entity) =>
               entity.getIn(['attributes', activeEditOption.optionId]) !== newValue
                 ? updatedEntities.push(entity.setIn(['attributes', activeEditOption.optionId], newValue))

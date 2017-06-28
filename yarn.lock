@@ -6210,9 +6210,9 @@ rc@^1.1.2, rc@~1.1.6:
     minimist "^1.2.0"
     strip-json-comments "~1.0.4"
 
-re-reselect@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/re-reselect/-/re-reselect-0.1.0.tgz#62bf4fb48c1b18224be5d180b10b52a8dae1aa85"
+re-reselect@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/re-reselect/-/re-reselect-0.5.0.tgz#cee923e59a4ab7f9d9d85fae1479686cb4e1ee50"
 
 react-addons-perf@^15.4.2:
   version "15.4.2"

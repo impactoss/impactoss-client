@@ -96,11 +96,12 @@ const isReady = (state, { path }) =>
     true
   );
 
-const getEntitiesPure = createSelector(
-  getGlobalEntities,
-  (state, { path }) => path,
-  (entities, path) => entities.get(path)
-);
+const getEntitiesPure = createCachedSelector(
+  (state, props) => state.getIn(['global', 'entities', props.path]),
+  (entities) => entities
+)((state, { path }) => path);
+
+const selectEntities = (state, path) => state.getIn(['global', 'entities', path]);
 
 // filter entities by attribute or id, also allows multiple conditions
 // eg where: {draft: false} or where: {id: 1, draft: false}
@@ -429,6 +430,8 @@ export {
   makeSelectPreviousPathname,
   getRequestedAt,
   isReady,
+  selectEntities,
+  getEntitiesPure,
   getEntitiesWhere,
   getEntities,
   hasEntity,
