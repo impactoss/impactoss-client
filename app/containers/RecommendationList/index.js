@@ -4,16 +4,16 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { Map } from 'immutable';
 
-import EntityList from 'containers/EntityList2';
+import EntityList from 'containers/EntityList';
 import { PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'containers/App/constants';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { isReady, selectEntities } from 'containers/App/selectors';
+import { isReady } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -29,54 +29,47 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       this.props.loadEntitiesIfNeeded();
     }
   }
-  // componentWillUpdate(nextProps) {
-  //   // reload entities if invalidated
-  //   console.log('reclist componentWillUpdate')
-  //   console.log('componentWillUpdate: entities', this.props.entities !== nextProps.entities)
-  //   console.log('componentWillUpdate: taxonomies', this.props.taxonomies !== nextProps.taxonomies)
-  //   console.log('componentWillUpdate: categories', this.props.categories !== nextProps.categories)
-  //   console.log('componentWillUpdate: measures', this.props.measures !== nextProps.measures)
-  //   console.log('componentWillUpdate: entityCategories', this.props.entityCategories !== nextProps.entityCategories)
-  //   console.log('componentWillUpdate: recommendation_measures', this.props.recommendation_measures !== nextProps.recommendation_measures)
-  // }
-  // shouldComponentUpdate(nextProps, state) {
-  //   return this.props.dataReady !== nextProps.dataReady;
-  // }
+
   render() {
-    const {
-      dataReady,
-      entities,
-      entityCategories,
-      taxonomies,
-      categories,
-      measures,
-      recommendation_measures,
-    } = this.props;
+    const { dataReady } = this.props;
 
     // define selects for getEntities
-
-    const relationships = {
+    const selects = {
       entities: {
-        entityCategories: {
-          key: 'recommendation_id',
-          reverse: true,
-        },
-        entityConnections: {
-          recommendation_measures: {
+        path: 'recommendations',
+        extensions: [
+          {
+            path: 'recommendation_categories',
+            key: 'recommendation_id',
+            reverse: true,
+            as: 'taxonomies',
+          },
+          {
+            path: 'recommendation_measures',
             key: 'recommendation_id',
             reverse: true,
             as: 'measures',
-            hasConnection: { // exclude "ghost" connections, eg draft
-              measures: {
-                key: 'measure_id',
-              },
+            connected: {
+              path: 'measures',
+              key: 'measure_id',
+              forward: true,
             },
           },
-        },
+        ],
+      },
+      connections: {
+        options: ['measures'],
       },
       taxonomies: { // filter by each category
+        path: 'taxonomies',
+        out: 'js',
         where: {
           tags_recommendations: true,
+        },
+        extend: {
+          path: 'categories',
+          key: 'taxonomy_id',
+          reverse: true,
         },
       },
     };
@@ -100,31 +93,31 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           },
         ],
       },
-      // taxonomies: { // filter by each category
-      //   query: 'cat',
-      //   filter: true,
-      //   connected: {
-      //     path: 'recommendation_categories',
-      //     key: 'recommendation_id',
-      //     whereKey: 'category_id',
-      //   },
-      // },
-      // connections: { // filter by associated entity
-      //   options: [
-      //     {
-      //       filter: true,
-      //       label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-      //       path: 'measures', // filter by recommendation connection
-      //       query: 'actions',
-      //       key: 'measure_id',
-      //       connected: {
-      //         path: 'recommendation_measures',
-      //         key: 'recommendation_id',
-      //         whereKey: 'measure_id',
-      //       },
-      //     },
-      //   ],
-      // },
+      taxonomies: { // filter by each category
+        query: 'cat',
+        filter: true,
+        connected: {
+          path: 'recommendation_categories',
+          key: 'recommendation_id',
+          whereKey: 'category_id',
+        },
+      },
+      connections: { // filter by associated entity
+        options: [
+          {
+            filter: true,
+            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+            path: 'measures', // filter by recommendation connection
+            query: 'actions',
+            key: 'measure_id',
+            connected: {
+              path: 'recommendation_measures',
+              key: 'recommendation_id',
+              whereKey: 'measure_id',
+            },
+          },
+        ],
+      },
     };
     const edits = {
       taxonomies: { // edit category
@@ -180,28 +173,19 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { dataReady &&
-          <EntityList
-            location={this.props.location}
-            relationships={relationships}
-            path="recommendations"
-            filters={filters}
-            edits={edits}
-            entities={entities}
-            connections={{ measures }}
-            taxonomies={taxonomies}
-            categories={categories}
-            entityCategories={entityCategories}
-            entityConnections={{ recommendation_measures }}
-            header={headerOptions}
-            dataReady={dataReady}
-            entityTitle={{
-              single: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
-              plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
-            }}
-            entityLinkTo="/recommendations/"
-          />
-        }
+        <EntityList
+          location={this.props.location}
+          selects={selects}
+          filters={filters}
+          edits={edits}
+          header={headerOptions}
+          dataReady={dataReady}
+          entityTitle={{
+            single: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
+            plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+          }}
+          entityLinkTo="/recommendations/"
+        />
       </div>
     );
   }
@@ -213,17 +197,12 @@ RecommendationList.propTypes = {
   handleImport: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
-  entities: PropTypes.instanceOf(Map),
-  taxonomies: PropTypes.instanceOf(Map),
-  categories: PropTypes.instanceOf(Map),
-  measures: PropTypes.instanceOf(Map),
-  entityCategories: PropTypes.instanceOf(Map),
-  recommendation_measures: PropTypes.instanceOf(Map),
 };
 
 RecommendationList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
+
 const mapStateToProps = (state) => ({
   dataReady: isReady(state, { path: [
     'measures',
@@ -234,12 +213,6 @@ const mapStateToProps = (state) => ({
     'recommendation_measures',
     'recommendation_categories',
   ] }),
-  entities: selectEntities(state, 'recommendations'),
-  taxonomies: selectEntities(state, 'taxonomies'),
-  categories: selectEntities(state, 'categories'),
-  entityCategories: selectEntities(state, 'recommendation_categories'),
-  measures: selectEntities(state, 'measures'),
-  recommendation_measures: selectEntities(state, 'recommendation_measures'),
 });
 
 function mapDispatchToProps(dispatch) {

@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Map, fromJS } from 'immutable';
 import { connect } from 'react-redux';
 import { isEqual } from 'lodash/lang';

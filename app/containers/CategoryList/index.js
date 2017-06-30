@@ -3,7 +3,8 @@
  * Taxonomies
  *
  */
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
@@ -168,7 +169,7 @@ CategoryList.propTypes = {
 };
 
 CategoryList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({

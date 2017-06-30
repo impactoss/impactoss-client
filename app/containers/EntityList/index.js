@@ -3,7 +3,8 @@
  * EntityList
  *
  */
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -327,7 +328,7 @@ EntityList.defaultProps = {
 };
 
 EntityList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
