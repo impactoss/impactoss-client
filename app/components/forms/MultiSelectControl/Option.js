@@ -17,8 +17,8 @@ const Reference = styled.span`
 const Count = styled.span`
   position: absolute;
   top: 0;
-  right: 0
-  color: ${palette('dark', 4)}
+  right: 0;
+  color: ${palette('dark', 4)};
 `;
 
 const Option = (props) => (
