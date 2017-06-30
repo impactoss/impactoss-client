@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import appMessages from 'containers/App/messages';
 
@@ -31,7 +32,7 @@ ReferenceField.propTypes = {
 };
 
 ReferenceField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default ReferenceField;

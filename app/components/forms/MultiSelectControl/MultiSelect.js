@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import { kebabCase, lowerCase } from 'lodash/string';
 import styled from 'styled-components';

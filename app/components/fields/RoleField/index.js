@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import appMessages from 'containers/App/messages';
 
@@ -24,7 +25,7 @@ RoleField.propTypes = {
   field: PropTypes.object.isRequired,
 };
 RoleField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default RoleField;

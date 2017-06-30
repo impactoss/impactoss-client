@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 // import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -102,10 +103,10 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
 }
 
 SelectFile.propTypes = {
-  onChange: React.PropTypes.func,
-  value: React.PropTypes.object,
-  as: React.PropTypes.string,
-  accept: React.PropTypes.string,
+  onChange: PropTypes.func,
+  value: PropTypes.object,
+  as: PropTypes.string,
+  accept: PropTypes.string,
 };
 
 export default SelectFile;

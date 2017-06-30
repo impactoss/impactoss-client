@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import appMessages from 'containers/App/messages';
 
@@ -24,6 +25,6 @@ TitleShortField.propTypes = {
   field: PropTypes.object.isRequired,
 };
 TitleShortField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 export default TitleShortField;

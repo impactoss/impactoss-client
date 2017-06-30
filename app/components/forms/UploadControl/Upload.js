@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import ReactS3Uploader from 'react-s3-uploader';
 import styled from 'styled-components';
@@ -151,10 +152,10 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
 }
 
 Upload.propTypes = {
-  onChange: React.PropTypes.func,
-  value: React.PropTypes.string,
+  onChange: PropTypes.func,
+  value: PropTypes.string,
 };
 // Upload.contextTypes = {
-//   intl: React.PropTypes.object.isRequired,
+//   intl: PropTypes.object.isRequired,
 // };
 export default Upload;
