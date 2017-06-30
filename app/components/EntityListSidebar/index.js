@@ -3,7 +3,8 @@
  * EntityListSidebar
  *
  */
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -244,7 +245,7 @@ EntityListSidebar.propTypes = {
 };
 
 EntityListSidebar.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default EntityListSidebar;

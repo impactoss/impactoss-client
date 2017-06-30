@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import EntityListNestedReportItem from 'components/EntityListItem/EntityListNestedItem/EntityListNestedReportItem';
@@ -49,7 +50,7 @@ EntityListNestedReportList.propTypes = {
   entityLinkTo: PropTypes.string,
 };
 EntityListNestedReportList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default EntityListNestedReportList;
