@@ -20,6 +20,7 @@ import { reduce } from 'lodash/collection';
 import { USER_ROLES } from 'containers/App/constants';
 
 import asArray from 'utils/as-array';
+
 import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
 
 // high level state selects
@@ -61,6 +62,54 @@ const selectLocation = createSelector(
     }
   }
 );
+const getLocationQuery = createSelector(
+  selectLocation,
+  (location) => location.get('query')
+);
+const getWhereQuery = createSelector(
+  getLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('where')
+);
+const getAttributeQuery = createSelector(
+  getWhereQuery,
+  (whereQuery) => whereQuery &&
+    asArray(whereQuery).reduce((memo, where) => {
+      const attrValue = where.split(':');
+      return Object.assign(memo, { [attrValue[0]]: attrValue[1] });
+    }, {})
+);
+
+const getWithoutQuery = createSelector(
+  getLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('without')
+);
+
+const getSearchQuery = createSelector(
+  getLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('search')
+);
+// const getWithoutAssociationQuery = createSelector(
+//   getWithoutQuery,
+//   (withoutQuery) =>
+//     asArray(withoutQuery).map((pathOrTax) => {
+//       // check numeric ? taxonomy filter : related entity filter
+//       if (isNumber(pathOrTax)) {
+//         return {
+//           taxonomyId: pathOrTax,
+//           path: filters.taxonomies.connected.path,
+//           key: filters.taxonomies.connected.key,
+//         };
+//       }
+//       if (filters.connections.options) {
+//         // related entity filter
+//         const connection = find(filters.connections.options, { query: pathOrTax });
+//         return connection ? connection.connected : {};
+//       }
+//       return {};
+//     });
+//
+//
+// )
 
 const makeSelectPathnameOnAuthChange = () => createSelector(
   getRoute,
@@ -102,6 +151,7 @@ const getEntitiesPure = createCachedSelector(
 )((state, { path }) => path);
 
 const selectEntities = (state, path) => state.getIn(['global', 'entities', path]);
+
 
 // filter entities by attribute or id, also allows multiple conditions
 // eg where: {draft: false} or where: {id: 1, draft: false}
@@ -237,10 +287,9 @@ const prepareEntitySearchTarget = (entity, fields) =>
 
 // check if entities have connections with other entities via associative table
 const getEntitiesSearch = createSelector(
-  (state) => state,
   getEntitiesIfConnected,
   (state, { search }) => search,
-  (state, entities, search) => {
+  (entities, search) => {
     if (search) {
       try {
         const regex = new RegExp(regExMultipleWords(search.query), 'i');
@@ -444,5 +493,8 @@ export {
   isUserAdmin,
   isUserManager,
   isUserContributor,
+  getAttributeQuery,
+  getSearchQuery,
+  getWithoutQuery,
   selectLocation,
 };

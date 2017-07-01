@@ -115,6 +115,11 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     return buttons;
   }
 
+  formatLabel = (path) => {
+    const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
+    return this.context.intl.formatMessage(message);
+  }
+
   render() {
     // console.log('EntityListSidebar.render')
     const {
@@ -147,7 +152,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
           connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
           connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
-        }
+        },
+        this.formatLabel
       );
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
       panelGroups = makeEditGroups(
@@ -155,7 +161,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
           taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
           connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
-        }
+        },
+        this.formatLabel
       );
     }
     let formOptions = null;
@@ -165,7 +172,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           entitiesSorted, filters, activeOption, location, taxonomies, connections, connectedTaxonomies, {
             titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
             without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
-          }
+          },
+          this.formatLabel,
         );
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
         formOptions = makeActiveEditOptions(

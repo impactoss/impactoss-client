@@ -29,7 +29,7 @@ import EntityListHeader from 'components/EntityListHeader';
 import EntityListFooter from 'components/EntityListFooter';
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
-import { getEntities, isUserManager } from 'containers/App/selectors';
+import { isUserManager } from 'containers/App/selectors';
 
 import { CONTENT_LIST } from 'containers/App/constants';
 
@@ -39,12 +39,6 @@ import {
   groupEntities,
   getGroupedEntitiesForPage,
 } from './groupFactory';
-
-import {
-  getAttributeQuery,
-  getConnectedQuery,
-  getWithoutQuery,
-} from './entityQueries';
 
 import {
   activePanelSelector,
@@ -118,7 +112,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       taxonomies,
       connections,
     } = this.props;
-
+    // console.log('entityList:render')
     // do not list 'own' taxonomies in connected taxonomies
     const connectedTaxonomies = dataReady && this.props.connectedTaxonomies && taxonomies
       ? reduce(this.props.connectedTaxonomies, (filteredTaxonomies, tax, key) =>
@@ -211,7 +205,17 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               { dataReady &&
                 <ListEntities>
                   <EntityListSearch
-                    filters={makeCurrentFilters(this.props, this.context.intl.formatMessage(messages.filterFormWithoutPrefix))}
+                    filters={makeCurrentFilters(
+                      {
+                        filters,
+                        taxonomies,
+                        connections,
+                        connectedTaxonomies,
+                        location,
+                        onTagClick: this.props.onTagClick,
+                      },
+                      this.context.intl.formatMessage(messages.filterFormWithoutPrefix)
+                    )}
                     searchQuery={location.query.search || ''}
                     onSearch={this.props.onSearch}
                   />
@@ -331,54 +335,10 @@ EntityList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = (state) => ({
   isManager: isUserManager(state),
   activePanel: activePanelSelector(state),
   entityIdsSelected: entitiesSelectedSelector(state),
-  // entities: {},
-  // taxonomies: null,
-  // connections: null,
-  // connectedTaxonomies: null,
-  entities: getEntities(state, {
-    out: 'js',
-    path: props.selects.entities.path,
-    where: props.location.query && props.location.query.where
-      ? getAttributeQuery(props.location.query.where)
-      : null,
-    connected: props.filters && props.location.query
-      ? getConnectedQuery(props.location.query, props.filters)
-      : null,
-    without: props.location.query && props.location.query.without
-      ? getWithoutQuery(props.location.query.without, props.filters)
-      : null,
-    search: props.location.query && props.location.query.search
-      ? {
-        query: props.location.query.search,
-        fields: props.filters.search,
-      }
-      : null,
-    extend: props.selects.entities.extensions,
-  }),
-  taxonomies: props.selects && props.selects.taxonomies
-    ? getEntities(state, props.selects.taxonomies)
-    : null,
-  connections: props.selects && props.selects.connections
-    ? reduce(props.selects.connections.options, (result, option) => {
-      const path = typeof option === 'string' ? option : option.path;
-      return {
-        ...result,
-        [path]: getEntities(state, {
-          out: 'js',
-          path,
-        }),
-      };
-    }, {})
-    : null,
-  connectedTaxonomies: props.selects && props.selects.connectedTaxonomies
-  ? reduce(props.selects.connectedTaxonomies.options, (memo, select) =>
-    Object.assign({}, memo, getEntities(state, select))
-  , {})
-  : null,
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -458,7 +418,7 @@ function mapDispatchToProps(dispatch, props) {
           const newValue = creates.first(); // take the first TODO multiselect should be run in single value mode and only return 1 value
           saveData = saveData
             .set('attributes', true)
-            .set('path', props.selects.entities.path)
+            .set('path', props.path)
             .set('entities', entities.reduce((updatedEntities, entity) =>
               entity.getIn(['attributes', activeEditOption.optionId]) !== newValue
                 ? updatedEntities.push(entity.setIn(['attributes', activeEditOption.optionId], newValue))
