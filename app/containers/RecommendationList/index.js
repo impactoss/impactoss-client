@@ -11,13 +11,13 @@ import Helmet from 'react-helmet';
 // import { isEqual } from 'lodash/lang';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
+import { isReady, selectTaxonomies } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
 
 import { FILTERS, EDITS } from './constants';
-import { getConnections, getTaxonomies, getRecommendations } from './selectors';
+import { selectConnections, selectRecommendations } from './selectors';
 import messages from './messages';
 
 export class RecommendationList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -122,9 +122,9 @@ const mapStateToProps = (state) => ({
     'recommendation_measures',
     'recommendation_categories',
   ] }),
-  entities: getRecommendations(state),
-  taxonomies: getTaxonomies(state),
-  connections: getConnections(state),
+  entities: selectRecommendations(state),
+  taxonomies: selectTaxonomies(state),
+  connections: selectConnections(state),
 });
 
 function mapDispatchToProps(dispatch) {

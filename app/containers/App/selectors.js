@@ -17,11 +17,12 @@ import { createSelector } from 'reselect';
 import createCachedSelector from 're-reselect';
 import { reduce } from 'lodash/collection';
 
-import { USER_ROLES } from 'containers/App/constants';
-
 import asArray from 'utils/as-array';
+import { regExMultipleWords } from 'utils/string';
 
-import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
+import { USER_ROLES } from 'containers/App/constants';
+import { attributesEqual, prepareEntitySearchTarget } from 'containers/App/selector-utils';
+
 
 // high level state selects
 const getRoute = (state) => state.get('route');
@@ -50,66 +51,6 @@ const makeSelectLocationState = () => {
     return prevRoutingStateJS;
   };
 };
-
-
-const selectLocation = createSelector(
-  getRoute,
-  (routeState) => {
-    try {
-      return routeState.get('locationBeforeTransitions');
-    } catch (error) {
-      return null;
-    }
-  }
-);
-const getLocationQuery = createSelector(
-  selectLocation,
-  (location) => location.get('query')
-);
-const getWhereQuery = createSelector(
-  getLocationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('where')
-);
-const getAttributeQuery = createSelector(
-  getWhereQuery,
-  (whereQuery) => whereQuery &&
-    asArray(whereQuery).reduce((memo, where) => {
-      const attrValue = where.split(':');
-      return Object.assign(memo, { [attrValue[0]]: attrValue[1] });
-    }, {})
-);
-
-const getWithoutQuery = createSelector(
-  getLocationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('without')
-);
-
-const getSearchQuery = createSelector(
-  getLocationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('search')
-);
-// const getWithoutAssociationQuery = createSelector(
-//   getWithoutQuery,
-//   (withoutQuery) =>
-//     asArray(withoutQuery).map((pathOrTax) => {
-//       // check numeric ? taxonomy filter : related entity filter
-//       if (isNumber(pathOrTax)) {
-//         return {
-//           taxonomyId: pathOrTax,
-//           path: filters.taxonomies.connected.path,
-//           key: filters.taxonomies.connected.key,
-//         };
-//       }
-//       if (filters.connections.options) {
-//         // related entity filter
-//         const connection = find(filters.connections.options, { query: pathOrTax });
-//         return connection ? connection.connected : {};
-//       }
-//       return {};
-//     });
-//
-//
-// )
 
 const makeSelectPathnameOnAuthChange = () => createSelector(
   getRoute,
@@ -145,13 +86,12 @@ const isReady = (state, { path }) =>
     true
   );
 
+// OLD inperformant way of selecting and querying entities
+
 const getEntitiesPure = createCachedSelector(
   (state, props) => state.getIn(['global', 'entities', props.path]),
   (entities) => entities
 )((state, { path }) => path);
-
-const selectEntities = (state, path) => state.getIn(['global', 'entities', path]);
-
 
 // filter entities by attribute or id, also allows multiple conditions
 // eg where: {draft: false} or where: {id: 1, draft: false}
@@ -276,14 +216,6 @@ const getEntitiesIfConnected = createSelector(
     )) // reduce connected conditions // filter entities
   : entities  // !connected
 );
-
-// prep searchtarget, incl id
-const prepareEntitySearchTarget = (entity, fields) =>
-  reduce(
-    fields,
-    (target, field) => `${target} ${cleanupSearchTarget(entity.getIn(['attributes', field]))}`,
-    entity.get('id')
-  );
 
 // check if entities have connections with other entities via associative table
 const getEntitiesSearch = createSelector(
@@ -470,6 +402,110 @@ const getUser = createSelector(
   }
 );
 
+// NEW performant way of selecting and querying entities
+
+const selectLocation = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.get('locationBeforeTransitions');
+    } catch (error) {
+      return null;
+    }
+  }
+);
+const selectLocationQuery = createSelector(
+  selectLocation,
+  (location) => location && location.get('query')
+);
+const selectWhereQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('where')
+);
+const selectAttributeQuery = createSelector(
+  selectWhereQuery,
+  (whereQuery) => whereQuery &&
+    asArray(whereQuery).reduce((memo, where) => {
+      const attrValue = where.split(':');
+      return Object.assign(memo, { [attrValue[0]]: attrValue[1] });
+    }, {})
+);
+
+const selectWithoutQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('without')
+);
+
+const selectCategoryQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('cat')
+);
+
+const selectConnectedCategoryQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('catx')
+);
+
+const selectSearchQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('search')
+);
+
+const selectEntities = (state, path) => state.getIn(['global', 'entities', path]);
+
+export const selectTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => taxonomies
+    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_recommendations']))
+    .map((taxonomy) => taxonomy.set(
+      'categories',
+      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+    ))
+);
+
+const selectEntitiesWhere = createSelector(
+  selectAttributeQuery,
+  (state, { path }) => selectEntities(state, path),
+  (query, entities) => {
+    // console.log('getEntitiesWhere', attributeQuery)
+    if (query) {
+      return entities.filter((entity) =>
+        reduce(query, (passing, value, attribute) => {
+          // TODO if !passing return false, no point going further
+          if (attribute === 'id') {
+            return passing && entity.get('id') === value.toString();
+          }
+          const testValue = entity.getIn(['attributes', attribute]);
+          if (typeof testValue === 'undefined' || testValue === null) {
+            return (value === 'null') ? passing : false;
+          }
+          return passing && testValue.toString() === value.toString();
+        }, true)
+      );
+    }
+    return entities;
+  }
+);
+
+const selectEntitiesSearch = createSelector(
+  selectEntitiesWhere,
+  selectSearchQuery,
+  (state, { searchAttributes }) => JSON.stringify(searchAttributes), // enable caching,
+  (entities, query, searchAttributes) => {
+    if (query) {
+      try {
+        const regex = new RegExp(regExMultipleWords(query), 'i');
+        return entities.filter((entity) =>
+          regex.test(prepareEntitySearchTarget(entity, JSON.parse(searchAttributes)))
+        );
+      } catch (e) {
+        return entities;
+      }
+    }
+    return entities;  // !search
+  }
+);
 
 export {
   getGlobal,
@@ -480,6 +516,7 @@ export {
   getRequestedAt,
   isReady,
   selectEntities,
+  selectEntitiesSearch,
   getEntitiesPure,
   getEntitiesWhere,
   getEntities,
@@ -493,8 +530,11 @@ export {
   isUserAdmin,
   isUserManager,
   isUserContributor,
-  getAttributeQuery,
-  getSearchQuery,
-  getWithoutQuery,
+  selectAttributeQuery,
+  selectSearchQuery,
+  selectWithoutQuery,
+  selectCategoryQuery,
+  selectConnectedCategoryQuery,
+  selectLocationQuery,
   selectLocation,
 };
