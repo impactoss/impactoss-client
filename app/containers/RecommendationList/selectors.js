@@ -20,7 +20,7 @@ export const selectConnections = createSelector(
   (measures) => ({ measures })
 );
 
-export const selectRecommendationsNested = createSelector(
+const selectRecommendationsNested = createSelector(
   (state) => selectEntitiesSearch(state, {
     path: 'recommendations',
     searchAttributes: ['reference', 'title'],
@@ -43,8 +43,7 @@ export const selectRecommendationsNested = createSelector(
       )
     )
 );
-
-export const selectRecommendationsWithout = createSelector(
+const selectRecommendationsWithout = createSelector(
   selectRecommendationsNested,
   (state) => selectEntities(state, 'categories'),
   selectWithoutQuery,
@@ -52,7 +51,7 @@ export const selectRecommendationsWithout = createSelector(
     ? filterEntitiesWithoutAssociation(recommendations, categories, query)
     : recommendations
 );
-export const selectRecommendationsByConnections = createSelector(
+const selectRecommendationsByConnections = createSelector(
   selectRecommendationsWithout,
   selectLocationQuery,
   (recommendations, query) => query
@@ -63,7 +62,7 @@ export const selectRecommendationsByConnections = createSelector(
     }])
     : recommendations
 );
-export const selectRecommendationsByCategories = createSelector(
+const selectRecommendationsByCategories = createSelector(
   selectRecommendationsByConnections,
   selectCategoryQuery,
   (recommendations, query) => query
@@ -71,7 +70,11 @@ export const selectRecommendationsByCategories = createSelector(
     : recommendations
 );
 
-export const selectRecommendations = createSelector(
-  selectRecommendationsByCategories,
-  (recommendations) => recommendations
-);
+// kicks off series of cascading selectors
+// 1. selectEntitiesWhere filters by attribute
+// 2. selectEntitiesSearch filters by keyword
+// 3. selectRecommendationsNested will nest related entities
+// 4. selectRecommendationsWithout will filter by absence of taxonomy or connection
+// 5. selectRecommendationsByConnections will filter by specific connection
+// 6. selectRecommendationsByCategories will filter by specific categories
+export const selectRecommendations = selectRecommendationsByCategories;
