@@ -32,7 +32,6 @@ export const makeAttributeEditOptions = (entities, edits, activeEditOption, mess
     selectedCount: entities.length,
     multiple: false,
     required: true,
-    search: false,
   };
 
   const option = find(edits.attributes.options, (o) => o.attribute === activeEditOption.optionId);
@@ -67,7 +66,6 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
     selectedCount: entities.length,
     multiple: true,
     required: false,
-    search: true,
   };
 
   const taxonomy = taxonomies[parseInt(activeEditOption.optionId, 10)];
@@ -102,7 +100,6 @@ export const makeConnectionEditOptions = (entities, edits, connections, activeEd
     selectedCount: entities.length,
     multiple: true,
     required: false,
-    search: true,
   };
 
   const option = find(edits.connections.options, (o) => o.path === activeEditOption.optionId);
