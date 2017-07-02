@@ -64,7 +64,7 @@ export const makeFilterGroups = (
         [option.path]: {
           id: option.path, // filterOptionId
           label: formatLabel(option.label),
-          icon: option.path === 'measures' ? 'actions' : option.path,
+          icon: option.path,
           active: !!activeFilterOption && activeFilterOption.optionId === option.path,
         },
       }), {}),

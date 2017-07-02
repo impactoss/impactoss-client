@@ -1,9 +1,9 @@
 import { createSelector } from 'reselect';
 
 /**
- * Direct selector to the actionEdit state domain
+ * Direct selector to the measureEdit state domain
  */
-const selectActionEditDomain = (state) => state.get('actionEdit');
+const selectActionEditDomain = (state) => state.get('measureEdit');
 
 /**
  * Default selector used by ActionEdit

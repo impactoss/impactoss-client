@@ -115,10 +115,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     return buttons;
   }
 
-  formatLabel = (path) => {
-    const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
-    return this.context.intl.formatMessage(message);
-  }
 
   render() {
     // console.log('EntityListSidebar.render')
@@ -135,6 +131,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       activePanel,
       onPanelSelect,
       location,
+      formatLabel,
     } = this.props;
 
     const entitiesSelected = filter(entitiesSorted, (entity) => entityIdsSelected.indexOf(entity.id) >= 0);
@@ -153,7 +150,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
           connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
         },
-        this.formatLabel
+        formatLabel
       );
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
       panelGroups = makeEditGroups(
@@ -162,18 +159,24 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
           connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
         },
-        this.formatLabel
+        formatLabel
       );
     }
     let formOptions = null;
     if (activeOption) {
       if (activePanel === FILTERS_PANEL) {
         formOptions = makeActiveFilterOptions(
-          entitiesSorted, filters, activeOption, location, taxonomies, connections, connectedTaxonomies, {
+          entitiesSorted,
+          filters,
+          activeOption,
+          location,
+          taxonomies,
+          connections,
+          connectedTaxonomies, {
             titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
             without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
           },
-          this.formatLabel,
+          formatLabel,
         );
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
         formOptions = makeActiveEditOptions(
@@ -250,6 +253,7 @@ EntityListSidebar.propTypes = {
   activePanel: PropTypes.string,
   onAssign: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,
+  formatLabel: PropTypes.func.isRequired,
 };
 
 EntityListSidebar.contextTypes = {

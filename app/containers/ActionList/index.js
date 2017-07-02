@@ -38,19 +38,19 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
   getDates = (indicator) => indicator.dates
     ? Object.values(indicator.dates)
     : [];
-  getIndicators = (action) => action.indicators
-    ? Object.values(action.indicators).reduce((memo, indicatorAssociation) =>
+  getIndicators = (measure) => measure.indicators
+    ? Object.values(measure.indicators).reduce((memo, indicatorAssociation) =>
       indicatorAssociation.indicator
         ? memo.concat([indicatorAssociation.indicator])
         : memo
     , [])
     : [];
 
-  getReportCount = (actionOrIndicator) => {
+  getReportCount = (measureOrIndicator) => {
     let count = 0;
-    // test action:  return sum of reports for all indicators
-    if (actionOrIndicator.indicators) {
-      count = Object.values(actionOrIndicator.indicators).reduce((counter, indicatorAssociation) =>
+    // test measure:  return sum of reports for all indicators
+    if (measureOrIndicator.indicators) {
+      count = Object.values(measureOrIndicator.indicators).reduce((counter, indicatorAssociation) =>
         counter + (indicatorAssociation.indicator && indicatorAssociation.indicator.reports
           ? Object.keys(indicatorAssociation.indicator.reports).length
           : 0
@@ -58,18 +58,18 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       , 0);
     }
     // test indicator: return number of reports for each indicator
-    if (actionOrIndicator.reports) {
-      count = Object.keys(actionOrIndicator.reports).length;
+    if (measureOrIndicator.reports) {
+      count = Object.keys(measureOrIndicator.reports).length;
     }
     return count;
   }
-  getReportInfo = (actionOrIndicator) => {
+  getReportInfo = (measureOrIndicator) => {
     const info = [];
     let due = 0;
     let overdue = 0;
-    // test action:  return sum of reports for all indicators
-    if (actionOrIndicator.indicators) {
-      forEach(actionOrIndicator.indicators, (indicatorAssociation) => {
+    // test measure:  return sum of reports for all indicators
+    if (measureOrIndicator.indicators) {
+      forEach(measureOrIndicator.indicators, (indicatorAssociation) => {
         if (indicatorAssociation.indicator && indicatorAssociation.indicator.dates) {
           forEach(indicatorAssociation.indicator.dates, (date) => {
             due += date.attributes.due ? 1 : 0;
@@ -79,8 +79,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       });
     }
     // test indicator: return number of reports for each indicator
-    if (actionOrIndicator.dates) {
-      forEach(actionOrIndicator.dates, (date) => {
+    if (measureOrIndicator.dates) {
+      forEach(measureOrIndicator.dates, (date) => {
         due += date.attributes.due ? 1 : 0;
         overdue += date.attributes.overdue ? 1 : 0;
       });
@@ -89,8 +89,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     if (overdue) info.push(`${overdue} overdue`);
     return info;
   }
-  getIndicatorCount = (action) => action.indicators
-    ? Object.keys(action.indicators).length
+  getIndicatorCount = (measure) => measure.indicators
+    ? Object.keys(measure.indicators).length
     : 0;
 
   render() {
@@ -429,7 +429,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
 
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
-      icon: 'actions',
+      icon: 'measures',
       actions: [{
         type: 'text',
         title: 'Import',

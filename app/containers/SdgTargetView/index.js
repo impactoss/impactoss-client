@@ -81,7 +81,7 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
       },
     ];
 
-  getBodyMainFields = (entity, indicators, actions) => {
+  getBodyMainFields = (entity, indicators, measures) => {
     const fields = [];
     if (entity.attributes.description && entity.attributes.description.trim().length > 0) {
       fields.push({
@@ -99,10 +99,10 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
       fields: [
         {
           type: 'connections',
-          label: `${Object.values(actions).length} ${this.context.intl.formatMessage(Object.values(actions).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
-          entityType: 'actions',
-          values: Object.values(actions),
-          icon: 'actions',
+          label: `${Object.values(measures).length} ${this.context.intl.formatMessage(Object.values(measures).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
+          entityType: 'measures',
+          values: Object.values(measures),
+          icon: 'measures',
           entityPath: '/actions/',
           taxonomies: null,
           showEmpty: this.context.intl.formatMessage(appMessages.entities.measures.empty),
@@ -157,13 +157,13 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
     },
   ]);
 
-  getFields = (entity, isManager, indicators, taxonomies, actions) => ({
+  getFields = (entity, isManager, indicators, taxonomies, measures) => ({
     header: {
       main: this.getHeaderMainFields(entity, isManager),
       aside: this.getHeaderAsideFields(entity, isManager),
     },
     body: {
-      main: this.getBodyMainFields(entity, indicators, actions),
+      main: this.getBodyMainFields(entity, indicators, measures),
       aside: this.getBodyAsideFields(entity, taxonomies),
     },
   });
@@ -182,7 +182,7 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
       isManager,
       indicators,
       taxonomies,
-      actions,
+      measures,
     } = this.props;
 
     const buttons = isManager
@@ -226,7 +226,7 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
           }
           { sdgtarget && dataReady &&
             <EntityView
-              fields={this.getFields(sdgtarget, isManager, indicators, taxonomies, actions)}
+              fields={this.getFields(sdgtarget, isManager, indicators, taxonomies, measures)}
             />
           }
         </Content>
@@ -244,7 +244,7 @@ SdgTargetView.propTypes = {
   isManager: PropTypes.bool,
   taxonomies: PropTypes.object,
   indicators: PropTypes.object,
-  actions: PropTypes.object,
+  measures: PropTypes.object,
   params: PropTypes.object,
 };
 
@@ -333,8 +333,8 @@ const mapStateToProps = (state, props) => ({
       ],
     },
   ),
-  // all connected actions
-  actions: getEntities(
+  // all connected measures
+  measures: getEntities(
     state, {
       path: 'measures',
       out: 'js',

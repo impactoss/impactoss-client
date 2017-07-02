@@ -21,11 +21,6 @@ export const FILTERS = {
   taxonomies: { // filter by each category
     query: 'cat',
     filter: true,
-    connected: {
-      path: 'recommendation_categories',
-      key: 'recommendation_id',
-      whereKey: 'category_id',
-    },
   },
   connections: { // filter by associated entity
     options: [
@@ -33,13 +28,7 @@ export const FILTERS = {
         filter: true,
         label: 'entities.measures.plural',
         path: 'measures', // filter by recommendation connection
-        query: 'actions',
         key: 'measure_id',
-        connected: {
-          path: 'recommendation_measures',
-          key: 'recommendation_id',
-          whereKey: 'measure_id',
-        },
       },
     ],
   },
@@ -61,7 +50,6 @@ export const EDITS = {
         key: 'measure_id',
         ownKey: 'recommendation_id',
         filter: true,
-
       },
     ],
   },

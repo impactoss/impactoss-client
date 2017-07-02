@@ -190,7 +190,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="measures"
             buttons={
               dataReady ? [{
                 type: 'cancel',
@@ -215,7 +215,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           }
           {dataReady &&
             <EntityForm
-              model="actionNew.form.data"
+              model="measureNew.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}

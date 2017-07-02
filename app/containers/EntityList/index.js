@@ -33,6 +33,8 @@ import { isUserManager } from 'containers/App/selectors';
 
 import { CONTENT_LIST } from 'containers/App/constants';
 
+import appMessages from 'containers/App/messages';
+
 import { makeCurrentFilters } from './filtersFactory';
 import {
   makeGroupOptions,
@@ -97,6 +99,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       this.ScrollContainer
     );
   }
+
+  formatLabel = (path) => {
+    const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
+    return this.context.intl.formatMessage(message);
+  }
+
   render() {
     const {
       sortBy,
@@ -109,22 +117,26 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       filters,
       edits,
       location,
-      taxonomies,
-      connections,
     } = this.props;
     // console.log('entityList:render')
+    // convert to JS if present
+    const entities = this.props.entities && this.props.entities.toJS();
+    const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
+    const connections = this.props.connections &&
+      reduce(this.props.connections, (memo, connection, path) => Object.assign(memo, { [path]: connection.toJS() }), {});
+    let connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
+
     // do not list 'own' taxonomies in connected taxonomies
-    const connectedTaxonomies = dataReady && this.props.connectedTaxonomies && taxonomies
-      ? reduce(this.props.connectedTaxonomies, (filteredTaxonomies, tax, key) =>
+    connectedTaxonomies = dataReady && connectedTaxonomies && taxonomies
+      && reduce(connectedTaxonomies, (filteredTaxonomies, tax, key) =>
           Object.keys(taxonomies).indexOf(key) < 0
             ? Object.assign(filteredTaxonomies, { [key]: tax })
             : filteredTaxonomies
-        , {})
-      : this.props.connectedTaxonomies;
+        , {});
 
     // sorted entities
-    const entitiesSorted = dataReady && this.props.entities
-      ? orderBy(this.props.entities, getEntitySortIteratee(sortBy), sortOrder)
+    const entitiesSorted = dataReady && entities
+      ? orderBy(entities, getEntitySortIteratee(sortBy), sortOrder)
       : [];
 
     // grouping and paging
@@ -178,6 +190,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               onPanelSelect={onPanelSelect}
               canEdit={isManager}
               activePanel={activePanel}
+              formatLabel={this.formatLabel}
               onAssign={(associations, activeEditOption) =>
                 this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
             />
@@ -214,14 +227,15 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                         location,
                         onTagClick: this.props.onTagClick,
                       },
-                      this.context.intl.formatMessage(messages.filterFormWithoutPrefix)
+                      this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
+                      this.formatLabel
                     )}
                     searchQuery={location.query.search || ''}
                     onSearch={this.props.onSearch}
                   />
                   <EntityListOptions
-                    groupOptions={makeGroupOptions(filters, taxonomies, connectedTaxonomies)}
-                    subgroupOptions={makeGroupOptions(filters, taxonomies)}
+                    groupOptions={makeGroupOptions(taxonomies, connectedTaxonomies)}
+                    subgroupOptions={makeGroupOptions(taxonomies)}
                     groupSelectValue={location.query.group}
                     subgroupSelectValue={location.query.subgroup}
                     onGroupSelect={this.props.onGroupSelect}

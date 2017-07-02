@@ -208,7 +208,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             <ButtonIconAboveWrap>
               <ButtonIconAbove onClick={() => onPageLink('/actions')}>
                 <div>
-                  <Icon name="actions" size={'4em'} />
+                  <Icon name="s" size={'4em'} />
                 </div>
                 <div>
                   <FormattedMessage {...messages.exploreActionsLink} />

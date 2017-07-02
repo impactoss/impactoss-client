@@ -53,7 +53,7 @@ export const filterEntitiesWithoutAssociation = (entities, categories, query) =>
     asList(query).reduce((passing, pathOrTax) =>
       passing && !(isNumber(pathOrTax)
         ? testEntityTaxonomyAssociation(entity, categories, parseInt(pathOrTax, 10))
-        : testEntityAssociation(entity, pathOrTax !== 'actions' ? pathOrTax : 'measures')
+        : testEntityAssociation(entity, pathOrTax)
       )
     , true)
   );
@@ -72,8 +72,8 @@ export const filterEntitiesByCategories = (entities, query) =>
 export const filterEntitiesByConnection = (entities, query, connections) =>
   entities.filter((entity) =>
     asArray(connections).reduce((passing, connection) =>
-      passing && (query.get(connection.queryPath)
-        ? asList(query.get(connection.queryPath)).reduce((passingQuery, associatedId) =>
+      passing && (query.get(connection.path)
+        ? asList(query.get(connection.path)).reduce((passingQuery, associatedId) =>
           passingQuery && testEntityEntityAssociation(entity, connection, parseInt(associatedId, 10))
         , true)
         : true

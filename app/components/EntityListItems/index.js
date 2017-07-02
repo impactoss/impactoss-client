@@ -40,8 +40,8 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
           count: Object.keys(entity[option.path]).length,
           option: {
             label: option.label,
-            icon: option.path === 'measures' ? 'actions' : option.path,
-            style: option.path === 'measures' ? 'actions' : option.path,
+            icon: option.path,
+            style: option.path,
           },
         });
       }

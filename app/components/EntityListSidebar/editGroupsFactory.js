@@ -48,7 +48,7 @@ export const makeEditGroups = (
           path: option.connectPath,
           key: option.key,
           ownKey: option.ownKey,
-          icon: option.path === 'measures' ? 'actions' : option.path,
+          icon: option.path,
           active: !!activeEditOption && activeEditOption.optionId === option.path,
         },
       }), {}),

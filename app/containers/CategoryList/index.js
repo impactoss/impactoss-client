@@ -74,7 +74,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     }
     if (taxonomy.attributes.tags_measures) {
       attributes.push({
-        attribute: 'actions',
+        attribute: 'measures',
         label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
       });
     }
@@ -218,7 +218,7 @@ const mapStateToProps = (state, props) => ({
           path: 'measure_categories',
           key: 'category_id',
           reverse: true,
-          as: 'actions',
+          as: 'measures',
           connected: {
             path: 'measures',
             key: 'measure_id',

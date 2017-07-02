@@ -85,7 +85,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     ];
 
 
-  getBodyMainFields = (entity, actions, actionTaxonomies) => ([
+  getBodyMainFields = (entity, measures, measureTaxonomies) => ([
     {
       fields: [
         {
@@ -107,12 +107,12 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       fields: [
         {
           type: 'connections',
-          label: `${Object.values(actions).length} ${this.context.intl.formatMessage(Object.values(actions).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
-          entityType: 'actions',
-          values: Object.values(actions),
-          icon: 'actions',
+          label: `${Object.values(measures).length} ${this.context.intl.formatMessage(Object.values(measures).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
+          entityType: 'measures',
+          values: Object.values(measures),
+          icon: 'measures',
           entityPath: '/actions/',
-          taxonomies: actionTaxonomies,
+          taxonomies: measureTaxonomies,
           showEmpty: this.context.intl.formatMessage(appMessages.entities.measures.empty),
           connectionOptions: [{
             label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
@@ -145,21 +145,21 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       })),
     },
   ]);
-  getFields = (entity, isManager, actions, taxonomies, actionTaxonomies) => ({
+  getFields = (entity, isManager, measures, taxonomies, measureTaxonomies) => ({
     header: {
       main: this.getHeaderMainFields(entity, isManager),
       aside: this.getHeaderAsideFields(entity, isManager),
     },
     body: {
-      main: this.getBodyMainFields(entity, actions, actionTaxonomies),
+      main: this.getBodyMainFields(entity, measures, measureTaxonomies),
       aside: this.getBodyAsideFields(taxonomies),
     },
   });
 
-  mapActions = (actions) =>
-    Object.values(actions).map((action) => ({
-      label: action.attributes.title,
-      linkTo: `/actions/${action.id}`,
+  mapMeasures = (measures) =>
+    Object.values(measures).map((measure) => ({
+      label: measure.attributes.title,
+      linkTo: `/actions/${measure.id}`,
     }))
 
   mapCategoryOptions = (categories) => categories
@@ -170,7 +170,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     : []
 
   render() {
-    const { recommendation, dataReady, isManager, actions, taxonomies, actionTaxonomies } = this.props;
+    const { recommendation, dataReady, isManager, measures, taxonomies, measureTaxonomies } = this.props;
     const buttons = isManager
     ? [
       {
@@ -213,7 +213,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
           }
           { recommendation && dataReady &&
             <EntityView
-              fields={this.getFields(recommendation, isManager, actions, taxonomies, actionTaxonomies)}
+              fields={this.getFields(recommendation, isManager, measures, taxonomies, measureTaxonomies)}
             />
           }
         </Content>
@@ -229,8 +229,8 @@ RecommendationView.propTypes = {
   recommendation: PropTypes.object,
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
-  actionTaxonomies: PropTypes.object,
-  actions: PropTypes.object,
+  measureTaxonomies: PropTypes.object,
+  measures: PropTypes.object,
   params: PropTypes.object,
   isManager: PropTypes.bool,
 };
@@ -293,7 +293,7 @@ const mapStateToProps = (state, props) => ({
       out: 'js',
     },
   ),
-  actionTaxonomies: getEntities(
+  measureTaxonomies: getEntities(
     state, {
       out: 'js',
       path: 'taxonomies',
@@ -307,8 +307,8 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
-  // all connected actions
-  actions: getEntities(
+  // all connected measures
+  measures: getEntities(
     state, {
       path: 'measures',
       out: 'js',
@@ -386,7 +386,7 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleClose: () => {
       dispatch(updatePath('/recommendations'));
-      // TODO should be "go back" if history present or to actions list when not
+      // TODO should be "go back" if history present or to measures list when not
     },
   };
 }

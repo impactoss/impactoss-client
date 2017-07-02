@@ -5,11 +5,11 @@ import { getConnectedCategoryIds } from 'utils/entities';
 import isNumber from 'utils/is-number';
 
 
-export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies) => {
+export const makeGroupOptions = (taxonomies, connectedTaxonomies) => {
   let options = [];
 
   // taxonomy options
-  if (filters.taxonomies && taxonomies) {
+  if (taxonomies) {
     // first prepare taxonomy options
     options = options.concat(Object.values(taxonomies).map((taxonomy) => ({
       value: taxonomy.id, // filterOptionId
@@ -17,7 +17,7 @@ export const makeGroupOptions = (filters, taxonomies, connectedTaxonomies) => {
     })));
   }
   // connectedTaxonomies options
-  if (filters.connectedTaxonomies && connectedTaxonomies) {
+  if (connectedTaxonomies) {
     // first prepare taxonomy options
     options = options.concat(Object.values(connectedTaxonomies).map((taxonomy) => ({
       value: `x:${taxonomy.id}`, // filterOptionId
@@ -103,7 +103,7 @@ export const makeConnectedTaxonomyGroups = (entities, taxonomy, filters) => {
     const taxCategoryIds = [];
     forEach(filters.connectedTaxonomies.connections, (connection) => {
       // if entity has taxonomies
-      if (entity[connection.path]) { // action.recommendations stores recommendation_measures
+      if (entity[connection.path]) { // measure.recommendations stores recommendation_measures
         // add categories from entities if not present otherwise increase count
         const categoryIds = getConnectedCategoryIds(
           entity,

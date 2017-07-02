@@ -24,10 +24,6 @@ const entitiesSelectedSelector = createSelector(
   (pageState) => pageState.get('entitiesSelected').toJS()
 );
 
-/**
- * Default selector used by ActionEdit
- */
-
 const entityListSelect = createSelector(
   selectEntityListDomain,
   (substate) => substate.toJS()

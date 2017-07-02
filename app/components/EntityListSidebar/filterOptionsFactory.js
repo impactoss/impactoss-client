@@ -15,7 +15,7 @@ export const makeActiveFilterOptions = (entities, filters, activeFilterOption, l
     case 'connectedTaxonomies':
       return makeConnectedTaxonomyFilterOptions(entities, filters, connectedTaxonomies, activeFilterOption, location, messages, formatLabel);
     case 'connections':
-      return makeConnectionFilterOptions(entities, filters, connections, activeFilterOption, location, messages, formatLabel);
+      return makeConnectionFilterOptions(entities, filters.connections.options, connections, activeFilterOption, location, messages, formatLabel);
     case 'attributes':
       return makeAttributeFilterOptions(entities, filters, activeFilterOption, location, messages, formatLabel);
     default:
@@ -227,7 +227,7 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeF
 //
 //
 //
-export const makeConnectionFilterOptions = (entities, filters, connections, activeFilterOption, location, messages, formatLabel) => {
+export const makeConnectionFilterOptions = (entities, options, connections, activeFilterOption, location, messages, formatLabel) => {
   const locationQuery = location.query;
 
   const filterOptions = {
@@ -238,15 +238,15 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
     filter: true,
   };
   // get the active option
-  const option = find(filters.connections.options, (o) => o.path === activeFilterOption.optionId);
+  const option = find(options, (o) => o.path === activeFilterOption.optionId);
   // if option active
   if (option) {
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(formatLabel(option.label))}`;
     filterOptions.filter = option.filter;
     // if no entities found show any active options
     if (entities.length === 0) {
-      if (locationQuery[option.query]) {
-        const locationQueryValue = locationQuery[option.query];
+      if (locationQuery[option.path]) {
+        const locationQueryValue = locationQuery[option.path];
         forEach(asArray(locationQueryValue), (queryValue) => {
           const value = parseInt(queryValue, 10);
           filterOptions.options[value] = {
@@ -256,7 +256,7 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
             showCount: true,
             value,
             count: 0,
-            query: option.query,
+            query: option.path,
             checked: true,
           };
         });
@@ -265,7 +265,7 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
       if (locationQuery.without) {
         const locationQueryValue = locationQuery.without;
         forEach(asArray(locationQueryValue), (queryValue) => {
-          if (option.query === queryValue) {
+          if (option.path === queryValue) {
             filterOptions.options[queryValue] = {
               label: `${messages.without} ${lowerCase(formatLabel(option.label))}`,
               showCount: true,
@@ -303,8 +303,8 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
                   showCount: true,
                   value: connectedId,
                   count: 1,
-                  query: option.query,
-                  checked: optionChecked(locationQuery[option.query], connectedId),
+                  query: option.path,
+                  checked: optionChecked(locationQuery[option.path], connectedId),
                   order: reference,
                 };
               }
@@ -321,10 +321,10 @@ export const makeConnectionFilterOptions = (entities, filters, connections, acti
               label: `${messages.without} ${lowerCase(formatLabel(option.label))}`,
               showCount: true,
               labelBold: true,
-              value: option.query,
+              value: option.path,
               count: 1,
               query: 'without',
-              checked: optionChecked(locationQuery.without, option.query),
+              checked: optionChecked(locationQuery.without, option.path),
               order: 0,
             };
           }

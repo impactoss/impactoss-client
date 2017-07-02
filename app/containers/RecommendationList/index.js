@@ -78,8 +78,8 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         />
         <EntityList
           location={this.props.location}
-          entities={this.props.entities && this.props.entities.toJS()}
-          taxonomies={this.props.taxonomies && this.props.taxonomies.toJS()}
+          entities={this.props.entities}
+          taxonomies={this.props.taxonomies}
           connections={this.props.connections}
           path="recommendations"
           filters={FILTERS}

@@ -286,7 +286,6 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
             filter: true,
             label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
             path: 'measures', // filter by recommendation connection
-            query: 'actions',
             key: 'measure_id',
             connected: {
               path: 'sdgtarget_measures',

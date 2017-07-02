@@ -56,14 +56,14 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="measures"
             buttons={[{
               type: 'cancel',
               onClick: this.props.handleCancel,
             }]}
           />
           <ImportEntitiesForm
-            model="actionImport.form.data"
+            model="measureImport.form.data"
             formData={viewDomain.form.data}
             fieldModel="import"
             handleSubmit={(formData) => this.props.handleSubmit(formData)}

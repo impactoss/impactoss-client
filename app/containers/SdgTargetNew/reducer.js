@@ -21,7 +21,7 @@ const formInitial = fromJS({
   },
   associatedTaxonomies: {},
   associatedIndicators: [],
-  associatedActions: [],
+  associatedMeasures: [],
 });
 
 function formReducer(state = formInitial, action) {

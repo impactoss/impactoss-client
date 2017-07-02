@@ -43,5 +43,5 @@ export default combineReducers({
   page: entitySaveReducer,
   form: combineForms({
     data: formReducer,
-  }, 'actionEdit.form'),
+  }, 'measureEdit.form'),
 });

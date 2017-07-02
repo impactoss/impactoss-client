@@ -57,7 +57,6 @@ const selectRecommendationsByConnections = createSelector(
   (recommendations, query) => query
     ? filterEntitiesByConnection(recommendations, query, [{
       path: 'measures',
-      queryPath: 'actions',
       key: 'measure_id',
     }])
     : recommendations

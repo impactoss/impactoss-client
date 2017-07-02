@@ -169,7 +169,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="measures"
             buttons={
               dataReady ? [{
                 type: 'cancel',
