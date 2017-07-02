@@ -21,7 +21,7 @@ import asArray from 'utils/as-array';
 import { regExMultipleWords } from 'utils/string';
 
 import { USER_ROLES } from 'containers/App/constants';
-import { attributesEqual, prepareEntitySearchTarget } from 'containers/App/selector-utils';
+import { prepareEntitySearchTarget } from 'containers/App/selector-utils';
 
 
 // high level state selects
@@ -452,17 +452,6 @@ const selectSearchQuery = createSelector(
 );
 
 const selectEntities = (state, path) => state.getIn(['global', 'entities', path]);
-
-export const selectTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
-  (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_recommendations']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
-);
 
 const selectEntitiesWhere = createSelector(
   selectAttributeQuery,

@@ -420,6 +420,7 @@ function mapDispatchToProps(dispatch, props) {
       const entities = fromJS(selectedEntities);
       let saveData = Map();
       const changes = formData.get('values').filter((option) => option.get('hasChanged'));
+
       const creates = changes
         .filter((option) => option.get('checked') === true)
         .map((option) => option.get('value'));
@@ -487,7 +488,7 @@ function mapDispatchToProps(dispatch, props) {
             let existingAssignments;
             switch (activeEditOption.group) {
               case ('taxonomies'):
-                existingAssignments = entity.get(activeEditOption.group);
+                existingAssignments = entity.get('categories');
                 break;
               case ('connections'):
                 existingAssignments = entity.get(activeEditOption.optionId);

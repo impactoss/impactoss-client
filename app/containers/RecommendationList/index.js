@@ -11,13 +11,13 @@ import Helmet from 'react-helmet';
 // import { isEqual } from 'lodash/lang';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { isReady, selectTaxonomies } from 'containers/App/selectors';
+import { isReady } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
 
 import { FILTERS, EDITS } from './constants';
-import { selectConnections, selectRecommendations } from './selectors';
+import { selectConnections, selectRecommendations, selectTaxonomies } from './selectors';
 import messages from './messages';
 
 export class RecommendationList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

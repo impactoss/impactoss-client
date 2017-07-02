@@ -58,9 +58,9 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
   forEach(Object.values(entities), (entity) => {
     const taxCategoryIds = [];
     // if entity has taxonomies
-    if (entity.taxonomies) {
+    if (entity.categories) {
       // add categories from entities if not present otherwise increase count
-      const categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
+      const categoryIds = map(map(Object.values(entity.categories), 'attributes'), 'category_id');
       forEach(taxonomy.categories, (cat, catId) => {
         // if entity has category of active taxonomy
         if (categoryIds && categoryIds.indexOf(parseInt(catId, 10)) > -1) {

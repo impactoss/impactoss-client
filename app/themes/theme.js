@@ -86,6 +86,8 @@ theme.palette = {
   recommendationsHover: ['#F48B5D'],
   attributes: ['#6C787A'],
   attributesHover: ['#4A595C'],
+  roles: ['#6C787A'],
+  rolesHover: ['#4A595C'],
 
 
   //

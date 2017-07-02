@@ -28,16 +28,16 @@ const selectRecommendationsNested = createSelector(
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'measures'),
-  (recommendations, recCategories, recMeasures, measures) =>
-    recommendations.map((recommendation) => recommendation
+  (entities, entityCategories, recMeasures, measures) =>
+    entities.map((entity) => entity
       .set(
         'categories',
-        recCategories.filter((recCat) => attributesEqual(recCat.getIn(['attributes', 'recommendation_id']), recommendation.get('id')))
+        entityCategories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'recommendation_id']), entity.get('id')))
       )
       .set(
         'measures',
         recMeasures.filter((recMeasure) =>
-          attributesEqual(recMeasure.getIn(['attributes', 'recommendation_id']), recommendation.get('id'))
+          attributesEqual(recMeasure.getIn(['attributes', 'recommendation_id']), entity.get('id'))
           && measures.get(recMeasure.getIn(['attributes', 'measure_id']).toString())
         )
       )
@@ -47,26 +47,26 @@ const selectRecommendationsWithout = createSelector(
   selectRecommendationsNested,
   (state) => selectEntities(state, 'categories'),
   selectWithoutQuery,
-  (recommendations, categories, query) => query
-    ? filterEntitiesWithoutAssociation(recommendations, categories, query)
-    : recommendations
+  (entities, categories, query) => query
+    ? filterEntitiesWithoutAssociation(entities, categories, query)
+    : entities
 );
 const selectRecommendationsByConnections = createSelector(
   selectRecommendationsWithout,
   selectLocationQuery,
-  (recommendations, query) => query
-    ? filterEntitiesByConnection(recommendations, query, [{
+  (entities, query) => query
+    ? filterEntitiesByConnection(entities, query, [{
       path: 'measures',
       key: 'measure_id',
     }])
-    : recommendations
+    : entities
 );
 const selectRecommendationsByCategories = createSelector(
   selectRecommendationsByConnections,
   selectCategoryQuery,
-  (recommendations, query) => query
-    ? filterEntitiesByCategories(recommendations, query)
-    : recommendations
+  (entities, query) => query
+    ? filterEntitiesByCategories(entities, query)
+    : entities
 );
 
 // kicks off series of cascading selectors
@@ -77,3 +77,15 @@ const selectRecommendationsByCategories = createSelector(
 // 5. selectRecommendationsByConnections will filter by specific connection
 // 6. selectRecommendationsByCategories will filter by specific categories
 export const selectRecommendations = selectRecommendationsByCategories;
+
+
+export const selectTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => taxonomies
+    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_recommendations']))
+    .map((taxonomy) => taxonomy.set(
+      'categories',
+      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+    ))
+);
