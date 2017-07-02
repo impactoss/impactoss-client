@@ -55,7 +55,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
             options={fromJS(formOptions.options).toList()}
             multiple={formOptions.multiple}
             required={formOptions.required}
-            filter={formOptions.filter}
+            search={formOptions.search}
             onCancel={onCancel}
             buttons={buttons}
           />

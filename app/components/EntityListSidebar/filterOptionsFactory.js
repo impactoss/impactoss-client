@@ -31,13 +31,13 @@ export const makeAttributeFilterOptions = (entities, filters, activeFilterOption
     options: {},
     multiple: true,
     required: false,
-    filter: true,
+    search: true,
   };
   // the attribute option
   const option = find(filters.attributes.options, (o) => o.attribute === activeFilterOption.optionId);
   if (option) {
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(formatLabel(option.label))}`;
-    filterOptions.filter = option.filter;
+    filterOptions.search = option.search;
     const locationQueryValue = locationQuery.where;
     if (entities.length === 0) {
       if (locationQueryValue && option.options) {
@@ -127,7 +127,7 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeF
 
   const filterOptions = {
     groupId: 'taxonomies',
-    filter: filters.taxonomies.filter,
+    search: filters.taxonomies.search,
     options: {},
     multiple: true,
     required: false,
@@ -175,10 +175,10 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeF
     } else {
       forEach(Object.values(entities), (entity) => {
         const taxCategoryIds = [];
-        // if entity has taxonomies
-        if (entity.taxonomies) {
+        // if entity has categories
+        if (entity.categories) {
           // add categories from entities if not present otherwise increase count
-          const categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
+          const categoryIds = map(map(Object.values(entity.categories), 'attributes'), 'category_id');
           forEach(taxonomy.categories, (cat, catId) => {
             // if entity has category of active taxonomy
             if (categoryIds && categoryIds.indexOf(parseInt(catId, 10)) > -1) {
@@ -235,14 +235,14 @@ export const makeConnectionFilterOptions = (entities, options, connections, acti
     options: {},
     multiple: true,
     required: false,
-    filter: true,
+    search: true,
   };
   // get the active option
   const option = find(options, (o) => o.path === activeFilterOption.optionId);
   // if option active
   if (option) {
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(formatLabel(option.label))}`;
-    filterOptions.filter = option.filter;
+    filterOptions.search = option.search;
     // if no entities found show any active options
     if (entities.length === 0) {
       if (locationQuery[option.path]) {
@@ -341,7 +341,7 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
 
   const filterOptions = {
     groupId: 'connectedTaxonomies',
-    filter: filters.connectedTaxonomies.filter,
+    search: filters.connectedTaxonomies.search,
     options: {},
     multiple: true,
     required: false,

@@ -19,7 +19,7 @@ const MultiSelectControl = (props) => {
     required,
     title,
     buttons,
-    filter,
+    search,
     onCancel,
      ...otherProps
   } = props;
@@ -40,7 +40,7 @@ const MultiSelectControl = (props) => {
         required,
         buttons,
         title,
-        filter,
+        search,
         onCancel,
       }}
       {...otherProps}
@@ -53,7 +53,7 @@ MultiSelectControl.propTypes = {
   threeState: PropTypes.bool,
   multiple: PropTypes.bool,
   required: PropTypes.bool,
-  filter: PropTypes.bool,
+  search: PropTypes.bool,
   options: PropTypes.instanceOf(List),
   title: PropTypes.string,
   buttons: PropTypes.array,
@@ -61,7 +61,7 @@ MultiSelectControl.propTypes = {
 };
 
 MultiSelectControl.defaultProps = {
-  filter: true,
+  search: true,
   multiple: true,
   required: false,
   threeState: false,

@@ -31,7 +31,7 @@ const selectRecommendationsNested = createSelector(
   (recommendations, recCategories, recMeasures, measures) =>
     recommendations.map((recommendation) => recommendation
       .set(
-        'taxonomies',
+        'categories',
         recCategories.filter((recCat) => attributesEqual(recCat.getIn(['attributes', 'recommendation_id']), recommendation.get('id')))
       )
       .set(

@@ -51,8 +51,8 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
 
   getEntityTags = (entity, taxonomies, query, onClick) => {
     const tags = [];
-    if (entity.taxonomies) {
-      const categoryIds = map(map(Object.values(entity.taxonomies), 'attributes'), 'category_id');
+    if (entity.categories) {
+      const categoryIds = map(map(Object.values(entity.categories), 'attributes'), 'category_id');
       forEach(taxonomies, (tax) => {
         forEach(tax.categories, (category, catId) => {
           if (categoryIds && categoryIds.indexOf(parseInt(catId, 10)) > -1) {

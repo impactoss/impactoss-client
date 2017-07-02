@@ -16,14 +16,14 @@ const testEntityEntityAssociation = (entity, connection, associatedId) =>
 // check if entity has nested category by id
 const testEntityCategoryAssociation = (entity, categoryId) =>
   entity
-  .get('taxonomies')
+  .get('categories')
   .map((taxCategory) => taxCategory.getIn(['attributes', 'category_id']))
   .includes(categoryId);
 
 // check if entity has any category by taxonomy id
 const testEntityTaxonomyAssociation = (entity, categories, taxonomyId) =>
   entity
-  .get('taxonomies')
+  .get('categories')
   .map((taxCategory) => categories.get(taxCategory.getIn(['attributes', 'category_id']).toString()).getIn(['attributes', 'taxonomy_id']))
   .includes(taxonomyId);
 

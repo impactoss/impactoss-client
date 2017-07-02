@@ -32,12 +32,13 @@ export const makeAttributeEditOptions = (entities, edits, activeEditOption, mess
     selectedCount: entities.length,
     multiple: false,
     required: true,
+    search: false,
   };
 
   const option = find(edits.attributes.options, (o) => o.attribute === activeEditOption.optionId);
   if (option) {
     editOptions.title = messages.title;
-    editOptions.filter = option.filter;
+    editOptions.search = option.search;
     forEach(option.options, (attributeOption) => {
       const count = reduce(entities, (counter, entity) =>
         typeof entity.attributes[option.attribute] !== 'undefined'
@@ -66,18 +67,18 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
     selectedCount: entities.length,
     multiple: true,
     required: false,
-    filter: true,
+    search: true,
   };
 
   const taxonomy = taxonomies[parseInt(activeEditOption.optionId, 10)];
   if (taxonomy) {
     editOptions.title = messages.title;
     editOptions.multiple = taxonomy.attributes.allow_multiple;
-    editOptions.filter = taxonomy.attributes.filter;
+    editOptions.search = taxonomy.attributes.search;
     forEach(taxonomy.categories, (category) => {
       const count = reduce(entities, (counter, entity) => {
-        const categoryIds = entity.taxonomies
-          ? map(map(Object.values(entity.taxonomies), 'attributes'), (attribute) => attribute.category_id.toString())
+        const categoryIds = entity.categories
+          ? map(map(Object.values(entity.categories), 'attributes'), (attribute) => attribute.category_id.toString())
           : [];
         return categoryIds && categoryIds.indexOf(category.id) > -1 ? counter + 1 : counter;
       }, 0);
@@ -101,14 +102,14 @@ export const makeConnectionEditOptions = (entities, edits, connections, activeEd
     selectedCount: entities.length,
     multiple: true,
     required: false,
-    filter: true,
+    search: true,
   };
 
   const option = find(edits.connections.options, (o) => o.path === activeEditOption.optionId);
   if (option) {
     editOptions.title = messages.title;
     editOptions.path = option.connectPath;
-    editOptions.filter = option.filter;
+    editOptions.search = option.search;
     forEach(connections[option.path], (connection) => {
       const count = reduce(entities, (counter, entity) => {
         const connectedIds = entity[option.path]
