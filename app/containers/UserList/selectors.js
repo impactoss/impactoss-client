@@ -31,11 +31,11 @@ const selectUsersNested = createSelector(
     entities.map((entity) => entity
       .set(
         'categories',
-        entityCategories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'user_id']), entity.get('id')))
+        entityCategories.filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
       )
       .set(
         'roles',
-        entityRoles.filter((entityRole) => attributesEqual(entityRole.getIn(['attributes', 'user_id']), entity.get('id')))
+        entityRoles.filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
       )
     )
 );

@@ -25,20 +25,20 @@ const selectRecommendationsNested = createSelector(
     path: 'recommendations',
     searchAttributes: ['reference', 'title'],
   }),
+  (state) => selectConnections(state),
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'recommendation_measures'),
-  (state) => selectEntities(state, 'measures'),
-  (entities, entityCategories, recMeasures, measures) =>
+  (entities, connections, entityCategories, entityMeasures) =>
     entities.map((entity) => entity
       .set(
         'categories',
-        entityCategories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'recommendation_id']), entity.get('id')))
+        entityCategories.filter((association) => attributesEqual(association.getIn(['attributes', 'recommendation_id']), entity.get('id')))
       )
       .set(
         'measures',
-        recMeasures.filter((recMeasure) =>
-          attributesEqual(recMeasure.getIn(['attributes', 'recommendation_id']), entity.get('id'))
-          && measures.get(recMeasure.getIn(['attributes', 'measure_id']).toString())
+        entityMeasures.filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'recommendation_id']), entity.get('id'))
+          && connections.measures.get(association.getIn(['attributes', 'measure_id']).toString())
         )
       )
     )
