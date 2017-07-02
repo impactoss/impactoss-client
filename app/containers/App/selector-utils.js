@@ -67,6 +67,29 @@ export const filterEntitiesByCategories = (entities, query) =>
     , true)
   );
 
+// filter entities by association with one or more categories
+// assumes prior nesting of relationships
+export const filterEntitiesByConnectedCategories = (entities, connections, query, connectionKeys) =>
+  entities.filter((entity) =>
+    asList(query).reduce((passing, queryArg) => {
+      const pathValue = queryArg.split(':');
+      const path = pathValue[0];
+      const connectionsForPath = connections[path];
+      if (connectionsForPath) {
+        // test
+        // if any connection is associated with entity AND if connection is associated to category
+        return passing && connectionsForPath.reduce((passingConnection, connection) =>
+          passingConnection || (
+            testEntityEntityAssociation(entity, { path, key: connectionKeys[path] }, parseInt(connection.get('id'), 10))
+            && testEntityCategoryAssociation(connection, parseInt(pathValue[1], 10))
+          )
+        );
+      }
+      return false;
+    }
+    , true)
+  );
+
 // filter entities by by association with one or more entities of specific connection type
 // assumes prior nesting of relationships
 export const filterEntitiesByConnection = (entities, query, connections) =>

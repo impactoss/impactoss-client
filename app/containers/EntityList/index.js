@@ -121,18 +121,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     // console.log('entityList:render')
     // convert to JS if present
     const entities = this.props.entities && this.props.entities.toJS();
-    const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
     const connections = this.props.connections &&
       reduce(this.props.connections, (memo, connection, path) => Object.assign(memo, { [path]: connection.toJS() }), {});
-    let connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
-
-    // do not list 'own' taxonomies in connected taxonomies
-    connectedTaxonomies = dataReady && connectedTaxonomies && taxonomies
-      && reduce(connectedTaxonomies, (filteredTaxonomies, tax, key) =>
-          Object.keys(taxonomies).indexOf(key) < 0
-            ? Object.assign(filteredTaxonomies, { [key]: tax })
-            : filteredTaxonomies
-        , {});
+    const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
+    const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
 
     // sorted entities
     const entitiesSorted = dataReady && entities

@@ -1,4 +1,6 @@
 import { createSelector } from 'reselect';
+import { Map } from 'immutable';
+import { reduce } from 'lodash/collection';
 
 import {
   selectEntities,
@@ -6,26 +8,96 @@ import {
   selectWithoutQuery,
   selectLocationQuery,
   selectCategoryQuery,
+  selectConnectedCategoryQuery,
 } from 'containers/App/selectors';
 
 import {
   filterEntitiesByConnection,
   filterEntitiesByCategories,
+  filterEntitiesByConnectedCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
 } from 'containers/App/selector-utils';
 
-export const selectConnectedTaxonomies = () => null;
+export const selectTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => taxonomies
+    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_measures']))
+    .map((taxonomy) => taxonomy.set(
+      'categories',
+      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+    ))
+);
 
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'indicators'),
   (state) => selectEntities(state, 'recommendations'),
   (state) => selectEntities(state, 'sdgtargets'),
-  (indicators, recommendations, sdgtargets) => ({
+  (state) => selectEntities(state, 'recommendation_categories'),
+  (state) => selectEntities(state, 'sdgtarget_categories'),
+  (indicators, recommendations, sdgtargets, recommendationCategories, sdgtargetCategories) => ({
     indicators,
-    recommendations,
-    sdgtargets,
+    recommendations: recommendations.map((recommendation) =>
+      recommendation.set(
+        'categories',
+        recommendationCategories.filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'recommendation_id']), recommendation.get('id'))
+        )
+      )
+    ),
+    sdgtargets: sdgtargets.map((sdgtarget) =>
+      sdgtarget.set(
+        'categories',
+        sdgtargetCategories.filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), sdgtarget.get('id'))
+        )
+      )
+    ),
   })
+);
+
+export const selectConnectedTaxonomies = createSelector(
+  (state) => selectConnections(state),
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (state) => selectEntities(state, 'recommendation_categories'),
+  (state) => selectEntities(state, 'sdgtarget_categories'),
+  (connections, taxonomies, categories, categoryRecommendations, categorySdgTargets) =>
+    // for all connections
+    reduce([
+      {
+        tags: 'tags_recommendations',
+        path: 'recommendations',
+        key: 'recommendation_id',
+        associations: categoryRecommendations,
+      },
+      {
+        tags: 'tags_sdgtargets',
+        path: 'sdgtargets',
+        key: 'sdgtarget_id',
+        associations: categorySdgTargets,
+      },
+    ], (connectedTaxonomies, connection) =>
+      // merge connected taxonomies.
+      // TODO deal with conflicts
+      connectedTaxonomies.merge(
+        taxonomies
+          .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]) && !taxonomy.getIn(['attributes', 'tags_measures']))
+          .map((taxonomy) => taxonomy.set(
+            'categories',
+            categories
+              .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+              .map((category) => category.set(
+                connection.path,
+                connection.associations.filter((association) =>
+                  attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
+                  && connections[connection.path].get(association.getIn(['attributes', connection.key]).toString())
+                )
+              ))
+          ))
+      )
+    , Map())
 );
 
 const selectMeasuresNested = createSelector(
@@ -102,6 +174,17 @@ const selectMeasuresByCategories = createSelector(
     ? filterEntitiesByCategories(entities, query)
     : entities
 );
+const selectMeasuresByConnectedCategories = createSelector(
+  selectMeasuresByCategories,
+  selectConnections,
+  selectConnectedCategoryQuery,
+  (entities, connections, query) => query
+    ? filterEntitiesByConnectedCategories(entities, connections, query, {
+      recommendations: 'recommendation_id',
+      sdgtargets: 'sdgtarget_id',
+    })
+    : entities
+);
 
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
@@ -110,18 +193,8 @@ const selectMeasuresByCategories = createSelector(
 // 4. selectMeasuresWithout will filter by absence of taxonomy or connection
 // 5. selectMeasuresByConnections will filter by specific connection
 // 6. selectMeasuresByCategories will filter by specific categories
-export const selectMeasures = selectMeasuresByCategories;
-
-export const selectTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
-  (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_measures']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
-);
+// 6. selectMeasuresByCOnnectedCategories will filter by specific categories connected via connection
+export const selectMeasures = selectMeasuresByConnectedCategories;
 
 
 // define selects for getEntities
@@ -229,59 +302,3 @@ export const selectTaxonomies = createSelector(
 //       },
 //     ],
 //   },
-//   connections: {
-//     options: ['indicators', 'recommendations', 'sdgtargets'],
-//   },
-//   taxonomies: { // filter by each category
-//     out: 'js',
-//     path: 'taxonomies',
-//     where: {
-//       tags_measures: true,
-//     },
-//     extend: {
-//       path: 'categories',
-//       key: 'taxonomy_id',
-//       reverse: true,
-//     },
-//   },
-//   connectedTaxonomies: { // filter by each category
-//     options: [
-//       {
-//         out: 'js',
-//         path: 'taxonomies',
-//         where: {
-//           tags_recommendations: true,
-//         },
-//         extend: {
-//           path: 'categories',
-//           key: 'taxonomy_id',
-//           reverse: true,
-//           extend: {
-//             path: 'recommendation_categories',
-//             key: 'category_id',
-//             reverse: true,
-//             as: 'recommendations',
-//           },
-//         },
-//       },
-//       {
-//         out: 'js',
-//         path: 'taxonomies',
-//         where: {
-//           tags_sdgtargets: true,
-//         },
-//         extend: {
-//           path: 'categories',
-//           key: 'taxonomy_id',
-//           reverse: true,
-//           extend: {
-//             path: 'sdgtarget_categories',
-//             key: 'category_id',
-//             reverse: true,
-//             as: 'sdgtargets',
-//           },
-//         },
-//       },
-//     ],
-//   },
-// };

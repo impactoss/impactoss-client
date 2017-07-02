@@ -191,6 +191,9 @@ const mapStateToProps = (state) => ({
     'recommendations',
     'recommendation_measures',
     'recommendation_categories',
+    'sdgtargets',
+    'sdgtarget_measures',
+    'sdgtarget_categories',
     'indicators',
     'measure_indicators',
     'user_roles',
@@ -213,6 +216,9 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('recommendations'));
       dispatch(loadEntitiesIfNeeded('recommendation_measures'));
       dispatch(loadEntitiesIfNeeded('recommendation_categories'));
+      dispatch(loadEntitiesIfNeeded('sdgtargets'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_measures'));
+      dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
       dispatch(loadEntitiesIfNeeded('indicators'));
       dispatch(loadEntitiesIfNeeded('measure_indicators'));
       dispatch(loadEntitiesIfNeeded('user_roles'));

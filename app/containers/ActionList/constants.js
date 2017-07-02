@@ -6,6 +6,22 @@ export const FILTERS = {
     query: 'cat',
     search: true,
   },
+  connectedTaxonomies: { // filter by each category
+    query: 'catx',
+    search: true,
+    connections: [
+      {
+        path: 'recommendations', // filter by recommendation connection
+        title: 'entities.recommendations.plural',
+        key: 'recommendation_id',
+      },
+      {
+        path: 'sdgtargets', // filter by recommendation connection
+        title: 'entities.sdgtargets.plural',
+        key: 'sdgtarget_id',
+      },
+    ],
+  },
   connections: { // filter by associated entity
     options: [
       {
@@ -40,43 +56,6 @@ export const FILTERS = {
   },
 };
 
-//   connectedTaxonomies: { // filter by each category
-//     query: 'catx',
-//     filter: true,
-//     connections: [
-//       {
-//         path: 'recommendations', // filter by recommendation connection
-//         title: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
-//         key: 'recommendation_id',
-//         connected: {
-//           path: 'recommendation_measures',
-//           key: 'measure_id',
-//           connected: {
-//             path: 'recommendation_categories',
-//             key: 'recommendation_id',
-//             attribute: 'recommendation_id',
-//             whereKey: 'category_id',
-//           },
-//         },
-//       },
-//       {
-//         path: 'sdgtargets', // filter by recommendation connection
-//         title: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
-//         key: 'sdgtarget_id',
-//         connected: {
-//           path: 'sdgtarget_measures',
-//           key: 'measure_id',
-//           connected: {
-//             path: 'sdgtarget_categories',
-//             key: 'sdgtarget_id',
-//             attribute: 'sdgtarget_id',
-//             whereKey: 'category_id',
-//           },
-//         },
-//       },
-//     ],
-//   },
-// };
 export const EDITS = {
   taxonomies: { // edit category
     connectPath: 'measure_categories',
