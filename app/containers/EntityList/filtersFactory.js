@@ -29,10 +29,10 @@ formatLabel
       withoutMessage
     ));
   }
-  if (filters.connectedTaxonomies && connectedTaxonomies.taxonomies) {
+  if (filters.connectedTaxonomies && connectedTaxonomies) {
     filterTags = filterTags.concat(getCurrentConnectedTaxonomyFilters(
       filters.connectedTaxonomies,
-      connectedTaxonomies.taxonomies,
+      connectedTaxonomies,
       locationQuery,
       onTagClick
     ));
