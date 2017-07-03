@@ -21,7 +21,7 @@ const activePanelSelector = createSelector(
 
 const entitiesSelectedSelector = createSelector(
   pageSelector,
-  (pageState) => pageState.get('entitiesSelected').toJS()
+  (pageState) => pageState.get('entitiesSelected')
 );
 
 const entityListSelect = createSelector(

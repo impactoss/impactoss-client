@@ -24,6 +24,7 @@ export const FILTERS = {
         label: 'entities.indicators.plural',
         path: 'indicators', // filter by recommendation connection
         key: 'indicator_id',
+        expandable: true, // used for omitting from connected counts
       },
       {
         search: true,

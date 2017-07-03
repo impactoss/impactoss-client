@@ -7,25 +7,23 @@ import { getConnectedCategoryIds } from 'utils/entities';
 import { optionChecked, attributeOptionChecked } from './utils';
 
 
-export const makeActiveFilterOptions = (entities, filters, activeFilterOption, location, taxonomies, connections, connectedTaxonomies, messages, formatLabel) => {
+export const makeActiveFilterOptions = (entities, filters, activeFilterOption, locationQuery, taxonomies, connections, connectedTaxonomies, messages, formatLabel) => {
   // create filterOptions
   switch (activeFilterOption.group) {
     case 'taxonomies':
-      return makeTaxonomyFilterOptions(entities, filters, taxonomies, activeFilterOption, location, messages);
+      return makeTaxonomyFilterOptions(entities, filters, taxonomies, activeFilterOption, locationQuery, messages);
     case 'connectedTaxonomies':
-      return makeConnectedTaxonomyFilterOptions(entities, filters, connectedTaxonomies, activeFilterOption, location, messages, formatLabel);
+      return makeConnectedTaxonomyFilterOptions(entities, filters, connectedTaxonomies, activeFilterOption, locationQuery, messages, formatLabel);
     case 'connections':
-      return makeConnectionFilterOptions(entities, filters.connections.options, connections, activeFilterOption, location, messages, formatLabel);
+      return makeConnectionFilterOptions(entities, filters.connections.options, connections, activeFilterOption, locationQuery, messages, formatLabel);
     case 'attributes':
-      return makeAttributeFilterOptions(entities, filters, activeFilterOption, location, messages, formatLabel);
+      return makeAttributeFilterOptions(entities, filters, activeFilterOption, locationQuery, messages, formatLabel);
     default:
       return null;
   }
 };
 
-export const makeAttributeFilterOptions = (entities, filters, activeFilterOption, location, messages, formatLabel) => {
-  const locationQuery = location.query;
-
+export const makeAttributeFilterOptions = (entities, filters, activeFilterOption, locationQuery, messages, formatLabel) => {
   const filterOptions = {
     groupId: 'attributes',
     options: {},
@@ -122,9 +120,7 @@ export const makeAttributeFilterOptions = (entities, filters, activeFilterOption
 //
 //
 //
-export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeFilterOption, location, messages) => {
-  const locationQuery = location.query;
-
+export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeFilterOption, locationQuery, messages) => {
   const filterOptions = {
     groupId: 'taxonomies',
     search: filters.taxonomies.search,
@@ -227,9 +223,7 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeF
 //
 //
 //
-export const makeConnectionFilterOptions = (entities, options, connections, activeFilterOption, location, messages, formatLabel) => {
-  const locationQuery = location.query;
-
+export const makeConnectionFilterOptions = (entities, options, connections, activeFilterOption, locationQuery, messages, formatLabel) => {
   const filterOptions = {
     groupId: 'connections',
     options: {},
@@ -336,9 +330,7 @@ export const makeConnectionFilterOptions = (entities, options, connections, acti
 };
 
 
-export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedTaxonomies, activeFilterOption, location, messages) => {
-  const locationQuery = location.query;
-
+export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedTaxonomies, activeFilterOption, locationQuery, messages) => {
   const filterOptions = {
     groupId: 'connectedTaxonomies',
     search: filters.connectedTaxonomies.search,

@@ -113,7 +113,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       activePanel,
       dataReady,
       isManager,
-      entityIdsSelected,
       onPanelSelect,
       filters,
       edits,
@@ -122,20 +121,23 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     // console.log('entityList:render')
     // convert to JS if present
     const entities = this.props.entities && this.props.entities.toJS();
-    const connections = this.props.connections &&
-      reduce(this.props.connections, (memo, connection, path) => Object.assign(memo, { [path]: connection.toJS() }), {});
     const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
     const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
+    const entityIdsSelected = this.props.entityIdsSelected && this.props.entityIdsSelected.toJS();
+    const connections = this.props.connections &&
+      reduce(this.props.connections, (memo, connection, path) => Object.assign(memo, { [path]: connection.toJS() }), {});
 
-    // sorted entities
+    // sorted entities: TODO consider moving to selector for caching?
     const entitiesSorted = dataReady && entities
       ? orderBy(entities, getEntitySortIteratee(sortBy), sortOrder)
       : [];
 
     // grouping and paging
+    // TODO consider moving to selector for caching
     const entitiesGrouped = entitiesSorted.length > 0
       ? groupEntities(entitiesSorted, taxonomies, connectedTaxonomies, filters, location.query)
       : [];
+
     const entitiesGroupedFlattened = flatten(entitiesGrouped.map((group, gIndex) => group.entitiesGrouped
       ? flatten(group.entitiesGrouped.map((subgroup, sgIndex) =>
         subgroup.entities.map((entity) => ({ group: gIndex, subgroup: sgIndex, entity }))
@@ -146,9 +148,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     const pager = getPager(entitiesGroupedFlattened.length, location.query.page && parseInt(location.query.page, 10));
     // get new page of items from items array
     const pageItems = entitiesGroupedFlattened.slice(pager.startIndex, pager.endIndex + 1);
-    const entitiesGroupedPaged = getGroupedEntitiesForPage(pageItems, entitiesGrouped);
-    // console.log('entitiesGrouped', entitiesGrouped)
-    // console.log('entitiesGroupedPaged', entitiesGroupedPaged)
+    const entitiesGroupedForPage = getGroupedEntitiesForPage(pageItems, entitiesGrouped);
 
     // selected entities
     const entitiesSelected = dataReady ? map(filter(Object.values(pageItems), (item) => entityIdsSelected.indexOf(item.entity.id) >= 0), 'entity') : [];
@@ -178,8 +178,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               connections={connections}
               connectedTaxonomies={connectedTaxonomies}
               entitiesSorted={entitiesSorted}
-              entityIdsSelected={entityIdsSelected}
-              location={location}
+              entityIdsSelected={this.props.entityIdsSelected}
+              locationQuery={location.query}
               onPanelSelect={onPanelSelect}
               canEdit={isManager}
               activePanel={activePanel}
@@ -263,11 +263,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                       }}
                     />
                     <EntityListGroups
-                      entitiesGrouped={entitiesGroupedPaged}
-                      entitiesSorted={entitiesSorted}
-                      entityIdsSelected={entityIdsSelected}
-                      taxonomies={taxonomies}
-                      connectedTaxonomies={connectedTaxonomies}
+                      entitiesGrouped={entitiesGroupedForPage}
+                      entityIdsSelected={this.props.entityIdsSelected}
+                      taxonomies={this.props.taxonomies}
                       filters={filters}
                       locationQuery={location.query}
                       header={this.props.header}
@@ -315,7 +313,7 @@ EntityList.propTypes = {
   activePanel: PropTypes.string,
   isManager: PropTypes.bool,
   entities: PropTypes.object.isRequired,
-  entityIdsSelected: PropTypes.array,
+  entityIdsSelected: PropTypes.object,
   taxonomies: PropTypes.object,
   connections: PropTypes.object,
   connectedTaxonomies: PropTypes.object,

@@ -54,22 +54,22 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.activePanel !== this.props.activePanel || nextProps.location.key !== this.props.location.key) {
+    if (nextProps.activePanel !== this.props.activePanel) {
       // close and reset option panel
       this.setState({ activeOption: null });
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
-    // console.log('EntityListSidebar.shouldComponentUpdate')
-    // console.log('props isEqual', isEqual(this.props, nextProps))
-    return !isEqual(this.props.location, nextProps.location)
-      || !isEqual(this.props.filters, nextProps.filters)
-      || !isEqual(this.props.edits, nextProps.edits)
-      || !isEqual(this.props.taxonomies, nextProps.taxonomies)
-      || !isEqual(this.props.connections, nextProps.connections)
-      || !isEqual(this.props.connectedTaxonomies, nextProps.connectedTaxonomies)
-      || !isEqual(this.props.entitiesSorted, nextProps.entitiesSorted)
-      || !isEqual(this.props.entityIdsSelected, nextProps.entityIdsSelected)
+    // console.log('locationQuery.where',!isEqual(this.props.locationQuery.where, nextProps.locationQuery.where))
+    // console.log('locationQuery.without',!isEqual(this.props.locationQuery.without, nextProps.locationQuery.without))
+    // console.log('locationQuery.cat',!isEqual(this.props.locationQuery.cat, nextProps.locationQuery.cat))
+    // console.log('locationQuery.catx',!isEqual(this.props.locationQuery.catx, nextProps.locationQuery.catx))
+    // console.log('entityIdsSelected',this.props.entityIdsSelected !== nextProps.entityIdsSelected)
+    // console.log('activePanel',this.props.activePanel !== nextProps.activePanel)
+    // console.log('state',!isEqual(this.state, nextState));
+    // TODO consider targeting specific query params, eg where, without, cat, catx but also recommendations, etc
+    return !isEqual(this.props.locationQuery, nextProps.locationQuery)
+      || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.activePanel !== nextProps.activePanel
       || !isEqual(this.state, nextState);
   }
@@ -125,15 +125,15 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       connections,
       connectedTaxonomies,
       entitiesSorted,
-      entityIdsSelected,
       onAssign,
       canEdit,
       activePanel,
       onPanelSelect,
-      location,
+      locationQuery,
       formatLabel,
     } = this.props;
 
+    const entityIdsSelected = this.props.entityIdsSelected && this.props.entityIdsSelected.toJS();
     const entitiesSelected = filter(entitiesSorted, (entity) => entityIdsSelected.indexOf(entity.id) >= 0);
 
     const activeOption = this.state.activeOption;
@@ -169,7 +169,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           entitiesSorted,
           filters,
           activeOption,
-          location,
+          locationQuery,
           taxonomies,
           connections,
           connectedTaxonomies, {
@@ -241,7 +241,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   }
 }
 EntityListSidebar.propTypes = {
-  location: PropTypes.object,
+  locationQuery: PropTypes.object,
   canEdit: PropTypes.bool,
   filters: PropTypes.object,
   edits: PropTypes.object,
@@ -249,7 +249,7 @@ EntityListSidebar.propTypes = {
   connections: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   entitiesSorted: PropTypes.array,
-  entityIdsSelected: PropTypes.array,
+  entityIdsSelected: PropTypes.object,
   activePanel: PropTypes.string,
   onAssign: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,
