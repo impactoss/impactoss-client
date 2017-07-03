@@ -444,7 +444,7 @@ function mapDispatchToProps(dispatch, props) {
             let existingAssignments;
             switch (activeEditOption.group) {
               case ('taxonomies'):
-                existingAssignments = entity.get(activeEditOption.group);
+                existingAssignments = entity.get('categories');
                 break;
               case ('connections'):
                 existingAssignments = entity.get(activeEditOption.optionId);
