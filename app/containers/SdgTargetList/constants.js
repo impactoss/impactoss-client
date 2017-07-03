@@ -6,6 +6,17 @@ export const FILTERS = {
     query: 'cat',
     search: true,
   },
+  connectedTaxonomies: { // filter by each category
+    query: 'catx',
+    search: true,
+    connections: [
+      {
+        path: 'measures', // filter by recommendation connection
+        title: 'entities.measures.plural',
+        key: 'measure_id',
+      },
+    ],
+  },
   connections: { // filter by associated entity
     options: [
       {

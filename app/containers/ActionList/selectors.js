@@ -123,7 +123,7 @@ const selectMeasuresNested = createSelector(
     measureRecommendations,
     measureSdgTargets,
     progressReports,
-    dueDates,
+    dueDates
     // measures,
     // expandNo
   ) => entities.map((entity) => entity

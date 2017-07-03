@@ -1,4 +1,6 @@
 import { createSelector } from 'reselect';
+import { Map } from 'immutable';
+import { reduce } from 'lodash/collection';
 
 import {
   selectEntities,
@@ -6,24 +8,78 @@ import {
   selectWithoutQuery,
   selectLocationQuery,
   selectCategoryQuery,
+  selectConnectedCategoryQuery,
 } from 'containers/App/selectors';
 
 import {
   filterEntitiesByConnection,
   filterEntitiesByCategories,
+  filterEntitiesByConnectedCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
 } from 'containers/App/selector-utils';
 
-export const selectConnectedTaxonomies = () => null;
-
+export const selectTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => taxonomies
+    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_sdgtargets']))
+    .map((taxonomy) => taxonomy.set(
+      'categories',
+      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+    ))
+);
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'indicators'),
   (state) => selectEntities(state, 'measures'),
-  (indicators, measures) => ({
+  (state) => selectEntities(state, 'measure_categories'),
+  (indicators, measures, measureCategories) => ({
     indicators,
-    measures,
+    measures: measures.map((measure) =>
+      measure.set(
+        'categories',
+        measureCategories.filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
+        )
+      )
+    ),
   })
+);
+
+export const selectConnectedTaxonomies = createSelector(
+  (state) => selectConnections(state),
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (state) => selectEntities(state, 'measure_categories'),
+  (connections, taxonomies, categories, categoryMeasures) =>
+    // for all connections
+    reduce([
+      {
+        tags: 'tags_measures',
+        path: 'measures',
+        key: 'measure_id',
+        associations: categoryMeasures,
+      },
+    ], (connectedTaxonomies, connection) =>
+      // merge connected taxonomies.
+      // TODO deal with conflicts
+      connectedTaxonomies.merge(
+        taxonomies
+          .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]) && !taxonomy.getIn(['attributes', 'tags_sdgtargets']))
+          .map((taxonomy) => taxonomy.set(
+            'categories',
+            categories
+              .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+              .map((category) => category.set(
+                connection.path,
+                connection.associations.filter((association) =>
+                  attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
+                  && connections[connection.path].get(association.getIn(['attributes', connection.key]).toString())
+                )
+              ))
+          ))
+      )
+    , Map())
 );
 
 const selectSdgTargetsNested = createSelector(
@@ -35,18 +91,20 @@ const selectSdgTargetsNested = createSelector(
   (state) => selectEntities(state, 'sdgtarget_categories'),
   (state) => selectEntities(state, 'sdgtarget_indicators'),
   (state) => selectEntities(state, 'sdgtarget_measures'),
-  (entities, connections, entityCategories, entityIndicators, entityMeasures) =>
-    entities.map((entity) => entity
+  (state) => selectEntities(state, 'progress_reports'),
+  (state) => selectEntities(state, 'due_dates'),
+  (
+    entities,
+    connections,
+    entityCategories,
+    entityIndicators,
+    entityMeasures,
+    progressReports,
+    dueDates
+  ) => entities.map((entity) => entity
     .set(
       'categories',
       entityCategories.filter((association) => attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), entity.get('id')))
-    )
-    .set(
-      'indicators',
-      entityIndicators.filter((association) =>
-        attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), entity.get('id'))
-        && connections.indicators.get(association.getIn(['attributes', 'indicator_id']).toString())
-      )
     )
     .set(
       'measures',
@@ -54,6 +112,42 @@ const selectSdgTargetsNested = createSelector(
         attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), entity.get('id'))
         && connections.measures.get(association.getIn(['attributes', 'measure_id']).toString())
       )
+    )
+    .set(
+      'indicators',
+      entityIndicators
+      .filter((entityIndicator) =>
+        attributesEqual(entityIndicator.getIn(['attributes', 'sdgtarget_id']), entity.get('id'))
+        && connections.indicators.get(entityIndicator.getIn(['attributes', 'indicator_id']).toString())
+      )
+      .map((entityIndicator) => {
+        // nest actual indicator with indicator connection
+        const indicator = connections.indicators.get(entityIndicator.getIn(['attributes', 'indicator_id']).toString());
+        // if (indicator) {
+        return entityIndicator.set(
+          'indicator',
+          indicator
+            // nest reports
+            .set('reports', progressReports.filter((report) =>
+              attributesEqual(report.getIn(['attributes', 'indicator_id']), indicator.get('id'))
+            ))
+            // nest dates without report
+            .set(
+              'dates',
+              dueDates
+              .filter((date) => {
+                // is associated
+                const associated = attributesEqual(date.getIn(['attributes', 'indicator_id']), indicator.get('id'));
+                if (associated) {
+                  // has no report
+                  const dateReports = progressReports.filter((report) => attributesEqual(report.getIn(['attributes', 'due_date_id']), date.get('id')));
+                  return !dateReports || dateReports.size === 0;
+                }
+                return false;
+              }
+            ))
+        );
+      })
     )
   )
 );
@@ -88,7 +182,16 @@ const selectSdgTargetsByCategories = createSelector(
     ? filterEntitiesByCategories(entities, query)
     : entities
 );
-
+const selectSdgTargetsByConnectedCategories = createSelector(
+  selectSdgTargetsByCategories,
+  selectConnections,
+  selectConnectedCategoryQuery,
+  (entities, connections, query) => query
+    ? filterEntitiesByConnectedCategories(entities, connections, query, {
+      measures: 'measure_id',
+    })
+    : entities
+);
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
 // 2. selectEntitiesSearch filters by keyword
@@ -96,18 +199,7 @@ const selectSdgTargetsByCategories = createSelector(
 // 4. selectSdgTargetsWithout will filter by absence of taxonomy or connection
 // 5. selectSdgTargetsByConnections will filter by specific connection
 // 6. selectSdgTargetsByCategories will filter by specific categories
-export const selectSdgTargets = selectSdgTargetsByCategories;
-
-export const selectTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
-  (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_sdgtargets']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
-);
+export const selectSdgTargets = selectSdgTargetsByConnectedCategories;
 //
 // // define selects for getEntities
 // const selects = {
