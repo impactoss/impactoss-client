@@ -9,6 +9,7 @@ import {
   selectLocationQuery,
   selectCategoryQuery,
   selectConnectedCategoryQuery,
+  // selectExpandQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -110,32 +111,98 @@ const selectMeasuresNested = createSelector(
   (state) => selectEntities(state, 'measure_indicators'),
   (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'sdgtarget_measures'),
-  (entities, connections, entityCategories, entityIndicators, entityRecommendations, entitySdgTargets) =>
-    entities.map((entity) => entity
+  (state) => selectEntities(state, 'progress_reports'),
+  (state) => selectEntities(state, 'due_dates'),
+  // (state) => selectEntities(state, 'measures'),
+  // (state) => selectExpandQuery(state),
+  (
+    entities,
+    connections,
+    measureCategories,
+    measureIndicators,
+    measureRecommendations,
+    measureSdgTargets,
+    progressReports,
+    dueDates,
+    // measures,
+    // expandNo
+  ) => entities.map((entity) => entity
+    // nest categories
     .set(
       'categories',
-      entityCategories.filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id')))
+      measureCategories.filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id')))
     )
-    .set(
-      'indicators',
-      entityIndicators.filter((association) =>
-        attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
-        && connections.indicators.get(association.getIn(['attributes', 'indicator_id']).toString())
-      )
-    )
+    // nest recommendations connections
     .set(
       'recommendations',
-      entityRecommendations.filter((association) =>
+      measureRecommendations.filter((association) =>
         attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
         && connections.recommendations.get(association.getIn(['attributes', 'recommendation_id']).toString())
       )
     )
+    // nest sdgtarget connections
     .set(
       'sdgtargets',
-      entitySdgTargets.filter((association) =>
+      measureSdgTargets.filter((association) =>
         attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
         && connections.sdgtargets.get(association.getIn(['attributes', 'sdgtarget_id']).toString())
       )
+    )
+    // nest indicator connections
+    .set(
+      'indicators',
+      measureIndicators
+      .filter((entityIndicator) =>
+        attributesEqual(entityIndicator.getIn(['attributes', 'measure_id']), entity.get('id'))
+        && connections.indicators.get(entityIndicator.getIn(['attributes', 'indicator_id']).toString())
+      )
+      .map((entityIndicator) => {
+        // nest actual indicator with indicator connection
+        const indicator = connections.indicators.get(entityIndicator.getIn(['attributes', 'indicator_id']).toString());
+        // if (indicator) {
+        return entityIndicator.set(
+          'indicator',
+          indicator
+            // nest reports
+            .set('reports', progressReports.filter((report) =>
+              attributesEqual(report.getIn(['attributes', 'indicator_id']), indicator.get('id'))
+            ))
+            // nest dates without report
+            .set(
+              'dates',
+              dueDates
+              .filter((date) => {
+                // is associated
+                const associated = attributesEqual(date.getIn(['attributes', 'indicator_id']), indicator.get('id'));
+                if (associated) {
+                  // has no report
+                  const dateReports = progressReports.filter((report) => attributesEqual(report.getIn(['attributes', 'due_date_id']), date.get('id')));
+                  return !dateReports || dateReports.size === 0;
+                }
+                return false;
+              }
+            ))
+        );
+          // if (expandNo) {
+          //   // nest connected measures
+          //   console.log('nest connected measures')
+          //   indicator = indicator.set(
+          //     'measures',
+          //     measureIndicators
+          //       .filter((measureIndicator) =>
+          //         attributesEqual(measureIndicator.getIn(['attributes', 'indicator_id']), indicator.get('id'))
+          //         && measures.get(entityIndicator.getIn(['attributes', 'measure_id']).toString())
+          //       )
+          //       .map((measureIndicator) => measureIndicator.set(
+          //         'measure',
+          //         measures.get(measureIndicator.getIn(['attributes', 'measure_id']).toString())
+          //       ))
+          //   )
+          // }
+          // return entityIndicator.set('indicator', indicator)
+        // }
+        // return entityIndicator
+      })
     )
   )
 );
@@ -201,41 +268,6 @@ export const selectMeasures = selectMeasuresByConnectedCategories;
 // const selects = {
 //   entities: {
 //     path: 'measures',
-//     extensions: [
-//       {
-//         path: 'measure_categories',
-//         key: 'measure_id',
-//         reverse: true,
-//         as: 'taxonomies',
-//       },
-//       {
-//         path: 'recommendation_measures',
-//         key: 'measure_id',
-//         reverse: true,
-//         as: 'recommendations',
-//         // extend: {
-//         //   path: 'recommendations',
-//         //   key: 'recommendation_id',
-//         //   as: 'recommendation',
-//         //   type: 'single',
-//         // },
-//         connected: {
-//           path: 'recommendations',
-//           key: 'recommendation_id',
-//           forward: true,
-//         },
-//       },
-//       {
-//         path: 'sdgtarget_measures',
-//         key: 'measure_id',
-//         reverse: true,
-//         as: 'sdgtargets',
-//         connected: {
-//           path: 'sdgtargets',
-//           key: 'sdgtarget_id',
-//           forward: true,
-//         },
-//       },
 //       {
 //         path: 'measure_indicators',
 //         key: 'measure_id',

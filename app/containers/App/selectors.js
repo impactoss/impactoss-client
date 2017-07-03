@@ -450,6 +450,10 @@ const selectSearchQuery = createSelector(
   selectLocationQuery,
   (locationQuery) => locationQuery && locationQuery.get('search')
 );
+const selectExpandQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('expand')
+);
 
 const selectEntities = (state, path) => state.getIn(['global', 'entities', path]);
 
@@ -524,6 +528,7 @@ export {
   selectWithoutQuery,
   selectCategoryQuery,
   selectConnectedCategoryQuery,
+  selectExpandQuery,
   selectLocationQuery,
   selectLocation,
 };
