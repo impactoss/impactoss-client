@@ -1,4 +1,6 @@
 import { createSelector } from 'reselect';
+import { Map } from 'immutable';
+import { reduce } from 'lodash/collection';
 
 import {
   selectEntities,
@@ -6,24 +8,83 @@ import {
   selectWithoutQuery,
   selectLocationQuery,
   selectCategoryQuery,
+  selectConnectedCategoryQuery,
 } from 'containers/App/selectors';
 
 import {
   filterEntitiesByConnection,
   filterEntitiesByCategories,
+  filterEntitiesByConnectedCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
 } from 'containers/App/selector-utils';
 
-export const selectConnectedTaxonomies = () => null;
-
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'measures'),
   (state) => selectEntities(state, 'sdgtargets'),
-  (measures, sdgtargets) => ({
-    measures,
-    sdgtargets,
+  (state) => selectEntities(state, 'measure_categories'),
+  (state) => selectEntities(state, 'sdgtarget_categories'),
+  (measures, sdgtargets, measureCategories, sdgtargetCategories) => ({
+    measures: measures.map((measure) =>
+      measure.set(
+        'categories',
+        measureCategories.filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
+        )
+      )
+    ),
+    sdgtargets: sdgtargets.map((sdgtarget) =>
+      sdgtarget.set(
+        'categories',
+        sdgtargetCategories.filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), sdgtarget.get('id'))
+        )
+      )
+    ),
   })
+);
+
+export const selectConnectedTaxonomies = createSelector(
+  (state) => selectConnections(state),
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (state) => selectEntities(state, 'measure_categories'),
+  (state) => selectEntities(state, 'sdgtarget_categories'),
+  (connections, taxonomies, categories, categoryMeasures, categorySdgTargets) =>
+    // for all connections
+    reduce([
+      {
+        tags: 'tags_measures',
+        path: 'measures',
+        key: 'measure_id',
+        associations: categoryMeasures,
+      },
+      {
+        tags: 'tags_sdgtargets',
+        path: 'sdgtargets',
+        key: 'sdgtarget_id',
+        associations: categorySdgTargets,
+      },
+    ], (connectedTaxonomies, connection) =>
+      // merge connected taxonomies.
+      // TODO deal with conflicts
+      connectedTaxonomies.merge(
+        taxonomies
+          .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]) && !taxonomy.getIn(['attributes', 'tags_indicators']))
+          .map((taxonomy) => taxonomy.set(
+            'categories',
+            categories
+              .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+              .map((category) => category.set(
+                connection.path,
+                connection.associations.filter((association) =>
+                  attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
+                  && connections[connection.path].get(association.getIn(['attributes', connection.key]).toString())
+                )
+              ))
+          ))
+      )
+    , Map())
 );
 
 const selectIndicatorsNested = createSelector(
@@ -34,7 +95,16 @@ const selectIndicatorsNested = createSelector(
   (state) => selectConnections(state),
   (state) => selectEntities(state, 'measure_indicators'),
   (state) => selectEntities(state, 'sdgtarget_indicators'),
-  (entities, connections, entityMeasures, entitySdgTargets) =>
+  (state) => selectEntities(state, 'progress_reports'),
+  (state) => selectEntities(state, 'due_dates'),
+  (
+    entities,
+    connections,
+    entityMeasures,
+    entitySdgTargets,
+    progressReports,
+    dueDates,
+  ) =>
     entities.map((entity) => entity
     .set(
       'measures',
@@ -50,6 +120,25 @@ const selectIndicatorsNested = createSelector(
         && connections.sdgtargets.get(association.getIn(['attributes', 'sdgtarget_id']).toString())
       )
     )
+    // nest reports
+    .set('reports', progressReports.filter((report) =>
+      attributesEqual(report.getIn(['attributes', 'indicator_id']), entity.get('id'))
+    ))
+    // nest dates without report
+    .set(
+      'dates',
+      dueDates
+      .filter((date) => {
+        // is associated
+        const associated = attributesEqual(date.getIn(['attributes', 'indicator_id']), entity.get('id'));
+        if (associated) {
+          // has no report
+          const dateReports = progressReports.filter((report) => attributesEqual(report.getIn(['attributes', 'due_date_id']), date.get('id')));
+          return !dateReports || dateReports.size === 0;
+        }
+        return false;
+      }
+    ))
   )
 );
 const selectIndicatorsWithout = createSelector(
@@ -83,7 +172,17 @@ const selectIndicatorsByCategories = createSelector(
     ? filterEntitiesByCategories(entities, query)
     : entities
 );
-
+const selectIndicatorsByConnectedCategories = createSelector(
+  selectIndicatorsByCategories,
+  selectConnections,
+  selectConnectedCategoryQuery,
+  (entities, connections, query) => query
+    ? filterEntitiesByConnectedCategories(entities, connections, query, {
+      measures: 'measure_id',
+      sdgtargets: 'sdgtarget_id',
+    })
+    : entities
+);
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
 // 2. selectEntitiesSearch filters by keyword
@@ -91,7 +190,8 @@ const selectIndicatorsByCategories = createSelector(
 // 4. selectIndicatorsWithout will filter by absence of taxonomy or connection
 // 5. selectIndicatorsByConnections will filter by specific connection
 // 6. selectIndicatorsByCategories will filter by specific categories
-export const selectIndicators = selectIndicatorsByCategories;
+// 7. selectIndicatorsByCOnnectedCategories will filter by specific categories connected via connection
+export const selectIndicators = selectIndicatorsByConnectedCategories;
 
 // define selects for getEntities
 // const selects = {
@@ -99,92 +199,9 @@ export const selectIndicators = selectIndicatorsByCategories;
 //     path: 'indicators',
 //     extensions: [
 //       {
-//         path: 'measure_indicators',
-//         key: 'indicator_id',
-//         reverse: true,
-//         as: 'measures',
-//         connected: {
-//           path: 'measures',
-//           key: 'measure_id',
-//           forward: true,
-//         },
-//       },
-//       {
-//         path: 'sdgtarget_indicators',
-//         key: 'indicator_id',
-//         reverse: true,
-//         as: 'sdgtargets',
-//         connected: {
-//           path: 'sdgtargets',
-//           key: 'sdgtarget_id',
-//           forward: true,
-//         },
-//       },
-//       {
 //         type: 'single',
 //         path: 'users',
 //         key: 'manager_id',
 //         as: 'manager',
 //       },
 //       {
-//         path: 'progress_reports',
-//         key: 'indicator_id',
-//         reverse: true,
-//         as: 'reports',
-//       },
-//       {
-//         path: 'due_dates',
-//         key: 'indicator_id',
-//         reverse: true,
-//         as: 'dates',
-//         without: {
-//           path: 'progress_reports',
-//           key: 'due_date_id',
-//         },
-//       },
-//     ],
-//   },
-//   connections: {
-//     options: ['measures', 'sdgtargets'],
-//   },
-//   connectedTaxonomies: { // filter by each category
-//     options: [
-//       {
-//         out: 'js',
-//         path: 'taxonomies',
-//         where: {
-//           tags_measures: true,
-//         },
-//         extend: {
-//           path: 'categories',
-//           key: 'taxonomy_id',
-//           reverse: true,
-//           extend: {
-//             path: 'measure_categories',
-//             key: 'category_id',
-//             reverse: true,
-//             as: 'measures',
-//           },
-//         },
-//       },
-//       {
-//         out: 'js',
-//         path: 'taxonomies',
-//         where: {
-//           tags_sdgtargets: true,
-//         },
-//         extend: {
-//           path: 'categories',
-//           key: 'taxonomy_id',
-//           reverse: true,
-//           extend: {
-//             path: 'sdgtarget_categories',
-//             key: 'category_id',
-//             reverse: true,
-//             as: 'sdgtargets',
-//           },
-//         },
-//       },
-//     ],
-//   },
-// };

@@ -2,6 +2,22 @@ import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 export const FILTERS = {
   search: ['title', 'reference'],
+  connectedTaxonomies: { // filter by each category
+    query: 'catx',
+    search: true,
+    connections: [
+      {
+        path: 'measures', // filter by recommendation connection
+        title: 'entities.measures.plural',
+        key: 'measure_id',
+      },
+      {
+        path: 'sdgtargets', // filter by recommendation connection
+        title: 'entities.sdgtargets.plural',
+        key: 'sdgtarget_id',
+      },
+    ],
+  },
   connections: { // filter by associated entity
     options: [
       {
@@ -39,44 +55,7 @@ export const FILTERS = {
     ],
   },
 };
-// const filters = {
-//   connectedTaxonomies: { // filter by each category
-//     query: 'catx',
-//     filter: true,
-//     connections: [
-//       {
-//         path: 'measures', // filter by recommendation connection
-//         title: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-//         key: 'measure_id',
-//         connected: {
-//           path: 'measure_indicators',
-//           key: 'indicator_id',
-//           connected: {
-//             path: 'measure_categories',
-//             key: 'measure_id',
-//             attribute: 'measure_id',
-//             whereKey: 'category_id',
-//           },
-//         },
-//       },
-//       {
-//         path: 'sdgtargets', // filter by recommendation connection
-//         title: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
-//         key: 'sdgtarget_id',
-//         connected: {
-//           path: 'sdgtarget_indicators',
-//           key: 'indicator_id',
-//           connected: {
-//             path: 'sdgtarget_categories',
-//             key: 'sdgtarget_id',
-//             attribute: 'sdgtarget_id',
-//             whereKey: 'category_id',
-//           },
-//         },
-//       },
-//     ],
-//   },
-// };
+
 export const EDITS = {
   connections: { // filter by associated entity
     options: [
