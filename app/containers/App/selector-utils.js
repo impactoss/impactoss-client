@@ -24,9 +24,13 @@ const testEntityCategoryAssociation = (entity, categoryId) =>
 const testEntityTaxonomyAssociation = (entity, categories, taxonomyId) =>
   entity
   .get('categories')
-  .map((taxCategory) => categories.get(taxCategory.getIn(['attributes', 'category_id']).toString()).getIn(['attributes', 'taxonomy_id']))
+  .map((taxCategory) => {
+    const category = categories.get(taxCategory.getIn(['attributes', 'category_id']).toString());
+    return category
+    ? category.getIn(['attributes', 'taxonomy_id'])
+    : category;
+  })
   .includes(taxonomyId);
-
 // check if entity has any nested connection by type
 const testEntityAssociation = (entity, associatedPath) =>
   entity.get(associatedPath) && entity.get(associatedPath).size > 0;

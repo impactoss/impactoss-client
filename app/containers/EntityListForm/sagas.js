@@ -16,6 +16,12 @@ export function* updateQuery(args) {
     add: value.get('checked'),
     remove: !value.get('checked'),
   })).toJS();
+  yield params.push({
+    arg: 'page',
+    value: '',
+    replace: true,
+    remove: true,
+  });
   yield put(updateRouteQuery(params));
 }
 

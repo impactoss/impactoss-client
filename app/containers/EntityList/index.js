@@ -58,6 +58,7 @@ import {
   updateQuery,
   updateGroup,
   updatePage,
+  updateExpand,
 } from './actions';
 
 import messages from './messages';
@@ -363,13 +364,10 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleExpandLink: (expandNoNew) => {
       // default expand by 1
-      const value = typeof expandNoNew !== 'undefined' ? expandNoNew : props.expandNo + 1;
-      dispatch(updateQuery(fromJS([{
-        query: 'expand',
-        value,
-        replace: true,
-        checked: value > 0,
-      }])));
+      dispatch(updateExpand(typeof expandNoNew !== 'undefined'
+        ? expandNoNew
+        : props.expandNo + 1
+      ));
     },
     onSearch: (value) => {
       dispatch(updateQuery(fromJS([
