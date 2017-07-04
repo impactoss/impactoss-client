@@ -1,6 +1,6 @@
 import { range } from 'lodash/util';
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 50;
 const PAGE_LINKS = 5;
 
 // default to first page

@@ -6,38 +6,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-// import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import { Map, List, fromJS } from 'immutable';
 import { orderBy, reduce, filter, map } from 'lodash/collection';
 import { flatten } from 'lodash/array';
 
-import { jumpToComponent } from 'utils/scroll-to-component';
 import { getEntitySortIteratee } from 'utils/sort';
 
-import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
-import Container from 'components/basic/Container';
 import Sidebar from 'components/basic/Sidebar';
-import Loading from 'components/Loading';
-import ContentHeader from 'components/ContentHeader';
+
 import EntityListSidebar from 'components/EntityListSidebar';
-import EntityListGroups from 'components/EntityListGroups';
-import EntityListSearch from 'components/EntityListSearch';
-import EntityListOptions from 'components/EntityListOptions';
-import EntityListHeader from 'components/EntityListHeader';
-import EntityListFooter from 'components/EntityListFooter';
-import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
+import EntityListMain from 'components/EntityListMain';
 
 import { isUserManager } from 'containers/App/selectors';
 
-import { CONTENT_LIST } from 'containers/App/constants';
-
 import appMessages from 'containers/App/messages';
 
-import { makeCurrentFilters } from './filtersFactory';
 import {
-  makeGroupOptions,
   groupEntities,
   getGroupedEntitiesForPage,
 } from './groupFactory';
@@ -48,7 +33,6 @@ import {
 } from './selectors';
 
 import { getPager } from './pagination';
-import { getHeaderColumns } from './header';
 
 import {
   showPanel,
@@ -60,14 +44,6 @@ import {
   updatePage,
   updateExpand,
 } from './actions';
-
-import messages from './messages';
-
-const Content = styled.div`
-  padding: 0 4em;
-`;
-const ListEntities = styled.div``;
-const ListWrapper = styled.div``;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -93,13 +69,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   //   console.log(nextProps.entities === this.props.entities, 'immutable map equal')
   //   console.log(JSON.stringify(nextProps.entities) === JSON.stringify(this.props.entities), 'stringified objects equal')
   // }
-  scrollToTop = () => {
-    jumpToComponent(
-      this.ScrollTarget,
-      this.ScrollReference,
-      this.ScrollContainer
-    );
-  }
 
   formatLabel = (path) => {
     const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
@@ -118,7 +87,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       edits,
       location,
     } = this.props;
-    // console.log('entityList:render')
     // convert to JS if present
     const entities = this.props.entities && this.props.entities.toJS();
     const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
@@ -152,20 +120,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     // selected entities
     const entitiesSelected = dataReady ? map(filter(Object.values(pageItems), (item) => entityIdsSelected.indexOf(item.entity.id) >= 0), 'entity') : [];
-    let allChecked = CHECKBOX_STATES.INDETERMINATE;
-    let listHeaderLabel = this.props.entityTitle.plural;
-    if (dataReady) {
-      if (entitiesSelected.length === 0) {
-        allChecked = CHECKBOX_STATES.UNCHECKED;
-      } else if (pageItems.length > 0 && entitiesSelected.length === pageItems.length) {
-        allChecked = CHECKBOX_STATES.CHECKED;
-      }
-      if (entitiesSelected.length === 1) {
-        listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.single} selected`;
-      } else if (entitiesSelected.length > 1) {
-        listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
-      }
-    }
 
     return (
       <div>
@@ -189,108 +143,36 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             />
           }
         </Sidebar>
-        <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }}>
-          <Container innerRef={(node) => { this.ScrollReference = node; }}>
-            <Content>
-              <ContentHeader
-                type={CONTENT_LIST}
-                icon={this.props.header.icon}
-                supTitle={this.props.header.supTitle}
-                title={dataReady
-                  ? `${entitiesSorted.length} ${entitiesSorted.length === 1 ? this.props.entityTitle.single : this.props.entityTitle.plural}`
-                  : this.props.entityTitle.plural
-                }
-                buttons={dataReady && isManager
-                  ? this.props.header.actions
-                  : null
-                }
-              />
-              { !dataReady &&
-                <Loading />
-              }
-              { dataReady &&
-                <ListEntities>
-                  <EntityListSearch
-                    filters={makeCurrentFilters(
-                      {
-                        filters,
-                        taxonomies,
-                        connections,
-                        connectedTaxonomies,
-                        location,
-                        onTagClick: this.props.onTagClick,
-                      },
-                      this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
-                      this.formatLabel
-                    )}
-                    searchQuery={location.query.search || ''}
-                    onSearch={this.props.onSearch}
-                  />
-                  <EntityListOptions
-                    groupOptions={makeGroupOptions(taxonomies, connectedTaxonomies)}
-                    subgroupOptions={makeGroupOptions(taxonomies)}
-                    groupSelectValue={location.query.group}
-                    subgroupSelectValue={location.query.subgroup}
-                    onGroupSelect={this.props.onGroupSelect}
-                    onSubgroupSelect={this.props.onSubgroupSelect}
-                    expandLink={this.props.isExpandable
-                      ? {
-                        expanded: this.props.expandNo === this.props.expandableColumns.length,
-                        collapsed: this.props.expandNo === 0,
-                        onClick: () => this.props.handleExpandLink(
-                          this.props.expandNo < this.props.expandableColumns.length
-                          ? this.props.expandableColumns.length
-                          : 0
-                        ),
-                      }
-                      : null
-                    }
-                  />
-                  <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
-                    <EntityListHeader
-                      columns={getHeaderColumns(
-                        listHeaderLabel,
-                        isManager,
-                        this.props.isExpandable,
-                        this.props.expandNo,
-                        this.props.expandableColumns,
-                        this.props.handleExpandLink
-                      )}
-                      isSelect={isManager}
-                      isSelected={allChecked}
-                      onSelect={(checked) => {
-                        this.props.onEntitySelectAll(checked ? map(pageItems, (item) => item.entity.id) : []);
-                      }}
-                    />
-                    <EntityListGroups
-                      entitiesGrouped={entitiesGroupedForPage}
-                      entityIdsSelected={this.props.entityIdsSelected}
-                      taxonomies={this.props.taxonomies}
-                      filters={filters}
-                      locationQuery={location.query}
-                      header={this.props.header}
-                      entityLinkTo={this.props.entityLinkTo}
-                      isManager={this.props.isManager}
-                      onTagClick={this.props.onTagClick}
-                      onEntitySelect={this.props.onEntitySelect}
-                      expandNo={this.props.expandNo}
-                      isExpandable={this.props.isExpandable}
-                      expandableColumns={this.props.expandableColumns}
-                      handleExpandLink={this.props.handleExpandLink}
-                    />
-                    <EntityListFooter
-                      pager={pager}
-                      onPageSelect={(page) => {
-                        this.scrollToTop();
-                        this.props.onPageSelect(page);
-                      }}
-                    />
-                  </ListWrapper>
-                </ListEntities>
-              }
-            </Content>
-          </Container>
-        </ContainerWithSidebar>
+        <EntityListMain
+          dataReady={dataReady}
+          entitiesTotal={entitiesSorted.length}
+          entitiesGrouped={entitiesGroupedForPage}
+          entityIdsSelected={this.props.entityIdsSelected}
+          entitiesSelectedTotal={entitiesSelected.length}
+          entityTitle={this.props.entityTitle}
+          isManager={isManager}
+          filters={filters}
+          location={location}
+          pager={pager}
+          pageItems={pageItems}
+          formatLabel={this.formatLabel}
+          header={this.props.header}
+          taxonomies={this.props.taxonomies}
+          connections={connections}
+          connectedTaxonomies={this.props.connectedTaxonomies}
+          onTagClick={this.props.onTagClick}
+          onGroupSelect={this.props.onGroupSelect}
+          onSubgroupSelect={this.props.onSubgroupSelect}
+          isExpandable={this.props.isExpandable}
+          expandNo={this.props.expandNo}
+          handleExpandLink={this.props.handleExpandLink}
+          expandableColumns={this.props.expandableColumns}
+          onEntitySelectAll={this.props.onEntitySelectAll}
+          onEntitySelect={this.props.onEntitySelect}
+          entityLinkTo={this.props.entityLinkTo}
+          onPageSelect={this.props.onPageSelect}
+          onSearch={this.props.onSearch}
+        />
       </div>
     );
   }

@@ -27,13 +27,12 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
   shouldComponentUpdate(nextProps) {
     // console.log('entitiesGrouped', isEqual(this.props.entitiesGrouped, nextProps.entitiesGrouped))
     // console.log('entityIdsSelected', this.props.entityIdsSelected === nextProps.entityIdsSelected)
-    // console.log('locationQuery', this.props.locationQuery === nextProps.locationQuery)
+    // console.log('locationQuery', isEqual(this.props.locationQuery, nextProps.locationQuery), nextProps.locationQuery)
     return !isEqual(this.props.entitiesGrouped, nextProps.entitiesGrouped)
     || !isEqual(this.props.locationQuery, nextProps.locationQuery)
     || this.props.entityIdsSelected !== nextProps.entityIdsSelected;
   }
   render() {
-    // console.log('EntityListGroups.render')
     const {
       entitiesGrouped,
       filters,
@@ -86,6 +85,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                           </ListEntitiesSubGroupHeader>
                         }
                         <EntityListItems
+                          scrollContainer={this.props.scrollContainer}
                           taxonomies={taxonomies}
                           associations={filters}
                           entities={entitySubGroup.entities}
@@ -105,6 +105,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                   }
                   { entityGroup.entities && !entityGroup.entitiesGrouped &&
                     <EntityListItems
+                      scrollContainer={this.props.scrollContainer}
                       taxonomies={taxonomies}
                       associations={filters}
                       entities={entityGroup.entities}
@@ -145,6 +146,7 @@ EntityListGroups.propTypes = {
   onEntitySelect: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,
   handleExpandLink: PropTypes.func.isRequired,
+  scrollContainer: PropTypes.object,
 };
 
 export default EntityListGroups;
