@@ -6272,7 +6272,7 @@ react-deep-force-update@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/react-deep-force-update/-/react-deep-force-update-1.0.1.tgz#f911b5be1d2a6fe387507dd6e9a767aa2924b4c7"
 
-react-dom@^15.0.1, react-dom@^15.6.1:
+react-dom@>=0.14.0, react-dom@^15.0.1, react-dom@^15.6.1:
   version "15.6.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-15.6.1.tgz#2cb0ed4191038e53c209eb3a79a23e2a4cf99470"
   dependencies:
@@ -6341,6 +6341,12 @@ react-redux@^5.0.5:
     lodash-es "^4.2.0"
     loose-envify "^1.1.0"
     prop-types "^15.5.10"
+
+react-rendered-size@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-rendered-size/-/react-rendered-size-1.1.0.tgz#191ac827bdae754f9d148e065da18b52f2b9d8b8"
+  dependencies:
+    react-dom ">=0.14.0"
 
 react-router-redux@4.0.8:
   version "4.0.8"
@@ -6822,6 +6828,17 @@ scroll-behavior@^0.9.3:
   dependencies:
     dom-helpers "^3.0.0"
     invariant "^2.2.1"
+
+scrollmonitor-react@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/scrollmonitor-react/-/scrollmonitor-react-2.2.1.tgz#aa9946dd5986cd1a2a6aac49f682a6befb2a5421"
+  dependencies:
+    prop-types "^15.5.10"
+    scrollmonitor "^1.1.1"
+
+scrollmonitor@^1.1.1:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/scrollmonitor/-/scrollmonitor-1.2.3.tgz#87bf912ca28da64796f529e8129fa4a9b106fb74"
 
 seek-bzip@^1.0.3:
   version "1.0.5"
