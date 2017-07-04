@@ -1,12 +1,16 @@
 import { range } from 'lodash/util';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 25;
+const PAGE_SIZE_MAX = 100;
 const PAGE_LINKS = 5;
 
 // default to first page
 export const getPager = (totalItems, currentPage = 1, pageSize = PAGE_SIZE) => {
   // calculate total pages
-  const totalPages = Math.ceil(totalItems / pageSize);
+  const perPage = Math.min(pageSize, PAGE_SIZE_MAX);
+
+  const totalPages = Math.ceil(totalItems / perPage);
+
   // make sure we dont overshoot
   const currentMaxPage = Math.min(currentPage, totalPages);
   // less than 5 total pages so show all
@@ -28,8 +32,8 @@ export const getPager = (totalItems, currentPage = 1, pageSize = PAGE_SIZE) => {
 
 
   // calculate start and end item indexes
-  const startIndex = (currentMaxPage - 1) * pageSize;
-  const endIndex = Math.min((startIndex + pageSize) - 1, totalItems - 1);
+  const startIndex = (currentMaxPage - 1) * perPage;
+  const endIndex = Math.min((startIndex + perPage) - 1, totalItems - 1);
 
   // create an array of pages to ng-repeat in the pager control
   const pages = range(startPage, endPage + 1);
@@ -37,7 +41,7 @@ export const getPager = (totalItems, currentPage = 1, pageSize = PAGE_SIZE) => {
   return {
     totalItems,
     currentPage: currentMaxPage,
-    pageSize,
+    pageSize: perPage,
     totalPages,
     startPage,
     endPage,

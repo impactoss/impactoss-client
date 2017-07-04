@@ -113,7 +113,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       : group.entities.map((entity) => ({ group: gIndex, entity }))
     ));
     // get new pager object for specified page
-    const pager = getPager(entitiesGroupedFlattened.length, location.query.page && parseInt(location.query.page, 10));
+    const pager = getPager(
+      entitiesGroupedFlattened.length,
+      location.query.page && parseInt(location.query.page, 10),
+      location.query.items && parseInt(location.query.items, 10)
+    );
     // get new page of items from items array
     const pageItems = entitiesGroupedFlattened.slice(pager.startIndex, pager.endIndex + 1);
     const entitiesGroupedForPage = getGroupedEntitiesForPage(pageItems, entitiesGrouped);
