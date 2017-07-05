@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import CategoryListHeader from 'components/CategoryListHeader';
-import CategoryListItem from 'components/CategoryListItem';
+import CategoryListHeader from 'components/categoryList/CategoryListHeader';
+import CategoryListItem from 'components/categoryList/CategoryListItem';
 
 const Styled = styled.div``;
 const CategoryListBody = styled.div`

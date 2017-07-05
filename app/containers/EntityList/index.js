@@ -15,8 +15,8 @@ import { getEntitySortIteratee } from 'utils/sort';
 
 import Sidebar from 'components/basic/Sidebar';
 
-import EntityListSidebar from 'components/EntityListSidebar';
-import EntityListMain from 'components/EntityListMain';
+import EntityListSidebar from 'components/entityList/EntityListSidebar';
+import EntityListMain from 'components/entityList/EntityListMain';
 
 import { isUserManager } from 'containers/App/selectors';
 

@@ -5,7 +5,7 @@ import { palette } from 'styled-theme';
 
 import Component from 'components/basic/Component';
 import SupTitle from 'components/SupTitle';
-import TaxonomySidebarItem from 'components/TaxonomySidebarItem';
+import TaxonomySidebarItem from 'components/categoryList/TaxonomySidebarItem';
 
 import messages from './messages';
 

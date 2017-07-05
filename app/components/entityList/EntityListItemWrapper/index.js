@@ -6,7 +6,7 @@ import { palette } from 'styled-theme';
 import { map, forEach } from 'lodash/collection';
 // import { isEqual } from 'lodash/lang';
 
-import EntityListItem from 'components/EntityListItem';
+import EntityListItem from 'components/entityList/EntityListItem';
 
 import EntityListNestedList from './EntityListNestedList';
 import EntityListNestedReportList from './EntityListNestedReportList';

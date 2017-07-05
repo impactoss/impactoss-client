@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { isEqual } from 'lodash/lang';
 
-import EntityListItems from 'components/EntityListItems';
+import EntityListItems from 'components/entityList/EntityListItems';
 
 import messages from './messages';
 

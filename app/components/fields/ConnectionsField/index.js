@@ -7,7 +7,7 @@ import { without } from 'lodash/array';
 import { getEntitySortIteratee } from 'utils/sort';
 
 import appMessages from 'containers/App/messages';
-import EntityListItems from 'components/EntityListItems';
+import EntityListItems from 'components/entityList/EntityListItems';
 
 import FieldWrap from 'components/fields/FieldWrap';
 import LabelLarge from 'components/fields/LabelLarge';

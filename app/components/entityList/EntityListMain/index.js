@@ -18,11 +18,11 @@ import ContainerWithSidebar from 'components/basic/Container/ContainerWithSideba
 import Container from 'components/basic/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
-import EntityListGroups from 'components/EntityListGroups';
-import EntityListSearch from 'components/EntityListSearch';
-import EntityListOptions from 'components/EntityListOptions';
-import EntityListHeader from 'components/EntityListHeader';
-import EntityListFooter from 'components/EntityListFooter';
+import EntityListGroups from 'components/entityList/EntityListGroups';
+import EntityListSearch from 'components/entityList/EntityListSearch';
+import EntityListOptions from 'components/entityList/EntityListOptions';
+import EntityListHeader from 'components/entityList/EntityListHeader';
+import EntityListFooter from 'components/entityList/EntityListFooter';
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import { CONTENT_LIST } from 'containers/App/constants';

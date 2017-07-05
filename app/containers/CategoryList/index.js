@@ -33,8 +33,8 @@ import Scrollable from 'components/basic/Scrollable';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
-import CategoryListItems from 'components/CategoryListItems';
-import TaxonomySidebar from 'components/TaxonomySidebar';
+import CategoryListItems from 'components/categoryList/CategoryListItems';
+import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 
 // relative
 import messages from './messages';
