@@ -9,7 +9,7 @@ const Styled = styled.div`
 `;
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillUpdate() {
+  componentDidUpdate() {
     if (this.props.scrollContainer) {
       this.props.scrollContainer.update();
     }
