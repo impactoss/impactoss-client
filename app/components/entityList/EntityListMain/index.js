@@ -18,15 +18,15 @@ import ContainerWithSidebar from 'components/styled/Container/ContainerWithSideb
 import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
-import EntityListGroups from 'components/entityList/EntityListGroups';
-import EntityListSearch from 'components/entityList/EntityListSearch';
-import EntityListOptions from 'components/entityList/EntityListOptions';
-import EntityListHeader from 'components/entityList/EntityListHeader';
-import EntityListFooter from 'components/entityList/EntityListFooter';
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import { CONTENT_LIST } from 'containers/App/constants';
 
+import EntityListGroups from './EntityListGroups';
+import EntityListSearch from './EntityListSearch';
+import EntityListOptions from './EntityListOptions';
+import EntityListHeader from './EntityListHeader';
+import EntityListFooter from './EntityListFooter';
 import { makeCurrentFilters } from './filtersFactory';
 import { makeGroupOptions } from './group-options';
 import { getHeaderColumns } from './header';

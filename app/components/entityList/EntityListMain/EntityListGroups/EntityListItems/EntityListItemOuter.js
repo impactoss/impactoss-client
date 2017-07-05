@@ -4,7 +4,7 @@ import { getRenderedHeight } from 'react-rendered-size';
 import styled from 'styled-components';
 import { Watch } from 'scrollmonitor-react';
 
-import EntityListItemWrapper from 'components/entityList/EntityListItemWrapper';
+import EntityListItemWrapper from './EntityListItemWrapper';
 
 const Placeholder = styled.div`
   height: ${(props) => props.height}px;

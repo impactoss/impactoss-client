@@ -13,7 +13,7 @@ import { palette } from 'styled-theme';
 import { isEqual } from 'lodash/lang';
 
 import Button from 'components/buttons/Button';
-import EntityListGroupBy from 'components/entityList/EntityListGroupBy';
+import EntityListGroupBy from './EntityListGroupBy';
 
 import messages from './messages';
 
