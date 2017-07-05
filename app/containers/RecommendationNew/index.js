@@ -4,14 +4,15 @@
 *
 */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
 import { Map, List } from 'immutable';
 
 import {
-  renderActionControl,
+  renderMeasureControl,
   renderTaxonomyControl,
   validateRequired,
 } from 'utils/forms';
@@ -102,7 +103,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       ],
     },
   ]);
-  getBodyMainFields = (actions) => ([
+  getBodyMainFields = (measures) => ([
     {
       fields: [
         {
@@ -125,7 +126,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderActionControl(actions),
+        renderMeasureControl(measures),
       ],
     },
   ]);
@@ -138,18 +139,18 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     },
   ]);
 
-  getFields = (taxonomies, actions) => ({ // isManager, taxonomies,
+  getFields = (taxonomies, measures) => ({ // isManager, taxonomies,
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(),
     },
     body: {
-      main: this.getBodyMainFields(actions),
+      main: this.getBodyMainFields(measures),
       aside: this.getBodyAsideFields(taxonomies),
     },
   })
   render() {
-    const { dataReady, viewDomain, taxonomies, actions } = this.props;
+    const { dataReady, viewDomain, taxonomies, measures } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -197,7 +198,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(taxonomies, actions)}
+              fields={this.getFields(taxonomies, measures)}
             />
           }
         </Content>
@@ -215,11 +216,11 @@ RecommendationNew.propTypes = {
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
-  actions: PropTypes.object,
+  measures: PropTypes.object,
 };
 
 RecommendationNew.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -243,7 +244,7 @@ const mapStateToProps = (state) => ({
       },
     },
   ),
-  actions: getEntities(
+  measures: getEntities(
     state, {
       path: 'measures',
     },
@@ -278,11 +279,11 @@ function mapDispatchToProps(dispatch) {
         );
       }
 
-      // actions
-      if (formData.get('associatedActions')) {
+      // measures
+      if (formData.get('associatedMeasures')) {
         saveData = saveData.set('recommendationMeasures', Map({
           delete: List(),
-          create: getCheckedValuesFromOptions(formData.get('associatedActions'))
+          create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
           .map((id) => Map({
             measure_id: id,
           })),

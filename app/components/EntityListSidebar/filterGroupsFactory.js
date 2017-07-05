@@ -7,7 +7,8 @@ export const makeFilterGroups = (
   connections,
   connectedTaxonomies,
   activeFilterOption,
-  messages
+  messages,
+  formatLabel
 ) => {
   const filterGroups = {};
 
@@ -62,8 +63,8 @@ export const makeFilterGroups = (
         ...options,
         [option.path]: {
           id: option.path, // filterOptionId
-          label: option.label,
-          icon: option.path === 'measures' ? 'actions' : option.path,
+          label: formatLabel(option.label),
+          icon: option.path,
           active: !!activeFilterOption && activeFilterOption.optionId === option.path,
         },
       }), {}),
@@ -81,7 +82,7 @@ export const makeFilterGroups = (
         ...options,
         [option.attribute]: {
           id: option.attribute, // filterOptionId
-          label: option.label,
+          label: formatLabel(option.label),
           active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
         },
       }), {}),

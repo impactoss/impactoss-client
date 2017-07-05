@@ -4,7 +4,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
@@ -189,7 +190,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="measures"
             buttons={
               dataReady ? [{
                 type: 'cancel',
@@ -214,7 +215,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           }
           {dataReady &&
             <EntityForm
-              model="actionNew.form.data"
+              model="measureNew.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
@@ -243,7 +244,7 @@ ActionNew.propTypes = {
 };
 
 ActionNew.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

@@ -4,18 +4,22 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { forEach } from 'lodash/collection';
 
-import EntityList from 'containers/EntityList';
-import { PUBLISH_STATUSES } from 'containers/App/constants';
-
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
-
 import appMessages from 'containers/App/messages';
+
+import EntityList from 'containers/EntityList';
+import { FILTERS, EDITS } from './constants';
+import { selectConnections, selectSdgTargets, selectTaxonomies, selectConnectedTaxonomies } from './selectors';
+
+
 import messages from './messages';
 
 export class SdgTargetList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -116,247 +120,6 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
       },
     ];
 
-    // define selects for getEntities
-    const selects = {
-      entities: {
-        path: 'sdgtargets',
-        extensions: [
-          {
-            path: 'sdgtarget_categories',
-            key: 'sdgtarget_id',
-            reverse: true,
-            as: 'taxonomies',
-          },
-          {
-            path: 'sdgtarget_indicators',
-            key: 'sdgtarget_id',
-            reverse: true,
-            as: 'indicators',
-            connected: {
-              path: 'indicators',
-              key: 'indicator_id',
-              forward: true,
-            },
-            extend: {
-              path: 'indicators',
-              key: 'indicator_id',
-              as: 'indicator',
-              type: 'single',
-              extend: expandNo ? [
-                {
-                  path: 'progress_reports',
-                  key: 'indicator_id',
-                  reverse: true,
-                  as: 'reports',
-                },
-                {
-                  path: 'due_dates',
-                  key: 'indicator_id',
-                  reverse: true,
-                  as: 'dates',
-                  without: {
-                    path: 'progress_reports',
-                    key: 'due_date_id',
-                  },
-                },
-                {
-                  path: 'sdgtarget_indicators',
-                  key: 'indicator_id',
-                  reverse: true,
-                  as: 'sdgtargets',
-                  extend: {
-                    path: 'sdgtargets',
-                    key: 'sdgtarget_id',
-                    as: 'sdgtarget',
-                    type: 'single',
-                  },
-                },
-              ] : [
-                {
-                  path: 'progress_reports',
-                  key: 'indicator_id',
-                  reverse: true,
-                  as: 'reports',
-                },
-                {
-                  path: 'due_dates',
-                  key: 'indicator_id',
-                  reverse: true,
-                  as: 'dates',
-                  without: {
-                    path: 'progress_reports',
-                    key: 'due_date_id',
-                  },
-                },
-              ],
-            },
-          },
-          {
-            path: 'sdgtarget_measures',
-            key: 'sdgtarget_id',
-            reverse: true,
-            as: 'measures',
-            connected: {
-              path: 'measures',
-              key: 'measure_id',
-              forward: true,
-            },
-          },
-        ],
-      },
-      connections: {
-        options: ['indicators', 'measures'],
-      },
-      connectedTaxonomies: { // filter by each category
-        options: [
-          {
-            out: 'js',
-            path: 'taxonomies',
-            where: {
-              tags_measures: true,
-            },
-            extend: {
-              path: 'categories',
-              key: 'taxonomy_id',
-              reverse: true,
-              extend: {
-                path: 'measure_categories',
-                key: 'category_id',
-                reverse: true,
-                as: 'measures',
-              },
-            },
-          },
-        ],
-      },
-      taxonomies: { // filter by each category
-        out: 'js',
-        path: 'taxonomies',
-        where: {
-          tags_sdgtargets: true,
-        },
-        extend: {
-          path: 'categories',
-          key: 'taxonomy_id',
-          reverse: true,
-        },
-      },
-    };
-
-    // specify the filter and query options
-    const filters = {
-      search: ['reference', 'title'],
-      attributes: {  // filter by attribute value
-        options: [
-          {
-            filter: false,
-            label: this.context.intl.formatMessage(appMessages.attributes.draft),
-            attribute: 'draft',
-            options: PUBLISH_STATUSES,
-          },
-        ],
-      },
-      taxonomies: { // filter by each category
-        query: 'cat',
-        filter: true,
-        connected: {
-          path: 'sdgtarget_categories',
-          key: 'sdgtarget_id',
-          whereKey: 'category_id',
-        },
-      },
-      connections: { // filter by associated entity
-        options: [
-          {
-            label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
-            path: 'indicators', // filter by recommendation connection
-            query: 'indicators',
-            key: 'indicator_id',
-            filter: true,
-            expandable: true,
-            connected: {
-              path: 'sdgtarget_indicators',
-              key: 'sdgtarget_id',
-              whereKey: 'indicator_id',
-            },
-          },
-          {
-            filter: true,
-            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-            path: 'measures', // filter by recommendation connection
-            query: 'actions',
-            key: 'measure_id',
-            connected: {
-              path: 'sdgtarget_measures',
-              key: 'sdgtarget_id',
-              whereKey: 'measure_id',
-            },
-          },
-        ],
-      },
-      connectedTaxonomies: { // filter by each category
-        query: 'catx',
-        filter: true,
-        connections: [
-          {
-            path: 'measures', // filter by recommendation connection
-            title: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-            key: 'measure_id',
-            connected: {
-              path: 'measure_indicators',
-              key: 'indicator_id',
-              connected: {
-                path: 'measure_categories',
-                key: 'measure_id',
-                attribute: 'measure_id',
-                whereKey: 'category_id',
-              },
-            },
-          },
-        ],
-      },
-    };
-
-    const edits = {
-      taxonomies: { // edit category
-        connectPath: 'sdgtarget_categories',
-        key: 'category_id',
-        ownKey: 'sdgtarget_id',
-        filter: true,
-      },
-      connections: { // filter by associated entity
-        options: [
-          {
-            filter: true,
-            label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
-            path: 'indicators',
-            connectPath: 'sdgtarget_indicators',
-            key: 'indicator_id',
-            ownKey: 'sdgtarget_id',
-          },
-          {
-            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-            path: 'measures',
-            connectPath: 'sdgtarget_measures', // filter by recommendation connection
-            key: 'measure_id',
-            ownKey: 'sdgtarget_id',
-            filter: true,
-
-          },
-        ],
-      },
-      attributes: {  // edit attribute value
-        options: [
-          {
-            label: this.context.intl.formatMessage(appMessages.attributes.draft),
-            attribute: 'draft',
-            options: PUBLISH_STATUSES,
-            filter: false,
-          },
-        ],
-      },
-    };
-
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'sdgtargets',
@@ -381,9 +144,13 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
         />
         <EntityList
           location={this.props.location}
-          selects={selects}
-          filters={filters}
-          edits={edits}
+          entities={this.props.entities}
+          taxonomies={this.props.taxonomies}
+          connections={this.props.connections}
+          connectedTaxonomies={this.props.connectedTaxonomies}
+          path="sdgtargets"
+          filters={FILTERS}
+          edits={EDITS}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
@@ -406,10 +173,14 @@ SdgTargetList.propTypes = {
   handleImport: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
+  entities: PropTypes.object.isRequired,
+  taxonomies: PropTypes.object,
+  connections: PropTypes.object,
+  connectedTaxonomies: PropTypes.object,
 };
 
 SdgTargetList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -428,6 +199,10 @@ const mapStateToProps = (state) => ({
     'due_dates',
     'progress_reports',
   ] }),
+  entities: selectSdgTargets(state),
+  taxonomies: selectTaxonomies(state),
+  connections: selectConnections(state),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

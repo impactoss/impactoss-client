@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Control, Form, Errors } from 'react-redux-form/immutable';
 import styled from 'styled-components';
@@ -80,7 +81,7 @@ const MultiselectActiveOptionRemove = styled(Button)`
   display: block;
   padding: 12px 16px 0 0;
   &:hover {
-    color: ${palette('primary', 1)}
+    color: ${palette('primary', 1)};
   }
 `;
 const MultiSelectDropdownIcon = styled.div`

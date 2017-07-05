@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -117,13 +118,13 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
 }
 
 Header.propTypes = {
-  isSignedIn: React.PropTypes.bool,
-  userId: React.PropTypes.string,
-  currentPath: React.PropTypes.string,
-  pages: React.PropTypes.array,
-  navItems: React.PropTypes.array,
-  onPageLink: React.PropTypes.func.isRequired,
-  isHome: React.PropTypes.bool, // not shown on home page
+  isSignedIn: PropTypes.bool,
+  userId: PropTypes.string,
+  currentPath: PropTypes.string,
+  pages: PropTypes.array,
+  navItems: PropTypes.array,
+  onPageLink: PropTypes.func.isRequired,
+  isHome: PropTypes.bool, // not shown on home page
 };
 
 Header.defaultProps = {

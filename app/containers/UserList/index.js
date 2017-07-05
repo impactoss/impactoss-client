@@ -4,16 +4,19 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
-import EntityList from 'containers/EntityList';
-
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
-
 import appMessages from 'containers/App/messages';
+
+import EntityList from 'containers/EntityList';
+
+import { FILTERS, EDITS } from './constants';
+import { selectConnections, selectUsers, selectTaxonomies } from './selectors';
 import messages from './messages';
 
 export class UserList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -32,79 +35,6 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
   render() {
     const { dataReady } = this.props;
 
-    // define selects for getEntities
-    const selects = {
-      entities: {
-        path: 'users',
-        extensions: [
-          {
-            path: 'user_categories',
-            key: 'user_id',
-            reverse: true,
-            as: 'taxonomies',
-          },
-          {
-            path: 'user_roles',
-            key: 'user_id',
-            reverse: true,
-            as: 'roles',
-          },
-        ],
-      },
-      connections: {
-        options: ['roles'],
-      },
-      taxonomies: { // filter by each category
-        out: 'js',
-        path: 'taxonomies',
-        where: {
-          tags_users: true,
-        },
-        extend: {
-          path: 'categories',
-          key: 'taxonomy_id',
-          reverse: true,
-        },
-      },
-    };
-
-    // specify the filter and query  options
-    const filters = {
-      search: ['name'],
-      taxonomies: { // filter by each category
-        query: 'cat',
-        filter: true,
-        connected: {
-          path: 'user_categories',
-          key: 'user_id',
-          whereKey: 'category_id',
-        },
-      },
-      connections: { // filter by associated entity
-        options: [
-          {
-            label: this.context.intl.formatMessage(appMessages.entities.roles.plural),
-            path: 'roles', // filter by user connection
-            query: 'roles',
-            key: 'role_id',
-            filter: false,
-            connected: {
-              path: 'user_roles',
-              key: 'user_id',
-              whereKey: 'role_id',
-            },
-          },
-        ],
-      },
-    };
-    const edits = {
-      taxonomies: { // edit category
-        connectPath: 'user_categories',
-        key: 'category_id',
-        ownKey: 'user_id',
-        filter: true,
-      },
-    };
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'users',
@@ -120,9 +50,12 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
         />
         <EntityList
           location={this.props.location}
-          selects={selects}
-          filters={filters}
-          edits={edits}
+          entities={this.props.entities}
+          taxonomies={this.props.taxonomies}
+          connections={this.props.connections}
+          path="users"
+          filters={FILTERS}
+          edits={EDITS}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
@@ -140,10 +73,13 @@ UserList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
+  entities: PropTypes.object.isRequired,
+  taxonomies: PropTypes.object,
+  connections: PropTypes.object,
 };
 
 UserList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -155,6 +91,9 @@ const mapStateToProps = (state) => ({
     'categories',
     'taxonomies',
   ] }),
+  entities: selectUsers(state),
+  taxonomies: selectTaxonomies(state),
+  connections: selectConnections(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

@@ -280,7 +280,7 @@ export function* saveEntitySaga({ data }) {
       });
     }
 
-    // update recommendation-action connections
+    // update recommendation-measure connections
     if (data.entity.recommendationMeasures) {
       yield call(updateConnectionsSaga, {
         data: {
@@ -290,7 +290,7 @@ export function* saveEntitySaga({ data }) {
       });
     }
 
-    // update action-indicatos connections
+    // update measure-indicatos connections
     if (data.entity.measureIndicators) {
       yield call(updateConnectionsSaga, {
         data: {
@@ -300,7 +300,7 @@ export function* saveEntitySaga({ data }) {
       });
     }
 
-    // update action-category connections
+    // update measure-category connections
     if (data.entity.measureCategories) {
       yield call(updateConnectionsSaga, {
         data: {
@@ -320,17 +320,17 @@ export function* saveEntitySaga({ data }) {
       });
     }
 
-    // update sdgtarget-action connections
-    if (data.entity.sdgtargetActions) {
+    // update sdgtarget-measure connections
+    if (data.entity.sdgtargetMeasures) {
       yield call(updateConnectionsSaga, {
         data: {
           path: 'sdgtarget_measures',
-          updates: data.entity.sdgtargetActions,
+          updates: data.entity.sdgtargetMeasures,
         },
       });
     }
 
-    // update action-category connections
+    // update measure-category connections
     if (data.entity.sdgtargetCategories) {
       yield call(updateConnectionsSaga, {
         data: {
@@ -408,11 +408,11 @@ export function* newEntitySaga({ data }) {
     }
 
     // update sdgtarget-indicator connections
-    if (data.entity.sdgtargetActions) {
+    if (data.entity.sdgtargetMeasures) {
       yield call(createConnectionsSaga, {
         entityId: entityCreated.data.id,
         path: 'sdgtarget_measures',
-        updates: data.entity.sdgtargetActions,
+        updates: data.entity.sdgtargetMeasures,
         keyPair: ['measure_id', 'sdgtarget_id'],
       });
     }

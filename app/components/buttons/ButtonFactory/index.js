@@ -1,5 +1,5 @@
-import React, { PropTypes } from 'react';
-
+import React from 'react';
+import PropTypes from 'prop-types';
 import Icon from 'components/Icon';
 import appMessages from 'containers/App/messages';
 
@@ -76,7 +76,7 @@ ButtonFactory.propTypes = {
   button: PropTypes.object.isRequired,
 };
 ButtonFactory.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default ButtonFactory;

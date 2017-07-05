@@ -4,7 +4,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
@@ -15,7 +16,7 @@ import { Map, List, fromJS } from 'immutable';
 import {
   userOptions,
   entityOptions,
-  renderActionControl,
+  renderMeasureControl,
   renderSdgTargetControl,
   renderUserControl,
   validateRequired,
@@ -76,14 +77,14 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { actions, indicator, users, sdgtargets } = props;
+    const { measures, indicator, users, sdgtargets } = props;
     indicator.attributes.frequency_months = indicator.attributes.frequency_months || 1;
 
     return indicator
     ? Map({
       id: indicator.id,
       attributes: fromJS(indicator.attributes),
-      associatedActions: entityOptions(actions, true),
+      associatedMeasures: entityOptions(measures, true),
       associatedSdgTargets: entityOptions(sdgtargets, true),
       associatedUser: userOptions(users, indicator.attributes.manager_id),
       // TODO allow single value for singleSelect
@@ -147,7 +148,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (actions, sdgtargets) => ([
+  getBodyMainFields = (measures, sdgtargets) => ([
     {
       fields: [
         {
@@ -163,7 +164,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderActionControl(actions),
+        renderMeasureControl(measures),
         renderSdgTargetControl(sdgtargets),
       ],
     },
@@ -224,19 +225,19 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getFields = (entity, actions, sdgtargets, users) => ({ // isManager, taxonomies,
+  getFields = (entity, measures, sdgtargets, users) => ({ // isManager, taxonomies,
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(entity),
     },
     body: {
-      main: this.getBodyMainFields(actions, sdgtargets),
+      main: this.getBodyMainFields(measures, sdgtargets),
       aside: this.getBodyAsideFields(entity, users),
     },
   })
 
   render() {
-    const { indicator, dataReady, viewDomain, actions, users, sdgtargets } = this.props;
+    const { indicator, dataReady, viewDomain, measures, users, sdgtargets } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -259,7 +260,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(viewDomain.form.data, actions, sdgtargets),
+                onClick: () => this.props.handleSubmit(viewDomain.form.data, measures, sdgtargets),
               }] : null
             }
           />
@@ -281,10 +282,10 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             <EntityForm
               model="indicatorEdit.form.data"
               formData={viewDomain.form.data}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, actions, sdgtargets)}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, measures, sdgtargets)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(indicator, actions, sdgtargets, users)}
+              fields={this.getFields(indicator, measures, sdgtargets, users)}
             />
           }
         </Content>
@@ -304,13 +305,13 @@ IndicatorEdit.propTypes = {
   indicator: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
-  actions: PropTypes.object,
+  measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   users: PropTypes.object,
 };
 
 IndicatorEdit.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -343,7 +344,7 @@ const mapStateToProps = (state, props) => ({
   ),
 
   // all recommendations, listing connection if any
-  actions: getEntities(
+  measures: getEntities(
     state,
     {
       path: 'measures',
@@ -409,14 +410,14 @@ function mapDispatchToProps(dispatch, props) {
       // console.log('populateForm', formData)
       dispatch(formActions.load(model, formData));
     },
-    handleSubmit: (formData, actions, sdgtargets) => {
+    handleSubmit: (formData, measures, sdgtargets) => {
       let saveData = formData
         .set(
           'measureIndicators',
           getConnectionUpdatesFromFormData({
             formData,
-            connections: actions,
-            connectionAttribute: 'associatedActions',
+            connections: measures,
+            connectionAttribute: 'associatedMeasures',
             createConnectionKey: 'measure_id',
             createKey: 'indicator_id',
           })

@@ -4,7 +4,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -58,7 +59,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
       case 'connectedTaxonomies':
         return (<Dot palette="taxonomies" pIndex={parseInt(optionId, 10)} />);
       case 'connections':
-        return (<Dot palette={optionId === 'measures' ? 'actions' : optionId} pIndex={0} />);
+        return (<Dot palette={optionId} pIndex={0} />);
       default:
         return null;
     }

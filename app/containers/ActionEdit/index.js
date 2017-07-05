@@ -4,7 +4,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
@@ -57,8 +58,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.action) {
-      this.props.populateForm('actionEdit.form.data', this.getInitialFormData());
+    if (this.props.dataReady && this.props.measure) {
+      this.props.populateForm('measureEdit.form.data', this.getInitialFormData());
     }
   }
 
@@ -68,20 +69,20 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.action) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.measure) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('actionEdit.form.data', this.getInitialFormData(nextProps));
+      this.props.populateForm('measureEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, recommendations, indicators, action, sdgtargets } = props;
+    const { taxonomies, recommendations, indicators, measure, sdgtargets } = props;
 
-    return action
+    return measure
     ? Map({
-      id: action.id,
-      attributes: fromJS(action.attributes),
+      id: measure.id,
+      attributes: fromJS(measure.attributes),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRecommendations: entityOptions(recommendations, true),
       associatedIndicators: entityOptions(indicators, true),
@@ -224,7 +225,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   })
 
   render() {
-    const { action, dataReady, viewDomain, recommendations, indicators, taxonomies, sdgtargets } = this.props;
+    const { measure, dataReady, viewDomain, recommendations, indicators, taxonomies, sdgtargets } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -240,9 +241,9 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="measures"
             buttons={
-              action && dataReady ? [{
+              measure && dataReady ? [{
                 type: 'cancel',
                 onClick: this.props.handleCancel,
               },
@@ -264,17 +265,17 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           {saveError &&
             <p>{saveError}</p>
           }
-          { !action && !dataReady &&
+          { !measure && !dataReady &&
             <Loading />
           }
-          { !action && dataReady && !saveError &&
+          { !measure && dataReady && !saveError &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {action && dataReady &&
+          {measure && dataReady &&
             <EntityForm
-              model="actionEdit.form.data"
+              model="measureEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
@@ -285,7 +286,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(action, taxonomies, recommendations, indicators, sdgtargets)}
+              fields={this.getFields(measure, taxonomies, recommendations, indicators, sdgtargets)}
             />
           }
         </Content>
@@ -302,7 +303,7 @@ ActionEdit.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
-  action: PropTypes.object,
+  measure: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
@@ -312,7 +313,7 @@ ActionEdit.propTypes = {
 };
 
 ActionEdit.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -329,7 +330,7 @@ const mapStateToProps = (state, props) => ({
     'measure_indicators',
     'sdgtargets',
   ] }),
-  action: getEntity(
+  measure: getEntity(
     state,
     {
       id: props.params.id,

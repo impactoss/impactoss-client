@@ -56,11 +56,11 @@ export const taxonomyOptions = (taxonomies) => taxonomies
     values.set(tax.get('id'), entityOptions(tax.get('categories'))), Map())
   : Map();
 
-export const renderActionControl = (entities) => entities
+export const renderMeasureControl = (entities) => entities
 ? {
   id: 'actions',
-  model: '.associatedActions',
-  dataPath: ['associatedActions'],
+  model: '.associatedMeasures',
+  dataPath: ['associatedMeasures'],
   label: 'Actions',
   controlType: 'multiselect',
   options: entityOptions(entities),

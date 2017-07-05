@@ -3,7 +3,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
@@ -100,11 +101,11 @@ const TopActions = styled.div`
   padding-top: 2em;
 `;
 const Title = styled.h1`
-  color:${palette('headerBrand', 0)}
+  color:${palette('headerBrand', 0)};
   font-family: ${(props) => props.theme.fonts.headerBrandMain};
   text-transform: uppercase;
   margin-bottom:0;
-  font-size: 2.8em
+  font-size: 2.8em;
 `;
 
 const Claim = styled.p`
@@ -207,7 +208,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             <ButtonIconAboveWrap>
               <ButtonIconAbove onClick={() => onPageLink('/actions')}>
                 <div>
-                  <Icon name="actions" size={'4em'} />
+                  <Icon name="s" size={'4em'} />
                 </div>
                 <div>
                   <FormattedMessage {...messages.exploreActionsLink} />

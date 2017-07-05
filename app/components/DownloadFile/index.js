@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Icon from 'components/Icon';
@@ -22,7 +23,7 @@ const DownloadFile = ({ url }) => {
 };
 
 DownloadFile.propTypes = {
-  url: React.PropTypes.string,
+  url: PropTypes.string,
 };
 
 export default DownloadFile;

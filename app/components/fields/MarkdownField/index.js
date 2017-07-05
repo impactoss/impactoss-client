@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
 
 import appMessages from 'containers/App/messages';
@@ -24,7 +25,7 @@ MarkdownField.propTypes = {
   field: PropTypes.object.isRequired,
 };
 MarkdownField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default MarkdownField;

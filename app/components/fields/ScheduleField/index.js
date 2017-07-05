@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
@@ -71,7 +72,7 @@ ScheduleField.propTypes = {
   field: PropTypes.object.isRequired,
 };
 ScheduleField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default ScheduleField;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -110,12 +111,12 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
 }
 
 Footer.propTypes = {
-  pages: React.PropTypes.array,
-  onPageLink: React.PropTypes.func.isRequired,
+  pages: PropTypes.array,
+  onPageLink: PropTypes.func.isRequired,
 };
 
 Footer.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default Footer;

@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Map, fromJS } from 'immutable';
 import { connect } from 'react-redux';
 import { isEqual } from 'lodash/lang';
@@ -54,7 +55,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
             options={fromJS(formOptions.options).toList()}
             multiple={formOptions.multiple}
             required={formOptions.required}
-            filter={formOptions.filter}
+            search={formOptions.search}
             onCancel={onCancel}
             buttons={buttons}
           />

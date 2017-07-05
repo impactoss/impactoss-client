@@ -4,7 +4,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
@@ -55,14 +56,14 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="measures"
             buttons={[{
               type: 'cancel',
               onClick: this.props.handleCancel,
             }]}
           />
           <ImportEntitiesForm
-            model="actionImport.form.data"
+            model="measureImport.form.data"
             formData={viewDomain.form.data}
             fieldModel="import"
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
@@ -98,7 +99,7 @@ ActionImport.propTypes = {
 };
 
 ActionImport.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

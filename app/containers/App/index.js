@@ -4,9 +4,10 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-// import Perf from 'react-addons-perf';
+import Perf from 'react-addons-perf';
 
 import styled from 'styled-components';
 import Header from 'components/Header';
@@ -92,7 +93,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   render() {
-    // window.Perf = Perf;
+    window.Perf = Perf;
     const { pages, onPageLink, isUserSignedIn, isManager, location } = this.props;
     return (
       <div>

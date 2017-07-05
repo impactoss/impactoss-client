@@ -4,7 +4,7 @@
 *
 */
 import React from 'react';
-
+import PropTypes from 'prop-types';
 import asArray from 'utils/as-array';
 
 import FieldGroup from 'components/fields/FieldGroup';
@@ -60,9 +60,9 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
 }
 
 EntityView.propTypes = {
-  fields: React.PropTypes.object,
+  fields: PropTypes.object,
 };
 EntityView.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 export default EntityView;

@@ -4,7 +4,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
@@ -15,7 +16,7 @@ import { Map, fromJS } from 'immutable';
 import {
   taxonomyOptions,
   entityOptions,
-  renderActionControl,
+  renderMeasureControl,
   renderTaxonomyControl,
   validateRequired,
 } from 'utils/forms';
@@ -73,13 +74,13 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, actions, recommendation } = props;
+    const { taxonomies, measures, recommendation } = props;
     return recommendation
     ? Map({
       id: recommendation.id,
       attributes: fromJS(recommendation.attributes),
       associatedTaxonomies: taxonomyOptions(taxonomies),
-      associatedActions: entityOptions(actions, true),
+      associatedMeasures: entityOptions(measures, true),
     })
     : Map();
   };
@@ -143,7 +144,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       ],
     },
   ]);
-  getBodyMainFields = (actions) => ([
+  getBodyMainFields = (measures) => ([
     {
       fields: [
         {
@@ -166,7 +167,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderActionControl(actions),
+        renderMeasureControl(measures),
       ],
     },
   ]);
@@ -179,18 +180,18 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     },
   ]);
 
-  getFields = (entity, taxonomies, actions) => ({ // isManager, taxonomies,
+  getFields = (entity, taxonomies, measures) => ({ // isManager, taxonomies,
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(entity),
     },
     body: {
-      main: this.getBodyMainFields(actions),
+      main: this.getBodyMainFields(measures),
       aside: this.getBodyAsideFields(entity, taxonomies),
     },
   })
   render() {
-    const { recommendation, dataReady, viewDomain, actions, taxonomies } = this.props;
+    const { recommendation, dataReady, viewDomain, measures, taxonomies } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -217,7 +218,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                 onClick: () => this.props.handleSubmit(
                   viewDomain.form.data,
                   taxonomies,
-                  actions,
+                  measures,
                 ),
               }] : null
             }
@@ -243,11 +244,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 taxonomies,
-                actions
+                measures
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(recommendation, taxonomies, actions)}
+              fields={this.getFields(recommendation, taxonomies, measures)}
             />
           }
         </Content>
@@ -268,11 +269,11 @@ RecommendationEdit.propTypes = {
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
-  actions: PropTypes.object,
+  measures: PropTypes.object,
 };
 
 RecommendationEdit.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -324,8 +325,8 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
-  // // all actions, listing connection if any
-  actions: getEntities(
+  // // all measures, listing connection if any
+  measures: getEntities(
     state, {
       path: 'measures',
       extend: {
@@ -358,7 +359,7 @@ function mapDispatchToProps(dispatch, props) {
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
-    handleSubmit: (formData, taxonomies, actions) => {
+    handleSubmit: (formData, taxonomies, measures) => {
       const saveData = formData
         .set(
           'recommendationCategories',
@@ -372,8 +373,8 @@ function mapDispatchToProps(dispatch, props) {
           'recommendationMeasures',
           getConnectionUpdatesFromFormData({
             formData,
-            connections: actions,
-            connectionAttribute: 'associatedActions',
+            connections: measures,
+            connectionAttribute: 'associatedMeasures',
             createConnectionKey: 'measure_id',
             createKey: 'recommendation_id',
           })

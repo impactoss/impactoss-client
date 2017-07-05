@@ -4,7 +4,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
@@ -15,7 +16,7 @@ import { Map, fromJS } from 'immutable';
 import {
   taxonomyOptions,
   entityOptions,
-  renderActionControl,
+  renderMeasureControl,
   renderIndicatorControl,
   renderTaxonomyControl,
   validateRequired,
@@ -74,7 +75,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, indicators, sdgtarget, actions } = props;
+    const { taxonomies, indicators, sdgtarget, measures } = props;
 
     return sdgtarget
     ? Map({
@@ -82,7 +83,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
       attributes: fromJS(sdgtarget.attributes),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedIndicators: entityOptions(indicators, true),
-      associatedActions: entityOptions(actions, true),
+      associatedMeasures: entityOptions(measures, true),
     })
     : Map();
   }
@@ -148,12 +149,12 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (indicators, actions) => ([
+  getBodyMainFields = (indicators, measures) => ([
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderActionControl(actions),
+        renderMeasureControl(measures),
         renderIndicatorControl(indicators),
       ],
     },
@@ -167,19 +168,19 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getFields = (entity, taxonomies, indicators, actions) => ({ // isManager, taxonomies,
+  getFields = (entity, taxonomies, indicators, measures) => ({ // isManager, taxonomies,
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(entity),
     },
     body: {
-      main: this.getBodyMainFields(indicators, actions),
+      main: this.getBodyMainFields(indicators, measures),
       aside: this.getBodyAsideFields(entity, taxonomies),
     },
   })
 
   render() {
-    const { sdgtarget, dataReady, viewDomain, indicators, taxonomies, actions } = this.props;
+    const { sdgtarget, dataReady, viewDomain, indicators, taxonomies, measures } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -207,7 +208,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
                   viewDomain.form.data,
                   taxonomies,
                   indicators,
-                  actions
+                  measures
                 ),
               }] : null
             }
@@ -234,11 +235,11 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
                 formData,
                 taxonomies,
                 indicators,
-                actions
+                measures
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(sdgtarget, taxonomies, indicators, actions)}
+              fields={this.getFields(sdgtarget, taxonomies, indicators, measures)}
             />
           }
         </Content>
@@ -260,11 +261,11 @@ SdgTargetEdit.propTypes = {
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   indicators: PropTypes.object,
-  actions: PropTypes.object,
+  measures: PropTypes.object,
 };
 
 SdgTargetEdit.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -333,7 +334,7 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
-  actions: getEntities(
+  measures: getEntities(
     state,
     {
       path: 'measures',
@@ -370,7 +371,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.load(model, formData));
     },
 
-    handleSubmit: (formData, taxonomies, indicators, actions) => {
+    handleSubmit: (formData, taxonomies, indicators, measures) => {
       const saveData = formData
         .set(
           'sdgtargetCategories',
@@ -381,11 +382,11 @@ function mapDispatchToProps(dispatch, props) {
           })
         )
         .set(
-          'sdgtargetActions',
+          'sdgtargetMeasures',
           getConnectionUpdatesFromFormData({
             formData,
-            connections: actions,
-            connectionAttribute: 'associatedActions',
+            connections: measures,
+            connectionAttribute: 'associatedMeasures',
             createConnectionKey: 'measure_id',
             createKey: 'sdgtarget_id',
           })

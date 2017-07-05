@@ -5,7 +5,8 @@ export const makeEditGroups = (
   taxonomies,
   connections,
   activeEditOption,
-  messages
+  messages,
+  formatLabel
 ) => {
   const editGroups = {};
 
@@ -43,11 +44,11 @@ export const makeEditGroups = (
         ...options,
         [option.path]: {
           id: option.path, // filterOptionId
-          label: option.label,
+          label: formatLabel(option.label),
           path: option.connectPath,
           key: option.key,
           ownKey: option.ownKey,
-          icon: option.path === 'measures' ? 'actions' : option.path,
+          icon: option.path,
           active: !!activeEditOption && activeEditOption.optionId === option.path,
         },
       }), {}),
@@ -65,7 +66,7 @@ export const makeEditGroups = (
         ...options,
         [option.attribute]: {
           id: option.attribute, // filterOptionId
-          label: option.label,
+          label: formatLabel(option.label),
           active: !!activeEditOption && activeEditOption.optionId === option.attribute,
         },
       }), {}),

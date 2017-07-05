@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { orderBy } from 'lodash/collection';
 import { without } from 'lodash/array';
@@ -84,7 +85,7 @@ ConnectionsField.propTypes = {
   field: PropTypes.object.isRequired,
 };
 ConnectionsField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default ConnectionsField;

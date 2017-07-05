@@ -17,10 +17,12 @@ import { createSelector } from 'reselect';
 import createCachedSelector from 're-reselect';
 import { reduce } from 'lodash/collection';
 
-import { USER_ROLES } from 'containers/App/constants';
-
 import asArray from 'utils/as-array';
-import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
+import { regExMultipleWords } from 'utils/string';
+
+import { USER_ROLES } from 'containers/App/constants';
+import { prepareEntitySearchTarget } from 'containers/App/selector-utils';
+
 
 // high level state selects
 const getRoute = (state) => state.get('route');
@@ -49,18 +51,6 @@ const makeSelectLocationState = () => {
     return prevRoutingStateJS;
   };
 };
-
-
-const selectLocation = createSelector(
-  getRoute,
-  (routeState) => {
-    try {
-      return routeState.get('locationBeforeTransitions');
-    } catch (error) {
-      return null;
-    }
-  }
-);
 
 const makeSelectPathnameOnAuthChange = () => createSelector(
   getRoute,
@@ -96,11 +86,12 @@ const isReady = (state, { path }) =>
     true
   );
 
-const getEntitiesPure = createSelector(
-  getGlobalEntities,
-  (state, { path }) => path,
-  (entities, path) => entities.get(path)
-);
+// OLD inperformant way of selecting and querying entities
+
+const getEntitiesPure = createCachedSelector(
+  (state, props) => state.getIn(['global', 'entities', props.path]),
+  (entities) => entities
+)((state, { path }) => path);
 
 // filter entities by attribute or id, also allows multiple conditions
 // eg where: {draft: false} or where: {id: 1, draft: false}
@@ -226,20 +217,11 @@ const getEntitiesIfConnected = createSelector(
   : entities  // !connected
 );
 
-// prep searchtarget, incl id
-const prepareEntitySearchTarget = (entity, fields) =>
-  reduce(
-    fields,
-    (target, field) => `${target} ${cleanupSearchTarget(entity.getIn(['attributes', field]))}`,
-    entity.get('id')
-  );
-
 // check if entities have connections with other entities via associative table
 const getEntitiesSearch = createSelector(
-  (state) => state,
   getEntitiesIfConnected,
   (state, { search }) => search,
-  (state, entities, search) => {
+  (entities, search) => {
     if (search) {
       try {
         const regex = new RegExp(regExMultipleWords(search.query), 'i');
@@ -420,6 +402,103 @@ const getUser = createSelector(
   }
 );
 
+// NEW performant way of selecting and querying entities
+
+const selectLocation = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.get('locationBeforeTransitions');
+    } catch (error) {
+      return null;
+    }
+  }
+);
+const selectLocationQuery = createSelector(
+  selectLocation,
+  (location) => location && location.get('query')
+);
+const selectWhereQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('where')
+);
+const selectAttributeQuery = createSelector(
+  selectWhereQuery,
+  (whereQuery) => whereQuery &&
+    asArray(whereQuery).reduce((memo, where) => {
+      const attrValue = where.split(':');
+      return Object.assign(memo, { [attrValue[0]]: attrValue[1] });
+    }, {})
+);
+
+const selectWithoutQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('without')
+);
+
+const selectCategoryQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('cat')
+);
+
+const selectConnectedCategoryQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('catx')
+);
+
+const selectSearchQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('search')
+);
+const selectExpandQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('expand')
+);
+
+const selectEntities = (state, path) => state.getIn(['global', 'entities', path]);
+
+const selectEntitiesWhere = createSelector(
+  selectAttributeQuery,
+  (state, { path }) => selectEntities(state, path),
+  (query, entities) => {
+    // console.log('getEntitiesWhere', attributeQuery)
+    if (query) {
+      return entities.filter((entity) =>
+        reduce(query, (passing, value, attribute) => {
+          // TODO if !passing return false, no point going further
+          if (attribute === 'id') {
+            return passing && entity.get('id') === value.toString();
+          }
+          const testValue = entity.getIn(['attributes', attribute]);
+          if (typeof testValue === 'undefined' || testValue === null) {
+            return (value === 'null') ? passing : false;
+          }
+          return passing && testValue.toString() === value.toString();
+        }, true)
+      );
+    }
+    return entities;
+  }
+);
+
+const selectEntitiesSearch = createSelector(
+  selectEntitiesWhere,
+  selectSearchQuery,
+  (state, { searchAttributes }) => JSON.stringify(searchAttributes), // enable caching,
+  (entities, query, searchAttributes) => {
+    if (query) {
+      try {
+        const regex = new RegExp(regExMultipleWords(query), 'i');
+        return entities.filter((entity) =>
+          regex.test(prepareEntitySearchTarget(entity, JSON.parse(searchAttributes)))
+        );
+      } catch (e) {
+        return entities;
+      }
+    }
+    return entities;  // !search
+  }
+);
 
 export {
   getGlobal,
@@ -429,6 +508,9 @@ export {
   makeSelectPreviousPathname,
   getRequestedAt,
   isReady,
+  selectEntities,
+  selectEntitiesSearch,
+  getEntitiesPure,
   getEntitiesWhere,
   getEntities,
   hasEntity,
@@ -441,5 +523,12 @@ export {
   isUserAdmin,
   isUserManager,
   isUserContributor,
+  selectAttributeQuery,
+  selectSearchQuery,
+  selectWithoutQuery,
+  selectCategoryQuery,
+  selectConnectedCategoryQuery,
+  selectExpandQuery,
+  selectLocationQuery,
   selectLocation,
 };

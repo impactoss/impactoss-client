@@ -4,7 +4,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
@@ -225,7 +226,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 
   render() {
     const {
-      action,
+      measure,
       dataReady,
       isManager,
       recommendations,
@@ -264,20 +265,20 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="measures"
             buttons={buttons}
           />
-          { !action && !dataReady &&
+          { !measure && !dataReady &&
             <Loading />
           }
-          { !action && dataReady &&
+          { !measure && dataReady &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          { action && dataReady &&
+          { measure && dataReady &&
             <EntityView
-              fields={this.getFields(action, isManager, recommendations, indicators, taxonomies, recTaxonomies, sdgtargets, sdgtargetTaxonomies)}
+              fields={this.getFields(measure, isManager, recommendations, indicators, taxonomies, recTaxonomies, sdgtargets, sdgtargetTaxonomies)}
             />
           }
         </Content>
@@ -290,7 +291,7 @@ ActionView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleEdit: PropTypes.func,
   handleClose: PropTypes.func,
-  action: PropTypes.object,
+  measure: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   taxonomies: PropTypes.object,
@@ -303,7 +304,7 @@ ActionView.propTypes = {
 };
 
 ActionView.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 
@@ -325,7 +326,7 @@ const mapStateToProps = (state, props) => ({
     'sdgtarget_measures',
     'sdgtarget_categories',
   ] }),
-  action: getEntity(
+  measure: getEntity(
     state,
     {
       id: props.params.id,
@@ -339,7 +340,7 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
-  // all connected categories for all action-taggable taxonomies
+  // all connected categories for all measure-taggable taxonomies
   taxonomies: getEntities(
     state,
     {
@@ -525,8 +526,8 @@ function mapDispatchToProps(dispatch) {
       dispatch(loadEntitiesIfNeeded('sdgtarget_measures'));
       dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
     },
-    handleEdit: (actionId) => {
-      dispatch(updatePath(`/actions/edit/${actionId}`));
+    handleEdit: (measureId) => {
+      dispatch(updatePath(`/actions/edit/${measureId}`));
     },
     handleClose: () => {
       dispatch(updatePath('/actions'));

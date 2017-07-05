@@ -21,6 +21,7 @@ import {
   UPDATE_QUERY,
   UPDATE_GROUP,
   PAGE_CHANGE,
+  EXPAND_CHANGE,
 } from './constants';
 
 export function* updateQuery(args) {
@@ -33,8 +34,9 @@ export function* updateQuery(args) {
   })).toJS();
   yield params.push({
     arg: 'page',
-    value: '1',
+    value: '',
     replace: true,
+    remove: true,
   });
   yield put(updateRouteQuery(params));
 }
@@ -48,8 +50,9 @@ export function* updateGroup(args) {
   })).toJS();
   yield params.push({
     arg: 'page',
-    value: '1',
+    value: '',
     replace: true,
+    remove: true,
   });
   yield put(updateRouteQuery(params));
 }
@@ -57,6 +60,13 @@ export function* updatePage(args) {
   yield put(updateRouteQuery({
     arg: 'page',
     value: args.page,
+    replace: true,
+  }));
+}
+export function* updateExpand(args) {
+  yield put(updateRouteQuery({
+    arg: 'expand',
+    value: args.expand,
     replace: true,
   }));
 }
@@ -89,6 +99,7 @@ export default function* entityList() {
   yield takeLatest(UPDATE_QUERY, updateQuery);
   yield takeLatest(UPDATE_GROUP, updateGroup);
   yield takeLatest(PAGE_CHANGE, updatePage);
+  yield takeLatest(EXPAND_CHANGE, updateExpand);
 
   yield takeLatest(SAVE_EDITS, saveEdits);
   yield takeLatest(LOCATION_CHANGE, locationChangeSaga);

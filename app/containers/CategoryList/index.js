@@ -3,7 +3,8 @@
  * Taxonomies
  *
  */
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
@@ -73,7 +74,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     }
     if (taxonomy.attributes.tags_measures) {
       attributes.push({
-        attribute: 'actions',
+        attribute: 'measures',
         label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
       });
     }
@@ -168,7 +169,7 @@ CategoryList.propTypes = {
 };
 
 CategoryList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -217,7 +218,7 @@ const mapStateToProps = (state, props) => ({
           path: 'measure_categories',
           key: 'category_id',
           reverse: true,
-          as: 'actions',
+          as: 'measures',
           connected: {
             path: 'measures',
             key: 'measure_id',

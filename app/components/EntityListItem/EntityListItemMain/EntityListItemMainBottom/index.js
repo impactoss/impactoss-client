@@ -1,11 +1,12 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Component from 'components/basic/Component';
 
 import EntityListItemMainBottomTaxonomies from './EntityListItemMainBottomTaxonomies';
 import EntityListItemMainBottomConnections from './EntityListItemMainBottomConnections';
-import EntityListItemMainBottomTargetDate from './EntityListItemMainBottomTargetDate';
+// import EntityListItemMainBottomTargetDate from './EntityListItemMainBottomTargetDate';
 
 const Styled = styled(Component)``;
 
@@ -25,10 +26,10 @@ export default class EntityListItemMainBottom extends React.PureComponent { // e
         { entity.connectedCounts && entity.connectedCounts.length > 0 &&
           <EntityListItemMainBottomConnections connections={entity.connectedCounts} />
         }
-        { entity.targetDate &&
-          <EntityListItemMainBottomTargetDate date={entity.targetDate} />
-        }
       </Styled>
     );
+    // { entity.targetDate &&
+    //   <EntityListItemMainBottomTargetDate date={entity.targetDate} />
+    // }
   }
 }

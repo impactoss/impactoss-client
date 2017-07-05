@@ -4,7 +4,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
@@ -168,7 +169,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="measures"
             buttons={
               dataReady ? [{
                 type: 'cancel',
@@ -226,7 +227,7 @@ CategoryNew.propTypes = {
 };
 
 CategoryNew.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({

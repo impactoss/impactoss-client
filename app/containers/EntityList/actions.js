@@ -13,6 +13,7 @@ import {
   UPDATE_QUERY,
   UPDATE_GROUP,
   PAGE_CHANGE,
+  EXPAND_CHANGE,
 } from './constants';
 
 export function showPanel(activePanel) {
@@ -67,5 +68,12 @@ export function updatePage(page) {
   return {
     type: PAGE_CHANGE,
     page,
+  };
+}
+
+export function updateExpand(expand) {
+  return {
+    type: EXPAND_CHANGE,
+    expand,
   };
 }

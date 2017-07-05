@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import EntityListNestedReportItem from 'components/EntityListItem/EntityListNestedItem/EntityListNestedReportItem';
@@ -15,7 +16,7 @@ export class EntityListNestedReportList extends React.PureComponent { // eslint-
   mapToEntityListItem = (entity, entityLinkTo) => ({
     id: entity.id,
     title: entity.attributes.name || entity.attributes.title,
-    reference: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+    reference: this.context.intl && this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
     linkTo: `${entityLinkTo}${entity.id}`,
     status: entity.attributes.draft ? 'draft' : null,
   });
@@ -49,7 +50,7 @@ EntityListNestedReportList.propTypes = {
   entityLinkTo: PropTypes.string,
 };
 EntityListNestedReportList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default EntityListNestedReportList;

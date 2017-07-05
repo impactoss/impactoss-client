@@ -14,7 +14,8 @@ export const makeCurrentFilters = ({
   location,
   onTagClick,
 },
-withoutMessage
+withoutMessage,
+formatLabel
 ) => {
   const locationQuery = location.query;
 
@@ -28,10 +29,10 @@ withoutMessage
       withoutMessage
     ));
   }
-  if (filters.connectedTaxonomies && connectedTaxonomies.taxonomies) {
+  if (filters.connectedTaxonomies && connectedTaxonomies) {
     filterTags = filterTags.concat(getCurrentConnectedTaxonomyFilters(
       filters.connectedTaxonomies,
-      connectedTaxonomies.taxonomies,
+      connectedTaxonomies,
       locationQuery,
       onTagClick
     ));
@@ -42,7 +43,8 @@ withoutMessage
       connections,
       locationQuery,
       onTagClick,
-      withoutMessage
+      withoutMessage,
+      formatLabel
     ));
   }
   if (filters.attributes) {
@@ -138,11 +140,11 @@ export const getCurrentConnectedTaxonomyFilters = (taxonomyFilters, connectedTax
   }
   return tags;
 };
-export const getCurrentConnectionFilters = (connectionFiltersOptions, connections, locationQuery, onClick, withoutMessage) => {
+export const getCurrentConnectionFilters = (connectionFiltersOptions, connections, locationQuery, onClick, withoutMessage, formatLabel) => {
   const tags = [];
   forEach(connectionFiltersOptions, (option) => {
-    if (locationQuery[option.query] && connections[option.path]) {
-      const locationQueryValue = locationQuery[option.query];
+    if (locationQuery[option.path] && connections[option.path]) {
+      const locationQueryValue = locationQuery[option.path];
       forEach(asArray(locationQueryValue), (queryValue) => {
         const value = parseInt(queryValue, 10);
         const connection = connections[option.path][value];
@@ -152,10 +154,10 @@ export const getCurrentConnectionFilters = (connectionFiltersOptions, connection
         label = label.length > 20 ? `${label.substring(0, 20)}...` : label;
         tags.push({
           label,
-          type: option.path === 'measures' ? 'actions' : option.path,
+          type: option.path,
           onClick: () => onClick({
             value,
-            query: option.query,
+            query: option.path,
             checked: false,
           }),
         });
@@ -168,10 +170,10 @@ export const getCurrentConnectionFilters = (connectionFiltersOptions, connection
     forEach(connectionFiltersOptions, (option) => {
       forEach(asArray(locationQueryValue), (queryValue) => {
         // numeric means taxonomy
-        if (option.query === queryValue) {
+        if (option.path === queryValue) {
           tags.push({
-            label: `${withoutMessage} ${lowerCase(option.label)}`,
-            type: option.path === 'measures' ? 'actions' : option.path,
+            label: `${withoutMessage} ${lowerCase(formatLabel(option.label))}`,
+            type: option.path,
             without: true,
             onClick: () => onClick({
               value: queryValue,

@@ -4,14 +4,15 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
 import { Map, List } from 'immutable';
 
 import {
-  renderActionControl,
+  renderMeasureControl,
   renderSdgTargetControl,
   renderUserControl,
   validateRequired,
@@ -100,7 +101,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getBodyMainFields = (actions, sdgtargets) => ([
+  getBodyMainFields = (measures, sdgtargets) => ([
     {
       fields: [
         {
@@ -116,7 +117,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderActionControl(actions),
+        renderMeasureControl(measures),
         renderSdgTargetControl(sdgtargets),
       ],
     },
@@ -175,19 +176,19 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getFields = (actions, users, sdgtargets) => ({ // isManager, taxonomies,
+  getFields = (measures, users, sdgtargets) => ({ // isManager, taxonomies,
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(),
     },
     body: {
-      main: this.getBodyMainFields(actions, sdgtargets),
+      main: this.getBodyMainFields(measures, sdgtargets),
       aside: this.getBodyAsideFields(users),
     },
   })
 
   render() {
-    const { dataReady, viewDomain, actions, users, sdgtargets } = this.props;
+    const { dataReady, viewDomain, measures, users, sdgtargets } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -235,7 +236,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(actions, users, sdgtargets)}
+              fields={this.getFields(measures, users, sdgtargets)}
             />
           }
         </Content>
@@ -252,13 +253,13 @@ IndicatorNew.propTypes = {
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
-  actions: PropTypes.object,
+  measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   users: PropTypes.object,
 };
 
 IndicatorNew.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -271,8 +272,8 @@ const mapStateToProps = (state) => ({
     'sdgtargets',
   ] }),
 
-  // all actions,
-  actions: getEntities(
+  // all measures,
+  measures: getEntities(
     state, {
       path: 'measures',
     },
@@ -314,11 +315,11 @@ function mapDispatchToProps(dispatch) {
     },
     handleSubmit: (formData) => {
       let saveData = formData;
-      // actions
-      if (formData.get('associatedActions')) {
+      // measures
+      if (formData.get('associatedMeasures')) {
         saveData = saveData.set('measureIndicators', Map({
           delete: List(),
-          create: getCheckedValuesFromOptions(formData.get('associatedActions'))
+          create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
           .map((id) => Map({
             measure_id: id,
           })),

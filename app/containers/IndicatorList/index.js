@@ -4,18 +4,20 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { forEach } from 'lodash/collection';
 
-import EntityList from 'containers/EntityList';
-import { PUBLISH_STATUSES } from 'containers/App/constants';
-
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
-
 import appMessages from 'containers/App/messages';
+
+import EntityList from 'containers/EntityList';
+import { FILTERS, EDITS } from './constants';
+import { selectConnections, selectIndicators, selectConnectedTaxonomies } from './selectors';
+
 import messages from './messages';
 
 export class IndicatorList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -36,11 +38,11 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
   getDates = (indicator) => indicator.dates
     ? Object.values(indicator.dates)
     : [];
-  getReportCount = (actionOrIndicator) => {
+  getReportCount = (measureOrIndicator) => {
     let count = 0;
-    // test action:  return sum of reports for all indicators
-    if (actionOrIndicator.indicators) {
-      count = Object.values(actionOrIndicator.indicators).reduce((counter, indicatorAssociation) =>
+    // test measure:  return sum of reports for all indicators
+    if (measureOrIndicator.indicators) {
+      count = Object.values(measureOrIndicator.indicators).reduce((counter, indicatorAssociation) =>
         counter + (indicatorAssociation.indicator && indicatorAssociation.indicator.reports
           ? Object.keys(indicatorAssociation.indicator.reports).length
           : 0
@@ -48,18 +50,18 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
       , 0);
     }
     // test indicator: return number of reports for each indicator
-    if (actionOrIndicator.reports) {
-      count = Object.keys(actionOrIndicator.reports).length;
+    if (measureOrIndicator.reports) {
+      count = Object.keys(measureOrIndicator.reports).length;
     }
     return count;
   }
-  getReportInfo = (actionOrIndicator) => {
+  getReportInfo = (measureOrIndicator) => {
     const info = [];
     let due = 0;
     let overdue = 0;
-    // test action:  return sum of reports for all indicators
-    if (actionOrIndicator.indicators) {
-      forEach(actionOrIndicator.indicators, (indicatorAssociation) => {
+    // test measure:  return sum of reports for all indicators
+    if (measureOrIndicator.indicators) {
+      forEach(measureOrIndicator.indicators, (indicatorAssociation) => {
         if (indicatorAssociation.indicator && indicatorAssociation.indicator.dates) {
           forEach(indicatorAssociation.indicator.dates, (date) => {
             due += date.attributes.due ? 1 : 0;
@@ -69,8 +71,8 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
       });
     }
     // test indicator: return number of reports for each indicator
-    if (actionOrIndicator.dates) {
-      forEach(actionOrIndicator.dates, (date) => {
+    if (measureOrIndicator.dates) {
+      forEach(measureOrIndicator.dates, (date) => {
         due += date.attributes.due ? 1 : 0;
         overdue += date.attributes.overdue ? 1 : 0;
       });
@@ -94,228 +96,9 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         icon: 'reminder',
       },
     ];
-    // define selects for getEntities
-    const selects = {
-      entities: {
-        path: 'indicators',
-        extensions: [
-          {
-            path: 'measure_indicators',
-            key: 'indicator_id',
-            reverse: true,
-            as: 'measures',
-            connected: {
-              path: 'measures',
-              key: 'measure_id',
-              forward: true,
-            },
-          },
-          {
-            path: 'sdgtarget_indicators',
-            key: 'indicator_id',
-            reverse: true,
-            as: 'sdgtargets',
-            connected: {
-              path: 'sdgtargets',
-              key: 'sdgtarget_id',
-              forward: true,
-            },
-          },
-          {
-            type: 'single',
-            path: 'users',
-            key: 'manager_id',
-            as: 'manager',
-          },
-          {
-            path: 'progress_reports',
-            key: 'indicator_id',
-            reverse: true,
-            as: 'reports',
-          },
-          {
-            path: 'due_dates',
-            key: 'indicator_id',
-            reverse: true,
-            as: 'dates',
-            without: {
-              path: 'progress_reports',
-              key: 'due_date_id',
-            },
-          },
-        ],
-      },
-      connections: {
-        options: ['measures', 'sdgtargets'],
-      },
-      connectedTaxonomies: { // filter by each category
-        options: [
-          {
-            out: 'js',
-            path: 'taxonomies',
-            where: {
-              tags_measures: true,
-            },
-            extend: {
-              path: 'categories',
-              key: 'taxonomy_id',
-              reverse: true,
-              extend: {
-                path: 'measure_categories',
-                key: 'category_id',
-                reverse: true,
-                as: 'measures',
-              },
-            },
-          },
-          {
-            out: 'js',
-            path: 'taxonomies',
-            where: {
-              tags_sdgtargets: true,
-            },
-            extend: {
-              path: 'categories',
-              key: 'taxonomy_id',
-              reverse: true,
-              extend: {
-                path: 'sdgtarget_categories',
-                key: 'category_id',
-                reverse: true,
-                as: 'sdgtargets',
-              },
-            },
-          },
-        ],
-      },
-    };
 
     // specify the filter and query  options
-    const filters = {
-      search: ['title', 'reference'],
-      keyword: {
-        attributes: [
-          'id',
-          'title',
-          'description',
-        ],
-      },
-      attributes: {  // filter by attribute value
-        options: [
-          {
-            filter: false,
-            label: this.context.intl.formatMessage(appMessages.attributes.draft),
-            attribute: 'draft',
-            options: PUBLISH_STATUSES,
-          },
-          {
-            filter: true,
-            label: this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
-            attribute: 'manager_id',
-            extension: {
-              key: 'manager',
-              label: 'name',
-              without: true,
-            },
-          },
-        ],
-      },
-      connections: { // filter by associated entity
-        label: 'By connection',
-        options: [
-          {
-            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-            path: 'measures', // filter by indicator connection
-            query: 'actions',
-            key: 'measure_id',
-            connected: {
-              path: 'measure_indicators',
-              key: 'indicator_id',
-              whereKey: 'measure_id',
-            },
-          },
-          {
-            label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
-            path: 'sdgtargets', // filter by indicator connection
-            query: 'sdgtargets',
-            key: 'sdgtarget_id',
-            connected: {
-              path: 'sdgtarget_indicators',
-              key: 'indicator_id',
-              whereKey: 'sdgtarget_id',
-            },
-          },
-        ],
-      },
-      connectedTaxonomies: { // filter by each category
-        query: 'catx',
-        filter: true,
-        connections: [
-          {
-            path: 'measures', // filter by recommendation connection
-            title: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-            key: 'measure_id',
-            connected: {
-              path: 'measure_indicators',
-              key: 'indicator_id',
-              connected: {
-                path: 'measure_categories',
-                key: 'measure_id',
-                attribute: 'measure_id',
-                whereKey: 'category_id',
-              },
-            },
-          },
-          {
-            path: 'sdgtargets', // filter by recommendation connection
-            title: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
-            key: 'sdgtarget_id',
-            connected: {
-              path: 'sdgtarget_indicators',
-              key: 'indicator_id',
-              connected: {
-                path: 'sdgtarget_categories',
-                key: 'sdgtarget_id',
-                attribute: 'sdgtarget_id',
-                whereKey: 'category_id',
-              },
-            },
-          },
-        ],
-      },
-    };
-    const edits = {
-      connections: { // filter by associated entity
-        options: [
-          {
-            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-            path: 'measures', // filter by recommendation connection
-            connectPath: 'measure_indicators',
-            key: 'measure_id',
-            ownKey: 'indicator_id',
-            filter: true,
-          },
-          {
-            label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
-            path: 'sdgtargets', // filter by recommendation connection
-            connectPath: 'sdgtarget_indicators',
-            key: 'sdgtarget_id',
-            ownKey: 'indicator_id',
-            filter: true,
-          },
-        ],
-      },
-      attributes: {  // edit attribute value
-        options: [
-          {
-            label: this.context.intl.formatMessage(appMessages.attributes.draft),
-            attribute: 'draft',
-            options: PUBLISH_STATUSES,
-            filter: false,
-          },
-        ],
-      },
-    };
+
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'indicators',
@@ -340,9 +123,12 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         />
         <EntityList
           location={this.props.location}
-          selects={selects}
-          filters={filters}
-          edits={edits}
+          entities={this.props.entities}
+          connections={this.props.connections}
+          connectedTaxonomies={this.props.connectedTaxonomies}
+          path="indicators"
+          filters={FILTERS}
+          edits={EDITS}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
@@ -365,10 +151,13 @@ IndicatorList.propTypes = {
   handleImport: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
+  entities: PropTypes.object.isRequired,
+  connections: PropTypes.object,
+  connectedTaxonomies: PropTypes.object,
 };
 
 IndicatorList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -387,6 +176,9 @@ const mapStateToProps = (state) => ({
     'due_dates',
     'progress_reports',
   ] }),
+  entities: selectIndicators(state),
+  connections: selectConnections(state),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

@@ -4,7 +4,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
@@ -103,7 +104,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     ];
   }
 
-  getBodyMainFields = (entity, actions, reports, sdgtargets, actionTaxonomies, sdgtargetTaxonomies, isContributor) => ([
+  getBodyMainFields = (entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor) => ([
     {
       fields: [
         {
@@ -131,12 +132,12 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       fields: [
         {
           type: 'connections',
-          label: `${Object.values(actions).length} ${this.context.intl.formatMessage(Object.values(actions).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
-          entityType: 'actions',
-          values: Object.values(actions),
-          icon: 'actions',
+          label: `${Object.values(measures).length} ${this.context.intl.formatMessage(Object.values(measures).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
+          entityType: 'measures',
+          values: Object.values(measures),
+          icon: 'measures',
           entityPath: '/actions/',
-          taxonomies: actionTaxonomies,
+          taxonomies: measureTaxonomies,
           showEmpty: this.context.intl.formatMessage(appMessages.entities.measures.empty),
           connectionOptions: [{
             label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
@@ -187,13 +188,13 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     },
   ]);
 
-  getFields = (entity, isContributor, actions, sdgtargets, reports, dates, actionTaxonomies, sdgtargetTaxonomies) => ({
+  getFields = (entity, isContributor, measures, sdgtargets, reports, dates, measureTaxonomies, sdgtargetTaxonomies) => ({
     header: {
       main: this.getHeaderMainFields(entity, isContributor),
       aside: this.getHeaderAsideFields(entity, isContributor),
     },
     body: {
-      main: this.getBodyMainFields(entity, actions, reports, sdgtargets, actionTaxonomies, sdgtargetTaxonomies, isContributor),
+      main: this.getBodyMainFields(entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor),
       aside: isContributor ? this.getBodyAsideFields(entity, dates) : null,
     },
   });
@@ -212,7 +213,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     }))
 
   render() {
-    const { indicator, dataReady, isContributor, actions, sdgtargets, reports, dates, actionTaxonomies, sdgtargetTaxonomies } = this.props;
+    const { indicator, dataReady, isContributor, measures, sdgtargets, reports, dates, measureTaxonomies, sdgtargetTaxonomies } = this.props;
 
     const buttons = isContributor
     ? [
@@ -260,7 +261,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
           }
           { indicator && dataReady &&
             <EntityView
-              fields={this.getFields(indicator, isContributor, actions, sdgtargets, reports, dates, actionTaxonomies, sdgtargetTaxonomies)}
+              fields={this.getFields(indicator, isContributor, measures, sdgtargets, reports, dates, measureTaxonomies, sdgtargetTaxonomies)}
             />
           }
         </Content>
@@ -277,17 +278,17 @@ IndicatorView.propTypes = {
   indicator: PropTypes.object,
   dataReady: PropTypes.bool,
   isContributor: PropTypes.bool,
-  actions: PropTypes.object,
+  measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   reports: PropTypes.object,
-  actionTaxonomies: PropTypes.object,
+  measureTaxonomies: PropTypes.object,
   sdgtargetTaxonomies: PropTypes.object,
   dates: PropTypes.object,
   params: PropTypes.object,
 };
 
 IndicatorView.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 
@@ -330,7 +331,7 @@ const mapStateToProps = (state, props) => ({
       ],
     },
   ),
-  actionTaxonomies: getEntities(
+  measureTaxonomies: getEntities(
     state, {
       out: 'js',
       path: 'taxonomies',
@@ -358,8 +359,8 @@ const mapStateToProps = (state, props) => ({
       },
     },
   ),
-  // all connected actions
-  actions: getEntities(
+  // all connected measures
+  measures: getEntities(
     state, {
       path: 'measures',
       out: 'js',
