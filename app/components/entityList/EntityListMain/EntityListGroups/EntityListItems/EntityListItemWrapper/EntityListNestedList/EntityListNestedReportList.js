@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import EntityListNestedReportItem from './EntityListItem/EntityListNestedItem/EntityListNestedReportItem';
-import EntityListNestedReportDateItem from './EntityListItem/EntityListNestedItem/EntityListNestedReportDateItem';
+import EntityListNestedReportItem from './EntityListNestedItem/EntityListNestedReportItem';
+import EntityListNestedReportDateItem from './EntityListNestedItem/EntityListNestedReportDateItem';
 
 const ChildItems = styled.span`
   display: inline-block;

@@ -9,13 +9,24 @@ const Styled = styled.div`
 `;
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  // componentWillMount() {
+  //   console.log('EntityListItems.componentWillMount')
+  //   // if (this.props.scrollContainer) {
+  //   //   this.props.scrollContainer.update();
+  //   // }
+  // }
+  // componentWillUpdate() {
+  //   console.log('EntityListItems.componentWillUpdate()')
+  // }
   componentDidUpdate() {
+    // console.log('EntityListItems.componentDidUpdate')
     if (this.props.scrollContainer) {
       this.props.scrollContainer.update();
     }
   }
   render() {
     const { entities, expandNo, ...props } = this.props;
+    // console.log('EntityListItems.render')
     return (
       <Styled separated={expandNo}>
         {

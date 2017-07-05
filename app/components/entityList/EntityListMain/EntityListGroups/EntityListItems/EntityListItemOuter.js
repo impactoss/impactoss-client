@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { getRenderedHeight } from 'react-rendered-size';
 import styled from 'styled-components';
 import { Watch } from 'scrollmonitor-react';
+import { isEqual } from 'lodash/lang';
 
 import EntityListItemWrapper from './EntityListItemWrapper';
 
@@ -20,10 +21,26 @@ class EntityListItemOuter extends React.PureComponent { // eslint-disable-line r
       height: 0,
     };
   }
-  componentWillMount() {
-    this.setState({ height: getRenderedHeight(this.renderItem()) });
+  shouldComponentUpdate(nextProps, nextState) {
+    // only recalculate height if not in viewport
+    // console.log('EntityListItemOuter.shouldComponentUpdate', this.props.entity.id)
+    // // console.log('props', isEqual(this.props, nextProps), this.props, nextProps)
+    // // console.log('state', isEqual(this.state, nextState), this.state, nextState)
+    // console.log('isInViewport', isEqual(this.props.isInViewport, nextProps.isInViewport))
+    // console.log('entity', isEqual(this.props.entity, nextProps.entity))
+    return this.state.height !== nextState.height
+      || !isEqual(this.props.entity, nextProps.entity)
+      || !isEqual(this.props.entityIdsSelected, nextProps.entityIdsSelected)
+      || !isEqual(this.props.isInViewport, nextProps.isInViewport);
   }
 
+  componentWillUpdate() {
+    // only recalculate height if not in viewport
+    if (this.props.scrollContainer && !this.props.isInViewport) {
+      // console.log('EntityListItemOuter.componentWillUpdate().getRenderedHeight')
+      this.setState({ height: getRenderedHeight(this.renderItem()) });
+    }
+  }
   renderItem = () => {
     const { entity, ...props } = this.props;
     return (
@@ -50,6 +67,7 @@ EntityListItemOuter.propTypes = {
   entity: PropTypes.object.isRequired,
   isInViewport: PropTypes.bool,
   scrollContainer: PropTypes.object,
+  entityIdsSelected: PropTypes.array,
 };
 
 export default Watch(EntityListItemOuter);

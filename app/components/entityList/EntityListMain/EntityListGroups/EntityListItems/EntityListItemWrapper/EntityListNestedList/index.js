@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import EntityListNestedItem from './EntityListItem/EntityListNestedItem';
+import EntityListNestedItem from './EntityListNestedItem';
 import EntityListNestedReportList from './EntityListNestedReportList';
 
 const Styled = styled.span`

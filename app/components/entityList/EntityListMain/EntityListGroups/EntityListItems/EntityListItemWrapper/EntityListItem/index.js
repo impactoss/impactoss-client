@@ -40,6 +40,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       || this.props.checked !== nextProps.checked
       || this.props.expandNo !== nextProps.expandNo;
   }
+
   render() {
     const {
       entity,

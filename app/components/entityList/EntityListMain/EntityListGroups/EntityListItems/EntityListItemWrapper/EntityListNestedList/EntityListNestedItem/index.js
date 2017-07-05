@@ -5,8 +5,8 @@ import { palette } from 'styled-theme';
 
 import Component from 'components/styled/Component';
 
-import EntityListItemMain from '../EntityListItemMain';
-import EntityListItemExpandable from '../EntityListItemExpandable';
+import EntityListItemMain from '../../EntityListItem/EntityListItemMain';
+import EntityListItemExpandable from '../../EntityListItem/EntityListItemExpandable';
 
 const Styled = styled.span`
   display: inline-block;

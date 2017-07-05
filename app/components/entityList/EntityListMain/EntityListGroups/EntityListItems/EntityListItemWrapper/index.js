@@ -7,9 +7,8 @@ import { map, forEach } from 'lodash/collection';
 // import { isEqual } from 'lodash/lang';
 
 import EntityListItem from './EntityListItem';
-
 import EntityListNestedList from './EntityListNestedList';
-import EntityListNestedReportList from './EntityListNestedReportList';
+import EntityListNestedReportList from './EntityListNestedList/EntityListNestedReportList';
 
 const ItemWrapper = styled.div`
   border-top: 1px solid;
