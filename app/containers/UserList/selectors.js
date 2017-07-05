@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { Map } from 'immutable';
 
 import {
   selectEntities,
@@ -17,7 +18,7 @@ import {
 
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'roles'),
-  (roles) => ({ roles })
+  (roles) => Map().set('roles', roles)
 );
 
 const selectUsersNested = createSelector(

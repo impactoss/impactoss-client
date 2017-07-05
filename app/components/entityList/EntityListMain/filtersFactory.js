@@ -11,14 +11,12 @@ export const makeCurrentFilters = ({
   taxonomies,
   connections,
   connectedTaxonomies,
-  location,
+  locationQuery,
   onTagClick,
 },
 withoutMessage,
 formatLabel
 ) => {
-  const locationQuery = location.query;
-
   let filterTags = [];
   if (filters.taxonomies && taxonomies) {
     filterTags = filterTags.concat(getCurrentTaxonomyFilters(

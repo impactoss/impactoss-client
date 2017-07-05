@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -39,7 +38,7 @@ const IconWrapUnscheduled = styled(IconWrap)`
 `;
 
 
-export default class EntityListNestedReportDateItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class EntityListNestedReportDateItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     dates: PropTypes.array,
@@ -58,17 +57,23 @@ export default class EntityListNestedReportDateItem extends React.PureComponent 
             </IconWrap>
             <Status>
               { dates[0].attributes.overdue &&
-                <FormattedMessage {...appMessages.entities.due_dates.overdue} />
+                <span>
+                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.overdue)}
+                </span>
               }
               { dates[0].attributes.due &&
-                <FormattedMessage {...appMessages.entities.due_dates.due} />
+                <span>
+                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.due)}
+                </span>
               }
               { !dates[0].attributes.due && !dates[0].attributes.overdue &&
-                <FormattedMessage {...appMessages.entities.due_dates.scheduled} />
+                <span>
+                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.scheduled)}
+                </span>
               }
             </Status>
             <DueDate overdue={dates[0].attributes.overdue}>
-              <FormattedDate value={new Date(dates[0].attributes.due_date)} />
+              { this.context.intl && this.context.intl.formatDate(new Date(dates[0].attributes.due_date))}
             </DueDate>
           </span>
         }
@@ -78,7 +83,7 @@ export default class EntityListNestedReportDateItem extends React.PureComponent 
               <Icon name="reminder" />
             </IconWrapUnscheduled>
             <Status unscheduled>
-              <FormattedMessage {...appMessages.entities.due_dates.empty} />
+              {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.empty)}
             </Status>
           </span>
         }
@@ -86,3 +91,9 @@ export default class EntityListNestedReportDateItem extends React.PureComponent 
     );
   }
 }
+
+EntityListNestedReportDateItem.contextTypes = {
+  intl: PropTypes.object,
+};
+
+export default EntityListNestedReportDateItem;

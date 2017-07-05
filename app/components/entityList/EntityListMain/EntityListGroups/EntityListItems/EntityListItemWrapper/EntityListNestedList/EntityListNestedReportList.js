@@ -50,7 +50,7 @@ EntityListNestedReportList.propTypes = {
   entityLinkTo: PropTypes.string,
 };
 EntityListNestedReportList.contextTypes = {
-  intl: PropTypes.object.isRequired,
+  intl: PropTypes.object,
 };
 
 export default EntityListNestedReportList;

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { isEqual } from 'lodash/lang';
+import { Map, List } from 'immutable';
 
 import EntityListItems from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems';
 
@@ -45,7 +46,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       expandNo,
       isExpandable,
       expandableColumns,
-      handleExpandLink,
+      onExpand,
     } = this.props;
     const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
     const entityIdsSelected = this.props.entityIdsSelected && this.props.entityIdsSelected.toJS();
@@ -98,7 +99,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                           expandNo={expandNo}
                           isExpandable={isExpandable}
                           expandableColumns={expandableColumns}
-                          onExpand={handleExpandLink}
+                          onExpand={onExpand}
                         />
                       </ListEntitiesSubGroup>
                     ))
@@ -118,7 +119,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                       expandNo={expandNo}
                       isExpandable={isExpandable}
                       expandableColumns={expandableColumns}
-                      onExpand={handleExpandLink}
+                      onExpand={onExpand}
                     />
                   }
                 </ListEntitiesGroup>
@@ -133,9 +134,9 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
 
 EntityListGroups.propTypes = {
   entitiesGrouped: PropTypes.array.isRequired,
-  entityIdsSelected: PropTypes.object.isRequired,
+  entityIdsSelected: PropTypes.instanceOf(List).isRequired,
   expandableColumns: PropTypes.array,
-  taxonomies: PropTypes.object,
+  taxonomies: PropTypes.instanceOf(Map),
   filters: PropTypes.object,
   header: PropTypes.object,
   locationQuery: PropTypes.object,
@@ -145,7 +146,7 @@ EntityListGroups.propTypes = {
   isExpandable: PropTypes.bool,
   onEntitySelect: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,
-  handleExpandLink: PropTypes.func.isRequired,
+  onExpand: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,
 };
 

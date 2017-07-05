@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { Map, List } from 'immutable';
 
 import { filter } from 'lodash/collection';
 import { isEqual } from 'lodash/lang';
@@ -121,9 +122,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     const {
       filters,
       edits,
-      taxonomies,
-      connections,
-      connectedTaxonomies,
       entitiesSorted,
       onAssign,
       canEdit,
@@ -132,7 +130,9 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       locationQuery,
       formatLabel,
     } = this.props;
-
+    const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
+    const connections = this.props.connections && this.props.connections.toJS();
+    const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
     const entityIdsSelected = this.props.entityIdsSelected && this.props.entityIdsSelected.toJS();
     const entitiesSelected = filter(entitiesSorted, (entity) => entityIdsSelected.indexOf(entity.id) >= 0);
 
@@ -241,15 +241,15 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   }
 }
 EntityListSidebar.propTypes = {
+  taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
+  connectedTaxonomies: PropTypes.instanceOf(Map),
+  entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.object,
   canEdit: PropTypes.bool,
   filters: PropTypes.object,
   edits: PropTypes.object,
-  taxonomies: PropTypes.object,
-  connections: PropTypes.object,
-  connectedTaxonomies: PropTypes.object,
   entitiesSorted: PropTypes.array,
-  entityIdsSelected: PropTypes.object,
   activePanel: PropTypes.string,
   onAssign: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,

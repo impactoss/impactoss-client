@@ -37,25 +37,31 @@ export const selectConnections = createSelector(
   (state) => selectEntities(state, 'sdgtargets'),
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'sdgtarget_categories'),
-  (indicators, recommendations, sdgtargets, recommendationCategories, sdgtargetCategories) => ({
-    indicators,
-    recommendations: recommendations.map((recommendation) =>
-      recommendation.set(
-        'categories',
-        recommendationCategories.filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'recommendation_id']), recommendation.get('id'))
+  (indicators, recommendations, sdgtargets, recommendationCategories, sdgtargetCategories) =>
+    Map()
+    .set('indicators', indicators)
+    .set(
+      'recommendations',
+      recommendations.map((recommendation) =>
+        recommendation.set(
+          'categories',
+          recommendationCategories.filter((association) =>
+            attributesEqual(association.getIn(['attributes', 'recommendation_id']), recommendation.get('id'))
+          )
         )
       )
-    ),
-    sdgtargets: sdgtargets.map((sdgtarget) =>
-      sdgtarget.set(
-        'categories',
-        sdgtargetCategories.filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), sdgtarget.get('id'))
+    )
+    .set(
+      'sdgtargets',
+      sdgtargets.map((sdgtarget) =>
+        sdgtarget.set(
+          'categories',
+          sdgtargetCategories.filter((association) =>
+            attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), sdgtarget.get('id'))
+          )
         )
       )
-    ),
-  })
+    )
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -93,7 +99,7 @@ export const selectConnectedTaxonomies = createSelector(
                 connection.path,
                 connection.associations.filter((association) =>
                   attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
-                  && connections[connection.path].get(association.getIn(['attributes', connection.key]).toString())
+                  && connections.getIn([connection.path, association.getIn(['attributes', connection.key]).toString()])
                 )
               ))
           ))
@@ -137,7 +143,7 @@ const selectMeasuresNested = createSelector(
       'recommendations',
       measureRecommendations.filter((association) =>
         attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
-        && connections.recommendations.get(association.getIn(['attributes', 'recommendation_id']).toString())
+        && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
       )
     )
     // nest sdgtarget connections
@@ -145,7 +151,7 @@ const selectMeasuresNested = createSelector(
       'sdgtargets',
       measureSdgTargets.filter((association) =>
         attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
-        && connections.sdgtargets.get(association.getIn(['attributes', 'sdgtarget_id']).toString())
+        && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
       )
     )
     // nest indicator connections
@@ -154,11 +160,11 @@ const selectMeasuresNested = createSelector(
       measureIndicators
       .filter((entityIndicator) =>
         attributesEqual(entityIndicator.getIn(['attributes', 'measure_id']), entity.get('id'))
-        && connections.indicators.get(entityIndicator.getIn(['attributes', 'indicator_id']).toString())
+        && connections.getIn(['indicators', entityIndicator.getIn(['attributes', 'indicator_id']).toString()])
       )
       .map((entityIndicator) => {
         // nest actual indicator with indicator connection
-        const indicator = connections.indicators.get(entityIndicator.getIn(['attributes', 'indicator_id']).toString());
+        const indicator = connections.getIn(['indicators', entityIndicator.getIn(['attributes', 'indicator_id']).toString()]);
         // if (indicator) {
         return entityIndicator.set(
           'indicator',

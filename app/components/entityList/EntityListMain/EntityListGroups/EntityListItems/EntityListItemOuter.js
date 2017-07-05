@@ -29,6 +29,7 @@ class EntityListItemOuter extends React.PureComponent { // eslint-disable-line r
     // console.log('isInViewport', isEqual(this.props.isInViewport, nextProps.isInViewport))
     // console.log('entity', isEqual(this.props.entity, nextProps.entity))
     return this.state.height !== nextState.height
+      || this.props.expandNo !== nextProps.expandNo
       || !isEqual(this.props.entity, nextProps.entity)
       || !isEqual(this.props.entityIdsSelected, nextProps.entityIdsSelected)
       || !isEqual(this.props.isInViewport, nextProps.isInViewport);
@@ -67,6 +68,7 @@ EntityListItemOuter.propTypes = {
   entity: PropTypes.object.isRequired,
   isInViewport: PropTypes.bool,
   scrollContainer: PropTypes.object,
+  expandNo: PropTypes.number,
   entityIdsSelected: PropTypes.array,
 };
 

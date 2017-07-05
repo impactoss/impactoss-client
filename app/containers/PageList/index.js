@@ -8,14 +8,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-
-import EntityList from 'containers/EntityList';
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { Map } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
-
 import appMessages from 'containers/App/messages';
+
+import EntityList from 'containers/EntityList';
+
+import { FILTERS, EDITS } from './constants';
+import { selectPages } from './selectors';
 import messages from './messages';
 
 export class PageList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -34,41 +36,6 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
   render() {
     const { dataReady } = this.props;
 
-    // define selects for getEntities
-    const selects = {
-      entities: {
-        path: 'pages',
-      },
-    };
-
-    // specify the filter and query  options
-    const filters = {
-      search: ['title'],
-      attributes: {  // filter by attribute value
-        label: 'By attribute',
-        options: [
-          {
-            label: 'Status',
-            attribute: 'draft',
-            options: PUBLISH_STATUSES,
-            filter: false,
-          },
-        ],
-      },
-    };
-    const edits = {
-      attributes: {  // edit attribute value
-        label: 'Update attribute',
-        options: [
-          {
-            label: 'Status',
-            attribute: 'draft',
-            options: PUBLISH_STATUSES,
-            filter: false,
-          },
-        ],
-      },
-    };
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'pages',
@@ -89,9 +56,10 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
         />
         <EntityList
           location={this.props.location}
-          selects={selects}
-          filters={filters}
-          edits={edits}
+          entities={this.props.entities}
+          path="pages"
+          filters={FILTERS}
+          edits={EDITS}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
@@ -110,6 +78,7 @@ PageList.propTypes = {
   handleNew: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
+  entities: PropTypes.instanceOf(Map).isRequired,
 };
 
 PageList.contextTypes = {
@@ -120,6 +89,7 @@ const mapStateToProps = (state) => ({
   dataReady: isReady(state, { path: [
     'pages',
   ] }),
+  entities: selectPages(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

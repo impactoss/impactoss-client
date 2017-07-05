@@ -24,24 +24,30 @@ export const selectConnections = createSelector(
   (state) => selectEntities(state, 'sdgtargets'),
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'sdgtarget_categories'),
-  (measures, sdgtargets, measureCategories, sdgtargetCategories) => ({
-    measures: measures.map((measure) =>
-      measure.set(
-        'categories',
-        measureCategories.filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
+  (measures, sdgtargets, measureCategories, sdgtargetCategories) =>
+    Map()
+    .set(
+      'measures',
+      measures.map((measure) =>
+        measure.set(
+          'categories',
+          measureCategories.filter((association) =>
+            attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
+          )
         )
       )
-    ),
-    sdgtargets: sdgtargets.map((sdgtarget) =>
-      sdgtarget.set(
-        'categories',
-        sdgtargetCategories.filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), sdgtarget.get('id'))
+    )
+    .set(
+      'sdgtargets',
+      sdgtargets.map((sdgtarget) =>
+        sdgtarget.set(
+          'categories',
+          sdgtargetCategories.filter((association) =>
+            attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), sdgtarget.get('id'))
+          )
         )
       )
-    ),
-  })
+    )
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -79,7 +85,7 @@ export const selectConnectedTaxonomies = createSelector(
                 connection.path,
                 connection.associations.filter((association) =>
                   attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
-                  && connections[connection.path].get(association.getIn(['attributes', connection.key]).toString())
+                  && connections.getIn([connection.path, association.getIn(['attributes', connection.key]).toString()])
                 )
               ))
           ))
@@ -110,14 +116,14 @@ const selectIndicatorsNested = createSelector(
       'measures',
       entityMeasures.filter((association) =>
         attributesEqual(association.getIn(['attributes', 'indicator_id']), entity.get('id'))
-        && connections.measures.get(association.getIn(['attributes', 'measure_id']).toString())
+        && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
       )
     )
     .set(
       'sdgtargets',
       entitySdgTargets.filter((association) =>
         attributesEqual(association.getIn(['attributes', 'indicator_id']), entity.get('id'))
-        && connections.sdgtargets.get(association.getIn(['attributes', 'sdgtarget_id']).toString())
+        && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
       )
     )
     // nest reports

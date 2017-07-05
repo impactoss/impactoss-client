@@ -78,7 +78,7 @@ export const filterEntitiesByConnectedCategories = (entities, connections, query
     asList(query).reduce((passing, queryArg) => {
       const pathValue = queryArg.split(':');
       const path = pathValue[0];
-      const connectionsForPath = connections[path];
+      const connectionsForPath = connections.get(path);
       return connectionsForPath
         ? passing && connectionsForPath.reduce((passingConnection, connection) =>
           // test

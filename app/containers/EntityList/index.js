@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { Map, List, fromJS } from 'immutable';
-import { orderBy, reduce, filter, map } from 'lodash/collection';
+import { orderBy, filter, map } from 'lodash/collection';
 import { flatten } from 'lodash/array';
 
 import { getEntitySortIteratee } from 'utils/sort';
@@ -92,8 +92,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
     const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
     const entityIdsSelected = this.props.entityIdsSelected && this.props.entityIdsSelected.toJS();
-    const connections = this.props.connections &&
-      reduce(this.props.connections, (memo, connection, path) => Object.assign(memo, { [path]: connection.toJS() }), {});
 
     // sorted entities: TODO consider moving to selector for caching?
     const entitiesSorted = dataReady && entities
@@ -130,13 +128,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         <Sidebar>
           { dataReady &&
             <EntityListSidebar
+              taxonomies={this.props.taxonomies}
+              connections={this.props.connections}
+              connectedTaxonomies={this.props.connectedTaxonomies}
+              entityIdsSelected={this.props.entityIdsSelected}
               filters={filters}
               edits={edits}
-              taxonomies={taxonomies}
-              connections={connections}
-              connectedTaxonomies={connectedTaxonomies}
               entitiesSorted={entitiesSorted}
-              entityIdsSelected={this.props.entityIdsSelected}
               locationQuery={location.query}
               onPanelSelect={onPanelSelect}
               canEdit={isManager}
@@ -148,32 +146,34 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           }
         </Sidebar>
         <EntityListMain
-          dataReady={dataReady}
-          entitiesTotal={entitiesSorted.length}
-          entitiesGrouped={entitiesGroupedForPage}
-          entityIdsSelected={this.props.entityIdsSelected}
-          entitiesSelectedTotal={entitiesSelected.length}
-          entityTitle={this.props.entityTitle}
-          isManager={isManager}
-          filters={filters}
-          location={location}
-          pager={pager}
-          pageItems={pageItems}
-          formatLabel={this.formatLabel}
           header={this.props.header}
           taxonomies={this.props.taxonomies}
-          connections={connections}
+          connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
-          onTagClick={this.props.onTagClick}
-          onGroupSelect={this.props.onGroupSelect}
-          onSubgroupSelect={this.props.onSubgroupSelect}
           isExpandable={this.props.isExpandable}
           expandNo={this.props.expandNo}
-          handleExpandLink={this.props.handleExpandLink}
           expandableColumns={this.props.expandableColumns}
-          onEntitySelectAll={this.props.onEntitySelectAll}
-          onEntitySelect={this.props.onEntitySelect}
           entityLinkTo={this.props.entityLinkTo}
+          onExpand={this.props.onExpand}
+          onGroupSelect={this.props.onGroupSelect}
+          onSubgroupSelect={this.props.onSubgroupSelect}
+          onTagClick={this.props.onTagClick}
+          entityIdsSelected={this.props.entityIdsSelected}
+          entityTitle={this.props.entityTitle}
+          dataReady={dataReady}
+          entitiesGrouped={entitiesGroupedForPage}
+          entitiesTotal={entitiesSorted.length}
+          entitiesSelectedTotal={entitiesSelected.length}
+          isManager={isManager}
+          filters={filters}
+          locationQuery={location.query}
+          pager={pager}
+          pageItemsTotal={pageItems.length}
+          formatLabel={this.formatLabel}
+          onEntitySelectAll={(checked) => {
+            this.props.onEntitySelectAll(checked ? map(pageItems, (item) => item.entity.id) : []);
+          }}
+          onEntitySelect={this.props.onEntitySelect}
           onPageSelect={this.props.onPageSelect}
           onSearch={this.props.onSearch}
         />
@@ -183,6 +183,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 }
 
 EntityList.propTypes = {
+  // wrapper props
+  entities: PropTypes.instanceOf(Map).isRequired,
+  taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
+  connectedTaxonomies: PropTypes.instanceOf(Map),
   filters: PropTypes.object,
   edits: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -195,21 +200,17 @@ EntityList.propTypes = {
   isExpandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
   expandNo: PropTypes.number,
-  // select props
+  // selector props
   activePanel: PropTypes.string,
   isManager: PropTypes.bool,
-  entities: PropTypes.object.isRequired,
   entityIdsSelected: PropTypes.object,
-  taxonomies: PropTypes.object,
-  connections: PropTypes.object,
-  connectedTaxonomies: PropTypes.object,
   // dispatch props
   onPanelSelect: PropTypes.func.isRequired,
   handleEditSubmit: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,
-  handleExpandLink: PropTypes.func.isRequired,
+  onExpand: PropTypes.func.isRequired,
   onGroupSelect: PropTypes.func.isRequired,
   onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
@@ -246,7 +247,7 @@ function mapDispatchToProps(dispatch, props) {
     onTagClick: (value) => {
       dispatch(updateQuery(fromJS([value])));
     },
-    handleExpandLink: (expandNoNew) => {
+    onExpand: (expandNoNew) => {
       // default expand by 1
       dispatch(updateExpand(typeof expandNoNew !== 'undefined'
         ? expandNoNew

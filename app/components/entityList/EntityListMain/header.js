@@ -1,4 +1,4 @@
-export const getHeaderColumns = (label, isSelect, isExpandable, expandNo, expandableColumns, handleExpandLink) => {
+export const getHeaderColumns = (label, isSelect, isExpandable, expandNo, expandableColumns, onExpand) => {
   // TODO figure out a betterway to determine column widths. this is terrible
   let width = 1;
   // if nested
@@ -42,7 +42,7 @@ export const getHeaderColumns = (label, isSelect, isExpandable, expandNo, expand
         label: col.label,
         isExpandable: true,
         isExpand,
-        onExpand: () => handleExpandLink(isExpand ? i : i + 1),
+        onExpand: () => onExpand(isExpand ? i : i + 1),
         width,
       };
     });

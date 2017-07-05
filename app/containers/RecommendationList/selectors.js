@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { Map } from 'immutable';
 
 import {
   selectEntities,
@@ -17,7 +18,7 @@ import {
 
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'measures'),
-  (measures) => ({ measures })
+  (measures) => Map().set('measures', measures)
 );
 
 const selectRecommendationsNested = createSelector(
@@ -38,7 +39,7 @@ const selectRecommendationsNested = createSelector(
         'measures',
         entityMeasures.filter((association) =>
           attributesEqual(association.getIn(['attributes', 'recommendation_id']), entity.get('id'))
-          && connections.measures.get(association.getIn(['attributes', 'measure_id']).toString())
+          && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
         )
       )
     )

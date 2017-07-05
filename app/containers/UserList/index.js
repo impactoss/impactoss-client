@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { Map } from 'immutable';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -73,9 +74,9 @@ UserList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
-  entities: PropTypes.object.isRequired,
-  taxonomies: PropTypes.object,
-  connections: PropTypes.object,
+  entities: PropTypes.instanceOf(Map).isRequired,
+  taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
 };
 
 UserList.contextTypes = {

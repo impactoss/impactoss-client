@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 // import { isEqual } from 'lodash/lang';
+import { Map } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -103,9 +104,9 @@ RecommendationList.propTypes = {
   handleImport: PropTypes.func,
   location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
-  entities: PropTypes.object.isRequired,
-  taxonomies: PropTypes.object,
-  connections: PropTypes.object,
+  entities: PropTypes.instanceOf(Map).isRequired,
+  taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
 };
 
 RecommendationList.contextTypes = {
