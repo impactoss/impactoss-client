@@ -15,7 +15,7 @@ import { isEqual } from 'lodash/lang';
 import { FILTERS_PANEL, EDIT_PANEL } from 'containers/App/constants';
 import { FILTER_FORM_MODEL, EDIT_FORM_MODEL } from 'containers/EntityListForm/constants';
 
-import Scrollable from 'components/basic/Scrollable';
+import Scrollable from 'components/styled/Scrollable';
 import ButtonToggle from 'components/buttons/ButtonToggle';
 import SupTitle from 'components/SupTitle';
 

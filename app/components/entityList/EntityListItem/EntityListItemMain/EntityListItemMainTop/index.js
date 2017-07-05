@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Component from 'components/basic/Component';
+import Component from 'components/styled/Component';
 import Icon from 'components/Icon';
 
 import EntityListItemMainTopReference from './EntityListItemMainTopReference';

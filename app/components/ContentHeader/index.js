@@ -6,7 +6,7 @@ import Grid from 'grid-styled';
 
 import { CONTENT_LIST, CONTENT_SINGLE } from 'containers/App/constants';
 
-import Row from 'components/basic/Row';
+import Row from 'components/styled/Row';
 import SupTitle from 'components/SupTitle';
 import Icon from 'components/Icon';
 

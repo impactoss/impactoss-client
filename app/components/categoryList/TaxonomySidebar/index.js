@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import Component from 'components/basic/Component';
+import Component from 'components/styled/Component';
 import SupTitle from 'components/SupTitle';
 import TaxonomySidebarItem from 'components/categoryList/TaxonomySidebarItem';
 

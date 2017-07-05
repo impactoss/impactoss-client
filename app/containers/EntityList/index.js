@@ -13,7 +13,7 @@ import { flatten } from 'lodash/array';
 
 import { getEntitySortIteratee } from 'utils/sort';
 
-import Sidebar from 'components/basic/Sidebar';
+import Sidebar from 'components/styled/Sidebar';
 
 import EntityListSidebar from 'components/entityList/EntityListSidebar';
 import EntityListMain from 'components/entityList/EntityListMain';

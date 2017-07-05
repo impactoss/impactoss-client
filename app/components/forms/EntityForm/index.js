@@ -12,7 +12,7 @@ import { lowerCase } from 'utils/string';
 
 import appMessages from 'containers/App/messages';
 
-import A from 'components/basic/A';
+import A from 'components/styled/A';
 import Icon from 'components/Icon';
 import FieldFactory from 'components/fields/FieldFactory';
 import Button from 'components/buttons/Button';

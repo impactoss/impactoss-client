@@ -22,8 +22,8 @@ import { scrollToComponent } from 'utils/scroll-to-component';
 
 import Button from 'components/buttons/Button';
 import ButtonHero from 'components/buttons/ButtonHero';
-import Section from 'components/basic/Section';
-import Container from 'components/basic/Container';
+import Section from 'components/styled/Section';
+import Container from 'components/styled/Container';
 import Icon from 'components/Icon';
 import Loading from 'components/Loading';
 import TaxonomyList from 'components/TaxonomyList';

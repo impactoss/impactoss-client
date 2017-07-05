@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import Component from 'components/basic/Component';
-import Clear from 'components/basic/Clear';
+import Component from 'components/styled/Component';
+import Clear from 'components/styled/Clear';
 import Icon from 'components/Icon';
 
 const Styled = styled(Component)`

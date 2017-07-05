@@ -26,10 +26,10 @@ import { CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 // components
-import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
-import Container from 'components/basic/Container';
-import Sidebar from 'components/basic/Sidebar';
-import Scrollable from 'components/basic/Scrollable';
+import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
+import Container from 'components/styled/Container';
+import Sidebar from 'components/styled/Sidebar';
+import Scrollable from 'components/styled/Scrollable';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';

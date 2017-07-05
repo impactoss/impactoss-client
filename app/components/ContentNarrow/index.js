@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Grid from 'grid-styled';
 
 import Content from 'components/Content';
-import Row from 'components/basic/Row';
+import Row from 'components/styled/Row';
 
 class ContentNarrow extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {

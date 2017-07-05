@@ -14,8 +14,8 @@ import { isEqual } from 'lodash/lang';
 
 import { jumpToComponent } from 'utils/scroll-to-component';
 
-import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
-import Container from 'components/basic/Container';
+import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
+import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import EntityListGroups from 'components/entityList/EntityListGroups';

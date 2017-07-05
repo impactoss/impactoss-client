@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { isEqual } from 'lodash/lang';
 
-import Component from 'components/basic/Component';
-import Clear from 'components/basic/Clear';
+import Component from 'components/styled/Component';
+import Clear from 'components/styled/Clear';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
 import EntityListItemMainTitle from './EntityListItemMainTitle';
