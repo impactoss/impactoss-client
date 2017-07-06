@@ -6,7 +6,7 @@ import {
   selectEntities,
   selectEntitiesSearch,
   selectWithoutQuery,
-  selectLocationQuery,
+  selectConnectionQuery,
   selectCategoryQuery,
   selectConnectedCategoryQuery,
   // selectExpandQuery,
@@ -222,7 +222,7 @@ const selectMeasuresWithout = createSelector(
 );
 const selectMeasuresByConnections = createSelector(
   selectMeasuresWithout,
-  selectLocationQuery,
+  selectConnectionQuery,
   (entities, query) => query
     ? filterEntitiesByConnection(entities, query, [
       {

@@ -8,31 +8,20 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { Map, List, fromJS } from 'immutable';
-import { orderBy, filter, map } from 'lodash/collection';
-import { flatten } from 'lodash/array';
-
-import { getEntitySortIteratee } from 'utils/sort';
 
 import Sidebar from 'components/styled/Sidebar';
 
 import EntityListSidebar from 'components/entityList/EntityListSidebar';
 import EntityListMain from 'components/entityList/EntityListMain';
 
-import { isUserManager } from 'containers/App/selectors';
+import { isUserManager, selectLocationQuery } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
-
-import {
-  groupEntities,
-  getGroupedEntitiesForPage,
-} from './groupFactory';
 
 import {
   activePanelSelector,
   entitiesSelectedSelector,
 } from './selectors';
-
-import { getPager } from './pagination';
 
 import {
   showPanel,
@@ -47,135 +36,63 @@ import {
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  // TODO figure out why component updates when child component (sidebar option) internal state changes
-  //    possibly due to form model changes
-  //    consider moving form reducer to sidebar or use local form
-  // shouldComponentUpdate(nextProps) {
-  //   const s_p = JSON.stringify(this.props)
-  //   const s_np = JSON.stringify(nextProps)
-  //   return s_np !== s_p
-  // }
-  // shouldComponentUpdate(nextProps) {
-  //   console.log('-------------------------')
-  //   console.log('componentWillReceiveProps')
-  //   console.log(nextProps.entities === this.props.entities, 'immutable map equal')
-  //   const update = JSON.stringify(this.props) !== JSON.stringify(nextProps);
-  //   console.log(!update, 'stringified objects equal')
-  //   return update
-  // }
-  // componentWillReceiveProps(nextProps) {
-  //   console.log('-------------------------')
-  //   console.log('componentWillReceiveProps')
-  //   console.log(nextProps.entities === this.props.entities, 'immutable map equal')
-  //   console.log(JSON.stringify(nextProps.entities) === JSON.stringify(this.props.entities), 'stringified objects equal')
-  // }
-
   formatLabel = (path) => {
     const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
     return this.context.intl.formatMessage(message);
   }
 
   render() {
-    const {
-      sortBy,
-      sortOrder,
-      activePanel,
-      dataReady,
-      isManager,
-      onPanelSelect,
-      filters,
-      edits,
-      location,
-    } = this.props;
-    // convert to JS if present
-    const entities = this.props.entities && this.props.entities.toJS();
-    const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
-    const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
-    const entityIdsSelected = this.props.entityIdsSelected && this.props.entityIdsSelected.toJS();
-
-    // sorted entities: TODO consider moving to selector for caching?
-    const entitiesSorted = dataReady && entities
-      ? orderBy(entities, getEntitySortIteratee(sortBy), sortOrder)
-      : [];
-
-    // grouping and paging
-    // TODO consider moving to selector for caching
-    const entitiesGrouped = entitiesSorted.length > 0
-      ? groupEntities(entitiesSorted, taxonomies, connectedTaxonomies, filters, location.query)
-      : [];
-
-    const entitiesGroupedFlattened = flatten(entitiesGrouped.map((group, gIndex) => group.entitiesGrouped
-      ? flatten(group.entitiesGrouped.map((subgroup, sgIndex) =>
-        subgroup.entities.map((entity) => ({ group: gIndex, subgroup: sgIndex, entity }))
-      ))
-      : group.entities.map((entity) => ({ group: gIndex, entity }))
-    ));
-    // get new pager object for specified page
-    const pager = getPager(
-      entitiesGroupedFlattened.length,
-      location.query.page && parseInt(location.query.page, 10),
-      location.query.items && parseInt(location.query.items, 10)
-    );
-    // get new page of items from items array
-    const pageItems = entitiesGroupedFlattened.slice(pager.startIndex, pager.endIndex + 1);
-    const entitiesGroupedForPage = getGroupedEntitiesForPage(pageItems, entitiesGrouped);
-
     // selected entities
-    const entitiesSelected = dataReady ? map(filter(Object.values(pageItems), (item) => entityIdsSelected.indexOf(item.entity.id) >= 0), 'entity') : [];
-
+    // console.log('EntityList.render' , this.props.entityIdsSelected && this.props.entityIdsSelected.toJS())
     return (
       <div>
         <Sidebar>
-          { dataReady &&
+          { this.props.dataReady &&
             <EntityListSidebar
+              entities={this.props.entities}
               taxonomies={this.props.taxonomies}
               connections={this.props.connections}
               connectedTaxonomies={this.props.connectedTaxonomies}
               entityIdsSelected={this.props.entityIdsSelected}
-              filters={filters}
-              edits={edits}
-              entitiesSorted={entitiesSorted}
-              locationQuery={location.query}
-              onPanelSelect={onPanelSelect}
-              canEdit={isManager}
-              activePanel={activePanel}
+              filters={this.props.filters}
+              edits={this.props.edits}
+              locationQuery={this.props.locationQuery}
+              canEdit={this.props.isManager}
+              activePanel={this.props.activePanel}
               formatLabel={this.formatLabel}
+              onPanelSelect={this.props.onPanelSelect}
               onAssign={(associations, activeEditOption) =>
-                this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
+                this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
             />
           }
         </Sidebar>
         <EntityListMain
-          header={this.props.header}
+          entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
-          isExpandable={this.props.isExpandable}
-          expandNo={this.props.expandNo}
+          entityIdsSelected={this.props.entityIdsSelected}
+          locationQuery={this.props.locationQuery}
+
+          filters={this.props.filters}
+          header={this.props.header}
+          entityTitle={this.props.entityTitle}
           expandableColumns={this.props.expandableColumns}
+
+          dataReady={this.props.dataReady}
           entityLinkTo={this.props.entityLinkTo}
+          isExpandable={this.props.isExpandable}
+          isManager={this.props.isManager}
+
+          formatLabel={this.formatLabel}
+          onEntitySelect={this.props.onEntitySelect}
+          onEntitySelectAll={this.props.onEntitySelectAll}
+          onTagClick={this.props.onTagClick}
           onExpand={this.props.onExpand}
           onGroupSelect={this.props.onGroupSelect}
           onSubgroupSelect={this.props.onSubgroupSelect}
-          onTagClick={this.props.onTagClick}
-          entityIdsSelected={this.props.entityIdsSelected}
-          entityTitle={this.props.entityTitle}
-          dataReady={dataReady}
-          entitiesGrouped={entitiesGroupedForPage}
-          entitiesTotal={entitiesSorted.length}
-          entitiesSelectedTotal={entitiesSelected.length}
-          isManager={isManager}
-          filters={filters}
-          locationQuery={location.query}
-          pager={pager}
-          pageItemsTotal={pageItems.length}
-          formatLabel={this.formatLabel}
-          onEntitySelectAll={(checked) => {
-            this.props.onEntitySelectAll(checked ? map(pageItems, (item) => item.entity.id) : []);
-          }}
-          onEntitySelect={this.props.onEntitySelect}
-          onPageSelect={this.props.onPageSelect}
           onSearch={this.props.onSearch}
+          onPageSelect={this.props.onPageSelect}
         />
       </div>
     );
@@ -192,14 +109,11 @@ EntityList.propTypes = {
   edits: PropTypes.object,
   dataReady: PropTypes.bool,
   header: PropTypes.object,
-  sortBy: PropTypes.string,
-  sortOrder: PropTypes.string,
-  location: PropTypes.object,
+  locationQuery: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object, // single/plural
   entityLinkTo: PropTypes.string,
   isExpandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
-  expandNo: PropTypes.number,
   // selector props
   activePanel: PropTypes.string,
   isManager: PropTypes.bool,
@@ -217,18 +131,13 @@ EntityList.propTypes = {
   onPageSelect: PropTypes.func.isRequired,
 };
 
-EntityList.defaultProps = {
-  sortBy: 'id',
-  sortOrder: 'desc',
-  expandNo: 0,
-};
-
 EntityList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   isManager: isUserManager(state),
+  locationQuery: selectLocationQuery(state),
   activePanel: activePanelSelector(state),
   entityIdsSelected: entitiesSelectedSelector(state),
 });
@@ -291,8 +200,10 @@ function mapDispatchToProps(dispatch, props) {
     onPageSelect: (page) => {
       dispatch(updatePage(page));
     },
-    handleEditSubmit: (formData, selectedEntities, activeEditOption) => {
-      const entities = fromJS(selectedEntities);
+    handleEditSubmit: (formData, activeEditOption, entityIdsSelected) => {
+      const entities = props.entities.filter(
+        (entity) => entityIdsSelected.includes(entity.get('id'))
+      );
       let saveData = Map();
       const changes = formData.get('values').filter((option) => option.get('hasChanged'));
 

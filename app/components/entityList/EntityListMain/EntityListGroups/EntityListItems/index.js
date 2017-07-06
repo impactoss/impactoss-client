@@ -18,12 +18,12 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
   // componentWillUpdate() {
   //   console.log('EntityListItems.componentWillUpdate()')
   // }
-  componentDidUpdate() {
-    // console.log('EntityListItems.componentDidUpdate')
-    if (this.props.scrollContainer) {
-      this.props.scrollContainer.update();
-    }
-  }
+  // componentDidUpdate() {
+  //   // console.log('EntityListItems.componentDidUpdate')
+  //   if (this.props.scrollContainer) {
+  //     this.props.scrollContainer.update();
+  //   }
+  // }
   render() {
     const { entities, expandNo, ...props } = this.props;
     // console.log('EntityListItems.render')

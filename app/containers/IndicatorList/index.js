@@ -82,8 +82,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
     return info;
   }
   render() {
-    const { dataReady, location } = this.props;
-    const expandNo = location.query.expand;
+    const { dataReady } = this.props;
     const expandableColumns = [
       {
         label: 'Progress reports',
@@ -122,7 +121,6 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
           ]}
         />
         <EntityList
-          location={this.props.location}
           entities={this.props.entities}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
@@ -136,7 +134,6 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
             plural: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
           }}
           entityLinkTo="/indicators/"
-          expandNo={expandNo ? parseInt(expandNo, 10) : 0}
           isExpandable
           expandableColumns={expandableColumns}
         />
@@ -149,7 +146,6 @@ IndicatorList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
-  location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
   entities: PropTypes.object.isRequired,
   connections: PropTypes.object,

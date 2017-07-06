@@ -1,10 +1,8 @@
-import { reduce } from 'lodash/collection';
+import { reduce, find } from 'lodash/collection';
 
 import { cleanupSearchTarget } from 'utils/string';
 import asList from 'utils/as-list';
-import asArray from 'utils/as-array';
 import isNumber from 'utils/is-number';
-
 
 // check if entity has nested connection by id
 const testEntityEntityAssociation = (entity, connection, associatedId) =>
@@ -95,14 +93,14 @@ export const filterEntitiesByConnectedCategories = (entities, connections, query
 
 // filter entities by by association with one or more entities of specific connection type
 // assumes prior nesting of relationships
-export const filterEntitiesByConnection = (entities, query, connections) =>
+export const filterEntitiesByConnection = (entities, query, connectionPathKeys) =>
   entities.filter((entity) =>
-    asArray(connections).reduce((passing, connection) =>
-      passing && (query.get(connection.path)
-        ? asList(query.get(connection.path)).reduce((passingQuery, associatedId) =>
-          passingQuery && testEntityEntityAssociation(entity, connection, parseInt(associatedId, 10))
-        , true)
-        : true
-      )
-    , true)
+    asList(query).reduce((passing, queryArg) => {
+      const pathValue = queryArg.split(':');
+      const path = pathValue[0];
+      const connectionPathKey = find(connectionPathKeys, (cpk) => cpk.path === path);
+      return connectionPathKey
+        ? passing && testEntityEntityAssociation(entity, connectionPathKey, parseInt(pathValue[1], 10))
+        : passing;
+    }, true)
   );

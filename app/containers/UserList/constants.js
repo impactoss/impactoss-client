@@ -5,6 +5,7 @@ export const FILTERS = {
     search: true,
   },
   connections: { // filter by associated entity
+    query: 'connected',
     options: [
       {
         search: true,

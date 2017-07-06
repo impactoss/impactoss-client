@@ -18,6 +18,7 @@ export const FILTERS = {
     ],
   },
   connections: { // filter by associated entity
+    query: 'connected',
     options: [
       {
         search: true,

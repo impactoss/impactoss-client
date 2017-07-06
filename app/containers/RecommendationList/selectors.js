@@ -5,7 +5,7 @@ import {
   selectEntities,
   selectEntitiesSearch,
   selectWithoutQuery,
-  selectLocationQuery,
+  selectConnectionQuery,
   selectCategoryQuery,
 } from 'containers/App/selectors';
 
@@ -54,7 +54,7 @@ const selectRecommendationsWithout = createSelector(
 );
 const selectRecommendationsByConnections = createSelector(
   selectRecommendationsWithout,
-  selectLocationQuery,
+  selectConnectionQuery,
   (entities, query) => query
     ? filterEntitiesByConnection(entities, query, [{
       path: 'measures',

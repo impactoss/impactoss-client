@@ -5,31 +5,26 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ScrollContainer } from 'scrollmonitor-react';
+// import { ScrollContainer } from 'scrollmonitor-react';
 import { Map, List } from 'immutable';
-
 import styled from 'styled-components';
+// import { isEqual } from 'lodash/lang';
 
-import { isEqual } from 'lodash/lang';
-
-import { jumpToComponent } from 'utils/scroll-to-component';
+// import { jumpToComponent } from 'utils/scroll-to-component';
 
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
-import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import { CONTENT_LIST } from 'containers/App/constants';
 
 import EntityListGroups from './EntityListGroups';
 import EntityListSearch from './EntityListSearch';
 import EntityListOptions from './EntityListOptions';
-import EntityListHeader from './EntityListHeader';
-import EntityListFooter from './EntityListFooter';
 import { makeCurrentFilters } from './filtersFactory';
 import { makeGroupOptions } from './group-options';
-import { getHeaderColumns } from './header';
+
 
 import messages from './messages';
 
@@ -41,89 +36,73 @@ const ListWrapper = styled.div``;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
-    return !isEqual(this.props.entitiesGrouped, nextProps.entitiesGrouped)
-      || !isEqual(this.props.locationQuery, nextProps.locationQuery)
-      || !isEqual(this.props.scrollContainer, nextProps.scrollContainer)
+    // console.log('entities',this.props.entities === nextProps.entities)
+    // console.log('entityIdsSelected',this.props.entityIdsSelected === nextProps.entityIdsSelected)
+    // console.log('dataReady',this.props.dataReady === nextProps.dataReady)
+    // console.log('scrollContainer',isEqual(this.props.scrollContainer, nextProps.scrollContainer))
+    // console.log('locationQuery',isEqual(this.props.locationQuery, nextProps.locationQuery))
+    return this.props.entities !== nextProps.entities
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
-      || this.props.dataReady !== nextProps.dataReady;
+      || this.props.dataReady !== nextProps.dataReady
+      || this.props.locationQuery !== nextProps.locationQuery;
+      // || !isEqual(this.props.scrollContainer, nextProps.scrollContainer);
   }
-  scrollToTop = () => {
-    jumpToComponent(
-      this.ScrollTarget,
-      this.ScrollReference,
-      this.ScrollContainer
-    );
-  }
+  // scrollToTop = () => {
+  //   jumpToComponent(
+  //     this.ScrollTarget,
+  //     this.ScrollReference,
+  //     this.ScrollContainer
+  //   );
+  // }
 
   render() {
     const {
-      dataReady,
-      entitiesTotal,
-      entitiesSelectedTotal,
-      pageItemsTotal,
-      entityTitle,
-      isManager,
       filters,
-      locationQuery,
-      pager,
-      formatLabel,
       header,
-      onTagClick,
+      entityTitle,
+      expandableColumns,
+      dataReady,
+      isExpandable,
+      isManager,
+      formatLabel,
       onGroupSelect,
       onSubgroupSelect,
-      isExpandable,
-      expandNo,
       onExpand,
-      expandableColumns,
-      onEntitySelectAll,
-      onEntitySelect,
-      onPageSelect,
       onSearch,
+      onTagClick,
     } = this.props;
-    // console.log('EntityListMain.render')
+
+    const locationQuery = this.props.locationQuery && this.props.locationQuery.toJS();
     const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
     const connections = this.props.connections && this.props.connections.toJS();
     const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
 
-    // convert to JS if present
-    let allChecked = CHECKBOX_STATES.INDETERMINATE;
-    if (dataReady) {
-      if (entitiesSelectedTotal === 0) {
-        allChecked = CHECKBOX_STATES.UNCHECKED;
-      } else if (pageItemsTotal > 0 && entitiesSelectedTotal === pageItemsTotal) {
-        allChecked = CHECKBOX_STATES.CHECKED;
-      }
-    }
-    let listHeaderLabel = entityTitle.plural;
-    if (dataReady) {
-      if (entitiesSelectedTotal === 1) {
-        listHeaderLabel = `${entitiesSelectedTotal} ${entityTitle.single} selected`;
-      } else if (entitiesSelectedTotal > 1) {
-        listHeaderLabel = `${entitiesSelectedTotal} ${entityTitle.plural} selected`;
-      }
-    }
+    const expandNo = parseInt(locationQuery.expand, 10);
 
+    const headerTitle = this.props.entities && dataReady
+      ? `${this.props.entities.size} ${this.props.entities.size === 1 ? entityTitle.single : entityTitle.plural}`
+      : entityTitle.plural;
+// <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
+// <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }} >
+// <Container innerRef={(node) => { this.ScrollReference = node; }}>
     return (
-      <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }} >
-        <Container innerRef={(node) => { this.ScrollReference = node; }}>
+      <ContainerWithSidebar>
+        <Container>
           <Content>
             <ContentHeader
               type={CONTENT_LIST}
               icon={header.icon}
               supTitle={header.supTitle}
-              title={dataReady
-                ? `${entitiesTotal} ${entitiesTotal === 1 ? entityTitle.single : entityTitle.plural}`
-                : entityTitle.plural
-              }
+              title={headerTitle}
               buttons={dataReady && isManager
                 ? header.actions
                 : null
               }
             />
-            { (!dataReady || !this.props.scrollContainer) &&
+            { !dataReady &&
               <Loading />
             }
-            { dataReady && this.props.scrollContainer &&
+            { dataReady &&
               <ListEntities>
                 <EntityListSearch
                   filters={makeCurrentFilters(
@@ -161,43 +140,29 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     : null
                   }
                 />
-                <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
-                  <EntityListHeader
-                    columns={getHeaderColumns(
-                      listHeaderLabel,
-                      isManager,
-                      isExpandable,
-                      expandNo,
-                      expandableColumns,
-                      onExpand
-                    )}
-                    isSelect={isManager}
-                    isSelected={allChecked}
-                    onSelect={(checked) => onEntitySelectAll(checked)}
-                  />
+                <ListWrapper>
                   <EntityListGroups
-                    scrollContainer={this.props.scrollContainer}
-                    entitiesGrouped={this.props.entitiesGrouped}
-                    entityIdsSelected={this.props.entityIdsSelected}
+                    entities={this.props.entities}
                     taxonomies={this.props.taxonomies}
+                    connectedTaxonomies={this.props.connectedTaxonomies}
+                    entityIdsSelected={this.props.entityIdsSelected}
+                    locationQuery={this.props.locationQuery}
                     entityLinkTo={this.props.entityLinkTo}
+                    entityTitle={entityTitle}
                     filters={filters}
-                    locationQuery={locationQuery}
                     header={header}
                     isManager={isManager}
-                    onTagClick={onTagClick}
-                    onEntitySelect={onEntitySelect}
                     expandNo={expandNo}
                     isExpandable={isExpandable}
                     expandableColumns={expandableColumns}
                     onExpand={onExpand}
-                  />
-                  <EntityListFooter
-                    pager={pager}
+                    onTagClick={onTagClick}
                     onPageSelect={(page) => {
-                      this.scrollToTop();
-                      onPageSelect(page);
+                      // this.scrollToTop();
+                      this.props.onPageSelect(page);
                     }}
+                    onEntitySelect={this.props.onEntitySelect}
+                    onEntitySelectAll={this.props.onEntitySelectAll}
                   />
                 </ListWrapper>
               </ListEntities>
@@ -210,27 +175,22 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
 }
 
 EntityListMain.propTypes = {
+  entities: PropTypes.instanceOf(Map),
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
+  locationQuery: PropTypes.instanceOf(Map),
   // object/arrays
-  pager: PropTypes.object,
   filters: PropTypes.object,
   header: PropTypes.object,
-  locationQuery: PropTypes.object,
   entityTitle: PropTypes.object, // single/plural
   expandableColumns: PropTypes.array,
-  entitiesGrouped: PropTypes.array,
   // primitive
   dataReady: PropTypes.bool,
   entityLinkTo: PropTypes.string,
   isExpandable: PropTypes.bool,
-  expandNo: PropTypes.number,
   isManager: PropTypes.bool,
-  entitiesTotal: PropTypes.number,
-  entitiesSelectedTotal: PropTypes.number,
-  pageItemsTotal: PropTypes.number,
   // functions
   formatLabel: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
@@ -241,11 +201,12 @@ EntityListMain.propTypes = {
   onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
-  scrollContainer: PropTypes.object,
+  // scrollContainer: PropTypes.object,
 };
 
 EntityListMain.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default ScrollContainer(EntityListMain);
+// export default ScrollContainer(EntityListMain);
+export default EntityListMain;

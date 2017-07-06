@@ -55,7 +55,6 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <EntityList
-          location={this.props.location}
           entities={this.props.entities}
           path="pages"
           filters={FILTERS}
@@ -76,7 +75,6 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
 PageList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
-  location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
   entities: PropTypes.instanceOf(Map).isRequired,
 };

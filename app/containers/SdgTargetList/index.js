@@ -98,8 +98,7 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
     : 0;
 
   render() {
-    const { dataReady, location } = this.props;
-    const expandNo = location.query.expand;
+    const { dataReady } = this.props;
     const expandableColumns = [
       {
         label: 'Indicators',
@@ -144,7 +143,6 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
           ]}
         />
         <EntityList
-          location={this.props.location}
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
@@ -159,7 +157,6 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
             plural: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
           }}
           entityLinkTo="/sdgtargets/"
-          expandNo={expandNo ? parseInt(expandNo, 10) : 0}
           isExpandable
           expandableColumns={expandableColumns}
         />
@@ -172,7 +169,6 @@ SdgTargetList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
-  location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
   entities: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),

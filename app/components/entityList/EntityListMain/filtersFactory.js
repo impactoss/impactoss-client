@@ -37,7 +37,7 @@ formatLabel
   }
   if (filters.connections && connections) {
     filterTags = filterTags.concat(getCurrentConnectionFilters(
-      filters.connections.options,
+      filters.connections,
       connections,
       locationQuery,
       onTagClick,
@@ -138,34 +138,39 @@ export const getCurrentConnectedTaxonomyFilters = (taxonomyFilters, connectedTax
   }
   return tags;
 };
-export const getCurrentConnectionFilters = (connectionFiltersOptions, connections, locationQuery, onClick, withoutMessage, formatLabel) => {
+export const getCurrentConnectionFilters = (connectionFilters, connections, locationQuery, onClick, withoutMessage, formatLabel) => {
   const tags = [];
-  forEach(connectionFiltersOptions, (option) => {
-    if (locationQuery[option.path] && connections[option.path]) {
-      const locationQueryValue = locationQuery[option.path];
+  forEach(connectionFilters.options, (option) => {
+    if (locationQuery[connectionFilters.query] && connections[option.path]) {
+      const locationQueryValue = locationQuery[connectionFilters.query];
       forEach(asArray(locationQueryValue), (queryValue) => {
-        const value = parseInt(queryValue, 10);
-        const connection = connections[option.path][value];
-        let label = connection
-            ? connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name
-            : upperFirst(value);
-        label = label.length > 20 ? `${label.substring(0, 20)}...` : label;
-        tags.push({
-          label,
-          type: option.path,
-          onClick: () => onClick({
-            value,
-            query: option.path,
-            checked: false,
-          }),
-        });
+        const valueSplit = queryValue.split(':');
+        if (valueSplit.length > 0) {
+          const value = parseInt(valueSplit[1], 10);
+          const connection = connections[option.path][value];
+          if (connection) {
+            let label = connection
+                ? connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name
+                : upperFirst(value);
+            label = label.length > 20 ? `${label.substring(0, 20)}...` : label;
+            tags.push({
+              label,
+              type: option.path,
+              onClick: () => onClick({
+                value: queryValue,
+                query: connectionFilters.query,
+                checked: false,
+              }),
+            });
+          }
+        }
       });
     }
   });
 
   if (locationQuery.without) {
     const locationQueryValue = locationQuery.without;
-    forEach(connectionFiltersOptions, (option) => {
+    forEach(connectionFilters.options, (option) => {
       forEach(asArray(locationQueryValue), (queryValue) => {
         // numeric means taxonomy
         if (option.path === queryValue) {

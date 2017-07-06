@@ -440,6 +440,10 @@ const selectCategoryQuery = createSelector(
   selectLocationQuery,
   (locationQuery) => locationQuery && locationQuery.get('cat')
 );
+const selectConnectionQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('connected')
+);
 
 const selectConnectedCategoryQuery = createSelector(
   selectLocationQuery,
@@ -529,6 +533,7 @@ export {
   selectCategoryQuery,
   selectConnectedCategoryQuery,
   selectExpandQuery,
+  selectConnectionQuery,
   selectLocationQuery,
   selectLocation,
 };

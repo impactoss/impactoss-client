@@ -78,7 +78,6 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           ]}
         />
         <EntityList
-          location={this.props.location}
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
@@ -102,7 +101,6 @@ RecommendationList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
-  location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
   entities: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),

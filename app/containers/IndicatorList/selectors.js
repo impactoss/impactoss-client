@@ -6,7 +6,7 @@ import {
   selectEntities,
   selectEntitiesSearch,
   selectWithoutQuery,
-  selectLocationQuery,
+  selectConnectionQuery,
   selectCategoryQuery,
   selectConnectedCategoryQuery,
 } from 'containers/App/selectors';
@@ -157,7 +157,7 @@ const selectIndicatorsWithout = createSelector(
 );
 const selectIndicatorsByConnections = createSelector(
   selectIndicatorsWithout,
-  selectLocationQuery,
+  selectConnectionQuery,
   (entities, query) => query
     ? filterEntitiesByConnection(entities, query, [
       {
