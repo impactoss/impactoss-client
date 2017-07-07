@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { forEach } from 'lodash/collection';
-import { Map } from 'immutable';
+import { List, Map } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -168,7 +168,7 @@ ActionList.propTypes = {
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
   dataReady: PropTypes.bool,
-  entities: PropTypes.instanceOf(Map).isRequired,
+  entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),

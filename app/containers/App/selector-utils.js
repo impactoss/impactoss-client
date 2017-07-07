@@ -104,3 +104,60 @@ export const filterEntitiesByConnection = (entities, query, connectionPathKeys) 
         : passing;
     }, true)
   );
+
+const getEntitySortValueMapper = (entity, sortBy) => {
+  switch (sortBy) {
+    case 'id':
+      // ID field needs to be treated as an int when sorting
+      return entity.get(sortBy);
+    default:
+      return entity.getIn(['attributes', sortBy]);
+  }
+};
+const getEntitySortComparator = (valueA, valueB, sortOrder) => {
+  // check equality
+  if (valueA === valueB) {
+    return 0;
+  }
+  let result;
+  const floatA = parseFloat(valueA);
+  const floatB = parseFloat(valueB);
+  const aStartsWithNumber = !isNaN(floatA);
+  const bStartsWithNumber = !isNaN(floatB);
+  if (aStartsWithNumber && !bStartsWithNumber) {
+    result = -1;
+  } else if (!aStartsWithNumber && bStartsWithNumber) {
+    result = 1;
+  } else if (aStartsWithNumber && bStartsWithNumber) {
+    const aIsNumber = aStartsWithNumber && isFinite(valueA);
+    const bIsNumber = aStartsWithNumber && isFinite(valueA);
+    if (aIsNumber && !bIsNumber) {
+      result = -1;
+    } else if (!aIsNumber && bIsNumber) {
+      result = 1;
+    } else if (aIsNumber && bIsNumber) {
+      // both numbers
+      result = floatA < floatB ? -1 : 1;
+    } else if (floatA !== floatB) {
+      // both starting with number but are not numbers entirely
+      // compare numbers first then remaining strings if numbers equal
+      result = floatA < floatB ? -1 : 1;
+    } else {
+      result = getEntitySortComparator(
+        valueA.slice(floatA.toString().length - (valueA.slice(0, 1) === '.' ? 1 : 0)),
+        valueB.slice(floatB.toString().length - (valueB.slice(0, 1) === '.' ? 1 : 0)),
+        'asc'
+      );
+    }
+  } else {
+    // neither starting with number
+    result = valueA < valueB ? -1 : 1;
+  }
+  return sortOrder === 'desc' ? result * -1 : result;
+};
+export const sortEntities = (entities, sortOrder, sortBy) =>
+  entities
+    .sortBy(
+      (entity) => getEntitySortValueMapper(entity, sortBy || 'id'),
+      (a, b) => getEntitySortComparator(a, b, sortOrder || 'asc')
+    ).toList();

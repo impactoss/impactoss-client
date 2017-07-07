@@ -7,6 +7,8 @@ import {
   selectWithoutQuery,
   selectConnectionQuery,
   selectCategoryQuery,
+  selectSortByQuery,
+  selectSortOrderQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -14,6 +16,7 @@ import {
   filterEntitiesByCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
+  sortEntities,
 } from 'containers/App/selector-utils';
 
 export const selectConnections = createSelector(
@@ -73,8 +76,13 @@ const selectUsersByCategories = createSelector(
 // 4. selectUsersWithout will filter by absence of taxonomy or connection
 // 5. selectUsersByConnections will filter by specific connection
 // 6. selectUsersByCategories will filter by specific categories
-export const selectUsers = selectUsersByCategories;
-
+export const selectUsers = createSelector(
+  selectUsersByCategories,
+  selectSortByQuery,
+  selectSortOrderQuery,
+  (entities, sortBy, sortOrder) =>
+    sortEntities(entities, sortOrder || 'asc', sortBy || 'name')
+);
 
 export const selectTaxonomies = createSelector(
   (state) => selectEntities(state, 'taxonomies'),

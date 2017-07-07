@@ -164,7 +164,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     if (activeOption) {
       if (activePanel === FILTERS_PANEL) {
         formOptions = makeActiveFilterOptions(
-          Object.values(entities.toJS()),
+          entities.toJS(),
           filters,
           activeOption,
           locationQuery,
@@ -179,8 +179,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
         const entitiesSelected = entities.filter((entity) => this.props.entityIdsSelected.includes(entity.get('id')));
         formOptions = makeActiveEditOptions(
-          Object.values(entitiesSelected.toJS()), edits, activeOption, taxonomies, connections, {
-            title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.length} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}`,
+          entitiesSelected.toJS(), edits, activeOption, taxonomies, connections, {
+            title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.size} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}`,
           }
         );
       }
@@ -240,7 +240,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   }
 }
 EntityListSidebar.propTypes = {
-  entities: PropTypes.instanceOf(Map),
+  entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),

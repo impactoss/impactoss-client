@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { List } from 'immutable';
+import { Map, List } from 'immutable';
 
 import { map, forEach } from 'lodash/collection';
 // import { isEqual } from 'lodash/lang';
@@ -40,16 +40,16 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
     const tags = [];
     if (entity.categories) {
       const categoryIds = map(map(Object.values(entity.categories), 'attributes'), 'category_id');
-      forEach(taxonomies, (tax) => {
-        forEach(tax.categories, (category, catId) => {
+      taxonomies.forEach((tax) => {
+        tax.get('categories').forEach((category, catId) => {
           if (categoryIds && categoryIds.indexOf(parseInt(catId, 10)) > -1) {
-            const label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
-              ? category.attributes.short_title
-              : category.attributes.title);
+            const label = (category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
+              ? category.getIn(['attributes', 'short_title'])
+              : category.getIn(['attributes', 'title']));
             if (query && onClick) {
               tags.push({
-                taxId: tax.id,
-                title: category.attributes.title,
+                taxId: tax.get('id'),
+                title: category.getIn(['attributes', 'title']),
                 label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
                 onClick: () => onClick({
                   value: catId,
@@ -59,8 +59,8 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
               });
             } else {
               tags.push({
-                taxId: tax.id,
-                title: category.attributes.title,
+                taxId: tax.get('id'),
+                title: category.getIn(['attributes', 'title']),
                 label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
               });
             }
@@ -93,7 +93,8 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
         ? this.getEntityTags(entity,
           taxonomies,
           associations.taxonomies && associations.taxonomies.query,
-          associations.taxonomies && onTagClick)
+          associations.taxonomies && onTagClick
+        )
         : [],
       connectedCounts: associations && associations.connections ? this.getConnectedCounts(entity, associations.connections.options) : [],
       expandables: isExpandable && !expandNo
@@ -158,9 +159,9 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
 
 EntityListItemWrapper.propTypes = {
   entityIdsSelected: PropTypes.instanceOf(List),
+  taxonomies: PropTypes.instanceOf(Map),
   entity: PropTypes.object.isRequired,
   expandableColumns: PropTypes.array,
-  taxonomies: PropTypes.object,
   associations: PropTypes.object,
   isSelect: PropTypes.bool,
   onEntitySelect: PropTypes.func,

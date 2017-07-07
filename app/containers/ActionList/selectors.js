@@ -9,7 +9,8 @@ import {
   selectConnectionQuery,
   selectCategoryQuery,
   selectConnectedCategoryQuery,
-  // selectExpandQuery,
+  selectSortByQuery,
+  selectSortOrderQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -18,6 +19,7 @@ import {
   filterEntitiesByConnectedCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
+  sortEntities,
 } from 'containers/App/selector-utils';
 
 export const selectTaxonomies = createSelector(
@@ -267,4 +269,10 @@ const selectMeasuresByConnectedCategories = createSelector(
 // 5. selectMeasuresByConnections will filter by specific connection
 // 6. selectMeasuresByCategories will filter by specific categories
 // 7. selectMeasuresByCOnnectedCategories will filter by specific categories connected via connection
-export const selectMeasures = selectMeasuresByConnectedCategories;
+export const selectMeasures = createSelector(
+  selectMeasuresByConnectedCategories,
+  selectSortByQuery,
+  selectSortOrderQuery,
+  (entities, sortBy, sortOrder) =>
+    sortEntities(entities, sortOrder || 'asc', sortBy)
+);

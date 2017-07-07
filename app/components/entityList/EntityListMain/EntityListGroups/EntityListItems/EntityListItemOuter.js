@@ -12,7 +12,6 @@ const Placeholder = styled.div`
   height: ${(props) => props.height}px;
   width: 100%;
   display: block;
-  background-color:#fff;
 `;
 
 class EntityListItemOuter extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

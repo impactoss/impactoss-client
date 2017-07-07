@@ -52,7 +52,9 @@ function entityListReducer(state = initialState, action) {
     }
     case LOCATION_CHANGE: {
       // TODO do not reset on location change 'expand'
-      return state.set('entitiesSelected', List());
+      return state.getIn(['route', 'locationBeforeTransition', 'pathname']) === state.getIn(['route', 'locationBeforeTransition', 'pathnamePrevious'])
+        ? state.set('entitiesSelected', List())
+        : state;
     }
     default:
       return state;

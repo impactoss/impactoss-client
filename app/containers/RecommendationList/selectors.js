@@ -7,6 +7,8 @@ import {
   selectWithoutQuery,
   selectConnectionQuery,
   selectCategoryQuery,
+  selectSortByQuery,
+  selectSortOrderQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -14,11 +16,23 @@ import {
   filterEntitiesByCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
+  sortEntities,
 } from 'containers/App/selector-utils';
 
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'measures'),
   (measures) => Map().set('measures', measures)
+);
+
+export const selectTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => taxonomies
+    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_recommendations']))
+    .map((taxonomy) => taxonomy.set(
+      'categories',
+      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+    ))
 );
 
 const selectRecommendationsNested = createSelector(
@@ -77,16 +91,10 @@ const selectRecommendationsByCategories = createSelector(
 // 4. selectRecommendationsWithout will filter by absence of taxonomy or connection
 // 5. selectRecommendationsByConnections will filter by specific connection
 // 6. selectRecommendationsByCategories will filter by specific categories
-export const selectRecommendations = selectRecommendationsByCategories;
-
-
-export const selectTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
-  (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_recommendations']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
+export const selectRecommendations = createSelector(
+  selectRecommendationsByCategories,
+  selectSortByQuery,
+  selectSortOrderQuery,
+  (entities, sortBy, sortOrder) =>
+    sortEntities(entities, sortOrder || 'asc', sortBy || 'reference')
 );

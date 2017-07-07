@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { Map } from 'immutable';
+import { List } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -76,7 +76,7 @@ PageList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
   dataReady: PropTypes.bool,
-  entities: PropTypes.instanceOf(Map).isRequired,
+  entities: PropTypes.instanceOf(List).isRequired,
 };
 
 PageList.contextTypes = {

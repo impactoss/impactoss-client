@@ -54,21 +54,6 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       this.ScrollContainer
     );
   }
-  // componentWillMount() {
-  //   console.log('EntityListMain.componentWillMount')
-  //   // if (this.props.scrollContainer) {
-  //   //   this.props.scrollContainer.update();
-  //   // }
-  // }
-  // componentDidMount() {
-  //   console.log('EntityListMain.componentDidMount')
-  //   // if (this.props.scrollContainer) {
-  //   //   this.props.scrollContainer.update();
-  //   // }
-  // }
-  // componentWillUpdate() {
-  //   console.log('EntityListMain.componentWillUpdate()')
-  // }
   render() {
     // console.log('EntityListMain.render')
     const {
@@ -113,10 +98,10 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 : null
               }
             />
-            { !dataReady &&
+            { (!dataReady || !this.props.scrollContainer) &&
               <Loading />
             }
-            { dataReady &&
+            { dataReady && this.props.scrollContainer &&
               <ListEntities>
                 <EntityListSearch
                   filters={makeCurrentFilters(
@@ -189,7 +174,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
 }
 
 EntityListMain.propTypes = {
-  entities: PropTypes.instanceOf(Map),
+  entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),

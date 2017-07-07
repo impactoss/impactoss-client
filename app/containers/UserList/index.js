@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { Map } from 'immutable';
+import { List, Map } from 'immutable';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -72,7 +72,7 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
 UserList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   dataReady: PropTypes.bool,
-  entities: PropTypes.instanceOf(Map).isRequired,
+  entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
 };

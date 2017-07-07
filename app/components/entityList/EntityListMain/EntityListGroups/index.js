@@ -6,9 +6,7 @@ import { Map, List } from 'immutable';
 
 // import { isEqual } from 'lodash/lang';
 import { flatten } from 'lodash/array';
-import { orderBy, map } from 'lodash/collection';
-
-import { getEntitySortIteratee } from 'utils/sort';
+import { map } from 'lodash/collection';
 
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
@@ -46,6 +44,13 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
   //   || this.props.locationQuery !== nextProps.locationQuery
   //   || this.props.entityIdsSelected !== nextProps.entityIdsSelected;
   // }
+  // componentWillReceiveProps(nextProps) {
+  //   console.log('EntityListGroups.componentWillReceiveProps()')
+  //   console.log('locationQuery', isEqual(this.props.locationQuery, nextProps.locationQuery), nextProps.locationQuery)
+  //   console.log('entities', isEqual(this.props.entities, nextProps.entities))
+  //   console.log('entityIdsSelected', isEqual(this.props.entityIdsSelected, nextProps.entityIdsSelected))
+  //   console.log('scrollContainer', isEqual(this.props.scrollContainer, nextProps.scrollContainer))
+  // }
   // componentWillMount() {
   //   console.log('EntityListGroups.componentWillMount')
   //   // if (this.props.scrollContainer) {
@@ -73,21 +78,16 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       isExpandable,
       expandableColumns,
       onExpand,
-      sortBy,
-      sortOrder,
       entityTitle,
       onEntitySelectAll,
+      // entities,
     } = this.props;
-    // console.log('EntityListGroups.render')
-    const entities = this.props.entities && this.props.entities.toJS();
+    // this.props.entities && console.log('EntityListGroups.render', this.props.entities.toJS())
+    const entitiesSorted = this.props.entities && this.props.entities.toJS();
     const locationQuery = this.props.locationQuery && this.props.locationQuery.toJS();
     const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
     const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
 
-    // sorted entities: TODO consider moving to selector for caching?
-    const entitiesSorted = entities
-      ? orderBy(entities, getEntitySortIteratee(sortBy), sortOrder)
-      : [];
     // grouping and paging
     // group entities
     const entitiesGrouped = entitiesSorted.length > 0
@@ -176,7 +176,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             </ListEntitiesSubGroupHeader>
                           }
                           <EntityListItems
-                            taxonomies={taxonomies}
+                            taxonomies={this.props.taxonomies}
                             associations={filters}
                             entities={entitySubGroup.entities}
                             entityIdsSelected={entityIdsSelected}
@@ -196,7 +196,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                     }
                     { entityGroup.entities && !entityGroup.entitiesGrouped &&
                       <EntityListItems
-                        taxonomies={taxonomies}
+                        taxonomies={this.props.taxonomies}
                         associations={filters}
                         entities={entityGroup.entities}
                         entityIdsSelected={entityIdsSelected}
@@ -228,15 +228,13 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
 }
 
 EntityListGroups.propTypes = {
-  entities: PropTypes.instanceOf(Map),
+  entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object,
   entityLinkTo: PropTypes.string,
-  sortBy: PropTypes.string,
-  sortOrder: PropTypes.string,
   filters: PropTypes.object,
   header: PropTypes.object,
   isManager: PropTypes.bool,

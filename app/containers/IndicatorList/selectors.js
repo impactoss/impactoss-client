@@ -9,6 +9,8 @@ import {
   selectConnectionQuery,
   selectCategoryQuery,
   selectConnectedCategoryQuery,
+  selectSortByQuery,
+  selectSortOrderQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -17,6 +19,7 @@ import {
   filterEntitiesByConnectedCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
+  sortEntities,
 } from 'containers/App/selector-utils';
 
 export const selectConnections = createSelector(
@@ -197,8 +200,13 @@ const selectIndicatorsByConnectedCategories = createSelector(
 // 5. selectIndicatorsByConnections will filter by specific connection
 // 6. selectIndicatorsByCategories will filter by specific categories
 // 7. selectIndicatorsByCOnnectedCategories will filter by specific categories connected via connection
-export const selectIndicators = selectIndicatorsByConnectedCategories;
-
+export const selectIndicators = createSelector(
+  selectIndicatorsByConnectedCategories,
+  selectSortByQuery,
+  selectSortOrderQuery,
+  (entities, sortBy, sortOrder) =>
+    sortEntities(entities, sortOrder || 'asc', sortBy || 'reference')
+);
 // define selects for getEntities
 // const selects = {
 //   entities: {

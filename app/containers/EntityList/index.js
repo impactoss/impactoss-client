@@ -101,7 +101,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
 EntityList.propTypes = {
   // wrapper props
-  entities: PropTypes.instanceOf(Map).isRequired,
+  entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),

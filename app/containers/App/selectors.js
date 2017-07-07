@@ -458,6 +458,14 @@ const selectExpandQuery = createSelector(
   selectLocationQuery,
   (locationQuery) => locationQuery && locationQuery.get('expand')
 );
+const selectSortOrderQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('sortOrder')
+);
+const selectSortByQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('sortBy')
+);
 
 const selectEntities = (state, path) => state.getIn(['global', 'entities', path]);
 
@@ -535,5 +543,7 @@ export {
   selectExpandQuery,
   selectConnectionQuery,
   selectLocationQuery,
+  selectSortOrderQuery,
+  selectSortByQuery,
   selectLocation,
 };

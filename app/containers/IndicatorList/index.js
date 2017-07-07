@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { forEach } from 'lodash/collection';
+import { Map, List } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -147,9 +148,9 @@ IndicatorList.propTypes = {
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
   dataReady: PropTypes.bool,
-  entities: PropTypes.object.isRequired,
-  connections: PropTypes.object,
-  connectedTaxonomies: PropTypes.object,
+  entities: PropTypes.instanceOf(List).isRequired,
+  connections: PropTypes.instanceOf(Map),
+  connectedTaxonomies: PropTypes.instanceOf(Map),
 };
 
 IndicatorList.contextTypes = {

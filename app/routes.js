@@ -247,7 +247,7 @@ export default function createRoutes(store) {
         const renderRoute = loadModule(cb);
 
         importModules.then(([reducer, sagas, component]) => {
-          injectReducer('actionNew', reducer.default);
+          injectReducer('measureNew', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });
@@ -268,7 +268,7 @@ export default function createRoutes(store) {
         const renderRoute = loadModule(cb);
 
         importModules.then(([reducer, sagas, component]) => {
-          injectReducer('actionImport', reducer.default);
+          injectReducer('measureImport', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });
@@ -305,7 +305,7 @@ export default function createRoutes(store) {
         const renderRoute = loadModule(cb);
 
         importModules.then(([reducer, sagas, component]) => {
-          injectReducer('actionEdit', reducer.default);
+          injectReducer('measureEdit', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });

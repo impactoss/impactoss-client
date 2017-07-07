@@ -2,7 +2,12 @@ import { createSelector } from 'reselect';
 
 import {
   selectEntitiesSearch,
+  selectSortByQuery,
+  selectSortOrderQuery,
 } from 'containers/App/selectors';
+
+import { sortEntities } from 'containers/App/selector-utils';
+
 
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
@@ -13,5 +18,8 @@ export const selectPages = createSelector(
     path: 'pages',
     searchAttributes: ['title'],
   }),
-  (pages) => pages
+  selectSortByQuery,
+  selectSortOrderQuery,
+  (entities, sortBy, sortOrder) =>
+    sortEntities(entities, sortOrder || 'asc', sortBy || 'title')
 );
