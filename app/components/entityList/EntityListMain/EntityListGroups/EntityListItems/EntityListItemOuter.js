@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { getRenderedHeight } from 'react-rendered-size';
-import styled from 'styled-components';
 import { Watch } from 'scrollmonitor-react';
+import styled from 'styled-components';
 import { isEqual } from 'lodash/lang';
+import { List } from 'immutable';
 
 import EntityListItemWrapper from './EntityListItemWrapper';
 
@@ -21,24 +22,40 @@ class EntityListItemOuter extends React.PureComponent { // eslint-disable-line r
       height: 0,
     };
   }
+  componentWillMount() {
+    // console.log('EntityListItemOuter.componentWillMount()',
+    //   this.props.entity.id,
+    //   this.props.isInViewport,
+    // )
+    if (this.props.scrollContainer && !this.props.isInViewport) {
+      // console.log('componentWillMount setheight', this.props.entity.id)
+      this.setState({ height: getRenderedHeight(this.renderItem()) });
+    }
+  }
   shouldComponentUpdate(nextProps, nextState) {
     // only recalculate height if not in viewport
     // console.log('EntityListItemOuter.shouldComponentUpdate', this.props.entity.id)
-    // // console.log('props', isEqual(this.props, nextProps), this.props, nextProps)
-    // // console.log('state', isEqual(this.state, nextState), this.state, nextState)
+    // console.log('height', this.state.height === nextState.height, this.state.height, nextState.height)
     // console.log('isInViewport', isEqual(this.props.isInViewport, nextProps.isInViewport))
+    // console.log('expandNo', this.props.expandNo === nextProps.expandNo, nextProps.expandNo)
     // console.log('entity', isEqual(this.props.entity, nextProps.entity))
-    return this.state.height !== nextState.height
-      || this.props.expandNo !== nextProps.expandNo
-      || !isEqual(this.props.entity, nextProps.entity)
-      || !isEqual(this.props.entityIdsSelected, nextProps.entityIdsSelected)
-      || !isEqual(this.props.isInViewport, nextProps.isInViewport);
-  }
+    // console.log('entityIdsSelected', isEqual(this.props.entityIdsSelected, nextProps.entityIdsSelected))
 
-  componentWillUpdate() {
-    // only recalculate height if not in viewport
-    if (this.props.scrollContainer && !this.props.isInViewport) {
-      // console.log('EntityListItemOuter.componentWillUpdate().getRenderedHeight')
+    return this.state.height !== nextState.height
+    || this.props.expandNo !== nextProps.expandNo
+    || this.props.isInViewport !== nextProps.isInViewport
+    || this.props.entityIdsSelected !== nextProps.entityIdsSelected
+    || !isEqual(this.props.entity, nextProps.entity);
+  }
+  componentWillUpdate(nextProps) {
+    // // only recalculate height if not in viewport
+    // console.log('EntityListItemOuter.componentWillUpdate()',
+    //   this.props.entity.id,
+    //   this.props.isInViewport,
+    //   nextProps.isInViewport,
+    // )
+    if (this.props.scrollContainer && !nextProps.isInViewport) {
+      // console.log('componentWillUpdate setheight', this.props.entity.id)
       this.setState({ height: getRenderedHeight(this.renderItem()) });
     }
   }
@@ -53,11 +70,19 @@ class EntityListItemOuter extends React.PureComponent { // eslint-disable-line r
   }
 
   render() {
+    // console.log(
+    //   'EntityListItemOuter.render',
+    //   this.props.entity.id,
+    //   this.props.isInViewport,
+    // )
+
     return (
       <div>
-        { !this.props.scrollContainer || this.props.isInViewport
-          ? this.renderItem()
-          : <Placeholder height={this.state.height} />
+        { this.props.scrollContainer && this.props.isInViewport &&
+          this.renderItem()
+        }
+        { this.props.scrollContainer && !this.props.isInViewport &&
+          <Placeholder height={this.state.height} />
         }
       </div>
     );
@@ -65,11 +90,11 @@ class EntityListItemOuter extends React.PureComponent { // eslint-disable-line r
 }
 
 EntityListItemOuter.propTypes = {
+  entityIdsSelected: PropTypes.instanceOf(List),
   entity: PropTypes.object.isRequired,
   isInViewport: PropTypes.bool,
   scrollContainer: PropTypes.object,
   expandNo: PropTypes.number,
-  entityIdsSelected: PropTypes.array,
 };
 
 export default Watch(EntityListItemOuter);

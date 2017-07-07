@@ -10,7 +10,6 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Map, List } from 'immutable';
 
-import { filter } from 'lodash/collection';
 import { isEqual } from 'lodash/lang';
 
 import { FILTERS_PANEL, EDIT_PANEL } from 'containers/App/constants';
@@ -69,7 +68,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     // console.log('activePanel',this.props.activePanel !== nextProps.activePanel)
     // console.log('state',!isEqual(this.state, nextState));
     // TODO consider targeting specific query params, eg where, without, cat, catx but also recommendations, etc
-    return !isEqual(this.props.locationQuery, nextProps.locationQuery)
+    return this.props.locationQuery === nextProps.locationQuery
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.activePanel !== nextProps.activePanel
       || !isEqual(this.state, nextState);
@@ -122,23 +121,22 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     const {
       filters,
       edits,
-      entitiesSorted,
       onAssign,
       canEdit,
       activePanel,
       onPanelSelect,
-      locationQuery,
       formatLabel,
+      entities,
     } = this.props;
+    const locationQuery = this.props.locationQuery && this.props.locationQuery.toJS();
     const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
     const connections = this.props.connections && this.props.connections.toJS();
     const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
     const entityIdsSelected = this.props.entityIdsSelected && this.props.entityIdsSelected.toJS();
-    const entitiesSelected = filter(entitiesSorted, (entity) => entityIdsSelected.indexOf(entity.id) >= 0);
 
     const activeOption = this.state.activeOption;
-    const hasSelected = entitiesSelected && entitiesSelected.length > 0;
-    const hasEntities = entitiesSorted && entitiesSorted.length > 0;
+    const hasSelected = entityIdsSelected && entityIdsSelected.length > 0;
+    const hasEntities = entities && entities.size > 0;
     const formModel = activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL;
 
     let panelGroups = null;
@@ -166,7 +164,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     if (activeOption) {
       if (activePanel === FILTERS_PANEL) {
         formOptions = makeActiveFilterOptions(
-          entitiesSorted,
+          Object.values(entities.toJS()),
           filters,
           activeOption,
           locationQuery,
@@ -179,8 +177,9 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           formatLabel,
         );
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
+        const entitiesSelected = entities.filter((entity) => this.props.entityIdsSelected.includes(entity.get('id')));
         formOptions = makeActiveEditOptions(
-          entitiesSelected, edits, activeOption, taxonomies, connections, {
+          Object.values(entitiesSelected.toJS()), edits, activeOption, taxonomies, connections, {
             title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.length} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}`,
           }
         );
@@ -241,15 +240,15 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   }
 }
 EntityListSidebar.propTypes = {
+  entities: PropTypes.instanceOf(Map),
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
-  locationQuery: PropTypes.object,
+  locationQuery: PropTypes.instanceOf(Map),
   canEdit: PropTypes.bool,
   filters: PropTypes.object,
   edits: PropTypes.object,
-  entitiesSorted: PropTypes.array,
   activePanel: PropTypes.string,
   onAssign: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,

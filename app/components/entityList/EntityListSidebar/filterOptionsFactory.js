@@ -15,7 +15,7 @@ export const makeActiveFilterOptions = (entities, filters, activeFilterOption, l
     case 'connectedTaxonomies':
       return makeConnectedTaxonomyFilterOptions(entities, filters, connectedTaxonomies, activeFilterOption, locationQuery, messages, formatLabel);
     case 'connections':
-      return makeConnectionFilterOptions(entities, filters.connections.options, connections, activeFilterOption, locationQuery, messages, formatLabel);
+      return makeConnectionFilterOptions(entities, filters.connections, connections, activeFilterOption, locationQuery, messages, formatLabel);
     case 'attributes':
       return makeAttributeFilterOptions(entities, filters, activeFilterOption, locationQuery, messages, formatLabel);
     default:
@@ -223,7 +223,7 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomies, activeF
 //
 //
 //
-export const makeConnectionFilterOptions = (entities, options, connections, activeFilterOption, locationQuery, messages, formatLabel) => {
+export const makeConnectionFilterOptions = (entities, connectionFilters, connections, activeFilterOption, locationQuery, messages, formatLabel) => {
   const filterOptions = {
     groupId: 'connections',
     options: {},
@@ -232,32 +232,38 @@ export const makeConnectionFilterOptions = (entities, options, connections, acti
     search: true,
   };
   // get the active option
-  const option = find(options, (o) => o.path === activeFilterOption.optionId);
+  const option = find(connectionFilters.options, (o) => o.path === activeFilterOption.optionId);
   // if option active
   if (option) {
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(formatLabel(option.label))}`;
     filterOptions.search = option.search;
+    const query = connectionFilters.query;
+    let locationQueryValue = locationQuery[query];
     // if no entities found show any active options
     if (entities.length === 0) {
-      if (locationQuery[option.path]) {
-        const locationQueryValue = locationQuery[option.path];
+      if (locationQueryValue) {
         forEach(asArray(locationQueryValue), (queryValue) => {
-          const value = parseInt(queryValue, 10);
-          filterOptions.options[value] = {
-            label: connections[option.path] && connections[option.path][value]
-                ? connections[option.path][value].attributes.title
-                : upperFirst(value),
-            showCount: true,
-            value,
-            count: 0,
-            query: option.path,
-            checked: true,
-          };
+          const locationQueryValueConnection = queryValue.split(':');
+          if (locationQueryValueConnection.length > 1) {
+            if (option.path === locationQueryValueConnection[0]) {
+              const value = parseInt(locationQueryValueConnection[1], 10);
+              filterOptions.options[value] = {
+                label: connections[option.path] && connections[option.path][value]
+                    ? connections[option.path][value].attributes.title
+                    : upperFirst(value),
+                showCount: true,
+                value: `${option.path}:${value}`,
+                count: 0,
+                query,
+                checked: true,
+              };
+            }
+          }
         });
       }
       // also check for active without options
       if (locationQuery.without) {
-        const locationQueryValue = locationQuery.without;
+        locationQueryValue = locationQuery.without;
         forEach(asArray(locationQueryValue), (queryValue) => {
           if (option.path === queryValue) {
             filterOptions.options[queryValue] = {
@@ -290,15 +296,16 @@ export const makeConnectionFilterOptions = (entities, options, connections, acti
               if (filterOptions.options[connectedId]) {
                 filterOptions.options[connectedId].count += 1;
               } else {
-                const reference = connection.attributes.number || connection.id;
+                const value = `${option.path}:${connectedId}`;
+                const reference = connection.attributes.reference || connection.attributes.number || connection.id;
                 filterOptions.options[connectedId] = {
                   label: connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name,
                   reference,
                   showCount: true,
-                  value: connectedId,
+                  value: `${option.path}:${connectedId}`,
                   count: 1,
-                  query: option.path,
-                  checked: optionChecked(locationQuery[option.path], connectedId),
+                  query,
+                  checked: optionChecked(locationQueryValue, value),
                   order: reference,
                 };
               }

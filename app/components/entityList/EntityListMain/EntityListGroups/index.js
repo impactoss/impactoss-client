@@ -2,11 +2,26 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { isEqual } from 'lodash/lang';
 import { Map, List } from 'immutable';
 
-import EntityListItems from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems';
+// import { isEqual } from 'lodash/lang';
+import { flatten } from 'lodash/array';
+import { orderBy, map } from 'lodash/collection';
 
+import { getEntitySortIteratee } from 'utils/sort';
+
+import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
+
+import EntityListItems from './EntityListItems';
+import EntityListHeader from './EntityListHeader';
+import EntityListFooter from './EntityListFooter';
+
+import { getHeaderColumns } from './header';
+import { getPager } from './pagination';
+import {
+  groupEntities,
+  getGroupedEntitiesForPage,
+} from './groupFactory';
 import messages from './messages';
 
 const ListEntitiesMain = styled.div`
@@ -25,129 +40,221 @@ const ListEntitiesSubGroupHeader = styled.h5`
 `;
 
 export class EntityListGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  shouldComponentUpdate(nextProps) {
-    // console.log('entitiesGrouped', isEqual(this.props.entitiesGrouped, nextProps.entitiesGrouped))
-    // console.log('entityIdsSelected', this.props.entityIdsSelected === nextProps.entityIdsSelected)
-    // console.log('locationQuery', isEqual(this.props.locationQuery, nextProps.locationQuery), nextProps.locationQuery)
-    return !isEqual(this.props.entitiesGrouped, nextProps.entitiesGrouped)
-    || !isEqual(this.props.locationQuery, nextProps.locationQuery)
-    || this.props.entityIdsSelected !== nextProps.entityIdsSelected;
-  }
+  // shouldComponentUpdate(nextProps) {
+  //   // console.log('locationQuery', isEqual(this.props.locationQuery, nextProps.locationQuery), nextProps.locationQuery)
+  //   return this.props.entities !== nextProps.entities
+  //   || this.props.locationQuery !== nextProps.locationQuery
+  //   || this.props.entityIdsSelected !== nextProps.entityIdsSelected;
+  // }
+  // componentWillMount() {
+  //   console.log('EntityListGroups.componentWillMount')
+  //   // if (this.props.scrollContainer) {
+  //   //   this.props.scrollContainer.update();
+  //   // }
+  // }
+  // componentWillUpdate() {
+  //   console.log('EntityListGroups.componentWillUpdate()')
+  // }
+  // componentDidUpdate() {
+  //   console.log('EntityListGroups.componentDidUpdate')
+  //   // if (this.props.scrollContainer) {
+  //   //   this.props.scrollContainer.update();
+  //   // }
+  // }
   render() {
     const {
-      entitiesGrouped,
+      entityIdsSelected,
       filters,
-      locationQuery,
       header,
       entityLinkTo,
       isManager,
       onTagClick,
       onEntitySelect,
-      expandNo,
       isExpandable,
       expandableColumns,
       onExpand,
+      sortBy,
+      sortOrder,
+      entityTitle,
+      onEntitySelectAll,
     } = this.props;
+    // console.log('EntityListGroups.render')
+    const entities = this.props.entities && this.props.entities.toJS();
+    const locationQuery = this.props.locationQuery && this.props.locationQuery.toJS();
     const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
-    const entityIdsSelected = this.props.entityIdsSelected && this.props.entityIdsSelected.toJS();
+    const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
 
+    // sorted entities: TODO consider moving to selector for caching?
+    const entitiesSorted = entities
+      ? orderBy(entities, getEntitySortIteratee(sortBy), sortOrder)
+      : [];
+    // grouping and paging
+    // group entities
+    const entitiesGrouped = entitiesSorted.length > 0
+      ? groupEntities(entitiesSorted, taxonomies, connectedTaxonomies, filters, locationQuery)
+      : [];
+
+    // flatten groups for pagination, important as can include duplicates
+    const entitiesGroupedFlattened = flatten(entitiesGrouped.map((group, gIndex) => group.entitiesGrouped
+      ? flatten(group.entitiesGrouped.map((subgroup, sgIndex) =>
+        subgroup.entities.map((entity) => ({ group: gIndex, subgroup: sgIndex, entity }))
+      ))
+      : group.entities.map((entity) => ({ group: gIndex, entity }))
+    ));
+
+    // get new pager object for specified page
+    const pager = getPager(
+      entitiesGroupedFlattened.length,
+      locationQuery.page && parseInt(locationQuery.page, 10),
+      locationQuery.items && parseInt(locationQuery.items, 10)
+    );
+    // get new page of items from items array
+    const pageItems = entitiesGroupedFlattened.slice(pager.startIndex, pager.endIndex + 1);
+    const entitiesGroupedForPage = getGroupedEntitiesForPage(pageItems, entitiesGrouped);
+
+    // convert to JS if present
+    let allChecked = CHECKBOX_STATES.INDETERMINATE;
+    if (entityIdsSelected.size === 0) {
+      allChecked = CHECKBOX_STATES.UNCHECKED;
+    } else if (pageItems.length > 0 && entityIdsSelected.size === pageItems.length) {
+      allChecked = CHECKBOX_STATES.CHECKED;
+    }
+    let listHeaderLabel = entityTitle.plural;
+    if (entityIdsSelected.size === 1) {
+      listHeaderLabel = `${entityIdsSelected.size} ${entityTitle.single} selected`;
+    } else if (entityIdsSelected.size > 1) {
+      listHeaderLabel = `${entityIdsSelected.size} ${entityTitle.plural} selected`;
+    }
     const locationGroup = locationQuery.group;
     const locationSubGroup = locationQuery.subgroup;
-
+    const expandNo = locationQuery.expand ? parseInt(locationQuery.expand, 10) : 0;
     return (
-      <ListEntitiesMain>
-        { entitiesGrouped.length === 0 && locationQuery &&
-          <ListEntitiesEmpty>
-            <FormattedMessage {...messages.listEmptyAfterQuery} />
-          </ListEntitiesEmpty>
-        }
-        { entitiesGrouped.length === 0 && !locationQuery &&
-          <ListEntitiesEmpty>
-            <FormattedMessage {...messages.listEmpty} />
-          </ListEntitiesEmpty>
-        }
-        { entitiesGrouped.length > 0 &&
-          <div>
-            {
-              entitiesGrouped.map((entityGroup, i) => (
-                <ListEntitiesGroup key={i}>
-                  { locationGroup && entityGroup.label &&
-                    <ListEntitiesGroupHeader>
-                      {entityGroup.label}
-                    </ListEntitiesGroupHeader>
-                  }
-                  {
-                    entityGroup.entitiesGrouped &&
-                    entityGroup.entitiesGrouped.map((entitySubGroup, j) => (
-                      <ListEntitiesSubGroup key={j}>
-                        { locationSubGroup && entitySubGroup.label &&
-                          <ListEntitiesSubGroupHeader>
-                            {entitySubGroup.label}
-                          </ListEntitiesSubGroupHeader>
-                        }
-                        <EntityListItems
-                          scrollContainer={this.props.scrollContainer}
-                          taxonomies={taxonomies}
-                          associations={filters}
-                          entities={entitySubGroup.entities}
-                          entityIdsSelected={entityIdsSelected}
-                          entityIcon={header.icon}
-                          entityLinkTo={entityLinkTo}
-                          isSelect={isManager}
-                          onTagClick={onTagClick}
-                          onEntitySelect={onEntitySelect}
-                          expandNo={expandNo}
-                          isExpandable={isExpandable}
-                          expandableColumns={expandableColumns}
-                          onExpand={onExpand}
-                        />
-                      </ListEntitiesSubGroup>
-                    ))
-                  }
-                  { entityGroup.entities && !entityGroup.entitiesGrouped &&
-                    <EntityListItems
-                      scrollContainer={this.props.scrollContainer}
-                      taxonomies={taxonomies}
-                      associations={filters}
-                      entities={entityGroup.entities}
-                      entityIdsSelected={entityIdsSelected}
-                      entityIcon={header.icon}
-                      entityLinkTo={entityLinkTo}
-                      isSelect={isManager}
-                      onTagClick={onTagClick}
-                      onEntitySelect={onEntitySelect}
-                      expandNo={expandNo}
-                      isExpandable={isExpandable}
-                      expandableColumns={expandableColumns}
-                      onExpand={onExpand}
-                    />
-                  }
-                </ListEntitiesGroup>
-              ))
-            }
-          </div>
-        }
-      </ListEntitiesMain>
+      <div>
+        <EntityListHeader
+          columns={getHeaderColumns(
+            listHeaderLabel,
+            isManager,
+            isExpandable,
+            expandNo,
+            expandableColumns,
+            onExpand
+          )}
+          isSelect={isManager}
+          isSelected={allChecked}
+          onSelect={(checked) => {
+            onEntitySelectAll(checked ? map(pageItems, (item) => item.entity.id) : []);
+          }}
+        />
+        <ListEntitiesMain>
+          { entitiesGroupedForPage.length === 0 && locationQuery &&
+            <ListEntitiesEmpty>
+              <FormattedMessage {...messages.listEmptyAfterQuery} />
+            </ListEntitiesEmpty>
+          }
+          { entitiesGroupedForPage.length === 0 && !locationQuery &&
+            <ListEntitiesEmpty>
+              <FormattedMessage {...messages.listEmpty} />
+            </ListEntitiesEmpty>
+          }
+          { entitiesGroupedForPage.length > 0 &&
+            <div>
+              {
+                entitiesGroupedForPage.map((entityGroup, i) => (
+                  <ListEntitiesGroup key={i}>
+                    { locationGroup && entityGroup.label &&
+                      <ListEntitiesGroupHeader>
+                        {entityGroup.label}
+                      </ListEntitiesGroupHeader>
+                    }
+                    {
+                      entityGroup.entitiesGrouped &&
+                      entityGroup.entitiesGrouped.map((entitySubGroup, j) => (
+                        <ListEntitiesSubGroup key={j}>
+                          { locationSubGroup && entitySubGroup.label &&
+                            <ListEntitiesSubGroupHeader>
+                              {entitySubGroup.label}
+                            </ListEntitiesSubGroupHeader>
+                          }
+                          <EntityListItems
+                            taxonomies={taxonomies}
+                            associations={filters}
+                            entities={entitySubGroup.entities}
+                            entityIdsSelected={entityIdsSelected}
+                            entityIcon={header.icon}
+                            entityLinkTo={entityLinkTo}
+                            isSelect={isManager}
+                            onTagClick={onTagClick}
+                            onEntitySelect={onEntitySelect}
+                            expandNo={expandNo}
+                            isExpandable={isExpandable}
+                            expandableColumns={expandableColumns}
+                            onExpand={onExpand}
+                            scrollContainer={this.props.scrollContainer}
+                          />
+                        </ListEntitiesSubGroup>
+                      ))
+                    }
+                    { entityGroup.entities && !entityGroup.entitiesGrouped &&
+                      <EntityListItems
+                        taxonomies={taxonomies}
+                        associations={filters}
+                        entities={entityGroup.entities}
+                        entityIdsSelected={entityIdsSelected}
+                        entityIcon={header.icon}
+                        entityLinkTo={entityLinkTo}
+                        isSelect={isManager}
+                        onTagClick={onTagClick}
+                        onEntitySelect={onEntitySelect}
+                        expandNo={expandNo}
+                        isExpandable={isExpandable}
+                        expandableColumns={expandableColumns}
+                        onExpand={onExpand}
+                        scrollContainer={this.props.scrollContainer}
+                      />
+                    }
+                  </ListEntitiesGroup>
+                ))
+              }
+            </div>
+          }
+        </ListEntitiesMain>
+        <EntityListFooter
+          pager={pager}
+          onPageSelect={this.props.onPageSelect}
+        />
+      </div>
     );
   }
 }
 
 EntityListGroups.propTypes = {
-  entitiesGrouped: PropTypes.array.isRequired,
-  entityIdsSelected: PropTypes.instanceOf(List).isRequired,
-  expandableColumns: PropTypes.array,
+  entities: PropTypes.instanceOf(Map),
   taxonomies: PropTypes.instanceOf(Map),
+  connectedTaxonomies: PropTypes.instanceOf(Map),
+  entityIdsSelected: PropTypes.instanceOf(List),
+  locationQuery: PropTypes.instanceOf(Map),
+  entityTitle: PropTypes.object,
+  entityLinkTo: PropTypes.string,
+  sortBy: PropTypes.string,
+  sortOrder: PropTypes.string,
   filters: PropTypes.object,
   header: PropTypes.object,
-  locationQuery: PropTypes.object,
-  entityLinkTo: PropTypes.string,
   isManager: PropTypes.bool,
-  expandNo: PropTypes.number,
   isExpandable: PropTypes.bool,
-  onEntitySelect: PropTypes.func.isRequired,
-  onTagClick: PropTypes.func.isRequired,
+  expandableColumns: PropTypes.array,
   onExpand: PropTypes.func.isRequired,
+  onTagClick: PropTypes.func.isRequired,
+  onPageSelect: PropTypes.func.isRequired,
+  onEntitySelect: PropTypes.func.isRequired,
+  onEntitySelectAll: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,
 };
+
+
+EntityListGroups.defaultProps = {
+  sortBy: 'id',
+  sortOrder: 'desc',
+};
+
 
 export default EntityListGroups;

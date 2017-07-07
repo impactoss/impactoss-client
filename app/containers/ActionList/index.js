@@ -96,8 +96,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     : 0;
 
   render() {
-    const { dataReady, location } = this.props;
-    const expandNo = location.query.expand;
+    const { dataReady } = this.props;
     const expandableColumns = [
       {
         label: 'Indicators',
@@ -142,7 +141,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           ]}
         />
         <EntityList
-          location={this.props.location}
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
@@ -157,7 +155,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
           }}
           entityLinkTo="/actions/"
-          expandNo={expandNo ? parseInt(expandNo, 10) : 0}
           isExpandable
           expandableColumns={expandableColumns}
         />
@@ -170,7 +167,6 @@ ActionList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
-  location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
   entities: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),

@@ -1,6 +1,6 @@
 import { range } from 'lodash/util';
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 20;
 const PAGE_SIZE_MAX = 100;
 const PAGE_LINKS = 5;
 
