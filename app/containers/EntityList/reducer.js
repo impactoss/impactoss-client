@@ -51,6 +51,7 @@ function entityListReducer(state = initialState, action) {
         .set('activePanel', EDIT_PANEL);
     }
     case LOCATION_CHANGE: {
+      // TODO do not reset on location change 'expand'
       return state.set('entitiesSelected', List());
     }
     default:

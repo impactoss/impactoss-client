@@ -5,12 +5,11 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { ScrollContainer } from 'scrollmonitor-react';
+import { ScrollContainer } from 'scrollmonitor-react';
 import { Map, List } from 'immutable';
 import styled from 'styled-components';
-// import { isEqual } from 'lodash/lang';
 
-// import { jumpToComponent } from 'utils/scroll-to-component';
+import { jumpToComponent } from 'utils/scroll-to-component';
 
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
@@ -36,26 +35,42 @@ const ListWrapper = styled.div``;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
-    // console.log('entities',this.props.entities === nextProps.entities)
-    // console.log('entityIdsSelected',this.props.entityIdsSelected === nextProps.entityIdsSelected)
-    // console.log('dataReady',this.props.dataReady === nextProps.dataReady)
-    // console.log('scrollContainer',isEqual(this.props.scrollContainer, nextProps.scrollContainer))
-    // console.log('locationQuery',isEqual(this.props.locationQuery, nextProps.locationQuery))
     return this.props.entities !== nextProps.entities
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.dataReady !== nextProps.dataReady
-      || this.props.locationQuery !== nextProps.locationQuery;
-      // || !isEqual(this.props.scrollContainer, nextProps.scrollContainer);
+      || this.props.locationQuery !== nextProps.locationQuery
+      || typeof this.props.scrollContainer !== typeof nextProps.scrollContainer;
   }
-  // scrollToTop = () => {
-  //   jumpToComponent(
-  //     this.ScrollTarget,
-  //     this.ScrollReference,
-  //     this.ScrollContainer
-  //   );
+  componentDidUpdate() {
+    // console.log('EntityListMain.componentDidUpdate')
+    if (this.props.scrollContainer) {
+      this.props.scrollContainer.recalculateLocations();
+    }
+  }
+  scrollToTop = () => {
+    jumpToComponent(
+      this.ScrollTarget,
+      this.ScrollReference,
+      this.ScrollContainer
+    );
+  }
+  // componentWillMount() {
+  //   console.log('EntityListMain.componentWillMount')
+  //   // if (this.props.scrollContainer) {
+  //   //   this.props.scrollContainer.update();
+  //   // }
   // }
-
+  // componentDidMount() {
+  //   console.log('EntityListMain.componentDidMount')
+  //   // if (this.props.scrollContainer) {
+  //   //   this.props.scrollContainer.update();
+  //   // }
+  // }
+  // componentWillUpdate() {
+  //   console.log('EntityListMain.componentWillUpdate()')
+  // }
   render() {
+    // console.log('EntityListMain.render')
     const {
       filters,
       header,
@@ -82,12 +97,11 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     const headerTitle = this.props.entities && dataReady
       ? `${this.props.entities.size} ${this.props.entities.size === 1 ? entityTitle.single : entityTitle.plural}`
       : entityTitle.plural;
-// <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
-// <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }} >
-// <Container innerRef={(node) => { this.ScrollReference = node; }}>
+// <ContainerWithSidebar>
+// <Container>
     return (
-      <ContainerWithSidebar>
-        <Container>
+      <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Container innerRef={(node) => { this.ScrollReference = node; }}>
           <Content>
             <ContentHeader
               type={CONTENT_LIST}
@@ -140,7 +154,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     : null
                   }
                 />
-                <ListWrapper>
+                <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
                   <EntityListGroups
                     entities={this.props.entities}
                     taxonomies={this.props.taxonomies}
@@ -152,17 +166,17 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     filters={filters}
                     header={header}
                     isManager={isManager}
-                    expandNo={expandNo}
                     isExpandable={isExpandable}
                     expandableColumns={expandableColumns}
                     onExpand={onExpand}
                     onTagClick={onTagClick}
                     onPageSelect={(page) => {
-                      // this.scrollToTop();
+                      this.scrollToTop();
                       this.props.onPageSelect(page);
                     }}
                     onEntitySelect={this.props.onEntitySelect}
                     onEntitySelectAll={this.props.onEntitySelectAll}
+                    scrollContainer={this.props.scrollContainer}
                   />
                 </ListWrapper>
               </ListEntities>
@@ -201,12 +215,12 @@ EntityListMain.propTypes = {
   onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
-  // scrollContainer: PropTypes.object,
+  scrollContainer: PropTypes.object,
 };
 
 EntityListMain.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-// export default ScrollContainer(EntityListMain);
-export default EntityListMain;
+export default ScrollContainer(EntityListMain);
+// export default EntityListMain;

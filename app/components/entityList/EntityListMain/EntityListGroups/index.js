@@ -46,6 +46,21 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
   //   || this.props.locationQuery !== nextProps.locationQuery
   //   || this.props.entityIdsSelected !== nextProps.entityIdsSelected;
   // }
+  // componentWillMount() {
+  //   console.log('EntityListGroups.componentWillMount')
+  //   // if (this.props.scrollContainer) {
+  //   //   this.props.scrollContainer.update();
+  //   // }
+  // }
+  // componentWillUpdate() {
+  //   console.log('EntityListGroups.componentWillUpdate()')
+  // }
+  // componentDidUpdate() {
+  //   console.log('EntityListGroups.componentDidUpdate')
+  //   // if (this.props.scrollContainer) {
+  //   //   this.props.scrollContainer.update();
+  //   // }
+  // }
   render() {
     const {
       entityIdsSelected,
@@ -55,7 +70,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       isManager,
       onTagClick,
       onEntitySelect,
-      expandNo,
       isExpandable,
       expandableColumns,
       onExpand,
@@ -64,7 +78,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       entityTitle,
       onEntitySelectAll,
     } = this.props;
-
+    // console.log('EntityListGroups.render')
     const entities = this.props.entities && this.props.entities.toJS();
     const locationQuery = this.props.locationQuery && this.props.locationQuery.toJS();
     const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
@@ -113,6 +127,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     }
     const locationGroup = locationQuery.group;
     const locationSubGroup = locationQuery.subgroup;
+    const expandNo = locationQuery.expand ? parseInt(locationQuery.expand, 10) : 0;
     return (
       <div>
         <EntityListHeader
@@ -164,7 +179,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             taxonomies={taxonomies}
                             associations={filters}
                             entities={entitySubGroup.entities}
-                            entityIdsSelected={entityIdsSelected ? entityIdsSelected.toJS() : []}
+                            entityIdsSelected={entityIdsSelected}
                             entityIcon={header.icon}
                             entityLinkTo={entityLinkTo}
                             isSelect={isManager}
@@ -174,6 +189,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             isExpandable={isExpandable}
                             expandableColumns={expandableColumns}
                             onExpand={onExpand}
+                            scrollContainer={this.props.scrollContainer}
                           />
                         </ListEntitiesSubGroup>
                       ))
@@ -183,7 +199,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                         taxonomies={taxonomies}
                         associations={filters}
                         entities={entityGroup.entities}
-                        entityIdsSelected={entityIdsSelected ? entityIdsSelected.toJS() : []}
+                        entityIdsSelected={entityIdsSelected}
                         entityIcon={header.icon}
                         entityLinkTo={entityLinkTo}
                         isSelect={isManager}
@@ -193,6 +209,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                         isExpandable={isExpandable}
                         expandableColumns={expandableColumns}
                         onExpand={onExpand}
+                        scrollContainer={this.props.scrollContainer}
                       />
                     }
                   </ListEntitiesGroup>
@@ -214,7 +231,7 @@ EntityListGroups.propTypes = {
   entities: PropTypes.instanceOf(Map),
   taxonomies: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
-  entityIdsSelected: PropTypes.instanceOf(List).isRequired,
+  entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object,
   entityLinkTo: PropTypes.string,
@@ -223,7 +240,6 @@ EntityListGroups.propTypes = {
   filters: PropTypes.object,
   header: PropTypes.object,
   isManager: PropTypes.bool,
-  expandNo: PropTypes.number,
   isExpandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
   onExpand: PropTypes.func.isRequired,
@@ -231,6 +247,7 @@ EntityListGroups.propTypes = {
   onPageSelect: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,
+  scrollContainer: PropTypes.object,
 };
 
 

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { List } from 'immutable';
 
 import { map, forEach } from 'lodash/collection';
 // import { isEqual } from 'lodash/lang';
@@ -17,16 +18,6 @@ const ItemWrapper = styled.div`
 `;
 
 export class EntityListItemWrapper extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  // shouldComponentUpdate(nextProps) {
-  //   // console.log('props isEqual', isEqual(this.props, nextProps))
-  //   return !isEqual(this.props.entities, nextProps.entities)
-  //     || !isEqual(this.props.entityIdsSelected, nextProps.entityIdsSelected)
-  //     || !isEqual(this.props.taxonomies, nextProps.taxonomies)
-  //     || !isEqual(this.props.associations, nextProps.associations)
-  //     || this.props.isSelect !== nextProps.isSelect
-  //     || this.props.checked !== nextProps.checked
-  //     || this.props.expandNo !== nextProps.expandNo;
-  // }
   getConnectedCounts = (entity, connectionOptions) => {
     const counts = [];
     forEach(connectionOptions, (option) => {
@@ -120,9 +111,9 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
 
 
   render() {
+    // console.log('EntityListItemWrapper.render')
     const {
       entity,
-      entityIdsSelected,
       isSelect,
       onEntitySelect,
       expandNo,
@@ -130,13 +121,13 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       expandableColumns,
       onExpand,
       entityIcon,
+      entityIdsSelected,
     } = this.props;
-
     return (
       <ItemWrapper separated={expandNo}>
         <EntityListItem
           select={isSelect}
-          checked={isSelect && entityIdsSelected.indexOf(entity.id) > -1}
+          checked={isSelect && entityIdsSelected.includes(entity.id)}
           onSelect={(checked) => onEntitySelect(entity.id, checked)}
           entity={this.mapToEntityListItem(entity, this.props)}
           expandNo={expandNo}
@@ -166,9 +157,9 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
 }
 
 EntityListItemWrapper.propTypes = {
+  entityIdsSelected: PropTypes.instanceOf(List),
   entity: PropTypes.object.isRequired,
   expandableColumns: PropTypes.array,
-  entityIdsSelected: PropTypes.array,
   taxonomies: PropTypes.object,
   associations: PropTypes.object,
   isSelect: PropTypes.bool,
