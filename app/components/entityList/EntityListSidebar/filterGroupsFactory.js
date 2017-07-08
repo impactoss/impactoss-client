@@ -4,7 +4,6 @@ import { reduce } from 'lodash/collection';
 export const makeFilterGroups = (
   filters,
   taxonomies,
-  connections,
   connectedTaxonomies,
   activeFilterOption,
   messages,
@@ -20,13 +19,13 @@ export const makeFilterGroups = (
       label: messages.taxonomies,
       show: true,
       icon: 'categories',
-      options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
+      options: taxonomies.reduce((taxOptions, taxonomy) => ({
         ...taxOptions,
-        [taxonomy.id]: {
-          id: taxonomy.id, // filterOptionId
-          label: taxonomy.attributes.title,
-          icon: `taxonomy_${taxonomy.id}`,
-          active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.id,
+        [taxonomy.get('id')]: {
+          id: taxonomy.get('id'), // filterOptionId
+          label: taxonomy.getIn(['attributes', 'title']),
+          icon: `taxonomy_${taxonomy.get('id')}`,
+          active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
         },
       }), {}),
     };
@@ -40,20 +39,20 @@ export const makeFilterGroups = (
       label: messages.connectedTaxonomies,
       show: true,
       icon: 'connectedCategories',
-      options: reduce(Object.values(connectedTaxonomies), (taxOptions, taxonomy) => ({
+      options: connectedTaxonomies.reduce((taxOptions, taxonomy) => ({
         ...taxOptions,
-        [taxonomy.id]: {
-          id: taxonomy.id, // filterOptionId
-          label: taxonomy.attributes.title,
-          icon: `taxonomy_${taxonomy.id}`,
-          active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.id,
+        [taxonomy.get('id')]: {
+          id: taxonomy.get('id'), // filterOptionId
+          label: taxonomy.getIn(['attributes', 'title']),
+          icon: `taxonomy_${taxonomy.get('id')}`,
+          active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
         },
       }), {}),
     };
   }
 
   // connections option group
-  if (filters.connections && connections) {
+  if (filters.connections) {
     // first prepare taxonomy options
     filterGroups.connections = {
       id: 'connections', // filterGroupId

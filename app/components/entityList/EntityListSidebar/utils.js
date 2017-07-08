@@ -1,8 +1,8 @@
-import asArray from 'utils/as-array';
+import asList from 'utils/as-list';
 
 //
 export const optionChecked = (queryValue, value) =>
-  !!(queryValue && (asArray(queryValue)).indexOf(value.toString()) > -1);
+  !!(queryValue && (asList(queryValue)).includes(value.toString()));
 
 // attribute checked
 export const attributeOptionChecked = (queryValue, value) =>

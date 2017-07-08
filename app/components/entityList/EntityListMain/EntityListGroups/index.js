@@ -82,7 +82,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       connectedTaxonomies,
     } = this.props;
     // grouping and paging
-    // console.log('entities', entities.toJS())
     // group entities , regardless of page items
     const locationGroup = locationQuery.get('group');
     const entityGroups = locationGroup
@@ -126,7 +125,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     let allChecked = CHECKBOX_STATES.INDETERMINATE;
     if (entityIdsSelected.size === 0) {
       allChecked = CHECKBOX_STATES.UNCHECKED;
-    } else if (entitiesOnPage.length > 0 && entityIdsSelected.size === entitiesOnPage.size) {
+    } else if (entitiesOnPage.size > 0 && entityIdsSelected.size === entitiesOnPage.size) {
       allChecked = CHECKBOX_STATES.CHECKED;
     }
     let listHeaderLabel = entityTitle.plural;

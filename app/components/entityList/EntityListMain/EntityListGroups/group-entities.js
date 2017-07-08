@@ -2,7 +2,7 @@ import { Map, List } from 'immutable';
 import { forEach } from 'lodash/collection';
 import { lowerCase as loCase } from 'lodash/string';
 import { lowerCase } from 'utils/string';
-import { getConnectedCategoryIdsImmutable } from 'utils/entities';
+import { getConnectedCategoryIds } from 'utils/entities';
 import isNumber from 'utils/is-number';
 
 export const groupEntities = (
@@ -97,7 +97,7 @@ export const makeConnectedTaxonomyGroups = (entities, taxonomy, filters) => {
       // if entity has taxonomies
       if (entity.get(connection.path)) { // measure.recommendations stores recommendation_measures
         // add categories from entities if not present otherwise increase count
-        const categoryIds = getConnectedCategoryIdsImmutable(
+        const categoryIds = getConnectedCategoryIds(
           entity,
           connection,
           taxonomy

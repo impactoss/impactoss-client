@@ -104,7 +104,7 @@ const getCurrentTaxonomyFilters = (
     taxonomies.forEach((taxonomy) => {
       asList(locationQueryValue).forEach((queryValue) => {
         // numeric means taxonomy
-        if (isNumber(queryValue) && taxonomy.id === queryValue) {
+        if (isNumber(queryValue) && taxonomy.get('id') === queryValue) {
           const value = queryValue.toString();
           tags.push({
             label: `${withoutMessage} ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`,
@@ -132,7 +132,7 @@ const getCurrentConnectedTaxonomyFilters = (
   onClick
 ) => {
   const tags = [];
-  if (locationQuery[taxonomyFilters.query]) {
+  if (locationQuery.get(taxonomyFilters.query)) {
     const locationQueryValue = locationQuery.get(taxonomyFilters.query);
     connectedTaxonomies.forEach((taxonomy) => {
       asList(locationQueryValue).forEach((queryValue) => {

@@ -127,22 +127,26 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       onPanelSelect,
       formatLabel,
       entities,
+      locationQuery,
+      taxonomies,
+      connectedTaxonomies,
+      connections,
+      entityIdsSelected,
     } = this.props;
-    const locationQuery = this.props.locationQuery && this.props.locationQuery.toJS();
-    const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
-    const connections = this.props.connections && this.props.connections.toJS();
-    const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
-    const entityIdsSelected = this.props.entityIdsSelected && this.props.entityIdsSelected.toJS();
 
     const activeOption = this.state.activeOption;
-    const hasSelected = entityIdsSelected && entityIdsSelected.length > 0;
+    const hasSelected = entityIdsSelected && entityIdsSelected.size > 0;
     const hasEntities = entities && entities.size > 0;
     const formModel = activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL;
 
     let panelGroups = null;
     if (activePanel === FILTERS_PANEL) {
       panelGroups = makeFilterGroups(
-        filters, taxonomies, connections, connectedTaxonomies, activeOption, {
+        filters,
+        taxonomies,
+        connectedTaxonomies,
+        activeOption,
+        {
           attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
           taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
           connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
@@ -152,7 +156,10 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       );
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
       panelGroups = makeEditGroups(
-        edits, taxonomies, connections, activeOption, {
+        edits,
+        taxonomies,
+        activeOption,
+        {
           attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
           taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
           connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
@@ -164,22 +171,28 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     if (activeOption) {
       if (activePanel === FILTERS_PANEL) {
         formOptions = makeActiveFilterOptions(
-          entities.toJS(),
+          entities,
           filters,
           activeOption,
           locationQuery,
           taxonomies,
           connections,
-          connectedTaxonomies, {
+          connectedTaxonomies,
+          {
             titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
             without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
           },
           formatLabel,
         );
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
-        const entitiesSelected = entities.filter((entity) => this.props.entityIdsSelected.includes(entity.get('id')));
+        const entitiesSelected = entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
         formOptions = makeActiveEditOptions(
-          entitiesSelected.toJS(), edits, activeOption, taxonomies, connections, {
+          entitiesSelected.toJS(),
+          edits,
+          activeOption,
+          taxonomies.toJS(),
+          connections.toJS(),
+          {
             title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.size} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}`,
           }
         );

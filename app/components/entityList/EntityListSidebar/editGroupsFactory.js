@@ -3,7 +3,6 @@ import { reduce } from 'lodash/collection';
 export const makeEditGroups = (
   edits,
   taxonomies,
-  connections,
   activeEditOption,
   messages,
   formatLabel
@@ -18,23 +17,23 @@ export const makeEditGroups = (
       label: messages.taxonomies,
       show: true,
       icon: 'categories',
-      options: reduce(Object.values(taxonomies), (taxOptions, taxonomy) => ({
+      options: taxonomies.reduce((taxOptions, taxonomy) => ({
         ...taxOptions,
-        [taxonomy.id]: {
-          id: taxonomy.id, // filterOptionId
-          label: taxonomy.attributes.title,
-          icon: `taxonomy_${taxonomy.id}`,
+        [taxonomy.get('id')]: {
+          id: taxonomy.get('id'), // filterOptionId
+          label: taxonomy.getIn(['attributes', 'title']),
+          icon: `taxonomy_${taxonomy.get('id')}`,
           path: edits.taxonomies.connectPath,
           key: edits.taxonomies.key,
           ownKey: edits.taxonomies.ownKey,
-          active: !!activeEditOption && activeEditOption.optionId === taxonomy.id,
+          active: !!activeEditOption && activeEditOption.optionId === taxonomy.get('id'),
         },
       }), {}),
     };
   }
 
   // connections option group
-  if (edits.connections && connections) {
+  if (edits.connections) {
     // first prepare taxonomy options
     editGroups.connections = {
       id: 'connections', // filterGroupId
