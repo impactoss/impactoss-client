@@ -3,10 +3,10 @@ import { upperFirst } from 'lodash/string';
 
 import { lowerCase } from 'utils/string';
 import isNumber from 'utils/is-number';
-import asArray from 'utils/as-array';
+import asList from 'utils/as-list';
 
 
-export const makeCurrentFilters = ({
+export const currentFilters = ({
   filters,
   taxonomies,
   connections,
@@ -54,24 +54,41 @@ formatLabel
   }
   return filterTags;
 };
+const getCategoryLabel = (category) => {
+  const label = category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
+    ? category.getIn(['attributes', 'short_title'])
+    : category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']);
+  return label.length > 10 ? `${label.substring(0, 10)}...` : label;
+};
 
-export const getCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQuery, onClick, withoutMessage) => {
+const getConnectionLabel = (connection, value) => {
+  const label = connection
+    ? connection.getIn(['attributes', 'title'])
+      || connection.getIn(['attributes', 'friendly_name'])
+      || connection.getIn(['attributes', 'name'])
+    : upperFirst(value);
+  return label.length > 20 ? `${label.substring(0, 20)}...` : label;
+};
+
+const getCurrentTaxonomyFilters = (
+  taxonomyFilters,
+  taxonomies,
+  locationQuery,
+  onClick,
+  withoutMessage
+) => {
   const tags = [];
-  if (locationQuery[taxonomyFilters.query]) {
-    const locationQueryValue = locationQuery[taxonomyFilters.query];
-    forEach(taxonomies, (taxonomy) => {
-      forEach(asArray(locationQueryValue), (queryValue) => {
-        const value = parseInt(queryValue, 10);
-        if (taxonomy.categories[value]) {
-          const category = taxonomy.categories[value];
-          let label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
-            ? category.attributes.short_title
-            : category.attributes.title || category.attributes.name);
-          label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
+  if (locationQuery.get(taxonomyFilters.query)) {
+    const locationQueryValue = locationQuery.get(taxonomyFilters.query);
+    taxonomies.forEach((taxonomy) => {
+      asList(locationQueryValue).forEach((queryValue) => {
+        const value = queryValue.toString();
+        if (taxonomy.getIn(['categories', value])) {
+          const category = taxonomy.getIn(['categories', value]);
           tags.push({
-            label,
+            label: getCategoryLabel(category),
             type: 'taxonomies',
-            id: taxonomy.id,
+            id: taxonomy.get('id'),
             onClick: () => onClick({
               value,
               query: taxonomyFilters.query,
@@ -82,17 +99,17 @@ export const getCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQ
       });
     });
   }
-  if (locationQuery.without) {
-    const locationQueryValue = locationQuery.without;
-    forEach(taxonomies, (taxonomy) => {
-      forEach(asArray(locationQueryValue), (queryValue) => {
+  if (locationQuery.get('without')) {
+    const locationQueryValue = locationQuery.get('without');
+    taxonomies.forEach((taxonomy) => {
+      asList(locationQueryValue).forEach((queryValue) => {
         // numeric means taxonomy
         if (isNumber(queryValue) && taxonomy.id === queryValue) {
-          const value = parseInt(queryValue, 10);
+          const value = queryValue.toString();
           tags.push({
-            label: `${withoutMessage} ${lowerCase(taxonomy.attributes.title)}`,
+            label: `${withoutMessage} ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`,
             type: 'taxonomies',
-            id: taxonomy.id,
+            id: taxonomy.get('id'),
             without: true,
             onClick: () => onClick({
               value,
@@ -106,25 +123,28 @@ export const getCurrentTaxonomyFilters = (taxonomyFilters, taxonomies, locationQ
   }
   return tags;
 };
-export const getCurrentConnectedTaxonomyFilters = (taxonomyFilters, connectedTaxonomies, locationQuery, onClick) => {
+
+
+const getCurrentConnectedTaxonomyFilters = (
+  taxonomyFilters,
+  connectedTaxonomies,
+  locationQuery,
+  onClick
+) => {
   const tags = [];
   if (locationQuery[taxonomyFilters.query]) {
-    const locationQueryValue = locationQuery[taxonomyFilters.query];
-    forEach(connectedTaxonomies, (taxonomy) => {
-      forEach(asArray(locationQueryValue), (queryValue) => {
+    const locationQueryValue = locationQuery.get(taxonomyFilters.query);
+    connectedTaxonomies.forEach((taxonomy) => {
+      asList(locationQueryValue).forEach((queryValue) => {
         const valueSplit = queryValue.split(':');
         if (valueSplit.length > 0) {
-          const value = parseInt(valueSplit[1], 10);
-          if (taxonomy.categories[value]) {
-            const category = taxonomy.categories[value];
-            let label = (category.attributes.short_title && category.attributes.short_title.trim().length > 0
-              ? category.attributes.short_title
-              : category.attributes.title || category.attributes.name);
-            label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
+          const value = valueSplit[1].toString();
+          if (taxonomy.getIn(['categories', value])) {
+            const category = taxonomy.getIn(['categories', value]);
             tags.push({
-              label,
+              label: getCategoryLabel(category),
               type: 'taxonomies',
-              id: taxonomy.id,
+              id: taxonomy.get('id'),
               onClick: () => onClick({
                 value: queryValue,
                 query: taxonomyFilters.query,
@@ -138,23 +158,26 @@ export const getCurrentConnectedTaxonomyFilters = (taxonomyFilters, connectedTax
   }
   return tags;
 };
-export const getCurrentConnectionFilters = (connectionFilters, connections, locationQuery, onClick, withoutMessage, formatLabel) => {
+const getCurrentConnectionFilters = (
+  connectionFilters,
+  connections,
+  locationQuery,
+  onClick,
+  withoutMessage,
+  formatLabel
+) => {
   const tags = [];
   forEach(connectionFilters.options, (option) => {
-    if (locationQuery[connectionFilters.query] && connections[option.path]) {
-      const locationQueryValue = locationQuery[connectionFilters.query];
-      forEach(asArray(locationQueryValue), (queryValue) => {
+    if (locationQuery.get(connectionFilters.query) && connections.get(option.path)) {
+      const locationQueryValue = locationQuery.get(connectionFilters.query);
+      asList(locationQueryValue).forEach((queryValue) => {
         const valueSplit = queryValue.split(':');
         if (valueSplit.length > 0) {
-          const value = parseInt(valueSplit[1], 10);
-          const connection = connections[option.path][value];
+          const value = valueSplit[1].toString();
+          const connection = connections.getIn([option.path, value]);
           if (connection) {
-            let label = connection
-                ? connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name
-                : upperFirst(value);
-            label = label.length > 20 ? `${label.substring(0, 20)}...` : label;
             tags.push({
-              label,
+              label: getConnectionLabel(connection, value),
               type: option.path,
               onClick: () => onClick({
                 value: queryValue,
@@ -168,10 +191,10 @@ export const getCurrentConnectionFilters = (connectionFilters, connections, loca
     }
   });
 
-  if (locationQuery.without) {
-    const locationQueryValue = locationQuery.without;
+  if (locationQuery.get('without')) {
+    const locationQueryValue = locationQuery.get('without');
     forEach(connectionFilters.options, (option) => {
-      forEach(asArray(locationQueryValue), (queryValue) => {
+      asList(locationQueryValue).forEach((queryValue) => {
         // numeric means taxonomy
         if (option.path === queryValue) {
           tags.push({
@@ -190,13 +213,13 @@ export const getCurrentConnectionFilters = (connectionFilters, connections, loca
   }
   return tags;
 };
-export const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuery, onClick) => {
+const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuery, onClick) => {
   const tags = [];
-  if (locationQuery.where) {
-    const locationQueryValue = locationQuery.where;
+  if (locationQuery.get('where')) {
+    const locationQueryValue = locationQuery.get('where');
     forEach(attributeFiltersOptions, (option) => {
       if (locationQueryValue) {
-        forEach(asArray(locationQueryValue), (queryValue) => {
+        asList(locationQueryValue).forEach((queryValue) => {
           const valueSplit = queryValue.split(':');
           if (valueSplit[0] === option.attribute && valueSplit.length > 0) {
             const value = valueSplit[1];

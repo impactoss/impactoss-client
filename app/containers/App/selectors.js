@@ -18,6 +18,7 @@ import createCachedSelector from 're-reselect';
 import { reduce } from 'lodash/collection';
 
 import asArray from 'utils/as-array';
+import asList from 'utils/as-list';
 import { regExMultipleWords } from 'utils/string';
 
 import { USER_ROLES } from 'containers/App/constants';
@@ -425,7 +426,7 @@ const selectWhereQuery = createSelector(
 const selectAttributeQuery = createSelector(
   selectWhereQuery,
   (whereQuery) => whereQuery &&
-    asArray(whereQuery).reduce((memo, where) => {
+    asList(whereQuery).reduce((memo, where) => {
       const attrValue = where.split(':');
       return Object.assign(memo, { [attrValue[0]]: attrValue[1] });
     }, {})

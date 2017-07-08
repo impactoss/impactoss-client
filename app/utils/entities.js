@@ -5,6 +5,31 @@ import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl
 
 
 // get connected category ids for taxonomy
+export const getConnectedCategoryIdsImmutable = (entity, connection, taxonomy) => {
+  let categoryIds = List();
+  if (taxonomy.get('categories')) {
+    // the associated entities ids, eg recommendation ids
+    const connectionIds = entity.get(connection.path).map((connectedEntity) => connectedEntity.get('attributes')).map((att) => att.get(connection.key));
+    // for each category of active taxonomy
+    taxonomy.get('categories').forEach((category) => {
+      // we have saved the associated entities, eg recommendations
+      if (category.get(connection.path)) {
+        // for each category-entitiy-connection, eg recommendation_categories
+        category.get(connection.path).forEach((categoryConnection) => {
+          // if connection exists and category not previously recorded (through other connection)
+          if (connectionIds.includes(categoryConnection.getIn(['attributes', connection.key]))
+            && !categoryIds.includes(categoryConnection.getIn(['attributes', 'category_id']))) {
+            // remember category
+            categoryIds = categoryIds.push(categoryConnection.getIn(['attributes', 'category_id']));
+          }
+        });
+      }
+    });
+  }
+  return categoryIds;
+};
+
+// get connected category ids for taxonomy
 export const getConnectedCategoryIds = (entity, connection, taxonomy) => {
   const categoryIds = [];
   if (taxonomy.categories) {
@@ -28,6 +53,7 @@ export const getConnectedCategoryIds = (entity, connection, taxonomy) => {
   }
   return categoryIds;
 };
+
 
 export const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
   ? taxonomy.get('categories').reduce((catsAssociated, cat) => {

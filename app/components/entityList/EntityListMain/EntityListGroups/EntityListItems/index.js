@@ -32,10 +32,10 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
     return (
       <Styled separated={expandNo}>
         { this.props.scrollContainer &&
-          entities.map((entity) =>
+          entities.map((entity, key) =>
             <EntityListItemOuter
               scrollContainer={this.props.scrollContainer}
-              key={entity.id}
+              key={key}
               entity={entity}
               expandNo={expandNo}
               {...props}

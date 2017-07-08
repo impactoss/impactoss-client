@@ -21,9 +21,8 @@ import { CONTENT_LIST } from 'containers/App/constants';
 import EntityListGroups from './EntityListGroups';
 import EntityListSearch from './EntityListSearch';
 import EntityListOptions from './EntityListOptions';
-import { makeCurrentFilters } from './filtersFactory';
-import { makeGroupOptions } from './group-options';
-
+import { currentFilters } from './current-filters';
+import { getGroupOptions } from './group-options';
 
 import messages from './messages';
 
@@ -70,20 +69,18 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       onExpand,
       onSearch,
       onTagClick,
+      taxonomies,
+      connections,
+      connectedTaxonomies,
+      locationQuery,
     } = this.props;
 
-    const locationQuery = this.props.locationQuery && this.props.locationQuery.toJS();
-    const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
-    const connections = this.props.connections && this.props.connections.toJS();
-    const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
-
-    const expandNo = parseInt(locationQuery.expand, 10);
+    const expandNo = parseInt(locationQuery.get('expand'), 10);
 
     const headerTitle = this.props.entities && dataReady
       ? `${this.props.entities.size} ${this.props.entities.size === 1 ? entityTitle.single : entityTitle.plural}`
       : entityTitle.plural;
-// <ContainerWithSidebar>
-// <Container>
+
     return (
       <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }} >
         <Container innerRef={(node) => { this.ScrollReference = node; }}>
@@ -104,7 +101,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
             { dataReady && this.props.scrollContainer &&
               <ListEntities>
                 <EntityListSearch
-                  filters={makeCurrentFilters(
+                  filters={currentFilters(
                     {
                       filters,
                       taxonomies,
@@ -116,14 +113,14 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
                     formatLabel
                   )}
-                  searchQuery={locationQuery.search || ''}
+                  searchQuery={locationQuery.get('search') || ''}
                   onSearch={onSearch}
                 />
                 <EntityListOptions
-                  groupOptions={makeGroupOptions(taxonomies, connectedTaxonomies)}
-                  subgroupOptions={makeGroupOptions(taxonomies)}
-                  groupSelectValue={locationQuery.group}
-                  subgroupSelectValue={locationQuery.subgroup}
+                  groupOptions={getGroupOptions(taxonomies, connectedTaxonomies)}
+                  subgroupOptions={getGroupOptions(taxonomies)}
+                  groupSelectValue={locationQuery.get('group')}
+                  subgroupSelectValue={locationQuery.get('subgroup')}
                   onGroupSelect={onGroupSelect}
                   onSubgroupSelect={onSubgroupSelect}
                   expandLink={isExpandable

@@ -5,9 +5,6 @@ import styled from 'styled-components';
 import { Map, List } from 'immutable';
 
 // import { isEqual } from 'lodash/lang';
-import { flatten } from 'lodash/array';
-import { map } from 'lodash/collection';
-
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import EntityListItems from './EntityListItems';
@@ -16,10 +13,8 @@ import EntityListFooter from './EntityListFooter';
 
 import { getHeaderColumns } from './header';
 import { getPager } from './pagination';
-import {
-  groupEntities,
-  getGroupedEntitiesForPage,
-} from './groupFactory';
+import { groupEntities } from './group-entities';
+  // getGroupedEntitiesForPage,
 import messages from './messages';
 
 const ListEntitiesMain = styled.div`
@@ -66,6 +61,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
   //   //   this.props.scrollContainer.update();
   //   // }
   // }
+
   render() {
     const {
       entityIdsSelected,
@@ -80,43 +76,57 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       onExpand,
       entityTitle,
       onEntitySelectAll,
-      // entities,
+      entities,
+      locationQuery,
+      taxonomies,
+      connectedTaxonomies,
     } = this.props;
-    // this.props.entities && console.log('EntityListGroups.render', this.props.entities.toJS())
-    const entitiesSorted = this.props.entities && this.props.entities.toJS();
-    const locationQuery = this.props.locationQuery && this.props.locationQuery.toJS();
-    const taxonomies = this.props.taxonomies && this.props.taxonomies.toJS();
-    const connectedTaxonomies = this.props.connectedTaxonomies && this.props.connectedTaxonomies.toJS();
-
     // grouping and paging
-    // group entities
-    const entitiesGrouped = entitiesSorted.length > 0
-      ? groupEntities(entitiesSorted, taxonomies, connectedTaxonomies, filters, locationQuery)
-      : [];
+    // console.log('entities', entities.toJS())
+    // group entities , regardless of page items
+    const locationGroup = locationQuery.get('group');
+    const entityGroups = locationGroup
+      ? groupEntities(entities, taxonomies, connectedTaxonomies, filters, locationQuery)
+      : List().push(Map({ entities }));
 
-    // flatten groups for pagination, important as can include duplicates
-    const entitiesGroupedFlattened = flatten(entitiesGrouped.map((group, gIndex) => group.entitiesGrouped
-      ? flatten(group.entitiesGrouped.map((subgroup, sgIndex) =>
-        subgroup.entities.map((entity) => ({ group: gIndex, subgroup: sgIndex, entity }))
-      ))
-      : group.entities.map((entity) => ({ group: gIndex, entity }))
-    ));
+    // flatten all entities
+    let entityGroupsFlattened;
+    if (locationGroup) {
+      // flatten groups for pagination, important as can include duplicates
+      entityGroupsFlattened = entityGroups.map((group, gIndex) => group.get('entityGroups')
+        ? group.get('entityGroups').map(
+          (subgroup, sgIndex) => subgroup.get('entities').map(
+            (entity) => Map({ group: gIndex, subgroup: sgIndex, entity })
+          )
+        ).flatten(1)
+        : group.get('entities').map((entity) => Map({ group: gIndex, entity }))
+      ).flatten(1);
+    }
 
     // get new pager object for specified page
     const pager = getPager(
-      entitiesGroupedFlattened.length,
-      locationQuery.page && parseInt(locationQuery.page, 10),
-      locationQuery.items && parseInt(locationQuery.items, 10)
+      locationGroup ? entityGroupsFlattened.size : entities.size,
+      locationQuery.get('page') && parseInt(locationQuery.get('page'), 10),
+      locationQuery.get('items') && parseInt(locationQuery.get('items'), 10)
     );
-    // get new page of items from items array
-    const pageItems = entitiesGroupedFlattened.slice(pager.startIndex, pager.endIndex + 1);
-    const entitiesGroupedForPage = getGroupedEntitiesForPage(pageItems, entitiesGrouped);
 
-    // convert to JS if present
+    let entityGroupsPaged = entityGroups;
+    let entitiesOnPage;
+    if (pager.totalPages > 1) {
+      // group again if necessary, this time just for items on page
+      if (locationGroup) {
+        entitiesOnPage = entityGroupsFlattened.map((item) => item.get('entity')).slice(pager.startIndex, pager.endIndex + 1);
+        entityGroupsPaged = groupEntities(entitiesOnPage, taxonomies, connectedTaxonomies, filters, locationQuery);
+      } else {
+        entitiesOnPage = entities.slice(pager.startIndex, pager.endIndex + 1);
+        entityGroupsPaged = List().push(Map({ entities: entitiesOnPage }));
+      }
+    }
+
     let allChecked = CHECKBOX_STATES.INDETERMINATE;
     if (entityIdsSelected.size === 0) {
       allChecked = CHECKBOX_STATES.UNCHECKED;
-    } else if (pageItems.length > 0 && entityIdsSelected.size === pageItems.length) {
+    } else if (entitiesOnPage.length > 0 && entityIdsSelected.size === entitiesOnPage.size) {
       allChecked = CHECKBOX_STATES.CHECKED;
     }
     let listHeaderLabel = entityTitle.plural;
@@ -125,9 +135,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     } else if (entityIdsSelected.size > 1) {
       listHeaderLabel = `${entityIdsSelected.size} ${entityTitle.plural} selected`;
     }
-    const locationGroup = locationQuery.group;
-    const locationSubGroup = locationQuery.subgroup;
-    const expandNo = locationQuery.expand ? parseInt(locationQuery.expand, 10) : 0;
+    const expandNo = locationQuery.get('expand') ? parseInt(locationQuery.get('expand'), 10) : 0;
     return (
       <div>
         <EntityListHeader
@@ -142,43 +150,43 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           isSelect={isManager}
           isSelected={allChecked}
           onSelect={(checked) => {
-            onEntitySelectAll(checked ? map(pageItems, (item) => item.entity.id) : []);
+            onEntitySelectAll(checked ? entitiesOnPage.map((entity) => entity.get('id')).toArray() : []);
           }}
         />
         <ListEntitiesMain>
-          { entitiesGroupedForPage.length === 0 && locationQuery &&
+          { entityGroupsPaged.size === 0 && locationQuery &&
             <ListEntitiesEmpty>
               <FormattedMessage {...messages.listEmptyAfterQuery} />
             </ListEntitiesEmpty>
           }
-          { entitiesGroupedForPage.length === 0 && !locationQuery &&
+          { entityGroupsPaged.size === 0 && !locationQuery &&
             <ListEntitiesEmpty>
               <FormattedMessage {...messages.listEmpty} />
             </ListEntitiesEmpty>
           }
-          { entitiesGroupedForPage.length > 0 &&
+          { entityGroupsPaged.size > 0 &&
             <div>
               {
-                entitiesGroupedForPage.map((entityGroup, i) => (
+                entityGroupsPaged.map((entityGroup, i) => (
                   <ListEntitiesGroup key={i}>
-                    { locationGroup && entityGroup.label &&
+                    { locationGroup && entityGroup.get('label') &&
                       <ListEntitiesGroupHeader>
-                        {entityGroup.label}
+                        {entityGroup.get('label')}
                       </ListEntitiesGroupHeader>
                     }
                     {
-                      entityGroup.entitiesGrouped &&
-                      entityGroup.entitiesGrouped.map((entitySubGroup, j) => (
+                      entityGroup.get('entityGroups') &&
+                      entityGroup.get('entityGroups').map((entitySubGroup, j) => (
                         <ListEntitiesSubGroup key={j}>
-                          { locationSubGroup && entitySubGroup.label &&
+                          { locationQuery.get('subgroup') && entitySubGroup.get('label') &&
                             <ListEntitiesSubGroupHeader>
-                              {entitySubGroup.label}
+                              {entitySubGroup.get('label')}
                             </ListEntitiesSubGroupHeader>
                           }
                           <EntityListItems
                             taxonomies={this.props.taxonomies}
                             associations={filters}
-                            entities={entitySubGroup.entities}
+                            entities={entitySubGroup.get('entities').toJS()}
                             entityIdsSelected={entityIdsSelected}
                             entityIcon={header.icon}
                             entityLinkTo={entityLinkTo}
@@ -194,11 +202,11 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                         </ListEntitiesSubGroup>
                       ))
                     }
-                    { entityGroup.entities && !entityGroup.entitiesGrouped &&
+                    { entityGroup.get('entities') && !entityGroup.get('entityGroups') &&
                       <EntityListItems
                         taxonomies={this.props.taxonomies}
                         associations={filters}
-                        entities={entityGroup.entities}
+                        entities={entityGroup.get('entities').toJS()}
                         entityIdsSelected={entityIdsSelected}
                         entityIcon={header.icon}
                         entityLinkTo={entityLinkTo}

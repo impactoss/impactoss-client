@@ -6,9 +6,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { filter } from 'lodash/collection';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { List } from 'immutable';
 
 import { isEqual } from 'lodash/lang';
 
@@ -47,24 +47,24 @@ export class EntityListOptions extends React.PureComponent { // eslint-disable-l
     const {
       groupSelectValue,
       subgroupSelectValue,
-      groupOptions,
       onGroupSelect,
       onSubgroupSelect,
       expandLink,
     } = this.props;
-    const subgroupOptions = filter(this.props.subgroupOptions, (option) => option.value !== groupSelectValue);
-    const groupOptionsFiltered = filter(groupOptions, (option) => option.value !== subgroupSelectValue);
+
+    const groupOptions = this.props.groupOptions && this.props.groupOptions.filter((option) => option.get('value') !== subgroupSelectValue);
+    const subgroupOptions = this.props.subgroupOptions && this.props.subgroupOptions.filter((option) => option.get('value') !== groupSelectValue);
     return (
       <Styled>
         <EntityListGroupBy
           value={groupSelectValue}
-          options={groupOptionsFiltered}
+          options={groupOptions.toJS()}
           onChange={onGroupSelect}
         />
-        { groupSelectValue && subgroupOptions.length > 0 &&
+        { groupSelectValue && subgroupOptions.size > 0 &&
           <EntityListGroupBy
             value={subgroupSelectValue}
-            options={subgroupOptions}
+            options={subgroupOptions.toJS()}
             onChange={onSubgroupSelect}
             isSubgroup
           />
@@ -91,8 +91,8 @@ export class EntityListOptions extends React.PureComponent { // eslint-disable-l
 EntityListOptions.propTypes = {
   groupSelectValue: PropTypes.string,
   subgroupSelectValue: PropTypes.string,
-  groupOptions: PropTypes.array,
-  subgroupOptions: PropTypes.array,
+  groupOptions: PropTypes.instanceOf(List),
+  subgroupOptions: PropTypes.instanceOf(List),
   onGroupSelect: PropTypes.func,
   onSubgroupSelect: PropTypes.func,
   expandLink: PropTypes.object,
