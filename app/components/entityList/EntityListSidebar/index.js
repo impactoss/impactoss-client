@@ -187,11 +187,11 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
         const entitiesSelected = entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
         formOptions = makeActiveEditOptions(
-          entitiesSelected.toJS(),
+          entitiesSelected,
           edits,
           activeOption,
-          taxonomies.toJS(),
-          connections.toJS(),
+          taxonomies,
+          connections,
           {
             title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.size} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}`,
           }

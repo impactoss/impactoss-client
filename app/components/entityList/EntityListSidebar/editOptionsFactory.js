@@ -1,5 +1,6 @@
-import { find, forEach, map, reduce } from 'lodash/collection';
+import { find, forEach } from 'lodash/collection';
 import { STATES as CHECKBOX } from 'components/forms/IndeterminateCheckbox';
+import { List } from 'immutable';
 
 export const checkedState = (count, length) => {
   if (count === length) {
@@ -29,7 +30,7 @@ export const makeAttributeEditOptions = (entities, edits, activeEditOption, mess
     groupId: 'attributes',
     search: true,
     options: {},
-    selectedCount: entities.length,
+    selectedCount: entities.size,
     multiple: false,
     required: true,
   };
@@ -39,9 +40,9 @@ export const makeAttributeEditOptions = (entities, edits, activeEditOption, mess
     editOptions.title = messages.title;
     editOptions.search = option.search;
     forEach(option.options, (attributeOption) => {
-      const count = reduce(entities, (counter, entity) =>
-        typeof entity.attributes[option.attribute] !== 'undefined'
-          && entity.attributes[option.attribute].toString() === attributeOption.value.toString()
+      const count = entities.reduce((counter, entity) =>
+        typeof entity.getIn(['attributes', option.attribute]) !== 'undefined'
+          && entity.getIn(['attributes', option.attribute]).toString() === attributeOption.value.toString()
           ? counter + 1
           : counter
       , 0);
@@ -50,7 +51,7 @@ export const makeAttributeEditOptions = (entities, edits, activeEditOption, mess
         label: attributeOption.label,
         value: attributeOption.value,
         attribute: option.attribute,
-        checked: checkedState(count, entities.length),
+        checked: checkedState(count, entities.size),
         order: attributeOption.label,
       };
     });
@@ -63,28 +64,31 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
     groupId: 'taxonomies',
     search: true,
     options: {},
-    selectedCount: entities.length,
+    selectedCount: entities.size,
     multiple: true,
     required: false,
   };
 
-  const taxonomy = taxonomies[parseInt(activeEditOption.optionId, 10)];
+  const taxonomy = taxonomies.get(activeEditOption.optionId);
   if (taxonomy) {
     editOptions.title = messages.title;
-    editOptions.multiple = taxonomy.attributes.allow_multiple;
-    editOptions.search = taxonomy.attributes.search;
-    forEach(taxonomy.categories, (category) => {
-      const count = reduce(entities, (counter, entity) => {
-        const categoryIds = entity.categories
-          ? map(map(Object.values(entity.categories), 'attributes'), (attribute) => attribute.category_id.toString())
-          : [];
-        return categoryIds && categoryIds.indexOf(category.id) > -1 ? counter + 1 : counter;
+    editOptions.multiple = taxonomy.getIn(['attributes', 'allow_multiple']);
+    editOptions.search = taxonomy.getIn(['attributes', 'search']);
+    taxonomy.get('categories').forEach((category) => {
+      const count = entities.reduce((counter, entity) => {
+        const categoryIds = entity.get('categories')
+          ? entity
+            .get('categories')
+            .map((cat) => cat.get('attributes'))
+            .map((att) => att.get('category_id').toString())
+          : List();
+        return categoryIds.includes(category.get('id')) ? counter + 1 : counter;
       }, 0);
-      const label = category.attributes.title || category.attributes.name;
-      editOptions.options[category.id] = {
+      const label = category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']);
+      editOptions.options[category.get('id')] = {
         label,
-        value: category.id,
-        checked: checkedState(count, entities.length),
+        value: category.get('id'),
+        checked: checkedState(count, entities.size),
         order: label,
       };
     });
@@ -97,7 +101,7 @@ export const makeConnectionEditOptions = (entities, edits, connections, activeEd
     groupId: 'connections',
     search: true,
     options: {},
-    selectedCount: entities.length,
+    selectedCount: entities.size,
     multiple: true,
     required: false,
   };
@@ -107,19 +111,24 @@ export const makeConnectionEditOptions = (entities, edits, connections, activeEd
     editOptions.title = messages.title;
     editOptions.path = option.connectPath;
     editOptions.search = option.search;
-    forEach(connections[option.path], (connection) => {
-      const count = reduce(entities, (counter, entity) => {
-        const connectedIds = entity[option.path]
-          ? map(map(Object.values(entity[option.path]), 'attributes'), (attribute) => attribute[option.key].toString())
-          : null;
-        return connectedIds && connectedIds.indexOf(connection.id) > -1 ? counter + 1 : counter;
+    connections.get(option.path).forEach((connection) => {
+      const count = entities.reduce((counter, entity) => {
+        const connectedIds = entity.get(option.path)
+          ? entity
+            .get(option.path)
+            .map((entityConnection) => entityConnection.get('attributes'))
+            .map((att) => att.get(option.key).toString())
+          : List();
+        return connectedIds.includes(connection.get('id')) ? counter + 1 : counter;
       }, 0);
-      const reference = connection.attributes.number || connection.id;
-      editOptions.options[connection.id] = {
-        label: connection.attributes.title || connection.attributes.friendly_name || connection.attributes.name,
+      const reference = connection.getIn(['attributes', 'number']) || connection.get('id');
+      editOptions.options[connection.get('id')] = {
+        label: connection.getIn(['attributes', 'title'])
+          || connection.getIn(['attributes', 'friendly_name'])
+          || connection.getIn(['attributes', 'name']),
         reference,
-        value: connection.id,
-        checked: checkedState(count, entities.length),
+        value: connection.get('id'),
+        checked: checkedState(count, entities.size),
         order: reference,
       };
     });
