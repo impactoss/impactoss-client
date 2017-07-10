@@ -34,20 +34,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  getReports = (indicator) => indicator.reports
-    ? Object.values(indicator.reports)
-    : [];
-  getDates = (indicator) => indicator.dates
-    ? Object.values(indicator.dates)
-    : [];
-  getIndicators = (measure) => measure.indicators
-    ? Object.values(measure.indicators).reduce((memo, indicatorAssociation) =>
-      indicatorAssociation.indicator
-        ? memo.concat([indicatorAssociation.indicator])
-        : memo
-    , [])
-    : [];
-
   getReportCount = (measureOrIndicator) => {
     let count = 0;
     // test measure:  return sum of reports for all indicators
@@ -97,26 +83,24 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
 
   render() {
     const { dataReady } = this.props;
-    const expandableColumns = [
-      {
-        label: 'Indicators',
-        type: 'indicators',
-        getCount: this.getIndicatorCount,
-        getEntities: this.getIndicators,
-        entityLinkTo: '/indicators/',
-        icon: 'indicators',
-      },
-      {
-        label: 'Progress reports',
-        type: 'reports',
-        getCount: this.getReportCount,
-        getInfo: this.getReportInfo,
-        getReports: this.getReports,
-        getDates: this.getDates,
-        entityLinkTo: '/reports/',
-        icon: 'reminder',
-      },
-    ];
+    // const expandableColumns = [
+    //   {
+    //     label: 'Indicators',
+    //     type: 'indicators',
+    //     path: 'indicators',
+    //     getCount: this.getIndicatorCount,
+    //     entityLinkTo: '/indicators/',
+    //     icon: 'indicators',
+    //   },
+    //   {
+    //     label: 'Progress reports',
+    //     type: 'reports',
+    //     getCount: this.getReportCount,
+    //     getInfo: this.getReportInfo,
+    //     entityLinkTo: '/reports/',
+    //     icon: 'reminder',
+    //   },
+    // ];
 
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
@@ -155,8 +139,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
           }}
           entityLinkTo="/actions/"
-          isExpandable
-          expandableColumns={expandableColumns}
         />
       </div>
     );

@@ -4,9 +4,11 @@ import { lowerCase } from 'utils/string';
 import isNumber from 'utils/is-number';
 import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
-import { getConnectedCategoryIds } from 'utils/entities';
+import {
+  getConnectedCategories,
+  testEntityCategoryAssociation,
+} from 'utils/entities';
 import { optionChecked, attributeOptionChecked } from './utils';
-
 
 export const makeActiveFilterOptions = (entities, filters, activeFilterOption, locationQuery, taxonomies, connections, connectedTaxonomies, messages, formatLabel) => {
   // create filterOptions
@@ -176,13 +178,9 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
         // if entity has categories
         if (entity.get('categories')) {
           // add categories from entities if not present otherwise increase count
-          const categoryIds = entity
-            .get('categories')
-            .map((cat) => cat.get('attributes'))
-            .map((att) => att.get('category_id'));
           taxonomy.get('categories').forEach((cat, catId) => {
             // if entity has category of active taxonomy
-            if (categoryIds && categoryIds.includes(parseInt(catId, 10))) {
+            if (testEntityCategoryAssociation(entity, catId)) {
               taxCategoryIds.push(catId);
               // if category already added
               if (filterOptions.options[catId]) {
@@ -289,13 +287,7 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
         // if entity has connected entities
         if (entity.get(option.path)) {
           // add connected entities if not present otherwise increase count
-          const connectedIds = {
-            [option.path]: entity
-              .get(option.path)
-              .map((connectedEntity) => connectedEntity.get('attributes'))
-              .map((att) => att.get(option.key)),
-          };
-          connectedIds[option.path].forEach((connectedId) => {
+          entity.get(option.path).forEach((connectedId) => {
             const connection = connections.getIn([option.path, connectedId.toString()]);
             // if not taxonomy already considered
             if (connection) {
@@ -397,30 +389,27 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
           // if entity has taxonomies
           if (entity.get(connection.path)) { // action.recommendations stores recommendation_measures
             // add categories from entities for taxonomy
-            const categoryIds = getConnectedCategoryIds(
-              entity,
-              connection,
-              taxonomy
+            const categories = getConnectedCategories(
+              entity.get(connection.path),
+              taxonomy.get('categories'),
+              connection.path,
             );
-            categoryIds.forEach((categoryId) => {
-              // if category of current taxonomy
-              if (taxonomy.getIn(['categories', categoryId.toString()])) {
-                // if category already added
-                if (filterOptions.options[categoryId]) {
-                  filterOptions.options[categoryId].count += 1;
-                } else {
-                  const value = `${connection.path}:${categoryId}`;
-                  const label = taxonomy.getIn(['categories', categoryId.toString(), 'attributes', 'title']);
-                  filterOptions.options[categoryId] = {
-                    label,
-                    showCount: true,
-                    value,
-                    count: 1,
-                    query,
-                    checked: optionChecked(locationQueryValue, value),
-                    order: label,
-                  };
-                }
+            categories.forEach((category) => {
+              // if category already added
+              if (filterOptions.options[category.get('id')]) {
+                filterOptions.options[category.get('id')].count += 1;
+              } else {
+                const value = `${connection.path}:${category.get('id')}`;
+                const label = category.getIn(['attributes', 'title']);
+                filterOptions.options[category.get('id')] = {
+                  label,
+                  showCount: true,
+                  value,
+                  count: 1,
+                  query,
+                  checked: optionChecked(locationQueryValue, value),
+                  order: label,
+                };
               }
             });
           }

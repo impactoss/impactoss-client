@@ -21,11 +21,8 @@ import {
   renderUserControl,
   validateRequired,
   validateDateFormat,
-} from 'utils/forms';
-
-import {
   getConnectionUpdatesFromFormData,
-} from 'utils/entities';
+} from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 

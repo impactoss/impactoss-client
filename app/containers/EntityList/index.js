@@ -42,8 +42,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   }
 
   render() {
-    // selected entities
     // console.log('EntityList.render' , this.props.entityIdsSelected && this.props.entityIdsSelected.toJS())
+
+    // make sure selected entities are still actually on page
+    const { entityIdsSelected, entities } = this.props;
+    const entityIdsSelectedFiltered = entityIdsSelected.size > 0 && entities
+      ? entityIdsSelected.filter((id) => entities.map((entity) => entity.get('id')).includes(id))
+      : entityIdsSelected;
     return (
       <div>
         <Sidebar>
@@ -53,7 +58,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               taxonomies={this.props.taxonomies}
               connections={this.props.connections}
               connectedTaxonomies={this.props.connectedTaxonomies}
-              entityIdsSelected={this.props.entityIdsSelected}
+              entityIdsSelected={
+                entityIdsSelected.size === entityIdsSelectedFiltered.size
+                ? entityIdsSelected
+                : entityIdsSelectedFiltered
+              }
               filters={this.props.filters}
               edits={this.props.edits}
               locationQuery={this.props.locationQuery}
@@ -71,7 +80,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
-          entityIdsSelected={this.props.entityIdsSelected}
+          entityIdsSelected={
+            entityIdsSelected.size === entityIdsSelectedFiltered.size
+            ? entityIdsSelected
+            : entityIdsSelectedFiltered
+          }
           locationQuery={this.props.locationQuery}
 
           filters={this.props.filters}
@@ -253,11 +266,8 @@ function mapDispatchToProps(dispatch, props) {
             }
 
             if (!!existingAssignments && existingAssignments.size > 0) {
-              const existingAssignmentIds = existingAssignments.map((assigned) =>
-                assigned.getIn(['attributes', activeEditOption.key]).toString()
-              ).toList();
               // exclude existing relations from the changeSet
-              changeSet = creates.filterNot((id) => existingAssignmentIds.includes(id.toString()));
+              changeSet = creates.filter((id) => !existingAssignments.includes(parseInt(id, 10)));
             } else {
               changeSet = creates; // add for all creates
             }
@@ -286,16 +296,15 @@ function mapDispatchToProps(dispatch, props) {
 
             if (!!existingAssignments && existingAssignments.size > 0) {
               changeSet = existingAssignments
-                .filter((assigned) =>
-                  deletes.includes(assigned.getIn(['attributes', activeEditOption.key]).toString()))
-                .map((assigned) => assigned.get('id'));
+                .filter((assigned) => deletes.includes(assigned.toString()))
+                .keySeq() // discard values
+                .toList();
             }
-
             return deleteList.concat(changeSet);
           }, List()));
         }
       }
-
+      // console.log(saveData.toJS())
       dispatch(saveEdits(saveData.toJS()));
     },
   };

@@ -52,8 +52,10 @@ export class EntityListOptions extends React.PureComponent { // eslint-disable-l
       expandLink,
     } = this.props;
 
-    const groupOptions = this.props.groupOptions && this.props.groupOptions.filter((option) => option.get('value') !== subgroupSelectValue);
-    const subgroupOptions = this.props.subgroupOptions && this.props.subgroupOptions.filter((option) => option.get('value') !== groupSelectValue);
+    const groupOptions = this.props.groupOptions
+    && this.props.groupOptions.filter((option) => option.get('value') !== subgroupSelectValue);
+    const subgroupOptions = this.props.subgroupOptions
+    && this.props.subgroupOptions.filter((option) => option.get('value') !== groupSelectValue);
     return (
       <Styled>
         <EntityListGroupBy

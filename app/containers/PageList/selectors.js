@@ -6,7 +6,7 @@ import {
   selectSortOrderQuery,
 } from 'containers/App/selectors';
 
-import { sortEntities } from 'containers/App/selector-utils';
+import { sortEntities } from 'utils/entities';
 
 
 // kicks off series of cascading selectors

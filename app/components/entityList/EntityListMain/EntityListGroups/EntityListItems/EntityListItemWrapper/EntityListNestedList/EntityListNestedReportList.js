@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-
+import { Map } from 'immutable';
 import EntityListNestedReportItem from './EntityListNestedItem/EntityListNestedReportItem';
 import EntityListNestedReportDateItem from './EntityListNestedItem/EntityListNestedReportDateItem';
 
@@ -13,29 +13,21 @@ const ChildItems = styled.span`
 
 export class EntityListNestedReportList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  mapToEntityListItem = (entity, entityLinkTo) => ({
-    id: entity.id,
-    title: entity.attributes.name || entity.attributes.title,
-    reference: this.context.intl && this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
-    linkTo: `${entityLinkTo}${entity.id}`,
-    status: entity.attributes.draft ? 'draft' : null,
-  });
-
   render() {
-    const { reports, dates, entityLinkTo } = this.props;
-
+    const { entity, entityLinkTo } = this.props;
     return (
       <ChildItems>
-        { dates &&
+        { entity.get('dates') &&
           <EntityListNestedReportDateItem
-            dates={dates}
+            dates={entity.get('dates')}
           />
         }
         {
-          reports.map((report, i) =>
+          entity.get('reports').map((report, i) =>
             <EntityListNestedReportItem
               key={i}
-              report={this.mapToEntityListItem(report, entityLinkTo)}
+              report={report}
+              entityLinkTo={entityLinkTo}
             />
           )
         }
@@ -45,12 +37,8 @@ export class EntityListNestedReportList extends React.PureComponent { // eslint-
 }
 
 EntityListNestedReportList.propTypes = {
-  reports: PropTypes.array,
-  dates: PropTypes.array,
+  entity: PropTypes.instanceOf(Map),
   entityLinkTo: PropTypes.string,
-};
-EntityListNestedReportList.contextTypes = {
-  intl: PropTypes.object,
 };
 
 export default EntityListNestedReportList;

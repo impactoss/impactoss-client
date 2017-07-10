@@ -1,4 +1,4 @@
-export const getHeaderColumns = (label, isSelect, isExpandable, expandNo, expandableColumns, onExpand) => {
+export const getHeaderColumns = (label, isManager, isExpandable, expandNo, expandableColumns, onExpand) => {
   // TODO figure out a betterway to determine column widths. this is terrible
   let width = 1;
   // if nested
@@ -7,7 +7,7 @@ export const getHeaderColumns = (label, isSelect, isExpandable, expandNo, expand
   }
   const columns = [{
     label,
-    isSelect,
+    isManager,
     width,
   }];
   if (isExpandable) {

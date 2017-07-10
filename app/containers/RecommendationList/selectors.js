@@ -17,7 +17,7 @@ import {
   filterEntitiesWithoutAssociation,
   attributesEqual,
   sortEntities,
-} from 'containers/App/selector-utils';
+} from 'utils/entities';
 
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'measures'),
@@ -47,14 +47,18 @@ const selectRecommendationsNested = createSelector(
     entities.map((entity) => entity
       .set(
         'categories',
-        entityCategories.filter((association) => attributesEqual(association.getIn(['attributes', 'recommendation_id']), entity.get('id')))
+        entityCategories
+        .filter((association) => attributesEqual(association.getIn(['attributes', 'recommendation_id']), entity.get('id')))
+        .map((association) => association.getIn(['attributes', 'category_id']))
       )
       .set(
         'measures',
-        entityMeasures.filter((association) =>
+        entityMeasures
+        .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'recommendation_id']), entity.get('id'))
           && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
         )
+        .map((association) => association.getIn(['attributes', 'measure_id']))
       )
     )
 );
@@ -70,10 +74,7 @@ const selectRecommendationsByConnections = createSelector(
   selectRecommendationsWithout,
   selectConnectionQuery,
   (entities, query) => query
-    ? filterEntitiesByConnection(entities, query, [{
-      path: 'measures',
-      key: 'measure_id',
-    }])
+    ? filterEntitiesByConnection(entities, query)
     : entities
 );
 const selectRecommendationsByCategories = createSelector(
@@ -83,7 +84,6 @@ const selectRecommendationsByCategories = createSelector(
     ? filterEntitiesByCategories(entities, query)
     : entities
 );
-
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
 // 2. selectEntitiesSearch filters by keyword

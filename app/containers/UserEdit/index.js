@@ -17,11 +17,8 @@ import {
   taxonomyOptions,
   validateRequired,
   renderTaxonomyControl,
-} from 'utils/forms';
-
-import {
   getCategoryUpdatesFromFormData,
-} from 'utils/entities';
+} from 'utils/forms';
 
 import {
   loadEntitiesIfNeeded,

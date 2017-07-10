@@ -12,7 +12,7 @@ function parseJSON(response) {
   if (contentType && contentType.indexOf('application/json') !== -1) {
     return response.json();
   }
-  console.error("Non JSON response!"); // eslint-disable-line
+  // console.error("Non JSON response!"); // eslint-disable-line
   return {};
 }
 

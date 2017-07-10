@@ -1,5 +1,5 @@
 import { Map, List } from 'immutable';
-
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 export const entityOption = (entity, reference) => Map({
   value: entity.get('id'),
@@ -142,4 +142,66 @@ export const validateDateFormat = (val) => {
   // yyyy-mm-dd
   const dateformat = /^\d{4}[-](0?[1-9]|1[012])[-](0?[1-9]|[12][0-9]|3[01])$/;
   return val.match(dateformat);
+};
+
+const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
+  ? taxonomy.get('categories').reduce((catsAssociated, cat) => {
+    if (cat.get('associated')) {
+      return catsAssociated.set(cat.get('id'), cat.get('associated').keySeq().first());
+    }
+    return catsAssociated;
+  }, Map())
+  : Map();
+
+const getAssociatedEntities = (entities) =>
+  entities.reduce((entitiesAssociated, entity) => entity.get('associated')
+    ? entitiesAssociated.set(entity.get('id'), entity.get('associated').keySeq().first())
+    : entitiesAssociated
+  , Map());
+
+export const getCategoryUpdatesFromFormData = ({ formData, taxonomies, createKey }) =>
+  taxonomies.reduce((updates, tax, taxId) => {
+    const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
+
+    // store associated cats as { [cat.id]: [association.id], ... }
+    // then we can use keys for creating new associations and values for deleting
+    const associatedCategories = getAssociatedCategories(tax);
+
+    return Map({
+      delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) =>
+        !formCategoryIds.includes(catId)
+          ? associatedIds.push(associatedId)
+          : associatedIds
+      , List())),
+      create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) =>
+        !associatedCategories.has(catId)
+          ? payloads.push(Map({
+            category_id: catId,
+            [createKey]: formData.get('id'),
+          }))
+          : payloads
+      , List())),
+    });
+  }, Map({ delete: List(), create: List() }));
+
+export const getConnectionUpdatesFromFormData = ({ formData, connections, connectionAttribute, createConnectionKey, createKey }) => {
+  const formConnectionIds = getCheckedValuesFromOptions(formData.get(connectionAttribute));
+  // store associated Actions as { [action.id]: [association.id], ... }
+  const associatedConnections = getAssociatedEntities(connections);
+
+  return Map({
+    delete: associatedConnections.reduce((associatedIds, associatedId, id) =>
+      !formConnectionIds.includes(id)
+        ? associatedIds.push(associatedId)
+        : associatedIds
+    , List()),
+    create: formConnectionIds.reduce((payloads, id) =>
+      !associatedConnections.has(id)
+        ? payloads.push(Map({
+          [createConnectionKey]: id,
+          [createKey]: formData.get('id'),
+        }))
+        : payloads
+    , List()),
+  });
 };

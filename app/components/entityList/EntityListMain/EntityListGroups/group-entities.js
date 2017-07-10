@@ -2,7 +2,10 @@ import { Map, List } from 'immutable';
 import { forEach } from 'lodash/collection';
 import { lowerCase as loCase } from 'lodash/string';
 import { lowerCase } from 'utils/string';
-import { getConnectedCategoryIds } from 'utils/entities';
+import {
+  getConnectedCategories,
+  testEntityCategoryAssociation,
+} from 'utils/entities';
 import isNumber from 'utils/is-number';
 
 export const groupEntities = (
@@ -46,18 +49,14 @@ const makeEntityGroups = (
 export const makeTaxonomyGroups = (entities, taxonomy) => {
   let groups = Map();
   entities.forEach((entity) => {
-    let taxCategoryIds = List();
+    let hasTaxCategory = false;
     // if entity has taxonomies
     if (entity.get('categories')) {
       // add categories from entities if not present otherwise increase count
-      const categoryIds = entity
-        .get('categories')
-        .map((cat) => cat.get('attributes'))
-        .map((att) => att.get('category_id'));
       taxonomy.get('categories').forEach((cat, catId) => {
         // if entity has category of active taxonomy
-        if (categoryIds && categoryIds.includes(parseInt(catId, 10))) {
-          taxCategoryIds = taxCategoryIds.push(catId);
+        if (testEntityCategoryAssociation(entity, 'categories', catId)) {
+          hasTaxCategory = true;
           // if category already added
           if (groups.get(catId)) {
             groups = groups.setIn([catId, 'entities'], groups.getIn([catId, 'entities']).push(entity));
@@ -73,7 +72,7 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
         }
       });
     }
-    if (taxCategoryIds.size === 0) {
+    if (!hasTaxCategory) {
       if (groups.get('without')) {
         groups = groups.setIn(['without', 'entities'], groups.getIn(['without', 'entities']).push(entity));
       } else {
@@ -92,52 +91,49 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
 export const makeConnectedTaxonomyGroups = (entities, taxonomy, filters) => {
   let groups = Map();
   entities.forEach((entity) => {
-    let taxCategoryIds = List();
+    let hasTaxCategory = false;
     forEach(filters.connectedTaxonomies.connections, (connection) => {
       // if entity has taxonomies
       if (entity.get(connection.path)) { // measure.recommendations stores recommendation_measures
         // add categories from entities if not present otherwise increase count
-        const categoryIds = getConnectedCategoryIds(
-          entity,
-          connection,
-          taxonomy
+        const categories = getConnectedCategories(
+          entity.get(connection.path),
+          taxonomy.get('categories'),
+          connection.path,
         );
-        taxonomy.get('categories').forEach((cat, catId) => {
-          // if entity has category of active taxonomy
-          if (categoryIds && categoryIds.includes(parseInt(catId, 10))) {
-            taxCategoryIds = taxCategoryIds.push(catId);
-            // if category already added
-            if (groups.get(catId)) {
-              groups = groups.setIn([catId, 'entities'], groups.getIn([catId, 'entities']).push(entity));
-            } else {
-              const label = cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
-              groups = groups.set(catId, Map({
-                label,
-                entities: List().push(entity),
-                order: loCase(label),
-                id: catId,
-              }));
-            }
+        hasTaxCategory = hasTaxCategory || categories.size > 0;
+        categories.forEach((cat, catId) => {
+          // if category already added
+          if (groups.get(catId)) {
+            groups = groups.setIn([catId, 'entities'], groups.getIn([catId, 'entities']).push(entity));
+          } else {
+            const label = cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
+            groups = groups.set(catId, Map({
+              label,
+              entities: List().push(entity),
+              order: loCase(label),
+              id: catId,
+            }));
           }
         });
       }
-      if (taxCategoryIds.size === 0) {
-        if (groups.get('without')) {
-          groups = groups.setIn(['without', 'entities'], groups.getIn(['without', 'entities']).push(entity));
-        } else {
-          groups = groups.set('without', Map({
-            label: `Without ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`, // `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
-            entities: List().push(entity),
-            order: 'zzzzzzzzz',
-            id: 'without',
-          }));
-        }
-      }
     });  // for each connection
+    if (!hasTaxCategory) {
+      if (groups.get('without')) {
+        groups = groups.setIn(['without', 'entities'], groups.getIn(['without', 'entities']).push(entity));
+      } else {
+        groups = groups.set('without', Map({
+          label: `Without ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`, // `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
+          entities: List().push(entity),
+          order: 'zzzzzzzzz',
+          id: 'without',
+        }));
+      }
+    }
   });  // for each entities
   return groups.sortBy((group) => group.get('order')).toList();
 };
-//
+
 // export const getGroupedEntitiesForPage = (pageItems, entitiesGrouped) =>
 //   pageItems.reduce((groups, item) => {
 //     // figure out 1st level group and existing targetGroup

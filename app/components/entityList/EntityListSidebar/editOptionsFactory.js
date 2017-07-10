@@ -1,6 +1,10 @@
 import { find, forEach } from 'lodash/collection';
 import { STATES as CHECKBOX } from 'components/forms/IndeterminateCheckbox';
-import { List } from 'immutable';
+
+import {
+  testEntityEntityAssociation,
+  testEntityCategoryAssociation,
+} from 'utils/entities';
 
 export const checkedState = (count, length) => {
   if (count === length) {
@@ -75,15 +79,9 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
     editOptions.multiple = taxonomy.getIn(['attributes', 'allow_multiple']);
     editOptions.search = taxonomy.getIn(['attributes', 'search']);
     taxonomy.get('categories').forEach((category) => {
-      const count = entities.reduce((counter, entity) => {
-        const categoryIds = entity.get('categories')
-          ? entity
-            .get('categories')
-            .map((cat) => cat.get('attributes'))
-            .map((att) => att.get('category_id').toString())
-          : List();
-        return categoryIds.includes(category.get('id')) ? counter + 1 : counter;
-      }, 0);
+      const count = entities.reduce((counter, entity) =>
+        testEntityCategoryAssociation(entity, category.get('id')) ? counter + 1 : counter
+      , 0);
       const label = category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']);
       editOptions.options[category.get('id')] = {
         label,
@@ -112,15 +110,9 @@ export const makeConnectionEditOptions = (entities, edits, connections, activeEd
     editOptions.path = option.connectPath;
     editOptions.search = option.search;
     connections.get(option.path).forEach((connection) => {
-      const count = entities.reduce((counter, entity) => {
-        const connectedIds = entity.get(option.path)
-          ? entity
-            .get(option.path)
-            .map((entityConnection) => entityConnection.get('attributes'))
-            .map((att) => att.get(option.key).toString())
-          : List();
-        return connectedIds.includes(connection.get('id')) ? counter + 1 : counter;
-      }, 0);
+      const count = entities.reduce((counter, entity) =>
+        testEntityEntityAssociation(entity, option.path, connection.get('id')) ? counter + 1 : counter
+      , 0);
       const reference = connection.getIn(['attributes', 'number']) || connection.get('id');
       editOptions.options[connection.get('id')] = {
         label: connection.getIn(['attributes', 'title'])

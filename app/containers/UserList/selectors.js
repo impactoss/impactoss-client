@@ -17,7 +17,7 @@ import {
   filterEntitiesWithoutAssociation,
   attributesEqual,
   sortEntities,
-} from 'containers/App/selector-utils';
+} from 'utils/entities';
 
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'roles'),
@@ -35,11 +35,15 @@ const selectUsersNested = createSelector(
     entities.map((entity) => entity
       .set(
         'categories',
-        entityCategories.filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
+        entityCategories
+        .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
+        .map((association) => association.getIn(['attributes', 'category_id']))
       )
       .set(
         'roles',
-        entityRoles.filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
+        entityRoles
+        .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
+        .map((association) => association.getIn(['attributes', 'role_id']))
       )
     )
 );
@@ -55,10 +59,7 @@ const selectUsersByConnections = createSelector(
   selectUsersWithout,
   selectConnectionQuery,
   (entities, query) => query
-    ? filterEntitiesByConnection(entities, query, [{
-      path: 'roles',
-      key: 'role_id',
-    }])
+    ? filterEntitiesByConnection(entities, query)
     : entities
 );
 const selectUsersByCategories = createSelector(

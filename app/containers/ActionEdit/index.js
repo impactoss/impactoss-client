@@ -22,12 +22,9 @@ import {
   renderSdgTargetControl,
   validateRequired,
   validateDateFormat,
-} from 'utils/forms';
-
-import {
   getCategoryUpdatesFromFormData,
   getConnectionUpdatesFromFormData,
-} from 'utils/entities';
+} from 'utils/forms';
 
 import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';

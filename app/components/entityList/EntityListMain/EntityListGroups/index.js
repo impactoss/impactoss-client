@@ -63,6 +63,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
   // }
 
   render() {
+    // console.log('EntityListGroups.render')
     const {
       entityIdsSelected,
       filters,
@@ -120,8 +121,9 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
         entitiesOnPage = entities.slice(pager.startIndex, pager.endIndex + 1);
         entityGroupsPaged = List().push(Map({ entities: entitiesOnPage }));
       }
+    } else {
+      entitiesOnPage = entities;
     }
-
     let allChecked = CHECKBOX_STATES.INDETERMINATE;
     if (entityIdsSelected.size === 0) {
       allChecked = CHECKBOX_STATES.UNCHECKED;
@@ -135,6 +137,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       listHeaderLabel = `${entityIdsSelected.size} ${entityTitle.plural} selected`;
     }
     const expandNo = locationQuery.get('expand') ? parseInt(locationQuery.get('expand'), 10) : 0;
+
     return (
       <div>
         <EntityListHeader
@@ -146,7 +149,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
             expandableColumns,
             onExpand
           )}
-          isSelect={isManager}
+          isManager={isManager}
           isSelected={allChecked}
           onSelect={(checked) => {
             onEntitySelectAll(checked ? entitiesOnPage.map((entity) => entity.get('id')).toArray() : []);
@@ -185,11 +188,11 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                           <EntityListItems
                             taxonomies={this.props.taxonomies}
                             associations={filters}
-                            entities={entitySubGroup.get('entities').toJS()}
+                            entities={entitySubGroup.get('entities')}
                             entityIdsSelected={entityIdsSelected}
                             entityIcon={header.icon}
                             entityLinkTo={entityLinkTo}
-                            isSelect={isManager}
+                            isManager={isManager}
                             onTagClick={onTagClick}
                             onEntitySelect={onEntitySelect}
                             expandNo={expandNo}
@@ -205,11 +208,11 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                       <EntityListItems
                         taxonomies={this.props.taxonomies}
                         associations={filters}
-                        entities={entityGroup.get('entities').toJS()}
+                        entities={entityGroup.get('entities')}
                         entityIdsSelected={entityIdsSelected}
                         entityIcon={header.icon}
                         entityLinkTo={entityLinkTo}
-                        isSelect={isManager}
+                        isManager={isManager}
                         onTagClick={onTagClick}
                         onEntitySelect={onEntitySelect}
                         expandNo={expandNo}

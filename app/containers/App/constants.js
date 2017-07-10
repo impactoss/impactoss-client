@@ -34,12 +34,14 @@ export const AUTHENTICATE_FORWARD = 'nmrf/App/AUTHENTICATE_FORWARD';
 
 export const ADD_ENTITY = 'nmrf/App/ADD_ENTITY';
 export const UPDATE_ENTITY = 'nmrf/App/UPDATE_ENTITY';
-export const DELETE_ENTITY = 'nmrf/App/DELETE_ENTITY';
+export const REMOVE_ENTITY = 'nmrf/App/REMOVE_ENTITY';
+export const UPDATE_ENTITIES = 'nmrf/App/UPDATE_ENTITIES';
+export const UPDATE_CONNECTIONS = 'nmrf/App/UPDATE_CONNECTIONS';
 
 export const SAVE_ENTITY = 'nmrf/App/SAVE_ENTITY';
 export const NEW_ENTITY = 'nmrf/App/NEW_ENTITY';
-export const UPDATE_CONNECTIONS = 'nmrf/App/UPDATE_CONNECTIONS';
-export const UPDATE_ENTITIES = 'nmrf/App/UPDATE_ENTITIES';
+export const SAVE_CONNECTIONS = 'nmrf/App/SAVE_CONNECTIONS';
+export const SAVE_ENTITIES = 'nmrf/App/SAVE_ENTITIES';
 export const DUEDATE_ASSIGNED = 'nmrf/App/DUEDATE_ASSIGNED';
 export const DUEDATE_UNASSIGNED = 'nmrf/App/DUEDATE_UNASSIGNED';
 

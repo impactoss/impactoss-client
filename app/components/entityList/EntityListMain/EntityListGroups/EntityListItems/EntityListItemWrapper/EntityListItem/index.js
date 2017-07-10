@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { isEqual } from 'lodash/lang';
-
+// import { isEqual } from 'lodash/lang';
+import { Map } from 'immutable';
 import Component from 'components/styled/Component';
 
 import EntityListItemMain from './EntityListItemMain';
 import EntityListItemSelect from './EntityListItemSelect';
-import EntityListItemExpandable from './EntityListItemExpandable';
+// import EntityListItemExpandable from './EntityListItemExpandable';
 
 
 const Styled = styled.span`
@@ -35,65 +35,104 @@ const MainInnerWrapper = styled(Component)`
 
 class EntityListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
-    return !isEqual(this.props.entity, nextProps.entity)
-      || this.props.select !== nextProps.select
-      || this.props.checked !== nextProps.checked
+    return this.props.entity !== nextProps.entity
+      || this.props.isSelected !== nextProps.isSelected
       || this.props.expandNo !== nextProps.expandNo;
   }
+  // getExpandables = () => {
+  //   const {
+  //     expandNo,
+  //     isExpandable,
+  //     expandableColumns,
+  //     onExpand,
+  //   } = this.props;
+  //   const entity = this.props.entity.toJS()
+  //   return isExpandable && !expandNo
+  //     ? expandableColumns.map((column, i) => ({
+  //       type: column.type,
+  //       icon: column.icon,
+  //       label: column.label,
+  //       count: column.getCount && column.getCount(entity),
+  //       info: column.getInfo && column.getInfo(entity),
+  //       onClick: () => onExpand(expandNo > i ? i : i + 1),
+  //     }))
+  //     : null;
+  // }
 
   render() {
     const {
       entity,
-      select,
-      checked,
+      isManager,
+      isSelected,
       onSelect,
       expandNo,
       entityIcon,
+      associations,
+      taxonomies,
+      onTagClick,
+      // isExpandable,
+      entityLinkTo,
     } = this.props;
+
+    // console.log('EntityListItem.render', entity.get('id'))
 
     return (
       <Styled expandNo={expandNo}>
         <Item>
-          <MainWrapper expandables={entity.expandables} >
+          <MainWrapper>
             <MainInnerWrapper>
-              {select &&
-                <EntityListItemSelect checked={checked} onSelect={onSelect} />
+              {isManager &&
+                <EntityListItemSelect checked={isSelected} onSelect={onSelect} />
               }
-              <EntityListItemMain entity={entity} entityIcon={entityIcon} />
+              <EntityListItemMain
+                entity={entity}
+                taxonomies={taxonomies}
+                entityIcon={entityIcon}
+                onTagClick={onTagClick}
+                associations={associations}
+                entityLinkTo={entityLinkTo}
+              />
             </MainInnerWrapper>
           </MainWrapper>
-          {entity.expandables &&
-            entity.expandables.map((expandable, i, list) =>
-              <EntityListItemExpandable
-                key={i}
-                label={expandable.label}
-                type={expandable.type}
-                entityIcon={expandable.icon}
-                count={expandable.count}
-                info={expandable.info}
-                onClick={expandable.onClick}
-                width={(1 - 0.66) / list.length}
-              />
-            )
-          }
         </Item>
       </Styled>
     );
   }
 }
 
+// {isExpandable && expandNo > 0 &&
+//   expandables.map((expandable, i, list) =>
+//     <EntityListItemExpandable
+//       key={i}
+//       label={expandable.label}
+//       type={expandable.type}
+//       entityIcon={expandable.icon}
+//       count={expandable.count}
+//       info={expandable.info}
+//       onClick={expandable.onClick}
+//       width={(1 - 0.66) / list.length}
+//     />
+//   )
+// }
 
 EntityListItem.propTypes = {
-  entity: PropTypes.object.isRequired,
-  select: PropTypes.bool,
-  checked: PropTypes.bool,
-  expandNo: PropTypes.number,
+  entity: PropTypes.instanceOf(Map).isRequired,
+  taxonomies: PropTypes.instanceOf(Map),
+  isManager: PropTypes.bool,
+  isSelected: PropTypes.bool,
   onSelect: PropTypes.func,
+  expandNo: PropTypes.number,
+  // isExpandable: PropTypes.bool,
+  // expandableColumns: PropTypes.object,
+  // onExpand: PropTypes.func,
   entityIcon: PropTypes.string,
+  onTagClick: PropTypes.func,
+  associations: PropTypes.object,
+  entityLinkTo: PropTypes.string,
 };
 
 EntityListItem.defaultProps = {
-  checked: false,
+  isSelected: false,
   expandNo: null,
 };
 

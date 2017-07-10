@@ -20,7 +20,7 @@ const ColumnNestedWrap = styled.div`
 class EntityListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   renderFirstColumn = (col) => {
     const { isSelected, onSelect } = this.props;
-    if (col.isSelect) {
+    if (col.isManager) {
       return (
         <ColumnSelect
           isSelected={isSelected}

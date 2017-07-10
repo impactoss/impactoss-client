@@ -45,17 +45,15 @@ function entityListReducer(state = initialState, action) {
           : selected.filterNot((id) => id === action.data.id))
         .set('activePanel', EDIT_PANEL);
     }
-    case ENTITIES_SELECT: {
+    case ENTITIES_SELECT:
       return state
         .set('entitiesSelected', fromJS(action.ids))
         .set('activePanel', EDIT_PANEL);
-    }
-    case LOCATION_CHANGE: {
+    case LOCATION_CHANGE:
       // TODO do not reset on location change 'expand'
       return state.getIn(['route', 'locationBeforeTransition', 'pathname']) === state.getIn(['route', 'locationBeforeTransition', 'pathnamePrevious'])
         ? state.set('entitiesSelected', List())
         : state;
-    }
     default:
       return state;
   }

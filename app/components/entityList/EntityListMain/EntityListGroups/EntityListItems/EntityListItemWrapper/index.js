@@ -4,12 +4,12 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Map, List } from 'immutable';
 
-import { map, forEach } from 'lodash/collection';
+// import { map, forEach } from 'lodash/collection';
 // import { isEqual } from 'lodash/lang';
 
 import EntityListItem from './EntityListItem';
-import EntityListNestedList from './EntityListNestedList';
-import EntityListNestedReportList from './EntityListNestedList/EntityListNestedReportList';
+// import EntityListNestedList from './EntityListNestedList';
+// import EntityListNestedReportList from './EntityListNestedList/EntityListNestedReportList';
 
 const ItemWrapper = styled.div`
   border-top: 1px solid;
@@ -18,158 +18,81 @@ const ItemWrapper = styled.div`
 `;
 
 export class EntityListItemWrapper extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  getConnectedCounts = (entity, connectionOptions) => {
-    const counts = [];
-    forEach(connectionOptions, (option) => {
-      const isExpandable = typeof option.expandable !== 'undefined' ? option.expandable : false;
-      if (!isExpandable && entity[option.path] && Object.keys(entity[option.path]).length > 0) {
-        counts.push({
-          count: Object.keys(entity[option.path]).length,
-          option: {
-            label: option.label,
-            icon: option.path,
-            style: option.path,
-          },
-        });
-      }
-    });
-    return counts;
-  };
 
-  getEntityTags = (entity, taxonomies, query, onClick) => {
-    const tags = [];
-    if (entity.categories) {
-      const categoryIds = map(map(Object.values(entity.categories), 'attributes'), 'category_id');
-      taxonomies.forEach((tax) => {
-        tax.get('categories').forEach((category, catId) => {
-          if (categoryIds && categoryIds.indexOf(parseInt(catId, 10)) > -1) {
-            const label = (category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
-              ? category.getIn(['attributes', 'short_title'])
-              : category.getIn(['attributes', 'title']));
-            if (query && onClick) {
-              tags.push({
-                taxId: tax.get('id'),
-                title: category.getIn(['attributes', 'title']),
-                label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
-                onClick: () => onClick({
-                  value: catId,
-                  query,
-                  checked: true,
-                }),
-              });
-            } else {
-              tags.push({
-                taxId: tax.get('id'),
-                title: category.getIn(['attributes', 'title']),
-                label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
-              });
-            }
-          }
-        });
-      });
-    }
-    return tags;
-  };
-
-  mapToEntityListItem = (entity, props) => {
-    const {
-      taxonomies,
-      entityLinkTo,
-      associations,
-      onTagClick,
-      expandNo,
-      isExpandable,
-      expandableColumns,
-      onExpand,
-    } = props;
-    return {
-      id: entity.id,
-      title: entity.attributes.name || entity.attributes.title,
-      reference: entity.attributes.number || entity.attributes.reference || entity.id,
-      linkTo: `${entityLinkTo}${entity.id}`,
-      status: entity.attributes.draft ? 'draft' : null,
-      // targetDate: entity.attributes.target_date ? this.context.intl.formatDate(new Date(entity.attributes.target_date)) : null,
-      tags: taxonomies
-        ? this.getEntityTags(entity,
-          taxonomies,
-          associations.taxonomies && associations.taxonomies.query,
-          associations.taxonomies && onTagClick
-        )
-        : [],
-      connectedCounts: associations && associations.connections ? this.getConnectedCounts(entity, associations.connections.options) : [],
-      expandables: isExpandable && !expandNo
-        ? expandableColumns.map((column, i) => ({
-          type: column.type,
-          icon: column.icon,
-          label: column.label,
-          count: column.getCount && column.getCount(entity),
-          info: column.getInfo && column.getInfo(entity),
-          onClick: () => onExpand(expandNo > i ? i : i + 1),
-        }))
-        : null,
-    };
-  };
-
+  getNestedIndicators = (entity) => entity.get('indicators')
+    ? entity.get('indicators').reduce((nested, association) =>
+      association.get('indicator')
+        ? nested.push(association.get('indicator'))
+        : nested
+    , List())
+    : List();
 
   render() {
-    // console.log('EntityListItemWrapper.render')
     const {
-      entity,
-      isSelect,
+      isManager,
       onEntitySelect,
       expandNo,
-      isExpandable,
-      expandableColumns,
+      // isExpandable,
+      // expandableColumns,
       onExpand,
       entityIcon,
       entityIdsSelected,
+      taxonomies,
+      onTagClick,
+      associations,
+      entityLinkTo,
+      entity,
     } = this.props;
+    // console.log('EntityListItemWrapper.render', entity.id)
     return (
       <ItemWrapper separated={expandNo}>
         <EntityListItem
-          select={isSelect}
-          checked={isSelect && entityIdsSelected.includes(entity.id)}
-          onSelect={(checked) => onEntitySelect(entity.id, checked)}
-          entity={this.mapToEntityListItem(entity, this.props)}
+          entity={entity}
+          isManager={isManager}
+          isSelected={isManager && entityIdsSelected.includes(entity.get('id'))}
+          onSelect={(checked) => onEntitySelect(entity.get('id'), checked)}
           expandNo={expandNo}
+          onExpand={onExpand}
           entityIcon={entityIcon}
+          taxonomies={taxonomies}
+          onTagClick={onTagClick}
+          associations={associations}
+          entityLinkTo={entityLinkTo}
         />
-        {isExpandable && expandNo > 0 && expandableColumns[0].type === 'reports' &&
-          <EntityListNestedReportList
-            reports={expandableColumns[0].getReports(entity)}
-            entityLinkTo={expandableColumns[0].entityLinkTo}
-            dates={expandableColumns[0].getDates(entity)}
-          />
-        }
-        {isExpandable && expandNo > 0 && expandableColumns[0].type !== 'reports' &&
-          <EntityListNestedList
-            entities={expandableColumns[0].getEntities(entity)}
-            entityLinkTo={expandableColumns[0].entityLinkTo}
-            entityIcon={expandableColumns[0].icon}
-            expandNo={expandNo - 1}
-            isExpandable={expandableColumns.length > 1}
-            expandableColumns={expandableColumns.length > 1 ? [expandableColumns[1]] : null}
-            onExpand={onExpand}
-          />
-        }
       </ItemWrapper>
     );
   }
 }
+//
+// {isExpandable && expandNo > 0 && expandableColumns[0].type === 'reports' &&
+//   <EntityListNestedReportList
+//     entity={entity}
+//     entityLinkTo={expandableColumns[0].entityLinkTo}
+//   />
+// }
+// {isExpandable && expandNo > 0 && expandableColumns[0].type === 'indicators' &&
+//   <EntityListNestedList
+//     entities={this.getNestedIndicators(entity)}
+//     entityLinkTo={expandableColumns[0].entityLinkTo}
+//     entityIcon={expandableColumns[0].icon}
+//     expandNo={expandNo - 1}
+//     isExpandable={expandableColumns.length > 1}
+//     expandableColumns={expandableColumns.length > 1 ? [expandableColumns[1]] : null}
+//     onExpand={onExpand}
+//   />
+// }
 
 EntityListItemWrapper.propTypes = {
-  entityIdsSelected: PropTypes.instanceOf(List),
+  entity: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
-  entity: PropTypes.object.isRequired,
-  expandableColumns: PropTypes.array,
+  entityIdsSelected: PropTypes.instanceOf(List),
   associations: PropTypes.object,
-  isSelect: PropTypes.bool,
+  isManager: PropTypes.bool,
   onEntitySelect: PropTypes.func,
   entityLinkTo: PropTypes.string,
   onTagClick: PropTypes.func,
   onExpand: PropTypes.func,
   expandNo: PropTypes.number,
-  isExpandable: PropTypes.bool,
   entityIcon: PropTypes.string,
 };
 

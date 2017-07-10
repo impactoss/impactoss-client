@@ -3,8 +3,8 @@ import { takeLatest, put, select } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import {
-  updateConnections,
-  updateEntities,
+  saveConnections,
+  saveEntities,
   updateRouteQuery,
 } from 'containers/App/actions';
 
@@ -77,13 +77,13 @@ export function* saveEdits({ data }) {
     //  { id: id, attributes: {...} },
     //  { id: id, attributes: {...} }, ...
     // ]}
-    yield put(updateEntities(data));
+    yield put(saveEntities(data));
   } else {
     // data = { attributes: true, path: path, updates: {
     //   creates: [{entity_id, assignedId}, ...],
     //   deletes: [assignment, ids,...]
     // }}
-    yield put(updateConnections(data));
+    yield put(saveConnections(data));
   }
 }
 

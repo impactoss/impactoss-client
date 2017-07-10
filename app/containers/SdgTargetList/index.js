@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { forEach } from 'lodash/collection';
+// import { forEach } from 'lodash/collection';
 import { Map, List } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
@@ -35,90 +35,72 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
       this.props.loadEntitiesIfNeeded();
     }
   }
-
-  getReports = (indicator) => indicator.reports
-    ? Object.values(indicator.reports)
-    : [];
-  getDates = (indicator) => indicator.dates
-    ? Object.values(indicator.dates)
-    : [];
-  getIndicators = (sdgtarget) => sdgtarget.indicators
-    ? Object.values(sdgtarget.indicators).reduce((memo, indicatorAssociation) =>
-      indicatorAssociation.indicator
-        ? memo.concat([indicatorAssociation.indicator])
-        : memo
-    , [])
-    : [];
-
-  getReportCount = (sdgtargetOrIndicator) => {
-    let count = 0;
-    // test sdgtarget:  return sum of reports for all indicators
-    if (sdgtargetOrIndicator.indicators) {
-      count = Object.values(sdgtargetOrIndicator.indicators).reduce((counter, indicatorAssociation) =>
-        counter + (indicatorAssociation.indicator && indicatorAssociation.indicator.reports
-          ? Object.keys(indicatorAssociation.indicator.reports).length
-          : 0
-        )
-      , 0);
-    }
-    // test indicator: return number of reports for each indicator
-    if (sdgtargetOrIndicator.reports) {
-      count = Object.keys(sdgtargetOrIndicator.reports).length;
-    }
-    return count;
-  }
-  getReportInfo = (sdgtargetOrIndicator) => {
-    const info = [];
-    let due = 0;
-    let overdue = 0;
-    // test sdgtarget:  return sum of reports for all indicators
-    if (sdgtargetOrIndicator.indicators) {
-      forEach(sdgtargetOrIndicator.indicators, (indicatorAssociation) => {
-        if (indicatorAssociation.indicator && indicatorAssociation.indicator.dates) {
-          forEach(indicatorAssociation.indicator.dates, (date) => {
-            due += date.attributes.due ? 1 : 0;
-            overdue += date.attributes.overdue ? 1 : 0;
-          });
-        }
-      });
-    }
-    // test indicator: return number of reports for each indicator
-    if (sdgtargetOrIndicator.dates) {
-      forEach(sdgtargetOrIndicator.dates, (date) => {
-        due += date.attributes.due ? 1 : 0;
-        overdue += date.attributes.overdue ? 1 : 0;
-      });
-    }
-    if (due) info.push(`${due} due`);
-    if (overdue) info.push(`${overdue} overdue`);
-    return info;
-  }
-  getIndicatorCount = (sdgtarget) => sdgtarget.indicators
-    ? Object.keys(sdgtarget.indicators).length
-    : 0;
+  //
+  // getReportCount = (sdgtargetOrIndicator) => {
+  //   let count = 0;
+  //   // test sdgtarget:  return sum of reports for all indicators
+  //   if (sdgtargetOrIndicator.indicators) {
+  //     count = Object.values(sdgtargetOrIndicator.indicators).reduce((counter, indicatorAssociation) =>
+  //       counter + (indicatorAssociation.indicator && indicatorAssociation.indicator.reports
+  //         ? Object.keys(indicatorAssociation.indicator.reports).length
+  //         : 0
+  //       )
+  //     , 0);
+  //   }
+  //   // test indicator: return number of reports for each indicator
+  //   if (sdgtargetOrIndicator.reports) {
+  //     count = Object.keys(sdgtargetOrIndicator.reports).length;
+  //   }
+  //   return count;
+  // }
+  // getReportInfo = (sdgtargetOrIndicator) => {
+  //   const info = [];
+  //   let due = 0;
+  //   let overdue = 0;
+  //   // test sdgtarget:  return sum of reports for all indicators
+  //   if (sdgtargetOrIndicator.indicators) {
+  //     forEach(sdgtargetOrIndicator.indicators, (indicatorAssociation) => {
+  //       if (indicatorAssociation.indicator && indicatorAssociation.indicator.dates) {
+  //         forEach(indicatorAssociation.indicator.dates, (date) => {
+  //           due += date.attributes.due ? 1 : 0;
+  //           overdue += date.attributes.overdue ? 1 : 0;
+  //         });
+  //       }
+  //     });
+  //   }
+  //   // test indicator: return number of reports for each indicator
+  //   if (sdgtargetOrIndicator.dates) {
+  //     forEach(sdgtargetOrIndicator.dates, (date) => {
+  //       due += date.attributes.due ? 1 : 0;
+  //       overdue += date.attributes.overdue ? 1 : 0;
+  //     });
+  //   }
+  //   if (due) info.push(`${due} due`);
+  //   if (overdue) info.push(`${overdue} overdue`);
+  //   return info;
+  // }
+  // getIndicatorCount = (sdgtarget) => sdgtarget.indicators
+  //   ? Object.keys(sdgtarget.indicators).length
+  //   : 0;
 
   render() {
     const { dataReady } = this.props;
-    const expandableColumns = [
-      {
-        label: 'Indicators',
-        type: 'indicators',
-        getCount: this.getIndicatorCount,
-        getEntities: this.getIndicators,
-        entityLinkTo: '/indicators/',
-        icon: 'indicators',
-      },
-      {
-        label: 'Progress reports',
-        type: 'reports',
-        getCount: this.getReportCount,
-        getInfo: this.getReportInfo,
-        getReports: this.getReports,
-        getDates: this.getDates,
-        entityLinkTo: '/reports/',
-        icon: 'reminder',
-      },
-    ];
+    // const expandableColumns = [
+    //   {
+    //     label: 'Indicators',
+    //     type: 'indicators',
+    //     entityLinkTo: '/indicators/',
+    //     icon: 'indicators',
+    //   },
+    //   {
+    //     label: 'Progress reports',
+    //     type: 'reports',
+    //     getCount: this.getReportCount,
+    //     getInfo: this.getReportInfo,
+    //     entityLinkTo: '/reports/',
+    //     icon: 'reminder',
+    //   },
+    // ];
 
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
@@ -157,8 +139,6 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
             plural: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
           }}
           entityLinkTo="/sdgtargets/"
-          isExpandable
-          expandableColumns={expandableColumns}
         />
       </div>
     );

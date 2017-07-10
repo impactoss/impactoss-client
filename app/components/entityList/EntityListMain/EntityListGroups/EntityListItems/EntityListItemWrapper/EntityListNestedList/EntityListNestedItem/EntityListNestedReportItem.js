@@ -40,24 +40,36 @@ export default class EntityListNestedReportItem extends React.PureComponent { //
 
   static propTypes = {
     report: PropTypes.object.isRequired,
+    entityLinkTo: PropTypes.string,
   }
 
-
   render() {
-    const { report } = this.props;
+    const { report, entityLinkTo } = this.props;
 
     return (
-      <Styled to={report.linkTo}>
+      <Styled to={`${entityLinkTo}${report.get('id')}`}>
         <Top>
-          {report.reference &&
-            <Reference>{report.reference}</Reference>
+          {report.getIn(['attributes', 'updated_at']) &&
+            <Reference>
+              {
+                report.getIn(['attributes', 'updated_at'])
+              }
+            </Reference>
           }
-          {report.status &&
-            <Status>{report.status}</Status>
+          {report.getIn(['attributes', 'draft']) &&
+            <Status>
+              {
+                report.getIn(['attributes', 'draft'])
+              }
+            </Status>
           }
         </Top>
         <Clear />
-        <Title to={report.linkTo}>{report.title}</Title>
+        <Title to={`${entityLinkTo}${report.get('id')}`}>
+          {
+            report.getIn(['attributes', 'title'])
+          }
+        </Title>
       </Styled>
     );
   }

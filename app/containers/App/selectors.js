@@ -22,7 +22,7 @@ import asList from 'utils/as-list';
 import { regExMultipleWords } from 'utils/string';
 
 import { USER_ROLES } from 'containers/App/constants';
-import { prepareEntitySearchTarget } from 'containers/App/selector-utils';
+import { prepareEntitySearchTarget } from 'utils/entities';
 
 
 // high level state selects

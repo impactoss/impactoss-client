@@ -173,18 +173,20 @@ const getCurrentConnectionFilters = (
       asList(locationQueryValue).forEach((queryValue) => {
         const valueSplit = queryValue.split(':');
         if (valueSplit.length > 0) {
-          const value = valueSplit[1].toString();
-          const connection = connections.getIn([option.path, value]);
-          if (connection) {
-            tags.push({
-              label: getConnectionLabel(connection, value),
-              type: option.path,
-              onClick: () => onClick({
-                value: queryValue,
-                query: connectionFilters.query,
-                checked: false,
-              }),
-            });
+          if (option.path === valueSplit[0]) {
+            const value = valueSplit[1].toString();
+            const connection = connections.getIn([option.path, value]);
+            if (connection) {
+              tags.push({
+                label: getConnectionLabel(connection, value),
+                type: option.path,
+                onClick: () => onClick({
+                  value: queryValue,
+                  query: connectionFilters.query,
+                  checked: false,
+                }),
+              });
+            }
           }
         }
       });

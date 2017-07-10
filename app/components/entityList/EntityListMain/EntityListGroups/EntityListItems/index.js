@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { List } from 'immutable';
 
 import EntityListItemOuter from './EntityListItemOuter';
 
@@ -48,7 +49,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
 }
 
 EntityListItems.propTypes = {
-  entities: PropTypes.array.isRequired,
+  entities: PropTypes.instanceOf(List).isRequired,
   scrollContainer: PropTypes.object,
   expandNo: PropTypes.number,
 };

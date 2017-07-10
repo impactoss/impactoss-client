@@ -11,6 +11,7 @@ import {
   selectConnectedCategoryQuery,
   selectSortByQuery,
   selectSortOrderQuery,
+  // selectExpandQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -20,7 +21,7 @@ import {
   filterEntitiesWithoutAssociation,
   attributesEqual,
   sortEntities,
-} from 'containers/App/selector-utils';
+} from 'utils/entities';
 
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'measures'),
@@ -34,9 +35,11 @@ export const selectConnections = createSelector(
       measures.map((measure) =>
         measure.set(
           'categories',
-          measureCategories.filter((association) =>
+          measureCategories
+          .filter((association) =>
             attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
           )
+          .map((association) => association.getIn(['attributes', 'category_id']))
         )
       )
     )
@@ -45,9 +48,11 @@ export const selectConnections = createSelector(
       sdgtargets.map((sdgtarget) =>
         sdgtarget.set(
           'categories',
-          sdgtargetCategories.filter((association) =>
+          sdgtargetCategories
+          .filter((association) =>
             attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), sdgtarget.get('id'))
           )
+          .map((association) => association.getIn(['attributes', 'category_id']))
         )
       )
     )
@@ -86,10 +91,12 @@ export const selectConnectedTaxonomies = createSelector(
               .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
               .map((category) => category.set(
                 connection.path,
-                connection.associations.filter((association) =>
+                connection.associations
+                .filter((association) =>
                   attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
                   && connections.getIn([connection.path, association.getIn(['attributes', connection.key]).toString()])
                 )
+                .map((association) => association.getIn(['attributes', connection.key]))
               ))
           ))
       )
@@ -117,17 +124,21 @@ const selectIndicatorsNested = createSelector(
     entities.map((entity) => entity
     .set(
       'measures',
-      entityMeasures.filter((association) =>
+      entityMeasures
+      .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'indicator_id']), entity.get('id'))
         && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
       )
+      .map((association) => association.getIn(['attributes', 'measure_id']))
     )
     .set(
       'sdgtargets',
-      entitySdgTargets.filter((association) =>
+      entitySdgTargets
+      .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'indicator_id']), entity.get('id'))
         && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
       )
+      .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
     )
     // nest reports
     .set('reports', progressReports.filter((report) =>
@@ -162,16 +173,7 @@ const selectIndicatorsByConnections = createSelector(
   selectIndicatorsWithout,
   selectConnectionQuery,
   (entities, query) => query
-    ? filterEntitiesByConnection(entities, query, [
-      {
-        path: 'measures',
-        key: 'measure_id',
-      },
-      {
-        path: 'sdgtargets',
-        key: 'sdgtarget_id',
-      },
-    ])
+    ? filterEntitiesByConnection(entities, query)
     : entities
 );
 const selectIndicatorsByCategories = createSelector(
@@ -186,11 +188,14 @@ const selectIndicatorsByConnectedCategories = createSelector(
   selectConnections,
   selectConnectedCategoryQuery,
   (entities, connections, query) => query
-    ? filterEntitiesByConnectedCategories(entities, connections, query, {
-      measures: 'measure_id',
-      sdgtargets: 'sdgtarget_id',
-    })
+    ? filterEntitiesByConnectedCategories(entities, connections, query)
     : entities
+);
+const selectIndicatorsExpandables = createSelector(
+  selectIndicatorsByConnectedCategories,
+  (entities) => entities
+  // (state) => selectExpandQuery(state),
+  // (entities, expandNo) => entities
 );
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
@@ -201,7 +206,7 @@ const selectIndicatorsByConnectedCategories = createSelector(
 // 6. selectIndicatorsByCategories will filter by specific categories
 // 7. selectIndicatorsByCOnnectedCategories will filter by specific categories connected via connection
 export const selectIndicators = createSelector(
-  selectIndicatorsByConnectedCategories,
+  selectIndicatorsExpandables,
   selectSortByQuery,
   selectSortOrderQuery,
   (entities, sortBy, sortOrder) =>

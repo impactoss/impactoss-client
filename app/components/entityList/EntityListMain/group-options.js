@@ -7,7 +7,7 @@ export const getGroupOptions = (taxonomies, connectedTaxonomies) => {
   // taxonomy options
   if (taxonomies) {
     // first prepare taxonomy options
-    options = options.merge(
+    options = options.concat(
       taxonomies
       .map((taxonomy) => Map({
         value: taxonomy.get('id'), // filterOptionId
@@ -16,10 +16,11 @@ export const getGroupOptions = (taxonomies, connectedTaxonomies) => {
       .toList()
     );
   }
+
   // connectedTaxonomies options
   if (connectedTaxonomies) {
     // first prepare taxonomy options
-    options = options.merge(
+    options = options.concat(
       connectedTaxonomies
         .map((taxonomy) => Map({
           value: `x:${taxonomy.get('id')}`, // filterOptionId

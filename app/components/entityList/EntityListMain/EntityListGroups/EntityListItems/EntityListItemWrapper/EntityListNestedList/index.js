@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { List } from 'immutable';
 
 import EntityListNestedItem from './EntityListNestedItem';
 import EntityListNestedReportList from './EntityListNestedReportList';
@@ -27,11 +28,12 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
       expandableColumns,
       onExpand,
     } = props;
+
     return {
-      id: entity.id,
-      title: entity.attributes.name || entity.attributes.title,
-      reference: entity.attributes.number || entity.id,
-      linkTo: `${entityLinkTo}${entity.id}`,
+      id: entity.get('id'),
+      title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'name']),
+      reference: entity.getIn(['attributes', 'reference']) || entity.id,
+      linkTo: `${entityLinkTo}${entity.get('id')}`,
       status: entity.attributes.draft ? 'draft' : null,
       expandables: isExpandable && !expandNo
         ? expandableColumns.map((column) => ({
@@ -48,13 +50,12 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
 
   render() {
     const {
-      entities,
       expandNo,
       isExpandable,
       expandableColumns,
       entityIcon,
+      entities,
     } = this.props;
-
     return (
       <Styled>
         {
@@ -67,8 +68,7 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
               />
               {isExpandable && expandNo > 0 && expandableColumns.length > 0 &&
                 <EntityListNestedReportList
-                  reports={expandableColumns[0].getReports(entity)}
-                  dates={expandableColumns[0].getDates(entity)}
+                  entity={entity}
                   entityLinkTo={expandableColumns[0].entityLinkTo}
                 />
               }
@@ -81,7 +81,7 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
 }
 
 EntityListNestedList.propTypes = {
-  entities: PropTypes.array.isRequired,
+  entities: PropTypes.instanceOf(List).isRequired,
   entityLinkTo: PropTypes.string,
   expandNo: PropTypes.number,
   isExpandable: PropTypes.bool,
