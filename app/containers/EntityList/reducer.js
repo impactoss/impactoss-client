@@ -50,9 +50,11 @@ function entityListReducer(state = initialState, action) {
         .set('entitiesSelected', fromJS(action.ids))
         .set('activePanel', EDIT_PANEL);
     case LOCATION_CHANGE:
+      // reset selected entities on query change (location changes but not path)
+      // TODO do not reset entitiesSelected on 'expand'
       return state.getIn(['route', 'locationBeforeTransition', 'pathname']) === state.getIn(['route', 'locationBeforeTransition', 'pathnamePrevious'])
-        ? state.set('entitiesSelected', List()) // TODO do not reset entitiesSelected on 'expand'
-        : initialState;
+        ? state.set('entitiesSelected', List())
+        : state;
     default:
       return state;
   }

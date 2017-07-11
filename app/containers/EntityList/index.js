@@ -25,6 +25,7 @@ import {
 } from './selectors';
 
 import {
+  resetState,
   showPanel,
   saveEdits,
   selectEntity,
@@ -36,12 +37,13 @@ import {
 } from './actions';
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  componentWillMount() {
+    this.props.resetStateOnMount();
+  }
   formatLabel = (path) => {
     const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
     return this.context.intl.formatMessage(message);
   }
-
   render() {
     // console.log('EntityList.render')
     // console.log('EntityList.render' , this.props.entityIdsSelected && this.props.entityIdsSelected.toJS())
@@ -144,6 +146,7 @@ EntityList.propTypes = {
   onSearch: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
+  resetStateOnMount: PropTypes.func.isRequired,
 };
 
 EntityList.contextTypes = {
@@ -158,6 +161,9 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch, props) {
   return {
+    resetStateOnMount: () => {
+      dispatch(resetState());
+    },
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));
     },
