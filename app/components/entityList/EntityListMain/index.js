@@ -44,7 +44,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     return this.props.entities !== nextProps.entities
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.dataReady !== nextProps.dataReady
-      || this.props.locationQuery === nextProps.locationQuery
+      || this.props.locationQuery !== nextProps.locationQuery
       || typeof this.props.scrollContainer !== typeof nextProps.scrollContainer;
   }
   componentDidUpdate() {
