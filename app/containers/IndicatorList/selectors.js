@@ -11,7 +11,7 @@ import {
   selectConnectedCategoryQuery,
   selectSortByQuery,
   selectSortOrderQuery,
-  // selectExpandQuery,
+  selectExpandQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -193,9 +193,34 @@ const selectIndicatorsByConnectedCategories = createSelector(
 );
 const selectIndicatorsExpandables = createSelector(
   selectIndicatorsByConnectedCategories,
-  (entities) => entities
-  // (state) => selectExpandQuery(state),
-  // (entities, expandNo) => entities
+  (state) => selectEntities(state, 'progress_reports'),
+  (state) => selectEntities(state, 'due_dates'),
+  (state) => selectExpandQuery(state),
+  (entities, reports, dueDates, expandNo) =>
+    entities.map((entity) => {
+      const dueDatesForIndicator = dueDates.filter((date) => attributesEqual(entity.get('id'), date.getIn(['attributes', 'indicator_id'])));
+      if (expandNo <= 0) {
+        // insert expandables:
+        // - indicators
+        // - reports (incl due_dates)
+        return entity
+        .set('expandable', 'reporting')
+        .set('reporting', Map()
+          .set('overdue', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'overdue'])).size)
+          .set('due', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'due'])).size)
+          .set('reports', reports.filter((report) => attributesEqual(entity.get('id'), report.getIn(['attributes', 'indicator_id']))))
+        );
+      }
+      // insert expanded indicators with expandable reports (incl due_dates)
+      const dueDatesScheduled = dueDatesForIndicator.filter((date) => !date.getIn(['attributes', 'has_progress_report']));
+      return entity
+      .set('expanded', 'reporting')
+      .set('reporting', Map()
+        // store upcoming scheduled indicator
+        .set('scheduled', dueDatesScheduled && sortEntities(dueDatesScheduled, 'asc', 'due_date', 'date').first())
+        .set('reports', reports.filter((report) => attributesEqual(entity.get('id'), report.getIn(['attributes', 'indicator_id']))))
+      );
+    })
 );
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
@@ -212,15 +237,3 @@ export const selectIndicators = createSelector(
   (entities, sortBy, sortOrder) =>
     sortEntities(entities, sortOrder || 'asc', sortBy || 'reference')
 );
-// define selects for getEntities
-// const selects = {
-//   entities: {
-//     path: 'indicators',
-//     extensions: [
-//       {
-//         type: 'single',
-//         path: 'users',
-//         key: 'manager_id',
-//         as: 'manager',
-//       },
-//       {

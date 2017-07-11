@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { forEach } from 'lodash/collection';
 import { List, Map } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
@@ -34,73 +33,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  getReportCount = (measureOrIndicator) => {
-    let count = 0;
-    // test measure:  return sum of reports for all indicators
-    if (measureOrIndicator.indicators) {
-      count = Object.values(measureOrIndicator.indicators).reduce((counter, indicatorAssociation) =>
-        counter + (indicatorAssociation.indicator && indicatorAssociation.indicator.reports
-          ? Object.keys(indicatorAssociation.indicator.reports).length
-          : 0
-        )
-      , 0);
-    }
-    // test indicator: return number of reports for each indicator
-    if (measureOrIndicator.reports) {
-      count = Object.keys(measureOrIndicator.reports).length;
-    }
-    return count;
-  }
-  getReportInfo = (measureOrIndicator) => {
-    const info = [];
-    let due = 0;
-    let overdue = 0;
-    // test measure:  return sum of reports for all indicators
-    if (measureOrIndicator.indicators) {
-      forEach(measureOrIndicator.indicators, (indicatorAssociation) => {
-        if (indicatorAssociation.indicator && indicatorAssociation.indicator.dates) {
-          forEach(indicatorAssociation.indicator.dates, (date) => {
-            due += date.attributes.due ? 1 : 0;
-            overdue += date.attributes.overdue ? 1 : 0;
-          });
-        }
-      });
-    }
-    // test indicator: return number of reports for each indicator
-    if (measureOrIndicator.dates) {
-      forEach(measureOrIndicator.dates, (date) => {
-        due += date.attributes.due ? 1 : 0;
-        overdue += date.attributes.overdue ? 1 : 0;
-      });
-    }
-    if (due) info.push(`${due} due`);
-    if (overdue) info.push(`${overdue} overdue`);
-    return info;
-  }
-  getIndicatorCount = (measure) => measure.indicators
-    ? Object.keys(measure.indicators).length
-    : 0;
-
   render() {
     const { dataReady } = this.props;
-    // const expandableColumns = [
-    //   {
-    //     label: 'Indicators',
-    //     type: 'indicators',
-    //     path: 'indicators',
-    //     getCount: this.getIndicatorCount,
-    //     entityLinkTo: '/indicators/',
-    //     icon: 'indicators',
-    //   },
-    //   {
-    //     label: 'Progress reports',
-    //     type: 'reports',
-    //     getCount: this.getReportCount,
-    //     getInfo: this.getReportInfo,
-    //     entityLinkTo: '/reports/',
-    //     icon: 'reminder',
-    //   },
-    // ];
 
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),

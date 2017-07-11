@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { Map } from 'immutable';
+import { List, Map } from 'immutable';
 import { reduce } from 'lodash/collection';
 
 import {
@@ -11,7 +11,7 @@ import {
   selectConnectedCategoryQuery,
   selectSortByQuery,
   selectSortOrderQuery,
-  // selectExpandQuery,
+  selectExpandQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -21,6 +21,7 @@ import {
   filterEntitiesWithoutAssociation,
   attributesEqual,
   sortEntities,
+  testEntityEntityAssociation,
 } from 'utils/entities';
 
 export const selectTaxonomies = createSelector(
@@ -102,16 +103,12 @@ const selectSdgTargetsNested = createSelector(
   (state) => selectEntities(state, 'sdgtarget_categories'),
   (state) => selectEntities(state, 'sdgtarget_indicators'),
   (state) => selectEntities(state, 'sdgtarget_measures'),
-  // (state) => selectEntities(state, 'progress_reports'),
-  // (state) => selectEntities(state, 'due_dates'),
   (
     entities,
     connections,
     entityCategories,
     entityIndicators,
     entityMeasures,
-    // progressReports,
-    // dueDates
   ) => entities.map((entity) => entity
     .set(
       'categories',
@@ -136,35 +133,6 @@ const selectSdgTargetsNested = createSelector(
         && connections.getIn(['indicators', entityIndicator.getIn(['attributes', 'indicator_id']).toString()])
       )
       .map((association) => association.getIn(['attributes', 'indicator_id']))
-      //
-      // .map((entityIndicator) => {
-      //   // nest actual indicator with indicator connection
-      //   const indicator = connections.getIn(['indicators', entityIndicator.getIn(['attributes', 'indicator_id']).toString()]);
-      //   // if (indicator) {
-      //   return entityIndicator.set(
-      //     'indicator',
-      //     indicator
-      //       // nest reports
-      //       .set('reports', progressReports.filter((report) =>
-      //         attributesEqual(report.getIn(['attributes', 'indicator_id']), indicator.get('id'))
-      //       ))
-      //       // nest dates without report
-      //       .set(
-      //         'dates',
-      //         dueDates
-      //         .filter((date) => {
-      //           // is associated
-      //           const associated = attributesEqual(date.getIn(['attributes', 'indicator_id']), indicator.get('id'));
-      //           if (associated) {
-      //             // has no report
-      //             const dateReports = progressReports.filter((report) => attributesEqual(report.getIn(['attributes', 'due_date_id']), date.get('id')));
-      //             return !dateReports || dateReports.size === 0;
-      //           }
-      //           return false;
-      //         }
-      //       ))
-      //   );
-      // })
     )
   )
 );
@@ -201,9 +169,56 @@ const selectSdgTargetsByConnectedCategories = createSelector(
 
 const selectSdgTargetsExpandables = createSelector(
   selectSdgTargetsByConnectedCategories,
-  (entities) => entities
-  // (state) => selectExpandQuery(state),
-  // (entities, expandNo) => entities
+  (state) => selectEntities(state, 'indicators'),
+  (state) => selectEntities(state, 'progress_reports'),
+  (state) => selectEntities(state, 'due_dates'),
+  (state) => selectExpandQuery(state),
+  (entities, indicators, reports, dueDates, expandNo) =>
+    entities.map((entity) => {
+      if (expandNo <= 0) {
+        // insert expandables:
+        // - indicators
+        // - reports (incl due_dates)
+        const dueDatesAnyIndicator = dueDates.filter((date) => testEntityEntityAssociation(entity, 'indicators', date.getIn(['attributes', 'indicator_id'])));
+        return entity
+        .set('expandable', List(['indicators', 'reporting']))
+        .set('reporting', Map()
+          .set('overdue', dueDatesAnyIndicator.filter((date) => date.getIn(['attributes', 'overdue'])).size)
+          .set('due', dueDatesAnyIndicator.filter((date) => date.getIn(['attributes', 'due'])).size)
+          .set('reports', reports.filter((report) => testEntityEntityAssociation(entity, 'indicators', report.getIn(['attributes', 'indicator_id']))))
+        );
+      }
+      // insert expanded indicators with expandable reports (incl due_dates)
+      return entity
+      .set('expanded', 'indicatorsExpanded')
+      .set('indicatorsExpanded',
+        indicators
+        .filter((indicator) => testEntityEntityAssociation(entity, 'indicators', indicator.get('id')))
+        .map((indicator) => {
+          // due dates for indicator
+          const dueDatesForIndicator = dueDates.filter((date) => attributesEqual(date.getIn(['attributes', 'indicator_id']), indicator.get('id')));
+          const reportsForIndicator = reports.filter((report) => attributesEqual(report.getIn(['attributes', 'indicator_id']), indicator.get('id')));
+          if (expandNo === 1) {
+            return indicator
+            .set('expandable', 'reporting')
+            .set('reporting', Map()
+              // store counts
+              .set('overdue', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'overdue'])).size)
+              .set('due', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'due'])).size)
+              .set('reports', reportsForIndicator)
+            );
+          }
+          const dueDatesScheduled = dueDatesForIndicator && dueDatesForIndicator.filter((date) => !date.getIn(['attributes', 'has_progress_report']));
+          return indicator
+          .set('expanded', 'reporting')
+          .set('reporting', Map()
+            // store upcoming scheduled indicator
+            .set('scheduled', dueDatesScheduled && sortEntities(dueDatesScheduled, 'asc', 'due_date', 'date').first())
+            .set('reports', reportsForIndicator)
+          );
+        })
+      );
+    })
 );
 
 // kicks off series of cascading selectors

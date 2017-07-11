@@ -458,6 +458,8 @@ const selectSearchQuery = createSelector(
 const selectExpandQuery = createSelector(
   selectLocationQuery,
   (locationQuery) => locationQuery && locationQuery.get('expand')
+    ? parseInt(locationQuery.get('expand'), 10)
+    : 0
 );
 const selectSortOrderQuery = createSelector(
   selectLocationQuery,
