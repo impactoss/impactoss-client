@@ -104,9 +104,10 @@ export const selectConnectedTaxonomies = createSelector(
 );
 
 const selectIndicatorsNested = createSelector(
-  (state) => selectEntitiesSearch(state, {
+  (state, locationQuery) => selectEntitiesSearch(state, {
     path: 'indicators',
     searchAttributes: ['title', 'reference'],
+    locationQuery,
   }),
   (state) => selectConnections(state),
   (state) => selectEntities(state, 'measure_indicators'),

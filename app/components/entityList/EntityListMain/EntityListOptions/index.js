@@ -49,7 +49,8 @@ export class EntityListOptions extends React.PureComponent { // eslint-disable-l
       subgroupSelectValue,
       onGroupSelect,
       onSubgroupSelect,
-      expandLink,
+      expanded,
+      collapsed,
     } = this.props;
 
     const groupOptions = this.props.groupOptions
@@ -71,16 +72,16 @@ export class EntityListOptions extends React.PureComponent { // eslint-disable-l
             isSubgroup
           />
         }
-        { expandLink &&
+        { (expanded !== collapsed) &&
           <ListEntitiesHeaderOptionLink
-            onClick={expandLink.onClick}
+            onClick={this.props.onExpand}
           >
             {
-              !expandLink.expanded &&
+              !expanded &&
               <FormattedMessage {...messages.expand} />
             }
             {
-              expandLink.expanded &&
+              expanded &&
               <FormattedMessage {...messages.collapse} />
             }
           </ListEntitiesHeaderOptionLink>
@@ -97,7 +98,9 @@ EntityListOptions.propTypes = {
   subgroupOptions: PropTypes.instanceOf(List),
   onGroupSelect: PropTypes.func,
   onSubgroupSelect: PropTypes.func,
-  expandLink: PropTypes.object,
+  onExpand: PropTypes.func,
+  expanded: PropTypes.bool,
+  collapsed: PropTypes.bool,
 };
 
 export default EntityListOptions;

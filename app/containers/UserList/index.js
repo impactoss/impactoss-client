@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { List, Map } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -53,7 +53,8 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
-          path="users"
+          clientPath="users"
+          serverPath="users"
           filters={FILTERS}
           edits={EDITS}
           header={headerOptions}
@@ -62,7 +63,7 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
             single: this.context.intl.formatMessage(appMessages.entities.users.single),
             plural: this.context.intl.formatMessage(appMessages.entities.users.plural),
           }}
-          entityLinkTo="/users/"
+          locationQuery={fromJS(this.props.location.query)}
         />
       </div>
     );
@@ -75,13 +76,14 @@ UserList.propTypes = {
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
+  location: PropTypes.object,
 };
 
 UserList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
     'users',
     'user_roles',
@@ -90,7 +92,7 @@ const mapStateToProps = (state) => ({
     'categories',
     'taxonomies',
   ] }),
-  entities: selectUsers(state),
+  entities: selectUsers(state, fromJS(props.location.query)),
   taxonomies: selectTaxonomies(state),
   connections: selectConnections(state),
 });

@@ -37,7 +37,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
     );
   }
   renderColumn = (col, i) => {
-    if (col.isExpandable) {
+    if (col.expandableColumns) {
       return (
         <ColumnExpand
           key={i}

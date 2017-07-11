@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router';
 import Clear from 'components/styled/Clear';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-const Styled = styled(Link)`
+const Styled = styled.a`
   padding: 5px 10px;
   position: relative;
   background-color: ${palette('primary', 4)};
@@ -31,7 +30,7 @@ const Reference = styled.div`
   text-decoration: none;
   font-size: 0.9em;
 `;
-const Title = styled.div`
+const Title = styled.a`
   font-size: 0.8em;
   text-decoration: none;
 `;
@@ -40,14 +39,14 @@ export default class EntityListNestedReportItem extends React.PureComponent { //
 
   static propTypes = {
     report: PropTypes.object.isRequired,
-    entityLinkTo: PropTypes.string,
+    onEntityClick: PropTypes.func,
   }
 
   render() {
-    const { report, entityLinkTo } = this.props;
+    const { report, onEntityClick } = this.props;
 
     return (
-      <Styled to={`${entityLinkTo}${report.get('id')}`}>
+      <Styled onClick={() => onEntityClick(report.get('id'), 'reports')}>
         <Top>
           {report.getIn(['attributes', 'updated_at']) &&
             <Reference>
@@ -65,7 +64,7 @@ export default class EntityListNestedReportItem extends React.PureComponent { //
           }
         </Top>
         <Clear />
-        <Title to={`${entityLinkTo}${report.get('id')}`}>
+        <Title onClick={() => onEntityClick(report.get('id'), 'reports')}>
           {
             report.getIn(['attributes', 'title'])
           }

@@ -22,36 +22,34 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
 
   mapToEntityListItem = (entity, props) => {
     const {
-      entityLinkTo,
-      expandNo,
-      isExpandable,
-      expandableColumns,
-      onExpand,
+      onEntityClick,
+      // expandNo,
+      // expandableColumns,
+      // onExpand,
     } = props;
 
     return {
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'name']),
       reference: entity.getIn(['attributes', 'reference']) || entity.id,
-      linkTo: `${entityLinkTo}${entity.get('id')}`,
       status: entity.attributes.draft ? 'draft' : null,
-      expandables: isExpandable && !expandNo
-        ? expandableColumns.map((column) => ({
-          type: column.type,
-          label: column.label,
-          count: column.getCount && column.getCount(entity),
-          info: column.getInfo && column.getInfo(entity),
-          icon: column.icon,
-          onClick: () => onExpand(),
-        }))
-        : [],
+      onEntityClick: () => onEntityClick(entity.get('id')),
+      // expandables: expandableColumns && !expandNo
+      //   ? expandableColumns.map((column) => ({
+      //     type: column.type,
+      //     label: column.label,
+      //     count: column.getCount && column.getCount(entity),
+      //     info: column.getInfo && column.getInfo(entity),
+      //     icon: column.icon,
+      //     onClick: () => onExpand(),
+      //   }))
+      //   : [],
     };
   };
 
   render() {
     const {
       expandNo,
-      isExpandable,
       expandableColumns,
       entityIcon,
       entities,
@@ -66,10 +64,9 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
                 entityIcon={entityIcon}
                 expandNo={expandNo}
               />
-              {isExpandable && expandNo > 0 && expandableColumns.length > 0 &&
+              {expandableColumns && expandNo > 0 &&
                 <EntityListNestedReportList
                   entity={entity}
-                  entityLinkTo={expandableColumns[0].entityLinkTo}
                 />
               }
             </ItemWrapper>
@@ -82,11 +79,10 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
 
 EntityListNestedList.propTypes = {
   entities: PropTypes.instanceOf(List).isRequired,
-  entityLinkTo: PropTypes.string,
+  onEntityClick: PropTypes.func,
   expandNo: PropTypes.number,
-  isExpandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
-  onExpand: PropTypes.func,
+  // onExpand: PropTypes.func,
   entityIcon: PropTypes.string,
 };
 

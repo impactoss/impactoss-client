@@ -14,9 +14,10 @@ import { sortEntities } from 'utils/entities';
 // 2. selectEntitiesSearch filters by keyword
 // 3. selectUsers
 export const selectPages = createSelector(
-  (state) => selectEntitiesSearch(state, {
+  (state, locationQuery) => selectEntitiesSearch(state, {
     path: 'pages',
     searchAttributes: ['title'],
+    locationQuery,
   }),
   selectSortByQuery,
   selectSortOrderQuery,

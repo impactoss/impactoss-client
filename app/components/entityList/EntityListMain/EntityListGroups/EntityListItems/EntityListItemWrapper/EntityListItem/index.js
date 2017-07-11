@@ -42,12 +42,12 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
   // getExpandables = () => {
   //   const {
   //     expandNo,
-  //     isExpandable,
+  //     expandableColumns,
   //     expandableColumns,
   //     onExpand,
   //   } = this.props;
   //   const entity = this.props.entity.toJS()
-  //   return isExpandable && !expandNo
+  //   return expandableColumns && !expandNo
   //     ? expandableColumns.map((column, i) => ({
   //       type: column.type,
   //       icon: column.icon,
@@ -70,8 +70,8 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       associations,
       taxonomies,
       onTagClick,
-      // isExpandable,
-      entityLinkTo,
+      // expandableColumns,
+      onEntityClick,
     } = this.props;
 
     // console.log('EntityListItem.render', entity.get('id'))
@@ -90,7 +90,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
                 entityIcon={entityIcon}
                 onTagClick={onTagClick}
                 associations={associations}
-                entityLinkTo={entityLinkTo}
+                onEntityClick={onEntityClick}
               />
             </MainInnerWrapper>
           </MainWrapper>
@@ -100,7 +100,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
   }
 }
 
-// {isExpandable && expandNo > 0 &&
+// {expandableColumns && expandNo > 0 &&
 //   expandables.map((expandable, i, list) =>
 //     <EntityListItemExpandable
 //       key={i}
@@ -122,13 +122,13 @@ EntityListItem.propTypes = {
   isSelected: PropTypes.bool,
   onSelect: PropTypes.func,
   expandNo: PropTypes.number,
-  // isExpandable: PropTypes.bool,
+  // expandableColumns: PropTypes.array,
   // expandableColumns: PropTypes.object,
   // onExpand: PropTypes.func,
   entityIcon: PropTypes.string,
   onTagClick: PropTypes.func,
   associations: PropTypes.object,
-  entityLinkTo: PropTypes.string,
+  onEntityClick: PropTypes.func,
 };
 
 EntityListItem.defaultProps = {

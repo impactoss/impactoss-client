@@ -33,46 +33,16 @@ const ListEntitiesSubGroupHeader = styled.h5`
 `;
 
 export class EntityListGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  // shouldComponentUpdate(nextProps) {
-  //   // console.log('locationQuery', isEqual(this.props.locationQuery, nextProps.locationQuery), nextProps.locationQuery)
-  //   return this.props.entities !== nextProps.entities
-  //   || this.props.locationQuery !== nextProps.locationQuery
-  //   || this.props.entityIdsSelected !== nextProps.entityIdsSelected;
-  // }
-  // componentWillReceiveProps(nextProps) {
-  //   console.log('EntityListGroups.componentWillReceiveProps()')
-  //   console.log('locationQuery', isEqual(this.props.locationQuery, nextProps.locationQuery), nextProps.locationQuery)
-  //   console.log('entities', isEqual(this.props.entities, nextProps.entities))
-  //   console.log('entityIdsSelected', isEqual(this.props.entityIdsSelected, nextProps.entityIdsSelected))
-  //   console.log('scrollContainer', isEqual(this.props.scrollContainer, nextProps.scrollContainer))
-  // }
-  // componentWillMount() {
-  //   console.log('EntityListGroups.componentWillMount')
-  //   // if (this.props.scrollContainer) {
-  //   //   this.props.scrollContainer.update();
-  //   // }
-  // }
-  // componentWillUpdate() {
-  //   console.log('EntityListGroups.componentWillUpdate()')
-  // }
-  // componentDidUpdate() {
-  //   console.log('EntityListGroups.componentDidUpdate')
-  //   // if (this.props.scrollContainer) {
-  //   //   this.props.scrollContainer.update();
-  //   // }
-  // }
-
   render() {
     // console.log('EntityListGroups.render')
     const {
       entityIdsSelected,
       filters,
       header,
-      entityLinkTo,
+      onEntityClick,
       isManager,
       onTagClick,
       onEntitySelect,
-      isExpandable,
       expandableColumns,
       onExpand,
       entityTitle,
@@ -144,7 +114,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           columns={getHeaderColumns(
             listHeaderLabel,
             isManager,
-            isExpandable,
             expandNo,
             expandableColumns,
             onExpand
@@ -191,12 +160,11 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             entities={entitySubGroup.get('entities')}
                             entityIdsSelected={entityIdsSelected}
                             entityIcon={header.icon}
-                            entityLinkTo={entityLinkTo}
+                            onEntityClick={onEntityClick}
                             isManager={isManager}
                             onTagClick={onTagClick}
                             onEntitySelect={onEntitySelect}
                             expandNo={expandNo}
-                            isExpandable={isExpandable}
                             expandableColumns={expandableColumns}
                             onExpand={onExpand}
                             scrollContainer={this.props.scrollContainer}
@@ -211,12 +179,11 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                         entities={entityGroup.get('entities')}
                         entityIdsSelected={entityIdsSelected}
                         entityIcon={header.icon}
-                        entityLinkTo={entityLinkTo}
+                        onEntityClick={onEntityClick}
                         isManager={isManager}
                         onTagClick={onTagClick}
                         onEntitySelect={onEntitySelect}
                         expandNo={expandNo}
-                        isExpandable={isExpandable}
                         expandableColumns={expandableColumns}
                         onExpand={onExpand}
                         scrollContainer={this.props.scrollContainer}
@@ -244,15 +211,14 @@ EntityListGroups.propTypes = {
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object,
-  entityLinkTo: PropTypes.string,
   filters: PropTypes.object,
   header: PropTypes.object,
   isManager: PropTypes.bool,
-  isExpandable: PropTypes.bool,
   expandableColumns: PropTypes.array,
   onExpand: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
+  onEntityClick: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,

@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { List } from 'immutable';
+import { List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -56,7 +56,6 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
         />
         <EntityList
           entities={this.props.entities}
-          path="pages"
           filters={FILTERS}
           edits={EDITS}
           header={headerOptions}
@@ -65,7 +64,9 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
             single: this.context.intl.formatMessage(appMessages.entities.pages.single),
             plural: this.context.intl.formatMessage(appMessages.entities.pages.plural),
           }}
-          entityLinkTo="/pages/"
+          serverPath="pages"
+          clientPath="pages"
+          locationQuery={fromJS(this.props.location.query)}
         />
       </div>
     );
@@ -77,17 +78,18 @@ PageList.propTypes = {
   handleNew: PropTypes.func,
   dataReady: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
+  location: PropTypes.object,
 };
 
 PageList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
     'pages',
   ] }),
-  entities: selectPages(state),
+  entities: selectPages(state, fromJS(props.location.query)),
 });
 function mapDispatchToProps(dispatch) {
   return {

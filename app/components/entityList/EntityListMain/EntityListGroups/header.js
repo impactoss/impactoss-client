@@ -1,8 +1,8 @@
-export const getHeaderColumns = (label, isManager, isExpandable, expandNo, expandableColumns, onExpand) => {
+export const getHeaderColumns = (label, isManager, expandNo, expandableColumns, onExpand) => {
   // TODO figure out a betterway to determine column widths. this is terrible
   let width = 1;
   // if nested
-  if (isExpandable && expandableColumns.length > 0) {
+  if (expandableColumns && expandableColumns.length > 0) {
     width = expandNo > 0 ? 0.5 : 0.66;
   }
   const columns = [{
@@ -10,7 +10,7 @@ export const getHeaderColumns = (label, isManager, isExpandable, expandNo, expan
     isManager,
     width,
   }];
-  if (isExpandable) {
+  if (expandableColumns) {
     const exColumns = expandableColumns.map((col, i, exCols) => {
       const isExpand = expandNo > i;
       width = 1;
@@ -40,7 +40,7 @@ export const getHeaderColumns = (label, isManager, isExpandable, expandNo, expan
 
       return {
         label: col.label,
-        isExpandable: true,
+        expandableNo: expandableColumns,
         isExpand,
         onExpand: () => onExpand(isExpand ? i : i + 1),
         width,

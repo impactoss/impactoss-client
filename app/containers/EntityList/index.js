@@ -14,8 +14,9 @@ import Sidebar from 'components/styled/Sidebar';
 import EntityListSidebar from 'components/entityList/EntityListSidebar';
 import EntityListMain from 'components/entityList/EntityListMain';
 
-import { isUserManager, selectLocationQuery } from 'containers/App/selectors';
+import { isUserManager } from 'containers/App/selectors';
 
+import { updatePath } from 'containers/App/actions';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -42,6 +43,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   }
 
   render() {
+    // console.log('EntityList.render')
     // console.log('EntityList.render' , this.props.entityIdsSelected && this.props.entityIdsSelected.toJS())
 
     // make sure selected entities are still actually on page
@@ -90,11 +92,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           filters={this.props.filters}
           header={this.props.header}
           entityTitle={this.props.entityTitle}
-          expandableColumns={this.props.expandableColumns}
 
           dataReady={this.props.dataReady}
-          entityLinkTo={this.props.entityLinkTo}
-          isExpandable={this.props.isExpandable}
+          expandableColumns={this.props.expandableColumns}
           isManager={this.props.isManager}
 
           formatLabel={this.formatLabel}
@@ -106,6 +106,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onSubgroupSelect={this.props.onSubgroupSelect}
           onSearch={this.props.onSearch}
           onPageSelect={this.props.onPageSelect}
+          onEntityClick={this.props.onEntityClick}
         />
       </div>
     );
@@ -124,8 +125,8 @@ EntityList.propTypes = {
   header: PropTypes.object,
   locationQuery: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object, // single/plural
-  entityLinkTo: PropTypes.string,
-  isExpandable: PropTypes.bool,
+  // serverPath: PropTypes.string,
+  // clientPath: PropTypes.string,
   expandableColumns: PropTypes.array,
   // selector props
   activePanel: PropTypes.string,
@@ -142,6 +143,7 @@ EntityList.propTypes = {
   onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
+  onEntityClick: PropTypes.func.isRequired,
 };
 
 EntityList.contextTypes = {
@@ -150,7 +152,6 @@ EntityList.contextTypes = {
 
 const mapStateToProps = (state) => ({
   isManager: isUserManager(state),
-  locationQuery: selectLocationQuery(state),
   activePanel: activePanelSelector(state),
   entityIdsSelected: entitiesSelectedSelector(state),
 });
@@ -162,6 +163,9 @@ function mapDispatchToProps(dispatch, props) {
     },
     onEntitySelect: (id, checked) => {
       dispatch(selectEntity({ id, checked }));
+    },
+    onEntityClick: (id, path) => {
+      dispatch(updatePath(`/${path || props.clientPath}/${id}`));
     },
     onEntitySelectAll: (ids) => {
       dispatch(selectEntities(ids));
@@ -232,7 +236,7 @@ function mapDispatchToProps(dispatch, props) {
           const newValue = creates.first(); // take the first TODO multiselect should be run in single value mode and only return 1 value
           saveData = saveData
             .set('attributes', true)
-            .set('path', props.path)
+            .set('path', props.serverPath)
             .set('entities', entities.reduce((updatedEntities, entity) =>
               entity.getIn(['attributes', activeEditOption.optionId]) !== newValue
                 ? updatedEntities.push(entity.setIn(['attributes', activeEditOption.optionId], newValue))

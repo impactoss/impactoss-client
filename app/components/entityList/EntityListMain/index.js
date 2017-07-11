@@ -34,10 +34,17 @@ const ListWrapper = styled.div``;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
+    // console.log('EntityListMain.shouldComponentUpdate')
+    // console.log(this.props.entities !== nextProps.entities)
+    // console.log(this.props.entityIdsSelected !== nextProps.entityIdsSelected)
+    // console.log(this.props.dataReady !== nextProps.dataReady)
+    // console.log(isEqual(this.props.locationQuery, nextProps.locationQuery))
+    // console.log(this.props.locationQuery === nextProps.locationQuery)
+    // console.log(typeof this.props.scrollContainer !== typeof nextProps.scrollContainer)
     return this.props.entities !== nextProps.entities
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.dataReady !== nextProps.dataReady
-      || this.props.locationQuery !== nextProps.locationQuery
+      || this.props.locationQuery === nextProps.locationQuery
       || typeof this.props.scrollContainer !== typeof nextProps.scrollContainer;
   }
   componentDidUpdate() {
@@ -59,9 +66,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       filters,
       header,
       entityTitle,
-      expandableColumns,
       dataReady,
-      isExpandable,
+      expandableColumns,
       isManager,
       formatLabel,
       onGroupSelect,
@@ -123,18 +129,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   subgroupSelectValue={locationQuery.get('subgroup')}
                   onGroupSelect={onGroupSelect}
                   onSubgroupSelect={onSubgroupSelect}
-                  expandLink={isExpandable
-                    ? {
-                      expanded: expandNo === expandableColumns.length,
-                      collapsed: expandNo === 0,
-                      onClick: () => onExpand(
-                        expandNo < expandableColumns.length
-                        ? expandableColumns.length
-                        : 0
-                      ),
-                    }
-                    : null
-                  }
+                  onExpand={() => onExpand(expandNo < expandableColumns ? expandableColumns : 0)}
+                  expanded={expandNo === expandableColumns}
+                  collapsed={expandNo !== expandableColumns && expandNo === 0}
                 />
                 <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
                   <EntityListGroups
@@ -143,12 +140,11 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     connectedTaxonomies={this.props.connectedTaxonomies}
                     entityIdsSelected={this.props.entityIdsSelected}
                     locationQuery={this.props.locationQuery}
-                    entityLinkTo={this.props.entityLinkTo}
+                    onEntityClick={this.props.onEntityClick}
                     entityTitle={entityTitle}
                     filters={filters}
                     header={header}
                     isManager={isManager}
-                    isExpandable={isExpandable}
                     expandableColumns={expandableColumns}
                     onExpand={onExpand}
                     onTagClick={onTagClick}
@@ -181,14 +177,13 @@ EntityListMain.propTypes = {
   filters: PropTypes.object,
   header: PropTypes.object,
   entityTitle: PropTypes.object, // single/plural
-  expandableColumns: PropTypes.array,
   // primitive
   dataReady: PropTypes.bool,
-  entityLinkTo: PropTypes.string,
-  isExpandable: PropTypes.bool,
+  expandableColumns: PropTypes.array,
   isManager: PropTypes.bool,
   // functions
   formatLabel: PropTypes.func.isRequired,
+  onEntityClick: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,

@@ -14,7 +14,7 @@ const ChildItems = styled.span`
 export class EntityListNestedReportList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { entity, entityLinkTo } = this.props;
+    const { entity, onEntityClick } = this.props;
     return (
       <ChildItems>
         { entity.get('dates') &&
@@ -27,7 +27,7 @@ export class EntityListNestedReportList extends React.PureComponent { // eslint-
             <EntityListNestedReportItem
               key={i}
               report={report}
-              entityLinkTo={entityLinkTo}
+              onEntityClick={() => onEntityClick(report.get('id'), 'reports')}
             />
           )
         }
@@ -38,7 +38,7 @@ export class EntityListNestedReportList extends React.PureComponent { // eslint-
 
 EntityListNestedReportList.propTypes = {
   entity: PropTypes.instanceOf(Map),
-  entityLinkTo: PropTypes.string,
+  onEntityClick: PropTypes.func,
 };
 
 export default EntityListNestedReportList;

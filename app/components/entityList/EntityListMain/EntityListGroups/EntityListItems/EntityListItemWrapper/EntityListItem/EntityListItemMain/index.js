@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 // import { isEqual } from 'lodash/lang';
@@ -17,7 +16,7 @@ const Styled = styled(Component)`
   padding: 5px 10px;
 `;
 
-const EntityListItemMainTitleWrap = styled(Link)`
+const EntityListItemMainTitleWrap = styled.a`
   text-decoration: none;
   display: block;
   padding: 3px 0 8px;
@@ -32,9 +31,9 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
     entity: PropTypes.instanceOf(Map).isRequired,
     taxonomies: PropTypes.instanceOf(Map),
     entityIcon: PropTypes.string,
-    entityLinkTo: PropTypes.string,
+    onEntityClick: PropTypes.func,
     nested: PropTypes.bool,
-    // isExpandable: PropTypes.bool,
+    // expandableColumns: PropTypes.array,
     onTagClick: PropTypes.func,
     associations: PropTypes.object,
   }
@@ -92,7 +91,6 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
   mapToEntityListItem = () => {
     const {
       taxonomies,
-      entityLinkTo,
       associations,
       onTagClick,
       entity,
@@ -101,7 +99,6 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
       reference: entity.getIn(['attributes', 'reference']) || entity.get('id'),
-      linkTo: `${entityLinkTo}${entity.get('id')}`,
       status: entity.getIn(['attributes', 'draft']) ? 'draft' : null,
       // targetDate: entity.attributes.target_date ? this.context.intl.formatDate(new Date(entity.attributes.target_date)) : null,
       tags: taxonomies
@@ -115,7 +112,7 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
     };
   };
   render() {
-    const { entityIcon, nested } = this.props;
+    const { entityIcon, nested, onEntityClick } = this.props;
 
     // console.log('EntityListItemMain.render', this.props.entity.get('id'))
     const entity = this.mapToEntityListItem();
@@ -123,7 +120,7 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
       <Styled>
         <EntityListItemMainTop entity={entity} entityIcon={entityIcon} />
         <Clear />
-        <EntityListItemMainTitleWrap to={entity.linkTo}>
+        <EntityListItemMainTitleWrap onClick={() => onEntityClick(entity.id)}>
           <EntityListItemMainTitle nested={nested}>
             {entity.title}
           </EntityListItemMainTitle>

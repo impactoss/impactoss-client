@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { Map, List } from 'immutable';
+import { List, Map, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -50,7 +50,14 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         onClick: () => this.props.handleNew(),
       }],
     };
-
+    const expandableColumns = [
+      {
+        label: 'Progress reports',
+        type: 'reporting',
+        clientPath: 'reports',
+        icon: 'reminder',
+      },
+    ];
     return (
       <div>
         <Helmet
@@ -63,7 +70,8 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
           entities={this.props.entities}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
-          path="indicators"
+          serverPath="indicators"
+          clientPath="indicators"
           filters={FILTERS}
           edits={EDITS}
           header={headerOptions}
@@ -72,7 +80,8 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
             single: this.context.intl.formatMessage(appMessages.entities.indicators.single),
             plural: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
           }}
-          entityLinkTo="/indicators/"
+          expandableColumns={expandableColumns}
+          locationQuery={fromJS(this.props.location.query)}
         />
       </div>
     );
@@ -87,13 +96,14 @@ IndicatorList.propTypes = {
   entities: PropTypes.instanceOf(List).isRequired,
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
+  location: PropTypes.object,
 };
 
 IndicatorList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
     'indicators',
     'users',
@@ -109,7 +119,7 @@ const mapStateToProps = (state) => ({
     'due_dates',
     'progress_reports',
   ] }),
-  entities: selectIndicators(state),
+  entities: selectIndicators(state, fromJS(props.location.query)),
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
 });

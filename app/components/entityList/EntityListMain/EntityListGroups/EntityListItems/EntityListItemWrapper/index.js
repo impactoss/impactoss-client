@@ -32,7 +32,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       isManager,
       onEntitySelect,
       expandNo,
-      // isExpandable,
+      // expandableColumns,
       // expandableColumns,
       onExpand,
       entityIcon,
@@ -40,7 +40,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       taxonomies,
       onTagClick,
       associations,
-      entityLinkTo,
+      onEntityClick,
       entity,
     } = this.props;
     // console.log('EntityListItemWrapper.render', entity.id)
@@ -57,26 +57,26 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
           taxonomies={taxonomies}
           onTagClick={onTagClick}
           associations={associations}
-          entityLinkTo={entityLinkTo}
+          onEntityClick={onEntityClick}
         />
       </ItemWrapper>
     );
   }
 }
 //
-// {isExpandable && expandNo > 0 && expandableColumns[0].type === 'reports' &&
+// {expandableColumns && expandNo > 0 && expandableColumns[0].type === 'reports' &&
 //   <EntityListNestedReportList
 //     entity={entity}
-//     entityLinkTo={expandableColumns[0].entityLinkTo}
+//     onEntityClick={expandableColumns[0].onEntityClick}
 //   />
 // }
-// {isExpandable && expandNo > 0 && expandableColumns[0].type === 'indicators' &&
+// {expandableColumns && expandNo > 0 && expandableColumns[0].type === 'indicators' &&
 //   <EntityListNestedList
 //     entities={this.getNestedIndicators(entity)}
-//     entityLinkTo={expandableColumns[0].entityLinkTo}
+//     onEntityClick={expandableColumns[0].onEntityClick}
 //     entityIcon={expandableColumns[0].icon}
 //     expandNo={expandNo - 1}
-//     isExpandable={expandableColumns.length > 1}
+//     expandableColumns={expandableColumns.length > 1}
 //     expandableColumns={expandableColumns.length > 1 ? [expandableColumns[1]] : null}
 //     onExpand={onExpand}
 //   />
@@ -88,8 +88,8 @@ EntityListItemWrapper.propTypes = {
   entityIdsSelected: PropTypes.instanceOf(List),
   associations: PropTypes.object,
   isManager: PropTypes.bool,
+  onEntityClick: PropTypes.func,
   onEntitySelect: PropTypes.func,
-  entityLinkTo: PropTypes.string,
   onTagClick: PropTypes.func,
   onExpand: PropTypes.func,
   expandNo: PropTypes.number,

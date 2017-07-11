@@ -60,6 +60,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
+    // console.log('locationQuery', isEqual(this.props.locationQuery, nextProps.locationQuery))
+    // console.log('locationQuery', this.props.locationQuery === nextProps.locationQuery)
     // console.log('locationQuery.where',!isEqual(this.props.locationQuery.where, nextProps.locationQuery.where))
     // console.log('locationQuery.without',!isEqual(this.props.locationQuery.without, nextProps.locationQuery.without))
     // console.log('locationQuery.cat',!isEqual(this.props.locationQuery.cat, nextProps.locationQuery.cat))
@@ -68,7 +70,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     // console.log('activePanel',this.props.activePanel !== nextProps.activePanel)
     // console.log('state',!isEqual(this.state, nextState));
     // TODO consider targeting specific query params, eg where, without, cat, catx but also recommendations, etc
-    return this.props.locationQuery === nextProps.locationQuery
+    return this.props.locationQuery !== nextProps.locationQuery
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.activePanel !== nextProps.activePanel
       || !isEqual(this.state, nextState);
@@ -117,7 +119,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
 
 
   render() {
-    // console.log('EntityListSidebar.render')
     const {
       filters,
       edits,

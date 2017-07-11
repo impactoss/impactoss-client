@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -49,7 +49,20 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
         onClick: () => this.props.handleNew(),
       }],
     };
-
+    const expandableColumns = [
+      {
+        label: 'Indicators',
+        type: 'indicators',
+        clientPath: 'indicators',
+        icon: 'indicators',
+      },
+      {
+        label: 'Progress reports',
+        type: 'reporting',
+        clientPath: 'reports',
+        icon: 'reminder',
+      },
+    ];
     return (
       <div>
         <Helmet
@@ -63,7 +76,8 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
-          path="sdgtargets"
+          serverPath="sdgtargets"
+          clientPath="sdgtargets"
           filters={FILTERS}
           edits={EDITS}
           header={headerOptions}
@@ -72,7 +86,8 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
             single: this.context.intl.formatMessage(appMessages.entities.sdgtargets.single),
             plural: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
           }}
-          entityLinkTo="/sdgtargets/"
+          expandableColumns={expandableColumns}
+          locationQuery={fromJS(this.props.location.query)}
         />
       </div>
     );
@@ -88,13 +103,14 @@ SdgTargetList.propTypes = {
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
+  location: PropTypes.object,
 };
 
 SdgTargetList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
     'sdgtargets',
     'sdgtarget_categories',
@@ -110,7 +126,7 @@ const mapStateToProps = (state) => ({
     'due_dates',
     'progress_reports',
   ] }),
-  entities: selectSdgTargets(state),
+  entities: selectSdgTargets(state, fromJS(props.location.query)),
   taxonomies: selectTaxonomies(state),
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),

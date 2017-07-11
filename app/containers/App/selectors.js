@@ -403,7 +403,6 @@ const getUser = createSelector(
   }
 );
 
-// NEW performant way of selecting and querying entities
 
 const selectLocation = createSelector(
   getRoute,
@@ -415,16 +414,17 @@ const selectLocation = createSelector(
     }
   }
 );
-const selectLocationQuery = createSelector(
-  selectLocation,
-  (location) => location && location.get('query')
-);
+// const selectLocationQuery = createSelector(
+//   selectLocation,
+//   (location) => location && location.get('query')
+// );
+
 const selectWhereQuery = createSelector(
-  selectLocationQuery,
+  (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('where')
 );
 const selectAttributeQuery = createSelector(
-  selectWhereQuery,
+  (state, { locationQuery }) => selectWhereQuery(state, locationQuery),
   (whereQuery) => whereQuery &&
     asList(whereQuery).reduce((memo, where) => {
       const attrValue = where.split(':');
@@ -433,42 +433,45 @@ const selectAttributeQuery = createSelector(
 );
 
 const selectWithoutQuery = createSelector(
-  selectLocationQuery,
+  (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('without')
 );
 
 const selectCategoryQuery = createSelector(
-  selectLocationQuery,
+  (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('cat')
 );
 const selectConnectionQuery = createSelector(
-  selectLocationQuery,
+  (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('connected')
 );
 
 const selectConnectedCategoryQuery = createSelector(
-  selectLocationQuery,
+  (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('catx')
 );
 
 const selectSearchQuery = createSelector(
-  selectLocationQuery,
+  (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('search')
 );
 const selectExpandQuery = createSelector(
-  selectLocationQuery,
+  (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('expand')
     ? parseInt(locationQuery.get('expand'), 10)
     : 0
 );
 const selectSortOrderQuery = createSelector(
-  selectLocationQuery,
+  (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('sortOrder')
 );
 const selectSortByQuery = createSelector(
-  selectLocationQuery,
+  (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('sortBy')
 );
+
+
+// NEW performant way of selecting and querying entities
 
 const selectEntities = (state, path) => state.getIn(['global', 'entities', path]);
 
@@ -498,14 +501,14 @@ const selectEntitiesWhere = createSelector(
 
 const selectEntitiesSearch = createSelector(
   selectEntitiesWhere,
-  selectSearchQuery,
-  (state, { searchAttributes }) => JSON.stringify(searchAttributes), // enable caching,
+  (state, { locationQuery }) => selectSearchQuery(state, locationQuery),
+  (state, { searchAttributes }) => searchAttributes,
   (entities, query, searchAttributes) => {
     if (query) {
       try {
         const regex = new RegExp(regExMultipleWords(query), 'i');
         return entities.filter((entity) =>
-          regex.test(prepareEntitySearchTarget(entity, JSON.parse(searchAttributes)))
+          regex.test(prepareEntitySearchTarget(entity, searchAttributes))
         );
       } catch (e) {
         return entities;
@@ -538,6 +541,7 @@ export {
   isUserAdmin,
   isUserManager,
   isUserContributor,
+  selectLocation,
   selectAttributeQuery,
   selectSearchQuery,
   selectWithoutQuery,
@@ -545,8 +549,6 @@ export {
   selectConnectedCategoryQuery,
   selectExpandQuery,
   selectConnectionQuery,
-  selectLocationQuery,
   selectSortOrderQuery,
   selectSortByQuery,
-  selectLocation,
 };

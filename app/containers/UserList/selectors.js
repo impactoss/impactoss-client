@@ -25,9 +25,10 @@ export const selectConnections = createSelector(
 );
 
 const selectUsersNested = createSelector(
-  (state) => selectEntitiesSearch(state, {
+  (state, locationQuery) => selectEntitiesSearch(state, {
     path: 'users',
     searchAttributes: ['name'],
+    locationQuery,
   }),
   (state) => selectEntities(state, 'user_categories'),
   (state) => selectEntities(state, 'user_roles'),

@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { List, Map } from 'immutable';
+import { List, Map, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -49,7 +49,20 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         onClick: () => this.props.handleNew(),
       }],
     };
-
+    const expandableColumns = [
+      {
+        label: 'Indicators',
+        type: 'indicators',
+        clientPath: 'indicators',
+        icon: 'indicators',
+      },
+      {
+        label: 'Progress reports',
+        type: 'reporting',
+        clientPath: 'reports',
+        icon: 'reminder',
+      },
+    ];
     return (
       <div>
         <Helmet
@@ -63,7 +76,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
-          path="measures"
+          serverPath="measures"
+          clientPath="actions"
           filters={FILTERS}
           edits={EDITS}
           header={headerOptions}
@@ -72,7 +86,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             single: this.context.intl.formatMessage(appMessages.entities.measures.single),
             plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
           }}
-          entityLinkTo="/actions/"
+          expandableColumns={expandableColumns}
+          locationQuery={fromJS(this.props.location.query)}
         />
       </div>
     );
@@ -84,6 +99,7 @@ ActionList.propTypes = {
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
   dataReady: PropTypes.bool,
+  location: PropTypes.object,
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
@@ -94,7 +110,7 @@ ActionList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
     'measures',
     'measure_categories',
@@ -113,7 +129,7 @@ const mapStateToProps = (state) => ({
     'due_dates',
     'progress_reports',
   ] }),
-  entities: selectMeasures(state),
+  entities: selectMeasures(state, fromJS(props.location.query)),
   taxonomies: selectTaxonomies(state),
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),

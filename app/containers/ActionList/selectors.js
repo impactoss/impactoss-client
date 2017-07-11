@@ -114,9 +114,10 @@ export const selectConnectedTaxonomies = createSelector(
 );
 
 const selectMeasuresNested = createSelector(
-  (state) => selectEntitiesSearch(state, {
+  (state, locationQuery) => selectEntitiesSearch(state, {
     path: 'measures',
     searchAttributes: ['title'],
+    locationQuery,
   }),
   (state) => selectConnections(state),
   (state) => selectEntities(state, 'measure_categories'),
@@ -206,7 +207,7 @@ const selectMeasuresExpandables = createSelector(
   (state) => selectEntities(state, 'indicators'),
   (state) => selectEntities(state, 'progress_reports'),
   (state) => selectEntities(state, 'due_dates'),
-  (state) => selectExpandQuery(state),
+  selectExpandQuery,
   (entities, indicators, reports, dueDates, expandNo) =>
     entities.map((entity) => {
       if (expandNo <= 0) {

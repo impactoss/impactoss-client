@@ -36,9 +36,10 @@ export const selectTaxonomies = createSelector(
 );
 
 const selectRecommendationsNested = createSelector(
-  (state) => selectEntitiesSearch(state, {
+  (state, locationQuery) => selectEntitiesSearch(state, {
     path: 'recommendations',
     searchAttributes: ['reference', 'title'],
+    locationQuery,
   }),
   (state) => selectConnections(state),
   (state) => selectEntities(state, 'recommendation_categories'),

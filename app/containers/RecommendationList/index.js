@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 // import { isEqual } from 'lodash/lang';
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { isReady } from 'containers/App/selectors';
@@ -81,7 +81,8 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
-          path="recommendations"
+          serverPath="recommendations"
+          clientPath="recommendations"
           filters={FILTERS}
           edits={EDITS}
           header={headerOptions}
@@ -90,7 +91,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             single: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
             plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
           }}
-          entityLinkTo="/recommendations/"
+          locationQuery={fromJS(this.props.location.query)}
         />
       </div>
     );
@@ -105,13 +106,14 @@ RecommendationList.propTypes = {
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
+  location: PropTypes.object,
 };
 
 RecommendationList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   dataReady: isReady(state, { path: [
     'measures',
     'users',
@@ -121,7 +123,7 @@ const mapStateToProps = (state) => ({
     'recommendation_measures',
     'recommendation_categories',
   ] }),
-  entities: selectRecommendations(state),
+  entities: selectRecommendations(state, fromJS(props.location.query)),
   taxonomies: selectTaxonomies(state),
   connections: selectConnections(state),
 });
