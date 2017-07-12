@@ -81,7 +81,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       locationQuery,
     } = this.props;
 
-    const expandNo = parseInt(locationQuery.get('expand'), 10);
+    const expandNo = expandableColumns && locationQuery.get('expand')
+      ? parseInt(locationQuery.get('expand'), 10)
+      : 0;
 
     const headerTitle = this.props.entities && dataReady
       ? `${this.props.entities.size} ${this.props.entities.size === 1 ? entityTitle.single : entityTitle.plural}`
@@ -129,9 +131,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   subgroupSelectValue={locationQuery.get('subgroup')}
                   onGroupSelect={onGroupSelect}
                   onSubgroupSelect={onSubgroupSelect}
-                  onExpand={() => onExpand(expandNo < expandableColumns ? expandableColumns : 0)}
-                  expanded={expandNo === expandableColumns}
-                  collapsed={expandNo !== expandableColumns && expandNo === 0}
+                  onExpand={() => onExpand(expandNo < expandableColumns.length ? expandableColumns.length : 0)}
+                  expanded={expandableColumns && expandNo === expandableColumns.length}
+                  expandable={expandableColumns && expandableColumns.length > 0}
                 />
                 <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
                   <EntityListGroups
@@ -145,8 +147,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     filters={filters}
                     header={header}
                     isManager={isManager}
-                    expandableColumns={expandableColumns}
                     onExpand={onExpand}
+                    expandableColumns={expandableColumns}
+                    expandNo={expandNo}
                     onTagClick={onTagClick}
                     onPageSelect={(page) => {
                       this.scrollToTop();

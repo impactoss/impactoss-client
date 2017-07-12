@@ -5,13 +5,11 @@ import styled from 'styled-components';
 import { Map, List } from 'immutable';
 
 // import { isEqual } from 'lodash/lang';
-import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import EntityListItems from './EntityListItems';
 import EntityListHeader from './EntityListHeader';
 import EntityListFooter from './EntityListFooter';
 
-import { getHeaderColumns } from './header';
 import { getPager } from './pagination';
 import { groupEntities } from './group-entities';
   // getGroupedEntitiesForPage,
@@ -45,6 +43,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       onEntitySelect,
       expandableColumns,
       onExpand,
+      expandNo,
       entityTitle,
       onEntitySelectAll,
       entities,
@@ -94,32 +93,17 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     } else {
       entitiesOnPage = entities;
     }
-    let allChecked = CHECKBOX_STATES.INDETERMINATE;
-    if (entityIdsSelected.size === 0) {
-      allChecked = CHECKBOX_STATES.UNCHECKED;
-    } else if (entitiesOnPage.size > 0 && entityIdsSelected.size === entitiesOnPage.size) {
-      allChecked = CHECKBOX_STATES.CHECKED;
-    }
-    let listHeaderLabel = entityTitle.plural;
-    if (entityIdsSelected.size === 1) {
-      listHeaderLabel = `${entityIdsSelected.size} ${entityTitle.single} selected`;
-    } else if (entityIdsSelected.size > 1) {
-      listHeaderLabel = `${entityIdsSelected.size} ${entityTitle.plural} selected`;
-    }
-    const expandNo = locationQuery.get('expand') ? parseInt(locationQuery.get('expand'), 10) : 0;
 
     return (
       <div>
         <EntityListHeader
-          columns={getHeaderColumns(
-            listHeaderLabel,
-            isManager,
-            expandNo,
-            expandableColumns,
-            onExpand
-          )}
+          selectedTotal={entityIdsSelected.size}
+          pageTotal={entitiesOnPage.size}
+          expandNo={expandNo}
+          expandableColumns={expandableColumns}
+          onExpand={onExpand}
           isManager={isManager}
-          isSelected={allChecked}
+          entityTitle={entityTitle}
           onSelect={(checked) => {
             onEntitySelectAll(checked ? entitiesOnPage.map((entity) => entity.get('id')).toArray() : []);
           }}
@@ -215,6 +199,7 @@ EntityListGroups.propTypes = {
   header: PropTypes.object,
   isManager: PropTypes.bool,
   expandableColumns: PropTypes.array,
+  expandNo: PropTypes.number,
   onExpand: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
+
 import Column from './Column';
 import ColumnSelect from './ColumnSelect';
 import ColumnExpand from './ColumnExpand';
@@ -16,56 +18,101 @@ const ColumnNestedWrap = styled.div`
   background-color: ${palette('light', 1)};
   display: inline-block;
 `;
+const WIDTH_FULL = 1;
+const WIDTH_MAIN = 0.66;
+const WIDTH_HALF = 0.5;
+const WIDTH_OTHER = 0.34;
 
 class EntityListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  renderFirstColumn = (col) => {
-    const { isSelected, onSelect } = this.props;
-    if (col.isManager) {
-      return (
-        <ColumnSelect
-          isSelected={isSelected}
-          onSelect={onSelect}
-          label={col.label}
-          width={col.width}
-        />
-      );
+  getListHeaderLabel = (entityTitle, selectedTotal) => {
+    if (selectedTotal === 1) {
+      return `${selectedTotal} ${entityTitle.single} selected`;
     }
-    return (
-      <Column width={col.width}>
-        {col.label}
-      </Column>
-    );
-  }
-  renderColumn = (col, i) => {
-    if (col.expandableColumns) {
-      return (
-        <ColumnExpand
-          key={i}
-          isExpand={col.isExpand}
-          onExpand={col.onExpand}
-          label={col.label}
-          width={col.width}
-        />
-      );
+    if (selectedTotal > 1) {
+      return `${selectedTotal} ${entityTitle.plural} selected`;
     }
-    return (
-      <Column
-        key={i}
-        width={col.width}
-      >
-        {col.label}
-      </Column>
-    );
+    return entityTitle.plural;
   }
+  getSelectedState = (selectedTotal, pageTotal) => {
+    if (selectedTotal === 0) {
+      return CHECKBOX_STATES.UNCHECKED;
+    }
+    if (selectedTotal > 0 && selectedTotal === pageTotal) {
+      return CHECKBOX_STATES.CHECKED;
+    }
+    return CHECKBOX_STATES.INDETERMINATE;
+  }
+  getFirstColumnWidth = (expandableColumns, expandNo) => {
+    // TODO figure out a betterway to determine column widths.
+    const hasNested = expandableColumns && expandableColumns.length > 0;
+    const isNestedExpand = expandNo > 0;
+    if (!hasNested && !isNestedExpand) {
+      return WIDTH_FULL;
+    }
+    if (hasNested && !isNestedExpand) {
+      return WIDTH_MAIN;
+    }
+    return WIDTH_HALF;
+  }
+  // TODO figure out a betterway to determine column widths
+  getExpandableColumnWidth = (i, total, expandNo) => {
+    const onlyItem = total === 1;
+    const isParentExpand = expandNo <= i;
+    const isExpand = expandNo > i;
+    const isNestedExpand = expandNo > (i + 1);
+    const hasNested = total > (i + 1);
+    // if only item
+    if (onlyItem) {
+      return WIDTH_FULL;
+    }
+    if (isExpand && hasNested && !isNestedExpand) {
+      return WIDTH_MAIN;
+    }
+    if (!isExpand && !hasNested && isParentExpand) {
+      return WIDTH_OTHER;
+    }
+    return WIDTH_HALF;
+  };
+
   render() {
-    const { columns } = this.props;
-    const firstColumn = columns.shift();
+    const {
+      selectedTotal,
+      pageTotal,
+      entityTitle,
+      isManager,
+      expandNo,
+      expandableColumns,
+      onExpand,
+      onSelect,
+    } = this.props;
+
+    const firstColumnWidth = this.getFirstColumnWidth(expandableColumns, expandNo);
     return (
       <Styled>
-        { firstColumn && this.renderFirstColumn(firstColumn) }
-        { columns.length > 0 &&
-          <ColumnNestedWrap width={1 - firstColumn.width}>
-            { columns.map((col, i) => this.renderColumn(col, i)) }
+        { !isManager &&
+          <Column width={firstColumnWidth}>
+            {this.getListHeaderLabel(entityTitle, selectedTotal)}
+          </Column>
+        }
+        { isManager &&
+          <ColumnSelect
+            width={firstColumnWidth}
+            isSelected={this.getSelectedState(selectedTotal, pageTotal)}
+            label={this.getListHeaderLabel(entityTitle, selectedTotal)}
+            onSelect={onSelect}
+          />
+        }
+        { expandableColumns.length > 0 &&
+          <ColumnNestedWrap width={1 - firstColumnWidth}>
+            { expandableColumns.map((col, i, list) =>
+              <ColumnExpand
+                key={i}
+                isExpand={expandNo > i}
+                onExpand={() => onExpand(expandNo > i ? i : i + 1)}
+                label={col.label}
+                width={this.getExpandableColumnWidth(i, list.length, expandNo)}
+              />
+            )}
           </ColumnNestedWrap>
         }
       </Styled>
@@ -73,8 +120,13 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
   }
 }
 EntityListHeader.propTypes = {
-  columns: PropTypes.array,
-  isSelected: PropTypes.bool,
+  selectedTotal: PropTypes.number,
+  pageTotal: PropTypes.number,
+  expandNo: PropTypes.number,
+  isManager: PropTypes.bool,
+  expandableColumns: PropTypes.array,
+  entityTitle: PropTypes.object,
+  onExpand: PropTypes.func,
   onSelect: PropTypes.func,
 };
 
