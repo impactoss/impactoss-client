@@ -18,7 +18,11 @@ const ItemWrapper = styled.div`
 `;
 
 export class EntityListItemWrapper extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  shouldComponentUpdate(nextProps) {
+    return this.props.expandNo !== nextProps.expandNo
+    || this.props.entity !== nextProps.entity
+    || this.props.entityIdsSelected !== nextProps.entityIdsSelected;
+  }
   getNestedIndicators = (entity) => entity.get('indicators')
     ? entity.get('indicators').reduce((nested, association) =>
       association.get('indicator')
@@ -43,7 +47,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       onEntityClick,
       entity,
     } = this.props;
-    // console.log('EntityListItemWrapper.render', entity.id)
+    // console.log('EntityListItemWrapper.render', entity.get('id'))
     return (
       <ItemWrapper separated={expandNo}>
         <EntityListItem

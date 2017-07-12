@@ -3,46 +3,37 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { List } from 'immutable';
 
-import EntityListItemOuter from './EntityListItemOuter';
+import EntityListItemWatch from './EntityListItemWatch';
+import EntityListItemWrapper from './EntityListItemWrapper';
 
 const Styled = styled.div`
   padding: ${(props) => props.separated ? '1em 0 2em' : '0 0 2em'};
 `;
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  // componentWillMount() {
-  //   console.log('EntityListItems.componentWillMount')
-  //   // if (this.props.scrollContainer) {
-  //   //   this.props.scrollContainer.update();
-  //   // }
-  // }
-  // componentWillUpdate() {
-  //   console.log('EntityListItems.componentWillUpdate()')
-  // }
-  // componentDidUpdate() {
-  //   console.log('EntityListItems.componentDidUpdate')
-  //   // if (this.props.scrollContainer) {
-  //   //   this.props.scrollContainer.update();
-  //   // }
-  // }
-  // componentWillReceiveProps(nextProps) {
-  //   console.log('EntityListItems.componentWillReceiveProps()')
-  // }
+
+  renderEntity = (entity, key) => (
+    <EntityListItemWrapper
+      key={key}
+      entity={entity}
+      {...this.props}
+    />
+  );
   render() {
-    const { entities, expandNo, ...props } = this.props;
     return (
-      <Styled separated={expandNo}>
-        { this.props.scrollContainer &&
-          entities.map((entity, key) =>
-            <EntityListItemOuter
-              scrollContainer={this.props.scrollContainer}
-              key={key}
-              entity={entity}
-              expandNo={expandNo}
-              {...props}
-            />
-          )
-        }
+      <Styled separated={this.props.expandNo}>
+        { this.props.entities.map((entity, key) =>
+          this.props.scrollContainer
+          ? <EntityListItemWatch
+            scrollContainer={this.props.scrollContainer}
+            key={key}
+            entity={entity}
+            expandNo={this.props.expandNo}
+            entityIdsSelected={this.props.entityIdsSelected}
+            renderEntity={() => this.renderEntity(entity, key)}
+          />
+          : this.renderEntity(entity, key)
+        )}
       </Styled>
     );
   }
@@ -50,6 +41,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
 
 EntityListItems.propTypes = {
   entities: PropTypes.instanceOf(List).isRequired,
+  entityIdsSelected: PropTypes.instanceOf(List).isRequired,
   scrollContainer: PropTypes.object,
   expandNo: PropTypes.number,
 };

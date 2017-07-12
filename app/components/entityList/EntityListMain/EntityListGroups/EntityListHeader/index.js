@@ -102,7 +102,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
             onSelect={onSelect}
           />
         }
-        { expandableColumns.length > 0 &&
+        { expandableColumns && expandableColumns.length > 0 &&
           <ColumnNestedWrap width={1 - firstColumnWidth}>
             { expandableColumns.map((col, i, list) =>
               <ColumnExpand

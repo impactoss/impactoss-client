@@ -7,7 +7,7 @@ import { without } from 'lodash/array';
 import { getEntitySortIteratee } from 'utils/sort';
 
 import appMessages from 'containers/App/messages';
-import EntityListItems from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems';
+// import EntityListItems from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems';
 
 import FieldWrap from 'components/fields/FieldWrap';
 import LabelLarge from 'components/fields/LabelLarge';
@@ -26,6 +26,20 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
       showAllConnections: [],
     };
   }
+  // <EntityListItems
+  //   entities={this.state.showAllConnections.indexOf(field.entityType) >= 0
+  //     ? sortedValues
+  //     : (sortedValues.slice(0, CONNECTIONMAX))
+  //   }
+  //   entityIcon={field.icon}
+  //   entityLinkTo={field.entityPath}
+  //   taxonomies={field.taxonomies}
+  //   associations={{
+  //     connections: { // filter by associated entity
+  //       options: field.connectionOptions,
+  //     },
+  //   }}
+  // />
   render() {
     const { field } = this.props;
     const sortedValues = orderBy(field.values, getEntitySortIteratee('id'), 'desc');
@@ -40,20 +54,7 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
           }
         </LabelLarge>
         <EntityListItemsWrap>
-          <EntityListItems
-            entities={this.state.showAllConnections.indexOf(field.entityType) >= 0
-              ? sortedValues
-              : (sortedValues.slice(0, CONNECTIONMAX))
-            }
-            entityIcon={field.icon}
-            entityLinkTo={field.entityPath}
-            taxonomies={field.taxonomies}
-            associations={{
-              connections: { // filter by associated entity
-                options: field.connectionOptions,
-              },
-            }}
-          />
+          EntityListItems: TODO
         </EntityListItemsWrap>
         { sortedValues.length > CONNECTIONMAX &&
           <ToggleAllItems
