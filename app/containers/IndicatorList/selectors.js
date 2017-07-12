@@ -205,21 +205,21 @@ const selectIndicatorsExpandables = createSelector(
         // - indicators
         // - reports (incl due_dates)
         return entity
-        .set('expandable', 'reporting')
-        .set('reporting', Map()
+        .set('expandable', 'reports')
+        .set('reports', reports.filter((report) => attributesEqual(entity.get('id'), report.getIn(['attributes', 'indicator_id']))))
+        .set('dates', Map()
           .set('overdue', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'overdue'])).size)
           .set('due', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'due'])).size)
-          .set('reports', reports.filter((report) => attributesEqual(entity.get('id'), report.getIn(['attributes', 'indicator_id']))))
         );
       }
       // insert expanded indicators with expandable reports (incl due_dates)
       const dueDatesScheduled = dueDatesForIndicator.filter((date) => !date.getIn(['attributes', 'has_progress_report']));
       return entity
-      .set('expanded', 'reporting')
-      .set('reporting', Map()
+      .set('expanded', 'reports')
+      .set('reports', reports.filter((report) => attributesEqual(entity.get('id'), report.getIn(['attributes', 'indicator_id']))))
+      .set('dates', Map()
         // store upcoming scheduled indicator
         .set('scheduled', dueDatesScheduled && sortEntities(dueDatesScheduled, 'asc', 'due_date', 'date').first())
-        .set('reports', reports.filter((report) => attributesEqual(entity.get('id'), report.getIn(['attributes', 'indicator_id']))))
       );
     })
 );

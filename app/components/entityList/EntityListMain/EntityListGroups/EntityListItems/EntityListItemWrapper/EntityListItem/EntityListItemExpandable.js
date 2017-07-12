@@ -39,12 +39,11 @@ const Info = styled.div`
 export default class EntityListItemExpandable extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
-    type: PropTypes.string,
-    entityIcon: PropTypes.string,
+    column: PropTypes.object,
     count: PropTypes.number,
-    info: PropTypes.array,
     onClick: PropTypes.func,
     width: PropTypes.number,
+    dates: PropTypes.object,
   }
 
   static defaultProps = {
@@ -55,16 +54,20 @@ export default class EntityListItemExpandable extends React.PureComponent { // e
     const {
       count,
       onClick,
-      info,
+      dates,
       width,
-      entityIcon,
-      type,
     } = this.props;
+    const { type, icon } = this.props.column;
 
+    const info = [];
+    if (dates) {
+      if (dates.due) info.push(`${dates.due} due`);
+      if (dates.overdue) info.push(`${dates.overdue} overdue`);
+    }
     return (
       <Styled width={width} onClick={onClick}>
         <Top>
-          <Icon name={entityIcon} text iconRight />
+          <Icon name={icon} text iconRight />
         </Top>
         <Clear />
         <Count type={type} count={count}>{count}</Count>

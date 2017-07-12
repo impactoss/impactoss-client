@@ -36,8 +36,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       isManager,
       onEntitySelect,
       expandNo,
-      // expandableColumns,
-      // expandableColumns,
+      expandableColumns,
       onExpand,
       entityIcon,
       entityIdsSelected,
@@ -47,7 +46,12 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       onEntityClick,
       entity,
     } = this.props;
-    // console.log('EntityListItemWrapper.render', entity.get('id'))
+    // console.log('EntityListItemWrapper.render')
+    // console.log('expandableColumns', expandableColumns)
+    // console.log('entity', entity.toJS())
+    // entity.get('expandable') && console.log('entity.expandable', entity.get('expandable'))
+    // entity.get('expanded') && console.log('entity.expanded', entity.get('expanded'))
+
     return (
       <ItemWrapper separated={expandNo}>
         <EntityListItem
@@ -55,8 +59,9 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
           isManager={isManager}
           isSelected={isManager && entityIdsSelected.includes(entity.get('id'))}
           onSelect={(checked) => onEntitySelect(entity.get('id'), checked)}
-          expandNo={expandNo}
           onExpand={onExpand}
+          expandNo={expandNo}
+          expandableColumns={expandableColumns}
           entityIcon={entityIcon}
           taxonomies={taxonomies}
           onTagClick={onTagClick}
@@ -98,6 +103,7 @@ EntityListItemWrapper.propTypes = {
   onExpand: PropTypes.func,
   expandNo: PropTypes.number,
   entityIcon: PropTypes.string,
+  expandableColumns: PropTypes.array,
 };
 
 export default EntityListItemWrapper;

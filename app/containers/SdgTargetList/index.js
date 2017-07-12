@@ -58,7 +58,7 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
       },
       {
         label: 'Progress reports',
-        type: 'reporting',
+        type: 'reports',
         clientPath: 'reports',
         icon: 'reminder',
       },

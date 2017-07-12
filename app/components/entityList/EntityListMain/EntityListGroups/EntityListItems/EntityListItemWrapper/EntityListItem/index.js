@@ -2,18 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-// import { isEqual } from 'lodash/lang';
+import { find } from 'lodash/collection';
 import { Map } from 'immutable';
+import asList from 'utils/as-list';
 import Component from 'components/styled/Component';
 
 import EntityListItemMain from './EntityListItemMain';
 import EntityListItemSelect from './EntityListItemSelect';
-// import EntityListItemExpandable from './EntityListItemExpandable';
+import EntityListItemExpandable from './EntityListItemExpandable';
 
 
 const Styled = styled.span`
   display: inline-block;
-  width: ${(props) => props.expandNo ? '50%' : '100%'};
+  width: ${(props) => props.expanded ? 50 : 100}%;
   vertical-align: top;
 
 `;
@@ -24,9 +25,8 @@ const Item = styled(Component)`
 `;
 const MainWrapper = styled(Component)`
   display: table-cell;
-  width: ${(props) => props.expandables ? 66 : 100}%;
-  border-right: 1px solid ${(props) => props.expandables ? palette('light', 0) : 'transparent'};
-
+  width: ${(props) => props.expandable ? 66 : 100}%;
+  border-right: 1px solid ${(props) => props.expandable ? palette('light', 0) : 'transparent'};
 `;
 const MainInnerWrapper = styled(Component)`
   display: table;
@@ -39,25 +39,6 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       || this.props.isSelected !== nextProps.isSelected
       || this.props.expandNo !== nextProps.expandNo;
   }
-  // getExpandables = () => {
-  //   const {
-  //     expandNo,
-  //     expandableColumns,
-  //     expandableColumns,
-  //     onExpand,
-  //   } = this.props;
-  //   const entity = this.props.entity.toJS()
-  //   return expandableColumns && !expandNo
-  //     ? expandableColumns.map((column, i) => ({
-  //       type: column.type,
-  //       icon: column.icon,
-  //       label: column.label,
-  //       count: column.getCount && column.getCount(entity),
-  //       info: column.getInfo && column.getInfo(entity),
-  //       onClick: () => onExpand(expandNo > i ? i : i + 1),
-  //     }))
-  //     : null;
-  // }
 
   render() {
     const {
@@ -65,21 +46,19 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       isManager,
       isSelected,
       onSelect,
-      expandNo,
       entityIcon,
       associations,
       taxonomies,
       onTagClick,
-      // expandableColumns,
+      expandableColumns,
+      onExpand,
       onEntityClick,
+      expandNo,
     } = this.props;
-
-    // console.log('EntityListItem.render', entity.get('id'))
-
     return (
-      <Styled expandNo={expandNo}>
+      <Styled expanded={expandNo > 0}>
         <Item>
-          <MainWrapper>
+          <MainWrapper expandable={entity.get('expandable')}>
             <MainInnerWrapper>
               {isManager &&
                 <EntityListItemSelect checked={isSelected} onSelect={onSelect} />
@@ -94,26 +73,24 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
               />
             </MainInnerWrapper>
           </MainWrapper>
+          {
+            entity.get('expandable') &&
+            asList(entity.get('expandable')).map((attribute, i, list) =>
+              <EntityListItemExpandable
+                key={i}
+                column={find(expandableColumns, (col) => col.type === attribute)}
+                count={entity.get(attribute) ? entity.get(attribute).size : 0}
+                dates={attribute === 'reports' ? entity.get('dates').toJS() : null}
+                onClick={() => onExpand(expandNo > i ? i : i + 1)}
+                width={(1 - 0.66) / list.size}
+              />
+            )
+          }
         </Item>
       </Styled>
     );
   }
 }
-
-// {expandableColumns && expandNo > 0 &&
-//   expandables.map((expandable, i, list) =>
-//     <EntityListItemExpandable
-//       key={i}
-//       label={expandable.label}
-//       type={expandable.type}
-//       entityIcon={expandable.icon}
-//       count={expandable.count}
-//       info={expandable.info}
-//       onClick={expandable.onClick}
-//       width={(1 - 0.66) / list.length}
-//     />
-//   )
-// }
 
 EntityListItem.propTypes = {
   entity: PropTypes.instanceOf(Map).isRequired,
@@ -122,9 +99,8 @@ EntityListItem.propTypes = {
   isSelected: PropTypes.bool,
   onSelect: PropTypes.func,
   expandNo: PropTypes.number,
-  // expandableColumns: PropTypes.array,
-  // expandableColumns: PropTypes.object,
-  // onExpand: PropTypes.func,
+  expandableColumns: PropTypes.array,
+  onExpand: PropTypes.func,
   entityIcon: PropTypes.string,
   onTagClick: PropTypes.func,
   associations: PropTypes.object,
@@ -133,7 +109,7 @@ EntityListItem.propTypes = {
 
 EntityListItem.defaultProps = {
   isSelected: false,
-  expandNo: null,
+  expandNo: 0,
 };
 
 export default EntityListItem;

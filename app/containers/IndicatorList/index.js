@@ -53,7 +53,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
     const expandableColumns = [
       {
         label: 'Progress reports',
-        type: 'reporting',
+        type: 'reports',
         clientPath: 'reports',
         icon: 'reminder',
       },

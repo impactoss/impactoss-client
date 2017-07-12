@@ -58,7 +58,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       },
       {
         label: 'Progress reports',
-        type: 'reporting',
+        type: 'reports',
         clientPath: 'reports',
         icon: 'reminder',
       },

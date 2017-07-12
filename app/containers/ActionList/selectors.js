@@ -216,11 +216,11 @@ const selectMeasuresExpandables = createSelector(
         // - reports (incl due_dates)
         const dueDatesAnyIndicator = dueDates.filter((date) => testEntityEntityAssociation(entity, 'indicators', date.getIn(['attributes', 'indicator_id'])));
         return entity
-        .set('expandable', List(['indicators', 'reporting']))
-        .set('reporting', Map()
+        .set('expandable', List(['indicators', 'reports']))
+        .set('reports', reports.filter((report) => testEntityEntityAssociation(entity, 'indicators', report.getIn(['attributes', 'indicator_id']))))
+        .set('dates', Map()
           .set('overdue', dueDatesAnyIndicator.filter((date) => date.getIn(['attributes', 'overdue'])).size)
           .set('due', dueDatesAnyIndicator.filter((date) => date.getIn(['attributes', 'due'])).size)
-          .set('reports', reports.filter((report) => testEntityEntityAssociation(entity, 'indicators', report.getIn(['attributes', 'indicator_id']))))
         );
       }
       // insert expanded indicators with expandable reports (incl due_dates)
@@ -235,21 +235,21 @@ const selectMeasuresExpandables = createSelector(
           const reportsForIndicator = reports.filter((report) => attributesEqual(report.getIn(['attributes', 'indicator_id']), indicator.get('id')));
           if (expandNo === 1) {
             return indicator
-            .set('expandable', 'reporting')
-            .set('reporting', Map()
+            .set('expandable', 'reports')
+            .set('reports', reportsForIndicator)
+            .set('dates', Map()
               // store counts
               .set('overdue', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'overdue'])).size)
               .set('due', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'due'])).size)
-              .set('reports', reportsForIndicator)
             );
           }
           const dueDatesScheduled = dueDatesForIndicator && dueDatesForIndicator.filter((date) => !date.getIn(['attributes', 'has_progress_report']));
           return indicator
-          .set('expanded', 'reporting')
-          .set('reporting', Map()
+          .set('expanded', 'reports')
+          .set('reports', reportsForIndicator)
+          .set('dates', Map()
             // store upcoming scheduled indicator
             .set('scheduled', dueDatesScheduled && sortEntities(dueDatesScheduled, 'asc', 'due_date', 'date').first())
-            .set('reports', reportsForIndicator)
           );
         })
       );
