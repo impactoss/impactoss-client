@@ -41,7 +41,13 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
     const { report, onEntityClick } = this.props;
 
     return (
-      <Styled onClick={() => onEntityClick(report.get('id'), 'reports')}>
+      <Styled
+        onClick={(evt) => {
+          evt.preventDefault();
+          onEntityClick(report.get('id'), 'reports')
+        }}
+        href={`/reports/${report.get('id')}`}
+      >
         <Top>
           {report.getIn(['attributes', 'updated_at']) &&
             <Reference>

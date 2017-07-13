@@ -100,7 +100,7 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
       reference: entity.getIn(['attributes', 'reference']) || entity.get('id'),
       status: entity.getIn(['attributes', 'draft']) ? 'draft' : null,
-      path: nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : null,
+      path: nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath,
       tags: taxonomies
         ? this.getEntityTags(entity,
           taxonomies,
@@ -122,7 +122,13 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
       <Styled>
         <EntityListItemMainTop entity={entity} entityIcon={entityIcon} />
         <Clear />
-        <EntityListItemMainTitleWrap onClick={() => onEntityClick(entity.id, entity.path)}>
+        <EntityListItemMainTitleWrap
+          onClick={(evt) => {
+            evt.preventDefault();
+            onEntityClick(entity.id, entity.path);
+          }}
+          href={`/${entity.path}/${entity.id}`}
+        >
           <EntityListItemMainTitle nested={nestLevel && nestLevel > 0}>
             {entity.title}
           </EntityListItemMainTitle>
