@@ -4,7 +4,7 @@ import { reduce } from 'lodash/collection';
 
 import {
   selectEntities,
-  selectEntitiesSearch,
+  selectEntitiesSearchQuery,
   selectWithoutQuery,
   selectConnectionQuery,
   selectCategoryQuery,
@@ -114,7 +114,7 @@ export const selectConnectedTaxonomies = createSelector(
 );
 
 const selectMeasuresNested = createSelector(
-  (state, locationQuery) => selectEntitiesSearch(state, {
+  (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'measures',
     searchAttributes: ['title'],
     locationQuery,
@@ -258,7 +258,7 @@ const selectMeasuresExpandables = createSelector(
 
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
-// 2. selectEntitiesSearch filters by keyword
+// 2. selectEntitiesSearchQuery filters by keyword
 // 3. selectMeasuresNested will nest related entities
 // 4. selectMeasuresWithout will filter by absence of taxonomy or connection
 // 5. selectMeasuresByConnections will filter by specific connection

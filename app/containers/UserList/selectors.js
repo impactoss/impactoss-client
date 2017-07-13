@@ -3,7 +3,7 @@ import { Map } from 'immutable';
 
 import {
   selectEntities,
-  selectEntitiesSearch,
+  selectEntitiesSearchQuery,
   selectWithoutQuery,
   selectConnectionQuery,
   selectCategoryQuery,
@@ -25,7 +25,7 @@ export const selectConnections = createSelector(
 );
 
 const selectUsersNested = createSelector(
-  (state, locationQuery) => selectEntitiesSearch(state, {
+  (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'users',
     searchAttributes: ['name'],
     locationQuery,
@@ -73,7 +73,7 @@ const selectUsersByCategories = createSelector(
 
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
-// 2. selectEntitiesSearch filters by keyword
+// 2. selectEntitiesSearchQuery filters by keyword
 // 3. selectUsersNested will nest related entities
 // 4. selectUsersWithout will filter by absence of taxonomy or connection
 // 5. selectUsersByConnections will filter by specific connection

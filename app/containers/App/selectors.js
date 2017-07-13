@@ -22,7 +22,7 @@ import asList from 'utils/as-list';
 import { regExMultipleWords } from 'utils/string';
 
 import { USER_ROLES } from 'containers/App/constants';
-import { prepareEntitySearchTarget } from 'utils/entities';
+import { prepareEntitySearchTarget, filterEntitiesByAttributes } from 'utils/entities';
 
 
 // high level state selects
@@ -475,32 +475,32 @@ const selectSortByQuery = createSelector(
 
 const selectEntities = (state, path) => state.getIn(['global', 'entities', path]);
 
-const selectEntitiesWhere = createSelector(
-  selectAttributeQuery,
+const selectEntity = createSelector(
   (state, { path }) => selectEntities(state, path),
-  (query, entities) => {
-    // console.log('getEntitiesWhere', attributeQuery)
-    if (query) {
-      return entities.filter((entity) =>
-        reduce(query, (passing, value, attribute) => {
-          // TODO if !passing return false, no point going further
-          if (attribute === 'id') {
-            return passing && entity.get('id') === value.toString();
-          }
-          const testValue = entity.getIn(['attributes', attribute]);
-          if (typeof testValue === 'undefined' || testValue === null) {
-            return (value === 'null') ? passing : false;
-          }
-          return passing && testValue.toString() === value.toString();
-        }, true)
-      );
-    }
-    return entities;
-  }
+  (state, { id }) => id,
+  (entities, id) => entities.get(id.toString())
 );
 
-const selectEntitiesSearch = createSelector(
-  selectEntitiesWhere,
+// filter entities by attributes, using object
+const selectEntitiesWhere = createSelector(
+  (state, { where }) => where,
+  (state, { path }) => selectEntities(state, path),
+  (query, entities) => query
+    ? filterEntitiesByAttributes(entities, query)
+    : entities
+);
+
+// filter entities by attributes, using locationQuery
+const selectEntitiesWhereQuery = createSelector(
+  selectAttributeQuery,
+  (state, { path }) => selectEntities(state, path),
+  (query, entities) => query
+    ? filterEntitiesByAttributes(entities, query)
+    : entities
+);
+
+const selectEntitiesSearchQuery = createSelector(
+  selectEntitiesWhereQuery,
   (state, { locationQuery }) => selectSearchQuery(state, locationQuery),
   (state, { searchAttributes }) => searchAttributes,
   (entities, query, searchAttributes) => {
@@ -527,7 +527,7 @@ export {
   getRequestedAt,
   isReady,
   selectEntities,
-  selectEntitiesSearch,
+  selectEntitiesSearchQuery,
   getEntitiesPure,
   getEntitiesWhere,
   getEntities,
@@ -551,4 +551,6 @@ export {
   selectConnectionQuery,
   selectSortOrderQuery,
   selectSortByQuery,
+  selectEntity,
+  selectEntitiesWhere,
 };

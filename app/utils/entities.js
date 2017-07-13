@@ -103,6 +103,17 @@ export const filterEntitiesByConnection = (entities, query) =>
     }, true)
   );
 
+// query is object not string!
+export const filterEntitiesByAttributes = (entities, query) =>
+  entities.filter((entity) =>
+    reduce(query, (passing, value, attribute) =>
+      // TODO if !passing return false, no point going further
+      passing && ((attribute === 'id')
+      ? attributesEqual(entity.get('id'), value)
+      : attributesEqual(entity.getIn(['attributes', attribute]), value))
+    , true)
+  );
+
 const getEntitySortValueMapper = (entity, sortBy) => {
   switch (sortBy) {
     case 'id':
@@ -163,3 +174,13 @@ export const sortEntities = (entities, sortOrder, sortBy, type) =>
       (entity) => getEntitySortValueMapper(entity, sortBy || 'id'),
       (a, b) => getEntitySortComparator(a, b, sortOrder || 'asc', type)
     ).toList();
+
+export const entitiesSetAssociated = (entities, entityKey, associations, associationKey, associationId) =>
+  entities && entities.map((entity) =>
+    entity.set('associated',
+      associations.find((association) =>
+        attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id'))
+        && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
+      )
+    )
+  );
