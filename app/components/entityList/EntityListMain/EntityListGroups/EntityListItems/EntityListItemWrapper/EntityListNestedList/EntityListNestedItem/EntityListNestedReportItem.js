@@ -44,7 +44,7 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
       <Styled
         onClick={(evt) => {
           evt.preventDefault();
-          onEntityClick(report.get('id'), 'reports')
+          onEntityClick(report.get('id'), 'reports');
         }}
         href={`/reports/${report.get('id')}`}
       >
