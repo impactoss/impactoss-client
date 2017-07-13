@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import EntityListNestedReportItem from './EntityListNestedItem/EntityListNestedReportItem';
 import EntityListNestedReportDateItem from './EntityListNestedItem/EntityListNestedReportDateItem';
 
@@ -14,16 +14,16 @@ const ChildItems = styled.span`
 export class EntityListNestedReportList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { entity, onEntityClick } = this.props;
+    const { reports, dates, onEntityClick } = this.props;
     return (
       <ChildItems>
-        { entity.get('dates') &&
+        { dates &&
           <EntityListNestedReportDateItem
-            dates={entity.get('dates')}
+            dates={dates}
           />
         }
         {
-          entity.get('reports').map((report, i) =>
+          reports.map((report, i) =>
             <EntityListNestedReportItem
               key={i}
               report={report}
@@ -37,7 +37,8 @@ export class EntityListNestedReportList extends React.PureComponent { // eslint-
 }
 
 EntityListNestedReportList.propTypes = {
-  entity: PropTypes.instanceOf(Map),
+  reports: PropTypes.instanceOf(List),
+  dates: PropTypes.instanceOf(Map),
   onEntityClick: PropTypes.func,
 };
 

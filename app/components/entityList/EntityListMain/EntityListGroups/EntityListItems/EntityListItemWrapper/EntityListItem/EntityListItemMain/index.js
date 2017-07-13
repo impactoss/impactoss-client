@@ -30,12 +30,11 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
   static propTypes = {
     entity: PropTypes.instanceOf(Map).isRequired,
     taxonomies: PropTypes.instanceOf(Map),
-    entityIcon: PropTypes.string,
-    onEntityClick: PropTypes.func,
-    nested: PropTypes.bool,
-    // expandableColumns: PropTypes.array,
-    onTagClick: PropTypes.func,
     config: PropTypes.object,
+    entityIcon: PropTypes.string,
+    nestLevel: PropTypes.number,
+    onEntityClick: PropTypes.func,
+    onTagClick: PropTypes.func,
   }
 
   getConnectedCounts = (entity, connectionOptions) => {
@@ -94,12 +93,14 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
       config,
       onTagClick,
       entity,
+      nestLevel,
     } = this.props;
     return {
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
       reference: entity.getIn(['attributes', 'reference']) || entity.get('id'),
       status: entity.getIn(['attributes', 'draft']) ? 'draft' : null,
+      path: nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : null,
       tags: taxonomies
         ? this.getEntityTags(entity,
           taxonomies,
@@ -113,7 +114,7 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
     };
   };
   render() {
-    const { entityIcon, nested, onEntityClick } = this.props;
+    const { entityIcon, nestLevel, onEntityClick } = this.props;
 
     // console.log('EntityListItemMain.render', this.props.entity.get('id'))
     const entity = this.mapToEntityListItem();
@@ -121,8 +122,8 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
       <Styled>
         <EntityListItemMainTop entity={entity} entityIcon={entityIcon} />
         <Clear />
-        <EntityListItemMainTitleWrap onClick={() => onEntityClick(entity.id)}>
-          <EntityListItemMainTitle nested={nested}>
+        <EntityListItemMainTitleWrap onClick={() => onEntityClick(entity.id, entity.path)}>
+          <EntityListItemMainTitle nested={nestLevel && nestLevel > 0}>
             {entity.title}
           </EntityListItemMainTitle>
         </EntityListItemMainTitleWrap>

@@ -20,53 +20,36 @@ const ItemWrapper = styled.div`
 `;
 export class EntityListNestedList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  mapToEntityListItem = (entity, props) => {
-    const {
-      onEntityClick,
-      // expandNo,
-      // expandableColumns,
-      // onExpand,
-    } = props;
-
-    return {
-      id: entity.get('id'),
-      title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'name']),
-      reference: entity.getIn(['attributes', 'reference']) || entity.id,
-      status: entity.attributes.draft ? 'draft' : null,
-      onEntityClick: () => onEntityClick(entity.get('id')),
-      // expandables: expandableColumns && !expandNo
-      //   ? expandableColumns.map((column) => ({
-      //     type: column.type,
-      //     label: column.label,
-      //     count: column.getCount && column.getCount(entity),
-      //     info: column.getInfo && column.getInfo(entity),
-      //     icon: column.icon,
-      //     onClick: () => onExpand(),
-      //   }))
-      //   : [],
-    };
-  };
-
   render() {
     const {
-      expandNo,
-      expandableColumns,
-      entityIcon,
       entities,
+      config,
+      nestLevel,
+      onExpand,
+      onEntityClick,
+      expandNo,
     } = this.props;
+
+    const entityIcon = config.expandableColumns[nestLevel - 1].icon;
     return (
       <Styled>
         {
           entities.map((entity, i) =>
-            <ItemWrapper key={i} separated={expandNo && i > 0}>
+            <ItemWrapper key={i} separated={(expandNo - nestLevel) > 0 && i > 0}>
               <EntityListNestedItem
-                entity={this.mapToEntityListItem(entity, this.props)}
+                entity={entity}
                 entityIcon={entityIcon}
                 expandNo={expandNo}
+                nestLevel={nestLevel}
+                config={config}
+                onEntityClick={onEntityClick}
+                onExpand={onExpand}
               />
-              {expandableColumns && expandNo > 0 &&
+              {expandNo > nestLevel && entity.get('expanded') && entity.get('expanded') === 'reports' && entity.get('reports') &&
                 <EntityListNestedReportList
-                  entity={entity}
+                  reports={entity.get('reports').toList()}
+                  dates={entity.get('dates')}
+                  onEntityClick={onEntityClick}
                 />
               }
             </ItemWrapper>
@@ -79,11 +62,11 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
 
 EntityListNestedList.propTypes = {
   entities: PropTypes.instanceOf(List).isRequired,
-  onEntityClick: PropTypes.func,
+  config: PropTypes.object,
+  nestLevel: PropTypes.number,
   expandNo: PropTypes.number,
-  expandableColumns: PropTypes.array,
-  // onExpand: PropTypes.func,
-  entityIcon: PropTypes.string,
+  onExpand: PropTypes.func,
+  onEntityClick: PropTypes.func,
 };
 
 export default EntityListNestedList;

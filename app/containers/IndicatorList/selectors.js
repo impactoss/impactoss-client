@@ -196,7 +196,7 @@ const selectIndicatorsExpandables = createSelector(
   selectIndicatorsByConnectedCategories,
   (state) => selectEntities(state, 'progress_reports'),
   (state) => selectEntities(state, 'due_dates'),
-  (state) => selectExpandQuery(state),
+  selectExpandQuery,
   (entities, reports, dueDates, expandNo) =>
     entities.map((entity) => {
       const dueDatesForIndicator = dueDates.filter((date) => attributesEqual(entity.get('id'), date.getIn(['attributes', 'indicator_id'])));

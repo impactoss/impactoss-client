@@ -4,12 +4,9 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Map, List } from 'immutable';
 
-// import { map, forEach } from 'lodash/collection';
-// import { isEqual } from 'lodash/lang';
-
 import EntityListItem from './EntityListItem';
-// import EntityListNestedList from './EntityListNestedList';
-// import EntityListNestedReportList from './EntityListNestedList/EntityListNestedReportList';
+import EntityListNestedList from './EntityListNestedList';
+import EntityListNestedReportList from './EntityListNestedList/EntityListNestedReportList';
 
 const ItemWrapper = styled.div`
   border-top: 1px solid;
@@ -23,14 +20,6 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
     || this.props.entity !== nextProps.entity
     || this.props.entityIdsSelected !== nextProps.entityIdsSelected;
   }
-  getNestedIndicators = (entity) => entity.get('indicators')
-    ? entity.get('indicators').reduce((nested, association) =>
-      association.get('indicator')
-        ? nested.push(association.get('indicator'))
-        : nested
-    , List())
-    : List();
-
   render() {
     const {
       isManager,
@@ -46,10 +35,6 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       entity,
     } = this.props;
     // console.log('EntityListItemWrapper.render')
-    // console.log('expandableColumns', expandableColumns)
-    // console.log('entity', entity.toJS())
-    // entity.get('expandable') && console.log('entity.expandable', entity.get('expandable'))
-    // entity.get('expanded') && console.log('entity.expanded', entity.get('expanded'))
 
     return (
       <ItemWrapper separated={expandNo}>
@@ -66,28 +51,31 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
           config={config}
           onEntityClick={onEntityClick}
         />
+        {config.expandableColumns && expandNo > 0 && entity.get('expanded') && entity.get('expanded') !== 'reports' &&
+          <EntityListNestedList
+            entities={
+              entity.get(entity.get('expanded'))
+              ? entity.get(entity.get('expanded')).toList()
+              : List()
+            }
+            config={config}
+            nestLevel={1}
+            expandNo={expandNo}
+            onExpand={onExpand}
+            onEntityClick={onEntityClick}
+          />
+        }
+        {expandNo > 0 && entity.get('expanded') && entity.get('expanded') === 'reports' && entity.get('reports') &&
+          <EntityListNestedReportList
+            reports={entity.get('reports').toList()}
+            dates={entity.get('dates')}
+            onEntityClick={onEntityClick}
+          />
+        }
       </ItemWrapper>
     );
   }
 }
-//
-// {expandableColumns && expandNo > 0 && expandableColumns[0].type === 'reports' &&
-//   <EntityListNestedReportList
-//     entity={entity}
-//     onEntityClick={expandableColumns[0].onEntityClick}
-//   />
-// }
-// {expandableColumns && expandNo > 0 && expandableColumns[0].type === 'indicators' &&
-//   <EntityListNestedList
-//     entities={this.getNestedIndicators(entity)}
-//     onEntityClick={expandableColumns[0].onEntityClick}
-//     entityIcon={expandableColumns[0].icon}
-//     expandNo={expandNo - 1}
-//     expandableColumns={expandableColumns.length > 1}
-//     expandableColumns={expandableColumns.length > 1 ? [expandableColumns[1]] : null}
-//     onExpand={onExpand}
-//   />
-// }
 
 EntityListItemWrapper.propTypes = {
   entity: PropTypes.instanceOf(Map).isRequired,

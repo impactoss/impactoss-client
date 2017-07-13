@@ -119,7 +119,7 @@ const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
   }
   let result;
   if (type === 'date') {
-    result = new Date(valueA) > new Date(valueB) ? -1 : 1;
+    result = new Date(valueA) < new Date(valueB) ? -1 : 1;
   } else {
     const floatA = parseFloat(valueA);
     const floatB = parseFloat(valueB);

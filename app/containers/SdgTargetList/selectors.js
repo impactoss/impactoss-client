@@ -173,7 +173,7 @@ const selectSdgTargetsExpandables = createSelector(
   (state) => selectEntities(state, 'indicators'),
   (state) => selectEntities(state, 'progress_reports'),
   (state) => selectEntities(state, 'due_dates'),
-  (state) => selectExpandQuery(state),
+  selectExpandQuery,
   (entities, indicators, reports, dueDates, expandNo) =>
     entities.map((entity) => {
       if (expandNo <= 0) {

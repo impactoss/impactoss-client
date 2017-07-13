@@ -16,7 +16,6 @@ const Styled = styled.span`
   display: inline-block;
   width: ${(props) => props.expanded ? 50 : 100}%;
   vertical-align: top;
-
 `;
 const Item = styled(Component)`
   display: table;
