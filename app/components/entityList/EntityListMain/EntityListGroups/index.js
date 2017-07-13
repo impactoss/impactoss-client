@@ -35,13 +35,12 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     // console.log('EntityListGroups.render')
     const {
       entityIdsSelected,
-      filters,
+      config,
       header,
       onEntityClick,
       isManager,
       onTagClick,
       onEntitySelect,
-      expandableColumns,
       onExpand,
       expandNo,
       entityTitle,
@@ -55,7 +54,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     // group entities , regardless of page items
     const locationGroup = locationQuery.get('group');
     const entityGroups = locationGroup
-      ? groupEntities(entities, taxonomies, connectedTaxonomies, filters, locationQuery)
+      ? groupEntities(entities, taxonomies, connectedTaxonomies, config, locationQuery)
       : List().push(Map({ entities }));
 
     // flatten all entities
@@ -85,7 +84,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       // group again if necessary, this time just for items on page
       if (locationGroup) {
         entitiesOnPage = entityGroupsFlattened.map((item) => item.get('entity')).slice(pager.startIndex, pager.endIndex + 1);
-        entityGroupsPaged = groupEntities(entitiesOnPage, taxonomies, connectedTaxonomies, filters, locationQuery);
+        entityGroupsPaged = groupEntities(entitiesOnPage, taxonomies, connectedTaxonomies, config, locationQuery);
       } else {
         entitiesOnPage = entities.slice(pager.startIndex, pager.endIndex + 1);
         entityGroupsPaged = List().push(Map({ entities: entitiesOnPage }));
@@ -100,7 +99,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           selectedTotal={entityIdsSelected.size}
           pageTotal={entitiesOnPage.size}
           expandNo={expandNo}
-          expandableColumns={expandableColumns}
+          expandableColumns={config.expandableColumns}
           onExpand={onExpand}
           isManager={isManager}
           entityTitle={entityTitle}
@@ -140,7 +139,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                           }
                           <EntityListItems
                             taxonomies={this.props.taxonomies}
-                            associations={filters}
+                            config={config}
                             entities={entitySubGroup.get('entities')}
                             entityIdsSelected={entityIdsSelected}
                             entityIcon={header.icon}
@@ -149,7 +148,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             onTagClick={onTagClick}
                             onEntitySelect={onEntitySelect}
                             expandNo={expandNo}
-                            expandableColumns={expandableColumns}
                             onExpand={onExpand}
                             scrollContainer={this.props.scrollContainer}
                           />
@@ -159,7 +157,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                     { entityGroup.get('entities') && !entityGroup.get('entityGroups') &&
                       <EntityListItems
                         taxonomies={this.props.taxonomies}
-                        associations={filters}
+                        config={config}
                         entities={entityGroup.get('entities')}
                         entityIdsSelected={entityIdsSelected}
                         entityIcon={header.icon}
@@ -168,7 +166,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                         onTagClick={onTagClick}
                         onEntitySelect={onEntitySelect}
                         expandNo={expandNo}
-                        expandableColumns={expandableColumns}
                         onExpand={onExpand}
                         scrollContainer={this.props.scrollContainer}
                       />
@@ -195,10 +192,9 @@ EntityListGroups.propTypes = {
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object,
-  filters: PropTypes.object,
+  config: PropTypes.object,
   header: PropTypes.object,
   isManager: PropTypes.bool,
-  expandableColumns: PropTypes.array,
   expandNo: PropTypes.number,
   onExpand: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,

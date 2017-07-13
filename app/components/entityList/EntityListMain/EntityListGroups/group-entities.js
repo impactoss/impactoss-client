@@ -12,21 +12,21 @@ export const groupEntities = (
   entities,
   taxonomies,
   connectedTaxonomies,
-  filters,
+  config,
   locationQuery
 ) => locationQuery.get('subgroup')
-  ? makeEntityGroups(entities, taxonomies, connectedTaxonomies, filters, locationQuery.get('group'))
+  ? makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, locationQuery.get('group'))
     .map((group) => group.set(
       'entityGroups',
-      makeEntityGroups(group.get('entities'), taxonomies, connectedTaxonomies, filters, locationQuery.get('subgroup'))
+      makeEntityGroups(group.get('entities'), taxonomies, connectedTaxonomies, config, locationQuery.get('subgroup'))
     ))
-  : makeEntityGroups(entities, taxonomies, connectedTaxonomies, filters, locationQuery.get('group'));
+  : makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, locationQuery.get('group'));
 
 const makeEntityGroups = (
   entities,
   taxonomies,
   connectedTaxonomies,
-  filters,
+  config,
   locationQueryGroup
 ) => {
   if (locationQueryGroup) {
@@ -38,7 +38,7 @@ const makeEntityGroups = (
     if (locationQueryGroupSplit.length > 1) {
       const taxonomy = connectedTaxonomies.get(locationQueryGroupSplit[1]);
       if (taxonomy) {
-        return makeConnectedTaxonomyGroups(entities, taxonomy, filters);
+        return makeConnectedTaxonomyGroups(entities, taxonomy, config);
       }
     }
     return List().push(Map({ entities }));
@@ -88,11 +88,11 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
   return groups.sortBy((group) => group.get('order')).toList();
 };
 
-export const makeConnectedTaxonomyGroups = (entities, taxonomy, filters) => {
+export const makeConnectedTaxonomyGroups = (entities, taxonomy, config) => {
   let groups = Map();
   entities.forEach((entity) => {
     let hasTaxCategory = false;
-    forEach(filters.connectedTaxonomies.connections, (connection) => {
+    forEach(config.connectedTaxonomies.connections, (connection) => {
       // if entity has taxonomies
       if (entity.get(connection.path)) { // measure.recommendations stores recommendation_measures
         // add categories from entities if not present otherwise increase count

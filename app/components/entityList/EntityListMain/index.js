@@ -63,11 +63,10 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
   render() {
     // console.log('EntityListMain.render')
     const {
-      filters,
+      config,
       header,
       entityTitle,
       dataReady,
-      expandableColumns,
       isManager,
       formatLabel,
       onGroupSelect,
@@ -81,7 +80,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       locationQuery,
     } = this.props;
 
-    const expandNo = expandableColumns && locationQuery.get('expand')
+    const expandNo = config.expandableColumns && locationQuery.get('expand')
       ? parseInt(locationQuery.get('expand'), 10)
       : 0;
 
@@ -111,7 +110,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 <EntityListSearch
                   filters={currentFilters(
                     {
-                      filters,
+                      config,
                       taxonomies,
                       connections,
                       connectedTaxonomies,
@@ -131,9 +130,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   subgroupSelectValue={locationQuery.get('subgroup')}
                   onGroupSelect={onGroupSelect}
                   onSubgroupSelect={onSubgroupSelect}
-                  onExpand={() => onExpand(expandNo < expandableColumns.length ? expandableColumns.length : 0)}
-                  expanded={expandableColumns && expandNo === expandableColumns.length}
-                  expandable={expandableColumns && expandableColumns.length > 0}
+                  onExpand={() => onExpand(expandNo < config.expandableColumns.length ? config.expandableColumns.length : 0)}
+                  expanded={config.expandableColumns && expandNo === config.expandableColumns.length}
+                  expandable={config.expandableColumns && config.expandableColumns.length > 0}
                 />
                 <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
                   <EntityListGroups
@@ -144,11 +143,10 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     locationQuery={this.props.locationQuery}
                     onEntityClick={this.props.onEntityClick}
                     entityTitle={entityTitle}
-                    filters={filters}
+                    config={config}
                     header={header}
                     isManager={isManager}
                     onExpand={onExpand}
-                    expandableColumns={expandableColumns}
                     expandNo={expandNo}
                     onTagClick={onTagClick}
                     onPageSelect={(page) => {
@@ -177,12 +175,11 @@ EntityListMain.propTypes = {
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
   // object/arrays
-  filters: PropTypes.object,
+  config: PropTypes.object,
   header: PropTypes.object,
   entityTitle: PropTypes.object, // single/plural
   // primitive
   dataReady: PropTypes.bool,
-  expandableColumns: PropTypes.array,
   isManager: PropTypes.bool,
   // functions
   formatLabel: PropTypes.func.isRequired,

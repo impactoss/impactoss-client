@@ -39,18 +39,22 @@ export const makeEditGroups = (
       id: 'connections', // filterGroupId
       label: messages.connections,
       show: true,
-      options: reduce(edits.connections.options, (options, option) => ({
-        ...options,
-        [option.path]: {
-          id: option.path, // filterOptionId
-          label: formatLabel(option.label),
-          path: option.connectPath,
-          key: option.key,
-          ownKey: option.ownKey,
-          icon: option.path,
-          active: !!activeEditOption && activeEditOption.optionId === option.path,
-        },
-      }), {}),
+      options: reduce(edits.connections.options, (options, option) =>
+        typeof option.edit === 'undefined' || option.edit
+        ? {
+          ...options,
+          [option.path]: {
+            id: option.path, // filterOptionId
+            label: formatLabel(option.label),
+            path: option.connectPath,
+            key: option.key,
+            ownKey: option.ownKey,
+            icon: option.path,
+            active: !!activeEditOption && activeEditOption.optionId === option.path,
+          },
+        }
+        : options
+      , {}),
     };
   }
 
@@ -61,14 +65,18 @@ export const makeEditGroups = (
       id: 'attributes', // filterGroupId
       label: messages.attributes,
       show: true,
-      options: reduce(edits.attributes.options, (options, option) => ({
-        ...options,
-        [option.attribute]: {
-          id: option.attribute, // filterOptionId
-          label: formatLabel(option.label),
-          active: !!activeEditOption && activeEditOption.optionId === option.attribute,
-        },
-      }), {}),
+      options: reduce(edits.attributes.options, (options, option) =>
+        typeof option.edit === 'undefined' || option.edit
+        ? {
+          ...options,
+          [option.attribute]: {
+            id: option.attribute, // filterOptionId
+            label: formatLabel(option.label),
+            active: !!activeEditOption && activeEditOption.optionId === option.attribute,
+          },
+        }
+        : options
+      , {}),
     };
   }
 

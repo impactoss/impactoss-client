@@ -1,6 +1,8 @@
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
-export const FILTERS = {
+export const CONFIG = {
+  serverPath: 'indicators',
+  clientPath: 'indicators',
   search: ['title', 'reference'],
   connectedTaxonomies: { // filter by each category
     query: 'catx',
@@ -24,14 +26,18 @@ export const FILTERS = {
       {
         search: true,
         label: 'entities.measures.plural',
-        path: 'measures', // filter by recommendation connection
+        path: 'measures',
         key: 'measure_id',
+        connectPath: 'measure_indicators',
+        ownKey: 'indicator_id',
       },
       {
         search: true,
         label: 'entities.sdgtargets.plural',
-        path: 'sdgtargets', // filter by recommendation connection
+        path: 'sdgtargets',
         key: 'sdgtarget_id',
+        ownKey: 'indicator_id',
+        connectPath: 'sdgtarget_indicators',
       },
     ],
   },
@@ -43,49 +49,25 @@ export const FILTERS = {
         attribute: 'draft',
         options: PUBLISH_STATUSES,
       },
-      {
-        filter: true,
-        label: 'attributes.manager_id.indicators',
-        attribute: 'manager_id',
-        extension: {
-          key: 'manager',
-          label: 'name',
-          without: true,
-        },
-      },
+      // {
+      //   edit: false,
+      //   filter: true,
+      //   label: 'attributes.manager_id.indicators',
+      //   attribute: 'manager_id',
+      //   extension: {
+      //     key: 'manager',
+      //     label: 'name',
+      //     without: true,
+      //   },
+      // },
     ],
   },
-};
-
-export const EDITS = {
-  connections: { // filter by associated entity
-    options: [
-      {
-        label: 'entities.measures.plural',
-        path: 'measures',
-        connectPath: 'measure_indicators', // filter by recommendation connection
-        key: 'measure_id',
-        ownKey: 'indicator_id',
-        search: true,
-      },
-      {
-        label: 'entities.sdgtargets.plural',
-        path: 'sdgtargets',
-        connectPath: 'sdgtarget_indicators', // filter by recommendation connection
-        key: 'sdgtarget_id',
-        ownKey: 'indicator_id',
-        search: true,
-      },
-    ],
-  },
-  attributes: {  // edit attribute value
-    options: [
-      {
-        label: 'attributes.draft',
-        attribute: 'draft',
-        options: PUBLISH_STATUSES,
-        search: false,
-      },
-    ],
-  },
+  expandableColumns: [
+    {
+      label: 'Progress reports',
+      type: 'reports',
+      clientPath: 'reports',
+      icon: 'reminder',
+    },
+  ],
 };

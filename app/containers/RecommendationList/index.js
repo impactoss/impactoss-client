@@ -17,7 +17,7 @@ import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
 
-import { FILTERS, EDITS } from './constants';
+import { CONFIG } from './constants';
 import { selectConnections, selectRecommendations, selectTaxonomies } from './selectors';
 import messages from './messages';
 
@@ -81,10 +81,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
-          serverPath="recommendations"
-          clientPath="recommendations"
-          filters={FILTERS}
-          edits={EDITS}
+          config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{

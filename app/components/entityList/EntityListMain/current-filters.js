@@ -7,7 +7,7 @@ import asList from 'utils/as-list';
 
 
 export const currentFilters = ({
-  filters,
+  config,
   taxonomies,
   connections,
   connectedTaxonomies,
@@ -18,26 +18,26 @@ withoutMessage,
 formatLabel
 ) => {
   let filterTags = [];
-  if (filters.taxonomies && taxonomies) {
+  if (config.taxonomies && taxonomies) {
     filterTags = filterTags.concat(getCurrentTaxonomyFilters(
-      filters.taxonomies,
+      config.taxonomies,
       taxonomies,
       locationQuery,
       onTagClick,
       withoutMessage
     ));
   }
-  if (filters.connectedTaxonomies && connectedTaxonomies) {
+  if (config.connectedTaxonomies && connectedTaxonomies) {
     filterTags = filterTags.concat(getCurrentConnectedTaxonomyFilters(
-      filters.connectedTaxonomies,
+      config.connectedTaxonomies,
       connectedTaxonomies,
       locationQuery,
       onTagClick
     ));
   }
-  if (filters.connections && connections) {
+  if (config.connections && connections) {
     filterTags = filterTags.concat(getCurrentConnectionFilters(
-      filters.connections,
+      config.connections,
       connections,
       locationQuery,
       onTagClick,
@@ -45,9 +45,9 @@ formatLabel
       formatLabel
     ));
   }
-  if (filters.attributes) {
+  if (config.attributes) {
     filterTags = filterTags.concat(getCurrentAttributeFilters(
-      filters.attributes.options,
+      config.attributes.options,
       locationQuery,
       onTagClick
     ));

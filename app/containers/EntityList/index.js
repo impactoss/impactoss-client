@@ -67,8 +67,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 ? entityIdsSelected
                 : entityIdsSelectedFiltered
               }
-              filters={this.props.filters}
-              edits={this.props.edits}
+              config={this.props.config}
               locationQuery={this.props.locationQuery}
               canEdit={this.props.isManager}
               activePanel={this.props.activePanel}
@@ -91,12 +90,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           }
           locationQuery={this.props.locationQuery}
 
-          filters={this.props.filters}
+          config={this.props.config}
           header={this.props.header}
           entityTitle={this.props.entityTitle}
 
           dataReady={this.props.dataReady}
-          expandableColumns={this.props.expandableColumns}
           isManager={this.props.isManager}
 
           formatLabel={this.formatLabel}
@@ -121,15 +119,11 @@ EntityList.propTypes = {
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
-  filters: PropTypes.object,
-  edits: PropTypes.object,
+  config: PropTypes.object,
   dataReady: PropTypes.bool,
   header: PropTypes.object,
   locationQuery: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object, // single/plural
-  // serverPath: PropTypes.string,
-  // clientPath: PropTypes.string,
-  expandableColumns: PropTypes.array,
   // selector props
   activePanel: PropTypes.string,
   isManager: PropTypes.bool,
@@ -171,7 +165,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(selectEntity({ id, checked }));
     },
     onEntityClick: (id, path) => {
-      dispatch(updatePath(`/${path || props.clientPath}/${id}`));
+      dispatch(updatePath(`/${path || props.config.clientPath}/${id}`));
     },
     onEntitySelectAll: (ids) => {
       dispatch(selectEntities(ids));
@@ -242,7 +236,7 @@ function mapDispatchToProps(dispatch, props) {
           const newValue = creates.first(); // take the first TODO multiselect should be run in single value mode and only return 1 value
           saveData = saveData
             .set('attributes', true)
-            .set('path', props.serverPath)
+            .set('path', props.config.serverPath)
             .set('entities', entities.reduce((updatedEntities, entity) =>
               entity.getIn(['attributes', activeEditOption.optionId]) !== newValue
                 ? updatedEntities.push(entity.setIn(['attributes', activeEditOption.optionId], newValue))

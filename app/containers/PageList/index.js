@@ -16,7 +16,7 @@ import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
 
-import { FILTERS, EDITS } from './constants';
+import { CONFIG } from './constants';
 import { selectPages } from './selectors';
 import messages from './messages';
 
@@ -56,16 +56,13 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
         />
         <EntityList
           entities={this.props.entities}
-          filters={FILTERS}
-          edits={EDITS}
+          config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
             single: this.context.intl.formatMessage(appMessages.entities.pages.single),
             plural: this.context.intl.formatMessage(appMessages.entities.pages.plural),
           }}
-          serverPath="pages"
-          clientPath="pages"
           locationQuery={fromJS(this.props.location.query)}
         />
       </div>

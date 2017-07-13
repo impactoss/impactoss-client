@@ -15,7 +15,7 @@ import { isReady } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
-import { FILTERS, EDITS } from './constants';
+import { CONFIG } from './constants';
 import { selectConnections, selectSdgTargets, selectTaxonomies, selectConnectedTaxonomies } from './selectors';
 
 import messages from './messages';
@@ -49,20 +49,7 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
         onClick: () => this.props.handleNew(),
       }],
     };
-    const expandableColumns = [
-      {
-        label: 'Indicators',
-        type: 'indicators',
-        clientPath: 'indicators',
-        icon: 'indicators',
-      },
-      {
-        label: 'Progress reports',
-        type: 'reports',
-        clientPath: 'reports',
-        icon: 'reminder',
-      },
-    ];
+
     return (
       <div>
         <Helmet
@@ -76,17 +63,13 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
-          serverPath="sdgtargets"
-          clientPath="sdgtargets"
-          filters={FILTERS}
-          edits={EDITS}
+          config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
             single: this.context.intl.formatMessage(appMessages.entities.sdgtargets.single),
             plural: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
           }}
-          expandableColumns={expandableColumns}
           locationQuery={fromJS(this.props.location.query)}
         />
       </div>

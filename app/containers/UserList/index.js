@@ -16,7 +16,7 @@ import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
 
-import { FILTERS, EDITS } from './constants';
+import { CONFIG } from './constants';
 import { selectConnections, selectUsers, selectTaxonomies } from './selectors';
 import messages from './messages';
 
@@ -53,10 +53,7 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
-          clientPath="users"
-          serverPath="users"
-          filters={FILTERS}
-          edits={EDITS}
+          config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{

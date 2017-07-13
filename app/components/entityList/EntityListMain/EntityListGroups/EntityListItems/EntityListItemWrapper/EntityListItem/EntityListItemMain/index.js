@@ -35,13 +35,13 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
     nested: PropTypes.bool,
     // expandableColumns: PropTypes.array,
     onTagClick: PropTypes.func,
-    associations: PropTypes.object,
+    config: PropTypes.object,
   }
 
   getConnectedCounts = (entity, connectionOptions) => {
     const counts = [];
     forEach(connectionOptions, (option) => {
-      if (entity.get(option.path) && entity.get(option.path).size > 0) {
+      if (!option.expandable && entity.get(option.path) && entity.get(option.path).size > 0) {
         counts.push({
           count: entity.get(option.path).size,
           option: {
@@ -91,7 +91,7 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
   mapToEntityListItem = () => {
     const {
       taxonomies,
-      associations,
+      config,
       onTagClick,
       entity,
     } = this.props;
@@ -100,15 +100,16 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
       reference: entity.getIn(['attributes', 'reference']) || entity.get('id'),
       status: entity.getIn(['attributes', 'draft']) ? 'draft' : null,
-      // targetDate: entity.attributes.target_date ? this.context.intl.formatDate(new Date(entity.attributes.target_date)) : null,
       tags: taxonomies
         ? this.getEntityTags(entity,
           taxonomies,
-          associations.taxonomies && associations.taxonomies.query,
-          associations.taxonomies && onTagClick
+          config.taxonomies && config.taxonomies.query,
+          config.taxonomies && onTagClick
         )
         : [],
-      connectedCounts: associations && associations.connections ? this.getConnectedCounts(entity, associations.connections.options) : [],
+      connectedCounts: config && config.connections
+        ? this.getConnectedCounts(entity, config.connections.options)
+        : [],
     };
   };
   render() {

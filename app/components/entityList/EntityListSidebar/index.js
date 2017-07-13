@@ -120,8 +120,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
 
   render() {
     const {
-      filters,
-      edits,
+      config,
       onAssign,
       canEdit,
       activePanel,
@@ -143,7 +142,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     let panelGroups = null;
     if (activePanel === FILTERS_PANEL) {
       panelGroups = makeFilterGroups(
-        filters,
+        config,
         taxonomies,
         connectedTaxonomies,
         activeOption,
@@ -157,7 +156,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       );
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
       panelGroups = makeEditGroups(
-        edits,
+        config,
         taxonomies,
         activeOption,
         {
@@ -173,7 +172,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       if (activePanel === FILTERS_PANEL) {
         formOptions = makeActiveFilterOptions(
           entities,
-          filters,
+          config,
           activeOption,
           locationQuery,
           taxonomies,
@@ -189,7 +188,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         const entitiesSelected = entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
         formOptions = makeActiveEditOptions(
           entitiesSelected,
-          edits,
+          config,
           activeOption,
           taxonomies,
           connections,
@@ -261,8 +260,7 @@ EntityListSidebar.propTypes = {
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
   canEdit: PropTypes.bool,
-  filters: PropTypes.object,
-  edits: PropTypes.object,
+  config: PropTypes.object,
   activePanel: PropTypes.string,
   onAssign: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,

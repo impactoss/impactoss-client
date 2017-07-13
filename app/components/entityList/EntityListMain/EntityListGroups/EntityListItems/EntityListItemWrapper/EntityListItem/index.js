@@ -47,10 +47,9 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       isSelected,
       onSelect,
       entityIcon,
-      associations,
+      config,
       taxonomies,
       onTagClick,
-      expandableColumns,
       onExpand,
       onEntityClick,
       expandNo,
@@ -68,7 +67,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
                 taxonomies={taxonomies}
                 entityIcon={entityIcon}
                 onTagClick={onTagClick}
-                associations={associations}
+                config={config}
                 onEntityClick={onEntityClick}
               />
             </MainInnerWrapper>
@@ -78,7 +77,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
             asList(entity.get('expandable')).map((attribute, i, list) =>
               <EntityListItemExpandable
                 key={i}
-                column={find(expandableColumns, (col) => col.type === attribute)}
+                column={find(config.expandableColumns, (col) => col.type === attribute)}
                 count={entity.get(attribute) ? entity.get(attribute).size : 0}
                 dates={attribute === 'reports' ? entity.get('dates').toJS() : null}
                 onClick={() => onExpand(expandNo > i ? i : i + 1)}
@@ -99,11 +98,10 @@ EntityListItem.propTypes = {
   isSelected: PropTypes.bool,
   onSelect: PropTypes.func,
   expandNo: PropTypes.number,
-  expandableColumns: PropTypes.array,
   onExpand: PropTypes.func,
   entityIcon: PropTypes.string,
   onTagClick: PropTypes.func,
-  associations: PropTypes.object,
+  config: PropTypes.object,
   onEntityClick: PropTypes.func,
 };
 

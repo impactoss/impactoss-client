@@ -15,7 +15,7 @@ import { isReady } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
-import { FILTERS, EDITS } from './constants';
+import { CONFIG } from './constants';
 import { selectConnections, selectMeasures, selectTaxonomies, selectConnectedTaxonomies } from './selectors';
 
 import messages from './messages';
@@ -49,20 +49,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         onClick: () => this.props.handleNew(),
       }],
     };
-    const expandableColumns = [
-      {
-        label: 'Indicators',
-        type: 'indicators',
-        clientPath: 'indicators',
-        icon: 'indicators',
-      },
-      {
-        label: 'Progress reports',
-        type: 'reports',
-        clientPath: 'reports',
-        icon: 'reminder',
-      },
-    ];
     return (
       <div>
         <Helmet
@@ -76,17 +62,13 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
-          serverPath="measures"
-          clientPath="actions"
-          filters={FILTERS}
-          edits={EDITS}
+          config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
             single: this.context.intl.formatMessage(appMessages.entities.measures.single),
             plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
           }}
-          expandableColumns={expandableColumns}
           locationQuery={fromJS(this.props.location.query)}
         />
       </div>
