@@ -22,17 +22,21 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import { getEntity, isReady } from 'containers/App/selectors';
+import { isReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectIndicator,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
-
+import { DEPENDENCIES } from './constants';
 
 export class ReportNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -116,28 +120,32 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
         checked: true,
       },
     ];
+    const NO_OF_REPORT_OPTIONS = 1;
     let excludeCount = 0;
-    return dates
-      ? Object.values(dates).reduce((memo, date, i) => {
-        // only allow active and those that are not associated
-        if (i - excludeCount < 1 && typeof date.reportCount !== 'undefined' && date.reportCount === 0) {
-          if (date.attributes.overdue) excludeCount += 1;
-          const label =
-            `${this.context.intl.formatDate(new Date(date.attributes.due_date))} ${
-              date.attributes.overdue ? this.context.intl.formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
-              date.attributes.due ? this.context.intl.formatMessage(appMessages.entities.due_dates.due) : ''}`;
-          return memo.concat([
-            {
-              value: parseInt(date.id, 10),
-              label,
-              highlight: date.attributes.overdue,
-              checked: false,
-            },
-          ]);
+    return dates && dates.reduce((memo, date, i) => {
+      const optionNoNotExceeded = i - excludeCount < NO_OF_REPORT_OPTIONS;
+      const withoutReport = !date.getIn(['attributes', 'has_progress_report']);
+      // only allow upcoming and those that are not associated
+      if (optionNoNotExceeded && withoutReport) {
+        // exclude overdue and already assigned date from max no of date options
+        if (date.getIn(['attributes', 'overdue'])) {
+          excludeCount += 1;
         }
-        return memo;
-      }, dateOptions)
-    : dateOptions;
+        const label =
+          `${this.context.intl.formatDate(new Date(date.getIn(['attributes', 'due_date'])))} ${
+            date.getIn(['attributes', 'overdue']) ? this.context.intl.formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
+            date.getIn(['attributes', 'due']) ? this.context.intl.formatMessage(appMessages.entities.due_dates.due) : ''}`;
+        return memo.concat([
+          {
+            value: parseInt(date.get('id'), 10),
+            label,
+            highlight: date.getIn(['attributes', 'overdue']),
+            checked: false,
+          },
+        ]);
+      }
+      return memo;
+    }, dateOptions);
   }
   getBodyAsideFields = (indicator) => ([ // fieldGroups
     { // fieldGroup
@@ -148,7 +156,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           id: 'due_date_id',
           controlType: 'radio',
           model: '.attributes.due_date_id',
-          options: this.getDateOptions(indicator.dates),
+          options: this.getDateOptions(indicator.get('dates')),
           value: 0,
           hints: {
             1: this.context.intl.formatMessage(appMessages.entities.due_dates.empty),
@@ -247,45 +255,15 @@ ReportNew.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'indicators',
-    'due_dates',
-    'progress_reports',
-  ] }),
-  indicator: getEntity(
-    state,
-    {
-      out: 'js',
-      id: props.params.id,
-      path: 'indicators',
-      extend: {
-        path: 'due_dates',
-        key: 'indicator_id',
-        reverse: true,
-        as: 'dates',
-        without: {
-          path: 'progress_reports',
-          key: 'due_date_id',
-        },
-        extend: {
-          type: 'count',
-          path: 'progress_reports',
-          key: 'due_date_id',
-          reverse: true,
-          as: 'reportCount',
-        },
-      },
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
+  indicator: selectIndicator(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('progress_reports'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleSubmit: (formData, indicatorReference) => {
       let saveData = formData;

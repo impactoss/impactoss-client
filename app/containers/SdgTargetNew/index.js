@@ -30,17 +30,21 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import { getEntities, isReady } from 'containers/App/selectors';
+import { selectEntities, isReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectTaxonomies,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
-
+import { DEPENDENCIES } from './constants';
 
 export class SdgTargetNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -221,49 +225,17 @@ SdgTargetNew.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  viewDomain: viewDomainSelect(state),
-  // all categories for all taggable taxonomies
-  dataReady: isReady(state, { path: [
-    'categories',
-    'taxonomies',
-    'indicators',
-    'measures',
-  ] }),
-  taxonomies: getEntities(
-    state,
-    {
-      path: 'taxonomies',
-      where: {
-        tags_sdgtargets: true,
-      },
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-      },
-    },
-  ),
-  // all indicators,
-  indicators: getEntities(
-    state, {
-      path: 'indicators',
-    },
-  ),
-  // all measures,
-  measures: getEntities(
-    state, {
-      path: 'measures',
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
+  taxonomies: selectTaxonomies(state),
+  indicators: selectEntities(state, 'indicators'),
+  measures: selectEntities(state, 'measures'),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('measures'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));

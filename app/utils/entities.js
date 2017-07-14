@@ -190,7 +190,7 @@ export const entitySetUser = (entity, users) =>
     users.find((user) => attributesEqual(entity.getIn(['attributes', 'last_modified_user_id']), user.get('id')))
   );
 
-export const prepareTaxonomies = (taxonomies, categories, associations, tagsKey, entityKey, entityId) =>
+export const prepareTaxonomiesAssociated = (taxonomies, categories, associations, tagsKey, entityKey, entityId) =>
   taxonomies && taxonomies
   .filter((tax) => tax.getIn(['attributes', tagsKey]))
   .map((tax) => tax.set('categories', entitiesSetAssociated(
@@ -200,6 +200,13 @@ export const prepareTaxonomies = (taxonomies, categories, associations, tagsKey,
     entityKey,
     entityId
   )));
+
+export const prepareTaxonomies = (taxonomies, categories, tagsKey) =>
+  taxonomies && taxonomies
+  .filter((tax) => tax.getIn(['attributes', tagsKey]))
+  .map((tax) => tax.set('categories',
+    categories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id')))
+  ));
 
 export const prepareCategory = (category, users, taxonomies) =>
   category && entitySetUser(

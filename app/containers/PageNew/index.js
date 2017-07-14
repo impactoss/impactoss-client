@@ -9,14 +9,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
-import {
-  validateRequired,
-} from 'utils/forms';
+import { validateRequired } from 'utils/forms';
 
 import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
+  loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
@@ -28,14 +27,24 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import { selectDomain } from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES } from './constants';
 
 
 export class PageNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
+  componentWillMount() {
+    this.props.loadEntitiesIfNeeded();
+  }
+
   componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
     if (nextProps.dataReady && !this.props.dataReady) {
       this.props.redirectIfNotPermitted();
     }
@@ -168,6 +177,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
 }
 
 PageNew.propTypes = {
+  loadEntitiesIfNeeded: PropTypes.func.isRequired,
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
@@ -181,14 +191,15 @@ PageNew.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'user_roles',
-  ] }),
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
+    loadEntitiesIfNeeded: () => {
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
     },

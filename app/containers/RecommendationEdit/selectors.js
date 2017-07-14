@@ -8,7 +8,7 @@ import {
 import {
   entitiesSetAssociated,
   entitySetUser,
-  prepareTaxonomies,
+  prepareTaxonomiesAssociated,
 } from 'utils/entities';
 
 export const selectDomain = createSelector(
@@ -28,7 +28,7 @@ export const selectTaxonomies = createSelector(
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'recommendation_categories'),
   (id, taxonomies, categories, associations) =>
-    prepareTaxonomies(taxonomies, categories, associations, 'tags_recommendations', 'recommendation_id', id)
+    prepareTaxonomiesAssociated(taxonomies, categories, associations, 'tags_recommendations', 'recommendation_id', id)
 );
 export const selectMeasures = createSelector(
   (state, id) => id,

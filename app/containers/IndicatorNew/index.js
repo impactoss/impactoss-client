@@ -31,17 +31,21 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import { getEntities, isReady } from 'containers/App/selectors';
+import { selectEntities, isReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectUsers,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
-
+import { DEPENDENCIES } from './constants';
 
 export class IndicatorNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -263,52 +267,20 @@ IndicatorNew.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  viewDomain: viewDomainSelect(state),
-  // all categories for all taggable taxonomies
-  dataReady: isReady(state, { path: [
-    'measures',
-    'users',
-    'user_roles',
-    'sdgtargets',
-  ] }),
-
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
   // all measures,
-  measures: getEntities(
-    state, {
-      path: 'measures',
-    },
-  ),
-
+  measures: selectEntities(state, 'measures'),
   // all sdgtargets,
-  sdgtargets: getEntities(
-    state, {
-      path: 'sdgtargets',
-    },
-  ),
-
+  sdgtargets: selectEntities(state, 'sdgtargets'),
   // all users, listing connection if any
-  users: getEntities(
-    state,
-    {
-      path: 'users',
-      connected: {
-        path: 'user_roles',
-        key: 'user_id',
-        where: {
-          role_id: USER_ROLES.CONTRIBUTOR, // contributors only TODO: from constants
-        },
-      },
-    },
-  ),
+  users: selectUsers(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('sdgtargets'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));

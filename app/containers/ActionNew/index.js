@@ -32,17 +32,21 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import { getEntities, isReady } from 'containers/App/selectors';
+import { selectEntities, isReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectTaxonomies,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
-
+import { DEPENDENCIES } from './constants';
 
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -248,57 +252,18 @@ ActionNew.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  viewDomain: viewDomainSelect(state),
-  // all categories for all taggable taxonomies
-  dataReady: isReady(state, { path: [
-    'categories',
-    'taxonomies',
-    'recommendations',
-    'indicators',
-    'sdgtargets',
-  ] }),
-  taxonomies: getEntities(
-    state,
-    {
-      path: 'taxonomies',
-      where: {
-        tags_measures: true,
-      },
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-      },
-    },
-  ),
-  // all recommendations,
-  recommendations: getEntities(
-    state, {
-      path: 'recommendations',
-    },
-  ),
-  // all indicators,
-  indicators: getEntities(
-    state, {
-      path: 'indicators',
-    },
-  ),
-  // all indicators,
-  sdgtargets: getEntities(
-    state, {
-      path: 'sdgtargets',
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
+  taxonomies: selectTaxonomies(state),
+  sdgtargets: selectEntities(state, 'sdgtargets'),
+  indicators: selectEntities(state, 'indicators'),
+  recommendations: selectEntities(state, 'recommendations'),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('sdgtargets'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));

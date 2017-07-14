@@ -29,10 +29,9 @@ import {
 } from 'containers/App/actions';
 
 import {
-  getEntity,
-  getEntities,
   isReady,
   isUserAdmin,
+  selectEntity,
 } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
@@ -40,9 +39,14 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectUsers,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES } from './constants';
 
 
 export class CategoryNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -121,7 +125,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         label: this.context.intl.formatMessage(appMessages.attributes.url),
       }],
     });
-    if (isAdmin && !!taxonomy.attributes.has_manager) {
+    if (isAdmin && !!taxonomy.getIn(['attributes', 'has_manager'])) {
       fields.push({
         fields: [
           renderUserControl(
@@ -150,8 +154,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     const taxonomyReference = this.props.params.id;
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-    if (taxonomy && taxonomy.attributes) {
-      pageTitle = `${pageTitle} (${taxonomy.attributes.title})`;
+    if (taxonomy && taxonomy.get('attributes')) {
+      pageTitle = `${pageTitle} (${taxonomy.getIn(['attributes', 'title'])})`;
     }
 
     return (
@@ -232,42 +236,16 @@ CategoryNew.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isAdmin: isUserAdmin(state),
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'taxonomies',
-    'users',
-    'user_roles',
-  ] }),
-  taxonomy: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'taxonomies',
-      out: 'js',
-    },
-  ),
-  // all users of role manager
-  users: getEntities(
-    state,
-    {
-      path: 'users',
-      connected: {
-        path: 'user_roles',
-        key: 'user_id',
-        where: {
-          role_id: USER_ROLES.MANAGER,
-        },
-      },
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
+  taxonomy: selectEntity(state, { path: 'taxonomies', id: props.params.id }),
+  users: selectUsers(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
