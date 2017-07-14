@@ -11,7 +11,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { fromJS, Map } from 'immutable';
+import { Map } from 'immutable';
 
 import {
   validateRequired,
@@ -27,26 +27,28 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import {
-  getEntity,
-  isReady,
-} from 'containers/App/selectors';
+import { isReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectViewEntity,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES } from './constants';
 
 export class ReportEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
-    if (this.props.dataReady && this.props.report) {
+    if (this.props.dataReady && this.props.viewEntity) {
       this.props.populateForm('reportEdit.form.data', this.getInitialFormData());
     }
   }
@@ -57,7 +59,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
       this.props.loadEntitiesIfNeeded();
     }
 
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.report) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('reportEdit.form.data', this.getInitialFormData(nextProps));
     }
@@ -65,14 +67,18 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { report } = props;
-    if (!report.attributes.due_date_id) {
-      report.attributes.due_date_id = 0;
+    const { viewEntity } = props;
+    let attributes = viewEntity.get('attributes');
+    if (!attributes.get('due_date_id')) {
+      attributes = attributes.set('due_date_id', 0);
     }
-    return Map({
-      id: report.id,
-      attributes: fromJS(report.attributes),
-    });
+
+    return viewEntity
+    ? Map({
+      id: viewEntity.get('id'),
+      attributes,
+    })
+    : Map();
   }
 
   getHeaderMainFields = () => ([ // fieldGroups
@@ -111,7 +117,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
               controlType: 'select',
               model: '.attributes.draft',
               label: this.context.intl.formatMessage(appMessages.attributes.draft),
-              value: entity.attributes.draft,
+              value: entity.getIn(['attributes', 'draft']),
               options: PUBLISH_STATUSES,
             },
           ],
@@ -122,11 +128,11 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           fields: [
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
             },
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.user && entity.user.attributes.name,
+              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
             },
           ],
         },
@@ -155,7 +161,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           controlType: 'select',
           model: '.attributes.document_public',
           options: DOC_PUBLISH_STATUSES,
-          value: entity.attributes.document_public,
+          value: entity.getIn(['attributes', 'document_public']),
           label: this.context.intl.formatMessage(appMessages.attributes.document_public),
         },
       ],
@@ -169,22 +175,28 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         checked: activeDateId === null || activeDateId === 0 || activeDateId === '',
       },
     ];
+    const NO_OF_REPORT_OPTIONS = 1;
     let excludeCount = 0;
-    return Object.values(dates).reduce((memo, date, i) => {
-      // only allow active and those that are not associated
-      if (i - excludeCount < 1
-      && ((typeof date.reportCount !== 'undefined' && date.reportCount === 0) || (activeDateId ? activeDateId.toString() === date.id : false))) {
-        if (date.attributes.overdue || (activeDateId && activeDateId.toString() === date.id)) excludeCount += 1;
+    return dates && dates.reduce((memo, date, i) => {
+      const isOwnDate = activeDateId ? activeDateId.toString() === date.get('id') : false;
+      const optionNoNotExceeded = i - excludeCount < NO_OF_REPORT_OPTIONS;
+      const withoutReport = !date.getIn(['attributes', 'has_progress_report']) || isOwnDate;
+      // only allow upcoming and those that are not associated
+      if (optionNoNotExceeded && withoutReport) {
+        // exclude overdue and already assigned date from max no of date options
+        if (date.getIn(['attributes', 'overdue']) || isOwnDate) {
+          excludeCount += 1;
+        }
         const label =
-          `${this.context.intl.formatDate(new Date(date.attributes.due_date))} ${
-            date.attributes.overdue ? this.context.intl.formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
-            date.attributes.due ? this.context.intl.formatMessage(appMessages.entities.due_dates.due) : ''}`;
+          `${this.context.intl.formatDate(new Date(date.getIn(['attributes', 'due_date'])))} ${
+            date.getIn(['attributes', 'overdue']) ? this.context.intl.formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
+            date.getIn(['attributes', 'due']) ? this.context.intl.formatMessage(appMessages.entities.due_dates.due) : ''}`;
         return memo.concat([
           {
-            value: parseInt(date.id, 10),
+            value: parseInt(date.get('id'), 10),
             label,
-            highlight: date.attributes.overdue,
-            checked: activeDateId ? date.id === activeDateId : false,
+            highlight: date.getIn(['attributes', 'overdue']),
+            checked: activeDateId ? date.get('id') === activeDateId : false,
           },
         ]);
       }
@@ -195,13 +207,13 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.single),
       icon: 'calendar',
-      fields: entity.indicator && entity.indicator.dates
+      fields: entity.get('indicator') && entity.getIn(['indicator', 'dates'])
         ? [{
           id: 'due_date_id',
           controlType: 'radio',
           model: '.attributes.due_date_id',
-          options: this.getDateOptions(entity.indicator.dates, entity.attributes.due_date_id),
-          value: entity.attributes.due_date_id || 0,
+          options: this.getDateOptions(entity.getIn(['indicator', 'dates']), entity.getIn(['attributes', 'due_date_id'])),
+          value: entity.getIn(['attributes', 'due_date_id']) || 0,
           hints: {
             1: this.context.intl.formatMessage(appMessages.entities.due_dates.empty),
           },
@@ -210,7 +222,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     },
   ]);
 
-  getFields = (entity) => ({ // isManager, taxonomies,
+  getFields = (entity) => ({ // isManager, taxonomies
     header: {
       main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(entity),
@@ -221,13 +233,13 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     },
   })
   render() {
-    const { report, dataReady, viewDomain } = this.props;
+    const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-    if (report && dataReady) {
-      pageTitle = `${pageTitle} for indicator ${report.attributes.indicator_id}`;
+    if (viewEntity && dataReady) {
+      pageTitle = `${pageTitle} for indicator ${viewEntity.getIn(['attributes', 'indicator_id'])}`;
     }
     return (
       <div>
@@ -243,13 +255,13 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             type={CONTENT_SINGLE}
             icon="reports"
             buttons={
-              report && dataReady ? [{
+              viewEntity && dataReady ? [{
                 type: 'cancel',
                 onClick: () => this.props.handleCancel(reference),
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(viewDomain.form.data, report.attributes.due_date_id),
+                onClick: () => this.props.handleSubmit(viewDomain.form.data, viewEntity.getIn(['attributes', 'due_date_id'])),
               }] : null
             }
           />
@@ -259,10 +271,10 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           {saveError &&
             <p>{saveError}</p>
           }
-          { !report && !dataReady &&
+          { !viewEntity && !dataReady &&
             <Loading />
           }
-          { !report && dataReady && !saveError &&
+          { !viewEntity && dataReady && !saveError &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
@@ -271,10 +283,10 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             <EntityForm
               model="reportEdit.form.data"
               formData={viewDomain.form.data}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, report.attributes.due_date_id)}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity.getIn(['attributes', 'due_date_id']))}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(report)}
+              fields={this.getFields(viewEntity)}
             />
           }
         </Content>
@@ -291,7 +303,7 @@ ReportEdit.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
-  report: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
 };
@@ -301,48 +313,9 @@ ReportEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'progress_reports',
-    'users',
-    'due_dates',
-    'indicators',
-  ] }),
-  report: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'progress_reports',
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-        {
-          type: 'single',
-          path: 'indicators',
-          key: 'indicator_id',
-          as: 'indicator',
-          extend: {
-            path: 'due_dates',
-            key: 'indicator_id',
-            reverse: true,
-            as: 'dates',
-            extend: {
-              type: 'count',
-              path: 'progress_reports',
-              key: 'due_date_id',
-              reverse: true,
-              as: 'reportCount',
-            },
-          },
-        },
-      ],
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -357,7 +330,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR));
     },
     populateForm: (model, formData) => {
-      dispatch(formActions.load(model, fromJS(formData)));
+      dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData, previousDateAssigned) => {
       let saveData = formData;

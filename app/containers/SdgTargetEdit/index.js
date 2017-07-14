@@ -11,7 +11,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, fromJS } from 'immutable';
+import { Map } from 'immutable';
 
 import {
   taxonomyOptions,
@@ -34,26 +34,30 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import {
-  getEntity,
-  getEntities,
-  isReady,
-} from 'containers/App/selectors';
+import { isReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectViewEntity,
+  selectTaxonomies,
+  selectIndicators,
+  selectMeasures,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES } from './constants';
 
 export class SdgTargetEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.sdgtarget) {
+    if (this.props.dataReady && this.props.viewEntity) {
       this.props.populateForm('sdgtargetEdit.form.data', this.getInitialFormData());
     }
   }
@@ -64,7 +68,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.sdgtarget) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('sdgtargetEdit.form.data', this.getInitialFormData(nextProps));
     }
@@ -72,12 +76,12 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, indicators, sdgtarget, measures } = props;
+    const { taxonomies, indicators, viewEntity, measures } = props;
 
-    return sdgtarget
+    return viewEntity
     ? Map({
-      id: sdgtarget.id,
-      attributes: fromJS(sdgtarget.attributes),
+      id: viewEntity.get('id'),
+      attributes: viewEntity.get('attributes'),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedIndicators: entityOptions(indicators, true),
       associatedMeasures: entityOptions(measures, true),
@@ -125,7 +129,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
           controlType: 'select',
           model: '.attributes.draft',
           label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          value: entity.attributes.draft,
+          value: entity.getIn(['attributes', 'draft']),
           options: PUBLISH_STATUSES,
         },
         {
@@ -134,11 +138,11 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
           fields: [
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
             },
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.user && entity.user.attributes.name,
+              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
             },
           ],
         },
@@ -157,7 +161,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyAsideFields = (entity, taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
@@ -172,12 +176,12 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
     },
     body: {
       main: this.getBodyMainFields(indicators, measures),
-      aside: this.getBodyAsideFields(entity, taxonomies),
+      aside: this.getBodyAsideFields(taxonomies),
     },
   })
 
   render() {
-    const { sdgtarget, dataReady, viewDomain, indicators, taxonomies, measures } = this.props;
+    const { viewEntity, dataReady, viewDomain, indicators, taxonomies, measures } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -195,7 +199,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
             type={CONTENT_SINGLE}
             icon="sdgtargets"
             buttons={
-              sdgtarget && dataReady ? [{
+              viewEntity && dataReady ? [{
                 type: 'cancel',
                 onClick: this.props.handleCancel,
               },
@@ -216,15 +220,15 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
           {saveError &&
             <p>{saveError}</p>
           }
-          { !sdgtarget && !dataReady &&
+          { !viewEntity && !dataReady &&
             <Loading />
           }
-          { !sdgtarget && dataReady && !saveError &&
+          { !viewEntity && dataReady && !saveError &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {sdgtarget && dataReady &&
+          {viewEntity && dataReady &&
             <EntityForm
               model="sdgtargetEdit.form.data"
               formData={viewDomain.form.data}
@@ -236,7 +240,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(sdgtarget, taxonomies, indicators, measures)}
+              fields={this.getFields(viewEntity, taxonomies, indicators, measures)}
             />
           }
         </Content>
@@ -253,7 +257,7 @@ SdgTargetEdit.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
-  sdgtarget: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
@@ -266,100 +270,18 @@ SdgTargetEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'sdgtargets',
-    'users',
-    'categories',
-    'taxonomies',
-    'sdgtarget_categories',
-    'indicators',
-    'sdgtarget_indicators',
-    'measures',
-    'sdgtarget_measures',
-  ] }),
-  sdgtarget: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'sdgtargets',
-      out: 'js',
-      extend: {
-        type: 'single',
-        path: 'users',
-        key: 'last_modified_user_id',
-        as: 'user',
-      },
-    },
-  ),
-  // all categories for all taggable taxonomies, listing connection if any
-  taxonomies: getEntities(
-    state,
-    {
-      path: 'taxonomies',
-      where: {
-        tags_sdgtargets: true,
-      },
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-        extend: {
-          as: 'associated',
-          path: 'sdgtarget_categories',
-          key: 'category_id',
-          reverse: true,
-          where: {
-            sdgtarget_id: props.params.id,
-          },
-        },
-      },
-    },
-  ),
-  indicators: getEntities(
-    state,
-    {
-      path: 'indicators',
-      extend: {
-        as: 'associated',
-        path: 'sdgtarget_indicators',
-        key: 'indicator_id',
-        reverse: true,
-        where: {
-          sdgtarget_id: props.params.id,
-        },
-      },
-    },
-  ),
-  measures: getEntities(
-    state,
-    {
-      path: 'measures',
-      extend: {
-        as: 'associated',
-        path: 'sdgtarget_measures',
-        key: 'measure_id',
-        reverse: true,
-        where: {
-          sdgtarget_id: props.params.id,
-        },
-      },
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
+  measures: selectMeasures(state, props.params.id),
+  taxonomies: selectTaxonomies(state, props.params.id),
+  indicators: selectIndicators(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('sdgtargets'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_measures'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));

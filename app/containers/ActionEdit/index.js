@@ -45,7 +45,7 @@ import EntityForm from 'components/forms/EntityForm';
 
 import {
   selectDomain,
-  selectMeasure,
+  selectViewEntity,
   selectTaxonomies,
   selectRecommendations,
   selectIndicators,
@@ -60,7 +60,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.measure) {
+    if (this.props.dataReady && this.props.viewEntity) {
       this.props.populateForm('measureEdit.form.data', this.getInitialFormData());
     }
   }
@@ -71,7 +71,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.measure) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('measureEdit.form.data', this.getInitialFormData(nextProps));
     }
@@ -79,12 +79,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { measure, taxonomies, recommendations, indicators, sdgtargets } = props;
+    const { viewEntity, taxonomies, recommendations, indicators, sdgtargets } = props;
 
-    return measure
+    return viewEntity
     ? Map({
-      id: measure.get('id'),
-      attributes: measure.get('attributes'),
+      id: viewEntity.get('id'),
+      attributes: viewEntity.get('attributes'),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRecommendations: entityOptions(recommendations, true),
       associatedIndicators: entityOptions(indicators, true),
@@ -227,7 +227,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   })
 
   render() {
-    const { measure, dataReady, viewDomain, taxonomies, recommendations, indicators, sdgtargets } = this.props;
+    const { viewEntity, dataReady, viewDomain, taxonomies, recommendations, indicators, sdgtargets } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -245,7 +245,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             type={CONTENT_SINGLE}
             icon="measures"
             buttons={
-              measure && dataReady ? [{
+              viewEntity && dataReady ? [{
                 type: 'cancel',
                 onClick: this.props.handleCancel,
               },
@@ -267,15 +267,15 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           {saveError &&
             <p>{saveError}</p>
           }
-          { !measure && !dataReady &&
+          { !viewEntity && !dataReady &&
             <Loading />
           }
-          { !measure && dataReady && !saveError &&
+          { !viewEntity && dataReady && !saveError &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {measure && dataReady &&
+          {viewEntity && dataReady &&
             <EntityForm
               model="measureEdit.form.data"
               formData={viewDomain.form.data}
@@ -288,7 +288,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(measure, taxonomies, recommendations, indicators, sdgtargets)}
+              fields={this.getFields(viewEntity, taxonomies, recommendations, indicators, sdgtargets)}
             />
           }
         </Content>
@@ -305,7 +305,7 @@ ActionEdit.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
-  measure: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
@@ -321,7 +321,7 @@ ActionEdit.contextTypes = {
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   dataReady: isReady(state, { path: DEPENDENCIES }),
-  measure: selectMeasure(state, props.params.id),
+  viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),
   indicators: selectIndicators(state, props.params.id),

@@ -32,8 +32,6 @@ import {
 } from 'containers/App/actions';
 
 import {
-  getEntity,
-  getEntities,
   isReady,
   isUserAdmin,
 } from 'containers/App/selectors';
@@ -43,17 +41,22 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectViewEntity,
+  selectUsers,
+} from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES } from './constants';
 
 export class CategoryEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
-    if (this.props.dataReady && this.props.category) {
+    if (this.props.dataReady && this.props.viewEntity) {
       this.props.populateForm('categoryEdit.form.data', this.getInitialFormData());
     }
   }
@@ -63,7 +66,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.category) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('categoryEdit.form.data', this.getInitialFormData(nextProps));
     }
@@ -71,12 +74,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { category, users } = props;
-    return category
+    const { viewEntity, users } = props;
+    return viewEntity
     ? Map({
-      id: category.id,
-      attributes: fromJS(category.attributes),
-      associatedUser: userOptions(users, category.attributes.manager_id),
+      id: viewEntity.get('id'),
+      attributes: viewEntity.get('attributes'),
+      associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
       // TODO allow single value for singleSelect
     })
     : Map();
@@ -125,11 +128,11 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           fields: [
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
             },
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.user && entity.user.attributes.name,
+              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
             },
           ],
         },
@@ -160,13 +163,13 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         placeholder: this.context.intl.formatMessage(appMessages.placeholders.url),
       }],
     });
-    if (isAdmin && !!entity.taxonomy.attributes.has_manager) {
+    if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({
         fields: [
           renderUserControl(
             users,
             this.context.intl.formatMessage(appMessages.attributes.manager_id.categories),
-            entity.attributes.manager_id
+            entity.getIn(['attributes', 'manager_id'])
           ),
         ],
       });
@@ -186,7 +189,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   })
 
   render() {
-    const { category, dataReady, isAdmin, viewDomain, users } = this.props;
+    const { viewEntity, dataReady, isAdmin, viewDomain, users } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -204,7 +207,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             type={CONTENT_SINGLE}
             icon="categories"
             buttons={
-              category && dataReady ? [{
+              viewEntity && dataReady ? [{
                 type: 'cancel',
                 onClick: () => this.props.handleCancel(reference),
               },
@@ -220,22 +223,22 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           {saveError &&
             <p>{saveError}</p>
           }
-          { !category && !dataReady &&
+          { !viewEntity && !dataReady &&
             <Loading />
           }
-          { !category && dataReady && !saveError &&
+          { !viewEntity && dataReady && !saveError &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {category && dataReady &&
+          {viewEntity && dataReady &&
             <EntityForm
               model="categoryEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(category, users, isAdmin)}
+              fields={this.getFields(viewEntity, users, isAdmin)}
             />
           }
         </Content>
@@ -252,7 +255,7 @@ CategoryEdit.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
-  category: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
   params: PropTypes.object,
@@ -265,60 +268,16 @@ CategoryEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isAdmin: isUserAdmin(state),
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'users',
-    'user_roles',
-    'categories',
-    'taxonomies',
-  ] }),
-  category: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'categories',
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-        {
-          type: 'single',
-          path: 'taxonomies',
-          key: 'taxonomy_id',
-          as: 'taxonomy',
-        },
-      ],
-    },
-  ),
-  // all users of role manager
-  users: getEntities(
-    state,
-    {
-      path: 'users',
-      connected: {
-        path: 'user_roles',
-        key: 'user_id',
-        where: {
-          role_id: USER_ROLES.MANAGER, // managers only
-        },
-      },
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
+  users: selectUsers(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));

@@ -184,3 +184,35 @@ export const entitiesSetAssociated = (entities, entityKey, associations, associa
       )
     )
   );
+
+export const entitySetUser = (entity, users) =>
+  entity && entity.set('user',
+    users.find((user) => attributesEqual(entity.getIn(['attributes', 'last_modified_user_id']), user.get('id')))
+  );
+
+export const prepareTaxonomies = (taxonomies, categories, associations, tagsKey, entityKey, entityId) =>
+  taxonomies && taxonomies
+  .filter((tax) => tax.getIn(['attributes', tagsKey]))
+  .map((tax) => tax.set('categories', entitiesSetAssociated(
+    categories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))),
+    'category_id',
+    associations,
+    entityKey,
+    entityId
+  )));
+
+export const prepareCategory = (category, users, taxonomies) =>
+  category && entitySetUser(
+    category.set('taxonomy', taxonomies.find((tax) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), tax.get('id')))),
+    users
+  );
+
+export const usersSetRoles = (users, userRoles, roleId) =>
+  users && users
+  .filter((user) => {
+    const roles = userRoles.filter((association) =>
+      attributesEqual(association.getIn(['attributes', 'role_id']), roleId)
+      && attributesEqual(association.getIn(['attributes', 'user_id']), user.get('id'))
+    );
+    return roles && roles.size > 0;
+  });

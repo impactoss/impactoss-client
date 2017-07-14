@@ -10,8 +10,7 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
-import { Map, List, fromJS } from 'immutable';
-import { map } from 'lodash/collection';
+import { Map, List } from 'immutable';
 
 import {
   taxonomyOptions,
@@ -27,8 +26,6 @@ import {
 } from 'containers/App/actions';
 
 import {
-  getUser,
-  getEntities,
   isReady,
   isUserManager,
 } from 'containers/App/selectors';
@@ -41,15 +38,22 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectViewEntity,
+  selectTaxonomies,
+  selectRoles,
+} from './selectors';
+
 import { save } from './actions';
 import messages from './messages';
+import { DEPENDENCIES } from './constants';
 
 export class UserEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.user) {
+    if (this.props.dataReady && this.props.viewEntity) {
       this.props.populateForm('userEdit.form.data', this.getInitialFormData());
     }
   }
@@ -59,20 +63,20 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.user) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.populateForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, user } = props;
+    const { taxonomies, roles, viewEntity } = props;
 
     return Map({
-      id: user.id,
-      attributes: fromJS(user.attributes),
+      id: viewEntity.get('id'),
+      attributes: viewEntity.get('attributes'),
       associatedTaxonomies: taxonomyOptions(taxonomies),
-      associatedRole: this.getHighestUserRoleId(user.roles),
+      associatedRole: this.getHighestUserRoleId(roles),
     });
   }
 
@@ -102,40 +106,36 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
         label: this.context.intl.formatMessage(appMessages.entities.roles.defaultRole),
       },
     ];
-    return Object.values(roles).reduce((memo, role) =>
+    return roles.reduce((memo, role) =>
       memo.concat([
         {
-          value: parseInt(role.id, 10),
-          label: role.attributes.friendly_name,
+          value: parseInt(role.get('id'), 10),
+          label: role.getIn(['attributes', 'friendly_name']),
         },
       ])
     , roleOptions);
   }
 
   // only show the highest rated role (lower role ids means higher)
-  getHighestUserRoleId = (userRoles) => {
-    if (userRoles) {
-      const highestRole = Object.values(userRoles).reduce((currentHighestRole, role) =>
-        !currentHighestRole || role.role.id < currentHighestRole.id
-        ? role.role
-        : currentHighestRole
-      , null);
-      return highestRole.id;
-    }
-    return 0;
-  }
+  getHighestUserRoleId = (roles) =>
+    roles.reduce((currentHighestRoleId, role) =>
+      role.get('associated') && role.get('id') < currentHighestRoleId
+        ? role.get('id')
+        : currentHighestRoleId
+    , 99999);
+
   // only show the highest rated role (lower role ids means higher)
   getHighestUserRoleLabel = (roles) => {
-    if (roles) {
-      const highestRole = Object.values(roles).reduce((currentHighestRole, role) =>
-        !currentHighestRole || role.role.id < currentHighestRole.id
-        ? role.role
+    const highestRole = roles.reduce((currentHighestRole, role) =>
+      role.get('associated') && (!currentHighestRole || role.get('id') < currentHighestRole.get('id'))
+        ? role.get('id')
         : currentHighestRole
-      , null);
-      return highestRole.attributes.friendly_name;
-    }
-    return this.context.intl.formatMessage(appMessages.entities.roles.defaultRole);
+    , null);
+    return highestRole
+      ? highestRole.getIn(['attributes', 'friendly_name'])
+      : this.context.intl.formatMessage(appMessages.entities.roles.defaultRole);
   }
+
   getHeaderAsideFields = (entity, roles, isManager) => ([
     {
       fields: isManager ? [
@@ -146,14 +146,14 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               controlType: 'info',
               type: 'reference',
               label: this.context.intl.formatMessage(appMessages.attributes.id),
-              value: entity.id,
+              value: entity.get('id'),
             },
             {
               id: 'role',
               controlType: 'select',
               model: '.associatedRole',
               label: this.context.intl.formatMessage(appMessages.entities.roles.single),
-              value: this.getHighestUserRoleId(entity.roles),
+              value: this.getHighestUserRoleId(roles),
               options: this.getRoleOptions(roles),
             },
           ],
@@ -164,11 +164,11 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           fields: [
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
             },
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.user && entity.user.attributes.name,
+              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
             },
           ],
         },
@@ -180,12 +180,12 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           fields: [
             {
               type: 'reference',
-              value: entity.id,
+              value: entity.get('id'),
               label: this.context.intl.formatMessage(appMessages.attributes.id),
             },
             {
               type: 'role',
-              value: this.getHighestUserRoleLabel(entity.roles),
+              value: this.getHighestUserRoleLabel(roles),
             },
           ],
         },
@@ -212,7 +212,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     },
   ]);
 
-  getBodyAsideFields = (entity, isManager, taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (isManager, taxonomies) => ([ // fieldGroups
     !isManager ? null : { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
@@ -227,12 +227,12 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     },
     body: {
       main: this.getBodyMainFields(),
-      aside: this.getBodyAsideFields(entity, isManager, taxonomies),
+      aside: this.getBodyAsideFields(isManager, taxonomies),
     },
   })
 
   render() {
-    const { user, dataReady, viewDomain, taxonomies, roles, isManager } = this.props;
+    const { viewEntity, dataReady, viewDomain, taxonomies, roles, isManager } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -250,7 +250,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             type={CONTENT_SINGLE}
             icon="users"
             buttons={
-              user && [{
+              viewEntity && [{
                 type: 'cancel',
                 onClick: () => this.props.handleCancel(this.props.params.id),
               },
@@ -260,7 +260,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                   viewDomain.form.data,
                   taxonomies,
                   roles,
-                  user.roles
                 ),
               }]
             }
@@ -271,15 +270,15 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           {saveError &&
             <p>{saveError}</p>
           }
-          { !user && !dataReady &&
+          { !viewEntity && !dataReady &&
             <Loading />
           }
-          { !user && dataReady && !saveError &&
+          { !viewEntity && dataReady && !saveError &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {user && dataReady &&
+          {viewEntity && dataReady &&
             <EntityForm
               model="userEdit.form.data"
               formData={viewDomain.form.data}
@@ -287,11 +286,10 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 formData,
                 taxonomies,
                 roles,
-                user.roles
               )}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(user, roles, isManager, taxonomies)}
+              fields={this.getFields(viewEntity, roles, isManager, taxonomies)}
             />
           }
         </Content>
@@ -307,7 +305,7 @@ UserEdit.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
-  user: PropTypes.object,
+  viewEntity: PropTypes.object,
   roles: PropTypes.object,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -321,88 +319,22 @@ UserEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isManager: isUserManager(state),
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'users',
-    'roles',
-    'categories',
-    'taxonomies',
-    'user_categories',
-  ] }),
-  user: getUser(
-    state,
-    {
-      id: props.params.id,
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-        {
-          path: 'user_roles',
-          key: 'user_id',
-          as: 'roles',
-          reverse: true,
-          extend: {
-            type: 'single',
-            path: 'roles',
-            key: 'role_id',
-            as: 'role',
-          },
-        },
-      ],
-    },
-  ),
-  // all categories for all taggable taxonomies, listing connection if any
-  taxonomies: getEntities(
-    state,
-    {
-      path: 'taxonomies',
-      where: {
-        tags_users: true,
-      },
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-        extend: {
-          as: 'associated',
-          path: 'user_categories',
-          key: 'category_id',
-          reverse: true,
-          where: {
-            user_id: props.params.id,
-          },
-        },
-      },
-    },
-  ),
-  roles: getEntities(
-    state,
-    {
-      path: 'roles',
-      out: 'js',
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
+  taxonomies: selectTaxonomies(state, props.params.id),
+  roles: selectRoles(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('roles'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('user_categories'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     populateForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
-    handleSubmit: (formData, taxonomies, roleOptions, previousRoles) => {
+    handleSubmit: (formData, taxonomies, roles) => {
       let saveData = formData
         .set(
           'userCategories',
@@ -415,23 +347,24 @@ function mapDispatchToProps(dispatch) {
 
       // roles
       // higher is actually lower
-      const newHighestRole = formData.get('associatedRole');
+      const newHighestRole = parseInt(formData.get('associatedRole'), 10);
       // store all higher roles
-      const newRoleIds = parseInt(newHighestRole, 10) === 0
-        ? []
-        : Object.values(roleOptions).reduce((memo, role) => parseInt(newHighestRole, 10) <= parseInt(role.id, 10)
-            ? memo.concat([role.id])
+      const newRoleIds = newHighestRole === 0
+        ? List()
+        : roles.reduce((memo, role) =>
+          newHighestRole <= parseInt(role.get('id'), 10)
+            ? memo.push(role.get('id'))
             : memo
-          , []
-        );
+        , List());
+
       saveData = saveData.set('userRoles', Map({
-        delete: previousRoles && Object.values(previousRoles).reduce((memo, previousRole) =>
-          newRoleIds.indexOf(previousRole.attributes.role_id.toString()) < 0
-            ? memo.push(previousRole.id)
+        delete: roles.reduce((memo, role) =>
+          role.get('associated') && newRoleIds.includes(role.get('id'))
+            ? memo.push(role.getIn(['associated', 'id']))
             : memo
           , List()),
         create: newRoleIds.reduce((memo, id) =>
-          !previousRoles || map(map(previousRoles, 'attributes'), 'role_id').indexOf(parseInt(id, 10)) < 0
+          roles.find((role) => role.get('id') === id && !role.get('associated'))
             ? memo.push(Map({ role_id: id, user_id: formData.get('id') }))
             : memo
         , List()),

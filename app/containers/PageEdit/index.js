@@ -26,26 +26,27 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import {
-  getEntity,
-  isReady,
-} from 'containers/App/selectors';
+import { isReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectViewEntity,
+} from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES } from './constants';
 
 export class PageEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.page) {
+    if (this.props.dataReady && this.props.viewEntity) {
       this.props.populateForm('pageEdit.form.data', this.getInitialFormData());
     }
   }
@@ -56,7 +57,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.page) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('pageEdit.form.data', this.getInitialFormData(nextProps));
     }
@@ -64,8 +65,8 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { page } = props;
-    return fromJS(page);
+    const { viewEntity } = props;
+    return fromJS(viewEntity);
   }
 
   getHeaderMainFields = (entity) => ([ // fieldGroups
@@ -74,7 +75,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
         {
           controlType: 'info',
           type: 'reference',
-          value: entity.id,
+          value: entity.get('id'),
           label: this.context.intl.formatMessage(appMessages.attributes.id),
         },
         {
@@ -123,11 +124,11 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           fields: [
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
             },
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.user && entity.user.attributes.name,
+              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
             },
           ],
         },
@@ -159,9 +160,9 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     },
   })
   render() {
-    const { page, dataReady, viewDomain } = this.props;
+    const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError } = viewDomain.viewEntity;
 
     return (
       <div>
@@ -177,7 +178,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
             type={CONTENT_SINGLE}
             icon="categories"
             buttons={
-              page && dataReady ? [{
+              viewEntity && dataReady ? [{
                 type: 'cancel',
                 onClick: this.props.handleCancel,
               },
@@ -193,22 +194,22 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           {saveError &&
             <p>{saveError}</p>
           }
-          { !page && !dataReady &&
+          { !viewEntity && !dataReady &&
             <Loading />
           }
-          { !page && dataReady && !saveError &&
+          { !viewEntity && dataReady && !saveError &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {page && dataReady &&
+          {viewEntity && dataReady &&
             <EntityForm
               model="pageEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(page)}
+              fields={this.getFields(viewEntity)}
             />
           }
         </Content>
@@ -227,7 +228,7 @@ PageEdit.propTypes = {
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
-  page: PropTypes.object,
+  viewEntity: PropTypes.object,
 };
 
 PageEdit.contextTypes = {
@@ -235,35 +236,15 @@ PageEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'users',
-    'pages',
-  ] }),
-
-  page: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'pages',
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-      ],
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('pages'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));

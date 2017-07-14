@@ -11,7 +11,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, List, fromJS } from 'immutable';
+import { Map, List } from 'immutable';
 
 import {
   userOptions,
@@ -26,7 +26,7 @@ import {
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { PUBLISH_STATUSES, USER_ROLES, REPORT_FREQUENCIES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, PUBLISH_STATUSES, REPORT_FREQUENCIES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -36,26 +36,31 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import {
-  getEntity,
-  getEntities,
-  isReady,
-} from 'containers/App/selectors';
+import { isReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectViewEntity,
+  selectMeasures,
+  selectSdgTargets,
+  selectUsers,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES } from './constants';
+
 
 export class IndicatorEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.indicator) {
+    if (this.props.dataReady && this.props.viewEntity) {
       this.props.populateForm('indicatorEdit.form.data', this.getInitialFormData());
     }
   }
@@ -66,7 +71,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('indicatorEdit.form.data', this.getInitialFormData(nextProps));
     }
@@ -74,16 +79,18 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { measures, indicator, users, sdgtargets } = props;
-    indicator.attributes.frequency_months = indicator.attributes.frequency_months || 1;
-
-    return indicator
+    const { measures, viewEntity, users, sdgtargets } = props;
+    let attributes = viewEntity.get('attributes');
+    if (!attributes.get('frequency_months')) {
+      attributes = attributes.set('frequency_months', 1);
+    }
+    return viewEntity
     ? Map({
-      id: indicator.id,
-      attributes: fromJS(indicator.attributes),
+      id: viewEntity.get('id'),
+      attributes,
       associatedMeasures: entityOptions(measures, true),
       associatedSdgTargets: entityOptions(sdgtargets, true),
-      associatedUser: userOptions(users, indicator.attributes.manager_id),
+      associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
       // TODO allow single value for singleSelect
     })
     : Map();
@@ -124,7 +131,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           controlType: 'select',
           model: '.attributes.draft',
           label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          value: entity.attributes.draft,
+          value: entity.getIn(['attributes', 'draft']),
           options: PUBLISH_STATUSES,
         },
         {
@@ -133,11 +140,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           fields: [
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
+              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
             },
             {
               label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.user && entity.user.attributes.name,
+              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
             },
           ],
         },
@@ -190,7 +197,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           controlType: 'checkbox',
           model: '.attributes.repeat',
           label: this.context.intl.formatMessage(appMessages.attributes.repeat),
-          value: entity.attributes.repeat,
+          value: entity.getIn(['attributes', 'repeat']),
         },
         {
           id: 'frequency',
@@ -198,7 +205,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           label: this.context.intl.formatMessage(appMessages.attributes.frequency_months),
           model: '.attributes.frequency_months',
           options: REPORT_FREQUENCIES,
-          value: parseInt(entity.attributes.frequency_months, 10),
+          value: parseInt(entity.getIn(['attributes', 'frequency_months']), 10),
         },
         {
           id: 'end_date',
@@ -216,7 +223,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         renderUserControl(
           users,
           this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
-          entity.attributes.manager_id,
+          entity.getIn(['attributes', 'manager_id']),
         ),
       ],
     },
@@ -234,7 +241,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   })
 
   render() {
-    const { indicator, dataReady, viewDomain, measures, users, sdgtargets } = this.props;
+    const { viewEntity, dataReady, viewDomain, measures, users, sdgtargets } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -251,7 +258,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             type={CONTENT_SINGLE}
             icon="indicators"
             buttons={
-              indicator && dataReady ? [{
+              viewEntity && dataReady ? [{
                 type: 'cancel',
                 onClick: this.props.handleCancel,
               },
@@ -267,22 +274,22 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           {saveError &&
             <p>{saveError}</p>
           }
-          { !indicator && !dataReady &&
+          { !viewEntity && !dataReady &&
             <Loading />
           }
-          { !indicator && dataReady && !saveError &&
+          { !viewEntity && dataReady && !saveError &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {indicator && dataReady &&
+          {viewEntity && dataReady &&
             <EntityForm
               model="indicatorEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData, measures, sdgtargets)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(indicator, measures, sdgtargets, users)}
+              fields={this.getFields(viewEntity, measures, sdgtargets, users)}
             />
           }
         </Content>
@@ -299,7 +306,7 @@ IndicatorEdit.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
-  indicator: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
@@ -312,93 +319,18 @@ IndicatorEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'measures',
-    'sdgtargets',
-    'users',
-    'user_roles',
-    'indicators',
-    'measure_indicators',
-    'sdgtarget_indicators',
-  ] }),
-
-  indicator: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'indicators',
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-      ],
-    },
-  ),
-
-  // all recommendations, listing connection if any
-  measures: getEntities(
-    state,
-    {
-      path: 'measures',
-      extend: {
-        as: 'associated',
-        path: 'measure_indicators',
-        key: 'measure_id',
-        reverse: true,
-        where: {
-          indicator_id: props.params.id,
-        },
-      },
-    },
-  ),
-  // all recommendations, listing connection if any
-  sdgtargets: getEntities(
-    state,
-    {
-      path: 'sdgtargets',
-      extend: {
-        as: 'associated',
-        path: 'sdgtarget_indicators',
-        key: 'sdgtarget_id',
-        reverse: true,
-        where: {
-          indicator_id: props.params.id,
-        },
-      },
-    },
-  ),
-
-  // all users of role contributor
-  users: getEntities(
-    state,
-    {
-      path: 'users',
-      connected: {
-        path: 'user_roles',
-        key: 'user_id',
-        where: {
-          role_id: USER_ROLES.CONTRIBUTOR, // contributors only
-        },
-      },
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
+  sdgtargets: selectSdgTargets(state, props.params.id),
+  measures: selectMeasures(state, props.params.id),
+  users: selectUsers(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('sdgtargets'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('measure_indicators'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
