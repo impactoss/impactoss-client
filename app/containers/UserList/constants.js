@@ -1,3 +1,12 @@
+export const DEPENDENCIES = [
+  'users',
+  'user_roles',
+  'roles',
+  'user_categories',
+  'categories',
+  'taxonomies',
+];
+
 export const CONFIG = {
   clientPath: 'users',
   serverPath: 'users',

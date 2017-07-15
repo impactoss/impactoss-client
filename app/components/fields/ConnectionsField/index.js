@@ -1,23 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-import { orderBy } from 'lodash/collection';
-import { without } from 'lodash/array';
+// import { FormattedMessage } from 'react-intl';
+// import { orderBy } from 'lodash/collection';
+// import { without } from 'lodash/array';
 
-import { getEntitySortIteratee } from 'utils/sort';
+// import { getEntitySortIteratee } from 'utils/sort';
 
-import appMessages from 'containers/App/messages';
-// import EntityListItems from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems';
+// import appMessages from 'containers/App/messages';
+import EntityListItems from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems';
 
 import FieldWrap from 'components/fields/FieldWrap';
 import LabelLarge from 'components/fields/LabelLarge';
 import Dot from 'components/fields/Dot';
 import DotWrapper from 'components/fields/DotWrapper';
 import EntityListItemsWrap from 'components/fields/EntityListItemsWrap';
-import ToggleAllItems from 'components/fields/ToggleAllItems';
+// import ToggleAllItems from 'components/fields/ToggleAllItems';
 import EmptyHint from 'components/fields/EmptyHint';
 
-const CONNECTIONMAX = 5;
+// const CONNECTIONMAX = 5;
 
 class ConnectionsField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -40,9 +40,27 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
   //     },
   //   }}
   // />
+  // { sortedValues.length > CONNECTIONMAX &&
+  //   <ToggleAllItems
+  //     onClick={() =>
+  //       this.setState({
+  //         showAllConnections: this.state.showAllConnections.indexOf(field.entityType) >= 0
+  //           ? without(this.state.showAllConnections, field.entityType)
+  //           : this.state.showAllConnections.concat([field.entityType]),
+  //       })
+  //     }
+  //   >
+  //     { this.state.showAllConnections.indexOf(field.entityType) >= 0 &&
+  //       <FormattedMessage {...appMessages.entities.showLess} />
+  //     }
+  //     { this.state.showAllConnections.indexOf(field.entityType) < 0 &&
+  //       <FormattedMessage {...appMessages.entities.showAll} />
+  //     }
+  //   </ToggleAllItems>
+  // }
   render() {
     const { field } = this.props;
-    const sortedValues = orderBy(field.values, getEntitySortIteratee('id'), 'desc');
+    // const sortedValues = orderBy(field.values, getEntitySortIteratee('id'), 'desc');
     return (
       <FieldWrap>
         <LabelLarge>
@@ -54,27 +72,16 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
           }
         </LabelLarge>
         <EntityListItemsWrap>
-          EntityListItems: TODO
+          <EntityListItems
+            taxonomies={field.taxonomies}
+            config={{ connections: { options: field.connectionOptions } }}
+            entities={field.values}
+            entityIcon={field.icon}
+            onEntityClick={() => null}
+            onTagClick={() => null}
+          />
         </EntityListItemsWrap>
-        { sortedValues.length > CONNECTIONMAX &&
-          <ToggleAllItems
-            onClick={() =>
-              this.setState({
-                showAllConnections: this.state.showAllConnections.indexOf(field.entityType) >= 0
-                  ? without(this.state.showAllConnections, field.entityType)
-                  : this.state.showAllConnections.concat([field.entityType]),
-              })
-            }
-          >
-            { this.state.showAllConnections.indexOf(field.entityType) >= 0 &&
-              <FormattedMessage {...appMessages.entities.showLess} />
-            }
-            { this.state.showAllConnections.indexOf(field.entityType) < 0 &&
-              <FormattedMessage {...appMessages.entities.showAll} />
-            }
-          </ToggleAllItems>
-        }
-        { (!field.values || field.values.length === 0) &&
+        { (!field.values || field.values.size === 0) &&
           <EmptyHint>{field.showEmpty}</EmptyHint>
         }
       </FieldWrap>

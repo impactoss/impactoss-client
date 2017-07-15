@@ -11,12 +11,16 @@ import Helmet from 'react-helmet';
 import { List, Map, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
+import {
+  isReady,
+  selectMeasureTaxonomies,
+} from 'containers/App/selectors';
+
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
-import { CONFIG } from './constants';
-import { selectConnections, selectMeasures, selectTaxonomies, selectConnectedTaxonomies } from './selectors';
+import { CONFIG, DEPENDENCIES } from './constants';
+import { selectConnections, selectMeasures, selectConnectedTaxonomies } from './selectors';
 
 import messages from './messages';
 
@@ -93,48 +97,16 @@ ActionList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: [
-    'measures',
-    'measure_categories',
-    'users',
-    'taxonomies',
-    'categories',
-    'recommendations',
-    'recommendation_measures',
-    'recommendation_categories',
-    'sdgtargets',
-    'sdgtarget_measures',
-    'sdgtarget_categories',
-    'indicators',
-    'measure_indicators',
-    'user_roles',
-    'due_dates',
-    'progress_reports',
-  ] }),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
   entities: selectMeasures(state, fromJS(props.location.query)),
-  taxonomies: selectTaxonomies(state),
+  taxonomies: selectMeasureTaxonomies(state),
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('measure_categories'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
-      dispatch(loadEntitiesIfNeeded('sdgtargets'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_measures'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('measure_indicators'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('progress_reports'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
       dispatch(updatePath('/actions/new/'));

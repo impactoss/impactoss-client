@@ -1,5 +1,24 @@
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
+export const DEPENDENCIES = [
+  'measures',
+  'measure_categories',
+  'users',
+  'taxonomies',
+  'categories',
+  'recommendations',
+  'recommendation_measures',
+  'recommendation_categories',
+  'sdgtargets',
+  'sdgtarget_measures',
+  'sdgtarget_categories',
+  'indicators',
+  'measure_indicators',
+  'user_roles',
+  'due_dates',
+  'progress_reports',
+];
+
 export const CONFIG = {
   serverPath: 'measures',
   clientPath: 'actions',

@@ -12,13 +12,18 @@ import Helmet from 'react-helmet';
 import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
+import {
+  isReady,
+  selectRecommendationConnections,
+  selectRecommendationTaxonomies,
+} from 'containers/App/selectors';
+
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
 
-import { CONFIG } from './constants';
-import { selectConnections, selectRecommendations, selectTaxonomies } from './selectors';
+import { CONFIG, DEPENDENCIES } from './constants';
+import { selectRecommendations } from './selectors';
 import messages from './messages';
 
 export class RecommendationList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -111,31 +116,16 @@ RecommendationList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: [
-    'measures',
-    'users',
-    'taxonomies',
-    'categories',
-    'recommendations',
-    'recommendation_measures',
-    'recommendation_categories',
-  ] }),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
   entities: selectRecommendations(state, fromJS(props.location.query)),
-  taxonomies: selectTaxonomies(state),
-  connections: selectConnections(state),
+  taxonomies: selectRecommendationTaxonomies(state),
+  connections: selectRecommendationConnections(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
-      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
       dispatch(updatePath('/recommendations/new/'));

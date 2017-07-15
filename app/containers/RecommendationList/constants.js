@@ -1,5 +1,15 @@
 import { PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'containers/App/constants';
 
+export const DEPENDENCIES = [
+  'measures',
+  'users',
+  'taxonomies',
+  'categories',
+  'recommendations',
+  'recommendation_measures',
+  'recommendation_categories',
+];
+
 export const CONFIG = {
   serverPath: 'recommendations',
   clientPath: 'recommendations',

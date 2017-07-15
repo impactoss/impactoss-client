@@ -11,13 +11,13 @@ import Helmet from 'react-helmet';
 import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
+import { isReady, selectUserConnections, selectUserTaxonomies } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
 
-import { CONFIG } from './constants';
-import { selectConnections, selectUsers, selectTaxonomies } from './selectors';
+import { CONFIG, DEPENDENCIES } from './constants';
+import { selectUsers } from './selectors';
 import messages from './messages';
 
 export class UserList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -81,27 +81,15 @@ UserList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: [
-    'users',
-    'user_roles',
-    'roles',
-    'user_categories',
-    'categories',
-    'taxonomies',
-  ] }),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
   entities: selectUsers(state, fromJS(props.location.query)),
-  taxonomies: selectTaxonomies(state),
-  connections: selectConnections(state),
+  taxonomies: selectUserTaxonomies(state),
+  connections: selectUserConnections(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('roles'));
-      dispatch(loadEntitiesIfNeeded('user_categories'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
   };
 }

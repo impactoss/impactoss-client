@@ -41,7 +41,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
 
 EntityListItems.propTypes = {
   entities: PropTypes.instanceOf(List).isRequired,
-  entityIdsSelected: PropTypes.instanceOf(List).isRequired,
+  entityIdsSelected: PropTypes.instanceOf(List),
   scrollContainer: PropTypes.object,
   expandNo: PropTypes.number,
 };

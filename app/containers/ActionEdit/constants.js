@@ -17,4 +17,5 @@ export const DEPENDENCIES = [
   'indicators',
   'measure_indicators',
   'sdgtargets',
+  'sdgtarget_measures',
 ];

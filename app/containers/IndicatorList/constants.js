@@ -1,5 +1,21 @@
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
+export const DEPENDENCIES = [
+  'indicators',
+  'users',
+  'taxonomies',
+  'categories',
+  'measures',
+  'measure_indicators',
+  'measure_categories',
+  'sdgtargets',
+  'sdgtarget_indicators',
+  'sdgtarget_categories',
+  'user_roles',
+  'due_dates',
+  'progress_reports',
+];
+
 export const CONFIG = {
   serverPath: 'indicators',
   clientPath: 'indicators',

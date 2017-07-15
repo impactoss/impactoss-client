@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { Map } from 'immutable';
 
 import {
   selectEntities,
@@ -18,11 +17,6 @@ import {
   attributesEqual,
   sortEntities,
 } from 'utils/entities';
-
-export const selectConnections = createSelector(
-  (state) => selectEntities(state, 'roles'),
-  (roles) => Map().set('roles', roles)
-);
 
 const selectUsersNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
@@ -84,15 +78,4 @@ export const selectUsers = createSelector(
   selectSortOrderQuery,
   (entities, sortBy, sortOrder) =>
     sortEntities(entities, sortOrder || 'asc', sortBy || 'name')
-);
-
-export const selectTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
-  (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_users']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
 );

@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { Map } from 'immutable';
 
 import {
   selectEntities,
@@ -9,6 +8,7 @@ import {
   selectCategoryQuery,
   selectSortByQuery,
   selectSortOrderQuery,
+  selectRecommendationConnections,
 } from 'containers/App/selectors';
 
 import {
@@ -19,29 +19,13 @@ import {
   sortEntities,
 } from 'utils/entities';
 
-export const selectConnections = createSelector(
-  (state) => selectEntities(state, 'measures'),
-  (measures) => Map().set('measures', measures)
-);
-
-export const selectTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
-  (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_recommendations']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
-);
-
 const selectRecommendationsNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'recommendations',
     searchAttributes: ['reference', 'title'],
     locationQuery,
   }),
-  (state) => selectConnections(state),
+  (state) => selectRecommendationConnections(state),
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'recommendation_measures'),
   (entities, connections, entityCategories, entityMeasures) =>

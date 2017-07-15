@@ -185,20 +185,43 @@ export const entitiesSetAssociated = (entities, entityKey, associations, associa
     )
   );
 
+export const entitiesIsAssociated = (entities, entityKey, associations, associationKey, associationId) =>
+  entities && associations && entities.filter((entity) =>
+    associations.find((association) =>
+      attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id'))
+      && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
+    )
+  );
+
 export const entitySetUser = (entity, users) =>
   entity && entity.set('user',
     users.find((user) => attributesEqual(entity.getIn(['attributes', 'last_modified_user_id']), user.get('id')))
   );
 
-export const prepareTaxonomiesAssociated = (taxonomies, categories, associations, tagsKey, entityKey, entityId) =>
+export const prepareTaxonomiesIsAssociated = (taxonomies, categories, associations, tagsKey, associationKey, associationId) =>
+  taxonomies && taxonomies
+  .filter((tax) => tax.getIn(['attributes', tagsKey]))
+  .map((tax) =>
+    tax.set('categories', categories
+      .filter((cat) =>
+        attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))
+        && associations.find((association) =>
+          attributesEqual(association.getIn(['attributes', 'category_id']), cat.get('id'))
+          && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
+        )
+      )
+    )
+  );
+
+export const prepareTaxonomiesAssociated = (taxonomies, categories, associations, tagsKey, associationKey, associationId) =>
   taxonomies && taxonomies
   .filter((tax) => tax.getIn(['attributes', tagsKey]))
   .map((tax) => tax.set('categories', entitiesSetAssociated(
     categories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))),
     'category_id',
     associations,
-    entityKey,
-    entityId
+    associationKey,
+    associationId
   )));
 
 export const prepareTaxonomies = (taxonomies, categories, tagsKey) =>

@@ -16,7 +16,7 @@ import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
 
-import { CONFIG } from './constants';
+import { CONFIG, DEPENDENCIES } from './constants';
 import { selectPages } from './selectors';
 import messages from './messages';
 
@@ -83,15 +83,13 @@ PageList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: [
-    'pages',
-  ] }),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
   entities: selectPages(state, fromJS(props.location.query)),
 });
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('pages'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
       dispatch(updatePath('/pages/new/'));

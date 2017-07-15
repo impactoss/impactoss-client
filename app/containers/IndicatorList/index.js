@@ -15,7 +15,7 @@ import { isReady } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
-import { CONFIG } from './constants';
+import { CONFIG, DEPENDENCIES } from './constants';
 import { selectConnections, selectIndicators, selectConnectedTaxonomies } from './selectors';
 
 import messages from './messages';
@@ -93,21 +93,7 @@ IndicatorList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: [
-    'indicators',
-    'users',
-    'taxonomies',
-    'categories',
-    'measures',
-    'measure_indicators',
-    'measure_categories',
-    'sdgtargets',
-    'sdgtarget_indicators',
-    'sdgtarget_categories',
-    'user_roles',
-    'due_dates',
-    'progress_reports',
-  ] }),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
   entities: selectIndicators(state, fromJS(props.location.query)),
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
@@ -115,19 +101,7 @@ const mapStateToProps = (state, props) => ({
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('measure_indicators'));
-      dispatch(loadEntitiesIfNeeded('measure_categories'));
-      dispatch(loadEntitiesIfNeeded('sdgtargets'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('progress_reports'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
       dispatch(updatePath('/indicators/new/'));

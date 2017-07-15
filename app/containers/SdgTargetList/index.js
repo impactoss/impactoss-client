@@ -11,12 +11,17 @@ import Helmet from 'react-helmet';
 import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
+
+import {
+  isReady,
+  selectSdgTargetTaxonomies,
+} from 'containers/App/selectors';
+
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
-import { CONFIG } from './constants';
-import { selectConnections, selectSdgTargets, selectTaxonomies, selectConnectedTaxonomies } from './selectors';
+import { CONFIG, DEPENDENCIES } from './constants';
+import { selectConnections, selectSdgTargets, selectConnectedTaxonomies } from './selectors';
 
 import messages from './messages';
 
@@ -94,42 +99,16 @@ SdgTargetList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: [
-    'sdgtargets',
-    'sdgtarget_categories',
-    'users',
-    'taxonomies',
-    'categories',
-    'indicators',
-    'sdgtarget_indicators',
-    'measures',
-    'sdgtarget_measures',
-    'measure_categories',
-    'user_roles',
-    'due_dates',
-    'progress_reports',
-  ] }),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
   entities: selectSdgTargets(state, fromJS(props.location.query)),
-  taxonomies: selectTaxonomies(state),
+  taxonomies: selectSdgTargetTaxonomies(state),
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('sdgtargets'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_measures'));
-      dispatch(loadEntitiesIfNeeded('measure_categories'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('progress_reports'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
       dispatch(updatePath('/sdgtargets/new/'));

@@ -16,13 +16,18 @@
 import { createSelector } from 'reselect';
 import createCachedSelector from 're-reselect';
 import { reduce } from 'lodash/collection';
+import { Map } from 'immutable';
 
 import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 import { regExMultipleWords } from 'utils/string';
 
 import { USER_ROLES } from 'containers/App/constants';
-import { prepareEntitySearchTarget, filterEntitiesByAttributes } from 'utils/entities';
+import {
+  prepareEntitySearchTarget,
+  filterEntitiesByAttributes,
+  attributesEqual,
+} from 'utils/entities';
 
 
 // high level state selects
@@ -518,6 +523,85 @@ const selectEntitiesSearchQuery = createSelector(
   }
 );
 
+const selectUserConnections = createSelector(
+  (state) => selectEntities(state, 'roles'),
+  (roles) => Map().set('roles', roles)
+);
+
+const selectRecommendationConnections = createSelector(
+  (state) => selectEntities(state, 'measures'),
+  (measures) => Map().set('measures', measures)
+);
+
+const selectSdgTargetConnections = createSelector(
+  (state) => selectEntities(state, 'measures'),
+  (state) => selectEntities(state, 'indicators'),
+  (measures, indicators) => Map()
+    .set('measures', measures)
+    .set('indicators', indicators)
+);
+
+const selectIndicatorConnections = createSelector(
+  (state) => selectEntities(state, 'measures'),
+  (state) => selectEntities(state, 'sdgtargets'),
+  (measures, sdgtargets) => Map()
+    .set('measures', measures)
+    .set('sdgtargets', sdgtargets)
+);
+
+const selectMeasureConnections = createSelector(
+  (state) => selectEntities(state, 'recommendations'),
+  (state) => selectEntities(state, 'indicators'),
+  (state) => selectEntities(state, 'sdgtargets'),
+  (recommendations, indicators, sdgtargets) => Map()
+    .set('recommendations', recommendations)
+    .set('indicators', indicators)
+    .set('sdgtargets', sdgtargets)
+);
+
+const selectMeasureTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => taxonomies
+    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_measures']))
+    .map((taxonomy) => taxonomy.set(
+      'categories',
+      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+    ))
+);
+
+const selectRecommendationTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => taxonomies
+    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_recommendations']))
+    .map((taxonomy) => taxonomy.set(
+      'categories',
+      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+    ))
+);
+
+const selectSdgTargetTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => taxonomies
+    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_sdgtargets']))
+    .map((taxonomy) => taxonomy.set(
+      'categories',
+      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+    ))
+);
+const selectUserTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => taxonomies
+    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_users']))
+    .map((taxonomy) => taxonomy.set(
+      'categories',
+      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+    ))
+);
+
 export {
   getGlobal,
   makeSelectLocationState,
@@ -553,4 +637,13 @@ export {
   selectSortByQuery,
   selectEntity,
   selectEntitiesWhere,
+  selectRecommendationConnections,
+  selectSdgTargetConnections,
+  selectIndicatorConnections,
+  selectMeasureConnections,
+  selectUserConnections,
+  selectRecommendationTaxonomies,
+  selectSdgTargetTaxonomies,
+  selectMeasureTaxonomies,
+  selectUserTaxonomies,
 };
