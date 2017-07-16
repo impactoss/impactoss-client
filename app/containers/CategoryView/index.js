@@ -108,7 +108,12 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     (isManager && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) &&
       {
         type: 'dark',
-        fields: [getManagerField(entity, this.context.intl.formatMessage, appMessages.attributes.manager_id.categoriesEmpty)],
+        fields: [getManagerField(
+          entity,
+          this.context.intl.formatMessage,
+          appMessages.attributes.manager_id.categories,
+          appMessages.attributes.manager_id.categoriesEmpty
+        )],
       },
   ]);
 

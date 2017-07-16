@@ -10,6 +10,17 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
+import {
+  getReferenceField,
+  getTitleField,
+  getStatusField,
+  getMetaField,
+  getMarkdownField,
+  getMeasureConnectionField,
+  getSdgTargetConnectionField,
+  getManagerField,
+} from 'utils/fields';
+
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
@@ -20,14 +31,24 @@ import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 
 import {
-  getEntity,
-  getEntities,
   isReady,
   isUserContributor,
+  selectMeasureTaxonomies,
+  selectSdgTargetTaxonomies,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
+
+import {
+  selectViewEntity,
+  selectMeasures,
+  selectSdgTargets,
+  selectReports,
+  selectDueDates,
+} from './selectors';
+
+import { DEPENDENCIES } from './constants';
 
 export class IndicatorView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -44,73 +65,24 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          type: 'reference',
-          value: entity.attributes.reference,
-          large: true,
-          label: this.context.intl.formatMessage(appMessages.attributes.reference),
-        },
-        {
-          type: 'titleText',
-          value: entity.attributes.title,
-          isManager,
-        },
+        getReferenceField(entity),
+        getTitleField(entity, isManager),
       ],
     },
   ]);
 
-  getHeaderAsideFields = (entity, isContributor) => {
-    if (isContributor) {
-      return [
-        {
-          fields: [
-            {
-              type: 'status',
-              value: entity.attributes.draft,
-            },
-            {
-              type: 'meta',
-              fields: [
-                {
-                  label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-                  value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
-                },
-                {
-                  label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-                  value: entity.user && entity.user.attributes.name,
-                },
-              ],
-            },
-          ],
-        },
-      ];
-    }
-    return [
-      {
-        fields: [
-          {
-            type: 'referenceStatus',
-            fields: [
-              {
-                type: 'reference',
-                large: true,
-                value: entity.attributes.reference || entity.id,
-                label: this.context.intl.formatMessage(appMessages.attributes.idOrRef),
-              },
-            ],
-          },
-        ],
-      },
-    ];
-  }
+  getHeaderAsideFields = (entity, isContributor) => isContributor &&
+    ([{
+      fields: [
+        getStatusField(entity),
+        getMetaField(entity, this.context.intl.formatMessage, appMessages, this.context.intl.formatDate),
+      ],
+    }]);
 
-  getBodyMainFields = (entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor) => ([
+  getBodyMainFields = (entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick) => ([
     {
       fields: [
-        {
-          type: 'description',
-          value: entity.attributes.description,
-        },
+        getMarkdownField(entity, 'description', true, this.context.intl.formatMessage, appMessages),
         {
           type: 'reports',
           label: this.context.intl.formatMessage(appMessages.entities.progress_reports.plural),
@@ -127,41 +99,11 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       ],
     },
     {
-      label: 'Connections',
+      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        {
-          type: 'connections',
-          label: `${Object.values(measures).length} ${this.context.intl.formatMessage(Object.values(measures).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
-          entityType: 'measures',
-          values: Object.values(measures),
-          icon: 'measures',
-          entityPath: '/actions/',
-          taxonomies: measureTaxonomies,
-          showEmpty: this.context.intl.formatMessage(appMessages.entities.measures.empty),
-          connectionOptions: [{
-            label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
-            path: 'recommendations',
-          },
-          {
-            label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
-            path: 'indicators',
-          }],
-        },
-        {
-          type: 'connections',
-          label: `${Object.values(sdgtargets).length} ${this.context.intl.formatMessage(Object.values(sdgtargets).length === 1 ? appMessages.entities.sdgtargets.single : appMessages.entities.sdgtargets.plural)}`,
-          entityType: 'sdgtargets',
-          values: Object.values(sdgtargets),
-          icon: 'sdgtargets',
-          entityPath: '/sdgtargets/',
-          taxonomies: sdgtargetTaxonomies,
-          showEmpty: this.context.intl.formatMessage(appMessages.entities.sdgtargets.empty),
-          connectionOptions: [{
-            label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
-            path: 'indicators',
-          }],
-        },
+        getMeasureConnectionField(measures, measureTaxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
+        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
       ],
     },
   ]);
@@ -178,42 +120,49 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
           values: this.mapDates(dates),
           showEmpty: this.context.intl.formatMessage(appMessages.entities.due_dates.empty),
         },
-        {
-          label: this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
-          type: 'manager',
-          value: entity.manager && entity.manager.attributes.name,
-          showEmpty: this.context.intl.formatMessage(appMessages.attributes.manager_id.indicatorsEmpty),
-        },
+        getManagerField(
+          entity,
+          this.context.intl.formatMessage,
+          appMessages.attributes.manager_id.indicators,
+          appMessages.attributes.manager_id.indicatorsEmpty
+        ),
       ],
     },
   ]);
 
-  getFields = (entity, isContributor, measures, sdgtargets, reports, dates, measureTaxonomies, sdgtargetTaxonomies) => ({
-    header: {
-      main: this.getHeaderMainFields(entity, isContributor),
-      aside: this.getHeaderAsideFields(entity, isContributor),
-    },
-    body: {
-      main: this.getBodyMainFields(entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor),
-      aside: isContributor ? this.getBodyAsideFields(entity, dates) : null,
-    },
-  });
+  mapReports = (reports) => reports
+    ? reports.map((report) => ({
+      label: report.getIn(['attributes', 'title']),
+      dueDate: report.get('due_date') ? this.context.intl.formatDate(new Date(report.getIn(['due_date', 'attributes', 'due_date']))) : null,
+      linkTo: `/reports/${report.get('id')}`,
+    })).toList()
+    : [];
 
-  mapReports = (reports) =>
-    Object.values(reports).map((report) => ({
-      label: report.attributes.title,
-      dueDate: report.due_date ? this.context.intl.formatDate(new Date(report.due_date.attributes.due_date)) : null,
-      linkTo: `/reports/${report.id}`,
-    }))
-  mapDates = (dates) =>
-    Object.values(dates).map((date) => ({
-      label: this.context.intl.formatDate(new Date(date.attributes.due_date)),
-      due: date.attributes.due,
-      overdue: date.attributes.overdue,
-    }))
+  mapDates = (dates) => dates
+  ? dates.map((date) => ({
+    label: this.context.intl.formatDate(new Date(date.getIn(['attributes', 'due_date']))),
+    due: date.getIn(['attributes', 'due']),
+    overdue: date.getIn(['attributes', 'overdue']),
+  })).toList()
+  : [];
 
   render() {
-    const { indicator, dataReady, isContributor, measures, sdgtargets, reports, dates, measureTaxonomies, sdgtargetTaxonomies } = this.props;
+    const {
+      viewEntity,
+      dataReady,
+      isContributor,
+      measures,
+      sdgtargets,
+      reports,
+      dates,
+      measureTaxonomies,
+      sdgtargetTaxonomies,
+      onEntityClick,
+    } = this.props;
+    // measures && console.log(measures.toJS())
+    // sdgtargets && console.log(sdgtargets.toJS())
+    // reports && console.log(reports.toJS())
+    // dates && console.log(dates.toJS())
 
     const buttons = isContributor
     ? [
@@ -251,17 +200,26 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
             icon="indicators"
             buttons={buttons}
           />
-          { !indicator && !dataReady &&
+          { !viewEntity && !dataReady &&
             <Loading />
           }
-          { !indicator && dataReady &&
+          { !viewEntity && dataReady &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          { indicator && dataReady &&
+          { viewEntity && dataReady &&
             <EntityView
-              fields={this.getFields(indicator, isContributor, measures, sdgtargets, reports, dates, measureTaxonomies, sdgtargetTaxonomies)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(viewEntity, isContributor),
+                  aside: this.getHeaderAsideFields(viewEntity, isContributor),
+                },
+                body: {
+                  main: this.getBodyMainFields(viewEntity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick),
+                  aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
+                },
+              }}
             />
           }
         </Content>
@@ -272,10 +230,11 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
 
 IndicatorView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  onEntityClick: PropTypes.func,
   handleEdit: PropTypes.func,
   handleClose: PropTypes.func,
   handleNewReport: PropTypes.func,
-  indicator: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   isContributor: PropTypes.bool,
   measures: PropTypes.object,
@@ -294,197 +253,23 @@ IndicatorView.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isContributor: isUserContributor(state),
-  dataReady: isReady(state, { path: [
-    'measures',
-    'sdgtargets',
-    'users',
-    'indicators',
-    'measure_indicators',
-    'sdgtarget_indicators',
-    'progress_reports',
-    'due_dates',
-    'taxonomies',
-    'categories',
-    'recommendations',
-    'recommendation_measures',
-    'measure_categories',
-  ] }),
-  indicator: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'indicators',
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-        {
-          type: 'single',
-          path: 'users',
-          key: 'manager_id',
-          as: 'manager',
-        },
-      ],
-    },
-  ),
-  measureTaxonomies: getEntities(
-    state, {
-      out: 'js',
-      path: 'taxonomies',
-      where: {
-        tags_measures: true,
-      },
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-      },
-    },
-  ),
-  sdgtargetTaxonomies: getEntities(
-    state, {
-      out: 'js',
-      path: 'taxonomies',
-      where: {
-        tags_sdgtargets: true,
-      },
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-      },
-    },
-  ),
-  // all connected measures
-  measures: getEntities(
-    state, {
-      path: 'measures',
-      out: 'js',
-      connected: {
-        path: 'measure_indicators',
-        key: 'measure_id',
-        where: {
-          indicator_id: props.params.id,
-        },
-      },
-      extend: [
-        {
-          path: 'measure_categories',
-          key: 'measure_id',
-          reverse: true,
-          as: 'taxonomies',
-        },
-        {
-          path: 'recommendation_measures',
-          key: 'measure_id',
-          reverse: true,
-          as: 'recommendations',
-          connected: {
-            path: 'recommendations',
-            key: 'recommendation_id',
-            forward: true,
-          },
-        },
-        {
-          path: 'measure_indicators',
-          key: 'measure_id',
-          reverse: true,
-          as: 'indicators',
-          connected: {
-            path: 'indicators',
-            key: 'indicator_id',
-            forward: true,
-          },
-        },
-      ],
-    },
-  ),
-  sdgtargets: getEntities(
-    state, {
-      path: 'sdgtargets',
-      out: 'js',
-      connected: {
-        path: 'sdgtarget_indicators',
-        key: 'sdgtarget_id',
-        where: {
-          indicator_id: props.params.id,
-        },
-      },
-      extend: [
-        {
-          path: 'sdgtarget_categories',
-          key: 'sdgtarget_id',
-          reverse: true,
-          as: 'taxonomies',
-        },
-        {
-          path: 'sdgtarget_indicators',
-          key: 'sdgtarget_id',
-          reverse: true,
-          as: 'indicators',
-          connected: {
-            path: 'indicators',
-            key: 'indicator_id',
-            forward: true,
-          },
-        },
-      ],
-    },
-  ),
-  // all connected reports
-  reports: getEntities(
-    state, {
-      path: 'progress_reports',
-      out: 'js',
-      where: {
-        indicator_id: props.params.id,
-      },
-      extend: {
-        path: 'due_dates',
-        key: 'due_date_id',
-        type: 'single',
-        as: 'due_date',
-      },
-    },
-  ),
-  // all connected due_dates
-  dates: getEntities(
-    state, {
-      path: 'due_dates',
-      out: 'js',
-      where: {
-        indicator_id: props.params.id,
-      },
-      without: {
-        path: 'progress_reports',
-        key: 'due_date_id',
-      },
-    },
-  ),
+  dataReady: isReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
+  sdgtargets: selectSdgTargets(state, props.params.id),
+  sdgtargetTaxonomies: selectSdgTargetTaxonomies(state),
+  measures: selectMeasures(state, props.params.id),
+  measureTaxonomies: selectMeasureTaxonomies(state),
+  reports: selectReports(state, props.params.id),
+  dates: selectDueDates(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('progress_reports'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('measure_indicators'));
-      dispatch(loadEntitiesIfNeeded('measure_categories'));
-      dispatch(loadEntitiesIfNeeded('sdgtargets'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_indicators'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
+    onEntityClick: (id, path) => {
+      dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: () => {
       dispatch(updatePath(`/indicators/edit/${props.params.id}`));

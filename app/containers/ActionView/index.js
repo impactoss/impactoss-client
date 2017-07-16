@@ -94,7 +94,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       fields: [
         getIndicatorConnectionField(indicators, this.context.intl.formatMessage, appMessages, onEntityClick),
         getRecommendationConnectionField(recommendations, recTaxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
-        getSdgTargetConnectionField(recommendations, sdgtargetTaxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
+        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
       ],
     },
   ]);

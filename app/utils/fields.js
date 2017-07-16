@@ -183,8 +183,9 @@ export const getMeasureConnectionField = (entities, taxonomies, formatMessage, a
     onEntityClick,
   });
 
-export const getManagerField = (entity, formatMessage, messageEmpty) =>
+export const getManagerField = (entity, formatMessage, messageLabel, messageEmpty) =>
   ({
+    label: formatMessage(messageLabel),
     type: 'manager',
     value: entity.get('manager') && entity.getIn(['manager', 'attributes', 'name']),
     showEmpty: formatMessage(messageEmpty),

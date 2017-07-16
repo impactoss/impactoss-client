@@ -2,10 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { orderBy } from 'lodash/collection';
-
-import { getEntitySortIteratee } from 'utils/sort';
-
 import appMessages from 'containers/App/messages';
 
 import Icon from 'components/Icon';
@@ -33,7 +29,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
   }
   render() {
     const { field } = this.props;
-    const sortedValues = orderBy(field.values, getEntitySortIteratee('id'), 'asc');
+
     return (
       <FieldWrap>
         <LabelLarge>
@@ -45,7 +41,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
           </ButtonWrap>
         }
         <EntityListItemsWrap>
-          { sortedValues.map((value, i) => (this.state.showAllReports || i < REPORTSMAX) && (
+          { field.values.map((value, i) => (this.state.showAllReports || i < REPORTSMAX) && (
             <ReportListLink key={i} to={value.linkTo}>
               <ReportListItem>
                 <ListItemIcon>
