@@ -3,9 +3,6 @@
  * ActionView constants
  *
  */
-
-export const SAVE = 'nmrf/ActionEdit/SAVE';
-
 export const DEPENDENCIES = [
   'measures',
   'measure_categories',

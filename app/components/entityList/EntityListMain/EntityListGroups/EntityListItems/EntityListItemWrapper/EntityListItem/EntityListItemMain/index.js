@@ -32,9 +32,9 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
     taxonomies: PropTypes.instanceOf(Map),
     config: PropTypes.object,
     entityIcon: PropTypes.string,
+    entityPath: PropTypes.string,
     nestLevel: PropTypes.number,
     onEntityClick: PropTypes.func,
-    onTagClick: PropTypes.func,
   }
 
   getConnectedCounts = (entity, connectionOptions) => {
@@ -54,7 +54,7 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
     return counts;
   };
 
-  getEntityTags = (entity, taxonomies, query, onClick) => {
+  getEntityTags = (entity, taxonomies, onClick) => {
     const tags = [];
     if (entity.get('categories')) {
       taxonomies.forEach((tax) => {
@@ -63,16 +63,12 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
             const label = (category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
               ? category.getIn(['attributes', 'short_title'])
               : category.getIn(['attributes', 'title']));
-            if (query && onClick) {
+            if (onClick) {
               tags.push({
                 taxId: tax.get('id'),
                 title: category.getIn(['attributes', 'title']),
                 label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
-                onClick: () => onClick({
-                  value: catId,
-                  query,
-                  checked: true,
-                }),
+                onClick: () => onClick(catId, 'category'),
               });
             } else {
               tags.push({
@@ -91,21 +87,21 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
     const {
       taxonomies,
       config,
-      onTagClick,
+      onEntityClick,
       entity,
       nestLevel,
+      entityPath,
     } = this.props;
     return {
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
       reference: entity.getIn(['attributes', 'reference']) || entity.get('id'),
       status: entity.getIn(['attributes', 'draft']) ? 'draft' : null,
-      path: nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath,
+      path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
       tags: taxonomies
         ? this.getEntityTags(entity,
           taxonomies,
-          config.taxonomies && config.taxonomies.query,
-          config.taxonomies && onTagClick
+          onEntityClick
         )
         : [],
       connectedCounts: config && config.connections

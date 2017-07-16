@@ -48,10 +48,10 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       entityIcon,
       config,
       taxonomies,
-      onTagClick,
       onExpand,
       onEntityClick,
       expandNo,
+      entityPath,
     } = this.props;
     return (
       <Styled expanded={expandNo > 0}>
@@ -65,8 +65,8 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
                 entity={entity}
                 taxonomies={taxonomies}
                 entityIcon={entityIcon}
-                onTagClick={onTagClick}
                 config={config}
+                entityPath={entityPath}
                 onEntityClick={onEntityClick}
               />
             </MainInnerWrapper>
@@ -99,7 +99,7 @@ EntityListItem.propTypes = {
   expandNo: PropTypes.number,
   onExpand: PropTypes.func,
   entityIcon: PropTypes.string,
-  onTagClick: PropTypes.func,
+  entityPath: PropTypes.string,
   config: PropTypes.object,
   onEntityClick: PropTypes.func,
 };

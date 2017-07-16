@@ -29,10 +29,10 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       entityIcon,
       entityIdsSelected,
       taxonomies,
-      onTagClick,
       config,
       onEntityClick,
       entity,
+      entityPath,
     } = this.props;
     // console.log('EntityListItemWrapper.render')
 
@@ -47,9 +47,9 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
           expandNo={expandNo}
           entityIcon={entityIcon}
           taxonomies={taxonomies}
-          onTagClick={onTagClick}
           config={config}
           onEntityClick={onEntityClick}
+          entityPath={entityPath}
         />
         {config.expandableColumns && expandNo > 0 && entity.get('expanded') && entity.get('expanded') !== 'reports' &&
           <EntityListNestedList
@@ -85,9 +85,9 @@ EntityListItemWrapper.propTypes = {
   isManager: PropTypes.bool,
   onEntityClick: PropTypes.func,
   onEntitySelect: PropTypes.func,
-  onTagClick: PropTypes.func,
   onExpand: PropTypes.func,
   expandNo: PropTypes.number,
+  entityPath: PropTypes.string,
   entityIcon: PropTypes.string,
 };
 

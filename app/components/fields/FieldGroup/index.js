@@ -12,6 +12,7 @@ import Label from 'components/fields/Label';
 class FieldGroup extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { group } = this.props;
+
     return (
       <FieldGroupWrapper type={group.type}>
         { group.label &&

@@ -39,7 +39,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       header,
       onEntityClick,
       isManager,
-      onTagClick,
       onEntitySelect,
       onExpand,
       expandNo,
@@ -145,7 +144,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             entityIcon={header.icon}
                             onEntityClick={onEntityClick}
                             isManager={isManager}
-                            onTagClick={onTagClick}
                             onEntitySelect={onEntitySelect}
                             expandNo={expandNo}
                             onExpand={onExpand}
@@ -163,7 +161,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                         entityIcon={header.icon}
                         onEntityClick={onEntityClick}
                         isManager={isManager}
-                        onTagClick={onTagClick}
                         onEntitySelect={onEntitySelect}
                         expandNo={expandNo}
                         onExpand={onExpand}
@@ -197,7 +194,6 @@ EntityListGroups.propTypes = {
   isManager: PropTypes.bool,
   expandNo: PropTypes.number,
   onExpand: PropTypes.func.isRequired,
-  onTagClick: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,

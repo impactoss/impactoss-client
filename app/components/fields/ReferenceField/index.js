@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import appMessages from 'containers/App/messages';
-
 import Label from 'components/fields/Label';
 import Reference from 'components/fields/Reference';
 import ReferenceLarge from 'components/fields/ReferenceLarge';
@@ -13,9 +11,11 @@ class ReferenceField extends React.PureComponent { // eslint-disable-line react/
     const { field } = this.props;
     return (
       <FieldWrapInline>
-        <Label>
-          {field.label || this.context.intl.formatMessage(appMessages.attributes.reference)}
-        </Label>
+        { field.label &&
+          <Label>
+            {field.label}
+          </Label>
+        }
         { field.large &&
           <ReferenceLarge>{field.value}</ReferenceLarge>
         }
@@ -29,10 +29,6 @@ class ReferenceField extends React.PureComponent { // eslint-disable-line react/
 
 ReferenceField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-
-ReferenceField.contextTypes = {
-  intl: PropTypes.object.isRequired,
 };
 
 export default ReferenceField;

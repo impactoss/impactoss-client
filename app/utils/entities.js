@@ -193,10 +193,18 @@ export const entitiesIsAssociated = (entities, entityKey, associations, associat
     )
   );
 
-export const entitySetUser = (entity, users) =>
-  entity && entity.set('user',
-    users.find((user) => attributesEqual(entity.getIn(['attributes', 'last_modified_user_id']), user.get('id')))
+export const entitySetSingle = (entity, related, key, relatedKey) =>
+  entity && entity.set(key,
+    related.find((r) => attributesEqual(entity.getIn(['attributes', relatedKey]), r.get('id')))
   );
+
+export const entitySetUser = (entity, users) =>
+  entity && entitySetSingle(entity, users, 'user', 'last_modified_user_id');
+
+export const entitySetSingles = (entity, singles) =>
+  entity && singles.reduce((memo, { related, key, relatedKey }) =>
+   entitySetSingle(memo, related, key, relatedKey), entity);
+
 
 export const prepareTaxonomiesIsAssociated = (taxonomies, categories, associations, tagsKey, associationKey, associationId) =>
   taxonomies && taxonomies
