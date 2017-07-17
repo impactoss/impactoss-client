@@ -162,7 +162,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
   render() {
     const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = viewDomain.viewEntity;
+    const { saveSending, saveError } = viewDomain.page;
 
     return (
       <div>

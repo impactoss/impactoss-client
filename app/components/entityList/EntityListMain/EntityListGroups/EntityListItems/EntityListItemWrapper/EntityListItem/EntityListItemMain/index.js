@@ -44,7 +44,7 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
         counts.push({
           count: entity.get(option.path).size,
           option: {
-            label: option.label,
+            // label: option.label,
             icon: option.path,
             style: option.path,
           },

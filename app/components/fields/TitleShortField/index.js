@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -13,7 +14,7 @@ class TitleShortField extends React.PureComponent { // eslint-disable-line react
     return (
       <FieldWrap>
         <Label>
-          {field.label || this.context.intl.formatMessage(appMessages.attributes.short_title)}
+          <FormattedMessage {...(field.label || appMessages.attributes.short_title)} />
         </Label>
         <ShortTitleTag pIndex={field.taxonomyId}>{field.value}</ShortTitleTag>
       </FieldWrap>
@@ -23,8 +24,5 @@ class TitleShortField extends React.PureComponent { // eslint-disable-line react
 
 TitleShortField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-TitleShortField.contextTypes = {
-  intl: PropTypes.object.isRequired,
 };
 export default TitleShortField;

@@ -22,57 +22,76 @@ export const getLinkField = (entity) => ({
   value: entity.getIn(['attributes', 'url']),
   anchor: getLinkAnchor(entity.getIn(['attributes', 'url'])),
 });
-export const getTitleField = (entity, isManager) => ({
+export const getTitleField = (entity, isManager, attribute = 'title') => ({
   type: 'title',
-  value: entity.getIn(['attributes', 'title']),
+  value: entity.getIn(['attributes', attribute]),
   isManager,
 });
-export const getStatusField = (entity) => ({
+export const getStatusField = (entity, attribute = 'draft', options, label) => ({
   type: 'status',
-  value: entity.getIn(['attributes', 'draft']),
+  value: entity.getIn(['attributes', attribute]),
+  options,
+  label,
 });
-export const getMetaField = (entity, formatMessage, appMessages, formatDate) => ({
+
+// only show the highest rated role (lower role ids means higher)
+export const getHighestUserRoleLabel = (roles) => {
+  const highestRole = roles.reduce((currentHighestRole, role) =>
+  (!currentHighestRole || role.get('id') < currentHighestRole.get('id'))
+    ? role
+    : currentHighestRole
+  , null);
+  return highestRole.getIn(['attributes', 'friendly_name']);
+};
+
+export const getRoleField = (entity) => ({
+  type: 'role',
+  value: entity.get('roles') && getHighestUserRoleLabel(entity.get('roles')),
+});
+
+export const getMetaField = (entity, appMessages) => ({
   type: 'meta',
   fields: [
     {
-      label: formatMessage(appMessages.attributes.meta.updated_at),
-      value: formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
+      label: appMessages.attributes.meta.updated_at,
+      value: entity.getIn(['attributes', 'updated_at']),
+      date: true,
     },
     {
-      label: formatMessage(appMessages.attributes.meta.updated_by),
-      value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
+      label: appMessages.attributes.meta.updated_by,
+      value: entity.get('user') && entity.getIn(['user', 'attributes', 'name']),
     },
   ],
 });
 
-export const getMarkdownField = (entity, attribute, hasLabel, formatMessage, appMessages) =>
+export const getMarkdownField = (entity, attribute, hasLabel, appMessages) =>
   !!entity.getIn(['attributes', attribute]) &&
   (entity.getIn(['attributes', attribute]).trim().length > 0) &&
   ({
     type: 'markdown',
     value: entity.getIn(['attributes', attribute]),
-    label: hasLabel && formatMessage(appMessages.attributes[attribute]),
+    label: hasLabel && appMessages.attributes[attribute],
   });
 
-export const getDateField = (entity, attribute, formatMessage, appMessages, formatDate, showEmpty) =>
+export const getDateField = (entity, attribute, appMessages, showEmpty, emptyMessage) =>
   (showEmpty || (
     !!entity.getIn(['attributes', attribute]) &&
     (entity.getIn(['attributes', attribute]).trim().length > 0)
   )) &&
   ({
     type: 'date',
-    value: entity.getIn(['attributes', attribute]) && formatDate(new Date(entity.getIn(['attributes', attribute]))),
-    label: formatMessage(appMessages.attributes[attribute]),
-    showEmpty: showEmpty && formatMessage(appMessages.attributes[`${attribute}_empty`]),
+    value: !!entity.getIn(['attributes', attribute]) && entity.getIn(['attributes', attribute]),
+    label: appMessages.attributes[attribute],
+    showEmpty: showEmpty && (emptyMessage || appMessages.attributes[`${attribute}_empty`]),
   });
 
-export const getTextField = (entity, attribute, formatMessage, appMessages) =>
+export const getTextField = (entity, attribute, appMessages) =>
   !!entity.getIn(['attributes', attribute]) &&
   (entity.getIn(['attributes', attribute]).trim().length > 0) &&
   ({
     type: 'text',
     value: entity.getIn(['attributes', attribute]),
-    label: formatMessage(appMessages.attributes[attribute]),
+    label: appMessages.attributes[attribute],
   });
 
 const mapCategoryOptions = (categories) => categories
@@ -82,10 +101,37 @@ const mapCategoryOptions = (categories) => categories
   })).toArray()
   : [];
 
-export const getTaxonomyFields = (taxonomies, formatMessage, appMessages) =>
+const mapReports = (reports) => reports
+  ? reports.map((report) => ({
+    label: report.getIn(['attributes', 'title']),
+    dueDate: report.get('due_date') ? report.getIn(['due_date', 'attributes', 'due_date']) : null,
+    linkTo: `/reports/${report.get('id')}`,
+  })).toArray()
+  : [];
+
+export const getReportsField = (reports, appMessages, button) => ({
+  type: 'reports',
+  values: mapReports(reports),
+  button: button || null,
+});
+
+const mapDates = (dates) => dates
+  ? dates.map((date) => ({
+    date: date.getIn(['attributes', 'due_date']),
+    due: date.getIn(['attributes', 'due']),
+    overdue: date.getIn(['attributes', 'overdue']),
+  })).toArray()
+  : [];
+
+export const getScheduleField = (dates) => ({
+  type: 'schedule',
+  values: mapDates(dates),
+});
+
+export const getTaxonomyFields = (taxonomies, appMessages) =>
   taxonomies && taxonomies.map((taxonomy) => ({
     type: 'list',
-    label: formatMessage(appMessages.entities.taxonomies[taxonomy.get('id')].plural),
+    label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
     entityType: 'taxonomies',
     id: taxonomy.get('id'),
     values: mapCategoryOptions(taxonomy.get('categories')),
@@ -116,7 +162,6 @@ const getConnectionField = ({
   entityType,
   icon,
   entityPath,
-  formatMessage,
   appMessages,
   onEntityClick,
 }) => ({
@@ -127,66 +172,71 @@ const getConnectionField = ({
   icon: icon || entityType,
   entityPath: entityPath || entityType,
   onEntityClick,
-  showEmpty: formatMessage(appMessages.entities[entityType].empty),
+  showEmpty: appMessages.entities[entityType].empty,
   connectionOptions: connectionOptions.map((option) => ({
-    label: formatMessage(appMessages.entities[option].plural),
+    label: appMessages.entities[option].plural,
     path: option,
   })),
-  label: `${entities.size} ${formatMessage(entities.size === 1
-    ? appMessages.entities[entityType].single
-    : appMessages.entities[entityType].plural
-  )}`,
 });
 
-export const getIndicatorConnectionField = (entities, formatMessage, appMessages, onEntityClick) =>
+export const getIndicatorConnectionField = (entities, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies: null,
     connectionOptions: ['measures', 'sdgtargets'],
     entityType: 'indicators',
-    formatMessage,
     appMessages,
     onEntityClick,
   });
 
-export const getRecommendationConnectionField = (entities, taxonomies, formatMessage, appMessages, onEntityClick) =>
+export const getRecommendationConnectionField = (entities, taxonomies, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies,
     connectionOptions: ['measures'],
     entityType: 'recommendations',
-    formatMessage,
     appMessages,
     onEntityClick,
   });
 
-export const getSdgTargetConnectionField = (entities, taxonomies, formatMessage, appMessages, onEntityClick) =>
+export const getSdgTargetConnectionField = (entities, taxonomies, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies,
     connectionOptions: ['indicators', 'measures'],
     entityType: 'sdgtargets',
-    formatMessage,
     appMessages,
     onEntityClick,
   });
 
-export const getMeasureConnectionField = (entities, taxonomies, formatMessage, appMessages, onEntityClick) =>
+export const getMeasureConnectionField = (entities, taxonomies, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies,
     connectionOptions: ['indicators', 'recommendations', 'sdgtargets'],
     entityType: 'measures',
     entityPath: 'actions',
-    formatMessage,
     appMessages,
     onEntityClick,
   });
 
-export const getManagerField = (entity, formatMessage, messageLabel, messageEmpty) =>
+export const getManagerField = (entity, messageLabel, messageEmpty) =>
   ({
-    label: formatMessage(messageLabel),
+    label: messageLabel,
     type: 'manager',
     value: entity.get('manager') && entity.getIn(['manager', 'attributes', 'name']),
-    showEmpty: formatMessage(messageEmpty),
+    showEmpty: messageEmpty,
   });
+
+export const getDownloadField = (entity, isManager, appMessages) => ({
+  type: 'download',
+  value: entity.getIn(['attributes', 'document_url']),
+  isManager,
+  public: entity.getIn(['attributes', 'public']),
+  showEmpty: appMessages.attributes.documentEmpty,
+});
+
+export const getEmailField = (entity) => ({
+  type: 'email',
+  value: entity.getIn(['attributes', 'email']),
+});

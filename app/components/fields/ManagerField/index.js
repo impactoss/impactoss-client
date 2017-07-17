@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -14,13 +15,15 @@ class ManagerField extends React.PureComponent { // eslint-disable-line react/pr
     return (
       <FieldWrap>
         <Label>
-          {field.label || this.context.intl.formatMessage(appMessages.attributes.manager_id.categories)}
+          <FormattedMessage {...(field.label || appMessages.attributes.manager_id.categories)} />
         </Label>
         { field.value &&
           <Manager>{field.value}</Manager>
         }
         { !field.value &&
-          <EmptyHint>{field.showEmpty}</EmptyHint>
+          <EmptyHint>
+            <FormattedMessage {...field.showEmpty} />
+          </EmptyHint>
         }
       </FieldWrap>
     );
@@ -29,9 +32,6 @@ class ManagerField extends React.PureComponent { // eslint-disable-line react/pr
 
 ManagerField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-ManagerField.contextTypes = {
-  intl: PropTypes.object.isRequired,
 };
 
 export default ManagerField;

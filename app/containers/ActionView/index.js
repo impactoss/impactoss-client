@@ -76,25 +76,25 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     {
       fields: [
         getStatusField(entity),
-        getMetaField(entity, this.context.intl.formatMessage, appMessages, this.context.intl.formatDate),
+        getMetaField(entity, appMessages),
       ],
     },
   ]);
   getBodyMainFields = (entity, recommendations, indicators, recTaxonomies, sdgtargets, sdgtargetTaxonomies, onEntityClick) => ([
     {
       fields: [
-        getMarkdownField(entity, 'description', true, this.context.intl.formatMessage, appMessages),
-        getMarkdownField(entity, 'outcome', true, this.context.intl.formatMessage, appMessages),
-        getMarkdownField(entity, 'indicator_summary', true, this.context.intl.formatMessage, appMessages),
+        getMarkdownField(entity, 'description', true, appMessages),
+        getMarkdownField(entity, 'outcome', true, appMessages),
+        getMarkdownField(entity, 'indicator_summary', true, appMessages),
       ],
     },
     {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
+      label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getIndicatorConnectionField(indicators, this.context.intl.formatMessage, appMessages, onEntityClick),
-        getRecommendationConnectionField(recommendations, recTaxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
-        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
+        getIndicatorConnectionField(indicators, appMessages, onEntityClick),
+        getRecommendationConnectionField(recommendations, recTaxonomies, appMessages, onEntityClick),
+        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, appMessages, onEntityClick),
       ],
     },
   ]);
@@ -104,14 +104,14 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     {
       type: 'dark',
       fields: [
-        getDateField(entity, 'target_date', this.context.intl.formatMessage, appMessages, this.context.intl.formatDate, true),
-        getTextField(entity, 'target_date_comment', this.context.intl.formatMessage, appMessages),
+        getDateField(entity, 'target_date', appMessages, true),
+        getTextField(entity, 'target_date_comment', appMessages),
       ],
     },
     { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
+      label: appMessages.entities.taxonomies.plural,
       icon: 'categories',
-      fields: getTaxonomyFields(taxonomies, this.context.intl.formatMessage, appMessages),
+      fields: getTaxonomyFields(taxonomies, appMessages),
     },
   ]);
 

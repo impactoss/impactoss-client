@@ -23,11 +23,16 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
 
   render() {
     const { field } = this.props;
+    const label = `${field.values.size} ${this.context.intl.formatMessage(
+      field.values.size === 1
+      ? appMessages.entities[field.entityType].single
+      : appMessages.entities[field.entityType].plural
+    )}`;
 
     return (
       <FieldWrap>
         <LabelLarge>
-          {field.label}
+          {label}
           {field.entityType &&
             <DotWrapper>
               <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
@@ -61,7 +66,9 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
           }
         </EntityListItemsWrap>
         { (!field.values || field.values.size === 0) &&
-          <EmptyHint>{field.showEmpty}</EmptyHint>
+          <EmptyHint>
+            <FormattedMessage {...field.showEmpty} />
+          </EmptyHint>
         }
       </FieldWrap>
     );

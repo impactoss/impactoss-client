@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -13,9 +14,11 @@ class RoleField extends React.PureComponent { // eslint-disable-line react/prefe
     return (
       <FieldWrapInline>
         <Label>
-          {field.label || this.context.intl.formatMessage(appMessages.entities.roles.single)}
+          <FormattedMessage {...(field.label || appMessages.entities.roles.single)} />
         </Label>
-        <Status>{field.value || field.showEmpty}</Status>
+        <Status>
+          {field.value || this.context.intl.formatMessage(appMessages.entities.roles.defaultRole)}
+        </Status>
       </FieldWrapInline>
     );
   }

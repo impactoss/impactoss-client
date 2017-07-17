@@ -12,6 +12,7 @@ import {
   entitySetSingle,
   attributesEqual,
   entitiesIsAssociated,
+  sortEntities,
 } from 'utils/entities';
 
 export const selectViewEntity = createSelector(
@@ -41,7 +42,7 @@ export const selectMeasures = createSelector(
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'measure_indicators'),
   (id, connections, measures, measureTargets, measureRecommendations, measureCategories, measureIndicators) =>
-    measures && measureTargets && entitiesIsAssociated(measures, 'measure_id', measureIndicators, 'indicator_id', id)
+    measures && measureIndicators && entitiesIsAssociated(measures, 'measure_id', measureIndicators, 'indicator_id', id)
     .map((measure) => measure
       .set('categories', measureCategories
         .filter((association) =>
@@ -81,7 +82,7 @@ export const selectSdgTargets = createSelector(
   (state) => selectEntities(state, 'sdgtarget_categories'),
   (state) => selectEntities(state, 'sdgtarget_indicators'),
   (id, connections, targets, targetMeasures, targetCategories, targetIndicators) =>
-    targets && targetMeasures && entitiesIsAssociated(targets, 'sdgtarget_id', targetIndicators, 'indicator_id', id)
+    targets && targetIndicators && entitiesIsAssociated(targets, 'sdgtarget_id', targetIndicators, 'indicator_id', id)
     .map((target) => target
       .set('categories', targetCategories
         .filter((association) =>
@@ -121,10 +122,11 @@ export const selectDueDates = createSelector(
   (state, id) => id,
   (state) => selectEntities(state, 'due_dates'),
   (id, dates) =>
-    dates && dates
-    .filter((date) =>
-      attributesEqual(date.getIn(['attributes', 'indicator_id']), id)
-      && !date.getIn(['attributes', 'has_progress_report'])
+    dates && sortEntities(
+      dates.filter((date) =>
+        attributesEqual(date.getIn(['attributes', 'indicator_id']), id)
+        && !date.getIn(['attributes', 'has_progress_report'])
+      ), 'asc', 'due_date', 'date'
     )
 );
 // without: {

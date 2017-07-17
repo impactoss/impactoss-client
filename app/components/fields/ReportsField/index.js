@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, FormattedDate } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -33,7 +33,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
     return (
       <FieldWrap>
         <LabelLarge>
-          {field.label}
+          <FormattedMessage {...appMessages.entities.progress_reports.plural} />
         </LabelLarge>
         { field.button &&
           <ButtonWrap>
@@ -49,7 +49,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
                 </ListItemIcon>
                 { value.dueDate &&
                   <ReportDueDate>
-                    {value.dueDate}
+                    <FormattedDate value={new Date(value.dueDate)} />
                   </ReportDueDate>
                 }
                 { !value.dueDate &&
@@ -77,7 +77,9 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
           </ToggleAllItems>
         }
         { (!field.values || field.values.length === 0) &&
-          <EmptyHint>{field.showEmpty}</EmptyHint>
+          <EmptyHint>
+            <FormattedMessage {...appMessages.entities.progress_reports.empty} />
+          </EmptyHint>
         }
       </FieldWrap>
     );
@@ -86,9 +88,6 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
 
 ReportsField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-ReportsField.contextTypes = {
-  intl: PropTypes.object.isRequired,
 };
 
 export default ReportsField;

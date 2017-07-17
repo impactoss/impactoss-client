@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { find } from 'lodash/collection';
+import { FormattedMessage } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -16,7 +17,7 @@ class StatusField extends React.PureComponent { // eslint-disable-line react/pre
     return (
       <FieldWrapInline>
         <Label>
-          {field.label || this.context.intl.formatMessage(appMessages.attributes.status)}
+          <FormattedMessage {...(field.label || appMessages.attributes.status)} />
         </Label>
         <Status>
           {

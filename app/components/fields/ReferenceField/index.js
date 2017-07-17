@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import Label from 'components/fields/Label';
 import Reference from 'components/fields/Reference';
@@ -13,7 +14,7 @@ class ReferenceField extends React.PureComponent { // eslint-disable-line react/
       <FieldWrapInline>
         { field.label &&
           <Label>
-            {field.label}
+            <FormattedMessage {...field.label} />
           </Label>
         }
         { field.large &&

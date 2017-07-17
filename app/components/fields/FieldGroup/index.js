@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import Icon from 'components/Icon';
 
@@ -23,7 +24,7 @@ class FieldGroup extends React.PureComponent { // eslint-disable-line react/pref
               </GroupIcon>
             }
             <Label>
-              {group.label}
+              <FormattedMessage {...group.label} />
             </Label>
           </FieldGroupLabel>
         }

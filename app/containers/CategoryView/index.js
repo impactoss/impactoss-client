@@ -74,26 +74,26 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
   getHeaderAsideFields = (entity, isManager) => isManager &&
     ([{
       fields: [
-        getMetaField(entity, this.context.intl.formatMessage, appMessages, this.context.intl.formatDate),
+        getMetaField(entity, appMessages),
       ],
     }]);
 
   getBodyMainFields = (entity, recommendations, measures, taxonomies, sdgtargets, onEntityClick) => ([
     {
       fields: [
-        getMarkdownField(entity, 'description', true, this.context.intl.formatMessage, appMessages),
+        getMarkdownField(entity, 'description', true, appMessages),
       ],
     },
     {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
+      label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
         entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
-          getMeasureConnectionField(measures, taxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
+          getMeasureConnectionField(measures, taxonomies, appMessages, onEntityClick),
         entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
-          getRecommendationConnectionField(recommendations, taxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
+          getRecommendationConnectionField(recommendations, taxonomies, appMessages, onEntityClick),
         entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
-          getSdgTargetConnectionField(sdgtargets, taxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
+          getSdgTargetConnectionField(sdgtargets, taxonomies, appMessages, onEntityClick),
       ],
     },
   ]);
@@ -110,7 +110,6 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         type: 'dark',
         fields: [getManagerField(
           entity,
-          this.context.intl.formatMessage,
           appMessages.attributes.manager_id.categories,
           appMessages.attributes.manager_id.categoriesEmpty
         )],

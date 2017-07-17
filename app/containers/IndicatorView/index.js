@@ -19,6 +19,8 @@ import {
   getMeasureConnectionField,
   getSdgTargetConnectionField,
   getManagerField,
+  getScheduleField,
+  getReportsField,
 } from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
@@ -75,76 +77,53 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     ([{
       fields: [
         getStatusField(entity),
-        getMetaField(entity, this.context.intl.formatMessage, appMessages, this.context.intl.formatDate),
+        getMetaField(entity, appMessages),
       ],
     }]);
 
   getBodyMainFields = (entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick) => ([
     {
       fields: [
-        getMarkdownField(entity, 'description', true, this.context.intl.formatMessage, appMessages),
-        {
-          type: 'reports',
-          label: this.context.intl.formatMessage(appMessages.entities.progress_reports.plural),
-          values: this.mapReports(reports),
-          showEmpty: this.context.intl.formatMessage(appMessages.entities.progress_reports.empty),
-          button: isContributor
-            ? {
-              type: 'add',
-              title: this.context.intl.formatMessage(messages.addReport),
-              onClick: this.props.handleNewReport,
-            }
-            : null,
-        },
+        getMarkdownField(entity, 'description', true, appMessages),
+        getReportsField(
+          reports,
+          appMessages,
+          isContributor && {
+            type: 'add',
+            title: this.context.intl.formatMessage(messages.addReport),
+            onClick: this.props.handleNewReport,
+          }
+        ),
       ],
     },
     {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
+      label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getMeasureConnectionField(measures, measureTaxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
-        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, this.context.intl.formatMessage, appMessages, onEntityClick),
+        getMeasureConnectionField(measures, measureTaxonomies, appMessages, onEntityClick),
+        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, appMessages, onEntityClick),
       ],
     },
   ]);
 
   getBodyAsideFields = (entity, dates) => ([ // fieldGroups
     { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
+      label: appMessages.entities.due_dates.schedule,
       type: 'dark',
       icon: 'reminder',
       fields: [
-        {
-          label: this.context.intl.formatMessage(appMessages.entities.due_dates.plural),
-          type: 'schedule',
-          values: this.mapDates(dates),
-          showEmpty: this.context.intl.formatMessage(appMessages.entities.due_dates.empty),
-        },
+        getScheduleField(
+          dates,
+          appMessages,
+        ),
         getManagerField(
           entity,
-          this.context.intl.formatMessage,
           appMessages.attributes.manager_id.indicators,
           appMessages.attributes.manager_id.indicatorsEmpty
         ),
       ],
     },
   ]);
-
-  mapReports = (reports) => reports
-    ? reports.map((report) => ({
-      label: report.getIn(['attributes', 'title']),
-      dueDate: report.get('due_date') ? this.context.intl.formatDate(new Date(report.getIn(['due_date', 'attributes', 'due_date']))) : null,
-      linkTo: `/reports/${report.get('id')}`,
-    })).toList()
-    : [];
-
-  mapDates = (dates) => dates
-  ? dates.map((date) => ({
-    label: this.context.intl.formatDate(new Date(date.getIn(['attributes', 'due_date']))),
-    due: date.getIn(['attributes', 'due']),
-    overdue: date.getIn(['attributes', 'overdue']),
-  })).toList()
-  : [];
 
   render() {
     const {
@@ -159,10 +138,6 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       sdgtargetTaxonomies,
       onEntityClick,
     } = this.props;
-    // measures && console.log(measures.toJS())
-    // sdgtargets && console.log(sdgtargets.toJS())
-    // reports && console.log(reports.toJS())
-    // dates && console.log(dates.toJS())
 
     const buttons = isContributor
     ? [
