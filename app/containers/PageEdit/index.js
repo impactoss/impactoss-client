@@ -12,9 +12,14 @@ import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { fromJS } from 'immutable';
+
 import {
   validateRequired,
 } from 'utils/forms';
+
+import {
+  getMetaField,
+} from 'utils/fields';
 
 import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -69,15 +74,9 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     return fromJS(viewEntity);
   }
 
-  getHeaderMainFields = (entity) => ([ // fieldGroups
+  getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          controlType: 'info',
-          type: 'reference',
-          value: entity.get('id'),
-          label: this.context.intl.formatMessage(appMessages.attributes.id),
-        },
         {
           id: 'title',
           controlType: 'title',
@@ -118,20 +117,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           label: this.context.intl.formatMessage(appMessages.attributes.draft),
           options: PUBLISH_STATUSES,
         },
-        {
-          controlType: 'info',
-          type: 'meta',
-          fields: [
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
-            },
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
-            },
-          ],
-        },
+        getMetaField(entity, appMessages),
       ],
     },
   ]);
@@ -152,7 +138,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
 
   getFields = (entity) => ({ // isManager, taxonomies,
     header: {
-      main: this.getHeaderMainFields(entity),
+      main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(entity),
     },
     body: {

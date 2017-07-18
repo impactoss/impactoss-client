@@ -17,7 +17,7 @@ export const selectViewEntity = createSelector(
   (state) => selectEntities(state, 'user_roles'),
   (state) => selectEntities(state, 'roles'),
   (entity, users, userRoles, roles) =>
-    entity && entitySetUser(entity, users).set(
+    entity && users && userRoles && roles && entitySetUser(entity, users).set(
       'roles',
       userRoles
       .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))

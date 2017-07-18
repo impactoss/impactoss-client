@@ -26,6 +26,10 @@ import {
   getConnectionUpdatesFromFormData,
 } from 'utils/forms';
 
+import {
+  getMetaField,
+} from 'utils/fields';
+
 import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -93,15 +97,9 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     : Map();
   }
 
-  getHeaderMainFields = (entity) => ([ // fieldGroups
+  getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          controlType: 'info',
-          type: 'reference',
-          value: entity.get('id'),
-          label: this.context.intl.formatMessage(appMessages.attributes.id),
-        },
         {
           id: 'title',
           controlType: 'title',
@@ -130,20 +128,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           value: entity.getIn(['attributes', 'draft']),
           options: PUBLISH_STATUSES,
         },
-        {
-          controlType: 'info',
-          type: 'meta',
-          fields: [
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
-            },
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
-            },
-          ],
-        },
+        getMetaField(entity, appMessages),
       ],
     },
   ]);
@@ -217,7 +202,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   getFields = (entity, taxonomies, recommendations, indicators, sdgtargets) => ({ // isManager, taxonomies,
     header: {
-      main: this.getHeaderMainFields(entity),
+      main: this.getHeaderMainFields(),
       aside: this.getHeaderAsideFields(entity),
     },
     body: {

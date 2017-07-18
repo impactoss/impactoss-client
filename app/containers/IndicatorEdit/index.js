@@ -24,6 +24,10 @@ import {
   getConnectionUpdatesFromFormData,
 } from 'utils/forms';
 
+import {
+  getMetaField,
+} from 'utils/fields';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { USER_ROLES, PUBLISH_STATUSES, REPORT_FREQUENCIES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -134,20 +138,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           value: entity.getIn(['attributes', 'draft']),
           options: PUBLISH_STATUSES,
         },
-        {
-          controlType: 'info',
-          type: 'meta',
-          fields: [
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
-            },
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
-            },
-          ],
-        },
+        getMetaField(entity, appMessages),
       ],
     },
   ]);

@@ -17,6 +17,10 @@ import {
   validateRequired,
 } from 'utils/forms';
 
+import {
+  getMetaField,
+} from 'utils/fields';
+
 import { DOC_PUBLISH_STATUSES, PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -100,42 +104,18 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
       ],
     },
   ]);
-
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
         {
-          controlType: 'combo',
-          fields: [
-            {
-              controlType: 'info',
-              type: 'reference',
-              value: entity.id,
-            },
-            {
-              id: 'status',
-              controlType: 'select',
-              model: '.attributes.draft',
-              label: this.context.intl.formatMessage(appMessages.attributes.draft),
-              value: entity.getIn(['attributes', 'draft']),
-              options: PUBLISH_STATUSES,
-            },
-          ],
+          id: 'status',
+          controlType: 'select',
+          model: '.attributes.draft',
+          label: this.context.intl.formatMessage(appMessages.attributes.draft),
+          value: entity.getIn(['attributes', 'draft']),
+          options: PUBLISH_STATUSES,
         },
-        {
-          controlType: 'info',
-          type: 'meta',
-          fields: [
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
-            },
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
-            },
-          ],
-        },
+        getMetaField(entity, appMessages),
       ],
     },
   ]);

@@ -23,6 +23,10 @@ import {
   getConnectionUpdatesFromFormData,
 } from 'utils/forms';
 
+import {
+  getMetaField,
+} from 'utils/fields';
+
 import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE, ACCEPTED_STATUSES } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -127,20 +131,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           value: entity.getIn(['attributes', 'draft']),
           options: PUBLISH_STATUSES,
         },
-        {
-          controlType: 'info',
-          type: 'meta',
-          fields: [
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
-            },
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
-            },
-          ],
-        },
+        getMetaField(entity, appMessages),
       ],
     },
   ]);

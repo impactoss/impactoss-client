@@ -1,4 +1,5 @@
 export const getIdField = (entity) => ({
+  controlType: 'info',
   type: 'reference',
   value: entity.get('id'),
   large: true,
@@ -7,6 +8,7 @@ export const getReferenceField = (entity) =>
   !!entity.getIn(['attributes', 'reference']) &&
   (entity.getIn(['attributes', 'reference']).trim().length > 0) &&
   ({
+    controlType: 'info',
     type: 'reference',
     value: entity.getIn(['attributes', 'reference']),
     large: true,
@@ -45,11 +47,13 @@ const getHighestUserRoleLabel = (roles) => {
 };
 
 export const getRoleField = (entity) => ({
+  controlType: 'info',
   type: 'role',
   value: entity.get('roles') && getHighestUserRoleLabel(entity.get('roles')),
 });
 
 export const getMetaField = (entity, appMessages) => ({
+  controlType: 'info',
   type: 'meta',
   fields: [
     {

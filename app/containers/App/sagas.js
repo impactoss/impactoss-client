@@ -110,10 +110,10 @@ export function* checkRoleSaga({ role }) {
   const signedIn = yield select(selectIsSignedIn);
   if (signedIn) {
     const roleIds = yield select(selectSessionUserRoles);
-    if (!roleIds.includes(role)
+    if (!(roleIds.includes(role)
       || (role === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
       || (role === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
-    ) {
+    )) {
       yield put(push('/not-authorized'));
     }
   }

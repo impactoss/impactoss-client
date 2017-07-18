@@ -19,6 +19,10 @@ import {
   validateRequired,
 } from 'utils/forms';
 
+import {
+  getMetaField,
+} from 'utils/fields';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -119,26 +123,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getHeaderAsideFields = (entity) => ([
-    {
-      fields: [
-        {
-          controlType: 'info',
-          type: 'meta',
-          fields: [
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
-            },
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
-            },
-          ],
-        },
-      ],
-    },
-  ]);
+  getHeaderAsideFields = (entity) => ([{
+    fields: [getMetaField(entity, appMessages)],
+  }]);
+
   getBodyMainFields = () => ([
     {
       fields: [

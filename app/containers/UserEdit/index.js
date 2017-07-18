@@ -20,6 +20,11 @@ import {
 } from 'utils/forms';
 
 import {
+  getMetaField,
+  getRoleField,
+} from 'utils/fields';
+
+import {
   loadEntitiesIfNeeded,
   updatePath,
   updateEntityForm,
@@ -140,55 +145,18 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     {
       fields: isManager ? [
         {
-          controlType: 'combo',
-          fields: [
-            {
-              controlType: 'info',
-              type: 'reference',
-              label: this.context.intl.formatMessage(appMessages.attributes.id),
-              value: entity.get('id'),
-            },
-            {
-              id: 'role',
-              controlType: 'select',
-              model: '.associatedRole',
-              label: this.context.intl.formatMessage(appMessages.entities.roles.single),
-              value: this.getHighestUserRoleId(roles),
-              options: this.getRoleOptions(roles),
-            },
-          ],
+          id: 'role',
+          controlType: 'select',
+          model: '.associatedRole',
+          label: this.context.intl.formatMessage(appMessages.entities.roles.single),
+          value: this.getHighestUserRoleId(roles),
+          options: this.getRoleOptions(roles),
         },
-        {
-          controlType: 'info',
-          type: 'meta',
-          fields: [
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.getIn(['attributes', 'updated_at']))),
-            },
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.get('user') && entity.get(['user', 'attributes', 'name']),
-            },
-          ],
-        },
+        getMetaField(entity, appMessages),
       ]
       : [
-        {
-          controlType: 'info',
-          type: 'referenceRole',
-          fields: [
-            {
-              type: 'reference',
-              value: entity.get('id'),
-              label: this.context.intl.formatMessage(appMessages.attributes.id),
-            },
-            {
-              type: 'role',
-              value: this.getHighestUserRoleLabel(roles),
-            },
-          ],
-        },
+        getRoleField(entity),
+        getMetaField(entity, appMessages),
       ],
     },
   ]);
