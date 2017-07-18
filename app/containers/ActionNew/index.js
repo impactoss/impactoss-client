@@ -16,7 +16,7 @@ import {
   renderSdgTargetControl,
   renderIndicatorControl,
   renderTaxonomyControl,
-  validateRequired,
+  getTitleFormField,
   validateDateFormat,
 } from 'utils/forms';
 
@@ -67,19 +67,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
