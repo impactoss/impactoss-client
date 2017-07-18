@@ -35,7 +35,7 @@ export const getStatusField = (entity, attribute = 'draft', options, label) => (
 });
 
 // only show the highest rated role (lower role ids means higher)
-export const getHighestUserRoleLabel = (roles) => {
+const getHighestUserRoleLabel = (roles) => {
   const highestRole = roles.reduce((currentHighestRole, role) =>
   (!currentHighestRole || role.get('id') < currentHighestRole.get('id'))
     ? role
