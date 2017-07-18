@@ -14,7 +14,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 import { Map } from 'immutable';
 
 import {
-  validateRequired,
+  getTitleFormField,
 } from 'utils/forms';
 
 import {
@@ -88,19 +88,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);

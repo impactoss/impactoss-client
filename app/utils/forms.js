@@ -205,3 +205,60 @@ export const getConnectionUpdatesFromFormData = ({ formData, connections, connec
     , List()),
   });
 };
+
+export const getTitleFormField = (formatMessage, appMessages, controlType = 'title', attribute = 'title') => ({
+  id: attribute,
+  controlType,
+  model: `.attributes.${attribute}`,
+  placeholder: formatMessage(appMessages.placeholders[attribute]),
+  label: formatMessage(appMessages.attributes[attribute]),
+  validators: {
+    required: validateRequired,
+  },
+  errorMessages: {
+    required: formatMessage(appMessages.forms.fieldRequired),
+  },
+});
+
+export const getReferenceFormField = (formatMessage, appMessages, required = false) => required
+? {
+  id: 'reference',
+  controlType: 'short',
+  model: '.attributes.reference',
+  label: formatMessage(appMessages.attributes.reference),
+  placeholder: formatMessage(appMessages.placeholders.reference),
+  validators: {
+    required: validateRequired,
+  },
+  errorMessages: {
+    required: formatMessage(appMessages.forms.fieldRequired),
+  },
+}
+: {
+  id: 'reference',
+  controlType: 'short',
+  model: '.attributes.reference',
+  label: formatMessage(appMessages.attributes.referenceOptional),
+  placeholder: formatMessage(appMessages.placeholders.reference),
+};
+
+export const getShortTitleFormField = (formatMessage, appMessages) => ({
+  id: 'short_title',
+  controlType: 'short',
+  model: '.attributes.short_title',
+  placeholder: formatMessage(appMessages.placeholders.short_title),
+  label: formatMessage(appMessages.attributes.short_title),
+});
+export const getMenuTitleFormField = (formatMessage, appMessages) => ({
+  id: 'menuTitle',
+  controlType: 'short',
+  model: '.attributes.menu_title',
+  label: formatMessage(appMessages.attributes.menu_title),
+  placeholder: formatMessage(appMessages.placeholders.menu_title),
+  validators: {
+    required: validateRequired,
+  },
+  errorMessages: {
+    required: formatMessage(appMessages.forms.fieldRequired),
+  },
+});

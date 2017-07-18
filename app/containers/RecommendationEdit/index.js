@@ -18,9 +18,10 @@ import {
   entityOptions,
   renderMeasureControl,
   renderTaxonomyControl,
-  validateRequired,
   getCategoryUpdatesFromFormData,
   getConnectionUpdatesFromFormData,
+  getTitleFormField,
+  getReferenceFormField,
 } from 'utils/forms';
 
 import {
@@ -92,30 +93,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'reference',
-          controlType: 'short',
-          model: '.attributes.reference',
-          label: this.context.intl.formatMessage(appMessages.attributes.reference),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
-          id: 'title',
-          controlType: 'titleText',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getReferenceFormField(this.context.intl.formatMessage, appMessages, true), // required
+        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
       ],
     },
   ]);

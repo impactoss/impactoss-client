@@ -19,9 +19,10 @@ import {
   renderMeasureControl,
   renderSdgTargetControl,
   renderUserControl,
-  validateRequired,
   validateDateFormat,
   getConnectionUpdatesFromFormData,
+  getTitleFormField,
+  getReferenceFormField,
 } from 'utils/forms';
 
 import {
@@ -103,26 +104,8 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'reference',
-          controlType: 'short',
-          model: '.attributes.reference',
-          label: this.context.intl.formatMessage(appMessages.attributes.referenceDefault),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
-        },
-        {
-          id: 'title',
-          controlType: 'titleText',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getReferenceFormField(this.context.intl.formatMessage, appMessages),
+        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
       ],
     },
   ]);

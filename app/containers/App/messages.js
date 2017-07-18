@@ -57,6 +57,10 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.title',
       defaultMessage: 'Enter title',
     },
+    name: {
+      id: 'app.containers.App.placeholders.name',
+      defaultMessage: 'Enter user name',
+    },
     short_title: {
       id: 'app.containers.App.placeholders.title',
       defaultMessage: 'Abbr.',

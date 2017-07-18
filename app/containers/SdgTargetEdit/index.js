@@ -19,9 +19,10 @@ import {
   renderMeasureControl,
   renderIndicatorControl,
   renderTaxonomyControl,
-  validateRequired,
   getCategoryUpdatesFromFormData,
   getConnectionUpdatesFromFormData,
+  getTitleFormField,
+  getReferenceFormField,
 } from 'utils/forms';
 
 import {
@@ -96,31 +97,8 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'reference',
-          controlType: 'short',
-          model: '.attributes.reference',
-          label: this.context.intl.formatMessage(appMessages.attributes.reference),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
-          id: 'title',
-          controlType: 'titleText',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getReferenceFormField(this.context.intl.formatMessage, appMessages, true), // required
+        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
       ],
     },
   ]);

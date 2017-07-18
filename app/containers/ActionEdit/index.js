@@ -20,10 +20,10 @@ import {
   renderIndicatorControl,
   renderTaxonomyControl,
   renderSdgTargetControl,
-  validateRequired,
   validateDateFormat,
   getCategoryUpdatesFromFormData,
   getConnectionUpdatesFromFormData,
+  getTitleFormField,
 } from 'utils/forms';
 
 import {
@@ -100,19 +100,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);

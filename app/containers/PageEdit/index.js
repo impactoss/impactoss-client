@@ -14,7 +14,8 @@ import { actions as formActions } from 'react-redux-form/immutable';
 import { fromJS } from 'immutable';
 
 import {
-  validateRequired,
+  getTitleFormField,
+  getMenuTitleFormField,
 } from 'utils/forms';
 
 import {
@@ -77,32 +78,8 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
-          id: 'menuTitle',
-          controlType: 'short',
-          model: '.attributes.menu_title',
-          label: this.context.intl.formatMessage(appMessages.attributes.menu_title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.menu_title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
+        getMenuTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);

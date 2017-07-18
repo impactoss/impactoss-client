@@ -17,6 +17,7 @@ import {
   validateRequired,
   renderTaxonomyControl,
   getCategoryUpdatesFromFormData,
+  getTitleFormField,
 } from 'utils/forms';
 
 import {
@@ -88,18 +89,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'name',
-          controlType: 'title',
-          model: '.attributes.name',
-          label: this.context.intl.formatMessage(appMessages.attributes.name),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getTitleFormField(this.context.intl.formatMessage, appMessages, 'title', 'name'),
       ],
     },
   ]);

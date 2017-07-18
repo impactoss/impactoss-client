@@ -16,7 +16,9 @@ import { Map, List, fromJS } from 'immutable';
 import {
   userOptions,
   renderUserControl,
-  validateRequired,
+  getTitleFormField,
+  getReferenceFormField,
+  getShortTitleFormField,
 } from 'utils/forms';
 
 import {
@@ -92,33 +94,9 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'reference',
-          controlType: 'short',
-          model: '.attributes.reference',
-          label: this.context.intl.formatMessage(appMessages.attributes.referenceOptional),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
-        },
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
-          id: 'short_title',
-          controlType: 'short',
-          model: '.attributes.short_title',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.short_title),
-          label: this.context.intl.formatMessage(appMessages.attributes.short_title),
-        },
+        getReferenceFormField(this.context.intl.formatMessage, appMessages),
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
+        getShortTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);

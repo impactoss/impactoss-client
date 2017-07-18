@@ -81,7 +81,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
   };
 
   getHeaderMainFields = (entity, isManager) => ([{ // fieldGroup
-    fields: [getTitleField(entity, isManager, 'name')],
+    fields: [getTitleField(entity, isManager, 'name', appMessages.attributes.name)],
   }]);
 
   getHeaderAsideFields = (entity) => ([{
