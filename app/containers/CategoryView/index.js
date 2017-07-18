@@ -33,8 +33,8 @@ import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 
 import {
-  isReady,
-  isUserManager,
+  selectReady,
+  selectIsUserManager,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -207,8 +207,8 @@ CategoryView.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isManager: isUserManager(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  isManager: selectIsUserManager(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   category: selectViewEntity(state, props.params.id),
   recommendations: selectRecommendations(state, props.params.id),
   measures: selectMeasures(state, props.params.id),

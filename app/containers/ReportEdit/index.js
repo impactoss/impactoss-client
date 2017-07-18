@@ -27,7 +27,7 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import { isReady } from 'containers/App/selectors';
+import { selectReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -314,7 +314,7 @@ ReportEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
 });
 

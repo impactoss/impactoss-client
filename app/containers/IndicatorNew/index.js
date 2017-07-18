@@ -31,7 +31,7 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import { selectEntities, isReady } from 'containers/App/selectors';
+import { selectEntities, selectReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -268,7 +268,7 @@ IndicatorNew.contextTypes = {
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   // all measures,
   measures: selectEntities(state, 'measures'),
   // all sdgtargets,

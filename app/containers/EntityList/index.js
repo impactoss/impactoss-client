@@ -14,7 +14,7 @@ import Sidebar from 'components/styled/Sidebar';
 import EntityListSidebar from 'components/entityList/EntityListSidebar';
 import EntityListMain from 'components/entityList/EntityListMain';
 
-import { isUserManager } from 'containers/App/selectors';
+import { selectIsUserManager } from 'containers/App/selectors';
 
 import { updatePath } from 'containers/App/actions';
 import appMessages from 'containers/App/messages';
@@ -148,7 +148,7 @@ EntityList.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  isManager: isUserManager(state),
+  isManager: selectIsUserManager(state),
   activePanel: activePanelSelector(state),
   entityIdsSelected: entitiesSelectedSelector(state),
 });

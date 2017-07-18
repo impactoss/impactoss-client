@@ -33,8 +33,8 @@ import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 
 import {
-  isReady,
-  isUserContributor,
+  selectReady,
+  selectIsUserContributor,
   selectMeasureTaxonomies,
   selectSdgTargetTaxonomies,
 } from 'containers/App/selectors';
@@ -227,8 +227,8 @@ IndicatorView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
-  isContributor: isUserContributor(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  isContributor: selectIsUserContributor(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),
   sdgtargetTaxonomies: selectSdgTargetTaxonomies(state),

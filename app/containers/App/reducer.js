@@ -31,7 +31,7 @@ import {
   INVALIDATE_ENTITIES,
   DUEDATE_ASSIGNED,
   DUEDATE_UNASSIGNED,
-  DB_SCHEMA,
+  DB_TABLES,
 } from './constants';
 
 // The initial state of the App
@@ -46,10 +46,10 @@ const initialState = fromJS({
   },
   /* eslint-disable no-param-reassign */
   // Record the time that entities where requested from the server
-  requested: Object.keys(DB_SCHEMA).reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  requested: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
   // Record the time that entities where returned from the server
-  ready: Object.keys(DB_SCHEMA).reduce((memo, table) => { memo[table] = null; return memo; }, {}),
-  entities: Object.keys(DB_SCHEMA).reduce((memo, table) => { memo[table] = {}; return memo; }, {}),
+  ready: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  entities: DB_TABLES.reduce((memo, table) => { memo[table] = {}; return memo; }, {}),
   /* eslint-enable no-param-reassign */
   user: {
     attributes: null,

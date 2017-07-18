@@ -20,7 +20,7 @@ import {
   updatePath,
   updateEntityForm,
 } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
+import { selectReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -192,7 +192,7 @@ PageNew.contextTypes = {
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
 });
 
 function mapDispatchToProps(dispatch) {

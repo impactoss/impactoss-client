@@ -51,10 +51,10 @@ import {
 import {
   makeSelectPathnameOnAuthChange,
   makeSelectPreviousPathname,
-  getRequestedAt,
-  isSignedIn,
+  selectRequestedAt,
+  selectIsSignedIn,
   selectLocation,
-  sessionUserRoles,
+  selectSessionUserRoles,
 } from 'containers/App/selectors';
 
 import {
@@ -70,11 +70,11 @@ import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
  */
 export function* checkEntitiesSaga(payload) {
   // requestedSelector returns the times that entities where fetched from the API
-  const requestedAt = yield select(getRequestedAt, { path: payload.path });
+  const requestedAt = yield select(selectRequestedAt, { path: payload.path });
 
   // If haven't requested yet, do so now.
   if (!requestedAt) {
-    const signedIn = yield select(isSignedIn);
+    const signedIn = yield select(selectIsSignedIn);
 
     try {
       // First record that we are requesting
@@ -107,13 +107,13 @@ export function* checkEntitiesSaga(payload) {
  * Check if user is authorized
  */
 export function* checkRoleSaga({ role }) {
-  const signedIn = yield select(isSignedIn);
+  const signedIn = yield select(selectIsSignedIn);
   if (signedIn) {
-    const roleIds = yield select(sessionUserRoles);
-    if (!(roleIds.indexOf(role) > -1
-    || (role === USER_ROLES.MANAGER && roleIds.indexOf(USER_ROLES.ADMIN) > -1)
-    || (role === USER_ROLES.CONTRIBUTOR && (roleIds.indexOf(USER_ROLES.MANAGER) > -1 || roleIds.indexOf(USER_ROLES.ADMIN) > -1))
-    )) {
+    const roleIds = yield select(selectSessionUserRoles);
+    if (!roleIds.includes(role)
+      || (role === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
+      || (role === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
+    ) {
       yield put(push('/not-authorized'));
     }
   }

@@ -20,9 +20,9 @@ import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 
 import {
-  isReady,
-  isUserAdmin,
-  isUserContributor,
+  selectReady,
+  selectIsUserAdmin,
+  selectIsUserContributor,
 } from 'containers/App/selectors';
 
 import {
@@ -144,9 +144,9 @@ PageView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
-  isAdmin: isUserAdmin(state),
-  isContributor: isUserContributor(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  isAdmin: selectIsUserAdmin(state),
+  isContributor: selectIsUserContributor(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   page: selectViewEntity(state, props.params.id),
 });
 

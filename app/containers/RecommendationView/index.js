@@ -30,8 +30,8 @@ import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 
 import {
-  isReady,
-  isUserManager,
+  selectReady,
+  selectIsUserManager,
   selectMeasureTaxonomies,
 } from 'containers/App/selectors';
 
@@ -183,8 +183,8 @@ RecommendationView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
-  isManager: isUserManager(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  isManager: selectIsUserManager(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   measures: selectMeasures(state, props.params.id),

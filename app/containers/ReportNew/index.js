@@ -22,7 +22,7 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import { isReady } from 'containers/App/selectors';
+import { selectReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -256,7 +256,7 @@ ReportNew.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   indicator: selectIndicator(state, props.params.id),
 });
 

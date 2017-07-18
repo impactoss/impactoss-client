@@ -28,9 +28,9 @@ import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 
 import {
-  isReady,
-  isUserManager,
-  getSessionUserId,
+  selectReady,
+  selectIsUserManager,
+  selectSessionUserId,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -166,9 +166,9 @@ UserView.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isManager: isUserManager(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
-  sessionUserId: getSessionUserId(state),
+  isManager: selectIsUserManager(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  sessionUserId: selectSessionUserId(state),
   user: selectViewEntity(state, props.params.id),
   // all connected categories for all user-taggable taxonomies
   taxonomies: selectTaxonomies(state, props.params.id),

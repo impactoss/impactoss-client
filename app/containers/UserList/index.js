@@ -11,7 +11,7 @@ import Helmet from 'react-helmet';
 import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
-import { isReady, selectUserConnections, selectUserTaxonomies } from 'containers/App/selectors';
+import { selectReady, selectUserConnections, selectUserTaxonomies } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
@@ -81,7 +81,7 @@ UserList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectUsers(state, fromJS(props.location.query)),
   taxonomies: selectUserTaxonomies(state),
   connections: selectUserConnections(state),

@@ -32,8 +32,8 @@ import {
 } from 'containers/App/actions';
 
 import {
-  isReady,
-  isUserAdmin,
+  selectReady,
+  selectIsUserAdmin,
 } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
@@ -267,9 +267,9 @@ CategoryEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isAdmin: isUserAdmin(state),
+  isAdmin: selectIsUserAdmin(state),
   viewDomain: selectDomain(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   users: selectUsers(state),
 });

@@ -15,8 +15,8 @@ import { mapToTaxonomyList } from 'utils/taxonomies';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
   selectEntities,
-  isReady,
-  isUserManager,
+  selectReady,
+  selectIsUserManager,
 } from 'containers/App/selectors';
 import { CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -135,8 +135,8 @@ CategoryList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isManager: isUserManager(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  isManager: selectIsUserManager(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectEntities(state, 'taxonomies'),
   taxonomy: selectTaxonomy(state, props.params.id),
   categories: selectCategories(state, typeof props.params.id !== 'undefined' ? props.params.id : 1),

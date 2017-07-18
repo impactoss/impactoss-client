@@ -19,7 +19,7 @@ import {
   updatePath,
 } from 'containers/App/actions';
 
-import { isReady } from 'containers/App/selectors';
+import { selectReady } from 'containers/App/selectors';
 
 // import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -101,7 +101,7 @@ IndicatorImport.contextTypes = {
 
 const mapStateToProps = (state) => ({
   viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
+  dataReady: selectReady(state, { path: [
     'user_roles',
   ] }),
 });

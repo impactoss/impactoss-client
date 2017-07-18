@@ -11,7 +11,7 @@ import Helmet from 'react-helmet';
 import { List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
+import { selectReady } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
@@ -83,7 +83,7 @@ PageList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectPages(state, fromJS(props.location.query)),
 });
 function mapDispatchToProps(dispatch) {

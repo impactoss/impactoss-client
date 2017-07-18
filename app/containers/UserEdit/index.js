@@ -26,8 +26,8 @@ import {
 } from 'containers/App/actions';
 
 import {
-  isReady,
-  isUserManager,
+  selectReady,
+  selectIsUserManager,
 } from 'containers/App/selectors';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
@@ -318,9 +318,9 @@ UserEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isManager: isUserManager(state),
+  isManager: selectIsUserManager(state),
   viewDomain: selectDomain(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   roles: selectRoles(state, props.params.id),

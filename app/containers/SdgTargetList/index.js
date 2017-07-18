@@ -13,7 +13,7 @@ import { Map, List, fromJS } from 'immutable';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import {
-  isReady,
+  selectReady,
   selectSdgTargetTaxonomies,
 } from 'containers/App/selectors';
 
@@ -99,7 +99,7 @@ SdgTargetList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectSdgTargets(state, fromJS(props.location.query)),
   taxonomies: selectSdgTargetTaxonomies(state),
   connections: selectConnections(state),

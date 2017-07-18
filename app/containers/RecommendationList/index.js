@@ -13,7 +13,7 @@ import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
-  isReady,
+  selectReady,
   selectRecommendationConnections,
   selectRecommendationTaxonomies,
 } from 'containers/App/selectors';
@@ -116,7 +116,7 @@ RecommendationList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectRecommendations(state, fromJS(props.location.query)),
   taxonomies: selectRecommendationTaxonomies(state),
   connections: selectRecommendationConnections(state),

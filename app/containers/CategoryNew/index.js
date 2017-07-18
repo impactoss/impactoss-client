@@ -29,8 +29,8 @@ import {
 } from 'containers/App/actions';
 
 import {
-  isReady,
-  isUserAdmin,
+  selectReady,
+  selectIsUserAdmin,
   selectEntity,
 } from 'containers/App/selectors';
 
@@ -235,9 +235,9 @@ CategoryNew.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isAdmin: isUserAdmin(state),
+  isAdmin: selectIsUserAdmin(state),
   viewDomain: selectDomain(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomy: selectEntity(state, { path: 'taxonomies', id: props.params.id }),
   users: selectUsers(state),
 });

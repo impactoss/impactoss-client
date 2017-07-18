@@ -12,7 +12,7 @@ import { List, Map, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
-  isReady,
+  selectReady,
   selectMeasureTaxonomies,
 } from 'containers/App/selectors';
 
@@ -97,7 +97,7 @@ ActionList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectMeasures(state, fromJS(props.location.query)),
   taxonomies: selectMeasureTaxonomies(state),
   connections: selectConnections(state),

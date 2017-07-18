@@ -30,8 +30,8 @@ import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 
 import {
-  isReady,
-  isUserContributor,
+  selectReady,
+  selectIsUserContributor,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -168,8 +168,8 @@ ReportView.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isContributor: isUserContributor(state),
-  dataReady: isReady(state, { path: DEPENDENCIES }),
+  isContributor: selectIsUserContributor(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
 });
 
