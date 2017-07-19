@@ -207,7 +207,13 @@ export const selectSortByQuery = createSelector(
 
 // NEW performant way of selecting and querying entities
 
-export const selectEntities = (state, path) => state.getIn(['global', 'entities', path]);
+const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
+
+export const selectEntities = createSelector(
+  selectEntitiesAll,
+  (state, path) => path,
+  (entities, path) => entities.get(path)
+);
 
 export const selectEntity = createSelector(
   (state, { path }) => selectEntities(state, path),

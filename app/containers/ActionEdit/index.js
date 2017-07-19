@@ -194,7 +194,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           {saveError &&
             <p>{saveError}</p>
           }
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady && !saveError &&

@@ -114,7 +114,7 @@ export function* checkRoleSaga({ role }) {
       || (role === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
       || (role === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
     )) {
-      yield put(push('/not-authorized'));
+      yield put(push('/login'));
     }
   }
 }

@@ -167,7 +167,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           {saveError &&
             <p>{saveError}</p>
           }
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady && !saveError &&

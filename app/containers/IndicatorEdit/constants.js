@@ -8,10 +8,10 @@ import { fromJS } from 'immutable';
 export const SAVE = 'nmrf/IndicatorEdit/SAVE';
 
 export const DEPENDENCIES = [
+  'user_roles',
   'measures',
   'sdgtargets',
   'users',
-  'user_roles',
   'indicators',
   'measure_indicators',
   'sdgtarget_indicators',

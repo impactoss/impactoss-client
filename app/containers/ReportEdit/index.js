@@ -78,14 +78,13 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     const props = nextProps || this.props;
     const { viewEntity } = props;
     let attributes = viewEntity.get('attributes');
-    if (!attributes.get('due_date_id')) {
-      attributes = attributes.set('due_date_id', 0);
+    if (attributes.get('due_date_id')) {
+      attributes = attributes.set('due_date_id', attributes.get('due_date_id').toString());
     }
-
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
-      attributes: viewEntity.get('attributes').mergeWith(
+      attributes: attributes.mergeWith(
         (oldVal, newVal) => oldVal === null ? newVal : oldVal,
         FORM_INITIAL.get('attributes')
       ),
@@ -129,7 +128,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           appMessages,
           this.context.intl.formatDate,
           entity.getIn(['indicator', 'dates']),
-          entity.getIn(['attributes', 'due_date_id']),
+          entity.getIn(['attributes', 'due_date_id'])
+            ? entity.getIn(['attributes', 'due_date_id']).toString()
+            : '0',
         )],
     },
   ]);
@@ -173,7 +174,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           {saveError &&
             <p>{saveError}</p>
           }
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady && !saveError &&
@@ -247,9 +248,13 @@ function mapDispatchToProps(dispatch) {
       let saveData = formData;
 
       const dateAssigned = formData.getIn(['attributes', 'due_date_id']);
-      if (dateAssigned === 0) {
-        saveData = saveData.setIn(['attributes', 'due_date_id'], null);
-      }
+      saveData = saveData.setIn(
+        ['attributes', 'due_date_id'],
+        dateAssigned === '0' || dateAssigned === 0
+        ? null
+        : parseInt(dateAssigned, 10)
+      );
+
       dispatch(save(
         saveData.toJS(),
         previousDateAssigned && previousDateAssigned !== dateAssigned

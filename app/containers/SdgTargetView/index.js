@@ -142,7 +142,7 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
             icon="sdgtargets"
             buttons={buttons}
           />
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady &&

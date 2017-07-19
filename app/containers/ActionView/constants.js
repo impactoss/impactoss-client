@@ -1,5 +1,6 @@
 
 export const DEPENDENCIES = [
+  'user_roles',
   'sdgtargets',
   'users',
   'taxonomies',

@@ -176,7 +176,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           {saveError &&
             <p>{saveError}</p>
           }
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady && !saveError &&

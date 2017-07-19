@@ -1,4 +1,5 @@
 export const DEPENDENCIES = [
+  'user_roles',
   'categories',
   'taxonomies',
   'recommendation_categories',
@@ -9,7 +10,6 @@ export const DEPENDENCIES = [
   'sdgtarget_categories',
   'sdgtarget_measures',
   'sdgtargets',
-  'user_roles',
 ];
 
 export const TAXONOMY_DEFAULT = 1;

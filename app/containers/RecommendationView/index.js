@@ -47,7 +47,20 @@ import {
 import { DEPENDENCIES } from './constants';
 
 export class RecommendationView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  // shouldComponentUpdate(nextProps) {
+  //   console.log('RecommendationView.shouldComponentUpdate')
+  //   console.log(this.props.viewEntity === nextProps.viewEntity)
+  //   console.log(this.props.taxonomies === nextProps.taxonomies)
+  //   console.log(this.props.measures === nextProps.measures)
+  //   console.log(this.props.dataReady === nextProps.dataReady)
+  //   // console.log(isEqual(this.props.locationQuery, nextProps.locationQuery))
+  //   // console.log(this.props.locationQuery === nextProps.locationQuery)
+  //   // console.log(typeof this.props.scrollContainer !== typeof nextProps.scrollContainer)
+  //   return this.props.viewEntity !== nextProps.viewEntity
+  //     || this.props.taxonomies !== nextProps.taxonomies
+  //     || this.props.dataReady !== nextProps.dataReady
+  //     || this.props.measures !== nextProps.measures
+  // }
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
@@ -119,7 +132,6 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       onClick: this.props.handleClose,
     }];
 
-
     return (
       <div>
         <Helmet
@@ -135,7 +147,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
             icon="recommendations"
             buttons={buttons}
           />
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady &&
@@ -180,7 +192,6 @@ RecommendationView.propTypes = {
 RecommendationView.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
-
 
 const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),

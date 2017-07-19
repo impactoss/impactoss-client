@@ -179,7 +179,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
           {saveError &&
             <p>{saveError}</p>
           }
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady && !saveError &&

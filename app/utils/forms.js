@@ -268,15 +268,15 @@ export const getStatusField = (formatMessage, appMessages, entity) => ({
 const getDueDateDateOptions = (dates, activeDateId, formatMessage, appMessages, formatDate) => {
   const dateOptions = [
     {
-      value: 0,
+      value: '0',
       label: formatMessage(appMessages.entities.progress_reports.unscheduled_short),
-      checked: activeDateId === null || activeDateId === 0 || activeDateId === '',
+      checked: activeDateId === null || activeDateId === '0' || activeDateId === '',
     },
   ];
   const NO_OF_REPORT_OPTIONS = 1;
   let excludeCount = 0;
   return dates && dates.reduce((memo, date, i) => {
-    const isOwnDate = activeDateId ? activeDateId.toString() === date.get('id') : false;
+    const isOwnDate = activeDateId ? date.get('id') === activeDateId : false;
     const optionNoNotExceeded = i - excludeCount < NO_OF_REPORT_OPTIONS;
     const withoutReport = !date.getIn(['attributes', 'has_progress_report']) || isOwnDate;
     // only allow upcoming and those that are not associated
@@ -291,7 +291,7 @@ const getDueDateDateOptions = (dates, activeDateId, formatMessage, appMessages, 
           date.getIn(['attributes', 'due']) ? formatMessage(appMessages.entities.due_dates.due) : ''}`;
       return memo.concat([
         {
-          value: parseInt(date.get('id'), 10),
+          value: date.get('id'),
           label,
           highlight: date.getIn(['attributes', 'overdue']),
           checked: activeDateId ? date.get('id') === activeDateId : false,
@@ -308,9 +308,9 @@ export const getDueDateOptionsField = (formatMessage, appMessages, formatDate, d
   model: '.attributes.due_date_id',
   options: getDueDateDateOptions(
     dates,
-    activeDateId || 0,
+    activeDateId || '0',
     formatMessage, appMessages, formatDate),
-  value: activeDateId || 0,
+  value: activeDateId || '0',
   hints: {
     1: formatMessage(appMessages.entities.due_dates.empty),
   },

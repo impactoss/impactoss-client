@@ -1,6 +1,7 @@
 import { PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'containers/App/constants';
 
 export const DEPENDENCIES = [
+  'user_roles',
   'measures',
   'users',
   'taxonomies',

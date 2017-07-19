@@ -1,6 +1,7 @@
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 
 export const DEPENDENCIES = [
+  'user_roles',
   'measures',
   'measure_categories',
   'users',
@@ -14,7 +15,6 @@ export const DEPENDENCIES = [
   'sdgtarget_categories',
   'indicators',
   'measure_indicators',
-  'user_roles',
   'due_dates',
   'progress_reports',
 ];

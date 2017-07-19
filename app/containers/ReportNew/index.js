@@ -87,7 +87,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           appMessages,
           this.context.intl.formatDate,
           indicator.get('dates'),
-          0,
+          '0',
         )],
     },
   ]);

@@ -243,9 +243,13 @@ export default defineMessages({
       id: 'app.containers.App.attributes.documentEmpty',
       defaultMessage: 'No document attached yet',
     },
-    due_date: {
-      id: 'app.containers.App.attributes.due_date',
+    due_date_id: {
+      id: 'app.containers.App.attributes.due_date_id',
       defaultMessage: 'Due date',
+    },
+    due_date_id_empty: {
+      id: 'app.containers.App.attributes.due_date_id_empty',
+      defaultMessage: 'No report scheduled',
     },
     manager_id: {
       indicators: {

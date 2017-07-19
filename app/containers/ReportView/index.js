@@ -11,12 +11,11 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
 import {
-  getIdField,
   getTitleField,
   getStatusField,
   getMetaField,
   getMarkdownField,
-  getDateField,
+  getDateRelatedField,
   getDownloadField,
 } from 'utils/fields';
 
@@ -53,7 +52,6 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getIdField(entity),
         getTitleField(entity, isManager),
       ],
     },
@@ -79,7 +77,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     {
       type: 'dark',
       fields: [
-        getDateField(entity, 'due_date', appMessages, true, appMessages.entities.progress_reports.unscheduled),
+        getDateRelatedField(entity.getIn(['date', 'attributes', 'due_date']), 'due_date_id', appMessages, true, appMessages.entities.progress_reports.unscheduled),
       ],
     },
   ]);
@@ -125,7 +123,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
               ]
              }
           />
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady &&

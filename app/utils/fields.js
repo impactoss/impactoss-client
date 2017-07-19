@@ -93,6 +93,15 @@ export const getDateField = (entity, attribute, appMessages, showEmpty, emptyMes
     showEmpty: showEmpty && (emptyMessage || appMessages.attributes[`${attribute}_empty`]),
   });
 
+export const getDateRelatedField = (value, attribute, appMessages, showEmpty, emptyMessage) =>
+  (showEmpty || (!!value && (value.trim().length > 0))) &&
+  ({
+    type: 'date',
+    value: !!value && value,
+    label: appMessages.attributes[attribute],
+    showEmpty: showEmpty && (emptyMessage || appMessages.attributes[`${attribute}_empty`]),
+  });
+
 export const getTextField = (entity, attribute, appMessages) =>
   !!entity.getIn(['attributes', attribute]) &&
   (entity.getIn(['attributes', attribute]).trim().length > 0) &&
@@ -121,6 +130,7 @@ export const getReportsField = (reports, appMessages, button) => ({
   type: 'reports',
   values: mapReports(reports),
   button: button || null,
+  showEmpty: true,
 });
 
 const mapDates = (dates) => dates

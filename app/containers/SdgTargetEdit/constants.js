@@ -22,6 +22,7 @@ export const FORM_INITIAL = fromJS({
 
 
 export const DEPENDENCIES = [
+  'user_roles',
   'sdgtargets',
   'users',
   'categories',

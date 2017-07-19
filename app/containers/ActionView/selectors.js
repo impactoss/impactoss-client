@@ -30,16 +30,21 @@ export const selectTaxonomies = createSelector(
     prepareTaxonomiesIsAssociated(taxonomies, categories, associations, 'tags_measures', 'measure_id', id)
   );
 
-
-// all connected recommendations
-export const selectRecommendations = createSelector(
+export const selectRecommendationsAssociated = createSelector(
   (state, id) => id,
-  (state) => selectRecommendationConnections(state),
   (state) => selectEntities(state, 'recommendations'),
   (state) => selectEntities(state, 'recommendation_measures'),
+  (id, entities, associations) =>
+    entitiesIsAssociated(entities, 'recommendation_id', associations, 'measure_id', id)
+);
+// all connected recommendations
+export const selectRecommendations = createSelector(
+  selectRecommendationsAssociated,
+  (state) => selectRecommendationConnections(state),
+  (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'recommendation_categories'),
-  (id, connections, recommendations, recMeasures, recCategories) =>
-    recommendations && recMeasures && entitiesIsAssociated(recommendations, 'recommendation_id', recMeasures, 'measure_id', id)
+  (recommendations, connections, recMeasures, recCategories) =>
+    recommendations && recMeasures && recommendations
     .map((rec) => rec
       .set('categories', recCategories
         .filter((association) =>
@@ -56,17 +61,22 @@ export const selectRecommendations = createSelector(
       )
     )
 );
-
+export const selectTargetsAssociated = createSelector(
+  (state, id) => id,
+  (state) => selectEntities(state, 'sdgtargets'),
+  (state) => selectEntities(state, 'sdgtarget_measures'),
+  (id, entities, associations) =>
+    entitiesIsAssociated(entities, 'sdgtarget_id', associations, 'measure_id', id)
+);
 // all connected sdgTargets
 export const selectSdgTargets = createSelector(
-  (state, id) => id,
+  selectTargetsAssociated,
   (state) => selectSdgTargetConnections(state),
-  (state) => selectEntities(state, 'sdgtargets'),
   (state) => selectEntities(state, 'sdgtarget_measures'),
   (state) => selectEntities(state, 'sdgtarget_categories'),
   (state) => selectEntities(state, 'sdgtarget_indicators'),
-  (id, connections, targets, targetMeasures, targetCategories, targetIndicators) =>
-    targets && targetMeasures && entitiesIsAssociated(targets, 'sdgtarget_id', targetMeasures, 'measure_id', id)
+  (targets, connections, targetMeasures, targetCategories, targetIndicators) =>
+    targets && targetMeasures && targets
     .map((target) => target
       .set('categories', targetCategories
         .filter((association) =>
@@ -91,16 +101,21 @@ export const selectSdgTargets = createSelector(
     )
 );
 
-//
+export const selectIndicatorsAssociated = createSelector(
+  (state, id) => id,
+  (state) => selectEntities(state, 'indicators'),
+  (state) => selectEntities(state, 'sdgtarget_measures'),
+  (id, entities, associations) =>
+    entitiesIsAssociated(entities, 'indicator_id', associations, 'measure_id', id)
+);
 // selectIndicators,
 export const selectIndicators = createSelector(
-  (state, id) => id,
+  selectIndicatorsAssociated,
   (state) => selectIndicatorConnections(state),
-  (state) => selectEntities(state, 'indicators'),
   (state) => selectEntities(state, 'measure_indicators'),
   (state) => selectEntities(state, 'sdgtarget_indicators'),
-  (id, connections, indicators, indicatorMeasures, indicatorTargets) =>
-    indicators && indicatorMeasures && entitiesIsAssociated(indicators, 'indicator_id', indicatorMeasures, 'measure_id', id)
+  (indicators, connections, indicatorMeasures, indicatorTargets) =>
+    indicators && indicatorMeasures && indicators
     .map((indicator) => indicator
       .set('measures', indicatorMeasures
         .filter((association) =>

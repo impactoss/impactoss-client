@@ -175,7 +175,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
             icon="indicators"
             buttons={buttons}
           />
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady &&

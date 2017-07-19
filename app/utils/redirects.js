@@ -42,7 +42,7 @@ function redirectIfNotPermitted(store, roleRequired) {
       || (roleRequired === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
       )) {
         replace({
-          pathname: '/not-authorized',
+          pathname: '/login',
         });
       }
     }

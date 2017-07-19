@@ -136,12 +136,12 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       },
       {
         type: 'close',
-        onClick: () => this.props.handleClose(this.props.category.taxonomy.id),
+        onClick: () => this.props.handleClose(this.props.category.getIn(['taxonomy', 'id'])),
       },
     ]
     : [{
       type: 'close',
-      onClick: () => this.props.handleClose(this.props.category.taxonomy.id),
+      onClick: () => this.props.handleClose(this.props.category.getIn(['taxonomy', 'id'])),
     }];
 
     return (

@@ -14,8 +14,19 @@ import {
   entitiesIsAssociated,
 } from 'utils/entities';
 
-export const selectViewEntity = createSelector(
+export const selectCategory = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
+  (category) => category
+);
+export const selectTaxonomy = createSelector(
+  selectCategory,
+  (state) => selectEntities(state, 'taxonomies'),
+  (category, taxonomies) => category && taxonomies &&
+    taxonomies.get(category.getIn(['attributes', 'taxonomy_id']).toString())
+);
+
+export const selectViewEntity = createSelector(
+  selectCategory,
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'taxonomies'),
   (entity, users, taxonomies) => entitySetSingles(entity, [
@@ -37,124 +48,145 @@ export const selectViewEntity = createSelector(
   ])
 );
 
+export const selectTagsRecommendations = createSelector(
+  selectTaxonomy,
+  (taxonomy) => taxonomy && taxonomy.getIn(['attributes', 'tags_recommendations'])
+);
+
+export const selectRecommendationsAssociated = createSelector(
+  selectTagsRecommendations,
+  (state, id) => id,
+  (state) => selectEntities(state, 'recommendations'),
+  (state) => selectEntities(state, 'recommendation_categories'),
+  (tags, id, entities, associations) => tags
+    ? entitiesIsAssociated(entities, 'recommendation_id', associations, 'category_id', id)
+    : null
+);
+
 // all connected recommendations
 export const selectRecommendations = createSelector(
-  (state, id) => id,
-  (state, id) => selectEntity(state, { path: 'categories', id }),
-  (state) => selectEntities(state, 'taxonomies'),
+  selectRecommendationsAssociated,
   (state) => selectRecommendationConnections(state),
-  (state) => selectEntities(state, 'recommendations'),
   (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'recommendation_categories'),
-  (id, category, taxonomies, connections, recommendations, recMeasures, recCategories) => {
-    const taxonomy = category && taxonomies && taxonomies.get(category.getIn(['attributes', 'taxonomy_id']).toString());
-    return (taxonomy && taxonomy.getIn(['attributes', 'tags_recommendations']) && recommendations)
-      ? entitiesIsAssociated(recommendations, 'recommendation_id', recCategories, 'category_id', id)
-      .map((rec) => rec
-        .set('categories', recCategories
-          .filter((association) =>
-            attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
-          )
-          .map((association) => association.getIn(['attributes', 'category_id']))
+  (recommendations, connections, recMeasures, recCategories) =>
+    recommendations && recommendations.map((rec) => rec
+      .set('categories', recCategories
+        .filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
         )
-        .set('measures', recMeasures
-          .filter((association) =>
-            attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
-            && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
-          )
-          .map((association) => association.getIn(['attributes', 'measure_id']))
-        )
+        .map((association) => association.getIn(['attributes', 'category_id']))
       )
-      : null;
-  }
+      .set('measures', recMeasures
+        .filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
+          && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
+        )
+        .map((association) => association.getIn(['attributes', 'measure_id']))
+      )
+    )
+);
+
+export const selectTagsMeasures = createSelector(
+  selectTaxonomy,
+  (taxonomy) => taxonomy && taxonomy.getIn(['attributes', 'tags_measures'])
+);
+
+export const selectMeasuresAssociated = createSelector(
+  selectTagsMeasures,
+  (state, id) => id,
+  (state) => selectEntities(state, 'measures'),
+  (state) => selectEntities(state, 'measure_categories'),
+  (tags, id, entities, associations) => tags
+    ? entitiesIsAssociated(entities, 'measure_id', associations, 'category_id', id)
+    : null
 );
 
 // all connected measures
 export const selectMeasures = createSelector(
-  (state, id) => id,
-  (state, id) => selectEntity(state, { path: 'categories', id }),
-  (state) => selectEntities(state, 'taxonomies'),
+  selectMeasuresAssociated,
   (state) => selectMeasureConnections(state),
-  (state) => selectEntities(state, 'measures'),
   (state) => selectEntities(state, 'sdgtarget_measures'),
   (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'measure_indicators'),
-  (id, category, taxonomies, connections, measures, measureTargets, measureRecommendations, measureCategories, measureIndicators) => {
-    const taxonomy = category && taxonomies && taxonomies.get(category.getIn(['attributes', 'taxonomy_id']).toString());
-    return (taxonomy && taxonomy.getIn(['attributes', 'tags_measures']) && measures)
-      ? entitiesIsAssociated(measures, 'measure_id', measureCategories, 'category_id', id)
-      .map((measure) => measure
-        .set('categories', measureCategories
-          .filter((association) =>
-            attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
-          )
-          .map((association) => association.getIn(['attributes', 'category_id']))
+  (measures, connections, measureTargets, measureRecommendations, measureCategories, measureIndicators) =>
+    measures && measures.map((measure) => measure
+      .set('categories', measureCategories
+        .filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
         )
-        .set('sdgtargets', measureTargets
-          .filter((association) =>
-            attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
-            && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
-          )
-          .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
-        )
-        .set('recommendations', measureRecommendations
-          .filter((association) =>
-            attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
-            && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
-          )
-          .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
-        )
-        .set('indicators', measureIndicators
-          .filter((association) =>
-            attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
-            && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
-          )
-          .map((association) => association.getIn(['attributes', 'indicator_id']))
-        )
+        .map((association) => association.getIn(['attributes', 'category_id']))
       )
-      : null;
-  }
+      .set('sdgtargets', measureTargets
+        .filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
+          && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
+        )
+        .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
+      )
+      .set('recommendations', measureRecommendations
+        .filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
+          && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
+        )
+        .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
+      )
+      .set('indicators', measureIndicators
+        .filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
+          && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
+        )
+        .map((association) => association.getIn(['attributes', 'indicator_id']))
+      )
+    )
+);
+
+export const selectTagsTargets = createSelector(
+  selectTaxonomy,
+  (taxonomy) => taxonomy && taxonomy.getIn(['attributes', 'tags_sdgtargets'])
+);
+
+export const selectTargetsAssociated = createSelector(
+  selectTagsTargets,
+  (state, id) => id,
+  (state) => selectEntities(state, 'sdgtargets'),
+  (state) => selectEntities(state, 'sdgtarget_categories'),
+  (tags, id, entities, associations) => tags
+    ? entitiesIsAssociated(entities, 'sdgtarget_id', associations, 'category_id', id)
+    : null
 );
 
 // all connected sdgTargets
 export const selectSdgTargets = createSelector(
-  (state, id) => id,
-  (state, id) => selectEntity(state, { path: 'categories', id }),
-  (state) => selectEntities(state, 'taxonomies'),
+  selectTargetsAssociated,
   (state) => selectSdgTargetConnections(state),
-  (state) => selectEntities(state, 'sdgtargets'),
   (state) => selectEntities(state, 'sdgtarget_measures'),
   (state) => selectEntities(state, 'sdgtarget_categories'),
   (state) => selectEntities(state, 'sdgtarget_indicators'),
-  (id, category, taxonomies, connections, targets, targetMeasures, targetCategories, targetIndicators) => {
-    const taxonomy = category && taxonomies && taxonomies.get(category.getIn(['attributes', 'taxonomy_id']).toString());
-    return taxonomy && taxonomy.getIn(['attributes', 'tags_sdgtargets']) && targets
-      ? entitiesIsAssociated(targets, 'sdgtarget_id', targetCategories, 'category_id', id)
-      .map((target) => target
-        .set('categories', targetCategories
-          .filter((association) =>
-            attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
-          )
-          .map((association) => association.getIn(['attributes', 'category_id']))
-        )
-        .set('measures', targetMeasures
-          .filter((association) =>
-            attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
-            && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
-          )
-          .map((association) => association.getIn(['attributes', 'measure_id']))
-        )
-        .set('indicators', targetIndicators
-          .filter((association) =>
-            attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
-            && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
-          )
-          .map((association) => association.getIn(['attributes', 'indicator_id']))
-        )
+  (targets, connections, targetMeasures, targetCategories, targetIndicators) =>
+    targets && targets.map((target) => target
+    .set('categories', targetCategories
+      .filter((association) =>
+        attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
       )
-      : null;
-  }
+      .map((association) => association.getIn(['attributes', 'category_id']))
+    )
+    .set('measures', targetMeasures
+      .filter((association) =>
+        attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
+        && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
+      )
+      .map((association) => association.getIn(['attributes', 'measure_id']))
+    )
+    .set('indicators', targetIndicators
+      .filter((association) =>
+        attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
+        && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
+      )
+      .map((association) => association.getIn(['attributes', 'indicator_id']))
+    )
+  )
 );
 
 export const selectTaxonomies = createSelector(

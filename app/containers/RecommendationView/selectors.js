@@ -26,19 +26,25 @@ export const selectTaxonomies = createSelector(
   (state) => selectEntities(state, 'recommendation_categories'),
   (id, taxonomies, categories, associations) =>
     prepareTaxonomiesIsAssociated(taxonomies, categories, associations, 'tags_recommendations', 'recommendation_id', id)
-  );
+);
 
+export const selectMeasuresAssociated = createSelector(
+  (state, id) => id,
+  (state) => selectEntities(state, 'measures'),
+  (state) => selectEntities(state, 'recommendation_measures'),
+  (id, entities, associations) =>
+    entitiesIsAssociated(entities, 'measure_id', associations, 'recommendation_id', id)
+);
 // all connected measures
 export const selectMeasures = createSelector(
-  (state, id) => id,
+  selectMeasuresAssociated,
   (state) => selectMeasureConnections(state),
-  (state) => selectEntities(state, 'measures'),
   (state) => selectEntities(state, 'sdgtarget_measures'),
   (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'measure_indicators'),
-  (id, connections, measures, measureTargets, measureRecommendations, measureCategories, measureIndicators) =>
-    measures && measureRecommendations && entitiesIsAssociated(measures, 'measure_id', measureRecommendations, 'recommendation_id', id)
+  (measures, connections, measureTargets, measureRecommendations, measureCategories, measureIndicators) =>
+    measures && measureRecommendations && measures
     .map((measure) => measure
       .set('categories', measureCategories
         .filter((association) =>

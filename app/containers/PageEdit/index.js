@@ -11,6 +11,8 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
+import { Map } from 'immutable';
+
 import {
   getTitleFormField,
   getMenuTitleFormField,
@@ -140,7 +142,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           {saveError &&
             <p>{saveError}</p>
           }
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady && !saveError &&

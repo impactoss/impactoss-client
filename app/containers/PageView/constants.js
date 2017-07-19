@@ -1,5 +1,5 @@
 export const DEPENDENCIES = [
+  'user_roles',
   'pages',
   'users',
-  'user_roles',
 ];

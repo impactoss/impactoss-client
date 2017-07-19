@@ -1,6 +1,6 @@
 export const DEPENDENCIES = [
-  'users',
   'user_roles',
+  'users',
   'roles',
   'user_categories',
   'categories',

@@ -163,7 +163,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
             icon="measures"
             buttons={buttons}
           />
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady &&

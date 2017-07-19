@@ -159,7 +159,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           {saveError &&
             <p>{saveError}</p>
           }
-          { !viewEntity && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !viewEntity && dataReady && !saveError &&

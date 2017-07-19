@@ -5,9 +5,9 @@
  */
 
 export const DEPENDENCIES = [
+  'user_roles',
   'categories',
   'users',
-  'user_roles',
   'taxonomies',
   'recommendations',
   'recommendation_measures',

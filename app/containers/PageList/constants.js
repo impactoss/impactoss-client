@@ -1,6 +1,7 @@
 import { PUBLISH_STATUSES } from 'containers/App/constants';
 // specify the filter and query  options
 export const DEPENDENCIES = [
+  'user_roles',
   'pages',
 ];
 

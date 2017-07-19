@@ -8,6 +8,7 @@ import { fromJS } from 'immutable';
 export const SAVE = 'nmrf/ActionEdit/SAVE';
 
 export const DEPENDENCIES = [
+  'user_roles',
   'measures',
   'users',
   'categories',

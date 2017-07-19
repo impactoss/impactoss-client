@@ -4,11 +4,11 @@
  *
  */
 export const DEPENDENCIES = [
+  'user_roles',
   'measures',
   'measure_categories',
   'measure_indicators',
   'users',
-  'user_roles',
   'taxonomies',
   'categories',
   'indicators',

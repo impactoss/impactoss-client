@@ -8,6 +8,7 @@ import { fromJS } from 'immutable';
 export const SAVE = 'nmrf/PageEdit/SAVE';
 
 export const DEPENDENCIES = [
+  'user_roles',
   'users',
   'pages',
 ];
