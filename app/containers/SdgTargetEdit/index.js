@@ -23,13 +23,15 @@ import {
   getConnectionUpdatesFromFormData,
   getTitleFormField,
   getReferenceFormField,
+  getMarkdownField,
+  getStatusField,
 } from 'utils/forms';
 
 import {
   getMetaField,
 } from 'utils/fields';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -106,20 +108,16 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          value: entity.getIn(['attributes', 'draft']),
-          options: PUBLISH_STATUSES,
-        },
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
         getMetaField(entity, appMessages),
       ],
     },
   ]);
 
   getBodyMainFields = (indicators, measures) => ([
+    {
+      fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
+    },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
@@ -137,17 +135,6 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
       fields: renderTaxonomyControl(taxonomies),
     },
   ]);
-
-  getFields = (entity, taxonomies, indicators, measures) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity),
-    },
-    body: {
-      main: this.getBodyMainFields(indicators, measures),
-      aside: this.getBodyAsideFields(taxonomies),
-    },
-  })
 
   render() {
     const { viewEntity, dataReady, viewDomain, indicators, taxonomies, measures } = this.props;
@@ -209,7 +196,16 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(viewEntity, taxonomies, indicators, measures)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity),
+                },
+                body: {
+                  main: this.getBodyMainFields(indicators, measures),
+                  aside: this.getBodyAsideFields(taxonomies),
+                },
+              }}
             />
           }
         </Content>

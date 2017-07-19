@@ -20,17 +20,20 @@ import {
   renderIndicatorControl,
   renderTaxonomyControl,
   renderSdgTargetControl,
-  validateDateFormat,
   getCategoryUpdatesFromFormData,
   getConnectionUpdatesFromFormData,
   getTitleFormField,
+  getStatusField,
+  getMarkdownField,
+  getDateField,
+  getFormField,
 } from 'utils/forms';
 
 import {
   getMetaField,
 } from 'utils/fields';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -108,14 +111,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          value: entity.getIn(['attributes', 'draft']),
-          options: PUBLISH_STATUSES,
-        },
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
         getMetaField(entity, appMessages),
       ],
     },
@@ -124,27 +120,9 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   getBodyMainFields = (recommendations, indicators, sdgtargets) => ([
     {
       fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-        },
-        {
-          id: 'outcome',
-          controlType: 'markdown',
-          model: '.attributes.outcome',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.outcome),
-          label: this.context.intl.formatMessage(appMessages.attributes.outcome),
-        },
-        {
-          id: 'indicator_summary',
-          controlType: 'markdown',
-          model: '.attributes.indicator_summary',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.indicator_summary),
-          label: this.context.intl.formatMessage(appMessages.attributes.indicator_summary),
-        },
+        getMarkdownField(this.context.intl.formatMessage, appMessages),
+        getMarkdownField(this.context.intl.formatMessage, appMessages, 'outcome'),
+        getMarkdownField(this.context.intl.formatMessage, appMessages, 'indicator_summary'),
       ],
     },
     {
@@ -160,26 +138,10 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   getBodyAsideFields = (taxonomies) => ([ // fieldGroups
     { // fieldGroup
-      fields: [{
-        id: 'target_date',
-        controlType: 'date',
-        model: '.attributes.target_date',
-        label: this.context.intl.formatMessage(appMessages.attributes.target_date),
-        placeholder: 'YYYY-MM-DD',
-        validators: {
-          date: validateDateFormat,
-        },
-        errorMessages: {
-          date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
-        },
-      },
-      {
-        id: 'target_date_comment',
-        controlType: 'textarea',
-        model: '.attributes.target_date_comment',
-        label: this.context.intl.formatMessage(appMessages.attributes.target_date_comment),
-        placeholder: this.context.intl.formatMessage(appMessages.placeholders.target_date_comment),
-      }],
+      fields: [
+        getDateField(this.context.intl.formatMessage, appMessages, 'target_date'),
+        getFormField(this.context.intl.formatMessage, appMessages, 'textarea', 'target_date_comment'),
+      ],
     },
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
@@ -187,17 +149,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       fields: renderTaxonomyControl(taxonomies),
     },
   ]);
-
-  getFields = (entity, taxonomies, recommendations, indicators, sdgtargets) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity),
-    },
-    body: {
-      main: this.getBodyMainFields(recommendations, indicators, sdgtargets),
-      aside: this.getBodyAsideFields(taxonomies),
-    },
-  })
 
   render() {
     const { viewEntity, dataReady, viewDomain, taxonomies, recommendations, indicators, sdgtargets } = this.props;
@@ -261,7 +212,16 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(viewEntity, taxonomies, recommendations, indicators, sdgtargets)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity),
+                },
+                body: {
+                  main: this.getBodyMainFields(recommendations, indicators, sdgtargets),
+                  aside: this.getBodyAsideFields(taxonomies),
+                },
+              }}
             />
           }
         </Content>

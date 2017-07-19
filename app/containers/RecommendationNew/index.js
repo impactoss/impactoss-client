@@ -16,11 +16,14 @@ import {
   renderTaxonomyControl,
   getTitleFormField,
   getReferenceFormField,
+  getAcceptedField,
+  getStatusField,
+  getMarkdownField,
 } from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE, ACCEPTED_STATUSES } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -72,36 +75,15 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     },
   ]);
 
-  getHeaderAsideFields = () => ([
-    {
-      fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          options: PUBLISH_STATUSES,
-        },
-      ],
-    },
-  ]);
+  getHeaderAsideFields = () => ([{
+    fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
+  }]);
+
   getBodyMainFields = (measures) => ([
     {
       fields: [
-        {
-          id: 'accepted',
-          controlType: 'select',
-          model: '.attributes.accepted',
-          label: this.context.intl.formatMessage(appMessages.attributes.accepted),
-          options: ACCEPTED_STATUSES,
-        },
-        {
-          id: 'response',
-          controlType: 'markdown',
-          model: '.attributes.response',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.response),
-          label: this.context.intl.formatMessage(appMessages.attributes.response),
-        },
+        getAcceptedField(this.context.intl.formatMessage, appMessages),
+        getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
       ],
     },
     {
@@ -121,16 +103,6 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     },
   ]);
 
-  getFields = (taxonomies, measures) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(),
-    },
-    body: {
-      main: this.getBodyMainFields(measures),
-      aside: this.getBodyAsideFields(taxonomies),
-    },
-  })
   render() {
     const { dataReady, viewDomain, taxonomies, measures } = this.props;
     const { saveSending, saveError } = viewDomain.page;
@@ -180,7 +152,16 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(taxonomies, measures)}
+              fields={{ // isManager, taxonomies,
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(),
+                },
+                body: {
+                  main: this.getBodyMainFields(measures),
+                  aside: this.getBodyAsideFields(taxonomies),
+                },
+              }}
             />
           }
         </Content>

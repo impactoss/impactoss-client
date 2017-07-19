@@ -19,6 +19,8 @@ import {
   getTitleFormField,
   getReferenceFormField,
   getShortTitleFormField,
+  getMarkdownField,
+  getFormField,
 } from 'utils/forms';
 
 import {
@@ -105,29 +107,13 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     fields: [getMetaField(entity, appMessages)],
   }]);
 
-  getBodyMainFields = () => ([
-    {
-      fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-        },
-      ],
-    },
-  ]);
+  getBodyMainFields = () => ([{
+    fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
+  }]);
   getBodyAsideFields = (entity, users, isAdmin) => {
     const fields = []; // fieldGroups
     fields.push({
-      fields: [{
-        id: 'url',
-        controlType: 'url',
-        model: '.attributes.url',
-        label: this.context.intl.formatMessage(appMessages.attributes.url),
-        placeholder: this.context.intl.formatMessage(appMessages.placeholders.url),
-      }],
+      fields: [getFormField(this.context.intl.formatMessage, appMessages, 'url', 'url')],
     });
     if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({
@@ -142,17 +128,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     }
     return fields;
   }
-
-  getFields = (entity, users, isAdmin) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity),
-    },
-    body: {
-      main: this.getBodyMainFields(),
-      aside: this.getBodyAsideFields(entity, users, isAdmin),
-    },
-  })
 
   render() {
     const { viewEntity, dataReady, isAdmin, viewDomain, users } = this.props;
@@ -204,7 +179,16 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(viewEntity, users, isAdmin)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity),
+                },
+                body: {
+                  main: this.getBodyMainFields(),
+                  aside: this.getBodyAsideFields(viewEntity, users, isAdmin),
+                },
+              }}
             />
           }
         </Content>

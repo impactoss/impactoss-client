@@ -15,13 +15,18 @@ import { Map } from 'immutable';
 
 import {
   getTitleFormField,
+  getDueDateOptionsField,
+  getDocumentStatusField,
+  getStatusField,
+  getMarkdownField,
+  getUploadField,
 } from 'utils/forms';
 
 import {
   getMetaField,
 } from 'utils/fields';
 
-import { DOC_PUBLISH_STATUSES, PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -95,14 +100,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          value: entity.getIn(['attributes', 'draft']),
-          options: PUBLISH_STATUSES,
-        },
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
         getMetaField(entity, appMessages),
       ],
     },
@@ -111,95 +109,28 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   getBodyMainFields = (entity) => ([
     {
       fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-        },
-        {
-          id: 'document_url',
-          controlType: 'uploader',
-          model: '.attributes.document_url',
-          label: this.context.intl.formatMessage(appMessages.attributes.document_url),
-        },
-        {
-          id: 'document_public',
-          controlType: 'select',
-          model: '.attributes.document_public',
-          options: DOC_PUBLISH_STATUSES,
-          value: entity.getIn(['attributes', 'document_public']),
-          label: this.context.intl.formatMessage(appMessages.attributes.document_public),
-        },
+        getMarkdownField(this.context.intl.formatMessage, appMessages),
+        getUploadField(this.context.intl.formatMessage, appMessages),
+        getDocumentStatusField(this.context.intl.formatMessage, appMessages, entity),
       ],
     },
   ]);
-  getDateOptions = (dates, activeDateId) => {
-    const dateOptions = [
-      {
-        value: 0,
-        label: this.context.intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short),
-        checked: activeDateId === null || activeDateId === 0 || activeDateId === '',
-      },
-    ];
-    const NO_OF_REPORT_OPTIONS = 1;
-    let excludeCount = 0;
-    return dates && dates.reduce((memo, date, i) => {
-      const isOwnDate = activeDateId ? activeDateId.toString() === date.get('id') : false;
-      const optionNoNotExceeded = i - excludeCount < NO_OF_REPORT_OPTIONS;
-      const withoutReport = !date.getIn(['attributes', 'has_progress_report']) || isOwnDate;
-      // only allow upcoming and those that are not associated
-      if (optionNoNotExceeded && withoutReport) {
-        // exclude overdue and already assigned date from max no of date options
-        if (date.getIn(['attributes', 'overdue']) || isOwnDate) {
-          excludeCount += 1;
-        }
-        const label =
-          `${this.context.intl.formatDate(new Date(date.getIn(['attributes', 'due_date'])))} ${
-            date.getIn(['attributes', 'overdue']) ? this.context.intl.formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
-            date.getIn(['attributes', 'due']) ? this.context.intl.formatMessage(appMessages.entities.due_dates.due) : ''}`;
-        return memo.concat([
-          {
-            value: parseInt(date.get('id'), 10),
-            label,
-            highlight: date.getIn(['attributes', 'overdue']),
-            checked: activeDateId ? date.get('id') === activeDateId : false,
-          },
-        ]);
-      }
-      return memo;
-    }, dateOptions);
-  }
+
   getBodyAsideFields = (entity) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.single),
       icon: 'calendar',
-      fields: entity.get('indicator') && entity.getIn(['indicator', 'dates'])
-        ? [{
-          id: 'due_date_id',
-          controlType: 'radio',
-          model: '.attributes.due_date_id',
-          options: this.getDateOptions(entity.getIn(['indicator', 'dates']), entity.getIn(['attributes', 'due_date_id'])),
-          value: entity.getIn(['attributes', 'due_date_id']) || 0,
-          hints: {
-            1: this.context.intl.formatMessage(appMessages.entities.due_dates.empty),
-          },
-        }]
-        : [],
+      fields: entity.get('indicator') && entity.getIn(['indicator', 'dates']) &&
+        [getDueDateOptionsField(
+          this.context.intl.formatMessage,
+          appMessages,
+          this.context.intl.formatDate,
+          entity.getIn(['indicator', 'dates']),
+          entity.getIn(['attributes', 'due_date_id']),
+        )],
     },
   ]);
 
-  getFields = (entity) => ({ // isManager, taxonomies
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity),
-    },
-    body: {
-      main: this.getBodyMainFields(entity),
-      aside: this.getBodyAsideFields(entity),
-    },
-  })
   render() {
     const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
@@ -254,7 +185,16 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
               handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity.getIn(['attributes', 'due_date_id']))}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(viewEntity)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity),
+                },
+                body: {
+                  main: this.getBodyMainFields(viewEntity),
+                  aside: this.getBodyAsideFields(viewEntity),
+                },
+              }}
             />
           }
         </Content>

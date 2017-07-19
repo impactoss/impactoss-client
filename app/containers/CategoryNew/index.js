@@ -16,6 +16,8 @@ import {
   getTitleFormField,
   getReferenceFormField,
   getShortTitleFormField,
+  getMarkdownField,
+  getFormField,
 } from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
@@ -77,31 +79,14 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     },
   ]);
 
-
-  getBodyMainFields = () => ([
-    {
-      fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-        },
-      ],
-    },
-  ]);
+  getBodyMainFields = () => ([{
+    fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
+  }]);
 
   getBodyAsideFields = (users, isAdmin, taxonomy) => {
     const fields = []; // fieldGroups
     fields.push({
-      fields: [{
-        id: 'url',
-        controlType: 'url',
-        model: '.attributes.url',
-        placeholder: this.context.intl.formatMessage(appMessages.placeholders.url),
-        label: this.context.intl.formatMessage(appMessages.attributes.url),
-      }],
+      fields: [getFormField(this.context.intl.formatMessage, appMessages, 'url', 'url')],
     });
     if (isAdmin && !!taxonomy.getIn(['attributes', 'has_manager'])) {
       fields.push({
@@ -115,16 +100,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     }
     return fields;
   }
-
-  getFields = (users, isAdmin, taxonomy) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-    },
-    body: {
-      main: this.getBodyMainFields(),
-      aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
-    },
-  })
 
   render() {
     const { taxonomy, dataReady, isAdmin, viewDomain, users } = this.props;
@@ -185,7 +160,15 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               )}
               handleCancel={() => this.props.handleCancel(taxonomyReference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(users, isAdmin, taxonomy)}
+              fields={{ // isManager, taxonomies,
+                header: {
+                  main: this.getHeaderMainFields(),
+                },
+                body: {
+                  main: this.getBodyMainFields(),
+                  aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
+                },
+              }}
             />
           }
         </Content>

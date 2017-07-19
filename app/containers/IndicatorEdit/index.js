@@ -19,10 +19,14 @@ import {
   renderMeasureControl,
   renderSdgTargetControl,
   renderUserControl,
-  validateDateFormat,
   getConnectionUpdatesFromFormData,
   getTitleFormField,
   getReferenceFormField,
+  getStatusField,
+  getMarkdownField,
+  getDateField,
+  getFrequencyField,
+  getCheckboxField,
 } from 'utils/forms';
 
 import {
@@ -31,7 +35,7 @@ import {
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES, PUBLISH_STATUSES, REPORT_FREQUENCIES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -113,14 +117,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          value: entity.getIn(['attributes', 'draft']),
-          options: PUBLISH_STATUSES,
-        },
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
         getMetaField(entity, appMessages),
       ],
     },
@@ -128,15 +125,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   getBodyMainFields = (measures, sdgtargets) => ([
     {
-      fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-        },
-      ],
+      fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
@@ -153,47 +142,10 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
       icon: 'reminder',
       fields: [
-        {
-          id: 'start_date',
-          controlType: 'date',
-          model: '.attributes.start_date',
-          label: this.context.intl.formatMessage(appMessages.attributes.start_date),
-          placeholder: 'YYYY-MM-DD',
-          validators: {
-            date: validateDateFormat,
-          },
-          errorMessages: {
-            date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
-          },
-        },
-        {
-          id: 'repeat',
-          controlType: 'checkbox',
-          model: '.attributes.repeat',
-          label: this.context.intl.formatMessage(appMessages.attributes.repeat),
-          value: entity.getIn(['attributes', 'repeat']),
-        },
-        {
-          id: 'frequency',
-          controlType: 'select',
-          label: this.context.intl.formatMessage(appMessages.attributes.frequency_months),
-          model: '.attributes.frequency_months',
-          options: REPORT_FREQUENCIES,
-          value: parseInt(entity.getIn(['attributes', 'frequency_months']), 10),
-        },
-        {
-          id: 'end_date',
-          controlType: 'date',
-          model: '.attributes.end_date',
-          label: this.context.intl.formatMessage(appMessages.attributes.end_date),
-          placeholder: 'YYYY-MM-DD',
-          validators: {
-            date: validateDateFormat,
-          },
-          errorMessages: {
-            date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
-          },
-        },
+        getDateField(this.context.intl.formatMessage, appMessages, 'start_date'),
+        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat'),
+        getFrequencyField(this.context.intl.formatMessage, appMessages, entity),
+        getDateField(this.context.intl.formatMessage, appMessages, 'end_date'),
         renderUserControl(
           users,
           this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
@@ -202,17 +154,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       ],
     },
   ]);
-
-  getFields = (entity, measures, sdgtargets, users) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity),
-    },
-    body: {
-      main: this.getBodyMainFields(measures, sdgtargets),
-      aside: this.getBodyAsideFields(entity, users),
-    },
-  })
 
   render() {
     const { viewEntity, dataReady, viewDomain, measures, users, sdgtargets } = this.props;
@@ -263,7 +204,16 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               handleSubmit={(formData) => this.props.handleSubmit(formData, measures, sdgtargets)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(viewEntity, measures, sdgtargets, users)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity),
+                },
+                body: {
+                  main: this.getBodyMainFields(measures, sdgtargets),
+                  aside: this.getBodyAsideFields(viewEntity, users),
+                },
+              }}
             />
           }
         </Content>

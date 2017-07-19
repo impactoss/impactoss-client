@@ -16,13 +16,15 @@ import { fromJS } from 'immutable';
 import {
   getTitleFormField,
   getMenuTitleFormField,
+  getMarkdownField,
+  getStatusField,
 } from 'utils/forms';
 
 import {
   getMetaField,
 } from 'utils/fields';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -87,41 +89,16 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          options: PUBLISH_STATUSES,
-        },
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
         getMetaField(entity, appMessages),
       ],
     },
   ]);
 
-  getBodyMainFields = () => ([
-    {
-      fields: [
-        {
-          id: 'content',
-          controlType: 'markdown',
-          model: '.attributes.content',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.content),
-          label: this.context.intl.formatMessage(appMessages.attributes.content),
-        },
-      ],
-    },
-  ]);
+  getBodyMainFields = () => ([{
+    fields: [getMarkdownField(this.context.intl.formatMessage, appMessages, 'content')],
+  }]);
 
-  getFields = (entity) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity),
-    },
-    body: {
-      main: this.getBodyMainFields(entity),
-    },
-  })
   render() {
     const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
@@ -172,7 +149,15 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(viewEntity)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity),
+                },
+                body: {
+                  main: this.getBodyMainFields(viewEntity),
+                },
+              }}
             />
           }
         </Content>

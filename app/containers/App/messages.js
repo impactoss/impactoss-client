@@ -61,6 +61,10 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.name',
       defaultMessage: 'Enter user name',
     },
+    email: {
+      id: 'app.containers.App.placeholders.email',
+      defaultMessage: 'Email address',
+    },
     short_title: {
       id: 'app.containers.App.placeholders.title',
       defaultMessage: 'Abbr.',
@@ -104,6 +108,10 @@ export default defineMessages({
     number: {
       id: 'app.containers.App.placeholders.number',
       defaultMessage: 'ID',
+    },
+    date: {
+      id: 'app.containers.App.placeholders.date',
+      defaultMessage: 'YYYY-MM-DD',
     },
   },
   attributes: {

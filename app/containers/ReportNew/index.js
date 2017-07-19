@@ -11,9 +11,14 @@ import Helmet from 'react-helmet';
 
 import {
   getTitleFormField,
+  getDueDateOptionsField,
+  getDocumentStatusField,
+  getStatusField,
+  getMarkdownField,
+  getUploadField,
 } from 'utils/forms';
 
-import { DOC_PUBLISH_STATUSES, PUBLISH_STATUSES, CONTENT_SINGLE } from 'containers/App/constants';
+import { CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -58,112 +63,35 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     },
   ]);
 
-  getHeaderAsideFields = () => ([
-    {
-      fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          value: true,
-          options: PUBLISH_STATUSES,
-        },
-      ],
-    },
-  ]);
+  getHeaderAsideFields = () => ([{
+    fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
+  }]);
 
   getBodyMainFields = () => ([
     {
       fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-        },
-        {
-          id: 'document_url',
-          controlType: 'uploader',
-          model: '.attributes.document_url',
-          label: this.context.intl.formatMessage(appMessages.attributes.document_url),
-        },
-        {
-          id: 'document_public',
-          controlType: 'select',
-          model: '.attributes.document_public',
-          options: DOC_PUBLISH_STATUSES,
-          value: true,
-          label: this.context.intl.formatMessage(appMessages.attributes.document_public),
-        },
+        getMarkdownField(this.context.intl.formatMessage, appMessages),
+        getUploadField(this.context.intl.formatMessage, appMessages),
+        getDocumentStatusField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
-  getDateOptions = (dates) => {
-    const dateOptions = [
-      {
-        value: 0,
-        label: this.context.intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short),
-        checked: true,
-      },
-    ];
-    const NO_OF_REPORT_OPTIONS = 1;
-    let excludeCount = 0;
-    return dates && dates.reduce((memo, date, i) => {
-      const optionNoNotExceeded = i - excludeCount < NO_OF_REPORT_OPTIONS;
-      const withoutReport = !date.getIn(['attributes', 'has_progress_report']);
-      // only allow upcoming and those that are not associated
-      if (optionNoNotExceeded && withoutReport) {
-        // exclude overdue and already assigned date from max no of date options
-        if (date.getIn(['attributes', 'overdue'])) {
-          excludeCount += 1;
-        }
-        const label =
-          `${this.context.intl.formatDate(new Date(date.getIn(['attributes', 'due_date'])))} ${
-            date.getIn(['attributes', 'overdue']) ? this.context.intl.formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
-            date.getIn(['attributes', 'due']) ? this.context.intl.formatMessage(appMessages.entities.due_dates.due) : ''}`;
-        return memo.concat([
-          {
-            value: parseInt(date.get('id'), 10),
-            label,
-            highlight: date.getIn(['attributes', 'overdue']),
-            checked: false,
-          },
-        ]);
-      }
-      return memo;
-    }, dateOptions);
-  }
+
   getBodyAsideFields = (indicator) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.single),
       icon: 'calendar',
-      fields: indicator
-        ? [{
-          id: 'due_date_id',
-          controlType: 'radio',
-          model: '.attributes.due_date_id',
-          options: this.getDateOptions(indicator.get('dates')),
-          value: 0,
-          hints: {
-            1: this.context.intl.formatMessage(appMessages.entities.due_dates.empty),
-          },
-        }]
-        : [],
+      fields: indicator &&
+        [getDueDateOptionsField(
+          this.context.intl.formatMessage,
+          appMessages,
+          this.context.intl.formatDate,
+          indicator.get('dates'),
+          0,
+        )],
     },
   ]);
 
-  getFields = (indicator) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(),
-    },
-    body: {
-      main: this.getBodyMainFields(),
-      aside: this.getBodyAsideFields(indicator),
-    },
-  })
   render() {
     const { dataReady, indicator, viewDomain } = this.props;
     const { saveSending, saveError } = viewDomain.page;
@@ -218,7 +146,16 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               )}
               handleCancel={() => this.props.handleCancel(indicatorReference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(indicator)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(),
+                },
+                body: {
+                  main: this.getBodyMainFields(),
+                  aside: this.getBodyAsideFields(indicator),
+                },
+              }}
             />
           }
         </Content>

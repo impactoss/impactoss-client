@@ -22,13 +22,16 @@ import {
   getConnectionUpdatesFromFormData,
   getTitleFormField,
   getReferenceFormField,
+  getAcceptedField,
+  getStatusField,
+  getMarkdownField,
 } from 'utils/forms';
 
 import {
   getMetaField,
 } from 'utils/fields';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE, ACCEPTED_STATUSES } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -102,35 +105,16 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          value: entity.getIn(['attributes', 'draft']),
-          options: PUBLISH_STATUSES,
-        },
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
         getMetaField(entity, appMessages),
       ],
     },
   ]);
-  getBodyMainFields = (measures) => ([
+  getBodyMainFields = (entity, measures) => ([
     {
       fields: [
-        {
-          id: 'accepted',
-          controlType: 'select',
-          model: '.attributes.accepted',
-          label: this.context.intl.formatMessage(appMessages.attributes.accepted),
-          options: ACCEPTED_STATUSES,
-        },
-        {
-          id: 'response',
-          controlType: 'markdown',
-          model: '.attributes.response',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.response),
-          label: this.context.intl.formatMessage(appMessages.attributes.response),
-        },
+        getAcceptedField(this.context.intl.formatMessage, appMessages, entity),
+        getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
       ],
     },
     {
@@ -150,16 +134,6 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     },
   ]);
 
-  getFields = (entity, taxonomies, measures) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity),
-    },
-    body: {
-      main: this.getBodyMainFields(measures),
-      aside: this.getBodyAsideFields(taxonomies),
-    },
-  })
   render() {
     const { viewEntity, dataReady, viewDomain, measures, taxonomies } = this.props;
     const reference = this.props.params.id;
@@ -218,7 +192,16 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(viewEntity, taxonomies, measures)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity),
+                },
+                body: {
+                  main: this.getBodyMainFields(viewEntity, measures),
+                  aside: this.getBodyAsideFields(taxonomies),
+                },
+              }}
             />
           }
         </Content>

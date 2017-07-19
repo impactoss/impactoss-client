@@ -14,10 +14,12 @@ import { Map, List } from 'immutable';
 
 import {
   taxonomyOptions,
-  validateRequired,
   renderTaxonomyControl,
   getCategoryUpdatesFromFormData,
   getTitleFormField,
+  getEmailField,
+  getHighestUserRoleId,
+  getRoleFormField,
 } from 'utils/forms';
 
 import {
@@ -82,66 +84,18 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       id: viewEntity.get('id'),
       attributes: viewEntity.get('attributes'),
       associatedTaxonomies: taxonomyOptions(taxonomies),
-      associatedRole: this.getHighestUserRoleId(roles),
+      associatedRole: getHighestUserRoleId(roles),
     });
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage, appMessages, 'title', 'name'),
-      ],
-    },
-  ]);
-
-  getRoleOptions = (roles) => {
-    const roleOptions = [
-      {
-        value: 0,
-        label: this.context.intl.formatMessage(appMessages.entities.roles.defaultRole),
-      },
-    ];
-    return roles.reduce((memo, role) =>
-      memo.concat([
-        {
-          value: parseInt(role.get('id'), 10),
-          label: role.getIn(['attributes', 'friendly_name']),
-        },
-      ])
-    , roleOptions);
-  }
-
-  // only show the highest rated role (lower role ids means higher)
-  getHighestUserRoleId = (roles) =>
-    roles.reduce((currentHighestRoleId, role) =>
-      role.get('associated') && role.get('id') < currentHighestRoleId
-        ? role.get('id')
-        : currentHighestRoleId
-    , 99999);
-
-  // only show the highest rated role (lower role ids means higher)
-  getHighestUserRoleLabel = (roles) => {
-    const highestRole = roles.reduce((currentHighestRole, role) =>
-      role.get('associated') && (!currentHighestRole || role.get('id') < currentHighestRole.get('id'))
-        ? role.get('id')
-        : currentHighestRole
-    , null);
-    return highestRole
-      ? highestRole.getIn(['attributes', 'friendly_name'])
-      : this.context.intl.formatMessage(appMessages.entities.roles.defaultRole);
-  }
+  getHeaderMainFields = () => ([{ // fieldGroup
+    fields: [getTitleFormField(this.context.intl.formatMessage, appMessages, 'title', 'name')],
+  }]);
 
   getHeaderAsideFields = (entity, roles, isManager) => ([
     {
       fields: isManager ? [
-        {
-          id: 'role',
-          controlType: 'select',
-          model: '.associatedRole',
-          label: this.context.intl.formatMessage(appMessages.entities.roles.single),
-          value: this.getHighestUserRoleId(roles),
-          options: this.getRoleOptions(roles),
-        },
+        getRoleFormField(this.context.intl.formatMessage, appMessages, roles),
         getMetaField(entity, appMessages),
       ]
       : [
@@ -151,24 +105,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     },
   ]);
 
-  getBodyMainFields = () => ([
-    {
-      fields: [
-        {
-          id: 'email',
-          controlType: 'email',
-          model: '.attributes.email',
-          label: this.context.intl.formatMessage(appMessages.attributes.email),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-      ],
-    },
-  ]);
+  getBodyMainFields = () => ([{
+    fields: [getEmailField(this.context.intl.formatMessage, appMessages)],
+  }]);
 
   getBodyAsideFields = (isManager, taxonomies) => ([ // fieldGroups
     !isManager ? null : { // fieldGroup
@@ -177,17 +116,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       fields: renderTaxonomyControl(taxonomies),
     },
   ]);
-
-  getFields = (entity, roles, isManager, taxonomies) => ({
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity, roles, isManager),
-    },
-    body: {
-      main: this.getBodyMainFields(),
-      aside: this.getBodyAsideFields(isManager, taxonomies),
-    },
-  })
 
   render() {
     const { viewEntity, dataReady, viewDomain, taxonomies, roles, isManager } = this.props;
@@ -247,7 +175,16 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               )}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(viewEntity, roles, isManager, taxonomies)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity, roles, isManager),
+                },
+                body: {
+                  main: this.getBodyMainFields(),
+                  aside: this.getBodyAsideFields(isManager, taxonomies),
+                },
+              }}
             />
           }
         </Content>
