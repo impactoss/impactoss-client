@@ -10,32 +10,46 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
 import {
-  validateRequired,
+  getTitleFormField,
+  getMenuTitleFormField,
+  getMarkdownField,
+  getStatusField,
 } from 'utils/forms';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
+  loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
 } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
+import { selectReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import { selectDomain } from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES } from './constants';
 
 
 export class PageNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
+  componentWillMount() {
+    this.props.loadEntitiesIfNeeded();
+  }
+
   componentWillReceiveProps(nextProps) {
+    // reload entities if invalidated
+    if (!nextProps.dataReady) {
+      this.props.loadEntitiesIfNeeded();
+    }
     if (nextProps.dataReady && !this.props.dataReady) {
       this.props.redirectIfNotPermitted();
     }
@@ -44,73 +58,20 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
-          id: 'menuTitle',
-          controlType: 'short',
-          model: '.attributes.menu_title',
-          label: this.context.intl.formatMessage(appMessages.attributes.menu_title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.menu_title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
+        getMenuTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
 
-  getHeaderAsideFields = () => ([
-    {
-      fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          options: PUBLISH_STATUSES,
-        },
-      ],
-    },
-  ]);
+  getHeaderAsideFields = () => ([{
+    fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
+  }]);
 
-  getBodyMainFields = () => ([
-    {
-      fields: [
-        {
-          id: 'content',
-          controlType: 'markdown',
-          model: '.attributes.content',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.content),
-          label: this.context.intl.formatMessage(appMessages.attributes.content),
-        },
-      ],
-    },
-  ]);
+  getBodyMainFields = () => ([{
+    fields: [getMarkdownField(this.context.intl.formatMessage, appMessages, 'content')],
+  }]);
 
-  getFields = () => ({
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(),
-    },
-    body: {
-      main: this.getBodyMainFields(),
-    },
-  })
   render() {
     const { viewDomain, dataReady } = this.props;
     const { saveSending, saveError } = viewDomain.page;
@@ -158,7 +119,15 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields()}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(),
+                },
+                body: {
+                  main: this.getBodyMainFields(),
+                },
+              }}
             />
           }
         </Content>
@@ -168,6 +137,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
 }
 
 PageNew.propTypes = {
+  loadEntitiesIfNeeded: PropTypes.func.isRequired,
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
@@ -181,14 +151,15 @@ PageNew.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'user_roles',
-  ] }),
+  viewDomain: selectDomain(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
+    loadEntitiesIfNeeded: () => {
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
     },

@@ -24,12 +24,14 @@ import {
   LOGOUT_SUCCESS,
   ADD_ENTITY,
   UPDATE_ENTITY,
-  DELETE_ENTITY,
+  UPDATE_ENTITIES,
+  UPDATE_CONNECTIONS,
+  REMOVE_ENTITY,
   ENTITIES_REQUESTED,
   INVALIDATE_ENTITIES,
   DUEDATE_ASSIGNED,
   DUEDATE_UNASSIGNED,
-  DB_SCHEMA,
+  DB_TABLES,
 } from './constants';
 
 // The initial state of the App
@@ -44,10 +46,10 @@ const initialState = fromJS({
   },
   /* eslint-disable no-param-reassign */
   // Record the time that entities where requested from the server
-  requested: Object.keys(DB_SCHEMA).reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  requested: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
   // Record the time that entities where returned from the server
-  ready: Object.keys(DB_SCHEMA).reduce((memo, table) => { memo[table] = null; return memo; }, {}),
-  entities: Object.keys(DB_SCHEMA).reduce((memo, table) => { memo[table] = {}; return memo; }, {}),
+  ready: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  entities: DB_TABLES.reduce((memo, table) => { memo[table] = {}; return memo; }, {}),
   /* eslint-enable no-param-reassign */
   user: {
     attributes: null,
@@ -84,10 +86,26 @@ function appReducer(state = initialState, payload) {
     case ADD_ENTITY:
       return state
         .setIn(['entities', payload.path, payload.entity.id], fromJS(payload.entity));
+    case UPDATE_ENTITIES:
+      return payload.entities.reduce((stateUpdated, entity) =>
+        stateUpdated.setIn(
+          ['entities', payload.path, entity.data.id, 'attributes'],
+          fromJS(entity.data.attributes)
+        )
+      , state);
+    case UPDATE_CONNECTIONS:
+      return payload.updates.reduce((stateUpdated, connection) =>
+        connection.type === 'delete'
+        ? stateUpdated.deleteIn(['entities', payload.path, connection.id])
+        : stateUpdated.setIn(
+          ['entities', payload.path, connection.data.id],
+          fromJS(connection.data)
+        )
+      , state);
     case UPDATE_ENTITY:
       return state
           .setIn(['entities', payload.path, payload.entity.id, 'attributes'], fromJS(payload.entity.attributes));
-    case DELETE_ENTITY:
+    case REMOVE_ENTITY:
       return state
           .deleteIn(['entities', payload.path, payload.id]);
     case ENTITIES_REQUESTED:

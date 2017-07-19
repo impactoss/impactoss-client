@@ -8,15 +8,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
+import { selectReady, selectUserConnections, selectUserTaxonomies } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
 
-import { FILTERS, EDITS } from './constants';
-import { selectConnections, selectUsers, selectTaxonomies } from './selectors';
+import { CONFIG, DEPENDENCIES } from './constants';
+import { selectUsers } from './selectors';
 import messages from './messages';
 
 export class UserList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -49,20 +50,17 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <EntityList
-          location={this.props.location}
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
-          path="users"
-          filters={FILTERS}
-          edits={EDITS}
+          config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
             single: this.context.intl.formatMessage(appMessages.entities.users.single),
             plural: this.context.intl.formatMessage(appMessages.entities.users.plural),
           }}
-          entityLinkTo="/users/"
+          locationQuery={fromJS(this.props.location.query)}
         />
       </div>
     );
@@ -71,39 +69,27 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
 
 UserList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
-  entities: PropTypes.object.isRequired,
-  taxonomies: PropTypes.object,
-  connections: PropTypes.object,
+  entities: PropTypes.instanceOf(List).isRequired,
+  taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
+  location: PropTypes.object,
 };
 
 UserList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  dataReady: isReady(state, { path: [
-    'users',
-    'user_roles',
-    'roles',
-    'user_categories',
-    'categories',
-    'taxonomies',
-  ] }),
-  entities: selectUsers(state),
-  taxonomies: selectTaxonomies(state),
-  connections: selectConnections(state),
+const mapStateToProps = (state, props) => ({
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  entities: selectUsers(state, fromJS(props.location.query)),
+  taxonomies: selectUserTaxonomies(state),
+  connections: selectUserConnections(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('roles'));
-      dispatch(loadEntitiesIfNeeded('user_categories'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
   };
 }

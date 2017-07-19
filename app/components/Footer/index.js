@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
 
-import Container from 'components/basic/Container';
-import Row from 'components/basic/Row';
+import Container from 'components/styled/Container';
+import Row from 'components/styled/Row';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';

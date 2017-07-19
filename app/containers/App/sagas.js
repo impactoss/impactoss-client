@@ -18,8 +18,8 @@ import {
   LOGOUT,
   VALIDATE_TOKEN,
   INVALIDATE_ENTITIES,
-  UPDATE_CONNECTIONS,
-  UPDATE_ENTITIES,
+  SAVE_CONNECTIONS,
+  SAVE_ENTITIES,
   UPDATE_ROUTE_QUERY,
   AUTHENTICATE_FORWARD,
   USER_ROLES,
@@ -38,8 +38,10 @@ import {
   entitiesRequested,
   invalidateEntities,
   updateEntity,
+  updateEntities,
+  updateConnections,
   addEntity,
-  deleteEntity,
+  // removeEntity,
   saveSending,
   saveSuccess,
   saveError,
@@ -49,10 +51,10 @@ import {
 import {
   makeSelectPathnameOnAuthChange,
   makeSelectPreviousPathname,
-  getRequestedAt,
-  isSignedIn,
+  selectRequestedAt,
+  selectIsSignedIn,
   selectLocation,
-  sessionUserRoles,
+  selectSessionUserRoles,
 } from 'containers/App/selectors';
 
 import {
@@ -68,11 +70,11 @@ import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
  */
 export function* checkEntitiesSaga(payload) {
   // requestedSelector returns the times that entities where fetched from the API
-  const requestedAt = yield select(getRequestedAt, { path: payload.path });
+  const requestedAt = yield select(selectRequestedAt, { path: payload.path });
 
   // If haven't requested yet, do so now.
   if (!requestedAt) {
-    const signedIn = yield select(isSignedIn);
+    const signedIn = yield select(selectIsSignedIn);
 
     try {
       // First record that we are requesting
@@ -105,14 +107,14 @@ export function* checkEntitiesSaga(payload) {
  * Check if user is authorized
  */
 export function* checkRoleSaga({ role }) {
-  const signedIn = yield select(isSignedIn);
+  const signedIn = yield select(selectIsSignedIn);
   if (signedIn) {
-    const roleIds = yield select(sessionUserRoles);
-    if (!(roleIds.indexOf(role) > -1
-    || (role === USER_ROLES.MANAGER && roleIds.indexOf(USER_ROLES.ADMIN) > -1)
-    || (role === USER_ROLES.CONTRIBUTOR && (roleIds.indexOf(USER_ROLES.MANAGER) > -1 || roleIds.indexOf(USER_ROLES.ADMIN) > -1))
+    const roleIds = yield select(selectSessionUserRoles);
+    if (!(roleIds.includes(role)
+      || (role === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
+      || (role === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
     )) {
-      yield put(push('/not-authorized'));
+      yield put(push('/login'));
     }
   }
 }
@@ -226,14 +228,11 @@ export function* validateTokenSaga() {
   }
 }
 
-export function* updateConnectionsSaga({ data }) {
+export function* saveConnectionsSaga({ data }) {
   // on the server
   const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
   // and on the client
-  yield connectionsUpdated.map((connection) => connection.type === 'delete'
-    ? put(deleteEntity(data.path, connection.id))
-    : put(addEntity(data.path, connection.data))
-  );
+  yield put(updateConnections(data.path, connectionsUpdated));
   // TODO: error handling
 }
 
@@ -246,7 +245,7 @@ export function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
     [keyPair[1]]: create[keyPair[1]] || entityId,
   }));
 
-  yield call(updateConnectionsSaga, { data: { path, updates: updatesUpdated } });
+  yield call(saveConnectionsSaga, { data: { path, updates: updatesUpdated } });
 }
 
 export function* saveEntitySaga({ data }) {
@@ -262,7 +261,7 @@ export function* saveEntitySaga({ data }) {
 
     // update user-roles connections
     if (data.entity.userRoles) {
-      yield call(updateConnectionsSaga, {
+      yield call(saveConnectionsSaga, {
         data: {
           path: 'user_roles',
           updates: data.entity.userRoles,
@@ -272,7 +271,7 @@ export function* saveEntitySaga({ data }) {
 
     // update user-category connections
     if (data.entity.userCategories) {
-      yield call(updateConnectionsSaga, {
+      yield call(saveConnectionsSaga, {
         data: {
           path: 'user_categories',
           updates: data.entity.userCategories,
@@ -282,7 +281,7 @@ export function* saveEntitySaga({ data }) {
 
     // update recommendation-measure connections
     if (data.entity.recommendationMeasures) {
-      yield call(updateConnectionsSaga, {
+      yield call(saveConnectionsSaga, {
         data: {
           path: 'recommendation_measures',
           updates: data.entity.recommendationMeasures,
@@ -292,7 +291,7 @@ export function* saveEntitySaga({ data }) {
 
     // update measure-indicatos connections
     if (data.entity.measureIndicators) {
-      yield call(updateConnectionsSaga, {
+      yield call(saveConnectionsSaga, {
         data: {
           path: 'measure_indicators',
           updates: data.entity.measureIndicators,
@@ -302,7 +301,7 @@ export function* saveEntitySaga({ data }) {
 
     // update measure-category connections
     if (data.entity.measureCategories) {
-      yield call(updateConnectionsSaga, {
+      yield call(saveConnectionsSaga, {
         data: {
           path: 'measure_categories',
           updates: data.entity.measureCategories,
@@ -312,7 +311,7 @@ export function* saveEntitySaga({ data }) {
 
     // update sdgtarget-indicatos connections
     if (data.entity.sdgtargetIndicators) {
-      yield call(updateConnectionsSaga, {
+      yield call(saveConnectionsSaga, {
         data: {
           path: 'sdgtarget_indicators',
           updates: data.entity.sdgtargetIndicators,
@@ -322,7 +321,7 @@ export function* saveEntitySaga({ data }) {
 
     // update sdgtarget-measure connections
     if (data.entity.sdgtargetMeasures) {
-      yield call(updateConnectionsSaga, {
+      yield call(saveConnectionsSaga, {
         data: {
           path: 'sdgtarget_measures',
           updates: data.entity.sdgtargetMeasures,
@@ -332,7 +331,7 @@ export function* saveEntitySaga({ data }) {
 
     // update measure-category connections
     if (data.entity.sdgtargetCategories) {
-      yield call(updateConnectionsSaga, {
+      yield call(saveConnectionsSaga, {
         data: {
           path: 'sdgtarget_categories',
           updates: data.entity.sdgtargetCategories,
@@ -342,7 +341,7 @@ export function* saveEntitySaga({ data }) {
 
     // update recommendation-category connections
     if (data.entity.recommendationCategories) {
-      yield call(updateConnectionsSaga, {
+      yield call(saveConnectionsSaga, {
         data: {
           path: 'recommendation_categories',
           updates: data.entity.recommendationCategories,
@@ -450,13 +449,13 @@ export function* newEntitySaga({ data }) {
 
 // Batch update entity attributes
 // WARNING untested =)
-export function* updateEntitiesSaga({ data }) {
+export function* saveEntitiesSaga({ data }) {
   try {
     yield put(saveSending(data));
     // on the server
     const entitiesUpdated = yield call(updateEntitiesRequest, data.path, data.entities);
     // // and on the client
-    yield entitiesUpdated.map((entity) => put(updateEntity(data.path, entity.data)));
+    yield put(updateEntities(data.path, entitiesUpdated));
     yield put(saveSuccess(data));
   } catch (error) {
     yield put(saveError('Error saving data', data));
@@ -543,8 +542,8 @@ export default function* rootSaga() {
 
   yield takeEvery(SAVE_ENTITY, saveEntitySaga);
   yield takeEvery(NEW_ENTITY, newEntitySaga);
-  yield takeEvery(UPDATE_CONNECTIONS, updateConnectionsSaga);
-  yield takeEvery(UPDATE_ENTITIES, updateEntitiesSaga);
+  yield takeEvery(SAVE_CONNECTIONS, saveConnectionsSaga);
+  yield takeEvery(SAVE_ENTITIES, saveEntitiesSaga);
 
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);

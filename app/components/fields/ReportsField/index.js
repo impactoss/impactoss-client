@@ -1,10 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-
-import { orderBy } from 'lodash/collection';
-
-import { getEntitySortIteratee } from 'utils/sort';
+import { FormattedMessage, FormattedDate } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -33,11 +29,11 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
   }
   render() {
     const { field } = this.props;
-    const sortedValues = orderBy(field.values, getEntitySortIteratee('id'), 'asc');
+
     return (
       <FieldWrap>
         <LabelLarge>
-          {field.label}
+          <FormattedMessage {...appMessages.entities.progress_reports.plural} />
         </LabelLarge>
         { field.button &&
           <ButtonWrap>
@@ -45,7 +41,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
           </ButtonWrap>
         }
         <EntityListItemsWrap>
-          { sortedValues.map((value, i) => (this.state.showAllReports || i < REPORTSMAX) && (
+          { field.values.map((value, i) => (this.state.showAllReports || i < REPORTSMAX) && (
             <ReportListLink key={i} to={value.linkTo}>
               <ReportListItem>
                 <ListItemIcon>
@@ -53,7 +49,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
                 </ListItemIcon>
                 { value.dueDate &&
                   <ReportDueDate>
-                    {value.dueDate}
+                    <FormattedDate value={new Date(value.dueDate)} />
                   </ReportDueDate>
                 }
                 { !value.dueDate &&
@@ -81,7 +77,9 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
           </ToggleAllItems>
         }
         { (!field.values || field.values.length === 0) &&
-          <EmptyHint>{field.showEmpty}</EmptyHint>
+          <EmptyHint>
+            <FormattedMessage {...appMessages.entities.progress_reports.empty} />
+          </EmptyHint>
         }
       </FieldWrap>
     );
@@ -90,9 +88,6 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
 
 ReportsField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-ReportsField.contextTypes = {
-  intl: PropTypes.object.isRequired,
 };
 
 export default ReportsField;

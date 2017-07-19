@@ -1,20 +1,10 @@
-import { takeLatest, put, select } from 'redux-saga/effects';
-
-import { LOCATION_CHANGE } from 'react-router-redux';
+import { takeLatest, put } from 'redux-saga/effects';
 
 import {
-  updateConnections,
-  updateEntities,
+  saveConnections,
+  saveEntities,
   updateRouteQuery,
 } from 'containers/App/actions';
-
-import {
-  selectLocation,
-} from 'containers/App/selectors';
-
-import {
-  resetState,
-} from './actions';
 
 import {
   SAVE_EDITS,
@@ -77,21 +67,13 @@ export function* saveEdits({ data }) {
     //  { id: id, attributes: {...} },
     //  { id: id, attributes: {...} }, ...
     // ]}
-    yield put(updateEntities(data));
+    yield put(saveEntities(data));
   } else {
     // data = { attributes: true, path: path, updates: {
     //   creates: [{entity_id, assignedId}, ...],
     //   deletes: [assignment, ids,...]
     // }}
-    yield put(updateConnections(data));
-  }
-}
-
-export function* locationChangeSaga() {
-  // reset list if path changed
-  const location = yield select(selectLocation);
-  if (location.get('pathname') !== location.get('pathnamePrevious')) {
-    yield put(resetState());
+    yield put(saveConnections(data));
   }
 }
 
@@ -102,5 +84,4 @@ export default function* entityList() {
   yield takeLatest(EXPAND_CHANGE, updateExpand);
 
   yield takeLatest(SAVE_EDITS, saveEdits);
-  yield takeLatest(LOCATION_CHANGE, locationChangeSaga);
 }

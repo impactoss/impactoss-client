@@ -1,20 +1,18 @@
-import { reduce } from 'lodash/collection';
-
-export const getTaxonomyTagList = (taxonomy) => {
+const getTaxonomyTagList = (taxonomy) => {
   const tags = [];
-  if (taxonomy.attributes.tags_recommendations) {
-    tags.push({
-      type: 'recommendations',
-      icon: 'recommendations',
-    });
-  }
-  if (taxonomy.attributes.tags_measures) {
+  if (taxonomy.getIn(['attributes', 'tags_measures'])) {
     tags.push({
       type: 'measures',
       icon: 'actions',
     });
   }
-  if (taxonomy.attributes.tags_sdgtargets) {
+  if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
+    tags.push({
+      type: 'recommendations',
+      icon: 'recommendations',
+    });
+  }
+  if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
     tags.push({
       type: 'sdgtargets',
       icon: 'sdgtargets',
@@ -22,30 +20,23 @@ export const getTaxonomyTagList = (taxonomy) => {
   }
   return tags;
 };
-export const mapToTaxonomyList = (taxonomies, onLink, activeId, tags = true) => Object.values(taxonomies).map((tax) => ({
-  id: tax.id,
+export const mapToTaxonomyList = (taxonomies, onLink, activeId, tags = true) => taxonomies.map((tax) => ({
+  id: tax.get('id'),
   count: tax.count,
-  onLink: () => onLink(`/categories/${tax.id}`),
+  onLink: () => onLink(`/categories/${tax.get('id')}`),
   tags: tags ? getTaxonomyTagList(tax) : null,
-  active: parseInt(activeId, 10) === parseInt(tax.id, 10),
-}));
+  active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
+})).toArray();
 
-export const getCategoryMaxCount = (categories, attribute) =>
-  reduce(categories, (countsMemo, cat) => {
-    if (cat[attribute]) {
-      return cat[attribute] > countsMemo
-        ? cat[attribute]
-        : countsMemo;
-    }
-    return countsMemo;
-  }, 0);
-
-export const mapToCategoryList = (categories, onLink, countAttributes) => Object.values(categories).map((cat) => ({
-  id: cat.id,
-  reference: cat.attributes.reference && cat.attributes.reference.trim() !== '' ? cat.attributes.reference : null,
-  title: cat.attributes.title,
-  onLink: () => onLink(`/category/${cat.id}`),
-  counts: countAttributes
-    ? countAttributes.map((countAttribute) => cat[countAttribute.attribute])
-    : null,
-}));
+export const mapToCategoryList = (categories, onLink, countAttributes) =>
+  categories.map((cat) => ({
+    id: cat.get('id'),
+    reference: cat.getIn(['attributes', 'reference']) && cat.getIn(['attributes', 'reference']).trim() !== ''
+      ? cat.getIn(['attributes', 'reference'])
+      : null,
+    title: cat.getIn(['attributes', 'title']),
+    onLink: () => onLink(`/category/${cat.get('id')}`),
+    counts: countAttributes
+      ? countAttributes.map((countAttribute) => cat.get(countAttribute.attribute))
+      : null,
+  })).toArray();

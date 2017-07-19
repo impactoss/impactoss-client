@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -13,7 +14,7 @@ class EmailField extends React.PureComponent { // eslint-disable-line react/pref
     return (
       <FieldWrap>
         <Label>
-          {field.label || this.context.intl.formatMessage(appMessages.attributes.url)}
+          <FormattedMessage {...(field.label || appMessages.attributes.email)} />
         </Label>
         <Url target="_blank" href={`mailto:${field.value}`}>
           {field.value}

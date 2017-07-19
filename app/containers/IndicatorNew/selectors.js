@@ -1,20 +1,18 @@
 import { createSelector } from 'reselect';
 
-/**
- * Direct selector to the actionNew state domain
- */
-const selectIndicatorNewDomain = () => (state) => state.get('indicatorNew');
+import { selectEntities } from 'containers/App/selectors';
+import { USER_ROLES } from 'containers/App/constants';
 
-/**
- * Default selector used by IndicatorNew
- */
+import { usersSetRoles } from 'utils/entities';
 
-const viewDomainSelect = createSelector(
-  selectIndicatorNewDomain(),
+export const selectDomain = createSelector(
+  (state) => state.get('indicatorNew'),
   (substate) => substate.toJS()
 );
-
-export default viewDomainSelect;
-export {
-  selectIndicatorNewDomain,
-};
+// all users of role contributor
+export const selectUsers = createSelector(
+  (state) => selectEntities(state, 'users'),
+  (state) => selectEntities(state, 'user_roles'),
+  (entities, associations) =>
+    usersSetRoles(entities, associations, USER_ROLES.CONTRIBUTOR)
+);

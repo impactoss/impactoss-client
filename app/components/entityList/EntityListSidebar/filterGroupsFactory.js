@@ -1,0 +1,92 @@
+import { reduce } from 'lodash/collection';
+
+// figure out filter groups for filter panel
+export const makeFilterGroups = (
+  filters,
+  taxonomies,
+  connectedTaxonomies,
+  activeFilterOption,
+  messages,
+  formatLabel
+) => {
+  const filterGroups = {};
+
+  // taxonomy option group
+  if (filters.taxonomies && taxonomies) {
+    // first prepare taxonomy options
+    filterGroups.taxonomies = {
+      id: 'taxonomies', // filterGroupId
+      label: messages.taxonomies,
+      show: true,
+      icon: 'categories',
+      options: taxonomies.reduce((taxOptions, taxonomy) => ({
+        ...taxOptions,
+        [taxonomy.get('id')]: {
+          id: taxonomy.get('id'), // filterOptionId
+          label: taxonomy.getIn(['attributes', 'title']),
+          icon: `taxonomy_${taxonomy.get('id')}`,
+          active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+        },
+      }), {}),
+    };
+  }
+
+  // connectedTaxonomies option group
+  if (filters.connectedTaxonomies) {
+    // first prepare taxonomy options
+    filterGroups.connectedTaxonomies = {
+      id: 'connectedTaxonomies', // filterGroupId
+      label: messages.connectedTaxonomies,
+      show: true,
+      icon: 'connectedCategories',
+      options: connectedTaxonomies.reduce((taxOptions, taxonomy) => ({
+        ...taxOptions,
+        [taxonomy.get('id')]: {
+          id: taxonomy.get('id'), // filterOptionId
+          label: taxonomy.getIn(['attributes', 'title']),
+          icon: `taxonomy_${taxonomy.get('id')}`,
+          active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+        },
+      }), {}),
+    };
+  }
+
+  // connections option group
+  if (filters.connections) {
+    // first prepare taxonomy options
+    filterGroups.connections = {
+      id: 'connections', // filterGroupId
+      label: messages.connections,
+      show: true,
+      options: reduce(filters.connections.options, (options, option) => ({
+        ...options,
+        [option.path]: {
+          id: option.path, // filterOptionId
+          label: formatLabel(option.label),
+          icon: option.path,
+          active: !!activeFilterOption && activeFilterOption.optionId === option.path,
+        },
+      }), {}),
+    };
+  }
+
+  // attributes
+  if (filters.attributes) {
+    // first prepare taxonomy options
+    filterGroups.attributes = {
+      id: 'attributes', // filterGroupId
+      label: messages.attributes,
+      show: true,
+      options: reduce(filters.attributes.options, (options, option) => ({
+        ...options,
+        [option.attribute]: {
+          id: option.attribute, // filterOptionId
+          label: formatLabel(option.label),
+          active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
+        },
+      }), {}),
+    };
+  }
+
+  return filterGroups;
+};

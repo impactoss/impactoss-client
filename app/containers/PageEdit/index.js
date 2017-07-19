@@ -11,12 +11,20 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { fromJS } from 'immutable';
+import { Map } from 'immutable';
+
 import {
-  validateRequired,
+  getTitleFormField,
+  getMenuTitleFormField,
+  getMarkdownField,
+  getStatusField,
 } from 'utils/forms';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import {
+  getMetaField,
+} from 'utils/fields';
+
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -26,26 +34,27 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import {
-  getEntity,
-  isReady,
-} from 'containers/App/selectors';
+import { selectReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectViewEntity,
+} from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class PageEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.page) {
+    if (this.props.dataReady && this.props.viewEntity) {
       this.props.populateForm('pageEdit.form.data', this.getInitialFormData());
     }
   }
@@ -56,7 +65,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.page) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('pageEdit.form.data', this.getInitialFormData(nextProps));
     }
@@ -64,45 +73,23 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { page } = props;
-    return fromJS(page);
+    const { viewEntity } = props;
+    return viewEntity
+    ? Map({
+      id: viewEntity.get('id'),
+      attributes: viewEntity.get('attributes').mergeWith(
+        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+        FORM_INITIAL.get('attributes')
+      ),
+    })
+    : Map();
   }
 
-  getHeaderMainFields = (entity) => ([ // fieldGroups
+  getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          controlType: 'info',
-          type: 'reference',
-          value: entity.id,
-          label: this.context.intl.formatMessage(appMessages.attributes.id),
-        },
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
-          id: 'menuTitle',
-          controlType: 'short',
-          model: '.attributes.menu_title',
-          label: this.context.intl.formatMessage(appMessages.attributes.menu_title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.menu_title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
+        getMenuTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
@@ -110,56 +97,18 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          options: PUBLISH_STATUSES,
-        },
-        {
-          controlType: 'info',
-          type: 'meta',
-          fields: [
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
-            },
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.user && entity.user.attributes.name,
-            },
-          ],
-        },
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
+        getMetaField(entity, appMessages),
       ],
     },
   ]);
 
-  getBodyMainFields = () => ([
-    {
-      fields: [
-        {
-          id: 'content',
-          controlType: 'markdown',
-          model: '.attributes.content',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.content),
-          label: this.context.intl.formatMessage(appMessages.attributes.content),
-        },
-      ],
-    },
-  ]);
+  getBodyMainFields = () => ([{
+    fields: [getMarkdownField(this.context.intl.formatMessage, appMessages, 'content')],
+  }]);
 
-  getFields = (entity) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(entity),
-      aside: this.getHeaderAsideFields(entity),
-    },
-    body: {
-      main: this.getBodyMainFields(entity),
-    },
-  })
   render() {
-    const { page, dataReady, viewDomain } = this.props;
+    const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -177,7 +126,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
             type={CONTENT_SINGLE}
             icon="categories"
             buttons={
-              page && dataReady ? [{
+              viewEntity && dataReady ? [{
                 type: 'cancel',
                 onClick: this.props.handleCancel,
               },
@@ -193,22 +142,30 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           {saveError &&
             <p>{saveError}</p>
           }
-          { !page && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
-          { !page && dataReady && !saveError &&
+          { !viewEntity && dataReady && !saveError &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {page && dataReady &&
+          {viewEntity && dataReady &&
             <EntityForm
               model="pageEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(page)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity),
+                },
+                body: {
+                  main: this.getBodyMainFields(viewEntity),
+                },
+              }}
             />
           }
         </Content>
@@ -227,7 +184,7 @@ PageEdit.propTypes = {
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
-  page: PropTypes.object,
+  viewEntity: PropTypes.object,
 };
 
 PageEdit.contextTypes = {
@@ -235,35 +192,15 @@ PageEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'users',
-    'pages',
-  ] }),
-
-  page: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'pages',
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-      ],
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('pages'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));

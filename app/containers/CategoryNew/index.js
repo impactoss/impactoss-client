@@ -13,7 +13,11 @@ import { List } from 'immutable';
 
 import {
   renderUserControl,
-  validateRequired,
+  getTitleFormField,
+  getReferenceFormField,
+  getShortTitleFormField,
+  getMarkdownField,
+  getFormField,
 } from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
@@ -29,10 +33,9 @@ import {
 } from 'containers/App/actions';
 
 import {
-  getEntity,
-  getEntities,
-  isReady,
-  isUserAdmin,
+  selectReady,
+  selectIsUserAdmin,
+  selectEntity,
 } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
@@ -40,9 +43,14 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectUsers,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES } from './constants';
 
 
 export class CategoryNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -64,64 +72,23 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'number',
-          controlType: 'short',
-          model: '.attributes.reference',
-          label: this.context.intl.formatMessage(appMessages.attributes.referenceOptional),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
-        },
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
-          id: 'short_title',
-          controlType: 'short',
-          model: '.attributes.short_title',
-          label: this.context.intl.formatMessage(appMessages.attributes.short_title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.short_title),
-        },
+        getReferenceFormField(this.context.intl.formatMessage, appMessages),
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
+        getShortTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
 
-
-  getBodyMainFields = () => ([
-    {
-      fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-        },
-      ],
-    },
-  ]);
+  getBodyMainFields = () => ([{
+    fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
+  }]);
 
   getBodyAsideFields = (users, isAdmin, taxonomy) => {
     const fields = []; // fieldGroups
     fields.push({
-      fields: [{
-        id: 'url',
-        controlType: 'url',
-        model: '.attributes.url',
-        placeholder: this.context.intl.formatMessage(appMessages.placeholders.url),
-        label: this.context.intl.formatMessage(appMessages.attributes.url),
-      }],
+      fields: [getFormField(this.context.intl.formatMessage, appMessages, 'url', 'url')],
     });
-    if (isAdmin && !!taxonomy.attributes.has_manager) {
+    if (isAdmin && !!taxonomy.getIn(['attributes', 'has_manager'])) {
       fields.push({
         fields: [
           renderUserControl(
@@ -134,24 +101,14 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return fields;
   }
 
-  getFields = (users, isAdmin, taxonomy) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-    },
-    body: {
-      main: this.getBodyMainFields(),
-      aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
-    },
-  })
-
   render() {
     const { taxonomy, dataReady, isAdmin, viewDomain, users } = this.props;
     const { saveSending, saveError } = viewDomain.page;
     const taxonomyReference = this.props.params.id;
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-    if (taxonomy && taxonomy.attributes) {
-      pageTitle = `${pageTitle} (${taxonomy.attributes.title})`;
+    if (taxonomy && taxonomy.get('attributes')) {
+      pageTitle = `${pageTitle} (${taxonomy.getIn(['attributes', 'title'])})`;
     }
 
     return (
@@ -203,7 +160,15 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               )}
               handleCancel={() => this.props.handleCancel(taxonomyReference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(users, isAdmin, taxonomy)}
+              fields={{ // isManager, taxonomies,
+                header: {
+                  main: this.getHeaderMainFields(),
+                },
+                body: {
+                  main: this.getBodyMainFields(),
+                  aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
+                },
+              }}
             />
           }
         </Content>
@@ -231,43 +196,17 @@ CategoryNew.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isAdmin: isUserAdmin(state),
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'taxonomies',
-    'users',
-    'user_roles',
-  ] }),
-  taxonomy: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'taxonomies',
-      out: 'js',
-    },
-  ),
-  // all users of role manager
-  users: getEntities(
-    state,
-    {
-      path: 'users',
-      connected: {
-        path: 'user_roles',
-        key: 'user_id',
-        where: {
-          role_id: USER_ROLES.MANAGER,
-        },
-      },
-    },
-  ),
+  isAdmin: selectIsUserAdmin(state),
+  viewDomain: selectDomain(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  taxonomy: selectEntity(state, { path: 'taxonomies', id: props.params.id }),
+  users: selectUsers(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));

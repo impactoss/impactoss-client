@@ -1,20 +1,16 @@
 import { createSelector } from 'reselect';
 
-/**
- * Direct selector to the recommendationNew state domain
- */
-const selectRecommendationNewDomain = (state) => state.get('recommendationNew');
+import { selectEntities } from 'containers/App/selectors';
+import { prepareTaxonomies } from 'utils/entities';
 
-/**
- * Default selector used by RecommendationNew
- */
-
-const viewDomainSelect = createSelector(
-  selectRecommendationNewDomain,
+export const selectDomain = createSelector(
+  (state) => state.get('recommendationNew'),
   (substate) => substate.toJS()
 );
 
-export default viewDomainSelect;
-export {
-  selectRecommendationNewDomain,
-};
+export const selectTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) =>
+    prepareTaxonomies(taxonomies, categories, 'tags_recommendations')
+);

@@ -1,15 +1,17 @@
 import { createSelector } from 'reselect';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import { reduce } from 'lodash/collection';
 
 import {
   selectEntities,
-  selectEntitiesSearch,
+  selectEntitiesSearchQuery,
   selectWithoutQuery,
-  selectLocationQuery,
+  selectConnectionQuery,
   selectCategoryQuery,
   selectConnectedCategoryQuery,
-  // selectExpandQuery,
+  selectSortByQuery,
+  selectSortOrderQuery,
+  selectExpandQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -18,18 +20,9 @@ import {
   filterEntitiesByConnectedCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
-} from 'containers/App/selector-utils';
-
-export const selectTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
-  (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_measures']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
-);
+  sortEntities,
+  testEntityEntityAssociation,
+} from 'utils/entities';
 
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'indicators'),
@@ -37,25 +30,31 @@ export const selectConnections = createSelector(
   (state) => selectEntities(state, 'sdgtargets'),
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'sdgtarget_categories'),
-  (indicators, recommendations, sdgtargets, recommendationCategories, sdgtargetCategories) => ({
-    indicators,
-    recommendations: recommendations.map((recommendation) =>
-      recommendation.set(
-        'categories',
-        recommendationCategories.filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'recommendation_id']), recommendation.get('id'))
+  (indicators, recommendations, sdgtargets, recommendationCategories, sdgtargetCategories) =>
+    Map()
+    .set('indicators', indicators)
+    .set(
+      'recommendations',
+      recommendations.map((recommendation) =>
+        recommendation.set(
+          'categories',
+          recommendationCategories
+          .filter((association) => attributesEqual(association.getIn(['attributes', 'recommendation_id']), recommendation.get('id')))
+          .map((association) => association.getIn(['attributes', 'category_id']))
         )
       )
-    ),
-    sdgtargets: sdgtargets.map((sdgtarget) =>
-      sdgtarget.set(
-        'categories',
-        sdgtargetCategories.filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), sdgtarget.get('id'))
+    )
+    .set(
+      'sdgtargets',
+      sdgtargets.map((sdgtarget) =>
+        sdgtarget.set(
+          'categories',
+          sdgtargetCategories
+          .filter((association) => attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), sdgtarget.get('id')))
+          .map((association) => association.getIn(['attributes', 'category_id']))
         )
       )
-    ),
-  })
+    )
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -80,41 +79,40 @@ export const selectConnectedTaxonomies = createSelector(
         associations: categorySdgTargets,
       },
     ], (connectedTaxonomies, connection) =>
-      // merge connected taxonomies.
       // TODO deal with conflicts
+      // merge connected taxonomies.
       connectedTaxonomies.merge(
         taxonomies
-          .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]) && !taxonomy.getIn(['attributes', 'tags_measures']))
-          .map((taxonomy) => taxonomy.set(
-            'categories',
-            categories
-              .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-              .map((category) => category.set(
-                connection.path,
-                connection.associations.filter((association) =>
-                  attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
-                  && connections[connection.path].get(association.getIn(['attributes', connection.key]).toString())
-                )
-              ))
+        .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]) && !taxonomy.getIn(['attributes', 'tags_measures']))
+        .map((taxonomy) => taxonomy.set(
+          'categories',
+          categories
+          .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+          .map((category) => category.set(
+            connection.path,
+            connection.associations
+            .filter((association) =>
+              attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
+              && connections.getIn([connection.path, association.getIn(['attributes', connection.key]).toString()])
+            )
+            .map((association) => association.getIn(['attributes', connection.key]))
           ))
+        ))
       )
     , Map())
 );
 
 const selectMeasuresNested = createSelector(
-  (state) => selectEntitiesSearch(state, {
+  (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'measures',
     searchAttributes: ['title'],
+    locationQuery,
   }),
   (state) => selectConnections(state),
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'measure_indicators'),
   (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'sdgtarget_measures'),
-  (state) => selectEntities(state, 'progress_reports'),
-  (state) => selectEntities(state, 'due_dates'),
-  // (state) => selectEntities(state, 'measures'),
-  // (state) => selectExpandQuery(state),
   (
     entities,
     connections,
@@ -122,87 +120,43 @@ const selectMeasuresNested = createSelector(
     measureIndicators,
     measureRecommendations,
     measureSdgTargets,
-    progressReports,
-    dueDates
-    // measures,
-    // expandNo
   ) => entities.map((entity) => entity
-    // nest categories
+    // nest category ids
     .set(
       'categories',
-      measureCategories.filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id')))
+      measureCategories
+      .filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id')))
+      .map((association) => association.getIn(['attributes', 'category_id']))
     )
-    // nest recommendations connections
+    // nest connected recommendation ids
     .set(
       'recommendations',
-      measureRecommendations.filter((association) =>
+      measureRecommendations
+      .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
-        && connections.recommendations.get(association.getIn(['attributes', 'recommendation_id']).toString())
+        && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
       )
+      .map((association) => association.getIn(['attributes', 'recommendation_id']))
     )
-    // nest sdgtarget connections
+    // nest connected sdgtarget ids
     .set(
       'sdgtargets',
-      measureSdgTargets.filter((association) =>
+      measureSdgTargets
+      .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
-        && connections.sdgtargets.get(association.getIn(['attributes', 'sdgtarget_id']).toString())
+        && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
       )
+      .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
     )
-    // nest indicator connections
+    // nest connected indicator ids
     .set(
       'indicators',
       measureIndicators
-      .filter((entityIndicator) =>
-        attributesEqual(entityIndicator.getIn(['attributes', 'measure_id']), entity.get('id'))
-        && connections.indicators.get(entityIndicator.getIn(['attributes', 'indicator_id']).toString())
+      .filter((association) =>
+        attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
+        && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
       )
-      .map((entityIndicator) => {
-        // nest actual indicator with indicator connection
-        const indicator = connections.indicators.get(entityIndicator.getIn(['attributes', 'indicator_id']).toString());
-        // if (indicator) {
-        return entityIndicator.set(
-          'indicator',
-          indicator
-            // nest reports
-            .set('reports', progressReports.filter((report) =>
-              attributesEqual(report.getIn(['attributes', 'indicator_id']), indicator.get('id'))
-            ))
-            // nest dates without report
-            .set(
-              'dates',
-              dueDates
-              .filter((date) => {
-                // is associated
-                const associated = attributesEqual(date.getIn(['attributes', 'indicator_id']), indicator.get('id'));
-                if (associated) {
-                  // has no report
-                  const dateReports = progressReports.filter((report) => attributesEqual(report.getIn(['attributes', 'due_date_id']), date.get('id')));
-                  return !dateReports || dateReports.size === 0;
-                }
-                return false;
-              }
-            ))
-        );
-          // if (expandNo) {
-          //   // nest connected measures
-          //   console.log('nest connected measures')
-          //   indicator = indicator.set(
-          //     'measures',
-          //     measureIndicators
-          //       .filter((measureIndicator) =>
-          //         attributesEqual(measureIndicator.getIn(['attributes', 'indicator_id']), indicator.get('id'))
-          //         && measures.get(entityIndicator.getIn(['attributes', 'measure_id']).toString())
-          //       )
-          //       .map((measureIndicator) => measureIndicator.set(
-          //         'measure',
-          //         measures.get(measureIndicator.getIn(['attributes', 'measure_id']).toString())
-          //       ))
-          //   )
-          // }
-          // return entityIndicator.set('indicator', indicator)
-        // }
-        // return entityIndicator
-      })
+      .map((association) => association.getIn(['attributes', 'indicator_id']))
     )
   )
 );
@@ -216,22 +170,9 @@ const selectMeasuresWithout = createSelector(
 );
 const selectMeasuresByConnections = createSelector(
   selectMeasuresWithout,
-  selectLocationQuery,
+  selectConnectionQuery,
   (entities, query) => query
-    ? filterEntitiesByConnection(entities, query, [
-      {
-        path: 'indicators',
-        key: 'indicator_id',
-      },
-      {
-        path: 'recommendations',
-        key: 'recommendation_id',
-      },
-      {
-        path: 'sdgtargets',
-        key: 'sdgtarget_id',
-      },
-    ])
+    ? filterEntitiesByConnection(entities, query)
     : entities
 );
 const selectMeasuresByCategories = createSelector(
@@ -246,19 +187,76 @@ const selectMeasuresByConnectedCategories = createSelector(
   selectConnections,
   selectConnectedCategoryQuery,
   (entities, connections, query) => query
-    ? filterEntitiesByConnectedCategories(entities, connections, query, {
-      recommendations: 'recommendation_id',
-      sdgtargets: 'sdgtarget_id',
-    })
+    ? filterEntitiesByConnectedCategories(entities, connections, query)
     : entities
+);
+
+const selectMeasuresExpandables = createSelector(
+  selectMeasuresByConnectedCategories,
+  (state) => selectEntities(state, 'indicators'),
+  (state) => selectEntities(state, 'progress_reports'),
+  (state) => selectEntities(state, 'due_dates'),
+  selectExpandQuery,
+  (entities, indicators, reports, dueDates, expandNo) =>
+    entities.map((entity) => {
+      if (expandNo <= 0) {
+        // insert expandables:
+        // - indicators
+        // - reports (incl due_dates)
+        const dueDatesAnyIndicator = dueDates.filter((date) => testEntityEntityAssociation(entity, 'indicators', date.getIn(['attributes', 'indicator_id'])));
+        return entity
+        .set('expandable', List(['indicators', 'reports']))
+        .set('reports', reports.filter((report) => testEntityEntityAssociation(entity, 'indicators', report.getIn(['attributes', 'indicator_id']))))
+        .set('dates', Map()
+          .set('overdue', dueDatesAnyIndicator.filter((date) => date.getIn(['attributes', 'overdue'])).size)
+          .set('due', dueDatesAnyIndicator.filter((date) => date.getIn(['attributes', 'due'])).size)
+        );
+      }
+      // insert expanded indicators with expandable reports (incl due_dates)
+      return entity
+      .set('expanded', 'indicatorsExpanded')
+      .set('indicatorsExpanded',
+        indicators
+        .filter((indicator) => testEntityEntityAssociation(entity, 'indicators', indicator.get('id')))
+        .map((indicator) => {
+          // due dates for indicator
+          const dueDatesForIndicator = dueDates.filter((date) => attributesEqual(date.getIn(['attributes', 'indicator_id']), indicator.get('id')));
+          const reportsForIndicator = reports.filter((report) => attributesEqual(report.getIn(['attributes', 'indicator_id']), indicator.get('id')));
+          if (expandNo === 1) {
+            return indicator
+            .set('expandable', 'reports')
+            .set('reports', reportsForIndicator)
+            .set('dates', Map()
+              // store counts
+              .set('overdue', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'overdue'])).size)
+              .set('due', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'due'])).size)
+            );
+          }
+          const dueDatesScheduled = dueDatesForIndicator && dueDatesForIndicator.filter((date) => !date.getIn(['attributes', 'has_progress_report']));
+          return indicator
+          .set('expanded', 'reports')
+          .set('reports', reportsForIndicator)
+          .set('dates', Map()
+            // store upcoming scheduled indicator
+            .set('scheduled', dueDatesScheduled && sortEntities(dueDatesScheduled, 'asc', 'due_date', 'date').first())
+          );
+        })
+      );
+    })
 );
 
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
-// 2. selectEntitiesSearch filters by keyword
+// 2. selectEntitiesSearchQuery filters by keyword
 // 3. selectMeasuresNested will nest related entities
 // 4. selectMeasuresWithout will filter by absence of taxonomy or connection
 // 5. selectMeasuresByConnections will filter by specific connection
 // 6. selectMeasuresByCategories will filter by specific categories
 // 7. selectMeasuresByCOnnectedCategories will filter by specific categories connected via connection
-export const selectMeasures = selectMeasuresByConnectedCategories;
+export const selectMeasures = createSelector(
+  selectMeasuresExpandables,
+  selectSortByQuery,
+  selectSortOrderQuery,
+  (entities, sortBy, sortOrder) =>
+    sortEntities(entities, sortOrder || 'asc', sortBy)
+);

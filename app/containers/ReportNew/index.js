@@ -10,10 +10,15 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
 import {
-  validateRequired,
+  getTitleFormField,
+  getDueDateOptionsField,
+  getDocumentStatusField,
+  getStatusField,
+  getMarkdownField,
+  getUploadField,
 } from 'utils/forms';
 
-import { DOC_PUBLISH_STATUSES, PUBLISH_STATUSES, CONTENT_SINGLE } from 'containers/App/constants';
+import { CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -22,17 +27,21 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import { getEntity, isReady } from 'containers/App/selectors';
+import { selectReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectIndicator,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
-
+import { DEPENDENCIES } from './constants';
 
 export class ReportNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -49,125 +58,40 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
 
-  getHeaderAsideFields = () => ([
-    {
-      fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          value: true,
-          options: PUBLISH_STATUSES,
-        },
-      ],
-    },
-  ]);
+  getHeaderAsideFields = () => ([{
+    fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
+  }]);
 
   getBodyMainFields = () => ([
     {
       fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-        },
-        {
-          id: 'document_url',
-          controlType: 'uploader',
-          model: '.attributes.document_url',
-          label: this.context.intl.formatMessage(appMessages.attributes.document_url),
-        },
-        {
-          id: 'document_public',
-          controlType: 'select',
-          model: '.attributes.document_public',
-          options: DOC_PUBLISH_STATUSES,
-          value: true,
-          label: this.context.intl.formatMessage(appMessages.attributes.document_public),
-        },
+        getMarkdownField(this.context.intl.formatMessage, appMessages),
+        getUploadField(this.context.intl.formatMessage, appMessages),
+        getDocumentStatusField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
-  getDateOptions = (dates) => {
-    const dateOptions = [
-      {
-        value: 0,
-        label: this.context.intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short),
-        checked: true,
-      },
-    ];
-    let excludeCount = 0;
-    return dates
-      ? Object.values(dates).reduce((memo, date, i) => {
-        // only allow active and those that are not associated
-        if (i - excludeCount < 1 && typeof date.reportCount !== 'undefined' && date.reportCount === 0) {
-          if (date.attributes.overdue) excludeCount += 1;
-          const label =
-            `${this.context.intl.formatDate(new Date(date.attributes.due_date))} ${
-              date.attributes.overdue ? this.context.intl.formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
-              date.attributes.due ? this.context.intl.formatMessage(appMessages.entities.due_dates.due) : ''}`;
-          return memo.concat([
-            {
-              value: parseInt(date.id, 10),
-              label,
-              highlight: date.attributes.overdue,
-              checked: false,
-            },
-          ]);
-        }
-        return memo;
-      }, dateOptions)
-    : dateOptions;
-  }
+
   getBodyAsideFields = (indicator) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.single),
       icon: 'calendar',
-      fields: indicator
-        ? [{
-          id: 'due_date_id',
-          controlType: 'radio',
-          model: '.attributes.due_date_id',
-          options: this.getDateOptions(indicator.dates),
-          value: 0,
-          hints: {
-            1: this.context.intl.formatMessage(appMessages.entities.due_dates.empty),
-          },
-        }]
-        : [],
+      fields: indicator &&
+        [getDueDateOptionsField(
+          this.context.intl.formatMessage,
+          appMessages,
+          this.context.intl.formatDate,
+          indicator.get('dates'),
+          '0',
+        )],
     },
   ]);
 
-  getFields = (indicator) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(),
-    },
-    body: {
-      main: this.getBodyMainFields(),
-      aside: this.getBodyAsideFields(indicator),
-    },
-  })
   render() {
     const { dataReady, indicator, viewDomain } = this.props;
     const { saveSending, saveError } = viewDomain.page;
@@ -222,7 +146,16 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               )}
               handleCancel={() => this.props.handleCancel(indicatorReference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(indicator)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(),
+                },
+                body: {
+                  main: this.getBodyMainFields(),
+                  aside: this.getBodyAsideFields(indicator),
+                },
+              }}
             />
           }
         </Content>
@@ -247,45 +180,15 @@ ReportNew.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'indicators',
-    'due_dates',
-    'progress_reports',
-  ] }),
-  indicator: getEntity(
-    state,
-    {
-      out: 'js',
-      id: props.params.id,
-      path: 'indicators',
-      extend: {
-        path: 'due_dates',
-        key: 'indicator_id',
-        reverse: true,
-        as: 'dates',
-        without: {
-          path: 'progress_reports',
-          key: 'due_date_id',
-        },
-        extend: {
-          type: 'count',
-          path: 'progress_reports',
-          key: 'due_date_id',
-          reverse: true,
-          as: 'reportCount',
-        },
-      },
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  indicator: selectIndicator(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('progress_reports'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleSubmit: (formData, indicatorReference) => {
       let saveData = formData;

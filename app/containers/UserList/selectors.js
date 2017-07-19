@@ -2,10 +2,12 @@ import { createSelector } from 'reselect';
 
 import {
   selectEntities,
-  selectEntitiesSearch,
+  selectEntitiesSearchQuery,
   selectWithoutQuery,
-  selectLocationQuery,
+  selectConnectionQuery,
   selectCategoryQuery,
+  selectSortByQuery,
+  selectSortOrderQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -13,17 +15,14 @@ import {
   filterEntitiesByCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
-} from 'containers/App/selector-utils';
-
-export const selectConnections = createSelector(
-  (state) => selectEntities(state, 'roles'),
-  (roles) => ({ roles })
-);
+  sortEntities,
+} from 'utils/entities';
 
 const selectUsersNested = createSelector(
-  (state) => selectEntitiesSearch(state, {
+  (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'users',
     searchAttributes: ['name'],
+    locationQuery,
   }),
   (state) => selectEntities(state, 'user_categories'),
   (state) => selectEntities(state, 'user_roles'),
@@ -31,11 +30,15 @@ const selectUsersNested = createSelector(
     entities.map((entity) => entity
       .set(
         'categories',
-        entityCategories.filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
+        entityCategories
+        .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
+        .map((association) => association.getIn(['attributes', 'category_id']))
       )
       .set(
         'roles',
-        entityRoles.filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
+        entityRoles
+        .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
+        .map((association) => association.getIn(['attributes', 'role_id']))
       )
     )
 );
@@ -49,12 +52,9 @@ const selectUsersWithout = createSelector(
 );
 const selectUsersByConnections = createSelector(
   selectUsersWithout,
-  selectLocationQuery,
+  selectConnectionQuery,
   (entities, query) => query
-    ? filterEntitiesByConnection(entities, query, [{
-      path: 'roles',
-      key: 'role_id',
-    }])
+    ? filterEntitiesByConnection(entities, query)
     : entities
 );
 const selectUsersByCategories = createSelector(
@@ -67,21 +67,15 @@ const selectUsersByCategories = createSelector(
 
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
-// 2. selectEntitiesSearch filters by keyword
+// 2. selectEntitiesSearchQuery filters by keyword
 // 3. selectUsersNested will nest related entities
 // 4. selectUsersWithout will filter by absence of taxonomy or connection
 // 5. selectUsersByConnections will filter by specific connection
 // 6. selectUsersByCategories will filter by specific categories
-export const selectUsers = selectUsersByCategories;
-
-
-export const selectTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
-  (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_users']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
+export const selectUsers = createSelector(
+  selectUsersByCategories,
+  selectSortByQuery,
+  selectSortOrderQuery,
+  (entities, sortBy, sortOrder) =>
+    sortEntities(entities, sortOrder || 'asc', sortBy || 'name')
 );

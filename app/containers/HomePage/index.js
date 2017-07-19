@@ -14,16 +14,18 @@ import { palette } from 'styled-theme';
 import { mapToTaxonomyList } from 'utils/taxonomies';
 
 import {
-  getEntities,
-  isReady,
+  selectReady,
+  selectEntities,
+  selectEntitiesWhere,
 } from 'containers/App/selectors';
+
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { scrollToComponent } from 'utils/scroll-to-component';
 
 import Button from 'components/buttons/Button';
 import ButtonHero from 'components/buttons/ButtonHero';
-import Section from 'components/basic/Section';
-import Container from 'components/basic/Container';
+import Section from 'components/styled/Section';
+import Container from 'components/styled/Container';
 import Icon from 'components/Icon';
 import Loading from 'components/Loading';
 import TaxonomyList from 'components/TaxonomyList';
@@ -31,7 +33,9 @@ import NormalImg from 'components/Img';
 import Footer from 'components/Footer';
 
 import appMessages from 'containers/App/messages';
+import { DB_TABLES } from 'containers/App/constants';
 import messages from './messages';
+import { DEPENDENCIES } from './constants';
 
 import graphicHome from './graphicHome.png';
 
@@ -137,10 +141,10 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   preparePageMenuPages = (pages) =>
-    Object.values(pages).map((page) => ({
-      path: `/pages/${page.id}`,
-      title: page.attributes.menu_title || page.attributes.title,
-    }));
+    pages.map((page) => ({
+      path: `/pages/${page.get('id')}`,
+      title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
+    })).toArray();
 
   render() {
     const { dataReady, onPageLink, pages, taxonomies } = this.props;
@@ -267,54 +271,19 @@ HomePage.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  dataReady: isReady(state, { path: [
-    'taxonomies',
-    'categories',
-    'pages',
-  ] }),
-  taxonomies: getEntities(
-    state,
-    {
-      path: 'taxonomies',
-      extend: {
-        type: 'count',
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-        as: 'count',
-      },
-      out: 'js',
-    },
-  ),
-  pages: getEntities(
-    state,
-    {
-      path: 'pages',
-      where: { draft: false },
-      out: 'js',
-    },
-  ),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  taxonomies: selectEntities(state, 'taxonomies'),
+  pages: selectEntitiesWhere(state, {
+    path: 'pages',
+    where: { draft: false },
+  }),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('pages'));
+      DB_TABLES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
       // kick off loading although not needed
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('roles'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('measure_categories'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('measure_indicators'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
-      dispatch(loadEntitiesIfNeeded('progress_reports'));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));

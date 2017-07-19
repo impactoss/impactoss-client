@@ -9,15 +9,21 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 // import { isEqual } from 'lodash/lang';
+import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectRecommendationConnections,
+  selectRecommendationTaxonomies,
+} from 'containers/App/selectors';
+
 import appMessages from 'containers/App/messages';
 
 import EntityList from 'containers/EntityList';
 
-import { FILTERS, EDITS } from './constants';
-import { selectConnections, selectRecommendations, selectTaxonomies } from './selectors';
+import { CONFIG, DEPENDENCIES } from './constants';
+import { selectRecommendations } from './selectors';
 import messages from './messages';
 
 export class RecommendationList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -77,20 +83,17 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           ]}
         />
         <EntityList
-          location={this.props.location}
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
-          path="recommendations"
-          filters={FILTERS}
-          edits={EDITS}
+          config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
             single: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
             plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
           }}
-          entityLinkTo="/recommendations/"
+          locationQuery={fromJS(this.props.location.query)}
         />
       </div>
     );
@@ -101,43 +104,28 @@ RecommendationList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
-  location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
-  entities: PropTypes.object.isRequired,
-  taxonomies: PropTypes.object,
-  connections: PropTypes.object,
+  entities: PropTypes.instanceOf(List).isRequired,
+  taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
+  location: PropTypes.object,
 };
 
 RecommendationList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  dataReady: isReady(state, { path: [
-    'measures',
-    'users',
-    'taxonomies',
-    'categories',
-    'recommendations',
-    'recommendation_measures',
-    'recommendation_categories',
-  ] }),
-  entities: selectRecommendations(state),
-  taxonomies: selectTaxonomies(state),
-  connections: selectConnections(state),
+const mapStateToProps = (state, props) => ({
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  entities: selectRecommendations(state, fromJS(props.location.query)),
+  taxonomies: selectRecommendationTaxonomies(state),
+  connections: selectRecommendationConnections(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
-      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
       dispatch(updatePath('/recommendations/new/'));

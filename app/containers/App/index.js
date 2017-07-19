@@ -12,13 +12,14 @@ import Perf from 'react-addons-perf';
 import styled from 'styled-components';
 import Header from 'components/Header';
 import {
-  isSignedIn,
-  getSessionUserId,
-  isUserManager,
-  isReady,
-  getEntities,
+  selectIsSignedIn,
+  selectIsUserManager,
+  selectSessionUserId,
+  selectReady,
+  selectEntitiesWhere,
 } from './selectors';
 import { validateToken, loadEntitiesIfNeeded, updatePath } from './actions';
+import { DEPENDENCIES } from './constants';
 
 import messages from './messages';
 
@@ -47,10 +48,10 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   preparePageMenuPages = (pages) =>
-    Object.values(pages).map((page) => ({
-      path: `/pages/${page.id}`,
-      title: page.attributes.menu_title || page.attributes.title,
-    }));
+    pages.map((page) => ({
+      path: `/pages/${page.get('id')}`,
+      title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
+    })).toArray();
 
   prepareMainMenuItems = (isManager, currentPath) => {
     let navItems = ([
@@ -130,21 +131,14 @@ App.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  dataReady: isReady(state, { path: [
-    'user_roles',
-    'pages',
-  ] }),
-  isManager: isUserManager(state),
-  isUserSignedIn: isSignedIn(state),
-  userId: getSessionUserId(state),
-  pages: getEntities(
-    state,
-    {
-      path: 'pages',
-      where: { draft: false },
-      out: 'js',
-    },
-  ),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  isManager: selectIsUserManager(state),
+  isUserSignedIn: selectIsSignedIn(state),
+  userId: selectSessionUserId(state),
+  pages: selectEntitiesWhere(state, {
+    path: 'pages',
+    where: { draft: false },
+  }),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -153,8 +147,7 @@ export function mapDispatchToProps(dispatch) {
       dispatch(validateToken()); // Maybe this could move to routes.js or App wrapper
     },
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('pages'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));

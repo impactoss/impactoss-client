@@ -15,13 +15,18 @@ import {
   renderMeasureControl,
   renderSdgTargetControl,
   renderUserControl,
-  validateRequired,
-  validateDateFormat,
+  getTitleFormField,
+  getReferenceFormField,
+  getStatusField,
+  getMarkdownField,
+  getDateField,
+  getFrequencyField,
+  getCheckboxField,
 } from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { PUBLISH_STATUSES, USER_ROLES, REPORT_FREQUENCIES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -31,17 +36,21 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import { getEntities, isReady } from 'containers/App/selectors';
+import { selectEntities, selectReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectUsers,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
-
+import { DEPENDENCIES } from './constants';
 
 export class IndicatorNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -62,26 +71,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'reference',
-          controlType: 'short',
-          model: '.attributes.reference',
-          label: this.context.intl.formatMessage(appMessages.attributes.referenceDefault),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
-        },
-        {
-          id: 'title',
-          controlType: 'titleText',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getReferenceFormField(this.context.intl.formatMessage, appMessages),
+        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
       ],
     },
   ]);
@@ -89,29 +80,14 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   getHeaderAsideFields = () => ([
     {
       fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          value: true,
-          options: PUBLISH_STATUSES,
-        },
+        getStatusField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
 
   getBodyMainFields = (measures, sdgtargets) => ([
     {
-      fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-        },
-      ],
+      fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
@@ -128,46 +104,10 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
       icon: 'reminder',
       fields: [
-        {
-          id: 'start_date',
-          controlType: 'date',
-          model: '.attributes.start_date',
-          label: this.context.intl.formatMessage(appMessages.attributes.start_date),
-          placeholder: 'YYYY-MM-DD',
-          validators: {
-            date: validateDateFormat,
-          },
-          errorMessages: {
-            date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
-          },
-        },
-        {
-          id: 'repeat',
-          controlType: 'checkbox',
-          model: '.attributes.repeat',
-          label: this.context.intl.formatMessage(appMessages.attributes.repeat),
-        },
-        {
-          id: 'frequency',
-          controlType: 'select',
-          label: this.context.intl.formatMessage(appMessages.attributes.frequency_months),
-          model: '.attributes.frequency_months',
-          options: REPORT_FREQUENCIES,
-          value: 1,
-        },
-        {
-          id: 'end_date',
-          controlType: 'date',
-          model: '.attributes.end_date',
-          label: this.context.intl.formatMessage(appMessages.attributes.end_date),
-          placeholder: 'YYYY-MM-DD',
-          validators: {
-            date: validateDateFormat,
-          },
-          errorMessages: {
-            date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
-          },
-        },
+        getDateField(this.context.intl.formatMessage, appMessages, 'start_date'),
+        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat'),
+        getFrequencyField(this.context.intl.formatMessage, appMessages),
+        getDateField(this.context.intl.formatMessage, appMessages, 'end_date'),
         renderUserControl(
           users,
           this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
@@ -175,17 +115,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       ],
     },
   ]);
-
-  getFields = (measures, users, sdgtargets) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(),
-    },
-    body: {
-      main: this.getBodyMainFields(measures, sdgtargets),
-      aside: this.getBodyAsideFields(users),
-    },
-  })
 
   render() {
     const { dataReady, viewDomain, measures, users, sdgtargets } = this.props;
@@ -236,7 +165,16 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(measures, users, sdgtargets)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(),
+                },
+                body: {
+                  main: this.getBodyMainFields(measures, sdgtargets),
+                  aside: this.getBodyAsideFields(users),
+                },
+              }}
             />
           }
         </Content>
@@ -263,52 +201,20 @@ IndicatorNew.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  viewDomain: viewDomainSelect(state),
-  // all categories for all taggable taxonomies
-  dataReady: isReady(state, { path: [
-    'measures',
-    'users',
-    'user_roles',
-    'sdgtargets',
-  ] }),
-
+  viewDomain: selectDomain(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   // all measures,
-  measures: getEntities(
-    state, {
-      path: 'measures',
-    },
-  ),
-
+  measures: selectEntities(state, 'measures'),
   // all sdgtargets,
-  sdgtargets: getEntities(
-    state, {
-      path: 'sdgtargets',
-    },
-  ),
-
+  sdgtargets: selectEntities(state, 'sdgtargets'),
   // all users, listing connection if any
-  users: getEntities(
-    state,
-    {
-      path: 'users',
-      connected: {
-        path: 'user_roles',
-        key: 'user_id',
-        where: {
-          role_id: USER_ROLES.CONTRIBUTOR, // contributors only TODO: from constants
-        },
-      },
-    },
-  ),
+  users: selectUsers(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('sdgtargets'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));

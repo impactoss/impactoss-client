@@ -11,22 +11,27 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, fromJS } from 'immutable';
+import { Map } from 'immutable';
 
 import {
   taxonomyOptions,
   entityOptions,
   renderMeasureControl,
   renderTaxonomyControl,
-  validateRequired,
+  getCategoryUpdatesFromFormData,
+  getConnectionUpdatesFromFormData,
+  getTitleFormField,
+  getReferenceFormField,
+  getAcceptedField,
+  getStatusField,
+  getMarkdownField,
 } from 'utils/forms';
 
 import {
-  getCategoryUpdatesFromFormData,
-  getConnectionUpdatesFromFormData,
-} from 'utils/entities';
+  getMetaField,
+} from 'utils/fields';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE, ACCEPTED_STATUSES } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -36,26 +41,29 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import {
-  getEntity,
-  getEntities,
-  isReady,
-} from 'containers/App/selectors';
+import { selectReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectViewEntity,
+  selectTaxonomies,
+  selectMeasures,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class RecommendationEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.recommendation) {
+    if (this.props.dataReady && this.props.viewEntity) {
       this.props.populateForm('recommendationEdit.form.data', this.getInitialFormData());
     }
   }
@@ -66,7 +74,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.recommendation) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
       this.props.populateForm('recommendationEdit.form.data', this.getInitialFormData(nextProps));
     }
@@ -74,11 +82,14 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, measures, recommendation } = props;
-    return recommendation
+    const { taxonomies, measures, viewEntity } = props;
+    return viewEntity
     ? Map({
-      id: recommendation.id,
-      attributes: fromJS(recommendation.attributes),
+      id: viewEntity.get('id'),
+      attributes: viewEntity.get('attributes').mergeWith(
+        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+        FORM_INITIAL.get('attributes')
+      ),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedMeasures: entityOptions(measures, true),
     })
@@ -88,30 +99,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'reference',
-          controlType: 'short',
-          model: '.attributes.reference',
-          label: this.context.intl.formatMessage(appMessages.attributes.reference),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
-          id: 'title',
-          controlType: 'titleText',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getReferenceFormField(this.context.intl.formatMessage, appMessages, true), // required
+        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
       ],
     },
   ]);
@@ -119,48 +108,16 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          value: entity.attributes.draft,
-          options: PUBLISH_STATUSES,
-        },
-        {
-          controlType: 'info',
-          type: 'meta',
-          fields: [
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
-            },
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.user && entity.user.attributes.name,
-            },
-          ],
-        },
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
+        getMetaField(entity, appMessages),
       ],
     },
   ]);
-  getBodyMainFields = (measures) => ([
+  getBodyMainFields = (entity, measures) => ([
     {
       fields: [
-        {
-          id: 'accepted',
-          controlType: 'select',
-          model: '.attributes.accepted',
-          label: this.context.intl.formatMessage(appMessages.attributes.accepted),
-          options: ACCEPTED_STATUSES,
-        },
-        {
-          id: 'response',
-          controlType: 'markdown',
-          model: '.attributes.response',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.response),
-          label: this.context.intl.formatMessage(appMessages.attributes.response),
-        },
+        getAcceptedField(this.context.intl.formatMessage, appMessages, entity),
+        getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
       ],
     },
     {
@@ -172,7 +129,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     },
   ]);
 
-  getBodyAsideFields = (entity, taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
@@ -180,18 +137,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     },
   ]);
 
-  getFields = (entity, taxonomies, measures) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity),
-    },
-    body: {
-      main: this.getBodyMainFields(measures),
-      aside: this.getBodyAsideFields(entity, taxonomies),
-    },
-  })
   render() {
-    const { recommendation, dataReady, viewDomain, measures, taxonomies } = this.props;
+    const { viewEntity, dataReady, viewDomain, measures, taxonomies } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError } = viewDomain.page;
 
@@ -209,7 +156,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
             type={CONTENT_SINGLE}
             icon="recommendations"
             buttons={
-              recommendation && dataReady ? [{
+              viewEntity && dataReady ? [{
                 type: 'cancel',
                 onClick: this.props.handleCancel,
               },
@@ -229,15 +176,15 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           {saveError &&
             <p>{saveError}</p>
           }
-          { !recommendation && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
-          { !recommendation && dataReady && !saveError &&
+          { !viewEntity && dataReady && !saveError &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {recommendation && dataReady &&
+          {viewEntity && dataReady &&
             <EntityForm
               model="recommendationEdit.form.data"
               formData={viewDomain.form.data}
@@ -248,7 +195,16 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(recommendation, taxonomies, measures)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity),
+                },
+                body: {
+                  main: this.getBodyMainFields(viewEntity, measures),
+                  aside: this.getBodyAsideFields(taxonomies),
+                },
+              }}
             />
           }
         </Content>
@@ -265,7 +221,7 @@ RecommendationEdit.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
-  recommendation: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
@@ -275,83 +231,18 @@ RecommendationEdit.propTypes = {
 RecommendationEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
-
 const mapStateToProps = (state, props) => ({
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'recommendations',
-    'users',
-    'categories',
-    'taxonomies',
-    'measures',
-    'recommendation_measures',
-    'recommendation_categories',
-  ] }),
-  recommendation: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'recommendations',
-      out: 'js',
-      extend: {
-        type: 'single',
-        path: 'users',
-        key: 'last_modified_user_id',
-        as: 'user',
-      },
-    },
-  ),
-  // all categories for all taggable taxonomies, listing connection if any
-  taxonomies: getEntities(
-    state,
-    {
-      path: 'taxonomies',
-      where: {
-        tags_recommendations: true,
-      },
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-        extend: {
-          as: 'associated',
-          path: 'recommendation_categories',
-          key: 'category_id',
-          reverse: true,
-          where: {
-            recommendation_id: props.params.id,
-          },
-        },
-      },
-    },
-  ),
-  // // all measures, listing connection if any
-  measures: getEntities(
-    state, {
-      path: 'measures',
-      extend: {
-        as: 'associated',
-        path: 'recommendation_measures',
-        key: 'measure_id',
-        reverse: true,
-        where: {
-          recommendation_id: props.params.id,
-        },
-      },
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
+  taxonomies: selectTaxonomies(state, props.params.id),
+  measures: selectMeasures(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));

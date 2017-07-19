@@ -12,8 +12,6 @@ import ListField from 'components/fields/ListField';
 import ManagerField from 'components/fields/ManagerField';
 import MetaField from 'components/fields/MetaField';
 import ReferenceField from 'components/fields/ReferenceField';
-import ReferenceRoleCombo from 'components/fields/ReferenceRoleCombo';
-import ReferenceStatusCombo from 'components/fields/ReferenceStatusCombo';
 import ReportsField from 'components/fields/ReportsField';
 import RoleField from 'components/fields/RoleField';
 import ScheduleField from 'components/fields/ScheduleField';
@@ -41,10 +39,6 @@ class FieldFactory extends React.PureComponent { // eslint-disable-line react/pr
           return (<MetaField field={field} />);
         case 'reference':
           return (<ReferenceField field={field} />);
-        case 'referenceStatus':
-          return (<ReferenceStatusCombo field={field} />);
-        case 'referenceRole':
-          return (<ReferenceRoleCombo field={field} />);
         case 'status':
           return (<StatusField field={field} />);
         case 'role':

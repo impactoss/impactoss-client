@@ -34,12 +34,14 @@ export const AUTHENTICATE_FORWARD = 'nmrf/App/AUTHENTICATE_FORWARD';
 
 export const ADD_ENTITY = 'nmrf/App/ADD_ENTITY';
 export const UPDATE_ENTITY = 'nmrf/App/UPDATE_ENTITY';
-export const DELETE_ENTITY = 'nmrf/App/DELETE_ENTITY';
+export const REMOVE_ENTITY = 'nmrf/App/REMOVE_ENTITY';
+export const UPDATE_ENTITIES = 'nmrf/App/UPDATE_ENTITIES';
+export const UPDATE_CONNECTIONS = 'nmrf/App/UPDATE_CONNECTIONS';
 
 export const SAVE_ENTITY = 'nmrf/App/SAVE_ENTITY';
 export const NEW_ENTITY = 'nmrf/App/NEW_ENTITY';
-export const UPDATE_CONNECTIONS = 'nmrf/App/UPDATE_CONNECTIONS';
-export const UPDATE_ENTITIES = 'nmrf/App/UPDATE_ENTITIES';
+export const SAVE_CONNECTIONS = 'nmrf/App/SAVE_CONNECTIONS';
+export const SAVE_ENTITIES = 'nmrf/App/SAVE_ENTITIES';
 export const DUEDATE_ASSIGNED = 'nmrf/App/DUEDATE_ASSIGNED';
 export const DUEDATE_UNASSIGNED = 'nmrf/App/DUEDATE_UNASSIGNED';
 
@@ -87,390 +89,417 @@ export const EDIT_PANEL = 'edit';
 export const CONTENT_LIST = 'list';
 export const CONTENT_SINGLE = 'single';
 
-export const DB_SCHEMA = {
-  categories: {
-    attributes: {
-      title: {
-        type: 'string',
-        required: true,
-      },
-      reference: 'string',
-      short_title: 'string',
-      description: 'string',
-      url: 'string',
-      taxonomy_id: 'number',
-      manager_id: 'number',
-      user_only: 'bool',
-    },
-    many: {
-      recommendation_categories: 'category_id',
-      measure_categories: 'category_id',
-      user_categories: 'category_id',
-      sdgtarget_categories: 'category_id',
-      recommendations: { via: 'recommendation_categories' },
-      measures: { via: 'measure_categories' },
-      sdgtargets: { via: 'sdgtarget_categories' },
-      users: { via: 'user_categories' },
-    },
-    one: {
-      taxonomies: {
-        fk: 'taxonomy_id',
-        as: 'taxonomy',
-      },
-      users: {
-        fk: 'manager_id',
-        as: 'manager',
-      },
-    },
-  },
-  taxonomies: {
-    attributes: {
-      title: {
-        type: 'string',
-        required: true,
-      },
-      tags_recommendations: 'bool',
-      tags_measures: 'bool',
-      tags_sdgtargets: 'bool',
-      tags_users: 'bool',
-      is_smart: 'bool',
-      allow_multiple: 'bool',
-      priority: 'number',
-      grouping_default: 'number',
-    },
-    many: {
-      categories: 'taxonomy_id',
-    },
-  },
-  recommendations: {
-    attributes: {
-      reference: {
-        type: 'string',
-        required: true,
-      },
-      title: {
-        type: 'string',
-        required: true,
-      },
-      response: {
-        type: 'string',
-        required: true,
-      },
-      draft: 'bool',
-      accepted: 'bool',
-    },
-    many: {
-      recommendation_categories: 'recommendation_id',
-      recommendation_measures: 'recommendation_id',
-      measures: { via: 'recommendation_measures' },
-      categories: { via: 'recommendation_categories' },
-    },
-  },
-  sdgtargets: {
-    attributes: {
-      reference: 'string',
-      title: {
-        type: 'string',
-        required: true,
-      },
-      description: 'string',
-      draft: 'bool',
-    },
-    many: {
-      sdgtarget_categories: 'sdgtarget_id',
-      sdgtarget_indicators: 'sdgtarget_id',
-      sdgtarget_measures: 'sdgtarget_id',
-      measures: { via: 'sdgtarget_measures' },
-      categories: { via: 'recommendationsdgtarget_categories_categories' },
-      indicators: { via: 'sdgtarget_indicators' },
-    },
-  },
-  measures: {
-    attributes: {
-      title: {
-        type: 'string',
-        required: true,
-      },
-      description: 'string',
-      draft: 'bool',
-      target_date: 'string',
-      outcome: 'string',
-      indicator_summary: 'string',
-      target_date_comment: 'string',
-    },
-    many: {
-      measure_categories: 'measure_id',
-      measure_indicators: 'measure_id',
-      sdgtarget_measures: 'measure_id',
-      recommendation_measures: 'measure_id',
-      categories: { via: 'measure_categories' },
-      recommendations: { via: 'recommendation_measures' },
-      sdgtargets: { via: 'sdgtarget_measures' },
-      indicators: { via: 'measure_indicators' },
-    },
-  },
-  indicators: {
-    attributes: {
-      reference: 'string',
-      title: {
-        type: 'string',
-        required: true,
-      },
-      description: 'string',
-      draft: 'bool',
-      manager_id: 'number',
-      frequency_months: 'number',
-      repeat: 'bool',
-      start_date: 'date',
-      end_date: 'date',
-    },
-    one: {
-      users: {
-        fk: 'manager_id',
-        as: 'manager',
-      },
-    },
-    many: {
-      due_dates: 'indicator_id',
-      progress_reports: 'indicator_id',
-      measure_indicators: 'indicator_id',
-      sdgtarget_indicators: 'indicator_id',
-      sdgtargets: { via: 'sdgtarget_indicators' },
-      measures: { via: 'measure_indicators' },
-    },
-  },
-  progress_reports: {
-    attributes: {
-      title: {
-        type: 'string',
-        required: true,
-      },
-      indicator_id: 'number',
-      due_date_id: 'number',
-      description: 'string',
-      document_url: 'string',
-      document_public: 'bool',
-      draft: 'bool',
-    },
-    one: {
-      indicators: {
-        fk: 'indicator_id',
-        as: 'indicator',
-      },
-      due_dates: {
-        fk: 'due_date_id',
-        as: 'indicator',
-      },
-    },
-  },
-  due_dates: {
-    attributes: {
-      indicator_id: 'number',
-      due_date: 'date',
-      draft: 'bool',
-    },
-    one: {
-      indicators: {
-        fk: 'indicator_id',
-        as: 'indicator',
-      },
-    },
-    many: {
-      progress_reports: 'due_date_id',
-    },
-  },
-  pages: {
-    attributes: {
-      title: {
-        type: 'string',
-        required: true,
-      },
-      content: 'string',
-      menu_title: 'string',
-      order: 'number',
-    },
-  },
-  roles: {
-    attributes: {
-      name: {
-        type: 'string',
-        required: true,
-      },
-      friendly_name: {
-        type: 'string',
-        required: true,
-      },
-    },
-    many: {
-      user_roles: 'role_id',
-    },
-  },
-  users: {
-    attributes: {
-      name: {
-        type: 'string',
-        required: true,
-      },
-      email: {
-        type: 'string',
-        required: true,
-      },
-      provider: {
-        type: 'string',
-        required: true,
-      },
-    },
-    many: {
-      user_roles: 'user_id',
-      user_categories: 'user_id',
-    },
-  },
-  recommendation_categories: {
-    attributes: {
-      recommendation_id: 'number',
-      category_id: 'number',
-    },
-    one: {
-      recommendations: {
-        fk: 'recommendation_id',
-        as: 'recommendation',
-      },
-      categories: {
-        fk: 'category_id',
-        as: 'category',
-      },
-    },
-  },
-  sdgtarget_categories: {
-    attributes: {
-      sdgtarget_id: 'number',
-      category_id: 'number',
-    },
-    one: {
-      sdgtargets: {
-        fk: 'sdgtarget_id',
-        as: 'sdgtarget',
-      },
-      categories: {
-        fk: 'category_id',
-        as: 'category',
-      },
-    },
-  },
-  measure_categories: {
-    attributes: {
-      measure_id: 'number',
-      category_id: 'number',
-    },
-    one: {
-      measures: {
-        fk: 'measure_id',
-        as: 'measure',
-      },
-      categories: {
-        fk: 'category_id',
-        as: 'category',
-      },
-    },
-  },
-  user_categories: {
-    attributes: {
-      user_id: 'number',
-      category_id: 'number',
-    },
-    one: {
-      users: {
-        fk: 'user_id',
-        as: 'user',
-      },
-      categories: {
-        fk: 'category_id',
-        as: 'category',
-      },
-    },
-  },
-  user_roles: {
-    attributes: {
-      user_id: 'number',
-      role_id: 'number',
-    },
-    one: {
-      users: {
-        fk: 'user_id',
-        as: 'user',
-      },
-      roles: {
-        fk: 'role_id',
-        as: 'role',
-      },
-    },
-  },
-  recommendation_measures: {
-    attributes: {
-      measure_id: 'number',
-      recommendation_id: 'number',
-    },
-    one: {
-      measures: {
-        fk: 'measure_id',
-        as: 'measure',
-      },
-      recommendations: {
-        fk: 'recommendation_id',
-        as: 'recommendation',
-      },
-    },
-  },
-  sdgtarget_measures: {
-    attributes: {
-      measure_id: 'number',
-      sdgtarget_id: 'number',
-    },
-    one: {
-      sdgtarget: {
-        fk: 'sdgtarget_id',
-        as: 'sdgtarget',
-      },
-      measures: {
-        fk: 'measure_id',
-        as: 'measure',
-      },
-    },
-  },
-  sdgtarget_indicators: {
-    attributes: {
-      sdgtarget_id: 'number',
-      indicator_id: 'number',
-    },
-    one: {
-      sdgtarget: {
-        fk: 'sdgtarget_id',
-        as: 'sdgtarget',
-      },
-      indicators: {
-        fk: 'indicator_id',
-        as: 'indicator',
-      },
-    },
-  },
-  measure_indicators: {
-    attributes: {
-      measure_id: 'number',
-      indicator_id: 'number',
-    },
-    one: {
-      measures: {
-        fk: 'measure_id',
-        as: 'measure',
-      },
-      indicators: {
-        fk: 'indicator_id',
-        as: 'indicator',
-      },
-    },
-  },
-};
+export const DEPENDENCIES = [
+  'user_roles',
+  'pages',
+];
 
+
+export const DB_TABLES = [
+  'users',
+  'user_roles',
+  'pages',
+  'taxonomies',
+  'categories',
+  'indicators',
+  'measure_categories',
+  'measure_indicators',
+  'measures',
+  'recommendation_categories',
+  'recommendation_measures',
+  'recommendations',
+  'sdgtarget_categories',
+  'sdgtarget_indicators',
+  'sdgtarget_measures',
+  'sdgtargets',
+  'user_categories',
+  'progress_reports',
+  'due_dates',
+];
+//
+// export const DB_SCHEMA = {
+//   categories: {
+//     attributes: {
+//       title: {
+//         type: 'string',
+//         required: true,
+//       },
+//       reference: 'string',
+//       short_title: 'string',
+//       description: 'string',
+//       url: 'string',
+//       taxonomy_id: 'number',
+//       manager_id: 'number',
+//       user_only: 'bool',
+//     },
+//     many: {
+//       recommendation_categories: 'category_id',
+//       measure_categories: 'category_id',
+//       user_categories: 'category_id',
+//       sdgtarget_categories: 'category_id',
+//       recommendations: { via: 'recommendation_categories' },
+//       measures: { via: 'measure_categories' },
+//       sdgtargets: { via: 'sdgtarget_categories' },
+//       users: { via: 'user_categories' },
+//     },
+//     one: {
+//       taxonomies: {
+//         fk: 'taxonomy_id',
+//         as: 'taxonomy',
+//       },
+//       users: {
+//         fk: 'manager_id',
+//         as: 'manager',
+//       },
+//     },
+//   },
+//   taxonomies: {
+//     attributes: {
+//       title: {
+//         type: 'string',
+//         required: true,
+//       },
+//       tags_recommendations: 'bool',
+//       tags_measures: 'bool',
+//       tags_sdgtargets: 'bool',
+//       tags_users: 'bool',
+//       is_smart: 'bool',
+//       allow_multiple: 'bool',
+//       priority: 'number',
+//       grouping_default: 'number',
+//     },
+//     many: {
+//       categories: 'taxonomy_id',
+//     },
+//   },
+//   recommendations: {
+//     attributes: {
+//       reference: {
+//         type: 'string',
+//         required: true,
+//       },
+//       title: {
+//         type: 'string',
+//         required: true,
+//       },
+//       response: {
+//         type: 'string',
+//         required: true,
+//       },
+//       draft: 'bool',
+//       accepted: 'bool',
+//     },
+//     many: {
+//       recommendation_categories: 'recommendation_id',
+//       recommendation_measures: 'recommendation_id',
+//       measures: { via: 'recommendation_measures' },
+//       categories: { via: 'recommendation_categories' },
+//     },
+//   },
+//   sdgtargets: {
+//     attributes: {
+//       reference: 'string',
+//       title: {
+//         type: 'string',
+//         required: true,
+//       },
+//       description: 'string',
+//       draft: 'bool',
+//     },
+//     many: {
+//       sdgtarget_categories: 'sdgtarget_id',
+//       sdgtarget_indicators: 'sdgtarget_id',
+//       sdgtarget_measures: 'sdgtarget_id',
+//       measures: { via: 'sdgtarget_measures' },
+//       categories: { via: 'recommendationsdgtarget_categories_categories' },
+//       indicators: { via: 'sdgtarget_indicators' },
+//     },
+//   },
+//   measures: {
+//     attributes: {
+//       title: {
+//         type: 'string',
+//         required: true,
+//       },
+//       description: 'string',
+//       draft: 'bool',
+//       target_date: 'string',
+//       outcome: 'string',
+//       indicator_summary: 'string',
+//       target_date_comment: 'string',
+//     },
+//     many: {
+//       measure_categories: 'measure_id',
+//       measure_indicators: 'measure_id',
+//       sdgtarget_measures: 'measure_id',
+//       recommendation_measures: 'measure_id',
+//       categories: { via: 'measure_categories' },
+//       recommendations: { via: 'recommendation_measures' },
+//       sdgtargets: { via: 'sdgtarget_measures' },
+//       indicators: { via: 'measure_indicators' },
+//     },
+//   },
+//   indicators: {
+//     attributes: {
+//       reference: 'string',
+//       title: {
+//         type: 'string',
+//         required: true,
+//       },
+//       description: 'string',
+//       draft: 'bool',
+//       manager_id: 'number',
+//       frequency_months: 'number',
+//       repeat: 'bool',
+//       start_date: 'date',
+//       end_date: 'date',
+//     },
+//     one: {
+//       users: {
+//         fk: 'manager_id',
+//         as: 'manager',
+//       },
+//     },
+//     many: {
+//       due_dates: 'indicator_id',
+//       progress_reports: 'indicator_id',
+//       measure_indicators: 'indicator_id',
+//       sdgtarget_indicators: 'indicator_id',
+//       sdgtargets: { via: 'sdgtarget_indicators' },
+//       measures: { via: 'measure_indicators' },
+//     },
+//   },
+//   progress_reports: {
+//     attributes: {
+//       title: {
+//         type: 'string',
+//         required: true,
+//       },
+//       indicator_id: 'number',
+//       due_date_id: 'number',
+//       description: 'string',
+//       document_url: 'string',
+//       document_public: 'bool',
+//       draft: 'bool',
+//     },
+//     one: {
+//       indicators: {
+//         fk: 'indicator_id',
+//         as: 'indicator',
+//       },
+//       due_dates: {
+//         fk: 'due_date_id',
+//         as: 'indicator',
+//       },
+//     },
+//   },
+//   due_dates: {
+//     attributes: {
+//       indicator_id: 'number',
+//       due_date: 'date',
+//       draft: 'bool',
+//     },
+//     one: {
+//       indicators: {
+//         fk: 'indicator_id',
+//         as: 'indicator',
+//       },
+//     },
+//     many: {
+//       progress_reports: 'due_date_id',
+//     },
+//   },
+//   pages: {
+//     attributes: {
+//       title: {
+//         type: 'string',
+//         required: true,
+//       },
+//       content: 'string',
+//       menu_title: 'string',
+//       order: 'number',
+//     },
+//   },
+//   roles: {
+//     attributes: {
+//       name: {
+//         type: 'string',
+//         required: true,
+//       },
+//       friendly_name: {
+//         type: 'string',
+//         required: true,
+//       },
+//     },
+//     many: {
+//       user_roles: 'role_id',
+//     },
+//   },
+//   users: {
+//     attributes: {
+//       name: {
+//         type: 'string',
+//         required: true,
+//       },
+//       email: {
+//         type: 'string',
+//         required: true,
+//       },
+//       provider: {
+//         type: 'string',
+//         required: true,
+//       },
+//     },
+//     many: {
+//       user_roles: 'user_id',
+//       user_categories: 'user_id',
+//     },
+//   },
+//   recommendation_categories: {
+//     attributes: {
+//       recommendation_id: 'number',
+//       category_id: 'number',
+//     },
+//     one: {
+//       recommendations: {
+//         fk: 'recommendation_id',
+//         as: 'recommendation',
+//       },
+//       categories: {
+//         fk: 'category_id',
+//         as: 'category',
+//       },
+//     },
+//   },
+//   sdgtarget_categories: {
+//     attributes: {
+//       sdgtarget_id: 'number',
+//       category_id: 'number',
+//     },
+//     one: {
+//       sdgtargets: {
+//         fk: 'sdgtarget_id',
+//         as: 'sdgtarget',
+//       },
+//       categories: {
+//         fk: 'category_id',
+//         as: 'category',
+//       },
+//     },
+//   },
+//   measure_categories: {
+//     attributes: {
+//       measure_id: 'number',
+//       category_id: 'number',
+//     },
+//     one: {
+//       measures: {
+//         fk: 'measure_id',
+//         as: 'measure',
+//       },
+//       categories: {
+//         fk: 'category_id',
+//         as: 'category',
+//       },
+//     },
+//   },
+//   user_categories: {
+//     attributes: {
+//       user_id: 'number',
+//       category_id: 'number',
+//     },
+//     one: {
+//       users: {
+//         fk: 'user_id',
+//         as: 'user',
+//       },
+//       categories: {
+//         fk: 'category_id',
+//         as: 'category',
+//       },
+//     },
+//   },
+//   user_roles: {
+//     attributes: {
+//       user_id: 'number',
+//       role_id: 'number',
+//     },
+//     one: {
+//       users: {
+//         fk: 'user_id',
+//         as: 'user',
+//       },
+//       roles: {
+//         fk: 'role_id',
+//         as: 'role',
+//       },
+//     },
+//   },
+//   recommendation_measures: {
+//     attributes: {
+//       measure_id: 'number',
+//       recommendation_id: 'number',
+//     },
+//     one: {
+//       measures: {
+//         fk: 'measure_id',
+//         as: 'measure',
+//       },
+//       recommendations: {
+//         fk: 'recommendation_id',
+//         as: 'recommendation',
+//       },
+//     },
+//   },
+//   sdgtarget_measures: {
+//     attributes: {
+//       measure_id: 'number',
+//       sdgtarget_id: 'number',
+//     },
+//     one: {
+//       sdgtarget: {
+//         fk: 'sdgtarget_id',
+//         as: 'sdgtarget',
+//       },
+//       measures: {
+//         fk: 'measure_id',
+//         as: 'measure',
+//       },
+//     },
+//   },
+//   sdgtarget_indicators: {
+//     attributes: {
+//       sdgtarget_id: 'number',
+//       indicator_id: 'number',
+//     },
+//     one: {
+//       sdgtarget: {
+//         fk: 'sdgtarget_id',
+//         as: 'sdgtarget',
+//       },
+//       indicators: {
+//         fk: 'indicator_id',
+//         as: 'indicator',
+//       },
+//     },
+//   },
+//   measure_indicators: {
+//     attributes: {
+//       measure_id: 'number',
+//       indicator_id: 'number',
+//     },
+//     one: {
+//       measures: {
+//         fk: 'measure_id',
+//         as: 'measure',
+//       },
+//       indicators: {
+//         fk: 'indicator_id',
+//         as: 'indicator',
+//       },
+//     },
+//   },
+// };
 
 // TODO need to pull from an env file
 export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';
