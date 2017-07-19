@@ -55,7 +55,7 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
       // add categories from entities if not present otherwise increase count
       taxonomy.get('categories').forEach((cat, catId) => {
         // if entity has category of active taxonomy
-        if (testEntityCategoryAssociation(entity, 'categories', catId)) {
+        if (testEntityCategoryAssociation(entity, catId)) {
           hasTaxCategory = true;
           // if category already added
           if (groups.get(catId)) {
