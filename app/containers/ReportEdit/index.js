@@ -50,7 +50,7 @@ import {
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class ReportEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -85,7 +85,10 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
-      attributes,
+      attributes: viewEntity.get('attributes').mergeWith(
+        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+        FORM_INITIAL.get('attributes')
+      ),
     })
     : Map();
   }

@@ -57,7 +57,7 @@ import {
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class CategoryEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -86,7 +86,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
-      attributes: viewEntity.get('attributes'),
+      attributes: viewEntity.get('attributes').mergeWith(
+        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+        FORM_INITIAL.get('attributes')
+      ),
       associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
       // TODO allow single value for singleSelect
     })

@@ -204,8 +204,8 @@ export const getConnectionUpdatesFromFormData = ({ formData, connections, connec
 // only show the highest rated role (lower role ids means higher)
 export const getHighestUserRoleId = (roles) =>
   roles.reduce((currentHighestRoleId, role) =>
-    role.get('associated') && role.get('id') < currentHighestRoleId
-      ? role.get('id')
+    role.get('associated') && parseInt(role.get('id'), 10) < currentHighestRoleId
+      ? parseInt(role.get('id'), 10)
       : currentHighestRoleId
   , 99999);
 
@@ -320,7 +320,7 @@ export const getTitleFormField = (formatMessage, appMessages, controlType = 'tit
   getFormField(formatMessage, appMessages, controlType, attribute, true);
 
 export const getReferenceFormField = (formatMessage, appMessages, required = false) =>
-  getFormField(formatMessage, appMessages, 'short', 'reference', required, required ? 'referenceOptional' : 'reference');
+  getFormField(formatMessage, appMessages, 'short', 'reference', required, required ? 'reference' : 'referenceOptional');
 
 export const getShortTitleFormField = (formatMessage, appMessages) =>
   getFormField(formatMessage, appMessages, 'short', 'short_title');

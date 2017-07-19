@@ -62,7 +62,7 @@ import {
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 
 export class IndicatorEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -89,14 +89,13 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
     const { measures, viewEntity, users, sdgtargets } = props;
-    let attributes = viewEntity.get('attributes');
-    if (!attributes.get('frequency_months')) {
-      attributes = attributes.set('frequency_months', 1);
-    }
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
-      attributes,
+      attributes: viewEntity.get('attributes').mergeWith(
+        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+        FORM_INITIAL.get('attributes')
+      ),
       associatedMeasures: entityOptions(measures, true),
       associatedSdgTargets: entityOptions(sdgtargets, true),
       associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),

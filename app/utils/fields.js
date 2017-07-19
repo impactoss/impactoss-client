@@ -38,19 +38,22 @@ export const getStatusField = (entity, attribute = 'draft', options, label) => (
 });
 
 // only show the highest rated role (lower role ids means higher)
-const getHighestUserRoleLabel = (roles) => {
+const getHighestUserRoleLabel = (roles, formatMessage, appMessages) => {
   const highestRole = roles.reduce((currentHighestRole, role) =>
   (!currentHighestRole || role.get('id') < currentHighestRole.get('id'))
     ? role
     : currentHighestRole
   , null);
-  return highestRole.getIn(['attributes', 'friendly_name']);
+  return highestRole
+  ? highestRole.getIn(['attributes', 'friendly_name'])
+  : formatMessage(appMessages.entities.roles.defaultRole);
 };
 
-export const getRoleField = (entity) => ({
+export const getRoleField = (entity, formatMessage, appMessages) => ({
   controlType: 'info',
   type: 'role',
-  value: entity.get('roles') && getHighestUserRoleLabel(entity.get('roles')),
+  value: entity.get('roles')
+    && getHighestUserRoleLabel(entity.get('roles'), formatMessage, appMessages),
 });
 
 export const getMetaField = (entity, appMessages) => ({

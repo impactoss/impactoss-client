@@ -86,7 +86,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
   getHeaderAsideFields = (entity) => ([{
     fields: [
-      getRoleField(entity),
+      getRoleField(entity, this.context.intl.formatMessage, appMessages),
       getMetaField(entity, appMessages),
     ],
   }]);
@@ -95,7 +95,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     fields: [getEmailField(entity)],
   }]);
 
-  getBodyAsideFields = (entity, taxonomies) => ([
+  getBodyAsideFields = (taxonomies) => ([
     { // fieldGroup
       label: appMessages.entities.taxonomies.plural,
       icon: 'categories',
@@ -138,7 +138,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                 },
                 body: {
                   main: this.getBodyMainFields(user),
-                  aside: isManager && this.getBodyAsideFields(user, taxonomies),
+                  aside: isManager && this.getBodyAsideFields(taxonomies),
                 },
               }}
             />

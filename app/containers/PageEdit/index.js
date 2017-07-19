@@ -11,8 +11,6 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { fromJS } from 'immutable';
-
 import {
   getTitleFormField,
   getMenuTitleFormField,
@@ -48,7 +46,7 @@ import {
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class PageEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -74,7 +72,15 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
     const { viewEntity } = props;
-    return fromJS(viewEntity);
+    return viewEntity
+    ? Map({
+      id: viewEntity.get('id'),
+      attributes: viewEntity.get('attributes').mergeWith(
+        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+        FORM_INITIAL.get('attributes')
+      ),
+    })
+    : Map();
   }
 
   getHeaderMainFields = () => ([ // fieldGroups

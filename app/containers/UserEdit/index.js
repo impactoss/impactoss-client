@@ -55,7 +55,7 @@ import {
 
 import { save } from './actions';
 import messages from './messages';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class UserEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -82,7 +82,10 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
     return Map({
       id: viewEntity.get('id'),
-      attributes: viewEntity.get('attributes'),
+      attributes: viewEntity.get('attributes').mergeWith(
+        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+        FORM_INITIAL.get('attributes')
+      ),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRole: getHighestUserRoleId(roles),
     });
@@ -99,7 +102,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
         getMetaField(entity, appMessages),
       ]
       : [
-        getRoleField(entity),
+        getRoleField(entity, this.context.intl.formatMessage, appMessages),
         getMetaField(entity, appMessages),
       ],
     },
@@ -109,8 +112,8 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     fields: [getEmailField(this.context.intl.formatMessage, appMessages)],
   }]);
 
-  getBodyAsideFields = (isManager, taxonomies) => ([ // fieldGroups
-    !isManager ? null : { // fieldGroup
+  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
+    { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
       fields: renderTaxonomyControl(taxonomies),
@@ -182,7 +185,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 },
                 body: {
                   main: this.getBodyMainFields(),
-                  aside: this.getBodyAsideFields(isManager, taxonomies),
+                  aside: isManager && this.getBodyAsideFields(taxonomies),
                 },
               }}
             />
@@ -243,6 +246,7 @@ function mapDispatchToProps(dispatch) {
       // roles
       // higher is actually lower
       const newHighestRole = parseInt(formData.get('associatedRole'), 10);
+
       // store all higher roles
       const newRoleIds = newHighestRole === 0
         ? List()
@@ -254,7 +258,7 @@ function mapDispatchToProps(dispatch) {
 
       saveData = saveData.set('userRoles', Map({
         delete: roles.reduce((memo, role) =>
-          role.get('associated') && newRoleIds.includes(role.get('id'))
+          role.get('associated') && newRoleIds.includes(parseInt(role.get('id'), 10))
             ? memo.push(role.getIn(['associated', 'id']))
             : memo
           , List()),

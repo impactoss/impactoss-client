@@ -3,6 +3,7 @@
  * UserEdit constants
  *
  */
+import { fromJS } from 'immutable';
 
 export const SAVE = 'nmrf/UserEdit/SAVE';
 
@@ -14,3 +15,11 @@ export const DEPENDENCIES = [
   'categories',
   'user_categories',
 ];
+
+export const FORM_INITIAL = fromJS({
+  id: '',
+  attributes: {
+    email: '',
+    name: '',
+  },
+});

@@ -57,7 +57,7 @@ import {
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class RecommendationEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -86,7 +86,10 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
-      attributes: viewEntity.get('attributes'),
+      attributes: viewEntity.get('attributes').mergeWith(
+        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+        FORM_INITIAL.get('attributes')
+      ),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedMeasures: entityOptions(measures, true),
     })
