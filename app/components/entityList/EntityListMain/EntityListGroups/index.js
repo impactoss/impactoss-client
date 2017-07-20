@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Link } from 'react-router';
 
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 import { Map, List } from 'immutable';
 
@@ -13,6 +11,7 @@ import { Map, List } from 'immutable';
 import EntityListItems from './EntityListItems';
 import EntityListHeader from './EntityListHeader';
 import EntityListFooter from './EntityListFooter';
+import EntityListGroupHeader from './EntityListGroupHeader';
 
 import { getPager } from './pagination';
 import { groupEntities } from './group-entities';
@@ -24,24 +23,7 @@ const ListEntitiesMain = styled.div`
 `;
 const ListEntitiesEmpty = styled.div``;
 const ListEntitiesGroup = styled.div``;
-
-const ListEntitiesGroupHeaderLink = styled(Link)`
-  color: ${palette('dark', 1)};
-  &:hover {
-    color: ${palette('dark', 0)};
-    text-decoration: underline;
-  }
-`;
-
-const ListEntitiesGroupHeader = styled.h3`
-  margin-top: 30px;
-`;
 const ListEntitiesSubGroup = styled.div``;
-const ListEntitiesSubGroupHeader = styled.h5`
-  margin-top: 12px;
-  font-weight: normal;
-  margin-bottom: 20px;
-`;
 
 export class EntityListGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -137,22 +119,14 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                 entityGroupsPaged.map((entityGroup, i) => (
                   <ListEntitiesGroup key={i}>
                     { groupSelectValue && entityGroup.get('label') &&
-                      <ListEntitiesGroupHeaderLink to={`category/${entityGroup.get('id')}`}>
-                        <ListEntitiesGroupHeader>
-                          {entityGroup.get('label')}
-                        </ListEntitiesGroupHeader>
-                      </ListEntitiesGroupHeaderLink>
+                      <EntityListGroupHeader group={entityGroup} level={1} />
                     }
                     {
                       entityGroup.get('entityGroups') &&
                       entityGroup.get('entityGroups').map((entitySubGroup, j) => (
                         <ListEntitiesSubGroup key={j}>
                           { subgroupSelectValue && entitySubGroup.get('label') &&
-                            <ListEntitiesGroupHeaderLink to={`category/${entitySubGroup.get('id')}`}>
-                              <ListEntitiesSubGroupHeader>
-                                {entitySubGroup.get('label')}
-                              </ListEntitiesSubGroupHeader>
-                            </ListEntitiesGroupHeaderLink>
+                            <EntityListGroupHeader group={entitySubGroup} level={2} />
                           }
                           <EntityListItems
                             taxonomies={this.props.taxonomies}
