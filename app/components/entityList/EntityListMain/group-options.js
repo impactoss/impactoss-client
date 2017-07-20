@@ -1,5 +1,25 @@
 import { List, Map } from 'immutable';
 
+export const getGroupValue = (taxonomies, connectedTaxonomies, groupAttribute, level) => {
+  if (taxonomies) {
+    const defaultTaxomony = taxonomies.find((tax) =>
+      tax.getIn(['attributes', groupAttribute]) === level
+    );
+    if (defaultTaxomony) {
+      return defaultTaxomony.get('id');
+    }
+  }
+  if (connectedTaxonomies) {
+    const defaultCTaxomony = connectedTaxonomies.find((tax) =>
+      tax.getIn(['attributes', groupAttribute]) === level
+    );
+    if (defaultCTaxomony) {
+      return `x:${defaultCTaxomony.get('id')}`;
+    }
+  }
+  return null;
+};
+
 // args: immutable Maps
 export const getGroupOptions = (taxonomies, connectedTaxonomies) => {
   let options = List();

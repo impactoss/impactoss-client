@@ -26,6 +26,7 @@ export const CONFIG = {
     connectPath: 'sdgtarget_categories',
     key: 'category_id',
     ownKey: 'sdgtarget_id',
+    defaultGroupAttribute: 'groups_sdgtargets_default',
   },
   connectedTaxonomies: { // filter by each connected category
     query: 'catx',

@@ -21,6 +21,7 @@ export const CONFIG = {
     connectPath: 'recommendation_categories',
     key: 'category_id',
     ownKey: 'recommendation_id',
+    defaultGroupAttribute: 'groups_recommendations_default',
   },
   connections: { // filter by associated entity
     query: 'connected',

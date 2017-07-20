@@ -35,8 +35,8 @@ export function* updateGroup(args) {
     arg: value.get('query'),
     value: value.get('value'),
     replace: true,
-    add: value.get('value') !== '',
-    remove: value.get('value') === '',
+    // add: value.get('value') !== '',
+    // remove: value.get('value') === '',
   })).toJS();
   yield params.push({
     arg: 'page',

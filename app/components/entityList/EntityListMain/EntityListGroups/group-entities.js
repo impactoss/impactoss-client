@@ -13,28 +13,29 @@ export const groupEntities = (
   taxonomies,
   connectedTaxonomies,
   config,
-  locationQuery
-) => locationQuery.get('subgroup')
-  ? makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, locationQuery.get('group'))
+  groupSelectValue,
+  subgroupSelectValue
+) => subgroupSelectValue
+  ? makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, groupSelectValue)
     .map((group) => group.set(
       'entityGroups',
-      makeEntityGroups(group.get('entities'), taxonomies, connectedTaxonomies, config, locationQuery.get('subgroup'))
+      makeEntityGroups(group.get('entities'), taxonomies, connectedTaxonomies, config, subgroupSelectValue)
     ))
-  : makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, locationQuery.get('group'));
+  : makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, groupSelectValue);
 
 const makeEntityGroups = (
   entities,
   taxonomies,
   connectedTaxonomies,
   config,
-  locationQueryGroup
+  groupSelectValue
 ) => {
-  if (locationQueryGroup) {
-    if (isNumber(locationQueryGroup)) {
-      const taxonomy = taxonomies.get(locationQueryGroup);
+  if (groupSelectValue) {
+    if (isNumber(groupSelectValue)) {
+      const taxonomy = taxonomies.get(groupSelectValue);
       return makeTaxonomyGroups(entities, taxonomy);
     }
-    const locationQueryGroupSplit = locationQueryGroup.split(':');
+    const locationQueryGroupSplit = groupSelectValue.split(':');
     if (locationQueryGroupSplit.length > 1) {
       const taxonomy = connectedTaxonomies.get(locationQueryGroupSplit[1]);
       if (taxonomy) {
@@ -55,7 +56,7 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
       // add categories from entities if not present otherwise increase count
       taxonomy.get('categories').forEach((cat, catId) => {
         // if entity has category of active taxonomy
-        if (testEntityCategoryAssociation(entity, 'categories', catId)) {
+        if (testEntityCategoryAssociation(entity, catId)) {
           hasTaxCategory = true;
           // if category already added
           if (groups.get(catId)) {

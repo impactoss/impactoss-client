@@ -29,6 +29,7 @@ export const CONFIG = {
     connectPath: 'measure_categories',
     key: 'category_id',
     ownKey: 'measure_id',
+    defaultGroupAttribute: 'groups_measures_default',
   },
   connectedTaxonomies: { // filter by each category
     query: 'catx',
