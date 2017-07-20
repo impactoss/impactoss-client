@@ -48,17 +48,18 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       locationQuery,
       taxonomies,
       connectedTaxonomies,
+      groupSelectValue,
+      subgroupSelectValue,
     } = this.props;
     // grouping and paging
     // group entities , regardless of page items
-    const locationGroup = locationQuery.get('group');
-    const entityGroups = locationGroup
-      ? groupEntities(entities, taxonomies, connectedTaxonomies, config, locationQuery)
+    const entityGroups = groupSelectValue
+      ? groupEntities(entities, taxonomies, connectedTaxonomies, config, groupSelectValue, subgroupSelectValue)
       : List().push(Map({ entities }));
 
     // flatten all entities
     let entityGroupsFlattened;
-    if (locationGroup) {
+    if (groupSelectValue) {
       // flatten groups for pagination, important as can include duplicates
       entityGroupsFlattened = entityGroups.map((group, gIndex) => group.get('entityGroups')
         ? group.get('entityGroups').map(
@@ -72,7 +73,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
 
     // get new pager object for specified page
     const pager = getPager(
-      locationGroup ? entityGroupsFlattened.size : entities.size,
+      groupSelectValue ? entityGroupsFlattened.size : entities.size,
       locationQuery.get('page') && parseInt(locationQuery.get('page'), 10),
       locationQuery.get('items') && parseInt(locationQuery.get('items'), 10)
     );
@@ -81,9 +82,9 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     let entitiesOnPage;
     if (pager.totalPages > 1) {
       // group again if necessary, this time just for items on page
-      if (locationGroup) {
+      if (groupSelectValue) {
         entitiesOnPage = entityGroupsFlattened.map((item) => item.get('entity')).slice(pager.startIndex, pager.endIndex + 1);
-        entityGroupsPaged = groupEntities(entitiesOnPage, taxonomies, connectedTaxonomies, config, locationQuery);
+        entityGroupsPaged = groupEntities(entitiesOnPage, taxonomies, connectedTaxonomies, config, groupSelectValue, subgroupSelectValue);
       } else {
         entitiesOnPage = entities.slice(pager.startIndex, pager.endIndex + 1);
         entityGroupsPaged = List().push(Map({ entities: entitiesOnPage }));
@@ -122,7 +123,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
               {
                 entityGroupsPaged.map((entityGroup, i) => (
                   <ListEntitiesGroup key={i}>
-                    { locationGroup && entityGroup.get('label') &&
+                    { groupSelectValue && entityGroup.get('label') &&
                       <ListEntitiesGroupHeader>
                         {entityGroup.get('label')}
                       </ListEntitiesGroupHeader>
@@ -131,7 +132,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                       entityGroup.get('entityGroups') &&
                       entityGroup.get('entityGroups').map((entitySubGroup, j) => (
                         <ListEntitiesSubGroup key={j}>
-                          { locationQuery.get('subgroup') && entitySubGroup.get('label') &&
+                          { subgroupSelectValue && entitySubGroup.get('label') &&
                             <ListEntitiesSubGroupHeader>
                               {entitySubGroup.get('label')}
                             </ListEntitiesSubGroupHeader>
@@ -199,6 +200,8 @@ EntityListGroups.propTypes = {
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,
+  groupSelectValue: PropTypes.string,
+  subgroupSelectValue: PropTypes.string,
 };
 
 

@@ -37,6 +37,8 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
   }
 `;
 
+const NONE = 'OFF';
+
 export class EntityListOptions extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
     return !isEqual(this.props, nextProps);
@@ -54,7 +56,6 @@ export class EntityListOptions extends React.PureComponent { // eslint-disable-l
       groupOptions,
       subgroupOptions,
     } = this.props;
-
     return (
       <Styled>
         <EntityListGroupBy
@@ -64,7 +65,7 @@ export class EntityListOptions extends React.PureComponent { // eslint-disable-l
           }
           onChange={onGroupSelect}
         />
-        { groupSelectValue && subgroupOptions.size > 0 &&
+        { groupSelectValue && groupSelectValue !== NONE && subgroupOptions.size > 0 &&
           <EntityListGroupBy
             value={subgroupSelectValue}
             options={subgroupOptions &&

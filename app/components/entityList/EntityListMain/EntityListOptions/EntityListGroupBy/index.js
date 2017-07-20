@@ -40,21 +40,24 @@ const Reset = styled(ButtonSimple)`
   font-weight: bold;
 `;
 
+const NONE = 'OFF';
+
 export class EntityListGroupBy extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     const { onChange, value, isSubgroup } = this.props;
     const optionActive = find(this.props.options, (option) => option.value === value);
-    const options = value && value !== ''
+    const options = value && value !== NONE
       ? this.props.options
       : [{
-        value: '',
+        value: NONE,
         label: this.context.intl.formatMessage(messages.placeholder),
         default: true,
       }].concat(this.props.options);
+
     return (
       <Styled>
-        { options && options.length > 0 &&
+        { this.props.options.length > 0 && options && options.length > 0 &&
           <span>
             <Label htmlFor="select">
               { !isSubgroup &&
@@ -64,18 +67,18 @@ export class EntityListGroupBy extends React.PureComponent { // eslint-disable-l
                 <FormattedMessage {...messages.subgroupBy} />
               }
             </Label>
-            { value === '' &&
+            { (!value || value === NONE) && !optionActive &&
               <Select
                 id="select"
-                onChange={(event) => onChange(event.target.value === value ? '' : event.target.value)}
-                value={value}
-                active={value !== ''}
+                onChange={(event) => onChange(event.target.value === value ? NONE : event.target.value)}
+                value={value || NONE}
+                active={false}
               >
                 { options.map((option, i) => (
                   <Option
                     key={i}
                     value={option.value}
-                    isPlaceholder={option.value === ''}
+                    isPlaceholder={option.value === NONE}
                     default={option.default}
                     active={option.value === value}
                   >
@@ -84,10 +87,10 @@ export class EntityListGroupBy extends React.PureComponent { // eslint-disable-l
                 ))}
               </Select>
             }
-            { value !== '' &&
+            { value !== NONE && optionActive &&
               <Reset
                 title={this.context.intl.formatMessage(messages.reset)}
-                onClick={() => onChange('')}
+                onClick={() => onChange(NONE)}
               >
                 {optionActive.label}
                 <Icon name="removeSmall" text textRight />
@@ -108,7 +111,7 @@ EntityListGroupBy.propTypes = {
 };
 
 EntityListGroupBy.defaultProps = {
-  value: '',
+  value: NONE,
 };
 
 EntityListGroupBy.contextTypes = {

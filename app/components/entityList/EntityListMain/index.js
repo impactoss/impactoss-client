@@ -22,7 +22,7 @@ import EntityListGroups from './EntityListGroups';
 import EntityListSearch from './EntityListSearch';
 import EntityListOptions from './EntityListOptions';
 import { currentFilters } from './current-filters';
-import { getGroupOptions } from './group-options';
+import { getGroupOptions, getGroupValue } from './group-options';
 
 import messages from './messages';
 
@@ -83,6 +83,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     const expandNo = config.expandableColumns && locationQuery.get('expand')
       ? parseInt(locationQuery.get('expand'), 10)
       : 0;
+    const groupSelectValue = locationQuery.get('group') || getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 1);
+    const subgroupSelectValue = locationQuery.get('subgroup') || getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 2);
 
     const headerTitle = this.props.entities && dataReady
       ? `${this.props.entities.size} ${this.props.entities.size === 1 ? entityTitle.single : entityTitle.plural}`
@@ -126,8 +128,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 <EntityListOptions
                   groupOptions={getGroupOptions(taxonomies, connectedTaxonomies)}
                   subgroupOptions={getGroupOptions(taxonomies)}
-                  groupSelectValue={locationQuery.get('group')}
-                  subgroupSelectValue={locationQuery.get('subgroup')}
+                  groupSelectValue={groupSelectValue}
+                  subgroupSelectValue={subgroupSelectValue}
                   onGroupSelect={onGroupSelect}
                   onSubgroupSelect={onSubgroupSelect}
                   onExpand={() => onExpand(expandNo < config.expandableColumns.length ? config.expandableColumns.length : 0)}
@@ -141,6 +143,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     connectedTaxonomies={this.props.connectedTaxonomies}
                     entityIdsSelected={this.props.entityIdsSelected}
                     locationQuery={this.props.locationQuery}
+                    groupSelectValue={groupSelectValue}
+                    subgroupSelectValue={subgroupSelectValue}
                     onEntityClick={this.props.onEntityClick}
                     entityTitle={entityTitle}
                     config={config}
