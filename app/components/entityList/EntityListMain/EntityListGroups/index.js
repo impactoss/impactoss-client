@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import { Link } from 'react-router';
+
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
+
 import { Map, List } from 'immutable';
 
 // import { isEqual } from 'lodash/lang';
@@ -20,6 +24,15 @@ const ListEntitiesMain = styled.div`
 `;
 const ListEntitiesEmpty = styled.div``;
 const ListEntitiesGroup = styled.div``;
+
+const ListEntitiesGroupHeaderLink = styled(Link)`
+  color: ${palette('dark', 1)};
+  &:hover {
+    color: ${palette('dark', 0)};
+    text-decoration: underline;
+  }
+`;
+
 const ListEntitiesGroupHeader = styled.h3`
   margin-top: 30px;
 `;
@@ -124,18 +137,22 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                 entityGroupsPaged.map((entityGroup, i) => (
                   <ListEntitiesGroup key={i}>
                     { groupSelectValue && entityGroup.get('label') &&
-                      <ListEntitiesGroupHeader>
-                        {entityGroup.get('label')}
-                      </ListEntitiesGroupHeader>
+                      <ListEntitiesGroupHeaderLink to={`category/${entityGroup.get('id')}`}>
+                        <ListEntitiesGroupHeader>
+                          {entityGroup.get('label')}
+                        </ListEntitiesGroupHeader>
+                      </ListEntitiesGroupHeaderLink>
                     }
                     {
                       entityGroup.get('entityGroups') &&
                       entityGroup.get('entityGroups').map((entitySubGroup, j) => (
                         <ListEntitiesSubGroup key={j}>
                           { subgroupSelectValue && entitySubGroup.get('label') &&
-                            <ListEntitiesSubGroupHeader>
-                              {entitySubGroup.get('label')}
-                            </ListEntitiesSubGroupHeader>
+                            <ListEntitiesGroupHeaderLink to={`category/${entitySubGroup.get('id')}`}>
+                              <ListEntitiesSubGroupHeader>
+                                {entitySubGroup.get('label')}
+                              </ListEntitiesSubGroupHeader>
+                            </ListEntitiesGroupHeaderLink>
                           }
                           <EntityListItems
                             taxonomies={this.props.taxonomies}
