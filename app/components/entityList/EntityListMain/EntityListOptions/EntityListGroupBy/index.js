@@ -47,36 +47,6 @@ export class EntityListGroupBy extends React.PureComponent { // eslint-disable-l
     );
   }
 }
-// <Select
-//   id="select"
-//   onChange={(event) => onChange(event.target.value === value ? NONE : event.target.value)}
-//   value={value || NONE}
-//   active={false}
-// >
-//   { options.map((option, i) => (
-//     <Option
-//       key={i}
-//       value={option.value}
-//       isPlaceholder={option.value === NONE}
-//       default={option.default}
-//       active={option.value === value}
-//     >
-//       {option.label}
-//     </Option>
-//   ))}
-// </Select>
-// }
-// { value !== NONE && optionActive &&
-// <Reset
-//   title={this.context.intl.formatMessage(messages.reset)}
-//   onClick={() => onChange(NONE)}
-// >
-//   {optionActive.label}
-//   <Icon name="removeSmall" text textRight />
-// </Reset>
-// }
-// </span>
-// }
 
 EntityListGroupBy.propTypes = {
   value: PropTypes.string,
