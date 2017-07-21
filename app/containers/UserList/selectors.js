@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { find } from 'lodash/collection';
 
 import {
   selectEntities,
@@ -17,6 +18,8 @@ import {
   attributesEqual,
   sortEntities,
 } from 'utils/entities';
+
+import { CONFIG } from './constants';
 
 const selectUsersNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
@@ -76,6 +79,14 @@ export const selectUsers = createSelector(
   selectUsersByCategories,
   selectSortByQuery,
   selectSortOrderQuery,
-  (entities, sortBy, sortOrder) =>
-    sortEntities(entities, sortOrder || 'asc', sortBy || 'name')
+  (entities, sort, order) => {
+    const sortBy = sort || 'name';
+    const sortOption = find(CONFIG.sorting, (option) => option.attribute === sortBy);
+    return sortEntities(
+      entities,
+      order || (sortOption ? sortOption.order : 'asc'),
+      sortBy,
+      sortOption ? sortOption.type : 'string'
+    );
+  }
 );

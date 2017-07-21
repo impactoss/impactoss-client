@@ -11,6 +11,23 @@ export const CONFIG = {
   clientPath: 'users',
   serverPath: 'users',
   search: ['name'],
+  sorting: [
+    {
+      attribute: 'id', // proxy for created at
+      type: 'number',
+      order: 'desc',
+    },
+    {
+      attribute: 'name',
+      type: 'string',
+      order: 'asc',
+    },
+    {
+      attribute: 'updated_at',
+      type: 'date',
+      order: 'desc',
+    },
+  ],
   taxonomies: { // filter by each category
     query: 'cat',
     search: true,

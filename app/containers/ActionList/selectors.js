@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { Map, List } from 'immutable';
-import { reduce } from 'lodash/collection';
+import { reduce, find } from 'lodash/collection';
 
 import {
   selectEntities,
@@ -23,6 +23,8 @@ import {
   sortEntities,
   testEntityEntityAssociation,
 } from 'utils/entities';
+
+import { CONFIG } from './constants';
 
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'indicators'),
@@ -257,6 +259,14 @@ export const selectMeasures = createSelector(
   selectMeasuresExpandables,
   selectSortByQuery,
   selectSortOrderQuery,
-  (entities, sortBy, sortOrder) =>
-    sortEntities(entities, sortOrder || 'asc', sortBy)
+  (entities, sort, order) => {
+    const sortBy = sort || 'id';
+    const sortOption = find(CONFIG.sorting, (option) => option.attribute === sortBy);
+    return sortEntities(
+      entities,
+      order || (sortOption ? sortOption.order : 'desc'),
+      sortBy,
+      sortOption ? sortOption.type : 'string'
+    );
+  }
 );

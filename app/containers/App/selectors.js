@@ -196,12 +196,12 @@ export const selectExpandQuery = createSelector(
 
 export const selectSortOrderQuery = createSelector(
   (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('sortOrder')
+  (locationQuery) => locationQuery && locationQuery.get('order')
 );
 
 export const selectSortByQuery = createSelector(
   (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('sortBy')
+  (locationQuery) => locationQuery && locationQuery.get('sort')
 );
 
 
