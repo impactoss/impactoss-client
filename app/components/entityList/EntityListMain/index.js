@@ -16,7 +16,7 @@ import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 
-import { CONTENT_LIST } from 'containers/App/constants';
+import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 
 import EntityListGroups from './EntityListGroups';
 import EntityListSearch from './EntityListSearch';
@@ -84,7 +84,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       ? parseInt(locationQuery.get('expand'), 10)
       : 0;
     const groupSelectValue = locationQuery.get('group') || getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 1);
-    const subgroupSelectValue = locationQuery.get('subgroup') || getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 2);
+    const subgroupSelectValue = groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET
+      ? locationQuery.get('subgroup') || getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 2)
+      : null;
 
     const headerTitle = this.props.entities && dataReady
       ? `${this.props.entities.size} ${this.props.entities.size === 1 ? entityTitle.single : entityTitle.plural}`
@@ -152,6 +154,10 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     isManager={isManager}
                     onExpand={onExpand}
                     expandNo={expandNo}
+                    onPageItemsSelect={(no) => {
+                      this.scrollToTop();
+                      this.props.onPageItemsSelect(no);
+                    }}
                     onPageSelect={(page) => {
                       this.scrollToTop();
                       this.props.onPageSelect(page);
@@ -195,6 +201,7 @@ EntityListMain.propTypes = {
   onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
+  onPageItemsSelect: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,
 };
 

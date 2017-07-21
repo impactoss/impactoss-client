@@ -16,4 +16,5 @@ export const ENTITIES_SELECT = 'nmrf/EntityList/ENTITIES_SELECT';
 export const UPDATE_QUERY = 'nmrf/EntityList/UPDATE_QUERY';
 export const UPDATE_GROUP = 'nmrf/EntityList/UPDATE_GROUP';
 export const PAGE_CHANGE = 'nmrf/EntityList/PAGE_CHANGE';
+export const PAGE_ITEM_CHANGE = 'nmrf/EntityList/PAGE_ITEM_CHANGE';
 export const EXPAND_CHANGE = 'nmrf/EntityList/EXPAND_CHANGE';

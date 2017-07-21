@@ -12,6 +12,7 @@ import {
   UPDATE_GROUP,
   PAGE_CHANGE,
   EXPAND_CHANGE,
+  PAGE_ITEM_CHANGE,
 } from './constants';
 
 export function* updateQuery(args) {
@@ -53,6 +54,21 @@ export function* updatePage(args) {
     replace: true,
   }));
 }
+export function* updatePageItems(args) {
+  yield put(updateRouteQuery([
+    {
+      arg: 'items',
+      value: args.no,
+      replace: true,
+    },
+    {
+      arg: 'page',
+      value: '',
+      replace: true,
+      remove: true,
+    },
+  ]));
+}
 export function* updateExpand(args) {
   yield put(updateRouteQuery({
     arg: 'expand',
@@ -81,6 +97,7 @@ export default function* entityList() {
   yield takeLatest(UPDATE_QUERY, updateQuery);
   yield takeLatest(UPDATE_GROUP, updateGroup);
   yield takeLatest(PAGE_CHANGE, updatePage);
+  yield takeLatest(PAGE_ITEM_CHANGE, updatePageItems);
   yield takeLatest(EXPAND_CHANGE, updateExpand);
 
   yield takeLatest(SAVE_EDITS, saveEdits);

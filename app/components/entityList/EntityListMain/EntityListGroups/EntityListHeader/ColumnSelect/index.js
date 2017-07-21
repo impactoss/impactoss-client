@@ -22,10 +22,12 @@ const Label = styled.label`
   vertical-align: middle;
 `;
 
+const SelectAll = styled.a``;
+
 class ColumnSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { isSelected, onSelect, width, label } = this.props;
+    const { isSelected, onSelect, width, label, hasSelectAll, onSelectAll, selectAllLabel } = this.props;
     return (
       <Styled
         width={width}
@@ -38,6 +40,17 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
           />
         </CheckboxWrap>
         <Label htmlFor="select-all">{label}</Label>
+        {hasSelectAll &&
+          <SelectAll
+            onClick={(e) => {
+              e.preventDefault();
+              onSelectAll();
+            }}
+            href="/"
+          >
+            {selectAllLabel}
+          </SelectAll>
+        }
       </Styled>
     );
   }
@@ -45,7 +58,10 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
 ColumnSelect.propTypes = {
   isSelected: PropTypes.bool,
   onSelect: PropTypes.func,
+  onSelectAll: PropTypes.func,
+  hasSelectAll: PropTypes.bool,
   label: PropTypes.string,
+  selectAllLabel: PropTypes.string,
   width: PropTypes.number,
 };
 ColumnSelect.defaultProps = {

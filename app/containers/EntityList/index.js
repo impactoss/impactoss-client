@@ -18,6 +18,7 @@ import { selectIsUserManager } from 'containers/App/selectors';
 
 import { updatePath } from 'containers/App/actions';
 import appMessages from 'containers/App/messages';
+import { PARAMS } from 'containers/App/constants';
 
 import {
   activePanelSelector,
@@ -34,6 +35,7 @@ import {
   updateGroup,
   updatePage,
   updateExpand,
+  updatePageItems,
 } from './actions';
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -106,6 +108,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onSubgroupSelect={this.props.onSubgroupSelect}
           onSearch={this.props.onSearch}
           onPageSelect={this.props.onPageSelect}
+          onPageItemsSelect={this.props.onPageItemsSelect}
           onEntityClick={this.props.onEntityClick}
         />
       </div>
@@ -139,6 +142,7 @@ EntityList.propTypes = {
   onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
+  onPageItemsSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
   resetStateOnMount: PropTypes.func.isRequired,
 };
@@ -197,7 +201,7 @@ function mapDispatchToProps(dispatch, props) {
           value,
         },
       ])));
-      if (value === '') {
+      if (value === PARAMS.GROUP_RESET) {
         dispatch(updateGroup(fromJS([
           {
             query: 'subgroup',
@@ -216,6 +220,9 @@ function mapDispatchToProps(dispatch, props) {
     },
     onPageSelect: (page) => {
       dispatch(updatePage(page));
+    },
+    onPageItemsSelect: (no) => {
+      dispatch(updatePageItems(no));
     },
     handleEditSubmit: (formData, activeEditOption, entityIdsSelected) => {
       const entities = props.entities.filter(

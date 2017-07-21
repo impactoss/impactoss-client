@@ -83,6 +83,8 @@ export const USER_ROLES = {
   CONTRIBUTOR: 3,
 };
 
+export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
+
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';
 
@@ -94,6 +96,9 @@ export const DEPENDENCIES = [
   'pages',
 ];
 
+export const PARAMS = {
+  GROUP_RESET: 'OFF',
+};
 
 export const DB_TABLES = [
   'users',
