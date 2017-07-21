@@ -94,6 +94,9 @@ export const DEPENDENCIES = [
   'pages',
 ];
 
+export const PARAMS = {
+  GROUP_RESET: 'OFF',
+};
 
 export const DB_TABLES = [
   'users',

@@ -12,6 +12,7 @@ import { List } from 'immutable';
 
 import { isEqual } from 'lodash/lang';
 
+import { PARAMS } from 'containers/App/constants';
 import Button from 'components/buttons/Button';
 import EntityListGroupBy from './EntityListGroupBy';
 
@@ -36,8 +37,6 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
     padding: 0 0 0 0.5em;
   }
 `;
-
-const NONE = 'OFF';
 
 export class EntityListOptions extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
@@ -65,7 +64,7 @@ export class EntityListOptions extends React.PureComponent { // eslint-disable-l
           }
           onChange={onGroupSelect}
         />
-        { groupSelectValue && groupSelectValue !== NONE && subgroupOptions.size > 0 &&
+        { groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET && subgroupOptions.size > 0 &&
           <EntityListGroupBy
             value={subgroupSelectValue}
             options={subgroupOptions &&

@@ -17,10 +17,13 @@ export const groupEntities = (
   subgroupSelectValue
 ) => subgroupSelectValue
   ? makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, groupSelectValue)
-    .map((group) => group.set(
-      'entityGroups',
-      makeEntityGroups(group.get('entities'), taxonomies, connectedTaxonomies, config, subgroupSelectValue)
-    ))
+    .map((group) => group
+      .set(
+        'entityGroups',
+        makeEntityGroups(group.get('entities'), taxonomies, connectedTaxonomies, config, subgroupSelectValue)
+      )
+      .delete('entities')
+    )
   : makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, groupSelectValue);
 
 const makeEntityGroups = (
@@ -88,6 +91,10 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
   });  // for each entities
   return groups.sortBy((group) => group.get('order')).toList();
 };
+
+export const setGroup = (entity, groupId) => entity.get('group')
+  ? entity.set('group', List().push(entity.get('group')).push())
+  : entity.set('group', groupId);
 
 export const makeConnectedTaxonomyGroups = (entities, taxonomy, config) => {
   let groups = Map();

@@ -14,6 +14,7 @@ import {
   UPDATE_GROUP,
   PAGE_CHANGE,
   EXPAND_CHANGE,
+  PAGE_ITEM_CHANGE,
 } from './constants';
 
 export function showPanel(activePanel) {
@@ -68,6 +69,13 @@ export function updatePage(page) {
   return {
     type: PAGE_CHANGE,
     page,
+  };
+}
+
+export function updatePageItems(no) {
+  return {
+    type: PAGE_ITEM_CHANGE,
+    no,
   };
 }
 

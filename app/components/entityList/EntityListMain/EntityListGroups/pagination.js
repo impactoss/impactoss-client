@@ -1,13 +1,11 @@
 import { range } from 'lodash/util';
 
 const PAGE_SIZE = 20;
-const PAGE_SIZE_MAX = 100;
 const PAGE_LINKS = 5;
 
 // default to first page
-export const getPager = (totalItems, currentPage = 1, pageSize = PAGE_SIZE) => {
+export const getPager = (totalItems, currentPage = 1, perPage = PAGE_SIZE) => {
   // calculate total pages
-  const perPage = Math.min(pageSize, PAGE_SIZE_MAX);
 
   const totalPages = Math.ceil(totalItems / perPage);
 

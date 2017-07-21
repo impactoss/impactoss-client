@@ -24,20 +24,24 @@ const WIDTH_HALF = 0.5;
 const WIDTH_OTHER = 0.34;
 
 class EntityListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  getListHeaderLabel = (entityTitle, selectedTotal) => {
-    if (selectedTotal === 1) {
-      return `${selectedTotal} ${entityTitle.single} selected`;
+  getListHeaderLabel = (entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage) => {
+    if (selectedTotal > 0) {
+      if (allSelected) {
+        return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected`;
+      }
+      if (allSelectedOnPage) {
+        return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} on this page are selected`;
+      }
+      return `${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected`;
     }
-    if (selectedTotal > 1) {
-      return `${selectedTotal} ${entityTitle.plural} selected`;
-    }
-    return entityTitle.plural;
+    const hint = (pageTotal < entitiesTotal) ? ` (${pageTotal} of ${entitiesTotal})` : '';
+    return `${entityTitle.plural}${hint}`;
   }
-  getSelectedState = (selectedTotal, pageTotal) => {
+  getSelectedState = (selectedTotal, allSelected) => {
     if (selectedTotal === 0) {
       return CHECKBOX_STATES.UNCHECKED;
     }
-    if (selectedTotal > 0 && selectedTotal === pageTotal) {
+    if (selectedTotal > 0 && allSelected) {
       return CHECKBOX_STATES.CHECKED;
     }
     return CHECKBOX_STATES.INDETERMINATE;
@@ -78,28 +82,36 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
     const {
       selectedTotal,
       pageTotal,
+      entitiesTotal,
+      allSelected,
+      allSelectedOnPage,
       entityTitle,
       isManager,
       expandNo,
       expandableColumns,
       onExpand,
       onSelect,
+      onSelectAll,
     } = this.props;
 
     const firstColumnWidth = this.getFirstColumnWidth(expandableColumns, expandNo);
+
     return (
       <Styled>
         { !isManager &&
           <Column width={firstColumnWidth}>
-            {this.getListHeaderLabel(entityTitle, selectedTotal)}
+            {this.getListHeaderLabel(entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage)}
           </Column>
         }
         { isManager &&
           <ColumnSelect
             width={firstColumnWidth}
-            isSelected={this.getSelectedState(selectedTotal, pageTotal)}
-            label={this.getListHeaderLabel(entityTitle, selectedTotal)}
+            isSelected={this.getSelectedState(selectedTotal, allSelected || allSelectedOnPage)}
+            label={this.getListHeaderLabel(entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage)}
             onSelect={onSelect}
+            hasSelectAll={allSelectedOnPage && !allSelected}
+            onSelectAll={onSelectAll}
+            selectAllLabel={`Select all ${entitiesTotal} ${entityTitle.plural}.`}
           />
         }
         { expandableColumns && expandableColumns.length > 0 &&
@@ -122,12 +134,16 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
 EntityListHeader.propTypes = {
   selectedTotal: PropTypes.number,
   pageTotal: PropTypes.number,
+  entitiesTotal: PropTypes.number,
+  allSelected: PropTypes.bool,
+  allSelectedOnPage: PropTypes.bool,
   expandNo: PropTypes.number,
   isManager: PropTypes.bool,
   expandableColumns: PropTypes.array,
   entityTitle: PropTypes.object,
   onExpand: PropTypes.func,
   onSelect: PropTypes.func,
+  onSelectAll: PropTypes.func,
 };
 
 export default EntityListHeader;
