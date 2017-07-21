@@ -55,11 +55,19 @@ export function* updatePage(args) {
   }));
 }
 export function* updatePageItems(args) {
-  yield put(updateRouteQuery({
-    arg: 'items',
-    value: args.no,
-    replace: true,
-  }));
+  yield put(updateRouteQuery([
+    {
+      arg: 'items',
+      value: args.no,
+      replace: true,
+    },
+    {
+      arg: 'page',
+      value: '',
+      replace: true,
+      remove: true,
+    },
+  ]));
 }
 export function* updateExpand(args) {
   yield put(updateRouteQuery({

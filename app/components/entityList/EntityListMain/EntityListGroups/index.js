@@ -262,13 +262,12 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
             </div>
           }
         </ListEntitiesMain>
-        { pager &&
-          <EntityListFooter
-            pager={pager}
-            onPageSelect={this.props.onPageSelect}
-            onPageItemsSelect={this.props.onPageItemsSelect}
-          />
-        }
+        <EntityListFooter
+          pageSize={pageSize}
+          pager={pager}
+          onPageSelect={this.props.onPageSelect}
+          onPageItemsSelect={this.props.onPageItemsSelect}
+        />
       </div>
     );
   }

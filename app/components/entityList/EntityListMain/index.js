@@ -154,7 +154,10 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     isManager={isManager}
                     onExpand={onExpand}
                     expandNo={expandNo}
-                    onPageItemsSelect={this.props.onPageItemsSelect}
+                    onPageItemsSelect={(no) => {
+                      this.scrollToTop();
+                      this.props.onPageItemsSelect(no);
+                    }}
                     onPageSelect={(page) => {
                       this.scrollToTop();
                       this.props.onPageSelect(page);
