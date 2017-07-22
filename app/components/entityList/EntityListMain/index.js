@@ -83,9 +83,11 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     const expandNo = config.expandableColumns && locationQuery.get('expand')
       ? parseInt(locationQuery.get('expand'), 10)
       : 0;
-    const groupSelectValue = locationQuery.get('group') || getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 1);
+    const groupSelectValue = locationQuery.get('group')
+    || (config.taxonomies && getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 1));
     const subgroupSelectValue = groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET
-      ? locationQuery.get('subgroup') || getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 2)
+      ? locationQuery.get('subgroup')
+        || (config.taxonomies && getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 2))
       : null;
 
     const headerTitle = this.props.entities && dataReady
@@ -101,6 +103,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
               icon={header.icon}
               supTitle={header.supTitle}
               title={headerTitle}
+              sortAttributes={config.sorting}
+
               buttons={dataReady && isManager
                 ? header.actions
                 : null
@@ -165,6 +169,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     onEntitySelect={this.props.onEntitySelect}
                     onEntitySelectAll={this.props.onEntitySelectAll}
                     scrollContainer={this.props.scrollContainer}
+                    onSortBy={this.props.onSortBy}
+                    onSortOrder={this.props.onSortOrder}
                   />
                 </ListWrapper>
               </ListEntities>
@@ -202,6 +208,8 @@ EntityListMain.propTypes = {
   onSearch: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
   onPageItemsSelect: PropTypes.func.isRequired,
+  onSortOrder: PropTypes.func.isRequired,
+  onSortBy: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,
 };
 

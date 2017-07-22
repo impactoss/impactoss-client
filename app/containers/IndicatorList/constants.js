@@ -20,6 +20,29 @@ export const CONFIG = {
   serverPath: 'indicators',
   clientPath: 'indicators',
   search: ['title', 'reference'],
+  sorting: [
+    {
+      attribute: 'id', // proxy for created at
+      type: 'number',
+      order: 'desc',
+      default: true,
+    },
+    {
+      attribute: 'reference',
+      type: 'string',
+      order: 'asc',
+    },
+    {
+      attribute: 'title',
+      type: 'string',
+      order: 'asc',
+    },
+    {
+      attribute: 'updated_at',
+      type: 'date',
+      order: 'desc',
+    },
+  ],
   connectedTaxonomies: { // filter by each category
     query: 'catx',
     search: true,

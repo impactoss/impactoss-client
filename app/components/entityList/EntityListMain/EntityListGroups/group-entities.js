@@ -1,6 +1,6 @@
 import { Map, List } from 'immutable';
 import { forEach } from 'lodash/collection';
-import { lowerCase as loCase } from 'lodash/string';
+import { toLower as loCase } from 'lodash/string';
 import { lowerCase } from 'utils/string';
 import {
   getConnectedCategories,
@@ -49,6 +49,10 @@ const makeEntityGroups = (
   }
   return List().push(Map({ entities }));
 };
+const getCategoryLabel = (cat) =>
+  cat.getIn(['attributes', 'reference'])
+  ? `${cat.getIn(['attributes', 'reference'])} ${cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name'])}`
+  : cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
 
 export const makeTaxonomyGroups = (entities, taxonomy) => {
   let groups = Map();
@@ -65,7 +69,7 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
           if (groups.get(catId)) {
             groups = groups.setIn([catId, 'entities'], groups.getIn([catId, 'entities']).push(entity));
           } else {
-            const label = cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
+            const label = getCategoryLabel(cat);
             groups = groups.set(catId, Map({
               label,
               entities: List().push(entity),
@@ -115,7 +119,7 @@ export const makeConnectedTaxonomyGroups = (entities, taxonomy, config) => {
           if (groups.get(catId)) {
             groups = groups.setIn([catId, 'entities'], groups.getIn([catId, 'entities']).push(entity));
           } else {
-            const label = cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
+            const label = getCategoryLabel(cat);
             groups = groups.set(catId, Map({
               label,
               entities: List().push(entity),
@@ -141,59 +145,3 @@ export const makeConnectedTaxonomyGroups = (entities, taxonomy, config) => {
   });  // for each entities
   return groups.sortBy((group) => group.get('order')).toList();
 };
-
-// export const getGroupedEntitiesForPage = (pageItems, entitiesGrouped) =>
-//   pageItems.reduce((groups, item) => {
-//     // figure out 1st level group and existing targetGroup
-//     const group = entitiesGrouped[item.group];
-//     const targetGroup = find(groups, { id: group.id });
-//     const entity = item.entity;
-//     // if subgroup
-//     if (group.entitiesGrouped) {
-//       const subgroup = group.entitiesGrouped[item.subgroup];
-//       // create 1st level targetGroup if not exists
-//       if (!targetGroup) {
-//         // also create 2nd level targetGroup if required
-//         groups.push({
-//           entitiesGrouped: [{
-//             entities: [entity],
-//             label: subgroup.label,
-//             order: subgroup.order,
-//             id: subgroup.id,
-//           }],
-//           label: group.label,
-//           order: group.order,
-//           id: group.id,
-//         });
-//       } else {
-//         // 1st level targetGroup already exists
-//         const targetSubgroup = find(targetGroup.entitiesGrouped, { id: subgroup.id });
-//         // create 2nd level targetGroup if not exists
-//         if (!targetSubgroup) {
-//           // create subgroup
-//           targetGroup.entitiesGrouped.push({
-//             entities: [entity],
-//             label: subgroup.label,
-//             order: subgroup.order,
-//             id: subgroup.id,
-//           });
-//         } else {
-//           // add to existing subgroup
-//           targetSubgroup.entities.push(entity);
-//         }
-//       }
-//     // no subgroups
-//     } else if (!targetGroup) {
-//       // create without 2nd level targetGroup
-//       groups.push({
-//         entities: [entity],
-//         label: group.label,
-//         order: group.order,
-//         id: group.id,
-//       });
-//     } else {
-//       // add to group
-//       targetGroup.entities.push(entity);
-//     }
-//     return groups;
-//   }, []);

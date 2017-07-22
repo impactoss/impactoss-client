@@ -9,6 +9,24 @@ export const CONFIG = {
   serverPath: 'pages',
   clientPath: 'pages',
   search: ['title'],
+  sorting: [
+    {
+      attribute: 'id', // proxy for created at
+      type: 'number',
+      order: 'desc',
+    },
+    {
+      attribute: 'title',
+      type: 'string',
+      order: 'asc',
+      default: true,
+    },
+    {
+      attribute: 'updated_at',
+      type: 'date',
+      order: 'desc',
+    },
+  ],
   attributes: {  // filter by attribute value
     options: [
       {

@@ -18,6 +18,10 @@ import {
   sortEntities,
 } from 'utils/entities';
 
+import { getSortOption } from 'utils/sort';
+
+import { CONFIG } from './constants';
+
 const selectUsersNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'users',
@@ -76,6 +80,13 @@ export const selectUsers = createSelector(
   selectUsersByCategories,
   selectSortByQuery,
   selectSortOrderQuery,
-  (entities, sortBy, sortOrder) =>
-    sortEntities(entities, sortOrder || 'asc', sortBy || 'name')
+  (entities, sort, order) => {
+    const sortOption = getSortOption(CONFIG.sorting, sort);
+    return sortEntities(
+      entities,
+      order || (sortOption ? sortOption.order : 'asc'),
+      sort || (sortOption ? sortOption.attribute : 'name'),
+      sortOption ? sortOption.type : 'string'
+    );
+  }
 );

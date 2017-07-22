@@ -19,6 +19,10 @@ import {
   sortEntities,
 } from 'utils/entities';
 
+import { getSortOption } from 'utils/sort';
+
+import { CONFIG } from './constants';
+
 const selectRecommendationsNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'recommendations',
@@ -80,6 +84,13 @@ export const selectRecommendations = createSelector(
   selectRecommendationsByCategories,
   selectSortByQuery,
   selectSortOrderQuery,
-  (entities, sortBy, sortOrder) =>
-    sortEntities(entities, sortOrder || 'asc', sortBy || 'reference')
+  (entities, sort, order) => {
+    const sortOption = getSortOption(CONFIG.sorting, sort);
+    return sortEntities(
+      entities,
+      order || (sortOption ? sortOption.order : 'desc'),
+      sort || (sortOption ? sortOption.attribute : 'id'),
+      sortOption ? sortOption.type : 'string'
+    );
+  }
 );

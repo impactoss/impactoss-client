@@ -77,6 +77,11 @@ export const DOC_PUBLISH_STATUSES = [
   { value: false, label: 'Private' },
 ];
 
+export const SORT_ORDER_OPTIONS = [
+  { value: 'asc', label: 'Ascending', icon: 'ascending', nextValue: 'desc' },
+  { value: 'desc', label: 'Descending', icon: 'descending', nextValue: 'asc' },
+];
+
 export const USER_ROLES = {
   ADMIN: 1,
   MANAGER: 2,

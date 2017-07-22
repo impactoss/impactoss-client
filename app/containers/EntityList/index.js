@@ -36,6 +36,8 @@ import {
   updatePage,
   updateExpand,
   updatePageItems,
+  updateSortBy,
+  updateSortOrder,
 } from './actions';
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -110,6 +112,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onPageSelect={this.props.onPageSelect}
           onPageItemsSelect={this.props.onPageItemsSelect}
           onEntityClick={this.props.onEntityClick}
+          onSortBy={this.props.onSortBy}
+          onSortOrder={this.props.onSortOrder}
         />
       </div>
     );
@@ -145,6 +149,8 @@ EntityList.propTypes = {
   onPageItemsSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
   resetStateOnMount: PropTypes.func.isRequired,
+  onSortBy: PropTypes.func.isRequired,
+  onSortOrder: PropTypes.func.isRequired,
 };
 
 EntityList.contextTypes = {
@@ -223,6 +229,12 @@ function mapDispatchToProps(dispatch, props) {
     },
     onPageItemsSelect: (no) => {
       dispatch(updatePageItems(no));
+    },
+    onSortOrder: (order) => {
+      dispatch(updateSortOrder(order));
+    },
+    onSortBy: (sort) => {
+      dispatch(updateSortBy(sort));
     },
     handleEditSubmit: (formData, activeEditOption, entityIdsSelected) => {
       const entities = props.entities.filter(

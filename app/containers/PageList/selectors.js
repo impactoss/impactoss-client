@@ -8,6 +8,9 @@ import {
 
 import { sortEntities } from 'utils/entities';
 
+import { getSortOption } from 'utils/sort';
+
+import { CONFIG } from './constants';
 
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
@@ -21,6 +24,13 @@ export const selectPages = createSelector(
   }),
   selectSortByQuery,
   selectSortOrderQuery,
-  (entities, sortBy, sortOrder) =>
-    sortEntities(entities, sortOrder || 'asc', sortBy || 'title')
+  (entities, sort, order) => {
+    const sortOption = getSortOption(CONFIG.sorting, sort);
+    return sortEntities(
+      entities,
+      order || (sortOption ? sortOption.order : 'asc'),
+      sort || (sortOption ? sortOption.attribute : 'title'),
+      sortOption ? sortOption.type : 'string'
+    );
+  }
 );

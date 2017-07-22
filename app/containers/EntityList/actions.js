@@ -15,6 +15,8 @@ import {
   PAGE_CHANGE,
   EXPAND_CHANGE,
   PAGE_ITEM_CHANGE,
+  SORTBY_CHANGE,
+  SORTORDER_CHANGE,
 } from './constants';
 
 export function showPanel(activePanel) {
@@ -83,5 +85,19 @@ export function updateExpand(expand) {
   return {
     type: EXPAND_CHANGE,
     expand,
+  };
+}
+
+export function updateSortBy(sort) {
+  return {
+    type: SORTBY_CHANGE,
+    sort,
+  };
+}
+
+export function updateSortOrder(order) {
+  return {
+    type: SORTORDER_CHANGE,
+    order,
   };
 }

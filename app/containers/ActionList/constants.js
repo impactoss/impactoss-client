@@ -23,6 +23,24 @@ export const CONFIG = {
   serverPath: 'measures',
   clientPath: 'actions',
   search: ['title'],
+  sorting: [
+    {
+      attribute: 'id', // proxy for created at
+      type: 'number',
+      order: 'desc',
+      default: true,
+    },
+    {
+      attribute: 'title',
+      type: 'string',
+      order: 'asc',
+    },
+    {
+      attribute: 'updated_at',
+      type: 'date',
+      order: 'desc',
+    },
+  ],
   taxonomies: { // filter by each category
     query: 'cat',
     search: true,

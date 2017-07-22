@@ -24,6 +24,10 @@ import {
   testEntityEntityAssociation,
 } from 'utils/entities';
 
+import { getSortOption } from 'utils/sort';
+
+import { CONFIG } from './constants';
+
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'indicators'),
   (state) => selectEntities(state, 'measures'),
@@ -223,6 +227,13 @@ export const selectSdgTargets = createSelector(
   selectSdgTargetsExpandables,
   selectSortByQuery,
   selectSortOrderQuery,
-  (entities, sortBy, sortOrder) =>
-    sortEntities(entities, sortOrder || 'asc', sortBy || 'reference')
+  (entities, sort, order) => {
+    const sortOption = getSortOption(CONFIG.sorting, sort);
+    return sortEntities(
+      entities,
+      order || (sortOption ? sortOption.order : 'asc'),
+      sort || (sortOption ? sortOption.attribute : 'reference'),
+      sortOption ? sortOption.type : 'string'
+    );
+  }
 );

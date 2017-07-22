@@ -15,6 +15,29 @@ export const CONFIG = {
   serverPath: 'recommendations',
   clientPath: 'recommendations',
   search: ['reference', 'title'],
+  sorting: [
+    {
+      attribute: 'id', // proxy for created at
+      type: 'number',
+      order: 'desc',
+      default: true,
+    },
+    {
+      attribute: 'reference',
+      type: 'string',
+      order: 'asc',
+    },
+    {
+      attribute: 'title',
+      type: 'string',
+      order: 'asc',
+    },
+    {
+      attribute: 'updated_at',
+      type: 'date',
+      order: 'desc',
+    },
+  ],
   taxonomies: { // filter by each category
     query: 'cat',
     search: true,

@@ -1,3 +1,5 @@
+import { find } from 'lodash/collection';
+
 export const getEntitySortIteratee = (field) => {
   switch (field) {
     case 'id':
@@ -7,3 +9,7 @@ export const getEntitySortIteratee = (field) => {
       return field;
   }
 };
+
+export const getSortOption = (sortOptions, sortBy) =>
+  find(sortOptions, (option) => option.attribute === sortBy)
+  || find(sortOptions, (option) => option.default);

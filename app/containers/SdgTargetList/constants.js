@@ -20,6 +20,29 @@ export const CONFIG = {
   serverPath: 'sdgtargets',
   clientPath: 'sdgtargets',
   search: ['reference', 'title'],
+  sorting: [
+    {
+      attribute: 'id', // proxy for created at
+      type: 'number',
+      order: 'desc',
+    },
+    {
+      attribute: 'reference',
+      type: 'string',
+      order: 'asc',
+      default: true,
+    },
+    {
+      attribute: 'title',
+      type: 'string',
+      order: 'asc',
+    },
+    {
+      attribute: 'updated_at',
+      type: 'date',
+      order: 'desc',
+    },
+  ],
   taxonomies: { // filter by each category
     query: 'cat',
     search: true,

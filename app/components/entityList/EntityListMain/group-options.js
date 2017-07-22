@@ -1,7 +1,7 @@
 import { List, Map } from 'immutable';
 
 export const getGroupValue = (taxonomies, connectedTaxonomies, groupAttribute, level) => {
-  if (taxonomies) {
+  if (groupAttribute && taxonomies) {
     const defaultTaxomony = taxonomies.find((tax) =>
       tax.getIn(['attributes', groupAttribute]) === level
     );
@@ -9,7 +9,7 @@ export const getGroupValue = (taxonomies, connectedTaxonomies, groupAttribute, l
       return defaultTaxomony.get('id');
     }
   }
-  if (connectedTaxonomies) {
+  if (groupAttribute && connectedTaxonomies) {
     const defaultCTaxomony = connectedTaxonomies.find((tax) =>
       tax.getIn(['attributes', groupAttribute]) === level
     );

@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { getSortOption } from 'utils/sort';
 
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
+import { SORT_ORDER_OPTIONS } from 'containers/App/constants';
 
-import Column from './Column';
 import ColumnSelect from './ColumnSelect';
 import ColumnExpand from './ColumnExpand';
 
@@ -92,28 +93,32 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
       onExpand,
       onSelect,
       onSelectAll,
+      sortOptions,
+
     } = this.props;
 
     const firstColumnWidth = this.getFirstColumnWidth(expandableColumns, expandNo);
 
+    const sortOption = getSortOption(sortOptions, this.props.sortBy);
+
     return (
       <Styled>
-        { !isManager &&
-          <Column width={firstColumnWidth}>
-            {this.getListHeaderLabel(entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage)}
-          </Column>
-        }
-        { isManager &&
-          <ColumnSelect
-            width={firstColumnWidth}
-            isSelected={this.getSelectedState(selectedTotal, allSelected || allSelectedOnPage)}
-            label={this.getListHeaderLabel(entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage)}
-            onSelect={onSelect}
-            hasSelectAll={allSelectedOnPage && !allSelected}
-            onSelectAll={onSelectAll}
-            selectAllLabel={`Select all ${entitiesTotal} ${entityTitle.plural}.`}
-          />
-        }
+        <ColumnSelect
+          width={firstColumnWidth}
+          isSelect={isManager}
+          isSelected={this.getSelectedState(selectedTotal, allSelected || allSelectedOnPage)}
+          label={this.getListHeaderLabel(entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage)}
+          onSelect={onSelect}
+          hasSelectAll={allSelectedOnPage && !allSelected}
+          onSelectAll={onSelectAll}
+          selectAllLabel={`Select all ${entitiesTotal} ${entityTitle.plural}.`}
+          sortBy={sortOption ? sortOption.attribute : null}
+          sortOrder={this.props.sortOrder || (sortOption ? sortOption.order : null)}
+          sortOptions={sortOptions}
+          sortOrderOptions={SORT_ORDER_OPTIONS}
+          onSortBy={this.props.onSortBy}
+          onSortOrder={this.props.onSortOrder}
+        />
         { expandableColumns && expandableColumns.length > 0 &&
           <ColumnNestedWrap width={1 - firstColumnWidth}>
             { expandableColumns.map((col, i, list) =>
@@ -141,9 +146,14 @@ EntityListHeader.propTypes = {
   isManager: PropTypes.bool,
   expandableColumns: PropTypes.array,
   entityTitle: PropTypes.object,
+  sortOptions: PropTypes.array,
+  sortOrder: PropTypes.string,
+  sortBy: PropTypes.string,
   onExpand: PropTypes.func,
   onSelect: PropTypes.func,
   onSelectAll: PropTypes.func,
+  onSortBy: PropTypes.func,
+  onSortOrder: PropTypes.func,
 };
 
 export default EntityListHeader;

@@ -192,6 +192,11 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           onExpand={onExpand}
           isManager={isManager}
           entityTitle={entityTitle}
+          sortOptions={config.sorting}
+          sortBy={locationQuery.get('sort')}
+          sortOrder={locationQuery.get('order')}
+          onSortBy={this.props.onSortBy}
+          onSortOrder={this.props.onSortOrder}
           onSelect={(checked) => {
             onEntitySelectAll(checked ? entityIdsOnPage.toArray() : []);
           }}
@@ -290,6 +295,8 @@ EntityListGroups.propTypes = {
   onEntityClick: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,
+  onSortBy: PropTypes.func.isRequired,
+  onSortOrder: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,
   groupSelectValue: PropTypes.string,
   subgroupSelectValue: PropTypes.string,
