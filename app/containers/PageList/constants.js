@@ -19,6 +19,7 @@ export const CONFIG = {
       attribute: 'title',
       type: 'string',
       order: 'asc',
+      default: true,
     },
     {
       attribute: 'updated_at',

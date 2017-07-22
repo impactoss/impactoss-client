@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { find } from 'lodash/collection';
 
 import {
   selectEntitiesSearchQuery,
@@ -8,6 +7,8 @@ import {
 } from 'containers/App/selectors';
 
 import { sortEntities } from 'utils/entities';
+
+import { getSortOption } from 'utils/sort';
 
 import { CONFIG } from './constants';
 
@@ -24,12 +25,11 @@ export const selectPages = createSelector(
   selectSortByQuery,
   selectSortOrderQuery,
   (entities, sort, order) => {
-    const sortBy = sort || 'title';
-    const sortOption = find(CONFIG.sorting, (option) => option.attribute === sortBy);
+    const sortOption = getSortOption(CONFIG.sorting, sort);
     return sortEntities(
       entities,
       order || (sortOption ? sortOption.order : 'asc'),
-      sortBy,
+      sort || (sortOption ? sortOption.attribute : 'title'),
       sortOption ? sortOption.type : 'string'
     );
   }

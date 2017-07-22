@@ -25,6 +25,7 @@ export const CONFIG = {
       attribute: 'id', // proxy for created at
       type: 'number',
       order: 'desc',
+      default: true,
     },
     {
       attribute: 'reference',

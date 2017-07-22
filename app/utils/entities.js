@@ -117,8 +117,10 @@ export const filterEntitiesByAttributes = (entities, query) =>
 const getEntitySortValueMapper = (entity, sortBy) => {
   switch (sortBy) {
     case 'id':
-      // ID field needs to be treated as an int when sorting
-      return entity.get(sortBy);
+      return entity.get('id');
+    case 'reference':
+      // use id field when reference not available
+      return entity.getIn(['attributes', 'reference']) || entity.get('id');
     default:
       return entity.getIn(['attributes', sortBy]);
   }
@@ -129,7 +131,11 @@ const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
     return 0;
   }
   let result;
-  if (type === 'date') {
+  if (typeof valueA === 'undefined' || valueA === null) {
+    result = 1;
+  } else if (typeof valueB === 'undefined' || valueB === null) {
+    result = -1;
+  } else if (type === 'date') {
     result = new Date(valueA) < new Date(valueB) ? -1 : 1;
   } else {
     const floatA = parseFloat(valueA);

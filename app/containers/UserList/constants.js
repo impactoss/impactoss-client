@@ -21,6 +21,7 @@ export const CONFIG = {
       attribute: 'name',
       type: 'string',
       order: 'asc',
+      default: true,
     },
     {
       attribute: 'updated_at',

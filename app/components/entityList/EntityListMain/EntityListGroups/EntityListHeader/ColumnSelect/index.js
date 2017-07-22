@@ -5,12 +5,16 @@ import styled from 'styled-components';
 import IndeterminateCheckbox from 'components/forms/IndeterminateCheckbox';
 import SelectReset from 'components/SelectReset';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
-// import Icon from 'components/Icon';
+import Icon from 'components/Icon';
 
 import Column from '../Column';
 
 import messages from './messages';
 
+const SortButton = styled(ButtonFlatIconOnly)`
+  padding: 0;
+  color: inherit;
+`;
 const Styled = styled(Column)`
   padding: 0.25em 0;
   position: relative;
@@ -88,14 +92,14 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
             onChange={this.props.onSortBy}
           />
           {nextSortOrderOption &&
-            <ButtonFlatIconOnly
+            <SortButton
               onClick={(e) => {
                 e.preventDefault();
                 this.props.onSortOrder(nextSortOrderOption.value);
               }}
             >
-              {sortOrderOption.label}
-            </ButtonFlatIconOnly>
+              <Icon name={sortOrderOption.icon} />
+            </SortButton>
           }
         </SelectWrapper>
       </Styled>
@@ -103,7 +107,6 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
   }
 }
 
-// <Icon name={sortOrderOption.icon} />
 ColumnSelect.propTypes = {
   isSelect: PropTypes.bool,
   isSelected: PropTypes.bool,

@@ -30,6 +30,7 @@ export const CONFIG = {
       attribute: 'reference',
       type: 'string',
       order: 'asc',
+      default: true,
     },
     {
       attribute: 'title',
