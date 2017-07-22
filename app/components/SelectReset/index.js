@@ -20,6 +20,7 @@ const Label = styled.label`
 const Select = styled.select`
   font-weight: ${(props) => props.active ? 'bold' : 'normal'};
 `;
+// border-bottom: 1px dotted #ccc;
 const Option = styled.option`
   color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 4) : palette('dark', 2)};
   background-color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 1) : palette('primary', 4)};
@@ -42,7 +43,9 @@ export class SelectReset extends React.PureComponent { // eslint-disable-line re
 
     return (
       <span>
-        <Label htmlFor={index}>{ label }</Label>
+        {label &&
+          <Label htmlFor={index}>{ label }</Label>
+        }
         { (!isReset || optionActive.value === emptyValue) &&
           <Select
             id={index}

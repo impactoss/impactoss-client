@@ -13,6 +13,8 @@ import {
   PAGE_CHANGE,
   EXPAND_CHANGE,
   PAGE_ITEM_CHANGE,
+  SORTBY_CHANGE,
+  SORTORDER_CHANGE,
 } from './constants';
 
 export function* updateQuery(args) {
@@ -76,6 +78,20 @@ export function* updateExpand(args) {
     replace: true,
   }));
 }
+export function* updateSortBy(args) {
+  yield put(updateRouteQuery({
+    arg: 'sort',
+    value: args.sort,
+    replace: true,
+  }));
+}
+export function* updateSortOrder(args) {
+  yield put(updateRouteQuery({
+    arg: 'order',
+    value: args.order,
+    replace: true,
+  }));
+}
 
 export function* saveEdits({ data }) {
   if (data.attributes) {
@@ -99,6 +115,8 @@ export default function* entityList() {
   yield takeLatest(PAGE_CHANGE, updatePage);
   yield takeLatest(PAGE_ITEM_CHANGE, updatePageItems);
   yield takeLatest(EXPAND_CHANGE, updateExpand);
+  yield takeLatest(SORTBY_CHANGE, updateSortBy);
+  yield takeLatest(SORTORDER_CHANGE, updateSortOrder);
 
   yield takeLatest(SAVE_EDITS, saveEdits);
 }

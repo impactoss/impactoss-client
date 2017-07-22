@@ -18,3 +18,5 @@ export const UPDATE_GROUP = 'nmrf/EntityList/UPDATE_GROUP';
 export const PAGE_CHANGE = 'nmrf/EntityList/PAGE_CHANGE';
 export const PAGE_ITEM_CHANGE = 'nmrf/EntityList/PAGE_ITEM_CHANGE';
 export const EXPAND_CHANGE = 'nmrf/EntityList/EXPAND_CHANGE';
+export const SORTBY_CHANGE = 'nmrf/EntityList/SORTBY_CHANGE';
+export const SORTORDER_CHANGE = 'nmrf/EntityList/SORTORDER_CHANGE';
