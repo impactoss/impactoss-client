@@ -663,12 +663,14 @@ export default function createRoutes(store) {
       name: 'categoryList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
+          import('containers/CategoryList/sagas'),
           import('containers/CategoryList'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([component]) => {
+        importModules.then(([sagas, component]) => {
+          injectSagas(sagas.default);
           renderRoute(component);
         });
 

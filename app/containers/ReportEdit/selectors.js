@@ -8,8 +8,9 @@ import {
 import {
   entitySetUser,
   attributesEqual,
-  sortEntities,
 } from 'utils/entities';
+
+import { sortEntities } from 'utils/sort';
 
 export const selectDomain = createSelector(
   (state) => state.get('reportEdit'),

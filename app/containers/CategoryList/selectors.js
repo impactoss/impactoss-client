@@ -1,14 +1,19 @@
 import { createSelector } from 'reselect';
 import { Map } from 'immutable';
 
-import { selectEntities } from 'containers/App/selectors';
+import {
+  selectEntities,
+  selectSortByQuery,
+  selectSortOrderQuery,
+} from 'containers/App/selectors';
 
 import { attributesEqual } from 'utils/entities';
+import { getSortOption, sortEntities } from 'utils/sort';
 
-import { TAXONOMY_DEFAULT } from './constants';
+import { TAXONOMY_DEFAULT, SORT_OPTIONS } from './constants';
 
 export const selectTaxonomy = createSelector(
-  (state, taxonomyId) => taxonomyId,
+  (state, { id }) => id,
   (state) => selectEntities(state, 'taxonomies'),
   (taxonomyId, taxonomies) =>
     taxonomies && taxonomies.get(typeof taxonomyId !== 'undefined' ? taxonomyId : TAXONOMY_DEFAULT)
@@ -44,6 +49,7 @@ const selectMeasures = createSelector(
       )
     )
 );
+
 const selectRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendations'),
   (state) => selectEntities(state, 'recommendation_categories'),
@@ -65,62 +71,85 @@ const selectSdgTargets = createSelector(
 const filterAssociatedEntities = (entities, key, associations) =>
   entities.filter((entity) => associations.find((association, id) => entity.get(key).includes(parseInt(id, 10))));
 
-export const selectCategories = createSelector(
+const selectCategoriesCounts = createSelector(
   selectTaxonomyCategories,
   selectRecommendations,
   selectMeasures,
   selectSdgTargets,
   (taxonomy, recommendations, measures, sdgtargets) => {
     if (taxonomy && taxonomy.get('categories')) {
-      const taxonomyCategories = taxonomy.get('categories').map((cat, categoryId) => {
-        let category = cat;
-        // measures
-        if (taxonomy.getIn(['attributes', 'tags_measures'])) {
-          const associatedMeasures = measures.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
-          category = category.set('measures', associatedMeasures.size);
-          // get all public associated measures
-          const associatedMeasuresPublic = associatedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
-          category = category.set('measuresTotalPublic', associatedMeasuresPublic ? associatedMeasuresPublic.size : 0);
-        }
-
-        // recommendations
-        if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
-          const associatedRecs = recommendations.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
-          category = category.set('recommendations', associatedRecs.size);
-          const associatedRecsPublic = associatedRecs.filter((rec) => !rec.getIn(['attributes', 'draft']));
-          category = category.set('recommendationsPublic', associatedRecsPublic ? associatedRecsPublic.size : 0);
-          // get all public accepted associated recs
-          const publicAccepted = associatedRecsPublic.filter((rec) => !!rec.getIn(['attributes', 'accepted']));
-          category = category.set('recommendationsAccepted', publicAccepted ? publicAccepted.size : 0);
-
-          // measures connected via recommendation
-          if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
-            const connectedMeasures = filterAssociatedEntities(measures, 'recommendation_ids', associatedRecs);
-            category = category.set('recommendationConnectedMeasures', connectedMeasures ? connectedMeasures.size : 0);
-            const connectedMeasuresPublic = connectedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
-            category = category.set('recommendationConnectedMeasuresPublic', connectedMeasuresPublic ? connectedMeasuresPublic.size : 0);
+      const taxonomyCategories = taxonomy
+        .get('categories')
+        .map((cat, categoryId) => {
+          let category = cat;
+          // measures
+          if (taxonomy.getIn(['attributes', 'tags_measures'])) {
+            const associatedMeasures = measures.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
+            category = category.set('measures', associatedMeasures.size);
+            // get all public associated measures
+            const associatedMeasuresPublic = associatedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
+            category = category.set('measuresTotalPublic', associatedMeasuresPublic ? associatedMeasuresPublic.size : 0);
           }
-        }
 
-        // sdgtargets
-        if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
-          const associatedTargets = sdgtargets.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
-          category = category.set('sdgtargets', associatedTargets.size);
-          const associatedTargetsPublic = associatedTargets.filter((target) => !target.getIn(['attributes', 'draft']));
-          category = category.set('sdgtargetsPublic', associatedTargetsPublic ? associatedTargetsPublic.size : 0);
+          // recommendations
+          if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
+            const associatedRecs = recommendations.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
+            category = category.set('recommendations', associatedRecs.size);
+            const associatedRecsPublic = associatedRecs.filter((rec) => !rec.getIn(['attributes', 'draft']));
+            category = category.set('recommendationsPublic', associatedRecsPublic ? associatedRecsPublic.size : 0);
+            // get all public accepted associated recs
+            const publicAccepted = associatedRecsPublic.filter((rec) => !!rec.getIn(['attributes', 'accepted']));
+            category = category.set('recommendationsAccepted', publicAccepted ? publicAccepted.size : 0);
 
-          // measures connected via recommendation
-          if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
-            const connectedMeasuresTarget = filterAssociatedEntities(measures, 'sdgtarget_ids', associatedTargets);
-            category = category.set('sdgtargetConnectedMeasures', connectedMeasuresTarget ? connectedMeasuresTarget.size : 0);
-            const connectedMeasuresTargetPublic = connectedMeasuresTarget.filter((measure) => !measure.getIn(['attributes', 'draft']));
-            category = category.set('sdgtargetConnectedMeasuresPublic', connectedMeasuresTargetPublic ? connectedMeasuresTargetPublic.size : 0);
+            // measures connected via recommendation
+            if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
+              const connectedMeasures = filterAssociatedEntities(measures, 'recommendation_ids', associatedRecs);
+              category = category.set('measures', connectedMeasures ? connectedMeasures.size : 0);
+              const connectedMeasuresPublic = connectedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
+              category = category.set('measuresTotalPublic', connectedMeasuresPublic ? connectedMeasuresPublic.size : 0);
+            }
           }
+
+          // sdgtargets
+          if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
+            const associatedTargets = sdgtargets.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
+            category = category.set('sdgtargets', associatedTargets.size);
+            const associatedTargetsPublic = associatedTargets.filter((target) => !target.getIn(['attributes', 'draft']));
+            category = category.set('sdgtargetsPublic', associatedTargetsPublic ? associatedTargetsPublic.size : 0);
+
+            // measures connected via recommendation
+            if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
+              const connectedMeasuresTarget = filterAssociatedEntities(measures, 'sdgtarget_ids', associatedTargets);
+              category = category.set('measures', connectedMeasuresTarget ? connectedMeasuresTarget.size : 0);
+              const connectedMeasuresTargetPublic = connectedMeasuresTarget.filter((measure) => !measure.getIn(['attributes', 'draft']));
+              category = category.set('measuresTotalPublic', connectedMeasuresTargetPublic ? connectedMeasuresTargetPublic.size : 0);
+            }
+          }
+
+          return category.set('titleSort', category.getIn(['attributes', 'reference'])
+            ? `${category.getIn(['attributes', 'reference'])} ${category.getIn(['attributes', 'title'])}`
+            : category.getIn(['attributes', 'title'])
+          );
         }
-        return category;
-      });
+      );
+
       return taxonomyCategories;
     }
     return Map();
+  }
+);
+
+export const selectCategories = createSelector(
+  selectCategoriesCounts,
+  (state, { query }) => selectSortByQuery(state, query),
+  (state, { query }) => selectSortOrderQuery(state, query),
+  (categories, sort, order) => {
+    const sortOption = getSortOption(SORT_OPTIONS, sort, 'query');
+    return sortEntities(
+      categories,
+      order || (sortOption ? sortOption.order : 'asc'),
+      sortOption ? sortOption.field : 'title',
+      sortOption ? sortOption.type : 'string',
+    );
   }
 );

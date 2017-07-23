@@ -12,8 +12,9 @@ import {
   entitySetSingle,
   attributesEqual,
   entitiesIsAssociated,
-  sortEntities,
 } from 'utils/entities';
+
+import { sortEntities } from 'utils/sort';
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'indicators', id }),
