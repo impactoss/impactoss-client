@@ -20,10 +20,9 @@ import {
   filterEntitiesByConnectedCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
-  sortEntities,
 } from 'utils/entities';
 
-import { getSortOption } from 'utils/sort';
+import { sortEntities, getSortOption } from 'utils/sort';
 
 import { CONFIG } from './constants';
 

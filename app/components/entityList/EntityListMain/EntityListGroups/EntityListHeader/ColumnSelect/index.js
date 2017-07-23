@@ -7,7 +7,7 @@ import SelectReset from 'components/SelectReset';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import Icon from 'components/Icon';
 
-import Column from '../Column';
+import ColumnHeader from 'components/styled/ColumnHeader';
 
 import messages from './messages';
 
@@ -15,7 +15,7 @@ const SortButton = styled(ButtonFlatIconOnly)`
   padding: 0;
   color: inherit;
 `;
-const Styled = styled(Column)`
+const Styled = styled(ColumnHeader)`
   padding: 0.25em 0;
   position: relative;
 `;

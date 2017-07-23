@@ -6,9 +6,7 @@ import {
   selectSortOrderQuery,
 } from 'containers/App/selectors';
 
-import { sortEntities } from 'utils/entities';
-
-import { getSortOption } from 'utils/sort';
+import { sortEntities, getSortOption } from 'utils/sort';
 
 import { CONFIG } from './constants';
 

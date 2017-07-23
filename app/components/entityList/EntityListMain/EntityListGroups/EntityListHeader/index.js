@@ -94,7 +94,6 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
       onSelect,
       onSelectAll,
       sortOptions,
-
     } = this.props;
 
     const firstColumnWidth = this.getFirstColumnWidth(expandableColumns, expandNo);

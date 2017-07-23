@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
+import { fromJS } from 'immutable';
 
 import { mapToTaxonomyList } from 'utils/taxonomies';
 
@@ -34,8 +35,9 @@ import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 
 // relative
 import messages from './messages';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, SORT_OPTIONS } from './constants';
 import { selectTaxonomy, selectCategories } from './selectors';
+import { updateSort } from './actions';
 
 const Content = styled.div`
   padding: 0 4em;
@@ -70,9 +72,9 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       }]
       : null;
 
-    //
-    // console.log('category list render')
-    // console.log(listColumns)
+    // //
+    // console.log('categoryList render')
+    // // console.log(listColumns)
     // categories && console.log(categories.toJS())
 
     return (
@@ -109,6 +111,10 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                   reference={reference}
                   categories={categories}
                   onPageLink={onPageLink}
+                  onSort={this.props.onSort}
+                  sortOptions={SORT_OPTIONS}
+                  sortBy={this.props.location.query && this.props.location.query.sort}
+                  sortOrder={this.props.location.query && this.props.location.query.order}
                 />
               }
             </Content>
@@ -121,6 +127,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
 CategoryList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onPageLink: PropTypes.func,
+  onSort: PropTypes.func,
   handleNew: PropTypes.func,
   taxonomy: PropTypes.object,
   taxonomies: PropTypes.object,
@@ -128,6 +135,7 @@ CategoryList.propTypes = {
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   params: PropTypes.object,
+  location: PropTypes.object,
 };
 
 CategoryList.contextTypes = {
@@ -138,8 +146,14 @@ const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectEntities(state, 'taxonomies'),
-  taxonomy: selectTaxonomy(state, props.params.id),
-  categories: selectCategories(state, typeof props.params.id !== 'undefined' ? props.params.id : 1),
+  taxonomy: selectTaxonomy(state, { id: props.params.id }),
+  categories: selectCategories(
+    state,
+    {
+      id: typeof props.params.id !== 'undefined' ? props.params.id : 1,
+      query: fromJS(props.location.query),
+    },
+  ),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -152,6 +166,9 @@ function mapDispatchToProps(dispatch) {
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));
+    },
+    onSort: (sort, order) => {
+      dispatch(updateSort({ sort, order }));
     },
   };
 }
