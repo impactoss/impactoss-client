@@ -228,7 +228,6 @@
     "minimist": "1.2.0",
     "prop-types": "^15.5.10",
     "querystring": "^0.2.0",
-    "re-reselect": "^0.5.0",
     "react": "^15.6.1",
     "react-addons-perf": "^15.4.2",
     "react-csv-downloader": "^0.1.4",
