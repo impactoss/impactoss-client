@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
@@ -6,12 +7,12 @@ import Icon from 'components/Icon';
 
 const Styled = styled.span`
   text-transform: uppercase;
-  color: ${palette('dark', 3)}
+  color: ${palette('dark', 3)};
   font-weight: bold;
 `;
 
 
-class SupTitle extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class SupTitle extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { icon, title } = this.props;
 

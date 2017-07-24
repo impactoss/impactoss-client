@@ -4,10 +4,19 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
+
+import {
+  getTitleField,
+  getRoleField,
+  getMetaField,
+  getEmailField,
+  getTaxonomyFields,
+} from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
@@ -19,15 +28,20 @@ import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 
 import {
-  getUser,
-  getEntities,
-  isReady,
-  isUserManager,
-  getSessionUserId,
+  selectReady,
+  selectIsUserManager,
+  selectSessionUserId,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
+
+import {
+  selectViewEntity,
+  selectTaxonomies,
+} from './selectors';
+
+import { DEPENDENCIES } from './constants';
 
 export class UserView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -43,7 +57,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
   }
 
   getButtons = () => {
-    const userId = this.props.user.id || this.props.user.attributes.id;
+    const userId = this.props.user.get('id') || this.props.user.getIn(['attributes', 'id']);
     const edit = {
       type: 'edit',
       onClick: () => this.props.handleEdit(userId),
@@ -66,131 +80,28 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     return [edit, close];
   };
 
-  getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        {
-          type: 'title',
-          value: entity.attributes.name,
-          label: this.context.intl.formatMessage(appMessages.attributes.name),
-          isManager,
-        },
-      ],
-    },
-  ]);
+  getHeaderMainFields = (entity, isManager) => ([{ // fieldGroup
+    fields: [getTitleField(entity, isManager, 'name', appMessages.attributes.name)],
+  }]);
 
-  getHeaderAsideFields = (entity, isManager) => {
-    if (!isManager) {
-      return [
-        {
-          fields: [
-            {
-              type: 'referenceRole',
-              fields: [
-                {
-                  type: 'reference',
-                  label: this.context.intl.formatMessage(appMessages.attributes.id),
-                  value: entity.id,
-                },
-                {
-                  type: 'role',
-                  value: this.getHighestUserRoleLabel(entity.roles),
-                },
-              ],
-            },
-          ],
-        },
-      ];
-    }
-    return [
-      {
-        fields: [
-          {
-            type: 'referenceRole',
-            fields: [
-              {
-                type: 'reference',
-                value: entity.id,
-                label: this.context.intl.formatMessage(appMessages.attributes.id),
-              },
-              {
-                type: 'role',
-                value: this.getHighestUserRoleLabel(entity.roles),
-              },
-            ],
-          },
-          {
-            type: 'meta',
-            fields: [
-              {
-                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-                value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
-              },
-              {
-                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-                value: entity.user && entity.user.attributes.name,
-              },
-            ],
-          },
-        ],
-      },
-    ];
-  }
-  getBodyMainFields = (entity) => ([
-    {
-      fields: [
-        {
-          type: 'email',
-          value: entity.attributes.email,
-          label: this.context.intl.formatMessage(appMessages.attributes.email),
-        },
-      ],
-    },
-  ]);
+  getHeaderAsideFields = (entity) => ([{
+    fields: [
+      getRoleField(entity, this.context.intl.formatMessage, appMessages),
+      getMetaField(entity, appMessages),
+    ],
+  }]);
 
-  getBodyAsideFields = (entity, isManager, taxonomies) => ([ // fieldGroups
+  getBodyMainFields = (entity) => ([{
+    fields: [getEmailField(entity)],
+  }]);
+
+  getBodyAsideFields = (taxonomies) => ([
     { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
+      label: appMessages.entities.taxonomies.plural,
       icon: 'categories',
-      fields: !isManager ? null : Object.values(taxonomies).map((taxonomy) => ({
-        type: 'list',
-        label: this.context.intl.formatMessage(appMessages.entities.taxonomies[taxonomy.id].plural),
-        entityType: 'taxonomies',
-        id: taxonomy.id,
-        values: this.mapCategoryOptions(taxonomy.categories),
-        showEmpty: this.context.intl.formatMessage(appMessages.entities.taxonomies[taxonomy.id].empty),
-      })),
+      fields: getTaxonomyFields(taxonomies, appMessages),
     },
   ]);
-  getFields = (entity, isManager, taxonomies) => ({
-    header: {
-      main: this.getHeaderMainFields(entity, isManager),
-      aside: this.getHeaderAsideFields(entity, isManager),
-    },
-    body: {
-      main: this.getBodyMainFields(entity),
-      aside: this.getBodyAsideFields(entity, isManager, taxonomies),
-    },
-  });
-
-  // only show the highest rated role (lower role ids means higher)
-  getHighestUserRoleLabel = (roles) => {
-    if (roles) {
-      const highestRole = Object.values(roles).reduce((currentHighestRole, role) =>
-        !currentHighestRole || role.role.id < currentHighestRole.id
-        ? role.role
-        : currentHighestRole
-      , null);
-      return highestRole.attributes.friendly_name;
-    }
-    return this.context.intl.formatMessage(appMessages.entities.roles.defaultRole);
-  }
-  mapCategoryOptions = (categories) => categories
-    ? Object.values(categories).map((cat) => ({
-      label: cat.attributes.title,
-      linkTo: `/category/${cat.id}`,
-    }))
-    : []
 
   render() {
     const { user, dataReady, isManager, taxonomies } = this.props;
@@ -219,7 +130,18 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
             </div>
           }
           { user && dataReady &&
-            <EntityView fields={this.getFields(user, isManager, taxonomies)} />
+            <EntityView
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(user, isManager),
+                  aside: isManager && this.getHeaderAsideFields(user),
+                },
+                body: {
+                  main: this.getBodyMainFields(user),
+                  aside: isManager && this.getBodyAsideFields(taxonomies),
+                },
+              }}
+            />
           }
         </Content>
       </div>
@@ -240,80 +162,22 @@ UserView.propTypes = {
 };
 
 UserView.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
-  isManager: isUserManager(state),
-  dataReady: isReady(state, { path: [
-    'users',
-    'roles',
-    'categories',
-    'taxonomies',
-    'user_categories',
-  ] }),
-  sessionUserId: getSessionUserId(state),
-  user: getUser(
-    state,
-    {
-      id: props.params.id,
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-        {
-          path: 'user_roles',
-          key: 'user_id',
-          as: 'roles',
-          reverse: true,
-          extend: {
-            type: 'single',
-            path: 'roles',
-            key: 'role_id',
-            as: 'role',
-          },
-        },
-      ],
-    },
-  ),
+  isManager: selectIsUserManager(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  sessionUserId: selectSessionUserId(state),
+  user: selectViewEntity(state, props.params.id),
   // all connected categories for all user-taggable taxonomies
-  taxonomies: getEntities(
-    state,
-    {
-      path: 'taxonomies',
-      where: {
-        tags_users: true,
-      },
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-        connected: {
-          path: 'user_categories',
-          key: 'category_id',
-          where: {
-            user_id: props.params.id,
-          },
-        },
-      },
-      out: 'js',
-    },
-  ),
+  taxonomies: selectTaxonomies(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('roles'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('user_categories'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: (userId) => {
       dispatch(updatePath(`/users/edit/${userId}`));

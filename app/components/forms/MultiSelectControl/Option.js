@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
@@ -16,8 +17,8 @@ const Reference = styled.span`
 const Count = styled.span`
   position: absolute;
   top: 0;
-  right: 0
-  color: ${palette('dark', 4)}
+  right: 0;
+  color: ${palette('dark', 4)};
 `;
 
 const Option = (props) => (

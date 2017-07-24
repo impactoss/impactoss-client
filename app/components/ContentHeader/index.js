@@ -1,11 +1,12 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
 
 import { CONTENT_LIST, CONTENT_SINGLE } from 'containers/App/constants';
 
-import Row from 'components/basic/Row';
+import Row from 'components/styled/Row';
 import SupTitle from 'components/SupTitle';
 import Icon from 'components/Icon';
 
@@ -43,7 +44,7 @@ const ButtonGroup = styled.div`
   }
 `;
 
-class ContentHeader extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class ContentHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   renderTitle = (type, title, icon) => {
     switch (type) {

@@ -21,12 +21,8 @@ const activePanelSelector = createSelector(
 
 const entitiesSelectedSelector = createSelector(
   pageSelector,
-  (pageState) => pageState.get('entitiesSelected').toJS()
+  (pageState) => pageState.get('entitiesSelected')
 );
-
-/**
- * Default selector used by ActionEdit
- */
 
 const entityListSelect = createSelector(
   selectEntityListDomain,

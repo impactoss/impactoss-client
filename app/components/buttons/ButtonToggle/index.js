@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import ButtonDefaultWithIcon from 'components/buttons/ButtonDefaultWithIcon';
@@ -26,7 +27,8 @@ const ButtonInactive = styled.span`
   top: 0;
   z-index: 1;
 `;
-class ButtonToggle extends React.Component { // eslint-disable-line react/prefer-stateless-function
+
+class ButtonToggle extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { options, activePanel, onSelect } = this.props;
     if (options.length === 2) {

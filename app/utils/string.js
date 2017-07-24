@@ -1,8 +1,9 @@
-import { lowerCase as loCase } from 'lodash/string';
+import { toLower as loCase } from 'lodash/string';
 import { reduce } from 'lodash/collection';
 
 export const lowerCase = (str) =>
   loCase(str).replace('un', 'UN').replace('hr', 'HR').replace('upr', 'UPR').replace('sdg', 'SDG');
+
 
 export const getPathFromUrl = (url) => url.split(/[?#]/)[0];
 
@@ -16,7 +17,10 @@ export const cleanupSearchTarget = (str) =>
     .replace(/[ō]/, 'o')
     .replace(/[ū]/, 'u');
 
-    // match multiple words
-    // see http://stackoverflow.com/questions/5421952/how-to-match-multiple-words-in-regex
+// match multiple words, incl substrings
 export const regExMultipleWords = (str) =>
+  reduce(str.split(' '), (words, s) => `${words}(?=.*${s})`, '');
+
+// match multiple words
+export const regExMultipleWordsMatchStart = (str) =>
   reduce(str.split(' '), (words, s) => `${words}(?=.*\\b${s})`, '');

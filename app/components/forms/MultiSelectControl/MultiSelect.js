@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import { kebabCase, lowerCase } from 'lodash/string';
 import styled from 'styled-components';
@@ -85,7 +86,7 @@ const ControlFooter = styled.div`
 `;
 const ControlMain = styled.div`
   position: absolute;
-  top: ${(props) => props.filter ? '115px' : '60px'};
+  top: ${(props) => props.search ? '115px' : '60px'};
   bottom: 50px;
   left: 0;
   right: 0;
@@ -131,7 +132,7 @@ export default class MultiSelect extends React.Component {
     required: PropTypes.bool,
     title: PropTypes.string,
     buttons: PropTypes.array,
-    filter: PropTypes.bool,
+    search: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -139,7 +140,7 @@ export default class MultiSelect extends React.Component {
     threeState: false,
     multiple: true,
     required: false,
-    filter: true,
+    search: true,
   }
 
   constructor() {
@@ -149,7 +150,7 @@ export default class MultiSelect extends React.Component {
     };
   }
 
-  onFilter = (evt) => {
+  onSearch = (evt) => {
     if (evt && evt !== undefined) evt.stopPropagation();
     this.setState({
       query: evt.target.value,
@@ -279,7 +280,7 @@ export default class MultiSelect extends React.Component {
     // filter checkboxes if needed
     // match multiple words
     // see http://stackoverflow.com/questions/5421952/how-to-match-multiple-words-in-regex
-    if (this.props.filter && this.state.query) {
+    if (this.props.search && this.state.query) {
       try {
         const regex = this.state.query.split(' ').reduce((memo, str) => `${memo}(?=.*\\b${str})`, '');
         const pattern = new RegExp(regex, 'i');
@@ -319,12 +320,12 @@ export default class MultiSelect extends React.Component {
             this.renderCancel(this.props.onCancel)
           }
         </ControlHeader>
-        { this.props.filter &&
+        { this.props.search &&
           <ControlSearch>
-            <Search id="search" onChange={this.onFilter} placeholder="Filter options" />
+            <Search id="search" onChange={this.onSearch} placeholder="Filter options" />
           </ControlSearch>
         }
-        <ControlMain filter={this.props.filter} >
+        <ControlMain search={this.props.search} >
           {checkboxes && checkboxes.map(this.renderCheckbox)}
         </ControlMain>
         <ControlFooter>

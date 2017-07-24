@@ -3,6 +3,7 @@
  *
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { FormattedMessage } from 'react-intl';
 import Helmet from 'react-helmet';
@@ -35,11 +36,11 @@ export class UserLogout extends React.PureComponent { // eslint-disable-line rea
 }
 
 UserLogout.propTypes = {
-  doLogout: React.PropTypes.func,
+  doLogout: PropTypes.func,
 };
 
 UserLogout.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export function mapDispatchToProps(dispatch) {

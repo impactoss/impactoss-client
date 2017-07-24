@@ -1,5 +1,5 @@
-import React, { PropTypes } from 'react';
-
+import React from 'react';
+import PropTypes from 'prop-types';
 import Icon from 'components/Icon';
 import appMessages from 'containers/App/messages';
 
@@ -8,7 +8,7 @@ import ButtonDefault from '../ButtonDefault';
 import ButtonFlat from '../ButtonFlat';
 import ButtonDefaultIconOnly from '../ButtonDefaultIconOnly';
 
-class ButtonFactory extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class ButtonFactory extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     const { button } = this.props;
@@ -76,7 +76,7 @@ ButtonFactory.propTypes = {
   button: PropTypes.object.isRequired,
 };
 ButtonFactory.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default ButtonFactory;

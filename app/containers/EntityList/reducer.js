@@ -7,6 +7,8 @@
 import { fromJS, List } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 
+import { LOCATION_CHANGE } from 'react-router-redux';
+
 import {
   FILTERS_PANEL,
   EDIT_PANEL,
@@ -43,11 +45,16 @@ function entityListReducer(state = initialState, action) {
           : selected.filterNot((id) => id === action.data.id))
         .set('activePanel', EDIT_PANEL);
     }
-    case ENTITIES_SELECT: {
+    case ENTITIES_SELECT:
       return state
         .set('entitiesSelected', fromJS(action.ids))
         .set('activePanel', EDIT_PANEL);
-    }
+    case LOCATION_CHANGE:
+      // reset selected entities on query change (location changes but not path)
+      // TODO do not reset entitiesSelected on 'expand'
+      return state.getIn(['route', 'locationBeforeTransition', 'pathname']) === state.getIn(['route', 'locationBeforeTransition', 'pathnamePrevious'])
+        ? state.set('entitiesSelected', List())
+        : state;
     default:
       return state;
   }

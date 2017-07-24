@@ -1,5 +1,6 @@
-import React, { PropTypes } from 'react';
-import { FormattedMessage } from 'react-intl';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage, FormattedDate } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -24,12 +25,12 @@ class ScheduleField extends React.PureComponent { // eslint-disable-line react/p
     return (
       <FieldWrap>
         <Label>
-          {field.label}
+          <FormattedMessage {...appMessages.entities.due_dates.plural} />
         </Label>
         {
           field.values.map((value, i) => (this.state.showAllDates || i < DATEMAX) && (
             <ScheduleItem key={i} overdue={value.overdue}>
-              {value.label}
+              <FormattedDate value={new Date(value.date)} />
               {
                 value.overdue &&
                 <ScheduleItemStatus>
@@ -60,7 +61,9 @@ class ScheduleField extends React.PureComponent { // eslint-disable-line react/p
           </ToggleAllItems>
         }
         { (!field.values || field.values.length === 0) &&
-          <EmptyHint>{field.showEmpty}</EmptyHint>
+          <EmptyHint>
+            <FormattedMessage {...appMessages.entities.due_dates.empty} />
+          </EmptyHint>
         }
       </FieldWrap>
     );
@@ -69,9 +72,6 @@ class ScheduleField extends React.PureComponent { // eslint-disable-line react/p
 
 ScheduleField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-ScheduleField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
 };
 
 export default ScheduleField;

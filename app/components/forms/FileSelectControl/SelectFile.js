@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 // import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -43,7 +44,7 @@ const Styled = styled.div`
 `;
 
 
-class SelectFile extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class SelectFile extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   handleChange = (e, results) => {
     // todo: limit to 1 file?
@@ -102,10 +103,10 @@ class SelectFile extends React.Component { // eslint-disable-line react/prefer-s
 }
 
 SelectFile.propTypes = {
-  onChange: React.PropTypes.func,
-  value: React.PropTypes.object,
-  as: React.PropTypes.string,
-  accept: React.PropTypes.string,
+  onChange: PropTypes.func,
+  value: PropTypes.object,
+  as: PropTypes.string,
+  accept: PropTypes.string,
 };
 
 export default SelectFile;

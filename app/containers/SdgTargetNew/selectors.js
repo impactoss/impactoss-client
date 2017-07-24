@@ -1,20 +1,16 @@
 import { createSelector } from 'reselect';
 
-/**
- * Direct selector to the actionNew state domain
- */
-const selectEditDomain = () => (state) => state.get('sdgtargetNew');
+import { selectEntities } from 'containers/App/selectors';
+import { prepareTaxonomies } from 'utils/entities';
 
-/**
- * Default selector used by ActionNew
- */
-
-const viewDomainSelect = createSelector(
-  selectEditDomain(),
+export const selectDomain = createSelector(
+  (state) => state.get('sdgtargetNew'),
   (substate) => substate.toJS()
 );
 
-export default viewDomainSelect;
-export {
-  selectEditDomain,
-};
+export const selectTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) =>
+    prepareTaxonomies(taxonomies, categories, 'tags_sdgtargets')
+);

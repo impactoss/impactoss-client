@@ -1,20 +1,19 @@
 import { createSelector } from 'reselect';
 
-/**
- * Direct selector to the pageEdit state domain
- */
-const selectPageEditDomain = (state) => state.get('pageEdit');
+import {
+  selectEntity,
+  selectEntities,
+} from 'containers/App/selectors';
 
-/**
- * Default selector used by PageEdit
- */
+import { entitySetUser } from 'utils/entities';
 
-const viewDomainSelect = createSelector(
-  selectPageEditDomain,
+export const selectDomain = createSelector(
+  (state) => state.get('pageEdit'),
   (substate) => substate.toJS()
 );
 
-export default viewDomainSelect;
-export {
-  selectPageEditDomain,
-};
+export const selectViewEntity = createSelector(
+  (state, id) => selectEntity(state, { path: 'pages', id }),
+  (state) => selectEntities(state, 'users'),
+  (entity, users) => entitySetUser(entity, users)
+);

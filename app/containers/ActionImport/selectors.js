@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 /**
  * Direct selector to the actionImport state domain
  */
-const selectViewDomain = () => (state) => state.get('actionImport');
+const selectViewDomain = () => (state) => state.get('measureImport');
 
 /**
  * Default selector used by ActionImport

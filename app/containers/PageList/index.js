@@ -4,17 +4,20 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-
-import EntityList from 'containers/EntityList';
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
-
+import { selectReady } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
+
+import EntityList from 'containers/EntityList';
+
+import { CONFIG, DEPENDENCIES } from './constants';
+import { selectPages } from './selectors';
 import messages from './messages';
 
 export class PageList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -33,41 +36,6 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
   render() {
     const { dataReady } = this.props;
 
-    // define selects for getEntities
-    const selects = {
-      entities: {
-        path: 'pages',
-      },
-    };
-
-    // specify the filter and query  options
-    const filters = {
-      search: ['title'],
-      attributes: {  // filter by attribute value
-        label: 'By attribute',
-        options: [
-          {
-            label: 'Status',
-            attribute: 'draft',
-            options: PUBLISH_STATUSES,
-            filter: false,
-          },
-        ],
-      },
-    };
-    const edits = {
-      attributes: {  // edit attribute value
-        label: 'Update attribute',
-        options: [
-          {
-            label: 'Status',
-            attribute: 'draft',
-            options: PUBLISH_STATUSES,
-            filter: false,
-          },
-        ],
-      },
-    };
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'pages',
@@ -87,17 +55,15 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <EntityList
-          location={this.props.location}
-          selects={selects}
-          filters={filters}
-          edits={edits}
+          entities={this.props.entities}
+          config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
             single: this.context.intl.formatMessage(appMessages.entities.pages.single),
             plural: this.context.intl.formatMessage(appMessages.entities.pages.plural),
           }}
-          entityLinkTo="/pages/"
+          locationQuery={fromJS(this.props.location.query)}
         />
       </div>
     );
@@ -107,23 +73,23 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
 PageList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
-  location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
+  entities: PropTypes.instanceOf(List).isRequired,
+  location: PropTypes.object,
 };
 
 PageList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  dataReady: isReady(state, { path: [
-    'pages',
-  ] }),
+const mapStateToProps = (state, props) => ({
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  entities: selectPages(state, fromJS(props.location.query)),
 });
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('pages'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
       dispatch(updatePath('/pages/new/'));

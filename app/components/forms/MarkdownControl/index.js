@@ -1,8 +1,9 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import A from 'components/basic/A';
+import A from 'components/styled/A';
 import ControlTextAreaLarge from '../ControlTextAreaLarge';
 import messages from './messages';
 

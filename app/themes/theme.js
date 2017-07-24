@@ -75,8 +75,8 @@ theme.palette = {
   taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#65C99B', '#238680', '#4EA53C', '#006096', '#178EC1', '#08C4F8'],
 
   // other entities
-  actions: ['#FFC107'],
-  actionsHover: ['#F2B200'],
+  measures: ['#FFC107'],
+  measuresHover: ['#F2B200'],
   sdgtargets: ['#40D7FF'],
   sdgtargetsHover: ['#08C4F8'],
   indicators: ['#EB6E51'],
@@ -87,6 +87,8 @@ theme.palette = {
   recommendationsHover: ['#F48B5D'],
   attributes: ['#6C787A'],
   attributesHover: ['#4A595C'],
+  roles: ['#6C787A'],
+  rolesHover: ['#4A595C'],
 
 
   //

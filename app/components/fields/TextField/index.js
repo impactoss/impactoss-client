@@ -1,4 +1,6 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import FieldWrap from 'components/fields/FieldWrap';
 import Label from 'components/fields/Label';
@@ -9,7 +11,7 @@ class TextField extends React.PureComponent { // eslint-disable-line react/prefe
     return (
       <FieldWrap>
         <Label>
-          {field.label}
+          <FormattedMessage {...field.label} />
         </Label>
         <p>{field.value}</p>
       </FieldWrap>

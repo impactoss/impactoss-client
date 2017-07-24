@@ -110,8 +110,8 @@ theme.palette = {
   ],
 
   // other entities
-  actions: ['#F9C907'],
-  actionsHover: ['#E3B707'],
+  measures: ['#F9C907'],
+  measuresHover: ['#E3B707'],
   sdgtargets: ['#00AEEF'],
   sdgtargetsHover: ['#009FDA'],
   indicators: ['#DB153D'],

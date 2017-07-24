@@ -3,40 +3,41 @@
  * Taxonomies
  *
  */
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
+import { fromJS } from 'immutable';
 
-import {
-  mapToCategoryList,
-  mapToTaxonomyList,
-  getCategoryMaxCount,
-} from 'utils/taxonomies';
+import { mapToTaxonomyList } from 'utils/taxonomies';
 
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
-  getEntities,
-  isReady,
-  isUserManager,
+  selectEntities,
+  selectReady,
+  selectIsUserManager,
 } from 'containers/App/selectors';
 import { CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 // components
-import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
-import Container from 'components/basic/Container';
-import Sidebar from 'components/basic/Sidebar';
-import Scrollable from 'components/basic/Scrollable';
+import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
+import Container from 'components/styled/Container';
+import Sidebar from 'components/styled/Sidebar';
+import Scrollable from 'components/styled/Scrollable';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
-import CategoryListItems from 'components/CategoryListItems';
-import TaxonomySidebar from 'components/TaxonomySidebar';
+import CategoryListItems from 'components/categoryList/CategoryListItems';
+import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 
 // relative
 import messages from './messages';
+import { DEPENDENCIES, SORT_OPTIONS } from './constants';
+import { selectTaxonomy, selectCategories } from './selectors';
+import { updateSort } from './actions';
 
 const Content = styled.div`
   padding: 0 4em;
@@ -57,62 +58,24 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
   getTaxTitle = (id) =>
     this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
 
-  getCountAttributes = (taxonomy) => {
-    const attributes = [];
-    if (taxonomy.attributes.tags_recommendations) {
-      attributes.push({
-        attribute: 'recommendations',
-        label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
-      });
-    }
-    if (taxonomy.attributes.tags_sdgtargets) {
-      attributes.push({
-        attribute: 'sdgtargets',
-        label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
-      });
-    }
-    if (taxonomy.attributes.tags_measures) {
-      attributes.push({
-        attribute: 'actions',
-        label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-      });
-    }
-    return attributes;
-  }
 
-  getListColumns = (taxonomy, categories, countAttributes) => {
-    const TITLE_COL_RATIO = 0.4;
-    const columns = [
-      {
-        type: 'title',
-        header: this.context.intl.formatMessage(appMessages.entities.taxonomies[taxonomy.id].single),
-        width: TITLE_COL_RATIO * 100,
-      },
-    ];
-    return columns.concat(countAttributes.map((attribute, i) => ({
-      type: 'count',
-      header: attribute.label,
-      width: ((1 - TITLE_COL_RATIO) / countAttributes.length) * 100,
-      maxCount: getCategoryMaxCount(categories, attribute.attribute),
-      countsIndex: i,
-      entity: attribute.attribute,
-    })));
-  }
   render() {
-    const { taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
-    const reference = typeof params.id !== 'undefined' ? parseInt(params.id, 10) : 1;
+    const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
+    const reference = typeof params.id !== 'undefined' ? params.id : '1';
     const contentTitle = this.getTaxTitle(reference);
-    const taxonomy = dataReady ? taxonomies[reference] : null;
 
     const buttons = dataReady && isManager
       ? [{
         type: 'add',
         title: this.context.intl.formatMessage(messages.add),
-        onClick: () => this.props.handleNew(taxonomy.id),
+        onClick: () => this.props.handleNew(reference),
       }]
       : null;
 
-    const countAttributes = dataReady ? this.getCountAttributes(taxonomy) : [];
+    // //
+    // console.log('categoryList render')
+    // // console.log(listColumns)
+    // categories && console.log(categories.toJS())
 
     return (
       <div>
@@ -142,10 +105,16 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
               { !dataReady &&
                 <Loading />
               }
-              { dataReady &&
+              { dataReady && taxonomy &&
                 <CategoryListItems
-                  columns={this.getListColumns(taxonomy, categories, countAttributes)}
-                  categories={mapToCategoryList(categories, onPageLink, countAttributes)}
+                  taxonomy={taxonomy}
+                  reference={reference}
+                  categories={categories}
+                  onPageLink={onPageLink}
+                  onSort={this.props.onSort}
+                  sortOptions={SORT_OPTIONS}
+                  sortBy={this.props.location.query && this.props.location.query.sort}
+                  sortOrder={this.props.location.query && this.props.location.query.order}
                 />
               }
             </Content>
@@ -155,110 +124,51 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     );
   }
 }
-
 CategoryList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onPageLink: PropTypes.func,
+  onSort: PropTypes.func,
   handleNew: PropTypes.func,
+  taxonomy: PropTypes.object,
   taxonomies: PropTypes.object,
   categories: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   params: PropTypes.object,
+  location: PropTypes.object,
 };
 
 CategoryList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
-  isManager: isUserManager(state),
-  dataReady: isReady(state, { path: [
-    'categories',
-    'taxonomies',
-    'recommendation_categories',
-    'recommendations',
-    'measure_categories',
-    'measures',
-    'sdgtarget_categories',
-    'sdgtargets',
-    'user_roles',
-  ] }),
-  taxonomies: getEntities(
+  isManager: selectIsUserManager(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  taxonomies: selectEntities(state, 'taxonomies'),
+  taxonomy: selectTaxonomy(state, { id: props.params.id }),
+  categories: selectCategories(
     state,
     {
-      path: 'taxonomies',
-      out: 'js',
+      id: typeof props.params.id !== 'undefined' ? props.params.id : 1,
+      query: fromJS(props.location.query),
     },
-  ),
-  categories: getEntities(
-    state,
-    {
-      out: 'js',
-      path: 'categories',
-      where: {
-        taxonomy_id: typeof props.params.id !== 'undefined' ? props.params.id : 1,
-      },
-      extend: [
-        {
-          type: 'count',
-          path: 'recommendation_categories',
-          key: 'category_id',
-          reverse: true,
-          as: 'recommendations',
-          connected: {
-            path: 'recommendations',
-            key: 'recommendation_id',
-            forward: true,
-          },
-        },
-        {
-          type: 'count',
-          path: 'measure_categories',
-          key: 'category_id',
-          reverse: true,
-          as: 'actions',
-          connected: {
-            path: 'measures',
-            key: 'measure_id',
-            forward: true,
-          },
-        },
-        {
-          type: 'count',
-          path: 'sdgtarget_categories',
-          key: 'category_id',
-          reverse: true,
-          as: 'sdgtargets',
-          connected: {
-            path: 'sdgtargets',
-            key: 'sdgtarget_id',
-            forward: true,
-          },
-        },
-      ],
-    }
   ),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('measure_categories'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('sdgtarget_categories'));
-      dispatch(loadEntitiesIfNeeded('sdgtargets'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: (taxonomyId) => {
       dispatch(updatePath(`/categories/${taxonomyId}/new`));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));
+    },
+    onSort: (sort, order) => {
+      dispatch(updateSort({ sort, order }));
     },
   };
 }

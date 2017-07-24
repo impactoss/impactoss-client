@@ -57,6 +57,14 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.title',
       defaultMessage: 'Enter title',
     },
+    name: {
+      id: 'app.containers.App.placeholders.name',
+      defaultMessage: 'Enter user name',
+    },
+    email: {
+      id: 'app.containers.App.placeholders.email',
+      defaultMessage: 'Email address',
+    },
     short_title: {
       id: 'app.containers.App.placeholders.title',
       defaultMessage: 'Abbr.',
@@ -100,6 +108,10 @@ export default defineMessages({
     number: {
       id: 'app.containers.App.placeholders.number',
       defaultMessage: 'ID',
+    },
+    date: {
+      id: 'app.containers.App.placeholders.date',
+      defaultMessage: 'YYYY-MM-DD',
     },
   },
   attributes: {
@@ -207,8 +219,8 @@ export default defineMessages({
       id: 'app.containers.App.attributes.repeat',
       defaultMessage: 'Repeat?',
     },
-    targetDateEmpty: {
-      id: 'app.containers.App.attributes.targetDateEmpty',
+    target_date_empty: {
+      id: 'app.containers.App.attributes.target_date_empty',
       defaultMessage: 'No target date set',
     },
     document_url: {
@@ -230,6 +242,14 @@ export default defineMessages({
     documentEmpty: {
       id: 'app.containers.App.attributes.documentEmpty',
       defaultMessage: 'No document attached yet',
+    },
+    due_date_id: {
+      id: 'app.containers.App.attributes.due_date_id',
+      defaultMessage: 'Due date',
+    },
+    due_date_id_empty: {
+      id: 'app.containers.App.attributes.due_date_id_empty',
+      defaultMessage: 'No report scheduled',
     },
     manager_id: {
       indicators: {

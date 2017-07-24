@@ -4,17 +4,26 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-
-import EntityList from 'containers/EntityList';
-import { PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'containers/App/constants';
+// import { isEqual } from 'lodash/lang';
+import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectRecommendationConnections,
+  selectRecommendationTaxonomies,
+} from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
+
+import EntityList from 'containers/EntityList';
+
+import { CONFIG, DEPENDENCIES } from './constants';
+import { selectRecommendations } from './selectors';
 import messages from './messages';
 
 export class RecommendationList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -27,128 +36,29 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
+    // console.log('test props')
+    // console.log('test location', isEqual(this.props.location, nextProps.location));
+    // console.log('test dataReady', isEqual(this.props.dataReady, nextProps.dataReady));
+    // console.log('test entities', isEqual(this.props.entities, nextProps.entities));
+    // console.log('test entities', this.props.entities === nextProps.entities);
+    // console.log('test taxonomies', isEqual(this.props.taxonomies, nextProps.taxonomies));
+    // console.log('test taxonomies', this.props.taxonomies === nextProps.taxonomies);
+    // console.log('test connections', isEqual(this.props.connections, nextProps.connections));
+    // console.log('test connections', this.props.connections === nextProps.connections);
   }
-
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   // console.log('EntityListSidebar.shouldComponentUpdate')
+  //   // console.log('props isEqual', isEqual(this.props, nextProps))
+  //   return !isEqual(this.props.location, nextProps.location)
+  //     || !isEqual(this.props.dataReady, nextProps.dataReady)
+  //     || !isEqual(this.props.taxonomies, nextProps.taxonomies)
+  //     || !isEqual(this.props.connections, nextProps.connections)
+  //     || !isEqual(this.props.entities, nextProps.entities)
+  //     || !isEqual(this.state, nextState);
+  // }
   render() {
     const { dataReady } = this.props;
-
-    // define selects for getEntities
-    const selects = {
-      entities: {
-        path: 'recommendations',
-        extensions: [
-          {
-            path: 'recommendation_categories',
-            key: 'recommendation_id',
-            reverse: true,
-            as: 'taxonomies',
-          },
-          {
-            path: 'recommendation_measures',
-            key: 'recommendation_id',
-            reverse: true,
-            as: 'measures',
-            connected: {
-              path: 'measures',
-              key: 'measure_id',
-              forward: true,
-            },
-          },
-        ],
-      },
-      connections: {
-        options: ['measures'],
-      },
-      taxonomies: { // filter by each category
-        out: 'js',
-        path: 'taxonomies',
-        where: {
-          tags_recommendations: true,
-        },
-        extend: {
-          path: 'categories',
-          key: 'taxonomy_id',
-          reverse: true,
-        },
-      },
-    };
-
-    const filters = {
-      search: ['reference', 'title'],
-      attributes: {  // filter by attribute value
-        label: 'By attribute',
-        options: [
-          {
-            filter: false,
-            label: this.context.intl.formatMessage(appMessages.attributes.accepted),
-            attribute: 'accepted',
-            options: ACCEPTED_STATUSES,
-          },
-          {
-            filter: false,
-            label: this.context.intl.formatMessage(appMessages.attributes.draft),
-            attribute: 'draft',
-            options: PUBLISH_STATUSES,
-          },
-        ],
-      },
-      taxonomies: { // filter by each category
-        query: 'cat',
-        filter: true,
-        connected: {
-          path: 'recommendation_categories',
-          key: 'recommendation_id',
-          whereKey: 'category_id',
-        },
-      },
-      connections: { // filter by associated entity
-        options: [
-          {
-            filter: true,
-            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-            path: 'measures', // filter by recommendation connection
-            query: 'actions',
-            key: 'measure_id',
-            connected: {
-              path: 'recommendation_measures',
-              key: 'recommendation_id',
-              whereKey: 'measure_id',
-            },
-          },
-        ],
-      },
-    };
-    const edits = {
-      taxonomies: { // edit category
-        connectPath: 'recommendation_categories',
-        key: 'category_id',
-        ownKey: 'recommendation_id',
-        filter: true,
-      },
-      connections: { // filter by associated entity
-        options: [
-          {
-            label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-            path: 'measures',
-            connectPath: 'recommendation_measures', // filter by recommendation connection
-            key: 'measure_id',
-            ownKey: 'recommendation_id',
-            filter: true,
-
-          },
-        ],
-      },
-      attributes: {  // edit attribute value
-        options: [
-          {
-            label: this.context.intl.formatMessage(appMessages.attributes.draft),
-            attribute: 'draft',
-            options: PUBLISH_STATUSES,
-            filter: false,
-          },
-        ],
-      },
-    };
+    // console.log('RecList:render')
 
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
@@ -173,17 +83,17 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           ]}
         />
         <EntityList
-          location={this.props.location}
-          selects={selects}
-          filters={filters}
-          edits={edits}
+          entities={this.props.entities}
+          taxonomies={this.props.taxonomies}
+          connections={this.props.connections}
+          config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
             single: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
             plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
           }}
-          entityLinkTo="/recommendations/"
+          locationQuery={fromJS(this.props.location.query)}
         />
       </div>
     );
@@ -194,37 +104,28 @@ RecommendationList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
-  location: PropTypes.object.isRequired,
   dataReady: PropTypes.bool,
+  entities: PropTypes.instanceOf(List).isRequired,
+  taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
+  location: PropTypes.object,
 };
 
 RecommendationList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  dataReady: isReady(state, { path: [
-    'measures',
-    'users',
-    'taxonomies',
-    'categories',
-    'recommendations',
-    'recommendation_measures',
-    'recommendation_categories',
-  ] }),
+const mapStateToProps = (state, props) => ({
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  entities: selectRecommendations(state, fromJS(props.location.query)),
+  taxonomies: selectRecommendationTaxonomies(state),
+  connections: selectRecommendationConnections(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
-      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
       dispatch(updatePath('/recommendations/new/'));

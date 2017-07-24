@@ -4,7 +4,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
@@ -15,13 +16,16 @@ import {
   renderSdgTargetControl,
   renderIndicatorControl,
   renderTaxonomyControl,
-  validateRequired,
-  validateDateFormat,
+  getTitleFormField,
+  getStatusField,
+  getMarkdownField,
+  getDateField,
+  getFormField,
 } from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -31,17 +35,21 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import { getEntities, isReady } from 'containers/App/selectors';
+import { selectEntities, selectReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectTaxonomies,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
-
+import { DEPENDENCIES } from './constants';
 
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -62,19 +70,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
@@ -82,13 +78,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   getHeaderAsideFields = () => ([
     {
       fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          options: PUBLISH_STATUSES,
-        },
+        getStatusField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
@@ -96,27 +86,9 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   getBodyMainFields = (recommendations, indicators, sdgtargets) => ([
     {
       fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-        },
-        {
-          id: 'outcome',
-          controlType: 'markdown',
-          model: '.attributes.outcome',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.outcome),
-          label: this.context.intl.formatMessage(appMessages.attributes.outcome),
-        },
-        {
-          id: 'indicator_summary',
-          controlType: 'markdown',
-          model: '.attributes.indicator_summary',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.indicator_summary),
-          label: this.context.intl.formatMessage(appMessages.attributes.indicator_summary),
-        },
+        getMarkdownField(this.context.intl.formatMessage, appMessages),
+        getMarkdownField(this.context.intl.formatMessage, appMessages, 'outcome'),
+        getMarkdownField(this.context.intl.formatMessage, appMessages, 'indicator_summary'),
       ],
     },
     {
@@ -132,26 +104,10 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
 
   getBodyAsideFields = (taxonomies) => ([ // fieldGroups
     { // fieldGroup
-      fields: [{
-        id: 'target_date',
-        controlType: 'date',
-        model: '.attributes.target_date',
-        label: this.context.intl.formatMessage(appMessages.attributes.target_date),
-        placeholder: 'YYYY-MM-DD',
-        validators: {
-          date: validateDateFormat,
-        },
-        errorMessages: {
-          date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
-        },
-      },
-      {
-        id: 'target_date_comment',
-        controlType: 'textarea',
-        model: '.attributes.target_date_comment',
-        label: this.context.intl.formatMessage(appMessages.attributes.target_date_comment),
-        placeholder: this.context.intl.formatMessage(appMessages.placeholders.target_date_comment),
-      }],
+      fields: [
+        getDateField(this.context.intl.formatMessage, appMessages, 'target_date'),
+        getFormField(this.context.intl.formatMessage, appMessages, 'textarea', 'target_date_comment'),
+      ],
     },
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
@@ -160,16 +116,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     },
   ]);
 
-  getFields = (taxonomies, recommendations, indicators, sdgtargets) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(),
-    },
-    body: {
-      main: this.getBodyMainFields(recommendations, indicators, sdgtargets),
-      aside: this.getBodyAsideFields(taxonomies),
-    },
-  })
   render() {
     const { dataReady, viewDomain, recommendations, indicators, taxonomies, sdgtargets } = this.props;
     const { saveSending, saveError } = viewDomain.page;
@@ -189,7 +135,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="measures"
             buttons={
               dataReady ? [{
                 type: 'cancel',
@@ -214,12 +160,21 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           }
           {dataReady &&
             <EntityForm
-              model="actionNew.form.data"
+              model="measureNew.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(taxonomies, recommendations, indicators, sdgtargets)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(),
+                },
+                body: {
+                  main: this.getBodyMainFields(recommendations, indicators, sdgtargets),
+                  aside: this.getBodyAsideFields(taxonomies),
+                },
+              }}
             />
           }
         </Content>
@@ -243,61 +198,22 @@ ActionNew.propTypes = {
 };
 
 ActionNew.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  viewDomain: viewDomainSelect(state),
-  // all categories for all taggable taxonomies
-  dataReady: isReady(state, { path: [
-    'categories',
-    'taxonomies',
-    'recommendations',
-    'indicators',
-    'sdgtargets',
-  ] }),
-  taxonomies: getEntities(
-    state,
-    {
-      path: 'taxonomies',
-      where: {
-        tags_measures: true,
-      },
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-      },
-    },
-  ),
-  // all recommendations,
-  recommendations: getEntities(
-    state, {
-      path: 'recommendations',
-    },
-  ),
-  // all indicators,
-  indicators: getEntities(
-    state, {
-      path: 'indicators',
-    },
-  ),
-  // all indicators,
-  sdgtargets: getEntities(
-    state, {
-      path: 'sdgtargets',
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  taxonomies: selectTaxonomies(state),
+  sdgtargets: selectEntities(state, 'sdgtargets'),
+  indicators: selectEntities(state, 'indicators'),
+  recommendations: selectEntities(state, 'recommendations'),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('sdgtargets'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));

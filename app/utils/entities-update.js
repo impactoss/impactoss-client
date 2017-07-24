@@ -12,6 +12,27 @@ export function updateAssociationsRequest(path, associations) {
 
   return Promise.all(requests);
 }
+export function updateAssociationsBatchRequest(path, associations) {
+  let ops = [];
+  if (associations.create) {
+    ops = ops.concat(associations.create.map((payload) => ({
+      method: 'post',
+      url: `${path}`,
+      params: payload,
+    })));
+  }
+  if (associations.delete) {
+    ops = ops.concat(associations.delete.map((associationId) => ({
+      method: 'delete',
+      url: `${path}/${associationId}`,
+    })));
+  }
+  const payload = {
+    ops,
+    sequential: true,
+  };
+  return apiRequest('post', 'batchapi', payload);
+}
 
 export function createAssociationRequest(path, payload) {
   return apiRequest('post', `${path}/`, payload);

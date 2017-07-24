@@ -4,7 +4,7 @@
 *
 */
 import React from 'react';
-
+import PropTypes from 'prop-types';
 import asArray from 'utils/as-array';
 
 import FieldGroup from 'components/fields/FieldGroup';
@@ -19,7 +19,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   renderMain = (fieldGroups, aside) => (
     <Main aside={aside}>
       {
-        asArray(fieldGroups).map((fieldGroup, i, list) => fieldGroup.fields && (
+        asArray(fieldGroups).map((fieldGroup, i, list) => fieldGroup && fieldGroup.fields && (
           <ViewPanel key={i} borderRight={aside} borderBottom={i < (list.length - 1)}>
             <FieldGroup group={fieldGroup} />
           </ViewPanel>
@@ -30,7 +30,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   renderAside = (fieldGroups) => (
     <Aside>
       {
-        asArray(fieldGroups).map((fieldGroup, i, list) => (
+        asArray(fieldGroups).map((fieldGroup, i, list) => fieldGroup && (
           <ViewPanel key={i} borderBottom={i < (list.length - 1)}>
             <FieldGroup group={fieldGroup} />
           </ViewPanel>
@@ -40,6 +40,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   );
   render() {
     const { fields } = this.props;
+
     return (
       <ViewWrapper>
         { fields.header &&
@@ -60,9 +61,9 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
 }
 
 EntityView.propTypes = {
-  fields: React.PropTypes.object,
+  fields: PropTypes.object,
 };
 EntityView.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 export default EntityView;

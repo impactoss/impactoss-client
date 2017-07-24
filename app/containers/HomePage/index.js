@@ -3,7 +3,8 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
@@ -13,16 +14,18 @@ import { palette } from 'styled-theme';
 import { mapToTaxonomyList } from 'utils/taxonomies';
 
 import {
-  getEntities,
-  isReady,
+  selectReady,
+  selectEntities,
+  selectEntitiesWhere,
 } from 'containers/App/selectors';
+
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { scrollToComponent } from 'utils/scroll-to-component';
 
 import Button from 'components/buttons/Button';
 import ButtonHero from 'components/buttons/ButtonHero';
-import Section from 'components/basic/Section';
-import Container from 'components/basic/Container';
+import Section from 'components/styled/Section';
+import Container from 'components/styled/Container';
 import Icon from 'components/Icon';
 import Loading from 'components/Loading';
 import TaxonomyList from 'components/TaxonomyList';
@@ -30,7 +33,9 @@ import TaxonomyList from 'components/TaxonomyList';
 import Footer from 'components/Footer';
 
 import appMessages from 'containers/App/messages';
+import { DB_TABLES } from 'containers/App/constants';
 import messages from './messages';
+import { DEPENDENCIES } from './constants';
 
 // import graphicHome from './graphicHome.png';
 //
@@ -100,11 +105,11 @@ const TopActions = styled.div`
   padding-top: 2em;
 `;
 const Title = styled.h1`
-  color:${palette('headerBrand', 0)}
+  color:${palette('headerBrand', 0)};
   font-family: ${(props) => props.theme.fonts.headerBrandMain};
   text-transform: uppercase;
   margin-bottom:0;
-  font-size: 2.8em
+  font-size: 2.8em;
 `;
 
 const Claim = styled.p`
@@ -136,10 +141,10 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   preparePageMenuPages = (pages) =>
-    Object.values(pages).map((page) => ({
-      path: `/pages/${page.id}`,
-      title: page.attributes.menu_title || page.attributes.title,
-    }));
+    pages.map((page) => ({
+      path: `/pages/${page.get('id')}`,
+      title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
+    })).toArray();
 
   render() {
     const { dataReady, onPageLink, pages, taxonomies } = this.props;
@@ -206,7 +211,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             <ButtonIconAboveWrap>
               <ButtonIconAbove onClick={() => onPageLink('/actions')}>
                 <div>
-                  <Icon name="actions" size={'4em'} />
+                  <Icon name="s" size={'4em'} />
                 </div>
                 <div>
                   <FormattedMessage {...messages.exploreActionsLink} />
@@ -265,54 +270,19 @@ HomePage.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  dataReady: isReady(state, { path: [
-    'taxonomies',
-    'categories',
-    'pages',
-  ] }),
-  taxonomies: getEntities(
-    state,
-    {
-      path: 'taxonomies',
-      extend: {
-        type: 'count',
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-        as: 'count',
-      },
-      out: 'js',
-    },
-  ),
-  pages: getEntities(
-    state,
-    {
-      path: 'pages',
-      where: { draft: false },
-      out: 'js',
-    },
-  ),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  taxonomies: selectEntities(state, 'taxonomies'),
+  pages: selectEntitiesWhere(state, {
+    path: 'pages',
+    where: { draft: false },
+  }),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('pages'));
+      DB_TABLES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
       // kick off loading although not needed
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('roles'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('measure_categories'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      dispatch(loadEntitiesIfNeeded('recommendation_categories'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('measure_indicators'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
-      dispatch(loadEntitiesIfNeeded('progress_reports'));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));

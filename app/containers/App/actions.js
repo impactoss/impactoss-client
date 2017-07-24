@@ -33,15 +33,17 @@ import {
   ENTITIES_READY,
   ADD_ENTITY,
   UPDATE_ENTITY,
-  DELETE_ENTITY,
+  UPDATE_ENTITIES,
+  UPDATE_CONNECTIONS,
+  REMOVE_ENTITY,
   NEW_ENTITY,
   SAVE_ENTITY,
   INVALIDATE_ENTITIES,
   SAVE_SENDING,
   SAVE_SUCCESS,
   SAVE_ERROR,
-  UPDATE_CONNECTIONS,
-  UPDATE_ENTITIES,
+  SAVE_CONNECTIONS,
+  SAVE_ENTITIES,
   UPDATE_ROUTE_QUERY,
   UPDATE_PATH,
   AUTHENTICATE_FORWARD,
@@ -151,10 +153,26 @@ export function updateEntity(path, entity) {
   };
 }
 
-
-export function deleteEntity(path, id) {
+export function updateEntities(path, entities) {
   return {
-    type: DELETE_ENTITY,
+    type: UPDATE_ENTITIES,
+    path,
+    entities,
+  };
+}
+
+export function updateConnections(path, updates) {
+  return {
+    type: UPDATE_CONNECTIONS,
+    path,
+    updates,
+  };
+}
+
+
+export function removeEntity(path, id) {
+  return {
+    type: REMOVE_ENTITY,
     path,
     id,
   };
@@ -174,16 +192,16 @@ export function newEntity(data) {
   };
 }
 
-export function updateConnections(data) {
+export function saveConnections(data) {
   return {
-    type: UPDATE_CONNECTIONS,
+    type: SAVE_CONNECTIONS,
     data,
   };
 }
 
-export function updateEntities(data) {
+export function saveEntities(data) {
   return {
-    type: UPDATE_ENTITIES,
+    type: SAVE_ENTITIES,
     data,
   };
 }

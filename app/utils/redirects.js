@@ -32,16 +32,17 @@ function redirectIfNotPermitted(store, roleRequired) {
       });
     } else if (store.getState().getIn(['global', 'user', 'attributes'])) {
       const userId = store.getState().getIn(['global', 'user', 'attributes']).id;
-      const roles = store.getState().getIn(['global', 'entities', 'user_roles']).filter((userRole) =>
-        userRole.getIn(['attributes', 'user_id']) === userId
-      ).toJS();
-      const roleIds = roles ? Object.values(roles).map((role) => role.attributes.role_id) : [];
-      if (!(roleIds.indexOf(roleRequired) > -1
-      || (roleRequired === USER_ROLES.MANAGER && roleIds.indexOf(USER_ROLES.ADMIN) > -1)
-      || (roleRequired === USER_ROLES.CONTRIBUTOR && (roleIds.indexOf(USER_ROLES.MANAGER) > -1 || roleIds.indexOf(USER_ROLES.ADMIN) > -1))
+      const roleIds = store.getState().getIn(['global', 'entities', 'user_roles'])
+        .filter((userRole) =>
+          userRole.getIn(['attributes', 'user_id']) === userId
+        )
+        .map((role) => role.getIn(['attributes', 'role_id']));
+      if (!(roleIds.includes(roleRequired)
+      || (roleRequired === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
+      || (roleRequired === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
       )) {
         replace({
-          pathname: '/not-authorized',
+          pathname: '/login',
         });
       }
     }

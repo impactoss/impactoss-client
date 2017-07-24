@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 // import { palette } from 'styled-theme';
 
@@ -15,7 +16,7 @@ const Button = styled(ButtonDefault)`
   font-size: 0.85em;
 `;
 
-class ButtonDefaultWithIcon extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     const { icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong } = this.props;

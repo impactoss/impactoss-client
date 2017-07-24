@@ -3,26 +3,19 @@
  * RecommendationImport reducer
  *
  */
-
-import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 
 import { entityImportReducer } from 'components/forms/EntityForm/utils';
-import { LOCATION_CHANGE } from 'react-router-redux';
 import {
   RESET_FORM,
+  FORM_INITIAL,
 } from './constants';
 
-const formInitial = fromJS({
-  import: null,
-});
-
-function formReducer(state = formInitial, action) {
+function formReducer(state = FORM_INITIAL, action) {
   switch (action.type) {
     case RESET_FORM:
-    case LOCATION_CHANGE:
-      return formInitial;
+      return FORM_INITIAL;
     default:
       return state;
   }

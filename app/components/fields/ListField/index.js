@@ -1,4 +1,6 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import FieldWrap from 'components/fields/FieldWrap';
@@ -19,7 +21,7 @@ class ListField extends React.PureComponent { // eslint-disable-line react/prefe
     return (
       <Styled>
         <ListLabel>
-          {field.label}
+          <FormattedMessage {...field.label} />
           {field.entityType &&
             <DotWrapper>
               <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
@@ -34,8 +36,10 @@ class ListField extends React.PureComponent { // eslint-disable-line react/prefe
             }
           </ListItem>
         ))}
-        { (!field.values || field.values.length === 0) &&
-          <EmptyHint>{field.showEmpty}</EmptyHint>
+        { field.showEmpty && (!field.values || field.values.length === 0) &&
+          <EmptyHint>
+            <FormattedMessage {...field.showEmpty} />
+          </EmptyHint>
         }
       </Styled>
     );

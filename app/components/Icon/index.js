@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import icons from 'themes/icons';
 
 import SVG from './SVG';
@@ -35,16 +36,16 @@ class Icon extends React.PureComponent {
 }
 
 Icon.propTypes = {
-  name: React.PropTypes.string,
-  title: React.PropTypes.string,
-  palette: React.PropTypes.string,
-  paletteIndex: React.PropTypes.number,
-  size: React.PropTypes.string,
-  iconSize: React.PropTypes.number,
-  color: React.PropTypes.string,
-  text: React.PropTypes.bool,
-  textLeft: React.PropTypes.bool,
-  textRight: React.PropTypes.bool,
+  name: PropTypes.string,
+  title: PropTypes.string,
+  palette: PropTypes.string,
+  paletteIndex: PropTypes.number,
+  size: PropTypes.string,
+  iconSize: PropTypes.number,
+  color: PropTypes.string,
+  text: PropTypes.bool,
+  textLeft: PropTypes.bool,
+  textRight: PropTypes.bool,
 };
 Icon.defaultProps = {
   name: 'placeholder',

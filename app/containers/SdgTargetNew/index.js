@@ -4,22 +4,26 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
 import { Map, List } from 'immutable';
 
 import {
-  renderActionControl,
+  renderMeasureControl,
   renderIndicatorControl,
   renderTaxonomyControl,
-  validateRequired,
+  getTitleFormField,
+  getReferenceFormField,
+  getMarkdownField,
+  getStatusField,
 } from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { PUBLISH_STATUSES, USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -29,17 +33,21 @@ import {
   updateEntityForm,
 } from 'containers/App/actions';
 
-import { getEntities, isReady } from 'containers/App/selectors';
+import { selectEntities, selectReady } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectTaxonomies,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
-
+import { DEPENDENCIES } from './constants';
 
 export class SdgTargetNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -60,67 +68,25 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'reference',
-          controlType: 'short',
-          model: '.attributes.reference',
-          label: this.context.intl.formatMessage(appMessages.attributes.reference),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.reference),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
-          id: 'title',
-          controlType: 'titleText',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getReferenceFormField(this.context.intl.formatMessage, appMessages, true), // required
+        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
       ],
     },
   ]);
 
-  getHeaderAsideFields = () => ([
-    {
-      fields: [
-        {
-          id: 'status',
-          controlType: 'select',
-          model: '.attributes.draft',
-          label: this.context.intl.formatMessage(appMessages.attributes.draft),
-          options: PUBLISH_STATUSES,
-        },
-      ],
-    },
-  ]);
+  getHeaderAsideFields = () => ([{
+    fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
+  }]);
 
-  getBodyMainFields = (indicators, actions) => ([
+  getBodyMainFields = (indicators, measures) => ([
     {
-      fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-        },
-      ],
+      fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderActionControl(actions),
+        renderMeasureControl(measures),
         renderIndicatorControl(indicators),
       ],
     },
@@ -134,18 +100,8 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getFields = (taxonomies, indicators, actions) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(),
-    },
-    body: {
-      main: this.getBodyMainFields(indicators, actions),
-      aside: this.getBodyAsideFields(taxonomies),
-    },
-  })
   render() {
-    const { dataReady, viewDomain, indicators, taxonomies, actions } = this.props;
+    const { dataReady, viewDomain, indicators, taxonomies, measures } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -193,7 +149,16 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(taxonomies, indicators, actions)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(),
+                },
+                body: {
+                  main: this.getBodyMainFields(indicators, measures),
+                  aside: this.getBodyAsideFields(taxonomies),
+                },
+              }}
             />
           }
         </Content>
@@ -212,57 +177,25 @@ SdgTargetNew.propTypes = {
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   indicators: PropTypes.object,
-  actions: PropTypes.object,
+  measures: PropTypes.object,
 };
 
 SdgTargetNew.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  viewDomain: viewDomainSelect(state),
-  // all categories for all taggable taxonomies
-  dataReady: isReady(state, { path: [
-    'categories',
-    'taxonomies',
-    'indicators',
-    'measures',
-  ] }),
-  taxonomies: getEntities(
-    state,
-    {
-      path: 'taxonomies',
-      where: {
-        tags_sdgtargets: true,
-      },
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-      },
-    },
-  ),
-  // all indicators,
-  indicators: getEntities(
-    state, {
-      path: 'indicators',
-    },
-  ),
-  // all actions,
-  actions: getEntities(
-    state, {
-      path: 'measures',
-    },
-  ),
+  viewDomain: selectDomain(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  taxonomies: selectTaxonomies(state),
+  indicators: selectEntities(state, 'indicators'),
+  measures: selectEntities(state, 'measures'),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('measures'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
@@ -295,11 +228,11 @@ function mapDispatchToProps(dispatch) {
           })),
         }));
       }
-      // actions
-      if (formData.get('associatedActions')) {
-        saveData = saveData.set('sdgtargetActions', Map({
+      // measures
+      if (formData.get('associatedMeasures')) {
+        saveData = saveData.set('sdgtargetMeasures', Map({
           delete: List(),
-          create: getCheckedValuesFromOptions(formData.get('associatedActions'))
+          create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
           .map((id) => Map({
             measure_id: id,
           })),
