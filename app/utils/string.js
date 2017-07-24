@@ -17,7 +17,10 @@ export const cleanupSearchTarget = (str) =>
     .replace(/[ō]/, 'o')
     .replace(/[ū]/, 'u');
 
-// match multiple words
+// match multiple words, incl substrings
 export const regExMultipleWords = (str) =>
   reduce(str.split(' '), (words, s) => `${words}(?=.*${s})`, '');
-  // reduce(str.split(' '), (words, s) => `${words}(?=.*\\b${s})`, '');
+
+// match multiple words
+export const regExMultipleWordsMatchStart = (str) =>
+  reduce(str.split(' '), (words, s) => `${words}(?=.*\\b${s})`, '');
