@@ -52,6 +52,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       onEntityClick,
       expandNo,
       entityPath,
+      connections,
     } = this.props;
     return (
       <Styled expanded={expandNo > 0}>
@@ -64,6 +65,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
               <EntityListItemMain
                 entity={entity}
                 taxonomies={taxonomies}
+                connections={connections}
                 entityIcon={entityIcon}
                 config={config}
                 entityPath={entityPath}
@@ -93,6 +95,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
 EntityListItem.propTypes = {
   entity: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
   isManager: PropTypes.bool,
   isSelected: PropTypes.bool,
   onSelect: PropTypes.func,

@@ -29,7 +29,12 @@ export default class EntityListItemMainBottomConnections extends React.PureCompo
           this.props.connections.map((connection, i) => (
             <span key={i}>
               <Icon name={connection.option.icon} text />
-              <Count pIndex={connection.option.style}>{connection.count}</Count>
+              <Count pIndex={connection.option.style}>
+                {connection.entities
+                  ? connection.entities.size
+                  : 0
+                }
+              </Count>
             </span>
           ))
         }

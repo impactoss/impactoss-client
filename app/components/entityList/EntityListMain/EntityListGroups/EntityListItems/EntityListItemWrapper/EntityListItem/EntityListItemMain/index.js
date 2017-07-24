@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 // import { isEqual } from 'lodash/lang';
-import { forEach } from 'lodash/collection';
+import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
 import Component from 'components/styled/Component';
 import Clear from 'components/styled/Clear';
@@ -30,6 +30,7 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
   static propTypes = {
     entity: PropTypes.instanceOf(Map).isRequired,
     taxonomies: PropTypes.instanceOf(Map),
+    connections: PropTypes.instanceOf(Map),
     config: PropTypes.object,
     entityIcon: PropTypes.string,
     entityPath: PropTypes.string,
@@ -37,22 +38,21 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
     onEntityClick: PropTypes.func,
   }
 
-  getConnectedCounts = (entity, connectionOptions) => {
-    const counts = [];
-    forEach(connectionOptions, (option) => {
-      if (!option.expandable && entity.get(option.path) && entity.get(option.path).size > 0) {
-        counts.push({
-          count: entity.get(option.path).size,
+  getConnections = (entity, connectionOptions, connections) =>
+    reduce(connectionOptions, (memo, option) =>
+      !option.expandable && entity.get(option.path) && entity.get(option.path).size > 0
+        ? memo.concat([{
           option: {
             // label: option.label,
             icon: option.path,
             style: option.path,
           },
-        });
-      }
-    });
-    return counts;
-  };
+          entities: connections.get(option.path) &&
+            entity.get(option.path).map((connectionId) => connections.getIn([option.path, connectionId.toString()])),
+        }])
+        : memo
+      , []
+    );
 
   getEntityTags = (entity, taxonomies, onClick) => {
     const tags = [];
@@ -91,6 +91,7 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
       entity,
       nestLevel,
       entityPath,
+      connections,
     } = this.props;
     return {
       id: entity.get('id'),
@@ -105,7 +106,7 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
         )
         : [],
       connectedCounts: config && config.connections
-        ? this.getConnectedCounts(entity, config.connections.options)
+        ? this.getConnections(entity, config.connections.options, connections)
         : [],
     };
   };

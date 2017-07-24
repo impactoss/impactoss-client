@@ -29,6 +29,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       entityIcon,
       entityIdsSelected,
       taxonomies,
+      connections,
       config,
       onEntityClick,
       entity,
@@ -47,6 +48,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
           expandNo={expandNo}
           entityIcon={entityIcon}
           taxonomies={taxonomies}
+          connections={connections}
           config={config}
           onEntityClick={onEntityClick}
           entityPath={entityPath}
@@ -80,6 +82,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
 EntityListItemWrapper.propTypes = {
   entity: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
   config: PropTypes.object,
   isManager: PropTypes.bool,
