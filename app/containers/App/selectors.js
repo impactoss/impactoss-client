@@ -248,7 +248,7 @@ export const selectEntitiesSearchQuery = createSelector(
       try {
         const regex = new RegExp(regExMultipleWords(query), 'i');
         return entities.filter((entity) =>
-          regex.test(prepareEntitySearchTarget(entity, searchAttributes))
+          regex.test(prepareEntitySearchTarget(entity, searchAttributes, query.length))
         );
       } catch (e) {
         return entities;

@@ -27,11 +27,13 @@ export const testEntityAssociation = (entity, associatedPath) =>
   entity.get(associatedPath) && entity.get(associatedPath).size > 0;
 
 // prep searchtarget, incl id
-export const prepareEntitySearchTarget = (entity, fields) =>
+export const prepareEntitySearchTarget = (entity, fields, queryLength) =>
   reduce(
     fields,
-    (target, field) => `${target} ${cleanupSearchTarget(entity.getIn(['attributes', field]))}`,
-    entity.get('id')
+    (target, field) => queryLength > 1 || field === 'reference '
+      ? `${target} ${cleanupSearchTarget(entity.getIn(['attributes', field]))}`
+      : target
+    , entity.get('id')
   );
 // comparison of attribute values, force string, check 'null' if unspecified
 export const attributesEqual = (testValue, value) =>
