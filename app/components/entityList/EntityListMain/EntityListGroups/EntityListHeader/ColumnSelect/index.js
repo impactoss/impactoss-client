@@ -82,6 +82,9 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
             }
           </span>
         }
+        {!isSelect &&
+          <Label>{label}</Label>
+        }
         <SelectWrapper>
           <SelectReset
             value={this.props.sortBy}
