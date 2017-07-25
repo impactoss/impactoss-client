@@ -51,6 +51,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
     // TODO figure out a betterway to determine column widths.
     const hasNested = expandableColumns && expandableColumns.length > 0;
     const isNestedExpand = expandNo > 0;
+
     if (!hasNested && !isNestedExpand) {
       return WIDTH_FULL;
     }
@@ -62,10 +63,11 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
   // TODO figure out a betterway to determine column widths
   getExpandableColumnWidth = (i, total, expandNo) => {
     const onlyItem = total === 1;
-    const isParentExpand = expandNo <= i;
+    const isParentExpand = expandNo === i;
     const isExpand = expandNo > i;
     const isNestedExpand = expandNo > (i + 1);
     const hasNested = total > (i + 1);
+
     // if only item
     if (onlyItem) {
       return WIDTH_FULL;
