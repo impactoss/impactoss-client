@@ -7,10 +7,12 @@ import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
 import Component from 'components/styled/Component';
 import Clear from 'components/styled/Clear';
+import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
 import EntityListItemMainTitle from './EntityListItemMainTitle';
 import EntityListItemMainBottom from './EntityListItemMainBottom';
+
 
 const Styled = styled(Component)`
   padding: 5px 10px;
@@ -26,33 +28,27 @@ const EntityListItemMainTitleWrap = styled.a`
   }
 `;
 
-export default class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  static propTypes = {
-    entity: PropTypes.instanceOf(Map).isRequired,
-    taxonomies: PropTypes.instanceOf(Map),
-    connections: PropTypes.instanceOf(Map),
-    config: PropTypes.object,
-    entityIcon: PropTypes.string,
-    entityPath: PropTypes.string,
-    nestLevel: PropTypes.number,
-    onEntityClick: PropTypes.func,
-  }
-
+class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   getConnections = (entity, connectionOptions, connections) =>
-    reduce(connectionOptions, (memo, option) =>
-      !option.expandable && entity.get(option.path) && entity.get(option.path).size > 0
-        ? memo.concat([{
+    reduce(connectionOptions, (memo, option) => {
+      if (!option.expandable && entity.get(option.path) && connections.get(option.path) && entity.get(option.path).size > 0) {
+        const entities = entity.get(option.path).map((connectionId) => connections.getIn([option.path, connectionId.toString()]));
+        return memo.concat([{
           option: {
-            // label: option.label,
+            label: this.context.intl && this.context.intl.formatMessage(
+              entities.size === 1
+              ? appMessages.entities[option.path].single
+              : appMessages.entities[option.path].plural
+            ),
             icon: option.path,
             style: option.path,
+            path: option.clientPath || option.path,
           },
-          entities: connections.get(option.path) &&
-            entity.get(option.path).map((connectionId) => connections.getIn([option.path, connectionId.toString()])),
-        }])
-        : memo
-      , []
-    );
+          entities,
+        }]);
+      }
+      return memo;
+    }, []);
 
   getEntityTags = (entity, taxonomies, onClick) => {
     const tags = [];
@@ -113,7 +109,6 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
   render() {
     const { entityIcon, nestLevel, onEntityClick } = this.props;
 
-    // console.log('EntityListItemMain.render', this.props.entity.get('id'))
     const entity = this.mapToEntityListItem();
     return (
       <Styled>
@@ -130,8 +125,28 @@ export default class EntityListItemMain extends React.PureComponent { // eslint-
             {entity.title}
           </EntityListItemMainTitle>
         </EntityListItemMainTitleWrap>
-        <EntityListItemMainBottom entity={entity} />
+        <EntityListItemMainBottom
+          entity={entity}
+          wrapper={this.props.wrapper}
+        />
       </Styled>
     );
   }
 }
+
+EntityListItemMain.propTypes = {
+  entity: PropTypes.instanceOf(Map).isRequired,
+  taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
+  wrapper: PropTypes.object,
+  config: PropTypes.object,
+  entityIcon: PropTypes.string,
+  entityPath: PropTypes.string,
+  nestLevel: PropTypes.number,
+  onEntityClick: PropTypes.func,
+};
+EntityListItemMain.contextTypes = {
+  intl: PropTypes.object,
+};
+
+export default EntityListItemMain;

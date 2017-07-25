@@ -1,25 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 import Icon from 'components/Icon';
 import BottomTagGroup from './BottomTagGroup';
-
-const Count = styled.span`
-  display: inline-block;
-  padding: 3px 7px;
-  position: relative;
-  top: -2px;
-  border-radius: 999px;
-  font-size: 0.8em;
-  background-color: ${(props) => palette(props.pIndex, 0)};
-  color: ${palette('primary', 4)};
-`;
+import ConnectionPopup from './ConnectionPopup';
 
 export default class EntityListItemMainBottomConnections extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     connections: PropTypes.array.isRequired,
+    wrapper: PropTypes.object,
   };
 
   render() {
@@ -29,12 +18,10 @@ export default class EntityListItemMainBottomConnections extends React.PureCompo
           this.props.connections.map((connection, i) => (
             <span key={i}>
               <Icon name={connection.option.icon} text />
-              <Count pIndex={connection.option.style}>
-                {connection.entities
-                  ? connection.entities.size
-                  : 0
-                }
-              </Count>
+              <ConnectionPopup
+                connection={connection}
+                wrapper={this.props.wrapper}
+              />
             </span>
           ))
         }

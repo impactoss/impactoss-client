@@ -15,10 +15,16 @@ const ItemWrapper = styled.div`
 `;
 
 export class EntityListItemWrapper extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  shouldComponentUpdate(nextProps) {
+  constructor(props) {
+    super(props);
+    this.state = { wrapper: null };
+  }
+  shouldComponentUpdate(nextProps, nextState) {
+    // console.log('shouldComponentUpdate', this.state.wrapper !== nextState.wrapper, this.state.wrapper, nextState.wrapper)
     return this.props.expandNo !== nextProps.expandNo
     || this.props.entity !== nextProps.entity
-    || this.props.entityIdsSelected !== nextProps.entityIdsSelected;
+    || this.props.entityIdsSelected !== nextProps.entityIdsSelected
+    || this.state.wrapper !== nextState.wrapper;
   }
   render() {
     const {
@@ -35,44 +41,56 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       entity,
       entityPath,
     } = this.props;
-    // console.log('EntityListItemWrapper.render')
+    // console.log('EntityListItemWrapper.render', this.state.wrapper)
 
     return (
-      <ItemWrapper separated={expandNo}>
-        <EntityListItem
-          entity={entity}
-          isManager={isManager}
-          isSelected={isManager && entityIdsSelected.includes(entity.get('id'))}
-          onSelect={(checked) => onEntitySelect(entity.get('id'), checked)}
-          onExpand={onExpand}
-          expandNo={expandNo}
-          entityIcon={entityIcon}
-          taxonomies={taxonomies}
-          connections={connections}
-          config={config}
-          onEntityClick={onEntityClick}
-          entityPath={entityPath}
-        />
-        {config.expandableColumns && expandNo > 0 && entity.get('expanded') && entity.get('expanded') !== 'reports' &&
-          <EntityListNestedList
-            entities={
-              entity.get(entity.get('expanded'))
-              ? entity.get(entity.get('expanded')).toList()
-              : List()
+      <ItemWrapper
+        separated={expandNo}
+        innerRef={(node) => {
+          if (!this.state.wrapper) {
+            this.setState({ wrapper: node });
+          }
+        }}
+      >
+        { this.state.wrapper &&
+          <div>
+            <EntityListItem
+              entity={entity}
+              isManager={isManager}
+              isSelected={isManager && entityIdsSelected.includes(entity.get('id'))}
+              onSelect={(checked) => onEntitySelect(entity.get('id'), checked)}
+              onExpand={onExpand}
+              expandNo={expandNo}
+              entityIcon={entityIcon}
+              taxonomies={taxonomies}
+              connections={connections}
+              config={config}
+              onEntityClick={onEntityClick}
+              entityPath={entityPath}
+              wrapper={this.state.wrapper}
+            />
+            {config.expandableColumns && expandNo > 0 && entity.get('expanded') && entity.get('expanded') !== 'reports' &&
+              <EntityListNestedList
+                entities={
+                  entity.get(entity.get('expanded'))
+                  ? entity.get(entity.get('expanded')).toList()
+                  : List()
+                }
+                config={config}
+                nestLevel={1}
+                expandNo={expandNo}
+                onExpand={onExpand}
+                onEntityClick={onEntityClick}
+              />
             }
-            config={config}
-            nestLevel={1}
-            expandNo={expandNo}
-            onExpand={onExpand}
-            onEntityClick={onEntityClick}
-          />
-        }
-        {expandNo > 0 && entity.get('expanded') && entity.get('expanded') === 'reports' && entity.get('reports') &&
-          <EntityListNestedReportList
-            reports={entity.get('reports').toList()}
-            dates={entity.get('dates')}
-            onEntityClick={onEntityClick}
-          />
+            {expandNo > 0 && entity.get('expanded') && entity.get('expanded') === 'reports' && entity.get('reports') &&
+              <EntityListNestedReportList
+                reports={entity.get('reports').toList()}
+                dates={entity.get('dates')}
+                onEntityClick={onEntityClick}
+              />
+            }
+          </div>
         }
       </ItemWrapper>
     );

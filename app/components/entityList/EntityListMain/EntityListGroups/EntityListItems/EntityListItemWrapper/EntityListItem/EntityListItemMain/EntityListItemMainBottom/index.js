@@ -13,6 +13,7 @@ const Styled = styled(Component)``;
 export default class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     entity: PropTypes.object.isRequired,
+    wrapper: PropTypes.object.isRequired,
   }
 
   render() {
@@ -24,7 +25,10 @@ export default class EntityListItemMainBottom extends React.PureComponent { // e
           <EntityListItemMainBottomTaxonomies tags={entity.tags} />
         }
         { entity.connectedCounts && entity.connectedCounts.length > 0 &&
-          <EntityListItemMainBottomConnections connections={entity.connectedCounts} />
+          <EntityListItemMainBottomConnections
+            connections={entity.connectedCounts}
+            wrapper={this.props.wrapper}
+          />
         }
       </Styled>
     );
