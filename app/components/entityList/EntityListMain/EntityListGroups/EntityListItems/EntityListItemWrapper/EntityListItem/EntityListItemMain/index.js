@@ -31,6 +31,7 @@ const EntityListItemMainTitleWrap = styled.a`
 class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   getConnections = (entity, connectionOptions, connections) =>
     reduce(connectionOptions, (memo, option) => {
+      // console.log(memo, option, entity.toJS())
       if (!option.expandable && entity.get(option.path) && connections.get(option.path) && entity.get(option.path).size > 0) {
         const entities = entity.get(option.path).map((connectionId) => connections.getIn([option.path, connectionId.toString()]));
         return memo.concat([{
@@ -125,10 +126,13 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             {entity.title}
           </EntityListItemMainTitle>
         </EntityListItemMainTitleWrap>
-        <EntityListItemMainBottom
-          entity={entity}
-          wrapper={this.props.wrapper}
-        />
+        { (entity.tags || (entity.connectedCounts && this.props.wrapper)) &&
+          <EntityListItemMainBottom
+            tags={entity.tags}
+            connections={entity.connectedCounts}
+            wrapper={this.props.wrapper}
+          />
+        }
       </Styled>
     );
   }

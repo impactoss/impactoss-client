@@ -96,7 +96,7 @@ export const selectMeasures = createSelector(
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
           && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
         )
-        .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
+        .map((association) => association.getIn(['attributes', 'recommendation_id']))
       )
       .set('indicators', measureIndicators
         .filter((association) =>

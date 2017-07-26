@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Link } from 'react-router';
-import Scrollable from 'components/styled/Scrollable';
+
+import { truncateText } from 'utils/string';
+
+const POPUP_WIDTH = 350;
+const POPUP_LENGTH = 66;
 
 const Count = styled.span`
   display: inline-block;
@@ -19,6 +23,7 @@ const Count = styled.span`
 const PopupWrapper = styled.span`
   position: relative;
 `;
+
 const Popup = styled.div`
   position: absolute;
   bottom: 100%;
@@ -28,33 +33,80 @@ const Popup = styled.div`
     if (props.align === 'left') return 'translate(-5%,0)';
     return 'translate(-50%,0)';
   }};
-  min-width: 200px;
-  max-width: ${POPUP_MAXWIDTH}px;
+  width: ${POPUP_WIDTH}px;
   display: block;
-  background: #fff;
   left: 50%;
   z-index: 1;
-  padding: 1em;
-  border: 1px solid #ddd;
-  color: #000;
+  padding-bottom: 4px;
+`;
+const PopupInner = styled.div`
+  width: 100%;
+  display: block;
+  background-color: ${palette('primary', 4)};
+  color: ${palette('dark', 1)};
+  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
+`;
+const TriangleBottom = styled.div`
+   width: 20px;
+   height: 11px;
+   position: relative;
+   overflow: hidden;
+   left: ${(props) => {
+     if (props.align === 'right') return '95';
+     if (props.align === 'left') return '5';
+     return '50';
+   }}%;
+   margin-left: -10px;
+
+   &:after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: ${palette('primary', 4)};
+      transform: rotate(45deg);
+      bottom: 5px;
+      left: 0px;
+      box-shadow: -1px -1px 10px -2px rgba(0,0,0,0.5);
+   }
 `;
 
 const PopupHeader = styled.div`
+  padding: 1em;
   font-weight: bold;
-  border-bottom: 1px solid;
-`;
-const PopupFooter = styled.div`
-  font-style: italic;
-  border-top: 1px solid;
-`;
-const PopupContent = styled.div`
-  position: relative;
-  padding: 1em 0;
-  height: ${(props) => props.count * 2}em;
-  max-height: 200px;
+  background-color: ${palette('light', 0)};
 `;
 
-const POPUP_MAXWIDTH = 500;
+const PopupContent = styled.div`
+  position: relative;
+  max-height: 200px;
+  height: ${(props) => props.count * 5}em;
+  overflow: auto;
+`;
+
+const Id = styled.span`
+  font-weight: bold;
+  color: ${palette('dark', 3)}
+`;
+const IdSpacer = styled.span`
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  color: ${palette('dark', 1)};
+`;
+const ItemContent = styled.span`
+  color: ${palette('dark', 1)};
+`;
+
+const ListItem = styled.div`
+  padding: 1em;
+  border-top: 1px solid ${palette('light', 0)};
+`;
+
+const ListItemLink = styled(Link)`
+  &:hover {
+    opacity: 0.75;
+  }
+`;
 
 export class ConnectionPopup extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -66,11 +118,10 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
   }
 
   getPopupAlign = (wrapper, popupRef) => {
-    // console.log(wrapper.getBoundingClientRect().right)
-    if (wrapper.getBoundingClientRect().right < (popupRef.getBoundingClientRect().right + (POPUP_MAXWIDTH / 2))) {
+    if (wrapper.getBoundingClientRect().right < (popupRef.getBoundingClientRect().right + (POPUP_WIDTH / 2))) {
       return 'right';
     }
-    if (wrapper.getBoundingClientRect().left > (popupRef.getBoundingClientRect().left - (POPUP_MAXWIDTH / 2))) {
+    if (wrapper.getBoundingClientRect().left > (popupRef.getBoundingClientRect().left - (POPUP_WIDTH / 2))) {
       return 'left';
     }
     return 'center';
@@ -84,15 +135,13 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
     this.setState({ popupOpen: false });
   }
 
-
   render() {
     const { connection, wrapper } = this.props;
-
     return (
       <PopupWrapper
         onFocus={false}
-        onMouseOver={this.openPopup}
-        onMouseLeave={this.closePopup}
+        onMouseOver={() => this.openPopup()}
+        onMouseLeave={() => this.closePopup()}
         innerRef={(node) => {
           if (!this.state.popupRef) {
             this.setState({ popupRef: node });
@@ -109,25 +158,28 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
           <Popup
             align={this.getPopupAlign(wrapper, this.state.popupRef)}
           >
-            <PopupHeader>
-              {`${connection.entities.size} connected ${connection.option.label}`}
-            </PopupHeader>
-            <PopupContent count={connection.entities.size}>
-              <Scrollable>
+            <PopupInner>
+              <PopupHeader>
+                {`${connection.entities.size} ${connection.option.label}`}
+              </PopupHeader>
+              <PopupContent count={connection.entities.size}>
                 {
-                  connection.entities.map((entity, i) => (
-                    <div key={i}>
-                      <Link to={`${connection.option.path}/${entity.get('id')}`} >
-                        {entity.getIn(['attributes', 'title'])}
-                      </Link>
-                    </div>
-                  ))
+                  connection.entities.toList().map((entity, i) => {
+                    const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
+                    return (
+                      <ListItem key={i}>
+                        <ListItemLink to={`${connection.option.path}/${entity.get('id')}`} >
+                          <Id>{ref}</Id>
+                          <IdSpacer>|</IdSpacer>
+                          <ItemContent>{truncateText(entity.getIn(['attributes', 'title']), POPUP_LENGTH - ref.length)}</ItemContent>
+                        </ListItemLink>
+                      </ListItem>
+                    );
+                  })
                 }
-              </Scrollable>
-            </PopupContent>
-            <PopupFooter>
-              Click to view
-            </PopupFooter>
+              </PopupContent>
+            </PopupInner>
+            <TriangleBottom align={this.getPopupAlign(wrapper, this.state.popupRef)} />
           </Popup>
         }
       </PopupWrapper>

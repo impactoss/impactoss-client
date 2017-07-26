@@ -12,28 +12,26 @@ const Styled = styled(Component)``;
 
 export default class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
-    entity: PropTypes.object.isRequired,
-    wrapper: PropTypes.object.isRequired,
+    tags: PropTypes.array,
+    connections: PropTypes.array,
+    wrapper: PropTypes.object,
   }
 
   render() {
-    const { entity } = this.props;
+    const { tags, connections, wrapper } = this.props;
 
     return (
       <Styled>
-        { entity.tags && entity.tags.length > 0 &&
-          <EntityListItemMainBottomTaxonomies tags={entity.tags} />
+        { tags && tags.length > 0 &&
+          <EntityListItemMainBottomTaxonomies tags={tags} />
         }
-        { entity.connectedCounts && entity.connectedCounts.length > 0 &&
+        { connections && connections.length > 0 &&
           <EntityListItemMainBottomConnections
-            connections={entity.connectedCounts}
-            wrapper={this.props.wrapper}
+            connections={connections}
+            wrapper={wrapper}
           />
         }
       </Styled>
     );
-    // { entity.targetDate &&
-    //   <EntityListItemMainBottomTargetDate date={entity.targetDate} />
-    // }
   }
 }

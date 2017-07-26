@@ -176,6 +176,7 @@ export const getCategoryShortTitleField = (entity) => ({
 const getConnectionField = ({
   entities,
   taxonomies,
+  connections,
   connectionOptions,
   entityType,
   icon,
@@ -186,6 +187,7 @@ const getConnectionField = ({
   type: 'connections',
   values: entities.toList(),
   taxonomies,
+  connections,
   entityType,
   icon: icon || entityType,
   entityPath: entityPath || entityType,
@@ -197,40 +199,44 @@ const getConnectionField = ({
   })),
 });
 
-export const getIndicatorConnectionField = (entities, appMessages, onEntityClick) =>
+export const getIndicatorConnectionField = (entities, connections, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies: null,
+    connections,
     connectionOptions: ['measures', 'sdgtargets'],
     entityType: 'indicators',
     appMessages,
     onEntityClick,
   });
 
-export const getRecommendationConnectionField = (entities, taxonomies, appMessages, onEntityClick) =>
+export const getRecommendationConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies,
+    connections,
     connectionOptions: ['measures'],
     entityType: 'recommendations',
     appMessages,
     onEntityClick,
   });
 
-export const getSdgTargetConnectionField = (entities, taxonomies, appMessages, onEntityClick) =>
+export const getSdgTargetConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies,
+    connections,
     connectionOptions: ['indicators', 'measures'],
     entityType: 'sdgtargets',
     appMessages,
     onEntityClick,
   });
 
-export const getMeasureConnectionField = (entities, taxonomies, appMessages, onEntityClick) =>
+export const getMeasureConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies,
+    connections,
     connectionOptions: ['indicators', 'recommendations', 'sdgtargets'],
     entityType: 'measures',
     entityPath: 'actions',
