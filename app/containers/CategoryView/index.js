@@ -35,6 +35,8 @@ import EntityView from 'components/EntityView';
 import {
   selectReady,
   selectIsUserManager,
+  selectMeasureConnections,
+  selectSdgTargetConnections,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -78,7 +80,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       ],
     }]);
 
-  getBodyMainFields = (entity, recommendations, measures, taxonomies, sdgtargets, onEntityClick) => ([
+  getBodyMainFields = (entity, recommendations, measures, taxonomies, sdgtargets, onEntityClick, sdgtargetConnections, measureConnections) => ([
     {
       fields: [
         getMarkdownField(entity, 'description', true, appMessages),
@@ -89,11 +91,11 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       icon: 'connections',
       fields: [
         entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
-          getMeasureConnectionField(measures, taxonomies, appMessages, onEntityClick),
+          getMeasureConnectionField(measures, taxonomies, measureConnections, appMessages, onEntityClick),
+        entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
+          getSdgTargetConnectionField(sdgtargets, taxonomies, sdgtargetConnections, appMessages, onEntityClick),
         entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
           getRecommendationConnectionField(recommendations, taxonomies, appMessages, onEntityClick),
-        entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
-          getSdgTargetConnectionField(sdgtargets, taxonomies, appMessages, onEntityClick),
       ],
     },
   ]);
@@ -126,6 +128,8 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       taxonomies,
       sdgtargets,
       onEntityClick,
+      sdgtargetConnections,
+      measureConnections,
     } = this.props;
 
     const buttons = dataReady && isManager
@@ -175,7 +179,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                   aside: this.getHeaderAsideFields(category, isManager),
                 },
                 body: {
-                  main: this.getBodyMainFields(category, recommendations, measures, taxonomies, sdgtargets, onEntityClick),
+                  main: this.getBodyMainFields(category, recommendations, measures, taxonomies, sdgtargets, onEntityClick, sdgtargetConnections, measureConnections),
                   aside: this.getBodyAsideFields(category, isManager),
                 },
               }}
@@ -196,10 +200,12 @@ CategoryView.propTypes = {
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   isManager: PropTypes.bool,
-  measures: PropTypes.object,
   recommendations: PropTypes.object,
   taxonomies: PropTypes.object,
+  measures: PropTypes.object,
   sdgtargets: PropTypes.object,
+  measureConnections: PropTypes.object,
+  sdgtargetConnections: PropTypes.object,
 };
 
 CategoryView.contextTypes = {
@@ -214,6 +220,8 @@ const mapStateToProps = (state, props) => ({
   measures: selectMeasures(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),
   taxonomies: selectTaxonomies(state),
+  measureConnections: selectMeasureConnections(state),
+  sdgtargetConnections: selectSdgTargetConnections(state),
 });
 
 function mapDispatchToProps(dispatch) {

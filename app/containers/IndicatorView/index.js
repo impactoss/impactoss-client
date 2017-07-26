@@ -37,6 +37,8 @@ import {
   selectIsUserContributor,
   selectMeasureTaxonomies,
   selectSdgTargetTaxonomies,
+  selectMeasureConnections,
+  selectSdgTargetConnections,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -81,7 +83,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       ],
     }]);
 
-  getBodyMainFields = (entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick) => ([
+  getBodyMainFields = (entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick, sdgtargetConnections, measureConnections) => ([
     {
       fields: [
         getMarkdownField(entity, 'description', true, appMessages),
@@ -100,8 +102,8 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getMeasureConnectionField(measures, measureTaxonomies, appMessages, onEntityClick),
-        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, appMessages, onEntityClick),
+        getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
+        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, appMessages, onEntityClick),
       ],
     },
   ]);
@@ -137,6 +139,8 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       measureTaxonomies,
       sdgtargetTaxonomies,
       onEntityClick,
+      sdgtargetConnections,
+      measureConnections,
     } = this.props;
 
     const buttons = isContributor
@@ -191,7 +195,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                   aside: this.getHeaderAsideFields(viewEntity, isContributor),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick),
+                  main: this.getBodyMainFields(viewEntity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick, sdgtargetConnections, measureConnections),
                   aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
                 },
               }}
@@ -219,6 +223,8 @@ IndicatorView.propTypes = {
   sdgtargetTaxonomies: PropTypes.object,
   dates: PropTypes.object,
   params: PropTypes.object,
+  measureConnections: PropTypes.object,
+  sdgtargetConnections: PropTypes.object,
 };
 
 IndicatorView.contextTypes = {
@@ -236,6 +242,8 @@ const mapStateToProps = (state, props) => ({
   measureTaxonomies: selectMeasureTaxonomies(state),
   reports: selectReports(state, props.params.id),
   dates: selectDueDates(state, props.params.id),
+  measureConnections: selectMeasureConnections(state),
+  sdgtargetConnections: selectSdgTargetConnections(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
