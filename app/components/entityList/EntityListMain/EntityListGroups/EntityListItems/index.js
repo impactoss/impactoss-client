@@ -12,10 +12,11 @@ const Styled = styled.div`
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  renderEntity = (entity, key) => (
+  renderEntity = (entity, key, simulate = false) => (
     <EntityListItemWrapper
       key={key}
       entity={entity}
+      simulate={simulate}
       {...this.props}
     />
   );
@@ -30,7 +31,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
             entity={entity}
             expandNo={this.props.expandNo}
             entityIdsSelected={this.props.entityIdsSelected}
-            renderEntity={() => this.renderEntity(entity, key)}
+            renderEntity={(simulate) => this.renderEntity(entity, key, simulate)}
           />
           : this.renderEntity(entity, key)
         )}

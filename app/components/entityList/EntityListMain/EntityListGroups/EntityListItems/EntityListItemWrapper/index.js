@@ -24,7 +24,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
     return this.props.expandNo !== nextProps.expandNo
     || this.props.entity !== nextProps.entity
     || this.props.entityIdsSelected !== nextProps.entityIdsSelected
-    || this.state.wrapper !== nextState.wrapper;
+    || (!this.props.simulate && this.state.wrapper !== nextState.wrapper);
   }
   render() {
     const {
@@ -41,18 +41,17 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       entity,
       entityPath,
     } = this.props;
-    // console.log('EntityListItemWrapper.render', this.state.wrapper)
 
     return (
       <ItemWrapper
         separated={expandNo}
         innerRef={(node) => {
-          if (!this.state.wrapper) {
+          if (!this.props.simulate && !this.state.wrapper) {
             this.setState({ wrapper: node });
           }
         }}
       >
-        { this.state.wrapper &&
+        { (this.props.simulate || this.state.wrapper) &&
           <div>
             <EntityListItem
               entity={entity}
@@ -110,6 +109,7 @@ EntityListItemWrapper.propTypes = {
   expandNo: PropTypes.number,
   entityPath: PropTypes.string,
   entityIcon: PropTypes.string,
+  simulate: PropTypes.bool,
 };
 
 export default EntityListItemWrapper;

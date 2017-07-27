@@ -55,6 +55,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       entityPath,
       connections,
     } = this.props;
+
     return (
       <Styled expanded={expandNo > 0}>
         <Item>
