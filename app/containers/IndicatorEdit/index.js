@@ -43,9 +43,10 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  deleteEntity,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -203,6 +204,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               handleSubmit={(formData) => this.props.handleSubmit(formData, measures, sdgtargets)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
+              handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
@@ -228,9 +230,11 @@ IndicatorEdit.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
@@ -243,6 +247,7 @@ IndicatorEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
+  isUserAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),
@@ -312,6 +317,12 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    handleDelete: () => {
+      dispatch(deleteEntity({
+        path: 'indicators',
+        id: props.params.id,
+      }));
     },
   };
 }

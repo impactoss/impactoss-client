@@ -14,6 +14,7 @@ import {
   REDIRECT_IF_NOT_PERMITTED,
   SAVE_ENTITY,
   NEW_ENTITY,
+  DELETE_ENTITY,
   AUTHENTICATE,
   LOGOUT,
   VALIDATE_TOKEN,
@@ -41,10 +42,13 @@ import {
   updateEntities,
   updateConnections,
   addEntity,
-  // removeEntity,
+  removeEntity,
   saveSending,
   saveSuccess,
   saveError,
+  deleteSending,
+  deleteSuccess,
+  deleteError,
   forwardOnAuthenticationChange,
 } from 'containers/App/actions';
 
@@ -59,6 +63,7 @@ import {
 
 import {
   newEntityRequest,
+  deleteEntityRequest,
   updateEntityRequest,
   updateEntitiesRequest,
   updateAssociationsRequest,
@@ -357,6 +362,19 @@ export function* saveEntitySaga({ data }) {
   }
 }
 
+export function* deleteEntitySaga({ data }) {
+  try {
+    yield put(deleteSending(data));
+    yield call(deleteEntityRequest, data.path, data.id);
+    yield put(removeEntity(data.path, data.id));
+    yield put(deleteSuccess(data));
+    yield put(push(`/${data.redirect || data.path}`));
+  } catch (error) {
+    // console.error(error);
+    yield put(deleteError('Error deleting data', data));
+  }
+}
+
 export function* newEntitySaga({ data }) {
   try {
     yield put(saveSending(data));
@@ -542,6 +560,7 @@ export default function* rootSaga() {
 
   yield takeEvery(SAVE_ENTITY, saveEntitySaga);
   yield takeEvery(NEW_ENTITY, newEntitySaga);
+  yield takeEvery(DELETE_ENTITY, deleteEntitySaga);
   yield takeEvery(SAVE_CONNECTIONS, saveConnectionsSaga);
   yield takeEvery(SAVE_ENTITIES, saveEntitiesSaga);
 

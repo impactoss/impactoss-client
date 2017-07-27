@@ -40,6 +40,7 @@ export const UPDATE_CONNECTIONS = 'nmrf/App/UPDATE_CONNECTIONS';
 
 export const SAVE_ENTITY = 'nmrf/App/SAVE_ENTITY';
 export const NEW_ENTITY = 'nmrf/App/NEW_ENTITY';
+export const DELETE_ENTITY = 'nmrf/App/DELETE_ENTITY';
 export const SAVE_CONNECTIONS = 'nmrf/App/SAVE_CONNECTIONS';
 export const SAVE_ENTITIES = 'nmrf/App/SAVE_ENTITIES';
 export const DUEDATE_ASSIGNED = 'nmrf/App/DUEDATE_ASSIGNED';
@@ -50,6 +51,10 @@ export const ENTITIES_READY = 'nmrf/App/ENTITIES_READY';
 export const SAVE_SENDING = 'nmrf/App/SAVE_SENDING';
 export const SAVE_SUCCESS = 'nmrf/App/SAVE_SUCCESS';
 export const SAVE_ERROR = 'nmrf/App/SAVE_ERROR';
+
+export const DELETE_SENDING = 'nmrf/App/DELETE_SENDING';
+export const DELETE_SUCCESS = 'nmrf/App/DELETE_SUCCESS';
+export const DELETE_ERROR = 'nmrf/App/DELETE_ERROR';
 
 export const UPDATE_ROUTE_QUERY = 'nmrf/App/UPDATE_ROUTE_QUERY';
 export const UPDATE_PATH = 'nmrf/App/UPDATE_PATH';

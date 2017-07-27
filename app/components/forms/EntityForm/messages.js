@@ -13,4 +13,18 @@ export default defineMessages({
     id: 'app.components.EntityForm.emptyLink',
     defaultMessage: 'Click to select.',
   },
+  confirmDeleteQuestion: {
+    id: 'app.components.EntityForm.confirmDeleteQuestion',
+    defaultMessage: 'Delete forever?',
+  },
+  buttons: {
+    cancelDelete: {
+      id: 'app.components.EntityForm.buttons.cancelDelete',
+      defaultMessage: 'Cancel',
+    },
+    confirmDelete: {
+      id: 'app.components.EntityForm.buttons.donfirmDelete',
+      defaultMessage: 'Delete',
+    },
+  },
 });

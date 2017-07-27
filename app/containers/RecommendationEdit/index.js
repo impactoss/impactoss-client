@@ -39,9 +39,10 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  deleteEntity,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -195,6 +196,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
+              handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
@@ -220,9 +222,11 @@ RecommendationEdit.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
@@ -233,6 +237,7 @@ RecommendationEdit.contextTypes = {
 };
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
+  isUserAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
@@ -279,6 +284,12 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    handleDelete: () => {
+      dispatch(deleteEntity({
+        path: 'recommendations',
+        id: props.params.id,
+      }));
     },
   };
 }

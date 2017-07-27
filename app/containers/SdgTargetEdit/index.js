@@ -39,9 +39,10 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  deleteEntity,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -199,6 +200,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
+              handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
@@ -224,9 +226,11 @@ SdgTargetEdit.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   indicators: PropTypes.object,
@@ -239,6 +243,7 @@ SdgTargetEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
+  isUserAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
@@ -296,6 +301,12 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    handleDelete: () => {
+      dispatch(deleteEntity({
+        path: 'sdgtargets',
+        id: props.params.id,
+      }));
     },
   };
 }
