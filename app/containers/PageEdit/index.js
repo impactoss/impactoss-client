@@ -138,7 +138,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
             }
           />
           {saveSending &&
-            <p>Saving</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>

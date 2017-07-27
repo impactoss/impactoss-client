@@ -104,7 +104,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
             }
           />
           {saveSending &&
-            <p>Saving</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>

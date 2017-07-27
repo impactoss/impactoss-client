@@ -145,7 +145,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             <Loading />
           }
           {saveSending &&
-            <p>Saving Category</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>

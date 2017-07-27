@@ -8,8 +8,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { createStructuredSelector } from 'reselect';
 
+import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
@@ -20,11 +20,11 @@ import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import { reset } from './actions';
-import makeUserPasswordResetSelector from './selectors';
+import { selectDomain } from './selectors';
 
 export class UserPasswordReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { resetSending, resetError } = this.props.userPasswordReset.page;
+    const { resetSending, resetError } = this.props.viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -43,12 +43,12 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
           {resetSending &&
-            <p>Sending... </p>
+            <Loading />
           }
           {resetError &&
             <p>{resetError}</p>
           }
-          { this.props.userPasswordReset.form &&
+          { this.props.viewDomain.form &&
             <AuthForm
               model="userPasswordReset.form.data"
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
@@ -91,7 +91,7 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
 }
 
 UserPasswordReset.propTypes = {
-  userPasswordReset: PropTypes.object.isRequired,
+  viewDomain: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
 };
@@ -100,8 +100,8 @@ UserPasswordReset.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = createStructuredSelector({
-  userPasswordReset: makeUserPasswordResetSelector(),
+const mapStateToProps = (state) => ({
+  viewDomain: selectDomain(state),
 });
 
 export function mapDispatchToProps(dispatch) {

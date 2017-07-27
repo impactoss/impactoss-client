@@ -128,7 +128,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
             }
           />
           {saveSending &&
-            <p>Saving Action</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>

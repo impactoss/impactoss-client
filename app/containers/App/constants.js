@@ -56,6 +56,10 @@ export const DELETE_SENDING = 'nmrf/App/DELETE_SENDING';
 export const DELETE_SUCCESS = 'nmrf/App/DELETE_SUCCESS';
 export const DELETE_ERROR = 'nmrf/App/DELETE_ERROR';
 
+export const RECOVER_SENDING = 'nmrf/App/RECOVER_SENDING';
+export const RECOVER_SUCCESS = 'nmrf/App/RECOVER_SUCCESS';
+export const RECOVER_ERROR = 'nmrf/App/RECOVER_ERROR';
+
 export const UPDATE_ROUTE_QUERY = 'nmrf/App/UPDATE_ROUTE_QUERY';
 export const UPDATE_PATH = 'nmrf/App/UPDATE_PATH';
 

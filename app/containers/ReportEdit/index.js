@@ -170,7 +170,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             }
           />
           {saveSending &&
-            <p>Saving Action</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>

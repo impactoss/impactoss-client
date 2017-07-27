@@ -184,7 +184,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             }
           />
           {saveSending &&
-            <p>Saving</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>
