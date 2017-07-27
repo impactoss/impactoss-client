@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import icons from 'themes/icons';
+import asArray from 'utils/as-array';
 
 import SVG from './SVG';
 
@@ -10,7 +11,7 @@ class Icon extends React.PureComponent {
     const icon = icons[name];
     if (icon) {
       const iSize = icon.size || iconSize;
-      const iconPaths = icon.paths || icon;
+      const iconPaths = icon.paths || icon.path || icon;
       return (
         <SVG
           viewBox={`0 0 ${iSize} ${iSize}`}
@@ -25,9 +26,7 @@ class Icon extends React.PureComponent {
           textRight={textRight}
         >
           <title>{title || `Icon: ${name}`}</title>
-          {
-            iconPaths.map((path, index) => (<path d={path} key={index}></path>))
-          }
+          <path d={asArray(iconPaths).reduce((memo, path) => `${memo}${path}`, '')}></path>
         </SVG>
       );
     }
