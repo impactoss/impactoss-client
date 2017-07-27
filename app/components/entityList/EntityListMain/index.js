@@ -146,6 +146,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   <EntityListGroups
                     entities={this.props.entities}
                     taxonomies={this.props.taxonomies}
+                    connections={connections}
                     connectedTaxonomies={this.props.connectedTaxonomies}
                     entityIdsSelected={this.props.entityIdsSelected}
                     locationQuery={this.props.locationQuery}

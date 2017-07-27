@@ -104,7 +104,7 @@ export const selectSdgTargets = createSelector(
 export const selectIndicatorsAssociated = createSelector(
   (state, id) => id,
   (state) => selectEntities(state, 'indicators'),
-  (state) => selectEntities(state, 'sdgtarget_measures'),
+  (state) => selectEntities(state, 'measure_indicators'),
   (id, entities, associations) =>
     entitiesIsAssociated(entities, 'indicator_id', associations, 'measure_id', id)
 );

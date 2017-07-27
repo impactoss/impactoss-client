@@ -24,3 +24,16 @@ export const regExMultipleWords = (str) =>
 // match multiple words
 export const regExMultipleWordsMatchStart = (str) =>
   reduce(str.split(' '), (words, s) => `${words}(?=.*\\b${s})`, '');
+
+export const truncateText = (text, limit) => {
+  if (text.length > limit) {
+    const words = text.split(' ');
+    let truncated = '';
+    while (truncated.length <= limit) {
+      const word = words.shift();
+      truncated = truncated.length > 0 ? `${truncated} ${word}` : word;
+    }
+    return `${truncated} \u2026`;
+  }
+  return text;
+};

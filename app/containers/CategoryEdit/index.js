@@ -37,6 +37,7 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  deleteEntity,
 } from 'containers/App/actions';
 
 import {
@@ -182,6 +183,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
+              handleDelete={() => isAdmin
+                ? this.props.handleDelete(viewEntity.getIn(['attributes', 'taxonomy_id']))
+                : null
+              }
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
@@ -207,6 +212,7 @@ CategoryEdit.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -227,7 +233,7 @@ const mapStateToProps = (state, props) => ({
   users: selectUsers(state),
 });
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
@@ -254,6 +260,13 @@ function mapDispatchToProps(dispatch) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    handleDelete: (taxonomyId) => {
+      dispatch(deleteEntity({
+        path: 'categories',
+        id: props.params.id,
+        redirect: `categories/${taxonomyId}`,
+      }));
     },
   };
 }

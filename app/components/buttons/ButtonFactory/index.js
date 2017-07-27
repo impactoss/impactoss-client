@@ -62,6 +62,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
           </ButtonFlat>
         );
       case 'text' :
+      case 'delete' :
       default :
         return (
           <ButtonFlat onClick={() => button.onClick()}>

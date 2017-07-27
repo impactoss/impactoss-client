@@ -38,6 +38,9 @@ import {
   selectIsUserManager,
   selectRecommendationTaxonomies,
   selectSdgTargetTaxonomies,
+  selectRecommendationConnections,
+  selectSdgTargetConnections,
+  selectIndicatorConnections,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -80,7 +83,18 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       ],
     },
   ]);
-  getBodyMainFields = (entity, recommendations, indicators, recTaxonomies, sdgtargets, sdgtargetTaxonomies, onEntityClick) => ([
+  getBodyMainFields = (
+    entity,
+    recommendations,
+    indicators,
+    recTaxonomies,
+    sdgtargets,
+    sdgtargetTaxonomies,
+    onEntityClick,
+    recConnections,
+    indicatorConnections,
+    sdgtargetConnections,
+  ) => ([
     {
       fields: [
         getMarkdownField(entity, 'description', true, appMessages),
@@ -92,9 +106,9 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getIndicatorConnectionField(indicators, appMessages, onEntityClick),
-        getRecommendationConnectionField(recommendations, recTaxonomies, appMessages, onEntityClick),
-        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, appMessages, onEntityClick),
+        getIndicatorConnectionField(indicators, indicatorConnections, appMessages, onEntityClick),
+        getRecommendationConnectionField(recommendations, recTaxonomies, recConnections, appMessages, onEntityClick),
+        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, appMessages, onEntityClick),
       ],
     },
   ]);
@@ -128,9 +142,12 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       sdgtargets,
       sdgtargetTaxonomies,
       onEntityClick,
+      recConnections,
+      sdgtargetConnections,
+      indicatorConnections,
     } = this.props;
     // viewEntity && console.log(viewEntity.toJS())
-    // recommendations && console.log(recommendations.toJS())
+    // indicators && console.log(indicators.toJS())
     // console.log('ActionView.render', dataReady)
     const buttons = isManager
     ? [
@@ -179,7 +196,18 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                   aside: isManager ? this.getHeaderAsideFields(viewEntity) : null,
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, recommendations, indicators, recTaxonomies, sdgtargets, sdgtargetTaxonomies, onEntityClick),
+                  main: this.getBodyMainFields(
+                    viewEntity,
+                    recommendations,
+                    indicators,
+                    recTaxonomies,
+                    sdgtargets,
+                    sdgtargetTaxonomies,
+                    onEntityClick,
+                    recConnections,
+                    indicatorConnections,
+                    sdgtargetConnections,
+                  ),
                   aside: this.getBodyAsideFields(viewEntity, taxonomies),
                 },
               }}
@@ -205,6 +233,9 @@ ActionView.propTypes = {
   indicators: PropTypes.object,
   sdgtargets: PropTypes.object,
   sdgtargetTaxonomies: PropTypes.object,
+  recConnections: PropTypes.object,
+  sdgtargetConnections: PropTypes.object,
+  indicatorConnections: PropTypes.object,
   params: PropTypes.object,
 };
 
@@ -223,6 +254,9 @@ const mapStateToProps = (state, props) => ({
   recommendations: selectRecommendations(state, props.params.id),
   recTaxonomies: selectRecommendationTaxonomies(state),
   sdgtargetTaxonomies: selectSdgTargetTaxonomies(state),
+  recConnections: selectRecommendationConnections(state),
+  sdgtargetConnections: selectSdgTargetConnections(state),
+  indicatorConnections: selectIndicatorConnections(state),
 });
 
 function mapDispatchToProps(dispatch) {

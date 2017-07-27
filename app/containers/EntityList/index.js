@@ -327,7 +327,6 @@ function mapDispatchToProps(dispatch, props) {
           }, List()));
         }
       }
-      // console.log(saveData.toJS())
       dispatch(saveEdits(saveData.toJS()));
     },
   };
