@@ -37,6 +37,7 @@ import {
   selectIsUserManager,
   selectMeasureConnections,
   selectSdgTargetConnections,
+  selectRecommendationConnections,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -80,7 +81,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       ],
     }]);
 
-  getBodyMainFields = (entity, recommendations, measures, taxonomies, sdgtargets, onEntityClick, sdgtargetConnections, measureConnections) => ([
+  getBodyMainFields = (entity, recommendations, measures, taxonomies, sdgtargets, onEntityClick, sdgtargetConnections, measureConnections, recommendationConnections) => ([
     {
       fields: [
         getMarkdownField(entity, 'description', true, appMessages),
@@ -95,7 +96,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
           getSdgTargetConnectionField(sdgtargets, taxonomies, sdgtargetConnections, appMessages, onEntityClick),
         entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
-          getRecommendationConnectionField(recommendations, taxonomies, appMessages, onEntityClick),
+          getRecommendationConnectionField(recommendations, taxonomies, recommendationConnections, appMessages, onEntityClick),
       ],
     },
   ]);
@@ -130,6 +131,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       onEntityClick,
       sdgtargetConnections,
       measureConnections,
+      recommendationConnections,
     } = this.props;
 
     const buttons = dataReady && isManager
@@ -179,7 +181,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                   aside: this.getHeaderAsideFields(category, isManager),
                 },
                 body: {
-                  main: this.getBodyMainFields(category, recommendations, measures, taxonomies, sdgtargets, onEntityClick, sdgtargetConnections, measureConnections),
+                  main: this.getBodyMainFields(category, recommendations, measures, taxonomies, sdgtargets, onEntityClick, sdgtargetConnections, measureConnections, recommendationConnections),
                   aside: this.getBodyAsideFields(category, isManager),
                 },
               }}
@@ -206,6 +208,7 @@ CategoryView.propTypes = {
   sdgtargets: PropTypes.object,
   measureConnections: PropTypes.object,
   sdgtargetConnections: PropTypes.object,
+  recommendationConnections: PropTypes.object,
 };
 
 CategoryView.contextTypes = {
@@ -222,6 +225,7 @@ const mapStateToProps = (state, props) => ({
   taxonomies: selectTaxonomies(state),
   measureConnections: selectMeasureConnections(state),
   sdgtargetConnections: selectSdgTargetConnections(state),
+  recommendationConnections: selectRecommendationConnections(state),
 });
 
 function mapDispatchToProps(dispatch) {
