@@ -235,14 +235,6 @@ export function* validateTokenSaga() {
   }
 }
 
-export function* saveConnectionsSaga({ data }) {
-  // on the server
-  const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
-  // and on the client
-  yield put(updateConnections(data.path, connectionsUpdated));
-  // TODO: error handling
-}
-
 export function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
   // make sure to use new entity id for full payload
   // we should have either the one (recommendation_id) or the other (measure_id)
@@ -468,7 +460,6 @@ export function* newEntitySaga({ data }) {
 }
 
 // Batch update entity attributes
-// WARNING untested =)
 export function* saveEntitiesSaga({ data }) {
   try {
     yield put(saveSending(data));
@@ -482,6 +473,21 @@ export function* saveEntitiesSaga({ data }) {
     yield put(invalidateEntities());
   }
 }
+
+export function* saveConnectionsSaga({ data }) {
+  try {
+    yield put(saveSending(data));
+    // on the server
+    const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
+    // and on the client
+    yield put(updateConnections(data.path, connectionsUpdated));
+    yield put(saveSuccess(data));
+  } catch (error) {
+    yield put(saveError('Error saving data', data));
+    yield put(invalidateEntities());
+  }
+}
+
 export function* updateRouteQuerySaga({ query, extend = true }) {
   // TODO consider using history.js's updateQueryStringParams
   const location = yield select(selectLocation);

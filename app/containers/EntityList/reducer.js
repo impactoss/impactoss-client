@@ -10,6 +10,9 @@ import { combineReducers } from 'redux-immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import {
+  SAVE_SENDING,
+  SAVE_ERROR,
+  SAVE_SUCCESS,
   FILTERS_PANEL,
   EDIT_PANEL,
 } from 'containers/App/constants';
@@ -24,6 +27,9 @@ import {
 const initialState = fromJS({
   activePanel: FILTERS_PANEL,
   entitiesSelected: [],
+  saveSending: false,
+  saveSuccess: false,
+  saveError: false,
 });
 
 function entityListReducer(state = initialState, action) {
@@ -55,6 +61,20 @@ function entityListReducer(state = initialState, action) {
       return state.getIn(['route', 'locationBeforeTransition', 'pathname']) === state.getIn(['route', 'locationBeforeTransition', 'pathnamePrevious'])
         ? state.set('entitiesSelected', List())
         : state;
+    case SAVE_SENDING:
+      return state
+        .set('saveSending', true)
+        .set('saveSuccess', false)
+        .set('saveError', false);
+    case SAVE_SUCCESS:
+      return state
+        .set('saveSending', false)
+        .set('saveSuccess', true);
+    case SAVE_ERROR:
+      return state
+        .set('saveSending', false)
+        .set('saveSuccess', false)
+        .set('saveError', action.error);
     default:
       return state;
   }

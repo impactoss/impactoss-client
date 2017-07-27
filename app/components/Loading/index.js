@@ -12,7 +12,7 @@ const ANIMATION_WIDTH = 20;
 
 const Styled = styled.div`
   display: block;
-  width: 100%
+  width: 100%;
   height: 3px;
   position: relative;
   background-color: ${palette('light', 2)};
