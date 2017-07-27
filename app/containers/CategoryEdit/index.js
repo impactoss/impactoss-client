@@ -163,7 +163,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             }
           />
           {saveSending &&
-            <p>Saving</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>

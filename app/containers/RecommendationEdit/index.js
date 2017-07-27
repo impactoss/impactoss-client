@@ -172,7 +172,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
             }
           />
           {saveSending &&
-            <p>Saving</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>

@@ -56,6 +56,9 @@ import {
   DUEDATE_UNASSIGNED,
   RESET_PASSWORD,
   RECOVER_PASSWORD,
+  RECOVER_SENDING,
+  RECOVER_SUCCESS,
+  RECOVER_ERROR,
 } from './constants';
 
 
@@ -76,6 +79,28 @@ export function saveSuccess(data) {
 export function saveError(error, data) {
   return {
     type: SAVE_ERROR,
+    data,
+    error,
+  };
+}
+
+export function recoverSending(data) {
+  return {
+    type: RECOVER_SENDING,
+    data,
+  };
+}
+
+export function recoverSuccess(data) {
+  return {
+    type: RECOVER_SUCCESS,
+    data,
+  };
+}
+
+export function recoverError(error, data) {
+  return {
+    type: RECOVER_ERROR,
     data,
     error,
   };

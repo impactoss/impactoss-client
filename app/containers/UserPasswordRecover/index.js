@@ -9,10 +9,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { createStructuredSelector } from 'reselect';
 import styled from 'styled-components';
 
 import Icon from 'components/Icon';
+import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
@@ -24,7 +24,7 @@ import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import { recover } from './actions';
-import makeUserPasswordRecoverSelector from './selectors';
+import { selectDomain } from './selectors';
 
 const BottomLinks = styled.div`
   padding: 2em 0;
@@ -32,6 +32,7 @@ const BottomLinks = styled.div`
 
 export class UserPasswordRecover extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
+    const { error, sending } = this.props.viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -49,7 +50,13 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
-          { this.props.userPasswordRecover.form &&
+          {error &&
+            <p>{error}</p>
+          }
+          {sending &&
+            <Loading />
+          }
+          { this.props.viewDomain.form &&
             <AuthForm
               model="userPasswordRecover.form.data"
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
@@ -92,7 +99,7 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
 }
 
 UserPasswordRecover.propTypes = {
-  userPasswordRecover: PropTypes.object.isRequired,
+  viewDomain: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
@@ -102,8 +109,8 @@ UserPasswordRecover.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = createStructuredSelector({
-  userPasswordRecover: makeUserPasswordRecoverSelector(),
+const mapStateToProps = (state) => ({
+  viewDomain: selectDomain(state),
 });
 
 export function mapDispatchToProps(dispatch) {

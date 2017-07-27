@@ -153,7 +153,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             <Loading />
           }
           {saveSending &&
-            <p>Saving Action</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>

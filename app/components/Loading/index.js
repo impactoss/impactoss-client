@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import ProgressBar from 'components/ProgressBar';
+// import ProgressBar from 'components/ProgressBar';
 // import messages from './messages';
 
 const ANIMATION_INTERVAL = 10;
@@ -20,12 +20,19 @@ const Styled = styled.div`
 `;
 const Bar = styled.div`
   display: block;
-  width: ${ANIMATION_WIDTH}%;
-  left: ${(props) => props.progress}%;
   height: 3px;
   position: relative;
   background-color: ${palette('primary', 2)};
+  left: 0;
 `;
+const BarDeterminate = styled(Bar)`
+  width: ${(props) => props.progress}%
+`;
+const BarIndeterminate = styled(Bar)`
+  width: ${ANIMATION_WIDTH}%;
+  left: ${(props) => props.progress}%;
+`;
+
 
 class Loading extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -34,7 +41,9 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
   }
   componentDidMount() {
     // console.log('componentDidMount', this.state.progress)
-    this.loadInterval = setInterval(this.handleTimeout, ANIMATION_INTERVAL);
+    if (!this.props.progress) {
+      this.loadInterval = setInterval(this.handleTimeout, ANIMATION_INTERVAL);
+    }
   }
   componentWillUnmount() {
     // console.log('componentWillUnmount')
@@ -48,16 +57,14 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
     this.setState({ progress: this.state.progress < 100 ? (this.state.progress + ANIMATION_STEP) : 0 });
   }
   render() {
-    if (this.props.progress) {
-      return (
-        <ProgressBar
-          progress={this.props.progress}
-        />
-      );
-    }
     return (
       <Styled>
-        <Bar progress={this.state.progress} />
+        {this.props.progress &&
+          <BarDeterminate progress={this.props.progress} />
+        }
+        {!this.props.progress &&
+          <BarIndeterminate progress={this.state.progress} />
+        }
       </Styled>
     );
   }

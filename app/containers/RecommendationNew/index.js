@@ -140,7 +140,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
             <Loading />
           }
           {saveSending &&
-            <p>Saving Action</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>
