@@ -7,6 +7,9 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { FormattedMessage } from 'react-intl';
 import Helmet from 'react-helmet';
+import Loading from 'components/Loading';
+import ContentNarrow from 'components/ContentNarrow';
+import ContentHeader from 'components/ContentHeader';
 
 import { logout } from 'containers/App/actions';
 
@@ -30,6 +33,12 @@ export class UserLogout extends React.PureComponent { // eslint-disable-line rea
             },
           ]}
         />
+        <ContentNarrow>
+          <ContentHeader
+            title={this.context.intl.formatMessage(messages.pageTitle)}
+          />
+          <Loading />
+        </ContentNarrow>
       </div>
     );
   }

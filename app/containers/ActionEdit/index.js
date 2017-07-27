@@ -44,7 +44,11 @@ import {
   deleteEntity,
 } from 'containers/App/actions';
 
-import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectReadyForAuthCheck,
+  selectIsUserAdmin,
+} from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -80,8 +84,11 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     }
     // repopulate if new data becomes ready
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.redirectIfNotPermitted();
       this.props.populateForm('measureEdit.form.data', this.getInitialFormData(nextProps));
+    }
+    //
+    if (nextProps.authReady && !this.props.authReady) {
+      this.props.redirectIfNotPermitted();
     }
   }
 
@@ -191,7 +198,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             }
           />
           {saveSending &&
-            <p>Saving</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>
@@ -247,6 +254,7 @@ ActionEdit.propTypes = {
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
@@ -262,6 +270,7 @@ ActionEdit.contextTypes = {
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   isUserAdmin: selectIsUserAdmin(state),
+  authReady: selectReadyForAuthCheck(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),

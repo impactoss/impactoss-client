@@ -10,9 +10,14 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { Map, List, fromJS } from 'immutable';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  redirectIfNotPermitted,
+} from 'containers/App/actions';
+
 import { selectReady, selectUserConnections, selectUserTaxonomies } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
+import { USER_ROLES } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
 
@@ -30,6 +35,9 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.redirectIfNotPermitted();
     }
   }
 
@@ -69,6 +77,7 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
 
 UserList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  redirectIfNotPermitted: PropTypes.func,
   dataReady: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
@@ -90,6 +99,9 @@ function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
   };
 }

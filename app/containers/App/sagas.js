@@ -49,16 +49,19 @@ import {
   deleteSending,
   deleteSuccess,
   deleteError,
+  recoverSending,
+  recoverSuccess,
+  recoverError,
   forwardOnAuthenticationChange,
 } from 'containers/App/actions';
 
 import {
-  makeSelectPathnameOnAuthChange,
-  makeSelectPreviousPathname,
+  selectPreviousPathname,
   selectRequestedAt,
   selectIsSignedIn,
   selectLocation,
   selectSessionUserRoles,
+  selectIsAuthenticating,
 } from 'containers/App/selectors';
 
 import {
@@ -113,6 +116,7 @@ export function* checkEntitiesSaga(payload) {
  */
 export function* checkRoleSaga({ role }) {
   const signedIn = yield select(selectIsSignedIn);
+  const authenticating = yield select(selectIsAuthenticating);
   if (signedIn) {
     const roleIds = yield select(selectSessionUserRoles);
     if (!(roleIds.includes(role)
@@ -121,6 +125,8 @@ export function* checkRoleSaga({ role }) {
     )) {
       yield put(push('/login'));
     }
+  } else if (!authenticating) {
+    yield put(push('/login'));
   }
 }
 
@@ -169,34 +175,30 @@ export function* authenticateSaga(payload) {
 // }
 
 export function* recoverSaga(payload) {
-  // TODO messages
   const { email } = payload.data;
   try {
+    yield put(recoverSending());
     yield call(apiRequest, 'post', 'auth/password', {
       email,
       redirect_url: `${window.location.origin}/resetpassword`, // TODO WIP
     });
+    yield put(recoverSuccess());
     // forward to login
     yield put(push('/login'));
   } catch (err) {
     err.response.json = yield err.response.json();
+    yield put(recoverError(err));
   }
 }
 
+const authRoutes = ['/login', '/register', '/logout'];
 export function* authChangeSaga() {
-  // forward to nextPathName if set
-  const nextPathname = yield select(makeSelectPathnameOnAuthChange());
-  if (nextPathname) {
-    yield put(push(nextPathname));
+  const prevPathname = yield select(selectPreviousPathname);
+  if (prevPathname && authRoutes.indexOf(prevPathname) < 0) {
+    yield put(push(prevPathname));
   } else {
-    // else forward to prevPathName if set
-    const prevPathname = yield select(makeSelectPreviousPathname());
-    if (prevPathname) {
-      yield put(push(prevPathname));
-    } else {
-      // forward to home
-      yield put(push('/'));
-    }
+    // forward to home
+    yield put(push('/'));
   }
 }
 
@@ -205,7 +207,7 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', 'auth/sign_out');
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(forwardOnAuthenticationChange());
+    yield put(push('/login'));
     yield put(invalidateEntities());
   } catch (err) {
     yield call(clearAuthValues);
@@ -231,14 +233,6 @@ export function* validateTokenSaga() {
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
   }
-}
-
-export function* saveConnectionsSaga({ data }) {
-  // on the server
-  const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
-  // and on the client
-  yield put(updateConnections(data.path, connectionsUpdated));
-  // TODO: error handling
 }
 
 export function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
@@ -466,7 +460,6 @@ export function* newEntitySaga({ data }) {
 }
 
 // Batch update entity attributes
-// WARNING untested =)
 export function* saveEntitiesSaga({ data }) {
   try {
     yield put(saveSending(data));
@@ -480,6 +473,21 @@ export function* saveEntitiesSaga({ data }) {
     yield put(invalidateEntities());
   }
 }
+
+export function* saveConnectionsSaga({ data }) {
+  try {
+    yield put(saveSending(data));
+    // on the server
+    const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
+    // and on the client
+    yield put(updateConnections(data.path, connectionsUpdated));
+    yield put(saveSuccess(data));
+  } catch (error) {
+    yield put(saveError('Error saving data', data));
+    yield put(invalidateEntities());
+  }
+}
+
 export function* updateRouteQuerySaga({ query, extend = true }) {
   // TODO consider using history.js's updateQueryStringParams
   const location = yield select(selectLocation);
