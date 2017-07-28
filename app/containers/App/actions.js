@@ -59,6 +59,7 @@ import {
   RECOVER_SENDING,
   RECOVER_SUCCESS,
   RECOVER_ERROR,
+  CLOSE_ENTITY,
 } from './constants';
 
 
@@ -433,5 +434,12 @@ export function dueDateUnassigned(id) {
   return {
     type: DUEDATE_UNASSIGNED,
     id,
+  };
+}
+
+export function closeEntity(path) {
+  return {
+    type: CLOSE_ENTITY,
+    path,
   };
 }

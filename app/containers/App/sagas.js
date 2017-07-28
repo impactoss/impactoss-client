@@ -3,7 +3,7 @@
  */
 
 import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
-import { push } from 'react-router-redux';
+import { push, goBack } from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
 
@@ -27,6 +27,7 @@ import {
   UPDATE_PATH,
   // RESET_PASSWORD,
   RECOVER_PASSWORD,
+  CLOSE_ENTITY,
 } from 'containers/App/constants';
 
 import {
@@ -57,6 +58,7 @@ import {
 
 import {
   selectPreviousPathname,
+  selectCurrentPathname,
   selectRequestedAt,
   selectIsSignedIn,
   selectLocation,
@@ -553,6 +555,17 @@ export function* updatePathSaga({ path }) {
   yield put(push(path));
 }
 
+export function* closeEntitySaga({ path }) {
+  // the close icon is to function like back if possible, otherwise go to default path provided
+  const previousPath = yield select(selectPreviousPathname);
+  const currentPath = yield select(selectCurrentPathname);
+  if (previousPath && previousPath !== currentPath) {
+    yield put(goBack());
+  } else {
+    yield put(push(path || '/'));
+  }
+}
+
 /**
  * Root saga manages watcher lifecycle
  */
@@ -576,4 +589,6 @@ export default function* rootSaga() {
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
+
+  yield takeEvery(CLOSE_ENTITY, closeEntitySaga);
 }

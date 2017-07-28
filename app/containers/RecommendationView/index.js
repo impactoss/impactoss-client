@@ -20,7 +20,7 @@ import {
   getTaxonomyFields,
 } from 'utils/fields';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { CONTENT_SINGLE, ACCEPTED_STATUSES } from 'containers/App/constants';
 
@@ -214,8 +214,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updatePath(`/recommendations/edit/${props.params.id}`));
     },
     handleClose: () => {
-      dispatch(updatePath('/recommendations'));
-      // TODO should be "go back" if history present or to measures list when not
+      dispatch(closeEntity('/recommendations'));
     },
     onEntityClick: (id, path) => {
       dispatch(updatePath(`/${path}/${id}`));

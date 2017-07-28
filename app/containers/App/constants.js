@@ -66,6 +66,8 @@ export const UPDATE_PATH = 'nmrf/App/UPDATE_PATH';
 export const SAVE_ENTITY_FORM = 'nmrf/App/SAVE_ENTITY_FORM';
 export const UPDATE_ENTITY_FORM = 'nmrf/App/UPDATE_ENTITY_FORM';
 
+export const CLOSE_ENTITY = 'nmrf/App/CLOSE_ENTITY';
+
 export const PUBLISH_STATUSES = [
   { value: true, label: 'Draft' },
   { value: false, label: 'Public' },
