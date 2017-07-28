@@ -15,14 +15,16 @@ export const entityOption = (entity, reference) => Map({
   order: reference || entity.getIn(['attributes', 'title']),
 });
 
-export const entityOptions = (entities, includeReference) => entities
+export const entityOptions = (entities, includeReference = false, includeIdFallback = true) => entities
   ? entities.reduce((options, entity) => {
     if (includeReference) {
       return options.push(entityOption(
         entity,
-        entity.hasIn(['attributes', 'reference'])
-        ? entity.getIn(['attributes', 'reference'])
-        : entity.get('id')
+        entity.getIn(['attributes', 'reference']) || (
+          includeIdFallback
+          ? entity.get('id')
+          : null
+        )
       ));
     }
     return options.push(entityOption(entity));
@@ -59,7 +61,7 @@ export const dateOption = (entity, activeDateId) => Map({
 
 export const taxonomyOptions = (taxonomies) => taxonomies
   ? taxonomies.reduce((values, tax) =>
-    values.set(tax.get('id'), entityOptions(tax.get('categories'))), Map())
+    values.set(tax.get('id'), entityOptions(tax.get('categories'), true, false)), Map())
   : Map();
 
 export const renderMeasureControl = (entities) => entities
@@ -125,7 +127,7 @@ export const renderTaxonomyControl = (taxonomies) => taxonomies
   label: tax.getIn(['attributes', 'title']),
   controlType: 'multiselect',
   multiple: tax.getIn(['attributes', 'allow_multiple']),
-  options: entityOptions(tax.get('categories')),
+  options: entityOptions(tax.get('categories'), true, false),
 }), [])
 : [];
 
