@@ -20,8 +20,8 @@ export const entityOptions = (entities, includeReference) => entities
     if (includeReference) {
       return options.push(entityOption(
         entity,
-        entity.hasIn(['attributes', 'number'])
-        ? entity.getIn(['attributes', 'number'])
+        entity.hasIn(['attributes', 'reference'])
+        ? entity.getIn(['attributes', 'reference'])
         : entity.get('id')
       ));
     }
@@ -69,7 +69,7 @@ export const renderMeasureControl = (entities) => entities
   dataPath: ['associatedMeasures'],
   label: 'Actions',
   controlType: 'multiselect',
-  options: entityOptions(entities),
+  options: entityOptions(entities, true),
 }
 : null;
 export const renderSdgTargetControl = (entities) => entities
@@ -79,7 +79,7 @@ export const renderSdgTargetControl = (entities) => entities
   dataPath: ['associatedSdgTargets'],
   label: 'SDG targets',
   controlType: 'multiselect',
-  options: entityOptions(entities),
+  options: entityOptions(entities, true),
 }
 : null;
 
@@ -101,7 +101,7 @@ export const renderIndicatorControl = (entities) => entities
   dataPath: ['associatedIndicators'],
   label: 'Indicators',
   controlType: 'multiselect',
-  options: entityOptions(entities),
+  options: entityOptions(entities, true),
 }
 : null;
 
@@ -319,8 +319,17 @@ export const getDueDateOptionsField = (formatMessage, appMessages, formatDate, d
 export const getTitleFormField = (formatMessage, appMessages, controlType = 'title', attribute = 'title') =>
   getFormField(formatMessage, appMessages, controlType, attribute, true);
 
-export const getReferenceFormField = (formatMessage, appMessages, required = false) =>
-  getFormField(formatMessage, appMessages, 'short', 'reference', required, required ? 'reference' : 'referenceOptional');
+export const getReferenceFormField = (formatMessage, appMessages, required = false, isAutoReference = false) =>
+  getFormField(
+    formatMessage,
+    appMessages,
+    'short',
+    'reference',
+    required,
+    required ? 'reference' : 'referenceOptional',
+    'reference',
+    isAutoReference ? formatMessage(appMessages.hints.autoReference) : null
+  );
 
 export const getShortTitleFormField = (formatMessage, appMessages) =>
   getFormField(formatMessage, appMessages, 'short', 'short_title');
@@ -356,7 +365,7 @@ export const getUploadField = (formatMessage, appMessages) =>
 export const getEmailField = (formatMessage, appMessages) =>
   getFormField(formatMessage, appMessages, 'email', 'email', true);
 
-export const getFormField = (formatMessage, appMessages, controlType, attribute, required, label, placeholder) => {
+export const getFormField = (formatMessage, appMessages, controlType, attribute, required, label, placeholder, hint) => {
   const field = {
     id: attribute,
     controlType,
@@ -365,6 +374,7 @@ export const getFormField = (formatMessage, appMessages, controlType, attribute,
     label: formatMessage(appMessages.attributes[label || attribute]),
     validators: {},
     errorMessages: {},
+    hint,
   };
   if (required) {
     field.validators.required = validateRequired;

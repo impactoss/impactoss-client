@@ -360,9 +360,9 @@ export function* deleteEntitySaga({ data }) {
   try {
     yield put(deleteSending(data));
     yield call(deleteEntityRequest, data.path, data.id);
+    yield put(push(`/${data.redirect || data.path}`));
     yield put(removeEntity(data.path, data.id));
     yield put(deleteSuccess(data));
-    yield put(push(`/${data.redirect || data.path}`));
   } catch (error) {
     // console.error(error);
     yield put(deleteError('Error deleting data', data));

@@ -143,7 +143,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
   render() {
     const { viewEntity, dataReady, viewDomain, indicators, taxonomies, measures } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
     return (
       <div>
@@ -174,21 +174,21 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
               }] : null
             }
           />
-          {saveSending &&
+          {(saveSending || deleteSending || !dataReady) &&
             <Loading />
+          }
+          {deleteError &&
+            <p>{deleteError}</p>
           }
           {saveError &&
             <p>{saveError}</p>
           }
-          { !dataReady &&
-            <Loading />
-          }
-          { !viewEntity && dataReady && !saveError &&
+          {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {viewEntity && dataReady &&
+          {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="sdgtargetEdit.form.data"
               formData={viewDomain.form.data}

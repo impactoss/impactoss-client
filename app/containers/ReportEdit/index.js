@@ -139,7 +139,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   render() {
     const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (viewEntity && dataReady) {
@@ -169,21 +169,21 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
               }] : null
             }
           />
-          {saveSending &&
+          {(saveSending || deleteSending || !dataReady) &&
             <Loading />
+          }
+          {deleteError &&
+            <p>{deleteError}</p>
           }
           {saveError &&
             <p>{saveError}</p>
           }
-          { !dataReady &&
-            <Loading />
-          }
-          { !viewEntity && dataReady && !saveError &&
+          {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {viewEntity && dataReady &&
+          {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="reportEdit.form.data"
               formData={viewDomain.form.data}

@@ -162,7 +162,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           { !dataReady &&
             <Loading />
           }
-          { !viewEntity && dataReady && !saveError &&
+          {!viewEntity && dataReady && !saveError &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>

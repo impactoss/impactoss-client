@@ -6,19 +6,23 @@ export const getIdField = (entity) => ({
   value: entity.get('id'),
   large: true,
 });
-export const getReferenceField = (entity) =>
-  !!entity.getIn(['attributes', 'reference']) &&
-  (entity.getIn(['attributes', 'reference']).trim().length > 0) &&
-  ({
-    controlType: 'info',
-    type: 'reference',
-    value: entity.getIn(['attributes', 'reference']),
-    large: true,
-  });
-const getLinkAnchor = (url) => {
-  const urlNoProtocol = url.replace(/^https?:\/\//i, '');
-  return truncateText(urlNoProtocol, 40);
+export const getReferenceField = (entity, defaultToId) => {
+  const value = defaultToId
+    ? entity.getIn(['attributes', 'reference']) || entity.get('id')
+    : entity.getIn(['attributes', 'reference']);
+  if (!!value && value.trim().length > 0) {
+    return ({
+      controlType: 'info',
+      type: 'reference',
+      value,
+      large: true,
+    });
+  }
+  return false;
 };
+const getLinkAnchor = (url) =>
+  truncateText(url.replace(/^https?:\/\//i, ''), 40);
+
 export const getLinkField = (entity) => ({
   type: 'link',
   value: entity.getIn(['attributes', 'url']),

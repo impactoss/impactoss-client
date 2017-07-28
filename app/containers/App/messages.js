@@ -52,6 +52,12 @@ export default defineMessages({
       defaultMessage: 'Please enter the date in the required format: YYYY-MM-DD',
     },
   },
+  hints: {
+    autoReference: {
+      id: 'app.containers.App.hints.autoReference',
+      defaultMessage: 'Leave blank to assign database id',
+    },
+  },
   placeholders: {
     title: {
       id: 'app.containers.App.placeholders.title',

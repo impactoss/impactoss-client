@@ -164,7 +164,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   render() {
     const { viewEntity, dataReady, viewDomain, taxonomies, recommendations, indicators, sdgtargets } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
     return (
       <div>
         <Helmet
@@ -197,21 +197,21 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               : null
             }
           />
-          {saveSending &&
+          {(saveSending || deleteSending || !dataReady) &&
             <Loading />
           }
           {saveError &&
             <p>{saveError}</p>
           }
-          { !dataReady &&
-            <Loading />
+          {deleteError &&
+            <p>{deleteError}</p>
           }
-          { !viewEntity && dataReady && !saveError &&
+          {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {viewEntity && dataReady &&
+          {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="measureEdit.form.data"
               formData={viewDomain.form.data}

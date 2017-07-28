@@ -71,7 +71,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceFormField(this.context.intl.formatMessage, appMessages),
+        getReferenceFormField(this.context.intl.formatMessage, appMessages, false, true),
         getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
       ],
     },

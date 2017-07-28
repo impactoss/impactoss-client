@@ -136,7 +136,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   render() {
     const { viewEntity, dataReady, isAdmin, viewDomain, users } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
     return (
       <div>
@@ -162,21 +162,21 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               }] : null
             }
           />
-          {saveSending &&
+          {(saveSending || deleteSending || !dataReady) &&
             <Loading />
+          }
+          {deleteError &&
+            <p>{deleteError}</p>
           }
           {saveError &&
             <p>{saveError}</p>
           }
-          { !dataReady &&
-            <Loading />
-          }
-          { !viewEntity && dataReady && !saveError &&
+          {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {viewEntity && dataReady &&
+          {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="categoryEdit.form.data"
               formData={viewDomain.form.data}

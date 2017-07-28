@@ -69,7 +69,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceField(entity),
+        getReferenceField(entity, true),
         getTitleField(entity, isManager),
       ],
     },

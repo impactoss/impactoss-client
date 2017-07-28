@@ -112,9 +112,18 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     const { entityIcon, nestLevel, onEntityClick } = this.props;
 
     const entity = this.mapToEntityListItem();
+
     return (
       <Styled>
-        <EntityListItemMainTop entity={entity} entityIcon={entityIcon} />
+        <EntityListItemMainTop
+          entity={entity}
+          entityIcon={entityIcon}
+          onEntityClick={(evt) => {
+            evt.preventDefault();
+            onEntityClick(entity.id, entity.path);
+          }}
+          path={`/${entity.path}/${entity.id}`}
+        />
         <Clear />
         <EntityListItemMainTitleWrap
           onClick={(evt) => {

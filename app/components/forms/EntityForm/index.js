@@ -49,6 +49,11 @@ import Required from '../Required';
 
 import messages from './messages';
 
+const Hint = styled.span`
+  color: ${palette('dark', 4)};
+  padding-left: 5px;
+`;
+
 const DeleteWrapper = styled.div`
   float: left;
   padding-left: 40px;
@@ -91,7 +96,6 @@ const MultiselectActiveOptionList = styled.div`
 `;
 const MultiselectActiveOptionListItem = styled.div`
   position: relative;
-  font-weight: 500;
   background-color: ${palette('primary', 4)};
   border-bottom: 1px solid ${palette('light', 1)};
   padding: 12px 0 12px 16px;
@@ -101,10 +105,14 @@ const MultiselectActiveOptionRemove = styled(Button)`
   top: 0;
   right: 0;
   display: block;
-  padding: 12px 16px 0 0;
+  padding: 0 16px;
+  bottom: 0;
   &:hover {
     color: ${palette('primary', 1)};
   }
+`;
+const MultiselectActiveOption = styled.div`
+  padding-right: 40px;
 `;
 const MultiSelectDropdownIcon = styled.div`
   position: absolute;
@@ -136,7 +144,10 @@ const MultiSelectWithoutLink = styled(A)`
     color: ${palette('linkDefault', 1)};
   }
 `;
-
+const Id = styled.div`
+  font-weight: bold;
+  color: ${palette('dark', 3)}
+`;
 const controls = {
   input: ControlInput,
   url: ControlInput,
@@ -155,7 +166,7 @@ const controls = {
 };
 
 // These props will be omitted before being passed to the Control component
-const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
+const nonControlProps = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages'];
 
 
 class EntityForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -275,7 +286,12 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             <MultiselectActiveOptionList>
               { options.map((option, i) => (
                 <MultiselectActiveOptionListItem key={i}>
-                  {`${option.get('label')} `}
+                  <MultiselectActiveOption>
+                    { option.get('reference') &&
+                      <Id>{option.get('reference')}</Id>
+                    }
+                    {option.get('label')}
+                  </MultiselectActiveOption>
                   <MultiselectActiveOptionRemove
                     onClick={(evt) => {
                       if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -376,6 +392,9 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
           </Label>
         }
         { formField }
+        {field.hint &&
+          <Hint>{field.hint}</Hint>
+        }
       </FormFieldWrap>
     );
   }
