@@ -5,6 +5,7 @@ import { palette } from 'styled-theme';
 // import { isEqual } from 'lodash/lang';
 import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
+import { truncateText } from 'utils/string';
 import Component from 'components/styled/Component';
 import Clear from 'components/styled/Clear';
 import appMessages from 'containers/App/messages';
@@ -64,14 +65,14 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
               tags.push({
                 taxId: tax.get('id'),
                 title: category.getIn(['attributes', 'title']),
-                label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
+                label: truncateText(label, 10),
                 onClick: () => onClick(catId, 'category'),
               });
             } else {
               tags.push({
                 taxId: tax.get('id'),
                 title: category.getIn(['attributes', 'title']),
-                label: label.length > 10 ? `${label.substring(0, 10)}...` : label,
+                label: truncateText(label, 10),
               });
             }
           }

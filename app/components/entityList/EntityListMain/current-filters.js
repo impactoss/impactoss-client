@@ -1,7 +1,7 @@
 import { find, forEach } from 'lodash/collection';
 import { upperFirst } from 'lodash/string';
 
-import { lowerCase } from 'utils/string';
+import { lowerCase, truncateText } from 'utils/string';
 import isNumber from 'utils/is-number';
 import asList from 'utils/as-list';
 
@@ -58,14 +58,14 @@ const getCategoryLabel = (category) => {
   const label = category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
     ? category.getIn(['attributes', 'short_title'])
     : category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']);
-  return label.length > 10 ? `${label.substring(0, 10)}...` : label;
+  return truncateText(label, 10);
 };
 
 const getConnectionLabel = (connection, value) => {
   const label = connection
     ? connection.getIn(['attributes', 'reference']) || connection.get('id')
     : upperFirst(value);
-  return label.length > 20 ? `${label.substring(0, 20)}...` : label;
+  return truncateText(label, 20);
 };
 
 const getCurrentTaxonomyFilters = (
@@ -237,7 +237,7 @@ const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuery, onCl
             } else if (option.options) {
               const attribute = find(option.options, (o) => o.value.toString() === value);
               let label = attribute ? attribute.label : upperFirst(value);
-              label = label.length > 10 ? `${label.substring(0, 10)}...` : label;
+              label = truncateText(label, 10);
               tags.push({
                 label,
                 type: 'attributes',

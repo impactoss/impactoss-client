@@ -1,3 +1,5 @@
+import { truncateText } from 'utils/string';
+
 export const getIdField = (entity) => ({
   controlType: 'info',
   type: 'reference',
@@ -15,9 +17,7 @@ export const getReferenceField = (entity) =>
   });
 const getLinkAnchor = (url) => {
   const urlNoProtocol = url.replace(/^https?:\/\//i, '');
-  return urlNoProtocol.length > 40
-    ? `${urlNoProtocol.substring(0, 40)}...`
-    : urlNoProtocol;
+  return truncateText(urlNoProtocol, 40);
 };
 export const getLinkField = (entity) => ({
   type: 'link',
@@ -162,9 +162,7 @@ const getCategoryShortTitle = (category) => {
   )
     ? category.getIn(['attributes', 'short_title'])
     : category.getIn(['attributes', 'title']);
-  return title.length > 10
-    ? `${title.substring(0, 10)}...`
-    : title;
+  return truncateText(title, 10);
 };
 
 export const getCategoryShortTitleField = (entity) => ({
