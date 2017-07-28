@@ -118,6 +118,7 @@ export const getTextField = (entity, attribute, appMessages) =>
 const mapCategoryOptions = (categories) => categories
   ? categories.map((cat) => ({
     label: cat.getIn(['attributes', 'title']),
+    reference: cat.getIn(['attributes', 'reference']) || null,
     linkTo: `/category/${cat.get('id')}`,
   })).toArray()
   : [];
