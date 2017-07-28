@@ -23,7 +23,7 @@ import {
   getReportsField,
 } from 'utils/fields';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
 
@@ -261,7 +261,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updatePath(`/reports/new/${props.params.id}`));
     },
     handleClose: () => {
-      dispatch(updatePath('/indicators'));
+      dispatch(closeEntity('/indicators'));
       // TODO should be "go back" if history present or to indicators list when not
     },
   };

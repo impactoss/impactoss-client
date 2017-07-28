@@ -21,7 +21,7 @@ import {
   getTaxonomyFields,
 } from 'utils/fields';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
 
@@ -220,8 +220,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/sdgtargets/edit/${sdgtargetId}`));
     },
     handleClose: () => {
-      dispatch(updatePath('/sdgtargets'));
-      // TODO should be "go back" if history present or to sdgtargets list when not
+      dispatch(closeEntity('/sdgtargets'));
     },
   };
 }

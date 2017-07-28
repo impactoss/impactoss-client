@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
 
@@ -159,8 +159,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updatePath(`/pages/edit/${props.params.id}`));
     },
     handleClose: () => {
-      dispatch(updatePath('/pages'));
-      // TODO should be "go back" if history present or to pages list when not
+      dispatch(closeEntity('/pages'));
     },
   };
 }
