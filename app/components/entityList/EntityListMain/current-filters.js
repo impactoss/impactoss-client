@@ -63,9 +63,7 @@ const getCategoryLabel = (category) => {
 
 const getConnectionLabel = (connection, value) => {
   const label = connection
-    ? connection.getIn(['attributes', 'title'])
-      || connection.getIn(['attributes', 'friendly_name'])
-      || connection.getIn(['attributes', 'name'])
+    ? connection.getIn(['attributes', 'reference']) || connection.get('id')
     : upperFirst(value);
   return label.length > 20 ? `${label.substring(0, 20)}...` : label;
 };
