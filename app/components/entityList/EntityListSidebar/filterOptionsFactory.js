@@ -119,6 +119,13 @@ export const makeAttributeFilterOptions = (entities, filters, activeOptionId, lo
   return filterOptions;
 };
 
+
+const getCategoryTitle = (category) =>
+  category.getIn(['attributes', 'title'])
+  || category.getIn(['attributes', 'name']);
+
+const getCategoryReference = (category) =>
+  category.getIn(['attributes', 'reference']) || null;
 //
 //
 //
@@ -140,10 +147,9 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
         forEach(asArray(locationQueryValue), (queryValue) => {
           const value = parseInt(queryValue, 10);
           if (taxonomy.getIn(['categories', value])) {
-            const label = taxonomy.getIn(['categories', value, 'attributes', 'title'])
-              || taxonomy.getIn(['categories', value, 'attributes', 'name']);
             filterOptions.options[value] = {
-              label,
+              reference: getCategoryReference(taxonomy.getIn(['categories', value])),
+              label: getCategoryTitle(taxonomy.getIn(['categories', value])),
               showCount: true,
               value,
               count: 0,
@@ -186,10 +192,10 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
               if (filterOptions.options[catId]) {
                 filterOptions.options[catId].count += 1;
               } else {
-                const label = cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
+                const label = getCategoryTitle(cat);
                 filterOptions.options[catId] = {
+                  reference: getCategoryReference(cat),
                   label,
-                  reference: null,
                   showCount: true,
                   value: catId,
                   count: 1,
@@ -223,6 +229,14 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
   return filterOptions;
 };
 
+const getConnectionTitle = (connection) =>
+  connection.getIn(['attributes', 'title'])
+  || connection.getIn(['attributes', 'friendly_name'])
+  || connection.getIn(['attributes', 'name']);
+const getConnectionReference = (connection) =>
+  connection.getIn(['attributes', 'reference'])
+  || connection.getIn(['attributes', 'number'])
+  || connection.get('id');
 //
 //
 //
@@ -251,8 +265,11 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
             if (option.path === locationQueryValueConnection[0]) {
               const value = parseInt(locationQueryValueConnection[1], 10);
               filterOptions.options[value] = {
+                reference: connections.get(option.path) && connections.getIn([option.path, value])
+                    ? getConnectionReference(connections.getIn([option.path, value]))
+                    : '',
                 label: connections.get(option.path) && connections.getIn([option.path, value])
-                    ? connections.getIn([option.path, value, 'attributes', 'title'])
+                    ? getConnectionTitle(connections.getIn([option.path, value]))
                     : upperFirst(value),
                 showCount: true,
                 value: `${option.path}:${value}`,
@@ -297,12 +314,8 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
                 filterOptions.options[connectedId].count += 1;
               } else {
                 const value = `${option.path}:${connectedId}`;
-                const reference = connection.getIn(['attributes', 'reference'])
-                  || connection.getIn(['attributes', 'number'])
-                  || connection.get('id');
-                const label = connection.getIn(['attributes', 'title'])
-                  || connection.getIn(['attributes', 'friendly_name'])
-                  || connection.getIn(['attributes', 'name']);
+                const reference = getConnectionReference(connection);
+                const label = getConnectionTitle(connection);
                 filterOptions.options[connectedId] = {
                   label,
                   reference,
@@ -366,10 +379,9 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
                 const categoryId = parseInt(locationQueryValueCategory[1], 10);
                 if (taxonomy.getIn(['categories', categoryId])) {
                   const cat = taxonomy.getIn(['categories', categoryId]);
-                  const label = cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
-
                   filterOptions.options[categoryId] = {
-                    label,
+                    reference: getCategoryReference(cat),
+                    label: getCategoryTitle(cat),
                     showCount: true,
                     value: `${connection.path}:${categoryId}`,
                     count: 0,
@@ -400,8 +412,9 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
                 filterOptions.options[category.get('id')].count += 1;
               } else {
                 const value = `${connection.path}:${category.get('id')}`;
-                const label = category.getIn(['attributes', 'title']);
+                const label = getCategoryTitle(category);
                 filterOptions.options[category.get('id')] = {
+                  reference: getCategoryReference(category),
                   label,
                   showCount: true,
                   value,
