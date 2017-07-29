@@ -56,26 +56,31 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   prepareMainMenuItems = (isManager, currentPath) => {
     let navItems = ([
       {
+        path: '/overview',
+        title: this.context.intl.formatMessage(messages.overview),
+        active: currentPath.startsWith('/overview'),
+      },
+      {
         path: '/categories',
         title: this.context.intl.formatMessage(messages.entities.taxonomies.plural),
         active: currentPath.startsWith('/category'),
-      },
-      {
-        path: '/recommendations',
-        title: this.context.intl.formatMessage(messages.entities.recommendations.plural),
       },
       {
         path: '/actions',
         title: this.context.intl.formatMessage(messages.entities.measures.plural),
       },
       {
-        path: '/sdgtargets',
-        title: this.context.intl.formatMessage(messages.entities.sdgtargets.plural),
-      },
-      {
         path: '/indicators',
         title: this.context.intl.formatMessage(messages.entities.indicators.plural),
         active: currentPath.startsWith('/reports'),
+      },
+      {
+        path: '/recommendations',
+        title: this.context.intl.formatMessage(messages.entities.recommendations.plural),
+      },
+      {
+        path: '/sdgtargets',
+        title: this.context.intl.formatMessage(messages.entities.sdgtargets.plural),
       },
     ]);
     if (isManager) {
