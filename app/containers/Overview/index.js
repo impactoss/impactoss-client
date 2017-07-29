@@ -215,12 +215,16 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
   // make sure to load all data from server
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+    window.addEventListener('resize', this.resize);
   }
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize);
   }
 
   getTaxonomiesByTagging = (taxonomies, tags) =>
@@ -285,6 +289,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       point,
     ];
   }
+
+  resize = () => this.forceUpdate();
 
   renderTaxonomyIcons = (taxonomies) => (
     <CategorisedIcons>
