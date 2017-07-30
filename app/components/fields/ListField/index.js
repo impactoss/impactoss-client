@@ -16,6 +16,10 @@ const Id = styled.div`
   font-weight: 500;
   color: ${palette('dark', 4)}
 `;
+const Id = styled.div`
+  font-weight: 500;
+  color: ${palette('dark', 4)}
+`;
 
 class ListField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {

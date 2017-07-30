@@ -121,6 +121,13 @@ export const makeAttributeFilterOptions = (entities, filters, activeOptionId, lo
   return filterOptions;
 };
 
+
+const getCategoryTitle = (category) =>
+  category.getIn(['attributes', 'title'])
+  || category.getIn(['attributes', 'name']);
+
+const getCategoryReference = (category) =>
+  category.getIn(['attributes', 'reference']) || null;
 //
 //
 //
@@ -222,6 +229,14 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
   return filterOptions;
 };
 
+const getConnectionTitle = (connection) =>
+  connection.getIn(['attributes', 'title'])
+  || connection.getIn(['attributes', 'friendly_name'])
+  || connection.getIn(['attributes', 'name']);
+const getConnectionReference = (connection) =>
+  connection.getIn(['attributes', 'reference'])
+  || connection.getIn(['attributes', 'number'])
+  || connection.get('id');
 //
 //
 //
