@@ -36,6 +36,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
   shouldComponentUpdate(nextProps) {
     return this.props.entity !== nextProps.entity
       || this.props.isSelected !== nextProps.isSelected
+      || this.props.wrapper !== nextProps.wrapper
       || this.props.expandNo !== nextProps.expandNo;
   }
 
@@ -52,7 +53,9 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       onEntityClick,
       expandNo,
       entityPath,
+      connections,
     } = this.props;
+
     return (
       <Styled expanded={expandNo > 0}>
         <Item>
@@ -64,10 +67,12 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
               <EntityListItemMain
                 entity={entity}
                 taxonomies={taxonomies}
+                connections={connections}
                 entityIcon={entityIcon}
                 config={config}
                 entityPath={entityPath}
                 onEntityClick={onEntityClick}
+                wrapper={this.props.wrapper}
               />
             </MainInnerWrapper>
           </MainWrapper>
@@ -93,6 +98,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
 EntityListItem.propTypes = {
   entity: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
   isManager: PropTypes.bool,
   isSelected: PropTypes.bool,
   onSelect: PropTypes.func,
@@ -102,6 +108,7 @@ EntityListItem.propTypes = {
   entityPath: PropTypes.string,
   config: PropTypes.object,
   onEntityClick: PropTypes.func,
+  wrapper: PropTypes.object,
 };
 
 EntityListItem.defaultProps = {

@@ -42,6 +42,22 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/overview',
+      name: 'overview',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Overview'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/logout',
       name: 'userLogout',
       getComponent(nextState, cb) {
@@ -808,14 +824,6 @@ export default function createRoutes(store) {
         });
 
         importModules.catch(errorLoading);
-      },
-    }, {
-      path: '/not-authorized',
-      name: 'notauthorized',
-      getComponent(nextState, cb) {
-        import('containers/NotAuthorizedPage')
-        .then(loadModule(cb))
-        .catch(errorLoading);
       },
     }, {
       path: '*',

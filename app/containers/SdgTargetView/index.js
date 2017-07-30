@@ -21,7 +21,7 @@ import {
   getTaxonomyFields,
 } from 'utils/fields';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
 
@@ -34,6 +34,8 @@ import {
   selectReady,
   selectIsUserManager,
   selectMeasureTaxonomies,
+  selectMeasureConnections,
+  selectIndicatorConnections,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -76,7 +78,7 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
     },
   ]);
 
-  getBodyMainFields = (entity, indicators, measures, measureTaxonomies, onEntityClick) => ([
+  getBodyMainFields = (entity, indicators, measures, measureTaxonomies, onEntityClick, measureConnections, indicatorConnections) => ([
     {
       fields: [
         getMarkdownField(entity, 'description', true, appMessages),
@@ -86,8 +88,8 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getIndicatorConnectionField(indicators, appMessages, onEntityClick),
-        getMeasureConnectionField(measures, measureTaxonomies, appMessages, onEntityClick),
+        getIndicatorConnectionField(indicators, indicatorConnections, appMessages, onEntityClick),
+        getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
       ],
     },
   ]);
@@ -109,6 +111,8 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
       measures,
       measureTaxonomies,
       onEntityClick,
+      measureConnections,
+      indicatorConnections,
     } = this.props;
 
     const buttons = isManager
@@ -158,7 +162,7 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
                   aside: isManager && this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, indicators, measures, measureTaxonomies, onEntityClick),
+                  main: this.getBodyMainFields(viewEntity, indicators, measures, measureTaxonomies, onEntityClick, measureConnections, indicatorConnections),
                   aside: this.getBodyAsideFields(viewEntity, taxonomies),
                 },
               }}
@@ -183,6 +187,8 @@ SdgTargetView.propTypes = {
   measures: PropTypes.object,
   measureTaxonomies: PropTypes.object,
   params: PropTypes.object,
+  measureConnections: PropTypes.object,
+  indicatorConnections: PropTypes.object,
 };
 
 SdgTargetView.contextTypes = {
@@ -197,6 +203,8 @@ const mapStateToProps = (state, props) => ({
   taxonomies: selectTaxonomies(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
   indicators: selectIndicators(state, props.params.id),
+  measureConnections: selectMeasureConnections(state),
+  indicatorConnections: selectIndicatorConnections(state),
   measureTaxonomies: selectMeasureTaxonomies(state),
 });
 
@@ -212,8 +220,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/sdgtargets/edit/${sdgtargetId}`));
     },
     handleClose: () => {
-      dispatch(updatePath('/sdgtargets'));
-      // TODO should be "go back" if history present or to sdgtargets list when not
+      dispatch(closeEntity('/sdgtargets'));
     },
   };
 }

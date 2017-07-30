@@ -41,9 +41,14 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  deleteEntity,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectReadyForAuthCheck,
+  selectIsUserAdmin,
+} from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -79,8 +84,11 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     }
     // repopulate if new data becomes ready
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.redirectIfNotPermitted();
       this.props.populateForm('measureEdit.form.data', this.getInitialFormData(nextProps));
+    }
+    //
+    if (nextProps.authReady && !this.props.authReady) {
+      this.props.redirectIfNotPermitted();
     }
   }
 
@@ -156,8 +164,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   render() {
     const { viewEntity, dataReady, viewDomain, taxonomies, recommendations, indicators, sdgtargets } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = viewDomain.page;
-
+    const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
     return (
       <div>
         <Helmet
@@ -172,7 +179,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             type={CONTENT_SINGLE}
             icon="measures"
             buttons={
-              viewEntity && dataReady ? [{
+              viewEntity && dataReady
+              ? [{
                 type: 'cancel',
                 onClick: this.props.handleCancel,
               },
@@ -185,24 +193,25 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                   indicators,
                   sdgtargets
                 ),
-              }] : null
+              }]
+              : null
             }
           />
-          {saveSending &&
-            <p>Saving</p>
+          {(saveSending || deleteSending || !dataReady) &&
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>
           }
-          { !dataReady &&
-            <Loading />
+          {deleteError &&
+            <p>{deleteError}</p>
           }
-          { !viewEntity && dataReady && !saveError &&
+          {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {viewEntity && dataReady &&
+          {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="measureEdit.form.data"
               formData={viewDomain.form.data}
@@ -215,6 +224,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
+              handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
@@ -240,9 +250,12 @@ ActionEdit.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
+  isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
@@ -256,6 +269,8 @@ ActionEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
+  isUserAdmin: selectIsUserAdmin(state),
+  authReady: selectReadyForAuthCheck(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
@@ -324,6 +339,13 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    handleDelete: () => {
+      dispatch(deleteEntity({
+        path: 'measures',
+        id: props.params.id,
+        redirect: 'actions',
+      }));
     },
   };
 }

@@ -39,9 +39,10 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  deleteEntity,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -142,7 +143,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
   render() {
     const { viewEntity, dataReady, viewDomain, indicators, taxonomies, measures } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
     return (
       <div>
@@ -173,21 +174,21 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
               }] : null
             }
           />
-          {saveSending &&
-            <p>Saving</p>
+          {(saveSending || deleteSending || !dataReady) &&
+            <Loading />
+          }
+          {deleteError &&
+            <p>{deleteError}</p>
           }
           {saveError &&
             <p>{saveError}</p>
           }
-          { !dataReady &&
-            <Loading />
-          }
-          { !viewEntity && dataReady && !saveError &&
+          {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {viewEntity && dataReady &&
+          {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="sdgtargetEdit.form.data"
               formData={viewDomain.form.data}
@@ -199,6 +200,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
               )}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
+              handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
@@ -224,9 +226,11 @@ SdgTargetEdit.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   indicators: PropTypes.object,
@@ -239,6 +243,7 @@ SdgTargetEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
+  isUserAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
@@ -296,6 +301,12 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    handleDelete: () => {
+      dispatch(deleteEntity({
+        path: 'sdgtargets',
+        id: props.params.id,
+      }));
     },
   };
 }

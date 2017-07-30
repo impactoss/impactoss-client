@@ -11,8 +11,6 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import { mapToTaxonomyList } from 'utils/taxonomies';
-
 import {
   selectReady,
   selectEntities,
@@ -20,15 +18,9 @@ import {
 } from 'containers/App/selectors';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { scrollToComponent } from 'utils/scroll-to-component';
 
-import Button from 'components/buttons/Button';
 import ButtonHero from 'components/buttons/ButtonHero';
 import Section from 'components/styled/Section';
-import Container from 'components/styled/Container';
-import Icon from 'components/Icon';
-import Loading from 'components/Loading';
-import TaxonomyList from 'components/TaxonomyList';
 // import NormalImg from 'components/Img';
 import Footer from 'components/Footer';
 
@@ -50,57 +42,7 @@ const SectionTop = styled(Section)`
   margin-top: -150px;
   padding-top: 130px;
 `;
-const ButtonIconOnly = styled(Button)`
-  color: ${palette('primary', 1)};
-  &:hover {
-    color: ${palette('primary', 0)};
-  }
-`;
-const ButtonIconWrap = styled.div`
-padding-top: 2em;
-`;
-const ButtonIconAbove = styled(Button)`
-  color: ${palette('primary', 4)};
-  &:hover {
-    color: ${palette('primary', 4)};
-    opacity: 0.95;
-  }
-`;
-const ButtonIconAboveMore = styled(Button)`
-  color: ${palette('primary', 1)};
-  &:hover {
-    color: ${palette('primary', 0)};
-  }
-  min-width: 200px;
-  margin: 0 30px;
-`;
-const ButtonIconAboveWrap = styled.div`
-  padding-top: 1em;
-  text-align: center;
-  font-size: 1.7em;
-`;
-const SectionCategories = styled(Section)`
-  padding-bottom: 8em;
-`;
-const SectionAction = styled(Section)`
-  color: ${palette('primary', 4)};
-  background-color: ${palette('primary', 1)};
-`;
-const SectionMore = styled(Section)`
-  color: ${palette('dark', 3)};
-  background-color: ${palette('primary', 4)};
-`;
-// text-align: center;
-const SectionTitle = styled.h2`
-  margin-bottom: 1em;
-`;
-const SectionLead = styled.p`
-  font-size: 1.25em;
-`;
-const TaxonomySlider = styled.div`
-  min-height: 6em;
-  padding-top: 2em;
-`;
+
 const TopActions = styled.div`
   padding-top: 2em;
 `;
@@ -147,8 +89,8 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
     })).toArray();
 
   render() {
-    const { dataReady, onPageLink, pages, taxonomies } = this.props;
-    // <GraphicHome src={graphicHome} alt={this.context.intl.formatMessage(messages.pageTitle)} />
+    const { onPageLink, pages } = this.props;
+
     return (
       <div>
         <Helmet
@@ -169,85 +111,12 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           </Intro>
           <TopActions>
             <div>
-              <ButtonHero onClick={() => scrollToComponent(this.SectionCategories)}>
+              <ButtonHero onClick={() => onPageLink('overview')}>
                 <FormattedMessage {...messages.explore} />
               </ButtonHero>
             </div>
-            <ButtonIconWrap>
-              <ButtonIconOnly onClick={() => scrollToComponent(this.SectionCategories)}>
-                <Icon name="arrowDown" />
-              </ButtonIconOnly>
-            </ButtonIconWrap>
           </TopActions>
         </SectionTop>
-        <SectionCategories innerRef={(node) => { this.SectionCategories = node; }}>
-          <Container>
-            <SectionTitle>
-              <FormattedMessage {...messages.exploreCategories} />
-            </SectionTitle>
-            <SectionLead>
-              <FormattedMessage {...messages.exploreCategoriesLead} />
-            </SectionLead>
-            <TaxonomySlider>
-              { !dataReady &&
-                <Loading />
-              }
-              { dataReady &&
-                <TaxonomyList
-                  taxonomies={mapToTaxonomyList(taxonomies, onPageLink)}
-                />
-              }
-            </TaxonomySlider>
-          </Container>
-        </SectionCategories>
-        <SectionAction>
-          <Container>
-            <SectionTitle>
-              <FormattedMessage {...messages.exploreActions} />
-            </SectionTitle>
-            <SectionLead>
-              <FormattedMessage {...messages.exploreActionsLead} />
-            </SectionLead>
-            <ButtonIconAboveWrap>
-              <ButtonIconAbove onClick={() => onPageLink('/actions')}>
-                <div>
-                  <Icon name="measures" />
-                </div>
-                <div>
-                  <FormattedMessage {...messages.exploreActionsLink} />
-                </div>
-              </ButtonIconAbove>
-            </ButtonIconAboveWrap>
-          </Container>
-        </SectionAction>
-        <SectionMore>
-          <Container>
-            <SectionTitle>
-              <FormattedMessage {...messages.exploreMore} />
-            </SectionTitle>
-            <SectionLead>
-              <FormattedMessage {...messages.exploreMoreLead} />
-            </SectionLead>
-            <ButtonIconAboveWrap>
-              <ButtonIconAboveMore onClick={() => onPageLink('/recommendations')}>
-                <div>
-                  <Icon name="recommendations" />
-                </div>
-                <div>
-                  <FormattedMessage {...appMessages.entities.recommendations.plural} />
-                </div>
-              </ButtonIconAboveMore>
-              <ButtonIconAboveMore onClick={() => onPageLink('/indicators')}>
-                <div>
-                  <Icon name="indicators" />
-                </div>
-                <div>
-                  <FormattedMessage {...appMessages.entities.indicators.plural} />
-                </div>
-              </ButtonIconAboveMore>
-            </ButtonIconAboveWrap>
-          </Container>
-        </SectionMore>
         <Footer
           pages={pages && this.preparePageMenuPages(pages)}
           onPageLink={onPageLink}
@@ -260,8 +129,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 HomePage.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func.isRequired,
   onPageLink: PropTypes.func.isRequired,
-  taxonomies: PropTypes.object,
-  dataReady: PropTypes.bool.isRequired,
   pages: PropTypes.object,
 };
 

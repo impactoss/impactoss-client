@@ -28,61 +28,24 @@ const getRoute = (state) => state.get('route');
 const getGlobal = (state) => state.get('global');
 const getGlobalRequested = (state) => state.getIn(['global', 'requested']);
 
-export const makeSelectAuth = () => createSelector(
+export const selectAuth = createSelector(
   getGlobal,
   (globalState) => globalState.get('auth').toJS()
 );
 
-// makeSelectLocationState expects a plain JS object for the routing state
-export const makeSelectLocationState = () => {
-  let prevRoutingState;
-  let prevRoutingStateJS;
-
-  return (state) => {
-    const routingState = state.get('route'); // or state.route
-
-    if (!routingState.equals(prevRoutingState)) {
-      prevRoutingState = routingState;
-      prevRoutingStateJS = routingState.toJS();
-    }
-
-    return prevRoutingStateJS;
-  };
-};
-
-export const makeSelectPathnameOnAuthChange = () => createSelector(
-  getRoute,
-  (routeState) => {
-    try {
-      return routeState.getIn(['locationBeforeTransitions', 'pathnameOnAuthChange']);
-    } catch (error) {
-      return null;
-    }
-  }
+export const selectIsAuthenticating = createSelector(
+  getGlobal,
+  (globalState) => globalState.getIn(['auth', 'sending'])
 );
 
-export const makeSelectPreviousPathname = () => createSelector(
-  getRoute,
-  (routeState) => {
-    try {
-      return routeState.getIn(['locationBeforeTransitions', 'pathnamePrevious']);
-    } catch (error) {
-      return null;
-    }
-  }
-);
+export const selectReadyUserRoles = (state) =>
+  !!state.getIn(['global', 'ready', 'user_roles']);
 
-export const selectRequestedAt = createSelector(
-  getGlobalRequested,
-  (state, { path }) => path,
-  (requested, path) => requested.get(path)
+export const selectReadyForAuthCheck = createSelector(
+  selectIsAuthenticating,
+  selectReadyUserRoles,
+  (isAuthenticating, rolesReady) => !isAuthenticating && rolesReady
 );
-
-export const selectReady = (state, { path }) =>
-  reduce(asArray(path),
-    (areReady, readyPath) => areReady && !!state.getIn(['global', 'ready', readyPath]),
-    true
-  );
 
 const selectSessionUser = createSelector(
   getGlobal,
@@ -136,6 +99,58 @@ export const selectIsUserContributor = createSelector(
     || userRoles.includes(USER_ROLES.MANAGER)
     || userRoles.includes(USER_ROLES.ADMIN)
 );
+
+
+// makeSelectLocationState expects a plain JS object for the routing state
+export const makeSelectLocationState = () => {
+  let prevRoutingState;
+  let prevRoutingStateJS;
+
+  return (state) => {
+    const routingState = state.get('route'); // or state.route
+
+    if (!routingState.equals(prevRoutingState)) {
+      prevRoutingState = routingState;
+      prevRoutingStateJS = routingState.toJS();
+    }
+
+    return prevRoutingStateJS;
+  };
+};
+
+export const selectCurrentPathname = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.getIn(['locationBeforeTransitions', 'pathname']);
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
+export const selectPreviousPathname = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.getIn(['locationBeforeTransitions', 'pathnamePrevious']);
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
+export const selectRequestedAt = createSelector(
+  getGlobalRequested,
+  (state, { path }) => path,
+  (requested, path) => requested.get(path)
+);
+
+export const selectReady = (state, { path }) =>
+  reduce(asArray(path),
+    (areReady, readyPath) => areReady && !!state.getIn(['global', 'ready', readyPath]),
+    true
+  );
 
 export const selectLocation = createSelector(
   getRoute,

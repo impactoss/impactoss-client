@@ -22,7 +22,7 @@ import { map } from 'lodash/collection';
 // import FieldWrap from 'components/fields/FieldWrap';
 import Field from 'components/fields/Field';
 
-import ProgressBar from 'components/ProgressBar';
+import Loading from 'components/Loading';
 
 import DocumentWrap from 'components/fields/DocumentWrap';
 
@@ -124,7 +124,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                                 {`(${Object.keys(failed).length} errors)`}
                               </span>
                             }
-                            <ProgressBar
+                            <Loading
                               progress={progress}
                             />
                           </Importing>

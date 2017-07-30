@@ -12,6 +12,7 @@ import Helmet from 'react-helmet';
 import styled from 'styled-components';
 
 import Icon from 'components/Icon';
+import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
@@ -23,7 +24,7 @@ import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import { register } from './actions';
-import userRegisterSelector from './selectors';
+import { selectDomain } from './selectors';
 
 const BottomLinks = styled.div`
   padding: 2em 0;
@@ -31,8 +32,7 @@ const BottomLinks = styled.div`
 
 export class UserRegister extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    // const { registerSending, registerError } = this.props.userRegister.page;
-    const { registerError } = this.props.userRegister.page;
+    const { registerError, registerSending } = this.props.viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -53,7 +53,10 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
           {registerError &&
             <p>{registerError}</p>
           }
-          { this.props.userRegister.form &&
+          {registerSending &&
+            <Loading />
+          }
+          { this.props.viewDomain.form &&
             <AuthForm
               model="userRegister.form.data"
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
@@ -135,7 +138,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
 }
 
 UserRegister.propTypes = {
-  userRegister: PropTypes.object,
+  viewDomain: PropTypes.object,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
@@ -146,7 +149,7 @@ UserRegister.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  userRegister: userRegisterSelector(state),
+  viewDomain: selectDomain(state),
 });
 
 export function mapDispatchToProps(dispatch) {

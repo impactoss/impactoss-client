@@ -34,9 +34,10 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  deleteEntity,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -138,7 +139,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   render() {
     const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (viewEntity && dataReady) {
@@ -168,27 +169,31 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
               }] : null
             }
           />
-          {saveSending &&
-            <p>Saving Action</p>
+          {(saveSending || deleteSending || !dataReady) &&
+            <Loading />
+          }
+          {deleteError &&
+            <p>{deleteError}</p>
           }
           {saveError &&
             <p>{saveError}</p>
           }
-          { !dataReady &&
-            <Loading />
-          }
-          { !viewEntity && dataReady && !saveError &&
+          {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {dataReady &&
+          {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="reportEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity.getIn(['attributes', 'due_date_id']))}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
+              handleDelete={() => this.props.isUserAdmin
+                ? this.props.handleDelete(viewEntity.getIn(['attributes', 'indicator_id']))
+                : null
+              }
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
@@ -214,9 +219,11 @@ ReportEdit.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
 };
 
@@ -226,11 +233,12 @@ ReportEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
+  isUserAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
 });
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('users'));
@@ -267,6 +275,13 @@ function mapDispatchToProps(dispatch) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    handleDelete: (indicatorId) => {
+      dispatch(deleteEntity({
+        path: 'progress_reports',
+        id: props.params.id,
+        redirect: `indicators/${indicatorId}`,
+      }));
     },
   };
 }

@@ -3,7 +3,7 @@
  */
 
 import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
-import { push } from 'react-router-redux';
+import { push, goBack } from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
 
@@ -14,6 +14,7 @@ import {
   REDIRECT_IF_NOT_PERMITTED,
   SAVE_ENTITY,
   NEW_ENTITY,
+  DELETE_ENTITY,
   AUTHENTICATE,
   LOGOUT,
   VALIDATE_TOKEN,
@@ -26,6 +27,7 @@ import {
   UPDATE_PATH,
   // RESET_PASSWORD,
   RECOVER_PASSWORD,
+  CLOSE_ENTITY,
 } from 'containers/App/constants';
 
 import {
@@ -41,24 +43,32 @@ import {
   updateEntities,
   updateConnections,
   addEntity,
-  // removeEntity,
+  removeEntity,
   saveSending,
   saveSuccess,
   saveError,
+  deleteSending,
+  deleteSuccess,
+  deleteError,
+  recoverSending,
+  recoverSuccess,
+  recoverError,
   forwardOnAuthenticationChange,
 } from 'containers/App/actions';
 
 import {
-  makeSelectPathnameOnAuthChange,
-  makeSelectPreviousPathname,
+  selectPreviousPathname,
+  selectCurrentPathname,
   selectRequestedAt,
   selectIsSignedIn,
   selectLocation,
   selectSessionUserRoles,
+  selectIsAuthenticating,
 } from 'containers/App/selectors';
 
 import {
   newEntityRequest,
+  deleteEntityRequest,
   updateEntityRequest,
   updateEntitiesRequest,
   updateAssociationsRequest,
@@ -108,6 +118,7 @@ export function* checkEntitiesSaga(payload) {
  */
 export function* checkRoleSaga({ role }) {
   const signedIn = yield select(selectIsSignedIn);
+  const authenticating = yield select(selectIsAuthenticating);
   if (signedIn) {
     const roleIds = yield select(selectSessionUserRoles);
     if (!(roleIds.includes(role)
@@ -116,6 +127,8 @@ export function* checkRoleSaga({ role }) {
     )) {
       yield put(push('/login'));
     }
+  } else if (!authenticating) {
+    yield put(push('/login'));
   }
 }
 
@@ -164,34 +177,30 @@ export function* authenticateSaga(payload) {
 // }
 
 export function* recoverSaga(payload) {
-  // TODO messages
   const { email } = payload.data;
   try {
+    yield put(recoverSending());
     yield call(apiRequest, 'post', 'auth/password', {
       email,
       redirect_url: `${window.location.origin}/resetpassword`, // TODO WIP
     });
+    yield put(recoverSuccess());
     // forward to login
     yield put(push('/login'));
   } catch (err) {
     err.response.json = yield err.response.json();
+    yield put(recoverError(err));
   }
 }
 
+const authRoutes = ['/login', '/register', '/logout'];
 export function* authChangeSaga() {
-  // forward to nextPathName if set
-  const nextPathname = yield select(makeSelectPathnameOnAuthChange());
-  if (nextPathname) {
-    yield put(push(nextPathname));
+  const prevPathname = yield select(selectPreviousPathname);
+  if (prevPathname && authRoutes.indexOf(prevPathname) < 0) {
+    yield put(push(prevPathname));
   } else {
-    // else forward to prevPathName if set
-    const prevPathname = yield select(makeSelectPreviousPathname());
-    if (prevPathname) {
-      yield put(push(prevPathname));
-    } else {
-      // forward to home
-      yield put(push('/'));
-    }
+    // forward to home
+    yield put(push('/'));
   }
 }
 
@@ -200,7 +209,7 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', 'auth/sign_out');
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(forwardOnAuthenticationChange());
+    yield put(push('/login'));
     yield put(invalidateEntities());
   } catch (err) {
     yield call(clearAuthValues);
@@ -226,14 +235,6 @@ export function* validateTokenSaga() {
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
   }
-}
-
-export function* saveConnectionsSaga({ data }) {
-  // on the server
-  const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
-  // and on the client
-  yield put(updateConnections(data.path, connectionsUpdated));
-  // TODO: error handling
 }
 
 export function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
@@ -357,6 +358,19 @@ export function* saveEntitySaga({ data }) {
   }
 }
 
+export function* deleteEntitySaga({ data }) {
+  try {
+    yield put(deleteSending(data));
+    yield call(deleteEntityRequest, data.path, data.id);
+    yield put(push(`/${data.redirect || data.path}`));
+    yield put(removeEntity(data.path, data.id));
+    yield put(deleteSuccess(data));
+  } catch (error) {
+    // console.error(error);
+    yield put(deleteError('Error deleting data', data));
+  }
+}
+
 export function* newEntitySaga({ data }) {
   try {
     yield put(saveSending(data));
@@ -448,7 +462,6 @@ export function* newEntitySaga({ data }) {
 }
 
 // Batch update entity attributes
-// WARNING untested =)
 export function* saveEntitiesSaga({ data }) {
   try {
     yield put(saveSending(data));
@@ -462,6 +475,21 @@ export function* saveEntitiesSaga({ data }) {
     yield put(invalidateEntities());
   }
 }
+
+export function* saveConnectionsSaga({ data }) {
+  try {
+    yield put(saveSending(data));
+    // on the server
+    const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
+    // and on the client
+    yield put(updateConnections(data.path, connectionsUpdated));
+    yield put(saveSuccess(data));
+  } catch (error) {
+    yield put(saveError('Error saving data', data));
+    yield put(invalidateEntities());
+  }
+}
+
 export function* updateRouteQuerySaga({ query, extend = true }) {
   // TODO consider using history.js's updateQueryStringParams
   const location = yield select(selectLocation);
@@ -527,6 +555,17 @@ export function* updatePathSaga({ path }) {
   yield put(push(path));
 }
 
+export function* closeEntitySaga({ path }) {
+  // the close icon is to function like back if possible, otherwise go to default path provided
+  const previousPath = yield select(selectPreviousPathname);
+  const currentPath = yield select(selectCurrentPathname);
+  if (previousPath && previousPath !== currentPath) {
+    yield put(goBack());
+  } else {
+    yield put(push(path || '/'));
+  }
+}
+
 /**
  * Root saga manages watcher lifecycle
  */
@@ -542,6 +581,7 @@ export default function* rootSaga() {
 
   yield takeEvery(SAVE_ENTITY, saveEntitySaga);
   yield takeEvery(NEW_ENTITY, newEntitySaga);
+  yield takeEvery(DELETE_ENTITY, deleteEntitySaga);
   yield takeEvery(SAVE_CONNECTIONS, saveConnectionsSaga);
   yield takeEvery(SAVE_ENTITIES, saveEntitiesSaga);
 
@@ -549,4 +589,6 @@ export default function* rootSaga() {
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
+
+  yield takeEvery(CLOSE_ENTITY, closeEntitySaga);
 }

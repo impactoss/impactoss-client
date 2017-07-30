@@ -78,6 +78,7 @@ export const CONFIG = {
         search: true,
         label: 'entities.measures.plural',
         path: 'measures',
+        clientPath: 'actions',
         key: 'measure_id',
         connectPath: 'sdgtarget_measures',
         ownKey: 'sdgtarget_id',

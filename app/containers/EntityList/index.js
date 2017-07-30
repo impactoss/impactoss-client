@@ -6,9 +6,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import { Map, List, fromJS } from 'immutable';
 
+import Loading from 'components/Loading';
 import Sidebar from 'components/styled/Sidebar';
 
 import EntityListSidebar from 'components/entityList/EntityListSidebar';
@@ -21,8 +24,9 @@ import appMessages from 'containers/App/messages';
 import { PARAMS } from 'containers/App/constants';
 
 import {
-  activePanelSelector,
-  entitiesSelectedSelector,
+  selectDomain,
+  selectActivePanel,
+  selectSelectedEntities,
 } from './selectors';
 
 import {
@@ -40,6 +44,20 @@ import {
   updateSortOrder,
 } from './actions';
 
+const Progress = styled.div`
+  position: absolute;
+  width: 100%;
+  display: block;
+  background: white;
+  bottom: 0;
+  -webkit-box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  background-color: ${palette('primary', 4)};
+  padding: 40px;
+  z-index: 200;
+`;
+
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     this.props.resetStateOnMount();
@@ -49,8 +67,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     return this.context.intl.formatMessage(message);
   }
   render() {
-    // console.log('EntityList.render')
-    // console.log('EntityList.render' , this.props.entityIdsSelected && this.props.entityIdsSelected.toJS())
+    // console.log('EntityList.render', this.props.viewDomain.saveSending)
 
     // make sure selected entities are still actually on page
     const { entityIdsSelected, entities } = this.props;
@@ -82,6 +99,16 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             />
           }
         </Sidebar>
+        {this.props.viewDomain.saveSending &&
+          <Progress>
+            <Loading />
+          </Progress>
+        }
+        {this.props.viewDomain.saveError &&
+          <Progress>
+            <p>{this.props.viewDomain.saveError}</p>
+          </Progress>
+        }
         <EntityListMain
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
@@ -135,6 +162,7 @@ EntityList.propTypes = {
   activePanel: PropTypes.string,
   isManager: PropTypes.bool,
   entityIdsSelected: PropTypes.object,
+  viewDomain: PropTypes.object,
   // dispatch props
   onPanelSelect: PropTypes.func.isRequired,
   handleEditSubmit: PropTypes.func.isRequired,
@@ -159,8 +187,9 @@ EntityList.contextTypes = {
 
 const mapStateToProps = (state) => ({
   isManager: selectIsUserManager(state),
-  activePanel: activePanelSelector(state),
-  entityIdsSelected: entitiesSelectedSelector(state),
+  activePanel: selectActivePanel(state),
+  entityIdsSelected: selectSelectedEntities(state),
+  viewDomain: selectDomain(state).toJS(),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -327,7 +356,6 @@ function mapDispatchToProps(dispatch, props) {
           }, List()));
         }
       }
-      // console.log(saveData.toJS())
       dispatch(saveEdits(saveData.toJS()));
     },
   };

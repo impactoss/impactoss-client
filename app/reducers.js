@@ -19,17 +19,8 @@ import entityListFormReducer from 'containers/EntityListForm/reducer';
  * The change is necessitated by moving to react-router-redux@4
  *
  */
-const loginRoutes = ['/login', '/register'];
 // Initial routing state
-const routeInitialState = fromJS({
-  locationBeforeTransitions: {
-    ...browserHistory.getCurrentLocation(),
-    pathnameOnAuthChange: loginRoutes.indexOf(browserHistory.getCurrentLocation().pathname) > -1
-      ? '/'
-      : browserHistory.getCurrentLocation().pathname,
-    // stay on same path on authenticateSuccess unless on login or register
-  },
-});
+const routeInitialState = fromJS({ locationBeforeTransitions: browserHistory.getCurrentLocation() });
 
 /**
  * Merge route into the global application state and remember previous route

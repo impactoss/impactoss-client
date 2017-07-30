@@ -6,15 +6,21 @@ import {
   SAVE_SENDING,
   SAVE_ERROR,
   SAVE_SUCCESS,
+  DELETE_SENDING,
+  DELETE_ERROR,
+  DELETE_SUCCESS,
 } from 'containers/App/constants';
 
 const initialState = fromJS({
   saveSending: false,
   saveSuccess: false,
   saveError: false,
+  deleteSending: false,
+  deleteSuccess: false,
+  deleteError: false,
 });
 
-export const entitySaveReducer = (state = initialState, action) => {
+export const entityFormReducer = (state = initialState, action) => {
   switch (action.type) {
     case SAVE_SENDING:
       return state
@@ -30,6 +36,20 @@ export const entitySaveReducer = (state = initialState, action) => {
         .set('saveSending', false)
         .set('saveSuccess', false)
         .set('saveError', action.error);
+    case DELETE_SENDING:
+      return state
+        .set('deleteSending', true)
+        .set('deleteSuccess', false)
+        .set('deleteError', false);
+    case DELETE_SUCCESS:
+      return state
+        .set('deleteSending', false)
+        .set('deleteSuccess', true);
+    case DELETE_ERROR:
+      return state
+        .set('deleteSending', false)
+        .set('deleteSuccess', false)
+        .set('deleteError', action.error);
     default:
       return state;
   }

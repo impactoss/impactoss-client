@@ -37,11 +37,15 @@ import {
   UPDATE_CONNECTIONS,
   REMOVE_ENTITY,
   NEW_ENTITY,
+  DELETE_ENTITY,
   SAVE_ENTITY,
   INVALIDATE_ENTITIES,
   SAVE_SENDING,
   SAVE_SUCCESS,
   SAVE_ERROR,
+  DELETE_SENDING,
+  DELETE_SUCCESS,
+  DELETE_ERROR,
   SAVE_CONNECTIONS,
   SAVE_ENTITIES,
   UPDATE_ROUTE_QUERY,
@@ -52,6 +56,10 @@ import {
   DUEDATE_UNASSIGNED,
   RESET_PASSWORD,
   RECOVER_PASSWORD,
+  RECOVER_SENDING,
+  RECOVER_SUCCESS,
+  RECOVER_ERROR,
+  CLOSE_ENTITY,
 } from './constants';
 
 
@@ -72,6 +80,50 @@ export function saveSuccess(data) {
 export function saveError(error, data) {
   return {
     type: SAVE_ERROR,
+    data,
+    error,
+  };
+}
+
+export function recoverSending(data) {
+  return {
+    type: RECOVER_SENDING,
+    data,
+  };
+}
+
+export function recoverSuccess(data) {
+  return {
+    type: RECOVER_SUCCESS,
+    data,
+  };
+}
+
+export function recoverError(error, data) {
+  return {
+    type: RECOVER_ERROR,
+    data,
+    error,
+  };
+}
+
+export function deleteSending(data) {
+  return {
+    type: DELETE_SENDING,
+    data,
+  };
+}
+
+export function deleteSuccess(data) {
+  return {
+    type: DELETE_SUCCESS,
+    data,
+  };
+}
+
+export function deleteError(error, data) {
+  return {
+    type: DELETE_ERROR,
     data,
     error,
   };
@@ -137,6 +189,48 @@ export function entitiesLoadingError(error, path) {
   };
 }
 
+
+// server side
+export function deleteEntity(data) {
+  return {
+    type: DELETE_ENTITY,
+    data,
+  };
+}
+
+// server side
+export function saveEntity(data) {
+  return {
+    type: SAVE_ENTITY,
+    data,
+  };
+}
+
+// server side
+export function newEntity(data) {
+  return {
+    type: NEW_ENTITY,
+    data,
+  };
+}
+
+// server side
+export function saveConnections(data) {
+  return {
+    type: SAVE_CONNECTIONS,
+    data,
+  };
+}
+
+// server side
+export function saveEntities(data) {
+  return {
+    type: SAVE_ENTITIES,
+    data,
+  };
+}
+
+// client side
 export function addEntity(path, entity) {
   return {
     type: ADD_ENTITY,
@@ -145,6 +239,7 @@ export function addEntity(path, entity) {
   };
 }
 
+// client side
 export function updateEntity(path, entity) {
   return {
     type: UPDATE_ENTITY,
@@ -153,6 +248,7 @@ export function updateEntity(path, entity) {
   };
 }
 
+// client side
 export function updateEntities(path, entities) {
   return {
     type: UPDATE_ENTITIES,
@@ -161,6 +257,7 @@ export function updateEntities(path, entities) {
   };
 }
 
+// client side
 export function updateConnections(path, updates) {
   return {
     type: UPDATE_CONNECTIONS,
@@ -169,40 +266,12 @@ export function updateConnections(path, updates) {
   };
 }
 
-
+// client side
 export function removeEntity(path, id) {
   return {
     type: REMOVE_ENTITY,
     path,
     id,
-  };
-}
-
-export function saveEntity(data) {
-  return {
-    type: SAVE_ENTITY,
-    data,
-  };
-}
-
-export function newEntity(data) {
-  return {
-    type: NEW_ENTITY,
-    data,
-  };
-}
-
-export function saveConnections(data) {
-  return {
-    type: SAVE_CONNECTIONS,
-    data,
-  };
-}
-
-export function saveEntities(data) {
-  return {
-    type: SAVE_ENTITIES,
-    data,
   };
 }
 
@@ -365,5 +434,12 @@ export function dueDateUnassigned(id) {
   return {
     type: DUEDATE_UNASSIGNED,
     id,
+  };
+}
+
+export function closeEntity(path) {
+  return {
+    type: CLOSE_ENTITY,
+    path,
   };
 }

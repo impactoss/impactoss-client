@@ -10,11 +10,13 @@ import appMessages from 'containers/App/messages';
 
 import ButtonCancel from 'components/buttons/ButtonCancel';
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
+import Clear from 'components/styled/Clear';
 
 import ErrorWrapper from '../ErrorWrapper';
 import FormWrapper from '../FormWrapper';
 import FormBody from '../FormBody';
 import FormFooter from '../FormFooter';
+import FormFooterButtons from '../FormFooterButtons';
 import Label from '../Label';
 import Field from '../Field';
 import Required from '../Required';
@@ -70,12 +72,15 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
             { fields && this.renderBody(fields) }
           </FormBody>
           <FormFooter>
-            <ButtonCancel type="button" onClick={handleCancel}>
-              <FormattedMessage {...appMessages.buttons.cancel} />
-            </ButtonCancel>
-            <ButtonSubmit type="submit">
-              {labels.submit}
-            </ButtonSubmit>
+            <FormFooterButtons>
+              <ButtonCancel type="button" onClick={handleCancel}>
+                <FormattedMessage {...appMessages.buttons.cancel} />
+              </ButtonCancel>
+              <ButtonSubmit type="submit">
+                {labels.submit}
+              </ButtonSubmit>
+            </FormFooterButtons>
+            <Clear />
           </FormFooter>
         </Form>
       </FormWrapper>

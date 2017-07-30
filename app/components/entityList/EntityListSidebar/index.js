@@ -98,25 +98,19 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     },
   ]);
 
-  getFormButtons = (activePanel) => {
-    const buttons = [{
+  getFormButtons = () => [
+    {
       type: 'simple',
-      title: (activePanel === EDIT_PANEL)
-        ? this.context.intl.formatMessage(appMessages.buttons.cancel)
-        : this.context.intl.formatMessage(appMessages.buttons.close),
+      title: this.context.intl.formatMessage(appMessages.buttons.cancel),
       onClick: this.onHideForm,
-    }];
-    if (activePanel === EDIT_PANEL) {
-      buttons.push({
-        type: 'primary',
-        title: this.context.intl.formatMessage(appMessages.buttons.assign),
-        submit: true,
-        // TODO consider making button inactive when form unchanged
-      });
-    }
-    return buttons;
-  }
-
+    },
+    {
+      type: 'primary',
+      title: this.context.intl.formatMessage(appMessages.buttons.assign),
+      submit: true,
+      // TODO consider making button inactive when form unchanged
+    },
+  ];
 
   render() {
     const {
@@ -236,8 +230,16 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           <EntityListForm
             model={formModel}
             formOptions={formOptions}
-            buttons={this.getFormButtons(activePanel)}
+            buttons={activePanel === EDIT_PANEL
+              ? this.getFormButtons()
+              : null
+            }
             onCancel={this.onHideForm}
+            onSelect={() => {
+              if (activePanel === FILTERS_PANEL) {
+                this.onHideForm();
+              }
+            }}
             onSubmit={activePanel === EDIT_PANEL
               ? (associations) => {
                 // close and reset option panel
