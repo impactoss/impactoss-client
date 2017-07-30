@@ -57,7 +57,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
         return (
           <TitleIconWrap>
             { icon &&
-              <Icon name={icon} text textLeft size="3em" />
+              <Icon name={icon} text textLeft />
             }
             <TitleSmall>{title}</TitleSmall>
           </TitleIconWrap>
