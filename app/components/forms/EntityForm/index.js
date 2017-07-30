@@ -60,10 +60,6 @@ const DeleteWrapper = styled.div`
 `;
 
 const ButtonDelete = styled(ButtonForm)`
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 1em;
-  padding: 1em 1.2em;
   color: ${palette('buttonFlat', 0)};
   &:hover {
     color: ${palette('buttonFlatHover', 0)};
