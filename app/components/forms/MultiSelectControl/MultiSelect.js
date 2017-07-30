@@ -239,7 +239,7 @@ export default class MultiSelect extends React.Component {
 
   renderCancel = (onCancel) => (
     <HeaderButton onClick={onCancel} >
-      <Icon name="close" size="1.75em" />
+      <Icon name="close" />
     </HeaderButton>
   );
 

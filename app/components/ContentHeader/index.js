@@ -53,7 +53,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
       case CONTENT_SINGLE:
         return (
           <TitleIconWrap>
-            <Icon name={icon} text textLeft size="3em" />
+            <Icon name={icon} text textLeft />
             <TitleSmall>{title}</TitleSmall>
           </TitleIconWrap>
         );

@@ -88,7 +88,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
         </DotWrapper>
         { option.get('icon') &&
           <IconWrapper>
-            <Icon name={option.get('icon')} size="24px" />
+            <Icon name={option.get('icon')} />
           </IconWrapper>
         }
       </Styled>

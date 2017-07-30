@@ -24,7 +24,6 @@ export const makeFilterGroups = (
         [taxonomy.get('id')]: {
           id: taxonomy.get('id'), // filterOptionId
           label: taxonomy.getIn(['attributes', 'title']),
-          icon: `taxonomy_${taxonomy.get('id')}`,
           active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
         },
       }), {}),
@@ -44,7 +43,6 @@ export const makeFilterGroups = (
         [taxonomy.get('id')]: {
           id: taxonomy.get('id'), // filterOptionId
           label: taxonomy.getIn(['attributes', 'title']),
-          icon: `taxonomy_${taxonomy.get('id')}`,
           active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
         },
       }), {}),

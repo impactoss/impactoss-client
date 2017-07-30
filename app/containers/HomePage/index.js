@@ -175,7 +175,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             </div>
             <ButtonIconWrap>
               <ButtonIconOnly onClick={() => scrollToComponent(this.SectionCategories)}>
-                <Icon name="arrowDown" size={'2.5em'} />
+                <Icon name="arrowDown" />
               </ButtonIconOnly>
             </ButtonIconWrap>
           </TopActions>
@@ -211,7 +211,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             <ButtonIconAboveWrap>
               <ButtonIconAbove onClick={() => onPageLink('/actions')}>
                 <div>
-                  <Icon name="s" size={'4em'} />
+                  <Icon name="measures" />
                 </div>
                 <div>
                   <FormattedMessage {...messages.exploreActionsLink} />
@@ -231,7 +231,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             <ButtonIconAboveWrap>
               <ButtonIconAboveMore onClick={() => onPageLink('/recommendations')}>
                 <div>
-                  <Icon name="recommendations" size={'3.5em'} />
+                  <Icon name="recommendations" />
                 </div>
                 <div>
                   <FormattedMessage {...appMessages.entities.recommendations.plural} />
@@ -239,7 +239,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               </ButtonIconAboveMore>
               <ButtonIconAboveMore onClick={() => onPageLink('/indicators')}>
                 <div>
-                  <Icon name="indicators" size={'3.5em'} />
+                  <Icon name="indicators" />
                 </div>
                 <div>
                   <FormattedMessage {...appMessages.entities.indicators.plural} />
