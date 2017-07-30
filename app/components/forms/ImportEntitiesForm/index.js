@@ -25,12 +25,14 @@ import Field from 'components/fields/Field';
 import Loading from 'components/Loading';
 
 import DocumentWrap from 'components/fields/DocumentWrap';
+
+import ButtonCancel from 'components/buttons/ButtonCancel';
+
 import FileSelectControl from '../FileSelectControl';
 // import ErrorWrapper from '../ErrorWrapper';
 import FormWrapper from '../FormWrapper';
 import FormBody from '../FormBody';
 import FormFieldWrap from '../FormFieldWrap';
-import ButtonCancel from '../ButtonCancel';
 // import Required from '../Required';
 
 // import messages from './messages';

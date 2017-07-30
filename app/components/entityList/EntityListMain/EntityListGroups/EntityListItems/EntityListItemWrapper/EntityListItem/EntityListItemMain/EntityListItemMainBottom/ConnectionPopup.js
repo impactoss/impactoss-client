@@ -18,6 +18,11 @@ const Count = styled.span`
   font-size: 0.8em;
   background-color: ${(props) => palette(props.pIndex, 0)};
   color: ${palette('primary', 4)};
+  height: 1.8em;
+  min-width: 1.8em;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 1.8em;
 `;
 
 const PopupWrapper = styled.span`

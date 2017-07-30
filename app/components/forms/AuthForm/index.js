@@ -8,6 +8,8 @@ import { startCase } from 'lodash/string';
 
 import appMessages from 'containers/App/messages';
 
+import ButtonCancel from 'components/buttons/ButtonCancel';
+import ButtonSubmit from 'components/buttons/ButtonSubmit';
 import Clear from 'components/styled/Clear';
 
 import ErrorWrapper from '../ErrorWrapper';
@@ -19,8 +21,6 @@ import Label from '../Label';
 import Field from '../Field';
 import Required from '../Required';
 import ControlInput from '../ControlInput';
-import ButtonCancel from '../ButtonCancel';
-import ButtonSubmit from '../ButtonSubmit';
 
 // These props will be omitted before being passed to the Control component
 const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
