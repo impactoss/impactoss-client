@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 
+import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
@@ -43,7 +44,7 @@ export class UserPassword extends React.PureComponent { // eslint-disable-line r
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
           {passwordSending &&
-            <p>Sending... </p>
+            <Loading />
           }
           {passwordError &&
             <p>{passwordError}</p>

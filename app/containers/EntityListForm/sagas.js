@@ -5,11 +5,11 @@ import {
 } from 'containers/App/actions';
 
 import {
-  FILTER_FORM_MODEL,
+  SET_FILTER,
 } from './constants';
 
-export function* updateQuery(args) {
-  const params = args.value.map((value) => ({
+export function* updateQuery({ values }) {
+  const params = values.map((value) => ({
     arg: value.get('query'),
     value: value.get('value') || 1,
     replace: value.get('replace'),
@@ -27,9 +27,5 @@ export function* updateQuery(args) {
 
 export default function* entityList() {
   // filter form changed
-  yield takeLatest(
-    (action) =>
-      action.model === `${FILTER_FORM_MODEL}.values` && action.type === 'rrf/change',
-    updateQuery
-  );
+  yield takeLatest(SET_FILTER, updateQuery);
 }

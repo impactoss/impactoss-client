@@ -9,9 +9,9 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { createStructuredSelector } from 'reselect';
 import styled from 'styled-components';
 
+import Loading from 'components/Loading';
 import Icon from 'components/Icon';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
@@ -19,13 +19,13 @@ import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
 import { updatePath } from 'containers/App/actions';
-import { makeSelectAuth } from 'containers/App/selectors';
+import { selectAuth } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import { login } from './actions';
-import makeUserLoginSelector from './selectors';
+import { selectDomain } from './selectors';
 
 const BottomLinks = styled.div`
   padding: 2em 0;
@@ -33,7 +33,7 @@ const BottomLinks = styled.div`
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { error, messages: message } = this.props.authentication;
+    const { error, messages: message, sending } = this.props.authentication;
     const required = (val) => val && val.length;
 
     return (
@@ -56,7 +56,10 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               <p key={i}>{errorMessage}</p>
             )
           }
-          { this.props.userLogin.form &&
+          {sending &&
+            <Loading />
+          }
+          { this.props.viewDomain.form &&
             <AuthForm
               model="userLogin.form.data"
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
@@ -125,7 +128,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
 }
 
 UserLogin.propTypes = {
-  userLogin: PropTypes.object.isRequired,
+  viewDomain: PropTypes.object.isRequired,
   authentication: PropTypes.object,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
@@ -136,9 +139,9 @@ UserLogin.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = createStructuredSelector({
-  userLogin: makeUserLoginSelector(),
-  authentication: makeSelectAuth(),
+const mapStateToProps = (state) => ({
+  viewDomain: selectDomain(state),
+  authentication: selectAuth(state),
 });
 
 export function mapDispatchToProps(dispatch) {

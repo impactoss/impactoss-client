@@ -1,24 +1,28 @@
+import { truncateText } from 'utils/string';
+
 export const getIdField = (entity) => ({
   controlType: 'info',
   type: 'reference',
   value: entity.get('id'),
   large: true,
 });
-export const getReferenceField = (entity) =>
-  !!entity.getIn(['attributes', 'reference']) &&
-  (entity.getIn(['attributes', 'reference']).trim().length > 0) &&
-  ({
-    controlType: 'info',
-    type: 'reference',
-    value: entity.getIn(['attributes', 'reference']),
-    large: true,
-  });
-const getLinkAnchor = (url) => {
-  const urlNoProtocol = url.replace(/^https?:\/\//i, '');
-  return urlNoProtocol.length > 40
-    ? `${urlNoProtocol.substring(0, 40)}...`
-    : urlNoProtocol;
+export const getReferenceField = (entity, defaultToId) => {
+  const value = defaultToId
+    ? entity.getIn(['attributes', 'reference']) || entity.get('id')
+    : entity.getIn(['attributes', 'reference']);
+  if (!!value && value.trim().length > 0) {
+    return ({
+      controlType: 'info',
+      type: 'reference',
+      value,
+      large: true,
+    });
+  }
+  return false;
 };
+const getLinkAnchor = (url) =>
+  truncateText(url.replace(/^https?:\/\//i, ''), 40);
+
 export const getLinkField = (entity) => ({
   type: 'link',
   value: entity.getIn(['attributes', 'url']),
@@ -114,6 +118,7 @@ export const getTextField = (entity, attribute, appMessages) =>
 const mapCategoryOptions = (categories) => categories
   ? categories.map((cat) => ({
     label: cat.getIn(['attributes', 'title']),
+    reference: cat.getIn(['attributes', 'reference']) || null,
     linkTo: `/category/${cat.get('id')}`,
   })).toArray()
   : [];
@@ -162,9 +167,7 @@ const getCategoryShortTitle = (category) => {
   )
     ? category.getIn(['attributes', 'short_title'])
     : category.getIn(['attributes', 'title']);
-  return title.length > 10
-    ? `${title.substring(0, 10)}...`
-    : title;
+  return truncateText(title, 10);
 };
 
 export const getCategoryShortTitleField = (entity) => ({
@@ -176,6 +179,7 @@ export const getCategoryShortTitleField = (entity) => ({
 const getConnectionField = ({
   entities,
   taxonomies,
+  connections,
   connectionOptions,
   entityType,
   icon,
@@ -186,6 +190,7 @@ const getConnectionField = ({
   type: 'connections',
   values: entities.toList(),
   taxonomies,
+  connections,
   entityType,
   icon: icon || entityType,
   entityPath: entityPath || entityType,
@@ -197,40 +202,44 @@ const getConnectionField = ({
   })),
 });
 
-export const getIndicatorConnectionField = (entities, appMessages, onEntityClick) =>
+export const getIndicatorConnectionField = (entities, connections, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies: null,
+    connections,
     connectionOptions: ['measures', 'sdgtargets'],
     entityType: 'indicators',
     appMessages,
     onEntityClick,
   });
 
-export const getRecommendationConnectionField = (entities, taxonomies, appMessages, onEntityClick) =>
+export const getRecommendationConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies,
+    connections,
     connectionOptions: ['measures'],
     entityType: 'recommendations',
     appMessages,
     onEntityClick,
   });
 
-export const getSdgTargetConnectionField = (entities, taxonomies, appMessages, onEntityClick) =>
+export const getSdgTargetConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies,
+    connections,
     connectionOptions: ['indicators', 'measures'],
     entityType: 'sdgtargets',
     appMessages,
     onEntityClick,
   });
 
-export const getMeasureConnectionField = (entities, taxonomies, appMessages, onEntityClick) =>
+export const getMeasureConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
   getConnectionField({
     entities,
     taxonomies,
+    connections,
     connectionOptions: ['indicators', 'recommendations', 'sdgtargets'],
     entityType: 'measures',
     entityPath: 'actions',

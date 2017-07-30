@@ -20,7 +20,7 @@ import {
   getTaxonomyFields,
 } from 'utils/fields';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { CONTENT_SINGLE, ACCEPTED_STATUSES } from 'containers/App/constants';
 
@@ -33,6 +33,7 @@ import {
   selectReady,
   selectIsUserManager,
   selectMeasureTaxonomies,
+  selectMeasureConnections,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -90,7 +91,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   ]);
 
 
-  getBodyMainFields = (entity, measures, measureTaxonomies, onEntityClick) => ([
+  getBodyMainFields = (entity, measures, measureTaxonomies, measureConnections, onEntityClick) => ([
     {
       fields: [
         getStatusField(entity, 'accepted', ACCEPTED_STATUSES, appMessages.attributes.accepted),
@@ -101,7 +102,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getMeasureConnectionField(measures, measureTaxonomies, appMessages, onEntityClick),
+        getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
       ],
     },
   ]);
@@ -115,7 +116,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   ]);
 
   render() {
-    const { viewEntity, dataReady, isManager, measures, taxonomies, measureTaxonomies, onEntityClick } = this.props;
+    const { viewEntity, dataReady, isManager, measures, taxonomies, measureTaxonomies, measureConnections, onEntityClick } = this.props;
     const buttons = isManager
     ? [
       {
@@ -163,7 +164,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
                   aside: isManager && this.getHeaderAsideFields(viewEntity, isManager),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, measures, measureTaxonomies, onEntityClick),
+                  main: this.getBodyMainFields(viewEntity, measures, measureTaxonomies, measureConnections, onEntityClick),
                   aside: this.getBodyAsideFields(taxonomies),
                 },
               }}
@@ -184,6 +185,7 @@ RecommendationView.propTypes = {
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   measureTaxonomies: PropTypes.object,
+  measureConnections: PropTypes.object,
   measures: PropTypes.object,
   params: PropTypes.object,
   isManager: PropTypes.bool,
@@ -200,6 +202,7 @@ const mapStateToProps = (state, props) => ({
   taxonomies: selectTaxonomies(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
   measureTaxonomies: selectMeasureTaxonomies(state),
+  measureConnections: selectMeasureConnections(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -211,8 +214,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updatePath(`/recommendations/edit/${props.params.id}`));
     },
     handleClose: () => {
-      dispatch(updatePath('/recommendations'));
-      // TODO should be "go back" if history present or to measures list when not
+      dispatch(closeEntity('/recommendations'));
     },
     onEntityClick: (id, path) => {
       dispatch(updatePath(`/${path}/${id}`));

@@ -20,7 +20,7 @@ const getTaxonomyTagList = (taxonomy) => {
   }
   return tags;
 };
-export const mapToTaxonomyList = (taxonomies, onLink, activeId, tags = true) => taxonomies.map((tax) => ({
+export const mapToTaxonomyList = (taxonomies, onLink, activeId, tags = false) => taxonomies.map((tax) => ({
   id: tax.get('id'),
   count: tax.count,
   onLink: () => onLink(`/categories/${tax.get('id')}`),

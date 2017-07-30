@@ -16,6 +16,10 @@ export default defineMessages({
       defaultMessage: 'Mahere Rautāki a Motu',
     },
   },
+  overview: {
+    id: 'app.containers.App.overview',
+    defaultMessage: 'Overview',
+  },
   buttons: {
     cancel: {
       id: 'app.containers.App.buttons.cancel',
@@ -50,6 +54,12 @@ export default defineMessages({
     dateFormatError: {
       id: 'app.containers.App.forms.dateFormatError',
       defaultMessage: 'Please enter the date in the required format: YYYY-MM-DD',
+    },
+  },
+  hints: {
+    autoReference: {
+      id: 'app.containers.App.hints.autoReference',
+      defaultMessage: 'Leave blank to assign database id',
     },
   },
   placeholders: {

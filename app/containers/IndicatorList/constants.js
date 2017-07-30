@@ -66,6 +66,7 @@ export const CONFIG = {
         search: true,
         label: 'entities.measures.plural',
         path: 'measures',
+        clientPath: 'actions',
         key: 'measure_id',
         connectPath: 'measure_indicators',
         ownKey: 'indicator_id',

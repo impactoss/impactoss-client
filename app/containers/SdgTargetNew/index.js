@@ -137,7 +137,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
             <Loading />
           }
           {saveSending &&
-            <p>Saving</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>

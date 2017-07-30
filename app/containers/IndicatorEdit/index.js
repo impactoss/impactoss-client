@@ -43,9 +43,10 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  deleteEntity,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -89,10 +90,14 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
     const { measures, viewEntity, users, sdgtargets } = props;
+    let attributes = viewEntity.get('attributes');
+    if (!attributes.get('reference')) {
+      attributes = attributes.set('reference', viewEntity.get('id'));
+    }
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
-      attributes: viewEntity.get('attributes').mergeWith(
+      attributes: attributes.mergeWith(
         (oldVal, newVal) => oldVal === null ? newVal : oldVal,
         FORM_INITIAL.get('attributes')
       ),
@@ -107,7 +112,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceFormField(this.context.intl.formatMessage, appMessages),
+        getReferenceFormField(this.context.intl.formatMessage, appMessages, false, true),
         getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
       ],
     },
@@ -156,7 +161,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   render() {
     const { viewEntity, dataReady, viewDomain, measures, users, sdgtargets } = this.props;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
     return (
       <div>
@@ -182,27 +187,28 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               }] : null
             }
           />
-          {saveSending &&
-            <p>Saving</p>
+          {(saveSending || deleteSending || !dataReady) &&
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>
           }
-          { !dataReady &&
-            <Loading />
+          {deleteError &&
+            <p>{deleteError}</p>
           }
-          { !viewEntity && dataReady && !saveError &&
+          {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {viewEntity && dataReady &&
+          {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="indicatorEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData, measures, sdgtargets)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
+              handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
@@ -228,9 +234,11 @@ IndicatorEdit.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
@@ -243,6 +251,7 @@ IndicatorEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
+  isUserAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),
@@ -312,6 +321,12 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    handleDelete: () => {
+      dispatch(deleteEntity({
+        path: 'indicators',
+        id: props.params.id,
+      }));
     },
   };
 }

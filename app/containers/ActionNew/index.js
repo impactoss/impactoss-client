@@ -153,7 +153,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             <Loading />
           }
           {saveSending &&
-            <p>Saving Action</p>
+            <Loading />
           }
           {saveError &&
             <p>{saveError}</p>

@@ -53,6 +53,7 @@ export const CONFIG = {
         search: true,
         label: 'entities.measures.plural',
         path: 'measures', // filter by recommendation connection
+        clientPath: 'actions', // filter by recommendation connection
         key: 'measure_id',
         connectPath: 'recommendation_measures', // filter by recommendation connection
         ownKey: 'recommendation_id',
