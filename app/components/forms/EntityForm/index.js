@@ -18,18 +18,21 @@ import FieldFactory from 'components/fields/FieldFactory';
 import Button from 'components/buttons/Button';
 import ButtonCancel from 'components/buttons/ButtonCancel';
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
+import ButtonForm from 'components/buttons/ButtonForm';
 import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
 import FieldGroupLabel from 'components/fields/FieldGroupLabel';
 import GroupIcon from 'components/fields/GroupIcon';
 import Label from 'components/fields/Label';
 import FieldWrap from 'components/fields/FieldWrap';
 import Field from 'components/fields/Field';
+import Clear from 'components/styled/Clear';
 
 import UploadControl from '../UploadControl';
 import MultiSelectControl from '../MultiSelectControl';
 import FormWrapper from '../FormWrapper';
 import FormPanel from '../FormPanel';
 import FormFooter from '../FormFooter';
+import FormFooterButtons from '../FormFooterButtons';
 import Aside from '../Aside';
 import Main from '../Main';
 import FormFieldWrap from '../FormFieldWrap';
@@ -45,6 +48,34 @@ import RadioControl from '../RadioControl';
 import Required from '../Required';
 
 import messages from './messages';
+
+const Hint = styled.span`
+  color: ${palette('dark', 4)};
+  padding-left: 5px;
+`;
+
+const DeleteWrapper = styled.div`
+  float: left;
+  padding-left: 40px;
+`;
+
+const ButtonDelete = styled(ButtonForm)`
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1em;
+  padding: 1em 1.2em;
+  color: ${palette('buttonFlat', 0)};
+  &:hover {
+    color: ${palette('buttonFlatHover', 0)};
+  }
+`;
+
+const ButtonPreDelete = styled(Button)`
+  color: ${palette('dark', 3)};
+  &:hover {
+    color: ${palette('primary', 0)};
+  }
+`;
 
 const MultiSelectWrapper = styled.div`
   position: absolute;
@@ -69,7 +100,6 @@ const MultiselectActiveOptionList = styled.div`
 `;
 const MultiselectActiveOptionListItem = styled.div`
   position: relative;
-  font-weight: 500;
   background-color: ${palette('primary', 4)};
   border-bottom: 1px solid ${palette('light', 1)};
   padding: 12px 0 12px 16px;
@@ -79,10 +109,14 @@ const MultiselectActiveOptionRemove = styled(Button)`
   top: 0;
   right: 0;
   display: block;
-  padding: 12px 16px 0 0;
+  padding: 0 16px;
+  bottom: 0;
   &:hover {
     color: ${palette('primary', 1)};
   }
+`;
+const MultiselectActiveOption = styled.div`
+  padding-right: 40px;
 `;
 const MultiSelectDropdownIcon = styled.div`
   position: absolute;
@@ -114,7 +148,10 @@ const MultiSelectWithoutLink = styled(A)`
     color: ${palette('linkDefault', 1)};
   }
 `;
-
+const Id = styled.div`
+  font-weight: bold;
+  color: ${palette('dark', 3)}
+`;
 const controls = {
   input: ControlInput,
   url: ControlInput,
@@ -133,7 +170,7 @@ const controls = {
 };
 
 // These props will be omitted before being passed to the Control component
-const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
+const nonControlProps = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages'];
 
 
 class EntityForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -142,9 +179,11 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     super();
     this.state = {
       multiselectOpen: null,
+      deleteConfirmed: false,
     };
   }
-    // MULTISELECT
+
+  // MULTISELECT
   onToggleMultiselect = (field) => {
     this.setState({
       multiselectOpen: this.state.multiselectOpen !== field.id ? field.id : null,
@@ -199,6 +238,10 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     return field.options.filter((o) => o.get('checked'));
   }
 
+  preDelete = (confirm = true) => {
+    this.setState({ deleteConfirmed: confirm });
+  }
+
   renderMultiSelect = (field, formData) => {
     const { id, model, ...controlProps } = this.getControlProps(field);
 
@@ -247,7 +290,12 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             <MultiselectActiveOptionList>
               { options.map((option, i) => (
                 <MultiselectActiveOptionListItem key={i}>
-                  {`${option.get('label')} `}
+                  <MultiselectActiveOption>
+                    { option.get('reference') &&
+                      <Id>{option.get('reference')}</Id>
+                    }
+                    {option.get('label')}
+                  </MultiselectActiveOption>
                   <MultiselectActiveOptionRemove
                     onClick={(evt) => {
                       if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -348,6 +396,9 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
           </Label>
         }
         { formField }
+        {field.hint &&
+          <Hint>{field.hint}</Hint>
+        }
       </FormFieldWrap>
     );
   }
@@ -429,12 +480,35 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             </FormPanel>
           }
           <FormFooter>
-            <ButtonCancel type="button" onClick={handleCancel}>
-              <FormattedMessage {...appMessages.buttons.cancel} />
-            </ButtonCancel>
-            <ButtonSubmit type="submit">
-              <FormattedMessage {...appMessages.buttons.save} />
-            </ButtonSubmit>
+            {this.props.handleDelete && !this.state.deleteConfirmed &&
+              <DeleteWrapper>
+                <ButtonPreDelete type="button" onClick={this.preDelete}>
+                  <Icon name="trash" />
+                </ButtonPreDelete>
+              </DeleteWrapper>
+            }
+            {this.props.handleDelete && this.state.deleteConfirmed &&
+              <DeleteWrapper>
+                <FormattedMessage {...messages.confirmDeleteQuestion} />
+                <ButtonCancel type="button" onClick={() => this.preDelete(false)}>
+                  <FormattedMessage {...messages.buttons.cancelDelete} />
+                </ButtonCancel>
+                <ButtonDelete type="button" onClick={this.props.handleDelete}>
+                  <FormattedMessage {...messages.buttons.confirmDelete} />
+                </ButtonDelete>
+              </DeleteWrapper>
+            }
+            {!this.state.deleteConfirmed &&
+              <FormFooterButtons>
+                <ButtonCancel type="button" onClick={handleCancel}>
+                  <FormattedMessage {...appMessages.buttons.cancel} />
+                </ButtonCancel>
+                <ButtonSubmit type="submit">
+                  <FormattedMessage {...appMessages.buttons.save} />
+                </ButtonSubmit>
+              </FormFooterButtons>
+            }
+            <Clear />
           </FormFooter>
         </Form>
       </FormWrapper>
@@ -445,6 +519,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
 EntityForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func,
   handleUpdate: PropTypes.func,
   model: PropTypes.string,
   fields: PropTypes.object,

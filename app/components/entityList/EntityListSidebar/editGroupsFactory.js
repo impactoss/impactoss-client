@@ -22,7 +22,6 @@ export const makeEditGroups = (
         [taxonomy.get('id')]: {
           id: taxonomy.get('id'), // filterOptionId
           label: taxonomy.getIn(['attributes', 'title']),
-          icon: `taxonomy_${taxonomy.get('id')}`,
           path: edits.taxonomies.connectPath,
           key: edits.taxonomies.key,
           ownKey: edits.taxonomies.ownKey,

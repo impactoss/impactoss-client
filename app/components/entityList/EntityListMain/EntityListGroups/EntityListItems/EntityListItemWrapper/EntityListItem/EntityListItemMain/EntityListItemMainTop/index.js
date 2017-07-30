@@ -13,14 +13,18 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
   static propTypes = {
     entity: PropTypes.object.isRequired,
     entityIcon: PropTypes.string,
+    onEntityClick: PropTypes.func,
+    path: PropTypes.string,
   };
 
   render() {
-    const { entity, entityIcon } = this.props;
+    const { entity, entityIcon, onEntityClick, path } = this.props;
 
     return (
       <Component>
-        <EntityListItemMainTopReference to={entity.linkTo}>{entity.reference}</EntityListItemMainTopReference>
+        <EntityListItemMainTopReference onClick={onEntityClick} href={path}>
+          {entity.reference}
+        </EntityListItemMainTopReference>
         <EntityListItemMainTopIcon>
           <Icon name={entityIcon} text iconRight />
         </EntityListItemMainTopIcon>

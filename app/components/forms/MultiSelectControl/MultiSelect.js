@@ -87,7 +87,7 @@ const ControlFooter = styled.div`
 const ControlMain = styled.div`
   position: absolute;
   top: ${(props) => props.search ? '115px' : '60px'};
-  bottom: 50px;
+  bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
   left: 0;
   right: 0;
   overflow-y: auto;
@@ -325,11 +325,11 @@ export default class MultiSelect extends React.Component {
             <Search id="search" onChange={this.onSearch} placeholder="Filter options" />
           </ControlSearch>
         }
-        <ControlMain search={this.props.search} >
+        <ControlMain search={this.props.search} hasFooter={this.props.buttons}>
           {checkboxes && checkboxes.map(this.renderCheckbox)}
         </ControlMain>
-        <ControlFooter>
-          { this.props.buttons &&
+        { this.props.buttons &&
+          <ControlFooter>
             <ButtonGroup>
               {
                 this.props.buttons.map((action, i) => (
@@ -337,8 +337,8 @@ export default class MultiSelect extends React.Component {
                 ))
               }
             </ButtonGroup>
-          }
-        </ControlFooter>
+          </ControlFooter>
+        }
       </ControlWrapper>
     );
   }

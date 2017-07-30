@@ -18,7 +18,7 @@ class EntityListItemWatch extends React.PureComponent { // eslint-disable-line r
     this.state = { height: 0 };
   }
   componentWillMount() {
-    this.setState({ height: getRenderedHeight(this.props.renderEntity()) });
+    this.setState({ height: getRenderedHeight(this.props.renderEntity(true)) });
   }
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.isInViewport !== nextProps.isInViewport
@@ -30,8 +30,7 @@ class EntityListItemWatch extends React.PureComponent { // eslint-disable-line r
   componentWillUpdate(nextProps) {
     // only recalculate height if not in viewport and only if things changed
     if (!nextProps.isInViewport && (this.props.expandNo !== nextProps.expandNo || this.props.entity !== nextProps.entity)) {
-      // console.log('componentWillUpdate setheight', this.props.entity.get('id'))
-      this.setState({ height: getRenderedHeight(this.props.renderEntity()) });
+      this.setState({ height: getRenderedHeight(this.props.renderEntity(true)) });
     }
   }
 

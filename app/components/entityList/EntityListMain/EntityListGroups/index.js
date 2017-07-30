@@ -232,6 +232,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                           }
                           <EntityListItems
                             taxonomies={this.props.taxonomies}
+                            connections={this.props.connections}
                             config={config}
                             entities={entitySubGroup.get('entities')}
                             entityIdsSelected={entityIdsSelected}
@@ -249,6 +250,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                     { entityGroup.get('entities') && !entityGroup.get('entityGroups') &&
                       <EntityListItems
                         taxonomies={this.props.taxonomies}
+                        connections={this.props.connections}
                         config={config}
                         entities={entityGroup.get('entities')}
                         entityIdsSelected={entityIdsSelected}
@@ -282,6 +284,7 @@ EntityListGroups.propTypes = {
   entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object,

@@ -14,7 +14,7 @@ import DocumentView from 'components/DocumentView';
 import DocumentWrap from 'components/fields/DocumentWrap';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 
-import ProgressBar from 'components/ProgressBar';
+import Loading from 'components/Loading';
 
 import { API_ENDPOINT, SIGNING_URL_ENDPOINT } from 'containers/App/constants';
 
@@ -136,7 +136,7 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
               <FormattedMessage {...appMessages.attributes.document_uploading} />
               {` ${this.state.progress}%`}
               {this.props.value}
-              <ProgressBar
+              <Loading
                 progress={this.state.progress}
               />
             </Uploading>

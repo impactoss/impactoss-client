@@ -42,6 +42,7 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
         <EntityListItemsWrap>
           <EntityListItems
             taxonomies={field.taxonomies}
+            connections={field.connections}
             config={{ connections: { options: field.connectionOptions } }}
             entities={
               this.state.showAllConnections
