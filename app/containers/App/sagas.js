@@ -4,7 +4,7 @@
 
 import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
 import { push, goBack } from 'react-router-redux';
-import { reduce, keyBy } from 'lodash/collection';
+import { reduce, keyBy, find } from 'lodash/collection';
 import { without } from 'lodash/array';
 
 import asArray from 'utils/as-array';
@@ -555,11 +555,16 @@ export function* updatePathSaga({ path }) {
   yield put(push(path));
 }
 
+const backTargetIgnore = ['/edit', '/new', 'login', '/reports'];
+
 export function* closeEntitySaga({ path }) {
   // the close icon is to function like back if possible, otherwise go to default path provided
   const previousPath = yield select(selectPreviousPathname);
   const currentPath = yield select(selectCurrentPathname);
-  if (previousPath && previousPath !== currentPath) {
+  if (previousPath // previous path exists
+    && previousPath !== currentPath // previous path is not the same as the current path
+    && !find(backTargetIgnore, (target) => previousPath.includes(target)) // and previous path is not one of the edit or login paths
+  ) {
     yield put(goBack());
   } else {
     yield put(push(path || '/'));
