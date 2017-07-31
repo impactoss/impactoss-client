@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
 
-import { CONTENT_LIST, CONTENT_SINGLE } from 'containers/App/constants';
+import { CONTENT_LIST, CONTENT_SINGLE, CONTENT_PAGE } from 'containers/App/constants';
 
 import Row from 'components/styled/Row';
 import SupTitle from 'components/SupTitle';
@@ -14,6 +14,8 @@ import ButtonFactory from 'components/buttons/ButtonFactory';
 
 const Styled = styled.div`
   padding: 3em 0 1em;
+  border-bottom: ${(props) => props.hasBottomBorder ? '1px solid' : 'none'};
+  border-color: ${palette('light', 2)};
 `;
 
 const TitleLarge = styled.h1`
@@ -48,12 +50,15 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
 
   renderTitle = (type, title, icon) => {
     switch (type) {
+      case CONTENT_PAGE:
       case CONTENT_LIST:
         return (<TitleLarge>{title}</TitleLarge>);
       case CONTENT_SINGLE:
         return (
           <TitleIconWrap>
-            <Icon name={icon} text textLeft />
+            { icon &&
+              <Icon name={icon} text textLeft />
+            }
             <TitleSmall>{title}</TitleSmall>
           </TitleIconWrap>
         );
@@ -64,16 +69,16 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
   render() {
     const { type, icon, supTitle, title, buttons } = this.props;
     return (
-      <Styled>
-        { type === CONTENT_LIST &&
+      <Styled hasBottomBorder={type === CONTENT_PAGE}>
+        { supTitle &&
           <SupTitle icon={icon} title={supTitle} />
         }
         <Row>
-          <Grid sm={buttons ? 1 / 2 : 1}>
+          <Grid sm={buttons ? 2 / 3 : 1}>
             {this.renderTitle(type, title, icon)}
           </Grid>
           { buttons &&
-            <Grid sm={1 / 2}>
+            <Grid sm={1 / 3}>
               <ButtonGroup>
                 {
                   buttons.map((button, i) => (

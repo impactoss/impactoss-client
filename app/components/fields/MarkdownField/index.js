@@ -17,7 +17,7 @@ class MarkdownField extends React.PureComponent { // eslint-disable-line react/p
             <FormattedMessage {...field.label} />
           </Label>
         }
-        <ReactMarkdown source={field.value} />
+        <ReactMarkdown source={field.value} className="react-markdown" />
       </FieldWrap>
     );
   }

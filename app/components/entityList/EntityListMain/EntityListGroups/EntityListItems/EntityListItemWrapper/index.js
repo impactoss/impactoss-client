@@ -108,7 +108,7 @@ EntityListItemWrapper.propTypes = {
   onExpand: PropTypes.func,
   expandNo: PropTypes.number,
   entityPath: PropTypes.string,
-  entityIcon: PropTypes.string,
+  entityIcon: PropTypes.func,
   simulate: PropTypes.bool,
 };
 

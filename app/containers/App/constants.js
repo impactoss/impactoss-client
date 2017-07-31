@@ -73,8 +73,8 @@ export const PUBLISH_STATUSES = [
   { value: false, label: 'Public' },
 ];
 export const ACCEPTED_STATUSES = [
-  { value: true, label: 'Accepted' },
-  { value: false, label: 'Noted' },
+  { value: true, label: 'Accepted', icon: 'recommendationAccepted' },
+  { value: false, label: 'Noted', icon: 'recommendationNoted' },
 ];
 export const REPORT_FREQUENCIES = [
   { value: 1, label: 'Monthly' },
@@ -106,6 +106,7 @@ export const EDIT_PANEL = 'edit';
 
 export const CONTENT_LIST = 'list';
 export const CONTENT_SINGLE = 'single';
+export const CONTENT_PAGE = 'page';
 
 export const DEPENDENCIES = [
   'user_roles',

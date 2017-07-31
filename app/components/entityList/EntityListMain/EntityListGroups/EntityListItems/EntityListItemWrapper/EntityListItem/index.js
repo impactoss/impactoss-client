@@ -104,7 +104,7 @@ EntityListItem.propTypes = {
   onSelect: PropTypes.func,
   expandNo: PropTypes.number,
   onExpand: PropTypes.func,
-  entityIcon: PropTypes.string,
+  entityIcon: PropTypes.func,
   entityPath: PropTypes.string,
   config: PropTypes.object,
   onEntityClick: PropTypes.func,

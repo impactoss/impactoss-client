@@ -23,7 +23,7 @@ import TitleShortField from 'components/fields/TitleShortField';
 
 class FieldFactory extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   renderField = (field) => {
-    if (field.value
+    if ((typeof field.value !== 'undefined' && field.value !== null)
       || (field.values && field.values.length)
       || (field.fields && field.fields.length)
       || field.showEmpty

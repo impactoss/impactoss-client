@@ -17,6 +17,7 @@ const Styled = styled.div`
   position: relative;
   background-color: ${palette('light', 2)};
   overflow: hidden;
+  margin-top: -3px;
 `;
 const Bar = styled.div`
   display: block;

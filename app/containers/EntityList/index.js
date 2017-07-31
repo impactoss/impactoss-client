@@ -128,6 +128,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           dataReady={this.props.dataReady}
           isManager={this.props.isManager}
 
+          entityIcon={this.props.entityIcon}
           formatLabel={this.formatLabel}
           onEntitySelect={this.props.onEntitySelect}
           onEntitySelectAll={this.props.onEntitySelectAll}
@@ -158,6 +159,7 @@ EntityList.propTypes = {
   header: PropTypes.object,
   locationQuery: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object, // single/plural
+  entityIcon: PropTypes.func,
   // selector props
   activePanel: PropTypes.string,
   isManager: PropTypes.bool,
