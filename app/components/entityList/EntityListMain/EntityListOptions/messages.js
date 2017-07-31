@@ -10,7 +10,7 @@ export default defineMessages({
     defaultMessage: 'Implementation Plan View',
   },
   collapse: {
-    id: 'app.containers.EntityListGroup.expand',
+    id: 'app.containers.EntityListGroup.collapse',
     defaultMessage: 'List View',
   },
 });

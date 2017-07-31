@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Link } from 'react-router';
 
+import { sortEntities } from 'utils/sort';
 import { truncateText } from 'utils/string';
 
 const POPUP_WIDTH = 350;
@@ -169,7 +170,9 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
               </PopupHeader>
               <PopupContent count={connection.entities.size}>
                 {
-                  connection.entities.toList().map((entity, i) => {
+                  sortEntities(connection.entities, 'asc', 'reference')
+                  .toList()
+                  .map((entity, i) => {
                     const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
                     return (
                       <ListItem key={i}>
