@@ -7,8 +7,13 @@ import asList from 'utils/as-list';
 import {
   getConnectedCategories,
   testEntityCategoryAssociation,
+  getEntityTitle,
+  getEntityReference,
 } from 'utils/entities';
-import { optionChecked, attributeOptionChecked } from './utils';
+import {
+  optionChecked,
+  attributeOptionChecked,
+} from './utils';
 
 export const makeActiveFilterOptions = (entities, filters, activeFilterOption, locationQuery, taxonomies, connections, connectedTaxonomies, messages, formatLabel) => {
   // create filterOptions
@@ -119,13 +124,6 @@ export const makeAttributeFilterOptions = (entities, filters, activeOptionId, lo
   return filterOptions;
 };
 
-
-const getCategoryTitle = (category) =>
-  category.getIn(['attributes', 'title'])
-  || category.getIn(['attributes', 'name']);
-
-const getCategoryReference = (category) =>
-  category.getIn(['attributes', 'reference']) || null;
 //
 //
 //
@@ -148,8 +146,8 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
           const value = parseInt(queryValue, 10);
           if (taxonomy.getIn(['categories', value])) {
             filterOptions.options[value] = {
-              reference: getCategoryReference(taxonomy.getIn(['categories', value])),
-              label: getCategoryTitle(taxonomy.getIn(['categories', value])),
+              reference: getEntityReference(taxonomy.getIn(['categories', value]), false),
+              label: getEntityTitle(taxonomy.getIn(['categories', value])),
               showCount: true,
               value,
               count: 0,
@@ -184,7 +182,7 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
         // if entity has categories
         if (entity.get('categories')) {
           // add categories from entities if not present otherwise increase count
-          taxonomy.get('categories').forEach((cat, catId) => {
+          taxonomy.get('categories').forEach((category, catId) => {
             // if entity has category of active taxonomy
             if (testEntityCategoryAssociation(entity, catId)) {
               taxCategoryIds.push(catId);
@@ -192,9 +190,9 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
               if (filterOptions.options[catId]) {
                 filterOptions.options[catId].count += 1;
               } else {
-                const label = getCategoryTitle(cat);
+                const label = getEntityTitle(category);
                 filterOptions.options[catId] = {
-                  reference: getCategoryReference(cat),
+                  reference: getEntityReference(category, false),
                   label,
                   showCount: true,
                   value: catId,
@@ -229,14 +227,6 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
   return filterOptions;
 };
 
-const getConnectionTitle = (connection) =>
-  connection.getIn(['attributes', 'title'])
-  || connection.getIn(['attributes', 'friendly_name'])
-  || connection.getIn(['attributes', 'name']);
-const getConnectionReference = (connection) =>
-  connection.getIn(['attributes', 'reference'])
-  || connection.getIn(['attributes', 'number'])
-  || connection.get('id');
 //
 //
 //
@@ -266,10 +256,10 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
               const value = parseInt(locationQueryValueConnection[1], 10);
               filterOptions.options[value] = {
                 reference: connections.get(option.path) && connections.getIn([option.path, value])
-                    ? getConnectionReference(connections.getIn([option.path, value]))
+                    ? getEntityReference(connections.getIn([option.path, value]))
                     : '',
                 label: connections.get(option.path) && connections.getIn([option.path, value])
-                    ? getConnectionTitle(connections.getIn([option.path, value]))
+                    ? getEntityTitle(connections.getIn([option.path, value]))
                     : upperFirst(value),
                 showCount: true,
                 value: `${option.path}:${value}`,
@@ -314,8 +304,8 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
                 filterOptions.options[connectedId].count += 1;
               } else {
                 const value = `${option.path}:${connectedId}`;
-                const reference = getConnectionReference(connection);
-                const label = getConnectionTitle(connection);
+                const reference = getEntityReference(connection);
+                const label = getEntityTitle(connection);
                 filterOptions.options[connectedId] = {
                   label,
                   reference,
@@ -378,10 +368,10 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
               if (connection.path === locationQueryValueCategory[0]) {
                 const categoryId = parseInt(locationQueryValueCategory[1], 10);
                 if (taxonomy.getIn(['categories', categoryId])) {
-                  const cat = taxonomy.getIn(['categories', categoryId]);
+                  const category = taxonomy.getIn(['categories', categoryId]);
                   filterOptions.options[categoryId] = {
-                    reference: getCategoryReference(cat),
-                    label: getCategoryTitle(cat),
+                    reference: getEntityReference(category, false),
+                    label: getEntityTitle(category),
                     showCount: true,
                     value: `${connection.path}:${categoryId}`,
                     count: 0,
@@ -412,9 +402,9 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
                 filterOptions.options[category.get('id')].count += 1;
               } else {
                 const value = `${connection.path}:${category.get('id')}`;
-                const label = getCategoryTitle(category);
+                const label = getEntityTitle(category);
                 filterOptions.options[category.get('id')] = {
-                  reference: getCategoryReference(category),
+                  reference: getEntityReference(category, false),
                   label,
                   showCount: true,
                   value,

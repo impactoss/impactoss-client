@@ -195,3 +195,15 @@ export const usersSetRoles = (users, userRoles, roleId) =>
     );
     return roles && roles.size > 0;
   });
+
+export const getEntityTitle = (entity) =>
+  entity.getIn(['attributes', 'title'])
+  || entity.getIn(['attributes', 'friendly_name'])
+  || entity.getIn(['attributes', 'name']);
+
+export const getEntityReference = (entity, defaultToId = true) =>
+  defaultToId
+    ? (entity.getIn(['attributes', 'reference'])
+      || entity.getIn(['attributes', 'number'])
+      || entity.get('id'))
+    : (entity.getIn(['attributes', 'reference']) || null);
