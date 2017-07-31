@@ -170,11 +170,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
               </PopupHeader>
               <PopupContent count={connection.entities.size}>
                 {
-                  sortEntities(
-                    connection.entities,
-                    'asc',
-                    'reference'
-                  )
+                  sortEntities(connection.entities, 'asc', 'reference')
                   .toList()
                   .map((entity, i) => {
                     const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
