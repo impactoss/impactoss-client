@@ -78,6 +78,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       connections,
       connectedTaxonomies,
       locationQuery,
+      entityIcon,
     } = this.props;
 
     const expandNo = config.expandableColumns && locationQuery.get('expand')
@@ -155,7 +156,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     onEntityClick={this.props.onEntityClick}
                     entityTitle={entityTitle}
                     config={config}
-                    header={header}
+                    entityIcon={entityIcon}
                     isManager={isManager}
                     onExpand={onExpand}
                     expandNo={expandNo}
@@ -197,6 +198,7 @@ EntityListMain.propTypes = {
   // primitive
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
+  entityIcon: PropTypes.func,
   // functions
   formatLabel: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,

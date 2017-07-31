@@ -112,7 +112,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     const {
       entityIdsSelected,
       config,
-      header,
+      entityIcon,
       onEntityClick,
       isManager,
       onEntitySelect,
@@ -236,7 +236,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             config={config}
                             entities={entitySubGroup.get('entities')}
                             entityIdsSelected={entityIdsSelected}
-                            entityIcon={header.icon}
+                            entityIcon={entityIcon}
                             onEntityClick={onEntityClick}
                             isManager={isManager}
                             onEntitySelect={onEntitySelect}
@@ -254,7 +254,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                         config={config}
                         entities={entityGroup.get('entities')}
                         entityIdsSelected={entityIdsSelected}
-                        entityIcon={header.icon}
+                        entityIcon={entityIcon}
                         onEntityClick={onEntityClick}
                         isManager={isManager}
                         onEntitySelect={onEntitySelect}
@@ -289,7 +289,7 @@ EntityListGroups.propTypes = {
   locationQuery: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object,
   config: PropTypes.object,
-  header: PropTypes.object,
+  entityIcon: PropTypes.func,
   isManager: PropTypes.bool,
   expandNo: PropTypes.number,
   onExpand: PropTypes.func.isRequired,

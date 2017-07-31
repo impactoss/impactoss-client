@@ -8,10 +8,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-// import { isEqual } from 'lodash/lang';
+import { find } from 'lodash/collection';
 import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { ACCEPTED_STATUSES } from 'containers/App/constants';
 import {
   selectReady,
   selectRecommendationConnections,
@@ -92,6 +93,12 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           entityTitle={{
             single: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
             plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+          }}
+          entityIcon={(entity) => {
+            const status = find(ACCEPTED_STATUSES,
+              (option) => option.value === entity.getIn(['attributes', 'accepted'])
+            );
+            return status ? status.icon : null;
           }}
           locationQuery={fromJS(this.props.location.query)}
         />

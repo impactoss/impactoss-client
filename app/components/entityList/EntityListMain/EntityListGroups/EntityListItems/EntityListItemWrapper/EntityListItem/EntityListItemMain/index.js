@@ -90,6 +90,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       nestLevel,
       entityPath,
       connections,
+      entityIcon,
     } = this.props;
     return {
       id: entity.get('id'),
@@ -97,6 +98,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       reference: entity.getIn(['attributes', 'reference']) || entity.get('id'),
       status: entity.getIn(['attributes', 'draft']) ? 'draft' : null,
       path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
+      entityIcon: entityIcon && entityIcon(entity),
       tags: taxonomies
         ? this.getEntityTags(entity,
           taxonomies,
@@ -109,7 +111,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     };
   };
   render() {
-    const { entityIcon, nestLevel, onEntityClick } = this.props;
+    const { nestLevel, onEntityClick } = this.props;
 
     const entity = this.mapToEntityListItem();
 
@@ -117,7 +119,6 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       <Styled>
         <EntityListItemMainTop
           entity={entity}
-          entityIcon={entityIcon}
           onEntityClick={(evt) => {
             evt.preventDefault();
             onEntityClick(entity.id, entity.path);
@@ -154,7 +155,7 @@ EntityListItemMain.propTypes = {
   connections: PropTypes.instanceOf(Map),
   wrapper: PropTypes.object,
   config: PropTypes.object,
-  entityIcon: PropTypes.string,
+  entityIcon: PropTypes.func,
   entityPath: PropTypes.string,
   nestLevel: PropTypes.number,
   onEntityClick: PropTypes.func,
