@@ -1,4 +1,8 @@
 import { Map, List } from 'immutable';
+import {
+  getEntityTitle,
+  getEntityReference,
+} from 'utils/entities';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 import {
   PUBLISH_STATUSES,
@@ -7,28 +11,15 @@ import {
   DOC_PUBLISH_STATUSES,
 } from 'containers/App/constants';
 
-export const entityOption = (entity, reference) => Map({
+export const entityOption = (entity, defaultToId) => Map({
   value: entity.get('id'),
-  label: entity.getIn(['attributes', 'title']),
-  reference,
+  label: getEntityTitle(entity),
+  reference: getEntityReference(entity, defaultToId),
   checked: !!entity.get('associated'),
-  order: reference || entity.getIn(['attributes', 'title']),
 });
 
-export const entityOptions = (entities, includeReference = false, includeIdFallback = true) => entities
-  ? entities.reduce((options, entity) => {
-    if (includeReference) {
-      return options.push(entityOption(
-        entity,
-        entity.getIn(['attributes', 'reference']) || (
-          includeIdFallback
-          ? entity.get('id')
-          : null
-        )
-      ));
-    }
-    return options.push(entityOption(entity));
-  }, List())
+export const entityOptions = (entities, defaultToId = true) => entities
+  ? entities.toList().map((entity) => entityOption(entity, defaultToId))
   : List();
 
 export const userOption = (entity, activeUserId) => Map({
@@ -61,7 +52,7 @@ export const dateOption = (entity, activeDateId) => Map({
 
 export const taxonomyOptions = (taxonomies) => taxonomies
   ? taxonomies.reduce((values, tax) =>
-    values.set(tax.get('id'), entityOptions(tax.get('categories'), true, false)), Map())
+    values.set(tax.get('id'), entityOptions(tax.get('categories'), false)), Map())
   : Map();
 
 export const renderMeasureControl = (entities) => entities
@@ -71,7 +62,7 @@ export const renderMeasureControl = (entities) => entities
   dataPath: ['associatedMeasures'],
   label: 'Actions',
   controlType: 'multiselect',
-  options: entityOptions(entities, true),
+  options: entityOptions(entities),
 }
 : null;
 export const renderSdgTargetControl = (entities) => entities
@@ -81,7 +72,7 @@ export const renderSdgTargetControl = (entities) => entities
   dataPath: ['associatedSdgTargets'],
   label: 'SDG targets',
   controlType: 'multiselect',
-  options: entityOptions(entities, true),
+  options: entityOptions(entities),
 }
 : null;
 
@@ -92,7 +83,7 @@ export const renderRecommendationControl = (entities) => entities
   dataPath: ['associatedRecommendations'],
   label: 'Recommendations',
   controlType: 'multiselect',
-  options: entityOptions(entities, true),
+  options: entityOptions(entities),
 }
 : null;
 
@@ -103,7 +94,7 @@ export const renderIndicatorControl = (entities) => entities
   dataPath: ['associatedIndicators'],
   label: 'Indicators',
   controlType: 'multiselect',
-  options: entityOptions(entities, true),
+  options: entityOptions(entities),
 }
 : null;
 
@@ -127,7 +118,7 @@ export const renderTaxonomyControl = (taxonomies) => taxonomies
   label: tax.getIn(['attributes', 'title']),
   controlType: 'multiselect',
   multiple: tax.getIn(['attributes', 'allow_multiple']),
-  options: entityOptions(tax.get('categories'), true, false),
+  options: entityOptions(tax.get('categories'), false),
 }), [])
 : [];
 
@@ -141,17 +132,12 @@ export const validateDateFormat = (val) => {
 };
 
 const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
-  ? taxonomy.get('categories').reduce((catsAssociated, cat) => {
-    if (cat.get('associated')) {
-      return catsAssociated.set(cat.get('id'), cat.get('associated').keySeq().first());
-    }
-    return catsAssociated;
-  }, Map())
+  ? getAssociatedEntities(taxonomy.get('categories'))
   : Map();
 
 const getAssociatedEntities = (entities) =>
   entities.reduce((entitiesAssociated, entity) => entity.get('associated')
-    ? entitiesAssociated.set(entity.get('id'), entity.get('associated').keySeq().first())
+    ? entitiesAssociated.set(entity.get('id'), entity.getIn(['associated', 'id']))
     : entitiesAssociated
   , Map());
 

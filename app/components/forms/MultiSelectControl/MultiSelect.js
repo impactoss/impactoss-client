@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
-import { kebabCase, lowerCase } from 'lodash/string';
+import { kebabCase } from 'lodash/string';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+
+import { getEntitySortComparator } from 'utils/sort';
 
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
@@ -114,12 +116,6 @@ export const getUncheckedValuesFromOptions = (options, onlyChanged = false) => {
   return opts.filterNot((o) => o.get('checked')).map((o) => o.get('value'));
 };
 
-const sortValues = {
-  [CHECKBOX_STATES.CHECKED]: -1,
-  [CHECKBOX_STATES.INDETERMINATE]: 0,
-  [CHECKBOX_STATES.UNCHECKED]: 1,
-};
-
 export default class MultiSelect extends React.Component {
 
   static propTypes = {
@@ -157,15 +153,6 @@ export default class MultiSelect extends React.Component {
     });
   }
 
-  getOrder = (option) => {
-    if (typeof option.get('order') !== 'undefined') {
-      return lowerCase(option.get('order').toString());
-    } else if (typeof option.get('label') === 'string') {
-      return lowerCase(option.get('label'));
-    }
-    return 'zzzzzzzzz';
-  }
-
   getNextValues = (checked, option) => {
     const { multiple, required, values } = this.props;
 
@@ -196,15 +183,81 @@ export default class MultiSelect extends React.Component {
     return existingValueIndex > -1 ? nextValues.set(existingValueIndex, newValue) : nextValues.push(newValue);
   }
 
+  // getOrder = (option) => {
+  //   if (typeof option.get('order') !== 'undefined') {
+  //     return lowerCase(option.get('order').toString());
+  //   } else if (typeof option.get('label') === 'string') {
+  //     return lowerCase(option.get('label'));
+  //   }
+  //   return 'zzzzzzzzz';
+  // }
+
+  getOptionSortValueMapper = (option) => {
+    if (option.get('order')) {
+      return option.get('order');
+    }
+    if (option.get('reference')) {
+      return option.get('reference');
+    }
+    return option.get('label');
+  }
+  getOptionSortAdditionalValueMapper = (option) => {
+    if (option.get('initialChecked')) {
+      return -2;
+    }
+    if (option.get('isIndeterminate')) {
+      return -1;
+    }
+    if (option.get('query') === 'without') {
+      return 0;
+    }
+    return 1;
+  }
+  prepareOptions = (options, values, threeState) =>
+    options.map((option) => {
+      const value = values.find((v) => option.get('value') === v.get('value') && option.get('query') === v.get('query'));
+      return option.withMutations((o) =>
+        o.set('checked', value ? value.get('checked') : false)
+        .set('initialChecked', option.get('checked'))
+        .set('isIndeterminate', threeState && option.get('checked') === CHECKBOX_STATES.INDETERMINATE)
+      );
+    });
+  sortOptions = (options) => options
+    .sortBy(
+      (option) => this.getOptionSortValueMapper(option),
+      (a, b) => getEntitySortComparator(a, b, 'asc')
+    )
+    .sortBy(
+      (option) => this.getOptionSortAdditionalValueMapper(option),
+      (a, b) => getEntitySortComparator(a, b, 'asc')
+    )
+  filterOptions = (options, query) => {    // filter checkboxes if needed
+      // match multiple words
+      // see http://stackoverflow.com/questions/5421952/how-to-match-multiple-words-in-regex
+    try {
+      const regex = query.split(' ').reduce((memo, str) => `${memo}(?=.*\\b${str})`, '');
+      const pattern = new RegExp(regex, 'i');
+      return options.filter((option) =>
+        pattern.test(option.get('value'))
+        || pattern.test(option.get('label'))
+        || pattern.test(option.get('reference'))
+        || pattern.test(option.get('search'))
+      );
+    } catch (e) {
+      // nothing
+      return options;
+    }
+  }
+
   renderCheckbox = (option, i) => {
     const checked = option.get('checked');
     // TODO consider isImmutable (need to upgrade to immutable v4)
-    const isThreeState = option.get('isThreeState');
+    const isIndeterminate = option.get('isIndeterminate');
     const id = `${checked}-${i}-${kebabCase(option.get('value'))}-${kebabCase(option.get('query'))}`;
     return (
       <OptionWrapper key={id}>
         <CheckboxWrapper>
-          { isThreeState &&
+          { isIndeterminate &&
             <IndeterminateCheckbox
               id={id}
               checked={checked}
@@ -213,7 +266,7 @@ export default class MultiSelect extends React.Component {
               }}
             />
           }
-          { !isThreeState &&
+          { !isIndeterminate &&
             <input
               id={id}
               type="checkbox"
@@ -267,51 +320,15 @@ export default class MultiSelect extends React.Component {
     const { options, values, threeState } = this.props;
 
     // prepare checkboxes
-    let checkboxes = options.map((option) => {
-      const value = values.find((v) => option.get('value') === v.get('value') && option.get('query') === v.get('query'));
-      return option.withMutations((o) =>
-        o.set('checked', value ? value.get('checked') : false)
-        .set('initialChecked', option.get('checked'))
-        .set('isThreeState', threeState && option.get('checked') === CHECKBOX_STATES.INDETERMINATE)
-        .set('order', this.getOrder(option))
-      );
-    });
+    let checkboxOptions = this.prepareOptions(options, values, threeState);
 
-    // filter checkboxes if needed
-    // match multiple words
-    // see http://stackoverflow.com/questions/5421952/how-to-match-multiple-words-in-regex
     if (this.props.search && this.state.query) {
-      try {
-        const regex = this.state.query.split(' ').reduce((memo, str) => `${memo}(?=.*\\b${str})`, '');
-        const pattern = new RegExp(regex, 'i');
-        checkboxes = checkboxes.filter((option) =>
-          pattern.test(option.get('value'))
-          || pattern.test(option.get('label'))
-          || pattern.test(option.get('reference'))
-          || pattern.test(option.get('search'))
-        );
-      } catch (e) {
-        // nothing
-      }
+      checkboxOptions = this.filterOptions(checkboxOptions, this.state.query);
     }
 
     // sort checkboxes
-    checkboxes = checkboxes.sort((a, b) => {
-      const aSort = a.get('order');
-      const bSort = b.get('order');
-      // first check for 0 order
-      if (aSort === '0' && aSort < bSort) return -1;
-      if (bSort === '0' && bSort < aSort) return 1;
-      // then check checked state
-      const aSortChecked = sortValues[a.get('initialChecked')];
-      const bSortChecked = sortValues[b.get('initialChecked')];
-      if (aSortChecked < bSortChecked) return -1;
-      if (aSortChecked > bSortChecked) return 1;
-      // if same checked state, sort by order value
-      if (aSort < bSort) return -1;
-      if (aSort > bSort) return 1;
-      return 0;
-    });
+    checkboxOptions = this.sortOptions(checkboxOptions);
+
     return (
       <ControlWrapper>
         <ControlHeader>
@@ -326,7 +343,7 @@ export default class MultiSelect extends React.Component {
           </ControlSearch>
         }
         <ControlMain search={this.props.search} hasFooter={this.props.buttons}>
-          {checkboxes && checkboxes.map(this.renderCheckbox)}
+          {checkboxOptions && checkboxOptions.map(this.renderCheckbox)}
         </ControlMain>
         { this.props.buttons &&
           <ControlFooter>

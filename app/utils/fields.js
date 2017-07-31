@@ -1,4 +1,5 @@
 import { truncateText } from 'utils/string';
+import { sortEntities } from 'utils/sort';
 
 export const getIdField = (entity) => ({
   controlType: 'info',
@@ -116,11 +117,17 @@ export const getTextField = (entity, attribute, appMessages) =>
   });
 
 const mapCategoryOptions = (categories) => categories
-  ? categories.map((cat) => ({
-    label: cat.getIn(['attributes', 'title']),
-    reference: cat.getIn(['attributes', 'reference']) || null,
-    linkTo: `/category/${cat.get('id')}`,
-  })).toArray()
+  ? sortEntities(
+      categories,
+      'asc',
+      'referenceThenTitle',
+    )
+    .map((cat) => ({
+      label: cat.getIn(['attributes', 'title']),
+      reference: cat.getIn(['attributes', 'reference']) || null,
+      linkTo: `/category/${cat.get('id')}`,
+    }))
+    .toArray()
   : [];
 
 const mapReports = (reports) => reports
@@ -204,7 +211,7 @@ const getConnectionField = ({
 
 export const getIndicatorConnectionField = (entities, connections, appMessages, onEntityClick) =>
   getConnectionField({
-    entities,
+    entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies: null,
     connections,
     connectionOptions: ['measures', 'sdgtargets'],
@@ -215,7 +222,7 @@ export const getIndicatorConnectionField = (entities, connections, appMessages, 
 
 export const getRecommendationConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
   getConnectionField({
-    entities,
+    entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies,
     connections,
     connectionOptions: ['measures'],
@@ -226,7 +233,7 @@ export const getRecommendationConnectionField = (entities, taxonomies, connectio
 
 export const getSdgTargetConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
   getConnectionField({
-    entities,
+    entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies,
     connections,
     connectionOptions: ['indicators', 'measures'],
@@ -237,7 +244,7 @@ export const getSdgTargetConnectionField = (entities, taxonomies, connections, a
 
 export const getMeasureConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
   getConnectionField({
-    entities,
+    entities: sortEntities(entities, 'asc', 'id'),
     taxonomies,
     connections,
     connectionOptions: ['indicators', 'recommendations', 'sdgtargets'],

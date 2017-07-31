@@ -4,6 +4,8 @@ import { STATES as CHECKBOX } from 'components/forms/IndeterminateCheckbox';
 import {
   testEntityEntityAssociation,
   testEntityCategoryAssociation,
+  getEntityTitle,
+  getEntityReference,
 } from 'utils/entities';
 
 export const checkedState = (count, length) => {
@@ -46,6 +48,7 @@ export const makeAttributeEditOptions = (entities, edits, activeEditOption, mess
     forEach(option.options, (attributeOption) => {
       const count = entities.reduce((counter, entity) =>
         typeof entity.getIn(['attributes', option.attribute]) !== 'undefined'
+          && entity.getIn(['attributes', option.attribute]) !== null
           && entity.getIn(['attributes', option.attribute]).toString() === attributeOption.value.toString()
           ? counter + 1
           : counter
@@ -56,7 +59,6 @@ export const makeAttributeEditOptions = (entities, edits, activeEditOption, mess
         value: attributeOption.value,
         attribute: option.attribute,
         checked: checkedState(count, entities.size),
-        order: attributeOption.label,
       };
     });
   }
@@ -82,12 +84,11 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
       const count = entities.reduce((counter, entity) =>
         testEntityCategoryAssociation(entity, category.get('id')) ? counter + 1 : counter
       , 0);
-      const label = category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']);
       editOptions.options[category.get('id')] = {
-        label,
+        reference: getEntityReference(category, false),
+        label: getEntityTitle(category),
         value: category.get('id'),
         checked: checkedState(count, entities.size),
-        order: label,
       };
     });
   }
@@ -113,15 +114,11 @@ export const makeConnectionEditOptions = (entities, edits, connections, activeEd
       const count = entities.reduce((counter, entity) =>
         testEntityEntityAssociation(entity, option.path, connection.get('id')) ? counter + 1 : counter
       , 0);
-      const reference = connection.getIn(['attributes', 'number']) || connection.get('id');
       editOptions.options[connection.get('id')] = {
-        label: connection.getIn(['attributes', 'title'])
-          || connection.getIn(['attributes', 'friendly_name'])
-          || connection.getIn(['attributes', 'name']),
-        reference,
+        reference: getEntityReference(connection),
+        label: getEntityTitle(connection),
         value: connection.get('id'),
         checked: checkedState(count, entities.size),
-        order: reference,
       };
     });
   }

@@ -5,6 +5,7 @@ export const DEPENDENCIES = [
   'users',
   'taxonomies',
   'categories',
+  'measure_categories',
   'sdgtarget_categories',
   'indicators',
   'sdgtarget_indicators',
