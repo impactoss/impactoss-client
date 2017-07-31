@@ -106,6 +106,7 @@ export const EDIT_PANEL = 'edit';
 
 export const CONTENT_LIST = 'list';
 export const CONTENT_SINGLE = 'single';
+export const CONTENT_PAGE = 'page';
 
 export const DEPENDENCIES = [
   'user_roles',

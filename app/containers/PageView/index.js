@@ -9,13 +9,20 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
-import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  updatePath,
+  // closeEntity
+} from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { CONTENT_PAGE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
-import Content from 'components/Content';
+import Container from 'components/styled/Container';
+import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 
@@ -26,7 +33,6 @@ import {
 } from 'containers/App/selectors';
 
 import {
-  getTitleField,
   getStatusField,
   getMetaField,
   getMarkdownField,
@@ -36,6 +42,10 @@ import appMessages from 'containers/App/messages';
 import messages from './messages';
 import { selectViewEntity } from './selectors';
 import { DEPENDENCIES } from './constants';
+
+const Styled = styled(ContainerWrapper)`
+  background-color: ${palette('primary', 4)}
+`;
 
 export class PageView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -49,28 +59,22 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     }
   }
 
-  getHeaderMainFields = (entity) => ([{
-    fields: [getTitleField(entity, true)],
-  }]);
-  getHeaderAsideFields = (entity) => ([{
+  getBodyAsideFields = (entity) => ([{
     fields: [
       getStatusField(entity),
       getMetaField(entity, appMessages),
     ],
   }]);
   getBodyMainFields = (entity) => ([{
-    fields: [getMarkdownField(entity, 'content', true, appMessages)],
+    fields: [getMarkdownField(entity, 'content', false, appMessages)],
   }]);
 
   getFields = (entity, isContributor) => ({
-    header: isContributor
-      ? {
-        main: this.getHeaderMainFields(entity),
-        aside: this.getHeaderAsideFields(entity),
-      }
-      : null,
     body: {
       main: this.getBodyMainFields(entity),
+      aside: isContributor
+        ? this.getBodyAsideFields(entity)
+        : null,
     },
   })
 
@@ -79,20 +83,11 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     const { page, dataReady, isAdmin, isContributor } = this.props;
 
     const buttons = isAdmin
-    ? [
-      {
-        type: 'edit',
-        onClick: this.props.handleEdit,
-      },
-      {
-        type: 'close',
-        onClick: this.props.handleClose,
-      },
-    ]
-    : [{
-      type: 'close',
-      onClick: this.props.handleClose,
-    }];
+    ? [{
+      type: 'edit',
+      onClick: this.props.handleEdit,
+    }]
+    : [];
 
     return (
       <div>
@@ -102,26 +97,30 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content>
-          <ContentHeader
-            title={page ? page.getIn(['attributes', 'title']) : ''}
-            type={CONTENT_SINGLE}
-            buttons={buttons}
-          />
-          { !page && !dataReady &&
-            <Loading />
-          }
-          { !page && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
-          }
-          { page && dataReady &&
-            <EntityView
-              fields={this.getFields(page, isContributor)}
+        <Styled className={`content-${CONTENT_PAGE}`}>
+          <Container isNarrow={!isContributor}>
+            <ContentHeader
+              title={page ? page.getIn(['attributes', 'title']) : ''}
+              supTitle={page ? page.getIn(['attributes', 'menu_title']) : ''}
+              type={CONTENT_PAGE}
+              buttons={buttons}
             />
-          }
-        </Content>
+            { !page && !dataReady &&
+              <Loading />
+            }
+            { !page && dataReady &&
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            }
+            { page && dataReady &&
+              <EntityView
+                fields={this.getFields(page, isContributor)}
+                seemless
+              />
+            }
+          </Container>
+        </Styled>
       </div>
     );
   }
@@ -130,7 +129,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
 PageView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleEdit: PropTypes.func,
-  handleClose: PropTypes.func,
+  // handleClose: PropTypes.func,
   page: PropTypes.object,
   dataReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
@@ -158,9 +157,9 @@ function mapDispatchToProps(dispatch, props) {
     handleEdit: () => {
       dispatch(updatePath(`/pages/edit/${props.params.id}`));
     },
-    handleClose: () => {
-      dispatch(closeEntity('/pages'));
-    },
+    // handleClose: () => {
+    //   dispatch(closeEntity('/pages'));
+    // },
   };
 }
 
