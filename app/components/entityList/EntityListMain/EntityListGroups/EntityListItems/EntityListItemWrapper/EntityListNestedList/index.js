@@ -30,7 +30,7 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
       expandNo,
     } = this.props;
 
-    const entityIcon = config.expandableColumns[nestLevel - 1].icon;
+    // const entityIcon = config.expandableColumns[nestLevel - 1].icon;
     return (
       <Styled>
         {
@@ -38,7 +38,6 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
             <ItemWrapper key={i} separated={(expandNo - nestLevel) > 0 && i > 0}>
               <EntityListNestedItem
                 entity={entity}
-                entityIcon={entityIcon}
                 expandNo={expandNo}
                 nestLevel={nestLevel}
                 config={config}

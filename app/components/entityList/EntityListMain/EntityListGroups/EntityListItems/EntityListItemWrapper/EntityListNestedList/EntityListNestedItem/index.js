@@ -33,7 +33,6 @@ export default class EntityListNestedItem extends React.PureComponent { // eslin
     entity: PropTypes.object.isRequired,
     expandNo: PropTypes.number,
     nestLevel: PropTypes.number,
-    entityIcon: PropTypes.string,
     config: PropTypes.object,
     onEntityClick: PropTypes.func,
     onExpand: PropTypes.func,
@@ -43,7 +42,6 @@ export default class EntityListNestedItem extends React.PureComponent { // eslin
     const {
       entity,
       expandNo,
-      entityIcon,
       onExpand,
       onEntityClick,
       config,
@@ -56,7 +54,6 @@ export default class EntityListNestedItem extends React.PureComponent { // eslin
           <MainWrapper expandable={entity.get('expandable')}>
             <EntityListItemMain
               entity={entity}
-              entityIcon={entityIcon}
               config={config}
               onEntityClick={onEntityClick}
               nestLevel={nestLevel}
