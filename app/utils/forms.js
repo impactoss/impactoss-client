@@ -132,17 +132,12 @@ export const validateDateFormat = (val) => {
 };
 
 const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
-  ? taxonomy.get('categories').reduce((catsAssociated, cat) => {
-    if (cat.get('associated')) {
-      return catsAssociated.set(cat.get('id'), cat.get('associated').keySeq().first());
-    }
-    return catsAssociated;
-  }, Map())
+  ? getAssociatedEntities(taxonomy.get('categories'))
   : Map();
 
 const getAssociatedEntities = (entities) =>
   entities.reduce((entitiesAssociated, entity) => entity.get('associated')
-    ? entitiesAssociated.set(entity.get('id'), entity.get('associated').keySeq().first())
+    ? entitiesAssociated.set(entity.get('id'), entity.getIn(['associated', 'id']))
     : entitiesAssociated
   , Map());
 
