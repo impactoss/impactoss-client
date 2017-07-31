@@ -48,6 +48,7 @@ export const makeAttributeEditOptions = (entities, edits, activeEditOption, mess
     forEach(option.options, (attributeOption) => {
       const count = entities.reduce((counter, entity) =>
         typeof entity.getIn(['attributes', option.attribute]) !== 'undefined'
+          && entity.getIn(['attributes', option.attribute]) !== null
           && entity.getIn(['attributes', option.attribute]).toString() === attributeOption.value.toString()
           ? counter + 1
           : counter
