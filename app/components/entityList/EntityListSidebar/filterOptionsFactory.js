@@ -84,7 +84,6 @@ export const makeAttributeFilterOptions = (entities, filters, activeOptionId, lo
               count: 1,
               query: 'where',
               checked: optionChecked(locationQueryValue, queryValue),
-              order: extension ? extension.getIn(['attributes', option.extension.label]) : value,
             };
           } else if (option.options) {
             const attribute = find(option.options, (o) => o.value.toString() === value);
@@ -96,7 +95,6 @@ export const makeAttributeFilterOptions = (entities, filters, activeOptionId, lo
               count: 1,
               query: 'where',
               checked: optionChecked(locationQueryValue, queryValue),
-              order: label,
             };
           }
         } else if (option.extension && option.extension.without) {
@@ -114,7 +112,6 @@ export const makeAttributeFilterOptions = (entities, filters, activeOptionId, lo
               count: 1,
               query: 'where',
               checked: optionChecked(locationQueryValue, queryValue),
-              order: 0,
             };
           }
         }
@@ -199,7 +196,6 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
                   count: 1,
                   query: filters.query,
                   checked: optionChecked(locationQuery.get(filters.query), catId),
-                  order: label,
                 };
               }
             }
@@ -217,7 +213,6 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
               count: 1,
               query: 'without',
               checked: optionChecked(locationQuery.get('without'), taxonomy.get('id')),
-              order: 0,
             };
           }
         }
@@ -314,7 +309,6 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
                   count: 1,
                   query,
                   checked: optionChecked(locationQueryValue, value),
-                  order: reference,
                 };
               }
             }
@@ -334,7 +328,6 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
               count: 1,
               query: 'without',
               checked: optionChecked(locationQuery.get('without'), option.path),
-              order: 0,
             };
           }
         }
@@ -411,7 +404,6 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
                   count: 1,
                   query,
                   checked: optionChecked(locationQueryValue, value),
-                  order: label,
                 };
               }
             });

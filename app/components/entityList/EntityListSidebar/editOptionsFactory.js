@@ -58,7 +58,6 @@ export const makeAttributeEditOptions = (entities, edits, activeEditOption, mess
         value: attributeOption.value,
         attribute: option.attribute,
         checked: checkedState(count, entities.size),
-        order: attributeOption.label,
       };
     });
   }
