@@ -69,5 +69,14 @@ injectGlobal`
     box-sizing: border-box;
   }
 
-
+  .content-page {
+    .react-markdown {
+      p {
+        &:first-child{
+          font-size: 1.5em;
+          padding-bottom: 15px;
+        }
+      }
+    }
+  }
 `;

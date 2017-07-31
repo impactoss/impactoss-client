@@ -125,7 +125,6 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
-            icon="categories"
             buttons={
               viewEntity && dataReady ? [{
                 type: 'cancel',

@@ -49,7 +49,6 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
                 ? field.values
                 : (field.values.slice(0, CONNECTIONMAX))
             }
-            entityIcon={field.icon}
             onEntityClick={field.onEntityClick}
             entityPath={field.entityPath}
           />
