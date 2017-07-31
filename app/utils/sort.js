@@ -12,9 +12,13 @@ const getEntitySortValueMapper = (entity, sortBy) => {
       // use id field when reference not available
       return entity.getIn(['attributes', sortBy]) || entity.get('id');
     // category sort option
-    case 'titleSort':
-      return entity.get(sortBy) || entity.getIn(['attributes', 'title']) || entity.get('id');
-    // category sort options
+    case 'referenceThenTitle':
+      // use id field when reference not available
+      return entity.getIn(['attributes', 'reference'])
+      || entity.getIn(['attributes', 'title'])
+      || entity.get('id');
+    // case 'titleSort':
+    //   return entity.get(sortBy) || entity.getIn(['attributes', 'title']) || entity.get('id');
     case 'measures':
     case 'recommendations':
     case 'sdgtargets':
@@ -24,7 +28,7 @@ const getEntitySortValueMapper = (entity, sortBy) => {
   }
 };
 
-const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
+export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
   // check equality
   if (valueA === valueB) {
     return 0;

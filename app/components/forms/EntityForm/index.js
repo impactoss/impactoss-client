@@ -9,6 +9,7 @@ import { omit } from 'lodash/object';
 
 import asArray from 'utils/as-array';
 import { lowerCase } from 'utils/string';
+import { getEntitySortComparator } from 'utils/sort';
 
 import appMessages from 'containers/App/messages';
 
@@ -224,15 +225,29 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     }
     return controls.input; // Default to input type if not specified
   }
+  getOptionSortValueMapper = (option) => {
+    if (option.get('order')) {
+      return option.get('order');
+    }
+    if (option.get('reference')) {
+      return option.get('reference');
+    }
+    return option.get('label');
+  }
 
   getMultiSelectActiveOptions = (field, formData) => {
     // use form data if already loaded
     if (formData.hasIn(field.dataPath)) {
-      return formData.getIn(field.dataPath).filter((o) => o.get('checked'));
-    // until then use initial options
+      return this.sortOptions(formData.getIn(field.dataPath).filter((o) => o.get('checked')));
     }
-    return field.options.filter((o) => o.get('checked'));
+    // until then use initial options
+    return this.sortOptions(field.options.filter((o) => o.get('checked')));
   }
+
+  sortOptions = (options) => options.sortBy(
+    (option) => this.getOptionSortValueMapper(option),
+    (a, b) => getEntitySortComparator(a, b, 'asc')
+  )
 
   preDelete = (confirm = true) => {
     this.setState({ deleteConfirmed: confirm });

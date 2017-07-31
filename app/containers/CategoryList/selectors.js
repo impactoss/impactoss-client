@@ -126,10 +126,7 @@ const selectCategoriesCounts = createSelector(
             }
           }
 
-          return category.set('titleSort', category.getIn(['attributes', 'reference'])
-            ? `${category.getIn(['attributes', 'reference'])} ${category.getIn(['attributes', 'title'])}`
-            : category.getIn(['attributes', 'title'])
-          );
+          return category;
         }
       );
 
