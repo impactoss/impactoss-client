@@ -10,6 +10,8 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import Grid from 'grid-styled';
+import Row from 'components/styled/Row';
 
 import {
   selectReady,
@@ -20,7 +22,6 @@ import {
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import ButtonHero from 'components/buttons/ButtonHero';
-import Section from 'components/styled/Section';
 import NormalImg from 'components/Img';
 import Footer from 'components/Footer';
 
@@ -33,14 +34,16 @@ import graphicHome from './graphicHome.png';
 
 const GraphicHome = styled(NormalImg)`
   width: 100%;
-  margin-bottom: -2em;
+  max-width: 800px;
 `;
 
-const SectionTop = styled(Section)`
-  text-align: center;
+const SectionTop = styled.div`
   min-height: 100vH;
-  margin-top: -150px;
-  padding-top: 130px;
+  background-color: ${palette('secondary', 3)};
+  color: ${palette('headerBrand', 1)};
+`;
+const SectionTopInner = styled.div`
+  text-align: center;
 `;
 
 const TopActions = styled.div`
@@ -48,25 +51,24 @@ const TopActions = styled.div`
 `;
 const Title = styled.h1`
   color:${palette('headerBrand', 0)};
-  font-family: ${(props) => props.theme.fonts.headerBrandMain};
-  text-transform: uppercase;
-  margin-bottom:0;
-  font-size: 2.8em;
+  font-family: ${(props) => props.theme.fonts.homeBrandMain};
+  font-size: ${(props) => props.theme.sizes.homeBrandMain};
 `;
 
 const Claim = styled.p`
   color: ${palette('headerBrand', 1)};
-  font-family: ${(props) => props.theme.fonts.headerBrandClaim};
-  font-size: 1.25em;
-  width: 40%;
+  font-family: ${(props) => props.theme.fonts.homeBrandClaim};
+  font-size: ${(props) => props.theme.sizes.homeBrandClaim};
+  font-weight: 100;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 1.5em;
 `;
 
 const Intro = styled.p`
   font-family: ${(props) => props.theme.fonts.secondary};
   font-size: 1.25em;
-  width: 40%;
+  width: 80%;
   margin-left: auto;
   margin-right: auto;
 `;
@@ -99,24 +101,31 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <SectionTop dark>
-          <GraphicHome src={graphicHome} alt={this.context.intl.formatMessage(messages.pageTitle)} />
-          <Title>
-            <FormattedMessage {...appMessages.app.title} />
-          </Title>
-          <Claim>
-            <FormattedMessage {...appMessages.app.claim} />
-          </Claim>
-          <Intro>
-            <FormattedMessage {...messages.intro} />
-          </Intro>
-          <TopActions>
-            <div>
-              <ButtonHero onClick={() => onPageLink('/overview')}>
-                <FormattedMessage {...messages.explore} />
-              </ButtonHero>
-            </div>
-          </TopActions>
+        <SectionTop>
+          <Row>
+            <Grid sm={1 / 6} />
+            <Grid sm={4 / 6}>
+              <SectionTopInner>
+                <GraphicHome src={graphicHome} alt={this.context.intl.formatMessage(messages.pageTitle)} />
+                <Title>
+                  <FormattedMessage {...appMessages.app.title} />
+                </Title>
+                <Claim>
+                  <FormattedMessage {...appMessages.app.claim} />
+                </Claim>
+                <Intro>
+                  <FormattedMessage {...messages.intro} />
+                </Intro>
+                <TopActions>
+                  <div>
+                    <ButtonHero onClick={() => onPageLink('/overview')}>
+                      <FormattedMessage {...messages.explore} />
+                    </ButtonHero>
+                  </div>
+                </TopActions>
+              </SectionTopInner>
+            </Grid>
+          </Row>
         </SectionTop>
         <Footer
           pages={pages && this.preparePageMenuPages(pages)}

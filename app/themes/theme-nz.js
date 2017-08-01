@@ -204,6 +204,8 @@ theme.fonts = {
   quote: 'Georgia, serif',
   headerBrandMain: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
   headerBrandClaim: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
+  homeBrandMain: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
+  homeBrandClaim: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
 };
 
 // sizes
@@ -211,6 +213,8 @@ theme.sizes = {
   // also see global-styles.js for other sizes
   headerBrandMain: '1.6em',
   headerBrandClaim: '1.6em',
+  homeBrandMain: '1.8em',
+  homeBrandClaim: '1.8em',
 };
 
 // end styled-theme settings
