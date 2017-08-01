@@ -13,11 +13,11 @@ import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
 import Row from 'components/styled/Row';
 
-import {
-  selectReady,
-  selectEntities,
-  selectEntitiesWhere,
-} from 'containers/App/selectors';
+// import {
+//   selectReady,
+//   selectEntities,
+//   selectEntitiesWhere,
+// } from 'containers/App/selectors';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
@@ -28,7 +28,7 @@ import Footer from 'components/Footer';
 import appMessages from 'containers/App/messages';
 import { DB_TABLES } from 'containers/App/constants';
 import messages from './messages';
-import { DEPENDENCIES } from './constants';
+// import { DEPENDENCIES } from './constants';
 
 import graphicHome from './graphicHome.png';
 
@@ -77,21 +77,21 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  componentWillReceiveProps(nextProps) {
-    // reload entities if invalidated
-    if (!nextProps.dataReady) {
-      this.props.loadEntitiesIfNeeded();
-    }
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   // reload entities if invalidated
+  //   // if (!nextProps.dataReady) {
+  //     this.props.loadEntitiesIfNeeded();
+  //   }
+  // }
 
-  preparePageMenuPages = (pages) =>
-    pages.map((page) => ({
-      path: `/pages/${page.get('id')}`,
-      title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
-    })).toArray();
+  // preparePageMenuPages = (pages) =>
+  //   pages.map((page) => ({
+  //     path: `/pages/${page.get('id')}`,
+  //     title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
+  //   })).toArray();
 
   render() {
-    const { onPageLink, pages } = this.props;
+    const { onPageLink } = this.props;
 
     return (
       <div>
@@ -127,10 +127,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             </Grid>
           </Row>
         </SectionTop>
-        <Footer
-          pages={pages && this.preparePageMenuPages(pages)}
-          onPageLink={onPageLink}
-        />
+        <Footer />
       </div>
     );
   }
@@ -139,21 +136,21 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 HomePage.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func.isRequired,
   onPageLink: PropTypes.func.isRequired,
-  pages: PropTypes.object,
+  // pages: PropTypes.object,
 };
 
 HomePage.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectEntities(state, 'taxonomies'),
-  pages: selectEntitiesWhere(state, {
-    path: 'pages',
-    where: { draft: false },
-  }),
-});
+// const mapStateToProps = () => ({
+//   // dataReady: selectReady(state, { path: DEPENDENCIES }),
+//   // taxonomies: selectEntities(state, 'taxonomies'),
+//   // pages: selectEntitiesWhere(state, {
+//   //   path: 'pages',
+//   //   where: { draft: false },
+//   // }),
+// });
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -168,4 +165,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 // Wrap the component to inject dispatch and state into it
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default connect(null, mapDispatchToProps)(HomePage);
