@@ -303,6 +303,10 @@ export default defineMessages({
       id: 'app.containers.App.entities.showLess',
       defaultMessage: 'Show less',
     },
+    connected: {
+      id: 'app.containers.App.entities.connected',
+      defaultMessage: '(inferred)',
+    },
     recommendations: {
       single: {
         id: 'app.containers.App.entities.recommendations.single',
