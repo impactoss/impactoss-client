@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import IndeterminateCheckbox from 'components/forms/IndeterminateCheckbox';
 import SelectReset from 'components/SelectReset';
@@ -17,35 +18,39 @@ const SortButton = styled(ButtonFlatIconOnly)`
 `;
 const Styled = styled(ColumnHeader)`
   padding: 0.25em 0;
-  position: relative;
+`;
+const LabelWrap = styled.div`
+  display: table-cell;
 `;
 const CheckboxWrap = styled.div`
-  width: 30px;
+  width: 40px;
   padding: 5px;
-  display: inline-block;
+  display: table-cell;
   text-align: center;
 `;
 const Checkbox = styled(IndeterminateCheckbox)`
   vertical-align: middle;
 `;
 const Label = styled.label`
-  padding: 5px;
   vertical-align: middle;
 `;
+const Wrapper = styled.div`
+  display: table;
+  width: 100%;
+`;
 const SelectWrapper = styled.div`
-  position: absolute;
-  right:0;
-  bottom:0;
+  display: table-cell;
   text-align:right;
-  display: block;
 `;
 
-const SelectAll = styled.a``;
+const SelectAll = styled.a`
+  vertical-align: middle;
+`;
 
 class ColumnSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { isSelect, isSelected, onSelect, width, label, hasSelectAll, onSelectAll, selectAllLabel } = this.props;
+    const { isSelect, isSelected, onSelect, width, label, hasSelectAll, onSelectAll, entitiesTotal } = this.props;
 
     const sortOptions = this.props.sortOptions.map((option) => ({
       value: option.attribute,
@@ -59,8 +64,8 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
       <Styled
         width={width}
       >
-        {isSelect &&
-          <span>
+        <Wrapper>
+          {isSelect &&
             <CheckboxWrap>
               <Checkbox
                 id="select-all"
@@ -68,43 +73,51 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
                 onChange={onSelect}
               />
             </CheckboxWrap>
-            <Label htmlFor="select-all">{label}</Label>
-            {hasSelectAll &&
-              <SelectAll
+          }
+          {isSelect &&
+            <LabelWrap>
+              <Label htmlFor="select-all">{label}</Label>
+              {hasSelectAll &&
+                <SelectAll
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onSelectAll();
+                  }}
+                  href="/"
+                >
+                  <FormattedMessage
+                    {...messages.selectAll}
+                    values={{ number: entitiesTotal }}
+                  />
+                </SelectAll>
+              }
+            </LabelWrap>
+          }
+          {!isSelect &&
+            <LabelWrap>
+              <Label>{label}</Label>
+            </LabelWrap>
+          }
+          <SelectWrapper>
+            <SelectReset
+              value={this.props.sortBy}
+              index="sortby"
+              options={sortOptions}
+              isReset={false}
+              onChange={this.props.onSortBy}
+            />
+            {nextSortOrderOption &&
+              <SortButton
                 onClick={(e) => {
                   e.preventDefault();
-                  onSelectAll();
+                  this.props.onSortOrder(nextSortOrderOption.value);
                 }}
-                href="/"
               >
-                {selectAllLabel}
-              </SelectAll>
+                <Icon name={sortOrderOption.icon} />
+              </SortButton>
             }
-          </span>
-        }
-        {!isSelect &&
-          <Label>{label}</Label>
-        }
-        <SelectWrapper>
-          <SelectReset
-            value={this.props.sortBy}
-            label="Sort by"
-            index="sortby"
-            options={sortOptions}
-            isReset={false}
-            onChange={this.props.onSortBy}
-          />
-          {nextSortOrderOption &&
-            <SortButton
-              onClick={(e) => {
-                e.preventDefault();
-                this.props.onSortOrder(nextSortOrderOption.value);
-              }}
-            >
-              <Icon name={sortOrderOption.icon} />
-            </SortButton>
-          }
-        </SelectWrapper>
+          </SelectWrapper>
+        </Wrapper>
       </Styled>
     );
   }
@@ -123,7 +136,7 @@ ColumnSelect.propTypes = {
   onSortOrder: PropTypes.func,
   hasSelectAll: PropTypes.bool,
   label: PropTypes.string,
-  selectAllLabel: PropTypes.string,
+  entitiesTotal: PropTypes.number,
   width: PropTypes.number,
 };
 ColumnSelect.defaultProps = {

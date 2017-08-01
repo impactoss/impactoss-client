@@ -27,8 +27,10 @@ const Styled = styled.div`
   top:0;
   left:0;
   right:0;
-  height:150px;
+  height:${(props) => props.isHome ? 0 : 150}px;
   background-color: ${palette('header', 0)};
+  box-shadow: ${(props) => props.isHome ? 'none' : '0px 0px 15px 0px rgba(0,0,0,0.5)'};
+  z-index: 101;
 `;
 
 
@@ -44,7 +46,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
 
     return (
       <Styled isHome={isHome}>
-        <Banner showPattern={!isHome}>
+        <Banner showPattern={!isHome} isHome={isHome}>
           { !isHome &&
             <Brand href={'/'} onClick={(evt) => this.onClick(evt, '/')}>
               <Logo src={logo} alt="logo" />
@@ -98,20 +100,22 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             }
           </NavPages>
         </Banner>
-        <NavMain hasBorder>
-          { navItems &&
-            navItems.map((item, i) => (
-              <LinkMain
-                key={i}
-                href={item.path}
-                active={item.active || currentPath.startsWith(item.path)}
-                onClick={(evt) => this.onClick(evt, item.path)}
-              >
-                {item.title}
-              </LinkMain>
-            ))
-          }
-        </NavMain>
+        { !isHome &&
+          <NavMain hasBorder>
+            { navItems &&
+              navItems.map((item, i) => (
+                <LinkMain
+                  key={i}
+                  href={item.path}
+                  active={item.active || currentPath.startsWith(item.path)}
+                  onClick={(evt) => this.onClick(evt, item.path)}
+                >
+                  {item.title}
+                </LinkMain>
+              ))
+            }
+          </NavMain>
+        }
       </Styled>
     );
   }

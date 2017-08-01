@@ -101,6 +101,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   render() {
     window.Perf = Perf;
     const { pages, onPageLink, isUserSignedIn, isManager, location } = this.props;
+
     return (
       <div>
         <Header

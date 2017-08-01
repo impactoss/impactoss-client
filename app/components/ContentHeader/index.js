@@ -2,11 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import Grid from 'grid-styled';
 
 import { CONTENT_LIST, CONTENT_SINGLE, CONTENT_PAGE } from 'containers/App/constants';
 
-import Row from 'components/styled/Row';
 import SupTitle from 'components/SupTitle';
 import Icon from 'components/Icon';
 
@@ -36,7 +34,18 @@ const TitleIconWrap = styled.span`
   color: ${palette('dark', 4)};
 `;
 const ButtonWrap = styled.span`
-  padding: 0 0.5em;
+  padding: 0 0.3em;
+  &:last-child {
+    padding: 0;
+  }
+`;
+const Table = styled.span`
+  display: table;
+  width: 100%;
+`;
+const TableCell = styled.span`
+  display: table-cell;
+  vertical-align: middle;
 `;
 
 const ButtonGroup = styled.div`
@@ -73,12 +82,12 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
         { supTitle &&
           <SupTitle icon={icon} title={supTitle} />
         }
-        <Row>
-          <Grid sm={buttons ? 2 / 3 : 1}>
+        <Table>
+          <TableCell>
             {this.renderTitle(type, title, icon)}
-          </Grid>
+          </TableCell>
           { buttons &&
-            <Grid sm={1 / 3}>
+            <TableCell>
               <ButtonGroup>
                 {
                   buttons.map((button, i) => (
@@ -88,9 +97,9 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
                   ))
                 }
               </ButtonGroup>
-            </Grid>
+            </TableCell>
           }
-        </Row>
+        </Table>
       </Styled>
     );
   }

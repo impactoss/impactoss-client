@@ -7,13 +7,20 @@ import ButtonDefault from 'components/buttons/ButtonDefault';
 import Icon from 'components/Icon';
 
 const Button = styled(ButtonDefault)`
-  padding: 0.25em 0.75em;
+  padding: 0.25em 1.25em;
   width: ${(props) => props.fullWidth ? '100%' : 'auto'};
   min-height: 3em;
   text-align: ${(props) => props.align};
-  text-transform: ${(props) => props.strong ? 'uppercase' : 'none'};
+  text-transform: ${(props) => props.uppercase ? 'uppercase' : 'none'};
   font-weight: ${(props) => props.strong ? 'bold' : 'normal'};
   font-size: 0.85em;
+`;
+
+const Title = styled.span`
+  padding-right: ${(props) => props.iconRight ? 3 : 0}px;
+  padding-left: ${(props) => props.iconRight ? 0 : 3}px;
+  position: relative;
+  top: 0.05em;
 `;
 
 class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -31,11 +38,11 @@ class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line
         title={title}
       >
         { iconRight &&
-          <span>{title}</span>
+          <Title iconRight>{title}</Title>
         }
         <Icon name={icon} text textRight={iconRight} textLeft={!iconRight} />
         { !iconRight &&
-          <span>{title}</span>
+          <Title>{title}</Title>
         }
       </Button>
     );

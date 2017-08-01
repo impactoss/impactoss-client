@@ -20,6 +20,7 @@ import {
 
 import { CONTENT_PAGE } from 'containers/App/constants';
 
+import Footer from 'components/Footer';
 import Loading from 'components/Loading';
 import Container from 'components/styled/Container';
 import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
@@ -44,7 +45,11 @@ import { selectViewEntity } from './selectors';
 import { DEPENDENCIES } from './constants';
 
 const Styled = styled(ContainerWrapper)`
-  background-color: ${palette('primary', 4)}
+  background-color: ${palette('primary', 4)};
+`;
+
+const ViewContainer = styled(Container)`
+  min-height: 100vH;
 `;
 
 export class PageView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -98,7 +103,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <Styled className={`content-${CONTENT_PAGE}`}>
-          <Container isNarrow={!isContributor}>
+          <ViewContainer isNarrow={!isContributor}>
             <ContentHeader
               title={page ? page.getIn(['attributes', 'title']) : ''}
               supTitle={page ? page.getIn(['attributes', 'menu_title']) : ''}
@@ -119,7 +124,8 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
                 seemless
               />
             }
-          </Container>
+          </ViewContainer>
+          <Footer />
         </Styled>
       </div>
     );

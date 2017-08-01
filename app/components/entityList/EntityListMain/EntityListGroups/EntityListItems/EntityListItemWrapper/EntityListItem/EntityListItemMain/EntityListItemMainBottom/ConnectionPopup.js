@@ -12,9 +12,8 @@ const POPUP_LENGTH = 66;
 
 const Count = styled.span`
   display: inline-block;
-  padding: 3px 7px;
   position: relative;
-  top: -2px;
+  top: 0;
   border-radius: 999px;
   font-size: 0.8em;
   background-color: ${(props) => palette(props.pIndex, 0)};

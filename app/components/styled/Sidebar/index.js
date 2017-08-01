@@ -8,5 +8,6 @@ const Sidebar = styled.div`
   bottom:0;
   background-color: ${palette('aside', 0)};
   z-index:100;
+  box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
 `;
 export default Sidebar;

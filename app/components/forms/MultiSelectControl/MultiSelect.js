@@ -4,6 +4,7 @@ import { List } from 'immutable';
 import { kebabCase } from 'lodash/string';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { FormattedMessage } from 'react-intl';
 
 import { getEntitySortComparator } from 'utils/sort';
 
@@ -11,32 +12,53 @@ import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import ButtonCancel from 'components/buttons/ButtonCancel';
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
-
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import Option from './Option';
 
+import messages from './messages';
 
 const OptionWrapper = styled.div`
-  padding: 0.5em 1em;
-  border-bottom: 1px solid ${palette('light', 1)};
-  display: table;
+  display: table-row;
   width: 100%;
 `;
 const ButtonGroup = styled.div`
   text-align:right;
 `;
 const ControlWrapper = styled.div``;
+const OptionListWrapper = styled.div`
+  display: table;
+  width: 100%;
+`;
 const CheckboxWrapper = styled.div`
   display: table-cell;
   vertical-align:middle;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  padding-left: 1em;
+  padding-right: 0.5em;
   width: 10px;
-  padding-top: 3px;
+  border-bottom: 1px solid ${palette('light', 1)};
 `;
 const OptionLabel = styled.label`
   display: table-cell;
   vertical-align:middle;
   cursor: pointer;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  padding-left: 0.5em;
+  padding-right: 1em;
+  border-bottom: 1px solid ${palette('light', 1)};
+`;
+const OptionCount = styled.span`
+  display: table-cell;
+  vertical-align:top;
+  color: ${palette('dark', 4)};
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  padding-right: 1em;
+  text-align: right;
+  border-bottom: 1px solid ${palette('light', 1)};
 `;
 const ControlHeader = styled.div`
   position: absolute;
@@ -45,14 +67,14 @@ const ControlHeader = styled.div`
   right: 0;
   background-color: ${palette('dark', 2)};
   color: ${palette('primary', 4)};
-  height: 60px;
-  padding: 2.25em 1em 0;
+  height: ${(props) => props.search ? '115px' : '60px'};
+  padding: 1em 0 1em 1em;
+  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
 `;
 const HeaderButton = styled(Button)`
   position: absolute;
   right:0;
-  bottom:0;
-  padding-right:;
+  top:0;
   &:hover {
     color: ${palette('primary', 1)};
   }
@@ -66,8 +88,6 @@ const ControlSearch = styled.div`
   background: ${palette('primary', 4)};
   height: 55px;
   padding: 1em;
-  border-left: ${palette('light', 2)};
-  border-right: ${palette('light', 2)};
   background-color: ${palette('light', 0)};
 `;
 const Search = styled.input`
@@ -82,9 +102,9 @@ const ControlFooter = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  border: 1px solid ${palette('light', 2)};
   background-color: ${palette('light', 0)};
   height: 50px;
+  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
 `;
 const ControlMain = styled.div`
   position: absolute;
@@ -94,8 +114,11 @@ const ControlMain = styled.div`
   right: 0;
   overflow-y: auto;
   padding:0;
-  border-left: 1px solid ${palette('light', 2)};
-  border-right: 1px solid ${palette('light', 2)};
+`;
+
+const NoOptions = styled.div`
+  padding: 1em;
+  font-style: italic;
 `;
 
 export const getChangedOptions = (options) =>
@@ -129,6 +152,7 @@ export default class MultiSelect extends React.Component {
     title: PropTypes.string,
     buttons: PropTypes.array,
     search: PropTypes.bool,
+    // advanced: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -137,6 +161,7 @@ export default class MultiSelect extends React.Component {
     multiple: true,
     required: false,
     search: true,
+    advanced: false,
   }
 
   constructor() {
@@ -283,9 +308,13 @@ export default class MultiSelect extends React.Component {
             bold={option.get('labelBold') || checked}
             reference={typeof option.get('reference') !== 'undefined' && option.get('reference') !== null ? option.get('reference').toString() : ''}
             label={option.get('label')}
-            count={option.get('showCount') && option.get('count')}
           />
         </OptionLabel>
+        { option.get('showCount') && typeof option.get('count') !== 'undefined' &&
+          <OptionCount>
+            {option.get('count')}
+          </OptionCount>
+        }
       </OptionWrapper>
     );
   }
@@ -331,19 +360,26 @@ export default class MultiSelect extends React.Component {
 
     return (
       <ControlWrapper>
-        <ControlHeader>
+        <ControlHeader search={this.props.search}>
           { this.props.title }
           { this.props.onCancel &&
             this.renderCancel(this.props.onCancel)
           }
+          { this.props.search &&
+            <ControlSearch>
+              <Search id="search" onChange={this.onSearch} placeholder="Filter options" />
+            </ControlSearch>
+          }
         </ControlHeader>
-        { this.props.search &&
-          <ControlSearch>
-            <Search id="search" onChange={this.onSearch} placeholder="Filter options" />
-          </ControlSearch>
-        }
         <ControlMain search={this.props.search} hasFooter={this.props.buttons}>
-          {checkboxOptions && checkboxOptions.map(this.renderCheckbox)}
+          <OptionListWrapper>
+            {checkboxOptions && checkboxOptions.map(this.renderCheckbox)}
+            {checkboxOptions.size === 0 &&
+              <NoOptions>
+                <FormattedMessage {...messages.empty} />
+              </NoOptions>
+            }
+          </OptionListWrapper>
         </ControlMain>
         { this.props.buttons &&
           <ControlFooter>

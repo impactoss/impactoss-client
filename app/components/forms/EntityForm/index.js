@@ -78,13 +78,17 @@ const MultiSelectWrapper = styled.div`
   position: absolute;
   top: 38px;
   right: 0;
-  height:400px;
+  height:450px;
   width: 100%;
   min-width: 350px;
-  background: #fff;
   overflow: hidden;
   display: block;
   z-index: 10;
+  background: ${palette('primary', 4)};
+  border-left: 1px solid ${palette('light', 2)};
+  border-right: 1px solid ${palette('light', 2)};
+  border-bottom: 1px solid ${palette('light', 2)};
+  box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
 `;
 const MultiSelectFieldWrapper = styled.div`
   position: relative;
