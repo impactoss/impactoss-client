@@ -552,7 +552,7 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
 }
 
 export function* updatePathSaga({ path }) {
-  yield put(push(path));
+  yield put(push(path.startsWith('/') ? path : `/${path}`));
 }
 
 const backTargetIgnore = ['/edit', '/new', 'login', '/reports'];

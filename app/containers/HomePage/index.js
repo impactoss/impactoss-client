@@ -112,7 +112,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           </Intro>
           <TopActions>
             <div>
-              <ButtonHero onClick={() => onPageLink('overview')}>
+              <ButtonHero onClick={() => onPageLink('/overview')}>
                 <FormattedMessage {...messages.explore} />
               </ButtonHero>
             </div>
