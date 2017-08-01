@@ -15,15 +15,7 @@ const Styled = styled.div`
 
 
 const Column = styled(ColumnHeader)`
-  position: relative;
   width:${(props) => props.colWidth}%;
-  display: table-cell;
-  padding: 0.25em 1em;
-  border-right: 1px solid ${palette('light', 2)};
-  font-size: 0.85em;
-  &:last-child {
-    border-right: none;
-  }
 `;
 
 const ColumnInner = styled.div`

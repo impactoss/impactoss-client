@@ -1,50 +1,58 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 import Icon from 'components/Icon';
-import Button from 'components/buttons/Button';
+import ColumnHeader from 'components/styled/ColumnHeader';
+import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 
 
-const Styled = styled(Button)`
-  width:${(props) => props.width * 100}%;
-  display: inline-block;
-  padding: 0.25em 1em;
-  border-right: 1px solid ${palette('light', 2)};
-  font-size: 0.85em;
-  &:last-child {
-    border-right: none;
-  }
+const Styled = styled(ColumnHeader)`
   text-align: left;
+  padding: 0 0.5em 0 1em;
 `;
 
+const Wrapper = styled.div`
+  display: table;
+  width: 100%;
+`;
 const Label = styled.div`
-  display: inline-block;
+  display: table-cell;
   vertical-align: middle;
 `;
-const IconWrap = styled.div`
-  float:right;
+
+const ExpandWrapper = styled.div`
+  display: table-cell;
+  text-align:right;
 `;
 
+const ExpandButton = styled(ButtonFlatIconOnly)`
+  padding: 0;
+  color: inherit;
+`;
 class ColumnExpand extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     const { isExpand, label, width, onExpand } = this.props;
     return (
       <Styled
-        onClick={onExpand}
         width={width}
       >
-        <Label>{label}</Label>
-        <IconWrap>
-          {isExpand &&
-            <Icon name="columnCollapse" text textRight />
-          }
-          {!isExpand &&
-            <Icon name="columnExpand" text textRight />
-          }
-        </IconWrap>
+        <Wrapper>
+          <Label>{label}</Label>
+          <ExpandWrapper>
+            <ExpandButton
+              onClick={onExpand}
+            >
+              {isExpand &&
+                <Icon name="columnCollapse" text textRight />
+              }
+              {!isExpand &&
+                <Icon name="columnExpand" text textRight />
+              }
+            </ExpandButton>
+          </ExpandWrapper>
+        </Wrapper>
       </Styled>
     );
   }

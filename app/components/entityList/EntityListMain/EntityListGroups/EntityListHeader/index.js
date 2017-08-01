@@ -13,12 +13,9 @@ import ColumnExpand from './ColumnExpand';
 const Styled = styled.div`
   width:100%;
   background-color: ${palette('light', 1)};
+  display: table;
 `;
-const ColumnNestedWrap = styled.div`
-  width:${(props) => props.width * 100}%;
-  background-color: ${palette('light', 1)};
-  display: inline-block;
-`;
+
 const WIDTH_FULL = 1;
 const WIDTH_MAIN = 0.66;
 const WIDTH_HALF = 0.5;
@@ -28,12 +25,12 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
   getListHeaderLabel = (entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage) => {
     if (selectedTotal > 0) {
       if (allSelected) {
-        return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected`;
+        return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected. `;
       }
       if (allSelectedOnPage) {
-        return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} on this page are selected`;
+        return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} on this page are selected. `;
       }
-      return `${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected`;
+      return `${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected. `;
     }
     const hint = (pageTotal < entitiesTotal) ? ` (${pageTotal} of ${entitiesTotal})` : '';
     return `${entityTitle.plural}${hint}`;
@@ -112,7 +109,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
           onSelect={onSelect}
           hasSelectAll={allSelectedOnPage && !allSelected}
           onSelectAll={onSelectAll}
-          selectAllLabel={`Select all ${entitiesTotal} ${entityTitle.plural}.`}
+          entitiesTotal={entitiesTotal}
           sortBy={sortOption ? sortOption.attribute : null}
           sortOrder={this.props.sortOrder || (sortOption ? sortOption.order : null)}
           sortOptions={sortOptions}
@@ -121,17 +118,15 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
           onSortOrder={this.props.onSortOrder}
         />
         { expandableColumns && expandableColumns.length > 0 &&
-          <ColumnNestedWrap width={1 - firstColumnWidth}>
-            { expandableColumns.map((col, i, list) =>
-              <ColumnExpand
-                key={i}
-                isExpand={expandNo > i}
-                onExpand={() => onExpand(expandNo > i ? i : i + 1)}
-                label={col.label}
-                width={this.getExpandableColumnWidth(i, list.length, expandNo)}
-              />
-            )}
-          </ColumnNestedWrap>
+          expandableColumns.map((col, i, list) =>
+            <ColumnExpand
+              key={i}
+              isExpand={expandNo > i}
+              onExpand={() => onExpand(expandNo > i ? i : i + 1)}
+              label={col.label}
+              width={(1 - firstColumnWidth) * this.getExpandableColumnWidth(i, list.length, expandNo)}
+            />
+          )
         }
       </Styled>
     );
