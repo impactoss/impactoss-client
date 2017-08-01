@@ -91,7 +91,7 @@ const PopupContent = styled.div`
 
 const Id = styled.span`
   font-weight: bold;
-  color: ${palette('dark', 3)}
+  color: ${palette('dark', 4)}
 `;
 const IdSpacer = styled.span`
   padding-left: 0.5em;
@@ -99,7 +99,7 @@ const IdSpacer = styled.span`
   color: ${palette('dark', 1)};
 `;
 const ItemContent = styled.span`
-  color: ${palette('dark', 1)};
+  color: ${palette('dark', 4)};
 `;
 
 const ListItem = styled.div`
