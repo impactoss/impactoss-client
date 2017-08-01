@@ -9,11 +9,12 @@ const Styled = styled.span`
   text-transform: uppercase;
   color: ${palette('dark', 3)};
   font-weight: bold;
+  font-size: 0.85em;
 `;
 
 const SupIconWrap = styled.span`
   position: relative;
-  top: -2px;
+  top: -1px;
 `;
 
 class SupTitle extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
