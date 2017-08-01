@@ -5,9 +5,7 @@ import styled from 'styled-components';
 import ButtonDefaultWithIcon from 'components/buttons/ButtonDefaultWithIcon';
 
 const Styled = styled.div`
-  // border-radius: 999px;
   position: relative;
-  // display: block;
   height: 50px;
 `;
 
@@ -68,6 +66,7 @@ class ButtonToggle extends React.PureComponent { // eslint-disable-line react/pr
                   onClick={() => onSelect(option.panel)}
                   align={i === 0 ? 'left' : 'right'}
                   inactive
+                  border={{ palette: 'light', pIndex: 2 }}
                   strong
                 />
               </ButtonInactive>
