@@ -65,8 +65,8 @@ const ControlSearch = styled.div`
   background: ${palette('primary', 4)};
   height: 55px;
   padding: 1em;
-  border-left: ${palette('light', 2)};
-  border-right: ${palette('light', 2)};
+  border-left: 1px solid ${palette('light', 2)};
+  border-right: 1px solid ${palette('light', 2)};
   background-color: ${palette('light', 0)};
 `;
 const Search = styled.input`
