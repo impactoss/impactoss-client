@@ -16,13 +16,13 @@ import EntityListItemMainBottom from './EntityListItemMainBottom';
 
 
 const Styled = styled(Component)`
-  padding: 5px 10px;
+  padding: ${(props) => props.isManager ? '10px 15px 10px 0px' : '10px 15px'};
 `;
 
 const EntityListItemMainTitleWrap = styled.a`
   text-decoration: none;
   display: block;
-  padding: 3px 0 8px;
+  padding: 3px 12px 3px 0;
   color: ${palette('dark', 0)};
   &:hover {
     color: ${palette('dark', 2)};
@@ -55,7 +55,9 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
   getEntityTags = (entity, taxonomies, onClick) => {
     const tags = [];
     if (entity.get('categories')) {
-      taxonomies.forEach((tax) => {
+      taxonomies
+      .sortBy((tax) => !tax.getIn(['attributes', 'is_smart']))
+      .forEach((tax) => {
         tax.get('categories').forEach((category, catId) => {
           if (entity.get('categories').includes(parseInt(catId, 10))) {
             const label = (category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
@@ -116,7 +118,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     const entity = this.mapToEntityListItem();
 
     return (
-      <Styled>
+      <Styled isManager={this.props.isManager}>
         <EntityListItemMainTop
           entity={entity}
           onEntityClick={(evt) => {
@@ -153,6 +155,7 @@ EntityListItemMain.propTypes = {
   entity: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
+  isManager: PropTypes.bool,
   wrapper: PropTypes.object,
   config: PropTypes.object,
   entityIcon: PropTypes.func,
