@@ -25,6 +25,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
           <ButtonDefaultWithIcon
             onClick={() => button.onClick()}
             icon="add"
+            strong
             title={button.title || this.context.intl.formatMessage(appMessages.buttons.add)}
           />
         );
