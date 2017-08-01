@@ -17,8 +17,8 @@ const Button = styled(ButtonDefault)`
 `;
 
 const Title = styled.span`
-  padding-right: ${(props) => props.iconRight ? 3 : 0}px;
-  padding-left: ${(props) => props.iconRight ? 0 : 3}px;
+  padding-right: 0;
+  padding-left: 0;
   position: relative;
   top: 0.05em;
 `;
