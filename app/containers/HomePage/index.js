@@ -21,7 +21,7 @@ import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import ButtonHero from 'components/buttons/ButtonHero';
 import Section from 'components/styled/Section';
-// import NormalImg from 'components/Img';
+import NormalImg from 'components/Img';
 import Footer from 'components/Footer';
 
 import appMessages from 'containers/App/messages';
@@ -29,12 +29,12 @@ import { DB_TABLES } from 'containers/App/constants';
 import messages from './messages';
 import { DEPENDENCIES } from './constants';
 
-// import graphicHome from './graphicHome.png';
-//
-// const GraphicHome = styled(NormalImg)`
-//   width: 100%;
-//   margin-bottom: -2em;
-// `;
+import graphicHome from './graphicHome.png';
+
+const GraphicHome = styled(NormalImg)`
+  width: 100%;
+  margin-bottom: -2em;
+`;
 
 const SectionTop = styled(Section)`
   text-align: center;
@@ -100,6 +100,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <SectionTop dark>
+          <GraphicHome src={graphicHome} alt={this.context.intl.formatMessage(messages.pageTitle)} />
           <Title>
             <FormattedMessage {...appMessages.app.title} />
           </Title>

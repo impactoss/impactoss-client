@@ -11,7 +11,7 @@ injectGlobal`
   body {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
-    line-height: 1.8;
+    line-height: 1.64em;
     color: #21282B;
   }
   textarea {
@@ -32,12 +32,18 @@ injectGlobal`
       color: #026B9F;
     }
   }
-
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.25;
+    font-weight: 700;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
   h1 {
     font-size: 2.5em;
   }
   h2 {
-    font-size: 2.15em;
+    font-size: 2.25em;
+    font-weight: 500;
   }
   h3 {
     font-size: 1.7em;
@@ -51,16 +57,11 @@ injectGlobal`
   h6 {
     font-size: 1em;
   }
-  h1, h2, h3, h4, h5, h6 {
-    line-height: 1.1;
-    font-weight: bold;
-    margin-top: 20px;
-    margin-bottom: 10px;
-  }
+
 
   p {
     margin-top: 0;
-    margin-bottom:10px;
+    margin-bottom:16px;
   }
 
   * {
@@ -69,11 +70,40 @@ injectGlobal`
     box-sizing: border-box;
   }
 
+  .react-markdown {
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 700;
+      margin-top: 1.75em;
+      margin-bottom: 0.5em;
+    }
+    h1 {
+      font-size: 1.75em;
+      font-weight: 500;
+    }
+    h2 {
+      font-size: 1.25em;
+    }
+    h3 {
+      font-size: 1.15em;
+    }
+    h4 {
+      font-size: 1em;
+    }
+    h5 {
+      font-size: 1em;
+    }
+    h6 {
+      font-size: 1em;
+    }
+  }
+
   .content-page {
     .react-markdown {
       p {
         &:first-child{
-          font-size: 1.5em;
+          font-size: 1.75em;
+          line-height: 1.4em;
+          color: #6A7880;
           padding-bottom: 15px;
         }
       }
