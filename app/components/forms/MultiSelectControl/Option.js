@@ -9,12 +9,12 @@ const Label = styled.div`
 `;
 const Id = styled.span`
   font-weight: bold;
-  color: ${palette('dark', 3)}
+  color: ${palette('dark', 4)}
 `;
 const IdSpacer = styled.span`
   padding-left: 0.5em;
   padding-right: 0.5em;
-  color: ${palette('dark', 1)};
+  color: ${palette('dark', 4)};
 `;
 const Option = (props) => (
   <Label bold={props.bold}>
