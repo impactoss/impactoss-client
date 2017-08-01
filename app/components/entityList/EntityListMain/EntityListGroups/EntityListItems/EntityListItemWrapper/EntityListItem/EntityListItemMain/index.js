@@ -92,6 +92,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       connections,
       entityIcon,
     } = this.props;
+
     return {
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
