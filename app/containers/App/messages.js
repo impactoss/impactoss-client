@@ -43,7 +43,7 @@ export default defineMessages({
     },
     assign: {
       id: 'app.containers.App.buttons.assign',
-      defaultMessage: 'Assign',
+      defaultMessage: 'Update',
     },
   },
   forms: {
