@@ -136,7 +136,7 @@ theme.palette = {
   headerBrandHover: [primary[4], primary[4]], // WARNING component sets opacity
 
   // headerNavPages: [ '#bg' ],
-  headerNavPages: ['transparent'],
+  headerNavPages: [secondary[3]],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
   headerNavPagesItem: [primary[4], primary[4], 'transparent', secondary[0]],
   headerNavPagesItemHover: [primary[4], primary[4], secondary[1], secondary[1]],

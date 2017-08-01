@@ -107,7 +107,7 @@ const Annotation = styled.div`
   width: 200px;
   color: ${palette('dark', 4)};
   line-height: 1.1em;
-  font-size: 0.9em;
+  font-size: 0.85em;
   margin-top: -2em;
 `;
 const Addressed = styled(Annotation)`
@@ -157,6 +157,7 @@ const DiagramButtonWrap = styled.div`
 const DiagramButtonMain = styled(DiagramButton)`
   color: ${palette('primary', 4)};
   background-color: ${palette('primary', 1)};
+  min-width: 230px;
   &:hover {
     color: ${palette('primary', 4)};
     background-color: ${palette('primary', 0)};
@@ -173,11 +174,16 @@ const DiagramButtonMainInside = styled.span`
   vertical-align:middle;
   margin-top: -30px;
 `;
+const DiagramButtonIcon = styled.div`
+  padding-bottom: 5px;
+`;
+
 const Count = styled.span`
   padding-right: 5px;
 `;
 const DiagramButtonMainTop = styled.div`
   font-size: 1.5em;
+  padding-bottom: 5px;
 `;
 const DiagramButtonMainBottom = styled.div`
   font-weight: normal;
@@ -254,7 +260,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       },
     ];
 
-  getCurvedConnectionPath = (start, end, curve = 0.25) =>
+  getCurvedConnectionPath = (start, end, curve = 0.2) =>
     [
       {
         x: start.x + 5,
@@ -433,9 +439,9 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                             }
                           }}
                         >
-                          <div>
+                          <DiagramButtonIcon>
                             <Icon name="recommendations" />
-                          </div>
+                          </DiagramButtonIcon>
                           <div>
                             <Count>{recommendationCount}</Count>
                             <FormattedMessage {...messages.buttons.recommendations} />
@@ -459,9 +465,9 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                             }
                           }}
                         >
-                          <div>
+                          <DiagramButtonIcon>
                             <Icon name="sdgtargets" />
-                          </div>
+                          </DiagramButtonIcon>
                           <div>
                             <Count>{sdgtargetCount}</Count>
                             <FormattedMessage {...messages.buttons.sdgtargets} />
@@ -491,9 +497,9 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                           }}
                         >
                           <DiagramButtonMainInside>
-                            <div>
+                            <DiagramButtonIcon>
                               <Icon name="measures" size="5em" />
-                            </div>
+                            </DiagramButtonIcon>
                             <DiagramButtonMainTop>
                               <FormattedMessage {...messages.buttons.measures} />
                             </DiagramButtonMainTop>
@@ -525,9 +531,9 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                           }
                         }}
                       >
-                        <div>
+                        <DiagramButtonIcon>
                           <Icon name="indicators" />
-                        </div>
+                        </DiagramButtonIcon>
                         <div>
                           <Count>{indicatorCount}</Count>
                           <FormattedMessage {...messages.buttons.indicators} />
