@@ -5,17 +5,26 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
 
+import NormalImg from 'components/Img';
 import Container from 'components/styled/Container';
 import Row from 'components/styled/Row';
 
 import messages from './messages';
+
+import hrclogo from './hrcnz-logo.png';
+
+const HrcLogo = styled(NormalImg)`
+  width: 100%;
+  max-width: 170px;
+  margin-top: 1em;
+`;
 
 const Styled = styled.div`
   background-color: ${palette('secondary', 1)};
   color: ${palette('primary', 4)};
 `;
 const Main = styled.div`
-  padding: 2em 0 3em;
+  padding: 2em 0 0;
 `;
 
 const FooterLink = styled.a`
@@ -26,6 +35,8 @@ const FooterLink = styled.a`
     opacity: 0.8;
   }
 `;
+
+
 // const FooterProjectLink = styled.a`
 //   font-weight:bold;
 //   color: ${palette('primary', 4)};
@@ -65,6 +76,7 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
                   >
                     <FormattedMessage {...messages.responsible.anchor} />
                   </FooterLink>
+                  <HrcLogo src={hrclogo} alt={this.context.intl.formatMessage(messages.responsible.logo)} />
                 </div>
               </Grid>
               <Grid sm={1 / 4}>

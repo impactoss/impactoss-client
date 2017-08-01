@@ -33,11 +33,15 @@ export default defineMessages({
       id: 'nmrf.components.Footer.responsible.anchor',
       defaultMessage: 'www.hrc.co.nz',
     },
+    logo: {
+      id: 'nmrf.components.Footer.responsible.logo',
+      defaultMessage: 'Logo of the New Zealand Human Rights Commission',
+    },
   },
   project: {
     text: {
       id: 'nmrf.components.Footer.project.text',
-      defaultMessage: 'This New Zealand National Plan of Action is powered by',
+      defaultMessage: 'The New Zealand National Plan of Action website is powered by',
     },
     url: {
       id: 'nmrf.components.Footer.project.url',
