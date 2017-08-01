@@ -58,9 +58,9 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
     switch (groupId) {
       case 'taxonomies':
       case 'connectedTaxonomies':
-        return (<Dot palette="taxonomies" pIndex={parseInt(optionId, 10)}/>);
+        return (<Dot palette="taxonomies" pIndex={parseInt(optionId, 10)} />);
       case 'connections':
-        return (<Dot palette={optionId} pIndex={0} round/>);
+        return (<Dot palette={optionId} pIndex={0} round />);
       default:
         return null;
     }
