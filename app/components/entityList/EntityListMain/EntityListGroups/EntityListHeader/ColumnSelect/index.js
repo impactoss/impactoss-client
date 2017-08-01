@@ -23,7 +23,7 @@ const LabelWrap = styled.div`
   display: table-cell;
 `;
 const CheckboxWrap = styled.div`
-  width: 30px;
+  width: 40px;
   padding: 5px;
   display: table-cell;
   text-align: center;

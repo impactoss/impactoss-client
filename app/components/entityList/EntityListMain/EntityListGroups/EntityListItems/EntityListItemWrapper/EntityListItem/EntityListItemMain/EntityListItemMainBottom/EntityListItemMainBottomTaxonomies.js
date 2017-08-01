@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import Icon from 'components/Icon';
 import ButtonTagCategory from 'components/buttons/ButtonTagCategory';
+import BottomIconWrap from './BottomIconWrap';
 import BottomTagGroup from './BottomTagGroup';
 
 export default class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -14,7 +15,9 @@ export default class EntityListItemMainBottomTaxonomies extends React.PureCompon
   render() {
     return (
       <BottomTagGroup>
-        <Icon name="categories" text />
+        <BottomIconWrap>
+          <Icon name="categories" text />
+        </BottomIconWrap>
         {
           this.props.tags.map((tag, i) => (
             <ButtonTagCategory
