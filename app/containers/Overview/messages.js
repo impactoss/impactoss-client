@@ -12,11 +12,11 @@ export default defineMessages({
   },
   title: {
     id: 'app.containers.Overview.title',
-    defaultMessage: 'Implementation plan of actions in context',
+    defaultMessage: 'The National Plan of Action and related subjects',
   },
   description: {
     id: 'app.containers.Overview.description',
-    defaultMessage: 'Start exploring by selecting a category group from the sidebar or one of the areas from the diagram below.',
+    defaultMessage: 'Start exploring by selecting a category group from the sidebar or one of the subjects from the diagram below.',
   },
   buttons: {
     recommendations: {
@@ -29,7 +29,7 @@ export default defineMessages({
     },
     measures: {
       id: 'app.containers.Overview.buttons.measures',
-      defaultMessage: 'Implementation plan',
+      defaultMessage: 'Plan of Action',
     },
     measuresAdditional: {
       id: 'app.containers.Overview.buttons.measures',
