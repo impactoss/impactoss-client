@@ -96,10 +96,10 @@ const Id = styled.span`
 const IdSpacer = styled.span`
   padding-left: 0.5em;
   padding-right: 0.5em;
-  color: ${palette('dark', 1)};
+  color: ${palette('dark', 4)};
 `;
 const ItemContent = styled.span`
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 1)};
 `;
 
 const ListItem = styled.div`
