@@ -25,7 +25,7 @@ import messages from './messages';
 
 const Main = styled.div`
   position: ${(props) => props.isHome ? 'relative' : 'absolute'};
-  top: ${(props) => props.isHome ? 0 : '150px'};
+  top: ${(props) => props.isHome ? 0 : 148}px;
   overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
   left: 0;
   right: 0;
