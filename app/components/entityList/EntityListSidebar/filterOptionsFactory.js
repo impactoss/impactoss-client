@@ -232,6 +232,7 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
     multiple: true,
     required: false,
     search: true,
+    advanced: true,
   };
   // get the active option
   const option = find(connectionFilters.options, (o) => o.path === activeOptionId);

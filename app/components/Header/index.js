@@ -29,6 +29,8 @@ const Styled = styled.div`
   right:0;
   height:150px;
   background-color: ${palette('header', 0)};
+  box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.5);
+  z-index: 101;
 `;
 
 
