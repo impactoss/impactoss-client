@@ -6,7 +6,7 @@ import { palette } from 'styled-theme';
 import { CONTENT_LIST, CONTENT_SINGLE, CONTENT_PAGE } from 'containers/App/constants';
 
 import SupTitle from 'components/SupTitle';
-import Icon from 'components/Icon';
+// import Icon from 'components/Icon';
 
 import ButtonFactory from 'components/buttons/ButtonFactory';
 
@@ -25,14 +25,14 @@ const TitleMedium = styled.h3`
   margin-top: 0;
   display: inline-block;
 `;
-const TitleSmall = styled.h4`
-  line-height: 1;
-  margin-top: 0;
-  display: inline-block;
-`;
-const TitleIconWrap = styled.span`
-  color: ${palette('dark', 4)};
-`;
+// const TitleSmall = styled.h4`
+//   line-height: 1;
+//   margin-top: 0;
+//   display: inline-block;
+// `;
+// const TitleIconWrap = styled.span`
+//   color: ${palette('dark', 4)};
+// `;
 const ButtonWrap = styled.span`
   padding: 0 0.3em;
   &:last-child {
@@ -64,12 +64,13 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
         return (<TitleLarge>{title}</TitleLarge>);
       case CONTENT_SINGLE:
         return (
-          <TitleIconWrap>
-            { icon &&
-              <Icon name={icon} text textLeft />
-            }
-            <TitleSmall>{title}</TitleSmall>
-          </TitleIconWrap>
+          <SupTitle icon={icon} title={title} />
+          // <TitleIconWrap>
+          //   { icon &&
+          //     <Icon name={icon} text textLeft />
+          //   }
+          //   <TitleSmall>{title}</TitleSmall>
+          // </TitleIconWrap>
         );
       default:
         return (<TitleMedium>{title}</TitleMedium>);

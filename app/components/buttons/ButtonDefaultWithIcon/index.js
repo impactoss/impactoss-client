@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-// import { palette } from 'styled-theme';
+import { palette } from 'styled-theme';
 
 import ButtonDefault from 'components/buttons/ButtonDefault';
 import Icon from 'components/Icon';
@@ -14,11 +14,13 @@ const Button = styled(ButtonDefault)`
   text-transform: ${(props) => props.uppercase ? 'uppercase' : 'none'};
   font-weight: ${(props) => props.strong ? 'bold' : 'normal'};
   font-size: 0.85em;
+  border: ${(props) => props.border ? '1px solid' : 0};
+  border-color: ${(props) => props.border ? palette(props.border.palette, props.border.pIndex) : 'transparent'};
 `;
 
 const Title = styled.span`
-  padding-right: ${(props) => props.iconRight ? 3 : 0}px;
-  padding-left: ${(props) => props.iconRight ? 0 : 3}px;
+  padding-right: 0;
+  padding-left: 0;
   position: relative;
   top: 0.05em;
 `;
@@ -26,7 +28,7 @@ const Title = styled.span`
 class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong } = this.props;
+    const { icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong, border } = this.props;
     return (
       <Button
         onClick={onClick}
@@ -36,6 +38,7 @@ class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line
         align={align}
         strong={strong}
         title={title}
+        border={border}
       >
         { iconRight &&
           <Title iconRight>{title}</Title>
@@ -58,6 +61,7 @@ ButtonDefaultWithIcon.propTypes = {
   inactive: PropTypes.bool,
   strong: PropTypes.bool,
   align: PropTypes.string,
+  border: PropTypes.object,
 };
 
 ButtonDefaultWithIcon.defaultProps = {
@@ -66,6 +70,7 @@ ButtonDefaultWithIcon.defaultProps = {
   disabled: false,
   inactive: false,
   strong: false,
+  border: null,
   align: 'center',
 };
 

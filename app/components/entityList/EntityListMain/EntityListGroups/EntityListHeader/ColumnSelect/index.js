@@ -21,6 +21,7 @@ const Styled = styled(ColumnHeader)`
 `;
 const LabelWrap = styled.div`
   display: table-cell;
+  padding-left: ${(props) => props.isSelect ? 0 : 15}px;
 `;
 const CheckboxWrap = styled.div`
   width: 40px;
@@ -75,7 +76,7 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
             </CheckboxWrap>
           }
           {isSelect &&
-            <LabelWrap>
+            <LabelWrap isSelect={isSelect}>
               <Label htmlFor="select-all">{label}</Label>
               {hasSelectAll &&
                 <SelectAll
