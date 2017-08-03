@@ -29,15 +29,15 @@ export default defineMessages({
   project: {
     text: {
       id: 'nmrf.components.Footer.project.text',
-      defaultMessage: 'This website is an implementation of the NMRF open source project',
+      defaultMessage: 'SADATA is powered by',
     },
     url: {
       id: 'nmrf.components.Footer.project.url',
-      defaultMessage: 'https://github.com/dumparkltd/hr-nmrf-client',
+      defaultMessage: 'http://impactoss.org',
     },
     anchor: {
       id: 'nmrf.components.Footer.project.anchor',
-      defaultMessage: 'NMRF Open Source',
+      defaultMessage: 'IMPACT OSS',
     },
   },
 });
