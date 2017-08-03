@@ -12,7 +12,7 @@ export default defineMessages({
   },
   title: {
     id: 'app.containers.Overview.title',
-    defaultMessage: 'The National Plan of Action and related subjects',
+    defaultMessage: 'The implementation plan and related subjects',
   },
   description: {
     id: 'app.containers.Overview.description',
@@ -29,7 +29,7 @@ export default defineMessages({
     },
     measures: {
       id: 'app.containers.Overview.buttons.measures',
-      defaultMessage: 'Plan of Action',
+      defaultMessage: 'Implementation plan',
     },
     measuresAdditional: {
       id: 'app.containers.Overview.buttons.measures',
