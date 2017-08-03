@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import Icon from 'components/Icon';
 import BottomTagGroup from './BottomTagGroup';
+import BottomIconWrap from './BottomIconWrap';
 import ConnectionPopup from './ConnectionPopup';
 
 export default class EntityListItemMainBottomConnections extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -17,7 +18,9 @@ export default class EntityListItemMainBottomConnections extends React.PureCompo
         {
           this.props.connections.map((connection, i) => (
             <span key={i}>
-              <Icon name={connection.option.icon} text />
+              <BottomIconWrap>
+                <Icon name={connection.option.icon} text />
+              </BottomIconWrap>
               <ConnectionPopup
                 connection={connection}
                 wrapper={this.props.wrapper}

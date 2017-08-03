@@ -12,11 +12,11 @@ export default defineMessages({
   },
   title: {
     id: 'app.containers.Overview.title',
-    defaultMessage: 'Implementation plan of actions in context',
+    defaultMessage: 'The implementation plan and related subjects',
   },
   description: {
     id: 'app.containers.Overview.description',
-    defaultMessage: 'Start exploring by selecting a category group from the sidebar or one of the areas from the diagram below.',
+    defaultMessage: 'Start exploring by selecting a category group from the sidebar or one of the subjects from the diagram below.',
   },
   buttons: {
     recommendations: {

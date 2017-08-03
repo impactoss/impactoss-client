@@ -13,7 +13,7 @@ const Styled = styled.button`
   display: block;
   margin-bottom: 2px;
   &:hover {
-    color: ${palette('dark', 3)};
+    opacity: 0.85;
   }
 `;
 const Column = styled.div`
@@ -39,12 +39,12 @@ const Bar = styled.div`
 const Count = styled.div`
   display: table-cell;
   width: 40px;
-  padding-right: 1em;
   font-weight: bold;
   text-align: right;
   vertical-align: middle;
   font-size: 1.1em;
   color: ${(props) => palette(props.palette, 0)};
+  padding-right: 5px;
 `;
 const Title = styled.span`
   font-size: 1.1em;

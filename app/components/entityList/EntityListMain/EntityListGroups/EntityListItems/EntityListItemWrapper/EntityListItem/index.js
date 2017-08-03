@@ -73,6 +73,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
                 entityPath={entityPath}
                 onEntityClick={onEntityClick}
                 wrapper={this.props.wrapper}
+                isManager={isManager}
               />
             </MainInnerWrapper>
           </MainWrapper>

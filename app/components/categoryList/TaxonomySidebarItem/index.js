@@ -41,7 +41,7 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
     return (
       <Styled onClick={() => taxonomy.onLink()} active={taxonomy.active}>
         <TaxIcon>
-          <Icon name={`taxonomy_${taxonomy.id}`} size="3em" />
+          <Icon name={`taxonomy_${taxonomy.id}`} />
         </TaxIcon>
         <TaxTitle>
           {this.getTaxTitle(taxonomy.id)}

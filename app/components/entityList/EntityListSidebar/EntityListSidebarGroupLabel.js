@@ -20,6 +20,8 @@ const Styled = styled.div`
 const Right = styled.div`
   color: ${palette('dark', 4)};
   float:right;
+  position: relative;
+  right: -5px;
 `;
 
 export default class EntityListSidebarGroupLabel extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
