@@ -97,12 +97,12 @@ export class EntityListFooter extends React.PureComponent { // eslint-disable-li
                   }}
                   title="Previous"
                 >
-                  <Icon name="arrowLeft" size="1.75em" />
+                  <Icon name="arrowLeft" />
                 </ListInlineItemNav>
               }
               {pager.currentPage === 1 &&
                 <ListInlineItemNavDisabled>
-                  <Icon name="arrowLeft" size="1.75em" />
+                  <Icon name="arrowLeft" />
                 </ListInlineItemNavDisabled>
               }
             </ListInlineItem>
@@ -172,12 +172,12 @@ export class EntityListFooter extends React.PureComponent { // eslint-disable-li
                   }}
                   title="Next"
                 >
-                  <Icon name="arrowRight" size="1.7em" />
+                  <Icon name="arrowRight" />
                 </ListInlineItemNav>
               }
               {pager.currentPage === pager.totalPages &&
                 <ListInlineItemNavDisabled>
-                  <Icon name="arrowRight" size="1.7em" />
+                  <Icon name="arrowRight" />
                 </ListInlineItemNavDisabled>
               }
             </ListInlineItem>

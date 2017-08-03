@@ -62,7 +62,7 @@ export const renderMeasureControl = (entities) => entities
   dataPath: ['associatedMeasures'],
   label: 'Actions',
   controlType: 'multiselect',
-  options: entityOptions(entities),
+  options: entityOptions(entities, true),
 }
 : null;
 export const renderSdgTargetControl = (entities) => entities
@@ -72,7 +72,7 @@ export const renderSdgTargetControl = (entities) => entities
   dataPath: ['associatedSdgTargets'],
   label: 'SDG targets',
   controlType: 'multiselect',
-  options: entityOptions(entities),
+  options: entityOptions(entities, true),
 }
 : null;
 
@@ -94,7 +94,7 @@ export const renderIndicatorControl = (entities) => entities
   dataPath: ['associatedIndicators'],
   label: 'Indicators',
   controlType: 'multiselect',
-  options: entityOptions(entities),
+  options: entityOptions(entities, true),
 }
 : null;
 

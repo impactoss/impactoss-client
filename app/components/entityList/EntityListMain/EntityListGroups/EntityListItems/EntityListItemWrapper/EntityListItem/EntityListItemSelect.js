@@ -5,7 +5,7 @@ import { palette } from 'styled-theme';
 
 const Select = styled.div`
   display: table-cell;
-  width: 30px;
+  width: 40px;
   background-color: ${palette('primary', 4)};
   padding: 5px;
   text-align: center;

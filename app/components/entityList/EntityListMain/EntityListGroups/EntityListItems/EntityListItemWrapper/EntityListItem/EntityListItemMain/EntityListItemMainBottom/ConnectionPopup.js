@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Link } from 'react-router';
 
+import { sortEntities } from 'utils/sort';
 import { truncateText } from 'utils/string';
 
 const POPUP_WIDTH = 350;
@@ -11,9 +12,8 @@ const POPUP_LENGTH = 66;
 
 const Count = styled.span`
   display: inline-block;
-  padding: 3px 7px;
   position: relative;
-  top: -2px;
+  top: 0;
   border-radius: 999px;
   font-size: 0.8em;
   background-color: ${(props) => palette(props.pIndex, 0)};
@@ -91,12 +91,12 @@ const PopupContent = styled.div`
 
 const Id = styled.span`
   font-weight: bold;
-  color: ${palette('dark', 3)}
+  color: ${palette('dark', 4)}
 `;
 const IdSpacer = styled.span`
   padding-left: 0.5em;
   padding-right: 0.5em;
-  color: ${palette('dark', 1)};
+  color: ${palette('dark', 4)};
 `;
 const ItemContent = styled.span`
   color: ${palette('dark', 1)};
@@ -169,7 +169,9 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
               </PopupHeader>
               <PopupContent count={connection.entities.size}>
                 {
-                  connection.entities.toList().map((entity, i) => {
+                  sortEntities(connection.entities, 'asc', 'reference')
+                  .toList()
+                  .map((entity, i) => {
                     const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
                     return (
                       <ListItem key={i}>

@@ -127,7 +127,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
                 }}
               >
                 <FormattedMessage {...messages.loginLink} />
-                <Icon name="arrowRight" text textRight size="1em" />
+                <Icon name="arrowRight" text textRight />
               </A>
             </p>
           </BottomLinks>

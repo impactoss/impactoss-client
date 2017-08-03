@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import Component from 'components/styled/Component';
-import Clear from 'components/styled/Clear';
 import Icon from 'components/Icon';
 
 const Styled = styled(Component)`
@@ -13,22 +12,21 @@ const Styled = styled(Component)`
   cursor: pointer;
   width:${(props) => props.width * 100}%;
   border-right: 1px solid ${palette('light', 0)};
-  vertical-align: top;
+  vertical-align: middle;
   padding: 5px 10px;
 `;
-const Top = styled.div`
-  float: right;
+const IconWrap = styled.span`
+  display: inline-block;
   color: ${palette('light', 3)};
+  top: -4px;
+  position: relative;
 `;
 
-const Count = styled.div`
+const Count = styled.span`
   display: inline-block;
-  background-color: ${(props) => props.count ? palette(props.type, 0) : palette('light', 4)};
-  color: ${palette('primary', 4)};
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 1em;
-  margin-bottom: 0.5em;
+  color: ${palette('dark', 3)};
+  padding: 0 8px;
+  font-size: 1.5em;
 `;
 
 const Info = styled.div`
@@ -66,10 +64,9 @@ export default class EntityListItemExpandable extends React.PureComponent { // e
     }
     return (
       <Styled width={width} onClick={onClick}>
-        <Top>
+        <IconWrap>
           <Icon name={icon} text iconRight />
-        </Top>
-        <Clear />
+        </IconWrap>
         <Count type={type} count={count}>{count}</Count>
         { info &&
           info.map((infoLine, i) =>

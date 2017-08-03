@@ -29,7 +29,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       });
       if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
         attributes.push({
-          via: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+          via: this.context.intl.formatMessage(appMessages.entities.connected),
           attribute: 'measures',
           attributePublic: 'measuresPublic',
           label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
@@ -44,7 +44,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       });
       if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
         attributes.push({
-          via: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
+          via: this.context.intl.formatMessage(appMessages.entities.connected),
           attribute: 'measures',
           attributePublic: 'measuresPublic',
           label: this.context.intl.formatMessage(appMessages.entities.measures.plural),

@@ -41,32 +41,34 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
   } else if (type === 'date') {
     result = new Date(valueA) < new Date(valueB) ? -1 : 1;
   } else {
-    const floatA = parseFloat(valueA);
-    const floatB = parseFloat(valueB);
-    const aStartsWithNumber = !isNaN(floatA);
-    const bStartsWithNumber = !isNaN(floatB);
+    const intA = parseInt(valueA, 10);
+    const intB = parseInt(valueB, 10);
+    const aStartsWithNumber = !isNaN(intA);
+    const bStartsWithNumber = !isNaN(intB);
     if (aStartsWithNumber && !bStartsWithNumber) {
       result = -1;
     } else if (!aStartsWithNumber && bStartsWithNumber) {
       result = 1;
     } else if (aStartsWithNumber && bStartsWithNumber) {
-      const aIsNumber = aStartsWithNumber && isFinite(valueA);
-      const bIsNumber = aStartsWithNumber && isFinite(valueA);
+      const aIsNumber = aStartsWithNumber && isFinite(valueA) && intA.toString() === valueA;
+      const bIsNumber = bStartsWithNumber && isFinite(valueB) && intB.toString() === valueB;
       if (aIsNumber && !bIsNumber) {
         result = -1;
       } else if (!aIsNumber && bIsNumber) {
         result = 1;
       } else if (aIsNumber && bIsNumber) {
         // both numbers
-        result = floatA < floatB ? -1 : 1;
-      } else if (floatA !== floatB) {
+        result = intA < intB ? -1 : 1;
+      } else if (intA !== intB) {
+        result = intA < intB ? -1 : 1;
+      } else {
         // both starting with number but are not numbers entirely
         // compare numbers first then remaining strings if numbers equal
-        result = floatA < floatB ? -1 : 1;
-      } else {
+        const intAlength = intA.toString().length;
+        const intBlength = intB.toString().length;
         result = getEntitySortComparator(
-          valueA.slice(floatA.toString().length - (valueA.slice(0, 1) === '.' ? 1 : 0)),
-          valueB.slice(floatB.toString().length - (valueB.slice(0, 1) === '.' ? 1 : 0)),
+          valueA.slice(intAlength + (valueA.slice(intAlength, intAlength + 1) === '.' ? 1 : 0)),
+          valueB.slice(intBlength + (valueB.slice(intBlength, intBlength + 1) === '.' ? 1 : 0)),
           'asc'
         );
       }

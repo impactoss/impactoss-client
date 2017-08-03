@@ -10,8 +10,6 @@ import Row from 'components/styled/Row';
 
 import messages from './messages';
 
-import Banner from './Banner';
-
 const Styled = styled.div`
   background-color: ${palette('secondary', 1)};
   color: ${palette('primary', 4)};
@@ -19,11 +17,19 @@ const Styled = styled.div`
 const Main = styled.div`
   padding: 2em 0 3em;
 `;
-const FooterContact = styled.a`
+
+const FooterLink = styled.a`
+  font-weight:bold;
+  color: ${palette('primary', 4)};
+  &:hover {
+    color: ${palette('primary', 4)};
+    opacity: 0.8;
+  }
 `;
-const FooterProjectLink = styled.a`
-font-weight:bold;
-`;
+// const FooterProjectLink = styled.a`
+//   font-weight:bold;
+//   color: ${palette('primary', 4)};
+// `;
 
 
 class Footer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -36,35 +42,41 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
   render() {
     return (
       <Styled >
-        <Banner />
         <Main>
           <Container>
             <Row>
               <Grid sm={1 / 2}>
                 <FormattedMessage {...messages.disclaimer} />
-                <div>
-                  <FooterContact
-                    target="_blank"
-                    href={`mailto:${this.context.intl.formatMessage(messages.contact.email)}`}
-                    title={this.context.intl.formatMessage(messages.contact.anchor)}
-                  >
-                    <FormattedMessage {...messages.contact.anchor} />
-                  </FooterContact>
-                </div>
+                <FooterLink
+                  target="_blank"
+                  href={`mailto:${this.context.intl.formatMessage(messages.contact.email)}`}
+                  title={this.context.intl.formatMessage(messages.contact.anchor)}
+                >
+                  <FormattedMessage {...messages.contact.anchor} />
+                </FooterLink>
               </Grid>
               <Grid sm={1 / 4}>
                 <FormattedMessage {...messages.responsible.text} />
+                <div>
+                  <FooterLink
+                    target="_blank"
+                    href={this.context.intl.formatMessage(messages.responsible.url)}
+                    title={this.context.intl.formatMessage(messages.responsible.anchor)}
+                  >
+                    <FormattedMessage {...messages.responsible.anchor} />
+                  </FooterLink>
+                </div>
               </Grid>
               <Grid sm={1 / 4}>
                 <FormattedMessage {...messages.project.text} />
                 <div>
-                  <FooterProjectLink
+                  <FooterLink
                     target="_blank"
                     href={this.context.intl.formatMessage(messages.project.url)}
                     title={this.context.intl.formatMessage(messages.project.anchor)}
                   >
                     <FormattedMessage {...messages.project.anchor} />
-                  </FooterProjectLink>
+                  </FooterLink>
                 </div>
               </Grid>
             </Row>
@@ -74,11 +86,6 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
     );
   }
 }
-
-// Footer.propTypes = {
-//   pages: PropTypes.array,
-//   onPageLink: PropTypes.func.isRequired,
-// };
 
 Footer.contextTypes = {
   intl: PropTypes.object.isRequired,

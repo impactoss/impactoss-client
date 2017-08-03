@@ -23,7 +23,15 @@ export default defineMessages({
   responsible: {
     text: {
       id: 'nmrf.components.Footer.responsible.text',
-      defaultMessage: 'This website is brought to you by: this section could include links to sponsors',
+      defaultMessage: 'Visit our website to learn more about Human Rights in New Zealand',
+    },
+    url: {
+      id: 'nmrf.components.Footer.responsible.url',
+      defaultMessage: 'https://www.hrc.co.nz/',
+    },
+    anchor: {
+      id: 'nmrf.components.Footer.responsible.anchor',
+      defaultMessage: 'www.hrc.co.nz',
     },
   },
   project: {

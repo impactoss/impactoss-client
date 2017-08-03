@@ -1,3 +1,1 @@
-export const DEPENDENCIES = [
-  'pages',
-];
+export const DEPENDENCIES = [];
