@@ -105,7 +105,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                 }}
               >
                 <FormattedMessage {...messages.registerLink} />
-                <Icon name="arrowRight" text textRight size="1em" />
+                <Icon name="arrowRight" text textRight />
               </A>
             </p>
             <p>
@@ -117,7 +117,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                 }}
               >
                 <FormattedMessage {...messages.recoverPasswordLink} />
-                <Icon name="arrowRight" text textRight size="1em" />
+                <Icon name="arrowRight" text textRight />
               </A>
             </p>
           </BottomLinks>

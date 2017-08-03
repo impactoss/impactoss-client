@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { isEqual } from 'lodash/lang';
 import { Form, actions as formActions } from 'react-redux-form/immutable';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import MultiSelectControl from 'components/forms/MultiSelectControl';
 import {
@@ -19,9 +20,14 @@ const FormWrapper = styled.div`
   top: 0;
   bottom: 0;
   left: 100%;
-  min-width: 350px;
-  background: #fff;
+  min-width: ${(props) => props.wide ? 700 : 350}px;
+  background: ${palette('primary', 4)};
   overflow: hidden;
+  border-left: 1px solid ${palette('light', 2)};
+  border-right: 1px solid ${palette('light', 2)};
+  border-bottom: 1px solid ${palette('light', 2)};
+  box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  z-index:-1;
 `;
 
 class EntityListForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -40,7 +46,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
   render() {
     const { model, onSubmit, onCancel, buttons, formOptions } = this.props;
     return (
-      <FormWrapper>
+      <FormWrapper wide={formOptions.advanced}>
         <Form
           model={model}
           onSubmit={onSubmit}
@@ -53,6 +59,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
             multiple={formOptions.multiple}
             required={formOptions.required}
             search={formOptions.search}
+            advanced={formOptions.advanced}
             onCancel={onCancel}
             onChange={(values) => {
               this.props.onFormChange(values, model);

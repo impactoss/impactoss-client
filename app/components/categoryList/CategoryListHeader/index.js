@@ -10,32 +10,30 @@ import ColumnHeader from 'components/styled/ColumnHeader';
 const Styled = styled.div`
   width:100%;
   background-color: ${palette('light', 1)};
+  display: table;
 `;
+
 
 const Column = styled(ColumnHeader)`
-  position: relative;
   width:${(props) => props.colWidth}%;
-  display: inline-block;
-  padding: 0.25em 1em;
-  border-right: 1px solid ${palette('light', 2)};
-  font-size: 0.85em;
-  &:last-child {
-    border-right: none;
-  }
 `;
 
-const Title = styled.div``;
+const ColumnInner = styled.div`
+  display: table;
+  width: 100%;
+`;
 
-const Via = styled.div`
+const Title = styled.span`
+  display: table-cell;
+`;
+
+const Via = styled.span`
   font-style: italic;
 `;
 
 const SortWrapper = styled.div`
-  position: absolute;
-  right:0;
-  bottom:0;
   text-align:right;
-  display: block;
+  display: table-cell;
 `;
 const SortButton = styled(ButtonFlatIconOnly)`
   padding: 0;
@@ -53,17 +51,21 @@ class CategoryListHeader extends React.PureComponent { // eslint-disable-line re
         {
           columns.map((col, i) => (
             <Column key={i} colWidth={col.width}>
-              <Title>{col.header}</Title>
-              {col.via &&
-                <Via>{`(through ${col.via})`}</Via>
-              }
-              {col.onClick &&
-                <SortWrapper>
-                  <SortButton onClick={col.onClick}>
-                    <Icon name={col.sortIcon} />
-                  </SortButton>
-                </SortWrapper>
-              }
+              <ColumnInner>
+                <Title>
+                  {col.header}
+                  {col.via &&
+                    <Via>{` ${col.via}`}</Via>
+                  }
+                </Title>
+                {col.onClick &&
+                  <SortWrapper>
+                    <SortButton onClick={col.onClick}>
+                      <Icon name={col.sortIcon} />
+                    </SortButton>
+                  </SortWrapper>
+                }
+              </ColumnInner>
             </Column>
           ))
         }

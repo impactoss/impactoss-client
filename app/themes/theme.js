@@ -94,6 +94,10 @@ theme.palette = {
   // HEADER "PALETTES" //////////////////////////////////////////////////////////////
   //
 
+  // home: [ '#bg' ],
+  home: [secondary[1]],
+  homeIntro: [light[2]],
+
   // header: [ '#bg' ],
   header: [secondary[1]],
 
@@ -175,7 +179,7 @@ theme.fonts = {
 // sizes
 theme.sizes = {
   // also see global-styles.js for other sizes
-  headerBrandMain: '2.6em',
+  headerBrandMain: '2.2em',
   headerBrandClaim: '0.85em',
 };
 

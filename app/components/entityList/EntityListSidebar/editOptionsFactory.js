@@ -103,6 +103,7 @@ export const makeConnectionEditOptions = (entities, edits, connections, activeEd
     selectedCount: entities.size,
     multiple: true,
     required: false,
+    advanced: true,
   };
 
   const option = find(edits.connections.options, (o) => o.path === activeEditOption.optionId);

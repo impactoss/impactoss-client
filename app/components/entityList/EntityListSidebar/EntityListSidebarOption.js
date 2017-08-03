@@ -42,7 +42,7 @@ const IconWrapper = styled.span`
 const Dot = styled.div`
   background-color: ${(props) => palette(props.palette, props.pIndex)};
   display: block;
-  border-radius: 999px;
+  border-radius: ${(props) => props.round ? 999 : 3}px;
   width: 1em;
   height: 1em;
 `;
@@ -59,7 +59,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
       case 'connectedTaxonomies':
         return (<Dot palette="taxonomies" pIndex={parseInt(optionId, 10)} />);
       case 'connections':
-        return (<Dot palette={optionId} pIndex={0} />);
+        return (<Dot palette={optionId} pIndex={0} round />);
       default:
         return null;
     }
@@ -87,7 +87,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
         </DotWrapper>
         { option.get('icon') &&
           <IconWrapper>
-            <Icon name={option.get('icon')} size="24px" />
+            <Icon name={option.get('icon')} />
           </IconWrapper>
         }
       </Styled>

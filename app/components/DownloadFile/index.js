@@ -17,7 +17,7 @@ const DownloadFile = ({ url }) => {
   return (
     <DownloadA href={url} download>
       {filename}
-      <Icon name="download" text textRight size="2em" />
+      <Icon name="download" text textRight />
     </DownloadA>
   );
 };
