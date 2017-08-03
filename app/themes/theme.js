@@ -94,6 +94,10 @@ theme.palette = {
   // HEADER "PALETTES" //////////////////////////////////////////////////////////////
   //
 
+  // home: [ '#bg' ],
+  home: [secondary[1]],
+  homeIntro: [light[2]],
+
   // header: [ '#bg' ],
   header: [secondary[1]],
 

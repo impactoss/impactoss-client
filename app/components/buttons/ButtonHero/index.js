@@ -6,9 +6,9 @@ const ButtonHero = styled(ButtonDefault)`
   font-size: 1.25em;
   padding: 0.8em;
   min-width: 200px;
-  background-color: ${palette('secondary', 0)};
+  background-color: ${palette('primary', 0)};
   &:hover {
-    background-color: ${palette('secondary', 1)};
+    background-color: ${palette('primary', 1)};
   }
 `;
 

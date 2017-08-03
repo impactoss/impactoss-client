@@ -3,7 +3,7 @@ import { palette } from 'styled-theme';
 
 export default styled.div`
   display: inline-block;
-  padding: 2px 5px;
+  padding: 0px 5px;
   font-family: ${(props) => props.theme.fonts.headerBrandClaim};
   font-size: ${(props) => props.theme.sizes.headerBrandClaim};
   background-color: ${palette('header', 0)};
