@@ -182,7 +182,7 @@ const Count = styled.span`
   padding-right: 5px;
 `;
 const DiagramButtonMainTop = styled.div`
-  font-size: 1.5em;
+  font-size: 1.3em;
   padding-bottom: 5px;
 `;
 const DiagramButtonMainBottom = styled.div`
