@@ -37,7 +37,7 @@ export default defineMessages({
   project: {
     text: {
       id: 'nmrf.components.Footer.project.text',
-      defaultMessage: 'This New Zealand National Plan of Action is powered by',
+      defaultMessage: 'SADATA is powered by',
     },
     url: {
       id: 'nmrf.components.Footer.project.url',
