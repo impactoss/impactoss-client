@@ -19,14 +19,14 @@ import {
   selectSessionUserId,
   selectReady,
   selectEntitiesWhere,
-  selectCreateModal,
+  selectNewEntityModal,
 } from './selectors';
 
 import {
   validateToken,
   loadEntitiesIfNeeded,
   updatePath,
-  openCreateModal,
+  openNewEntityModal,
 } from './actions';
 
 import { DEPENDENCIES } from './constants';
@@ -110,7 +110,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 
   render() {
     window.Perf = Perf;
-    const { pages, onPageLink, isUserSignedIn, isManager, location, createModal } = this.props;
+    const { pages, onPageLink, isUserSignedIn, isManager, location, newEntityModal } = this.props;
 
     return (
       <div>
@@ -126,20 +126,23 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         <Main isHome={location.pathname === '/'}>
           {React.Children.toArray(this.props.children)}
         </Main>
-        {createModal &&
+        {newEntityModal &&
           <ReactModal
             isOpen
-            contentLabel={createModal.get('path')}
+            contentLabel={newEntityModal.get('path')}
             onRequestClose={this.props.onCloseModal}
+            className="new-entity-modal"
+            overlayClassName="new-entity-modal-overlay"
             style={{
               overlay: { zIndex: 99999999 },
             }}
           >
             <EntityNew
-              path={createModal.get('path')}
-              attributes={createModal.get('attributes')}
+              path={newEntityModal.get('path')}
+              attributes={newEntityModal.get('attributes')}
               onSaveSuccess={this.props.onCloseModal}
               onCancel={this.props.onCloseModal}
+              inModal
             />
           </ReactModal>
         }
@@ -158,7 +161,7 @@ App.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onPageLink: PropTypes.func.isRequired,
   location: PropTypes.object.isRequired,
-  createModal: PropTypes.object,
+  newEntityModal: PropTypes.object,
   onCloseModal: PropTypes.func,
 };
 App.contextTypes = {
@@ -174,7 +177,7 @@ const mapStateToProps = (state) => ({
     path: 'pages',
     where: { draft: false },
   }),
-  createModal: selectCreateModal(state),
+  newEntityModal: selectNewEntityModal(state),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -189,7 +192,7 @@ export function mapDispatchToProps(dispatch) {
       dispatch(updatePath(path));
     },
     onCloseModal: () => {
-      dispatch(openCreateModal(null));
+      dispatch(openNewEntityModal(null));
     },
   };
 }

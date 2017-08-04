@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import { CONTENT_LIST, CONTENT_SINGLE, CONTENT_PAGE } from 'containers/App/constants';
+import { CONTENT_LIST, CONTENT_SINGLE, CONTENT_PAGE, CONTENT_MODAL } from 'containers/App/constants';
 
 import SupTitle from 'components/SupTitle';
 // import Icon from 'components/Icon';
@@ -11,7 +11,7 @@ import SupTitle from 'components/SupTitle';
 import ButtonFactory from 'components/buttons/ButtonFactory';
 
 const Styled = styled.div`
-  padding: 3em 0 1em;
+  padding: ${(props) => props.isModal ? '20px 0 20px 40px' : '3em 0 1em'};
   border-bottom: ${(props) => props.hasBottomBorder ? '1px solid' : 'none'};
   border-color: ${palette('light', 2)};
 `;
@@ -62,6 +62,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
       case CONTENT_PAGE:
       case CONTENT_LIST:
         return (<TitleLarge>{title}</TitleLarge>);
+      case CONTENT_MODAL:
       case CONTENT_SINGLE:
         return (
           <SupTitle icon={icon} title={title} />
@@ -79,7 +80,10 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
   render() {
     const { type, icon, supTitle, title, buttons } = this.props;
     return (
-      <Styled hasBottomBorder={type === CONTENT_PAGE}>
+      <Styled
+        hasBottomBorder={type === CONTENT_PAGE || type === CONTENT_MODAL}
+        isModal={type === CONTENT_MODAL}
+      >
         { supTitle &&
           <SupTitle icon={icon} title={supTitle} />
         }

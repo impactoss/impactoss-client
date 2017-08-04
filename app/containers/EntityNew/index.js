@@ -11,7 +11,7 @@ import { connect } from 'react-redux';
 import { getEntityFields } from 'utils/forms';
 
 import { newEntity } from 'containers/App/actions';
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import Content from 'components/Content';
@@ -25,15 +25,15 @@ import messages from './messages';
 
 export class EntityNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { viewDomain, path, attributes } = this.props;
+    const { viewDomain, path, attributes, inModal } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
       <div>
-        <Content>
+        <Content hasPaddingBottom={!inModal}>
           <ContentHeader
             title={this.context.intl.formatMessage(messages[path].pageTitle)}
-            type={CONTENT_SINGLE}
+            type={CONTENT_MODAL}
             icon="measures"
             buttons={[{
               type: 'cancel',
@@ -56,6 +56,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           <EntityForm
             model="entityNew.form.data"
             formData={viewDomain.form.data}
+            inModal={inModal}
             handleSubmit={(formData) => this.props.handleSubmit(
               formData,
               attributes
@@ -74,6 +75,7 @@ EntityNew.propTypes = {
   attributes: PropTypes.object,
   handleSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
+  inModal: PropTypes.bool,
   // onSaveSuccess: PropTypes.func,
   viewDomain: PropTypes.object,
 };

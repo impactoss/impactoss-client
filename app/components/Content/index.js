@@ -8,7 +8,7 @@ class Content extends React.PureComponent { // eslint-disable-line react/prefer-
   render() {
     return (
       <ContainerWrapper>
-        <Container>
+        <Container hasPaddingBottom={this.props.hasPaddingBottom}>
           {this.props.children}
         </Container>
       </ContainerWrapper>
@@ -18,6 +18,7 @@ class Content extends React.PureComponent { // eslint-disable-line react/prefer-
 
 Content.propTypes = {
   children: PropTypes.node,
+  hasPaddingBottom: PropTypes.bool,
 };
 
 export default Content;

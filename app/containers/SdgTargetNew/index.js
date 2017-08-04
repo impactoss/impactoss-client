@@ -31,6 +31,7 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import { selectEntities, selectReady } from 'containers/App/selectors';
@@ -78,7 +79,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
     fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
   }]);
 
-  getBodyMainFields = (indicators, measures) => ([
+  getBodyMainFields = (indicators, measures, onCreateOption) => ([
     {
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
@@ -86,22 +87,22 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures),
-        renderIndicatorControl(indicators),
+        renderMeasureControl(measures, onCreateOption),
+        renderIndicatorControl(indicators, onCreateOption),
       ],
     },
   ]);
 
-  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);
 
   render() {
-    const { dataReady, viewDomain, indicators, taxonomies, measures } = this.props;
+    const { dataReady, viewDomain, indicators, taxonomies, measures, onCreateOption } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -155,8 +156,8 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(indicators, measures),
-                  aside: this.getBodyAsideFields(taxonomies),
+                  main: this.getBodyMainFields(indicators, measures, onCreateOption),
+                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -178,6 +179,7 @@ SdgTargetNew.propTypes = {
   taxonomies: PropTypes.object,
   indicators: PropTypes.object,
   measures: PropTypes.object,
+  onCreateOption: PropTypes.func,
 };
 
 SdgTargetNew.contextTypes = {
@@ -246,6 +248,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

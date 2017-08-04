@@ -21,7 +21,7 @@ import { selectIsUserManager } from 'containers/App/selectors';
 
 import {
   updatePath,
-  openCreateModal,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import appMessages from 'containers/App/messages';
@@ -272,7 +272,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updateSortBy(sort));
     },
     onCreateOption: (args) => {
-      dispatch(openCreateModal(args));
+      dispatch(openNewEntityModal(args));
     },
     handleEditSubmit: (formData, activeEditOption, entityIdsSelected) => {
       const entities = props.entities.filter(

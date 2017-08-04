@@ -286,6 +286,13 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
               title={`Update ${lowerCase(field.label)}`}
               onCancel={this.onCloseMultiselect}
               buttons={[
+                field.onCreate
+                ? {
+                  type: 'simple',
+                  title: 'new',
+                  onClick: field.onCreate,
+                }
+                : null,
                 {
                   type: 'primary',
                   title: 'Close',
@@ -482,9 +489,10 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   );
 
   render() {
-    const { fields, model, handleSubmit, handleCancel } = this.props;
+    const { fields, model, handleSubmit, handleCancel, inModal } = this.props;
+
     return (
-      <FormWrapper>
+      <FormWrapper hasShadow={!inModal}>
         <Form model={model} onSubmit={handleSubmit} >
           { fields.header &&
             <FormPanel borderBottom>
@@ -543,6 +551,7 @@ EntityForm.propTypes = {
   model: PropTypes.string,
   fields: PropTypes.object,
   formData: PropTypes.object,
+  inModal: PropTypes.bool,
 };
 // EntityForm.controlTypes = {
 //   intl: PropTypes.object.isRequired,
