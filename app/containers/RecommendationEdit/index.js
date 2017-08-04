@@ -231,7 +231,7 @@ RecommendationEdit.propTypes = {
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
-  onCreateOption: PropTypes.objecfunc,
+  onCreateOption: PropTypes.func,
 };
 
 RecommendationEdit.contextTypes = {

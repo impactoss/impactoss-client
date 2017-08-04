@@ -30,7 +30,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
 
     return (
       <div>
-        <Content hasPaddingBottom={!inModal}>
+        <Content noPaddingBottom={!inModal}>
           <ContentHeader
             title={this.context.intl.formatMessage(messages[path].pageTitle)}
             type={CONTENT_MODAL}
