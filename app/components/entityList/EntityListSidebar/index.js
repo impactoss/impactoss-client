@@ -50,12 +50,14 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     };
   }
   componentWillMount() {
+    // console.log('componentWIllMount')
     this.setState({ activeOption: null });
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.activePanel !== this.props.activePanel) {
       // close and reset option panel
+      // console.log('componentWillReceiveProps')
       this.setState({ activeOption: null });
     }
   }
@@ -104,8 +106,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   getFormButtons = (activeOption) => [
     activeOption.create
     ? {
-      type: 'simple',
-      title: 'new',
+      type: 'addFromMultiselect',
+      position: 'left',
       onClick: () => this.props.onCreateOption(activeOption.create),
     }
     : null,
@@ -139,6 +141,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     } = this.props;
 
     const activeOption = this.state.activeOption;
+    // console.log('Sidebar render', activeOption)
     const hasSelected = entityIdsSelected && entityIdsSelected.size > 0;
     const hasEntities = entities && entities.size > 0;
     const formModel = activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL;

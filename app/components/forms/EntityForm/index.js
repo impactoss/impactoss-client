@@ -288,14 +288,13 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
               buttons={[
                 field.onCreate
                 ? {
-                  type: 'simple',
-                  title: 'new',
+                  type: 'addFromMultiselect',
+                  position: 'left',
                   onClick: field.onCreate,
                 }
                 : null,
                 {
-                  type: 'primary',
-                  title: 'Close',
+                  type: 'closeText',
                   onClick: this.onCloseMultiselect,
                 },
               ]}

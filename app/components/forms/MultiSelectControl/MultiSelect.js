@@ -10,7 +10,7 @@ import { getEntitySortComparator } from 'utils/sort';
 
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
-import ButtonFlat from 'components/buttons/ButtonFlat';
+import ButtonFactory from 'components/buttons/ButtonFactory';
 
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
@@ -23,7 +23,7 @@ const OptionWrapper = styled.div`
   width: 100%;
 `;
 const ButtonGroup = styled.div`
-  text-align:right;
+  float: ${(props) => props.left ? 'left' : 'right'}
 `;
 const ControlWrapper = styled.div``;
 const OptionListWrapper = styled.div`
@@ -326,15 +326,26 @@ export default class MultiSelect extends React.Component {
   );
 
   renderButton = (action, i) => (
-    <ButtonFlat
-      primary={action.type === 'primary'}
+    <ButtonFactory
       key={i}
-      onClick={action.onClick && (() => action.onClick())}
-      type={action.submit ? 'submit' : 'button'}
-    >
-      {action.title}
-    </ButtonFlat>
+      button={{
+        type: action.type === 'primary' ? 'textPrimary' : (action.type || 'text'),
+        title: action.title,
+        onClick: action.onClick && (() => action.onClick()),
+        submit: action.submit,
+      }}
+    />
   );
+  // renderButton = (action, i) => (
+  //   <ButtonFlat
+  //     primary={action.type === 'primary'}
+  //     key={i}
+  //     onClick={action.onClick && (() => action.onClick())}
+  //     type={action.submit ? 'submit' : 'button'}
+  //   >
+  //     {action.title}
+  //   </ButtonFlat>
+  // );
 
   render() {
     const { options, values, threeState } = this.props;
@@ -377,7 +388,14 @@ export default class MultiSelect extends React.Component {
             <ButtonGroup>
               {
                 this.props.buttons.map((action, i) => (
-                  action && this.renderButton(action, i)
+                  action && action.position !== 'left' && this.renderButton(action, i)
+                ))
+              }
+            </ButtonGroup>
+            <ButtonGroup left>
+              {
+                this.props.buttons.map((action, i) => (
+                  action && action.position === 'left' && this.renderButton(action, i)
                 ))
               }
             </ButtonGroup>
