@@ -370,3 +370,136 @@ export const getFormField = (formatMessage, appMessages, controlType, attribute,
   }
   return field;
 };
+
+const getCategoryFields = (args, formatMessage, appMessages) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getReferenceFormField(formatMessage, appMessages),
+        getTitleFormField(formatMessage, appMessages),
+        getShortTitleFormField(formatMessage, appMessages),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [getMarkdownField(formatMessage, appMessages)],
+    }],
+    aside: [{
+      fields: [getFormField(formatMessage, appMessages, 'url', 'url')],
+    }],
+  },
+});
+
+const getMeasureFields = (args, formatMessage, appMessages) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getTitleFormField(formatMessage, appMessages),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getStatusField(formatMessage, appMessages),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [
+        getMarkdownField(formatMessage, appMessages),
+        getMarkdownField(formatMessage, appMessages, 'outcome'),
+        getMarkdownField(formatMessage, appMessages, 'indicator_summary'),
+      ],
+    }],
+    aside: [{
+      fields: [
+        getDateField(formatMessage, appMessages, 'target_date'),
+        getFormField(formatMessage, appMessages, 'textarea', 'target_date_comment'),
+      ],
+    }],
+  },
+});
+
+const getIndicatorFields = (args, formatMessage, appMessages) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getReferenceFormField(formatMessage, appMessages, false, true),
+        getTitleFormField(formatMessage, appMessages, 'titleText'),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getStatusField(formatMessage, appMessages),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [getMarkdownField(formatMessage, appMessages)],
+    }],
+  },
+});
+
+const getRecommendationFields = (args, formatMessage, appMessages) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getReferenceFormField(formatMessage, appMessages, true), // required
+        getTitleFormField(formatMessage, appMessages),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getStatusField(formatMessage, appMessages),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [
+        getAcceptedField(formatMessage, appMessages),
+        getMarkdownField(formatMessage, appMessages, 'response'),
+      ],
+    }],
+  },
+});
+
+const getSdgtargetFields = (args, formatMessage, appMessages) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getReferenceFormField(formatMessage, appMessages, true), // required
+        getTitleFormField(formatMessage, appMessages, 'titleText'),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getStatusField(formatMessage, appMessages),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [getMarkdownField(formatMessage, appMessages)],
+    }],
+  },
+});
+
+export const getEntityFields = (path, args, formatMessage, appMessages) => {
+  switch (path) {
+    case 'categories':
+      return getCategoryFields(args, formatMessage, appMessages);
+    case 'measures':
+      return getMeasureFields(args, formatMessage, appMessages);
+    case 'indicators':
+      return getIndicatorFields(args, formatMessage, appMessages);
+    case 'recommendations':
+      return getRecommendationFields(args, formatMessage, appMessages);
+    case 'sdgtargets':
+      return getSdgtargetFields(args, formatMessage, appMessages);
+    default:
+      return {};
+  }
+};

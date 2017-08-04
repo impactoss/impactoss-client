@@ -68,6 +68,8 @@ export const UPDATE_ENTITY_FORM = 'nmrf/App/UPDATE_ENTITY_FORM';
 
 export const CLOSE_ENTITY = 'nmrf/App/CLOSE_ENTITY';
 
+export const OPEN_CREATE_MODAL = 'nmrf/App/OPEN_CREATE_MODAL';
+
 export const PUBLISH_STATUSES = [
   { value: true, label: 'Draft' },
   { value: false, label: 'Public' },

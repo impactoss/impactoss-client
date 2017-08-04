@@ -32,6 +32,7 @@ import {
   DUEDATE_ASSIGNED,
   DUEDATE_UNASSIGNED,
   DB_TABLES,
+  OPEN_CREATE_MODAL,
 } from './constants';
 
 // The initial state of the App
@@ -55,6 +56,7 @@ const initialState = fromJS({
     attributes: null,
     isSignedIn: isSignedIn(),
   },
+  createModal: null,
 });
 
 function appReducer(state = initialState, payload) {
@@ -162,6 +164,8 @@ function appReducer(state = initialState, payload) {
         .setIn(['ready', 'due_dates'], null) // should trigger new entity load
         .setIn(['requested', 'due_dates'], null)
         .setIn(['entities', 'due_dates'], fromJS({}));
+    case OPEN_CREATE_MODAL:
+      return state.set('createModal', fromJS(payload.args));
     default:
       return state;
   }

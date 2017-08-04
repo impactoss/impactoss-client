@@ -60,6 +60,7 @@ import {
   RECOVER_SUCCESS,
   RECOVER_ERROR,
   CLOSE_ENTITY,
+  OPEN_CREATE_MODAL,
 } from './constants';
 
 
@@ -441,5 +442,12 @@ export function closeEntity(path) {
   return {
     type: CLOSE_ENTITY,
     path,
+  };
+}
+
+export function openCreateModal(args) {
+  return {
+    type: OPEN_CREATE_MODAL,
+    args,
   };
 }

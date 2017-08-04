@@ -377,7 +377,7 @@ export default class MultiSelect extends React.Component {
             <ButtonGroup>
               {
                 this.props.buttons.map((action, i) => (
-                  this.renderButton(action, i)
+                  action && this.renderButton(action, i)
                 ))
               }
             </ButtonGroup>
