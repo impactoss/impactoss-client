@@ -17,6 +17,7 @@ const formInitial = fromJS({
     content: '',
     menu_title: '',
     draft: true,
+    order: '',
   },
 });
 

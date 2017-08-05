@@ -13,6 +13,9 @@ import ReactModal from 'react-modal';
 import styled from 'styled-components';
 import Header from 'components/Header';
 import EntityNew from 'containers/EntityNew';
+
+import { sortEntities } from 'utils/sort';
+
 import {
   selectIsSignedIn,
   selectIsUserManager,
@@ -58,10 +61,17 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   preparePageMenuPages = (pages) =>
-    pages.map((page) => ({
+    sortEntities(
+      pages,
+      'asc',
+      'order',
+      'number'
+    )
+    .map((page) => ({
       path: `/pages/${page.get('id')}`,
       title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
-    })).toArray();
+    }))
+    .toArray();
 
   prepareMainMenuItems = (isManager, currentPath) => {
     let navItems = ([

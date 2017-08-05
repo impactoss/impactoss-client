@@ -11,15 +11,20 @@ export const CONFIG = {
   search: ['title'],
   sorting: [
     {
-      attribute: 'id', // proxy for created at
+      attribute: 'order',
       type: 'number',
-      order: 'desc',
+      order: 'asc',
+      default: true,
     },
     {
       attribute: 'title',
       type: 'string',
       order: 'asc',
-      default: true,
+    },
+    {
+      attribute: 'id', // proxy for created at
+      type: 'number',
+      order: 'desc',
     },
     {
       attribute: 'updated_at',

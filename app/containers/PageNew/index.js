@@ -15,6 +15,7 @@ import {
   getMenuTitleFormField,
   getMarkdownField,
   getStatusField,
+  getMenuOrderFormField,
 } from 'utils/forms';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -62,6 +63,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
       fields: [
         getTitleFormField(this.context.intl.formatMessage, appMessages),
         getMenuTitleFormField(this.context.intl.formatMessage, appMessages),
+        getMenuOrderFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);

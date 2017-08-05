@@ -16,6 +16,7 @@ import { Map } from 'immutable';
 import {
   getTitleFormField,
   getMenuTitleFormField,
+  getMenuOrderFormField,
   getMarkdownField,
   getStatusField,
 } from 'utils/forms';
@@ -91,6 +92,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
       fields: [
         getTitleFormField(this.context.intl.formatMessage, appMessages),
         getMenuTitleFormField(this.context.intl.formatMessage, appMessages),
+        getMenuOrderFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);

@@ -3,6 +3,7 @@ import {
   getEntityTitle,
   getEntityReference,
 } from 'utils/entities';
+import isInteger from 'utils/is-integer';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 import {
   PUBLISH_STATUSES,
@@ -141,6 +142,8 @@ export const renderTaxonomyControl = (taxonomies, onCreateOption) => taxonomies
 : [];
 
 export const validateRequired = (val) => val !== null && val && val.length;
+
+export const validateNumber = isInteger;
 
 export const validateDateFormat = (val) => {
   if (!val) return true;
@@ -342,6 +345,13 @@ export const getShortTitleFormField = (formatMessage, appMessages) =>
 
 export const getMenuTitleFormField = (formatMessage, appMessages) =>
   getFormField(formatMessage, appMessages, 'short', 'menu_title', true); // required
+
+export const getMenuOrderFormField = (formatMessage, appMessages) => {
+  const field = getFormField(formatMessage, appMessages, 'short', 'order', false); // required
+  field.validators.number = validateNumber;
+  field.errorMessages.number = formatMessage(appMessages.forms.numberError);
+  return field;
+};
 
 export const getMarkdownField = (formatMessage, appMessages, attribute = 'description') =>
   getFormField(formatMessage, appMessages, 'markdown', attribute);
