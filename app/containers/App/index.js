@@ -8,17 +8,27 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Perf from 'react-addons-perf';
+import ReactModal from 'react-modal';
 
 import styled from 'styled-components';
 import Header from 'components/Header';
+import EntityNew from 'containers/EntityNew';
 import {
   selectIsSignedIn,
   selectIsUserManager,
   selectSessionUserId,
   selectReady,
   selectEntitiesWhere,
+  selectNewEntityModal,
 } from './selectors';
-import { validateToken, loadEntitiesIfNeeded, updatePath } from './actions';
+
+import {
+  validateToken,
+  loadEntitiesIfNeeded,
+  updatePath,
+  openNewEntityModal,
+} from './actions';
+
 import { DEPENDENCIES } from './constants';
 
 import messages from './messages';
@@ -100,7 +110,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 
   render() {
     window.Perf = Perf;
-    const { pages, onPageLink, isUserSignedIn, isManager, location } = this.props;
+    const { pages, onPageLink, isUserSignedIn, isManager, location, newEntityModal } = this.props;
 
     return (
       <div>
@@ -116,6 +126,26 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         <Main isHome={location.pathname === '/'}>
           {React.Children.toArray(this.props.children)}
         </Main>
+        {newEntityModal &&
+          <ReactModal
+            isOpen
+            contentLabel={newEntityModal.get('path')}
+            onRequestClose={this.props.onCloseModal}
+            className="new-entity-modal"
+            overlayClassName="new-entity-modal-overlay"
+            style={{
+              overlay: { zIndex: 99999999 },
+            }}
+          >
+            <EntityNew
+              path={newEntityModal.get('path')}
+              attributes={newEntityModal.get('attributes')}
+              onSaveSuccess={this.props.onCloseModal}
+              onCancel={this.props.onCloseModal}
+              inModal
+            />
+          </ReactModal>
+        }
       </div>
     );
   }
@@ -131,6 +161,8 @@ App.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onPageLink: PropTypes.func.isRequired,
   location: PropTypes.object.isRequired,
+  newEntityModal: PropTypes.object,
+  onCloseModal: PropTypes.func,
 };
 App.contextTypes = {
   intl: PropTypes.object.isRequired,
@@ -145,6 +177,7 @@ const mapStateToProps = (state) => ({
     path: 'pages',
     where: { draft: false },
   }),
+  newEntityModal: selectNewEntityModal(state),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -157,6 +190,9 @@ export function mapDispatchToProps(dispatch) {
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));
+    },
+    onCloseModal: () => {
+      dispatch(openNewEntityModal(null));
     },
   };
 }

@@ -40,6 +40,7 @@ import {
   updatePath,
   updateEntityForm,
   deleteEntity,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
@@ -114,7 +115,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       ],
     },
   ]);
-  getBodyMainFields = (entity, measures) => ([
+  getBodyMainFields = (entity, measures, onCreateOption) => ([
     {
       fields: [
         getAcceptedField(this.context.intl.formatMessage, appMessages, entity),
@@ -125,21 +126,21 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures),
+        renderMeasureControl(measures, onCreateOption),
       ],
     },
   ]);
 
-  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, measures, taxonomies } = this.props;
+    const { viewEntity, dataReady, viewDomain, measures, taxonomies, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
@@ -203,8 +204,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, measures),
-                  aside: this.getBodyAsideFields(taxonomies),
+                  main: this.getBodyMainFields(viewEntity, measures, onCreateOption),
+                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -230,6 +231,7 @@ RecommendationEdit.propTypes = {
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
+  onCreateOption: PropTypes.func,
 };
 
 RecommendationEdit.contextTypes = {
@@ -290,6 +292,9 @@ function mapDispatchToProps(dispatch, props) {
         path: 'recommendations',
         id: props.params.id,
       }));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

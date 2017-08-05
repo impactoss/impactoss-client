@@ -1,7 +1,7 @@
 import { reduce } from 'lodash/collection';
 
 export const makeEditGroups = (
-  edits,
+  config,
   taxonomies,
   activeEditOption,
   messages,
@@ -10,7 +10,7 @@ export const makeEditGroups = (
   const editGroups = {};
 
   // taxonomy option group
-  if (edits.taxonomies && taxonomies) {
+  if (config.taxonomies && taxonomies) {
     // first prepare taxonomy options
     editGroups.taxonomies = {
       id: 'taxonomies', // filterGroupId
@@ -22,23 +22,27 @@ export const makeEditGroups = (
         [taxonomy.get('id')]: {
           id: taxonomy.get('id'), // filterOptionId
           label: taxonomy.getIn(['attributes', 'title']),
-          path: edits.taxonomies.connectPath,
-          key: edits.taxonomies.key,
-          ownKey: edits.taxonomies.ownKey,
+          path: config.taxonomies.connectPath,
+          key: config.taxonomies.key,
+          ownKey: config.taxonomies.ownKey,
           active: !!activeEditOption && activeEditOption.optionId === taxonomy.get('id'),
+          create: {
+            path: 'categories',
+            attributes: { taxonomy_id: taxonomy.get('id') },
+          },
         },
       }), {}),
     };
   }
 
   // connections option group
-  if (edits.connections) {
+  if (config.connections) {
     // first prepare taxonomy options
     editGroups.connections = {
       id: 'connections', // filterGroupId
       label: messages.connections,
       show: true,
-      options: reduce(edits.connections.options, (options, option) =>
+      options: reduce(config.connections.options, (options, option) =>
         typeof option.edit === 'undefined' || option.edit
         ? {
           ...options,
@@ -50,6 +54,7 @@ export const makeEditGroups = (
             ownKey: option.ownKey,
             icon: option.path,
             active: !!activeEditOption && activeEditOption.optionId === option.path,
+            create: { path: option.path },
           },
         }
         : options
@@ -58,13 +63,13 @@ export const makeEditGroups = (
   }
 
   // attributes
-  if (edits.attributes) {
+  if (config.attributes) {
     // first prepare taxonomy options
     editGroups.attributes = {
       id: 'attributes', // filterGroupId
       label: messages.attributes,
       show: true,
-      options: reduce(edits.attributes.options, (options, option) =>
+      options: reduce(config.attributes.options, (options, option) =>
         typeof option.edit === 'undefined' || option.edit
         ? {
           ...options,

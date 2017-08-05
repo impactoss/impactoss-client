@@ -55,7 +55,7 @@ export const taxonomyOptions = (taxonomies) => taxonomies
     values.set(tax.get('id'), entityOptions(tax.get('categories'), false)), Map())
   : Map();
 
-export const renderMeasureControl = (entities) => entities
+export const renderMeasureControl = (entities, onCreateOption) => entities
 ? {
   id: 'actions',
   model: '.associatedMeasures',
@@ -63,9 +63,12 @@ export const renderMeasureControl = (entities) => entities
   label: 'Actions',
   controlType: 'multiselect',
   options: entityOptions(entities, true),
+  onCreate: onCreateOption
+    ? () => onCreateOption({ path: 'measures' })
+    : null,
 }
 : null;
-export const renderSdgTargetControl = (entities) => entities
+export const renderSdgTargetControl = (entities, onCreateOption) => entities
 ? {
   id: 'sdgtargets',
   model: '.associatedSdgTargets',
@@ -73,10 +76,13 @@ export const renderSdgTargetControl = (entities) => entities
   label: 'SDG targets',
   controlType: 'multiselect',
   options: entityOptions(entities, true),
+  onCreate: onCreateOption
+    ? () => onCreateOption({ path: 'sdgtargets' })
+    : null,
 }
 : null;
 
-export const renderRecommendationControl = (entities) => entities
+export const renderRecommendationControl = (entities, onCreateOption) => entities
 ? {
   id: 'recommendations',
   model: '.associatedRecommendations',
@@ -84,10 +90,13 @@ export const renderRecommendationControl = (entities) => entities
   label: 'Recommendations',
   controlType: 'multiselect',
   options: entityOptions(entities),
+  onCreate: onCreateOption
+    ? () => onCreateOption({ path: 'recommendations' })
+    : null,
 }
 : null;
 
-export const renderIndicatorControl = (entities) => entities
+export const renderIndicatorControl = (entities, onCreateOption) => entities
 ? {
   id: 'indicators',
   model: '.associatedIndicators',
@@ -95,6 +104,9 @@ export const renderIndicatorControl = (entities) => entities
   label: 'Indicators',
   controlType: 'multiselect',
   options: entityOptions(entities, true),
+  onCreate: onCreateOption
+    ? () => onCreateOption({ path: 'indicators' })
+    : null,
 }
 : null;
 
@@ -110,15 +122,21 @@ export const renderUserControl = (entities, label, activeUserId) => entities
 }
 : null;
 
-export const renderTaxonomyControl = (taxonomies) => taxonomies
-? taxonomies.reduce((controls, tax) => controls.concat({
-  id: tax.get('id'),
-  model: `.associatedTaxonomies.${tax.get('id')}`,
-  dataPath: ['associatedTaxonomies', tax.get('id')],
-  label: tax.getIn(['attributes', 'title']),
+export const renderTaxonomyControl = (taxonomies, onCreateOption) => taxonomies
+? taxonomies.reduce((controls, taxonomy) => controls.concat({
+  id: taxonomy.get('id'),
+  model: `.associatedTaxonomies.${taxonomy.get('id')}`,
+  dataPath: ['associatedTaxonomies', taxonomy.get('id')],
+  label: taxonomy.getIn(['attributes', 'title']),
   controlType: 'multiselect',
-  multiple: tax.getIn(['attributes', 'allow_multiple']),
-  options: entityOptions(tax.get('categories'), false),
+  multiple: taxonomy.getIn(['attributes', 'allow_multiple']),
+  options: entityOptions(taxonomy.get('categories'), false),
+  onCreate: onCreateOption
+    ? () => onCreateOption({
+      path: 'categories',
+      attributes: { taxonomy_id: taxonomy.get('id') },
+    })
+    : null,
 }), [])
 : [];
 
@@ -369,4 +387,137 @@ export const getFormField = (formatMessage, appMessages, controlType, attribute,
     field.errorMessages.required = formatMessage(appMessages.forms.fieldRequired);
   }
   return field;
+};
+
+const getCategoryFields = (args, formatMessage, appMessages) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getReferenceFormField(formatMessage, appMessages),
+        getTitleFormField(formatMessage, appMessages),
+        getShortTitleFormField(formatMessage, appMessages),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [getMarkdownField(formatMessage, appMessages)],
+    }],
+    aside: [{
+      fields: [getFormField(formatMessage, appMessages, 'url', 'url')],
+    }],
+  },
+});
+
+const getMeasureFields = (args, formatMessage, appMessages) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getTitleFormField(formatMessage, appMessages),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getStatusField(formatMessage, appMessages),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [
+        getMarkdownField(formatMessage, appMessages),
+        getMarkdownField(formatMessage, appMessages, 'outcome'),
+        getMarkdownField(formatMessage, appMessages, 'indicator_summary'),
+      ],
+    }],
+    aside: [{
+      fields: [
+        getDateField(formatMessage, appMessages, 'target_date'),
+        getFormField(formatMessage, appMessages, 'textarea', 'target_date_comment'),
+      ],
+    }],
+  },
+});
+
+const getIndicatorFields = (args, formatMessage, appMessages) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getReferenceFormField(formatMessage, appMessages, false, true),
+        getTitleFormField(formatMessage, appMessages, 'titleText'),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getStatusField(formatMessage, appMessages),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [getMarkdownField(formatMessage, appMessages)],
+    }],
+  },
+});
+
+const getRecommendationFields = (args, formatMessage, appMessages) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getReferenceFormField(formatMessage, appMessages, true), // required
+        getTitleFormField(formatMessage, appMessages),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getStatusField(formatMessage, appMessages),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [
+        getAcceptedField(formatMessage, appMessages),
+        getMarkdownField(formatMessage, appMessages, 'response'),
+      ],
+    }],
+  },
+});
+
+const getSdgtargetFields = (args, formatMessage, appMessages) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getReferenceFormField(formatMessage, appMessages, true), // required
+        getTitleFormField(formatMessage, appMessages, 'titleText'),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getStatusField(formatMessage, appMessages),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [getMarkdownField(formatMessage, appMessages)],
+    }],
+  },
+});
+
+export const getEntityFields = (path, args, formatMessage, appMessages) => {
+  switch (path) {
+    case 'categories':
+      return getCategoryFields(args, formatMessage, appMessages);
+    case 'measures':
+      return getMeasureFields(args, formatMessage, appMessages);
+    case 'indicators':
+      return getIndicatorFields(args, formatMessage, appMessages);
+    case 'recommendations':
+      return getRecommendationFields(args, formatMessage, appMessages);
+    case 'sdgtargets':
+      return getSdgtargetFields(args, formatMessage, appMessages);
+    default:
+      return {};
+  }
 };

@@ -34,6 +34,7 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import { selectEntities, selectReady } from 'containers/App/selectors';
@@ -85,7 +86,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getBodyMainFields = (measures, sdgtargets) => ([
+  getBodyMainFields = (measures, sdgtargets, onCreateOption) => ([
     {
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
@@ -93,8 +94,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures),
-        renderSdgTargetControl(sdgtargets),
+        renderMeasureControl(measures, onCreateOption),
+        renderSdgTargetControl(sdgtargets, onCreateOption),
       ],
     },
   ]);
@@ -117,7 +118,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   ]);
 
   render() {
-    const { dataReady, viewDomain, measures, users, sdgtargets } = this.props;
+    const { dataReady, viewDomain, measures, users, sdgtargets, onCreateOption } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -171,7 +172,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(measures, sdgtargets),
+                  main: this.getBodyMainFields(measures, sdgtargets, onCreateOption),
                   aside: this.getBodyAsideFields(users),
                 },
               }}
@@ -194,6 +195,7 @@ IndicatorNew.propTypes = {
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   users: PropTypes.object,
+  onCreateOption: PropTypes.func,
 };
 
 IndicatorNew.contextTypes = {
@@ -267,6 +269,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

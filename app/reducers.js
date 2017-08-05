@@ -9,6 +9,7 @@ import { browserHistory } from 'react-router';
 
 import globalReducer from 'containers/App/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
+import entityNewReducer from 'containers/EntityNew/reducer';
 import entityListReducer from 'containers/EntityList/reducer';
 import entityListFormReducer from 'containers/EntityListForm/reducer';
 
@@ -48,6 +49,7 @@ export default function createReducer(asyncReducers) {
     route: routeReducer,
     global: globalReducer,
     language: languageProviderReducer,
+    entityNew: entityNewReducer,
     entityList: entityListReducer,
     entityListForm: entityListFormReducer,
     ...asyncReducers,

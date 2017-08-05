@@ -28,6 +28,11 @@ const getRoute = (state) => state.get('route');
 const getGlobal = (state) => state.get('global');
 const getGlobalRequested = (state) => state.getIn(['global', 'requested']);
 
+export const selectNewEntityModal = createSelector(
+  getGlobal,
+  (globalState) => globalState.get('newEntityModal')
+);
+
 export const selectAuth = createSelector(
   getGlobal,
   (globalState) => globalState.get('auth').toJS()

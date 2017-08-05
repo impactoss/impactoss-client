@@ -44,6 +44,7 @@ import {
   updatePath,
   updateEntityForm,
   deleteEntity,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
@@ -127,7 +128,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (measures, sdgtargets) => ([
+  getBodyMainFields = (measures, sdgtargets, onCreateOption) => ([
     {
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
@@ -135,8 +136,8 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures),
-        renderSdgTargetControl(sdgtargets),
+        renderMeasureControl(measures, onCreateOption),
+        renderSdgTargetControl(sdgtargets, onCreateOption),
       ],
     },
   ]);
@@ -160,7 +161,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, measures, users, sdgtargets } = this.props;
+    const { viewEntity, dataReady, viewDomain, measures, users, sdgtargets, onCreateOption } = this.props;
     const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
     return (
@@ -215,7 +216,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(measures, sdgtargets),
+                  main: this.getBodyMainFields(measures, sdgtargets, onCreateOption),
                   aside: this.getBodyAsideFields(viewEntity, users),
                 },
               }}
@@ -243,6 +244,7 @@ IndicatorEdit.propTypes = {
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   users: PropTypes.object,
+  onCreateOption: PropTypes.func,
 };
 
 IndicatorEdit.contextTypes = {
@@ -327,6 +329,9 @@ function mapDispatchToProps(dispatch, props) {
         path: 'indicators',
         id: props.params.id,
       }));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

@@ -42,6 +42,7 @@ import {
   updatePath,
   updateEntityForm,
   deleteEntity,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import {
@@ -128,7 +129,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     },
   ]);
 
-  getBodyMainFields = (recommendations, indicators, sdgtargets) => ([
+  getBodyMainFields = (recommendations, indicators, sdgtargets, onCreateOption) => ([
     {
       fields: [
         getMarkdownField(this.context.intl.formatMessage, appMessages),
@@ -140,14 +141,14 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderRecommendationControl(recommendations),
-        renderSdgTargetControl(sdgtargets),
-        renderIndicatorControl(indicators),
+        renderRecommendationControl(recommendations, onCreateOption),
+        renderSdgTargetControl(sdgtargets, onCreateOption),
+        renderIndicatorControl(indicators, onCreateOption),
       ],
     },
   ]);
 
-  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
       fields: [
         getDateField(this.context.intl.formatMessage, appMessages, 'target_date'),
@@ -157,12 +158,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, taxonomies, recommendations, indicators, sdgtargets } = this.props;
+    const { viewEntity, dataReady, viewDomain, taxonomies, recommendations, indicators, sdgtargets, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
     return (
@@ -231,8 +232,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(recommendations, indicators, sdgtargets),
-                  aside: this.getBodyAsideFields(taxonomies),
+                  main: this.getBodyMainFields(recommendations, indicators, sdgtargets, onCreateOption),
+                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -261,6 +262,7 @@ ActionEdit.propTypes = {
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
   sdgtargets: PropTypes.object,
+  onCreateOption: PropTypes.func,
 };
 
 ActionEdit.contextTypes = {
@@ -346,6 +348,9 @@ function mapDispatchToProps(dispatch, props) {
         id: props.params.id,
         redirect: 'actions',
       }));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

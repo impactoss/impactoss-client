@@ -19,7 +19,11 @@ import EntityListMain from 'components/entityList/EntityListMain';
 
 import { selectIsUserManager } from 'containers/App/selectors';
 
-import { updatePath } from 'containers/App/actions';
+import {
+  updatePath,
+  openNewEntityModal,
+} from 'containers/App/actions';
+
 import appMessages from 'containers/App/messages';
 import { PARAMS } from 'containers/App/constants';
 
@@ -67,8 +71,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     return this.context.intl.formatMessage(message);
   }
   render() {
-    // console.log('EntityList.render', this.props.viewDomain.saveSending)
-
     // make sure selected entities are still actually on page
     const { entityIdsSelected, entities } = this.props;
     const entityIdsSelectedFiltered = entityIdsSelected.size > 0 && entities
@@ -94,6 +96,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               activePanel={this.props.activePanel}
               formatLabel={this.formatLabel}
               onPanelSelect={this.props.onPanelSelect}
+              onCreateOption={this.props.onCreateOption}
               onAssign={(associations, activeEditOption) =>
                 this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
             />
@@ -181,6 +184,7 @@ EntityList.propTypes = {
   resetStateOnMount: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
+  onCreateOption: PropTypes.func.isRequired,
 };
 
 EntityList.contextTypes = {
@@ -266,6 +270,9 @@ function mapDispatchToProps(dispatch, props) {
     },
     onSortBy: (sort) => {
       dispatch(updateSortBy(sort));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
     handleEditSubmit: (formData, activeEditOption, entityIdsSelected) => {
       const entities = props.entities.filter(

@@ -33,6 +33,7 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import { selectEntities, selectReady } from 'containers/App/selectors';
@@ -83,7 +84,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (recommendations, indicators, sdgtargets) => ([
+  getBodyMainFields = (recommendations, indicators, sdgtargets, onCreateOption) => ([
     {
       fields: [
         getMarkdownField(this.context.intl.formatMessage, appMessages),
@@ -95,14 +96,14 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderRecommendationControl(recommendations),
-        renderSdgTargetControl(sdgtargets),
-        renderIndicatorControl(indicators),
+        renderRecommendationControl(recommendations, onCreateOption),
+        renderSdgTargetControl(sdgtargets, onCreateOption),
+        renderIndicatorControl(indicators, onCreateOption),
       ],
     },
   ]);
 
-  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
       fields: [
         getDateField(this.context.intl.formatMessage, appMessages, 'target_date'),
@@ -112,12 +113,12 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);
 
   render() {
-    const { dataReady, viewDomain, recommendations, indicators, taxonomies, sdgtargets } = this.props;
+    const { dataReady, viewDomain, recommendations, indicators, taxonomies, sdgtargets, onCreateOption } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -171,8 +172,8 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(recommendations, indicators, sdgtargets),
-                  aside: this.getBodyAsideFields(taxonomies),
+                  main: this.getBodyMainFields(recommendations, indicators, sdgtargets, onCreateOption),
+                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -195,6 +196,7 @@ ActionNew.propTypes = {
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
   sdgtargets: PropTypes.object,
+  onCreateOption: PropTypes.func,
 };
 
 ActionNew.contextTypes = {
@@ -276,6 +278,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

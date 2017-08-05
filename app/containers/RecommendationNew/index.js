@@ -31,6 +31,7 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import { selectEntities, selectReady } from 'containers/App/selectors';
@@ -79,7 +80,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
   }]);
 
-  getBodyMainFields = (measures) => ([
+  getBodyMainFields = (measures, onCreateOption) => ([
     {
       fields: [
         getAcceptedField(this.context.intl.formatMessage, appMessages),
@@ -90,21 +91,21 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures),
+        renderMeasureControl(measures, onCreateOption),
       ],
     },
   ]);
 
-  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);
 
   render() {
-    const { dataReady, viewDomain, taxonomies, measures } = this.props;
+    const { dataReady, viewDomain, taxonomies, measures, onCreateOption } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -158,8 +159,8 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(measures),
-                  aside: this.getBodyAsideFields(taxonomies),
+                  main: this.getBodyMainFields(measures, onCreateOption),
+                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -180,6 +181,7 @@ RecommendationNew.propTypes = {
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
+  onCreateOption: PropTypes.func,
 };
 
 RecommendationNew.contextTypes = {
@@ -237,6 +239,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }
