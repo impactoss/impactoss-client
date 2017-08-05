@@ -35,7 +35,7 @@ import { FORM_INITIAL } from './constants';
 export class ActionImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     if (this.props.dataReady) {
-      this.props.populateForm('measureImport.form.data', FORM_INITIAL);
+      this.props.initialiseForm('measureImport.form.data', FORM_INITIAL);
     }
   }
   componentWillReceiveProps(nextProps) {
@@ -45,7 +45,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
     }
     if (nextProps.dataReady && !this.props.dataReady) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('measureImport.form.data', FORM_INITIAL);
+      this.props.initialiseForm('measureImport.form.data', FORM_INITIAL);
     }
   }
 
@@ -102,7 +102,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
 ActionImport.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleReset: PropTypes.func.isRequired,
@@ -129,7 +129,7 @@ function mapDispatchToProps(dispatch) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
-    populateForm: (model, formData) => {
+    initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData) => {

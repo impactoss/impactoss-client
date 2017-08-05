@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List } from 'immutable';
 
@@ -57,6 +58,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+    this.props.initialiseForm();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -196,6 +198,7 @@ IndicatorNew.propTypes = {
   sdgtargets: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
+  initialiseForm: PropTypes.func,
 };
 
 IndicatorNew.contextTypes = {
@@ -215,6 +218,9 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('indicatorNew.form.data'));
+    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },

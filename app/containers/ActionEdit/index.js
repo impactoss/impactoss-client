@@ -74,7 +74,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.viewEntity) {
-      this.props.populateForm('measureEdit.form.data', this.getInitialFormData());
+      this.props.initialiseForm('measureEdit.form.data', this.getInitialFormData());
     }
   }
 
@@ -85,7 +85,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     }
     // repopulate if new data becomes ready
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.populateForm('measureEdit.form.data', this.getInitialFormData(nextProps));
+      this.props.initialiseForm('measureEdit.form.data', this.getInitialFormData(nextProps));
     }
     //
     if (nextProps.authReady && !this.props.authReady) {
@@ -247,7 +247,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 ActionEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -289,7 +289,7 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
-    populateForm: (model, formData) => {
+    initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
 

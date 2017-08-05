@@ -37,7 +37,7 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
 
   componentWillMount() {
     if (this.props.dataReady) {
-      this.props.populateForm('sdgtargetImport.form.data', FORM_INITIAL);
+      this.props.initialiseForm('sdgtargetImport.form.data', FORM_INITIAL);
     }
   }
   componentWillReceiveProps(nextProps) {
@@ -47,7 +47,7 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
     }
     if (nextProps.dataReady && !this.props.dataReady) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('indicatorImport.form.data', FORM_INITIAL);
+      this.props.initialiseForm('indicatorImport.form.data', FORM_INITIAL);
     }
   }
 
@@ -101,7 +101,7 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
 SdgTargetImport.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleReset: PropTypes.func.isRequired,
@@ -125,7 +125,7 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
-    populateForm: (model, formData) => {
+    initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
     redirectIfNotPermitted: () => {

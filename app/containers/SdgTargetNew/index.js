@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List } from 'immutable';
 
@@ -54,6 +55,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+    this.props.initialiseForm();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -180,6 +182,7 @@ SdgTargetNew.propTypes = {
   indicators: PropTypes.object,
   measures: PropTypes.object,
   onCreateOption: PropTypes.func,
+  initialiseForm: PropTypes.func,
 };
 
 SdgTargetNew.contextTypes = {
@@ -196,6 +199,9 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('sdgtargetNew.form.data'));
+    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },

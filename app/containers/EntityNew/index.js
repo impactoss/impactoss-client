@@ -7,6 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import { getEntityFields } from 'utils/forms';
 
@@ -24,13 +25,16 @@ import { selectDomain } from './selectors';
 import messages from './messages';
 
 export class EntityNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentWillMount() {
+    this.props.initialiseForm();
+  }
   render() {
     const { viewDomain, path, attributes, inModal } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
       <div>
-        <Content noPaddingBottom={!inModal}>
+        <Content noPaddingBottom={inModal}>
           <ContentHeader
             title={this.context.intl.formatMessage(messages[path].pageTitle)}
             type={CONTENT_MODAL}
@@ -78,6 +82,7 @@ EntityNew.propTypes = {
   inModal: PropTypes.bool,
   // onSaveSuccess: PropTypes.func,
   viewDomain: PropTypes.object,
+  initialiseForm: PropTypes.func,
 };
 
 EntityNew.contextTypes = {
@@ -90,6 +95,9 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch, props) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('entityNew.form.data'));
+    },
     handleSubmit: (formData, attributes) => {
       const saveData = attributes
         ? formData.mergeIn(['attributes'], attributes)

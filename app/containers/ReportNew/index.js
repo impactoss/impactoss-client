@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
   getTitleFormField,
@@ -47,6 +48,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+    this.props.initialiseForm();
   }
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
@@ -173,6 +175,7 @@ ReportNew.propTypes = {
   dataReady: PropTypes.bool,
   indicator: PropTypes.object,
   params: PropTypes.object,
+  initialiseForm: PropTypes.func,
 };
 
 ReportNew.contextTypes = {
@@ -187,6 +190,9 @@ const mapStateToProps = (state, props) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('reportNew.form.data'));
+    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },

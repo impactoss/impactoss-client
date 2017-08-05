@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List } from 'immutable';
 
@@ -55,6 +56,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+    this.props.initialiseForm();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -182,6 +184,7 @@ RecommendationNew.propTypes = {
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
   onCreateOption: PropTypes.func,
+  initialiseForm: PropTypes.func,
 };
 
 RecommendationNew.contextTypes = {
@@ -197,6 +200,9 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('recommendationNew.form.data'));
+    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },

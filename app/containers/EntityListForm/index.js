@@ -33,13 +33,13 @@ const FormWrapper = styled.div`
 class EntityListForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    this.props.populateForm(this.props.model, this.props.formOptions.options);
+    this.props.initialiseForm(this.props.model, this.props.formOptions.options);
   }
 
   componentWillReceiveProps(nextProps) {
      // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
     if (!isEqual(nextProps.formOptions.options, this.props.formOptions.options)) {
-      this.props.populateForm(nextProps.model, nextProps.formOptions.options);
+      this.props.initialiseForm(nextProps.model, nextProps.formOptions.options);
     }
   }
 
@@ -74,7 +74,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
 }
 
 EntityListForm.propTypes = {
-  populateForm: PropTypes.func.isRequired,
+  initialiseForm: PropTypes.func.isRequired,
   onFormChange: PropTypes.func.isRequired,
   model: PropTypes.string.isRequired,
   formOptions: PropTypes.object,
@@ -88,7 +88,7 @@ const mapDispatchToProps = (dispatch) => ({
   // resetForm: (model) => {
   //   dispatch(formActions.reset(model));
   // },
-  populateForm: (model, options) => {
+  initialiseForm: (model, options) => {
     dispatch(formActions.load(model, Map({ values: fromJS(options).toList() })));
   },
   onFormChange: (values, model) => {

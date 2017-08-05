@@ -10,6 +10,7 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import Loading from 'components/Loading';
 import Icon from 'components/Icon';
@@ -32,6 +33,9 @@ const BottomLinks = styled.div`
 `;
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentWillMount() {
+    this.props.initialiseForm();
+  }
   render() {
     const { error, messages: message, sending } = this.props.authentication;
     const required = (val) => val && val.length;
@@ -133,6 +137,7 @@ UserLogin.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
+  initialiseForm: PropTypes.func,
 };
 
 UserLogin.contextTypes = {
@@ -146,6 +151,9 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('userLogin.form.data'));
+    },
     handleSubmit: (formData) => {
       dispatch(login(formData.toJS()));
     },

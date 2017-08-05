@@ -59,7 +59,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     this.props.loadEntitiesIfNeeded();
 
     if (this.props.dataReady && this.props.viewEntity) {
-      this.props.populateForm('reportEdit.form.data', this.getInitialFormData());
+      this.props.initialiseForm('reportEdit.form.data', this.getInitialFormData());
     }
   }
 
@@ -71,7 +71,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
 
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('reportEdit.form.data', this.getInitialFormData(nextProps));
+      this.props.initialiseForm('reportEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
@@ -215,7 +215,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
 ReportEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -249,7 +249,7 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR));
     },
-    populateForm: (model, formData) => {
+    initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData, previousDateAssigned) => {

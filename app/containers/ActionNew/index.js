@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List } from 'immutable';
 
@@ -49,13 +50,14 @@ import {
 } from './selectors';
 
 import messages from './messages';
-import { save } from './actions';
 import { DEPENDENCIES } from './constants';
+import { save } from './actions';
 
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+    this.props.initialiseForm();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -197,6 +199,7 @@ ActionNew.propTypes = {
   indicators: PropTypes.object,
   sdgtargets: PropTypes.object,
   onCreateOption: PropTypes.func,
+  initialiseForm: PropTypes.func,
 };
 
 ActionNew.contextTypes = {
@@ -214,6 +217,9 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('measureNew.form.data'));
+    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
