@@ -5,6 +5,7 @@ import { palette } from 'styled-theme';
 
 const Label = styled.div`
   font-weight: ${(props) => props.bold ? 'bold' : 'normal'};
+  font-style: ${(props) => props.italic ? 'italic' : 'normal'};
   position: relative;
 `;
 const Id = styled.span`
@@ -17,7 +18,7 @@ const IdSpacer = styled.span`
   color: ${palette('dark', 4)};
 `;
 const Option = (props) => (
-  <Label bold={props.bold}>
+  <Label bold={props.bold} italic={props.isNew}>
     {props.reference &&
       <Id>{props.reference}</Id>
     }
@@ -32,6 +33,7 @@ Option.propTypes = {
   label: PropTypes.string.isRequired,
   reference: PropTypes.string,
   bold: PropTypes.bool,
+  isNew: PropTypes.bool,
 };
 
 export default Option;

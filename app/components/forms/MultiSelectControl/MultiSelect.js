@@ -168,7 +168,13 @@ export default class MultiSelect extends React.Component {
     super();
     this.state = {
       query: null,
+      optionsInitial: null,
     };
+  }
+
+  componentWillMount() {
+    // remember initial options
+    this.setState({ optionsInitial: this.props.options });
   }
 
   onSearch = (evt) => {
@@ -180,7 +186,6 @@ export default class MultiSelect extends React.Component {
 
   getNextValues = (checked, option) => {
     const { multiple, required, values } = this.props;
-
     // do not update if required and change would result in empty list
     if (!checked && required) {
       const otherCheckedValues = values.find((v) =>
@@ -226,7 +231,7 @@ export default class MultiSelect extends React.Component {
     }
     return option.get('label');
   }
-  getOptionSortAdditionalValueMapper = (option) => {
+  getOptionSortCheckedValueMapper = (option) => {
     if (option.get('initialChecked')) {
       return -2;
     }
@@ -238,22 +243,33 @@ export default class MultiSelect extends React.Component {
     }
     return 1;
   }
+  getOptionSortRecentlyCreatedValueMapper = (option) => {
+    if (option.get('isNew')) return -1;
+    return 1;
+  }
   prepareOptions = (options, values, threeState) =>
     options.map((option) => {
       const value = values.find((v) => option.get('value') === v.get('value') && option.get('query') === v.get('query'));
+      const isNew = !this.state.optionsInitial.includes(option);
       return option.withMutations((o) =>
-        o.set('checked', value ? value.get('checked') : false)
+        o.set('checked', value && value.get('checked'))
+        .set('isNew', isNew)
         .set('initialChecked', option.get('checked'))
         .set('isIndeterminate', threeState && option.get('checked') === CHECKBOX_STATES.INDETERMINATE)
       );
     });
+
   sortOptions = (options) => options
     .sortBy(
       (option) => this.getOptionSortValueMapper(option),
       (a, b) => getEntitySortComparator(a, b, 'asc')
     )
     .sortBy(
-      (option) => this.getOptionSortAdditionalValueMapper(option),
+      (option) => this.getOptionSortRecentlyCreatedValueMapper(option),
+      (a, b) => getEntitySortComparator(a, b, 'asc')
+    )
+    .sortBy(
+      (option) => this.getOptionSortCheckedValueMapper(option),
       (a, b) => getEntitySortComparator(a, b, 'asc')
     )
   filterOptions = (options, query) => {    // filter checkboxes if needed
@@ -308,6 +324,7 @@ export default class MultiSelect extends React.Component {
             bold={option.get('labelBold') || checked}
             reference={typeof option.get('reference') !== 'undefined' && option.get('reference') !== null ? option.get('reference').toString() : ''}
             label={option.get('label')}
+            isNew={option.get('isNew')}
           />
         </OptionLabel>
         { option.get('showCount') && typeof option.get('count') !== 'undefined' &&
@@ -336,16 +353,6 @@ export default class MultiSelect extends React.Component {
       }}
     />
   );
-  // renderButton = (action, i) => (
-  //   <ButtonFlat
-  //     primary={action.type === 'primary'}
-  //     key={i}
-  //     onClick={action.onClick && (() => action.onClick())}
-  //     type={action.submit ? 'submit' : 'button'}
-  //   >
-  //     {action.title}
-  //   </ButtonFlat>
-  // );
 
   render() {
     const { options, values, threeState } = this.props;

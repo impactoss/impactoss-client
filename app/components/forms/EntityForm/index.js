@@ -491,7 +491,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     const { fields, model, handleSubmit, handleCancel, inModal } = this.props;
 
     return (
-      <FormWrapper hasShadow={!inModal}>
+      <FormWrapper withoutShadow={inModal}>
         <Form model={model} onSubmit={handleSubmit} >
           { fields.header &&
             <FormPanel borderBottom>
