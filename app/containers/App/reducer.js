@@ -75,6 +75,7 @@ function appReducer(state = initialState, payload) {
       return state
         .setIn(['auth', 'messages'], errors)
         .setIn(['auth', 'error'], true)
+        .setIn(['auth', 'sending'], false)
         .setIn(['user', 'attributes'], null)
         .setIn(['user', 'isSignedIn'], false);
     }
