@@ -55,6 +55,10 @@ export default defineMessages({
       id: 'app.containers.App.forms.dateFormatError',
       defaultMessage: 'Please enter the date in the required format: YYYY-MM-DD',
     },
+    numberError: {
+      id: 'app.containers.App.forms.numberError',
+      defaultMessage: 'Please enter a number',
+    },
   },
   hints: {
     autoReference: {
@@ -81,7 +85,11 @@ export default defineMessages({
     },
     menu_title: {
       id: 'app.containers.App.placeholders.title',
-      defaultMessage: 'Menu',
+      defaultMessage: 'Menu title',
+    },
+    order: {
+      id: 'app.containers.App.placeholders.order',
+      defaultMessage: '#',
     },
     reference: {
       id: 'app.containers.App.placeholders.reference',
@@ -168,6 +176,10 @@ export default defineMessages({
     menu_title: {
       id: 'app.containers.App.attributes.menu_title',
       defaultMessage: 'Menu title',
+    },
+    order: {
+      id: 'app.containers.App.attributes.order',
+      defaultMessage: 'Menu order',
     },
     reference: {
       id: 'app.containers.App.attributes.reference',

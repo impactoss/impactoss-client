@@ -30,5 +30,9 @@ export default defineMessages({
       id: 'app.containers.ColumnSelect.sortAttributes.updated_at',
       defaultMessage: 'Updated at',
     },
+    order: {
+      id: 'app.containers.ColumnSelect.sortAttributes.order',
+      defaultMessage: 'Menu order',
+    },
   },
 });
