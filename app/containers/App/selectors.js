@@ -14,12 +14,11 @@ import { Map } from 'immutable';
 
 import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
-import { regExMultipleWords } from 'utils/string';
 
 import { USER_ROLES } from 'containers/App/constants';
 import {
-  prepareEntitySearchTarget,
   filterEntitiesByAttributes,
+  filterEntitiesByKeywords,
   attributesEqual,
 } from 'utils/entities';
 
@@ -263,19 +262,9 @@ export const selectEntitiesSearchQuery = createSelector(
   selectEntitiesWhereQuery,
   (state, { locationQuery }) => selectSearchQuery(state, locationQuery),
   (state, { searchAttributes }) => searchAttributes,
-  (entities, query, searchAttributes) => {
-    if (query) {
-      try {
-        const regex = new RegExp(regExMultipleWords(query), 'i');
-        return entities.filter((entity) =>
-          regex.test(prepareEntitySearchTarget(entity, searchAttributes, query.length))
-        );
-      } catch (e) {
-        return entities;
-      }
-    }
-    return entities;  // !search
-  }
+  (entities, query, searchAttributes) => query
+    ? filterEntitiesByKeywords(entities, query, searchAttributes)
+    : entities  // !search
 );
 
 export const selectUserConnections = createSelector(

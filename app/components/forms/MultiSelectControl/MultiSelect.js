@@ -2,11 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import { kebabCase } from 'lodash/string';
+import { reduce } from 'lodash/collection';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { FormattedMessage } from 'react-intl';
 
 import { getEntitySortComparator } from 'utils/sort';
+import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
 
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
@@ -272,22 +274,43 @@ export default class MultiSelect extends React.Component {
       (option) => this.getOptionSortCheckedValueMapper(option),
       (a, b) => getEntitySortComparator(a, b, 'asc')
     )
-  filterOptions = (options, query) => {    // filter checkboxes if needed
-      // match multiple words
-      // see http://stackoverflow.com/questions/5421952/how-to-match-multiple-words-in-regex
-    try {
-      const regex = query.split(' ').reduce((memo, str) => `${memo}(?=.*\\b${str})`, '');
-      const pattern = new RegExp(regex, 'i');
-      return options.filter((option) =>
-        pattern.test(option.get('value'))
-        || pattern.test(option.get('label'))
-        || pattern.test(option.get('reference'))
-        || pattern.test(option.get('search'))
-      );
-    } catch (e) {
-      // nothing
-      return options;
+
+  prepareOptionSearchTarget = (option, fields, queryLength) =>
+    reduce(
+      fields,
+      (target, field) => {
+        if (option.get(field)) {
+          if (field === 'id' || field === 'reference' || field === 'value') {
+            return `${target} ${option.get(field)}`;
+          } else if (queryLength > 1) {
+            return `${target} ${cleanupSearchTarget(option.get(field))}`;
+          }
+          return target;
+        }
+        return target;
+      }, ''
+    );
+
+  // compare to utils/entities.js filterEntitiesByKeywords
+  filterOptionsByKeywords = (options, query) => {    // filter checkboxes if needed
+    if (query) {
+      try {
+        const regex = new RegExp(regExMultipleWords(query), 'i');
+        return options.filter((option) =>
+          regex.test(this.prepareOptionSearchTarget(
+            option,
+            (option.get('searchFields') && option.get('searchFields').size > 0)
+              ? option.get('searchFields').toArray()
+              : ['id', 'reference', 'label', 'search'],
+            query.length
+          ))
+        );
+      } catch (e) {
+        // nothing
+        return options;
+      }
     }
+    return options;
   }
 
   renderCheckbox = (option, i) => {
@@ -361,7 +384,7 @@ export default class MultiSelect extends React.Component {
     let checkboxOptions = this.prepareOptions(options, values, threeState);
 
     if (this.props.search && this.state.query) {
-      checkboxOptions = this.filterOptions(checkboxOptions, this.state.query);
+      checkboxOptions = this.filterOptionsByKeywords(checkboxOptions, this.state.query);
     }
 
     // sort checkboxes

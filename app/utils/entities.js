@@ -1,6 +1,6 @@
 import { reduce } from 'lodash/collection';
 
-import { cleanupSearchTarget } from 'utils/string';
+import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
 import asList from 'utils/as-list';
 import isNumber from 'utils/is-number';
 
@@ -115,6 +115,17 @@ export const filterEntitiesByAttributes = (entities, query) =>
       : attributesEqual(entity.getIn(['attributes', attribute]), value))
     , true)
   );
+
+export const filterEntitiesByKeywords = (entities, query, searchAttributes) => {
+  try {
+    const regex = new RegExp(regExMultipleWords(query), 'i');
+    return entities.filter((entity) =>
+      regex.test(prepareEntitySearchTarget(entity, searchAttributes, query.length))
+    );
+  } catch (e) {
+    return entities;
+  }
+};
 
 export const entitiesSetAssociated = (entities, entityKey, associations, associationKey, associationId) =>
   entities && entities.map((entity) =>
