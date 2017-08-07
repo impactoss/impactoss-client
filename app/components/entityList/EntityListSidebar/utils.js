@@ -2,6 +2,7 @@ import asList from 'utils/as-list';
 import {
   getEntityTitle,
   getEntityReference,
+  getCategoryShortTitle,
 } from 'utils/entities';
 
 //
@@ -33,6 +34,7 @@ export const makeTagFilterGroups = (connections, connectedTaxonomies) => {
           options: taxCategories.map((category) => ({
             reference: getEntityReference(category, false),
             label: getEntityTitle(category),
+            filterLabel: getCategoryShortTitle(category),
             showCount: false,
             value: category.get('id'),
           })).toList().toArray(),

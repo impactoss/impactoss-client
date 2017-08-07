@@ -1,6 +1,6 @@
 import { reduce } from 'lodash/collection';
 
-import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
+import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
 import asList from 'utils/as-list';
 import isNumber from 'utils/is-number';
 
@@ -231,3 +231,11 @@ export const getEntityReference = (entity, defaultToId = true) =>
       || entity.getIn(['attributes', 'number'])
       || entity.get('id'))
     : (entity.getIn(['attributes', 'reference']) || null);
+
+export const getCategoryShortTitle = (category) =>
+  truncateText(
+    category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
+      ? category.getIn(['attributes', 'short_title'])
+      : category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']),
+    10
+  );
