@@ -154,6 +154,7 @@ export default class MultiSelect extends React.Component {
     title: PropTypes.string,
     buttons: PropTypes.array,
     search: PropTypes.bool,
+    panelId: PropTypes.string,
     // advanced: PropTypes.bool,
   }
 
@@ -171,12 +172,25 @@ export default class MultiSelect extends React.Component {
     this.state = {
       query: null,
       optionsInitial: null,
+      panelId: null,
     };
   }
 
   componentWillMount() {
     // remember initial options
-    this.setState({ optionsInitial: this.props.options });
+    this.setState({
+      optionsInitial: this.props.options,
+      panelId: this.props.panelId,
+    });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.panelId && (nextProps.panelId !== this.state.panelId)) {
+      this.setState({
+        optionsInitial: nextProps.options,
+        panelId: nextProps.panelId,
+      });
+    }
   }
 
   onSearch = (evt) => {
@@ -214,15 +228,6 @@ export default class MultiSelect extends React.Component {
     // set current value, add if not present
     return existingValueIndex > -1 ? nextValues.set(existingValueIndex, newValue) : nextValues.push(newValue);
   }
-
-  // getOrder = (option) => {
-  //   if (typeof option.get('order') !== 'undefined') {
-  //     return lowerCase(option.get('order').toString());
-  //   } else if (typeof option.get('label') === 'string') {
-  //     return lowerCase(option.get('label'));
-  //   }
-  //   return 'zzzzzzzzz';
-  // }
 
   getOptionSortValueMapper = (option) => {
     if (option.get('order')) {

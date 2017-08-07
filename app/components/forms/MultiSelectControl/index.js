@@ -21,6 +21,7 @@ const MultiSelectControl = (props) => {
     buttons,
     search,
     onCancel,
+    panelId,
      ...otherProps
   } = props;
 
@@ -42,6 +43,7 @@ const MultiSelectControl = (props) => {
         title,
         search,
         onCancel,
+        panelId,
       }}
       {...otherProps}
     />
@@ -56,6 +58,7 @@ MultiSelectControl.propTypes = {
   search: PropTypes.bool,
   options: PropTypes.instanceOf(List),
   title: PropTypes.string,
+  panelId: PropTypes.string,
   buttons: PropTypes.array,
   onCancel: PropTypes.func,
 };
