@@ -95,7 +95,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
       case 'textPrimary' :
         return (
           <ButtonFlat
-            onClick={() => button.onClick()}
+            onClick={button.onClick && (() => button.onClick())}
             primary
             type={button.submit ? 'submit' : 'button'}
           >

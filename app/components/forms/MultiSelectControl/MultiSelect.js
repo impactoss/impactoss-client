@@ -9,6 +9,8 @@ import { FormattedMessage } from 'react-intl';
 
 import { getEntitySortComparator } from 'utils/sort';
 import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
+import { testEntityEntityAssociation } from 'utils/entities';
+import asList from 'utils/as-list';
 
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
@@ -154,6 +156,7 @@ export default class MultiSelect extends React.Component {
     title: PropTypes.string,
     buttons: PropTypes.array,
     search: PropTypes.bool,
+    advanced: PropTypes.bool,
     panelId: PropTypes.string,
     // advanced: PropTypes.bool,
   }
@@ -173,6 +176,7 @@ export default class MultiSelect extends React.Component {
       query: null,
       optionsInitial: null,
       panelId: null,
+      queryTags: null,
     };
   }
 
@@ -318,6 +322,13 @@ export default class MultiSelect extends React.Component {
     return options;
   }
 
+  filterOptionsByTags = (options, queryTags) =>
+    options.filter((option) =>
+      asList(queryTags).reduce((passing, tag) =>
+        passing && testEntityEntityAssociation(option, 'tags', parseInt(tag, 10))
+      , true)
+    );
+
   renderCheckbox = (option, i) => {
     const checked = option.get('checked');
     // TODO consider isImmutable (need to upgrade to immutable v4)
@@ -392,6 +403,12 @@ export default class MultiSelect extends React.Component {
       checkboxOptions = this.filterOptionsByKeywords(checkboxOptions, this.state.query);
     }
 
+    if (this.props.advanced && this.state.queryTags) {
+      checkboxOptions = this.filterOptionsByTags(checkboxOptions, this.state.queryTags);
+    }
+
+    // this.props.tagFilterGroups && console.log(this.props.tagFilterGroups)
+
     // sort checkboxes
     checkboxOptions = this.sortOptions(checkboxOptions);
 
@@ -422,9 +439,8 @@ export default class MultiSelect extends React.Component {
           <ControlFooter>
             <ButtonGroup>
               {
-                this.props.buttons.map((action, i) => (
-                  action && action.position !== 'left' && this.renderButton(action, i)
-                ))
+                this.props.buttons.map((action, i) =>
+                  action && action.position !== 'left' && this.renderButton(action, i))
               }
             </ButtonGroup>
             <ButtonGroup left>

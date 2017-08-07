@@ -7,6 +7,8 @@ import {
 
 import {
   entitiesSetAssociated,
+  entitySetAssociated,
+  entitySetCategoryIds,
   entitySetUser,
   prepareTaxonomiesAssociated,
 } from 'utils/entities';
@@ -34,8 +36,17 @@ export const selectRecommendations = createSelector(
   (state, id) => id,
   (state) => selectEntities(state, 'recommendations'),
   (state) => selectEntities(state, 'recommendation_measures'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'recommendation_id', associations, 'measure_id', id)
+  (state) => selectEntities(state, 'recommendation_categories'),
+  (id, entities, associations, categories) =>
+    entities && entities.map((entity) =>
+        entitySetAssociated(
+          entitySetCategoryIds(entity, 'recommendation_id', categories),
+          'recommendation_id',
+          associations,
+          'measure_id',
+          id
+        ),
+    )
 );
 export const selectSdgTargets = createSelector(
   (state, id) => id,

@@ -21,6 +21,7 @@ import {
   filterEntitiesWithoutAssociation,
   attributesEqual,
   testEntityEntityAssociation,
+  entitiesSetCategoryIds,
 } from 'utils/entities';
 
 import { sortEntities, getSortOption } from 'utils/sort';
@@ -36,27 +37,11 @@ export const selectConnections = createSelector(
   (indicators, recommendations, sdgtargets, recommendationCategories, sdgtargetCategories) =>
     Map()
     .set('indicators', indicators)
-    .set(
-      'recommendations',
-      recommendations.map((recommendation) =>
-        recommendation.set(
-          'categories',
-          recommendationCategories
-          .filter((association) => attributesEqual(association.getIn(['attributes', 'recommendation_id']), recommendation.get('id')))
-          .map((association) => association.getIn(['attributes', 'category_id']))
-        )
-      )
+    .set('recommendations',
+      entitiesSetCategoryIds(recommendations, 'recommendation_id', recommendationCategories)
     )
-    .set(
-      'sdgtargets',
-      sdgtargets.map((sdgtarget) =>
-        sdgtarget.set(
-          'categories',
-          sdgtargetCategories
-          .filter((association) => attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), sdgtarget.get('id')))
-          .map((association) => association.getIn(['attributes', 'category_id']))
-        )
-      )
+    .set('sdgtargets',
+      entitiesSetCategoryIds(sdgtargets, 'sdgtarget_id', sdgtargetCategories)
     )
 );
 

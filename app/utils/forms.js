@@ -17,6 +17,7 @@ export const entityOption = (entity, defaultToId) => Map({
   label: getEntityTitle(entity),
   reference: getEntityReference(entity, defaultToId),
   checked: !!entity.get('associated'),
+  tags: entity.get('categories'),
 });
 
 export const entityOptions = (entities, defaultToId = true) => entities

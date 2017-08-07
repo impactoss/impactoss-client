@@ -127,13 +127,26 @@ export const filterEntitiesByKeywords = (entities, query, searchAttributes) => {
   }
 };
 
+export const entitiesSetCategoryIds = (entities, entityKey, entityCategories) =>
+  entities && entities.map((entity) => entitySetCategoryIds(entity, entityKey, entityCategories));
+
+export const entitySetCategoryIds = (entity, entityKey, entityCategories) =>
+  entity.set(
+    'categories',
+    entityCategories
+    .filter((association) => attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id')))
+    .map((association) => association.getIn(['attributes', 'category_id']))
+  );
+
 export const entitiesSetAssociated = (entities, entityKey, associations, associationKey, associationId) =>
   entities && entities.map((entity) =>
-    entity.set('associated',
-      associations.find((association) =>
-        attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id'))
-        && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
-      )
+    entitySetAssociated(entity, entityKey, associations, associationKey, associationId));
+
+export const entitySetAssociated = (entity, entityKey, associations, associationKey, associationId) =>
+  entity.set('associated',
+    associations.find((association) =>
+      attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id'))
+      && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
     )
   );
 
