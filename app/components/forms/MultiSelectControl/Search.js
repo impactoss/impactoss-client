@@ -4,12 +4,6 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const Styled = styled.div`
-  position: absolute;
-  top: 60px;
-  left: 0;
-  right: 0;
-  background: ${palette('primary', 4)};
-  height: 55px;
   padding: 1em;
   background-color: ${palette('light', 0)};
 `;

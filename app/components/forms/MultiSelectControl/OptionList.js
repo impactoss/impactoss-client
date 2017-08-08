@@ -14,6 +14,7 @@ import messages from './messages';
 const Styled = styled.div`
   display: table;
   width: 100%;
+  border-top:1px solid ${palette('light', 1)};
 `;
 
 const OptionWrapper = styled.div`
@@ -51,7 +52,7 @@ const OptionCount = styled.span`
   border-bottom: 1px solid ${palette('light', 1)};
 `;
 
-const NoOptions = styled.div`
+const Empty = styled.div`
   padding: 1em;
   font-style: italic;
 `;
@@ -61,7 +62,7 @@ const OptionList = (props) => (
     { props.options && props.options.map((option, i) => {
       const checked = option.get('checked');
       const isIndeterminate = option.get('isIndeterminate');
-      const id = `${checked}-${i}-${kebabCase(option.get('value'))}-${kebabCase(option.get('query'))}`;
+      const id = `${i}-${kebabCase(option.get('value'))}`;
       return (
         <OptionWrapper key={id}>
           <CheckboxWrapper>
@@ -103,9 +104,9 @@ const OptionList = (props) => (
       );
     })}
     { (!props.options || props.options.size === 0) &&
-      <NoOptions>
+      <Empty>
         <FormattedMessage {...messages.empty} />
-      </NoOptions>
+      </Empty>
     }
   </Styled>
 );

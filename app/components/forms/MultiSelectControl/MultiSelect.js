@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List } from 'immutable';
+import { without } from 'lodash/array';
+import { filter, find } from 'lodash/collection';
+import { List, fromJS } from 'immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import ButtonFactory from 'components/buttons/ButtonFactory';
+import TagSearch from 'components/TagSearch';
 
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
@@ -14,29 +17,18 @@ import {
   filterOptionsByKeywords,
 } from './utils';
 
-import Close from './Close';
-import Search from './Search';
 import TagFilters from './TagFilters';
 import OptionList from './OptionList';
+import Header from './Header';
 
 const ButtonGroup = styled.div`
   float: ${(props) => props.left ? 'left' : 'right'}
 `;
 const ControlWrapper = styled.div``;
-const ControlHeader = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  background-color: ${palette('dark', 2)};
-  color: ${palette('primary', 4)};
-  height: ${(props) => props.search ? '115px' : '60px'};
-  padding: 1em 0 1em 1em;
-  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
-`;
+
 const ControlMain = styled.div`
   position: absolute;
-  top: ${(props) => props.search ? '115px' : '60px'};
+  top: 60px;
   bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
   left: 0;
   right: 0;
@@ -53,40 +45,20 @@ const ControlFooter = styled.div`
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
 `;
 
-export default class MultiSelect extends React.Component {
+const Search = styled.div`
+  padding: 1em;
+  background-color: ${palette('light', 0)};
+`;
 
-  static propTypes = {
-    options: PropTypes.instanceOf(List),
-    values: PropTypes.instanceOf(List),
-    onChange: PropTypes.func.isRequired,
-    onCancel: PropTypes.func,
-    multiple: PropTypes.bool,
-    required: PropTypes.bool,
-    title: PropTypes.string,
-    buttons: PropTypes.array,
-    search: PropTypes.bool,
-    advanced: PropTypes.bool,
-    panelId: PropTypes.string,
-    tagFilterGroups: PropTypes.array,
-  }
 
-  static defaultProps = {
-    values: new List(),
-    threeState: false,
-    multiple: true,
-    required: false,
-    search: true,
-    advanced: false,
-  }
-
+class MultiSelect extends React.Component {
   constructor() {
     super();
     this.state = {
       query: null,
       optionsInitial: null,
       panelId: null,
-      queryTags: null,
-      tagFilterGroupActive: null,
+      queryTags: [],
     };
   }
 
@@ -104,16 +76,21 @@ export default class MultiSelect extends React.Component {
         optionsInitial: nextProps.options,
         panelId: nextProps.panelId,
         query: null,
-        queryTags: null,
-        tagFilterGroupActive: null,
+        queryTags: [],
       });
     }
   }
 
-  onSearch = (evt) => {
-    if (evt && evt !== undefined) evt.stopPropagation();
+  onSearch = (value) => {
     this.setState({
-      query: evt.target.value,
+      query: value,
+    });
+  }
+  onTagSelected = (active, tagOption) => {
+    this.setState({
+      queryTags: active
+        ? this.state.queryTags.concat([tagOption.get('value')])
+        : without(this.state.queryTags, tagOption.get('value')),
     });
   }
 
@@ -170,6 +147,43 @@ export default class MultiSelect extends React.Component {
     return sortOptions(checkboxOptions);
   }
 
+  currentTagFilterGroups = (tagFilterGroups, options) => {
+    // get all actually connected categories from connections
+    const optionTagIds = options
+    .map((option) => option.get('tags'))
+    .flatten()
+    .toSet()
+    .toList();
+
+    // filter multiselect options
+    return optionTagIds.size > 0
+      && !(optionTagIds.size === 1 && !optionTagIds.first())
+      ? tagFilterGroups.map((group) => ({
+        title: group.title,
+        palette: group.palette,
+        options: filter(group.options, (groupOption) => optionTagIds.includes(parseInt(groupOption.value, 10))),
+      }))
+      : [];
+  };
+
+  currentFilters = (queryTags, filterGroups) =>
+    queryTags.map((tagValue) =>
+      filterGroups.reduce((memo, group) => {
+        const option = find(group.options, (groupOption) => groupOption.value === tagValue);
+        return option
+        ? ({
+          label: option.filterLabel,
+          type: group.palette[0],
+          id: group.palette[1],
+          onClick: (evt) => {
+            if (evt && evt.preventDefault) evt.preventDefault();
+            this.onTagSelected(false, fromJS(option));
+          },
+        })
+        : memo;
+      }, null)
+    );
+
   renderButton = (action, i) => (
     <ButtonFactory
       key={i}
@@ -183,27 +197,33 @@ export default class MultiSelect extends React.Component {
   );
 
   render() {
+    const options = this.prepareOptions(this.props, this.state);
     return (
       <ControlWrapper>
-        <ControlHeader search={this.props.search}>
-          { this.props.title }
-          { this.props.onCancel &&
-            <Close onCancel={this.props.onCancel} />
-          }
+        <Header
+          title={this.props.title}
+          onCancel={this.props.onCancel}
+        />
+        <ControlMain search={this.props.search} hasFooter={this.props.buttons}>
           { this.props.search &&
-            <Search onSearch={this.onSearch} queryTags={this.state.queryTags} />
+            <Search>
+              <TagSearch
+                onSearch={this.onSearch}
+                filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}
+                searchQuery={this.state.query || ''}
+                multiselect
+              />
+            </Search>
           }
           { this.props.advanced && this.props.tagFilterGroups &&
             <TagFilters
               queryTags={this.state.queryTags}
-              tagFilterGroups={this.props.tagFilterGroups}
-              tagFilterGroupActive={this.state.tagFilterGroupActive}
+              tagFilterGroups={this.currentTagFilterGroups(this.props.tagFilterGroups, options)}
+              onTagSelected={this.onTagSelected}
             />
           }
-        </ControlHeader>
-        <ControlMain search={this.props.search} hasFooter={this.props.buttons}>
           <OptionList
-            options={this.prepareOptions(this.props, this.state)}
+            options={options}
             onCheckboxChange={(checkedState, option) => {
               this.props.onChange(this.getNextValues(checkedState, option));
             }}
@@ -230,3 +250,30 @@ export default class MultiSelect extends React.Component {
     );
   }
 }
+
+
+MultiSelect.propTypes = {
+  options: PropTypes.instanceOf(List),
+  values: PropTypes.instanceOf(List),
+  onChange: PropTypes.func.isRequired,
+  onCancel: PropTypes.func,
+  multiple: PropTypes.bool,
+  required: PropTypes.bool,
+  title: PropTypes.string,
+  buttons: PropTypes.array,
+  search: PropTypes.bool,
+  advanced: PropTypes.bool,
+  panelId: PropTypes.string,
+  tagFilterGroups: PropTypes.array,
+};
+
+MultiSelect.defaultProps = {
+  values: new List(),
+  threeState: false,
+  multiple: true,
+  required: false,
+  search: true,
+  advanced: false,
+};
+
+export default MultiSelect;
