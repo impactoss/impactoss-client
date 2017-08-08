@@ -12,6 +12,9 @@ import Option from './Option';
 import messages from './messages';
 
 const Styled = styled.div`
+  width: 100%;
+`;
+const ListWrapper = styled.div`
   display: table;
   width: 100%;
   border-top:1px solid ${palette('light', 1)};
@@ -66,68 +69,115 @@ const Empty = styled.div`
   font-style: italic;
 `;
 
-const OptionList = (props) => (
-  <Styled>
-    { props.options && props.options.map((option, i) => {
-      const checked = option.get('checked');
-      const isIndeterminate = option.get('isIndeterminate');
-      const id = `${i}-${kebabCase(option.get('value'))}`;
-      return (
-        <OptionWrapper
-          key={id}
-          changedToChecked={option.get('changedToChecked')}
-          changedToUnchecked={option.get('changedToUnchecked')}
-        >
-          <CheckboxWrapper>
-            { isIndeterminate &&
-              <IndeterminateCheckbox
-                id={id}
-                checked={checked}
-                onChange={(checkedState) => {
-                  props.onCheckboxChange(checkedState, option);
-                }}
-              />
-            }
-            { !isIndeterminate &&
-              <input
-                id={id}
-                type="checkbox"
-                checked={checked}
-                onChange={(evt) => {
-                  evt.stopPropagation();
-                  props.onCheckboxChange(evt.target.checked, option);
-                }}
-              />
-            }
-          </CheckboxWrapper>
-          <OptionLabel htmlFor={id} >
-            <Option
-              bold={option.get('labelBold') || checked}
-              reference={typeof option.get('reference') !== 'undefined' && option.get('reference') !== null ? option.get('reference').toString() : ''}
-              label={option.get('label')}
-              isNew={option.get('isNew')}
-            />
-          </OptionLabel>
-          { option.get('showCount') && typeof option.get('count') !== 'undefined' &&
-            <OptionCount>
-              {option.get('count')}
-            </OptionCount>
+const More = styled.div`
+  display: block;
+  width: 100%;
+  padding: 0.5em 1em;
+  text-align: center;
+`;
+const MoreLink = styled.a``;
+
+const SHOW_INCREMENT = 20;
+
+class OptionList extends React.PureComponent {
+  constructor() {
+    super();
+    this.state = {
+      show: SHOW_INCREMENT,
+    };
+  }
+
+  showMore = () => {
+    this.setState({
+      show: this.state.show + SHOW_INCREMENT,
+    });
+  }
+
+  render() {
+    const options = this.props.options && this.props.options.slice(0, this.state.show);
+
+    const hasMore = options.size < this.props.options.size;
+
+    return (
+      <Styled>
+        <ListWrapper>
+          { options && options.map((option, i) => {
+            const checked = option.get('checked');
+            const isIndeterminate = option.get('isIndeterminate');
+            const id = `${i}-${kebabCase(option.get('value'))}`;
+            return (
+              <OptionWrapper
+                key={id}
+                changedToChecked={option.get('changedToChecked')}
+                changedToUnchecked={option.get('changedToUnchecked')}
+              >
+                <CheckboxWrapper>
+                  { isIndeterminate &&
+                    <IndeterminateCheckbox
+                      id={id}
+                      checked={checked}
+                      onChange={(checkedState) => {
+                        this.props.onCheckboxChange(checkedState, option);
+                      }}
+                    />
+                  }
+                  { !isIndeterminate &&
+                    <input
+                      id={id}
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(evt) => {
+                        evt.stopPropagation();
+                        this.props.onCheckboxChange(evt.target.checked, option);
+                      }}
+                    />
+                  }
+                </CheckboxWrapper>
+                <OptionLabel htmlFor={id} >
+                  <Option
+                    bold={option.get('labelBold') || checked}
+                    reference={typeof option.get('reference') !== 'undefined' && option.get('reference') !== null ? option.get('reference').toString() : ''}
+                    label={option.get('label')}
+                    isNew={option.get('isNew')}
+                  />
+                </OptionLabel>
+                { option.get('showCount') && typeof option.get('count') !== 'undefined' &&
+                  <OptionCount>
+                    {option.get('count')}
+                  </OptionCount>
+                }
+              </OptionWrapper>
+            );
+          })}
+          { (!options || options.size === 0) &&
+            <Empty>
+              <FormattedMessage {...messages.empty} />
+            </Empty>
           }
-        </OptionWrapper>
-      );
-    })}
-    { (!props.options || props.options.size === 0) &&
-      <Empty>
-        <FormattedMessage {...messages.empty} />
-      </Empty>
-    }
-  </Styled>
-);
+        </ListWrapper>
+        { hasMore &&
+          <More>
+            {`Showing ${options.size} of ${this.props.options.size}. `}
+            <MoreLink
+              href="/"
+              onClick={(evt) => {
+                if (evt && evt.preventDefault) evt.preventDefault();
+                this.showMore();
+              }}
+            >
+              Show more
+            </MoreLink>
+          </More>
+        }
+      </Styled>
+    );
+  }
+}
 
 
 OptionList.propTypes = {
   options: PropTypes.object,
-  // onCheckboxChange: PropTypes.func,
+  onCheckboxChange: PropTypes.func,
 };
 
 export default OptionList;

@@ -9,7 +9,7 @@ import { palette } from 'styled-theme';
 import ButtonFactory from 'components/buttons/ButtonFactory';
 import TagSearch from 'components/TagSearch';
 
-import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
+import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import {
   sortOptions,
@@ -46,7 +46,7 @@ const ControlMain = styled.div`
   right: 0;
   overflow-y: auto;
   padding:0;
-  padding-bottom: ${(props) => props.showChangeHint ? '50px' : '0px'};
+  padding-bottom: ${(props) => props.hasChangeNote ? '50px' : '0px'};
 `;
 const ControlFooter = styled.div`
   position: absolute;
@@ -61,6 +61,32 @@ const ControlFooter = styled.div`
 const Search = styled.div`
   padding: 1em;
   background-color: ${palette('light', 0)};
+`;
+
+const SelectAll = styled.div`
+  padding: 0.5em 1em 0.5em 0;
+  background-color: ${palette('light', 0)};
+  display: table;
+  width: 100%;
+`;
+
+const LabelWrap = styled.div`
+  display: table-cell;
+  padding-left: 0.5em;
+  padding-right: 1em;
+`;
+const CheckboxWrap = styled.div`
+  text-align: center;
+  display: table-cell;
+  padding-left: 1em;
+  padding-right: 0.5em;
+  width: 10px;
+`;
+const Checkbox = styled(IndeterminateCheckbox)`
+  vertical-align: middle;
+`;
+const Label = styled.label`
+  vertical-align: middle;
 `;
 
 
@@ -112,7 +138,7 @@ class MultiSelect extends React.Component {
     // do not update if required and change would result in empty list
     if (!checked && required) {
       const otherCheckedValues = values.find((v) =>
-        v.get('checked') && !(v.get('value') === option.get('value') && v.get('query') === option.get('query'))
+        v.get('checked') && v.get('value') !== option.get('value') // && v.get('query') === option.get('query'))
       );
       if (!otherCheckedValues) {
         return values;
@@ -122,7 +148,7 @@ class MultiSelect extends React.Component {
     // uncheck all others if single mode (!multiple)
     let nextValues = values;
     const existingValueIndex = values.findIndex((v) =>
-      v.get('value') === option.get('value') && v.get('query') === option.get('query')
+      v.get('value') === option.get('value') // && v.get('query') === option.get('query')
     );
     if (!multiple && checked) {
       // uncheck all other options
@@ -136,12 +162,39 @@ class MultiSelect extends React.Component {
     return existingValueIndex > -1 ? nextValues.set(existingValueIndex, newValue) : nextValues.push(newValue);
   }
 
-  isOptionIndeterminate = (option) => option.get('checked') === CHECKBOX_STATES.INDETERMINATE;
+  getAllSelectedValues = (checked, options) => {
+    const { values } = this.props;
+    // TODO consider how to deal with required variant
+    // uncheck all others if single mode (!multiple)
+    let nextValues = values;
+    options.forEach((option) => {
+      const existingValueIndex = values.findIndex((v) =>
+        v.get('value') === option.get('value') && v.get('query') === option.get('query')
+      );
+      const newValue = option.set('checked', checked).set('hasChanged', true);
+      // set new value
+      // set current value, add if not present
+      nextValues = existingValueIndex > -1
+        ? nextValues.set(existingValueIndex, newValue)
+        : nextValues.push(newValue);
+    });
+    return nextValues;
+  }
+
+  getSelectedState = (selectedTotal, allSelected) => {
+    if (selectedTotal === 0) {
+      return CHECKBOX_STATES.UNCHECKED;
+    }
+    if (selectedTotal > 0 && allSelected) {
+      return CHECKBOX_STATES.CHECKED;
+    }
+    return CHECKBOX_STATES.INDETERMINATE;
+  }
 
   // props, state
   // map options
   prepareOptions = ({ options, values, threeState }, { optionsInitial }) => options.map((option) => {
-    const value = values.find((v) => option.get('value') === v.get('value') && option.get('query') === v.get('query'));
+    const value = values.find((v) => option.get('value') === v.get('value'));// && option.get('query') === v.get('query'));
     const isNew = !optionsInitial.includes(option);
     const isIndeterminate = threeState && this.isOptionIndeterminate(option);
 
@@ -204,7 +257,9 @@ class MultiSelect extends React.Component {
       }, null)
     );
 
-  renderButton = (action, i) => (
+  isOptionIndeterminate = (option) => option.get('checked') === CHECKBOX_STATES.INDETERMINATE;
+
+  renderButton = (action, i, hasChanges) => (
     <ButtonFactory
       key={i}
       button={{
@@ -212,6 +267,7 @@ class MultiSelect extends React.Component {
         title: action.title,
         onClick: action.onClick && (() => action.onClick()),
         submit: action.submit,
+        disabled: action.submit && !hasChanges,
       }}
     />
   );
@@ -221,9 +277,11 @@ class MultiSelect extends React.Component {
 
     const optionsChangedToChecked = options.filter((option) => option.get('changedToChecked'));
     const optionsChangedToUnchecked = options.filter((option) => option.get('changedToUnchecked'));
-    const showChangeHint = this.props.advanced && (optionsChangedToChecked.size > 0 || optionsChangedToUnchecked.size > 0);
+    const hasChanges = optionsChangedToChecked.size > 0 || optionsChangedToUnchecked.size > 0;
+    const showChangeHint = this.props.advanced && hasChanges;
 
     options = this.filterOptions(options, this.props, this.state);
+    const filteredOptionsSelected = options.filter((option) => option.get('checked') || this.isOptionIndeterminate(option));
 
     return (
       <ControlWrapper>
@@ -253,6 +311,27 @@ class MultiSelect extends React.Component {
               onTagSelected={this.onTagSelected}
             />
           }
+          { this.props.advanced && this.props.multiple &&
+            <SelectAll>
+              <CheckboxWrap>
+                <Checkbox
+                  id="select-all-multiselect"
+                  checked={this.getSelectedState(filteredOptionsSelected.size, filteredOptionsSelected.size === options.size)}
+                  onChange={(checkedState) =>
+                    this.props.onChange(this.getAllSelectedValues(checkedState, options))
+                  }
+                />
+              </CheckboxWrap>
+              <LabelWrap>
+                <Label htmlFor="select-all-multiselect">
+                  {filteredOptionsSelected.size > 0
+                    ? `${filteredOptionsSelected.size} option(s) selected`
+                    : 'Options'
+                  }
+                </Label>
+              </LabelWrap>
+            </SelectAll>
+          }
           <OptionList
             options={options}
             onCheckboxChange={(checkedState, option) => {
@@ -280,13 +359,13 @@ class MultiSelect extends React.Component {
             <ButtonGroup>
               {
                 this.props.buttons.map((action, i) =>
-                  action && action.position !== 'left' && this.renderButton(action, i))
+                  action && action.position !== 'left' && this.renderButton(action, i, hasChanges))
               }
             </ButtonGroup>
             <ButtonGroup left>
               {
                 this.props.buttons.map((action, i) => (
-                  action && action.position === 'left' && this.renderButton(action, i)
+                  action && action.position === 'left' && this.renderButton(action, i, hasChanges)
                 ))
               }
             </ButtonGroup>

@@ -142,11 +142,12 @@ theme.palette = {
   //
   // BUTTONS / LINKS
   //
-  // button: ['#colorPrimary', '#colorSecondary'],
-  buttonFlat: [primary[1], dark[3]],
+  // button: ['#colorPrimary', '#colorSecondary', #disabled],
+  buttonFlat: [primary[1], dark[3], light[4]],
   buttonFlatHover: [primary[0], primary[1]],
   // buttonDefault: ['#text', '#bg'],
   buttonDefault: [primary[4], primary[1]],
+  buttonDefaultInactive: [primary[4], primary[1]],
   buttonDefaultHover: [primary[4], primary[0]],
   // buttonPrimary: ['#text', '#bg', '#border'],
   buttonDefaultIconOnly: [primary[4], primary[1], primary[1]],
