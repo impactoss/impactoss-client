@@ -26,6 +26,18 @@ const ButtonGroup = styled.div`
 `;
 const ControlWrapper = styled.div``;
 
+const ChangeHint = styled.div`
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
+  background-color: ${palette('light', 0)};
+  font-style: italic;
+  padding: 0.5em 1em;
+  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
+  text-align: right;
+`;
+
 const ControlMain = styled.div`
   position: absolute;
   top: 60px;
@@ -34,6 +46,7 @@ const ControlMain = styled.div`
   right: 0;
   overflow-y: auto;
   padding:0;
+  padding-bottom: ${(props) => props.showChangeHint ? '50px' : '0px'};
 `;
 const ControlFooter = styled.div`
   position: absolute;
@@ -123,20 +136,27 @@ class MultiSelect extends React.Component {
     return existingValueIndex > -1 ? nextValues.set(existingValueIndex, newValue) : nextValues.push(newValue);
   }
 
+  isOptionIndeterminate = (option) => option.get('checked') === CHECKBOX_STATES.INDETERMINATE;
+
   // props, state
-  prepareOptions = ({ options, values, threeState, search, advanced }, { query, queryTags, optionsInitial }) => {
-    // map options
-    let checkboxOptions = options.map((option) => {
-      const value = values.find((v) => option.get('value') === v.get('value') && option.get('query') === v.get('query'));
-      const isNew = !optionsInitial.includes(option);
-      return option.withMutations((o) =>
-        o.set('checked', value && value.get('checked'))
-        .set('isNew', isNew)
-        .set('initialChecked', option.get('checked'))
-        .set('isIndeterminate', threeState && option.get('checked') === CHECKBOX_STATES.INDETERMINATE)
-      );
-    });
-    // filter options
+  // map options
+  prepareOptions = ({ options, values, threeState }, { optionsInitial }) => options.map((option) => {
+    const value = values.find((v) => option.get('value') === v.get('value') && option.get('query') === v.get('query'));
+    const isNew = !optionsInitial.includes(option);
+    const isIndeterminate = threeState && this.isOptionIndeterminate(option);
+
+    return option.withMutations((o) =>
+      o.set('checked', value && value.get('checked'))
+      .set('isNew', isNew)
+      .set('changedToChecked', value.get('checked') && !option.get('checked'))
+      .set('changedToUnchecked', !value.get('checked') && !this.isOptionIndeterminate(value) && (option.get('checked') || isIndeterminate))
+      .set('initialChecked', option.get('checked'))
+      .set('isIndeterminate', isIndeterminate)
+    );
+  });
+
+  filterOptions = (options, { search, advanced }, { query, queryTags }) => { // filter options
+    let checkboxOptions = options;
     if (search && query) {
       checkboxOptions = filterOptionsByKeywords(checkboxOptions, query);
     }
@@ -145,7 +165,7 @@ class MultiSelect extends React.Component {
     }
     // sort options
     return sortOptions(checkboxOptions);
-  }
+  };
 
   currentTagFilterGroups = (tagFilterGroups, options) => {
     // get all actually connected categories from connections
@@ -197,14 +217,25 @@ class MultiSelect extends React.Component {
   );
 
   render() {
-    const options = this.prepareOptions(this.props, this.state);
+    let options = this.prepareOptions(this.props, this.state);
+
+    const optionsChangedToChecked = options.filter((option) => option.get('changedToChecked'));
+    const optionsChangedToUnchecked = options.filter((option) => option.get('changedToUnchecked'));
+    const showChangeHint = this.props.advanced && (optionsChangedToChecked.size > 0 || optionsChangedToUnchecked.size > 0);
+
+    options = this.filterOptions(options, this.props, this.state);
+
     return (
       <ControlWrapper>
         <Header
           title={this.props.title}
           onCancel={this.props.onCancel}
         />
-        <ControlMain search={this.props.search} hasFooter={this.props.buttons}>
+        <ControlMain
+          search={this.props.search}
+          hasFooter={this.props.buttons}
+          hasChangeNote={showChangeHint}
+        >
           { this.props.search &&
             <Search>
               <TagSearch
@@ -229,6 +260,21 @@ class MultiSelect extends React.Component {
             }}
           />
         </ControlMain>
+        { showChangeHint &&
+          <ChangeHint hasFooter={this.props.buttons}>
+            {'Your changes: '}
+            {optionsChangedToChecked.size > 0 &&
+              <span>
+                {`${optionsChangedToChecked.size} selected. `}
+              </span>
+            }
+            {optionsChangedToUnchecked.size > 0 &&
+              <span>
+                {`${optionsChangedToUnchecked.size} unselected. `}
+              </span>
+            }
+          </ChangeHint>
+        }
         { this.props.buttons &&
           <ControlFooter>
             <ButtonGroup>

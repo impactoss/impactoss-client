@@ -20,6 +20,15 @@ const Styled = styled.div`
 const OptionWrapper = styled.div`
   display: table-row;
   width: 100%;
+  background-color: ${(props) => {
+    if (props.changedToChecked) {
+      return '#e8ffe8';
+    }
+    if (props.changedToUnchecked) {
+      return '#e8ffe8';
+    }
+    return 'transparent';
+  }}
 `;
 const CheckboxWrapper = styled.div`
   display: table-cell;
@@ -64,7 +73,11 @@ const OptionList = (props) => (
       const isIndeterminate = option.get('isIndeterminate');
       const id = `${i}-${kebabCase(option.get('value'))}`;
       return (
-        <OptionWrapper key={id}>
+        <OptionWrapper
+          key={id}
+          changedToChecked={option.get('changedToChecked')}
+          changedToUnchecked={option.get('changedToUnchecked')}
+        >
           <CheckboxWrapper>
             { isIndeterminate &&
               <IndeterminateCheckbox

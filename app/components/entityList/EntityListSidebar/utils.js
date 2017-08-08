@@ -15,7 +15,7 @@ export const attributeOptionChecked = (queryValue, value) =>
 
 // turn taxonomies into multiselect options
 export const makeTagFilterGroups = (connections, connectedTaxonomies) =>
-  connectedTaxonomies.map((taxonomy) => ({
+  connectedTaxonomies && connectedTaxonomies.map((taxonomy) => ({
     title: taxonomy.getIn(['attributes', 'title']),
     palette: ['taxonomies', parseInt(taxonomy.get('id'), 10)],
     options: taxonomy.get('categories').map((category) => ({
