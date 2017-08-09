@@ -45,10 +45,10 @@ class ColumnExpand extends React.PureComponent { // eslint-disable-line react/pr
               onClick={onExpand}
             >
               {isExpand &&
-                <Icon name="columnCollapse" text textRight />
+                <Icon name="columnCollapse" text />
               }
               {!isExpand &&
-                <Icon name="columnExpand" text textRight />
+                <Icon name="columnExpand" text />
               }
             </ExpandButton>
           </ExpandWrapper>
