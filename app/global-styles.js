@@ -14,7 +14,7 @@ injectGlobal`
     line-height: 1.64em;
     color: #344547;
   }
-  textarea {
+  button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 

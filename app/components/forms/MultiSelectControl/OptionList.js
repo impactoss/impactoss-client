@@ -17,22 +17,22 @@ const Styled = styled.div`
 const ListWrapper = styled.div`
   display: table;
   width: 100%;
-  border-top:1px solid ${palette('light', 1)};
+  border-top: 2px solid ${palette('light', 1)};
 `;
 
 const OptionWrapper = styled.div`
   display: table-row;
   width: 100%;
-  background-color: ${(props) => {
-    if (props.changedToChecked) {
-      return '#e8ffe8';
-    }
-    if (props.changedToUnchecked) {
-      return '#e8ffe8';
-    }
-    return 'transparent';
-  }}
 `;
+// background-color: ${(props) => {
+//   if (props.changedToChecked) {
+//     return '#e8ffe8';
+//   }
+//   if (props.changedToUnchecked) {
+//     return '#e8ffe8';
+//   }
+//   return 'transparent';
+// }}
 const CheckboxWrapper = styled.div`
   display: table-cell;
   vertical-align:middle;
@@ -50,9 +50,15 @@ const OptionLabel = styled.label`
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   padding-left: 0.5em;
-  padding-right: 1em;
+  padding-right: 0.5em;
   border-bottom: 1px solid ${palette('light', 1)};
+  border-right: 0.5em solid ${(props) =>
+    (props.changedToChecked || props.changedToUnchecked)
+      ? palette('primary', 2)
+      : 'transparent'
+  };
 `;
+
 const OptionCount = styled.span`
   display: table-cell;
   vertical-align:top;
@@ -133,7 +139,11 @@ class OptionList extends React.PureComponent {
                     />
                   }
                 </CheckboxWrapper>
-                <OptionLabel htmlFor={id} >
+                <OptionLabel
+                  htmlFor={id}
+                  changedToChecked={option.get('changedToChecked')}
+                  changedToUnchecked={option.get('changedToUnchecked')}
+                >
                   <Option
                     bold={option.get('labelBold') || checked}
                     reference={typeof option.get('reference') !== 'undefined' && option.get('reference') !== null ? option.get('reference').toString() : ''}

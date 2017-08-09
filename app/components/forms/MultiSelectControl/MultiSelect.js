@@ -59,7 +59,7 @@ const ControlFooter = styled.div`
 `;
 
 const Search = styled.div`
-  padding: 1em;
+  padding: 0.5em 1em;
   background-color: ${palette('light', 0)};
 `;
 
@@ -68,12 +68,14 @@ const SelectAll = styled.div`
   background-color: ${palette('light', 0)};
   display: table;
   width: 100%;
+  line-height: 1.1;
 `;
 
 const LabelWrap = styled.div`
   display: table-cell;
   padding-left: 0.5em;
   padding-right: 1em;
+  font-size: 0.9em;
 `;
 const CheckboxWrap = styled.div`
   text-align: center;

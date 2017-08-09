@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { fromJS } from 'immutable';
 
+import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import OptionList from './OptionList';
 
@@ -11,30 +12,34 @@ import { sortOptions } from './utils';
 
 const Styled = styled.div`
   background-color: ${palette('light', 0)};
+  padding: 0 0.5em 0.5em;
+  position: relative;
 `;
 
 // padding: 0.75em 2em;
 const Group = styled(Button)`
+  padding: 0 0.5em;
 `;
 
 const GroupWrapper = styled.span`
-  position: relative;
   display: inline-block;
 `;
 const Dropdown = styled.div`
   position: absolute;
   left: 0;
+  right: 0;
+  width: 100%;
   top: 100%;
   z-index: 2;
   background-color: ${palette('primary', 4)};
-  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 8px 0 rgba(0,0,0,0.2);
   overflow-y: auto;
   max-height: 320px;
-  width: 300px;
 `;
+// box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
 
 const DotWrapper = styled.div`
-  padding: 5px;
+  padding: 5px 5px 5px 0;
   display: inline-block;
   vertical-align: middle;
 `;
@@ -42,15 +47,17 @@ const DotWrapper = styled.div`
 const Dot = styled.div`
   background-color: ${(props) => palette(props.palette, props.pIndex)};
   border-radius: ${(props) => props.round ? 999 : 3}px;
-  width: 1em;
-  height: 1em;
+  width: 0.9em;
+  height: 0.9em;
 `;
 
 const Label = styled.div`
   display: inline-block;
   vertical-align: middle;
   position: relative;
-  top: 2px;
+  top: 1px;
+  font-size: 0.9em;
+  font-weight: bold;
 `;
 
 class TagFilters extends React.PureComponent {
@@ -95,6 +102,7 @@ class TagFilters extends React.PureComponent {
               <Label>
                 {group.title}
               </Label>
+              <Icon name={this.state.active === key ? 'dropdownClose' : 'dropdownOpen'} text textRight />
             </Group>
             { key === this.state.active &&
               <Dropdown>

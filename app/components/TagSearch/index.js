@@ -22,10 +22,10 @@ const Search = styled.div`
   width: 100%;
   background-color: ${palette('primary', 4)};
   color: ${palette('dark', 2)};
-  padding: 7px;
+  padding: ${(props) => props.small ? '0 7px' : '7px'};
   border: 1px solid ${(props) => props.active ? palette('light', 4) : palette('light', 2)};
   box-shadow: 0 0 3px 0 ${(props) => props.active ? palette('dark', 2) : 'transparent'};
-  min-height: 36px;
+  min-height: ${(props) => props.small ? 30 : 36}px;
   border-radius: 5px;
 `;
 const SearchInput = styled(DebounceInput)`
@@ -60,7 +60,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     //   this.inputNode.focus()
     // }}
     return (
-      <Search active={this.state.active} >
+      <Search active={this.state.active} small={this.props.multiselect}>
         <Tags>
           {
             filters.map((filter, i) => filter.without
