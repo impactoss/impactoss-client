@@ -1,3 +1,4 @@
+import { Map } from 'immutable';
 import { reduce } from 'lodash/collection';
 
 import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
@@ -196,6 +197,10 @@ export const prepareTaxonomiesAssociated = (taxonomies, categories, associations
     associationKey,
     associationId
   )));
+
+export const prepareTaxonomiesMultiple = (taxonomies, categories, tagsKeys) =>
+  // TODO deal with conflicts
+  reduce(tagsKeys, (memo, tagsKey) => memo.merge(prepareTaxonomies(taxonomies, categories, tagsKey)), Map());
 
 export const prepareTaxonomies = (taxonomies, categories, tagsKey) =>
   taxonomies && taxonomies

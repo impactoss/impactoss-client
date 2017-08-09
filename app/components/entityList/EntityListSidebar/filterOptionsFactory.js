@@ -11,10 +11,12 @@ import {
   getEntityTitle,
   getEntityReference,
 } from 'utils/entities';
+
+import { makeTagFilterGroups } from 'utils/forms';
+
 import {
   optionChecked,
   attributeOptionChecked,
-  makeTagFilterGroups,
 } from './utils';
 
 export const makeActiveFilterOptions = (entities, filters, activeFilterOption, locationQuery, taxonomies, connections, connectedTaxonomies, messages, formatLabel) => {
@@ -342,7 +344,7 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
       });  // for each entities
     }
   }
-  filterOptions.tagFilterGroups = option && makeTagFilterGroups(optionConnections, connectedTaxonomies);
+  filterOptions.tagFilterGroups = option && makeTagFilterGroups(connectedTaxonomies);
   return filterOptions;
 };
 

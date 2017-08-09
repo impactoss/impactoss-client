@@ -8,7 +8,7 @@ import {
   getEntityReference,
 } from 'utils/entities';
 
-import { makeTagFilterGroups } from './utils';
+import { makeTagFilterGroups } from 'utils/forms';
 
 export const checkedState = (count, length) => {
   if (count === length) {
@@ -108,7 +108,7 @@ export const makeConnectionEditOptions = (entities, edits, connections, connecte
     multiple: true,
     required: false,
     advanced: true,
-    tagFilterGroups: option && makeTagFilterGroups(connections.get(option.path), connectedTaxonomies),
+    tagFilterGroups: option && makeTagFilterGroups(connectedTaxonomies),
   };
 
   if (option) {

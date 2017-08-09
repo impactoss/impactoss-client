@@ -38,7 +38,11 @@ import {
   openNewEntityModal,
 } from 'containers/App/actions';
 
-import { selectEntities, selectReady } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectMeasuresCategorised,
+  selectSdgTargetsCategorised,
+} from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -48,6 +52,7 @@ import EntityForm from 'components/forms/EntityForm';
 import {
   selectDomain,
   selectUsers,
+  selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
@@ -88,7 +93,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getBodyMainFields = (measures, sdgtargets, onCreateOption) => ([
+  getBodyMainFields = (connectedTaxonomies, measures, sdgtargets, onCreateOption) => ([
     {
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
@@ -96,8 +101,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures, onCreateOption),
-        renderSdgTargetControl(sdgtargets, onCreateOption),
+        renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
       ],
     },
   ]);
@@ -120,7 +125,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   ]);
 
   render() {
-    const { dataReady, viewDomain, measures, users, sdgtargets, onCreateOption } = this.props;
+    const { dataReady, viewDomain, connectedTaxonomies, measures, users, sdgtargets, onCreateOption } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -174,7 +179,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(measures, sdgtargets, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, measures, sdgtargets, onCreateOption),
                   aside: this.getBodyAsideFields(users),
                 },
               }}
@@ -199,6 +204,7 @@ IndicatorNew.propTypes = {
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
+  connectedTaxonomies: PropTypes.object,
 };
 
 IndicatorNew.contextTypes = {
@@ -209,11 +215,12 @@ const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   // all measures,
-  measures: selectEntities(state, 'measures'),
+  measures: selectMeasuresCategorised(state),
   // all sdgtargets,
-  sdgtargets: selectEntities(state, 'sdgtargets'),
+  sdgtargets: selectSdgTargetsCategorised(state),
   // all users, listing connection if any
   users: selectUsers(state),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
 function mapDispatchToProps(dispatch) {

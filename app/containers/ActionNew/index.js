@@ -37,7 +37,13 @@ import {
   openNewEntityModal,
 } from 'containers/App/actions';
 
-import { selectEntities, selectReady } from 'containers/App/selectors';
+import {
+  selectEntities,
+  selectReady,
+  selectSdgTargetsCategorised,
+  selectRecommendationsCategorised,
+  selectMeasureTaxonomies,
+} from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -46,7 +52,7 @@ import EntityForm from 'components/forms/EntityForm';
 
 import {
   selectDomain,
-  selectTaxonomies,
+  selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
@@ -86,7 +92,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (recommendations, indicators, sdgtargets, onCreateOption) => ([
+  getBodyMainFields = (connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption) => ([
     {
       fields: [
         getMarkdownField(this.context.intl.formatMessage, appMessages),
@@ -98,8 +104,8 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderRecommendationControl(recommendations, onCreateOption),
-        renderSdgTargetControl(sdgtargets, onCreateOption),
+        renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
+        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
         renderIndicatorControl(indicators, onCreateOption),
       ],
     },
@@ -120,7 +126,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   ]);
 
   render() {
-    const { dataReady, viewDomain, recommendations, indicators, taxonomies, sdgtargets, onCreateOption } = this.props;
+    const { dataReady, viewDomain, connectedTaxonomies, recommendations, indicators, taxonomies, sdgtargets, onCreateOption } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -174,7 +180,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(recommendations, indicators, sdgtargets, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption),
                   aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
@@ -200,6 +206,7 @@ ActionNew.propTypes = {
   sdgtargets: PropTypes.object,
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
+  connectedTaxonomies: PropTypes.object,
 };
 
 ActionNew.contextTypes = {
@@ -209,10 +216,11 @@ ActionNew.contextTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectTaxonomies(state),
-  sdgtargets: selectEntities(state, 'sdgtargets'),
+  taxonomies: selectMeasureTaxonomies(state),
+  sdgtargets: selectSdgTargetsCategorised(state),
   indicators: selectEntities(state, 'indicators'),
-  recommendations: selectEntities(state, 'recommendations'),
+  recommendations: selectRecommendationsCategorised(state),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
 function mapDispatchToProps(dispatch) {

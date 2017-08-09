@@ -32,4 +32,5 @@ export const DEPENDENCIES = [
   'sdgtarget_indicators',
   'measures',
   'sdgtarget_measures',
+  'measure_categories',
 ];

@@ -198,16 +198,20 @@ class MultiSelect extends React.Component {
   prepareOptions = ({ options, values, threeState }, { optionsInitial }) => options.map((option) => {
     const value = values.find((v) => option.get('value') === v.get('value'));// && option.get('query') === v.get('query'));
     const isNew = !optionsInitial.includes(option);
-    const isIndeterminate = threeState && this.isOptionIndeterminate(option);
-
-    return option.withMutations((o) =>
-      o.set('checked', value && value.get('checked'))
-      .set('isNew', isNew)
-      .set('changedToChecked', value.get('checked') && !option.get('checked'))
-      .set('changedToUnchecked', !value.get('checked') && !this.isOptionIndeterminate(value) && (option.get('checked') || isIndeterminate))
-      .set('initialChecked', option.get('checked'))
-      .set('isIndeterminate', isIndeterminate)
+    const isIndeterminateInitial = threeState && this.isOptionIndeterminate(option);
+    const isCheckedIntitial = option.get('checked');
+    const optionUpdated = option.withMutations((o) =>
+      o.set('isNew', isNew)
+      .set('initialChecked', isCheckedIntitial)
+      .set('isIndeterminate', isIndeterminateInitial)
     );
+    return value
+    ? optionUpdated.withMutations((o) =>
+      o.set('checked', value.get('checked'))
+      .set('changedToChecked', value.get('checked') && !isCheckedIntitial)
+      .set('changedToUnchecked', !value.get('checked') && !this.isOptionIndeterminate(value) && (isCheckedIntitial || isIndeterminateInitial))
+    )
+    : optionUpdated;
   });
 
   filterOptions = (options, { search, advanced }, { query, queryTags }) => { // filter options
