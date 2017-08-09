@@ -35,7 +35,11 @@ import {
   openNewEntityModal,
 } from 'containers/App/actions';
 
-import { selectEntities, selectReady } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectMeasuresCategorised,
+  selectRecommendationTaxonomies,
+} from 'containers/App/selectors';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -44,7 +48,7 @@ import EntityForm from 'components/forms/EntityForm';
 
 import {
   selectDomain,
-  selectTaxonomies,
+  selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
@@ -82,7 +86,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
   }]);
 
-  getBodyMainFields = (measures, onCreateOption) => ([
+  getBodyMainFields = (connectedTaxonomies, measures, onCreateOption) => ([
     {
       fields: [
         getAcceptedField(this.context.intl.formatMessage, appMessages),
@@ -93,7 +97,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures, onCreateOption),
+        renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
       ],
     },
   ]);
@@ -107,7 +111,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
   ]);
 
   render() {
-    const { dataReady, viewDomain, taxonomies, measures, onCreateOption } = this.props;
+    const { dataReady, viewDomain, connectedTaxonomies, taxonomies, measures, onCreateOption } = this.props;
     const { saveSending, saveError } = viewDomain.page;
 
     return (
@@ -161,7 +165,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(measures, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, measures, onCreateOption),
                   aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
@@ -185,6 +189,7 @@ RecommendationNew.propTypes = {
   measures: PropTypes.object,
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
+  connectedTaxonomies: PropTypes.object,
 };
 
 RecommendationNew.contextTypes = {
@@ -194,8 +199,9 @@ RecommendationNew.contextTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectTaxonomies(state),
-  measures: selectEntities(state, 'measures'),
+  taxonomies: selectRecommendationTaxonomies(state),
+  measures: selectMeasuresCategorised(state),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
 function mapDispatchToProps(dispatch) {

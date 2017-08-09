@@ -56,6 +56,7 @@ import {
   selectTaxonomies,
   selectIndicators,
   selectMeasures,
+  selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
@@ -119,7 +120,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (indicators, measures, onCreateOption) => ([
+  getBodyMainFields = (connectedTaxonomies, indicators, measures, onCreateOption) => ([
     {
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
@@ -127,7 +128,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures, onCreateOption),
+        renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
         renderIndicatorControl(indicators, onCreateOption),
       ],
     },
@@ -142,7 +143,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, indicators, taxonomies, measures, onCreateOption } = this.props;
+    const { viewEntity, dataReady, viewDomain, connectedTaxonomies, indicators, taxonomies, measures, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
@@ -208,7 +209,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(indicators, measures, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, indicators, measures, onCreateOption),
                   aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
@@ -237,6 +238,7 @@ SdgTargetEdit.propTypes = {
   indicators: PropTypes.object,
   measures: PropTypes.object,
   onCreateOption: PropTypes.func,
+  connectedTaxonomies: PropTypes.object,
 };
 
 SdgTargetEdit.contextTypes = {
@@ -251,6 +253,7 @@ const mapStateToProps = (state, props) => ({
   measures: selectMeasures(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   indicators: selectIndicators(state, props.params.id),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

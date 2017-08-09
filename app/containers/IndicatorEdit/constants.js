@@ -15,6 +15,10 @@ export const DEPENDENCIES = [
   'indicators',
   'measure_indicators',
   'sdgtarget_indicators',
+  'measure_categories',
+  'sdgtarget_categories',
+  'taxonomies',
+  'categories',
 ];
 
 export const FORM_INITIAL = fromJS({

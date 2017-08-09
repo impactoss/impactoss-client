@@ -2,6 +2,7 @@ import { Map, List } from 'immutable';
 import {
   getEntityTitle,
   getEntityReference,
+  getCategoryShortTitle,
 } from 'utils/entities';
 import isInteger from 'utils/is-integer';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
@@ -12,15 +13,16 @@ import {
   DOC_PUBLISH_STATUSES,
 } from 'containers/App/constants';
 
-export const entityOption = (entity, defaultToId) => Map({
+export const entityOption = (entity, defaultToId, hasTags) => Map({
   value: entity.get('id'),
   label: getEntityTitle(entity),
   reference: getEntityReference(entity, defaultToId),
   checked: !!entity.get('associated'),
+  tags: hasTags && entity.get('categories'),
 });
 
-export const entityOptions = (entities, defaultToId = true) => entities
-  ? entities.toList().map((entity) => entityOption(entity, defaultToId))
+export const entityOptions = (entities, defaultToId = true, hasTags = true) => entities
+  ? entities.toList().map((entity) => entityOption(entity, defaultToId, hasTags))
   : List();
 
 export const userOption = (entity, activeUserId) => Map({
@@ -53,10 +55,25 @@ export const dateOption = (entity, activeDateId) => Map({
 
 export const taxonomyOptions = (taxonomies) => taxonomies
   ? taxonomies.reduce((values, tax) =>
-    values.set(tax.get('id'), entityOptions(tax.get('categories'), false)), Map())
+    values.set(tax.get('id'), entityOptions(tax.get('categories'), false, false)), Map())
   : Map();
 
-export const renderMeasureControl = (entities, onCreateOption) => entities
+
+// turn taxonomies into multiselect options
+export const makeTagFilterGroups = (taxonomies) =>
+  taxonomies && taxonomies.map((taxonomy) => ({
+    title: taxonomy.getIn(['attributes', 'title']),
+    palette: ['taxonomies', parseInt(taxonomy.get('id'), 10)],
+    options: taxonomy.get('categories').map((category) => ({
+      reference: getEntityReference(category, false),
+      label: getEntityTitle(category),
+      filterLabel: getCategoryShortTitle(category),
+      showCount: false,
+      value: category.get('id'),
+    })).toList().toArray(),
+  })).toList().toArray();
+
+export const renderMeasureControl = (entities, taxonomies, onCreateOption) => entities
 ? {
   id: 'actions',
   model: '.associatedMeasures',
@@ -64,12 +81,15 @@ export const renderMeasureControl = (entities, onCreateOption) => entities
   label: 'Actions',
   controlType: 'multiselect',
   options: entityOptions(entities, true),
+  advanced: true,
+  tagFilterGroups: makeTagFilterGroups(taxonomies),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'measures' })
     : null,
 }
 : null;
-export const renderSdgTargetControl = (entities, onCreateOption) => entities
+
+export const renderSdgTargetControl = (entities, taxonomies, onCreateOption) => entities
 ? {
   id: 'sdgtargets',
   model: '.associatedSdgTargets',
@@ -77,13 +97,16 @@ export const renderSdgTargetControl = (entities, onCreateOption) => entities
   label: 'SDG targets',
   controlType: 'multiselect',
   options: entityOptions(entities, true),
+  advanced: true,
+  tagFilterGroups: makeTagFilterGroups(taxonomies),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'sdgtargets' })
     : null,
 }
 : null;
 
-export const renderRecommendationControl = (entities, onCreateOption) => entities
+
+export const renderRecommendationControl = (entities, taxonomies, onCreateOption) => entities
 ? {
   id: 'recommendations',
   model: '.associatedRecommendations',
@@ -91,6 +114,8 @@ export const renderRecommendationControl = (entities, onCreateOption) => entitie
   label: 'Recommendations',
   controlType: 'multiselect',
   options: entityOptions(entities),
+  advanced: true,
+  tagFilterGroups: makeTagFilterGroups(taxonomies),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'recommendations' })
     : null,
@@ -105,6 +130,7 @@ export const renderIndicatorControl = (entities, onCreateOption) => entities
   label: 'Indicators',
   controlType: 'multiselect',
   options: entityOptions(entities, true),
+  advanced: true,
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'indicators' })
     : null,

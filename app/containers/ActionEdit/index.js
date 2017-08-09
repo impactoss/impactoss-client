@@ -63,6 +63,7 @@ import {
   selectRecommendations,
   selectIndicators,
   selectSdgTargets,
+  selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
@@ -129,7 +130,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     },
   ]);
 
-  getBodyMainFields = (recommendations, indicators, sdgtargets, onCreateOption) => ([
+  getBodyMainFields = (connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption) => ([
     {
       fields: [
         getMarkdownField(this.context.intl.formatMessage, appMessages),
@@ -141,8 +142,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderRecommendationControl(recommendations, onCreateOption),
-        renderSdgTargetControl(sdgtargets, onCreateOption),
+        renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
+        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
         renderIndicatorControl(indicators, onCreateOption),
       ],
     },
@@ -163,9 +164,10 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, taxonomies, recommendations, indicators, sdgtargets, onCreateOption } = this.props;
+    const { viewEntity, dataReady, viewDomain, taxonomies, connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
+
     return (
       <div>
         <Helmet
@@ -232,7 +234,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(recommendations, indicators, sdgtargets, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption),
                   aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
@@ -259,6 +261,7 @@ ActionEdit.propTypes = {
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
+  connectedTaxonomies: PropTypes.object,
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
   sdgtargets: PropTypes.object,
@@ -276,6 +279,7 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
   sdgtargets: selectSdgTargets(state, props.params.id),
   indicators: selectIndicators(state, props.params.id),
   recommendations: selectRecommendations(state, props.params.id),

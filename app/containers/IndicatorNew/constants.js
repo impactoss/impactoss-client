@@ -11,4 +11,8 @@ export const DEPENDENCIES = [
   'measures',
   'users',
   'sdgtargets',
+  'measure_categories',
+  'sdgtarget_categories',
+  'categories',
+  'taxonomies',
 ];

@@ -38,14 +38,18 @@ export const makeFilterGroups = (
       label: messages.connectedTaxonomies,
       show: true,
       icon: 'connectedCategories',
-      options: connectedTaxonomies.reduce((taxOptions, taxonomy) => ({
-        ...taxOptions,
-        [taxonomy.get('id')]: {
-          id: taxonomy.get('id'), // filterOptionId
-          label: taxonomy.getIn(['attributes', 'title']),
-          active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
-        },
-      }), {}),
+      options: connectedTaxonomies.reduce((taxOptions, taxonomy) =>
+        filters.connectedTaxonomies.exclude && taxonomy.getIn(['attributes', filters.connectedTaxonomies.exclude])
+          ? taxOptions
+          : ({
+            ...taxOptions,
+            [taxonomy.get('id')]: {
+              id: taxonomy.get('id'), // filterOptionId
+              label: taxonomy.getIn(['attributes', 'title']),
+              active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+            },
+          })
+      , {}),
     };
   }
 

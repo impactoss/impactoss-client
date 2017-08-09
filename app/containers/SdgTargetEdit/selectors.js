@@ -3,12 +3,14 @@ import { createSelector } from 'reselect';
 import {
   selectEntity,
   selectEntities,
+  selectMeasuresCategorised,
 } from 'containers/App/selectors';
 
 import {
   entitiesSetAssociated,
   entitySetUser,
   prepareTaxonomiesAssociated,
+  prepareTaxonomiesMultiple,
 } from 'utils/entities';
 
 export const selectDomain = createSelector(
@@ -29,9 +31,16 @@ export const selectTaxonomies = createSelector(
   (id, taxonomies, categories, associations) =>
     prepareTaxonomiesAssociated(taxonomies, categories, associations, 'tags_sdgtargets', 'sdgtarget_id', id)
 );
+export const selectConnectedTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) =>
+    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
+);
+
 export const selectMeasures = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'measures'),
+  (state) => selectMeasuresCategorised(state),
   (state) => selectEntities(state, 'sdgtarget_measures'),
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'measure_id', associations, 'sdgtarget_id', id)

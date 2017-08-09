@@ -44,7 +44,8 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
   }
 
   render() {
-    const { model, onSubmit, onCancel, buttons, formOptions } = this.props;
+    const { model, onSubmit, onCancel, buttons, formOptions, activeOptionId } = this.props;
+
     return (
       <FormWrapper wide={formOptions.advanced}>
         <Form
@@ -60,6 +61,8 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
             required={formOptions.required}
             search={formOptions.search}
             advanced={formOptions.advanced}
+            tagFilterGroups={formOptions.tagFilterGroups}
+            panelId={activeOptionId}
             onCancel={onCancel}
             onChange={(values) => {
               this.props.onFormChange(values, model);
@@ -82,6 +85,7 @@ EntityListForm.propTypes = {
   onSelect: PropTypes.func,
   onCancel: PropTypes.func,
   buttons: PropTypes.array,
+  activeOptionId: PropTypes.string,
 };
 
 const mapDispatchToProps = (dispatch) => ({

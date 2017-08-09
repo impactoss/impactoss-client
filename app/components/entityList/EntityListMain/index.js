@@ -15,16 +15,21 @@ import ContainerWithSidebar from 'components/styled/Container/ContainerWithSideb
 import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
+import TagSearch from 'components/TagSearch';
 
 import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 
 import EntityListGroups from './EntityListGroups';
-import EntityListSearch from './EntityListSearch';
+
 import EntityListOptions from './EntityListOptions';
 import { currentFilters } from './current-filters';
 import { getGroupOptions, getGroupValue } from './group-options';
 
 import messages from './messages';
+
+const EntityListSearch = styled.div`
+  padding: 0 0 2em;
+`;
 
 const Content = styled.div`
   padding: 0 4em;
@@ -116,22 +121,24 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
             }
             { dataReady && this.props.scrollContainer &&
               <ListEntities>
-                <EntityListSearch
-                  filters={currentFilters(
-                    {
-                      config,
-                      taxonomies,
-                      connections,
-                      connectedTaxonomies,
-                      locationQuery,
-                      onTagClick,
-                    },
-                    this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
-                    formatLabel
-                  )}
-                  searchQuery={locationQuery.get('search') || ''}
-                  onSearch={onSearch}
-                />
+                <EntityListSearch>
+                  <TagSearch
+                    filters={currentFilters(
+                      {
+                        config,
+                        taxonomies,
+                        connections,
+                        connectedTaxonomies,
+                        locationQuery,
+                        onTagClick,
+                      },
+                      this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
+                      formatLabel
+                    )}
+                    searchQuery={locationQuery.get('search') || ''}
+                    onSearch={onSearch}
+                  />
+                </EntityListSearch>
                 <EntityListOptions
                   groupOptions={getGroupOptions(taxonomies, connectedTaxonomies)}
                   subgroupOptions={getGroupOptions(taxonomies)}

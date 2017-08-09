@@ -12,4 +12,5 @@ export const DEPENDENCIES = [
   'taxonomies',
   'indicators',
   'measures',
+  'measure_categories',
 ];

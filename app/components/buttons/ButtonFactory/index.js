@@ -20,6 +20,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
           <ButtonDefault
             onClick={() => button.onClick()}
             type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
           >
             {button.title}
           </ButtonDefault>
@@ -32,6 +33,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
             strong
             type={button.submit ? 'submit' : 'button'}
             title={button.title || this.context.intl.formatMessage(appMessages.buttons.add)}
+            disabled={button.disabled}
           />
         );
       case 'addFromMultiselect':
@@ -42,6 +44,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
             strong
             type={button.submit ? 'submit' : 'button'}
             title={button.title || this.context.intl.formatMessage(appMessages.buttons.add)}
+            disabled={button.disabled}
           />
         );
       case 'save' :
@@ -50,6 +53,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
             primary
             onClick={() => button.onClick()}
             type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
           >
             {button.title || this.context.intl.formatMessage(appMessages.buttons.save)}
           </ButtonFlat>
@@ -59,6 +63,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
           <ButtonFlat
             onClick={() => button.onClick()}
             type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
           >
             {button.title || this.context.intl.formatMessage(appMessages.buttons.cancel)}
           </ButtonFlat>
@@ -68,6 +73,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
           <ButtonFlat
             onClick={() => button.onClick()}
             type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
           >
             {button.title || this.context.intl.formatMessage(appMessages.buttons.edit)}
           </ButtonFlat>
@@ -78,6 +84,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
             onClick={() => button.onClick()}
             type={button.submit ? 'submit' : 'button'}
             title={button.title || this.context.intl.formatMessage(appMessages.buttons.close)}
+            disabled={button.disabled}
           >
             <Icon name="close" />
           </ButtonDefaultIconOnly>
@@ -88,6 +95,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
             onClick={() => button.onClick()}
             primary
             type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
           >
             {button.title || this.context.intl.formatMessage(appMessages.buttons.close)}
           </ButtonFlat>
@@ -95,9 +103,10 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
       case 'textPrimary' :
         return (
           <ButtonFlat
-            onClick={() => button.onClick()}
+            onClick={button.onClick && (() => button.onClick())}
             primary
             type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
           >
             {button.title}
           </ButtonFlat>
@@ -110,6 +119,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
           <ButtonFlat
             onClick={() => button.onClick()}
             type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
           >
             {button.title}
           </ButtonFlat>

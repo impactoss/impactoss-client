@@ -8,14 +8,12 @@ import { palette } from 'styled-theme';
 import { omit } from 'lodash/object';
 
 import asArray from 'utils/as-array';
-import { lowerCase } from 'utils/string';
-import { getEntitySortComparator } from 'utils/sort';
 
 import appMessages from 'containers/App/messages';
 
-import A from 'components/styled/A';
 import Icon from 'components/Icon';
 import FieldFactory from 'components/fields/FieldFactory';
+
 import Button from 'components/buttons/Button';
 import ButtonCancel from 'components/buttons/ButtonCancel';
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
@@ -29,7 +27,6 @@ import Field from 'components/fields/Field';
 import Clear from 'components/styled/Clear';
 
 import UploadControl from '../UploadControl';
-import MultiSelectControl from '../MultiSelectControl';
 import FormWrapper from '../FormWrapper';
 import FormPanel from '../FormPanel';
 import FormFooter from '../FormFooter';
@@ -47,6 +44,7 @@ import MarkdownControl from '../MarkdownControl';
 import DateControl from '../DateControl';
 import RadioControl from '../RadioControl';
 import Required from '../Required';
+import MultiSelectField from '../MultiSelectField';
 
 import messages from './messages';
 
@@ -74,85 +72,6 @@ const ButtonPreDelete = styled(Button)`
   }
 `;
 
-const MultiSelectWrapper = styled.div`
-  position: absolute;
-  top: 38px;
-  right: 0;
-  height:450px;
-  width: 100%;
-  min-width: 350px;
-  overflow: hidden;
-  display: block;
-  z-index: 10;
-  background: ${palette('primary', 4)};
-  border-left: 1px solid ${palette('light', 2)};
-  border-right: 1px solid ${palette('light', 2)};
-  border-bottom: 1px solid ${palette('light', 2)};
-  box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
-`;
-const MultiSelectFieldWrapper = styled.div`
-  position: relative;
-`;
-const MultiselectActiveOptions = styled.div`
-  position: relative;
-`;
-const MultiselectActiveOptionList = styled.div`
-  position: relative;
-`;
-const MultiselectActiveOptionListItem = styled.div`
-  position: relative;
-  background-color: ${palette('primary', 4)};
-  border-bottom: 1px solid ${palette('light', 1)};
-  padding: 12px 0 12px 16px;
-`;
-const MultiselectActiveOptionRemove = styled(Button)`
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: block;
-  padding: 0 16px;
-  bottom: 0;
-  &:hover {
-    color: ${palette('primary', 1)};
-  }
-`;
-const MultiselectActiveOption = styled.div`
-  padding-right: 40px;
-`;
-const MultiSelectDropdownIcon = styled.div`
-  position: absolute;
-  right: 0;
-  top: 0;
-  padding: 12px 16px 0 0;
-`;
-const MultiSelectDropdown = styled(Button)`
-  position: relative;
-  width: 100%;
-  font-size: 0.85em;
-  text-align: left;
-  color: ${palette('dark', 0)};
-  background-color: ${palette('light', 1)};
-  &:hover {
-    color: ${palette('dark', 0)}
-    background-color: ${palette('light', 2)}
-  }
-  padding: 12px 0 12px 16px;
-`;
-
-const MultiSelectWithout = styled.div`
-  padding: 12px 0 12px 16px;
-  color: ${palette('dark', 3)};
-`;
-const MultiSelectWithoutLink = styled(A)`
-  color: ${palette('dark', 3)};
-  &:hover {
-    color: ${palette('linkDefault', 1)};
-  }
-`;
-const Id = styled.div`
-  font-weight: bold;
-  color: ${palette('dark', 3)}
-`;
 const controls = {
   input: ControlInput,
   url: ControlInput,
@@ -171,7 +90,7 @@ const controls = {
 };
 
 // These props will be omitted before being passed to the Control component
-const nonControlProps = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages'];
+const NON_CONTROL_PROPS = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages'];
 
 
 class EntityForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -179,44 +98,16 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   constructor() {
     super();
     this.state = {
-      multiselectOpen: null,
       deleteConfirmed: false,
     };
-  }
-
-  // MULTISELECT
-  onToggleMultiselect = (field) => {
-    this.setState({
-      multiselectOpen: this.state.multiselectOpen !== field.id ? field.id : null,
-    });
-  }
-  onCloseMultiselect = () => {
-    this.setState({
-      multiselectOpen: null,
-    });
-  }
-  onMultiSelectItemRemove = (option, field) => {
-    const fieldData = this.props.formData.getIn(field.dataPath);
-    const formDataUpdated = this.props.formData.setIn(
-      field.dataPath,
-      fieldData.map((d) => {
-        if (option.get('value') === d.get('value')) {
-          return d.set('checked', false);
-        }
-        return d;
-      })
-    );
-    if (this.props.handleUpdate) {
-      this.props.handleUpdate(formDataUpdated);
-    }
   }
 
   getControlProps = (field) => {
     switch (field.controlType) {
       case 'select': // we will render select options as children, so don't pass options prop directly to the control
-        return omit(field, nonControlProps.concat(['options']));
+        return omit(field, NON_CONTROL_PROPS.concat(['options']));
       default:
-        return omit(field, nonControlProps);
+        return omit(field, NON_CONTROL_PROPS);
     }
   }
 
@@ -229,131 +120,19 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     }
     return controls.input; // Default to input type if not specified
   }
-  getOptionSortValueMapper = (option) => {
-    if (option.get('order')) {
-      return option.get('order');
-    }
-    if (option.get('reference')) {
-      return option.get('reference');
-    }
-    return option.get('label');
+
+  preDelete = (confirm = true) => {
+    this.setState({ deleteConfirmed: confirm });
   }
 
-  getMultiSelectActiveOptions = (field, formData) => {
-    // use form data if already loaded
-    if (formData.hasIn(field.dataPath)) {
-      return this.sortOptions(formData.getIn(field.dataPath).filter((o) => o.get('checked')));
-    }
-    // until then use initial options
-    return this.sortOptions(field.options.filter((o) => o.get('checked')));
-  }
-
-  sortOptions = (options) => options.sortBy(
-    (option) => this.getOptionSortValueMapper(option),
-    (a, b) => getEntitySortComparator(a, b, 'asc')
+  renderMultiSelect = (field, formData) => (
+    <MultiSelectField
+      field={field}
+      fieldData={formData.getIn(field.dataPath)}
+      handleUpdate={(fieldData) => this.props.handleUpdate(formData.setIn(field.dataPath, fieldData))}
+    />
   )
 
-  preDelete = (confirm = true) => {
-    this.setState({ deleteConfirmed: confirm });
-  }
-
-  preDelete = (confirm = true) => {
-    this.setState({ deleteConfirmed: confirm });
-  }
-
-  renderMultiSelect = (field, formData) => {
-    const { id, model, ...controlProps } = this.getControlProps(field);
-
-    return (
-      <MultiSelectFieldWrapper>
-        <MultiSelectDropdown
-          onClick={(evt) => {
-            if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-            this.onToggleMultiselect(field);
-          }}
-        >
-          { field.label }
-          <MultiSelectDropdownIcon>
-            <Icon name={this.state.multiselectOpen === id ? 'dropdownClose' : 'dropdownOpen'} />
-          </MultiSelectDropdownIcon>
-        </MultiSelectDropdown>
-        { this.renderMultiselectActiveOptions(field, formData) }
-        { this.state.multiselectOpen === id &&
-          <MultiSelectWrapper>
-            <MultiSelectControl
-              id={id}
-              model={model || `.${id}`}
-              title={`Update ${lowerCase(field.label)}`}
-              onCancel={this.onCloseMultiselect}
-              buttons={[
-                field.onCreate
-                ? {
-                  type: 'addFromMultiselect',
-                  position: 'left',
-                  onClick: field.onCreate,
-                }
-                : null,
-                {
-                  type: 'closeText',
-                  onClick: this.onCloseMultiselect,
-                },
-              ]}
-              {...controlProps}
-            />
-          </MultiSelectWrapper>
-        }
-      </MultiSelectFieldWrapper>
-    );
-  }
-  renderMultiselectActiveOptions = (field, formData) => {
-    const options = this.getMultiSelectActiveOptions(field, formData);
-    return (
-      <MultiselectActiveOptions>
-        {
-          options.size > 0
-          ? (
-            <MultiselectActiveOptionList>
-              { options.map((option, i) => (
-                <MultiselectActiveOptionListItem key={i}>
-                  <MultiselectActiveOption>
-                    { option.get('reference') &&
-                      <Id>{option.get('reference')}</Id>
-                    }
-                    {option.get('label')}
-                  </MultiselectActiveOption>
-                  <MultiselectActiveOptionRemove
-                    onClick={(evt) => {
-                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                      this.onMultiSelectItemRemove(option, field);
-                    }}
-                  >
-                    <Icon name="removeSmall" />
-                  </MultiselectActiveOptionRemove>
-                </MultiselectActiveOptionListItem>
-              )) }
-            </MultiselectActiveOptionList>
-          )
-          : (
-            <MultiSelectWithout>
-              <FormattedMessage
-                {...messages.empty}
-                values={{ entities: lowerCase(field.label) }}
-              />
-              <MultiSelectWithoutLink
-                href="#add"
-                onClick={(evt) => {
-                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.onToggleMultiselect(field);
-                }}
-              >
-                <FormattedMessage {...messages.emptyLink} />
-              </MultiSelectWithoutLink>
-            </MultiSelectWithout>
-          )
-        }
-      </MultiselectActiveOptions>
-    );
-  }
   renderFieldChildren = (field) => {
      // handle known cases here
     switch (field.controlType) {

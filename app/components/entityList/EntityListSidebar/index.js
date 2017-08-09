@@ -141,7 +141,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     } = this.props;
 
     const activeOption = this.state.activeOption;
-    // console.log('Sidebar render', activeOption)
+
     const hasSelected = entityIdsSelected && entityIdsSelected.size > 0;
     const hasEntities = entities && entities.size > 0;
     const formModel = activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL;
@@ -199,6 +199,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           activeOption,
           taxonomies,
           connections,
+          connectedTaxonomies,
           {
             title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.size} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}`,
           }
@@ -242,6 +243,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         { formOptions &&
           <EntityListForm
             model={formModel}
+            activeOptionId={activeOption.optionId}
             formOptions={formOptions}
             buttons={activePanel === EDIT_PANEL
               ? this.getFormButtons(activeOption)

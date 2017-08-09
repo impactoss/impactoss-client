@@ -1,6 +1,7 @@
+import { Map } from 'immutable';
 import { reduce } from 'lodash/collection';
 
-import { cleanupSearchTarget } from 'utils/string';
+import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
 import asList from 'utils/as-list';
 import isNumber from 'utils/is-number';
 
@@ -116,13 +117,37 @@ export const filterEntitiesByAttributes = (entities, query) =>
     , true)
   );
 
+export const filterEntitiesByKeywords = (entities, query, searchAttributes) => {
+  try {
+    const regex = new RegExp(regExMultipleWords(query), 'i');
+    return entities.filter((entity) =>
+      regex.test(prepareEntitySearchTarget(entity, searchAttributes, query.length))
+    );
+  } catch (e) {
+    return entities;
+  }
+};
+
+export const entitiesSetCategoryIds = (entities, entityKey, entityCategories) =>
+  entities && entities.map((entity) => entitySetCategoryIds(entity, entityKey, entityCategories));
+
+export const entitySetCategoryIds = (entity, entityKey, entityCategories) =>
+  entity.set(
+    'categories',
+    entityCategories
+    .filter((association) => attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id')))
+    .map((association) => association.getIn(['attributes', 'category_id']))
+  );
+
 export const entitiesSetAssociated = (entities, entityKey, associations, associationKey, associationId) =>
   entities && entities.map((entity) =>
-    entity.set('associated',
-      associations.find((association) =>
-        attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id'))
-        && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
-      )
+    entitySetAssociated(entity, entityKey, associations, associationKey, associationId));
+
+export const entitySetAssociated = (entity, entityKey, associations, associationKey, associationId) =>
+  entity.set('associated',
+    associations.find((association) =>
+      attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id'))
+      && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
     )
   );
 
@@ -173,6 +198,10 @@ export const prepareTaxonomiesAssociated = (taxonomies, categories, associations
     associationId
   )));
 
+export const prepareTaxonomiesMultiple = (taxonomies, categories, tagsKeys) =>
+  // TODO deal with conflicts
+  reduce(tagsKeys, (memo, tagsKey) => memo.merge(prepareTaxonomies(taxonomies, categories, tagsKey)), Map());
+
 export const prepareTaxonomies = (taxonomies, categories, tagsKey) =>
   taxonomies && taxonomies
   .filter((tax) => tax.getIn(['attributes', tagsKey]))
@@ -207,3 +236,11 @@ export const getEntityReference = (entity, defaultToId = true) =>
       || entity.getIn(['attributes', 'number'])
       || entity.get('id'))
     : (entity.getIn(['attributes', 'reference']) || null);
+
+export const getCategoryShortTitle = (category) =>
+  truncateText(
+    category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
+      ? category.getIn(['attributes', 'short_title'])
+      : category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']),
+    10
+  );

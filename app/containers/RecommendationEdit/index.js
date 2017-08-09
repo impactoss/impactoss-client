@@ -55,6 +55,7 @@ import {
   selectViewEntity,
   selectTaxonomies,
   selectMeasures,
+  selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
@@ -115,7 +116,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       ],
     },
   ]);
-  getBodyMainFields = (entity, measures, onCreateOption) => ([
+  getBodyMainFields = (connectedTaxonomies, entity, measures, onCreateOption) => ([
     {
       fields: [
         getAcceptedField(this.context.intl.formatMessage, appMessages, entity),
@@ -126,7 +127,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures, onCreateOption),
+        renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
       ],
     },
   ]);
@@ -140,7 +141,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, measures, taxonomies, onCreateOption } = this.props;
+    const { viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, taxonomies, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
@@ -204,7 +205,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, measures, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, viewEntity, measures, onCreateOption),
                   aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
@@ -232,6 +233,7 @@ RecommendationEdit.propTypes = {
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
   onCreateOption: PropTypes.func,
+  connectedTaxonomies: PropTypes.object,
 };
 
 RecommendationEdit.contextTypes = {
@@ -244,6 +246,7 @@ const mapStateToProps = (state, props) => ({
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
