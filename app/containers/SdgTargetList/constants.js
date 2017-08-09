@@ -54,6 +54,7 @@ export const CONFIG = {
   connectedTaxonomies: { // filter by each connected category
     query: 'catx',
     search: true,
+    exclude: 'tags_sdgtargets',
     connections: [
       {
         path: 'measures',

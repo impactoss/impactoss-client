@@ -2,7 +2,7 @@ import { reduce } from 'lodash/collection';
 
 // figure out filter groups for filter panel
 export const makeFilterGroups = (
-  filters,
+  config,
   taxonomies,
   connectedTaxonomies,
   activeFilterOption,
@@ -12,7 +12,7 @@ export const makeFilterGroups = (
   const filterGroups = {};
 
   // taxonomy option group
-  if (filters.taxonomies && taxonomies) {
+  if (config.taxonomies && taxonomies) {
     // first prepare taxonomy options
     filterGroups.taxonomies = {
       id: 'taxonomies', // filterGroupId
@@ -31,7 +31,7 @@ export const makeFilterGroups = (
   }
 
   // connectedTaxonomies option group
-  if (filters.connectedTaxonomies) {
+  if (config.connectedTaxonomies) {
     // first prepare taxonomy options
     filterGroups.connectedTaxonomies = {
       id: 'connectedTaxonomies', // filterGroupId
@@ -39,7 +39,7 @@ export const makeFilterGroups = (
       show: true,
       icon: 'connectedCategories',
       options: connectedTaxonomies.reduce((taxOptions, taxonomy) =>
-        filters.connectedTaxonomies.exclude && taxonomy.getIn(['attributes', filters.connectedTaxonomies.exclude])
+        config.connectedTaxonomies.exclude && taxonomy.getIn(['attributes', config.connectedTaxonomies.exclude])
           ? taxOptions
           : ({
             ...taxOptions,
@@ -54,13 +54,13 @@ export const makeFilterGroups = (
   }
 
   // connections option group
-  if (filters.connections) {
+  if (config.connections) {
     // first prepare taxonomy options
     filterGroups.connections = {
       id: 'connections', // filterGroupId
       label: messages.connections,
       show: true,
-      options: reduce(filters.connections.options, (options, option) => ({
+      options: reduce(config.connections.options, (options, option) => ({
         ...options,
         [option.path]: {
           id: option.path, // filterOptionId
@@ -73,13 +73,13 @@ export const makeFilterGroups = (
   }
 
   // attributes
-  if (filters.attributes) {
+  if (config.attributes) {
     // first prepare taxonomy options
     filterGroups.attributes = {
       id: 'attributes', // filterGroupId
       label: messages.attributes,
       show: true,
-      options: reduce(filters.attributes.options, (options, option) => ({
+      options: reduce(config.attributes.options, (options, option) => ({
         ...options,
         [option.attribute]: {
           id: option.attribute, // filterOptionId

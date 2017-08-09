@@ -87,7 +87,7 @@ export const selectConnectedTaxonomies = createSelector(
       // TODO deal with conflicts
       connectedTaxonomies.merge(
         taxonomies
-          .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]) && !taxonomy.getIn(['attributes', 'tags_indicators']))
+          .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]))
           .map((taxonomy) => taxonomy.set(
             'categories',
             categories

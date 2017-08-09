@@ -29,7 +29,6 @@ const Dropdown = styled.div`
   left: 0;
   right: 0;
   width: 100%;
-  top: 100%;
   z-index: 2;
   background-color: ${palette('primary', 4)};
   box-shadow: 0 8px 8px 0 rgba(0,0,0,0.2);

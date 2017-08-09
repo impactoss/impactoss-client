@@ -19,21 +19,21 @@ export const checkedState = (count, length) => {
   return CHECKBOX.UNCHECKED;
 };
 
-export const makeActiveEditOptions = (entities, edits, activeEditOption, taxonomies, connections, connectedTaxonomies, messages) => {
+export const makeActiveEditOptions = (entities, config, activeEditOption, taxonomies, connections, connectedTaxonomies, messages) => {
   // create edit options
   switch (activeEditOption.group) {
     case 'taxonomies':
       return makeTaxonomyEditOptions(entities, taxonomies, activeEditOption, messages);
     case 'connections':
-      return makeConnectionEditOptions(entities, edits, connections, connectedTaxonomies, activeEditOption, messages);
+      return makeConnectionEditOptions(entities, config, connections, connectedTaxonomies, activeEditOption, messages);
     case 'attributes':
-      return makeAttributeEditOptions(entities, edits, activeEditOption, messages);
+      return makeAttributeEditOptions(entities, config, activeEditOption, messages);
     default:
       return null;
   }
 };
 
-export const makeAttributeEditOptions = (entities, edits, activeEditOption, messages) => {
+export const makeAttributeEditOptions = (entities, config, activeEditOption, messages) => {
   const editOptions = {
     groupId: 'attributes',
     search: true,
@@ -43,7 +43,7 @@ export const makeAttributeEditOptions = (entities, edits, activeEditOption, mess
     required: true,
   };
 
-  const option = find(edits.attributes.options, (o) => o.attribute === activeEditOption.optionId);
+  const option = find(config.attributes.options, (o) => o.attribute === activeEditOption.optionId);
   if (option) {
     editOptions.title = messages.title;
     editOptions.search = option.search;
@@ -97,8 +97,8 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
   return editOptions;
 };
 
-export const makeConnectionEditOptions = (entities, edits, connections, connectedTaxonomies, activeEditOption, messages) => {
-  const option = find(edits.connections.options, (o) => o.path === activeEditOption.optionId);
+export const makeConnectionEditOptions = (entities, config, connections, connectedTaxonomies, activeEditOption, messages) => {
+  const option = find(config.connections.options, (o) => o.path === activeEditOption.optionId);
 
   const editOptions = {
     groupId: 'connections',
