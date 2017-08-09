@@ -125,10 +125,6 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     this.setState({ deleteConfirmed: confirm });
   }
 
-  preDelete = (confirm = true) => {
-    this.setState({ deleteConfirmed: confirm });
-  }
-
   renderMultiSelect = (field, formData) => (
     <MultiSelectField
       field={field}
