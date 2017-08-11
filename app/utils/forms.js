@@ -388,7 +388,7 @@ export const getTextareaField = (formatMessage, appMessages, attribute = 'descri
 export const getDateField = (formatMessage, appMessages, attribute) => {
   const field = getFormField(formatMessage, appMessages, 'date', attribute, false, attribute, 'date');
   field.validators.date = validateDateFormat;
-  field.errorMessages.required = formatMessage(appMessages.forms.dateFormatError);
+  field.errorMessages.date = formatMessage(appMessages.forms.dateFormatError);
   return field;
 };
 

@@ -26,6 +26,7 @@ import FieldWrap from 'components/fields/FieldWrap';
 import Field from 'components/fields/Field';
 import Clear from 'components/styled/Clear';
 
+import ErrorWrapper from '../ErrorWrapper';
 import UploadControl from '../UploadControl';
 import FormWrapper from '../FormWrapper';
 import FormPanel from '../FormPanel';
@@ -171,6 +172,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     </FieldWrap>
   );
   renderFormField = (field, nested) => {
+    // field.controlType === 'date' && console.log('field', field)
     let formField;
     if (!field.controlType) {
       formField = this.renderComponent(field);
@@ -228,12 +230,14 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
               {this.renderFormField(field)}
               {
                 field.errorMessages &&
-                <Errors
-                  className="errors"
-                  model={field.model}
-                  show="touched"
-                  messages={field.errorMessages}
-                />
+                <ErrorWrapper>
+                  <Errors
+                    className="errors"
+                    model={field.model}
+                    show={(fieldValue) => fieldValue.touched || !fieldValue.pristine}
+                    messages={field.errorMessages}
+                  />
+                </ErrorWrapper>
               }
             </Field>
           )
@@ -271,7 +275,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
 
     return (
       <FormWrapper withoutShadow={inModal}>
-        <Form model={model} onSubmit={handleSubmit} >
+        <Form model={model} onSubmit={handleSubmit}>
           { fields.header &&
             <FormPanel borderBottom>
               { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside) }
