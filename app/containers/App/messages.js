@@ -53,7 +53,7 @@ export default defineMessages({
     },
     dateFormatError: {
       id: 'app.containers.App.forms.dateFormatError',
-      defaultMessage: 'Please enter the date in the required format: dd/mm/yyyy',
+      defaultMessage: 'Please enter the date in the required format: dd/mm/yyyy', // change to format according to locale
     },
     numberError: {
       id: 'app.containers.App.forms.numberError',

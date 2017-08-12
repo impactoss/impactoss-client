@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { toLower } from 'lodash/string';
 
 import moment from 'moment/min/moment-with-locales';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import 'react-day-picker/lib/style.css';
+// Import Styles
+import './styles';
 
 import { DB_DATE_FORMAT } from 'containers/App/constants';
 
@@ -11,30 +13,25 @@ import InputComponent from './InputComponent';
 
 class DatePicker extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    // console.log('DatePicker', this.props)
-    const format = moment.localeData(this.context.intl.locale).longDateFormat('L');
+    const localeFormat = moment.localeData(this.context.intl.locale).longDateFormat('L');
 
     const formattedDay = this.props.value && moment(this.props.value, DB_DATE_FORMAT, true).isValid()
-      ? moment(this.props.value).format(format)
+      ? moment(this.props.value).format(localeFormat)
       : this.props.value;
-    // console.log('formattedDay', formattedDay)
-    // onBlur={(evt) => {
-    //   console.log('onBlur', evt.target.value)
-    //   // (!evt.target.value || evt.target.value.format) &&
-    //   this.props.onBlur(evt.target.value)
-    // }}
 
     return (
       <DayPickerInput
         value={formattedDay}
-        onDayChange={(value) => value && value.format && this.props.onChange(value.format(DB_DATE_FORMAT))}
         onChange={(evt) => this.props.onChange(evt.target.value)}
-        format={format}
+        onDayChange={(value) => value && value.format && this.props.onChange(value.format(DB_DATE_FORMAT))}
+        format={localeFormat}
         component={InputComponent}
-        placeholder={format}
+        placeholder={toLower(localeFormat)}
         dayPickerProps={{
           locale: this.context.intl.locale,
           firstDayOfWeek: moment.localeData(this.context.intl.locale).firstDayOfWeek(),
+          fixedWeeks: true,
+          // todayButton: 'Go to Today',
         }}
       />
     );

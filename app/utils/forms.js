@@ -6,6 +6,7 @@ import {
 } from 'utils/entities';
 import isInteger from 'utils/is-integer';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+import { validateDateFormat } from 'components/forms/validators/validate-date-format';
 import {
   PUBLISH_STATUSES,
   REPORT_FREQUENCIES,
@@ -170,13 +171,6 @@ export const renderTaxonomyControl = (taxonomies, onCreateOption) => taxonomies
 export const validateRequired = (val) => val !== null && val && val.length;
 
 export const validateNumber = isInteger;
-
-export const validateDateFormat = (val) => {
-  if (!val) return true;
-  // yyyy-mm-dd
-  const dateformat = /^\d{4}[-](0?[1-9]|1[012])[-](0?[1-9]|[12][0-9]|3[01])$/;
-  return val.match(dateformat);
-};
 
 const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
   ? getAssociatedEntities(taxonomy.get('categories'))
