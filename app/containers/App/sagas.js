@@ -134,7 +134,6 @@ export function* checkRoleSaga({ role }) {
 
 export function* authenticateSaga(payload) {
   const { password, email } = payload.data;
-
   try {
     yield put(authenticateSending());
     const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
@@ -213,7 +212,6 @@ export function* logoutSaga() {
     yield put(invalidateEntities());
   } catch (err) {
     yield call(clearAuthValues);
-      // TODO ensure this is displayed
     yield put(authenticateError(err));
   }
 }

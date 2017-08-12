@@ -45,6 +45,8 @@ export function checkErrorMessagesExist(response) {
     return response.json.errors.full_messages;
   } else if (response && response.json && response.json.errors) {
     return response.json.errors;
+  } else if (response && response.json && response.json.error) {
+    return [response.json.error];
   }
   return [];
 }
