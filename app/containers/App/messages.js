@@ -127,10 +127,6 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.number',
       defaultMessage: 'ID',
     },
-    date: {
-      id: 'app.containers.App.placeholders.date',
-      defaultMessage: 'dd/mm/yyyy',
-    },
   },
   attributes: {
     draft: {
