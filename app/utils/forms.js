@@ -6,6 +6,9 @@ import {
 } from 'utils/entities';
 import isInteger from 'utils/is-integer';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+import validateDateFormat from 'components/forms/validators/validate-date-format';
+import validateRequired from 'components/forms/validators/validate-required';
+
 import {
   PUBLISH_STATUSES,
   REPORT_FREQUENCIES,
@@ -166,17 +169,6 @@ export const renderTaxonomyControl = (taxonomies, onCreateOption) => taxonomies
     : null,
 }), [])
 : [];
-
-export const validateRequired = (val) => val !== null && val && val.length;
-
-export const validateNumber = isInteger;
-
-export const validateDateFormat = (val) => {
-  if (!val) return true;
-  // yyyy-mm-dd
-  const dateformat = /^\d{4}[-](0?[1-9]|1[012])[-](0?[1-9]|[12][0-9]|3[01])$/;
-  return val.match(dateformat);
-};
 
 const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
   ? getAssociatedEntities(taxonomy.get('categories'))
@@ -374,7 +366,7 @@ export const getMenuTitleFormField = (formatMessage, appMessages) =>
 
 export const getMenuOrderFormField = (formatMessage, appMessages) => {
   const field = getFormField(formatMessage, appMessages, 'short', 'order', false); // required
-  field.validators.number = validateNumber;
+  field.validators.number = isInteger;
   field.errorMessages.number = formatMessage(appMessages.forms.numberError);
   return field;
 };
@@ -388,7 +380,7 @@ export const getTextareaField = (formatMessage, appMessages, attribute = 'descri
 export const getDateField = (formatMessage, appMessages, attribute) => {
   const field = getFormField(formatMessage, appMessages, 'date', attribute, false, attribute, 'date');
   field.validators.date = validateDateFormat;
-  field.errorMessages.required = formatMessage(appMessages.forms.dateFormatError);
+  field.errorMessages.date = formatMessage(appMessages.forms.dateFormatError);
   return field;
 };
 
@@ -397,7 +389,7 @@ export const getCheckboxField = (formatMessage, appMessages, attribute, entity) 
     id: attribute,
     controlType: 'checkbox',
     model: `.attributes.${attribute}`,
-    label: formatMessage(appMessages.attributes[attribute]),
+    label: appMessages.attributes[attribute] && formatMessage(appMessages.attributes[attribute]),
     value: entity ? entity.getIn(['attributes', attribute]) : false,
   });
 
@@ -412,8 +404,8 @@ export const getFormField = (formatMessage, appMessages, controlType, attribute,
     id: attribute,
     controlType,
     model: `.attributes.${attribute}`,
-    placeholder: formatMessage(appMessages.placeholders[placeholder || attribute]),
-    label: formatMessage(appMessages.attributes[label || attribute]),
+    placeholder: appMessages.placeholders[placeholder || attribute] && formatMessage(appMessages.placeholders[placeholder || attribute]),
+    label: appMessages.attributes[label || attribute] && formatMessage(appMessages.attributes[label || attribute]),
     validators: {},
     errorMessages: {},
     hint,

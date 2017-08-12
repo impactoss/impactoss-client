@@ -7,10 +7,10 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   expand: {
     id: 'app.containers.EntityListGroup.expand',
-    defaultMessage: 'Expand',
+    defaultMessage: 'Implementation view',
   },
   collapse: {
     id: 'app.containers.EntityListGroup.collapse',
-    defaultMessage: 'List View',
+    defaultMessage: 'List view',
   },
 });
