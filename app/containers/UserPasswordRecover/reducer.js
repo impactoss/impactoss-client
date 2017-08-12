@@ -5,7 +5,7 @@
  */
 
 import { fromJS } from 'immutable';
-import { checkErrorMessagesExist } from 'utils/request';
+import { checkResponseError } from 'utils/request';
 
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
@@ -38,7 +38,7 @@ function passwordRecoverReducer(state = initialState, action) {
       return state
         .set('sending', false)
         .set('success', false)
-        .set('error', checkErrorMessagesExist(action.error.response));
+        .set('error', checkResponseError(action.error));
     default:
       return state;
   }

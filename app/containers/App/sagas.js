@@ -28,6 +28,7 @@ import {
   // RESET_PASSWORD,
   RECOVER_PASSWORD,
   CLOSE_ENTITY,
+  RECORD_OUTDATED,
 } from 'containers/App/constants';
 
 import {
@@ -145,35 +146,6 @@ export function* authenticateSaga(payload) {
     yield put(authenticateError(err));
   }
 }
-// moved to UserPasswordReset
-//
-// export function* resetSaga(payload) {
-//   const { password, passwordConfirmation } = payload.data;
-//   try {
-//     const location = yield select(selectLocation);
-//     const query = location.get('query');
-//     yield call(
-//       apiRequest,
-//       'put',
-//       'auth/password',
-//       {
-//         password,
-//         password_confirmation: passwordConfirmation,
-//       },
-//       {
-//         client: query.get('client_id'),
-//         reset_password: query.get('reset_password'),
-//         'access-token': query.get('token'),
-//         uid: query.get('uid'),
-//         expiry: query.get('expiry'),
-//       }
-//     );
-//     yield put(push('/login'));
-//   } catch (err) {
-//     err.response.json = yield err.response.json();
-//     // yield put(authenticateError(err));
-//   }
-// }
 
 export function* recoverSaga(payload) {
   const { email } = payload.data;
@@ -350,9 +322,12 @@ export function* saveEntitySaga({ data }) {
 
     yield put(saveSuccess(data));
     yield put(push(data.redirect));
-  } catch (error) {
-    yield put(saveError('Error saving data', data));
-    yield put(invalidateEntities());
+  } catch (err) {
+    err.response.json = yield err.response.json();
+    yield put(saveError(err, data));
+    if (err.response.json && err.response.json.error === RECORD_OUTDATED) {
+      yield put(invalidateEntities());
+    }
   }
 }
 
@@ -363,9 +338,9 @@ export function* deleteEntitySaga({ data }) {
     yield put(push(`/${data.redirect || data.path}`));
     yield put(removeEntity(data.path, data.id));
     yield put(deleteSuccess(data));
-  } catch (error) {
-    // console.error(error);
-    yield put(deleteError('Error deleting data', data));
+  } catch (err) {
+    err.response.json = yield err.response.json();
+    yield put(deleteError(err, data));
   }
 }
 
@@ -455,10 +430,9 @@ export function* newEntitySaga({ data }) {
     if (data.redirect) {
       yield put(push(`${data.redirect}/${entityCreated.data.id}`));
     }
-  } catch (error) {
-    // console.error(error);
-    yield put(saveError('Error saving data', data));
-    yield put(invalidateEntities());
+  } catch (err) {
+    err.response.json = yield err.response.json();
+    yield put(saveError(err, data));
   }
 }
 
@@ -471,8 +445,9 @@ export function* saveEntitiesSaga({ data }) {
     // // and on the client
     yield put(updateEntities(data.path, entitiesUpdated));
     yield put(saveSuccess(data));
-  } catch (error) {
-    yield put(saveError('Error saving data', data));
+  } catch (err) {
+    err.response.json = yield err.response.json();
+    yield put(saveError(err, data));
     yield put(invalidateEntities());
   }
 }
@@ -485,8 +460,9 @@ export function* saveConnectionsSaga({ data }) {
     // and on the client
     yield put(updateConnections(data.path, connectionsUpdated));
     yield put(saveSuccess(data));
-  } catch (error) {
-    yield put(saveError('Error saving data', data));
+  } catch (err) {
+    err.response.json = yield err.response.json();
+    yield put(saveError(err, data));
     yield put(invalidateEntities());
   }
 }

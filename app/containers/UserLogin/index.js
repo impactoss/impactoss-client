@@ -12,6 +12,7 @@ import Helmet from 'react-helmet';
 import styled from 'styled-components';
 import { actions as formActions } from 'react-redux-form/immutable';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Icon from 'components/Icon';
 import ContentNarrow from 'components/ContentNarrow';
@@ -37,7 +38,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
     this.props.initialiseForm();
   }
   render() {
-    const { error, messages: message, sending } = this.props.authentication;
+    const { error, sending } = this.props.authentication;
     const required = (val) => val && val.length;
 
     return (
@@ -56,9 +57,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
           {error &&
-            message.map((errorMessage, i) =>
-              <p key={i}>{errorMessage}</p>
-            )
+            <ErrorMessages error={error} />
           }
           {sending &&
             <Loading />

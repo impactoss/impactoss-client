@@ -5,7 +5,7 @@
  */
 
 import { fromJS } from 'immutable';
-import { checkErrorMessagesExist } from 'utils/request';
+import { checkResponseError } from 'utils/request';
 
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
@@ -37,7 +37,7 @@ function userRegisterReducer(state = initialState, action) {
       return state
         .set('registerSending', false)
         .set('registerSuccess', false)
-        .set('registerError', checkErrorMessagesExist(action.error.response));
+        .set('registerError', checkResponseError(action.error));
     default:
       return state;
   }

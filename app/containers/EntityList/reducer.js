@@ -17,6 +17,8 @@ import {
   EDIT_PANEL,
 } from 'containers/App/constants';
 
+import { checkResponseError } from 'utils/request';
+
 import {
   SHOW_PANEL,
   RESET_STATE,
@@ -74,7 +76,7 @@ function entityListReducer(state = initialState, action) {
       return state
         .set('saveSending', false)
         .set('saveSuccess', false)
-        .set('saveError', action.error);
+        .set('saveError', checkResponseError(action.error));
     default:
       return state;
   }

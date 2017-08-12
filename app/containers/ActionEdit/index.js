@@ -51,6 +51,7 @@ import {
   selectIsUserAdmin,
 } from 'containers/App/selectors';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -200,14 +201,14 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               : null
             }
           />
-          {(saveSending || deleteSending || !dataReady) &&
-            <Loading />
-          }
           {saveError &&
-            <p>{saveError}</p>
+            <ErrorMessages error={saveError} />
           }
           {deleteError &&
-            <p>{deleteError}</p>
+            <ErrorMessages error={deleteError} />
+          }
+          {(saveSending || deleteSending || !dataReady) &&
+            <Loading />
           }
           {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>

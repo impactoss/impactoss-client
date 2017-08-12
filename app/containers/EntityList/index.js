@@ -11,6 +11,7 @@ import { palette } from 'styled-theme';
 
 import { Map, List, fromJS } from 'immutable';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Sidebar from 'components/styled/Sidebar';
 
@@ -109,7 +110,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         }
         {this.props.viewDomain.saveError &&
           <Progress>
-            <p>{this.props.viewDomain.saveError}</p>
+            <ErrorMessages error={this.props.viewDomain.saveError} />
           </Progress>
         }
         <EntityListMain

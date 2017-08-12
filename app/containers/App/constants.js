@@ -11,6 +11,7 @@
 
 export const DEFAULT_LOCALE = 'en-GB';
 export const DB_DATE_FORMAT = 'YYYY-MM-DD';
+export const RECORD_OUTDATED = 'Record outdated';
 
 export const REDIRECT_IF_NOT_PERMITTED = 'nmrf/App/REDIRECT_IF_NOT_PERMITTED';
 export const LOAD_ENTITIES_IF_NEEDED = 'nmrf/App/LOAD_ENTITIES_IF_NEEDED';

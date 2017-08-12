@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import Icon from 'components/Icon';
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
@@ -55,7 +56,7 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
           {error &&
-            <p>{error}</p>
+            <ErrorMessages error={error} />
           }
           {sending &&
             <Loading />

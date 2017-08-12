@@ -9,6 +9,8 @@ import {
   DELETE_SUCCESS,
 } from 'containers/App/constants';
 
+import { checkResponseError } from 'utils/request';
+
 const initialState = fromJS({
   saveSending: false,
   saveSuccess: false,
@@ -33,7 +35,7 @@ export const entityFormReducer = (state = initialState, action) => {
       return state
         .set('saveSending', false)
         .set('saveSuccess', false)
-        .set('saveError', action.error);
+        .set('saveError', checkResponseError(action.error));
     case DELETE_SENDING:
       return state
         .set('deleteSending', true)
@@ -47,7 +49,7 @@ export const entityFormReducer = (state = initialState, action) => {
       return state
         .set('deleteSending', false)
         .set('deleteSuccess', false)
-        .set('deleteError', action.error);
+        .set('deleteError', checkResponseError(action.error));
     default:
       return state;
   }

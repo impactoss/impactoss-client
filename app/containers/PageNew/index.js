@@ -29,6 +29,7 @@ import {
 } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -107,13 +108,10 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
               }] : null
             }
           />
-          {saveSending &&
-            <Loading />
-          }
           {saveError &&
-            <p>{saveError}</p>
+            <ErrorMessages error={saveError} />
           }
-          { !dataReady &&
+          {(saveSending || !dataReady) &&
             <Loading />
           }
           {dataReady &&

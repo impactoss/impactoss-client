@@ -41,6 +41,7 @@ import {
 import { CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -153,13 +154,10 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               }]
             }
           />
-          {saveSending &&
-            <Loading />
-          }
           {saveError &&
-            <p>{saveError}</p>
+            <ErrorMessages error={saveError} />
           }
-          { !dataReady &&
+          {(saveSending || !dataReady) &&
             <Loading />
           }
           {!viewEntity && dataReady && !saveError &&
