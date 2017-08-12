@@ -4,12 +4,12 @@ import { toLower } from 'lodash/string';
 
 import moment from 'moment/min/moment-with-locales';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-// Import Styles
-import './styles';
-
 import { DB_DATE_FORMAT } from 'containers/App/constants';
 
 import InputComponent from './InputComponent';
+
+// Import DayPicker styles
+import './styles';
 
 class DatePicker extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {

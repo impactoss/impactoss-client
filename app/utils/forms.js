@@ -6,7 +6,9 @@ import {
 } from 'utils/entities';
 import isInteger from 'utils/is-integer';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
-import { validateDateFormat } from 'components/forms/validators/validate-date-format';
+import validateDateFormat from 'components/forms/validators/validate-date-format';
+import validateRequired from 'components/forms/validators/validate-required';
+
 import {
   PUBLISH_STATUSES,
   REPORT_FREQUENCIES,
@@ -167,10 +169,6 @@ export const renderTaxonomyControl = (taxonomies, onCreateOption) => taxonomies
     : null,
 }), [])
 : [];
-
-export const validateRequired = (val) => val !== null && val && val.length;
-
-export const validateNumber = isInteger;
 
 const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
   ? getAssociatedEntities(taxonomy.get('categories'))
@@ -368,7 +366,7 @@ export const getMenuTitleFormField = (formatMessage, appMessages) =>
 
 export const getMenuOrderFormField = (formatMessage, appMessages) => {
   const field = getFormField(formatMessage, appMessages, 'short', 'order', false); // required
-  field.validators.number = validateNumber;
+  field.validators.number = isInteger;
   field.errorMessages.number = formatMessage(appMessages.forms.numberError);
   return field;
 };
