@@ -56,6 +56,10 @@ export function checkResponseError(error) {
     };
 }
 
+function mapErrors(errors) {
+  return map(errors, (error, key) => `${capitalize(key)}: ${error}`);
+}
+
 export function checkErrorMessagesExist(response) {
   if (response && response.json && response.json.errors && response.json.errors.full_messages) {
     return response.json.errors.full_messages;
@@ -63,8 +67,12 @@ export function checkErrorMessagesExist(response) {
     return response.json.errors;
   } else if (response && response.json && response.json.error) {
     return response.json.error === Object(response.json.error)
-      ? map(response.json.error, (error, key) => `${capitalize(key)}: ${error}`)
+      ? mapErrors(response.json.errors)
       : [response.json.error];
+  } else if (response && response.json) {
+    return response.json === Object(response.json)
+      ? mapErrors(response.json)
+      : [response.json];
   }
   return [];
 }

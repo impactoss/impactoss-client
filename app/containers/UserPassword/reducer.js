@@ -3,8 +3,9 @@
  * UserPassword reducer
  *
  */
-
 import { fromJS } from 'immutable';
+import { LOCATION_CHANGE } from 'react-router-redux';
+
 import { checkResponseError } from 'utils/request';
 
 import { combineReducers } from 'redux-immutable';
@@ -24,6 +25,8 @@ const initialState = fromJS({
 
 function userPasswordReducer(state = initialState, action) {
   switch (action.type) {
+    case LOCATION_CHANGE:
+      return initialState;
     case PASSWORD_SENDING:
       return state
         .set('passwordSending', true)

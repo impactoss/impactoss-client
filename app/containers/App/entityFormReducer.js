@@ -1,4 +1,5 @@
 import { fromJS } from 'immutable';
+import { LOCATION_CHANGE } from 'react-router-redux';
 
 import {
   SAVE_SENDING,
@@ -22,6 +23,8 @@ const initialState = fromJS({
 
 export const entityFormReducer = (state = initialState, action) => {
   switch (action.type) {
+    case LOCATION_CHANGE:
+      return initialState;
     case SAVE_SENDING:
       return state
         .set('saveSending', true)

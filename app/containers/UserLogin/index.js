@@ -21,7 +21,6 @@ import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
 import { updatePath } from 'containers/App/actions';
-import { selectAuth } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -38,9 +37,8 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
     this.props.initialiseForm();
   }
   render() {
-    const { error, sending } = this.props.authentication;
+    const { authError, authSending } = this.props.viewDomain.page;
     const required = (val) => val && val.length;
-
     return (
       <div>
         <Helmet
@@ -56,10 +54,10 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
-          {error &&
-            <ErrorMessages error={error} />
+          {authError &&
+            <ErrorMessages error={authError} />
           }
-          {sending &&
+          {authSending &&
             <Loading />
           }
           { this.props.viewDomain.form &&
@@ -132,7 +130,6 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
 
 UserLogin.propTypes = {
   viewDomain: PropTypes.object.isRequired,
-  authentication: PropTypes.object,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
@@ -145,7 +142,6 @@ UserLogin.contextTypes = {
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
-  authentication: selectAuth(state),
 });
 
 export function mapDispatchToProps(dispatch) {

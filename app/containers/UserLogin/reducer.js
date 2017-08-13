@@ -5,10 +5,12 @@
  */
 
 import { fromJS } from 'immutable';
-// import { checkErrorMessagesExist } from 'utils/request';
+import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
+
+import { checkResponseError } from 'utils/request';
 
 import {
   AUTHENTICATE_SENDING,
@@ -23,6 +25,8 @@ const initialState = fromJS({
 });
 function userLoginReducer(state = initialState, action) {
   switch (action.type) {
+    case LOCATION_CHANGE:
+      return initialState;
     case AUTHENTICATE_SENDING:
       return state
         .set('authSending', true)
@@ -36,7 +40,7 @@ function userLoginReducer(state = initialState, action) {
       return state
         .set('authSending', false)
         .set('authSuccess', false)
-        .set('authError', action.error);
+        .set('authError', checkResponseError(action.error));
     default:
       return state;
   }

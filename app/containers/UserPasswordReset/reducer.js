@@ -4,6 +4,7 @@
  *
  */
 
+import { LOCATION_CHANGE } from 'react-router-redux';
 import { fromJS } from 'immutable';
 import { checkResponseError } from 'utils/request';
 
@@ -24,6 +25,8 @@ const initialState = fromJS({
 
 function userResetReducer(state = initialState, action) {
   switch (action.type) {
+    case LOCATION_CHANGE:
+      return initialState;
     case RESET_PASSWORD_SENDING:
       return state
         .set('resetSending', true)
