@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { reduce } from 'lodash/collection';
 
 import { Map, List, fromJS } from 'immutable';
 
@@ -25,8 +26,6 @@ import {
   openNewEntityModal,
 } from 'containers/App/actions';
 
-import { checkResponseError } from 'utils/request';
-
 import appMessages from 'containers/App/messages';
 import { PARAMS } from 'containers/App/constants';
 
@@ -38,6 +37,7 @@ import {
 
 import {
   resetState,
+  resetProgress,
   showPanel,
   save,
   newConnection,
@@ -68,49 +68,40 @@ const Progress = styled.div`
 `;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor() {
-    super();
-    this.state = {
-      sending: 0,
-      succeeded: {},
-      failed: {},
-    };
-  }
+
   componentWillMount() {
     this.props.resetStateOnMount();
   }
   componentWillReceiveProps(nextProps) {
-    // if (nextProps.formData.get('import') === null || this.props.formData.get('import') === null) {
-    //   this.setState({
-    //     succeeded: {},
-    //     failed: {},
-    //   });
-    // } else {
-    if (nextProps.viewDomain.success) {
-      this.state.succeeded[nextProps.viewDomain.success.data.timestamp] = nextProps.viewDomain.success;
+    if (Object.keys(nextProps.viewDomain.sending).length > 0
+      && Object.keys(nextProps.viewDomain.errors).length === 0
+      && this.computeProgress(nextProps.viewDomain) > 99.9
+    ) {
+      this.props.resetProgress();
     }
-    if (nextProps.error) {
-      this.state.failed[nextProps.viewDomain.success.data.timestamp] = checkResponseError(nextProps.viewDomain.error.error);
-    }
-    // }
   }
+
   formatLabel = (path) => {
     const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
     return this.context.intl.formatMessage(message);
   }
+
+  computeProgress = ({ sending, success, errors }) =>
+    Object.keys(sending).length > 0
+      ? ((Object.keys(success).length + Object.keys(errors).length) / Object.keys(sending).length) * 100
+      : null;
+
   render() {
     // make sure selected entities are still actually on page
-    const { entityIdsSelected, entities } = this.props;
-    const { sending, failed, succeeded } = this.state;
+    const { entityIdsSelected, entities, viewDomain } = this.props;
+    const { errors } = viewDomain;
 
     const entityIdsSelectedFiltered = entityIdsSelected.size > 0 && entities
       ? entityIdsSelected.filter((id) => entities.map((entity) => entity.get('id')).includes(id))
       : entityIdsSelected;
 
-    const progress = sending > 0
-      ? ((Object.keys(failed).length + Object.keys(succeeded).length) / sending) * 100
-      : null;
-    // console.log(progress)
+    const progress = this.computeProgress(viewDomain);
+
     return (
       <div>
         <Sidebar>
@@ -137,16 +128,24 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             />
           }
         </Sidebar>
-        { progress &&
+        { (progress && progress < 100) &&
           <Progress>
             <Loading
               progress={progress}
             />
           </Progress>
         }
-        {this.props.viewDomain.saveError &&
+        {(Object.keys(errors).length > 0) &&
           <Progress error>
-            <ErrorMessages error={this.props.viewDomain.saveError} />
+            <ErrorMessages
+              error={{
+                messages: reduce(errors, (memo, error) => error.messages
+                  ? memo.concat(error.messages)
+                  : memo
+                , []),
+              }}
+              onDismiss={this.props.resetProgress}
+            />
           </Progress>
         }
         <EntityListMain
@@ -219,6 +218,7 @@ EntityList.propTypes = {
   onPageItemsSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
   resetStateOnMount: PropTypes.func.isRequired,
+  resetProgress: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
@@ -239,6 +239,9 @@ function mapDispatchToProps(dispatch, props) {
   return {
     resetStateOnMount: () => {
       dispatch(resetState());
+    },
+    resetProgress: () => {
+      dispatch(resetProgress());
     },
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));

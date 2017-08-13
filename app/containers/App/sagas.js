@@ -101,6 +101,8 @@ export function* checkEntitiesSaga(payload) {
         if (response) {
           // Save response
           yield put(entitiesLoaded(keyBy(response.data, 'id'), payload.path, Date.now()));
+        } else {
+          yield call(checkEntitiesSaga, payload);
         }
       }
     } catch (err) {
@@ -334,7 +336,7 @@ export function* saveEntitySaga({ data }) {
     err.response.json = yield err.response.json();
     yield put(saveError(err, dataTS));
     if (err.response.json && err.response.json.error === RECORD_OUTDATED) {
-      yield put(invalidateEntities());
+      yield put(invalidateEntities(data.path));
     }
   }
 }
@@ -477,7 +479,7 @@ export function* saveConnectionsSaga({ data }) {
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(saveError(err, dataTS));
-    yield put(invalidateEntities());
+    yield put(invalidateEntities(data.path));
   }
 }
 

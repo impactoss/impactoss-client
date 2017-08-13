@@ -62,7 +62,12 @@ class ErrorMessages extends React.PureComponent { // eslint-disable-line react/p
           </MessageWrapper>
         }
         <DismissWrapper>
-          <Dismiss onClick={() => this.setState({ dismiss: true })}>
+          <Dismiss
+            onClick={() => {
+              this.setState({ dismiss: true });
+              if (this.props.onDismiss) this.props.onDismiss();
+            }}
+          >
             <Icon name="removeLarge" />
           </Dismiss>
         </DismissWrapper>
@@ -73,6 +78,7 @@ class ErrorMessages extends React.PureComponent { // eslint-disable-line react/p
 
 ErrorMessages.propTypes = {
   error: PropTypes.object,
+  onDismiss: PropTypes.func,
 };
 
 export default ErrorMessages;

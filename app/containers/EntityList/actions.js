@@ -10,6 +10,7 @@ import {
   NEW_CONNECTION,
   DELETE_CONNECTION,
   RESET_STATE,
+  RESET_PROGRESS,
   ENTITY_SELECTED,
   ENTITIES_SELECT,
   UPDATE_QUERY,
@@ -50,6 +51,12 @@ export function deleteConnection(data) {
 export function resetState() {
   return {
     type: RESET_STATE,
+  };
+}
+
+export function resetProgress() {
+  return {
+    type: RESET_PROGRESS,
   };
 }
 

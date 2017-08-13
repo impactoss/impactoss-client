@@ -13,6 +13,7 @@ export const SAVE = 'nmrf/EntityList/SAVE';
 export const NEW_CONNECTION = 'nmrf/EntityList/NEW_CONNECTION';
 export const DELETE_CONNECTION = 'nmrf/EntityList/DELETE_CONNECTION';
 export const RESET_STATE = 'nmrf/EntityList/RESET_STATE';
+export const RESET_PROGRESS = 'nmrf/EntityList/RESET_PROGRESS';
 export const ENTITY_SELECTED = 'nmrf/EntityList/ENTITY_SELECTED';
 export const ENTITIES_SELECT = 'nmrf/EntityList/ENTITIES_SELECT';
 export const UPDATE_QUERY = 'nmrf/EntityList/UPDATE_QUERY';
