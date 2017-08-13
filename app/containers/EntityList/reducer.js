@@ -13,11 +13,12 @@ import {
   SAVE_SENDING,
   SAVE_ERROR,
   SAVE_SUCCESS,
+  DELETE_SENDING,
+  DELETE_ERROR,
+  DELETE_SUCCESS,
   FILTERS_PANEL,
   EDIT_PANEL,
 } from 'containers/App/constants';
-
-import { checkResponseError } from 'utils/request';
 
 import {
   SHOW_PANEL,
@@ -29,9 +30,9 @@ import {
 const initialState = fromJS({
   activePanel: FILTERS_PANEL,
   entitiesSelected: [],
-  saveSending: false,
-  saveSuccess: false,
-  saveError: false,
+  sending: false,
+  success: false,
+  error: false,
 });
 
 function entityListReducer(state = initialState, action) {
@@ -63,20 +64,15 @@ function entityListReducer(state = initialState, action) {
       return state.getIn(['route', 'locationBeforeTransition', 'pathname']) === state.getIn(['route', 'locationBeforeTransition', 'pathnamePrevious'])
         ? state.set('entitiesSelected', List())
         : state;
+    case DELETE_SENDING:
     case SAVE_SENDING:
-      return state
-        .set('saveSending', true)
-        .set('saveSuccess', false)
-        .set('saveError', false);
+      return state.set('sending', action);
+    case DELETE_SUCCESS:
     case SAVE_SUCCESS:
-      return state
-        .set('saveSending', false)
-        .set('saveSuccess', true);
+      return state.set('success', action);
+    case DELETE_ERROR:
     case SAVE_ERROR:
-      return state
-        .set('saveSending', false)
-        .set('saveSuccess', false)
-        .set('saveError', checkResponseError(action.error));
+      return state.set('error', action);
     default:
       return state;
   }

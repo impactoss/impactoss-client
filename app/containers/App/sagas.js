@@ -20,7 +20,6 @@ import {
   VALIDATE_TOKEN,
   INVALIDATE_ENTITIES,
   SAVE_CONNECTIONS,
-  SAVE_ENTITIES,
   UPDATE_ROUTE_QUERY,
   AUTHENTICATE_FORWARD,
   USER_ROLES,
@@ -41,7 +40,6 @@ import {
   entitiesRequested,
   invalidateEntities,
   updateEntity,
-  updateEntities,
   updateConnections,
   addEntity,
   removeEntity,
@@ -71,7 +69,6 @@ import {
   newEntityRequest,
   deleteEntityRequest,
   updateEntityRequest,
-  updateEntitiesRequest,
   updateAssociationsRequest,
 } from 'utils/entities-update';
 import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
@@ -207,7 +204,15 @@ export function* validateTokenSaga() {
   }
 }
 
-export function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
+
+function stampPayload(payload) {
+  return Object.assign(payload, {
+    timestamp: `${Date.now()}-${Math.random().toString(36).slice(-8)}`,
+  });
+}
+
+
+function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
   // make sure to use new entity id for full payload
   // we should have either the one (recommendation_id) or the other (measure_id)
   const updatesUpdated = updates;
@@ -220,8 +225,9 @@ export function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
 }
 
 export function* saveEntitySaga({ data }) {
+  const dataTS = stampPayload(data);
   try {
-    yield put(saveSending(data));
+    yield put(saveSending(dataTS));
     // update entity attributes
     const entityUpdated = yield call(updateEntityRequest, data.path, data.entity);
     // and on the client
@@ -320,11 +326,13 @@ export function* saveEntitySaga({ data }) {
       });
     }
 
-    yield put(saveSuccess(data));
-    yield put(push(data.redirect));
+    yield put(saveSuccess(dataTS));
+    if (data.redirect) {
+      yield put(push(data.redirect));
+    }
   } catch (err) {
     err.response.json = yield err.response.json();
-    yield put(saveError(err, data));
+    yield put(saveError(err, dataTS));
     if (err.response.json && err.response.json.error === RECORD_OUTDATED) {
       yield put(invalidateEntities());
     }
@@ -332,21 +340,25 @@ export function* saveEntitySaga({ data }) {
 }
 
 export function* deleteEntitySaga({ data }) {
+  const dataTS = stampPayload(data);
   try {
-    yield put(deleteSending(data));
+    yield put(deleteSending(dataTS));
     yield call(deleteEntityRequest, data.path, data.id);
-    yield put(push(`/${data.redirect || data.path}`));
+    if (data.redirect) {
+      yield put(push(`/${data.redirect || data.path}`));
+    }
     yield put(removeEntity(data.path, data.id));
-    yield put(deleteSuccess(data));
+    yield put(deleteSuccess(dataTS));
   } catch (err) {
     err.response.json = yield err.response.json();
-    yield put(deleteError(err, data));
+    yield put(deleteError(err, dataTS));
   }
 }
 
 export function* newEntitySaga({ data }) {
+  const dataTS = stampPayload(data);
   try {
-    yield put(saveSending(data));
+    yield put(saveSending(dataTS));
     // update entity attributes
     // on the server
     const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
@@ -423,7 +435,7 @@ export function* newEntitySaga({ data }) {
       });
     }
 
-    yield put(saveSuccess(data));
+    yield put(saveSuccess(dataTS));
     if (data.onSuccess) {
       data.onSuccess();
     }
@@ -432,37 +444,39 @@ export function* newEntitySaga({ data }) {
     }
   } catch (err) {
     err.response.json = yield err.response.json();
-    yield put(saveError(err, data));
+    yield put(saveError(err, dataTS));
   }
 }
-
-// Batch update entity attributes
-export function* saveEntitiesSaga({ data }) {
-  try {
-    yield put(saveSending(data));
-    // on the server
-    const entitiesUpdated = yield call(updateEntitiesRequest, data.path, data.entities);
-    // // and on the client
-    yield put(updateEntities(data.path, entitiesUpdated));
-    yield put(saveSuccess(data));
-  } catch (err) {
-    err.response.json = yield err.response.json();
-    yield put(saveError(err, data));
-    yield put(invalidateEntities());
-  }
-}
-
+//
+// // Batch update entity attributes
+// export function* saveEntitiesSaga({ data }) {
+//   const dataTS = stampPayload(data);
+//   try {
+//     yield put(saveSending(dataTS));
+//     // on the server
+//     const entitiesUpdated = yield call(updateEntitiesRequest, data.path, data.entities);
+//     // // and on the client
+//     yield put(updateEntities(data.path, entitiesUpdated));
+//     yield put(saveSuccess(dataTS));
+//   } catch (err) {
+//     err.response.json = yield err.response.json();
+//     yield put(saveError(err, dataTS));
+//     yield put(invalidateEntities());
+//   }
+// }
+//
 export function* saveConnectionsSaga({ data }) {
+  const dataTS = stampPayload(data);
   try {
-    yield put(saveSending(data));
+    yield put(saveSending(dataTS));
     // on the server
     const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
     // and on the client
     yield put(updateConnections(data.path, connectionsUpdated));
-    yield put(saveSuccess(data));
+    yield put(saveSuccess(dataTS));
   } catch (err) {
     err.response.json = yield err.response.json();
-    yield put(saveError(err, data));
+    yield put(saveError(err, dataTS));
     yield put(invalidateEntities());
   }
 }
@@ -565,7 +579,7 @@ export default function* rootSaga() {
   yield takeEvery(NEW_ENTITY, newEntitySaga);
   yield takeEvery(DELETE_ENTITY, deleteEntitySaga);
   yield takeEvery(SAVE_CONNECTIONS, saveConnectionsSaga);
-  yield takeEvery(SAVE_ENTITIES, saveEntitiesSaga);
+  // yield takeEvery(SAVE_ENTITIES, saveEntitiesSaga);
 
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
