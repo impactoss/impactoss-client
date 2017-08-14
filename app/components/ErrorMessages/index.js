@@ -41,26 +41,28 @@ class ErrorMessages extends React.PureComponent { // eslint-disable-line react/p
     };
   }
 
+  // componentWillReceiveProps() {
+  //   this.setState({ dismiss: false });
+  // }
+
   render() {
     return this.state.dismiss
     ? null
     : (
       <Styled>
-        {this.props.error.messages &&
-          <MessageWrapper>
-            <div>
-              <strong>
-                <FormattedMessage {...messages.preBold} />
-              </strong>
-              <FormattedMessage {...messages.preAdditional} />
-              {
-                this.props.error.messages.map((message, i) => (
-                  <Message key={i}>{message}</Message>
-                ))
-              }
-            </div>
-          </MessageWrapper>
-        }
+        <MessageWrapper>
+          <div>
+            <strong>
+              <FormattedMessage {...messages.preBold} />
+            </strong>
+            <FormattedMessage {...messages.preAdditional} />
+            {
+              this.props.error.messages && this.props.error.messages.map((message, i) => (
+                <Message key={i}>{message}</Message>
+              ))
+            }
+          </div>
+        </MessageWrapper>
         <DismissWrapper>
           <Dismiss
             onClick={() => {

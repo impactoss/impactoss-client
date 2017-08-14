@@ -62,7 +62,15 @@ import {
   CLOSE_ENTITY,
   OPEN_NEW_ENTITY_MODAL,
   RESET_PROGRESS,
+  SUBMIT_INVALID,
 } from './constants';
+
+export function submitInvalid(data) {
+  return {
+    type: SUBMIT_INVALID,
+    data,
+  };
+}
 
 export function resetProgress() {
   return {

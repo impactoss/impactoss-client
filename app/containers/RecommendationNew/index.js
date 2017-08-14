@@ -33,6 +33,7 @@ import {
   updatePath,
   updateEntityForm,
   openNewEntityModal,
+  submitInvalid,
 } from 'containers/App/actions';
 
 import {
@@ -61,7 +62,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm();
+    this.props.initialiseForm('recommendationNew.form.data', this.props.viewDomain.form.data);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -113,7 +114,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
 
   render() {
     const { dataReady, viewDomain, connectedTaxonomies, taxonomies, measures, onCreateOption } = this.props;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.page;
 
     return (
       <div>
@@ -138,12 +139,13 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(
-                  viewDomain.form.data,
-                ),
+                onClick: () => this.props.handleSubmitRemote('recommendationNew.form.data'),
               }] : null
             }
           />
+          {!submitValid &&
+            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+          }
           {saveError &&
             <ErrorMessages error={saveError} />
           }
@@ -155,6 +157,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
               model="recommendationNew.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
+              handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
               fields={{ // isManager, taxonomies,
@@ -178,6 +181,8 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
 RecommendationNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
+  handleSubmitRemote: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -204,14 +209,20 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('recommendationNew.form.data'));
+    initialiseForm: (model, formData) => {
+      dispatch(formActions.load(model, formData));
     },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+    },
+    handleSubmitFail: (formData) => {
+      dispatch(submitInvalid(formData));
+    },
+    handleSubmitRemote: (model) => {
+      dispatch(formActions.submit(model));
     },
     handleSubmit: (formData) => {
       let saveData = formData;

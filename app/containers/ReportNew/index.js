@@ -26,6 +26,7 @@ import {
   loadEntitiesIfNeeded,
   updatePath,
   updateEntityForm,
+  submitInvalid,
 } from 'containers/App/actions';
 
 import { selectReady } from 'containers/App/selectors';
@@ -49,7 +50,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm();
+    this.props.initialiseForm('reportNew.form.data', this.props.viewDomain.form.data);
   }
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
@@ -97,7 +98,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
 
   render() {
     const { dataReady, indicator, viewDomain } = this.props;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.page;
     const indicatorReference = this.props.params.id;
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
@@ -126,10 +127,13 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(viewDomain.form.data, indicatorReference),
+                onClick: () => this.props.handleSubmitRemote('reportNew.form.data'),
               }] : null
             }
           />
+          {!submitValid &&
+            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+          }
           {saveError &&
             <ErrorMessages error={saveError} />
           }
@@ -144,6 +148,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                 formData,
                 indicatorReference
               )}
+              handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={() => this.props.handleCancel(indicatorReference)}
               handleUpdate={this.props.handleUpdate}
               fields={{
@@ -166,6 +171,8 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
 
 ReportNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  handleSubmitRemote: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -188,11 +195,17 @@ const mapStateToProps = (state, props) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('reportNew.form.data'));
+    initialiseForm: (model, formData) => {
+      dispatch(formActions.load(model, formData));
     },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
+    handleSubmitFail: (formData) => {
+      dispatch(submitInvalid(formData));
+    },
+    handleSubmitRemote: (model) => {
+      dispatch(formActions.submit(model));
     },
     handleSubmit: (formData, indicatorReference) => {
       let saveData = formData;

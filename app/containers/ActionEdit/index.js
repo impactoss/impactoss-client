@@ -10,7 +10,6 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
-
 import { Map } from 'immutable';
 
 import {
@@ -43,6 +42,7 @@ import {
   updateEntityForm,
   deleteEntity,
   openNewEntityModal,
+  submitInvalid,
 } from 'containers/App/actions';
 
 import {
@@ -167,7 +167,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   render() {
     const { viewEntity, dataReady, viewDomain, taxonomies, connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
 
     return (
       <div>
@@ -190,17 +190,14 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(
-                  viewDomain.form.data,
-                  taxonomies,
-                  recommendations,
-                  indicators,
-                  sdgtargets
-                ),
+                onClick: () => this.props.handleSubmitRemote('measureEdit.form.data'),
               }]
               : null
             }
           />
+          {!submitValid &&
+            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+          }
           {saveError &&
             <ErrorMessages error={saveError} />
           }
@@ -226,6 +223,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 indicators,
                 sdgtargets
               )}
+              handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
               handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
@@ -251,6 +249,8 @@ ActionEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
   initialiseForm: PropTypes.func,
+  handleSubmitRemote: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -297,7 +297,12 @@ function mapDispatchToProps(dispatch, props) {
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
-
+    handleSubmitFail: (formData) => {
+      dispatch(submitInvalid(formData));
+    },
+    handleSubmitRemote: (model) => {
+      dispatch(formActions.submit(model));
+    },
     handleSubmit: (formData, taxonomies, recommendations, indicators, sdgtargets) => {
       const saveData = formData
         .set(
