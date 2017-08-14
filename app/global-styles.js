@@ -117,7 +117,7 @@ injectGlobal`
     right: 40px;
     bottom: 40px;
     border: 0;
-    background: #F1F3F3;
+    background: #F5F6F6;
     overflow: auto;
     --webkit-overflow-scrolling: touch;
     border-radius: 0;
