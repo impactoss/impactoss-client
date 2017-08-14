@@ -35,6 +35,10 @@ const FooterLink = styled.a`
     opacity: 0.8;
   }
 `;
+// const FooterProjectLink = styled.a`
+//   font-weight:bold;
+//   color: ${palette('primary', 4)};
+// `;
 
 
 // const FooterProjectLink = styled.a`

@@ -66,18 +66,19 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
     }
   }
   render() {
-    const { option, onClick, groupId } = this.props;
+    const { option, onShowForm, groupId } = this.props;
 
     return (
       <Styled
         active={option.get('active')}
-        onClick={() => onClick({
+        onClick={() => onShowForm({
           group: groupId,
           optionId: option.get('id'),
           path: option.get('path'),
           key: option.get('key'),
           ownKey: option.get('ownKey'),
           active: option.get('active'),
+          create: option.get('create') && option.get('create').toJS(),
         })}
       >
         <Label>
@@ -99,7 +100,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
 EntityListSidebarOption.propTypes = {
   option: PropTypes.object.isRequired,
   groupId: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
+  onShowForm: PropTypes.func.isRequired,
 };
 
 export default EntityListSidebarOption;

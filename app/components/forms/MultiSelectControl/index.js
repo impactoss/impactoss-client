@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import { Control } from 'react-redux-form/immutable';
 
-import MultiSelect, {
+import MultiSelect from './MultiSelect';
+
+import {
   getChangedOptions,
   getCheckedOptions,
   getCheckedValuesFromOptions,
   getUncheckedValuesFromOptions,
-} from './MultiSelect';
+} from './utils';
 
 const MultiSelectControl = (props) => {
   const {
@@ -21,6 +23,9 @@ const MultiSelectControl = (props) => {
     buttons,
     search,
     onCancel,
+    panelId,
+    advanced,
+    tagFilterGroups,
      ...otherProps
   } = props;
 
@@ -42,6 +47,9 @@ const MultiSelectControl = (props) => {
         title,
         search,
         onCancel,
+        panelId,
+        advanced,
+        tagFilterGroups,
       }}
       {...otherProps}
     />
@@ -54,9 +62,12 @@ MultiSelectControl.propTypes = {
   multiple: PropTypes.bool,
   required: PropTypes.bool,
   search: PropTypes.bool,
+  advanced: PropTypes.bool,
   options: PropTypes.instanceOf(List),
   title: PropTypes.string,
+  panelId: PropTypes.string,
   buttons: PropTypes.array,
+  tagFilterGroups: PropTypes.array,
   onCancel: PropTypes.func,
 };
 
