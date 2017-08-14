@@ -5,6 +5,7 @@ import { filter, find } from 'lodash/collection';
 import { List, fromJS } from 'immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { FormattedMessage } from 'react-intl';
 
 import ButtonFactory from 'components/buttons/ButtonFactory';
 import TagSearch from 'components/TagSearch';
@@ -21,6 +22,8 @@ import TagFilters from './TagFilters';
 import OptionList from './OptionList';
 import Header from './Header';
 
+import messages from './messages';
+
 const ButtonGroup = styled.div`
   float: ${(props) => props.left ? 'left' : 'right'}
 `;
@@ -32,10 +35,15 @@ const ChangeHint = styled.div`
   right: 0;
   bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
   background-color: ${palette('light', 0)};
+  color: ${palette('dark', 3)};
   font-style: italic;
   padding: 0.5em 1em;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
   text-align: right;
+`;
+
+const ChangeHintHighlighted = styled.span`
+  color: ${palette('primary', 0)};
 `;
 
 const ControlMain = styled.div`
@@ -351,16 +359,18 @@ class MultiSelect extends React.Component {
         </ControlMain>
         { showChangeHint &&
           <ChangeHint hasFooter={this.props.buttons}>
-            {'Your changes: '}
+            <FormattedMessage {...messages.changeHint} />
             {optionsChangedToChecked.size > 0 &&
-              <span>
-                {`${optionsChangedToChecked.size} selected. `}
-              </span>
+              <ChangeHintHighlighted>
+                <FormattedMessage {...messages.changeHintSelected} values={{ no: optionsChangedToChecked.size }} />
+                .
+              </ChangeHintHighlighted>
             }
             {optionsChangedToUnchecked.size > 0 &&
-              <span>
-                {`${optionsChangedToUnchecked.size} unselected. `}
-              </span>
+              <ChangeHintHighlighted>
+                <FormattedMessage {...messages.changeHintUnselected} values={{ no: optionsChangedToUnchecked.size }} />
+                .
+              </ChangeHintHighlighted>
             }
           </ChangeHint>
         }
