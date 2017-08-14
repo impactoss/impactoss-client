@@ -61,8 +61,14 @@ import {
   RECOVER_ERROR,
   CLOSE_ENTITY,
   OPEN_NEW_ENTITY_MODAL,
+  RESET_PROGRESS,
 } from './constants';
 
+export function resetProgress() {
+  return {
+    type: RESET_PROGRESS,
+  };
+}
 
 export function saveSending(data) {
   return {

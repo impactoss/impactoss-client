@@ -19,6 +19,7 @@ import {
   redirectIfNotPermitted,
   updatePath,
   loadEntitiesIfNeeded,
+  resetProgress,
 } from 'containers/App/actions';
 
 import { selectReady } from 'containers/App/selectors';
@@ -80,8 +81,8 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
             handleCancel={this.props.handleCancel}
             handleReset={this.props.handleReset}
-            saveSuccess={viewDomain.page.saveSuccess}
-            saveError={viewDomain.page.saveError}
+            resetProgress={this.props.resetProgress}
+            progressData={viewDomain.page}
             template={{
               filename: 'indicators_template.csv',
               data: [{
@@ -106,6 +107,7 @@ IndicatorImport.propTypes = {
   handleReset: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  resetProgress: PropTypes.func.isRequired,
 };
 
 IndicatorImport.contextTypes = {
@@ -123,6 +125,9 @@ function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('user_roles'));
+    },
+    resetProgress: () => {
+      dispatch(resetProgress());
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
@@ -142,6 +147,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath('/indicators'));
     },
     handleReset: () => {
+      dispatch(resetProgress());
       dispatch(resetForm());
     },
   };

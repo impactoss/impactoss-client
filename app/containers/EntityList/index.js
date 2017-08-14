@@ -128,7 +128,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             />
           }
         </Sidebar>
-        { (progress && progress < 100) &&
+        { (progress > 0 && progress < 100) &&
           <Progress>
             <Loading
               progress={progress}

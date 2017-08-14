@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import { omit } from 'lodash/object';
-import { map } from 'lodash/collection';
+import { reduce } from 'lodash/collection';
 
 // import asArray from 'utils/as-array';
 // import { lowerCase } from 'utils/string';
@@ -22,6 +22,7 @@ import { map } from 'lodash/collection';
 // import FieldWrap from 'components/fields/FieldWrap';
 import Field from 'components/fields/Field';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 
 import DocumentWrap from 'components/fields/DocumentWrap';
@@ -53,36 +54,16 @@ const nonControlProps = ['label', 'component', 'controlType', 'children', 'error
 
 
 export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor() {
-    super();
-    this.state = {
-      succeeded: {},
-      failed: {},
-    };
-  }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.formData.get('import') === null || this.props.formData.get('import') === null) {
-      this.setState({
-        succeeded: {},
-        failed: {},
-      });
-    } else {
-      if (nextProps.saveSuccess) {
-        const timestamp = nextProps.saveSuccess.data.timestamp;
-        this.state.succeeded[timestamp] = this.state.succeeded[timestamp] || nextProps.saveSuccess;
-      }
-      if (nextProps.saveError) {
-        const timestamp = nextProps.saveError.data.timestamp;
-        this.state.failed[timestamp] = this.state.failed[timestamp] || nextProps.saveError;
-      }
-    }
-  }
   getControlProps = (field) => omit(field, nonControlProps);
 
+  computeProgress = ({ sending, success, errors }) =>
+    Object.keys(sending).length > 0
+      ? ((Object.keys(success).length + Object.keys(errors).length) / Object.keys(sending).length) * 100
+      : null;
+
   render() {
-    const { model, handleSubmit, handleCancel, handleReset, fieldModel, template, formData } = this.props;
-    const { failed, succeeded } = this.state;
+    const { model, handleSubmit, handleCancel, handleReset, fieldModel, template, formData, progressData } = this.props;
 
     const field = {
       id: 'file',
@@ -92,9 +73,8 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
     };
     const { id, ...props } = this.getControlProps(field);
 
-    const progress = formData.get('import')
-      ? ((Object.keys(failed).length + Object.keys(succeeded).length) / formData.get('import').rows.length) * 100
-      : null;
+    const progress = this.computeProgress(progressData);
+    const errors = progressData.errors;
 
     return (
       <div>
@@ -118,12 +98,6 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                         { progress < 100 &&
                           <Importing>
                             {`Importing ${formData.get('import').file.name}. `}
-                            {`Rows processed: ${Object.keys(failed).length + Object.keys(succeeded).length} of ${formData.get('import').rows.length}`}
-                            { Object.keys(failed).length > 0 &&
-                              <span>
-                                {`(${Object.keys(failed).length} errors)`}
-                              </span>
-                            }
                             <Loading
                               progress={progress}
                             />
@@ -141,15 +115,16 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                           </div>
                         }
                       </DocumentWrapEdit>
-                      { Object.keys(failed).length > 0 &&
-                        <div>
-                          <p>Failed rows:</p>
-                          { map(failed, (error, i) => (
-                            <p key={i}>
-                              {JSON.stringify(error.data.entity.attributes)}
-                            </p>
-                          ))}
-                        </div>
+                      {(Object.keys(errors).length > 0) &&
+                        <ErrorMessages
+                          error={{
+                            messages: reduce(errors, (memo, error) => error.messages
+                              ? memo.concat(error.messages)
+                              : memo
+                            , []),
+                          }}
+                          onDismiss={this.props.resetProgress}
+                        />
                       }
                     </div>
                   }
@@ -175,18 +150,12 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
 ImportEntitiesForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleReset: PropTypes.func.isRequired,
+  resetProgress: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   model: PropTypes.string,
   fieldModel: PropTypes.string,
   formData: PropTypes.object,
-  // saveSuccess: PropTypes.oneOfType([
-  //   PropTypes.bool,
-  //   PropTypes.object,
-  // ]),
-  // saveError: PropTypes.oneOfType([
-  //   PropTypes.bool,
-  //   PropTypes.object,
-  // ]),
+  progressData: PropTypes.object,
   template: PropTypes.object,
 };
 
