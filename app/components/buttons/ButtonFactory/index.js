@@ -18,7 +18,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
       case 'primary' :
         return (
           <ButtonDefault
-            onClick={button.onClick() && (() => button.onClick())}
+            onClick={button.onClick && (() => button.onClick())}
             type={button.submit ? 'submit' : 'button'}
             disabled={button.disabled}
           >
@@ -28,7 +28,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
       case 'formPrimary' :
         return (
           <ButtonSubmit
-            onClick={button.onClick() && (() => button.onClick())}
+            onClick={button.onClick && (() => button.onClick())}
             type={button.submit ? 'submit' : 'button'}
             disabled={button.disabled}
           >
