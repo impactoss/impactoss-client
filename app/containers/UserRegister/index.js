@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import Icon from 'components/Icon';
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
@@ -55,7 +56,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
           {registerError &&
-            <p>{registerError}</p>
+            <ErrorMessages error={registerError} />
           }
           {registerSending &&
             <Loading />

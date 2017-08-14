@@ -1,13 +1,16 @@
 import { takeLatest, put } from 'redux-saga/effects';
 
 import {
-  saveConnections,
-  saveEntities,
+  saveEntity,
+  newEntity,
+  deleteEntity,
   updateRouteQuery,
 } from 'containers/App/actions';
 
 import {
-  SAVE_EDITS,
+  SAVE,
+  NEW_CONNECTION,
+  DELETE_CONNECTION,
   UPDATE_QUERY,
   UPDATE_GROUP,
   PAGE_CHANGE,
@@ -93,20 +96,28 @@ export function* updateSortOrder(args) {
   }));
 }
 
-export function* saveEdits({ data }) {
-  if (data.attributes) {
-    // data = { attributes: true, path: path, entities: [
-    //  { id: id, attributes: {...} },
-    //  { id: id, attributes: {...} }, ...
-    // ]}
-    yield put(saveEntities(data));
-  } else {
-    // data = { attributes: true, path: path, updates: {
-    //   creates: [{entity_id, assignedId}, ...],
-    //   deletes: [assignment, ids,...]
-    // }}
-    yield put(saveConnections(data));
-  }
+export function* save({ data }) {
+  yield put(saveEntity({
+    path: data.path,
+    entity: data.entity,
+    redirect: false,
+  }));
+}
+
+export function* newConnection({ data }) {
+  yield put(newEntity({
+    path: data.path,
+    entity: data.entity,
+    redirect: false,
+  }));
+}
+
+export function* deleteConnection({ data }) {
+  yield put(deleteEntity({
+    path: data.path,
+    id: data.id,
+    redirect: false,
+  }));
 }
 
 export default function* entityList() {
@@ -118,5 +129,7 @@ export default function* entityList() {
   yield takeLatest(SORTBY_CHANGE, updateSortBy);
   yield takeLatest(SORTORDER_CHANGE, updateSortOrder);
 
-  yield takeLatest(SAVE_EDITS, saveEdits);
+  yield takeLatest(SAVE, save);
+  yield takeLatest(NEW_CONNECTION, newConnection);
+  yield takeLatest(DELETE_CONNECTION, deleteConnection);
 }

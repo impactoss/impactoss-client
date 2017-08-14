@@ -33,11 +33,6 @@ export const selectNewEntityModal = createSelector(
   (globalState) => globalState.get('newEntityModal')
 );
 
-export const selectAuth = createSelector(
-  getGlobal,
-  (globalState) => globalState.get('auth').toJS()
-);
-
 export const selectIsAuthenticating = createSelector(
   getGlobal,
   (globalState) => globalState.getIn(['auth', 'sending'])

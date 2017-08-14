@@ -16,6 +16,7 @@ import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import Content from 'components/Content';
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
@@ -51,11 +52,11 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
               ),
             }]}
           />
-          {saveSending &&
-            <Loading />
-          }
           {saveError &&
-            <p>{saveError}</p>
+            <ErrorMessages error={saveError} />
+          }
+          {(saveSending) &&
+            <Loading />
           }
           <EntityForm
             model="entityNew.form.data"

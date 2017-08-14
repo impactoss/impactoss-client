@@ -19,6 +19,7 @@ import {
   redirectIfNotPermitted,
   updatePath,
   loadEntitiesIfNeeded,
+  resetProgress,
 } from 'containers/App/actions';
 
 import { selectReady } from 'containers/App/selectors';
@@ -79,8 +80,8 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
             handleCancel={this.props.handleCancel}
             handleReset={this.props.handleReset}
-            saveSuccess={viewDomain.page.saveSuccess}
-            saveError={viewDomain.page.saveError}
+            resetProgress={this.props.resetProgress}
+            progressData={viewDomain.page}
             template={{
               filename: 'actions_template.csv',
               data: [{
@@ -108,6 +109,7 @@ ActionImport.propTypes = {
   handleReset: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  resetProgress: PropTypes.func.isRequired,
 };
 
 ActionImport.contextTypes = {
@@ -125,6 +127,9 @@ function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('user_roles'));
+    },
+    resetProgress: () => {
+      dispatch(resetProgress());
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
@@ -144,6 +149,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath('/actions'));
     },
     handleReset: () => {
+      dispatch(resetProgress());
       dispatch(resetForm());
     },
   };

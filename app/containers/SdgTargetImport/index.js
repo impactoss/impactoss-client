@@ -19,6 +19,7 @@ import {
   redirectIfNotPermitted,
   updatePath,
   loadEntitiesIfNeeded,
+  resetProgress,
 } from 'containers/App/actions';
 
 import { selectReady } from 'containers/App/selectors';
@@ -51,6 +52,11 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
     }
   }
 
+  computeProgress = ({ sending, success, errors }) =>
+    Object.keys(sending).length > 0
+      ? ((Object.keys(success).length + Object.keys(errors).length) / Object.keys(sending).length) * 100
+      : null;
+
   render() {
     const { viewDomain } = this.props;
     return (
@@ -81,8 +87,8 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
             handleCancel={this.props.handleCancel}
             handleReset={this.props.handleReset}
-            saveSuccess={viewDomain.page.saveSuccess}
-            saveError={viewDomain.page.saveError}
+            resetProgress={this.props.resetProgress}
+            progressData={viewDomain.page}
             template={{
               filename: 'sdgtargets_template.csv',
               data: [{
@@ -107,6 +113,7 @@ SdgTargetImport.propTypes = {
   handleReset: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  resetProgress: PropTypes.func.isRequired,
 };
 
 SdgTargetImport.contextTypes = {
@@ -124,6 +131,9 @@ function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('user_roles'));
+    },
+    resetProgress: () => {
+      dispatch(resetProgress());
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
@@ -143,6 +153,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath('/sdgtargets'));
     },
     handleReset: () => {
+      dispatch(resetProgress());
       dispatch(resetForm());
     },
   };

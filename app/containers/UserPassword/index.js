@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { actions as formActions } from 'react-redux-form/immutable';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
@@ -47,11 +48,11 @@ export class UserPassword extends React.PureComponent { // eslint-disable-line r
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
+          {passwordError &&
+            <ErrorMessages error={passwordError} />
+          }
           {passwordSending &&
             <Loading />
-          }
-          {passwordError &&
-            <p>{passwordError}</p>
           }
           { this.props.userPassword.form &&
             <AuthForm

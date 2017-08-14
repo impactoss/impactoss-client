@@ -42,6 +42,7 @@ import {
   selectSdgTargetTaxonomies,
 } from 'containers/App/selectors';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -141,14 +142,11 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
               }] : null
             }
           />
-          { !dataReady &&
-            <Loading />
-          }
-          {saveSending &&
-            <Loading />
-          }
           {saveError &&
-            <p>{saveError}</p>
+            <ErrorMessages error={saveError} />
+          }
+          {(saveSending || !dataReady) &&
+            <Loading />
           }
           {dataReady &&
             <EntityForm

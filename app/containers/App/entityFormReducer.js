@@ -1,4 +1,5 @@
 import { fromJS } from 'immutable';
+import { LOCATION_CHANGE } from 'react-router-redux';
 
 import {
   SAVE_SENDING,
@@ -8,6 +9,8 @@ import {
   DELETE_ERROR,
   DELETE_SUCCESS,
 } from 'containers/App/constants';
+
+import { checkResponseError } from 'utils/request';
 
 const initialState = fromJS({
   saveSending: false,
@@ -20,6 +23,8 @@ const initialState = fromJS({
 
 export const entityFormReducer = (state = initialState, action) => {
   switch (action.type) {
+    case LOCATION_CHANGE:
+      return initialState;
     case SAVE_SENDING:
       return state
         .set('saveSending', true)
@@ -33,7 +38,7 @@ export const entityFormReducer = (state = initialState, action) => {
       return state
         .set('saveSending', false)
         .set('saveSuccess', false)
-        .set('saveError', action.error);
+        .set('saveError', checkResponseError(action.error));
     case DELETE_SENDING:
       return state
         .set('deleteSending', true)
@@ -47,7 +52,7 @@ export const entityFormReducer = (state = initialState, action) => {
       return state
         .set('deleteSending', false)
         .set('deleteSuccess', false)
-        .set('deleteError', action.error);
+        .set('deleteError', checkResponseError(action.error));
     default:
       return state;
   }
