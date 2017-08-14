@@ -140,7 +140,9 @@ class MultiSelect extends React.Component {
     // do not update if required and change would result in empty list
     if (!checked && required) {
       const otherCheckedValues = values.find((v) =>
-        v.get('checked') && v.get('value') !== option.get('value') // && v.get('query') === option.get('query'))
+        v.get('checked')
+          && v.get('value') !== option.get('value')
+          && (option.get('query') ? v.get('query') === option.get('query') : true)
       );
       if (!otherCheckedValues) {
         return values;
@@ -150,7 +152,8 @@ class MultiSelect extends React.Component {
     // uncheck all others if single mode (!multiple)
     let nextValues = values;
     const existingValueIndex = values.findIndex((v) =>
-      v.get('value') === option.get('value') // && v.get('query') === option.get('query')
+      v.get('value') === option.get('value')
+        && (option.get('query') ? v.get('query') === option.get('query') : true)
     );
     if (!multiple && checked) {
       // uncheck all other options
@@ -171,7 +174,8 @@ class MultiSelect extends React.Component {
     let nextValues = values;
     options.forEach((option) => {
       const existingValueIndex = values.findIndex((v) =>
-        v.get('value') === option.get('value') && v.get('query') === option.get('query')
+        v.get('value') === option.get('value')
+          && (option.get('query') ? v.get('query') === option.get('query') : true)
       );
       const newValue = option.set('checked', checked).set('hasChanged', true);
       // set new value
