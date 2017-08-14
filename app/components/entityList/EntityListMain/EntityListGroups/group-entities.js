@@ -7,6 +7,7 @@ import {
   testEntityCategoryAssociation,
 } from 'utils/entities';
 import isNumber from 'utils/is-number';
+import { getEntitySortComparator } from 'utils/sort';
 
 export const groupEntities = (
   entities,
@@ -93,7 +94,10 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
       }
     }
   });  // for each entities
-  return groups.sortBy((group) => group.get('order')).toList();
+  return groups.sortBy(
+    (group) => group.get('order'),
+    (a, b) => getEntitySortComparator(a, b, 'asc')
+  ).toList();
 };
 
 export const setGroup = (entity, groupId) => entity.get('group')
@@ -143,5 +147,8 @@ export const makeConnectedTaxonomyGroups = (entities, taxonomy, config) => {
       }
     }
   });  // for each entities
-  return groups.sortBy((group) => group.get('order')).toList();
+  return groups.sortBy(
+    (group) => group.get('order'),
+    (a, b) => getEntitySortComparator(a, b, 'asc')
+  ).toList();
 };
