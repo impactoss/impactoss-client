@@ -22,6 +22,8 @@ const DocumentWrapEdit = styled(DocumentWrap)`
   background-color: ${palette('primary', 4)};
   position: relative;
   padding: 1em 0.75em;
+  border: 1px solid ${palette('light', 1)};
+  font-weight: bold;
 `;
 
 const Remove = styled(ButtonFlatIconOnly)`
