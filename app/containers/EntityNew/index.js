@@ -105,6 +105,7 @@ function mapDispatchToProps(dispatch, props) {
   return {
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
+      dispatch(formActions.reset(model));
     },
     handleSubmitFail: (formData) => {
       dispatch(submitInvalid(formData));
