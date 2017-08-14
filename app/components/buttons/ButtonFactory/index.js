@@ -5,6 +5,7 @@ import appMessages from 'containers/App/messages';
 
 import ButtonDefaultWithIcon from '../ButtonDefaultWithIcon';
 import ButtonDefault from '../ButtonDefault';
+import ButtonSubmit from '../ButtonSubmit';
 import ButtonFlat from '../ButtonFlat';
 import ButtonFlatWithIcon from '../ButtonFlatWithIcon';
 import ButtonDefaultIconOnly from '../ButtonDefaultIconOnly';
@@ -13,7 +14,6 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
 
   render() {
     const { button } = this.props;
-
     switch (button.type) {
       case 'primary' :
         return (
@@ -24,6 +24,16 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
           >
             {button.title}
           </ButtonDefault>
+        );
+      case 'formPrimary' :
+        return (
+          <ButtonSubmit
+            onClick={() => button.onClick()}
+            type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
+          >
+            {button.title}
+          </ButtonSubmit>
         );
       case 'add' :
         return (
@@ -93,7 +103,6 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
         return (
           <ButtonFlat
             onClick={() => button.onClick()}
-            primary
             type={button.submit ? 'submit' : 'button'}
             disabled={button.disabled}
           >

@@ -269,7 +269,7 @@ class MultiSelect extends React.Component {
     <ButtonFactory
       key={i}
       button={{
-        type: action.type === 'primary' ? 'textPrimary' : (action.type || 'text'),
+        type: action.type === 'primary' ? 'formPrimary' : (action.type || 'text'),
         title: action.title,
         onClick: action.onClick && (() => action.onClick()),
         submit: action.submit,

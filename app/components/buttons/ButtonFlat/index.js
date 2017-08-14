@@ -6,7 +6,6 @@ import Button from '../Button';
 const ButtonFlat = styled(Button)`
   font-weight: bold;
   text-transform: uppercase;
-  font-size: 1.2em;
   padding: 10px 12px;
   color: ${(props) => {
     if (props.disabled) {
