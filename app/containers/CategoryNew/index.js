@@ -31,6 +31,7 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  submitInvalid,
 } from 'containers/App/actions';
 
 import {
@@ -59,7 +60,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm();
+    this.props.initialiseForm('categoryNew.form.data', this.props.viewDomain.form.data);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -106,7 +107,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
   render() {
     const { taxonomy, dataReady, isAdmin, viewDomain, users } = this.props;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.page;
     const taxonomyReference = this.props.params.id;
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
@@ -137,13 +138,13 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(
-                  viewDomain.form.data,
-                  taxonomyReference
-                ),
+                onClick: () => this.props.handleSubmitRemote('categoryNew.form.data'),
               }] : null
             }
           />
+          {!submitValid &&
+            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+          }
           {saveError &&
             <ErrorMessages error={saveError} />
           }
@@ -158,6 +159,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                 formData,
                 taxonomyReference
               )}
+              handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={() => this.props.handleCancel(taxonomyReference)}
               handleUpdate={this.props.handleUpdate}
               fields={{ // isManager, taxonomies,
@@ -180,6 +182,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 CategoryNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
+  handleSubmitRemote: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -206,14 +210,20 @@ const mapStateToProps = (state, props) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('categoryNew.form.data'));
+    initialiseForm: (model, formData) => {
+      dispatch(formActions.load(model, formData));
     },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+    },
+    handleSubmitFail: (formData) => {
+      dispatch(submitInvalid(formData));
+    },
+    handleSubmitRemote: (model) => {
+      dispatch(formActions.submit(model));
     },
     handleSubmit: (formData, taxonomyReference) => {
       let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomyReference);

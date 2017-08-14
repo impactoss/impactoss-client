@@ -34,6 +34,7 @@ import {
   updatePath,
   updateEntityForm,
   deleteEntity,
+  submitInvalid,
   } from 'containers/App/actions';
 
 import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
@@ -114,7 +115,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
   render() {
     const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
 
     return (
       <div>
@@ -135,10 +136,13 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(viewDomain.form.data),
+                onClick: () => this.props.handleSubmitRemote('pageEdit.form.data'),
               }] : null
             }
           />
+          {!submitValid &&
+            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+          }
           {saveError &&
             <ErrorMessages error={saveError} />
           }
@@ -158,6 +162,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
               model="pageEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
+              handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
               handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
@@ -182,6 +187,8 @@ PageEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
   initialiseForm: PropTypes.func,
+  handleSubmitRemote: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -214,6 +221,12 @@ function mapDispatchToProps(dispatch, props) {
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
+    },
+    handleSubmitFail: (formData) => {
+      dispatch(submitInvalid(formData));
+    },
+    handleSubmitRemote: (model) => {
+      dispatch(formActions.submit(model));
     },
     handleSubmit: (formData) => {
       dispatch(save(formData.toJS()));

@@ -11,7 +11,10 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { getEntityFields } from 'utils/forms';
 
-import { newEntity } from 'containers/App/actions';
+import {
+  newEntity,
+  submitInvalid,
+} from 'containers/App/actions';
 import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -27,11 +30,12 @@ import messages from './messages';
 
 export class EntityNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
-    this.props.initialiseForm();
+    this.props.initialiseForm('entityNew.form.data', this.props.viewDomain.form.data);
   }
+
   render() {
     const { viewDomain, path, attributes, inModal } = this.props;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.page;
 
     return (
       <div>
@@ -39,19 +43,19 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={this.context.intl.formatMessage(messages[path].pageTitle)}
             type={CONTENT_MODAL}
-            icon="measures"
+            icon={path}
             buttons={[{
               type: 'cancel',
               onClick: this.props.onCancel,
             },
             {
               type: 'save',
-              onClick: () => this.props.handleSubmit(
-                viewDomain.form.data,
-                attributes
-              ),
+              onClick: () => this.props.handleSubmitRemote('entityNew.form.data'),
             }]}
           />
+          {!submitValid &&
+            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+          }
           {saveError &&
             <ErrorMessages error={saveError} />
           }
@@ -66,6 +70,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
               formData,
               attributes
             )}
+            handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
             fields={getEntityFields(path, null, this.context.intl.formatMessage, appMessages)}
           />
@@ -78,6 +83,8 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
 EntityNew.propTypes = {
   path: PropTypes.string.isRequired,
   attributes: PropTypes.object,
+  handleSubmitRemote: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   inModal: PropTypes.bool,
@@ -96,8 +103,14 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch, props) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('entityNew.form.data'));
+    initialiseForm: (model, formData) => {
+      dispatch(formActions.load(model, formData));
+    },
+    handleSubmitFail: (formData) => {
+      dispatch(submitInvalid(formData));
+    },
+    handleSubmitRemote: (model) => {
+      dispatch(formActions.submit(model));
     },
     handleSubmit: (formData, attributes) => {
       const saveData = attributes
