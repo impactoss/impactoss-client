@@ -33,12 +33,18 @@ import messages from './messages';
 
 const Styled = styled.div``;
 const Main = styled.div``;
+const ScrollableWrapper = styled(Scrollable)`
+  background-color: ${palette('light', 0)};
+`;
 const Header = styled.div`
   padding: 3em 2em 1em;
-  background-color: ${palette('light', 2)}
+  background-color: ${palette('light', 2)};
 `;
 const ListEntitiesEmpty = styled.div`
-  padding: 3em 2em 1em;
+  font-size: 1.2em;
+  padding: 1.5em;
+  color: ${palette('light', 4)};
+  font-weight: 500;
 `;
 
 export class EntityListSidebar extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -120,7 +126,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       type: 'primary',
       title: this.context.intl.formatMessage(appMessages.buttons.assign),
       submit: true,
-      // TODO consider making button inactive when form unchanged
     },
   ];
 
@@ -209,7 +214,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
 
     return (
       <Styled>
-        <Scrollable>
+        <ScrollableWrapper>
           <Header>
             {canEdit &&
               <ButtonToggle
@@ -239,7 +244,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
               </ListEntitiesEmpty>
             }
           </Main>
-        </Scrollable>
+        </ScrollableWrapper>
         { formOptions &&
           <EntityListForm
             model={formModel}
@@ -249,7 +254,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
               ? this.getFormButtons(activeOption)
               : null
             }
-            onCancel={this.onHideForm}
+            onCancel={(activePanel === FILTERS_PANEL) ? this.onHideForm : null}
             onSelect={() => {
               if (activePanel === FILTERS_PANEL) {
                 this.onHideForm();

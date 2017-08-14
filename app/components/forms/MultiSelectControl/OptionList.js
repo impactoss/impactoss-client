@@ -54,7 +54,7 @@ const OptionLabel = styled.label`
   border-bottom: 1px solid ${palette('light', 1)};
   border-right: 0.5em solid ${(props) =>
     (props.changedToChecked || props.changedToUnchecked)
-      ? palette('primary', 2)
+      ? palette('primary', 1)
       : 'transparent'
   };
 `;
@@ -80,8 +80,11 @@ const More = styled.div`
   width: 100%;
   padding: 0.5em 1em;
   text-align: center;
+  font-size: 0.85em;
 `;
-const MoreLink = styled.a``;
+const MoreLink = styled.a`
+  font-weight: bold;
+`;
 
 const SHOW_INCREMENT = 20;
 
@@ -167,7 +170,13 @@ class OptionList extends React.PureComponent {
         </ListWrapper>
         { hasMore &&
           <More>
-            {`Showing ${options.size} of ${this.props.options.size}. `}
+            <FormattedMessage
+              {...messages.showingOptions}
+              values={{
+                no: options.size,
+                total: this.props.options.size,
+              }}
+            />
             <MoreLink
               href="/"
               onClick={(evt) => {
@@ -175,7 +184,7 @@ class OptionList extends React.PureComponent {
                 this.showMore();
               }}
             >
-              Show more
+              <FormattedMessage {...messages.showMore} />
             </MoreLink>
           </More>
         }

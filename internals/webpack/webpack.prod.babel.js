@@ -17,8 +17,6 @@ module.exports = require('./webpack.base.babel')({
   },
 
   plugins: [
-    new webpack.IgnorePlugin(/\.\/locale$/),
-
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       children: true,

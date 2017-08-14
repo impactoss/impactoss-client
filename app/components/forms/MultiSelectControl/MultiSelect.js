@@ -5,7 +5,7 @@ import { filter, find } from 'lodash/collection';
 import { List, fromJS } from 'immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-// import { FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import ButtonFactory from 'components/buttons/ButtonFactory';
 import TagSearch from 'components/TagSearch';
@@ -22,6 +22,8 @@ import TagFilters from './TagFilters';
 import OptionList from './OptionList';
 import Header from './Header';
 
+import messages from './messages';
+
 const ButtonGroup = styled.div`
   float: ${(props) => props.left ? 'left' : 'right'}
 `;
@@ -33,10 +35,15 @@ const ChangeHint = styled.div`
   right: 0;
   bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
   background-color: ${palette('light', 0)};
+  color: ${palette('dark', 3)};
   font-style: italic;
   padding: 0.5em 1em;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
   text-align: right;
+`;
+
+const ChangeHintHighlighted = styled.span`
+  color: ${palette('primary', 0)};
 `;
 
 const ControlMain = styled.div`
@@ -141,7 +148,9 @@ class MultiSelect extends React.Component {
     // do not update if required and change would result in empty list
     if (!checked && required) {
       const otherCheckedValues = values.find((v) =>
-        v.get('checked') && v.get('value') !== option.get('value') // && v.get('query') === option.get('query'))
+        v.get('checked')
+          && v.get('value') !== option.get('value')
+          && (option.get('query') ? v.get('query') === option.get('query') : true)
       );
       if (!otherCheckedValues) {
         return values;
@@ -151,7 +160,8 @@ class MultiSelect extends React.Component {
     // uncheck all others if single mode (!multiple)
     let nextValues = values;
     const existingValueIndex = values.findIndex((v) =>
-      v.get('value') === option.get('value') // && v.get('query') === option.get('query')
+      v.get('value') === option.get('value')
+        && (option.get('query') ? v.get('query') === option.get('query') : true)
     );
     if (!multiple && checked) {
       // uncheck all other options
@@ -172,7 +182,8 @@ class MultiSelect extends React.Component {
     let nextValues = values;
     options.forEach((option) => {
       const existingValueIndex = values.findIndex((v) =>
-        v.get('value') === option.get('value') && v.get('query') === option.get('query')
+        v.get('value') === option.get('value')
+          && (option.get('query') ? v.get('query') === option.get('query') : true)
       );
       const newValue = option.set('checked', checked).set('hasChanged', true);
       // set new value
@@ -348,16 +359,18 @@ class MultiSelect extends React.Component {
         </ControlMain>
         { showChangeHint &&
           <ChangeHint hasFooter={this.props.buttons}>
-            {'Your changes: '}
+            <FormattedMessage {...messages.changeHint} />
             {optionsChangedToChecked.size > 0 &&
-              <span>
-                {`${optionsChangedToChecked.size} selected. `}
-              </span>
+              <ChangeHintHighlighted>
+                <FormattedMessage {...messages.changeHintSelected} values={{ no: optionsChangedToChecked.size }} />
+                .
+              </ChangeHintHighlighted>
             }
             {optionsChangedToUnchecked.size > 0 &&
-              <span>
-                {`${optionsChangedToUnchecked.size} unselected. `}
-              </span>
+              <ChangeHintHighlighted>
+                <FormattedMessage {...messages.changeHintUnselected} values={{ no: optionsChangedToUnchecked.size }} />
+                .
+              </ChangeHintHighlighted>
             }
           </ChangeHint>
         }

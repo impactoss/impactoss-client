@@ -4,10 +4,11 @@ import {
   getEntityReference,
   getCategoryShortTitle,
 } from 'utils/entities';
-import isInteger from 'utils/is-integer';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 import validateDateFormat from 'components/forms/validators/validate-date-format';
 import validateRequired from 'components/forms/validators/validate-required';
+import validateNumber from 'components/forms/validators/validate-number';
 
 import {
   PUBLISH_STATUSES,
@@ -366,7 +367,7 @@ export const getMenuTitleFormField = (formatMessage, appMessages) =>
 
 export const getMenuOrderFormField = (formatMessage, appMessages) => {
   const field = getFormField(formatMessage, appMessages, 'short', 'order', false); // required
-  field.validators.number = isInteger;
+  field.validators.number = validateNumber;
   field.errorMessages.number = formatMessage(appMessages.forms.numberError);
   return field;
 };

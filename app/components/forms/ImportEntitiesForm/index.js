@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { Form } from 'react-redux-form/immutable';
 // import { Form, Errors } from 'react-redux-form/immutable';
 import CsvDownloader from 'react-csv-downloader';
@@ -20,6 +20,7 @@ import { reduce } from 'lodash/collection';
 // import Button from 'components/buttons/Button';
 // import Label from 'components/fields/Label';
 // import FieldWrap from 'components/fields/FieldWrap';
+import A from 'components/styled/A';
 import Field from 'components/fields/Field';
 
 import ErrorMessages from 'components/ErrorMessages';
@@ -28,15 +29,17 @@ import Loading from 'components/Loading';
 import DocumentWrap from 'components/fields/DocumentWrap';
 
 import ButtonCancel from 'components/buttons/ButtonCancel';
+import ButtonSubmit from 'components/buttons/ButtonSubmit';
+import Clear from 'components/styled/Clear';
 
 import FileSelectControl from '../FileSelectControl';
-// import ErrorWrapper from '../ErrorWrapper';
 import FormWrapper from '../FormWrapper';
 import FormBody from '../FormBody';
 import FormFieldWrap from '../FormFieldWrap';
-// import Required from '../Required';
+import FormFooter from '../FormFooter';
+import FormFooterButtons from '../FormFooterButtons';
 
-// import messages from './messages';
+import messages from './messages';
 
 const Importing = styled.div`
   color: ${palette('primary', 0)};
@@ -52,6 +55,18 @@ const DocumentWrapEdit = styled(DocumentWrap)`
 // These props will be omitted before being passed to the Control component
 const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
 
+const FormTitle = styled.h2`
+  padding-top:0;
+`;
+const Hint = styled.div`
+  font-size: 1.2em;
+`;
+const CsvDownload = styled.span`
+  display: inline-block;
+`;
+const DownloadTemplate = styled(A)`
+  font-weight: bold;
+`;
 
 export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -78,9 +93,29 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
 
     return (
       <div>
-        <FormWrapper>
+        <FormWrapper white>
           <Form model={model} onSubmit={handleSubmit} >
             <FormBody>
+              <FormTitle>
+                <FormattedMessage {...messages.title} />
+              </FormTitle>
+              <Hint>
+                <FormattedMessage {...messages.templateHint} />
+                <CsvDownload>
+                  <CsvDownloader
+                    datas={template.data}
+                    filename={template.filename}
+                  >
+                    <DownloadTemplate href="/">
+                      <FormattedMessage {...messages.downloadTemplate} />
+                    </DownloadTemplate>
+                  </CsvDownloader>
+                </CsvDownload>
+                <span>.</span>
+              </Hint>
+              <Hint>
+                <FormattedMessage {...messages.formatHint} />
+              </Hint>
               <Field>
                 <FormFieldWrap>
                   { (progress === null || progress === 0) &&
@@ -90,6 +125,17 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                       as="text"
                       accept=".csv, text/csv"
                       {...props}
+                    />
+                  }
+                  {(Object.keys(errors).length > 0) &&
+                    <ErrorMessages
+                      error={{
+                        messages: reduce(errors, (memo, error) => error.messages
+                          ? memo.concat(error.messages)
+                          : memo
+                        , []),
+                      }}
+                      onDismiss={this.props.resetProgress}
                     />
                   }
                   { progress > 0 &&
@@ -105,41 +151,33 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                         }
                         { progress >= 100 &&
                           <div>
-                            <p>Complete!</p>
-                            <ButtonCancel onClick={handleCancel} type="button">
-                              Done
-                            </ButtonCancel>
-                            <ButtonCancel onClick={handleReset} type="button">
-                              Import again
-                            </ButtonCancel>
+                            {(Object.keys(errors).length > 0) &&
+                              <FormattedMessage {...messages.hasErrors} />
+                            }
+                            {(Object.keys(errors).length === 0) &&
+                              <FormattedMessage {...messages.success} />
+                            }
                           </div>
                         }
                       </DocumentWrapEdit>
-                      {(Object.keys(errors).length > 0) &&
-                        <ErrorMessages
-                          error={{
-                            messages: reduce(errors, (memo, error) => error.messages
-                              ? memo.concat(error.messages)
-                              : memo
-                            , []),
-                          }}
-                          onDismiss={this.props.resetProgress}
-                        />
-                      }
                     </div>
                   }
                 </FormFieldWrap>
               </Field>
-              <div>
-                Not sure about the format?
-                <CsvDownloader
-                  type="button"
-                  text="Download template"
-                  datas={template.data}
-                  filename={template.filename}
-                />
-              </div>
             </FormBody>
+            { progress >= 100 &&
+              <FormFooter>
+                <FormFooterButtons>
+                  <ButtonCancel type="button" onClick={handleReset}>
+                    <FormattedMessage {...messages.importAgain} />
+                  </ButtonCancel>
+                  <ButtonSubmit type="button" onClick={handleCancel}>
+                    <FormattedMessage {...messages.done} />
+                  </ButtonSubmit>
+                </FormFooterButtons>
+                <Clear />
+              </FormFooter>
+            }
           </Form>
         </FormWrapper>
       </div>

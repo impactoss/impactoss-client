@@ -73,7 +73,7 @@ export default defineMessages({
   },
   entitiesNotSelected: {
     id: 'app.containers.EntityListFilter.entitiesNotSelected',
-    defaultMessage: 'Please select one or more entities from the list to see the available edit options',
+    defaultMessage: 'Please select one or more entities from the list for available edit options',
   },
 
 });
