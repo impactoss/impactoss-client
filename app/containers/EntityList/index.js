@@ -8,9 +8,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { reduce } from 'lodash/collection';
 
 import { Map, List, fromJS } from 'immutable';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Sidebar from 'components/styled/Sidebar';
 
@@ -19,7 +21,11 @@ import EntityListMain from 'components/entityList/EntityListMain';
 
 import { selectIsUserManager } from 'containers/App/selectors';
 
-import { updatePath } from 'containers/App/actions';
+import {
+  updatePath,
+  openNewEntityModal,
+} from 'containers/App/actions';
+
 import appMessages from 'containers/App/messages';
 import { PARAMS } from 'containers/App/constants';
 
@@ -31,8 +37,11 @@ import {
 
 import {
   resetState,
+  resetProgress,
   showPanel,
-  saveEdits,
+  save,
+  newConnection,
+  deleteConnection,
   selectEntity,
   selectEntities,
   updateQuery,
@@ -54,26 +63,45 @@ const Progress = styled.div`
   -moz-box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   background-color: ${palette('primary', 4)};
-  padding: 40px;
+  padding: ${(props) => props.error ? 0 : 40}px;
   z-index: 200;
 `;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
   componentWillMount() {
     this.props.resetStateOnMount();
   }
+  componentWillReceiveProps(nextProps) {
+    if (Object.keys(nextProps.viewDomain.sending).length > 0
+      && Object.keys(nextProps.viewDomain.errors).length === 0
+      && this.computeProgress(nextProps.viewDomain) > 99.9
+    ) {
+      this.props.resetProgress();
+    }
+  }
+
   formatLabel = (path) => {
     const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
     return this.context.intl.formatMessage(message);
   }
-  render() {
-    // console.log('EntityList.render', this.props.viewDomain.saveSending)
 
+  computeProgress = ({ sending, success, errors }) =>
+    Object.keys(sending).length > 0
+      ? ((Object.keys(success).length + Object.keys(errors).length) / Object.keys(sending).length) * 100
+      : null;
+
+  render() {
     // make sure selected entities are still actually on page
-    const { entityIdsSelected, entities } = this.props;
+    const { entityIdsSelected, entities, viewDomain } = this.props;
+    const { errors } = viewDomain;
+
     const entityIdsSelectedFiltered = entityIdsSelected.size > 0 && entities
       ? entityIdsSelected.filter((id) => entities.map((entity) => entity.get('id')).includes(id))
       : entityIdsSelected;
+
+    const progress = this.computeProgress(viewDomain);
+
     return (
       <div>
         <Sidebar>
@@ -94,19 +122,30 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               activePanel={this.props.activePanel}
               formatLabel={this.formatLabel}
               onPanelSelect={this.props.onPanelSelect}
+              onCreateOption={this.props.onCreateOption}
               onAssign={(associations, activeEditOption) =>
                 this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
             />
           }
         </Sidebar>
-        {this.props.viewDomain.saveSending &&
+        { (progress > 0 && progress < 100) &&
           <Progress>
-            <Loading />
+            <Loading
+              progress={progress}
+            />
           </Progress>
         }
-        {this.props.viewDomain.saveError &&
-          <Progress>
-            <p>{this.props.viewDomain.saveError}</p>
+        {(Object.keys(errors).length > 0) &&
+          <Progress error>
+            <ErrorMessages
+              error={{
+                messages: reduce(errors, (memo, error) => error.messages
+                  ? memo.concat(error.messages)
+                  : memo
+                , []),
+              }}
+              onDismiss={this.props.resetProgress}
+            />
           </Progress>
         }
         <EntityListMain
@@ -179,8 +218,10 @@ EntityList.propTypes = {
   onPageItemsSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
   resetStateOnMount: PropTypes.func.isRequired,
+  resetProgress: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
+  onCreateOption: PropTypes.func.isRequired,
 };
 
 EntityList.contextTypes = {
@@ -198,6 +239,9 @@ function mapDispatchToProps(dispatch, props) {
   return {
     resetStateOnMount: () => {
       dispatch(resetState());
+    },
+    resetProgress: () => {
+      dispatch(resetProgress());
     },
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));
@@ -267,98 +311,86 @@ function mapDispatchToProps(dispatch, props) {
     onSortBy: (sort) => {
       dispatch(updateSortBy(sort));
     },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
+    },
     handleEditSubmit: (formData, activeEditOption, entityIdsSelected) => {
       const entities = props.entities.filter(
         (entity) => entityIdsSelected.includes(entity.get('id'))
       );
-      let saveData = Map();
-      const changes = formData.get('values').filter((option) => option.get('hasChanged'));
 
-      const creates = changes
+      // figure out changes
+      const changes = formData.get('values').filter((option) => option.get('hasChanged'));
+      // figure out updates (either new attribute values or new connections)
+      let creates = changes
         .filter((option) => option.get('checked') === true)
         .map((option) => option.get('value'));
-      const deletes = changes
-        .filter((option) => option.get('checked') === false)
-        .map((option) => option.get('value'));
 
+      // attributes
       if (activeEditOption.group === 'attributes') {
         if (creates.size > 0) {
-          const newValue = creates.first(); // take the first TODO multiselect should be run in single value mode and only return 1 value
-          saveData = saveData
-            .set('attributes', true)
-            .set('path', props.config.serverPath)
-            .set('entities', entities.reduce((updatedEntities, entity) =>
-              entity.getIn(['attributes', activeEditOption.optionId]) !== newValue
-                ? updatedEntities.push(entity.setIn(['attributes', activeEditOption.optionId], newValue))
-                : updatedEntities
-            , List()));
-        }
-      } else {
-        // associations
-        saveData = saveData
-          .set('attributes', false)
-          .set('path', activeEditOption.path)
-          .set('updates', Map({
-            create: List(),
-            delete: List(),
-          }));
-
-        if (creates.size > 0) {
-          saveData = saveData.setIn(['updates', 'create'], entities.reduce((createList, entity) => {
-            let changeSet = List();
-            let existingAssignments;
-            switch (activeEditOption.group) {
-              case ('taxonomies'):
-                existingAssignments = entity.get('categories');
-                break;
-              case ('connections'):
-                existingAssignments = entity.get(activeEditOption.optionId);
-                break;
-              default:
-                existingAssignments = List();
-                break;
+          // take the first TODO multiselect should be run in single value mode and only return 1 value
+          const newValue = creates.first();
+          entities.forEach((entity) => {
+            if (entity.getIn(['attributes', activeEditOption.optionId]) !== newValue) {
+              dispatch(save(Map()
+                .set('path', props.config.serverPath)
+                .set('entity', entity.setIn(['attributes', activeEditOption.optionId], newValue))
+                .toJS()
+              ));
             }
+          });
+        }
+      // connections
+      } else {
+        // figure out connection deletions (not necessary for attributes as deletions will be overridden)
+        const deletes = changes
+          .filter((option) => option.get('checked') === false)
+          .map((option) => option.get('value'));
 
+        entities.forEach((entity) => {
+          let existingAssignments;
+          switch (activeEditOption.group) {
+            case ('taxonomies'):
+              existingAssignments = entity.get('categories');
+              break;
+            case ('connections'):
+              existingAssignments = entity.get(activeEditOption.optionId);
+              break;
+            default:
+              existingAssignments = List();
+              break;
+          }
+          // create connections
+          if (creates.size > 0) {
             if (!!existingAssignments && existingAssignments.size > 0) {
               // exclude existing relations from the changeSet
-              changeSet = creates.filter((id) => !existingAssignments.includes(parseInt(id, 10)));
-            } else {
-              changeSet = creates; // add for all creates
+              creates = creates.filter((id) => !existingAssignments.includes(parseInt(id, 10)));
             }
-
-            return createList.concat(changeSet.map((change) => ({
-              [activeEditOption.ownKey]: entity.get('id'),
-              [activeEditOption.key]: change,
+            // associations
+            creates.forEach((id) => dispatch(newConnection({
+              path: activeEditOption.path,
+              entity: {
+                attributes: {
+                  [activeEditOption.ownKey]: entity.get('id'),
+                  [activeEditOption.key]: id,
+                },
+              },
             })));
-          }, List()));
-        }
-        if (deletes.size > 0) {
-          saveData = saveData.setIn(['updates', 'delete'], entities.reduce((deleteList, entity) => {
-            let changeSet = List();
-            let existingAssignments;
-            switch (activeEditOption.group) {
-              case ('taxonomies'):
-                existingAssignments = entity.get('categories');
-                break;
-              case ('connections'):
-                existingAssignments = entity.get(activeEditOption.optionId);
-                break;
-              default:
-                existingAssignments = List();
-                break;
-            }
-
+          }
+          // delete connections
+          if (deletes.size > 0) {
             if (!!existingAssignments && existingAssignments.size > 0) {
-              changeSet = existingAssignments
+              existingAssignments
                 .filter((assigned) => deletes.includes(assigned.toString()))
-                .keySeq() // discard values
-                .toList();
+                .forEach((assigned, id) => dispatch(deleteConnection({
+                  path: activeEditOption.path,
+                  id,
+                })));
             }
-            return deleteList.concat(changeSet);
-          }, List()));
-        }
+          }
+        }); // each entity
       }
-      dispatch(saveEdits(saveData.toJS()));
     },
   };
 }

@@ -6,8 +6,11 @@
 
 import {
   SHOW_PANEL,
-  SAVE_EDITS,
+  SAVE,
+  NEW_CONNECTION,
+  DELETE_CONNECTION,
   RESET_STATE,
+  RESET_PROGRESS,
   ENTITY_SELECTED,
   ENTITIES_SELECT,
   UPDATE_QUERY,
@@ -26,9 +29,21 @@ export function showPanel(activePanel) {
   };
 }
 
-export function saveEdits(data) {
+export function save(data) {
   return {
-    type: SAVE_EDITS,
+    type: SAVE,
+    data,
+  };
+}
+export function newConnection(data) {
+  return {
+    type: NEW_CONNECTION,
+    data,
+  };
+}
+export function deleteConnection(data) {
+  return {
+    type: DELETE_CONNECTION,
     data,
   };
 }
@@ -36,6 +51,12 @@ export function saveEdits(data) {
 export function resetState() {
   return {
     type: RESET_STATE,
+  };
+}
+
+export function resetProgress() {
+  return {
+    type: RESET_PROGRESS,
   };
 }
 

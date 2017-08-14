@@ -3,12 +3,15 @@ import { createSelector } from 'reselect';
 import {
   selectEntity,
   selectEntities,
+  selectRecommendationsCategorised,
+  selectSdgTargetsCategorised,
 } from 'containers/App/selectors';
 
 import {
   entitiesSetAssociated,
   entitySetUser,
   prepareTaxonomiesAssociated,
+  prepareTaxonomiesMultiple,
 } from 'utils/entities';
 
 export const selectDomain = createSelector(
@@ -30,16 +33,24 @@ export const selectTaxonomies = createSelector(
     prepareTaxonomiesAssociated(taxonomies, categories, associations, 'tags_measures', 'measure_id', id)
 );
 
+export const selectConnectedTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) =>
+    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations', 'tags_sdgtargets'])
+);
+
+
 export const selectRecommendations = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'recommendations'),
+  (state) => selectRecommendationsCategorised(state),
   (state) => selectEntities(state, 'recommendation_measures'),
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'recommendation_id', associations, 'measure_id', id)
 );
 export const selectSdgTargets = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'sdgtargets'),
+  (state) => selectSdgTargetsCategorised(state),
   (state) => selectEntities(state, 'sdgtarget_measures'),
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'sdgtarget_id', associations, 'measure_id', id)

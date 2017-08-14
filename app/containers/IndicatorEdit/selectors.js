@@ -5,12 +5,15 @@ import { USER_ROLES } from 'containers/App/constants';
 import {
   selectEntity,
   selectEntities,
+  selectMeasuresCategorised,
+  selectSdgTargetsCategorised,
 } from 'containers/App/selectors';
 
 import {
   entitiesSetAssociated,
   entitySetUser,
   usersSetRoles,
+  prepareTaxonomiesMultiple,
 } from 'utils/entities';
 
 
@@ -30,15 +33,23 @@ export const selectViewEntity = createSelector(
 
 export const selectMeasures = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'measures'),
+  (state) => selectMeasuresCategorised(state),
   (state) => selectEntities(state, 'measure_indicators'),
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'measure_id', associations, 'indicator_id', id)
 );
 
+
+export const selectConnectedTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) =>
+    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_sdgtargets'])
+);
+
 export const selectSdgTargets = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'sdgtargets'),
+  (state) => selectSdgTargetsCategorised(state),
   (state) => selectEntities(state, 'sdgtarget_indicators'),
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'sdgtarget_id', associations, 'indicator_id', id)

@@ -9,7 +9,9 @@
  * export const YOUR_ACTION_CONSTANT = 'yourproject/YourContainer/YOUR_ACTION_CONSTANT';
  */
 
-export const DEFAULT_LOCALE = 'en';
+export const DEFAULT_LOCALE = 'en-GB';
+export const DB_DATE_FORMAT = 'YYYY-MM-DD';
+export const RECORD_OUTDATED = 'Record outdated';
 
 export const REDIRECT_IF_NOT_PERMITTED = 'nmrf/App/REDIRECT_IF_NOT_PERMITTED';
 export const LOAD_ENTITIES_IF_NEEDED = 'nmrf/App/LOAD_ENTITIES_IF_NEEDED';
@@ -18,6 +20,7 @@ export const LOAD_ENTITIES_SUCCESS = 'nmrf/App/LOAD_ENTITIES_SUCCESS';
 export const LOAD_ENTITIES_ERROR = 'nmrf/App/LOAD_ENTITIES_ERROR';
 export const ENTITIES_REQUESTED = 'nmrf/App/ENTITIES_REQUESTED';
 export const INVALIDATE_ENTITIES = 'nmrf/App/INVALIDATE_ENTITIES';
+export const RESET_PROGRESS = 'nmrf/App/RESET_PROGRESS';
 
 export const AUTHENTICATE_SENDING = 'nmrf/App/AUTHENTICATE_SENDING';
 export const AUTHENTICATE = 'nmrf/App/AUTHENTICATE';
@@ -68,6 +71,8 @@ export const UPDATE_ENTITY_FORM = 'nmrf/App/UPDATE_ENTITY_FORM';
 
 export const CLOSE_ENTITY = 'nmrf/App/CLOSE_ENTITY';
 
+export const OPEN_NEW_ENTITY_MODAL = 'nmrf/App/OPEN_NEW_ENTITY_MODAL';
+
 export const PUBLISH_STATUSES = [
   { value: true, label: 'Draft' },
   { value: false, label: 'Public' },
@@ -107,6 +112,7 @@ export const EDIT_PANEL = 'edit';
 export const CONTENT_LIST = 'list';
 export const CONTENT_SINGLE = 'single';
 export const CONTENT_PAGE = 'page';
+export const CONTENT_MODAL = 'modal';
 
 export const DEPENDENCIES = [
   'user_roles',
