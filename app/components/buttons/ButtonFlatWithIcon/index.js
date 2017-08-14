@@ -7,13 +7,12 @@ import ButtonFlat from 'components/buttons/ButtonFlat';
 import Icon from 'components/Icon';
 
 const Button = styled(ButtonFlat)`
-  padding: 0.25em 1.25em;
+  padding: ${(props) => props.form ? '1em 1.2em' : '0.25em 1.25em'};
   width: ${(props) => props.fullWidth ? '100%' : 'auto'};
   min-height: 3em;
   text-align: ${(props) => props.align};
   text-transform: ${(props) => props.uppercase ? 'uppercase' : 'none'};
   font-weight: ${(props) => props.strong ? 'bold' : 'normal'};
-  font-size: 0.85em;
   border: ${(props) => props.border ? '1px solid' : 0};
   border-color: ${(props) => props.border ? palette(props.border.palette, props.border.pIndex) : 'transparent'};
 `;

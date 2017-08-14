@@ -120,7 +120,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       type: 'primary',
       title: this.context.intl.formatMessage(appMessages.buttons.assign),
       submit: true,
-      // TODO consider making button inactive when form unchanged
     },
   ];
 

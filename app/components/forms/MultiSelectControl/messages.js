@@ -5,6 +5,10 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  new: {
+    id: 'app.components.MultiSelectControl.new',
+    defaultMessage: 'New',
+  },
   empty: {
     id: 'app.components.MultiSelectControl.empty',
     defaultMessage: 'No options currently available',

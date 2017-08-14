@@ -6,7 +6,7 @@ import Button from '../Button';
 const ButtonFlat = styled(Button)`
   font-weight: bold;
   text-transform: uppercase;
-  padding: 10px 12px;
+  padding: ${(props) => props.form ? '1em 1.2em' : '10px 12px'};
   color: ${(props) => {
     if (props.disabled) {
       return palette('buttonFlat', 2);
