@@ -19,6 +19,7 @@ import {
   redirectIfNotPermitted,
   updatePath,
   loadEntitiesIfNeeded,
+  resetProgress,
 } from 'containers/App/actions';
 
 import { selectReady } from 'containers/App/selectors';
@@ -37,7 +38,7 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
 
   componentWillMount() {
     if (this.props.dataReady) {
-      this.props.populateForm('sdgtargetImport.form.data', FORM_INITIAL);
+      this.props.initialiseForm('sdgtargetImport.form.data', FORM_INITIAL);
     }
   }
   componentWillReceiveProps(nextProps) {
@@ -47,9 +48,14 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
     }
     if (nextProps.dataReady && !this.props.dataReady) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('indicatorImport.form.data', FORM_INITIAL);
+      this.props.initialiseForm('indicatorImport.form.data', FORM_INITIAL);
     }
   }
+
+  computeProgress = ({ sending, success, errors }) =>
+    Object.keys(sending).length > 0
+      ? ((Object.keys(success).length + Object.keys(errors).length) / Object.keys(sending).length) * 100
+      : null;
 
   render() {
     const { viewDomain } = this.props;
@@ -81,8 +87,8 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
             handleCancel={this.props.handleCancel}
             handleReset={this.props.handleReset}
-            saveSuccess={viewDomain.page.saveSuccess}
-            saveError={viewDomain.page.saveError}
+            resetProgress={this.props.resetProgress}
+            progressData={viewDomain.page}
             template={{
               filename: 'sdgtargets_template.csv',
               data: [{
@@ -101,12 +107,13 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
 SdgTargetImport.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleReset: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  resetProgress: PropTypes.func.isRequired,
 };
 
 SdgTargetImport.contextTypes = {
@@ -125,7 +132,10 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
-    populateForm: (model, formData) => {
+    resetProgress: () => {
+      dispatch(resetProgress());
+    },
+    initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
     redirectIfNotPermitted: () => {
@@ -143,6 +153,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath('/sdgtargets'));
     },
     handleReset: () => {
+      dispatch(resetProgress());
       dispatch(resetForm());
     },
   };

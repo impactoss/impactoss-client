@@ -6,7 +6,7 @@
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 
-import { entityFormReducer } from 'components/forms/EntityForm/reducers';
+import { entityFormReducer } from 'containers/App/entityFormReducer';
 import { UPDATE_ENTITY_FORM } from 'containers/App/constants';
 import { FORM_INITIAL } from './constants';
 

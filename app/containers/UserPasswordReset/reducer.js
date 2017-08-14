@@ -4,8 +4,9 @@
  *
  */
 
+import { LOCATION_CHANGE } from 'react-router-redux';
 import { fromJS } from 'immutable';
-import { checkErrorMessagesExist } from 'utils/request';
+import { checkResponseError } from 'utils/request';
 
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
@@ -24,6 +25,8 @@ const initialState = fromJS({
 
 function userResetReducer(state = initialState, action) {
   switch (action.type) {
+    case LOCATION_CHANGE:
+      return initialState;
     case RESET_PASSWORD_SENDING:
       return state
         .set('resetSending', true)
@@ -37,7 +40,7 @@ function userResetReducer(state = initialState, action) {
       return state
         .set('resetSending', false)
         .set('resetSuccess', false)
-        .set('resetError', checkErrorMessagesExist(action.error.response));
+        .set('resetError', checkResponseError(action.error));
     default:
       return state;
   }

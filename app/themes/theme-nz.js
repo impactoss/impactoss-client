@@ -127,6 +127,9 @@ theme.palette = {
   //
   // HEADER "PALETTES" //////////////////////////////////////////////////////////////
   //
+  // home: [ '#bg' ],
+  home: [secondary[3]],
+  homeIntro: [light[2]],
 
   // header: [ '#bg' ],
   header: [secondary[3]],
@@ -173,7 +176,7 @@ theme.palette = {
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary'],
-  buttonFlat: [primary[1], dark[3]],
+  buttonFlat: [primary[1], dark[3], light[4]],
   buttonFlatHover: [primary[0], primary[1]],
   // buttonDefault: ['#text', '#bg'],
   buttonDefault: [primary[4], primary[1]],

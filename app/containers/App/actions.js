@@ -60,8 +60,15 @@ import {
   RECOVER_SUCCESS,
   RECOVER_ERROR,
   CLOSE_ENTITY,
+  OPEN_NEW_ENTITY_MODAL,
+  RESET_PROGRESS,
 } from './constants';
 
+export function resetProgress() {
+  return {
+    type: RESET_PROGRESS,
+  };
+}
 
 export function saveSending(data) {
   return {
@@ -441,5 +448,12 @@ export function closeEntity(path) {
   return {
     type: CLOSE_ENTITY,
     path,
+  };
+}
+
+export function openNewEntityModal(args) {
+  return {
+    type: OPEN_NEW_ENTITY_MODAL,
+    args,
   };
 }

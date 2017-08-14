@@ -33,18 +33,19 @@ const FormWrapper = styled.div`
 class EntityListForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    this.props.populateForm(this.props.model, this.props.formOptions.options);
+    this.props.initialiseForm(this.props.model, this.props.formOptions.options);
   }
 
   componentWillReceiveProps(nextProps) {
      // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
     if (!isEqual(nextProps.formOptions.options, this.props.formOptions.options)) {
-      this.props.populateForm(nextProps.model, nextProps.formOptions.options);
+      this.props.initialiseForm(nextProps.model, nextProps.formOptions.options);
     }
   }
 
   render() {
-    const { model, onSubmit, onCancel, buttons, formOptions } = this.props;
+    const { model, onSubmit, onCancel, buttons, formOptions, activeOptionId } = this.props;
+
     return (
       <FormWrapper wide={formOptions.advanced}>
         <Form
@@ -60,6 +61,8 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
             required={formOptions.required}
             search={formOptions.search}
             advanced={formOptions.advanced}
+            tagFilterGroups={formOptions.tagFilterGroups}
+            panelId={activeOptionId}
             onCancel={onCancel}
             onChange={(values) => {
               this.props.onFormChange(values, model);
@@ -74,7 +77,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
 }
 
 EntityListForm.propTypes = {
-  populateForm: PropTypes.func.isRequired,
+  initialiseForm: PropTypes.func.isRequired,
   onFormChange: PropTypes.func.isRequired,
   model: PropTypes.string.isRequired,
   formOptions: PropTypes.object,
@@ -82,13 +85,14 @@ EntityListForm.propTypes = {
   onSelect: PropTypes.func,
   onCancel: PropTypes.func,
   buttons: PropTypes.array,
+  activeOptionId: PropTypes.string,
 };
 
 const mapDispatchToProps = (dispatch) => ({
   // resetForm: (model) => {
   //   dispatch(formActions.reset(model));
   // },
-  populateForm: (model, options) => {
+  initialiseForm: (model, options) => {
     dispatch(formActions.load(model, Map({ values: fromJS(options).toList() })));
   },
   onFormChange: (values, model) => {

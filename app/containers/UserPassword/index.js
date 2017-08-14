@@ -8,7 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { actions as formActions } from 'react-redux-form/immutable';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
@@ -23,6 +25,9 @@ import { save } from './actions';
 import userPasswordSelector from './selectors';
 
 export class UserPassword extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentWillMount() {
+    this.props.initialiseForm();
+  }
   render() {
     const { passwordSending, passwordError } = this.props.userPassword.page;
     const reference = this.props.params.id;
@@ -43,11 +48,11 @@ export class UserPassword extends React.PureComponent { // eslint-disable-line r
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
+          {passwordError &&
+            <ErrorMessages error={passwordError} />
+          }
           {passwordSending &&
             <Loading />
-          }
-          {passwordError &&
-            <p>{passwordError}</p>
           }
           { this.props.userPassword.form &&
             <AuthForm
@@ -109,6 +114,7 @@ UserPassword.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   params: PropTypes.object,
+  initialiseForm: PropTypes.func,
 };
 
 UserPassword.contextTypes = {
@@ -121,6 +127,9 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('userPassword.form.data'));
+    },
     handleSubmit: (formData, userId) => {
       const saveData = {
         ...formData.toJS(),

@@ -10,7 +10,6 @@ export function* save({ data }) {
     path: 'measures',
     entity: data,
     redirect: false,
-    timestamp: Date.now(),
   }));
 }
 

@@ -18,6 +18,7 @@ const Styled = styled.div`
   background-color: ${palette('light', 2)};
   overflow: hidden;
   margin-top: -3px;
+  z-index: 2;
 `;
 const Bar = styled.div`
   display: block;

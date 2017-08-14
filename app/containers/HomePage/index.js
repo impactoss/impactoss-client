@@ -39,10 +39,8 @@ const GraphicHome = styled(NormalImg)`
 
 const SectionTop = styled.div`
   min-height: 100vH;
-  background-color: ${palette('secondary', 3)};
-  color: ${palette('headerBrand', 1)};
-`;
-const SectionTopInner = styled.div`
+  background-color: ${palette('home', 0)};
+  color: ${palette('homeIntro', 0)};
   text-align: center;
 `;
 
@@ -102,29 +100,28 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <SectionTop>
+          <GraphicHome src={graphicHome} alt={this.context.intl.formatMessage(messages.pageTitle)} />
           <Row>
             <Grid sm={1 / 6} />
             <Grid sm={4 / 6}>
-              <SectionTopInner>
-                <GraphicHome src={graphicHome} alt={this.context.intl.formatMessage(messages.pageTitle)} />
-                <Title>
-                  <FormattedMessage {...appMessages.app.title} />
-                </Title>
-                <Claim>
-                  <FormattedMessage {...appMessages.app.claim} />
-                </Claim>
-                <Intro>
-                  <FormattedMessage {...messages.intro} />
-                </Intro>
-                <TopActions>
-                  <div>
-                    <ButtonHero onClick={() => onPageLink('/overview')}>
-                      <FormattedMessage {...messages.explore} />
-                    </ButtonHero>
-                  </div>
-                </TopActions>
-              </SectionTopInner>
+              <Title>
+                <FormattedMessage {...appMessages.app.title} />
+              </Title>
+              <Claim>
+                <FormattedMessage {...appMessages.app.claim} />
+              </Claim>
+              <Intro>
+                <FormattedMessage {...messages.intro} />
+              </Intro>
+              <TopActions>
+                <div>
+                  <ButtonHero onClick={() => onPageLink('/overview')}>
+                    <FormattedMessage {...messages.explore} />
+                  </ButtonHero>
+                </div>
+              </TopActions>
             </Grid>
+            <Grid sm={1 / 6} />
           </Row>
         </SectionTop>
         <Footer />

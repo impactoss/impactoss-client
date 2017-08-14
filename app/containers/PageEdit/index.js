@@ -16,6 +16,7 @@ import { Map } from 'immutable';
 import {
   getTitleFormField,
   getMenuTitleFormField,
+  getMenuOrderFormField,
   getMarkdownField,
   getStatusField,
 } from 'utils/forms';
@@ -37,6 +38,7 @@ import {
 
 import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -56,7 +58,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.viewEntity) {
-      this.props.populateForm('pageEdit.form.data', this.getInitialFormData());
+      this.props.initialiseForm('pageEdit.form.data', this.getInitialFormData());
     }
   }
 
@@ -68,7 +70,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     // repopulate if new data becomes ready
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('pageEdit.form.data', this.getInitialFormData(nextProps));
+      this.props.initialiseForm('pageEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
@@ -91,6 +93,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
       fields: [
         getTitleFormField(this.context.intl.formatMessage, appMessages),
         getMenuTitleFormField(this.context.intl.formatMessage, appMessages),
+        getMenuOrderFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
@@ -136,14 +139,14 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
               }] : null
             }
           />
-          {(saveSending || deleteSending || !dataReady) &&
-            <Loading />
+          {saveError &&
+            <ErrorMessages error={saveError} />
           }
           {deleteError &&
-            <p>{deleteError}</p>
+            <ErrorMessages error={deleteError} />
           }
-          {saveError &&
-            <p>{saveError}</p>
+          {(saveSending || deleteSending || !dataReady) &&
+            <Loading />
           }
           {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
@@ -178,7 +181,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
 PageEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -209,7 +212,7 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
     },
-    populateForm: (model, formData) => {
+    initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData) => {

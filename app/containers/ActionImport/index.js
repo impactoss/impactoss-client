@@ -12,13 +12,14 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { fromJS } from 'immutable';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE, DB_DATE_FORMAT } from 'containers/App/constants';
 // import appMessages from 'containers/App/messages';
 
 import {
   redirectIfNotPermitted,
   updatePath,
   loadEntitiesIfNeeded,
+  resetProgress,
 } from 'containers/App/actions';
 
 import { selectReady } from 'containers/App/selectors';
@@ -35,7 +36,7 @@ import { FORM_INITIAL } from './constants';
 export class ActionImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     if (this.props.dataReady) {
-      this.props.populateForm('measureImport.form.data', FORM_INITIAL);
+      this.props.initialiseForm('measureImport.form.data', FORM_INITIAL);
     }
   }
   componentWillReceiveProps(nextProps) {
@@ -45,7 +46,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
     }
     if (nextProps.dataReady && !this.props.dataReady) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('measureImport.form.data', FORM_INITIAL);
+      this.props.initialiseForm('measureImport.form.data', FORM_INITIAL);
     }
   }
 
@@ -79,8 +80,8 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
             handleCancel={this.props.handleCancel}
             handleReset={this.props.handleReset}
-            saveSuccess={viewDomain.page.saveSuccess}
-            saveError={viewDomain.page.saveError}
+            resetProgress={this.props.resetProgress}
+            progressData={viewDomain.page}
             template={{
               filename: 'actions_template.csv',
               data: [{
@@ -88,7 +89,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
                 description: 'Description | text (markdown supported)',
                 outcome: 'Desired outcome | text (markdown supported)',
                 indicator_summary: 'Indicator summary | text (markdown supported)',
-                target_date: 'Target Date | date (TODO: format)',
+                target_date: `Target Date | date (${DB_DATE_FORMAT})`,
                 target_date_comment: 'Target date comment | text',
               }],
             }}
@@ -102,12 +103,13 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
 ActionImport.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleReset: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  resetProgress: PropTypes.func.isRequired,
 };
 
 ActionImport.contextTypes = {
@@ -126,10 +128,13 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
+    resetProgress: () => {
+      dispatch(resetProgress());
+    },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
-    populateForm: (model, formData) => {
+    initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData) => {
@@ -144,6 +149,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath('/actions'));
     },
     handleReset: () => {
+      dispatch(resetProgress());
       dispatch(resetForm());
     },
   };

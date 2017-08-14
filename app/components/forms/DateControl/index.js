@@ -1,16 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import styled from 'styled-components';
-// import { palette } from 'styled-theme';
 
-import ControlInput from '../ControlInput';
+import { Control } from 'react-redux-form/immutable';
+
+import DatePicker from './DatePicker';
 
 export class DateControl extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { model, ...props } = this.props;
     return (
-      <ControlInput
+      <Control
+        type="date"
+        component={DatePicker}
         model={model}
+        mapProps={{
+          onChange: (cprops) => cprops.onChange,
+          error: ({ fieldValue }) => !fieldValue.valid,
+        }}
         {...props}
       />
     );
@@ -20,8 +26,5 @@ export class DateControl extends React.PureComponent { // eslint-disable-line re
 DateControl.propTypes = {
   model: PropTypes.string.isRequired,
 };
-// DateControl.contextTypes = {
-//   intl: PropTypes.object.isRequired,
-// };
 
 export default DateControl;

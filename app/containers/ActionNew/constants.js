@@ -13,4 +13,6 @@ export const DEPENDENCIES = [
   'recommendations',
   'indicators',
   'sdgtargets',
+  'recommendation_categories',
+  'sdgtarget_categories',
 ];

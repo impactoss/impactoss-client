@@ -16,6 +16,7 @@ export const DEPENDENCIES = [
   'measures',
   'recommendation_measures',
   'recommendation_categories',
+  'measure_categories',
 ];
 
 export const FORM_INITIAL = fromJS({

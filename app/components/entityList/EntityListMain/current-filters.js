@@ -1,6 +1,7 @@
 import { find, forEach } from 'lodash/collection';
 import { upperFirst } from 'lodash/string';
 
+import { getCategoryShortTitle } from 'utils/entities';
 import { lowerCase, truncateText } from 'utils/string';
 import isNumber from 'utils/is-number';
 import asList from 'utils/as-list';
@@ -54,12 +55,7 @@ formatLabel
   }
   return filterTags;
 };
-const getCategoryLabel = (category) => {
-  const label = category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
-    ? category.getIn(['attributes', 'short_title'])
-    : category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']);
-  return truncateText(label, 10);
-};
+
 
 const getConnectionLabel = (connection, value) => {
   const label = connection
@@ -84,7 +80,7 @@ const getCurrentTaxonomyFilters = (
         if (taxonomy.getIn(['categories', value])) {
           const category = taxonomy.getIn(['categories', value]);
           tags.push({
-            label: getCategoryLabel(category),
+            label: getCategoryShortTitle(category),
             type: 'taxonomies',
             id: taxonomy.get('id'),
             onClick: () => onClick({
@@ -140,7 +136,7 @@ const getCurrentConnectedTaxonomyFilters = (
           if (taxonomy.getIn(['categories', value])) {
             const category = taxonomy.getIn(['categories', value]);
             tags.push({
-              label: getCategoryLabel(category),
+              label: getCategoryShortTitle(category),
               type: 'taxonomies',
               id: taxonomy.get('id'),
               onClick: () => onClick({

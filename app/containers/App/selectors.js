@@ -14,13 +14,13 @@ import { Map } from 'immutable';
 
 import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
-import { regExMultipleWords } from 'utils/string';
 
 import { USER_ROLES } from 'containers/App/constants';
 import {
-  prepareEntitySearchTarget,
   filterEntitiesByAttributes,
-  attributesEqual,
+  filterEntitiesByKeywords,
+  entitySetCategoryIds,
+  prepareTaxonomies,
 } from 'utils/entities';
 
 // high level state selects
@@ -28,9 +28,9 @@ const getRoute = (state) => state.get('route');
 const getGlobal = (state) => state.get('global');
 const getGlobalRequested = (state) => state.getIn(['global', 'requested']);
 
-export const selectAuth = createSelector(
+export const selectNewEntityModal = createSelector(
   getGlobal,
-  (globalState) => globalState.get('auth').toJS()
+  (globalState) => globalState.get('newEntityModal')
 );
 
 export const selectIsAuthenticating = createSelector(
@@ -258,19 +258,9 @@ export const selectEntitiesSearchQuery = createSelector(
   selectEntitiesWhereQuery,
   (state, { locationQuery }) => selectSearchQuery(state, locationQuery),
   (state, { searchAttributes }) => searchAttributes,
-  (entities, query, searchAttributes) => {
-    if (query) {
-      try {
-        const regex = new RegExp(regExMultipleWords(query), 'i');
-        return entities.filter((entity) =>
-          regex.test(prepareEntitySearchTarget(entity, searchAttributes, query.length))
-        );
-      } catch (e) {
-        return entities;
-      }
-    }
-    return entities;  // !search
-  }
+  (entities, query, searchAttributes) => query
+    ? filterEntitiesByKeywords(entities, query, searchAttributes)
+    : entities  // !search
 );
 
 export const selectUserConnections = createSelector(
@@ -312,43 +302,44 @@ export const selectMeasureConnections = createSelector(
 export const selectMeasureTaxonomies = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_measures']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
+  (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_measures')
 );
 
 export const selectRecommendationTaxonomies = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_recommendations']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
+  (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_recommendations')
 );
 
 export const selectSdgTargetTaxonomies = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_sdgtargets']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
+  (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_sdgtargets')
 );
 
 export const selectUserTaxonomies = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => taxonomies
-    .filter((taxonomy) => taxonomy.getIn(['attributes', 'tags_users']))
-    .map((taxonomy) => taxonomy.set(
-      'categories',
-      categories.filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-    ))
+  (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_users')
+);
+
+export const selectRecommendationsCategorised = createSelector(
+  (state) => selectEntities(state, 'recommendations'),
+  (state) => selectEntities(state, 'recommendation_categories'),
+  (entities, categories) =>
+    entities && entities.map((entity) => entitySetCategoryIds(entity, 'recommendation_id', categories))
+);
+
+export const selectSdgTargetsCategorised = createSelector(
+  (state) => selectEntities(state, 'sdgtargets'),
+  (state) => selectEntities(state, 'sdgtarget_categories'),
+  (entities, categories) =>
+    entities && entities.map((entity) => entitySetCategoryIds(entity, 'sdgtarget_id', categories))
+);
+
+export const selectMeasuresCategorised = createSelector(
+  (state) => selectEntities(state, 'measures'),
+  (state) => selectEntities(state, 'measure_categories'),
+  (entities, categories) =>
+    entities && entities.map((entity) => entitySetCategoryIds(entity, 'measure_id', categories))
 );

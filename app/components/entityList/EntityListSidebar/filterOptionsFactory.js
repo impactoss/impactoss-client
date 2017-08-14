@@ -1,3 +1,4 @@
+import { List } from 'immutable';
 import { find, forEach } from 'lodash/collection';
 import { upperFirst } from 'lodash/string';
 import { lowerCase } from 'utils/string';
@@ -10,28 +11,31 @@ import {
   getEntityTitle,
   getEntityReference,
 } from 'utils/entities';
+
+import { makeTagFilterGroups } from 'utils/forms';
+
 import {
   optionChecked,
   attributeOptionChecked,
 } from './utils';
 
-export const makeActiveFilterOptions = (entities, filters, activeFilterOption, locationQuery, taxonomies, connections, connectedTaxonomies, messages, formatLabel) => {
+export const makeActiveFilterOptions = (entities, config, activeFilterOption, locationQuery, taxonomies, connections, connectedTaxonomies, messages, formatLabel) => {
   // create filterOptions
   switch (activeFilterOption.group) {
     case 'taxonomies':
-      return makeTaxonomyFilterOptions(entities, filters.taxonomies, taxonomies.get(activeFilterOption.optionId), locationQuery, messages);
+      return makeTaxonomyFilterOptions(entities, config.taxonomies, taxonomies.get(activeFilterOption.optionId), locationQuery, messages);
     case 'connectedTaxonomies':
-      return makeConnectedTaxonomyFilterOptions(entities, filters, connectedTaxonomies, activeFilterOption.optionId, locationQuery, messages, formatLabel);
+      return makeConnectedTaxonomyFilterOptions(entities, config, connectedTaxonomies, activeFilterOption.optionId, locationQuery, messages, formatLabel);
     case 'connections':
-      return makeConnectionFilterOptions(entities, filters.connections, connections, activeFilterOption.optionId, locationQuery, messages, formatLabel);
+      return makeConnectionFilterOptions(entities, config.connections, connections, connectedTaxonomies, activeFilterOption.optionId, locationQuery, messages, formatLabel);
     case 'attributes':
-      return makeAttributeFilterOptions(entities, filters.attributes, activeFilterOption.optionId, locationQuery.get('where'), messages, formatLabel);
+      return makeAttributeFilterOptions(entities, config.attributes, activeFilterOption.optionId, locationQuery.get('where'), messages, formatLabel);
     default:
       return null;
   }
 };
 
-export const makeAttributeFilterOptions = (entities, filters, activeOptionId, locationQueryValue, messages, formatLabel) => {
+export const makeAttributeFilterOptions = (entities, config, activeOptionId, locationQueryValue, messages, formatLabel) => {
   const filterOptions = {
     groupId: 'attributes',
     options: {},
@@ -40,7 +44,7 @@ export const makeAttributeFilterOptions = (entities, filters, activeOptionId, lo
     search: true,
   };
   // the attribute option
-  const option = find(filters.options, (o) => o.attribute === activeOptionId);
+  const option = find(config.options, (o) => o.attribute === activeOptionId);
   if (option) {
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(formatLabel(option.label))}`;
     filterOptions.search = option.search;
@@ -124,10 +128,10 @@ export const makeAttributeFilterOptions = (entities, filters, activeOptionId, lo
 //
 //
 //
-export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQuery, messages) => {
+export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQuery, messages) => {
   const filterOptions = {
     groupId: 'taxonomies',
-    search: filters.search,
+    search: config.search,
     options: {},
     multiple: true,
     required: false,
@@ -137,8 +141,8 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
   if (taxonomy && taxonomy.get('categories')) {
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`;
     if (entities.size === 0) {
-      if (locationQuery.get(filters.query)) {
-        const locationQueryValue = locationQuery.get(filters.query);
+      if (locationQuery.get(config.query)) {
+        const locationQueryValue = locationQuery.get(config.query);
         forEach(asArray(locationQueryValue), (queryValue) => {
           const value = parseInt(queryValue, 10);
           if (taxonomy.getIn(['categories', value])) {
@@ -148,7 +152,7 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
               showCount: true,
               value,
               count: 0,
-              query: filters.query,
+              query: config.query,
               checked: true,
             };
           }
@@ -187,15 +191,14 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
               if (filterOptions.options[catId]) {
                 filterOptions.options[catId].count += 1;
               } else {
-                const label = getEntityTitle(category);
                 filterOptions.options[catId] = {
                   reference: getEntityReference(category, false),
-                  label,
+                  label: getEntityTitle(category),
                   showCount: true,
                   value: catId,
                   count: 1,
-                  query: filters.query,
-                  checked: optionChecked(locationQuery.get(filters.query), catId),
+                  query: config.query,
+                  checked: optionChecked(locationQuery.get(config.query), catId),
                 };
               }
             }
@@ -225,7 +228,7 @@ export const makeTaxonomyFilterOptions = (entities, filters, taxonomy, locationQ
 //
 //
 //
-export const makeConnectionFilterOptions = (entities, connectionFilters, connections, activeOptionId, locationQuery, messages, formatLabel) => {
+export const makeConnectionFilterOptions = (entities, connectionFilters, connections, connectedTaxonomies, activeOptionId, locationQuery, messages, formatLabel) => {
   const filterOptions = {
     groupId: 'connections',
     options: {},
@@ -234,6 +237,8 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
     search: true,
     advanced: true,
   };
+  let optionConnections = List();
+
   // get the active option
   const option = find(connectionFilters.options, (o) => o.path === activeOptionId);
   // if option active
@@ -262,6 +267,9 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
                 count: 0,
                 query,
                 checked: true,
+                tags: connections.get(option.path) && connections.getIn([option.path, value])
+                  ? connections.getIn([option.path, value]).get('categories')
+                  : null,
               };
             }
           }
@@ -286,7 +294,6 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
       }
     } else {
       entities.forEach((entity) => {
-        const optionConnectedIds = [];
         // if entity has connected entities
         if (entity.get(option.path)) {
           // add connected entities if not present otherwise increase count
@@ -294,7 +301,7 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
             const connection = connections.getIn([option.path, connectedId.toString()]);
             // if not taxonomy already considered
             if (connection) {
-              optionConnectedIds.push(connectedId);
+              optionConnections = optionConnections.push(connection);
               // if category already added
               if (filterOptions.options[connectedId]) {
                 filterOptions.options[connectedId].count += 1;
@@ -310,12 +317,13 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
                   count: 1,
                   query,
                   checked: optionChecked(locationQueryValue, value),
+                  tags: connection.get('categories'),
                 };
               }
             }
           });
         }
-        if (optionConnectedIds.length === 0) {
+        if (optionConnections.size === 0) {
           if (filterOptions.options.without) {
             // no connection present
             // add without option
@@ -335,14 +343,15 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
       });  // for each entities
     }
   }
+  filterOptions.tagFilterGroups = option && makeTagFilterGroups(connectedTaxonomies);
   return filterOptions;
 };
 
 
-export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedTaxonomies, activeOptionId, locationQuery, messages) => {
+export const makeConnectedTaxonomyFilterOptions = (entities, config, connectedTaxonomies, activeOptionId, locationQuery, messages) => {
   const filterOptions = {
     groupId: 'connectedTaxonomies',
-    search: filters.connectedTaxonomies.search,
+    search: config.connectedTaxonomies.search,
     options: {},
     multiple: true,
     required: false,
@@ -351,14 +360,14 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
   const taxonomy = connectedTaxonomies.get(activeOptionId);
   if (taxonomy) {
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`;
-    const query = filters.connectedTaxonomies.query;
+    const query = config.connectedTaxonomies.query;
     const locationQueryValue = locationQuery.get(query);
     if (entities.size === 0) {
       if (locationQueryValue) {
         asList(locationQueryValue).forEach((queryValue) => {
           const locationQueryValueCategory = queryValue.split(':');
           if (locationQueryValueCategory.length > 1) {
-            forEach(filters.connectedTaxonomies.connections, (connection) => {
+            forEach(config.connectedTaxonomies.connections, (connection) => {
               if (connection.path === locationQueryValueCategory[0]) {
                 const categoryId = parseInt(locationQueryValueCategory[1], 10);
                 if (taxonomy.getIn(['categories', categoryId])) {
@@ -380,7 +389,7 @@ export const makeConnectedTaxonomyFilterOptions = (entities, filters, connectedT
       }
     } else {
       entities.forEach((entity) => {
-        forEach(filters.connectedTaxonomies.connections, (connection) => {
+        forEach(config.connectedTaxonomies.connections, (connection) => {
           // connection eg recommendations
           // if entity has taxonomies
           if (entity.get(connection.path)) { // action.recommendations stores recommendation_measures

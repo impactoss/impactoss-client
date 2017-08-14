@@ -39,7 +39,7 @@ export default class EntityListSidebarGroups extends React.PureComponent { // es
                       key={i}
                       option={option}
                       groupId={group.get('id')}
-                      onClick={this.props.onShowForm}
+                      onShowForm={this.props.onShowForm}
                     />
                   ))
                 }

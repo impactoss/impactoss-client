@@ -8,7 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { actions as formActions } from 'react-redux-form/immutable';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
@@ -23,6 +25,9 @@ import { reset } from './actions';
 import { selectDomain } from './selectors';
 
 export class UserPasswordReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentWillMount() {
+    this.props.initialiseForm();
+  }
   render() {
     const { resetSending, resetError } = this.props.viewDomain.page;
     const required = (val) => val && val.length;
@@ -42,11 +47,11 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
+          {resetError &&
+            <ErrorMessages error={resetError} />
+          }
           {resetSending &&
             <Loading />
-          }
-          {resetError &&
-            <p>{resetError}</p>
           }
           { this.props.viewDomain.form &&
             <AuthForm
@@ -94,6 +99,7 @@ UserPasswordReset.propTypes = {
   viewDomain: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  initialiseForm: PropTypes.func,
 };
 
 UserPasswordReset.contextTypes = {
@@ -106,6 +112,9 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('userPasswordReset.form.data'));
+    },
     handleSubmit: (formData) => {
       dispatch(reset(formData.toJS()));
     },

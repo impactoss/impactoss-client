@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { Map } from 'immutable';
 
 import {
   selectEntities,
@@ -16,6 +17,8 @@ import {
   filterEntitiesByCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
+  prepareTaxonomiesMultiple,
+  entitiesSetCategoryIds,
 } from 'utils/entities';
 
 import { sortEntities, getSortOption } from 'utils/sort';
@@ -92,4 +95,18 @@ export const selectRecommendations = createSelector(
       sortOption ? sortOption.type : 'string'
     );
   }
+);
+
+export const selectConnectedTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) =>
+    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
+);
+
+export const selectConnections = createSelector(
+  (state) => selectEntities(state, 'measures'),
+  (state) => selectEntities(state, 'measure_categories'),
+  (measures, measureCategories) =>
+    Map().set('measures', entitiesSetCategoryIds(measures, 'measure_id', measureCategories))
 );

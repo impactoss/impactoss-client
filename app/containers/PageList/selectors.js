@@ -27,8 +27,8 @@ export const selectPages = createSelector(
     return sortEntities(
       entities,
       order || (sortOption ? sortOption.order : 'asc'),
-      sort || (sortOption ? sortOption.attribute : 'title'),
-      sortOption ? sortOption.type : 'string'
+      sort || (sortOption ? sortOption.attribute : 'order'),
+      sortOption ? sortOption.type : 'number'
     );
   }
 );

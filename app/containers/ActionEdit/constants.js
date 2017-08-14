@@ -20,6 +20,8 @@ export const DEPENDENCIES = [
   'measure_indicators',
   'sdgtargets',
   'sdgtarget_measures',
+  'recommendation_categories',
+  'sdgtarget_categories',
 ];
 
 export const FORM_INITIAL = fromJS({
