@@ -12,7 +12,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { fromJS } from 'immutable';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE, DB_DATE_FORMAT } from 'containers/App/constants';
 // import appMessages from 'containers/App/messages';
 
 import {
@@ -89,7 +89,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
                 description: 'Description | text (markdown supported)',
                 outcome: 'Desired outcome | text (markdown supported)',
                 indicator_summary: 'Indicator summary | text (markdown supported)',
-                target_date: 'Target Date | date (TODO: format)',
+                target_date: `Target Date | date (${DB_DATE_FORMAT})`,
                 target_date_comment: 'Target date comment | text',
               }],
             }}

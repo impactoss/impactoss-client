@@ -5,6 +5,7 @@ import appMessages from 'containers/App/messages';
 
 import ButtonDefaultWithIcon from '../ButtonDefaultWithIcon';
 import ButtonDefault from '../ButtonDefault';
+import ButtonSubmit from '../ButtonSubmit';
 import ButtonFlat from '../ButtonFlat';
 import ButtonFlatWithIcon from '../ButtonFlatWithIcon';
 import ButtonDefaultIconOnly from '../ButtonDefaultIconOnly';
@@ -13,17 +14,26 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
 
   render() {
     const { button } = this.props;
-
     switch (button.type) {
       case 'primary' :
         return (
           <ButtonDefault
-            onClick={() => button.onClick()}
+            onClick={button.onClick && (() => button.onClick())}
             type={button.submit ? 'submit' : 'button'}
             disabled={button.disabled}
           >
             {button.title}
           </ButtonDefault>
+        );
+      case 'formPrimary' :
+        return (
+          <ButtonSubmit
+            onClick={button.onClick && (() => button.onClick())}
+            type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
+          >
+            {button.title}
+          </ButtonSubmit>
         );
       case 'add' :
         return (
@@ -45,6 +55,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
             type={button.submit ? 'submit' : 'button'}
             title={button.title || this.context.intl.formatMessage(appMessages.buttons.add)}
             disabled={button.disabled}
+            form
           />
         );
       case 'save' :
@@ -93,9 +104,9 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
         return (
           <ButtonFlat
             onClick={() => button.onClick()}
-            primary
             type={button.submit ? 'submit' : 'button'}
             disabled={button.disabled}
+            form
           >
             {button.title || this.context.intl.formatMessage(appMessages.buttons.close)}
           </ButtonFlat>

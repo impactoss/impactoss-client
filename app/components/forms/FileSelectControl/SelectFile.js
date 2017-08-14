@@ -9,34 +9,36 @@ import Baby from 'babyparse';
 // import appMessages from 'containers/App/messages';
 
 import Icon from 'components/Icon';
-import ButtonFlat from 'components/buttons/ButtonFlat';
+import ButtonSubmit from 'components/buttons/ButtonSubmit';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import ButtonDefaultWithIcon from 'components/buttons/ButtonDefaultWithIcon';
 
 import DocumentWrap from 'components/fields/DocumentWrap';
 
 const Remove = styled(ButtonFlatIconOnly)`
-  position: absolute;
-  right: 0;
-  top: 0;
-  padding: 1em 0.75em;
+  display: table-cell;
+  padding: 0 0.75em;
   color: ${palette('dark', 2)};
   &:hover {
     color: ${palette('primary', 0)};
   }
 `;
-const ImportButton = styled(ButtonFlat)`
-  position: absolute;
-  right: 3em;
-  top: 0.5em;
+const ImportButton = styled(ButtonSubmit)`
+  display: table-cell;
 `;
 
 const DocumentWrapEdit = styled(DocumentWrap)`
   background-color: ${palette('primary', 4)};
   position: relative;
-  padding: 1em 0.75em;
+  padding: 0 0 0 0.75em;
+  border: 1px solid ${palette('light', 1)};
+  font-weight: bold;
+  display: table;
 `;
 
+const FileName = styled.div`
+  display: table-cell;
+`;
 
 const Styled = styled.div`
   padding-top: 1em;
@@ -79,13 +81,13 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
       <Styled>
         { this.props.value &&
           <DocumentWrapEdit>
-            <div>{this.props.value.file.name}</div>
-            <ImportButton type="submit" primary>
-              {`Import ${this.props.value.rows.length} row(s)`}
-            </ImportButton>
+            <FileName>{this.props.value.file.name}</FileName>
             <Remove onClick={this.handleRemove}>
               <Icon name="removeLarge" />
             </Remove>
+            <ImportButton type="submit" primary>
+              {`Import ${this.props.value.rows.length} row(s)`}
+            </ImportButton>
           </DocumentWrapEdit>
         }
         { !this.props.value &&
