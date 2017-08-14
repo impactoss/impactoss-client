@@ -10,7 +10,9 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
+import { actions as formActions } from 'react-redux-form/immutable';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Icon from 'components/Icon';
 import ContentNarrow from 'components/ContentNarrow';
@@ -19,7 +21,6 @@ import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
 import { updatePath } from 'containers/App/actions';
-import { selectAuth } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -32,10 +33,12 @@ const BottomLinks = styled.div`
 `;
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentWillMount() {
+    this.props.initialiseForm();
+  }
   render() {
-    const { error, messages: message, sending } = this.props.authentication;
+    const { authError, authSending } = this.props.viewDomain.page;
     const required = (val) => val && val.length;
-
     return (
       <div>
         <Helmet
@@ -51,12 +54,10 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
-          {error &&
-            message.map((errorMessage, i) =>
-              <p key={i}>{errorMessage}</p>
-            )
+          {authError &&
+            <ErrorMessages error={authError} />
           }
-          {sending &&
+          {authSending &&
             <Loading />
           }
           { this.props.viewDomain.form &&
@@ -129,10 +130,10 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
 
 UserLogin.propTypes = {
   viewDomain: PropTypes.object.isRequired,
-  authentication: PropTypes.object,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
+  initialiseForm: PropTypes.func,
 };
 
 UserLogin.contextTypes = {
@@ -141,11 +142,13 @@ UserLogin.contextTypes = {
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
-  authentication: selectAuth(state),
 });
 
 export function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('userLogin.form.data'));
+    },
     handleSubmit: (formData) => {
       dispatch(login(formData.toJS()));
     },

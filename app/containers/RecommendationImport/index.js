@@ -19,6 +19,7 @@ import {
   redirectIfNotPermitted,
   updatePath,
   loadEntitiesIfNeeded,
+  resetProgress,
 } from 'containers/App/actions';
 
 import { selectReady } from 'containers/App/selectors';
@@ -36,7 +37,7 @@ import { FORM_INITIAL } from './constants';
 export class RecommendationImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     if (this.props.dataReady) {
-      this.props.populateForm('recommendationImport.form.data', FORM_INITIAL);
+      this.props.initialiseForm('recommendationImport.form.data', FORM_INITIAL);
     }
   }
   componentWillReceiveProps(nextProps) {
@@ -46,7 +47,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
     }
     if (nextProps.dataReady && !this.props.dataReady) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('recommendationImport.form.data', FORM_INITIAL);
+      this.props.initialiseForm('recommendationImport.form.data', FORM_INITIAL);
     }
   }
 
@@ -80,8 +81,8 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
             handleCancel={this.props.handleCancel}
             handleReset={this.props.handleReset}
-            saveSuccess={viewDomain.page.saveSuccess}
-            saveError={viewDomain.page.saveError}
+            resetProgress={this.props.resetProgress}
+            progressData={viewDomain.page}
             template={{
               filename: 'recommendations_template.csv',
               data: [{
@@ -101,12 +102,13 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
 RecommendationImport.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleReset: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  resetProgress: PropTypes.func.isRequired,
 };
 
 RecommendationImport.contextTypes = {
@@ -125,7 +127,10 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       dispatch(loadEntitiesIfNeeded('user_roles'));
     },
-    populateForm: (model, formData) => {
+    resetProgress: () => {
+      dispatch(resetProgress());
+    },
+    initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
     redirectIfNotPermitted: () => {
@@ -143,6 +148,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath('/recommendations'));
     },
     handleReset: () => {
+      dispatch(resetProgress());
       dispatch(resetForm());
     },
   };

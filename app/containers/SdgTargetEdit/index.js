@@ -40,10 +40,12 @@ import {
   updatePath,
   updateEntityForm,
   deleteEntity,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -55,6 +57,7 @@ import {
   selectTaxonomies,
   selectIndicators,
   selectMeasures,
+  selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
@@ -66,7 +69,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.viewEntity) {
-      this.props.populateForm('sdgtargetEdit.form.data', this.getInitialFormData());
+      this.props.initialiseForm('sdgtargetEdit.form.data', this.getInitialFormData());
     }
   }
 
@@ -78,7 +81,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
     // repopulate if new data becomes ready
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('sdgtargetEdit.form.data', this.getInitialFormData(nextProps));
+      this.props.initialiseForm('sdgtargetEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
@@ -118,7 +121,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (indicators, measures) => ([
+  getBodyMainFields = (connectedTaxonomies, indicators, measures, onCreateOption) => ([
     {
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
@@ -126,22 +129,22 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures),
-        renderIndicatorControl(indicators),
+        renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+        renderIndicatorControl(indicators, onCreateOption),
       ],
     },
   ]);
 
-  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, indicators, taxonomies, measures } = this.props;
+    const { viewEntity, dataReady, viewDomain, connectedTaxonomies, indicators, taxonomies, measures, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
@@ -174,14 +177,14 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
               }] : null
             }
           />
-          {(saveSending || deleteSending || !dataReady) &&
-            <Loading />
+          {saveError &&
+            <ErrorMessages error={saveError} />
           }
           {deleteError &&
-            <p>{deleteError}</p>
+            <ErrorMessages error={deleteError} />
           }
-          {saveError &&
-            <p>{saveError}</p>
+          {(saveSending || deleteSending || !dataReady) &&
+            <Loading />
           }
           {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
@@ -207,8 +210,8 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(indicators, measures),
-                  aside: this.getBodyAsideFields(taxonomies),
+                  main: this.getBodyMainFields(connectedTaxonomies, indicators, measures, onCreateOption),
+                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -222,7 +225,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
 SdgTargetEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -235,6 +238,8 @@ SdgTargetEdit.propTypes = {
   taxonomies: PropTypes.object,
   indicators: PropTypes.object,
   measures: PropTypes.object,
+  onCreateOption: PropTypes.func,
+  connectedTaxonomies: PropTypes.object,
 };
 
 SdgTargetEdit.contextTypes = {
@@ -249,6 +254,7 @@ const mapStateToProps = (state, props) => ({
   measures: selectMeasures(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   indicators: selectIndicators(state, props.params.id),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -259,7 +265,7 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
-    populateForm: (model, formData) => {
+    initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
 
@@ -307,6 +313,9 @@ function mapDispatchToProps(dispatch, props) {
         path: 'sdgtargets',
         id: props.params.id,
       }));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

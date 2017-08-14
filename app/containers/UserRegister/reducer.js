@@ -4,8 +4,9 @@
  *
  */
 
+import { LOCATION_CHANGE } from 'react-router-redux';
 import { fromJS } from 'immutable';
-import { checkErrorMessagesExist } from 'utils/request';
+import { checkResponseError } from 'utils/request';
 
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
@@ -24,6 +25,8 @@ const initialState = fromJS({
 
 function userRegisterReducer(state = initialState, action) {
   switch (action.type) {
+    case LOCATION_CHANGE:
+      return initialState;
     case REGISTER_USER_SENDING:
       return state
         .set('registerSending', true)
@@ -37,7 +40,7 @@ function userRegisterReducer(state = initialState, action) {
       return state
         .set('registerSending', false)
         .set('registerSuccess', false)
-        .set('registerError', checkErrorMessagesExist(action.error.response));
+        .set('registerError', checkResponseError(action.error));
     default:
       return state;
   }

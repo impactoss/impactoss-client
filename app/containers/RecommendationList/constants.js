@@ -9,6 +9,7 @@ export const DEPENDENCIES = [
   'recommendations',
   'recommendation_measures',
   'recommendation_categories',
+  'measure_categories',
 ];
 
 export const CONFIG = {

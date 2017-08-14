@@ -40,10 +40,12 @@ import {
   updatePath,
   updateEntityForm,
   deleteEntity,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -54,6 +56,7 @@ import {
   selectViewEntity,
   selectTaxonomies,
   selectMeasures,
+  selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
@@ -65,7 +68,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.viewEntity) {
-      this.props.populateForm('recommendationEdit.form.data', this.getInitialFormData());
+      this.props.initialiseForm('recommendationEdit.form.data', this.getInitialFormData());
     }
   }
 
@@ -77,7 +80,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     // repopulate if new data becomes ready
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('recommendationEdit.form.data', this.getInitialFormData(nextProps));
+      this.props.initialiseForm('recommendationEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
@@ -114,7 +117,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       ],
     },
   ]);
-  getBodyMainFields = (entity, measures) => ([
+  getBodyMainFields = (connectedTaxonomies, entity, measures, onCreateOption) => ([
     {
       fields: [
         getAcceptedField(this.context.intl.formatMessage, appMessages, entity),
@@ -125,21 +128,21 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures),
+        renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
       ],
     },
   ]);
 
-  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, measures, taxonomies } = this.props;
+    const { viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, taxonomies, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
 
@@ -171,14 +174,14 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               }] : null
             }
           />
-          {(saveSending || deleteSending || !dataReady) &&
-            <Loading />
+          {saveError &&
+            <ErrorMessages error={saveError} />
           }
           {deleteError &&
-            <p>{deleteError}</p>
+            <ErrorMessages error={deleteError} />
           }
-          {saveError &&
-            <p>{saveError}</p>
+          {(saveSending || deleteSending || !dataReady) &&
+            <Loading />
           }
           {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
@@ -203,8 +206,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, measures),
-                  aside: this.getBodyAsideFields(taxonomies),
+                  main: this.getBodyMainFields(connectedTaxonomies, viewEntity, measures, onCreateOption),
+                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -218,7 +221,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 RecommendationEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -230,6 +233,8 @@ RecommendationEdit.propTypes = {
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
+  onCreateOption: PropTypes.func,
+  connectedTaxonomies: PropTypes.object,
 };
 
 RecommendationEdit.contextTypes = {
@@ -242,6 +247,7 @@ const mapStateToProps = (state, props) => ({
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -252,7 +258,7 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
-    populateForm: (model, formData) => {
+    initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
     handleSubmit: (formData, taxonomies, measures) => {
@@ -290,6 +296,9 @@ function mapDispatchToProps(dispatch, props) {
         path: 'recommendations',
         id: props.params.id,
       }));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

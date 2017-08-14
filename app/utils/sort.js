@@ -50,17 +50,13 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
     } else if (!aStartsWithNumber && bStartsWithNumber) {
       result = 1;
     } else if (aStartsWithNumber && bStartsWithNumber) {
-      const aIsNumber = aStartsWithNumber && isFinite(valueA) && intA.toString() === valueA;
-      const bIsNumber = bStartsWithNumber && isFinite(valueB) && intB.toString() === valueB;
-      if (aIsNumber && !bIsNumber) {
-        result = -1;
-      } else if (!aIsNumber && bIsNumber) {
-        result = 1;
-      } else if (aIsNumber && bIsNumber) {
-        // both numbers
+      // both are pure numbers
+      if (intA.toString() === valueA && intB.toString() === valueB) {
         result = intA < intB ? -1 : 1;
+      // both are not pure numbers but start with numbers
       } else if (intA !== intB) {
         result = intA < intB ? -1 : 1;
+      // both are not pure numbers and start with same number
       } else {
         // both starting with number but are not numbers entirely
         // compare numbers first then remaining strings if numbers equal

@@ -20,5 +20,6 @@ export const FORM_INITIAL = fromJS({
     content: '',
     menu_title: '',
     draft: '',
+    order: '',
   },
 });

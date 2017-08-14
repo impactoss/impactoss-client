@@ -8,12 +8,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
   getTitleFormField,
   getMenuTitleFormField,
   getMarkdownField,
   getStatusField,
+  getMenuOrderFormField,
 } from 'utils/forms';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -27,6 +29,7 @@ import {
 } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -43,6 +46,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+    this.props.initialiseForm();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -60,6 +64,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
       fields: [
         getTitleFormField(this.context.intl.formatMessage, appMessages),
         getMenuTitleFormField(this.context.intl.formatMessage, appMessages),
+        getMenuOrderFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
@@ -103,13 +108,10 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
               }] : null
             }
           />
-          {saveSending &&
-            <Loading />
-          }
           {saveError &&
-            <p>{saveError}</p>
+            <ErrorMessages error={saveError} />
           }
-          { !dataReady &&
+          {(saveSending || !dataReady) &&
             <Loading />
           }
           {dataReady &&
@@ -144,6 +146,7 @@ PageNew.propTypes = {
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  initialiseForm: PropTypes.func,
 };
 
 PageNew.contextTypes = {
@@ -157,6 +160,9 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('pageNew.form.data'));
+    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },

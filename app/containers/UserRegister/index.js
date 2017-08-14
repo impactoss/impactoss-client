@@ -10,8 +10,10 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import Icon from 'components/Icon';
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
@@ -31,6 +33,9 @@ const BottomLinks = styled.div`
 `;
 
 export class UserRegister extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentWillMount() {
+    this.props.initialiseForm();
+  }
   render() {
     const { registerError, registerSending } = this.props.viewDomain.page;
     const required = (val) => val && val.length;
@@ -51,7 +56,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
           {registerError &&
-            <p>{registerError}</p>
+            <ErrorMessages error={registerError} />
           }
           {registerSending &&
             <Loading />
@@ -142,6 +147,7 @@ UserRegister.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
+  initialiseForm: PropTypes.func,
 };
 
 UserRegister.contextTypes = {
@@ -154,6 +160,9 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('userRegister.form.data'));
+    },
     handleSubmit: (formData) => {
       dispatch(register(formData.toJS()));
     },

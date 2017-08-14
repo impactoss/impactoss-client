@@ -15,7 +15,6 @@ import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { ACCEPTED_STATUSES } from 'containers/App/constants';
 import {
   selectReady,
-  selectRecommendationConnections,
   selectRecommendationTaxonomies,
 } from 'containers/App/selectors';
 
@@ -24,7 +23,7 @@ import appMessages from 'containers/App/messages';
 import EntityList from 'containers/EntityList';
 
 import { CONFIG, DEPENDENCIES } from './constants';
-import { selectRecommendations } from './selectors';
+import { selectRecommendations, selectConnectedTaxonomies, selectConnections } from './selectors';
 import messages from './messages';
 
 export class RecommendationList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -87,6 +86,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
+          connectedTaxonomies={this.props.connectedTaxonomies}
           config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
@@ -114,6 +114,7 @@ RecommendationList.propTypes = {
   dataReady: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
+  connectedTaxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   location: PropTypes.object,
 };
@@ -126,7 +127,8 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectRecommendations(state, fromJS(props.location.query)),
   taxonomies: selectRecommendationTaxonomies(state),
-  connections: selectRecommendationConnections(state),
+  connections: selectConnections(state),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
 function mapDispatchToProps(dispatch) {

@@ -14,7 +14,7 @@ injectGlobal`
     line-height: 1.64em;
     color: #21282B;
   }
-  textarea {
+  button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
@@ -108,5 +108,32 @@ injectGlobal`
         }
       }
     }
+  }
+
+  .new-entity-modal {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    right: 40px;
+    bottom: 40px;
+    border: 0;
+    background: #F1F3F3;
+    overflow: auto;
+    --webkit-overflow-scrolling: touch;
+    border-radius: 0;
+    outline: none;
+    padding: 20px;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 1170px;
+  }
+
+  .new-entity-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.85);
   }
 `;

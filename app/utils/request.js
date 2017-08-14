@@ -1,4 +1,6 @@
 import 'whatwg-fetch';
+import { map } from 'lodash/collection';
+import { capitalize } from 'lodash/string';
 
 /**
  * Parses the JSON returned by a network request
@@ -40,11 +42,37 @@ export function isContentJSON(response) {
   return contentType && contentType.indexOf('application/json') !== -1;
 }
 
+export function checkResponseError(error) {
+  return error.response
+    ? {
+      messages: checkErrorMessagesExist(error.response),
+      statusText: error.response.statusText,
+      status: error.response.status,
+    }
+    : {
+      messages: [],
+      statusText: 'Error without response',
+      status: 0,
+    };
+}
+
+function mapErrors(errors) {
+  return map(errors, (error, key) => `${capitalize(key)}: ${error}`);
+}
+
 export function checkErrorMessagesExist(response) {
   if (response && response.json && response.json.errors && response.json.errors.full_messages) {
     return response.json.errors.full_messages;
   } else if (response && response.json && response.json.errors) {
     return response.json.errors;
+  } else if (response && response.json && response.json.error) {
+    return response.json.error === Object(response.json.error)
+      ? mapErrors(response.json.errors)
+      : [response.json.error];
+  } else if (response && response.json) {
+    return response.json === Object(response.json)
+      ? mapErrors(response.json)
+      : [response.json];
   }
   return [];
 }

@@ -10,8 +10,10 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import Icon from 'components/Icon';
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
@@ -31,6 +33,9 @@ const BottomLinks = styled.div`
 `;
 
 export class UserPasswordRecover extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentWillMount() {
+    this.props.initialiseForm();
+  }
   render() {
     const { error, sending } = this.props.viewDomain.page;
     const required = (val) => val && val.length;
@@ -51,7 +56,7 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
           {error &&
-            <p>{error}</p>
+            <ErrorMessages error={error} />
           }
           {sending &&
             <Loading />
@@ -103,6 +108,7 @@ UserPasswordRecover.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
+  initialiseForm: PropTypes.func,
 };
 
 UserPasswordRecover.contextTypes = {
@@ -115,6 +121,9 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('userPasswordRecover.form.data'));
+    },
     handleSubmit: (formData) => {
       dispatch(recover(formData.toJS()));
     },

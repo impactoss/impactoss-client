@@ -41,7 +41,7 @@ const dark = coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395
 const light = coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad');
 
 // other palettes (not currently used)
-const danger = coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478');
+const danger = coolorsToHex('https://coolors.co/bf4c3a-e25646-e46556-e77467-e98478');
 const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-fff2ce');
 const success = coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-c8e6c9');
 
@@ -95,6 +95,10 @@ theme.palette = {
   // HEADER "PALETTES" //////////////////////////////////////////////////////////////
   //
 
+  // home: [ '#bg' ],
+  home: [secondary[1]],
+  homeIntro: [light[2]],
+
   // header: [ '#bg' ],
   header: [secondary[1]],
 
@@ -139,11 +143,12 @@ theme.palette = {
   //
   // BUTTONS / LINKS
   //
-  // button: ['#colorPrimary', '#colorSecondary'],
-  buttonFlat: [primary[1], dark[3]],
+  // button: ['#colorPrimary', '#colorSecondary', #disabled],
+  buttonFlat: [primary[1], dark[3], light[4]],
   buttonFlatHover: [primary[0], primary[1]],
   // buttonDefault: ['#text', '#bg'],
   buttonDefault: [primary[4], primary[1]],
+  buttonDefaultInactive: [primary[4], primary[1]],
   buttonDefaultHover: [primary[4], primary[0]],
   // buttonPrimary: ['#text', '#bg', '#border'],
   buttonDefaultIconOnly: [primary[4], primary[1], primary[1]],
@@ -176,7 +181,7 @@ theme.fonts = {
 // sizes
 theme.sizes = {
   // also see global-styles.js for other sizes
-  headerBrandMain: '2.6em',
+  headerBrandMain: '2.2em',
   headerBrandClaim: '0.85em',
 };
 
