@@ -41,6 +41,7 @@ import {
   updateEntityForm,
   deleteEntity,
   openNewEntityModal,
+  submitInvalid,
 } from 'containers/App/actions';
 
 import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
@@ -146,7 +147,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
   render() {
     const { viewEntity, dataReady, viewDomain, connectedTaxonomies, indicators, taxonomies, measures, onCreateOption } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError, deleteSending, deleteError } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
 
     return (
       <div>
@@ -168,15 +169,13 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(
-                  viewDomain.form.data,
-                  taxonomies,
-                  indicators,
-                  measures
-                ),
+                onClick: () => this.props.handleSubmitRemote('sdgtargetEdit.form.data'),
               }] : null
             }
           />
+          {!submitValid &&
+            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+          }
           {saveError &&
             <ErrorMessages error={saveError} />
           }
@@ -201,6 +200,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
                 indicators,
                 measures
               )}
+              handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
               handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
@@ -226,6 +226,8 @@ SdgTargetEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
   initialiseForm: PropTypes.func,
+  handleSubmitRemote: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -268,7 +270,12 @@ function mapDispatchToProps(dispatch, props) {
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
-
+    handleSubmitFail: (formData) => {
+      dispatch(submitInvalid(formData));
+    },
+    handleSubmitRemote: (model) => {
+      dispatch(formActions.submit(model));
+    },
     handleSubmit: (formData, taxonomies, indicators, measures) => {
       const saveData = formData
         .set(

@@ -36,6 +36,7 @@ import {
   updatePath,
   updateEntityForm,
   openNewEntityModal,
+  submitInvalid,
 } from 'containers/App/actions';
 
 import {
@@ -64,7 +65,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm();
+    this.props.initialiseForm('indicatorNew.form.data', this.props.viewDomain.form.data);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -127,7 +128,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
 
   render() {
     const { dataReady, viewDomain, connectedTaxonomies, measures, users, sdgtargets, onCreateOption } = this.props;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.page;
 
     return (
       <div>
@@ -152,12 +153,13 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(
-                  viewDomain.form.data,
-                ),
+                onClick: () => this.props.handleSubmitRemote('indicatorNew.form.data'),
               }] : null
             }
           />
+          {!submitValid &&
+            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+          }
           {saveError &&
             <ErrorMessages error={saveError} />
           }
@@ -168,6 +170,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             <EntityForm
               model="indicatorNew.form.data"
               formData={viewDomain.form.data}
+              handleSubmitFail={this.props.handleSubmitFail}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
@@ -192,6 +195,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
 IndicatorNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
+  handleSubmitRemote: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -223,14 +228,20 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('indicatorNew.form.data'));
+    initialiseForm: (model, formData) => {
+      dispatch(formActions.load(model, formData));
     },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+    },
+    handleSubmitFail: (formData) => {
+      dispatch(submitInvalid(formData));
+    },
+    handleSubmitRemote: (model) => {
+      dispatch(formActions.submit(model));
     },
     handleSubmit: (formData) => {
       let saveData = formData;

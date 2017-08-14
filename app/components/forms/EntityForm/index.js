@@ -271,11 +271,11 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   );
 
   render() {
-    const { fields, model, handleSubmit, handleCancel, inModal } = this.props;
+    const { fields, model, handleSubmit, handleCancel, handleSubmitFail, inModal } = this.props;
 
     return (
       <FormWrapper withoutShadow={inModal}>
-        <Form model={model} onSubmit={handleSubmit}>
+        <Form model={model} onSubmit={handleSubmit} onSubmitFailed={handleSubmitFail}>
           { fields.header &&
             <FormPanel borderBottom>
               { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside) }
@@ -326,6 +326,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
 }
 
 EntityForm.propTypes = {
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleDelete: PropTypes.func,
