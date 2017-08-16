@@ -106,7 +106,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                     datas={template.data}
                     filename={template.filename}
                   >
-                    <DownloadTemplate href="/">
+                    <DownloadTemplate href="/" onClick={(evt) => evt.preventDefault()}>
                       <FormattedMessage {...messages.downloadTemplate} />
                     </DownloadTemplate>
                   </CsvDownloader>
