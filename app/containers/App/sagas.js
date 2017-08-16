@@ -346,7 +346,7 @@ export function* deleteEntitySaga({ data }) {
   try {
     yield put(deleteSending(dataTS));
     yield call(deleteEntityRequest, data.path, data.id);
-    if (data.redirect) {
+    if (data.redirect !== false) {
       yield put(push(`/${data.redirect || data.path}`));
     }
     yield put(removeEntity(data.path, data.id));

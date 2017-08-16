@@ -169,6 +169,7 @@ function mapDispatchToProps(dispatch) {
   return {
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
+      dispatch(formActions.reset(model));
     },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
