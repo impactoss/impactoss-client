@@ -134,7 +134,7 @@ const CategorisedIcons = styled.div`
   padding-top: 5px;
 `;
 const CategorisedIcon = styled.span`
-  padding: 0 5px;
+  padding: 0 4px;
 `;
 
 const DiagramButton = styled(Button)`
