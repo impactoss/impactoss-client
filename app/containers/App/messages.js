@@ -67,6 +67,14 @@ export default defineMessages({
       id: 'app.containers.App.forms.startDateAfterEndDateError',
       defaultMessage: 'Start date must be before end date',
     },
+    multipleErrors: {
+      id: 'app.containers.App.forms.multipleErrors',
+      defaultMessage: 'One or more fields have errors.',
+    },
+    outdatedError: {
+      id: 'app.containers.App.forms.outdatedError',
+      defaultMessage: 'Sorry, this record has become outdated. Please find the latest server version below.',
+    },
   },
   hints: {
     autoReference: {

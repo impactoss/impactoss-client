@@ -9,6 +9,7 @@ import {
   DELETE_ERROR,
   DELETE_SUCCESS,
   SUBMIT_INVALID,
+  SAVE_ERROR_DISMISS,
 } from 'containers/App/constants';
 
 import { checkResponseError } from 'utils/request';
@@ -41,6 +42,11 @@ export const entityFormReducer = (state = initialState, action) => {
         .set('saveSending', false)
         .set('saveSuccess', false)
         .set('saveError', checkResponseError(action.error));
+    case SAVE_ERROR_DISMISS:
+      return state
+        .set('saveSending', false)
+        .set('saveSuccess', false)
+        .set('saveError', false);
     case DELETE_SENDING:
       return state
         .set('deleteSending', true)
@@ -56,7 +62,7 @@ export const entityFormReducer = (state = initialState, action) => {
         .set('deleteSuccess', false)
         .set('deleteError', checkResponseError(action.error));
     case SUBMIT_INVALID:
-      return state.set('submitValid', false);
+      return state.set('submitValid', action.valid);
     default:
       return state;
   }

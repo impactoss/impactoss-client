@@ -172,7 +172,10 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
             }
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
             <ErrorMessages error={saveError} />
@@ -237,6 +240,7 @@ RecommendationEdit.propTypes = {
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
   onCreateOption: PropTypes.func,
+  onErrorDismiss: PropTypes.func.isRequired,
   connectedTaxonomies: PropTypes.object,
 };
 
@@ -265,8 +269,11 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.reset(model));
       dispatch(formActions.change(model, formData, { silent: true }));
     },
-    handleSubmitFail: (formData) => {
-      dispatch(submitInvalid(formData));
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    handleSubmitFail: () => {
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));

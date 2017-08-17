@@ -132,7 +132,10 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
             }
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
             <ErrorMessages error={saveError} />
@@ -181,6 +184,7 @@ ReportNew.propTypes = {
   indicator: PropTypes.object,
   params: PropTypes.object,
   initialiseForm: PropTypes.func,
+  onErrorDismiss: PropTypes.func.isRequired,
 };
 
 ReportNew.contextTypes = {
@@ -202,8 +206,11 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    handleSubmitFail: (formData) => {
-      dispatch(submitInvalid(formData));
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    handleSubmitFail: () => {
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));

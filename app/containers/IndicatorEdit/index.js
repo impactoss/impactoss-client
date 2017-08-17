@@ -195,7 +195,10 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             }
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
             <ErrorMessages error={saveError} />
@@ -256,6 +259,7 @@ IndicatorEdit.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
+  onErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -304,6 +308,9 @@ function mapDispatchToProps(dispatch, props) {
         required: repeat,
       }));
     },
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
     handleSubmitFail: (formData, formatMessage) => {
       if (formData.$form.errors.endDatePresent) {
         dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
@@ -319,7 +326,7 @@ function mapDispatchToProps(dispatch, props) {
         dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', formatMessage(appMessages.forms.startDateAfterEndDateError)));
         dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', formatMessage(appMessages.forms.endDateBeforeStartDateError)));
       }
-      dispatch(submitInvalid(formData));
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));

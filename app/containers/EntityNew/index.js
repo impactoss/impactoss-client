@@ -55,7 +55,10 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             }]}
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
             <ErrorMessages error={saveError} />
@@ -92,6 +95,7 @@ EntityNew.propTypes = {
   // onSaveSuccess: PropTypes.func,
   viewDomain: PropTypes.object,
   initialiseForm: PropTypes.func,
+  onErrorDismiss: PropTypes.func.isRequired,
 };
 
 EntityNew.contextTypes = {
@@ -108,8 +112,11 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.reset(model));
       dispatch(formActions.change(model, formData, { silent: true }));
     },
-    handleSubmitFail: (formData) => {
-      dispatch(submitInvalid(formData));
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    handleSubmitFail: () => {
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
