@@ -304,15 +304,15 @@ const getDueDateDateOptions = (dates, activeDateId, formatMessage, appMessages, 
   const NO_OF_REPORT_OPTIONS = 1;
   let excludeCount = 0;
   return dates && dates.reduce((memo, date, i) => {
-    const isOwnDate = activeDateId ? date.get('id') === activeDateId : false;
+    const dateActive = activeDateId ? date.get('id') === activeDateId : false;
     const optionNoNotExceeded = i - excludeCount < NO_OF_REPORT_OPTIONS;
-    const withoutReport = !date.getIn(['attributes', 'has_progress_report']) || isOwnDate;
+    const withoutReport = !date.getIn(['attributes', 'has_progress_report']);
     // only allow upcoming and those that are not associated
-    if (optionNoNotExceeded && withoutReport) {
-      // exclude overdue and already assigned date from max no of date options
-      if (date.getIn(['attributes', 'overdue']) || isOwnDate) {
+    if ((optionNoNotExceeded && withoutReport) || dateActive) {
+      if (date.getIn(['attributes', 'overdue']) || dateActive) {
         excludeCount += 1;
       }
+      // exclude overdue and already assigned date from max no of date options
       const label =
         `${formatDate(new Date(date.getIn(['attributes', 'due_date'])))} ${
           date.getIn(['attributes', 'overdue']) ? formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
@@ -326,6 +326,7 @@ const getDueDateDateOptions = (dates, activeDateId, formatMessage, appMessages, 
         },
       ]);
     }
+    excludeCount += 1;
     return memo;
   }, dateOptions);
 };

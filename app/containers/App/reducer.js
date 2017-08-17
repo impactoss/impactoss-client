@@ -30,7 +30,6 @@ import {
   ENTITIES_REQUESTED,
   INVALIDATE_ENTITIES,
   DUEDATE_ASSIGNED,
-  DUEDATE_UNASSIGNED,
   DB_TABLES,
   OPEN_NEW_ENTITY_MODAL,
 } from './constants';
@@ -154,15 +153,6 @@ function appReducer(state = initialState, payload) {
         return state;
       }
       return state;
-    case DUEDATE_UNASSIGNED:
-      // reset due_date to get updated virtual fields: due, overdue, and has_progress_reports
-      // while the overdue and has_progress_reports fields would be trivial to set client-side, the due field
-      // is dependent on the server configuration (look-ahead-period) that is best not stored also on the client
-      // TODO instead of reloading all due dates we could alternatively only request a new version of the due_date in question
-      return state
-        .setIn(['ready', 'due_dates'], null) // should trigger new entity load
-        .setIn(['requested', 'due_dates'], null)
-        .setIn(['entities', 'due_dates'], fromJS({}));
     case OPEN_NEW_ENTITY_MODAL:
       return state.set('newEntityModal', fromJS(payload.args));
     default:
