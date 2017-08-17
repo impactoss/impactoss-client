@@ -28,6 +28,7 @@ import {
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
 import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
+import validateRequired from 'components/forms/validators/validate-required';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -118,7 +119,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       icon: 'reminder',
       fields: [
         getDateField(this.context.intl.formatMessage, appMessages, 'start_date', repeat, repeat ? 'start_date' : 'start_date_only'),
-        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat', null, this.props.resetValidityOnRepeatChange),
+        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat', null, (model, value) => this.props.resetValidityOnRepeatChange(model, value, this.props.viewDomain.form.data)),
         repeat ? getFrequencyField(this.context.intl.formatMessage, appMessages) : null,
         repeat ? getDateField(this.context.intl.formatMessage, appMessages, 'end_date', repeat) : null,
         renderUserControl(
@@ -257,14 +258,14 @@ function mapDispatchToProps(dispatch) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
-    resetValidityOnRepeatChange: (repeatModel, repeat) => {
-      dispatch(formActions.change(repeatModel, repeat));
+    resetValidityOnRepeatChange: (repeatModel, repeat, formData) => {
       dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
         required: repeat,
       }));
       dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', {
-        required: repeat,
+        required: repeat && !validateRequired(formData.getIn(['attributes', 'start_date'])),
       }));
+      dispatch(formActions.change(repeatModel, repeat));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));

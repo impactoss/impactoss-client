@@ -308,11 +308,11 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.change(model, formData, { silent: true }));
     },
     resetValidityOnRepeatChange: (repeatModel, repeat, formData) => {
-      dispatch(formActions.change(repeatModel, repeat));
       dispatch(formActions.resetValidity('indicatorEdit.form.data.attributes.end_date'));
       dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
-        required: repeat && validateRequired(formData.getIn(['attributes', 'start_date'])),
+        required: repeat && !validateRequired(formData.getIn(['attributes', 'start_date'])),
       }));
+      dispatch(formActions.change(repeatModel, repeat));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
