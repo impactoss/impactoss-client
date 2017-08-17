@@ -4,26 +4,15 @@
  *
  */
 
-import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 
 import { entityFormReducer } from 'containers/App/entityFormReducer';
 import { UPDATE_ENTITY_FORM } from 'containers/App/constants';
 
-const formInitial = fromJS({
-  attributes: {
-    title: '',
-    reference: '',
-    accepted: true,
-    response: '',
-    draft: true,
-  },
-  associatedTaxonomies: {},
-  associatedMeasures: [],
-});
+import { FORM_INITIAL } from './constants';
 
-function formReducer(state = formInitial, action) {
+function formReducer(state = FORM_INITIAL, action) {
   switch (action.type) {
     case UPDATE_ENTITY_FORM:
       return action.data;

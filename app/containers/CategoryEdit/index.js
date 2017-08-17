@@ -11,7 +11,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, List, fromJS } from 'immutable';
+import { Map, List } from 'immutable';
 
 import {
   userOptions,
@@ -250,7 +250,8 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
     initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, fromJS(formData)));
+      dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
     handleSubmitFail: (formData) => {
       dispatch(submitInvalid(formData));

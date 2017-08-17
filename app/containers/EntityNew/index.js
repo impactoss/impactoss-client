@@ -25,12 +25,13 @@ import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
 import { selectDomain } from './selectors';
+import { FORM_INITIAL } from './constants';
 
 import messages from './messages';
 
 export class EntityNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
-    this.props.initialiseForm('entityNew.form.data', this.props.viewDomain.form.data);
+    this.props.initialiseForm('entityNew.form.data', FORM_INITIAL);
   }
 
   render() {
@@ -104,8 +105,8 @@ const mapStateToProps = (state) => ({
 function mapDispatchToProps(dispatch, props) {
   return {
     initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
       dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
     handleSubmitFail: (formData) => {
       dispatch(submitInvalid(formData));
