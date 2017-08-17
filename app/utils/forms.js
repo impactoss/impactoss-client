@@ -378,20 +378,21 @@ export const getMarkdownField = (formatMessage, appMessages, attribute = 'descri
 export const getTextareaField = (formatMessage, appMessages, attribute = 'description') =>
   getFormField(formatMessage, appMessages, 'textarea', attribute);
 
-export const getDateField = (formatMessage, appMessages, attribute) => {
-  const field = getFormField(formatMessage, appMessages, 'date', attribute, false, attribute, 'date');
+export const getDateField = (formatMessage, appMessages, attribute, required = false, label) => {
+  const field = getFormField(formatMessage, appMessages, 'date', attribute, required, label, 'date');
   field.validators.date = validateDateFormat;
   field.errorMessages.date = formatMessage(appMessages.forms.dateFormatError);
   return field;
 };
 
-export const getCheckboxField = (formatMessage, appMessages, attribute, entity) => (
+export const getCheckboxField = (formatMessage, appMessages, attribute, entity, onChange) => (
   {
     id: attribute,
     controlType: 'checkbox',
     model: `.attributes.${attribute}`,
     label: appMessages.attributes[attribute] && formatMessage(appMessages.attributes[attribute]),
     value: entity ? entity.getIn(['attributes', attribute]) : false,
+    changeAction: onChange,
   });
 
 export const getUploadField = (formatMessage, appMessages) =>
@@ -412,7 +413,7 @@ export const getFormField = (formatMessage, appMessages, controlType, attribute,
     hint,
   };
   if (required) {
-    field.validators.required = validateRequired;
+    field.validators.required = typeof required === 'function' ? required : validateRequired;
     field.errorMessages.required = formatMessage(appMessages.forms.fieldRequired);
   }
   return field;

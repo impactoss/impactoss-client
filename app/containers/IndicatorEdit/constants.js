@@ -4,6 +4,7 @@
  *
  */
 import { fromJS } from 'immutable';
+import { REPORT_FREQUENCIES } from 'containers/App/constants';
 
 export const SAVE = 'nmrf/IndicatorEdit/SAVE';
 
@@ -28,7 +29,7 @@ export const FORM_INITIAL = fromJS({
     description: '',
     draft: '',
     manager_id: '',
-    frequency_months: 1,
+    frequency_months: REPORT_FREQUENCIES[0] ? REPORT_FREQUENCIES[0].value : '',
     start_date: '',
     repeat: '',
     end_date: '',

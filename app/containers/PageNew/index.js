@@ -40,14 +40,13 @@ import { selectDomain } from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES } from './constants';
-
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class PageNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('pageNew.form.data', this.props.viewDomain.form.data);
+    this.props.initialiseForm('pageNew.form.data', FORM_INITIAL);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -168,8 +167,8 @@ const mapStateToProps = (state) => ({
 function mapDispatchToProps(dispatch) {
   return {
     initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
       dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));

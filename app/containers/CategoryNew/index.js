@@ -53,14 +53,14 @@ import {
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 
 export class CategoryNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('categoryNew.form.data', this.props.viewDomain.form.data);
+    this.props.initialiseForm('categoryNew.form.data', FORM_INITIAL);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -211,8 +211,8 @@ const mapStateToProps = (state, props) => ({
 function mapDispatchToProps(dispatch) {
   return {
     initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
       dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
