@@ -42,6 +42,7 @@ import {
   deleteEntity,
   openNewEntityModal,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
 import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
@@ -180,7 +181,10 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
             />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {deleteError &&
             <ErrorMessages error={deleteError} />
@@ -246,6 +250,7 @@ SdgTargetEdit.propTypes = {
   onCreateOption: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 SdgTargetEdit.contextTypes = {
@@ -277,6 +282,9 @@ function mapDispatchToProps(dispatch, props) {
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
     },
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));

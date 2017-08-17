@@ -14,6 +14,7 @@ import { getEntityFields } from 'utils/forms';
 import {
   newEntity,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -61,7 +62,10 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {(saveSending) &&
             <Loading />
@@ -96,6 +100,7 @@ EntityNew.propTypes = {
   viewDomain: PropTypes.object,
   initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 EntityNew.contextTypes = {
@@ -114,6 +119,9 @@ function mapDispatchToProps(dispatch, props) {
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
     },
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));

@@ -36,6 +36,7 @@ import {
   updateEntityForm,
   openNewEntityModal,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
 import {
@@ -164,7 +165,10 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {(saveSending || !dataReady) &&
             <Loading />
@@ -213,6 +217,7 @@ ActionNew.propTypes = {
   initialiseForm: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 ActionNew.contextTypes = {
@@ -243,6 +248,9 @@ function mapDispatchToProps(dispatch) {
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
     },
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));

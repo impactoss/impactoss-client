@@ -27,6 +27,7 @@ import {
   updatePath,
   updateEntityForm,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
 
@@ -115,7 +116,10 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
             />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {(saveSending || !dataReady) &&
             <Loading />
@@ -154,6 +158,7 @@ PageNew.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   initialiseForm: PropTypes.func,
@@ -182,6 +187,9 @@ function mapDispatchToProps(dispatch) {
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
     },
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));

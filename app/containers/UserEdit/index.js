@@ -32,6 +32,7 @@ import {
   updatePath,
   updateEntityForm,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
 import {
@@ -158,7 +159,10 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {(saveSending || !dataReady) &&
             <Loading />
@@ -214,6 +218,7 @@ UserEdit.propTypes = {
   isManager: PropTypes.bool,
   params: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 UserEdit.contextTypes = {
@@ -240,6 +245,9 @@ function mapDispatchToProps(dispatch) {
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
     },
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));

@@ -39,6 +39,7 @@ import {
   updateEntityForm,
   deleteEntity,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
 import {
@@ -171,7 +172,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {deleteError &&
             <ErrorMessages error={deleteError} />
@@ -231,6 +235,7 @@ CategoryEdit.propTypes = {
   params: PropTypes.object,
   users: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 CategoryEdit.contextTypes = {
@@ -259,6 +264,9 @@ function mapDispatchToProps(dispatch, props) {
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
     },
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
