@@ -332,6 +332,9 @@ export function* saveEntitySaga({ data }) {
     if (data.redirect) {
       yield put(push(data.redirect));
     }
+    if (data.invalidateEntitiesOnSuccess) {
+      yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
+    }
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(saveError(err, dataTS));
