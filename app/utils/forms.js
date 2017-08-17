@@ -391,7 +391,7 @@ export const getCheckboxField = (formatMessage, appMessages, attribute, entity, 
     controlType: 'checkbox',
     model: `.attributes.${attribute}`,
     label: appMessages.attributes[attribute] && formatMessage(appMessages.attributes[attribute]),
-    value: entity ? entity.getIn(['attributes', attribute]) : false,
+    value: entity && entity.getIn(['attributes', attribute]) ? entity.getIn(['attributes', attribute]) : false,
     changeAction: onChange,
   });
 
