@@ -35,6 +35,7 @@ import {
   updateEntityForm,
   deleteEntity,
   submitInvalid,
+  saveErrorDismiss,
   } from 'containers/App/actions';
 
 import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
@@ -141,10 +142,16 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
             }
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {deleteError &&
             <ErrorMessages error={deleteError} />
@@ -198,6 +205,8 @@ PageEdit.propTypes = {
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   viewEntity: PropTypes.object,
+  onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 PageEdit.contextTypes = {
@@ -220,10 +229,17 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
     },
     initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
+      dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
-    handleSubmitFail: (formData) => {
-      dispatch(submitInvalid(formData));
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
+    },
+    handleSubmitFail: () => {
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));

@@ -4,47 +4,20 @@
  *
  */
 
-import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 
 import { entityFormReducer } from 'containers/App/entityFormReducer';
 import { UPDATE_ENTITY_FORM, SAVE_SUCCESS } from 'containers/App/constants';
 
-const formInitial = fromJS({
-  attributes: {
-    draft: true,
-    accepted: true,
-    title: '',
-    reference: '',
-    response: '',
-    short_title: '',
-    description: '',
-    url: '',
-    taxonomy_id: '',
-    manager_id: '',
-    user_only: '',
-    target_date: '',
-    outcome: '',
-    indicator_summary: '',
-    target_date_comment: '',
-    frequency_months: '',
-    repeat: '',
-    start_date: '',
-    end_date: '',
-    indicator_id: '',
-    due_date_id: '',
-    document_url: '',
-    document_public: true,
-  },
-});
+import { FORM_INITIAL } from './constants';
 
-function formReducer(state = formInitial, action) {
+function formReducer(state = FORM_INITIAL, action) {
   switch (action.type) {
     case UPDATE_ENTITY_FORM:
       return action.data;
     case SAVE_SUCCESS:
-      return formInitial;
+      return FORM_INITIAL;
     default:
       return state;
   }

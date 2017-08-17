@@ -1,3 +1,3 @@
 export default function isInteger(test) {
-  return !isNaN(test) && parseInt(Number(test), 10) === test && !isNaN(parseInt(test, 10));
+  return !isNaN(test) && !isNaN(parseInt(test, 10)) && parseInt(test, 10).toString() === test.toString();
 }

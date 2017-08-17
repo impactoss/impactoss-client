@@ -5,6 +5,7 @@ import {
   saveEntity,
   dueDateAssigned,
   dueDateUnassigned,
+  invalidateEntities,
 } from 'containers/App/actions';
 
 import { SAVE } from './constants';
@@ -20,7 +21,9 @@ export function* save({ data, dueDateIdUnchecked }) {
     yield put(dueDateAssigned(data.attributes.due_date_id));
   }
   if (dueDateIdUnchecked) {
+    // force due_date reload to get newly generated due_dates
     yield put(dueDateUnassigned(dueDateIdUnchecked));
+    yield put(invalidateEntities('due_dates'));
   }
 }
 

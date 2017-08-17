@@ -27,6 +27,7 @@ import {
   updatePath,
   updateEntityForm,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
 
@@ -40,14 +41,13 @@ import { selectDomain } from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES } from './constants';
-
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class PageNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('pageNew.form.data', this.props.viewDomain.form.data);
+    this.props.initialiseForm('pageNew.form.data', FORM_INITIAL);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -110,10 +110,16 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
             }
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {(saveSending || !dataReady) &&
             <Loading />
@@ -151,6 +157,8 @@ PageNew.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   initialiseForm: PropTypes.func,
@@ -168,8 +176,8 @@ const mapStateToProps = (state) => ({
 function mapDispatchToProps(dispatch) {
   return {
     initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
       dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
@@ -177,8 +185,14 @@ function mapDispatchToProps(dispatch) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
     },
-    handleSubmitFail: (formData) => {
-      dispatch(submitInvalid(formData));
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
+    },
+    handleSubmitFail: () => {
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));

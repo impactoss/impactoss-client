@@ -208,6 +208,7 @@ const getConnectionField = ({
   connectionOptions: connectionOptions.map((option) => ({
     label: appMessages.entities[option].plural,
     path: option,
+    clientPath: option === 'measures' ? 'actions' : option,
   })),
 });
 

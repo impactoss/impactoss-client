@@ -27,6 +27,7 @@ import {
   updatePath,
   updateEntityForm,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
 import { selectReady } from 'containers/App/selectors';
@@ -44,13 +45,13 @@ import {
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class ReportNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('reportNew.form.data', this.props.viewDomain.form.data);
+    this.props.initialiseForm('reportNew.form.data', FORM_INITIAL);
   }
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
@@ -132,10 +133,16 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
             }
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {(saveSending || !dataReady) &&
             <Loading />
@@ -181,6 +188,8 @@ ReportNew.propTypes = {
   indicator: PropTypes.object,
   params: PropTypes.object,
   initialiseForm: PropTypes.func,
+  onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 ReportNew.contextTypes = {
@@ -196,14 +205,20 @@ const mapStateToProps = (state, props) => ({
 function mapDispatchToProps(dispatch) {
   return {
     initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
       dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    handleSubmitFail: (formData) => {
-      dispatch(submitInvalid(formData));
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
+    },
+    handleSubmitFail: () => {
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));

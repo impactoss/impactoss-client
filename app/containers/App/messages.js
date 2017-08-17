@@ -59,6 +59,22 @@ export default defineMessages({
       id: 'app.containers.App.forms.numberError',
       defaultMessage: 'Please enter a number',
     },
+    endDateBeforeStartDateError: {
+      id: 'app.containers.App.forms.endDateBeforeStartDateError',
+      defaultMessage: 'End date must be after start date',
+    },
+    startDateAfterEndDateError: {
+      id: 'app.containers.App.forms.startDateAfterEndDateError',
+      defaultMessage: 'Start date must be before end date',
+    },
+    multipleErrors: {
+      id: 'app.containers.App.forms.multipleErrors',
+      defaultMessage: 'One or more fields have errors.',
+    },
+    outdatedError: {
+      id: 'app.containers.App.forms.outdatedError',
+      defaultMessage: 'Sorry, this record has become outdated. Please find the latest server version below.',
+    },
   },
   hints: {
     autoReference: {
@@ -223,7 +239,11 @@ export default defineMessages({
     },
     start_date: {
       id: 'app.containers.App.attributes.start_date',
-      defaultMessage: 'Date (start date)',
+      defaultMessage: 'Start date',
+    },
+    start_date_only: {
+      id: 'app.containers.App.attributes.start_date_only',
+      defaultMessage: 'Due date',
     },
     end_date: {
       id: 'app.containers.App.attributes.end_date',

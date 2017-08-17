@@ -34,6 +34,9 @@ import {
 } from 'utils/fields';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
+import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
+import validateRequired from 'components/forms/validators/validate-required';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -46,6 +49,7 @@ import {
   deleteEntity,
   openNewEntityModal,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
 import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
@@ -145,15 +149,16 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyAsideFields = (entity, users) => ([ // fieldGroups
+  getBodyAsideFields = (entity, users, repeat) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
       icon: 'reminder',
       fields: [
-        getDateField(this.context.intl.formatMessage, appMessages, 'start_date'),
-        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat'),
-        getFrequencyField(this.context.intl.formatMessage, appMessages, entity),
-        getDateField(this.context.intl.formatMessage, appMessages, 'end_date'),
+        getDateField(this.context.intl.formatMessage, appMessages, 'start_date', repeat, repeat ? 'start_date' : 'start_date_only'),
+        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat', entity, (model, value) => this.props.resetValidityOnRepeatChange(model, value, this.props.viewDomain.form.data)),
+        repeat ? getFrequencyField(this.context.intl.formatMessage, appMessages, entity) : null,
+        repeat ? getDateField(this.context.intl.formatMessage, appMessages, 'end_date', repeat)
+        : null,
         renderUserControl(
           users,
           this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
@@ -192,10 +197,16 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             }
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {deleteError &&
             <ErrorMessages error={deleteError} />
@@ -213,10 +224,18 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               model="indicatorEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData, measures, sdgtargets)}
-              handleSubmitFail={this.props.handleSubmitFail}
+              handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
               handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+              validators={{
+                '': {
+                  // Form-level validator
+                  endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
+                  startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
+                  endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
+                },
+              }}
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
@@ -224,7 +243,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                 },
                 body: {
                   main: this.getBodyMainFields(connectedTaxonomies, measures, sdgtargets, onCreateOption),
-                  aside: this.getBodyAsideFields(viewEntity, users),
+                  aside: this.getBodyAsideFields(viewEntity, users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
                 },
               }}
             />
@@ -245,6 +264,8 @@ IndicatorEdit.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
+  onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -254,6 +275,7 @@ IndicatorEdit.propTypes = {
   sdgtargets: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
+  resetValidityOnRepeatChange: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
 };
 
@@ -282,10 +304,38 @@ function mapDispatchToProps(dispatch, props) {
     },
     initialiseForm: (model, formData) => {
       // console.log('initialiseForm', formData)
-      dispatch(formActions.load(model, formData));
+      dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
-    handleSubmitFail: (formData) => {
-      dispatch(submitInvalid(formData));
+    resetValidityOnRepeatChange: (repeatModel, repeat, formData) => {
+      dispatch(formActions.change(repeatModel, repeat));
+      dispatch(formActions.resetValidity('indicatorEdit.form.data.attributes.end_date'));
+      dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
+        required: repeat && validateRequired(formData.getIn(['attributes', 'start_date'])),
+      }));
+    },
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
+    },
+    handleSubmitFail: (formData, formatMessage) => {
+      if (formData.$form.errors.endDatePresent) {
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
+          required: true,
+        }));
+      }
+      if (formData.$form.errors.startDatePresent) {
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
+          required: true,
+        }));
+      }
+      if (formData.$form.validity.endDatePresent && formData.$form.validity.startDatePresent && formData.$form.errors.endDateAfterStartDate) {
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', formatMessage(appMessages.forms.startDateAfterEndDateError)));
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', formatMessage(appMessages.forms.endDateBeforeStartDateError)));
+      }
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));

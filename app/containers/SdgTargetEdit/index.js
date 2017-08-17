@@ -42,6 +42,7 @@ import {
   deleteEntity,
   openNewEntityModal,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
 import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
@@ -174,10 +175,16 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
             }
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {deleteError &&
             <ErrorMessages error={deleteError} />
@@ -242,6 +249,8 @@ SdgTargetEdit.propTypes = {
   measures: PropTypes.object,
   onCreateOption: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
+  onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 SdgTargetEdit.contextTypes = {
@@ -268,10 +277,17 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
     initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
+      dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
-    handleSubmitFail: (formData) => {
-      dispatch(submitInvalid(formData));
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
+    },
+    handleSubmitFail: () => {
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));

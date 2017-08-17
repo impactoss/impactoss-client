@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { FormattedMessage } from 'react-intl';
 
+import { RECORD_OUTDATED } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import messages from './messages';
@@ -34,21 +36,16 @@ const Dismiss = styled(Button)``;
 const Message = styled.div``;
 
 class ErrorMessages extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor() {
-    super();
-    this.state = {
-      dismiss: false,
-    };
+
+  translateMessage = (message) => {
+    if (message === RECORD_OUTDATED) {
+      return this.context.intl.formatMessage(appMessages.forms.outdatedError);
+    }
+    return message;
   }
 
-  // componentWillReceiveProps() {
-  //   this.setState({ dismiss: false });
-  // }
-
   render() {
-    return this.state.dismiss
-    ? null
-    : (
+    return (
       <Styled>
         <MessageWrapper>
           <div>
@@ -58,21 +55,18 @@ class ErrorMessages extends React.PureComponent { // eslint-disable-line react/p
             <FormattedMessage {...messages.preAdditional} />
             {
               this.props.error.messages && this.props.error.messages.map((message, i) => (
-                <Message key={i}>{message}</Message>
+                <Message key={i}>{this.translateMessage(message)}</Message>
               ))
             }
           </div>
         </MessageWrapper>
-        <DismissWrapper>
-          <Dismiss
-            onClick={() => {
-              this.setState({ dismiss: true });
-              if (this.props.onDismiss) this.props.onDismiss();
-            }}
-          >
-            <Icon name="removeLarge" />
-          </Dismiss>
-        </DismissWrapper>
+        { this.props.onDismiss &&
+          <DismissWrapper>
+            <Dismiss onClick={this.props.onDismiss} >
+              <Icon name="removeLarge" />
+            </Dismiss>
+          </DismissWrapper>
+        }
       </Styled>
     );
   }
@@ -81,6 +75,9 @@ class ErrorMessages extends React.PureComponent { // eslint-disable-line react/p
 ErrorMessages.propTypes = {
   error: PropTypes.object,
   onDismiss: PropTypes.func,
+};
+ErrorMessages.contextTypes = {
+  intl: PropTypes.object,
 };
 
 export default ErrorMessages;

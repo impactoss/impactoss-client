@@ -54,6 +54,7 @@ export const ENTITIES_READY = 'nmrf/App/ENTITIES_READY';
 export const SAVE_SENDING = 'nmrf/App/SAVE_SENDING';
 export const SAVE_SUCCESS = 'nmrf/App/SAVE_SUCCESS';
 export const SAVE_ERROR = 'nmrf/App/SAVE_ERROR';
+export const SAVE_ERROR_DISMISS = 'nmrf/App/SAVE_ERROR_DISMISS';
 
 export const DELETE_SENDING = 'nmrf/App/DELETE_SENDING';
 export const DELETE_SUCCESS = 'nmrf/App/DELETE_SUCCESS';

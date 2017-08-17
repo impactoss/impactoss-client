@@ -26,6 +26,8 @@ import {
 } from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
+import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -37,6 +39,7 @@ import {
   updateEntityForm,
   openNewEntityModal,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
 import {
@@ -59,13 +62,13 @@ import {
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class IndicatorNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('indicatorNew.form.data', this.props.viewDomain.form.data);
+    this.props.initialiseForm('indicatorNew.form.data', FORM_INITIAL);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -109,15 +112,15 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getBodyAsideFields = (users) => ([ // fieldGroups
+  getBodyAsideFields = (users, repeat) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
       icon: 'reminder',
       fields: [
-        getDateField(this.context.intl.formatMessage, appMessages, 'start_date'),
-        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat'),
-        getFrequencyField(this.context.intl.formatMessage, appMessages),
-        getDateField(this.context.intl.formatMessage, appMessages, 'end_date'),
+        getDateField(this.context.intl.formatMessage, appMessages, 'start_date', repeat, repeat ? 'start_date' : 'start_date_only'),
+        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat', null, this.props.resetValidityOnRepeatChange),
+        repeat ? getFrequencyField(this.context.intl.formatMessage, appMessages) : null,
+        repeat ? getDateField(this.context.intl.formatMessage, appMessages, 'end_date', repeat) : null,
         renderUserControl(
           users,
           this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
@@ -129,7 +132,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   render() {
     const { dataReady, viewDomain, connectedTaxonomies, measures, users, sdgtargets, onCreateOption } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
-
     return (
       <div>
         <Helmet
@@ -158,10 +160,16 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             }
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {(saveSending || !dataReady) &&
             <Loading />
@@ -170,10 +178,18 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             <EntityForm
               model="indicatorNew.form.data"
               formData={viewDomain.form.data}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
+              handleSubmit={this.props.handleSubmit}
+              handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
+              validators={{
+                '': {
+                  // Form-level validator
+                  endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
+                  startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
+                  endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
+                },
+              }}
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
@@ -181,7 +197,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                 },
                 body: {
                   main: this.getBodyMainFields(connectedTaxonomies, measures, sdgtargets, onCreateOption),
-                  aside: this.getBodyAsideFields(users),
+                  aside: this.getBodyAsideFields(users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
                 },
               }}
             />
@@ -200,6 +216,8 @@ IndicatorNew.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   measures: PropTypes.object,
@@ -208,6 +226,7 @@ IndicatorNew.propTypes = {
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
+  resetValidityOnRepeatChange: PropTypes.func,
 };
 
 IndicatorNew.contextTypes = {
@@ -229,8 +248,8 @@ const mapStateToProps = (state) => ({
 function mapDispatchToProps(dispatch) {
   return {
     initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
       dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
@@ -238,8 +257,37 @@ function mapDispatchToProps(dispatch) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
-    handleSubmitFail: (formData) => {
-      dispatch(submitInvalid(formData));
+    resetValidityOnRepeatChange: (repeatModel, repeat) => {
+      dispatch(formActions.change(repeatModel, repeat));
+      dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
+        required: repeat,
+      }));
+      dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', {
+        required: repeat,
+      }));
+    },
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
+    },
+    handleSubmitFail: (formData, formatMessage) => {
+      if (formData.$form.errors.endDatePresent) {
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
+          required: true,
+        }));
+      }
+      if (formData.$form.errors.startDatePresent) {
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
+          required: true,
+        }));
+      }
+      if (formData.$form.validity.endDatePresent && formData.$form.validity.startDatePresent && formData.$form.errors.endDateAfterStartDate) {
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', formatMessage(appMessages.forms.startDateAfterEndDateError)));
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', formatMessage(appMessages.forms.endDateBeforeStartDateError)));
+      }
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
@@ -284,7 +332,6 @@ function mapDispatchToProps(dispatch) {
           .setIn(['attributes', 'frequency_months'], null)
           .setIn(['attributes', 'end_date'], null);
       }
-
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
