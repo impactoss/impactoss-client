@@ -34,6 +34,8 @@ import {
 } from 'utils/fields';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
+import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -145,15 +147,16 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyAsideFields = (entity, users) => ([ // fieldGroups
+  getBodyAsideFields = (entity, users, repeat) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
       icon: 'reminder',
       fields: [
-        getDateField(this.context.intl.formatMessage, appMessages, 'start_date'),
-        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat'),
-        getFrequencyField(this.context.intl.formatMessage, appMessages, entity),
-        getDateField(this.context.intl.formatMessage, appMessages, 'end_date'),
+        getDateField(this.context.intl.formatMessage, appMessages, 'start_date', repeat, repeat ? 'start_date' : 'start_date_only'),
+        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat', entity, this.props.resetValidityOnRepeatChange),
+        repeat ? getFrequencyField(this.context.intl.formatMessage, appMessages, entity) : null,
+        repeat ? getDateField(this.context.intl.formatMessage, appMessages, 'end_date', repeat)
+        : null,
         renderUserControl(
           users,
           this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
@@ -213,10 +216,18 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               model="indicatorEdit.form.data"
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(formData, measures, sdgtargets)}
-              handleSubmitFail={this.props.handleSubmitFail}
+              handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
               handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+              validators={{
+                '': {
+                  // Form-level validator
+                  endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
+                  startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
+                  endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
+                },
+              }}
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
@@ -224,7 +235,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                 },
                 body: {
                   main: this.getBodyMainFields(connectedTaxonomies, measures, sdgtargets, onCreateOption),
-                  aside: this.getBodyAsideFields(viewEntity, users),
+                  aside: this.getBodyAsideFields(viewEntity, users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
                 },
               }}
             />
@@ -254,6 +265,7 @@ IndicatorEdit.propTypes = {
   sdgtargets: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
+  resetValidityOnRepeatChange: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
 };
 
@@ -282,9 +294,31 @@ function mapDispatchToProps(dispatch, props) {
     },
     initialiseForm: (model, formData) => {
       // console.log('initialiseForm', formData)
-      dispatch(formActions.load(model, formData));
+      dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
-    handleSubmitFail: (formData) => {
+    resetValidityOnRepeatChange: (repeatModel, repeat) => {
+      dispatch(formActions.change(repeatModel, repeat));
+      dispatch(formActions.resetValidity('indicatorEdit.form.data.attributes.end_date'));
+      dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
+        required: repeat,
+      }));
+    },
+    handleSubmitFail: (formData, formatMessage) => {
+      if (formData.$form.errors.endDatePresent) {
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
+          required: true,
+        }));
+      }
+      if (formData.$form.errors.startDatePresent) {
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
+          required: true,
+        }));
+      }
+      if (formData.$form.validity.endDatePresent && formData.$form.validity.startDatePresent && formData.$form.errors.endDateAfterStartDate) {
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', formatMessage(appMessages.forms.startDateAfterEndDateError)));
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', formatMessage(appMessages.forms.endDateBeforeStartDateError)));
+      }
       dispatch(submitInvalid(formData));
     },
     handleSubmitRemote: (model) => {
