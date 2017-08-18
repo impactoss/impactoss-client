@@ -14,6 +14,7 @@ import { getEntityFields } from 'utils/forms';
 import {
   newEntity,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -25,12 +26,13 @@ import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
 import { selectDomain } from './selectors';
+import { FORM_INITIAL } from './constants';
 
 import messages from './messages';
 
 export class EntityNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
-    this.props.initialiseForm('entityNew.form.data', this.props.viewDomain.form.data);
+    this.props.initialiseForm('entityNew.form.data', FORM_INITIAL);
   }
 
   render() {
@@ -54,10 +56,16 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             }]}
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {(saveSending) &&
             <Loading />
@@ -91,6 +99,8 @@ EntityNew.propTypes = {
   // onSaveSuccess: PropTypes.func,
   viewDomain: PropTypes.object,
   initialiseForm: PropTypes.func,
+  onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 EntityNew.contextTypes = {
@@ -104,11 +114,17 @@ const mapStateToProps = (state) => ({
 function mapDispatchToProps(dispatch, props) {
   return {
     initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
       dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
-    handleSubmitFail: (formData) => {
-      dispatch(submitInvalid(formData));
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
+    },
+    handleSubmitFail: () => {
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));

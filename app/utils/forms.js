@@ -304,15 +304,15 @@ const getDueDateDateOptions = (dates, activeDateId, formatMessage, appMessages, 
   const NO_OF_REPORT_OPTIONS = 1;
   let excludeCount = 0;
   return dates && dates.reduce((memo, date, i) => {
-    const isOwnDate = activeDateId ? date.get('id') === activeDateId : false;
+    const dateActive = activeDateId ? date.get('id') === activeDateId : false;
     const optionNoNotExceeded = i - excludeCount < NO_OF_REPORT_OPTIONS;
-    const withoutReport = !date.getIn(['attributes', 'has_progress_report']) || isOwnDate;
+    const withoutReport = !date.getIn(['attributes', 'has_progress_report']);
     // only allow upcoming and those that are not associated
-    if (optionNoNotExceeded && withoutReport) {
-      // exclude overdue and already assigned date from max no of date options
-      if (date.getIn(['attributes', 'overdue']) || isOwnDate) {
+    if ((optionNoNotExceeded && withoutReport) || dateActive) {
+      if (date.getIn(['attributes', 'overdue']) || dateActive) {
         excludeCount += 1;
       }
+      // exclude overdue and already assigned date from max no of date options
       const label =
         `${formatDate(new Date(date.getIn(['attributes', 'due_date'])))} ${
           date.getIn(['attributes', 'overdue']) ? formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
@@ -326,6 +326,7 @@ const getDueDateDateOptions = (dates, activeDateId, formatMessage, appMessages, 
         },
       ]);
     }
+    excludeCount += 1;
     return memo;
   }, dateOptions);
 };
@@ -378,20 +379,21 @@ export const getMarkdownField = (formatMessage, appMessages, attribute = 'descri
 export const getTextareaField = (formatMessage, appMessages, attribute = 'description') =>
   getFormField(formatMessage, appMessages, 'textarea', attribute);
 
-export const getDateField = (formatMessage, appMessages, attribute) => {
-  const field = getFormField(formatMessage, appMessages, 'date', attribute, false, attribute, 'date');
+export const getDateField = (formatMessage, appMessages, attribute, required = false, label) => {
+  const field = getFormField(formatMessage, appMessages, 'date', attribute, required, label, 'date');
   field.validators.date = validateDateFormat;
   field.errorMessages.date = formatMessage(appMessages.forms.dateFormatError);
   return field;
 };
 
-export const getCheckboxField = (formatMessage, appMessages, attribute, entity) => (
+export const getCheckboxField = (formatMessage, appMessages, attribute, entity, onChange) => (
   {
     id: attribute,
     controlType: 'checkbox',
     model: `.attributes.${attribute}`,
     label: appMessages.attributes[attribute] && formatMessage(appMessages.attributes[attribute]),
-    value: entity ? entity.getIn(['attributes', attribute]) : false,
+    value: entity && entity.getIn(['attributes', attribute]) ? entity.getIn(['attributes', attribute]) : false,
+    changeAction: onChange,
   });
 
 export const getUploadField = (formatMessage, appMessages) =>
@@ -412,7 +414,7 @@ export const getFormField = (formatMessage, appMessages, controlType, attribute,
     hint,
   };
   if (required) {
-    field.validators.required = validateRequired;
+    field.validators.required = typeof required === 'function' ? required : validateRequired;
     field.errorMessages.required = formatMessage(appMessages.forms.fieldRequired);
   }
   return field;

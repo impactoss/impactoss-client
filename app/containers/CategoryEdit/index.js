@@ -11,7 +11,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, List, fromJS } from 'immutable';
+import { Map, List } from 'immutable';
 
 import {
   userOptions,
@@ -39,6 +39,7 @@ import {
   updateEntityForm,
   deleteEntity,
   submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
 import {
@@ -165,10 +166,16 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             }
           />
           {!submitValid &&
-            <ErrorMessages error={{ messages: ['One or more fields have errors.'] }} />
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
-            <ErrorMessages error={saveError} />
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
           {deleteError &&
             <ErrorMessages error={deleteError} />
@@ -227,6 +234,8 @@ CategoryEdit.propTypes = {
   isAdmin: PropTypes.bool,
   params: PropTypes.object,
   users: PropTypes.object,
+  onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 CategoryEdit.contextTypes = {
@@ -250,10 +259,17 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
     initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, fromJS(formData)));
+      dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
-    handleSubmitFail: (formData) => {
-      dispatch(submitInvalid(formData));
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
+    },
+    handleSubmitFail: () => {
+      dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));

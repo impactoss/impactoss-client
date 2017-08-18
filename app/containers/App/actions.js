@@ -43,6 +43,7 @@ import {
   SAVE_SENDING,
   SAVE_SUCCESS,
   SAVE_ERROR,
+  SAVE_ERROR_DISMISS,
   DELETE_SENDING,
   DELETE_SUCCESS,
   DELETE_ERROR,
@@ -65,10 +66,10 @@ import {
   SUBMIT_INVALID,
 } from './constants';
 
-export function submitInvalid(data) {
+export function submitInvalid(valid) {
   return {
     type: SUBMIT_INVALID,
-    data,
+    valid,
   };
 }
 
@@ -89,6 +90,12 @@ export function saveSuccess(data) {
   return {
     type: SAVE_SUCCESS,
     data,
+  };
+}
+
+export function saveErrorDismiss() {
+  return {
+    type: SAVE_ERROR_DISMISS,
   };
 }
 
