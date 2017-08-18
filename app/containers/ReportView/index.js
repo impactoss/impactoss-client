@@ -17,6 +17,7 @@ import {
   getMarkdownField,
   getDateRelatedField,
   getDownloadField,
+  getEntityLinkField,
 } from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
@@ -49,10 +50,11 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
       this.props.loadEntitiesIfNeeded();
     }
   }
-  getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
+  getHeaderMainFields = (entity, isManager, indicator) => ([ // fieldGroups
     { // fieldGroup
       fields: [
         getTitleField(entity, isManager),
+        getEntityLinkField(indicator, 'indicators', appMessages.entities.indicators.single),
       ],
     },
   ]);
@@ -86,11 +88,6 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
   render() {
     const { viewEntity, dataReady, isContributor } = this.props;
 
-    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-    if (viewEntity && dataReady) {
-      pageTitle = `${pageTitle} for indicator ${viewEntity.getIn(['attributes', 'indicator_id'])}`;
-    }
-
     return (
       <div>
         <Helmet
@@ -101,7 +98,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
         />
         <Content>
           <ContentHeader
-            title={pageTitle}
+            title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="report"
             buttons={isContributor
@@ -135,7 +132,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
             <EntityView
               fields={{
                 header: {
-                  main: this.getHeaderMainFields(viewEntity, isContributor),
+                  main: this.getHeaderMainFields(viewEntity, isContributor, viewEntity.get('indicator')),
                   aside: isContributor && this.getHeaderAsideFields(viewEntity),
                 },
                 body: {

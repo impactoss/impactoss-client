@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import { Link } from 'react-router';
 
 import appMessages from 'containers/App/messages';
 
@@ -16,9 +17,16 @@ class LinkField extends React.PureComponent { // eslint-disable-line react/prefe
         <Label>
           <FormattedMessage {...(field.label || appMessages.attributes.url)} />
         </Label>
-        <Url target="_blank" href={field.value}>
-          {field.anchor || field.value}
-        </Url>
+        { !field.internal &&
+          <Url target="_blank" href={field.value}>
+            {field.anchor || field.value}
+          </Url>
+        }
+        { field.internal &&
+          <Link to={field.value}>
+            {field.anchor}
+          </Link>
+        }
       </FieldWrap>
     );
   }
