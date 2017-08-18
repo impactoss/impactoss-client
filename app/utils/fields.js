@@ -31,6 +31,14 @@ export const getLinkField = (entity) => ({
   value: entity.getIn(['attributes', 'url']),
   anchor: getLinkAnchor(entity.getIn(['attributes', 'url'])),
 });
+export const getEntityLinkField = (entity, path, label) => ({
+  type: 'link',
+  internal: true,
+  value: `${path}/${entity.get('id')}`,
+  anchor: entity.getIn(['attributes', 'title']) || entity.getIn(['attributes', 'name']),
+  label,
+});
+
 export const getTitleField = (entity, isManager, attribute = 'title', label) => ({
   type: 'title',
   value: entity.getIn(['attributes', attribute]),
