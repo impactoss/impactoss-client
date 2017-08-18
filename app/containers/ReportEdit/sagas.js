@@ -4,8 +4,6 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 import {
   saveEntity,
   dueDateAssigned,
-  dueDateUnassigned,
-  invalidateEntities,
 } from 'containers/App/actions';
 
 import { SAVE } from './constants';
@@ -16,14 +14,10 @@ export function* save({ data, dueDateIdUnchecked }) {
     path: 'progress_reports',
     entity: data,
     redirect: `/reports/${data.id}`,
+    invalidateEntitiesOnSuccess: dueDateIdUnchecked && 'due_dates',
   }));
   if (data.attributes.due_date_id) {
     yield put(dueDateAssigned(data.attributes.due_date_id));
-  }
-  if (dueDateIdUnchecked) {
-    // force due_date reload to get newly generated due_dates
-    yield put(dueDateUnassigned(dueDateIdUnchecked));
-    yield put(invalidateEntities('due_dates'));
   }
 }
 

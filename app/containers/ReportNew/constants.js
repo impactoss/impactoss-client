@@ -14,7 +14,7 @@ export const FORM_INITIAL = fromJS({
     description: '',
     document_url: '',
     document_public: true,
-    due_date_id: 0,
+    due_date_id: '0',
   },
 });
 
