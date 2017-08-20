@@ -43,12 +43,19 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
   }
   componentDidMount() {
     // console.log('componentDidMount', this.state.progress)
-    if (!this.props.progress) {
-      this.loadInterval = setInterval(this.handleTimeout, ANIMATION_INTERVAL);
+    this.loadInterval = this.props.progress < 0
+      ? setInterval(this.handleTimeout, ANIMATION_INTERVAL)
+      : false;
+  }
+  componentWillReceiveProps(nextProps) {
+    if (this.loadInterval && nextProps.progress >= 0) {
+      this.resetTimer();
     }
   }
   componentWillUnmount() {
-    // console.log('componentWillUnmount')
+    this.resetTimer();
+  }
+  resetTimer = () => {
     if (this.loadInterval) {
       clearInterval(this.loadInterval);
       this.loadInterval = false;
@@ -61,10 +68,10 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
   render() {
     return (
       <Styled>
-        {this.props.progress &&
-          <BarDeterminate progress={this.props.progress} />
+        {this.props.progress >= 0 &&
+          <BarDeterminate progress={Math.max(this.props.progress, 5)} />
         }
-        {!this.props.progress &&
+        {this.props.progress < 0 &&
           <BarIndeterminate progress={this.state.progress} />
         }
       </Styled>
@@ -74,6 +81,10 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
 
 Loading.propTypes = {
   progress: PropTypes.number,
+};
+
+Loading.defaultProps = {
+  progress: -1,
 };
 
 export default Loading;

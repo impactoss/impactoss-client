@@ -19,3 +19,11 @@ export const selectSelectedEntities = createSelector(
   selectDomain,
   (pageState) => pageState.get('entitiesSelected')
 );
+
+export const selectProgress = createSelector(
+  selectDomain,
+  (pageState) =>
+    pageState.get('sending') && pageState.get('sending').size > 0
+      ? ((pageState.get('success').size + pageState.get('errors').size) / pageState.get('sending').size) * 100
+      : null
+);
