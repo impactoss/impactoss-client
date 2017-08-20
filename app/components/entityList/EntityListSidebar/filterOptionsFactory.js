@@ -42,6 +42,7 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
     multiple: true,
     required: false,
     search: true,
+    selectAll: false,
   };
   // the attribute option
   const option = find(config.options, (o) => o.attribute === activeOptionId);
@@ -135,6 +136,7 @@ export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQu
     options: {},
     multiple: true,
     required: false,
+    selectAll: false,
   };
   // get the active taxonomy
 
@@ -236,6 +238,7 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
     required: false,
     search: true,
     advanced: true,
+    selectAll: false,
   };
   let optionConnections = List();
 
@@ -355,6 +358,7 @@ export const makeConnectedTaxonomyFilterOptions = (entities, config, connectedTa
     options: {},
     multiple: true,
     required: false,
+    selectAll: false,
   };
 
   const taxonomy = connectedTaxonomies.get(activeOptionId);

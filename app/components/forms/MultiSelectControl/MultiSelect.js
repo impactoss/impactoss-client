@@ -329,7 +329,7 @@ class MultiSelect extends React.Component {
               onTagSelected={this.onTagSelected}
             />
           }
-          { this.props.advanced && this.props.multiple &&
+          { this.props.selectAll &&
             <SelectAll>
               <CheckboxWrap>
                 <Checkbox
@@ -408,6 +408,7 @@ MultiSelect.propTypes = {
   buttons: PropTypes.array,
   search: PropTypes.bool,
   advanced: PropTypes.bool,
+  selectAll: PropTypes.bool,
   panelId: PropTypes.string,
   tagFilterGroups: PropTypes.array,
 };

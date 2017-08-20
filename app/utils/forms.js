@@ -86,6 +86,7 @@ export const renderMeasureControl = (entities, taxonomies, onCreateOption) => en
   controlType: 'multiselect',
   options: entityOptions(entities, true),
   advanced: true,
+  selectAll: true,
   tagFilterGroups: makeTagFilterGroups(taxonomies),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'measures' })
@@ -102,6 +103,7 @@ export const renderSdgTargetControl = (entities, taxonomies, onCreateOption) => 
   controlType: 'multiselect',
   options: entityOptions(entities, true),
   advanced: true,
+  selectAll: true,
   tagFilterGroups: makeTagFilterGroups(taxonomies),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'sdgtargets' })
@@ -119,6 +121,7 @@ export const renderRecommendationControl = (entities, taxonomies, onCreateOption
   controlType: 'multiselect',
   options: entityOptions(entities),
   advanced: true,
+  selectAll: true,
   tagFilterGroups: makeTagFilterGroups(taxonomies),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'recommendations' })
@@ -135,6 +138,7 @@ export const renderIndicatorControl = (entities, onCreateOption) => entities
   controlType: 'multiselect',
   options: entityOptions(entities, true),
   advanced: true,
+  selectAll: true,
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'indicators' })
     : null,
