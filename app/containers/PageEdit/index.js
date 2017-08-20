@@ -137,6 +137,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('pageEdit.form.data'),
               }] : null
             }
@@ -168,6 +169,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
             <EntityForm
               model="pageEdit.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
@@ -183,6 +185,9 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
                 },
               }}
             />
+          }
+          { (saveSending || deleteSending) &&
+            <Loading />
           }
         </Content>
       </div>

@@ -138,6 +138,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('sdgtargetNew.form.data'),
               }] : null
             }
@@ -161,6 +162,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
             <EntityForm
               model="sdgtargetNew.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
@@ -176,6 +178,9 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
                 },
               }}
             />
+          }
+          { saveSending &&
+            <Loading />
           }
         </Content>
       </div>

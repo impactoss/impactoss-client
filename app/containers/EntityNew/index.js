@@ -52,6 +52,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             },
             {
               type: 'save',
+              disabled: saveSending,
               onClick: () => this.props.handleSubmitRemote('entityNew.form.data'),
             }]}
           />
@@ -74,6 +75,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             model="entityNew.form.data"
             formData={viewDomain.form.data}
             inModal={inModal}
+            saving={saveSending}
             handleSubmit={(formData) => this.props.handleSubmit(
               formData,
               attributes
@@ -82,6 +84,9 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             handleCancel={this.props.onCancel}
             fields={getEntityFields(path, null, this.context.intl.formatMessage, appMessages)}
           />
+          {saveSending &&
+            <Loading />
+          }
         </Content>
       </div>
     );

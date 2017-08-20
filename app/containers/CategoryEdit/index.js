@@ -161,6 +161,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('categoryEdit.form.data'),
               }] : null
             }
@@ -192,6 +193,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             <EntityForm
               model="categoryEdit.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={() => this.props.handleCancel(reference)}
@@ -211,6 +213,9 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                 },
               }}
             />
+          }
+          {(saveSending || deleteSending) &&
+            <Loading />
           }
         </Content>
       </div>

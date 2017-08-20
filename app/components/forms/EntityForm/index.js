@@ -312,7 +312,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                 <ButtonCancel type="button" onClick={handleCancel}>
                   <FormattedMessage {...appMessages.buttons.cancel} />
                 </ButtonCancel>
-                <ButtonSubmit type="submit">
+                <ButtonSubmit type="submit" disabled={this.props.saving}>
                   <FormattedMessage {...appMessages.buttons.save} />
                 </ButtonSubmit>
               </FormFooterButtons>
@@ -335,10 +335,11 @@ EntityForm.propTypes = {
   fields: PropTypes.object,
   formData: PropTypes.object,
   inModal: PropTypes.bool,
+  saving: PropTypes.bool,
   validators: PropTypes.object,
 };
-// EntityForm.controlTypes = {
-//   intl: PropTypes.object.isRequired,
-// };
+EntityForm.defaultProps = {
+  saving: false,
+};
 
 export default EntityForm;

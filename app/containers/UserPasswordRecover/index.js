@@ -64,6 +64,7 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
           { this.props.viewDomain.form &&
             <AuthForm
               model="userPasswordRecover.form.data"
+              sending={sending}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}

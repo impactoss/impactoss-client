@@ -140,6 +140,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('recommendationNew.form.data'),
               }] : null
             }
@@ -163,6 +164,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
             <EntityForm
               model="recommendationNew.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
@@ -178,6 +180,9 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                 },
               }}
             />
+          }
+          { saveSending &&
+            <Loading />
           }
         </Content>
       </div>

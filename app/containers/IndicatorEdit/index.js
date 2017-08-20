@@ -192,6 +192,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('indicatorEdit.form.data'),
               }] : null
             }
@@ -223,6 +224,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             <EntityForm
               model="indicatorEdit.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData, measures, sdgtargets)}
               handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}
@@ -247,6 +249,9 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                 },
               }}
             />
+          }
+          { (saveSending || deleteSending) &&
+            <Loading />
           }
         </Content>
       </div>

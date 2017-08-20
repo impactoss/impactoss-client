@@ -76,7 +76,7 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
               <ButtonCancel type="button" onClick={handleCancel}>
                 <FormattedMessage {...appMessages.buttons.cancel} />
               </ButtonCancel>
-              <ButtonSubmit type="submit">
+              <ButtonSubmit type="submit" disabled={this.props.sending}>
                 {labels.submit}
               </ButtonSubmit>
             </FormFooterButtons>
@@ -94,6 +94,9 @@ AuthForm.propTypes = {
   labels: PropTypes.object,
   model: PropTypes.string,
   fields: PropTypes.array,
+  sending: PropTypes.bool,
 };
-
+AuthForm.defaultProps = {
+  sending: false,
+};
 export default AuthForm;
