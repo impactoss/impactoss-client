@@ -191,6 +191,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('measureEdit.form.data'),
               }]
               : null
@@ -223,6 +224,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             <EntityForm
               model="measureEdit.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 taxonomies,
@@ -245,6 +247,9 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 },
               }}
             />
+          }
+          {(saveSending || deleteSending) &&
+            <Loading />
           }
         </Content>
       </div>

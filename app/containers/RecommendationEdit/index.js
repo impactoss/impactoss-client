@@ -168,6 +168,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('recommendationEdit.form.data'),
               }] : null
             }
@@ -199,6 +200,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
             <EntityForm
               model="recommendationEdit.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 taxonomies,
@@ -219,6 +221,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                 },
               }}
             />
+          }
+          { (saveSending || deleteSending) &&
+            <Loading />
           }
         </Content>
       </div>

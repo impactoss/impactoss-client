@@ -148,6 +148,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('userEdit.form.data'),
               }]
             }
@@ -176,6 +177,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             <EntityForm
               model="userEdit.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 taxonomies,
@@ -195,6 +197,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 },
               }}
             />
+          }
+          { saveSending &&
+            <Loading />
           }
         </Content>
       </div>

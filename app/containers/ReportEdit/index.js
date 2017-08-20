@@ -168,6 +168,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('reportEdit.form.data'),
               }] : null
             }
@@ -199,6 +200,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             <EntityForm
               model="reportEdit.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity.getIn(['attributes', 'due_date_id']))}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={() => this.props.handleCancel(reference)}
@@ -218,6 +220,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                 },
               }}
             />
+          }
+          { (saveSending || deleteSending) &&
+            <Loading />
           }
         </Content>
       </div>
