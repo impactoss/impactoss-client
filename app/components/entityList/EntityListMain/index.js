@@ -39,13 +39,19 @@ const ListWrapper = styled.div``;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
-    // console.log('EntityListMain.shouldComponentUpdate')
+    // console.log('EntityListMain.shouldComponentUpdate', nextProps.listUpdating)
     // console.log(this.props.entities !== nextProps.entities)
     // console.log(this.props.entityIdsSelected !== nextProps.entityIdsSelected)
     // console.log(this.props.dataReady !== nextProps.dataReady)
     // console.log(isEqual(this.props.locationQuery, nextProps.locationQuery))
     // console.log(this.props.locationQuery === nextProps.locationQuery)
     // console.log(typeof this.props.scrollContainer !== typeof nextProps.scrollContainer)
+    if (nextProps.listUpdating) {
+      return false;
+    }
+    if (this.props.listUpdating && !nextProps.listUpdating) {
+      return true;
+    }
     return this.props.entities !== nextProps.entities
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.dataReady !== nextProps.dataReady
@@ -221,6 +227,7 @@ EntityListMain.propTypes = {
   onSortOrder: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,
+  listUpdating: PropTypes.bool,
 };
 
 EntityListMain.contextTypes = {

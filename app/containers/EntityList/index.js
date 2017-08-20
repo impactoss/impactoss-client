@@ -8,10 +8,10 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { reduce } from 'lodash/collection';
 
 import { Map, List, fromJS } from 'immutable';
 
+import { getEntityReference } from 'utils/entities';
 import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Sidebar from 'components/styled/Sidebar';
@@ -27,10 +27,11 @@ import {
 } from 'containers/App/actions';
 
 import appMessages from 'containers/App/messages';
-import { PARAMS } from 'containers/App/constants';
+import { PARAMS, RECORD_OUTDATED } from 'containers/App/constants';
 
 import {
   selectDomain,
+  selectProgress,
   selectActivePanel,
   selectSelectedEntities,
 } from './selectors';
@@ -73,9 +74,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     this.props.resetStateOnMount();
   }
   componentWillReceiveProps(nextProps) {
-    if (Object.keys(nextProps.viewDomain.sending).length > 0
-      && Object.keys(nextProps.viewDomain.errors).length === 0
-      && this.computeProgress(nextProps.viewDomain) > 99.9
+    if (nextProps.viewDomain.get('sending').size > 0
+      && nextProps.viewDomain.get('errors').size === 0
+      && nextProps.progress > 99.9
     ) {
       this.props.resetProgress();
     }
@@ -86,27 +87,22 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     return this.context.intl.formatMessage(message);
   }
 
-  computeProgress = ({ sending, success, errors }) =>
-    Object.keys(sending).length > 0
-      ? ((Object.keys(success).length + Object.keys(errors).length) / Object.keys(sending).length) * 100
-      : null;
-
   render() {
     // make sure selected entities are still actually on page
-    const { entityIdsSelected, entities, viewDomain } = this.props;
-    const { errors } = viewDomain;
+    const { entityIdsSelected, entities, progress } = this.props;
+    const errors = this.props.viewDomain.get('errors');
+    const sending = this.props.viewDomain.get('sending');
 
     const entityIdsSelectedFiltered = entityIdsSelected.size > 0 && entities
       ? entityIdsSelected.filter((id) => entities.map((entity) => entity.get('id')).includes(id))
       : entityIdsSelected;
-
-    const progress = this.computeProgress(viewDomain);
 
     return (
       <div>
         <Sidebar>
           { this.props.dataReady &&
             <EntityListSidebar
+              listUpdating={progress !== null && progress >= 0 && progress < 100}
               entities={this.props.entities}
               taxonomies={this.props.taxonomies}
               connections={this.props.connections}
@@ -128,19 +124,28 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             />
           }
         </Sidebar>
-        { (progress > 0 && progress < 100) &&
+        { (progress !== null && progress < 100) &&
           <Progress>
             <Loading
               progress={progress}
             />
           </Progress>
         }
-        {(Object.keys(errors).length > 0) &&
+        {(errors.size > 0) &&
           <Progress error>
             <ErrorMessages
               error={{
-                messages: reduce(errors, (memo, error) => error.messages
-                  ? memo.concat(error.messages)
+                messages: errors.reduce((memo, error, timestamp) =>
+                  error.messages
+                  ? memo.concat(error.messages.map((message) => {
+                    const recordReference = sending.get(timestamp) && sending.get(timestamp).entity
+                      ? getEntityReference(fromJS(sending.get(timestamp).entity))
+                      : 'unknown';
+                    if (message === RECORD_OUTDATED) {
+                      return this.context.intl.formatMessage(appMessages.forms.outdatedErrorList, { recordReference });
+                    }
+                    return `${this.context.intl.formatMessage(appMessages.forms.otherErrorList, { recordReference })}${message}`;
+                  }))
                   : memo
                 , []),
               }}
@@ -149,6 +154,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           </Progress>
         }
         <EntityListMain
+          listUpdating={progress !== null && progress >= 0 && progress < 100}
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
@@ -204,6 +210,7 @@ EntityList.propTypes = {
   isManager: PropTypes.bool,
   entityIdsSelected: PropTypes.object,
   viewDomain: PropTypes.object,
+  progress: PropTypes.number,
   // dispatch props
   onPanelSelect: PropTypes.func.isRequired,
   handleEditSubmit: PropTypes.func.isRequired,
@@ -232,7 +239,8 @@ const mapStateToProps = (state) => ({
   isManager: selectIsUserManager(state),
   activePanel: selectActivePanel(state),
   entityIdsSelected: selectSelectedEntities(state),
-  viewDomain: selectDomain(state).toJS(),
+  viewDomain: selectDomain(state),
+  progress: selectProgress(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

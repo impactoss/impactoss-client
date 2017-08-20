@@ -471,18 +471,23 @@ export function* newEntitySaga({ data }) {
 // }
 //
 export function* saveConnectionsSaga({ data }) {
-  const dataTS = stampPayload(data);
-  try {
-    yield put(saveSending(dataTS));
-    // on the server
-    const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
-    // and on the client
-    yield put(updateConnections(data.path, connectionsUpdated));
-    yield put(saveSuccess(dataTS));
-  } catch (err) {
-    err.response.json = yield err.response.json();
-    yield put(saveError(err, dataTS));
-    yield put(invalidateEntities(data.path));
+  if (data.updates && (
+    (data.updates.create && data.updates.create.length > 0)
+    || (data.updates.delete && data.updates.delete.length > 0)
+  )) {
+    const dataTS = stampPayload(data);
+    try {
+      yield put(saveSending(dataTS));
+      // on the server
+      const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
+      // and on the client
+      yield put(updateConnections(data.path, connectionsUpdated));
+      yield put(saveSuccess(dataTS));
+    } catch (err) {
+      err.response.json = yield err.response.json();
+      yield put(saveError(err, dataTS));
+      yield put(invalidateEntities(data.path));
+    }
   }
 }
 
