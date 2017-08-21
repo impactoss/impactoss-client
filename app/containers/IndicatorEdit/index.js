@@ -4,30 +4,41 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, List, fromJS } from 'immutable';
+import { Map, List } from 'immutable';
 
 import {
   userOptions,
   entityOptions,
-  renderActionControl,
+  renderMeasureControl,
+  renderSdgTargetControl,
   renderUserControl,
-  validateRequired,
-  validateDateFormat,
+  getConnectionUpdatesFromFormData,
+  getTitleFormField,
+  getReferenceFormField,
+  getStatusField,
+  getMarkdownField,
+  getDateField,
+  getFrequencyField,
+  getCheckboxField,
 } from 'utils/forms';
 
 import {
-  getConnectionUpdatesFromFormData,
-} from 'utils/entities';
+  getMetaField,
+} from 'utils/fields';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
+import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
+import validateRequired from 'components/forms/validators/validate-required';
 
-import { PUBLISH_STATUSES, USER_ROLES, REPORT_FREQUENCIES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -35,29 +46,40 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  deleteEntity,
+  openNewEntityModal,
+  submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
-import {
-  getEntity,
-  getEntities,
-  isReady,
-} from 'containers/App/selectors';
+import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectViewEntity,
+  selectMeasures,
+  selectSdgTargets,
+  selectUsers,
+  selectConnectedTaxonomies,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
+
 
 export class IndicatorEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.indicator) {
-      this.props.populateForm('indicatorEdit.form.data', this.getInitialFormData());
+    if (this.props.dataReady && this.props.viewEntity) {
+      this.props.initialiseForm('indicatorEdit.form.data', this.getInitialFormData());
     }
   }
 
@@ -67,22 +89,29 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       this.props.loadEntitiesIfNeeded();
     }
     // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('indicatorEdit.form.data', this.getInitialFormData(nextProps));
+      this.props.initialiseForm('indicatorEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { actions, indicator, users } = props;
-    indicator.attributes.frequency_months = indicator.attributes.frequency_months || 1;
-    return indicator
+    const { measures, viewEntity, users, sdgtargets } = props;
+    let attributes = viewEntity.get('attributes');
+    if (!attributes.get('reference')) {
+      attributes = attributes.set('reference', viewEntity.get('id'));
+    }
+    return viewEntity
     ? Map({
-      id: indicator.id,
-      attributes: fromJS(indicator.attributes),
-      associatedActions: entityOptions(actions, true),
-      associatedUser: userOptions(users, indicator.attributes.manager_id),
+      id: viewEntity.get('id'),
+      attributes: attributes.mergeWith(
+        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+        FORM_INITIAL.get('attributes')
+      ),
+      associatedMeasures: entityOptions(measures, true),
+      associatedSdgTargets: entityOptions(sdgtargets, true),
+      associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
       // TODO allow single value for singleSelect
     })
     : Map();
@@ -91,18 +120,8 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'title',
-          controlType: 'titleText',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
+        getReferenceFormField(this.context.intl.formatMessage, appMessages, false, true),
+        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
       ],
     },
   ]);
@@ -110,132 +129,48 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        {
-          controlType: 'combo',
-          fields: [
-            {
-              controlType: 'info',
-              type: 'reference',
-              value: entity.id,
-              label: this.context.intl.formatMessage(appMessages.attributes.id),
-            },
-            {
-              id: 'status',
-              controlType: 'select',
-              model: '.attributes.draft',
-              label: this.context.intl.formatMessage(appMessages.attributes.draft),
-              value: entity.attributes.draft,
-              options: PUBLISH_STATUSES,
-            },
-          ],
-        },
-        {
-          controlType: 'info',
-          type: 'meta',
-          fields: [
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
-            },
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.user && entity.user.attributes.name,
-            },
-          ],
-        },
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
+        getMetaField(entity, appMessages),
       ],
     },
   ]);
 
-  getBodyMainFields = (actions) => ([
+  getBodyMainFields = (connectedTaxonomies, measures, sdgtargets, onCreateOption) => ([
     {
-      fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-        },
-      ],
+      fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderActionControl(actions),
+        renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
       ],
     },
   ]);
 
-  getBodyAsideFields = (entity, users) => ([ // fieldGroups
+  getBodyAsideFields = (entity, users, repeat) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
       icon: 'reminder',
       fields: [
-        {
-          id: 'start_date',
-          controlType: 'date',
-          model: '.attributes.start_date',
-          label: this.context.intl.formatMessage(appMessages.attributes.start_date),
-          placeholder: 'YYYY-MM-DD',
-          validators: {
-            date: validateDateFormat,
-          },
-          errorMessages: {
-            date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
-          },
-        },
-        {
-          id: 'repeat',
-          controlType: 'checkbox',
-          model: '.attributes.repeat',
-          label: this.context.intl.formatMessage(appMessages.attributes.repeat),
-          value: entity.attributes.repeat,
-        },
-        {
-          id: 'frequency',
-          controlType: 'select',
-          label: this.context.intl.formatMessage(appMessages.attributes.frequency_months),
-          model: '.attributes.frequency_months',
-          options: REPORT_FREQUENCIES,
-          value: parseInt(entity.attributes.frequency_months, 10),
-        },
-        {
-          id: 'end_date',
-          controlType: 'date',
-          model: '.attributes.end_date',
-          label: this.context.intl.formatMessage(appMessages.attributes.end_date),
-          placeholder: 'YYYY-MM-DD',
-          validators: {
-            date: validateDateFormat,
-          },
-          errorMessages: {
-            date: this.context.intl.formatMessage(appMessages.forms.dateFormatError),
-          },
-        },
+        getDateField(this.context.intl.formatMessage, appMessages, 'start_date', repeat, repeat ? 'start_date' : 'start_date_only'),
+        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat', entity, (model, value) => this.props.resetValidityOnRepeatChange(model, value, this.props.viewDomain.form.data)),
+        repeat ? getFrequencyField(this.context.intl.formatMessage, appMessages, entity) : null,
+        repeat ? getDateField(this.context.intl.formatMessage, appMessages, 'end_date', repeat)
+        : null,
         renderUserControl(
           users,
           this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
-          entity.attributes.manager_id,
+          entity.getIn(['attributes', 'manager_id']),
         ),
       ],
     },
   ]);
 
-  getFields = (entity, actions, users) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity),
-    },
-    body: {
-      main: this.getBodyMainFields(actions),
-      aside: this.getBodyAsideFields(entity, users),
-    },
-  })
-
   render() {
-    const { indicator, dataReady, viewDomain, actions, users } = this.props;
-    const { saveSending, saveError } = viewDomain.page;
+    const { viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, users, sdgtargets, onCreateOption } = this.props;
+    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
 
     return (
       <div>
@@ -251,39 +186,72 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             type={CONTENT_SINGLE}
             icon="indicators"
             buttons={
-              indicator && dataReady ? [{
+              viewEntity && dataReady ? [{
                 type: 'cancel',
                 onClick: this.props.handleCancel,
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(viewDomain.form.data, actions),
+                disabled: saveSending,
+                onClick: () => this.props.handleSubmitRemote('indicatorEdit.form.data'),
               }] : null
             }
           />
-          {saveSending &&
-            <p>Saving</p>
+          {!submitValid &&
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
-            <p>{saveError}</p>
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
-          { !indicator && !dataReady &&
+          {deleteError &&
+            <ErrorMessages error={deleteError} />
+          }
+          {(saveSending || deleteSending || !dataReady) &&
             <Loading />
           }
-          { !indicator && dataReady && !saveError &&
+          {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {indicator && dataReady &&
+          {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="indicatorEdit.form.data"
               formData={viewDomain.form.data}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, actions)}
+              saving={saveSending}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, measures, sdgtargets)}
+              handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(indicator, actions, users)}
+              handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+              validators={{
+                '': {
+                  // Form-level validator
+                  endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
+                  startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
+                  endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
+                },
+              }}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity),
+                },
+                body: {
+                  main: this.getBodyMainFields(connectedTaxonomies, measures, sdgtargets, onCreateOption),
+                  aside: this.getBodyAsideFields(viewEntity, users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
+                },
+              }}
             />
+          }
+          { (saveSending || deleteSending) &&
+            <Loading />
           }
         </Content>
       </div>
@@ -294,108 +262,109 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 IndicatorEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
+  handleSubmitRemote: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
+  onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
-  indicator: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
-  actions: PropTypes.object,
+  measures: PropTypes.object,
+  sdgtargets: PropTypes.object,
   users: PropTypes.object,
+  onCreateOption: PropTypes.func,
+  resetValidityOnRepeatChange: PropTypes.func,
+  connectedTaxonomies: PropTypes.object,
 };
 
 IndicatorEdit.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'measures',
-    'users',
-    'user_roles',
-    'indicators',
-    'measure_indicators',
-  ] }),
-
-  indicator: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'indicators',
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-      ],
-    },
-  ),
-
-  // all recommendations, listing connection if any
-  actions: getEntities(
-    state,
-    {
-      path: 'measures',
-      extend: {
-        as: 'associated',
-        path: 'measure_indicators',
-        key: 'measure_id',
-        reverse: true,
-        where: {
-          indicator_id: props.params.id,
-        },
-      },
-    },
-  ),
-
-  // all users of role contributor
-  users: getEntities(
-    state,
-    {
-      path: 'users',
-      connected: {
-        path: 'user_roles',
-        key: 'user_id',
-        where: {
-          role_id: USER_ROLES.CONTRIBUTOR, // contributors only
-        },
-      },
-    },
-  ),
+  viewDomain: selectDomain(state),
+  isUserAdmin: selectIsUserAdmin(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
+  sdgtargets: selectSdgTargets(state, props.params.id),
+  measures: selectMeasures(state, props.params.id),
+  users: selectUsers(state),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('measure_indicators'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
-    populateForm: (model, formData) => {
-      // console.log('populateForm', formData)
-      dispatch(formActions.load(model, formData));
+    initialiseForm: (model, formData) => {
+      // console.log('initialiseForm', formData)
+      dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
     },
-    handleSubmit: (formData, actions) => {
+    resetValidityOnRepeatChange: (repeatModel, repeat, formData) => {
+      dispatch(formActions.resetValidity('indicatorEdit.form.data.attributes.end_date'));
+      dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
+        required: repeat && !validateRequired(formData.getIn(['attributes', 'start_date'])),
+      }));
+      dispatch(formActions.change(repeatModel, repeat));
+    },
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
+    },
+    handleSubmitFail: (formData, formatMessage) => {
+      if (formData.$form.errors.endDatePresent) {
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
+          required: true,
+        }));
+      }
+      if (formData.$form.errors.startDatePresent) {
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
+          required: true,
+        }));
+      }
+      if (formData.$form.validity.endDatePresent && formData.$form.validity.startDatePresent && formData.$form.errors.endDateAfterStartDate) {
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', formatMessage(appMessages.forms.startDateAfterEndDateError)));
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', formatMessage(appMessages.forms.endDateBeforeStartDateError)));
+      }
+      dispatch(submitInvalid(false));
+    },
+    handleSubmitRemote: (model) => {
+      dispatch(formActions.submit(model));
+    },
+    handleSubmit: (formData, measures, sdgtargets) => {
       let saveData = formData
         .set(
           'measureIndicators',
           getConnectionUpdatesFromFormData({
             formData,
-            connections: actions,
-            connectionAttribute: 'associatedActions',
-            createConnectionKey: 'indicator_id',
-            createKey: 'measure_id',
+            connections: measures,
+            connectionAttribute: 'associatedMeasures',
+            createConnectionKey: 'measure_id',
+            createKey: 'indicator_id',
+          })
+        )
+        .set(
+          'sdgtargetIndicators',
+          getConnectionUpdatesFromFormData({
+            formData,
+            connections: sdgtargets,
+            connectionAttribute: 'associatedSdgTargets',
+            createConnectionKey: 'sdgtarget_id',
+            createKey: 'indicator_id',
           })
         );
 
@@ -408,12 +377,17 @@ function mapDispatchToProps(dispatch, props) {
       }
 
       // cleanup
+      // default to database id
+      const formRef = formData.getIn(['attributes', 'reference']) || '';
+      if (formRef.trim() === '') {
+        saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
+      }
+      // do not store repeat fields when not repeat
       if (!saveData.getIn(['attributes', 'repeat'])) {
         saveData = saveData
           .setIn(['attributes', 'frequency_months'], null)
           .setIn(['attributes', 'end_date'], null);
       }
-
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
@@ -421,6 +395,15 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    handleDelete: () => {
+      dispatch(deleteEntity({
+        path: 'indicators',
+        id: props.params.id,
+      }));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

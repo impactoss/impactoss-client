@@ -4,22 +4,39 @@ export function updateAssociationsRequest(path, associations) {
   // create action-category associations
   let requests = [];
   requests = requests.concat(associations.create.map((payload) =>
-    createAssociationRequest(path, payload)));
+    newEntityRequest(path, payload)));
 
   // delete action-category associations
   requests = requests.concat(associations.delete.map((associationId) =>
-    deleteAssociationRequest(path, associationId)));
+    deleteEntityRequest(path, associationId)));
 
   return Promise.all(requests);
 }
-
-export function createAssociationRequest(path, payload) {
-  return apiRequest('post', `${path}/`, payload);
+export function updateAssociationsBatchRequest(path, associations) {
+  let ops = [];
+  if (associations.create) {
+    ops = ops.concat(associations.create.map((payload) => ({
+      method: 'post',
+      url: `${path}`,
+      params: payload,
+    })));
+  }
+  if (associations.delete) {
+    ops = ops.concat(associations.delete.map((associationId) => ({
+      method: 'delete',
+      url: `${path}/${associationId}`,
+    })));
+  }
+  const payload = {
+    ops,
+    sequential: true,
+  };
+  return apiRequest('post', 'batchapi', payload);
 }
 
-export function deleteAssociationRequest(path, associationId) {
-  return apiRequest('delete', `${path}/${associationId}`).then(() => ({
-    id: associationId,
+export function deleteEntityRequest(path, entityId) {
+  return apiRequest('delete', `${path}/${entityId}`).then(() => ({
+    id: entityId,
     type: 'delete',
   }));
 }

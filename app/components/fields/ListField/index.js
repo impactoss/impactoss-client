@@ -1,4 +1,8 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import FieldWrap from 'components/fields/FieldWrap';
 import ListItem from 'components/fields/ListItem';
@@ -8,13 +12,18 @@ import EmptyHint from 'components/fields/EmptyHint';
 import Dot from 'components/fields/Dot';
 import DotWrapper from 'components/fields/DotWrapper';
 
+const Id = styled.div`
+  font-weight: 500;
+  color: ${palette('dark', 4)}
+`;
+
 class ListField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { field } = this.props;
     return (
       <FieldWrap>
         <ListLabel>
-          {field.label}
+          <FormattedMessage {...field.label} />
           {field.entityType &&
             <DotWrapper>
               <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
@@ -24,13 +33,29 @@ class ListField extends React.PureComponent { // eslint-disable-line react/prefe
         {field.values.map((value, i) => (
           <ListItem key={i}>
             {value.linkTo
-              ? <ListLink to={value.linkTo}>{value.label}</ListLink>
-              : <p>{value.label}</p>
+              ? <ListLink to={value.linkTo}>
+                {value.reference &&
+                  <Id>
+                    {value.reference}
+                  </Id>
+                }
+                {value.label}
+              </ListLink>
+              : <div>
+                {value.reference &&
+                  <Id>
+                    {value.reference}
+                  </Id>
+                }
+                {value.label}
+              </div>
             }
           </ListItem>
         ))}
-        { (!field.values || field.values.length === 0) &&
-          <EmptyHint>{field.showEmpty}</EmptyHint>
+        { field.showEmpty && (!field.values || field.values.length === 0) &&
+          <EmptyHint>
+            <FormattedMessage {...field.showEmpty} />
+          </EmptyHint>
         }
       </FieldWrap>
     );

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { FormattedMessage } from 'react-intl';
 import DownloadFile from 'components/DownloadFile';
@@ -23,9 +24,9 @@ const DocumentView = ({ status, url, isManager }) => {
 };
 
 DocumentView.propTypes = {
-  url: React.PropTypes.string,
-  status: React.PropTypes.bool,
-  isManager: React.PropTypes.bool,
+  url: PropTypes.string,
+  status: PropTypes.bool,
+  isManager: PropTypes.bool,
 };
 
 export default DocumentView;

@@ -16,6 +16,10 @@ export default defineMessages({
       defaultMessage: 'Samoa\'s home of human rights implementation',
     },
   },
+  overview: {
+    id: 'app.containers.App.overview',
+    defaultMessage: 'Overview',
+  },
   buttons: {
     cancel: {
       id: 'app.containers.App.buttons.cancel',
@@ -39,7 +43,7 @@ export default defineMessages({
     },
     assign: {
       id: 'app.containers.App.buttons.assign',
-      defaultMessage: 'Assign',
+      defaultMessage: 'Update',
     },
   },
   forms: {
@@ -49,7 +53,41 @@ export default defineMessages({
     },
     dateFormatError: {
       id: 'app.containers.App.forms.dateFormatError',
-      defaultMessage: 'Please enter the date in the required format: YYYY-MM-DD',
+      defaultMessage: 'Please enter the date in the required format: dd/mm/yyyy', // change to format according to locale
+    },
+    numberError: {
+      id: 'app.containers.App.forms.numberError',
+      defaultMessage: 'Please enter a number',
+    },
+    endDateBeforeStartDateError: {
+      id: 'app.containers.App.forms.endDateBeforeStartDateError',
+      defaultMessage: 'End date must be after start date',
+    },
+    startDateAfterEndDateError: {
+      id: 'app.containers.App.forms.startDateAfterEndDateError',
+      defaultMessage: 'Start date must be before end date',
+    },
+    multipleErrors: {
+      id: 'app.containers.App.forms.multipleErrors',
+      defaultMessage: 'One or more fields have errors.',
+    },
+    outdatedError: {
+      id: 'app.containers.App.forms.outdatedError',
+      defaultMessage: 'Sorry, this record has become outdated. Please review the latest server version below.',
+    },
+    outdatedErrorList: {
+      id: 'app.containers.App.forms.outdatedErrorList',
+      defaultMessage: 'Record {recordReference}: Sorry, this record has become outdated in the meantime. Please review the latest server version above.',
+    },
+    otherErrorList: {
+      id: 'app.containers.App.forms.otherErrorList',
+      defaultMessage: 'Record {recordReference}: ',
+    },
+  },
+  hints: {
+    autoReference: {
+      id: 'app.containers.App.hints.autoReference',
+      defaultMessage: 'Leave blank to assign database id',
     },
   },
   placeholders: {
@@ -57,17 +95,53 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.title',
       defaultMessage: 'Enter title',
     },
+    name: {
+      id: 'app.containers.App.placeholders.name',
+      defaultMessage: 'Enter user name',
+    },
+    email: {
+      id: 'app.containers.App.placeholders.email',
+      defaultMessage: 'Email address',
+    },
     short_title: {
       id: 'app.containers.App.placeholders.title',
       defaultMessage: 'Abbr.',
     },
     menu_title: {
       id: 'app.containers.App.placeholders.title',
-      defaultMessage: '',
+      defaultMessage: 'Menu title',
+    },
+    order: {
+      id: 'app.containers.App.placeholders.order',
+      defaultMessage: '#',
+    },
+    reference: {
+      id: 'app.containers.App.placeholders.reference',
+      defaultMessage: 'ID',
     },
     description: {
       id: 'app.containers.App.placeholders.description',
+      defaultMessage: 'Enter description',
+    },
+    content: {
+      id: 'app.containers.App.placeholders.content',
       defaultMessage: 'Enter content',
+    },
+    response: {
+      id: 'app.containers.App.placeholders.response',
+      defaultMessage: 'Enter response comment',
+    },
+    outcome: {
+      id: 'app.containers.App.placeholders.outcome',
+      defaultMessage: 'Enter desired outcome',
+    },
+    indicator_summary: {
+      id: 'app.containers.App.attributes.indicator_summary',
+      defaultMessage: 'Enter indicator summary',
+    },
+    target_date_comment: {
+      id: 'app.containers.App.attributes.target_date_comment',
+      defaultMessage: 'Additional information',
     },
     url: {
       id: 'app.containers.App.placeholders.url',
@@ -89,7 +163,31 @@ export default defineMessages({
     },
     description: {
       id: 'app.containers.App.attributes.description',
+      defaultMessage: 'Description',
+    },
+    content: {
+      id: 'app.containers.App.attributes.content',
       defaultMessage: 'Content',
+    },
+    accepted: {
+      id: 'app.containers.App.attributes.accepted',
+      defaultMessage: 'Government response',
+    },
+    response: {
+      id: 'app.containers.App.attributes.response',
+      defaultMessage: 'Government response comment',
+    },
+    outcome: {
+      id: 'app.containers.App.attributes.outcome',
+      defaultMessage: 'Desired outcome',
+    },
+    indicator_summary: {
+      id: 'app.containers.App.attributes.indicator_summary',
+      defaultMessage: 'Indicator summary',
+    },
+    target_date_comment: {
+      id: 'app.containers.App.attributes.target_date_comment',
+      defaultMessage: 'Target date comment',
     },
     short_title: {
       id: 'app.containers.App.attributes.short_title',
@@ -99,13 +197,29 @@ export default defineMessages({
       id: 'app.containers.App.attributes.menu_title',
       defaultMessage: 'Menu title',
     },
+    order: {
+      id: 'app.containers.App.attributes.order',
+      defaultMessage: 'Menu order',
+    },
     reference: {
       id: 'app.containers.App.attributes.reference',
       defaultMessage: 'Reference',
     },
+    referenceDefault: {
+      id: 'app.containers.App.attributes.referenceDefault',
+      defaultMessage: 'Reference (leave blank to use database id)',
+    },
+    referenceOptional: {
+      id: 'app.containers.App.attributes.referenceOptional',
+      defaultMessage: 'Reference (optional)',
+    },
     id: {
       id: 'app.containers.App.attributes.id',
       defaultMessage: 'No.',
+    },
+    idOrRef: {
+      id: 'app.containers.App.attributes.idOrRef',
+      defaultMessage: 'No./Ref.',
     },
     name: {
       id: 'app.containers.App.attributes.name',
@@ -133,7 +247,11 @@ export default defineMessages({
     },
     start_date: {
       id: 'app.containers.App.attributes.start_date',
-      defaultMessage: 'Date (start date)',
+      defaultMessage: 'Start date',
+    },
+    start_date_only: {
+      id: 'app.containers.App.attributes.start_date_only',
+      defaultMessage: 'Due date',
     },
     end_date: {
       id: 'app.containers.App.attributes.end_date',
@@ -147,8 +265,8 @@ export default defineMessages({
       id: 'app.containers.App.attributes.repeat',
       defaultMessage: 'Repeat?',
     },
-    targetDateEmpty: {
-      id: 'app.containers.App.attributes.targetDateEmpty',
+    target_date_empty: {
+      id: 'app.containers.App.attributes.target_date_empty',
       defaultMessage: 'No target date set',
     },
     document_url: {
@@ -170,6 +288,14 @@ export default defineMessages({
     documentEmpty: {
       id: 'app.containers.App.attributes.documentEmpty',
       defaultMessage: 'No document attached yet',
+    },
+    due_date_id: {
+      id: 'app.containers.App.attributes.due_date_id',
+      defaultMessage: 'Due date',
+    },
+    due_date_id_empty: {
+      id: 'app.containers.App.attributes.due_date_id_empty',
+      defaultMessage: 'No report scheduled',
     },
     manager_id: {
       indicators: {
@@ -213,6 +339,10 @@ export default defineMessages({
       id: 'app.containers.App.entities.showLess',
       defaultMessage: 'Show less',
     },
+    connected: {
+      id: 'app.containers.App.entities.connected',
+      defaultMessage: '(inferred)',
+    },
     recommendations: {
       single: {
         id: 'app.containers.App.entities.recommendations.single',
@@ -245,16 +375,30 @@ export default defineMessages({
         defaultMessage: 'Actions',
       },
       singleLong: {
-        id: 'app.containers.App.entities.actions.singleLong',
+        id: 'app.containers.App.entities.measures.singleLong',
         defaultMessage: 'Government action',
       },
       pluralLong: {
-        id: 'app.containers.App.entities.actions.pluralLong',
+        id: 'app.containers.App.entities.measures.pluralLong',
         defaultMessage: 'Government actions',
       },
       empty: {
         id: 'app.containers.App.entities.measures.empty',
         defaultMessage: 'No actions yet',
+      },
+    },
+    sdgtargets: {
+      single: {
+        id: 'app.containers.App.entities.sdgtargets.single',
+        defaultMessage: 'SDG target',
+      },
+      plural: {
+        id: 'app.containers.App.entities.sdgtargets.plural',
+        defaultMessage: 'SDG targets',
+      },
+      empty: {
+        id: 'app.containers.App.entities.sdgtargets.empty',
+        defaultMessage: 'No SDG targets yet',
       },
     },
     indicators: {
@@ -357,29 +501,29 @@ export default defineMessages({
       2: {
         single: {
           id: 'app.containers.App.entities.taxonomies.2.single',
-          defaultMessage: 'UN session',
+          defaultMessage: 'Cycle',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.2.plural',
-          defaultMessage: 'UN sessions',
+          defaultMessage: 'Cycles',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.2.empty',
-          defaultMessage: 'No UN session assigned yet',
+          defaultMessage: 'No cycle assigned yet',
         },
       },
       3: {
         single: {
           id: 'app.containers.App.entities.taxonomies.3.single',
-          defaultMessage: 'Human right',
+          defaultMessage: 'Human rights issue',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.3.plural',
-          defaultMessage: 'Human rights',
+          defaultMessage: 'Human rights issues',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.3.empty',
-          defaultMessage: 'No human right assigned yet',
+          defaultMessage: 'No human rights issue assigned yet',
         },
       },
       4: {
@@ -420,8 +564,22 @@ export default defineMessages({
           defaultMessage: 'Organisations',
         },
         empty: {
-          id: 'app.containers.App.entities.taxonomies.5.empty',
+          id: 'app.containers.App.entities.taxonomies.6.empty',
           defaultMessage: 'No organisation assigned yet',
+        },
+      },
+      7: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.7.single',
+          defaultMessage: 'SDG',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.7.plural',
+          defaultMessage: 'SDGs',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.7.empty',
+          defaultMessage: 'No SDG assigned yet',
         },
       },
     },

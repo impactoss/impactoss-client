@@ -1,12 +1,9 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { orderBy } from 'lodash/collection';
-import { without } from 'lodash/array';
-
-import { getEntitySortIteratee } from 'utils/sort';
 
 import appMessages from 'containers/App/messages';
-import EntityListItems from 'components/EntityListItems';
+import EntityListItems from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems';
 
 import FieldWrap from 'components/fields/FieldWrap';
 import LabelLarge from 'components/fields/LabelLarge';
@@ -21,17 +18,21 @@ const CONNECTIONMAX = 5;
 class ConnectionsField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor() {
     super();
-    this.state = {
-      showAllConnections: [],
-    };
+    this.state = { showAllConnections: false };
   }
+
   render() {
     const { field } = this.props;
-    const sortedValues = orderBy(field.values, getEntitySortIteratee('id'), 'desc');
+    const label = `${field.values.size} ${this.context.intl.formatMessage(
+      field.values.size === 1
+      ? appMessages.entities[field.entityType].single
+      : appMessages.entities[field.entityType].plural
+    )}`;
+
     return (
       <FieldWrap>
         <LabelLarge>
-          {field.label}
+          {label}
           {field.entityType &&
             <DotWrapper>
               <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
@@ -40,40 +41,35 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
         </LabelLarge>
         <EntityListItemsWrap>
           <EntityListItems
-            entities={this.state.showAllConnections.indexOf(field.entityType) >= 0
-              ? sortedValues
-              : (sortedValues.slice(0, CONNECTIONMAX))
-            }
-            entityIcon={field.icon}
-            entityLinkTo={field.entityPath}
             taxonomies={field.taxonomies}
-            associations={{
-              connections: { // filter by associated entity
-                options: field.connectionOptions,
-              },
-            }}
+            connections={field.connections}
+            config={{ connections: { options: field.connectionOptions } }}
+            entities={
+              this.state.showAllConnections
+                ? field.values
+                : (field.values.slice(0, CONNECTIONMAX))
+            }
+            entityIcon={field.entityIcon}
+            onEntityClick={field.onEntityClick}
+            entityPath={field.entityPath}
           />
+          { field.values.size > CONNECTIONMAX &&
+            <ToggleAllItems
+              onClick={() => this.setState({ showAllConnections: !this.state.showAllConnections })}
+            >
+              { this.state.showAllConnections &&
+                <FormattedMessage {...appMessages.entities.showLess} />
+              }
+              { !this.state.showAllConnections &&
+                <FormattedMessage {...appMessages.entities.showAll} />
+              }
+            </ToggleAllItems>
+          }
         </EntityListItemsWrap>
-        { sortedValues.length > CONNECTIONMAX &&
-          <ToggleAllItems
-            onClick={() =>
-              this.setState({
-                showAllConnections: this.state.showAllConnections.indexOf(field.entityType) >= 0
-                  ? without(this.state.showAllConnections, field.entityType)
-                  : this.state.showAllConnections.concat([field.entityType]),
-              })
-            }
-          >
-            { this.state.showAllConnections.indexOf(field.entityType) >= 0 &&
-              <FormattedMessage {...appMessages.entities.showLess} />
-            }
-            { this.state.showAllConnections.indexOf(field.entityType) < 0 &&
-              <FormattedMessage {...appMessages.entities.showAll} />
-            }
-          </ToggleAllItems>
-        }
-        { (!field.values || field.values.length === 0) &&
-          <EmptyHint>{field.showEmpty}</EmptyHint>
+        { (!field.values || field.values.size === 0) &&
+          <EmptyHint>
+            <FormattedMessage {...field.showEmpty} />
+          </EmptyHint>
         }
       </FieldWrap>
     );
@@ -84,7 +80,7 @@ ConnectionsField.propTypes = {
   field: PropTypes.object.isRequired,
 };
 ConnectionsField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default ConnectionsField;

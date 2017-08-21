@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Field } from 'react-redux-form/immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -13,7 +14,7 @@ const Hint = styled.div`
 // see also ScheduleItem
 const Label = styled.label`
   font-weight: bold;
-  color:  ${(props) => props.highlight ? palette('primary', 0) : palette('dark', 2)};
+  color:  ${(props) => props.highlight ? palette('primary', 1) : palette('dark', 2)};
 `;
 const LabelInner = styled.span`
   padding-left: 5px;

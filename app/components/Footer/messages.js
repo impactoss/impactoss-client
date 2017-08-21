@@ -23,21 +23,29 @@ export default defineMessages({
   responsible: {
     text: {
       id: 'nmrf.components.Footer.responsible.text',
-      defaultMessage: 'This website is brought to you by: this section could include links to sponsors',
+      defaultMessage: 'Visit our website to learn more about Human Rights in New Zealand',
+    },
+    url: {
+      id: 'nmrf.components.Footer.responsible.url',
+      defaultMessage: 'https://www.hrc.co.nz/',
+    },
+    anchor: {
+      id: 'nmrf.components.Footer.responsible.anchor',
+      defaultMessage: 'www.hrc.co.nz',
     },
   },
   project: {
     text: {
       id: 'nmrf.components.Footer.project.text',
-      defaultMessage: 'This website is an implementation of the NMRF open source project',
+      defaultMessage: 'SADATA is powered by',
     },
     url: {
       id: 'nmrf.components.Footer.project.url',
-      defaultMessage: 'https://github.com/dumparkltd/hr-nmrf-client',
+      defaultMessage: 'http://impactoss.org',
     },
     anchor: {
       id: 'nmrf.components.Footer.project.anchor',
-      defaultMessage: 'NMRF Open Source',
+      defaultMessage: 'IMPACT OSS',
     },
   },
 });

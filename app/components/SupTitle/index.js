@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
@@ -6,19 +7,26 @@ import Icon from 'components/Icon';
 
 const Styled = styled.span`
   text-transform: uppercase;
-  color: ${palette('dark', 3)}
+  color: ${palette('dark', 3)};
   font-weight: bold;
+  font-size: 0.85em;
 `;
 
+const SupIconWrap = styled.span`
+  position: relative;
+  top: -1px;
+`;
 
-class SupTitle extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class SupTitle extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { icon, title } = this.props;
 
     return (
       <Styled>
         { icon &&
-          <Icon name={icon} text textLeft />
+          <SupIconWrap>
+            <Icon name={icon} text textLeft />
+          </SupIconWrap>
         }
         { title }
       </Styled>

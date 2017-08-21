@@ -1,4 +1,6 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -12,14 +14,20 @@ class MetaField extends React.PureComponent { // eslint-disable-line react/prefe
     return (
       <FieldWrap>
         <Label>
-          {field.label || this.context.intl.formatMessage(appMessages.attributes.meta.title)}
+          <FormattedMessage {...(field.label || appMessages.attributes.meta.title)} />
         </Label>
         {
-          field.fields.map((metaField, i) => (
-            <Meta key={i}>
-              {`${metaField.label}: ${metaField.value}`}
-            </Meta>
-          ))
+          field.fields.map((metaField, i) => {
+            const value = metaField.date
+              ? this.context.intl.formatDate(new Date(metaField.value))
+              : metaField.value;
+            const label = this.context.intl.formatMessage(metaField.label);
+            return (
+              <Meta key={i}>
+                {`${label}: ${value}`}
+              </Meta>
+            );
+          })
         }
       </FieldWrap>
     );
@@ -30,7 +38,7 @@ MetaField.propTypes = {
   field: PropTypes.object.isRequired,
 };
 MetaField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default MetaField;

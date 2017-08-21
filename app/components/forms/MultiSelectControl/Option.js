@@ -1,37 +1,45 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { FormattedMessage } from 'react-intl';
+import messages from './messages';
 
 const Label = styled.div`
-  font-weight: ${(props) => props.bold ? 'bold' : 'normal'};
-  padding-left: 1em;
+  font-weight: ${(props) => props.bold ? 500 : 'normal'};
   position: relative;
 `;
-const Reference = styled.span`
-  font-weight: bold;
-  opacity: 0.5;
+const New = styled.span`
+  color: ${palette('primary', 4)};
+  background-color: ${palette('primary', 0)};
+  padding: 1px 5px;
   font-size: 0.8em;
-  padding-right: 10px;
+  margin-left: 0.5em;
+  border-radius: 4px;
 `;
-const Count = styled.span`
-  position: absolute;
-  top: 0;
-  right: 0
+const Id = styled.span`
+  font-weight: bold;
   color: ${palette('dark', 4)}
 `;
-
+const IdSpacer = styled.span`
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  color: ${palette('dark', 4)};
+`;
+// <Label bold={props.bold} italic={props.isNew}>
 const Option = (props) => (
-  <Label bold={props.bold}>
-    { props.reference &&
-      <Reference>
-        {props.reference}
-      </Reference>
+  <Label bold={false}>
+    {props.reference &&
+      <Id>{props.reference}</Id>
+    }
+    {props.reference &&
+      <IdSpacer>|</IdSpacer>
     }
     {props.label}
-    { typeof props.count !== 'undefined' &&
-      <Count>
-        {props.count}
-      </Count>
+    {props.isNew &&
+      <New>
+        <FormattedMessage {...messages.new} />
+      </New>
     }
   </Label>
 );
@@ -39,8 +47,8 @@ const Option = (props) => (
 Option.propTypes = {
   label: PropTypes.string.isRequired,
   reference: PropTypes.string,
-  count: PropTypes.number,
-  bold: PropTypes.bool,
+  // bold: PropTypes.bool,
+  isNew: PropTypes.bool,
 };
 
 export default Option;

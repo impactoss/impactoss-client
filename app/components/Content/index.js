@@ -1,13 +1,14 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import Container from 'components/basic/Container';
-import ContainerWrapper from 'components/basic/Container/ContainerWrapper';
+import Container from 'components/styled/Container';
+import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
 
-class Content extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class Content extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
       <ContainerWrapper>
-        <Container>
+        <Container noPaddingBottom={this.props.noPaddingBottom}>
           {this.props.children}
         </Container>
       </ContainerWrapper>
@@ -17,6 +18,7 @@ class Content extends React.Component { // eslint-disable-line react/prefer-stat
 
 Content.propTypes = {
   children: PropTypes.node,
+  noPaddingBottom: PropTypes.bool,
 };
 
 export default Content;

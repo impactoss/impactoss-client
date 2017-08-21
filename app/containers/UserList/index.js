@@ -4,16 +4,25 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { Map, List, fromJS } from 'immutable';
+
+import {
+  loadEntitiesIfNeeded,
+  redirectIfNotPermitted,
+} from 'containers/App/actions';
+
+import { selectReady, selectUserConnections, selectUserTaxonomies } from 'containers/App/selectors';
+import appMessages from 'containers/App/messages';
+import { USER_ROLES } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
-import { isReady } from 'containers/App/selectors';
-
-import appMessages from 'containers/App/messages';
+import { CONFIG, DEPENDENCIES } from './constants';
+import { selectUsers } from './selectors';
 import messages from './messages';
 
 export class UserList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -27,84 +36,14 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
+    if (nextProps.dataReady && !this.props.dataReady) {
+      this.props.redirectIfNotPermitted();
+    }
   }
 
   render() {
     const { dataReady } = this.props;
 
-    // define selects for getEntities
-    const selects = {
-      entities: {
-        path: 'users',
-        extensions: [
-          {
-            path: 'user_categories',
-            key: 'user_id',
-            reverse: true,
-            as: 'taxonomies',
-          },
-          {
-            path: 'user_roles',
-            key: 'user_id',
-            reverse: true,
-            as: 'roles',
-          },
-        ],
-      },
-      connections: {
-        options: ['roles'],
-      },
-      taxonomies: { // filter by each category
-        out: 'js',
-        path: 'taxonomies',
-        where: {
-          tags_users: true,
-        },
-        extend: {
-          path: 'categories',
-          key: 'taxonomy_id',
-          reverse: true,
-        },
-      },
-    };
-
-    // specify the filter and query  options
-    const filters = {
-      search: ['name'],
-      taxonomies: { // filter by each category
-        query: 'cat',
-        filter: true,
-        connected: {
-          path: 'user_categories',
-          key: 'user_id',
-          whereKey: 'category_id',
-        },
-      },
-      connections: { // filter by associated entity
-        options: [
-          {
-            label: this.context.intl.formatMessage(appMessages.entities.roles.plural),
-            path: 'roles', // filter by user connection
-            query: 'roles',
-            key: 'role_id',
-            filter: false,
-            connected: {
-              path: 'user_roles',
-              key: 'user_id',
-              whereKey: 'role_id',
-            },
-          },
-        ],
-      },
-    };
-    const edits = {
-      taxonomies: { // edit category
-        connectPath: 'user_categories',
-        key: 'category_id',
-        ownKey: 'user_id',
-        filter: true,
-      },
-    };
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'users',
@@ -119,17 +58,17 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <EntityList
-          location={this.props.location}
-          selects={selects}
-          filters={filters}
-          edits={edits}
+          entities={this.props.entities}
+          taxonomies={this.props.taxonomies}
+          connections={this.props.connections}
+          config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
             single: this.context.intl.formatMessage(appMessages.entities.users.single),
             plural: this.context.intl.formatMessage(appMessages.entities.users.plural),
           }}
-          entityLinkTo="/users/"
+          locationQuery={fromJS(this.props.location.query)}
         />
       </div>
     );
@@ -138,33 +77,31 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
 
 UserList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  location: PropTypes.object.isRequired,
+  redirectIfNotPermitted: PropTypes.func,
   dataReady: PropTypes.bool,
+  entities: PropTypes.instanceOf(List).isRequired,
+  taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
+  location: PropTypes.object,
 };
 
 UserList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  dataReady: isReady(state, { path: [
-    'users',
-    'user_roles',
-    'roles',
-    'user_categories',
-    'categories',
-    'taxonomies',
-  ] }),
+const mapStateToProps = (state, props) => ({
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  entities: selectUsers(state, fromJS(props.location.query)),
+  taxonomies: selectUserTaxonomies(state),
+  connections: selectUserConnections(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('roles'));
-      dispatch(loadEntitiesIfNeeded('user_categories'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
+    redirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
   };
 }

@@ -5,12 +5,18 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
-  empty: {
-    id: 'app.components.EntityForm.empty',
-    defaultMessage: 'No {entities} yet. ',
+  confirmDeleteQuestion: {
+    id: 'app.components.EntityForm.confirmDeleteQuestion',
+    defaultMessage: 'Delete forever?',
   },
-  emptyLink: {
-    id: 'app.components.EntityForm.emptyLink',
-    defaultMessage: 'Click to select.',
+  buttons: {
+    cancelDelete: {
+      id: 'app.components.EntityForm.buttons.cancelDelete',
+      defaultMessage: 'Cancel',
+    },
+    confirmDelete: {
+      id: 'app.components.EntityForm.buttons.donfirmDelete',
+      defaultMessage: 'Delete',
+    },
   },
 });

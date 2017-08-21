@@ -3,9 +3,10 @@
  * UserPassword reducer
  *
  */
-
 import { fromJS } from 'immutable';
-import { checkErrorMessagesExist } from 'utils/request';
+import { LOCATION_CHANGE } from 'react-router-redux';
+
+import { checkResponseError } from 'utils/request';
 
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
@@ -24,6 +25,8 @@ const initialState = fromJS({
 
 function userPasswordReducer(state = initialState, action) {
   switch (action.type) {
+    case LOCATION_CHANGE:
+      return initialState;
     case PASSWORD_SENDING:
       return state
         .set('passwordSending', true)
@@ -37,7 +40,7 @@ function userPasswordReducer(state = initialState, action) {
       return state
         .set('passwordSending', false)
         .set('passwordSuccess', false)
-        .set('passwordError', checkErrorMessagesExist(action.error.response));
+        .set('passwordError', checkResponseError(action.error));
     default:
       return state;
   }

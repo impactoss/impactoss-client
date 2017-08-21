@@ -4,37 +4,41 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { createStructuredSelector } from 'reselect';
 import styled from 'styled-components';
+import { actions as formActions } from 'react-redux-form/immutable';
 
+import ErrorMessages from 'components/ErrorMessages';
+import Loading from 'components/Loading';
 import Icon from 'components/Icon';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
-import A from 'components/basic/A';
+import A from 'components/styled/A';
 
 import { updatePath } from 'containers/App/actions';
-import { makeSelectAuth } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import { login } from './actions';
-import makeUserLoginSelector from './selectors';
+import { selectDomain } from './selectors';
 
 const BottomLinks = styled.div`
   padding: 2em 0;
 `;
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentWillMount() {
+    this.props.initialiseForm();
+  }
   render() {
-    const { error, messages: message } = this.props.authentication;
+    const { authError, authSending } = this.props.viewDomain.page;
     const required = (val) => val && val.length;
-
     return (
       <div>
         <Helmet
@@ -50,14 +54,16 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
-          {error &&
-            message.map((errorMessage, i) =>
-              <p key={i}>{errorMessage}</p>
-            )
+          {authError &&
+            <ErrorMessages error={authError} />
           }
-          { this.props.userLogin.form &&
+          {authSending &&
+            <Loading />
+          }
+          { this.props.viewDomain.form &&
             <AuthForm
               model="userLogin.form.data"
+              sending={authSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
@@ -101,7 +107,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                 }}
               >
                 <FormattedMessage {...messages.registerLink} />
-                <Icon name="arrowRight" text textRight size="1em" />
+                <Icon name="arrowRight" text textRight />
               </A>
             </p>
             <p>
@@ -113,7 +119,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                 }}
               >
                 <FormattedMessage {...messages.recoverPasswordLink} />
-                <Icon name="arrowRight" text textRight size="1em" />
+                <Icon name="arrowRight" text textRight />
               </A>
             </p>
           </BottomLinks>
@@ -124,24 +130,26 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
 }
 
 UserLogin.propTypes = {
-  userLogin: PropTypes.object.isRequired,
-  authentication: PropTypes.object,
+  viewDomain: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
+  initialiseForm: PropTypes.func,
 };
 
 UserLogin.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = createStructuredSelector({
-  userLogin: makeUserLoginSelector(),
-  authentication: makeSelectAuth(),
+const mapStateToProps = (state) => ({
+  viewDomain: selectDomain(state),
 });
 
 export function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('userLogin.form.data'));
+    },
     handleSubmit: (formData) => {
       dispatch(login(formData.toJS()));
     },

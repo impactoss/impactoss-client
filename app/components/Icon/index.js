@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import icons from 'themes/icons';
+import asArray from 'utils/as-array';
 
 import SVG from './SVG';
 
@@ -9,7 +11,7 @@ class Icon extends React.PureComponent {
     const icon = icons[name];
     if (icon) {
       const iSize = icon.size || iconSize;
-      const iconPaths = icon.paths || icon;
+      const iconPaths = icon.paths || icon.path || icon;
       return (
         <SVG
           viewBox={`0 0 ${iSize} ${iSize}`}
@@ -24,9 +26,7 @@ class Icon extends React.PureComponent {
           textRight={textRight}
         >
           <title>{title || `Icon: ${name}`}</title>
-          {
-            iconPaths.map((path, index) => (<path d={path} key={index}></path>))
-          }
+          <path d={asArray(iconPaths).reduce((memo, path) => `${memo}${path}`, '')}></path>
         </SVG>
       );
     }
@@ -35,16 +35,16 @@ class Icon extends React.PureComponent {
 }
 
 Icon.propTypes = {
-  name: React.PropTypes.string,
-  title: React.PropTypes.string,
-  palette: React.PropTypes.string,
-  paletteIndex: React.PropTypes.number,
-  size: React.PropTypes.string,
-  iconSize: React.PropTypes.number,
-  color: React.PropTypes.string,
-  text: React.PropTypes.bool,
-  textLeft: React.PropTypes.bool,
-  textRight: React.PropTypes.bool,
+  name: PropTypes.string,
+  title: PropTypes.string,
+  palette: PropTypes.string,
+  paletteIndex: PropTypes.number,
+  size: PropTypes.string,
+  iconSize: PropTypes.number,
+  color: PropTypes.string,
+  text: PropTypes.bool,
+  textLeft: PropTypes.bool,
+  textRight: PropTypes.bool,
 };
 Icon.defaultProps = {
   name: 'placeholder',

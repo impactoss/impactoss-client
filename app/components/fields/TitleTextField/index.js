@@ -1,4 +1,6 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -13,7 +15,7 @@ class TitleField extends React.PureComponent { // eslint-disable-line react/pref
       <FieldWrap>
         {field.isManager &&
           <Label>
-            {field.label || this.context.intl.formatMessage(appMessages.attributes.title)}
+            <FormattedMessage {...(field.label || appMessages.attributes.title)} />
           </Label>
         }
         <TitleText>{field.value}</TitleText>
@@ -24,9 +26,6 @@ class TitleField extends React.PureComponent { // eslint-disable-line react/pref
 
 TitleField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-TitleField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
 };
 
 export default TitleField;

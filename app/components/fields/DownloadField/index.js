@@ -1,6 +1,7 @@
-import React, { PropTypes } from 'react';
-
+import React from 'react';
+import PropTypes from 'prop-types';
 import DocumentView from 'components/DocumentView';
+import { FormattedMessage } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -15,15 +16,17 @@ class DownloadField extends React.PureComponent { // eslint-disable-line react/p
     return (
       <FieldWrap>
         <LabelLarge>
-          {field.label || this.context.intl.formatMessage(appMessages.attributes.document_url)}
+          <FormattedMessage {...(field.label || appMessages.attributes.document_url)} />
         </LabelLarge>
         { field.value &&
           <DocumentWrap>
             <DocumentView url={field.value} isManager={field.isManager} status={field.public} />
           </DocumentWrap>
         }
-        { !field.value &&
-          <EmptyHint>{field.showEmpty}</EmptyHint>
+        { !field.value && field.showEmpty &&
+          <EmptyHint>
+            <FormattedMessage {...field.showEmpty} />
+          </EmptyHint>
         }
       </FieldWrap>
     );
@@ -34,6 +37,6 @@ DownloadField.propTypes = {
   field: PropTypes.object.isRequired,
 };
 DownloadField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 export default DownloadField;

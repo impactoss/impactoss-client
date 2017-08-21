@@ -1,176 +1,156 @@
-import React, { PropTypes } from 'react';
-import { List } from 'immutable';
-import { kebabCase, lowerCase } from 'lodash/string';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { without } from 'lodash/array';
+import { filter, find } from 'lodash/collection';
+import { List, fromJS } from 'immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { FormattedMessage } from 'react-intl';
 
-import Icon from 'components/Icon';
-import Button from 'components/buttons/Button';
-import ButtonText from 'components/buttons/ButtonText';
+import ButtonFactory from 'components/buttons/ButtonFactory';
+import TagSearch from 'components/TagSearch';
 
 import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
-import Option from './Option';
+import {
+  sortOptions,
+  filterOptionsByTags,
+  filterOptionsByKeywords,
+} from './utils';
 
+import TagFilters from './TagFilters';
+import OptionList from './OptionList';
+import Header from './Header';
 
-const OptionWrapper = styled.div`
-  padding: 0.5em 1em;
-  border-bottom: 1px solid ${palette('light', 1)};
-  display: table;
-  width: 100%;
-`;
+import messages from './messages';
+
 const ButtonGroup = styled.div`
-  text-align:right;
+  float: ${(props) => props.left ? 'left' : 'right'}
 `;
 const ControlWrapper = styled.div``;
-const CheckboxWrapper = styled.div`
-  display: table-cell;
-  vertical-align:middle;
-  width: 10px;
-  padding-top: 3px;
-`;
-const OptionLabel = styled.label`
-  display: table-cell;
-  vertical-align:middle;
-  cursor: pointer;
-`;
-const ControlHeader = styled.div`
+
+const ChangeHint = styled.div`
   position: absolute;
-  top: 0;
   left: 0;
   right: 0;
-  background-color: ${palette('dark', 2)};
-  color: ${palette('primary', 4)};
-  height: 60px;
-  padding: 2.25em 1em 0;
-`;
-const HeaderButton = styled(Button)`
-  position: absolute;
-  right:0;
-  bottom:0;
-  padding-right:;
-  &:hover {
-    color: ${palette('primary', 0)};
-  }
+  bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
+  background-color: ${palette('light', 0)};
+  color: ${palette('dark', 3)};
+  font-style: italic;
+  padding: 0.5em 1em;
+  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
+  text-align: right;
 `;
 
-const ControlSearch = styled.div`
+const ChangeHintHighlighted = styled.span`
+  color: ${palette('primary', 0)};
+`;
+
+const ControlMain = styled.div`
   position: absolute;
   top: 60px;
+  bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
   left: 0;
   right: 0;
-  background: ${palette('primary', 4)};
-  height: 55px;
-  padding: 1em;
-  border-left: ${palette('light', 2)};
-  border-right: ${palette('light', 2)};
-  background-color: ${palette('light', 0)};
-`;
-const Search = styled.input`
-  background: ${palette('primary', 4)};
-  width:100%;
-  border:1px solid ${palette('light', 1)};
-  color: ${palette('dark', 4)};
-  padding:5px;
+  overflow-y: auto;
+  padding:0;
+  padding-bottom: ${(props) => props.hasChangeNote ? '50px' : '0px'};
 `;
 const ControlFooter = styled.div`
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  border: 1px solid ${palette('light', 2)};
   background-color: ${palette('light', 0)};
   height: 50px;
-`;
-const ControlMain = styled.div`
-  position: absolute;
-  top: ${(props) => props.filter ? '115px' : '60px'};
-  bottom: 50px;
-  left: 0;
-  right: 0;
-  overflow-y: auto;
-  padding:0;
-  border-left: 1px solid ${palette('light', 2)};
-  border-right: 1px solid ${palette('light', 2)};
+  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
 `;
 
-export const getChangedOptions = (options) =>
-  options.filter((o) => o.get('hasChanged'));
+const Search = styled.div`
+  padding: 0.5em 1em;
+  background-color: ${palette('light', 0)};
+`;
 
-export const getCheckedValuesFromOptions = (options, onlyChanged = false) => {
-  const opts = onlyChanged ? getChangedOptions(options) : options;
-  return opts.filter((o) => o.get('checked')).map((o) => o.get('value'));
-};
+const SelectAll = styled.div`
+  padding: 0.5em 1em 0.5em 0;
+  background-color: ${palette('light', 0)};
+  display: table;
+  width: 100%;
+  line-height: 1.1;
+`;
 
-export const getCheckedOptions = (options, onlyChanged = false) => {
-  const opts = onlyChanged ? getChangedOptions(options) : options;
-  return opts.filter((o) => o.get('checked'));
-};
+const LabelWrap = styled.div`
+  display: table-cell;
+  padding-left: 0.5em;
+  padding-right: 1em;
+  font-size: 0.9em;
+`;
+const CheckboxWrap = styled.div`
+  text-align: center;
+  display: table-cell;
+  padding-left: 1em;
+  padding-right: 0.5em;
+  width: 10px;
+`;
+const Checkbox = styled(IndeterminateCheckbox)`
+  vertical-align: middle;
+`;
+const Label = styled.label`
+  vertical-align: middle;
+`;
 
-export const getUncheckedValuesFromOptions = (options, onlyChanged = false) => {
-  const opts = onlyChanged ? getChangedOptions(options) : options;
-  return opts.filterNot((o) => o.get('checked')).map((o) => o.get('value'));
-};
 
-const sortValues = {
-  [CHECKBOX_STATES.CHECKED]: -1,
-  [CHECKBOX_STATES.INDETERMINATE]: 0,
-  [CHECKBOX_STATES.UNCHECKED]: 1,
-};
-
-export default class MultiSelect extends React.Component {
-
-  static propTypes = {
-    options: PropTypes.instanceOf(List),
-    values: PropTypes.instanceOf(List),
-    onChange: PropTypes.func.isRequired,
-    onCancel: PropTypes.func,
-    threeState: PropTypes.bool,
-    multiple: PropTypes.bool,
-    required: PropTypes.bool,
-    title: PropTypes.string,
-    buttons: PropTypes.array,
-    filter: PropTypes.bool,
-  }
-
-  static defaultProps = {
-    values: new List(),
-    threeState: false,
-    multiple: true,
-    required: false,
-    filter: true,
-  }
-
+class MultiSelect extends React.Component {
   constructor() {
     super();
     this.state = {
       query: null,
+      optionsInitial: null,
+      panelId: null,
+      queryTags: [],
     };
   }
 
-  onFilter = (evt) => {
-    if (evt && evt !== undefined) evt.stopPropagation();
+  componentWillMount() {
+    // remember initial options
     this.setState({
-      query: evt.target.value,
+      optionsInitial: this.props.options,
+      panelId: this.props.panelId,
     });
   }
 
-  getOrder = (option) => {
-    if (typeof option.get('order') !== 'undefined') {
-      return lowerCase(option.get('order').toString());
-    } else if (typeof option.get('label') === 'string') {
-      return lowerCase(option.get('label'));
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.panelId && (nextProps.panelId !== this.state.panelId)) {
+      this.setState({
+        optionsInitial: nextProps.options,
+        panelId: nextProps.panelId,
+        query: null,
+        queryTags: [],
+      });
     }
-    return 'zzzzzzzzz';
+  }
+
+  onSearch = (value) => {
+    this.setState({
+      query: value,
+    });
+  }
+  onTagSelected = (active, tagOption) => {
+    this.setState({
+      queryTags: active
+        ? this.state.queryTags.concat([tagOption.get('value')])
+        : without(this.state.queryTags, tagOption.get('value')),
+    });
   }
 
   getNextValues = (checked, option) => {
     const { multiple, required, values } = this.props;
-
     // do not update if required and change would result in empty list
     if (!checked && required) {
       const otherCheckedValues = values.find((v) =>
-        v.get('checked') && !(v.get('value') === option.get('value') && v.get('query') === option.get('query'))
+        v.get('checked')
+          && v.get('value') !== option.get('value')
+          && (option.get('query') ? v.get('query') === option.get('query') : true)
       );
       if (!otherCheckedValues) {
         return values;
@@ -180,7 +160,8 @@ export default class MultiSelect extends React.Component {
     // uncheck all others if single mode (!multiple)
     let nextValues = values;
     const existingValueIndex = values.findIndex((v) =>
-      v.get('value') === option.get('value') && v.get('query') === option.get('query')
+      v.get('value') === option.get('value')
+        && (option.get('query') ? v.get('query') === option.get('query') : true)
     );
     if (!multiple && checked) {
       // uncheck all other options
@@ -194,141 +175,251 @@ export default class MultiSelect extends React.Component {
     return existingValueIndex > -1 ? nextValues.set(existingValueIndex, newValue) : nextValues.push(newValue);
   }
 
-  renderCheckbox = (option, i) => {
-    const checked = option.get('checked');
-    // TODO consider isImmutable (need to upgrade to immutable v4)
-    const isThreeState = option.get('isThreeState');
-    const id = `${checked}-${i}-${kebabCase(option.get('value'))}-${kebabCase(option.get('query'))}`;
-    return (
-      <OptionWrapper key={id}>
-        <CheckboxWrapper>
-          { isThreeState &&
-            <IndeterminateCheckbox
-              id={id}
-              checked={checked}
-              onChange={(checkedState) => {
-                this.props.onChange(this.getNextValues(checkedState, option));
-              }}
-            />
-          }
-          { !isThreeState &&
-            <input
-              id={id}
-              type="checkbox"
-              checked={checked}
-              onChange={(evt) => {
-                if (evt && evt !== undefined) evt.stopPropagation();
-                this.props.onChange(this.getNextValues(evt.target.checked, option));
-              }}
-            />
-          }
-        </CheckboxWrapper>
-        <OptionLabel htmlFor={id} >
-          <Option
-            bold={option.get('labelBold') || checked}
-            reference={typeof option.get('reference') !== 'undefined' && option.get('reference') !== null ? option.get('reference').toString() : ''}
-            label={option.get('label')}
-            count={option.get('showCount') && option.get('count')}
-          />
-        </OptionLabel>
-      </OptionWrapper>
-    );
+  getAllSelectedValues = (checked, options) => {
+    const { values } = this.props;
+    // TODO consider how to deal with required variant
+    // uncheck all others if single mode (!multiple)
+    let nextValues = values;
+    options.forEach((option) => {
+      const existingValueIndex = values.findIndex((v) =>
+        v.get('value') === option.get('value')
+          && (option.get('query') ? v.get('query') === option.get('query') : true)
+      );
+      const newValue = option.set('checked', checked).set('hasChanged', true);
+      // set new value
+      // set current value, add if not present
+      nextValues = existingValueIndex > -1
+        ? nextValues.set(existingValueIndex, newValue)
+        : nextValues.push(newValue);
+    });
+    return nextValues;
   }
 
-  renderCancel = (onCancel) => (
-    <HeaderButton onClick={onCancel} >
-      <Icon name="close" size="1.75em" />
-    </HeaderButton>
-  );
+  getSelectedState = (selectedTotal, allSelected) => {
+    if (selectedTotal === 0) {
+      return CHECKBOX_STATES.UNCHECKED;
+    }
+    if (selectedTotal > 0 && allSelected) {
+      return CHECKBOX_STATES.CHECKED;
+    }
+    return CHECKBOX_STATES.INDETERMINATE;
+  }
 
-  renderButton = (action, i) => (
-    <ButtonText
-      primary={action.type === 'primary'}
+  // props, state
+  // map options
+  prepareOptions = ({ options, values, threeState }, { optionsInitial }) => options.map((option) => {
+    const value = values.find((v) => option.get('value') === v.get('value'));// && option.get('query') === v.get('query'));
+    const isNew = !optionsInitial.includes(option);
+    const isIndeterminateInitial = threeState && this.isOptionIndeterminate(option);
+    const isCheckedIntitial = option.get('checked');
+    const optionUpdated = option.withMutations((o) =>
+      o.set('isNew', isNew)
+      .set('initialChecked', isCheckedIntitial)
+      .set('isIndeterminate', isIndeterminateInitial)
+    );
+    return value
+    ? optionUpdated.withMutations((o) =>
+      o.set('checked', value.get('checked'))
+      .set('changedToChecked', value.get('checked') && !isCheckedIntitial)
+      .set('changedToUnchecked', !value.get('checked') && !this.isOptionIndeterminate(value) && (isCheckedIntitial || isIndeterminateInitial))
+    )
+    : optionUpdated;
+  });
+
+  filterOptions = (options, { search, advanced }, { query, queryTags }) => { // filter options
+    let checkboxOptions = options;
+    if (search && query) {
+      checkboxOptions = filterOptionsByKeywords(checkboxOptions, query);
+    }
+    if (advanced && queryTags) {
+      checkboxOptions = filterOptionsByTags(checkboxOptions, queryTags);
+    }
+    // sort options
+    return sortOptions(checkboxOptions);
+  };
+
+  currentTagFilterGroups = (tagFilterGroups, options) => {
+    // get all actually connected categories from connections
+    const optionTagIds = options
+    .map((option) => option.get('tags'))
+    .flatten()
+    .toSet()
+    .toList();
+
+    // filter multiselect options
+    return optionTagIds.size > 0
+      && !(optionTagIds.size === 1 && !optionTagIds.first())
+      ? tagFilterGroups.map((group) => ({
+        title: group.title,
+        palette: group.palette,
+        options: filter(group.options, (groupOption) => optionTagIds.includes(parseInt(groupOption.value, 10))),
+      }))
+      : [];
+  };
+
+  currentFilters = (queryTags, filterGroups) =>
+    queryTags.map((tagValue) =>
+      filterGroups.reduce((memo, group) => {
+        const option = find(group.options, (groupOption) => groupOption.value === tagValue);
+        return option
+        ? ({
+          label: option.filterLabel,
+          type: group.palette[0],
+          id: group.palette[1],
+          onClick: (evt) => {
+            if (evt && evt.preventDefault) evt.preventDefault();
+            this.onTagSelected(false, fromJS(option));
+          },
+        })
+        : memo;
+      }, null)
+    );
+
+  isOptionIndeterminate = (option) => option.get('checked') === CHECKBOX_STATES.INDETERMINATE;
+
+  renderButton = (action, i, hasChanges) => (
+    <ButtonFactory
       key={i}
-      onClick={action.onClick && (() => action.onClick())}
-      type={action.submit ? 'submit' : 'button'}
-    >
-      {action.title}
-    </ButtonText>
+      button={{
+        type: action.type === 'primary' ? 'formPrimary' : (action.type || 'text'),
+        title: action.title,
+        onClick: action.onClick && (() => action.onClick()),
+        submit: action.submit,
+        disabled: action.submit && !hasChanges,
+      }}
+    />
   );
 
   render() {
-    const { options, values, threeState } = this.props;
+    let options = this.prepareOptions(this.props, this.state);
 
-    // prepare checkboxes
-    let checkboxes = options.map((option) => {
-      const value = values.find((v) => option.get('value') === v.get('value') && option.get('query') === v.get('query'));
-      return option.withMutations((o) =>
-        o.set('checked', value ? value.get('checked') : false)
-        .set('initialChecked', option.get('checked'))
-        .set('isThreeState', threeState && option.get('checked') === CHECKBOX_STATES.INDETERMINATE)
-        .set('order', this.getOrder(option))
-      );
-    });
+    const optionsChangedToChecked = options.filter((option) => option.get('changedToChecked'));
+    const optionsChangedToUnchecked = options.filter((option) => option.get('changedToUnchecked'));
+    const hasChanges = optionsChangedToChecked.size > 0 || optionsChangedToUnchecked.size > 0;
+    const showChangeHint = this.props.advanced && hasChanges;
 
-    // filter checkboxes if needed
-    // match multiple words
-    // see http://stackoverflow.com/questions/5421952/how-to-match-multiple-words-in-regex
-    if (this.props.filter && this.state.query) {
-      try {
-        const regex = this.state.query.split(' ').reduce((memo, str) => `${memo}(?=.*\\b${str})`, '');
-        const pattern = new RegExp(regex, 'i');
-        checkboxes = checkboxes.filter((option) =>
-          pattern.test(option.get('value'))
-          || pattern.test(option.get('label'))
-          || pattern.test(option.get('reference'))
-          || pattern.test(option.get('search'))
-        );
-      } catch (e) {
-        // nothing
-      }
-    }
+    options = this.filterOptions(options, this.props, this.state);
+    const filteredOptionsSelected = options.filter((option) => option.get('checked') || this.isOptionIndeterminate(option));
 
-    // sort checkboxes
-    checkboxes = checkboxes.sort((a, b) => {
-      const aSort = a.get('order');
-      const bSort = b.get('order');
-      // first check for 0 order
-      if (aSort === '0' && aSort < bSort) return -1;
-      if (bSort === '0' && bSort < aSort) return 1;
-      // then check checked state
-      const aSortChecked = sortValues[a.get('initialChecked')];
-      const bSortChecked = sortValues[b.get('initialChecked')];
-      if (aSortChecked < bSortChecked) return -1;
-      if (aSortChecked > bSortChecked) return 1;
-      // if same checked state, sort by order value
-      if (aSort < bSort) return -1;
-      if (aSort > bSort) return 1;
-      return 0;
-    });
     return (
       <ControlWrapper>
-        <ControlHeader>
-          { this.props.title }
-          { this.props.onCancel &&
-            this.renderCancel(this.props.onCancel)
+        <Header
+          title={this.props.title}
+          onCancel={this.props.onCancel}
+        />
+        <ControlMain
+          search={this.props.search}
+          hasFooter={this.props.buttons}
+          hasChangeNote={showChangeHint}
+        >
+          { this.props.search &&
+            <Search>
+              <TagSearch
+                onSearch={this.onSearch}
+                filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}
+                searchQuery={this.state.query || ''}
+                multiselect
+              />
+            </Search>
           }
-        </ControlHeader>
-        { this.props.filter &&
-          <ControlSearch>
-            <Search id="search" onChange={this.onFilter} placeholder="Filter options" />
-          </ControlSearch>
-        }
-        <ControlMain filter={this.props.filter} >
-          {checkboxes && checkboxes.map(this.renderCheckbox)}
+          { this.props.advanced && this.props.tagFilterGroups &&
+            <TagFilters
+              queryTags={this.state.queryTags}
+              tagFilterGroups={this.currentTagFilterGroups(this.props.tagFilterGroups, options)}
+              onTagSelected={this.onTagSelected}
+            />
+          }
+          { this.props.selectAll &&
+            <SelectAll>
+              <CheckboxWrap>
+                <Checkbox
+                  id="select-all-multiselect"
+                  checked={this.getSelectedState(filteredOptionsSelected.size, filteredOptionsSelected.size === options.size)}
+                  onChange={(checkedState) =>
+                    this.props.onChange(this.getAllSelectedValues(checkedState, options))
+                  }
+                />
+              </CheckboxWrap>
+              <LabelWrap>
+                <Label htmlFor="select-all-multiselect">
+                  {filteredOptionsSelected.size > 0
+                    ? `${filteredOptionsSelected.size} option(s) selected`
+                    : 'Options'
+                  }
+                </Label>
+              </LabelWrap>
+            </SelectAll>
+          }
+          <OptionList
+            options={options}
+            onCheckboxChange={(checkedState, option) => {
+              this.props.onChange(this.getNextValues(checkedState, option));
+            }}
+          />
         </ControlMain>
-        <ControlFooter>
-          { this.props.buttons &&
+        { showChangeHint &&
+          <ChangeHint hasFooter={this.props.buttons}>
+            <FormattedMessage {...messages.changeHint} />
+            {optionsChangedToChecked.size > 0 &&
+              <ChangeHintHighlighted>
+                <FormattedMessage {...messages.changeHintSelected} values={{ no: optionsChangedToChecked.size }} />
+                .
+              </ChangeHintHighlighted>
+            }
+            {optionsChangedToUnchecked.size > 0 &&
+              <ChangeHintHighlighted>
+                <FormattedMessage {...messages.changeHintUnselected} values={{ no: optionsChangedToUnchecked.size }} />
+                .
+              </ChangeHintHighlighted>
+            }
+          </ChangeHint>
+        }
+        { this.props.buttons &&
+          <ControlFooter>
             <ButtonGroup>
               {
+                this.props.buttons.map((action, i) =>
+                  action && action.position !== 'left' && this.renderButton(action, i, hasChanges))
+              }
+            </ButtonGroup>
+            <ButtonGroup left>
+              {
                 this.props.buttons.map((action, i) => (
-                  this.renderButton(action, i)
+                  action && action.position === 'left' && this.renderButton(action, i, hasChanges)
                 ))
               }
             </ButtonGroup>
-          }
-        </ControlFooter>
+          </ControlFooter>
+        }
       </ControlWrapper>
     );
   }
 }
+
+
+MultiSelect.propTypes = {
+  options: PropTypes.instanceOf(List),
+  values: PropTypes.instanceOf(List),
+  onChange: PropTypes.func.isRequired,
+  onCancel: PropTypes.func,
+  multiple: PropTypes.bool,
+  required: PropTypes.bool,
+  title: PropTypes.string,
+  buttons: PropTypes.array,
+  search: PropTypes.bool,
+  advanced: PropTypes.bool,
+  selectAll: PropTypes.bool,
+  panelId: PropTypes.string,
+  tagFilterGroups: PropTypes.array,
+};
+
+MultiSelect.defaultProps = {
+  values: new List(),
+  threeState: false,
+  multiple: true,
+  required: false,
+  search: true,
+  advanced: false,
+};
+
+export default MultiSelect;

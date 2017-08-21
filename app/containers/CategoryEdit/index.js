@@ -4,19 +4,28 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, List, fromJS } from 'immutable';
+import { Map, List } from 'immutable';
 
 import {
   userOptions,
   renderUserControl,
-  validateRequired,
+  getTitleFormField,
+  getReferenceFormField,
+  getShortTitleFormField,
+  getMarkdownField,
+  getFormField,
 } from 'utils/forms';
+
+import {
+  getMetaField,
+} from 'utils/fields';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
@@ -28,32 +37,39 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  deleteEntity,
+  submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
 import {
-  getEntity,
-  getEntities,
-  isReady,
-  isUserAdmin,
+  selectReady,
+  selectIsUserAdmin,
 } from 'containers/App/selectors';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectViewEntity,
+  selectUsers,
+} from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class CategoryEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
-    if (this.props.dataReady && this.props.category) {
-      this.props.populateForm('categoryEdit.form.data', this.getInitialFormData());
+    if (this.props.dataReady && this.props.viewEntity) {
+      this.props.initialiseForm('categoryEdit.form.data', this.getInitialFormData());
     }
   }
 
@@ -62,20 +78,23 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.category) {
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
-      this.props.populateForm('categoryEdit.form.data', this.getInitialFormData(nextProps));
+      this.props.initialiseForm('categoryEdit.form.data', this.getInitialFormData(nextProps));
     }
   }
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { category, users } = props;
-    return category
+    const { viewEntity, users } = props;
+    return viewEntity
     ? Map({
-      id: category.id,
-      attributes: fromJS(category.attributes),
-      associatedUser: userOptions(users, category.attributes.manager_id),
+      id: viewEntity.get('id'),
+      attributes: viewEntity.get('attributes').mergeWith(
+        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+        FORM_INITIAL.get('attributes')
+      ),
+      associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
       // TODO allow single value for singleSelect
     })
     : Map();
@@ -84,83 +103,32 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
-          id: 'short_title',
-          controlType: 'short',
-          model: '.attributes.short_title',
-          label: this.context.intl.formatMessage(appMessages.attributes.short_title),
-        },
+        getReferenceFormField(this.context.intl.formatMessage, appMessages),
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
+        getShortTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
 
-  getHeaderAsideFields = (entity) => ([
-    {
-      fields: [
-        {
-          controlType: 'info',
-          type: 'reference',
-          value: entity.id,
-          label: this.context.intl.formatMessage(appMessages.attributes.id),
-        },
-        {
-          controlType: 'info',
-          type: 'meta',
-          fields: [
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-              value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
-            },
-            {
-              label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-              value: entity.user && entity.user.attributes.name,
-            },
-          ],
-        },
-      ],
-    },
-  ]);
-  getBodyMainFields = () => ([
-    {
-      fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-        },
-      ],
-    },
-  ]);
+  getHeaderAsideFields = (entity) => ([{
+    fields: [getMetaField(entity, appMessages)],
+  }]);
+
+  getBodyMainFields = () => ([{
+    fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
+  }]);
   getBodyAsideFields = (entity, users, isAdmin) => {
     const fields = []; // fieldGroups
     fields.push({
-      fields: [{
-        id: 'url',
-        controlType: 'url',
-        model: '.attributes.url',
-        label: this.context.intl.formatMessage(appMessages.attributes.url),
-      }],
+      fields: [getFormField(this.context.intl.formatMessage, appMessages, 'url', 'url')],
     });
-    if (isAdmin && !!entity.taxonomy.attributes.has_manager) {
+    if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({
         fields: [
           renderUserControl(
             users,
             this.context.intl.formatMessage(appMessages.attributes.manager_id.categories),
-            entity.attributes.manager_id
+            entity.getIn(['attributes', 'manager_id'])
           ),
         ],
       });
@@ -168,21 +136,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     return fields;
   }
 
-  getFields = (entity, users, isAdmin) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-      aside: this.getHeaderAsideFields(entity),
-    },
-    body: {
-      main: this.getBodyMainFields(),
-      aside: this.getBodyAsideFields(entity, users, isAdmin),
-    },
-  })
-
   render() {
-    const { category, dataReady, isAdmin, viewDomain, users } = this.props;
+    const { viewEntity, dataReady, isAdmin, viewDomain, users } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
 
     return (
       <div>
@@ -198,39 +155,67 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             type={CONTENT_SINGLE}
             icon="categories"
             buttons={
-              category && dataReady ? [{
+              viewEntity && dataReady ? [{
                 type: 'cancel',
                 onClick: () => this.props.handleCancel(reference),
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(viewDomain.form.data),
+                disabled: saveSending,
+                onClick: () => this.props.handleSubmitRemote('categoryEdit.form.data'),
               }] : null
             }
           />
-          {saveSending &&
-            <p>Saving</p>
+          {!submitValid &&
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
-            <p>{saveError}</p>
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
           }
-          { !category && !dataReady &&
+          {deleteError &&
+            <ErrorMessages error={deleteError} />
+          }
+          {(saveSending || deleteSending || !dataReady) &&
             <Loading />
           }
-          { !category && dataReady && !saveError &&
+          {!viewEntity && dataReady && !saveError && !deleteSending &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {category && dataReady &&
+          {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="categoryEdit.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
+              handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={() => this.props.handleCancel(reference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(category, users, isAdmin)}
+              handleDelete={() => isAdmin
+                ? this.props.handleDelete(viewEntity.getIn(['attributes', 'taxonomy_id']))
+                : null
+              }
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(viewEntity),
+                },
+                body: {
+                  main: this.getBodyMainFields(),
+                  aside: this.getBodyAsideFields(viewEntity, users, isAdmin),
+                },
+              }}
             />
+          }
+          {(saveSending || deleteSending) &&
+            <Loading />
           }
         </Content>
       </div>
@@ -241,84 +226,58 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 CategoryEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  populateForm: PropTypes.func,
+  initialiseForm: PropTypes.func,
+  handleSubmitRemote: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
-  category: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
   params: PropTypes.object,
   users: PropTypes.object,
+  onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 CategoryEdit.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
-  isAdmin: isUserAdmin(state),
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'users',
-    'user_roles',
-    'categories',
-    'taxonomies',
-  ] }),
-  category: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'categories',
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-        {
-          type: 'single',
-          path: 'taxonomies',
-          key: 'taxonomy_id',
-          as: 'taxonomy',
-        },
-      ],
-    },
-  ),
-  // all users of role manager
-  users: getEntities(
-    state,
-    {
-      path: 'users',
-      connected: {
-        path: 'user_roles',
-        key: 'user_id',
-        where: {
-          role_id: USER_ROLES.MANAGER, // managers only
-        },
-      },
-    },
-  ),
+  isAdmin: selectIsUserAdmin(state),
+  viewDomain: selectDomain(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
+  users: selectUsers(state),
 });
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
     },
-    populateForm: (model, formData) => {
-      dispatch(formActions.load(model, fromJS(formData)));
+    initialiseForm: (model, formData) => {
+      dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
+    },
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
+    },
+    handleSubmitFail: () => {
+      dispatch(submitInvalid(false));
+    },
+    handleSubmitRemote: (model) => {
+      dispatch(formActions.submit(model));
     },
     handleSubmit: (formData) => {
       let saveData = formData;
@@ -336,6 +295,13 @@ function mapDispatchToProps(dispatch) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    handleDelete: (taxonomyId) => {
+      dispatch(deleteEntity({
+        path: 'categories',
+        id: props.params.id,
+        redirect: `categories/${taxonomyId}`,
+      }));
     },
   };
 }

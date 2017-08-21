@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -26,12 +27,14 @@ const Styled = styled.div`
   top:0;
   left:0;
   right:0;
-  height:115px;
-  background-color: ${palette('primary', 2)};
+  height:${(props) => props.isHome ? 0 : 115}px;
+  background-color: ${palette('header', 0)};
+  box-shadow: ${(props) => props.isHome ? 'none' : '0px 0px 15px 0px rgba(0,0,0,0.5)'};
+  z-index: 101;
 `;
 
 
-class Header extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class Header extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   onClick = (evt, path) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -43,7 +46,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
 
     return (
       <Styled isHome={isHome}>
-        <Banner showPattern={!isHome}>
+        <Banner showPattern={!isHome} isHome={isHome}>
           { !isHome &&
             <Brand href={'/'} onClick={(evt) => this.onClick(evt, '/')}>
               <Logo src={logo} alt="logo" />
@@ -60,12 +63,14 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
           <NavAccount>
             {isSignedIn &&
               <span>
-                <LinkAccount
-                  href={`/users/${this.props.userId}`}
-                  onClick={(evt) => this.onClick(evt, `/users/${this.props.userId}`)}
-                >
-                  <FormattedMessage {...messages.user} />
-                </LinkAccount>
+                {this.props.userId &&
+                  <LinkAccount
+                    href={`/users/${this.props.userId}`}
+                    onClick={(evt) => this.onClick(evt, `/users/${this.props.userId}`)}
+                  >
+                    <FormattedMessage {...messages.user} />
+                  </LinkAccount>
+                }
                 <LinkAccount href={'/logout'} onClick={(evt) => this.onClick(evt, '/logout')}>
                   <FormattedMessage {...messages.logout} />
                 </LinkAccount>
@@ -97,33 +102,35 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
             }
           </NavPages>
         </Banner>
-        <NavMain hasBorder={isHome}>
-          { navItems &&
-            navItems.map((item, i) => (
-              <LinkMain
-                key={i}
-                href={item.path}
-                active={item.active || currentPath.startsWith(item.path)}
-                onClick={(evt) => this.onClick(evt, item.path)}
-              >
-                {item.title}
-              </LinkMain>
-            ))
-          }
-        </NavMain>
+        { !isHome &&
+          <NavMain hasBorder>
+            { navItems &&
+              navItems.map((item, i) => (
+                <LinkMain
+                  key={i}
+                  href={item.path}
+                  active={item.active || currentPath.startsWith(item.path)}
+                  onClick={(evt) => this.onClick(evt, item.path)}
+                >
+                  {item.title}
+                </LinkMain>
+              ))
+            }
+          </NavMain>
+        }
       </Styled>
     );
   }
 }
 
 Header.propTypes = {
-  isSignedIn: React.PropTypes.bool,
-  userId: React.PropTypes.string,
-  currentPath: React.PropTypes.string,
-  pages: React.PropTypes.array,
-  navItems: React.PropTypes.array,
-  onPageLink: React.PropTypes.func.isRequired,
-  isHome: React.PropTypes.bool, // not shown on home page
+  isSignedIn: PropTypes.bool,
+  userId: PropTypes.string,
+  currentPath: PropTypes.string,
+  pages: PropTypes.array,
+  navItems: PropTypes.array,
+  onPageLink: PropTypes.func.isRequired,
+  isHome: PropTypes.bool, // not shown on home page
 };
 
 Header.defaultProps = {

@@ -1,4 +1,6 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage, FormattedDate } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -18,15 +20,17 @@ class DateField extends React.PureComponent { // eslint-disable-line react/prefe
           <Icon name="calendar" />
         </FieldIcon>
         <Label>
-          {field.label || this.context.intl.formatMessage(appMessages.attributes.date)}
+          <FormattedMessage {...(field.label || appMessages.attributes.date)} />
         </Label>
         { field.value &&
           <DateValue>
-            {field.value}
+            <FormattedDate value={new Date(field.value)} />
           </DateValue>
         }
         { !field.value &&
-          <EmptyHint>{field.showEmpty}</EmptyHint>
+          <EmptyHint>
+            <FormattedMessage {...field.showEmpty} />
+          </EmptyHint>
         }
       </FieldWrap>
     );
@@ -35,9 +39,6 @@ class DateField extends React.PureComponent { // eslint-disable-line react/prefe
 
 DateField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-DateField.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
 };
 
 export default DateField;

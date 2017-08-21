@@ -4,17 +4,21 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import styled from 'styled-components';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import Icon from 'components/Icon';
+import ErrorMessages from 'components/ErrorMessages';
+import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
-import A from 'components/basic/A';
+import A from 'components/styled/A';
 
 import { updatePath } from 'containers/App/actions';
 
@@ -22,16 +26,18 @@ import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import { register } from './actions';
-import userRegisterSelector from './selectors';
+import { selectDomain } from './selectors';
 
 const BottomLinks = styled.div`
   padding: 2em 0;
 `;
 
 export class UserRegister extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentWillMount() {
+    this.props.initialiseForm();
+  }
   render() {
-    // const { registerSending, registerError } = this.props.userRegister.page;
-    const { registerError } = this.props.userRegister.page;
+    const { registerError, registerSending } = this.props.viewDomain.page;
     const required = (val) => val && val.length;
 
     return (
@@ -50,11 +56,15 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
           {registerError &&
-            <p>{registerError}</p>
+            <ErrorMessages error={registerError} />
           }
-          { this.props.userRegister.form &&
+          {registerSending &&
+            <Loading />
+          }
+          { this.props.viewDomain.form &&
             <AuthForm
               model="userRegister.form.data"
+              sending={registerSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
@@ -123,7 +133,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
                 }}
               >
                 <FormattedMessage {...messages.loginLink} />
-                <Icon name="arrowRight" text textRight size="1em" />
+                <Icon name="arrowRight" text textRight />
               </A>
             </p>
           </BottomLinks>
@@ -134,22 +144,26 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
 }
 
 UserRegister.propTypes = {
-  userRegister: PropTypes.object,
+  viewDomain: PropTypes.object,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
+  initialiseForm: PropTypes.func,
 };
 
 UserRegister.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  userRegister: userRegisterSelector(state),
+  viewDomain: selectDomain(state),
 });
 
 export function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('userRegister.form.data'));
+    },
     handleSubmit: (formData) => {
       dispatch(register(formData.toJS()));
     },

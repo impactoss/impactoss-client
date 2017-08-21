@@ -4,29 +4,53 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  updatePath,
+  // closeEntity
+} from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { CONTENT_PAGE } from 'containers/App/constants';
 
+import Footer from 'components/Footer';
 import Loading from 'components/Loading';
-import Content from 'components/Content';
+import Container from 'components/styled/Container';
+import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 
 import {
-  getEntity,
-  isReady,
-  isUserAdmin,
-  isUserContributor,
+  selectReady,
+  selectIsUserAdmin,
+  selectIsUserContributor,
 } from 'containers/App/selectors';
+
+import {
+  getStatusField,
+  getMetaField,
+  getMarkdownField,
+} from 'utils/fields';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
+import { selectViewEntity } from './selectors';
+import { DEPENDENCIES } from './constants';
+
+const Styled = styled(ContainerWrapper)`
+  background-color: ${palette('primary', 4)}
+`;
+
+const ViewContainer = styled(Container)`
+  min-height: 100vH;
+`;
 
 export class PageView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -40,92 +64,22 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     }
   }
 
-  getHeaderMainFields = (entity, isContributor) => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        {
-          type: 'title',
-          label: this.context.intl.formatMessage(appMessages.attributes.menu_title),
-          value: entity.attributes.menu_title,
-          isManager: isContributor,
-        },
-      ],
-    },
-  ]);
-  getHeaderAsideFields = (entity, isContributor) => {
-    if (!isContributor) {
-      return [
-        {
-          fields: [
-            {
-              type: 'referenceStatus',
-              fields: [
-                {
-                  type: 'reference',
-                  label: this.context.intl.formatMessage(appMessages.attributes.id),
-                  value: entity.id,
-                  large: true,
-                },
-              ],
-            },
-          ],
-        },
-      ];
-    }
-    return [
-      {
-        fields: [
-          {
-            type: 'referenceStatus',
-            fields: [
-              {
-                type: 'reference',
-                label: this.context.intl.formatMessage(appMessages.attributes.id),
-                value: entity.id,
-              },
-              {
-                type: 'status',
-                value: entity.attributes.draft,
-              },
-            ],
-          },
-          {
-            type: 'meta',
-            fields: [
-              {
-                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-                value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
-              },
-              {
-                label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-                value: entity.user && entity.user.attributes.name,
-              },
-            ],
-          },
-        ],
-      },
-    ];
-  }
-  getBodyMainFields = (entity) => ([
-    {
-      fields: [
-        {
-          type: 'description',
-          value: entity.attributes.content,
-        },
-      ],
-    },
-  ]);
+  getBodyAsideFields = (entity) => ([{
+    fields: [
+      getStatusField(entity),
+      getMetaField(entity, appMessages),
+    ],
+  }]);
+  getBodyMainFields = (entity) => ([{
+    fields: [getMarkdownField(entity, 'content', false, appMessages)],
+  }]);
 
   getFields = (entity, isContributor) => ({
-    header: isContributor
-      ? {
-        main: this.getHeaderMainFields(entity, isContributor),
-        aside: this.getHeaderAsideFields(entity, isContributor),
-      }
-      : null,
     body: {
-      main: this.getBodyMainFields(entity, isContributor),
+      main: this.getBodyMainFields(entity),
+      aside: isContributor
+        ? this.getBodyAsideFields(entity)
+        : null,
     },
   })
 
@@ -134,49 +88,45 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     const { page, dataReady, isAdmin, isContributor } = this.props;
 
     const buttons = isAdmin
-    ? [
-      {
-        type: 'edit',
-        onClick: this.props.handleEdit,
-      },
-      {
-        type: 'close',
-        onClick: this.props.handleClose,
-      },
-    ]
-    : [{
-      type: 'close',
-      onClick: this.props.handleClose,
-    }];
+    ? [{
+      type: 'edit',
+      onClick: this.props.handleEdit,
+    }]
+    : [];
 
     return (
       <div>
         <Helmet
-          title={page ? page.attributes.title : `${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={page ? page.getIn(['attributes', 'title']) : `${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content>
-          <ContentHeader
-            title={page ? page.attributes.title : ''}
-            type={CONTENT_SINGLE}
-            buttons={buttons}
-          />
-          { !page && !dataReady &&
-            <Loading />
-          }
-          { !page && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
-          }
-          { page && dataReady &&
-            <EntityView
-              fields={this.getFields(page, isContributor)}
+        <Styled className={`content-${CONTENT_PAGE}`}>
+          <ViewContainer isNarrow={!isContributor}>
+            <ContentHeader
+              title={page ? page.getIn(['attributes', 'title']) : ''}
+              supTitle={page ? page.getIn(['attributes', 'menu_title']) : ''}
+              type={CONTENT_PAGE}
+              buttons={buttons}
             />
-          }
-        </Content>
+            { !page && !dataReady &&
+              <Loading />
+            }
+            { !page && dataReady &&
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            }
+            { page && dataReady &&
+              <EntityView
+                fields={this.getFields(page, isContributor)}
+                seemless
+              />
+            }
+          </ViewContainer>
+          <Footer />
+        </Styled>
       </div>
     );
   }
@@ -185,7 +135,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
 PageView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleEdit: PropTypes.func,
-  handleClose: PropTypes.func,
+  // handleClose: PropTypes.func,
   page: PropTypes.object,
   dataReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
@@ -194,50 +144,28 @@ PageView.propTypes = {
 };
 
 PageView.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 
 const mapStateToProps = (state, props) => ({
-  isAdmin: isUserAdmin(state),
-  isContributor: isUserContributor(state),
-  dataReady: isReady(state, { path: [
-    'pages',
-    'users',
-    'user_roles',
-  ] }),
-  page: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'pages',
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-      ],
-    },
-  ),
+  isAdmin: selectIsUserAdmin(state),
+  isContributor: selectIsUserContributor(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  page: selectViewEntity(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
-      dispatch(loadEntitiesIfNeeded('pages'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: () => {
       dispatch(updatePath(`/pages/edit/${props.params.id}`));
     },
-    handleClose: () => {
-      dispatch(updatePath('/pages'));
-      // TODO should be "go back" if history present or to pages list when not
-    },
+    // handleClose: () => {
+    //   dispatch(closeEntity('/pages'));
+    // },
   };
 }
 

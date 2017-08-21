@@ -5,10 +5,12 @@ import Link from './Link';
 
 export default styled(Link)`
   font-weight: bold;
-  padding: 0.5em 1.5em;
-  color: ${(props) => props.active ? palette('primary', 1) : palette('light', 2)};
-
+  padding: 8px 24px 0;
+  height: 42px;
+  color:${(props) => props.active ? palette('headerNavMainItem', 1) : palette('headerNavMainItem', 0)};
+  background-color:${(props) => props.active ? palette('headerNavMainItem', 3) : palette('headerNavMainItem', 2)};
   &:hover {
-    color: ${palette('primary', 0)};
+    color:${(props) => props.active ? palette('headerNavMainItemHover', 1) : palette('headerNavMainItemHover', 0)};
+    background-color:${(props) => props.active ? palette('headerNavMainItemHover', 3) : palette('headerNavMainItemHover', 2)};
   }
 `;

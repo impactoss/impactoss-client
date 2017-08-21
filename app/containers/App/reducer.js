@@ -11,7 +11,8 @@
  */
 
 import { fromJS } from 'immutable';
-import { checkErrorMessagesExist } from 'utils/request';
+
+import { checkResponseError } from 'utils/request';
 import { isSignedIn } from 'utils/api-request';
 import {
   AUTHENTICATE_SENDING,
@@ -23,11 +24,14 @@ import {
   LOGOUT_SUCCESS,
   ADD_ENTITY,
   UPDATE_ENTITY,
-  DELETE_ENTITY,
+  UPDATE_ENTITIES,
+  UPDATE_CONNECTIONS,
+  REMOVE_ENTITY,
   ENTITIES_REQUESTED,
   INVALIDATE_ENTITIES,
   DUEDATE_ASSIGNED,
-  DUEDATE_UNASSIGNED,
+  DB_TABLES,
+  OPEN_NEW_ENTITY_MODAL,
 } from './constants';
 
 // The initial state of the App
@@ -40,64 +44,18 @@ const initialState = fromJS({
     error: false,
     messages: [],
   },
-  requested: { // Record the time that entities where requested from the server
-    taxonomies: null,
-    categories: null,
-    roles: null,
-    users: null,
-    user_categories: null,
-    user_roles: null,
-    indicators: null,
-    measures: null,
-    measure_categories: null,
-    measure_indicators: null,
-    recommendations: null,
-    recommendation_measures: null,
-    recommendation_categories: null,
-    progress_reports: null,
-    due_dates: null,
-    pages: null,
-  },
-  ready: { // Record the time that entities where returned from the server
-    taxonomies: null,
-    categories: null,
-    roles: null,
-    users: null,
-    user_categories: null,
-    user_roles: null,
-    indicators: null,
-    measures: null,
-    measure_categories: null,
-    measure_indicators: null,
-    recommendations: null,
-    recommendation_measures: null,
-    recommendation_categories: null,
-    progress_reports: null,
-    due_dates: null,
-    pages: null,
-  },
-  entities: {
-    taxonomies: {},
-    categories: {},
-    roles: {},
-    users: {},
-    user_categories: {},
-    user_roles: {},
-    indicators: {},
-    measures: {},
-    measure_categories: {},
-    measure_indicators: {},
-    recommendations: {},
-    recommendation_measures: {},
-    recommendation_categories: {},
-    progress_reports: {},
-    due_dates: {},
-    pages: {},
-  },
+  /* eslint-disable no-param-reassign */
+  // Record the time that entities where requested from the server
+  requested: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  // Record the time that entities where returned from the server
+  ready: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  entities: DB_TABLES.reduce((memo, table) => { memo[table] = {}; return memo; }, {}),
+  /* eslint-enable no-param-reassign */
   user: {
     attributes: null,
     isSignedIn: isSignedIn(),
   },
+  newEntityModal: null,
 });
 
 function appReducer(state = initialState, payload) {
@@ -112,10 +70,9 @@ function appReducer(state = initialState, payload) {
           .setIn(['user', 'isSignedIn'], true)
           .setIn(['auth', 'sending'], false);
     case AUTHENTICATE_ERROR: {
-      const errors = checkErrorMessagesExist(payload.error.response);
       return state
-        .setIn(['auth', 'messages'], errors)
-        .setIn(['auth', 'error'], true)
+        .setIn(['auth', 'error'], checkResponseError(payload.error))
+        .setIn(['auth', 'sending'], false)
         .setIn(['user', 'attributes'], null)
         .setIn(['user', 'isSignedIn'], false);
     }
@@ -129,10 +86,26 @@ function appReducer(state = initialState, payload) {
     case ADD_ENTITY:
       return state
         .setIn(['entities', payload.path, payload.entity.id], fromJS(payload.entity));
+    case UPDATE_ENTITIES:
+      return payload.entities.reduce((stateUpdated, entity) =>
+        stateUpdated.setIn(
+          ['entities', payload.path, entity.data.id, 'attributes'],
+          fromJS(entity.data.attributes)
+        )
+      , state);
+    case UPDATE_CONNECTIONS:
+      return payload.updates.reduce((stateUpdated, connection) =>
+        connection.type === 'delete'
+        ? stateUpdated.deleteIn(['entities', payload.path, connection.id])
+        : stateUpdated.setIn(
+          ['entities', payload.path, connection.data.id],
+          fromJS(connection.data)
+        )
+      , state);
     case UPDATE_ENTITY:
       return state
           .setIn(['entities', payload.path, payload.entity.id, 'attributes'], fromJS(payload.entity.attributes));
-    case DELETE_ENTITY:
+    case REMOVE_ENTITY:
       return state
           .deleteIn(['entities', payload.path, payload.id]);
     case ENTITIES_REQUESTED:
@@ -180,15 +153,8 @@ function appReducer(state = initialState, payload) {
         return state;
       }
       return state;
-    case DUEDATE_UNASSIGNED:
-      // reset due_date to get updated virtual fields: due, overdue, and has_progress_reports
-      // while the overdue and has_progress_reports fields would be trivial to set client-side, the due field
-      // is dependent on the server configuration (look-ahead-period) that is best not stored also on the client
-      // TODO instead of reloading all due dates we could alternatively only request a new version of the due_date in question
-      return state
-        .setIn(['ready', 'due_dates'], null) // should trigger new entity load
-        .setIn(['requested', 'due_dates'], null)
-        .setIn(['entities', 'due_dates'], fromJS({}));
+    case OPEN_NEW_ENTITY_MODAL:
+      return state.set('newEntityModal', fromJS(payload.args));
     default:
       return state;
   }

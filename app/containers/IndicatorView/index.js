@@ -4,12 +4,26 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import {
+  getReferenceField,
+  getTitleField,
+  getStatusField,
+  getMetaField,
+  getMarkdownField,
+  getMeasureConnectionField,
+  getSdgTargetConnectionField,
+  getManagerField,
+  getScheduleField,
+  getReportsField,
+} from 'utils/fields';
+
+import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
 
@@ -19,14 +33,26 @@ import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 
 import {
-  getEntity,
-  getEntities,
-  isReady,
-  isUserContributor,
+  selectReady,
+  selectIsUserContributor,
+  selectMeasureTaxonomies,
+  selectSdgTargetTaxonomies,
+  selectMeasureConnections,
+  selectSdgTargetConnections,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
+
+import {
+  selectViewEntity,
+  selectMeasures,
+  selectSdgTargets,
+  selectReports,
+  selectDueDates,
+} from './selectors';
+
+import { DEPENDENCIES } from './constants';
 
 export class IndicatorView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -43,166 +69,79 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          type: 'titleText',
-          value: entity.attributes.title,
-          isManager,
-        },
+        getReferenceField(entity, true),
+        getTitleField(entity, isManager),
       ],
     },
   ]);
 
-  getHeaderAsideFields = (entity, isContributor) => {
-    if (isContributor) {
-      return [
-        {
-          fields: [
-            {
-              type: 'referenceStatus',
-              fields: [
-                {
-                  type: 'reference',
-                  value: entity.id,
-                  label: this.context.intl.formatMessage(appMessages.attributes.id),
-                },
-                {
-                  type: 'status',
-                  value: entity.attributes.draft,
-                },
-              ],
-            },
-            {
-              type: 'meta',
-              fields: [
-                {
-                  label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_at),
-                  value: this.context.intl.formatDate(new Date(entity.attributes.updated_at)),
-                },
-                {
-                  label: this.context.intl.formatMessage(appMessages.attributes.meta.updated_by),
-                  value: entity.user && entity.user.attributes.name,
-                },
-              ],
-            },
-          ],
-        },
-      ];
-    }
-    return [
-      {
-        fields: [
-          {
-            type: 'referenceStatus',
-            fields: [
-              {
-                type: 'reference',
-                value: entity.id,
-                large: true,
-                label: this.context.intl.formatMessage(appMessages.attributes.id),
-              },
-            ],
-          },
-        ],
-      },
-    ];
-  }
+  getHeaderAsideFields = (entity, isContributor) => isContributor &&
+    ([{
+      fields: [
+        getStatusField(entity),
+        getMetaField(entity, appMessages),
+      ],
+    }]);
 
-  getBodyMainFields = (entity, actions, reports, actionTaxonomies, isContributor) => ([
+  getBodyMainFields = (entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick, sdgtargetConnections, measureConnections) => ([
     {
       fields: [
-        {
-          type: 'description',
-          value: entity.attributes.description,
-        },
-        {
-          type: 'reports',
-          label: this.context.intl.formatMessage(appMessages.entities.progress_reports.plural),
-          values: this.mapReports(reports),
-          showEmpty: this.context.intl.formatMessage(appMessages.entities.progress_reports.empty),
-          button: isContributor
-            ? {
-              type: 'add',
-              title: this.context.intl.formatMessage(messages.addReport),
-              onClick: this.props.handleNewReport,
-            }
-            : null,
-        },
+        getMarkdownField(entity, 'description', true, appMessages),
+        getReportsField(
+          reports,
+          appMessages,
+          isContributor && {
+            type: 'add',
+            title: this.context.intl.formatMessage(messages.addReport),
+            onClick: this.props.handleNewReport,
+          }
+        ),
       ],
     },
     {
-      label: 'Connections',
+      label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        {
-          type: 'connections',
-          label: `${Object.values(actions).length} ${this.context.intl.formatMessage(Object.values(actions).length === 1 ? appMessages.entities.measures.single : appMessages.entities.measures.plural)}`,
-          entityType: 'actions',
-          values: Object.values(actions),
-          icon: 'actions',
-          entityPath: '/actions/',
-          taxonomies: actionTaxonomies,
-          showEmpty: this.context.intl.formatMessage(appMessages.entities.measures.empty),
-          connectionOptions: [{
-            label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
-            path: 'recommendations',
-          },
-          {
-            label: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
-            path: 'indicators',
-          }],
-        },
+        getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
+        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, appMessages, onEntityClick),
       ],
     },
   ]);
 
   getBodyAsideFields = (entity, dates) => ([ // fieldGroups
     { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
+      label: appMessages.entities.due_dates.schedule,
       type: 'dark',
       icon: 'reminder',
       fields: [
-        {
-          label: this.context.intl.formatMessage(appMessages.entities.due_dates.plural),
-          type: 'schedule',
-          values: this.mapDates(dates),
-          showEmpty: this.context.intl.formatMessage(appMessages.entities.due_dates.empty),
-        },
-        {
-          label: this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
-          type: 'manager',
-          value: entity.manager && entity.manager.attributes.name,
-          showEmpty: this.context.intl.formatMessage(appMessages.attributes.manager_id.indicatorsEmpty),
-        },
+        getScheduleField(
+          dates,
+          appMessages,
+        ),
+        getManagerField(
+          entity,
+          appMessages.attributes.manager_id.indicators,
+          appMessages.attributes.manager_id.indicatorsEmpty
+        ),
       ],
     },
   ]);
 
-  getFields = (entity, isContributor, actions, reports, dates, actionTaxonomies) => ({
-    header: {
-      main: this.getHeaderMainFields(entity, isContributor),
-      aside: this.getHeaderAsideFields(entity, isContributor),
-    },
-    body: {
-      main: this.getBodyMainFields(entity, actions, reports, actionTaxonomies, isContributor),
-      aside: isContributor ? this.getBodyAsideFields(entity, dates) : null,
-    },
-  });
-
-  mapReports = (reports) =>
-    Object.values(reports).map((report) => ({
-      label: report.attributes.title,
-      dueDate: report.due_date ? this.context.intl.formatDate(new Date(report.due_date.attributes.due_date)) : null,
-      linkTo: `/reports/${report.id}`,
-    }))
-  mapDates = (dates) =>
-    Object.values(dates).map((date) => ({
-      label: this.context.intl.formatDate(new Date(date.attributes.due_date)),
-      due: date.attributes.due,
-      overdue: date.attributes.overdue,
-    }))
-
   render() {
-    const { indicator, dataReady, isContributor, actions, reports, dates, actionTaxonomies } = this.props;
+    const {
+      viewEntity,
+      dataReady,
+      isContributor,
+      measures,
+      sdgtargets,
+      reports,
+      dates,
+      measureTaxonomies,
+      sdgtargetTaxonomies,
+      onEntityClick,
+      sdgtargetConnections,
+      measureConnections,
+    } = this.props;
 
     const buttons = isContributor
     ? [
@@ -240,17 +179,26 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
             icon="indicators"
             buttons={buttons}
           />
-          { !indicator && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
-          { !indicator && dataReady &&
+          { !viewEntity && dataReady &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          { indicator && dataReady &&
+          { viewEntity && dataReady &&
             <EntityView
-              fields={this.getFields(indicator, isContributor, actions, reports, dates, actionTaxonomies)}
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(viewEntity, isContributor),
+                  aside: this.getHeaderAsideFields(viewEntity, isContributor),
+                },
+                body: {
+                  main: this.getBodyMainFields(viewEntity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick, sdgtargetConnections, measureConnections),
+                  aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
+                },
+              }}
             />
           }
         </Content>
@@ -261,166 +209,50 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
 
 IndicatorView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  onEntityClick: PropTypes.func,
   handleEdit: PropTypes.func,
   handleClose: PropTypes.func,
   handleNewReport: PropTypes.func,
-  indicator: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   isContributor: PropTypes.bool,
-  actions: PropTypes.object,
+  measures: PropTypes.object,
+  sdgtargets: PropTypes.object,
   reports: PropTypes.object,
-  actionTaxonomies: PropTypes.object,
+  measureTaxonomies: PropTypes.object,
+  sdgtargetTaxonomies: PropTypes.object,
   dates: PropTypes.object,
   params: PropTypes.object,
+  measureConnections: PropTypes.object,
+  sdgtargetConnections: PropTypes.object,
 };
 
 IndicatorView.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 
 const mapStateToProps = (state, props) => ({
-  isContributor: isUserContributor(state),
-  dataReady: isReady(state, { path: [
-    'measures',
-    'users',
-    'indicators',
-    'measure_indicators',
-    'progress_reports',
-    'due_dates',
-    'taxonomies',
-    'categories',
-    'recommendations',
-    'recommendation_measures',
-    'measure_categories',
-  ] }),
-  indicator: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'indicators',
-      out: 'js',
-      extend: [
-        {
-          type: 'single',
-          path: 'users',
-          key: 'last_modified_user_id',
-          as: 'user',
-        },
-        {
-          type: 'single',
-          path: 'users',
-          key: 'manager_id',
-          as: 'manager',
-        },
-      ],
-    },
-  ),
-  actionTaxonomies: getEntities(
-    state, {
-      out: 'js',
-      path: 'taxonomies',
-      where: {
-        tags_measures: true,
-      },
-      extend: {
-        path: 'categories',
-        key: 'taxonomy_id',
-        reverse: true,
-      },
-    },
-  ),
-  // all connected actions
-  actions: getEntities(
-    state, {
-      path: 'measures',
-      out: 'js',
-      connected: {
-        path: 'measure_indicators',
-        key: 'measure_id',
-        where: {
-          indicator_id: props.params.id,
-        },
-      },
-      extend: [
-        {
-          path: 'measure_categories',
-          key: 'measure_id',
-          reverse: true,
-          as: 'taxonomies',
-        },
-        {
-          path: 'recommendation_measures',
-          key: 'measure_id',
-          reverse: true,
-          as: 'recommendations',
-          connected: {
-            path: 'recommendations',
-            key: 'recommendation_id',
-            forward: true,
-          },
-        },
-        {
-          path: 'measure_indicators',
-          key: 'measure_id',
-          reverse: true,
-          as: 'indicators',
-          connected: {
-            path: 'indicators',
-            key: 'indicator_id',
-            forward: true,
-          },
-        },
-      ],
-    },
-  ),
-  // all connected reports
-  reports: getEntities(
-    state, {
-      path: 'progress_reports',
-      out: 'js',
-      where: {
-        indicator_id: props.params.id,
-      },
-      extend: {
-        path: 'due_dates',
-        key: 'due_date_id',
-        type: 'single',
-        as: 'due_date',
-      },
-    },
-  ),
-  // all connected due_dates
-  dates: getEntities(
-    state, {
-      path: 'due_dates',
-      out: 'js',
-      where: {
-        indicator_id: props.params.id,
-      },
-      without: {
-        path: 'progress_reports',
-        key: 'due_date_id',
-      },
-    },
-  ),
+  isContributor: selectIsUserContributor(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  viewEntity: selectViewEntity(state, props.params.id),
+  sdgtargets: selectSdgTargets(state, props.params.id),
+  sdgtargetTaxonomies: selectSdgTargetTaxonomies(state),
+  measures: selectMeasures(state, props.params.id),
+  measureTaxonomies: selectMeasureTaxonomies(state),
+  reports: selectReports(state, props.params.id),
+  dates: selectDueDates(state, props.params.id),
+  measureConnections: selectMeasureConnections(state),
+  sdgtargetConnections: selectSdgTargetConnections(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('indicators'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('progress_reports'));
-      dispatch(loadEntitiesIfNeeded('due_dates'));
-      dispatch(loadEntitiesIfNeeded('measures'));
-      dispatch(loadEntitiesIfNeeded('measure_indicators'));
-      dispatch(loadEntitiesIfNeeded('measure_categories'));
-      dispatch(loadEntitiesIfNeeded('recommendations'));
-      dispatch(loadEntitiesIfNeeded('recommendation_measures'));
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('categories'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
+    onEntityClick: (id, path) => {
+      dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: () => {
       dispatch(updatePath(`/indicators/edit/${props.params.id}`));
@@ -429,7 +261,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updatePath(`/reports/new/${props.params.id}`));
     },
     handleClose: () => {
-      dispatch(updatePath('/indicators'));
+      dispatch(closeEntity('/indicators'));
       // TODO should be "go back" if history present or to indicators list when not
     },
   };

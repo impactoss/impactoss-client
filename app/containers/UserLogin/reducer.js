@@ -5,29 +5,42 @@
  */
 
 import { fromJS } from 'immutable';
-// import { checkErrorMessagesExist } from 'utils/request';
+import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { combineReducers } from 'redux-immutable';
 import { combineForms } from 'react-redux-form/immutable';
 
+import { checkResponseError } from 'utils/request';
+
 import {
+  AUTHENTICATE_SENDING,
   AUTHENTICATE_SUCCESS,
   AUTHENTICATE_ERROR,
 } from 'containers/App/constants';
 
 const initialState = fromJS({
-  loginSuccess: false,
-  loginError: false,
+  authSending: false,
+  authSuccess: false,
+  authError: false,
 });
 function userLoginReducer(state = initialState, action) {
   switch (action.type) {
+    case LOCATION_CHANGE:
+      return initialState;
+    case AUTHENTICATE_SENDING:
+      return state
+        .set('authSending', true)
+        .set('authSuccess', false)
+        .set('authError', false);
     case AUTHENTICATE_SUCCESS:
       return state
-        .set('loginSuccess', true);
+        .set('authSending', false)
+        .set('authSuccess', true);
     case AUTHENTICATE_ERROR:
       return state
-        .set('loginSuccess', false)
-        .set('loginError', action.error);
+        .set('authSending', false)
+        .set('authSuccess', false)
+        .set('authError', checkResponseError(action.error));
     default:
       return state;
   }

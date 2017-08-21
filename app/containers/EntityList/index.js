@@ -3,437 +3,262 @@
  * EntityList
  *
  */
-
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import { Map, List, fromJS } from 'immutable';
-import { orderBy, reduce } from 'lodash/collection';
-import { pick } from 'lodash/object';
 
-import { getEntitySortIteratee } from 'utils/sort';
-
-import ContainerWithSidebar from 'components/basic/Container/ContainerWithSidebar';
-import Container from 'components/basic/Container';
-import Sidebar from 'components/basic/Sidebar';
+import { getEntityReference } from 'utils/entities';
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
-import ContentHeader from 'components/ContentHeader';
-import EntityListSidebar from 'components/EntityListSidebar';
-import EntityListItems from 'components/EntityListItems';
-import EntityListSearch from 'components/EntityListSearch';
-import EntityListOptions from 'components/EntityListOptions';
-import EntityListHeader from 'components/EntityListHeader';
-import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
+import Sidebar from 'components/styled/Sidebar';
 
-import { getEntities, isUserManager } from 'containers/App/selectors';
+import EntityListSidebar from 'components/entityList/EntityListSidebar';
+import EntityListMain from 'components/entityList/EntityListMain';
 
-import { CONTENT_LIST } from 'containers/App/constants';
-
-import { makeCurrentFilters } from './filtersFactory';
-import {
-  makeEntityGroups,
-  makeGroupOptions,
-} from './groupFactory';
+import { selectIsUserManager } from 'containers/App/selectors';
 
 import {
-  getAttributeQuery,
-  getConnectedQuery,
-  getWithoutQuery,
-} from './entityQueries';
+  updatePath,
+  openNewEntityModal,
+} from 'containers/App/actions';
+
+import appMessages from 'containers/App/messages';
+import { PARAMS, RECORD_OUTDATED } from 'containers/App/constants';
 
 import {
-  activePanelSelector,
-  entitiesSelectedSelector,
+  selectDomain,
+  selectProgress,
+  selectActivePanel,
+  selectSelectedEntities,
 } from './selectors';
 
 import {
+  resetState,
+  resetProgress,
   showPanel,
-  saveEdits,
+  save,
+  newConnection,
+  deleteConnection,
   selectEntity,
   selectEntities,
   updateQuery,
   updateGroup,
+  updatePage,
+  updateExpand,
+  updatePageItems,
+  updateSortBy,
+  updateSortOrder,
 } from './actions';
 
-import messages from './messages';
-
-const Content = styled.div`
-  padding: 0 4em;
-`;
-
-
-const ListEntities = styled.div``;
-const ListEntitiesMain = styled.div`
-  padding-top: 0.5em;
-`;
-const ListEntitiesEmpty = styled.div``;
-const ListEntitiesGroup = styled.div``;
-const ListEntitiesGroupHeader = styled.h3`
-  margin-top: 30px;
-`;
-const ListEntitiesSubGroup = styled.div``;
-const ListEntitiesSubGroupHeader = styled.h5`
-  margin-top: 12px;
-  font-weight: normal;
-  margin-bottom: 20px;
+const Progress = styled.div`
+  position: absolute;
+  width: 100%;
+  display: block;
+  background: white;
+  bottom: 0;
+  -webkit-box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  background-color: ${palette('primary', 4)};
+  padding: ${(props) => props.error ? 0 : 40}px;
+  z-index: 200;
 `;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  // TODO figure out why component updates when child component (sidebar option) internal state changes
-  //    possibly due to form model changes
-  //    consider moving form reducer to sidebar or use local form
-  // shouldComponentUpdate(nextProps) {
-  //   const s_p = JSON.stringify(this.props)
-  //   const s_np = JSON.stringify(nextProps)
-  //   return s_np !== s_p
-  // }
-
-  getHeaderColumns = (label, isSelect, isExpandable, expandNo, expandableColumns, handleExpandLink) => {
-    // TODO figure out a betterway to determine column widths. this is terrible
-    let width = 1;
-    // if nested
-    if (isExpandable && expandableColumns.length > 0) {
-      width = expandNo > 0 ? 0.5 : 0.66;
-    }
-    const columns = [{
-      label,
-      isSelect,
-      width,
-    }];
-    if (isExpandable) {
-      const exColumns = expandableColumns.map((col, i, exCols) => {
-        const isExpand = expandNo > i;
-        width = 1;
-        // if nested
-        if (exCols.length > i + 1) {
-          // if nested && nestedExpanded
-          if (expandNo > i + 1) {
-            width = 0.5;
-          // else if nested && !nestedExpanded
-          } else if (isExpand) {
-            width = 0.66;
-          } else {
-            width = 0.5;
-          }
-        // else if !nested // isExpand
-        } else if (isExpand) {
-          if (exCols.length > 1) {
-            width = 0.5;
-          }
-        } else if (exCols.length > 1) {
-          if (expandNo === i) {
-            width = 0.34;
-          } else {
-            width = 0.5;
-          }
-        }
-
-        return {
-          label: col.label,
-          isExpandable: true,
-          isExpand,
-          onExpand: () => handleExpandLink(isExpand ? i : i + 1),
-          width,
-        };
-      });
-      return columns.concat(exColumns);
-    }
-    return columns;
+  componentWillMount() {
+    this.props.resetStateOnMount();
   }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.viewDomain.get('sending').size > 0
+      && nextProps.viewDomain.get('errors').size === 0
+      && nextProps.progress > 99.9
+    ) {
+      this.props.resetProgress();
+    }
+  }
+
+  formatLabel = (path) => {
+    const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
+    return this.context.intl.formatMessage(message);
+  }
+
   render() {
-    const {
-      sortBy,
-      sortOrder,
-      activePanel,
-      dataReady,
-      isManager,
-      entityIdsSelected,
-      onPanelSelect,
-      filters,
-      edits,
-      location,
-      taxonomies,
-      connections,
-      connectedTaxonomies,
-    } = this.props;
+    // make sure selected entities are still actually on page
+    const { entityIdsSelected, entities, progress } = this.props;
+    const errors = this.props.viewDomain.get('errors');
+    const sending = this.props.viewDomain.get('sending');
 
-    // sorted entities
-    const entitiesSorted = dataReady && this.props.entities
-        ? orderBy(this.props.entities, getEntitySortIteratee(sortBy), sortOrder)
-        : [];
-    // selected entities
-    const entitiesSelected = dataReady ? Object.values(pick(this.props.entities, entityIdsSelected)) : [];
-
-    let allChecked = CHECKBOX_STATES.INDETERMINATE;
-    let listHeaderLabel = this.props.entityTitle.plural;
-
-    if (dataReady) {
-      if (entitiesSelected.length === 0) {
-        allChecked = CHECKBOX_STATES.UNCHECKED;
-      } else if (entitiesSorted.length > 0 && entitiesSelected.length === entitiesSorted.length) {
-        allChecked = CHECKBOX_STATES.CHECKED;
-      }
-      if (entitiesSelected.length === 1) {
-        listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.single} selected`;
-      } else if (entitiesSelected.length > 1) {
-        listHeaderLabel = `${entitiesSelected.length} ${this.props.entityTitle.plural} selected`;
-      }
-    }
-    let contentTitle = this.props.entityTitle.plural;
-    if (dataReady) {
-      contentTitle = `${entitiesSorted.length} ${entitiesSorted.length === 1 ? this.props.entityTitle.single : this.props.entityTitle.plural}`;
-    }
-
-    const buttons = dataReady && isManager
-      ? this.props.header.actions
-      : null;
+    const entityIdsSelectedFiltered = entityIdsSelected.size > 0 && entities
+      ? entityIdsSelected.filter((id) => entities.map((entity) => entity.get('id')).includes(id))
+      : entityIdsSelected;
 
     return (
       <div>
         <Sidebar>
-          { dataReady &&
+          { this.props.dataReady &&
             <EntityListSidebar
-              filters={filters}
-              edits={edits}
-              taxonomies={taxonomies}
-              connections={connections}
-              connectedTaxonomies={connectedTaxonomies}
-              entitiesSorted={entitiesSorted}
-              entitiesSelected={entitiesSelected}
-              location={location}
-              onPanelSelect={onPanelSelect}
-              canEdit={isManager}
-              activePanel={activePanel}
+              listUpdating={progress !== null && progress >= 0 && progress < 100}
+              entities={this.props.entities}
+              taxonomies={this.props.taxonomies}
+              connections={this.props.connections}
+              connectedTaxonomies={this.props.connectedTaxonomies}
+              entityIdsSelected={
+                entityIdsSelected.size === entityIdsSelectedFiltered.size
+                ? entityIdsSelected
+                : entityIdsSelectedFiltered
+              }
+              config={this.props.config}
+              locationQuery={this.props.locationQuery}
+              canEdit={this.props.isManager}
+              activePanel={this.props.activePanel}
+              formatLabel={this.formatLabel}
+              onPanelSelect={this.props.onPanelSelect}
+              onCreateOption={this.props.onCreateOption}
               onAssign={(associations, activeEditOption) =>
-                this.props.handleEditSubmit(associations, entitiesSelected, activeEditOption)}
+                this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
             />
           }
         </Sidebar>
-        <ContainerWithSidebar>
-          <Container>
-            <Content>
-              <ContentHeader
-                type={CONTENT_LIST}
-                icon={this.props.header.icon}
-                supTitle={this.props.header.supTitle}
-                title={contentTitle}
-                buttons={buttons}
-              />
-              { !dataReady &&
-                <Loading />
-              }
-              { dataReady &&
-                <ListEntities>
-                  <EntityListSearch
-                    filters={makeCurrentFilters(this.props, this.context.intl.formatMessage(messages.filterFormWithoutPrefix))}
-                    searchQuery={location.query.search || ''}
-                    onSearch={this.props.onSearch}
-                  />
-                  <EntityListOptions
-                    groupOptions={makeGroupOptions(filters, taxonomies, connectedTaxonomies)}
-                    groupSelectValue={location.query.group}
-                    subgroupSelectValue={location.query.subgroup}
-                    onGroupSelect={this.props.onGroupSelect}
-                    onSubgroupSelect={this.props.onSubgroupSelect}
-                    expandLink={this.props.isExpandable
-                      ? {
-                        expanded: this.props.expandNo === this.props.expandableColumns.length,
-                        collapsed: this.props.expandNo === 0,
-                        onClick: () => this.props.handleExpandLink(
-                          this.props.expandNo < this.props.expandableColumns.length
-                          ? this.props.expandableColumns.length
-                          : 0
-                        ),
-                      }
-                      : null
+        { (progress !== null && progress < 100) &&
+          <Progress>
+            <Loading
+              progress={progress}
+            />
+          </Progress>
+        }
+        {(errors.size > 0) &&
+          <Progress error>
+            <ErrorMessages
+              error={{
+                messages: errors.reduce((memo, error, timestamp) =>
+                  error.messages
+                  ? memo.concat(error.messages.map((message) => {
+                    const recordReference = sending.get(timestamp) && sending.get(timestamp).entity
+                      ? getEntityReference(fromJS(sending.get(timestamp).entity))
+                      : 'unknown';
+                    if (message === RECORD_OUTDATED) {
+                      return this.context.intl.formatMessage(appMessages.forms.outdatedErrorList, { recordReference });
                     }
-                  />
-                  <EntityListHeader
-                    columns={this.getHeaderColumns(
-                      listHeaderLabel,
-                      isManager,
-                      this.props.isExpandable,
-                      this.props.expandNo,
-                      this.props.expandableColumns,
-                      this.props.handleExpandLink
-                    )}
-                    isSelect={isManager}
-                    isSelected={allChecked}
-                    onSelect={(checked) => {
-                      this.props.onEntitySelectAll(checked ? Object.keys(this.props.entities) : []);
-                    }}
-                  />
-                  <ListEntitiesMain>
-                    { entitiesSorted.length === 0 && location.query &&
-                      <ListEntitiesEmpty>
-                        <FormattedMessage {...messages.listEmptyAfterQuery} />
-                      </ListEntitiesEmpty>
-                    }
-                    { entitiesSorted.length === 0 && !location.query &&
-                      <ListEntitiesEmpty>
-                        <FormattedMessage {...messages.listEmpty} />
-                      </ListEntitiesEmpty>
-                    }
-                    { entitiesSorted.length > 0 &&
-                      makeEntityGroups(
-                        entitiesSorted,
-                        taxonomies,
-                        connectedTaxonomies,
-                        filters,
-                        location.query.group
-                      ).map((entityGroup, i) => (
-                        <ListEntitiesGroup key={i}>
-                          { location.query.group && entityGroup.label &&
-                            <ListEntitiesGroupHeader>
-                              {entityGroup.label}
-                            </ListEntitiesGroupHeader>
-                          }
-                          {
-                            makeEntityGroups(
-                              entityGroup.entities,
-                              taxonomies,
-                              connectedTaxonomies,
-                              filters,
-                              location.query.subgroup
-                            ).map((entitySubGroup, j) => (
-                              <ListEntitiesSubGroup key={j}>
-                                { location.query.subgroup && entitySubGroup.label &&
-                                  <ListEntitiesSubGroupHeader>
-                                    {entitySubGroup.label}
-                                  </ListEntitiesSubGroupHeader>
-                                }
-                                <EntityListItems
-                                  taxonomies={taxonomies}
-                                  associations={filters}
-                                  entities={entitySubGroup.entities}
-                                  entitiesSelected={entitiesSelected}
-                                  entityIcon={this.props.header.icon}
-                                  entityLinkTo={this.props.entityLinkTo}
-                                  isSelect={isManager}
-                                  onTagClick={this.props.onTagClick}
-                                  onEntitySelect={this.props.onEntitySelect}
-                                  expandNo={this.props.expandNo}
-                                  isExpandable={this.props.isExpandable}
-                                  expandableColumns={this.props.expandableColumns}
-                                  onExpand={this.props.handleExpandLink}
-                                />
-                              </ListEntitiesSubGroup>
-                            ))
-                          }
-                        </ListEntitiesGroup>
-                      ))
-                    }
-                  </ListEntitiesMain>
-                </ListEntities>
-              }
-            </Content>
-          </Container>
-        </ContainerWithSidebar>
+                    return `${this.context.intl.formatMessage(appMessages.forms.otherErrorList, { recordReference })}${message}`;
+                  }))
+                  : memo
+                , []),
+              }}
+              onDismiss={this.props.resetProgress}
+            />
+          </Progress>
+        }
+        <EntityListMain
+          listUpdating={progress !== null && progress >= 0 && progress < 100}
+          entities={this.props.entities}
+          taxonomies={this.props.taxonomies}
+          connections={this.props.connections}
+          connectedTaxonomies={this.props.connectedTaxonomies}
+          entityIdsSelected={
+            entityIdsSelected.size === entityIdsSelectedFiltered.size
+            ? entityIdsSelected
+            : entityIdsSelectedFiltered
+          }
+          locationQuery={this.props.locationQuery}
+
+          config={this.props.config}
+          header={this.props.header}
+          entityTitle={this.props.entityTitle}
+
+          dataReady={this.props.dataReady}
+          isManager={this.props.isManager}
+
+          entityIcon={this.props.entityIcon}
+          formatLabel={this.formatLabel}
+          onEntitySelect={this.props.onEntitySelect}
+          onEntitySelectAll={this.props.onEntitySelectAll}
+          onTagClick={this.props.onTagClick}
+          onExpand={this.props.onExpand}
+          onGroupSelect={this.props.onGroupSelect}
+          onSubgroupSelect={this.props.onSubgroupSelect}
+          onSearch={this.props.onSearch}
+          onPageSelect={this.props.onPageSelect}
+          onPageItemsSelect={this.props.onPageItemsSelect}
+          onEntityClick={this.props.onEntityClick}
+          onSortBy={this.props.onSortBy}
+          onSortOrder={this.props.onSortOrder}
+        />
       </div>
     );
   }
 }
 
 EntityList.propTypes = {
-  filters: PropTypes.object,
-  edits: PropTypes.object,
+  // wrapper props
+  entities: PropTypes.instanceOf(List).isRequired,
+  taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
+  connectedTaxonomies: PropTypes.instanceOf(Map),
+  config: PropTypes.object,
   dataReady: PropTypes.bool,
   header: PropTypes.object,
-  sortBy: PropTypes.string,
-  sortOrder: PropTypes.string,
-  location: PropTypes.object,
+  locationQuery: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object, // single/plural
-  entityLinkTo: PropTypes.string,
-  isExpandable: PropTypes.bool,
-  expandableColumns: PropTypes.array,
-  expandNo: PropTypes.number,
-  // select props
+  entityIcon: PropTypes.func,
+  // selector props
   activePanel: PropTypes.string,
   isManager: PropTypes.bool,
-  entities: PropTypes.object.isRequired,
-  entityIdsSelected: PropTypes.array,
-  taxonomies: PropTypes.object,
-  connections: PropTypes.object,
-  connectedTaxonomies: PropTypes.object,
+  entityIdsSelected: PropTypes.object,
+  viewDomain: PropTypes.object,
+  progress: PropTypes.number,
   // dispatch props
   onPanelSelect: PropTypes.func.isRequired,
   handleEditSubmit: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,
   onTagClick: PropTypes.func.isRequired,
-  handleExpandLink: PropTypes.func.isRequired,
+  onExpand: PropTypes.func.isRequired,
   onGroupSelect: PropTypes.func.isRequired,
   onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
-};
-
-EntityList.defaultProps = {
-  sortBy: 'id',
-  sortOrder: 'desc',
-  expandNo: 0,
+  onPageSelect: PropTypes.func.isRequired,
+  onPageItemsSelect: PropTypes.func.isRequired,
+  onEntityClick: PropTypes.func.isRequired,
+  resetStateOnMount: PropTypes.func.isRequired,
+  resetProgress: PropTypes.func.isRequired,
+  onSortBy: PropTypes.func.isRequired,
+  onSortOrder: PropTypes.func.isRequired,
+  onCreateOption: PropTypes.func.isRequired,
 };
 
 EntityList.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state, props) => ({
-  isManager: isUserManager(state),
-  activePanel: activePanelSelector(state),
-  entityIdsSelected: entitiesSelectedSelector(state),
-  entities: getEntities(state, {
-    out: 'js',
-    path: props.selects.entities.path,
-    where: props.location.query && props.location.query.where
-      ? getAttributeQuery(props.location.query.where)
-      : null,
-    connected: props.filters && props.location.query
-      ? getConnectedQuery(props.location.query, props.filters)
-      : null,
-    without: props.location.query && props.location.query.without
-      ? getWithoutQuery(props.location.query.without, props.filters)
-      : null,
-    search: props.location.query && props.location.query.search
-      ? {
-        query: props.location.query.search,
-        fields: props.filters.search,
-      }
-      : null,
-    extend: props.selects.entities.extensions,
-  }),
-  taxonomies: props.selects && props.selects.taxonomies
-    ? getEntities(state, props.selects.taxonomies)
-    : null,
-  connections: props.selects && props.selects.connections
-    ? reduce(props.selects.connections.options, (result, option) => {
-      const path = typeof option === 'string' ? option : option.path;
-      return {
-        ...result,
-        [path]: getEntities(state, {
-          out: 'js',
-          path,
-        }),
-      };
-    }, {})
-    : null,
-  connectedTaxonomies: props.selects && props.selects.connectedTaxonomies
-  ? reduce(props.selects.connectedTaxonomies.options, (result, select) => ({
-    ...result,
-    [select.path]: getEntities(state, select),
-  }), {})
-  : null,
+const mapStateToProps = (state) => ({
+  isManager: selectIsUserManager(state),
+  activePanel: selectActivePanel(state),
+  entityIdsSelected: selectSelectedEntities(state),
+  viewDomain: selectDomain(state),
+  progress: selectProgress(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
+    resetStateOnMount: () => {
+      dispatch(resetState());
+    },
+    resetProgress: () => {
+      dispatch(resetProgress());
+    },
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));
     },
     onEntitySelect: (id, checked) => {
       dispatch(selectEntity({ id, checked }));
+    },
+    onEntityClick: (id, path) => {
+      dispatch(updatePath(`/${path || props.config.clientPath}/${id}`));
     },
     onEntitySelectAll: (ids) => {
       dispatch(selectEntities(ids));
@@ -441,15 +266,12 @@ function mapDispatchToProps(dispatch, props) {
     onTagClick: (value) => {
       dispatch(updateQuery(fromJS([value])));
     },
-    handleExpandLink: (expandNoNew) => {
+    onExpand: (expandNoNew) => {
       // default expand by 1
-      const value = typeof expandNoNew !== 'undefined' ? expandNoNew : props.expandNo + 1;
-      dispatch(updateQuery(fromJS([{
-        query: 'expand',
-        value,
-        replace: true,
-        checked: value > 0,
-      }])));
+      dispatch(updateExpand(typeof expandNoNew !== 'undefined'
+        ? expandNoNew
+        : props.expandNo + 1
+      ));
     },
     onSearch: (value) => {
       dispatch(updateQuery(fromJS([
@@ -468,7 +290,7 @@ function mapDispatchToProps(dispatch, props) {
           value,
         },
       ])));
-      if (value === '') {
+      if (value === PARAMS.GROUP_RESET) {
         dispatch(updateGroup(fromJS([
           {
             query: 'subgroup',
@@ -485,100 +307,98 @@ function mapDispatchToProps(dispatch, props) {
         },
       ])));
     },
-    handleEditSubmit: (formData, selectedEntities, activeEditOption) => {
-      const entities = fromJS(selectedEntities);
-      let saveData = Map();
+    onPageSelect: (page) => {
+      dispatch(updatePage(page));
+    },
+    onPageItemsSelect: (no) => {
+      dispatch(updatePageItems(no));
+    },
+    onSortOrder: (order) => {
+      dispatch(updateSortOrder(order));
+    },
+    onSortBy: (sort) => {
+      dispatch(updateSortBy(sort));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
+    },
+    handleEditSubmit: (formData, activeEditOption, entityIdsSelected) => {
+      const entities = props.entities.filter(
+        (entity) => entityIdsSelected.includes(entity.get('id'))
+      );
+
+      // figure out changes
       const changes = formData.get('values').filter((option) => option.get('hasChanged'));
-      const creates = changes
+      // figure out updates (either new attribute values or new connections)
+      let creates = changes
         .filter((option) => option.get('checked') === true)
         .map((option) => option.get('value'));
-      const deletes = changes
-        .filter((option) => option.get('checked') === false)
-        .map((option) => option.get('value'));
 
+      // attributes
       if (activeEditOption.group === 'attributes') {
         if (creates.size > 0) {
-          const newValue = creates.first(); // take the first TODO multiselect should be run in single value mode and only return 1 value
-          saveData = saveData
-            .set('attributes', true)
-            .set('path', props.selects.entities.path)
-            .set('entities', entities.reduce((updatedEntities, entity) =>
-              entity.getIn(['attributes', activeEditOption.optionId]) !== newValue
-                ? updatedEntities.push(entity.setIn(['attributes', activeEditOption.optionId], newValue))
-                : updatedEntities
-            , List()));
+          // take the first TODO multiselect should be run in single value mode and only return 1 value
+          const newValue = creates.first();
+          entities.forEach((entity) => {
+            if (entity.getIn(['attributes', activeEditOption.optionId]) !== newValue) {
+              dispatch(save(Map()
+                .set('path', props.config.serverPath)
+                .set('entity', entity.setIn(['attributes', activeEditOption.optionId], newValue))
+                .toJS()
+              ));
+            }
+          });
         }
+      // connections
       } else {
-        // associations
-        saveData = saveData
-          .set('attributes', false)
-          .set('path', activeEditOption.path)
-          .set('updates', Map({
-            create: List(),
-            delete: List(),
-          }));
+        // figure out connection deletions (not necessary for attributes as deletions will be overridden)
+        const deletes = changes
+          .filter((option) => option.get('checked') === false)
+          .map((option) => option.get('value'));
 
-        if (creates.size > 0) {
-          saveData = saveData.setIn(['updates', 'create'], entities.reduce((createList, entity) => {
-            let changeSet = List();
-            let existingAssignments;
-            switch (activeEditOption.group) {
-              case ('taxonomies'):
-                existingAssignments = entity.get(activeEditOption.group);
-                break;
-              case ('connections'):
-                existingAssignments = entity.get(activeEditOption.optionId);
-                break;
-              default:
-                existingAssignments = List();
-                break;
-            }
-
+        entities.forEach((entity) => {
+          let existingAssignments;
+          switch (activeEditOption.group) {
+            case ('taxonomies'):
+              existingAssignments = entity.get('categories');
+              break;
+            case ('connections'):
+              existingAssignments = entity.get(activeEditOption.optionId);
+              break;
+            default:
+              existingAssignments = List();
+              break;
+          }
+          // create connections
+          if (creates.size > 0) {
             if (!!existingAssignments && existingAssignments.size > 0) {
-              const existingAssignmentIds = existingAssignments.map((assigned) =>
-                assigned.getIn(['attributes', activeEditOption.key]).toString()
-              ).toList();
               // exclude existing relations from the changeSet
-              changeSet = creates.filterNot((id) => existingAssignmentIds.includes(id.toString()));
-            } else {
-              changeSet = creates; // add for all creates
+              creates = creates.filter((id) => !existingAssignments.includes(parseInt(id, 10)));
             }
-
-            return createList.concat(changeSet.map((change) => ({
-              [activeEditOption.ownKey]: entity.get('id'),
-              [activeEditOption.key]: change,
+            // associations
+            creates.forEach((id) => dispatch(newConnection({
+              path: activeEditOption.path,
+              entity: {
+                attributes: {
+                  [activeEditOption.ownKey]: entity.get('id'),
+                  [activeEditOption.key]: id,
+                },
+              },
             })));
-          }, List()));
-        }
-        if (deletes.size > 0) {
-          saveData = saveData.setIn(['updates', 'delete'], entities.reduce((deleteList, entity) => {
-            let changeSet = List();
-            let existingAssignments;
-            switch (activeEditOption.group) {
-              case ('taxonomies'):
-                existingAssignments = entity.get(activeEditOption.group);
-                break;
-              case ('connections'):
-                existingAssignments = entity.get(activeEditOption.optionId);
-                break;
-              default:
-                existingAssignments = List();
-                break;
-            }
-
+          }
+          // delete connections
+          if (deletes.size > 0) {
             if (!!existingAssignments && existingAssignments.size > 0) {
-              changeSet = existingAssignments
-                .filter((assigned) =>
-                  deletes.includes(assigned.getIn(['attributes', activeEditOption.key]).toString()))
-                .map((assigned) => assigned.get('id'));
+              existingAssignments
+                .filter((assigned) => deletes.includes(assigned.toString()))
+                .forEach((assigned, id) => dispatch(deleteConnection({
+                  path: activeEditOption.path,
+                  id,
+                })));
             }
-
-            return deleteList.concat(changeSet);
-          }, List()));
-        }
+          }
+        }); // each entity
       }
-
-      dispatch(saveEdits(saveData.toJS()));
     },
   };
 }

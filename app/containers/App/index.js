@@ -4,19 +4,35 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
+import Perf from 'react-addons-perf';
+import ReactModal from 'react-modal';
 
+import styled from 'styled-components';
 import Header from 'components/Header';
+import EntityNew from 'containers/EntityNew';
+
+import { sortEntities } from 'utils/sort';
+
 import {
-  isSignedIn,
-  getSessionUserId,
-  isUserManager,
-  isReady,
-  getEntities,
+  selectIsSignedIn,
+  selectIsUserManager,
+  selectSessionUserId,
+  selectReady,
+  selectEntitiesWhere,
+  selectNewEntityModal,
 } from './selectors';
-import { validateToken, loadEntitiesIfNeeded, updatePath } from './actions';
+
+import {
+  validateToken,
+  loadEntitiesIfNeeded,
+  updatePath,
+  openNewEntityModal,
+} from './actions';
+
+import { DEPENDENCIES } from './constants';
 
 import messages from './messages';
 
@@ -45,21 +61,29 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   preparePageMenuPages = (pages) =>
-    Object.values(pages).map((page) => ({
-      path: `/pages/${page.id}`,
-      title: page.attributes.menu_title || page.attributes.title,
-    }));
+    sortEntities(
+      pages,
+      'asc',
+      'order',
+      'number'
+    )
+    .map((page) => ({
+      path: `/pages/${page.get('id')}`,
+      title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
+    }))
+    .toArray();
 
   prepareMainMenuItems = (isManager, currentPath) => {
     let navItems = ([
       {
+        path: '/overview',
+        title: this.context.intl.formatMessage(messages.overview),
+        active: currentPath.startsWith('/overview'),
+      },
+      {
         path: '/categories',
         title: this.context.intl.formatMessage(messages.entities.taxonomies.plural),
         active: currentPath.startsWith('/category'),
-      },
-      {
-        path: '/recommendations',
-        title: this.context.intl.formatMessage(messages.entities.recommendations.plural),
       },
       {
         path: '/actions',
@@ -69,6 +93,14 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         path: '/indicators',
         title: this.context.intl.formatMessage(messages.entities.indicators.plural),
         active: currentPath.startsWith('/reports'),
+      },
+      {
+        path: '/recommendations',
+        title: this.context.intl.formatMessage(messages.entities.recommendations.plural),
+      },
+      {
+        path: '/sdgtargets',
+        title: this.context.intl.formatMessage(messages.entities.sdgtargets.plural),
       },
     ]);
     if (isManager) {
@@ -87,7 +119,9 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   render() {
-    const { pages, onPageLink, isUserSignedIn, isManager, location } = this.props;
+    window.Perf = Perf;
+    const { pages, onPageLink, isUserSignedIn, isManager, location, newEntityModal } = this.props;
+
     return (
       <div>
         <Header
@@ -102,6 +136,26 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         <Main isHome={location.pathname === '/'}>
           {React.Children.toArray(this.props.children)}
         </Main>
+        {newEntityModal &&
+          <ReactModal
+            isOpen
+            contentLabel={newEntityModal.get('path')}
+            onRequestClose={this.props.onCloseModal}
+            className="new-entity-modal"
+            overlayClassName="new-entity-modal-overlay"
+            style={{
+              overlay: { zIndex: 99999999 },
+            }}
+          >
+            <EntityNew
+              path={newEntityModal.get('path')}
+              attributes={newEntityModal.get('attributes')}
+              onSaveSuccess={this.props.onCloseModal}
+              onCancel={this.props.onCloseModal}
+              inModal
+            />
+          </ReactModal>
+        }
       </div>
     );
   }
@@ -117,27 +171,23 @@ App.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onPageLink: PropTypes.func.isRequired,
   location: PropTypes.object.isRequired,
+  newEntityModal: PropTypes.object,
+  onCloseModal: PropTypes.func,
 };
 App.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  dataReady: isReady(state, { path: [
-    'user_roles',
-    'pages',
-  ] }),
-  isManager: isUserManager(state),
-  isUserSignedIn: isSignedIn(state),
-  userId: getSessionUserId(state),
-  pages: getEntities(
-    state,
-    {
-      path: 'pages',
-      where: { draft: false },
-      out: 'js',
-    },
-  ),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  isManager: selectIsUserManager(state),
+  isUserSignedIn: selectIsSignedIn(state),
+  userId: selectSessionUserId(state),
+  pages: selectEntitiesWhere(state, {
+    path: 'pages',
+    where: { draft: false },
+  }),
+  newEntityModal: selectNewEntityModal(state),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -146,11 +196,13 @@ export function mapDispatchToProps(dispatch) {
       dispatch(validateToken()); // Maybe this could move to routes.js or App wrapper
     },
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('pages'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));
+    },
+    onCloseModal: () => {
+      dispatch(openNewEntityModal(null));
     },
   };
 }

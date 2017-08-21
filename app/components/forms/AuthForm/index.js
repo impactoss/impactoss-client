@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Form, Errors } from 'react-redux-form/immutable';
 
@@ -7,16 +8,19 @@ import { startCase } from 'lodash/string';
 
 import appMessages from 'containers/App/messages';
 
+import ButtonCancel from 'components/buttons/ButtonCancel';
+import ButtonSubmit from 'components/buttons/ButtonSubmit';
+import Clear from 'components/styled/Clear';
+
 import ErrorWrapper from '../ErrorWrapper';
 import FormWrapper from '../FormWrapper';
 import FormBody from '../FormBody';
 import FormFooter from '../FormFooter';
+import FormFooterButtons from '../FormFooterButtons';
 import Label from '../Label';
 import Field from '../Field';
 import Required from '../Required';
 import ControlInput from '../ControlInput';
-import ButtonCancel from '../ButtonCancel';
-import ButtonSubmit from '../ButtonSubmit';
 
 // These props will be omitted before being passed to the Control component
 const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
@@ -68,12 +72,15 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
             { fields && this.renderBody(fields) }
           </FormBody>
           <FormFooter>
-            <ButtonCancel onClick={handleCancel}>
-              <FormattedMessage {...appMessages.buttons.cancel} />
-            </ButtonCancel>
-            <ButtonSubmit type="submit">
-              {labels.submit}
-            </ButtonSubmit>
+            <FormFooterButtons>
+              <ButtonCancel type="button" onClick={handleCancel}>
+                <FormattedMessage {...appMessages.buttons.cancel} />
+              </ButtonCancel>
+              <ButtonSubmit type="submit" disabled={this.props.sending}>
+                {labels.submit}
+              </ButtonSubmit>
+            </FormFooterButtons>
+            <Clear />
           </FormFooter>
         </Form>
       </FormWrapper>
@@ -87,6 +94,9 @@ AuthForm.propTypes = {
   labels: PropTypes.object,
   model: PropTypes.string,
   fields: PropTypes.array,
+  sending: PropTypes.bool,
 };
-
+AuthForm.defaultProps = {
+  sending: false,
+};
 export default AuthForm;

@@ -4,15 +4,21 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { actions as formActions } from 'react-redux-form/immutable';
 
 import { List } from 'immutable';
 
 import {
   renderUserControl,
-  validateRequired,
+  getTitleFormField,
+  getReferenceFormField,
+  getShortTitleFormField,
+  getMarkdownField,
+  getFormField,
 } from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
@@ -25,29 +31,37 @@ import {
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
+  submitInvalid,
+  saveErrorDismiss,
 } from 'containers/App/actions';
 
 import {
-  getEntity,
-  getEntities,
-  isReady,
-  isUserAdmin,
+  selectReady,
+  selectIsUserAdmin,
+  selectEntity,
 } from 'containers/App/selectors';
 
+import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
 
-import viewDomainSelect from './selectors';
+import {
+  selectDomain,
+  selectUsers,
+} from './selectors';
+
 import messages from './messages';
 import { save } from './actions';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 
 export class CategoryNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+    this.props.initialiseForm('categoryNew.form.data', FORM_INITIAL);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -63,57 +77,23 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        {
-          id: 'title',
-          controlType: 'title',
-          model: '.attributes.title',
-          label: this.context.intl.formatMessage(appMessages.attributes.title),
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.title),
-          validators: {
-            required: validateRequired,
-          },
-          errorMessages: {
-            required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-          },
-        },
-        {
-          id: 'short_title',
-          controlType: 'short',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.short_title),
-          model: '.attributes.short_title',
-          label: this.context.intl.formatMessage(appMessages.attributes.short_title),
-        },
+        getReferenceFormField(this.context.intl.formatMessage, appMessages),
+        getTitleFormField(this.context.intl.formatMessage, appMessages),
+        getShortTitleFormField(this.context.intl.formatMessage, appMessages),
       ],
     },
   ]);
 
-
-  getBodyMainFields = () => ([
-    {
-      fields: [
-        {
-          id: 'description',
-          controlType: 'markdown',
-          model: '.attributes.description',
-          placeholder: this.context.intl.formatMessage(appMessages.placeholders.description),
-          label: this.context.intl.formatMessage(appMessages.attributes.description),
-        },
-      ],
-    },
-  ]);
+  getBodyMainFields = () => ([{
+    fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
+  }]);
 
   getBodyAsideFields = (users, isAdmin, taxonomy) => {
     const fields = []; // fieldGroups
     fields.push({
-      fields: [{
-        id: 'url',
-        controlType: 'url',
-        model: '.attributes.url',
-        placeholder: this.context.intl.formatMessage(appMessages.placeholders.url),
-        label: this.context.intl.formatMessage(appMessages.attributes.url),
-      }],
+      fields: [getFormField(this.context.intl.formatMessage, appMessages, 'url', 'url')],
     });
-    if (isAdmin && !!taxonomy.attributes.has_manager) {
+    if (isAdmin && !!taxonomy.getIn(['attributes', 'has_manager'])) {
       fields.push({
         fields: [
           renderUserControl(
@@ -126,24 +106,14 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return fields;
   }
 
-  getFields = (users, isAdmin, taxonomy) => ({ // isManager, taxonomies,
-    header: {
-      main: this.getHeaderMainFields(),
-    },
-    body: {
-      main: this.getBodyMainFields(),
-      aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
-    },
-  })
-
   render() {
     const { taxonomy, dataReady, isAdmin, viewDomain, users } = this.props;
-    const { saveSending, saveError } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.page;
     const taxonomyReference = this.props.params.id;
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-    if (taxonomy && taxonomy.attributes) {
-      pageTitle = `${pageTitle} (${taxonomy.attributes.title})`;
+    if (taxonomy && taxonomy.get('attributes')) {
+      pageTitle = `${pageTitle} (${taxonomy.getIn(['attributes', 'title'])})`;
     }
 
     return (
@@ -161,7 +131,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
-            icon="actions"
+            icon="measures"
             buttons={
               dataReady ? [{
                 type: 'cancel',
@@ -169,21 +139,24 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               },
               {
                 type: 'save',
-                onClick: () => this.props.handleSubmit(
-                  viewDomain.form.data,
-                  taxonomyReference
-                ),
+                onClick: () => this.props.handleSubmitRemote('categoryNew.form.data'),
               }] : null
             }
           />
-          { !dataReady &&
-            <Loading />
-          }
-          {saveSending &&
-            <p>Saving Category</p>
+          {!submitValid &&
+            <ErrorMessages
+              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+              onDismiss={this.props.onErrorDismiss}
+            />
           }
           {saveError &&
-            <p>{saveError}</p>
+            <ErrorMessages
+              error={saveError}
+              onDismiss={this.props.onServerErrorDismiss}
+            />
+          }
+          {(saveSending || !dataReady) &&
+            <Loading />
           }
           {dataReady &&
             <EntityForm
@@ -193,9 +166,18 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                 formData,
                 taxonomyReference
               )}
+              handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={() => this.props.handleCancel(taxonomyReference)}
               handleUpdate={this.props.handleUpdate}
-              fields={this.getFields(users, isAdmin, taxonomy)}
+              fields={{ // isManager, taxonomies,
+                header: {
+                  main: this.getHeaderMainFields(),
+                },
+                body: {
+                  main: this.getBodyMainFields(),
+                  aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
+                },
+              }}
             />
           }
         </Content>
@@ -207,6 +189,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 CategoryNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
+  handleSubmitRemote: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
@@ -216,53 +200,46 @@ CategoryNew.propTypes = {
   taxonomy: PropTypes.object,
   params: PropTypes.object,
   users: PropTypes.object,
+  initialiseForm: PropTypes.func,
+  onErrorDismiss: PropTypes.func.isRequired,
+  onServerErrorDismiss: PropTypes.func.isRequired,
 };
 
 CategoryNew.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
-  isAdmin: isUserAdmin(state),
-  viewDomain: viewDomainSelect(state),
-  dataReady: isReady(state, { path: [
-    'taxonomies',
-    'users',
-    'user_roles',
-  ] }),
-  taxonomy: getEntity(
-    state,
-    {
-      id: props.params.id,
-      path: 'taxonomies',
-      out: 'js',
-    },
-  ),
-  // all users of role manager
-  users: getEntities(
-    state,
-    {
-      path: 'users',
-      connected: {
-        path: 'user_roles',
-        key: 'user_id',
-        where: {
-          role_id: USER_ROLES.MANAGER,
-        },
-      },
-    },
-  ),
+  isAdmin: selectIsUserAdmin(state),
+  viewDomain: selectDomain(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
+  taxonomy: selectEntity(state, { path: 'taxonomies', id: props.params.id }),
+  users: selectUsers(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: (model, formData) => {
+      dispatch(formActions.reset(model));
+      dispatch(formActions.change(model, formData, { silent: true }));
+    },
     loadEntitiesIfNeeded: () => {
-      dispatch(loadEntitiesIfNeeded('taxonomies'));
-      dispatch(loadEntitiesIfNeeded('users'));
-      dispatch(loadEntitiesIfNeeded('user_roles'));
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+    },
+    onErrorDismiss: () => {
+      dispatch(submitInvalid(true));
+    },
+    onServerErrorDismiss: () => {
+      dispatch(saveErrorDismiss());
+    },
+    handleSubmitFail: () => {
+      dispatch(submitInvalid(false));
+    },
+    handleSubmitRemote: (model) => {
+      dispatch(formActions.submit(model));
     },
     handleSubmit: (formData, taxonomyReference) => {
       let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomyReference);

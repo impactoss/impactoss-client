@@ -1,25 +1,23 @@
-import { takeLatest, put, select } from 'redux-saga/effects';
-
-import { LOCATION_CHANGE } from 'react-router-redux';
+import { takeLatest, put } from 'redux-saga/effects';
 
 import {
-  updateConnections,
-  updateEntities,
+  saveEntity,
+  newEntity,
+  deleteEntity,
   updateRouteQuery,
 } from 'containers/App/actions';
 
 import {
-  selectLocation,
-} from 'containers/App/selectors';
-
-import {
-  resetState,
-} from './actions';
-
-import {
-  SAVE_EDITS,
+  SAVE,
+  NEW_CONNECTION,
+  DELETE_CONNECTION,
   UPDATE_QUERY,
   UPDATE_GROUP,
+  PAGE_CHANGE,
+  EXPAND_CHANGE,
+  PAGE_ITEM_CHANGE,
+  SORTBY_CHANGE,
+  SORTORDER_CHANGE,
 } from './constants';
 
 export function* updateQuery(args) {
@@ -30,6 +28,12 @@ export function* updateQuery(args) {
     add: value.get('checked'),
     remove: !value.get('checked'),
   })).toJS();
+  yield params.push({
+    arg: 'page',
+    value: '',
+    replace: true,
+    remove: true,
+  });
   yield put(updateRouteQuery(params));
 }
 export function* updateGroup(args) {
@@ -37,40 +41,95 @@ export function* updateGroup(args) {
     arg: value.get('query'),
     value: value.get('value'),
     replace: true,
-    add: value.get('value') !== '',
-    remove: value.get('value') === '',
+    // add: value.get('value') !== '',
+    // remove: value.get('value') === '',
   })).toJS();
+  yield params.push({
+    arg: 'page',
+    value: '',
+    replace: true,
+    remove: true,
+  });
   yield put(updateRouteQuery(params));
 }
-
-export function* saveEdits({ data }) {
-  if (data.attributes) {
-    // data = { attributes: true, path: path, entities: [
-    //  { id: id, attributes: {...} },
-    //  { id: id, attributes: {...} }, ...
-    // ]}
-    yield put(updateEntities(data));
-  } else {
-    // data = { attributes: true, path: path, updates: {
-    //   creates: [{entity_id, assignedId}, ...],
-    //   deletes: [assignment, ids,...]
-    // }}
-    yield put(updateConnections(data));
-  }
+export function* updatePage(args) {
+  yield put(updateRouteQuery({
+    arg: 'page',
+    value: args.page,
+    replace: true,
+  }));
+}
+export function* updatePageItems(args) {
+  yield put(updateRouteQuery([
+    {
+      arg: 'items',
+      value: args.no,
+      replace: true,
+    },
+    {
+      arg: 'page',
+      value: '',
+      replace: true,
+      remove: true,
+    },
+  ]));
+}
+export function* updateExpand(args) {
+  yield put(updateRouteQuery({
+    arg: 'expand',
+    value: args.expand,
+    replace: true,
+  }));
+}
+export function* updateSortBy(args) {
+  yield put(updateRouteQuery({
+    arg: 'sort',
+    value: args.sort,
+    replace: true,
+  }));
+}
+export function* updateSortOrder(args) {
+  yield put(updateRouteQuery({
+    arg: 'order',
+    value: args.order,
+    replace: true,
+  }));
 }
 
-export function* locationChangeSaga() {
-  // reset list if path changed
-  const location = yield select(selectLocation);
-  if (location.get('pathname') !== location.get('pathnamePrevious')) {
-    yield put(resetState());
-  }
+export function* save({ data }) {
+  yield put(saveEntity({
+    path: data.path,
+    entity: data.entity,
+    redirect: false,
+  }));
+}
+
+export function* newConnection({ data }) {
+  yield put(newEntity({
+    path: data.path,
+    entity: data.entity,
+    redirect: false,
+  }));
+}
+
+export function* deleteConnection({ data }) {
+  yield put(deleteEntity({
+    path: data.path,
+    id: data.id,
+    redirect: false,
+  }));
 }
 
 export default function* entityList() {
   yield takeLatest(UPDATE_QUERY, updateQuery);
   yield takeLatest(UPDATE_GROUP, updateGroup);
+  yield takeLatest(PAGE_CHANGE, updatePage);
+  yield takeLatest(PAGE_ITEM_CHANGE, updatePageItems);
+  yield takeLatest(EXPAND_CHANGE, updateExpand);
+  yield takeLatest(SORTBY_CHANGE, updateSortBy);
+  yield takeLatest(SORTORDER_CHANGE, updateSortOrder);
 
-  yield takeLatest(SAVE_EDITS, saveEdits);
-  yield takeLatest(LOCATION_CHANGE, locationChangeSaga);
+  yield takeLatest(SAVE, save);
+  yield takeLatest(NEW_CONNECTION, newConnection);
+  yield takeLatest(DELETE_CONNECTION, deleteConnection);
 }

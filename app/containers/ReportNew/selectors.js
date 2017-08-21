@@ -1,20 +1,29 @@
 import { createSelector } from 'reselect';
 
-/**
- * Direct selector to the reportNew state domain
- */
-const selectReportNewDomain = () => (state) => state.get('reportNew');
+import {
+  selectEntity,
+  selectEntities,
+} from 'containers/App/selectors';
 
-/**
- * Default selector used by ReportNew
- */
+import {
+  attributesEqual,
+} from 'utils/entities';
 
-const viewDomainSelect = createSelector(
-  selectReportNewDomain(),
+import { sortEntities } from 'utils/sort';
+
+export const selectDomain = createSelector(
+  (state) => state.get('reportNew'),
   (substate) => substate.toJS()
 );
 
-export default viewDomainSelect;
-export {
-  selectReportNewDomain,
-};
+export const selectIndicator = createSelector(
+  (state, id) => selectEntity(state, { path: 'indicators', id }),
+  (state) => selectEntities(state, 'due_dates'),
+  (indicator, dates) => indicator && indicator
+    .set('dates', sortEntities(
+      dates.filter((date) => attributesEqual(date.getIn(['attributes', 'indicator_id']), indicator.get('id'))),
+      'asc',
+      'due_date',
+      'date')
+    )
+);

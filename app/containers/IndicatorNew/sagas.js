@@ -10,6 +10,7 @@ export function* save({ data }) {
     path: 'indicators',
     entity: data,
     redirect: '/indicators',
+    invalidateEntitiesOnSuccess: 'due_dates',    // force due_date reload to get newly generated due_dates
   }));
 }
 

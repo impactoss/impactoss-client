@@ -42,6 +42,22 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/overview',
+      name: 'overview',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Overview'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '/logout',
       name: 'userLogout',
       getComponent(nextState, cb) {
@@ -247,7 +263,28 @@ export default function createRoutes(store) {
         const renderRoute = loadModule(cb);
 
         importModules.then(([reducer, sagas, component]) => {
-          injectReducer('actionNew', reducer.default);
+          injectReducer('measureNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/actions/import',
+      name: 'actionImport',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ActionImport/reducer'),
+          import('containers/ActionImport/sagas'),
+          import('containers/ActionImport'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('measureImport', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });
@@ -284,7 +321,102 @@ export default function createRoutes(store) {
         const renderRoute = loadModule(cb);
 
         importModules.then(([reducer, sagas, component]) => {
-          injectReducer('actionEdit', reducer.default);
+          injectReducer('measureEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/sdgtargets',
+      name: 'sdgtargetList',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetList'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/sdgtargets/new',
+      name: 'sdgtargetNew',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetNew/reducer'),
+          import('containers/SdgTargetNew/sagas'),
+          import('containers/SdgTargetNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('sdgtargetNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/sdgtargets/import',
+      name: 'sdgtargetImport',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetImport/reducer'),
+          import('containers/SdgTargetImport/sagas'),
+          import('containers/SdgTargetImport'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('sdgtargetImport', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/sdgtargets/:id',
+      name: 'sdgtargetView',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/sdgtargets/edit/:id',
+      name: 'sdgtargetEdit',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetEdit/reducer'),
+          import('containers/SdgTargetEdit/sagas'),
+          import('containers/SdgTargetEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('sdgtargetEdit', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });
@@ -321,6 +453,27 @@ export default function createRoutes(store) {
 
         importModules.then(([reducer, sagas, component]) => {
           injectReducer('recommendationNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/recommendations/import',
+      name: 'recommendationImport',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/RecommendationImport/reducer'),
+          import('containers/RecommendationImport/sagas'),
+          import('containers/RecommendationImport'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('recommendationImport', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });
@@ -395,6 +548,27 @@ export default function createRoutes(store) {
 
         importModules.then(([reducer, sagas, component]) => {
           injectReducer('indicatorNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/indicators/import',
+      name: 'indicatorImport',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorImport/reducer'),
+          import('containers/IndicatorImport/sagas'),
+          import('containers/IndicatorImport'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('indicatorImport', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });
@@ -499,30 +673,20 @@ export default function createRoutes(store) {
     }, {
       path: '/categories',
       name: 'taxonomies',
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/Taxonomies'),
-        ]);
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([component]) => {
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
+      onEnter: (nextState, replace) => replace('/categories/1'),
     }, {
       path: '/categories/:id', // the taxonomy id
-      name: 'taxonomyCategories',
+      name: 'categoryList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/TaxonomyCategories'),
+          import('containers/CategoryList/sagas'),
+          import('containers/CategoryList'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([component]) => {
+        importModules.then(([sagas, component]) => {
+          injectSagas(sagas.default);
           renderRoute(component);
         });
 
@@ -660,14 +824,6 @@ export default function createRoutes(store) {
         });
 
         importModules.catch(errorLoading);
-      },
-    }, {
-      path: '/not-authorized',
-      name: 'notauthorized',
-      getComponent(nextState, cb) {
-        import('containers/NotAuthorizedPage')
-        .then(loadModule(cb))
-        .catch(errorLoading);
       },
     }, {
       path: '*',

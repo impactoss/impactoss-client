@@ -1,10 +1,6 @@
 /**
  * The global state selectors
  *
- * Use `createCachedSelector` when you want to make a selector that takes arguments
- * https://github.com/reactjs/reselect/issues/184 ( problem )
- * https://github.com/toomuchdesign/re-reselect ( solution )
- *
  * use the makeSelector () => createSelector pattern when you want a selector that
  * doesn't take arguments, but can have its own cache between components
  *
@@ -12,29 +8,101 @@
  * https://github.com/react-boilerplate/react-boilerplate/pull/1205#issuecomment-274319934
  *
  */
-
 import { createSelector } from 'reselect';
-import createCachedSelector from 're-reselect';
 import { reduce } from 'lodash/collection';
-
-import { USER_ROLES } from 'containers/App/constants';
+import { Map } from 'immutable';
 
 import asArray from 'utils/as-array';
-import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
+import asList from 'utils/as-list';
+
+import { USER_ROLES } from 'containers/App/constants';
+import {
+  filterEntitiesByAttributes,
+  filterEntitiesByKeywords,
+  entitySetCategoryIds,
+  prepareTaxonomies,
+} from 'utils/entities';
 
 // high level state selects
 const getRoute = (state) => state.get('route');
 const getGlobal = (state) => state.get('global');
-const getGlobalEntities = (state) => state.getIn(['global', 'entities']);
 const getGlobalRequested = (state) => state.getIn(['global', 'requested']);
 
-const makeSelectAuth = () => createSelector(
+export const selectNewEntityModal = createSelector(
   getGlobal,
-  (globalState) => globalState.get('auth').toJS()
+  (globalState) => globalState.get('newEntityModal')
 );
 
+export const selectIsAuthenticating = createSelector(
+  getGlobal,
+  (globalState) => globalState.getIn(['auth', 'sending'])
+);
+
+export const selectReadyUserRoles = (state) =>
+  !!state.getIn(['global', 'ready', 'user_roles']);
+
+export const selectReadyForAuthCheck = createSelector(
+  selectIsAuthenticating,
+  selectReadyUserRoles,
+  (isAuthenticating, rolesReady) => !isAuthenticating && rolesReady
+);
+
+const selectSessionUser = createSelector(
+  getGlobal,
+  (state) => state.get('user')
+);
+
+export const selectSessionUserId = createSelector(
+  selectSessionUser,
+  (sessionUser) =>
+    sessionUser.get('attributes')
+    && sessionUser.get('attributes').id.toString()
+);
+
+export const selectIsSignedIn = createSelector(
+  selectSessionUser,
+  (sessionUser) => sessionUser.get('isSignedIn')
+);
+
+// const makeSessionUserRoles = () => selectSessionUserRoles;
+export const selectSessionUserRoles = createSelector(
+  (state) => state,
+  selectSessionUser,
+  (state, sessionUser) => {
+    if (sessionUser.get('attributes') && sessionUser.get('isSignedIn')) {
+      const roles = selectEntitiesWhere(state, {
+        path: 'user_roles',
+        where: {
+          user_id: sessionUser.get('attributes').id,
+        },
+      });
+      return roles.map((role) => role.getIn(['attributes', 'role_id'])).toArray();
+    }
+    return Map();
+  }
+);
+
+export const selectIsUserAdmin = createSelector(
+  selectSessionUserRoles,
+  (userRoles) => userRoles.includes(USER_ROLES.ADMIN)
+);
+
+export const selectIsUserManager = createSelector(
+  selectSessionUserRoles,
+  (userRoles) => userRoles.includes(USER_ROLES.MANAGER)
+  || userRoles.includes(USER_ROLES.ADMIN)
+);
+
+export const selectIsUserContributor = createSelector(
+  selectSessionUserRoles,
+  (userRoles) => userRoles.includes(USER_ROLES.CONTRIBUTOR)
+    || userRoles.includes(USER_ROLES.MANAGER)
+    || userRoles.includes(USER_ROLES.ADMIN)
+);
+
+
 // makeSelectLocationState expects a plain JS object for the routing state
-const makeSelectLocationState = () => {
+export const makeSelectLocationState = () => {
   let prevRoutingState;
   let prevRoutingStateJS;
 
@@ -50,30 +118,18 @@ const makeSelectLocationState = () => {
   };
 };
 
-
-const selectLocation = createSelector(
+export const selectCurrentPathname = createSelector(
   getRoute,
   (routeState) => {
     try {
-      return routeState.get('locationBeforeTransitions');
+      return routeState.getIn(['locationBeforeTransitions', 'pathname']);
     } catch (error) {
       return null;
     }
   }
 );
 
-const makeSelectPathnameOnAuthChange = () => createSelector(
-  getRoute,
-  (routeState) => {
-    try {
-      return routeState.getIn(['locationBeforeTransitions', 'pathnameOnAuthChange']);
-    } catch (error) {
-      return null;
-    }
-  }
-);
-
-const makeSelectPreviousPathname = () => createSelector(
+export const selectPreviousPathname = createSelector(
   getRoute,
   (routeState) => {
     try {
@@ -84,362 +140,206 @@ const makeSelectPreviousPathname = () => createSelector(
   }
 );
 
-const getRequestedAt = createSelector(
+export const selectRequestedAt = createSelector(
   getGlobalRequested,
   (state, { path }) => path,
   (requested, path) => requested.get(path)
 );
 
-const isReady = (state, { path }) =>
+export const selectReady = (state, { path }) =>
   reduce(asArray(path),
     (areReady, readyPath) => areReady && !!state.getIn(['global', 'ready', readyPath]),
     true
   );
 
-const getEntitiesPure = createSelector(
-  getGlobalEntities,
-  (state, { path }) => path,
+export const selectLocation = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.get('locationBeforeTransitions');
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
+const selectWhereQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('where')
+);
+
+export const selectAttributeQuery = createSelector(
+  (state, { locationQuery }) => selectWhereQuery(state, locationQuery),
+  (whereQuery) => whereQuery &&
+    asList(whereQuery).reduce((memo, where) => {
+      const attrValue = where.split(':');
+      return Object.assign(memo, { [attrValue[0]]: attrValue[1] });
+    }, {})
+);
+
+export const selectWithoutQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('without')
+);
+
+export const selectCategoryQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('cat')
+);
+
+export const selectConnectionQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('connected')
+);
+
+export const selectConnectedCategoryQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('catx')
+);
+
+export const selectSearchQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('search')
+);
+
+export const selectExpandQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('expand')
+    ? parseInt(locationQuery.get('expand'), 10)
+    : 0
+);
+
+export const selectSortOrderQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('order')
+);
+
+export const selectSortByQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('sort')
+);
+
+
+// NEW performant way of selecting and querying entities
+
+const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
+
+export const selectEntities = createSelector(
+  selectEntitiesAll,
+  (state, path) => path,
   (entities, path) => entities.get(path)
 );
 
-// filter entities by attribute or id, also allows multiple conditions
-// eg where: {draft: false} or where: {id: 1, draft: false}
-const getEntitiesWhere = createCachedSelector(
-  getEntitiesPure,
-  (state, { where }) => where ? JSON.stringify(where) : null, // enable caching
-  (entities, whereString) => {
-    if (whereString) {
-      const where = JSON.parse(whereString);
-      return entities.filter((entity) =>
-        reduce(where, (passing, value, key) => {
-          // TODO if !passing return false, no point going further
-          if (key === 'id') {
-            return passing && entity.get('id') === value.toString();
-          }
-          const testValue = entity.getIn(['attributes', key]);
-          if (typeof testValue === 'undefined' || testValue === null) {
-            return (value === 'null') ? passing : false;
-          }
-          return passing && testValue.toString() === value.toString();
-        }, true)
-      );
-    }
-    return entities;
-  }
-)((state, { path, where }) => `${path}:${JSON.stringify(where)}`);
+export const selectEntity = createSelector(
+  (state, { path }) => selectEntities(state, path),
+  (state, { id }) => id,
+  (entities, id) => entities.get(id.toString())
+);
 
-// filter entities by absence of connection to other entity/category via associative table
-// for taxonomies, eg: `without: { taxonomyId: 5, path: "measure_category", key: "measure_id" }`
-// for other entities, eg: `without: { path: "recommendation_measures", whereKey: "measure_id" }`
-const getEntitiesWithout = createSelector(
-  (state) => state,
-  getEntitiesWhere,
-  (state, { without }) => without,
-  (state, entities, without) => without
-    ? entities.filter((entity) =>
-      reduce(asArray(without), (passing, condition) => {
-        // check for taxonomies
-        if (condition.taxonomyId) {
-          // get all associations for entity and store category count for given taxonomy
-          const associations = getEntities(state, {
-            path: condition.path, // measure_categories
-            where: {
-              [condition.key]: entity.get('id'),
-            }, // {measure_id : 3}
-            extend: {
-              path: 'categories',
-              as: 'count',
-              key: 'category_id',
-              type: 'count',
-              where: {
-                taxonomy_id: condition.taxonomyId,
-              },
-            },
-          });
-          // check if not any category present (count > 0)
-          return passing && !associations.reduce((hasCategories, association) =>
-            hasCategories || association.get('count') > 0, false
-          );
-        }
-        // other entities
-        const associations = getEntitiesWhere(state, {
-          path: condition.path, // recommendation_measures
-          where: {
-            [condition.key]: entity.get('id'),
-          },
-        });
-        return passing && !(associations && associations.size); // !not associated
-      }, true)
-    )
+// filter entities by attributes, using object
+export const selectEntitiesWhere = createSelector(
+  (state, { where }) => where,
+  (state, { path }) => selectEntities(state, path),
+  (query, entities) => query
+    ? filterEntitiesByAttributes(entities, query)
     : entities
 );
 
-// check if entities have connections with other entities via associative table
-const getEntitiesIfConnected = createSelector(
-  (state) => state,
-  getEntitiesWithout,
-  (state, { connected }) => connected,
-  (state, entities, connected) => connected
-    ? entities.filter((entity) => reduce(
-      asArray(connected), // allows multiple connections
-      (passing, argsConnected) => {
-        if (argsConnected.key || argsConnected.connected || argsConnected.where) {
-          const where = argsConnected.where || {};
-          return passing && reduce(
-            asArray(where),
-            (passingWhere, whereArgs) => { // and multiple wheres
-              // TODO if passingWhere is false we don't need to do any more work
-              let connections;
-              if (argsConnected.forward) {
-                // forward: entity pointing to other entity
-                const key = entity.getIn(['attributes', argsConnected.key]);
-                connections = getEntitiesIfConnected(state, {
-                  path: argsConnected.path, // path of associative table
-                  where: {
-                    ...whereArgs,
-                    id: !!key && key.toString(),
-                  },
-                  connected: argsConnected.connected || null,
-                });
-              } else {
-                // other entity pointing to entity
-                connections = getEntitiesIfConnected(state, {
-                  path: argsConnected.path, // path of associative table
-                  where: {
-                    ...whereArgs,
-                    [argsConnected.key]: argsConnected.attribute
-                      ? entity.getIn(['attributes', argsConnected.attribute])
-                      : entity.get('id'),
-                  },
-                  connected: argsConnected.connected || null,
-                });
-              }
-              return passingWhere && connections && connections.size; // association present
-            },
-            true
-          );
-        }
-        return passing;
-      },
-      true
-    )) // reduce connected conditions // filter entities
-  : entities  // !connected
+// filter entities by attributes, using locationQuery
+const selectEntitiesWhereQuery = createSelector(
+  selectAttributeQuery,
+  (state, { path }) => selectEntities(state, path),
+  (query, entities) => query
+    ? filterEntitiesByAttributes(entities, query)
+    : entities
 );
 
-// prep searchtarget, incl id
-const prepareEntitySearchTarget = (entity, fields) =>
-  reduce(
-    fields,
-    (target, field) => `${target} ${cleanupSearchTarget(entity.getIn(['attributes', field]))}`,
-    entity.get('id')
-  );
-
-// check if entities have connections with other entities via associative table
-const getEntitiesSearch = createSelector(
-  (state) => state,
-  getEntitiesIfConnected,
-  (state, { search }) => search,
-  (state, entities, search) => {
-    if (search) {
-      try {
-        const regex = new RegExp(regExMultipleWords(search.query), 'i');
-        return entities.filter((entity) =>
-          regex.test(prepareEntitySearchTarget(entity, search.fields))
-        );
-      } catch (e) {
-        return entities;
-      }
-    }
-    return entities;  // !search
-  }
+export const selectEntitiesSearchQuery = createSelector(
+  selectEntitiesWhereQuery,
+  (state, { locationQuery }) => selectSearchQuery(state, locationQuery),
+  (state, { searchAttributes }) => searchAttributes,
+  (entities, query, searchAttributes) => query
+    ? filterEntitiesByKeywords(entities, query, searchAttributes)
+    : entities  // !search
 );
 
-const getEntities = createSelector(
-  (state) => state,
-  getEntitiesSearch,
-  (state, { out }) => out,
-  (state, { extend }) => extend,
-  (state, entities, out, extend) => {
-    // not to worry about caching here as "inexpensive"
-    let result;
-    if (extend) {
-      result = entities.map((entity) =>
-        extendEntity(state, entity, extend)
-      );
-    } else {
-      result = entities;
-    }
-    return out === 'js' ? result.toJS() : result;
-  }
+export const selectUserConnections = createSelector(
+  (state) => selectEntities(state, 'roles'),
+  (roles) => Map().set('roles', roles)
 );
 
-// helper: allows to extend entity by joining it with related entities,
-//   calls getEntities recursively
-const extendEntity = (state, entity, extendArgs) => {
-  const argsArray = asArray(extendArgs);
-  let result = entity;
-  argsArray.forEach((args) => {
-    const extend = {
-      path: args.path, // the table to look up, required
-      key: args.key, // the foreign key
-      type: args.type || 'list', // one of: list, count, single
-      as: args.as || args.path, // the attribute to store
-      reverse: args.reverse || false, // reverse relation
-      where: args.where || {}, // conditions for join
-      extend: args.extend || null,
-      connected: args.connected || null,
-      without: args.without || null,
-    };
-    if (extend.reverse) {
-      // reverse: other entity pointing to entity
-      extend.where[extend.key] = entity.get('id');
-    } else {
-      // entity pointing to other entity
-      const key = entity.getIn(['attributes', extend.key]);
-      extend.where.id = !!key && key.toString();
-    }
-    let extended;
-    if (extend.type === 'single') {
-      extend.id = extend.where.id; // getEntityPure selector requires id
-      extended = getEntity(state, extend);
-    } else {
-      extended = getEntities(state, extend);
-      if (extended && extend.type === 'count') {
-        extended = extended.size;
-      }
-    }
-    result = result.set(extend.as, extended && extended.size === 0 ? null : extended);
-  });
-  return result;
-};
-
-
-const getEntityPure = createSelector(
-  getEntitiesPure,
-  (state, { id }) => id && id.toString(),
-  (entities, id) => entities.get(id)
+export const selectRecommendationConnections = createSelector(
+  (state) => selectEntities(state, 'measures'),
+  (measures) => Map().set('measures', measures)
 );
 
-const hasEntity = createSelector(
-  getEntitiesPure,
-  (state, { id }) => id,
-  (entities, id) => entities.has(id)
+export const selectSdgTargetConnections = createSelector(
+  (state) => selectEntities(state, 'measures'),
+  (state) => selectEntities(state, 'indicators'),
+  (measures, indicators) => Map()
+    .set('measures', measures)
+    .set('indicators', indicators)
 );
 
-const getEntity = createSelector(
-  (state) => state,
-  getEntityPure,
-  (state, { out }) => out,
-  (state, { extend }) => extend,
-  (state, entity, out, extend) => {
-    // console.log('entitySelect: ' + JSON.stringify(args))
-    let result;
-    if (entity && extend) {
-      result = extendEntity(state, entity, extend);
-    } else {
-      result = entity;
-    }
-    return result && out === 'js' ? result.toJS() : result;
-  }
+export const selectIndicatorConnections = createSelector(
+  (state) => selectEntities(state, 'measures'),
+  (state) => selectEntities(state, 'sdgtargets'),
+  (measures, sdgtargets) => Map()
+    .set('measures', measures)
+    .set('sdgtargets', sdgtargets)
 );
 
-
-const getSessionUser = createSelector(
-  getGlobal,
-  (state) => state.get('user')
+export const selectMeasureConnections = createSelector(
+  (state) => selectEntities(state, 'recommendations'),
+  (state) => selectEntities(state, 'indicators'),
+  (state) => selectEntities(state, 'sdgtargets'),
+  (recommendations, indicators, sdgtargets) => Map()
+    .set('recommendations', recommendations)
+    .set('indicators', indicators)
+    .set('sdgtargets', sdgtargets)
 );
 
-const getSessionUserId = createSelector(
-  getSessionUser,
-  (sessionUser) =>
-    sessionUser.get('attributes')
-    && sessionUser.get('attributes').id.toString()
+export const selectMeasureTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_measures')
 );
 
-const isSignedIn = createSelector(
-  getSessionUser,
-  (sessionUser) => sessionUser.get('isSignedIn')
+export const selectRecommendationTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_recommendations')
 );
 
-// const makeSessionUserRoles = () => sessionUserRoles;
-const sessionUserRoles = createSelector(
-  (state) => state,
-  getSessionUser,
-  (state, sessionUser) => {
-    if (sessionUser.get('attributes') && sessionUser.get('isSignedIn')) {
-      const roles = getEntities(state, {
-        path: 'user_roles',
-        out: 'js',
-        where: {
-          user_id: sessionUser.get('attributes').id,
-        },
-      });
-      return roles ? Object.values(roles).map((role) => role.attributes.role_id) : [];
-    }
-    return [];
-  }
+export const selectSdgTargetTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_sdgtargets')
 );
 
-const isUserAdmin = createSelector(
-  sessionUserRoles,
-  (userRoles) => userRoles.indexOf(USER_ROLES.ADMIN) > -1
+export const selectUserTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_users')
 );
 
-const isUserManager = createSelector(
-  sessionUserRoles,
-  (userRoles) => userRoles.indexOf(USER_ROLES.MANAGER) > -1 || userRoles.indexOf(USER_ROLES.ADMIN) > -1
+export const selectRecommendationsCategorised = createSelector(
+  (state) => selectEntities(state, 'recommendations'),
+  (state) => selectEntities(state, 'recommendation_categories'),
+  (entities, categories) =>
+    entities && entities.map((entity) => entitySetCategoryIds(entity, 'recommendation_id', categories))
 );
 
-const isUserContributor = createSelector(
-  sessionUserRoles,
-  (userRoles) => userRoles.indexOf(USER_ROLES.CONTRIBUTOR) > -1 || userRoles.indexOf(USER_ROLES.MANAGER) > -1 || userRoles.indexOf(USER_ROLES.ADMIN) > -1
+export const selectSdgTargetsCategorised = createSelector(
+  (state) => selectEntities(state, 'sdgtargets'),
+  (state) => selectEntities(state, 'sdgtarget_categories'),
+  (entities, categories) =>
+    entities && entities.map((entity) => entitySetCategoryIds(entity, 'sdgtarget_id', categories))
 );
 
-const getUserEntities = createSelector(
-  getGlobalEntities,
-  (entities) => entities.get('users')
+export const selectMeasuresCategorised = createSelector(
+  (state) => selectEntities(state, 'measures'),
+  (state) => selectEntities(state, 'measure_categories'),
+  (entities, categories) =>
+    entities && entities.map((entity) => entitySetCategoryIds(entity, 'measure_id', categories))
 );
-
-const getUserEntity = createSelector(
-  getUserEntities,
-  (state, { id }) => id && id.toString(),
-  (users, id) => users.get(id)
-);
-
-const getUser = createSelector(
-  (state) => state,
-  getUserEntity,
-  (state, { out }) => out,
-  (state, { extend }) => extend,
-  (state, user, out, extend) => {
-    let result = user;
-    if (result && extend) {
-      result = extendEntity(state, result, extend);
-    }
-    return result && out === 'js' ? result.toJS() : result;
-  }
-);
-
-
-export {
-  getGlobal,
-  makeSelectLocationState,
-  makeSelectAuth,
-  makeSelectPathnameOnAuthChange,
-  makeSelectPreviousPathname,
-  getRequestedAt,
-  isReady,
-  getEntitiesWhere,
-  getEntities,
-  hasEntity,
-  getEntity,
-  getUser,
-  getSessionUser,
-  isSignedIn,
-  getSessionUserId,
-  sessionUserRoles,
-  isUserAdmin,
-  isUserManager,
-  isUserContributor,
-  selectLocation,
-};

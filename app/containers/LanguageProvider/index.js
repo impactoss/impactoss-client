@@ -7,16 +7,20 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { IntlProvider } from 'react-intl';
 
+import { DEFAULT_LOCALE } from 'containers/App/constants';
+
 import { makeSelectLocale } from './selectors';
+
 
 export class LanguageProvider extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
-      <IntlProvider locale={this.props.locale} key={this.props.locale} messages={this.props.messages[this.props.locale]}>
+      <IntlProvider defaultLocale={DEFAULT_LOCALE} locale={this.props.locale} key={this.props.locale} messages={this.props.messages[this.props.locale]}>
         {React.Children.only(this.props.children)}
       </IntlProvider>
     );
@@ -24,9 +28,9 @@ export class LanguageProvider extends React.PureComponent { // eslint-disable-li
 }
 
 LanguageProvider.propTypes = {
-  locale: React.PropTypes.string,
-  messages: React.PropTypes.object,
-  children: React.PropTypes.element.isRequired,
+  locale: PropTypes.string,
+  messages: PropTypes.object,
+  children: PropTypes.element.isRequired,
 };
 
 

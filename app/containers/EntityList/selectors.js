@@ -1,42 +1,29 @@
 import { createSelector } from 'reselect';
 
 /**
- * Direct selector to the actionEdit state domain
+ * Direct selector to the entityList state domain
  */
-const selectEntityListDomain = (state) => state.get('entityList');
+export const selectEntityListDomain = (state) => state.get('entityList');
 
-/**
- * Other specific selectors
- */
-
-const pageSelector = createSelector(
+export const selectDomain = createSelector(
    selectEntityListDomain,
    (substate) => substate.get('page')
 );
 
-const activePanelSelector = createSelector(
-  pageSelector,
+export const selectActivePanel = createSelector(
+  selectDomain,
   (pageState) => pageState.get('activePanel')
 );
 
-const entitiesSelectedSelector = createSelector(
-  pageSelector,
-  (pageState) => pageState.get('entitiesSelected').toJS()
+export const selectSelectedEntities = createSelector(
+  selectDomain,
+  (pageState) => pageState.get('entitiesSelected')
 );
 
-/**
- * Default selector used by ActionEdit
- */
-
-const entityListSelect = createSelector(
-  selectEntityListDomain,
-  (substate) => substate.toJS()
+export const selectProgress = createSelector(
+  selectDomain,
+  (pageState) =>
+    pageState.get('sending') && pageState.get('sending').size > 0
+      ? ((pageState.get('success').size + pageState.get('errors').size) / pageState.get('sending').size) * 100
+      : null
 );
-
-export default entityListSelect;
-export {
-  selectEntityListDomain,
-  entityListSelect,
-  activePanelSelector,
-  entitiesSelectedSelector,
-};

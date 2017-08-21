@@ -4,10 +4,14 @@
  *
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { actions as formActions } from 'react-redux-form/immutable';
 
+import ErrorMessages from 'components/ErrorMessages';
+import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
@@ -21,6 +25,9 @@ import { save } from './actions';
 import userPasswordSelector from './selectors';
 
 export class UserPassword extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentWillMount() {
+    this.props.initialiseForm();
+  }
   render() {
     const { passwordSending, passwordError } = this.props.userPassword.page;
     const reference = this.props.params.id;
@@ -41,15 +48,16 @@ export class UserPassword extends React.PureComponent { // eslint-disable-line r
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
-          {passwordSending &&
-            <p>Sending... </p>
-          }
           {passwordError &&
-            <p>{passwordError}</p>
+            <ErrorMessages error={passwordError} />
+          }
+          {passwordSending &&
+            <Loading />
           }
           { this.props.userPassword.form &&
             <AuthForm
               model="userPassword.form.data"
+              sending={passwordSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData, reference)}
               handleCancel={() => this.props.handleCancel(reference)}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
@@ -107,10 +115,11 @@ UserPassword.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   params: PropTypes.object,
+  initialiseForm: PropTypes.func,
 };
 
 UserPassword.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -119,6 +128,9 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
+    initialiseForm: () => {
+      dispatch(formActions.reset('userPassword.form.data'));
+    },
     handleSubmit: (formData, userId) => {
       const saveData = {
         ...formData.toJS(),

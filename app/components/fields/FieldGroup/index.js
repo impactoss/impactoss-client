@@ -1,4 +1,6 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import Icon from 'components/Icon';
 
@@ -8,11 +10,12 @@ import FieldGroupLabel from 'components/fields/FieldGroupLabel';
 import GroupIcon from 'components/fields/GroupIcon';
 import Label from 'components/fields/Label';
 
-class FieldGroup extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class FieldGroup extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { group } = this.props;
+    const { group, seemless } = this.props;
+
     return (
-      <FieldGroupWrapper type={group.type}>
+      <FieldGroupWrapper type={group.type} seemless={seemless}>
         { group.label &&
           <FieldGroupLabel>
             { group.icon &&
@@ -21,7 +24,7 @@ class FieldGroup extends React.Component { // eslint-disable-line react/prefer-s
               </GroupIcon>
             }
             <Label>
-              {group.label}
+              <FormattedMessage {...group.label} />
             </Label>
           </FieldGroupLabel>
         }
@@ -37,6 +40,7 @@ class FieldGroup extends React.Component { // eslint-disable-line react/prefer-s
 }
 FieldGroup.propTypes = {
   group: PropTypes.object.isRequired,
+  seemless: PropTypes.bool,
 };
 
 export default FieldGroup;

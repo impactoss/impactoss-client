@@ -1,72 +1,139 @@
-import React, { PropTypes } from 'react';
-
+import React from 'react';
+import PropTypes from 'prop-types';
 import Icon from 'components/Icon';
 import appMessages from 'containers/App/messages';
 
-import ButtonPrimaryIcon from '../ButtonPrimaryIcon';
-import ButtonPrimary from '../ButtonPrimary';
-import ButtonText from '../ButtonText';
-import ButtonIconPrimary from '../ButtonIconPrimary';
+import ButtonDefaultWithIcon from '../ButtonDefaultWithIcon';
+import ButtonDefault from '../ButtonDefault';
+import ButtonSubmit from '../ButtonSubmit';
+import ButtonFlat from '../ButtonFlat';
+import ButtonFlatWithIcon from '../ButtonFlatWithIcon';
+import ButtonDefaultIconOnly from '../ButtonDefaultIconOnly';
 
-class ButtonFactory extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class ButtonFactory extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     const { button } = this.props;
-
     switch (button.type) {
       case 'primary' :
         return (
-          <ButtonPrimary onClick={() => button.onClick()}>
+          <ButtonDefault
+            onClick={button.onClick && (() => button.onClick())}
+            type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
+          >
             {button.title}
-          </ButtonPrimary>
+          </ButtonDefault>
+        );
+      case 'formPrimary' :
+        return (
+          <ButtonSubmit
+            onClick={button.onClick && (() => button.onClick())}
+            type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
+          >
+            {button.title}
+          </ButtonSubmit>
         );
       case 'add' :
         return (
-          <ButtonPrimaryIcon
+          <ButtonDefaultWithIcon
             onClick={() => button.onClick()}
             icon="add"
+            strong
+            type={button.submit ? 'submit' : 'button'}
             title={button.title || this.context.intl.formatMessage(appMessages.buttons.add)}
+            disabled={button.disabled}
+          />
+        );
+      case 'addFromMultiselect':
+        return (
+          <ButtonFlatWithIcon
+            onClick={() => button.onClick()}
+            icon="add"
+            strong
+            type={button.submit ? 'submit' : 'button'}
+            title={button.title || this.context.intl.formatMessage(appMessages.buttons.add)}
+            disabled={button.disabled}
+            form
           />
         );
       case 'save' :
         return (
-          <ButtonText primary onClick={() => button.onClick()}>
+          <ButtonFlat
+            primary
+            onClick={() => button.onClick()}
+            type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
+          >
             {button.title || this.context.intl.formatMessage(appMessages.buttons.save)}
-          </ButtonText>
+          </ButtonFlat>
         );
       case 'cancel' :
         return (
-          <ButtonText onClick={() => button.onClick()}>
+          <ButtonFlat
+            onClick={() => button.onClick()}
+            type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
+          >
             {button.title || this.context.intl.formatMessage(appMessages.buttons.cancel)}
-          </ButtonText>
+          </ButtonFlat>
         );
       case 'edit' :
         return (
-          <ButtonText onClick={() => button.onClick()}>
+          <ButtonFlat
+            onClick={() => button.onClick()}
+            type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
+          >
             {button.title || this.context.intl.formatMessage(appMessages.buttons.edit)}
-          </ButtonText>
+          </ButtonFlat>
         );
       case 'close' :
         return (
-          <ButtonIconPrimary
+          <ButtonDefaultIconOnly
             onClick={() => button.onClick()}
+            type={button.submit ? 'submit' : 'button'}
             title={button.title || this.context.intl.formatMessage(appMessages.buttons.close)}
+            disabled={button.disabled}
           >
             <Icon name="close" />
-          </ButtonIconPrimary>
+          </ButtonDefaultIconOnly>
+        );
+      case 'closeText':
+        return (
+          <ButtonFlat
+            onClick={() => button.onClick()}
+            type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
+            form
+          >
+            {button.title || this.context.intl.formatMessage(appMessages.buttons.close)}
+          </ButtonFlat>
         );
       case 'textPrimary' :
         return (
-          <ButtonText onClick={() => button.onClick()} primary>
+          <ButtonFlat
+            onClick={button.onClick && (() => button.onClick())}
+            primary
+            type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
+          >
             {button.title}
-          </ButtonText>
+          </ButtonFlat>
         );
+      case 'simple' :
       case 'text' :
+      case 'delete' :
       default :
         return (
-          <ButtonText onClick={() => button.onClick()}>
+          <ButtonFlat
+            onClick={() => button.onClick()}
+            type={button.submit ? 'submit' : 'button'}
+            disabled={button.disabled}
+          >
             {button.title}
-          </ButtonText>
+          </ButtonFlat>
         );
     }
   }
@@ -76,7 +143,7 @@ ButtonFactory.propTypes = {
   button: PropTypes.object.isRequired,
 };
 ButtonFactory.contextTypes = {
-  intl: React.PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default ButtonFactory;
