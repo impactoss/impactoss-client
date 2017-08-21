@@ -240,7 +240,6 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
     advanced: true,
     selectAll: false,
   };
-  let optionConnections = List();
 
   // get the active option
   const option = find(connectionFilters.options, (o) => o.path === activeOptionId);
@@ -297,6 +296,7 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
       }
     } else {
       entities.forEach((entity) => {
+        let optionConnections = List();
         // if entity has connected entities
         if (entity.get(option.path)) {
           // add connected entities if not present otherwise increase count
