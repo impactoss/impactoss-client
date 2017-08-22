@@ -170,6 +170,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('sdgtargetEdit.form.data'),
               }] : null
             }
@@ -201,6 +202,7 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
             <EntityForm
               model="sdgtargetEdit.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 taxonomies,
@@ -222,6 +224,9 @@ export class SdgTargetEdit extends React.Component { // eslint-disable-line reac
                 },
               }}
             />
+          }
+          { (saveSending || deleteSending) &&
+            <Loading />
           }
         </Content>
       </div>

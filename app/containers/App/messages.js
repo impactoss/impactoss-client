@@ -73,7 +73,15 @@ export default defineMessages({
     },
     outdatedError: {
       id: 'app.containers.App.forms.outdatedError',
-      defaultMessage: 'Sorry, this record has become outdated. Please find the latest server version below.',
+      defaultMessage: 'Sorry, this record has become outdated. Please review the latest server version below.',
+    },
+    outdatedErrorList: {
+      id: 'app.containers.App.forms.outdatedErrorList',
+      defaultMessage: 'Record {recordReference}: Sorry, this record has become outdated in the meantime. Please review the latest server version above.',
+    },
+    otherErrorList: {
+      id: 'app.containers.App.forms.otherErrorList',
+      defaultMessage: 'Record {recordReference}: ',
     },
   },
   hints: {

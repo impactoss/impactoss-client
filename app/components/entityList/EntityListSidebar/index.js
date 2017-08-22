@@ -79,6 +79,12 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     // console.log('activePanel',this.props.activePanel !== nextProps.activePanel)
     // console.log('state',!isEqual(this.state, nextState));
     // TODO consider targeting specific query params, eg where, without, cat, catx but also recommendations, etc
+    if (nextProps.listUpdating && isEqual(this.state, nextState)) {
+      return false;
+    }
+    if (this.props.listUpdating && !nextProps.listUpdating) {
+      return true;
+    }
     return this.props.locationQuery !== nextProps.locationQuery
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.activePanel !== nextProps.activePanel
@@ -288,6 +294,7 @@ EntityListSidebar.propTypes = {
   onPanelSelect: PropTypes.func.isRequired,
   formatLabel: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
+  listUpdating: PropTypes.bool,
 };
 
 EntityListSidebar.contextTypes = {

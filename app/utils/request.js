@@ -48,11 +48,13 @@ export function checkResponseError(error) {
       messages: checkErrorMessagesExist(error.response),
       statusText: error.response.statusText,
       status: error.response.status,
+      error,
     }
     : {
       messages: [],
       statusText: 'Error without response',
       status: 0,
+      error,
     };
 }
 

@@ -41,6 +41,7 @@ export const makeAttributeEditOptions = (entities, config, activeEditOption, mes
     selectedCount: entities.size,
     multiple: false,
     required: true,
+    selectAll: false,
   };
 
   const option = find(config.attributes.options, (o) => o.attribute === activeEditOption.optionId);
@@ -75,6 +76,7 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
     selectedCount: entities.size,
     multiple: true,
     required: false,
+    selectAll: true,
   };
 
   const taxonomy = taxonomies.get(activeEditOption.optionId);
@@ -108,6 +110,7 @@ export const makeConnectionEditOptions = (entities, config, connections, connect
     multiple: true,
     required: false,
     advanced: true,
+    selectAll: true,
     tagFilterGroups: option && makeTagFilterGroups(connectedTaxonomies),
   };
 

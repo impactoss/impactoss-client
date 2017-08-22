@@ -63,12 +63,14 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           <NavAccount>
             {isSignedIn &&
               <span>
-                <LinkAccount
-                  href={`/users/${this.props.userId}`}
-                  onClick={(evt) => this.onClick(evt, `/users/${this.props.userId}`)}
-                >
-                  <FormattedMessage {...messages.user} />
-                </LinkAccount>
+                {this.props.userId &&
+                  <LinkAccount
+                    href={`/users/${this.props.userId}`}
+                    onClick={(evt) => this.onClick(evt, `/users/${this.props.userId}`)}
+                  >
+                    <FormattedMessage {...messages.user} />
+                  </LinkAccount>
+                }
                 <LinkAccount href={'/logout'} onClick={(evt) => this.onClick(evt, '/logout')}>
                   <FormattedMessage {...messages.logout} />
                 </LinkAccount>

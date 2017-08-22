@@ -25,6 +25,7 @@ const MultiSelectControl = (props) => {
     onCancel,
     panelId,
     advanced,
+    selectAll,
     tagFilterGroups,
      ...otherProps
   } = props;
@@ -49,6 +50,7 @@ const MultiSelectControl = (props) => {
         onCancel,
         panelId,
         advanced,
+        selectAll,
         tagFilterGroups,
       }}
       {...otherProps}
@@ -62,6 +64,7 @@ MultiSelectControl.propTypes = {
   multiple: PropTypes.bool,
   required: PropTypes.bool,
   search: PropTypes.bool,
+  selectAll: PropTypes.bool,
   advanced: PropTypes.bool,
   options: PropTypes.instanceOf(List),
   title: PropTypes.string,

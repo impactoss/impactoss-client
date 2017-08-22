@@ -56,6 +56,7 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
           { this.props.viewDomain.form &&
             <AuthForm
               model="userPasswordReset.form.data"
+              sending={resetSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}

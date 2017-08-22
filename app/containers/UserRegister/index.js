@@ -64,6 +64,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
           { this.props.viewDomain.form &&
             <AuthForm
               model="userRegister.form.data"
+              sending={registerSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData)}
               handleCancel={this.props.handleCancel}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
