@@ -79,6 +79,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       entityTitle,
       dataReady,
       isManager,
+      isContributor,
       formatLabel,
       onGroupSelect,
       onSubgroupSelect,
@@ -171,6 +172,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     config={config}
                     entityIcon={entityIcon}
                     isManager={isManager}
+                    isContributor={isContributor}
                     onExpand={onExpand}
                     expandNo={expandNo}
                     onPageItemsSelect={(no) => {
@@ -211,6 +213,7 @@ EntityListMain.propTypes = {
   // primitive
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
+  isContributor: PropTypes.bool,
   entityIcon: PropTypes.func,
   // functions
   formatLabel: PropTypes.func.isRequired,

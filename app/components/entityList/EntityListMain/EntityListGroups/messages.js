@@ -14,4 +14,14 @@ export default defineMessages({
     id: 'app.containers.EntityListGroups.listEmptyAfterQuery',
     defaultMessage: 'We are sorry, no results matched your search!',
   },
+  nestedListEmpty: {
+    reports: {
+      id: 'app.containers.EntityListGroups.nestedListEmpty.reports',
+      defaultMessage: 'No reports present',
+    },
+    indicatorsExpanded: {
+      id: 'app.containers.EntityListGroups.nestedListEmpty.indicatorsExpanded',
+      defaultMessage: 'No indicators present',
+    },
+  },
 });

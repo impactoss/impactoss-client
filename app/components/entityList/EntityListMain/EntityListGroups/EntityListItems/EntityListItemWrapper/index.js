@@ -7,6 +7,7 @@ import { Map, List } from 'immutable';
 import EntityListItem from './EntityListItem';
 import EntityListNestedList from './EntityListNestedList';
 import EntityListNestedReportList from './EntityListNestedList/EntityListNestedReportList';
+import EntityListNestedNoItem from './EntityListNestedList/EntityListNestedItem/EntityListNestedNoItem';
 
 const ItemWrapper = styled.div`
   border-top: 1px solid;
@@ -29,6 +30,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
   render() {
     const {
       isManager,
+      isContributor,
       onEntitySelect,
       expandNo,
       onExpand,
@@ -68,6 +70,12 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
               entityPath={entityPath}
               wrapper={this.state.wrapper}
             />
+            {config.expandableColumns
+              && expandNo > 0
+              && entity.get('expanded')
+              && (!entity.get(entity.get('expanded')) || entity.get(entity.get('expanded')).size === 0) &&
+              <EntityListNestedNoItem type={entity.get('expanded')} />
+            }
             {config.expandableColumns && expandNo > 0 && entity.get('expanded') && entity.get('expanded') !== 'reports' &&
               <EntityListNestedList
                 entities={
@@ -80,6 +88,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
                 expandNo={expandNo}
                 onExpand={onExpand}
                 onEntityClick={onEntityClick}
+                isContributor={isContributor}
               />
             }
             {expandNo > 0 && entity.get('expanded') && entity.get('expanded') === 'reports' && entity.get('reports') &&
@@ -87,6 +96,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
                 reports={entity.get('reports').toList()}
                 dates={entity.get('dates')}
                 onEntityClick={onEntityClick}
+                isContributor={isContributor}
               />
             }
           </div>
@@ -103,6 +113,7 @@ EntityListItemWrapper.propTypes = {
   entityIdsSelected: PropTypes.instanceOf(List),
   config: PropTypes.object,
   isManager: PropTypes.bool,
+  isContributor: PropTypes.bool,
   onEntityClick: PropTypes.func,
   onEntitySelect: PropTypes.func,
   onExpand: PropTypes.func,

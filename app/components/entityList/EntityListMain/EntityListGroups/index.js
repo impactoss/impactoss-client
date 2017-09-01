@@ -115,6 +115,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       entityIcon,
       onEntityClick,
       isManager,
+      isContributor,
       onEntitySelect,
       onExpand,
       expandNo,
@@ -257,6 +258,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                         entityIcon={entityIcon}
                         onEntityClick={onEntityClick}
                         isManager={isManager}
+                        isContributor={isContributor}
                         onEntitySelect={onEntitySelect}
                         expandNo={expandNo}
                         onExpand={onExpand}
@@ -291,6 +293,7 @@ EntityListGroups.propTypes = {
   config: PropTypes.object,
   entityIcon: PropTypes.func,
   isManager: PropTypes.bool,
+  isContributor: PropTypes.bool,
   expandNo: PropTypes.number,
   onExpand: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,

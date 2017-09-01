@@ -28,6 +28,7 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
       onExpand,
       onEntityClick,
       expandNo,
+      isContributor,
     } = this.props;
 
     // const entityIcon = config.expandableColumns[nestLevel - 1].icon;
@@ -49,6 +50,7 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
                   reports={entity.get('reports').toList()}
                   dates={entity.get('dates')}
                   onEntityClick={onEntityClick}
+                  isContributor={isContributor}
                 />
               }
             </ItemWrapper>
@@ -66,6 +68,7 @@ EntityListNestedList.propTypes = {
   expandNo: PropTypes.number,
   onExpand: PropTypes.func,
   onEntityClick: PropTypes.func,
+  isContributor: PropTypes.bool,
 };
 
 export default EntityListNestedList;
