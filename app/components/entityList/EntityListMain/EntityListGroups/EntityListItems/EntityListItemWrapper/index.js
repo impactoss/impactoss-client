@@ -74,7 +74,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
               && expandNo > 0
               && entity.get('expanded')
               && (!entity.get(entity.get('expanded')) || entity.get(entity.get('expanded')).size === 0) &&
-              <EntityListNestedNoItem type={entity.get('expanded')} />
+              <EntityListNestedNoItem type={entity.get('expanded')} nestLevel={1} />
             }
             {config.expandableColumns && expandNo > 0 && entity.get('expanded') && entity.get('expanded') !== 'reports' &&
               <EntityListNestedList
@@ -97,6 +97,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
                 dates={entity.get('dates')}
                 onEntityClick={onEntityClick}
                 isContributor={isContributor}
+                nestLevel={1}
               />
             }
           </div>

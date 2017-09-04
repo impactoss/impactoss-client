@@ -6,6 +6,10 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  draft: {
+    id: 'app.containers.EntityListGroups.draft',
+    defaultMessage: 'draft',
+  },
   listEmpty: {
     id: 'app.containers.EntityListGroups.listEmpty',
     defaultMessage: 'No entities in database',
@@ -17,11 +21,11 @@ export default defineMessages({
   nestedListEmpty: {
     reports: {
       id: 'app.containers.EntityListGroups.nestedListEmpty.reports',
-      defaultMessage: 'No reports present',
+      defaultMessage: 'No report yet',
     },
     indicatorsExpanded: {
       id: 'app.containers.EntityListGroups.nestedListEmpty.indicatorsExpanded',
-      defaultMessage: 'No indicators present',
+      defaultMessage: 'No indicator yet',
     },
   },
 });

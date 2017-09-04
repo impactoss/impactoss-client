@@ -15,7 +15,7 @@ const ChildItems = styled.span`
 export class EntityListNestedReportList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { reports, dates, onEntityClick, isContributor } = this.props;
+    const { reports, dates, onEntityClick, isContributor, nestLevel } = this.props;
     return (
       <ChildItems>
         { isContributor && dates &&
@@ -24,7 +24,7 @@ export class EntityListNestedReportList extends React.PureComponent { // eslint-
           />
         }
         { reports.size === 0 &&
-          <EntityListNestedNoItem type="reports" />
+          <EntityListNestedNoItem type="reports" nestLevel={nestLevel} />
         }
         {
           reports.map((report, i) =>
@@ -45,6 +45,7 @@ EntityListNestedReportList.propTypes = {
   dates: PropTypes.instanceOf(Map),
   onEntityClick: PropTypes.func,
   isContributor: PropTypes.bool,
+  nestLevel: PropTypes.number,
 };
 
 export default EntityListNestedReportList;

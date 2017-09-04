@@ -51,6 +51,7 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
                   dates={entity.get('dates')}
                   onEntityClick={onEntityClick}
                   isContributor={isContributor}
+                  nestLevel={nestLevel + 1}
                 />
               }
             </ItemWrapper>

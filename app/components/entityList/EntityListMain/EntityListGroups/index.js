@@ -136,7 +136,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     let entityIdsOnPage;
     let entityGroupsPaged;
     let pager;
-
     // grouping and paging
     // if grouping required
     if (groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET) {
@@ -240,6 +239,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             entityIcon={entityIcon}
                             onEntityClick={onEntityClick}
                             isManager={isManager}
+                            isContributor={isContributor}
                             onEntitySelect={onEntitySelect}
                             expandNo={expandNo}
                             onExpand={onExpand}
