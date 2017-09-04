@@ -43,7 +43,12 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
         href={`/reports/${report.get('id')}`}
       >
         <Top>
-          {report.getIn(['attributes', 'updated_at']) &&
+          {report.get('date') &&
+            <Reference>
+              { this.context.intl && this.context.intl.formatDate(new Date(report.getIn(['date', 'attributes', 'due_date'])))}
+            </Reference>
+          }
+          {!report.get('date') && report.getIn(['attributes', 'updated_at']) &&
             <Reference>
               { this.context.intl && this.context.intl.formatDate(new Date(report.getIn(['attributes', 'updated_at'])))}
             </Reference>
