@@ -10,13 +10,13 @@ import appMessages from 'containers/App/messages';
 
 const Styled = styled.div`
   position: relative;
-  font-weight: bold;
-  padding: 5px 10px;
+  padding: 10px 15px;
   background-color: ${palette('primary', 4)};
   color:  ${(props) => props.overdue ? palette('reports', 0) : palette('light', 4)};
+  margin-bottom: 1px;
 `;
 const Status = styled.div`
-  font-size: 1.2em;
+  font-size: 1em;
   color:  ${(props) => props.unscheduled ? palette('light', 3) : 'inherit'};
 `;
 const DueDate = styled.div`

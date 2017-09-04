@@ -99,7 +99,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
       reference: entity.getIn(['attributes', 'reference']) || entity.get('id'),
-      status: entity.getIn(['attributes', 'draft']) ? 'draft' : null,
+      draft: entity.getIn(['attributes', 'draft']),
       path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
       entityIcon: entityIcon && entityIcon(entity),
       tags: taxonomies

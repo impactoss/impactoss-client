@@ -4,8 +4,9 @@ import PropTypes from 'prop-types';
 import Component from 'components/styled/Component';
 import Icon from 'components/Icon';
 
+import EntityListItemStatus from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems/EntityListItemStatus';
+
 import EntityListItemMainTopReference from './EntityListItemMainTopReference';
-import EntityListItemMainTopStatus from './EntityListItemMainTopStatus';
 import EntityListItemMainTopIcon from './EntityListItemMainTopIcon';
 
 export default class EntityListItemMainTop extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -29,7 +30,7 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
             <Icon name={entity.entityIcon} text iconRight />
           </EntityListItemMainTopIcon>
         }
-        <EntityListItemMainTopStatus>{entity.status}</EntityListItemMainTopStatus>
+        <EntityListItemStatus draft={entity.draft} />
       </Component>
     );
   }

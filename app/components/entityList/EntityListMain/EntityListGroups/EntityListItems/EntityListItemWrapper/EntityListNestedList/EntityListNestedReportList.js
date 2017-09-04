@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Map, List } from 'immutable';
 import EntityListNestedReportItem from './EntityListNestedItem/EntityListNestedReportItem';
 import EntityListNestedReportDateItem from './EntityListNestedItem/EntityListNestedReportDateItem';
+import EntityListNestedNoItem from './EntityListNestedItem/EntityListNestedNoItem';
 
 const ChildItems = styled.span`
   display: inline-block;
@@ -14,13 +15,16 @@ const ChildItems = styled.span`
 export class EntityListNestedReportList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { reports, dates, onEntityClick } = this.props;
+    const { reports, dates, onEntityClick, isContributor, nestLevel } = this.props;
     return (
       <ChildItems>
-        { dates &&
+        { isContributor && dates &&
           <EntityListNestedReportDateItem
             dates={dates}
           />
+        }
+        { reports.size === 0 &&
+          <EntityListNestedNoItem type="reports" nestLevel={nestLevel} />
         }
         {
           reports.map((report, i) =>
@@ -40,6 +44,8 @@ EntityListNestedReportList.propTypes = {
   reports: PropTypes.instanceOf(List),
   dates: PropTypes.instanceOf(Map),
   onEntityClick: PropTypes.func,
+  isContributor: PropTypes.bool,
+  nestLevel: PropTypes.number,
 };
 
 export default EntityListNestedReportList;
