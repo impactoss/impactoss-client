@@ -158,6 +158,9 @@ export const entitiesIsAssociated = (entities, entityKey, associations, associat
       && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
     )
   );
+export const entitiesSetSingle = (entities, related, key, relatedKey) =>
+  entities && entities.map((entity) =>
+    entitySetSingle(entity, related, key, relatedKey));
 
 export const entitySetSingle = (entity, related, key, relatedKey) =>
   entity && entity.set(key,
