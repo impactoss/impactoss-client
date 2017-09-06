@@ -281,12 +281,12 @@ function mapDispatchToProps(dispatch) {
     },
     handleSubmitFail: (formData, formatMessage) => {
       if (formData.$form.errors.endDatePresent) {
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', {
           required: true,
         }));
       }
       if (formData.$form.errors.startDatePresent) {
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', {
           required: true,
         }));
       }

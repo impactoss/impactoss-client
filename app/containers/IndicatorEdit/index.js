@@ -321,7 +321,9 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.change(model, formData, { silent: true }));
     },
     resetValidityOnRepeatChange: (repeatModel, repeat, formData) => {
-      dispatch(formActions.resetValidity('indicatorEdit.form.data.attributes.end_date'));
+      dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
+        required: repeat,
+      }));
       dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
         required: repeat && !validateRequired(formData.getIn(['attributes', 'start_date'])),
       }));
@@ -345,8 +347,8 @@ function mapDispatchToProps(dispatch, props) {
         }));
       }
       if (formData.$form.validity.endDatePresent && formData.$form.validity.startDatePresent && formData.$form.errors.endDateAfterStartDate) {
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', formatMessage(appMessages.forms.startDateAfterEndDateError)));
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', formatMessage(appMessages.forms.endDateBeforeStartDateError)));
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', formatMessage(appMessages.forms.startDateAfterEndDateError)));
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', formatMessage(appMessages.forms.endDateBeforeStartDateError)));
       }
       dispatch(submitInvalid(false));
     },
