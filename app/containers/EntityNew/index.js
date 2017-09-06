@@ -11,6 +11,9 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { getEntityFields } from 'utils/forms';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import {
   newEntity,
   submitInvalid,
@@ -34,6 +37,11 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
   componentWillMount() {
     this.props.initialiseForm('entityNew.form.data', FORM_INITIAL);
   }
+  componentWillReceiveProps(nextProps) {
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
+    }
+  }
 
   render() {
     const { viewDomain, path, attributes, inModal } = this.props;
@@ -41,7 +49,10 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
 
     return (
       <div>
-        <Content noPaddingBottom={inModal}>
+        <Content
+          innerRef={(node) => { this.ScrollContainer = node; }}
+          noPaddingBottom={inModal}
+        >
           <ContentHeader
             title={this.context.intl.formatMessage(messages[path].pageTitle)}
             type={CONTENT_MODAL}

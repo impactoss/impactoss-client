@@ -32,6 +32,9 @@ import {
   getMetaField,
 } from 'utils/fields';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -93,6 +96,9 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     //
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
+    }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
     }
   }
 
@@ -178,7 +184,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}

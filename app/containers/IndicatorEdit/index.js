@@ -33,6 +33,9 @@ import {
   getMetaField,
 } from 'utils/fields';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
 import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
@@ -59,6 +62,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
+
 
 import {
   selectDomain,
@@ -93,7 +97,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       this.props.redirectIfNotPermitted();
       this.props.initialiseForm('indicatorEdit.form.data', this.getInitialFormData(nextProps));
     }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
+    }
   }
+
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
@@ -180,7 +188,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
