@@ -598,14 +598,26 @@ export default defineMessages({
       },
       overdue: {
         id: 'app.containers.App.entities.due_dates.overdue',
-        defaultMessage: 'Next report overdue',
+        defaultMessage: 'Report overdue',
       },
       due: {
         id: 'app.containers.App.entities.due_dates.due',
-        defaultMessage: 'Next report due',
+        defaultMessage: 'Report due',
       },
       scheduled: {
-        id: 'app.containers.App.entities.due_dates.due',
+        id: 'app.containers.App.entities.due_dates.scheduled',
+        defaultMessage: 'Report scheduled',
+      },
+      overdueNext: {
+        id: 'app.containers.App.entities.due_dates.overdueNext',
+        defaultMessage: 'Next report overdue',
+      },
+      dueNext: {
+        id: 'app.containers.App.entities.due_dates.dueNext',
+        defaultMessage: 'Next report due',
+      },
+      scheduledNext: {
+        id: 'app.containers.App.entities.due_dates.scheduledNext',
         defaultMessage: 'Next report scheduled',
       },
       showAll: {
