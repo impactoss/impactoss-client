@@ -21,6 +21,9 @@ import {
   getFormField,
 } from 'utils/forms';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -72,6 +75,9 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     if (nextProps.dataReady && !this.props.dataReady) {
       this.props.redirectIfNotPermitted();
     }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
+    }
   }
 
   getHeaderMainFields = () => ([ // fieldGroups
@@ -91,7 +97,12 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   getBodyAsideFields = (users, isAdmin, taxonomy) => {
     const fields = []; // fieldGroups
     fields.push({
-      fields: [getFormField(this.context.intl.formatMessage, appMessages, 'url', 'url')],
+      fields: [getFormField({
+        formatMessage: this.context.intl.formatMessage,
+        appMessages,
+        controlType: 'url',
+        attribute: 'url',
+      })],
     });
     if (isAdmin && !!taxonomy.getIn(['attributes', 'has_manager'])) {
       fields.push({
@@ -127,11 +138,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
-            icon="measures"
+            icon="categories"
             buttons={
               dataReady ? [{
                 type: 'cancel',

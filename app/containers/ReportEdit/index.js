@@ -26,6 +26,9 @@ import {
   getMetaField,
 } from 'utils/fields';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -75,6 +78,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
       this.props.initialiseForm('reportEdit.form.data', this.getInitialFormData(nextProps));
+    }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
     }
   }
 
@@ -156,7 +162,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}

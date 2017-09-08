@@ -27,6 +27,9 @@ import {
   getMarkdownField,
 } from 'utils/forms';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import {
   getMetaField,
 } from 'utils/fields';
@@ -83,6 +86,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.redirectIfNotPermitted();
       this.props.initialiseForm('recommendationEdit.form.data', this.getInitialFormData(nextProps));
+    }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
     }
   }
 
@@ -156,7 +162,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}

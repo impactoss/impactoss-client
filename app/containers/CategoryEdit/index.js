@@ -27,6 +27,9 @@ import {
   getMetaField,
 } from 'utils/fields';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -82,6 +85,9 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       this.props.redirectIfNotPermitted();
       this.props.initialiseForm('categoryEdit.form.data', this.getInitialFormData(nextProps));
     }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
+    }
   }
 
   getInitialFormData = (nextProps) => {
@@ -120,7 +126,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   getBodyAsideFields = (entity, users, isAdmin) => {
     const fields = []; // fieldGroups
     fields.push({
-      fields: [getFormField(this.context.intl.formatMessage, appMessages, 'url', 'url')],
+      fields: [getFormField({
+        formatMessage: this.context.intl.formatMessage,
+        appMessages,
+        controlType: 'url',
+        attribute: 'url',
+      })],
     });
     if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({
@@ -149,7 +160,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}

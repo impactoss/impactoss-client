@@ -18,6 +18,9 @@ import {
   getMenuOrderFormField,
 } from 'utils/forms';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -58,6 +61,9 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
     if (nextProps.dataReady && !this.props.dataReady) {
       this.props.redirectIfNotPermitted();
     }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
+    }
   }
 
   getHeaderMainFields = () => ([ // fieldGroups
@@ -93,7 +99,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
             },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}

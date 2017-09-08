@@ -61,17 +61,17 @@ class EntityListNestedReportDateItem extends React.PureComponent { // eslint-dis
             <Status>
               { overdue &&
                 <span>
-                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.overdue)}
+                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.overdueNext)}
                 </span>
               }
               { due &&
                 <span>
-                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.due)}
+                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.dueNext)}
                 </span>
               }
               { !overdue && !due &&
                 <span>
-                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.scheduled)}
+                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.scheduledNext)}
                 </span>
               }
             </Status>

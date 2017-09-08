@@ -27,6 +27,9 @@ import {
   getRoleField,
 } from 'utils/fields';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import {
   loadEntitiesIfNeeded,
   updatePath,
@@ -76,6 +79,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     }
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
+    }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
     }
   }
 
@@ -136,7 +142,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
