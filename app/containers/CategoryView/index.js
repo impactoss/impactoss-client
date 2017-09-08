@@ -165,7 +165,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             icon="categories"
             buttons={buttons}
           />
-          { !category && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
           { !category && dataReady &&
