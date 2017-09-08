@@ -126,7 +126,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   getBodyAsideFields = (entity, users, isAdmin) => {
     const fields = []; // fieldGroups
     fields.push({
-      fields: [getFormField(this.context.intl.formatMessage, appMessages, 'url', 'url')],
+      fields: [getFormField({
+        formatMessage: this.context.intl.formatMessage,
+        appMessages,
+        controlType: 'url',
+        attribute: 'url',
+      })],
     });
     if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({

@@ -350,41 +350,80 @@ export const getDueDateOptionsField = (formatMessage, appMessages, formatDate, d
 });
 
 export const getTitleFormField = (formatMessage, appMessages, controlType = 'title', attribute = 'title') =>
-  getFormField(formatMessage, appMessages, controlType, attribute, true);
-
-export const getReferenceFormField = (formatMessage, appMessages, required = false, isAutoReference = false) =>
-  getFormField(
+  getFormField({
     formatMessage,
     appMessages,
-    'short',
-    'reference',
+    controlType,
+    attribute,
+    required: true,
+  });
+
+export const getReferenceFormField = (formatMessage, appMessages, required = false, isAutoReference = false) =>
+  getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'short',
+    attribute: 'reference',
     required,
-    required ? 'reference' : 'referenceOptional',
-    'reference',
-    isAutoReference ? formatMessage(appMessages.hints.autoReference) : null
-  );
+    label: required ? 'reference' : 'referenceOptional',
+    hint: isAutoReference ? formatMessage(appMessages.hints.autoReference) : null,
+  });
 
 export const getShortTitleFormField = (formatMessage, appMessages) =>
-  getFormField(formatMessage, appMessages, 'short', 'short_title');
+  getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'short',
+    attribute: 'short_title',
+  });
 
 export const getMenuTitleFormField = (formatMessage, appMessages) =>
-  getFormField(formatMessage, appMessages, 'short', 'menu_title', true); // required
+  getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'short',
+    attribute: 'menu_title',
+    required: true,
+  });
 
 export const getMenuOrderFormField = (formatMessage, appMessages) => {
-  const field = getFormField(formatMessage, appMessages, 'short', 'order', false); // required
+  const field = getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'short',
+    attribute: 'order',
+  });
   field.validators.number = validateNumber;
   field.errorMessages.number = formatMessage(appMessages.forms.numberError);
   return field;
 };
 
 export const getMarkdownField = (formatMessage, appMessages, attribute = 'description') =>
-  getFormField(formatMessage, appMessages, 'markdown', attribute);
+  getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'markdown',
+    attribute,
+  });
 
 export const getTextareaField = (formatMessage, appMessages, attribute = 'description') =>
-  getFormField(formatMessage, appMessages, 'textarea', attribute);
+  getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'textarea',
+    attribute,
+  });
 
-export const getDateField = (formatMessage, appMessages, attribute, required = false, label) => {
-  const field = getFormField(formatMessage, appMessages, 'date', attribute, required, label, 'date');
+export const getDateField = (formatMessage, appMessages, attribute, required = false, label, onChange) => {
+  const field = getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'date',
+    attribute,
+    required,
+    label,
+    onChange,
+  });
   field.validators.date = validateDateFormat;
   field.errorMessages.date = formatMessage(appMessages.forms.dateFormatError);
   return field;
@@ -401,12 +440,34 @@ export const getCheckboxField = (formatMessage, appMessages, attribute, entity, 
   });
 
 export const getUploadField = (formatMessage, appMessages) =>
-  getFormField(formatMessage, appMessages, 'uploader', 'document_url', false, 'document_url', 'url');
+  getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'uploader',
+    attribute: 'document_url',
+    placeholder: 'url',
+  });
 
 export const getEmailField = (formatMessage, appMessages) =>
-  getFormField(formatMessage, appMessages, 'email', 'email', true);
+  getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'email',
+    attribute: 'email',
+    required: true,
+  });
 
-export const getFormField = (formatMessage, appMessages, controlType, attribute, required, label, placeholder, hint) => {
+export const getFormField = ({
+  formatMessage,
+  appMessages,
+  controlType,
+  attribute,
+  required,
+  label,
+  placeholder,
+  hint,
+  onChange,
+}) => {
   const field = {
     id: attribute,
     controlType,
@@ -417,6 +478,9 @@ export const getFormField = (formatMessage, appMessages, controlType, attribute,
     errorMessages: {},
     hint,
   };
+  if (onChange) {
+    field.changeAction = onChange;
+  }
   if (required) {
     field.validators.required = typeof required === 'function' ? required : validateRequired;
     field.errorMessages.required = formatMessage(appMessages.forms.fieldRequired);
@@ -439,7 +503,12 @@ const getCategoryFields = (args, formatMessage, appMessages) => ({
       fields: [getMarkdownField(formatMessage, appMessages)],
     }],
     aside: [{
-      fields: [getFormField(formatMessage, appMessages, 'url', 'url')],
+      fields: [getFormField({
+        formatMessage,
+        appMessages,
+        controlType: 'url',
+        attribute: 'url',
+      })],
     }],
   },
 });
@@ -468,7 +537,12 @@ const getMeasureFields = (args, formatMessage, appMessages) => ({
     aside: [{
       fields: [
         getDateField(formatMessage, appMessages, 'target_date'),
-        getFormField(formatMessage, appMessages, 'textarea', 'target_date_comment'),
+        getFormField({
+          formatMessage,
+          appMessages,
+          controlType: 'textarea',
+          attribute: 'target_date_comment',
+        }),
       ],
     }],
   },

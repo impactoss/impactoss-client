@@ -162,10 +162,30 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
       icon: 'reminder',
       fields: [
-        getDateField(this.context.intl.formatMessage, appMessages, 'start_date', repeat, repeat ? 'start_date' : 'start_date_only'),
-        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat', entity, (model, value) => this.props.resetValidityOnRepeatChange(model, value, this.props.viewDomain.form.data)),
+        getDateField(
+          this.context.intl.formatMessage,
+          appMessages,
+          'start_date',
+          repeat,
+          repeat ? 'start_date' : 'start_date_only',
+          (model, value) => this.props.onStartDateChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
+        ),
+        getCheckboxField(
+          this.context.intl.formatMessage,
+          appMessages,
+          'repeat',
+          entity,
+          (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
+        ),
         repeat ? getFrequencyField(this.context.intl.formatMessage, appMessages, entity) : null,
-        repeat ? getDateField(this.context.intl.formatMessage, appMessages, 'end_date', repeat)
+        repeat ? getDateField(
+          this.context.intl.formatMessage,
+          appMessages,
+          'end_date',
+          repeat,
+          'end_date',
+          (model, value) => this.props.onEndDateChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
+        )
         : null,
         renderUserControl(
           users,
@@ -288,8 +308,10 @@ IndicatorEdit.propTypes = {
   sdgtargets: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
-  resetValidityOnRepeatChange: PropTypes.func,
+  onRepeatChange: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
+  onStartDateChange: PropTypes.func,
+  onEndDateChange: PropTypes.func,
 };
 
 IndicatorEdit.contextTypes = {
@@ -320,14 +342,64 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.reset(model));
       dispatch(formActions.change(model, formData, { silent: true }));
     },
-    resetValidityOnRepeatChange: (repeatModel, repeat, formData) => {
-      dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
-        required: repeat,
-      }));
-      dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
-        required: repeat && !validateRequired(formData.getIn(['attributes', 'start_date'])),
-      }));
+    onRepeatChange: (repeatModel, repeat, formData, formatMessage) => {
+      // reset repeat erros when repeat turned off
+      if (!repeat) {
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
+          required: false,
+          startDateAfterEndDateError: false,
+        }));
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
+          required: false,
+          endDateBeforeStartDateError: false,
+        }));
+      } else if (validateRequired(formData.getIn(['attributes', 'start_date']))
+        && validateRequired(formData.getIn(['attributes', 'end_date']))
+        && !validateDateAfterDate(formData.getIn(['attributes', 'end_date']), formData.getIn(['attributes', 'start_date']))
+      ) {
+        dispatch(formActions.setErrors(
+          'indicatorEdit.form.data.attributes.start_date',
+          { startDateAfterEndDateError: formatMessage(appMessages.forms.startDateAfterEndDateError) }
+        ));
+        dispatch(formActions.setErrors(
+          'indicatorEdit.form.data.attributes.end_date',
+          { endDateBeforeStartDateError: formatMessage(appMessages.forms.endDateBeforeStartDateError) }
+        ));
+      }
       dispatch(formActions.change(repeatModel, repeat));
+    },
+    onStartDateChange: (dateModel, dateValue, formData, formatMessage) => {
+      // validateDateAfterDate if repeat and both dates present
+      if (formData.getIn(['attributes', 'repeat'])
+        && validateRequired(formData.getIn(['attributes', 'end_date']))
+        && validateRequired(dateValue)
+        && !validateDateAfterDate(formData.getIn(['attributes', 'end_date']), dateValue)
+      ) {
+        dispatch(formActions.setErrors(
+          'indicatorEdit.form.data.attributes.start_date',
+          { startDateAfterEndDateError: formatMessage(appMessages.forms.startDateAfterEndDateError) }
+        ));
+      } else {
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', { startDateAfterEndDateError: false }));
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', { endDateBeforeStartDateError: false }));
+      }
+      dispatch(formActions.change(dateModel, dateValue));
+    },
+    onEndDateChange: (dateModel, dateValue, formData, formatMessage) => {
+      if (formData.getIn(['attributes', 'repeat'])
+        && validateRequired(dateValue)
+        && validateRequired(formData.getIn(['attributes', 'start_date']))
+        && !validateDateAfterDate(dateValue, formData.getIn(['attributes', 'start_date']))
+      ) {
+        dispatch(formActions.setErrors(
+          'indicatorEdit.form.data.attributes.end_date',
+          { endDateBeforeStartDateError: formatMessage(appMessages.forms.endDateBeforeStartDateError) }
+        ));
+      } else {
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', { endDateBeforeStartDateError: false }));
+        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', { startDateAfterEndDateError: false }));
+      }
+      dispatch(formActions.change(dateModel, dateValue));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));

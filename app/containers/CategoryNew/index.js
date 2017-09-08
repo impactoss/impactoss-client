@@ -97,7 +97,12 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   getBodyAsideFields = (users, isAdmin, taxonomy) => {
     const fields = []; // fieldGroups
     fields.push({
-      fields: [getFormField(this.context.intl.formatMessage, appMessages, 'url', 'url')],
+      fields: [getFormField({
+        formatMessage: this.context.intl.formatMessage,
+        appMessages,
+        controlType: 'url',
+        attribute: 'url',
+      })],
     });
     if (isAdmin && !!taxonomy.getIn(['attributes', 'has_manager'])) {
       fields.push({
@@ -137,7 +142,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
-            icon="measures"
+            icon="categories"
             buttons={
               dataReady ? [{
                 type: 'cancel',

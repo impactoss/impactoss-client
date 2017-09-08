@@ -124,7 +124,12 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     { // fieldGroup
       fields: [
         getDateField(this.context.intl.formatMessage, appMessages, 'target_date'),
-        getFormField(this.context.intl.formatMessage, appMessages, 'textarea', 'target_date_comment'),
+        getFormField({
+          formatMessage: this.context.intl.formatMessage,
+          appMessages,
+          controlType: 'textarea',
+          attribute: 'target_date_comment',
+        }),
       ],
     },
     { // fieldGroup
