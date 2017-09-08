@@ -8,10 +8,16 @@ import { fromJS } from 'immutable';
 export const SAVE = 'nmrf/CategoryEdit/SAVE';
 
 export const DEPENDENCIES = [
+  'measures',
+  'sdgtargets',
+  'recommendations',
   'users',
   'user_roles',
   'categories',
   'taxonomies',
+  'measure_categories',
+  'sdgtarget_categories',
+  'recommendation_categories',
 ];
 
 export const FORM_INITIAL = fromJS({
@@ -25,5 +31,8 @@ export const FORM_INITIAL = fromJS({
     taxonomy_id: '',
     reference: '',
   },
+  associatedSdgTargets: [],
+  associatedMeasures: [],
+  associatedRecommendations: [],
   associatedUser: [],
 });

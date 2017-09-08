@@ -306,10 +306,10 @@ IndicatorEdit.propTypes = {
   params: PropTypes.object,
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
+  connectedTaxonomies: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
   onRepeatChange: PropTypes.func,
-  connectedTaxonomies: PropTypes.object,
   onStartDateChange: PropTypes.func,
   onEndDateChange: PropTypes.func,
 };
@@ -325,8 +325,8 @@ const mapStateToProps = (state, props) => ({
   viewEntity: selectViewEntity(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
-  users: selectUsers(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
+  users: selectUsers(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
