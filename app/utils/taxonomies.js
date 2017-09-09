@@ -34,7 +34,9 @@ export const mapToCategoryList = (categories, onLink, countAttributes) =>
     reference: cat.getIn(['attributes', 'reference']) && cat.getIn(['attributes', 'reference']).trim() !== ''
       ? cat.getIn(['attributes', 'reference'])
       : null,
-    title: cat.getIn(['attributes', 'title']),
+    title: cat.getIn(['attributes', 'user_only'])
+      ? `${cat.getIn(['attributes', 'title'])} (applicable to users only)`
+      : cat.getIn(['attributes', 'title']),
     onLink: () => onLink(`/category/${cat.get('id')}`),
     counts: countAttributes
       ? countAttributes.map((countAttribute) => cat.get(countAttribute.attribute))

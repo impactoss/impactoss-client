@@ -136,4 +136,10 @@ injectGlobal`
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.85);
   }
+
+  [type="checkbox"] {
+    vertical-align: middle;
+    position: relative;
+    bottom: 1px;
+  }
 `;

@@ -89,6 +89,10 @@ export default defineMessages({
       id: 'app.containers.App.hints.autoReference',
       defaultMessage: 'Leave blank to assign database id',
     },
+    user_only: {
+      id: 'app.containers.App.hints.user_only',
+      defaultMessage: 'Categorise users only',
+    },
   },
   placeholders: {
     title: {
@@ -296,6 +300,10 @@ export default defineMessages({
     due_date_id_empty: {
       id: 'app.containers.App.attributes.due_date_id_empty',
       defaultMessage: 'No report scheduled',
+    },
+    user_only: {
+      id: 'app.containers.App.attributes.user_only',
+      defaultMessage: 'Users only',
     },
     manager_id: {
       indicators: {

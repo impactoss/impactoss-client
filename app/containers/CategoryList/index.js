@@ -109,7 +109,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 <CategoryListItems
                   taxonomy={taxonomy}
                   reference={reference}
-                  categories={categories}
+                  categories={categories.filter((cat) => !cat.getIn(['attributes', 'user_only']) || isManager)}
                   onPageLink={onPageLink}
                   onSort={this.props.onSort}
                   sortOptions={SORT_OPTIONS}

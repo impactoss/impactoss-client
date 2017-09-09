@@ -81,25 +81,37 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       ],
     }]);
 
-  getBodyMainFields = (entity, recommendations, measures, taxonomies, sdgtargets, onEntityClick, sdgtargetConnections, measureConnections, recommendationConnections) => ([
-    {
-      fields: [
-        getMarkdownField(entity, 'description', true, appMessages),
-      ],
-    },
-    {
-      label: appMessages.entities.connections.plural,
-      icon: 'connections',
-      fields: [
-        entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
-          getMeasureConnectionField(measures, taxonomies, measureConnections, appMessages, onEntityClick),
-        entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
-          getSdgTargetConnectionField(sdgtargets, taxonomies, sdgtargetConnections, appMessages, onEntityClick),
-        entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
-          getRecommendationConnectionField(recommendations, taxonomies, recommendationConnections, appMessages, onEntityClick),
-      ],
-    },
-  ]);
+  getBodyMainFields = (
+    entity,
+    recommendations,
+    measures,
+    taxonomies,
+    sdgtargets,
+    onEntityClick,
+    sdgtargetConnections,
+    measureConnections,
+    recommendationConnections
+  ) => {
+    const fields = [];
+    fields.push({
+      fields: [getMarkdownField(entity, 'description', true, appMessages)],
+    });
+    if (!entity.getIn(['attributes', 'user_only'])) {
+      fields.push({
+        label: appMessages.entities.connections.plural,
+        icon: 'connections',
+        fields: [
+          entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
+            getMeasureConnectionField(measures, taxonomies, measureConnections, appMessages, onEntityClick),
+          entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
+            getSdgTargetConnectionField(sdgtargets, taxonomies, sdgtargetConnections, appMessages, onEntityClick),
+          entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
+            getRecommendationConnectionField(recommendations, taxonomies, recommendationConnections, appMessages, onEntityClick),
+        ],
+      });
+    }
+    return fields;
+  };
 
   getBodyAsideFields = (entity, isManager) => ([
     (entity.getIn(['attributes', 'url']) &&
@@ -181,7 +193,17 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                   aside: this.getHeaderAsideFields(category, isManager),
                 },
                 body: {
-                  main: this.getBodyMainFields(category, recommendations, measures, taxonomies, sdgtargets, onEntityClick, sdgtargetConnections, measureConnections, recommendationConnections),
+                  main: this.getBodyMainFields(
+                    category,
+                    recommendations,
+                    measures,
+                    taxonomies,
+                    sdgtargets,
+                    onEntityClick,
+                    sdgtargetConnections,
+                    measureConnections,
+                    recommendationConnections
+                  ),
                   aside: this.getBodyAsideFields(category, isManager),
                 },
               }}

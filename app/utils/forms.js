@@ -211,7 +211,10 @@ export const getCategoryUpdatesFromFormData = ({ formData, taxonomies, createKey
   }, Map({ delete: List(), create: List() }));
 
 export const getConnectionUpdatesFromFormData = ({ formData, connections, connectionAttribute, createConnectionKey, createKey }) => {
-  const formConnectionIds = getCheckedValuesFromOptions(formData.get(connectionAttribute));
+  const formConnectionIds = formData
+    ? getCheckedValuesFromOptions(formData.get(connectionAttribute))
+    : List();
+
   // store associated Actions as { [action.id]: [association.id], ... }
   const associatedConnections = getAssociatedEntities(connections);
 
@@ -437,6 +440,7 @@ export const getCheckboxField = (formatMessage, appMessages, attribute, entity, 
     label: appMessages.attributes[attribute] && formatMessage(appMessages.attributes[attribute]),
     value: entity && entity.getIn(['attributes', attribute]) ? entity.getIn(['attributes', attribute]) : false,
     changeAction: onChange,
+    hint: appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute]),
   });
 
 export const getUploadField = (formatMessage, appMessages) =>
