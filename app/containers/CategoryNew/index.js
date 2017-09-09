@@ -14,11 +14,15 @@ import { List } from 'immutable';
 
 import {
   renderUserControl,
+  renderMeasureControl,
+  renderSdgTargetControl,
+  renderRecommendationControl,
   getTitleFormField,
   getReferenceFormField,
   getShortTitleFormField,
   getMarkdownField,
   getFormField,
+  getConnectionUpdatesFromFormData,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -36,12 +40,16 @@ import {
   updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import {
   selectReady,
   selectIsUserAdmin,
   selectEntity,
+  selectMeasuresCategorised,
+  selectSdgTargetsCategorised,
+  selectRecommendationsCategorised,
 } from 'containers/App/selectors';
 
 import ErrorMessages from 'components/ErrorMessages';
@@ -53,6 +61,7 @@ import EntityForm from 'components/forms/EntityForm';
 import {
   selectDomain,
   selectUsers,
+  selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
@@ -90,9 +99,23 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     },
   ]);
 
-  getBodyMainFields = () => ([{
-    fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
-  }]);
+  getBodyMainFields = (taxonomy, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption) => ([
+    {
+      fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
+    },
+    {
+      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
+      icon: 'connections',
+      fields: [
+        taxonomy.getIn(['attributes', 'tags_measures']) && measures &&
+          renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+        taxonomy.getIn(['attributes', 'tags_sdgtargets']) && sdgtargets &&
+          renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
+        taxonomy.getIn(['attributes', 'tags_recommendations']) && recommendations &&
+          renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
+      ],
+    },
+  ]);
 
   getBodyAsideFields = (users, isAdmin, taxonomy) => {
     const fields = []; // fieldGroups
@@ -118,7 +141,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   }
 
   render() {
-    const { taxonomy, dataReady, isAdmin, viewDomain, users } = this.props;
+    const { taxonomy, dataReady, isAdmin, viewDomain, users, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
     const taxonomyReference = this.props.params.id;
 
@@ -175,7 +198,10 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               formData={viewDomain.form.data}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
-                taxonomyReference
+                measures,
+                recommendations,
+                sdgtargets,
+                taxonomy
               )}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={() => this.props.handleCancel(taxonomyReference)}
@@ -185,7 +211,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                   main: this.getHeaderMainFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(),
+                  main: this.getBodyMainFields(taxonomy, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption),
                   aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
                 },
               }}
@@ -211,9 +237,14 @@ CategoryNew.propTypes = {
   taxonomy: PropTypes.object,
   params: PropTypes.object,
   users: PropTypes.object,
+  measures: PropTypes.object,
+  sdgtargets: PropTypes.object,
+  recommendations: PropTypes.object,
+  connectedTaxonomies: PropTypes.object,
   initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  onCreateOption: PropTypes.func,
 };
 
 CategoryNew.contextTypes = {
@@ -226,6 +257,10 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomy: selectEntity(state, { path: 'taxonomies', id: props.params.id }),
   users: selectUsers(state),
+  measures: selectMeasuresCategorised(state),
+  sdgtargets: selectSdgTargetsCategorised(state),
+  recommendations: selectRecommendationsCategorised(state),
+  connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -252,8 +287,46 @@ function mapDispatchToProps(dispatch) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, taxonomyReference) => {
-      let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomyReference);
+    handleSubmit: (formData, measures, recommendations, sdgtargets, taxonomy) => {
+      let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomy.get('id'));
+      if (taxonomy.getIn(['attributes', 'tags_measures'])) {
+        saveData = saveData.set(
+          'measureCategories',
+          getConnectionUpdatesFromFormData({
+            formData,
+            connections: measures,
+            connectionAttribute: 'associatedMeasures',
+            createConnectionKey: 'measure_id',
+            createKey: 'category_id',
+          })
+        );
+      }
+      if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
+        saveData = saveData.set(
+          'recommendationCategories',
+          getConnectionUpdatesFromFormData({
+            formData,
+            connections: recommendations,
+            connectionAttribute: 'associatedRecommendations',
+            createConnectionKey: 'recommendation_id',
+            createKey: 'category_id',
+          })
+        );
+      }
+      if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
+        saveData = saveData.set(
+          'sdgtargetCategories',
+          getConnectionUpdatesFromFormData({
+            formData,
+            connections: sdgtargets,
+            connectionAttribute: 'associatedSdgTargets',
+            createConnectionKey: 'sdgtarget_id',
+            createKey: 'category_id',
+          })
+        );
+      }
+
+
       // TODO: remove once have singleselect instead of multiselect
       const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));
       if (List.isList(formUserIds) && formUserIds.size) {
@@ -268,6 +341,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }
