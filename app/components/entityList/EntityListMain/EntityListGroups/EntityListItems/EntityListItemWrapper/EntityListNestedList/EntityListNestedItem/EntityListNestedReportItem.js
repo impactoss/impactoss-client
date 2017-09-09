@@ -48,11 +48,6 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
               { this.context.intl && this.context.intl.formatDate(new Date(report.getIn(['date', 'attributes', 'due_date'])))}
             </Reference>
           }
-          {!report.get('date') && report.getIn(['attributes', 'updated_at']) &&
-            <Reference>
-              { this.context.intl && this.context.intl.formatDate(new Date(report.getIn(['attributes', 'updated_at'])))}
-            </Reference>
-          }
           <EntityListItemStatus draft={report.getIn(['attributes', 'draft'])} />
         </Top>
         <Clear />
