@@ -6,6 +6,7 @@ export const makeFilterGroups = (
   taxonomies,
   connectedTaxonomies,
   activeFilterOption,
+  canFilterDraft,
   messages,
   formatLabel
 ) => {
@@ -79,14 +80,18 @@ export const makeFilterGroups = (
       id: 'attributes', // filterGroupId
       label: messages.attributes,
       show: true,
-      options: reduce(config.attributes.options, (options, option) => ({
-        ...options,
-        [option.attribute]: {
-          id: option.attribute, // filterOptionId
-          label: formatLabel(option.label),
-          active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
-        },
-      }), {}),
+      options: reduce(config.attributes.options, (options, option) =>
+        option.attribute !== 'draft' || (option.attribute === 'draft' && canFilterDraft)
+          ? {
+            ...options,
+            [option.attribute]: {
+              id: option.attribute, // filterOptionId
+              label: formatLabel(option.label),
+              active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
+            },
+          }
+          : options
+      , {}),
     };
   }
 
