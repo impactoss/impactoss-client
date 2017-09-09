@@ -115,6 +115,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               config={this.props.config}
               locationQuery={this.props.locationQuery}
               canEdit={this.props.isManager}
+              canFilterDraft={this.props.isContributor}
               activePanel={this.props.activePanel}
               formatLabel={this.formatLabel}
               onPanelSelect={this.props.onPanelSelect}

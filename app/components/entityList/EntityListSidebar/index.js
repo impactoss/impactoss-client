@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import { isEqual } from 'lodash/lang';
 
@@ -139,6 +139,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     const {
       config,
       onAssign,
+      canFilterDraft,
       canEdit,
       activePanel,
       onPanelSelect,
@@ -164,13 +165,14 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         taxonomies,
         connectedTaxonomies,
         activeOption,
+        canFilterDraft,
         {
           attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
           taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
           connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
           connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
         },
-        formatLabel
+        formatLabel,
       );
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
       panelGroups = makeEditGroups(
@@ -235,7 +237,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           <Main>
             { (activePanel === FILTERS_PANEL || (activePanel === EDIT_PANEL && hasSelected && hasEntities)) &&
               <EntityListSidebarGroups
-                groups={panelGroups}
+                groups={fromJS(panelGroups)}
                 onShowForm={this.onShowForm}
               />
             }
@@ -288,6 +290,7 @@ EntityListSidebar.propTypes = {
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
   canEdit: PropTypes.bool,
+  canFilterDraft: PropTypes.bool,
   config: PropTypes.object,
   activePanel: PropTypes.string,
   onAssign: PropTypes.func.isRequired,
