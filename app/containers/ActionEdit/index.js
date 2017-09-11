@@ -32,6 +32,9 @@ import {
   getMetaField,
 } from 'utils/fields';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -94,6 +97,9 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
+    }
   }
 
   getInitialFormData = (nextProps) => {
@@ -155,7 +161,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     { // fieldGroup
       fields: [
         getDateField(this.context.intl.formatMessage, appMessages, 'target_date'),
-        getFormField(this.context.intl.formatMessage, appMessages, 'textarea', 'target_date_comment'),
+        getFormField({
+          formatMessage: this.context.intl.formatMessage,
+          appMessages,
+          controlType: 'textarea',
+          attribute: 'target_date_comment',
+        }),
       ],
     },
     { // fieldGroup
@@ -178,7 +189,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}

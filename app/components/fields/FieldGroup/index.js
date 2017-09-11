@@ -30,7 +30,7 @@ class FieldGroup extends React.PureComponent { // eslint-disable-line react/pref
         }
         {
           group.fields.map((field, i) => field
-            ? (<FieldFactory key={i} field={field} />)
+            ? (<FieldFactory key={i} field={Object.assign({}, field, { aside: this.props.aside })} />)
             : null
           )
         }
@@ -41,6 +41,7 @@ class FieldGroup extends React.PureComponent { // eslint-disable-line react/pref
 FieldGroup.propTypes = {
   group: PropTypes.object.isRequired,
   seemless: PropTypes.bool,
+  aside: PropTypes.bool,
 };
 
 export default FieldGroup;

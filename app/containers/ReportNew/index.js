@@ -19,6 +19,9 @@ import {
   getUploadField,
 } from 'utils/forms';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import { CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -57,6 +60,9 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
     }
   }
 
@@ -116,7 +122,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
             },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}

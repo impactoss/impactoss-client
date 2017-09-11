@@ -128,8 +128,9 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       sortBy,
       sortOrder,
       onSort,
+      userOnly,
     } = this.props;
-    const countAttributes = (taxonomy) ? this.getCountAttributes(taxonomy) : [];
+    const countAttributes = (!userOnly && taxonomy) ? this.getCountAttributes(taxonomy) : [];
     const categoriesMapped = mapToCategoryList(categories, onPageLink, countAttributes);
 
     const columns = this.getListColumns({
@@ -168,6 +169,7 @@ CategoryListItems.propTypes = {
   sortOptions: PropTypes.array,
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
+  userOnly: PropTypes.bool,
 };
 
 CategoryListItems.contextTypes = {

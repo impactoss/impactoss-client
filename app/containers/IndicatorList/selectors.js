@@ -20,6 +20,7 @@ import {
   filterEntitiesByConnectedCategories,
   filterEntitiesWithoutAssociation,
   attributesEqual,
+  entitiesSetSingle,
 } from 'utils/entities';
 
 import { sortEntities, getSortOption } from 'utils/sort';
@@ -203,13 +204,14 @@ const selectIndicatorsExpandables = createSelector(
   (entities, reports, dueDates, expandNo) =>
     entities.map((entity) => {
       const dueDatesForIndicator = dueDates.filter((date) => attributesEqual(entity.get('id'), date.getIn(['attributes', 'indicator_id'])));
+      const reportsForIndicator = reports.filter((report) => attributesEqual(entity.get('id'), report.getIn(['attributes', 'indicator_id'])));
       if (expandNo <= 0) {
         // insert expandables:
         // - indicators
         // - reports (incl due_dates)
         return entity
         .set('expandable', 'reports')
-        .set('reports', reports.filter((report) => attributesEqual(entity.get('id'), report.getIn(['attributes', 'indicator_id']))))
+        .set('reports', reportsForIndicator)
         .set('dates', Map()
           .set('overdue', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'overdue'])).size)
           .set('due', dueDatesForIndicator.filter((date) => date.getIn(['attributes', 'due'])).size)
@@ -219,7 +221,7 @@ const selectIndicatorsExpandables = createSelector(
       const dueDatesScheduled = dueDatesForIndicator.filter((date) => !date.getIn(['attributes', 'has_progress_report']));
       return entity
       .set('expanded', 'reports')
-      .set('reports', reports.filter((report) => attributesEqual(entity.get('id'), report.getIn(['attributes', 'indicator_id']))))
+      .set('reports', entitiesSetSingle(reportsForIndicator, dueDates, 'date', 'due_date_id'))
       .set('dates', Map()
         // store upcoming scheduled indicator
         .set('scheduled', dueDatesScheduled && sortEntities(dueDatesScheduled, 'asc', 'due_date', 'date').first())

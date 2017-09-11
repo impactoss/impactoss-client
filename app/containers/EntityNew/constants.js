@@ -13,7 +13,7 @@ export const FORM_INITIAL = fromJS({
     url: '',
     taxonomy_id: '',
     manager_id: '',
-    user_only: '',
+    user_only: false,
     target_date: '',
     outcome: '',
     indicator_summary: '',

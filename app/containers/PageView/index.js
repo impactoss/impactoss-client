@@ -110,7 +110,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
               type={CONTENT_PAGE}
               buttons={buttons}
             />
-            { !page && !dataReady &&
+            { !dataReady &&
               <Loading />
             }
             { !page && dataReady &&

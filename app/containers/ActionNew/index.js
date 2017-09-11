@@ -24,6 +24,9 @@ import {
   getFormField,
 } from 'utils/forms';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -77,6 +80,9 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     if (nextProps.dataReady && !this.props.dataReady) {
       this.props.redirectIfNotPermitted();
     }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
+    }
   }
 
   getHeaderMainFields = () => ([ // fieldGroups
@@ -118,7 +124,12 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     { // fieldGroup
       fields: [
         getDateField(this.context.intl.formatMessage, appMessages, 'target_date'),
-        getFormField(this.context.intl.formatMessage, appMessages, 'textarea', 'target_date_comment'),
+        getFormField({
+          formatMessage: this.context.intl.formatMessage,
+          appMessages,
+          controlType: 'textarea',
+          attribute: 'target_date_comment',
+        }),
       ],
     },
     { // fieldGroup
@@ -142,7 +153,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}

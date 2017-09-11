@@ -8,7 +8,11 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   pageTitle: {
     id: 'app.container.CategoryNew.pageTitle',
-    defaultMessage: 'New Category',
+    defaultMessage: 'New category',
+  },
+  pageTitleTaxonomy: {
+    id: 'app.container.CategoryNew.pageTitleTaxonomy',
+    defaultMessage: 'New {taxonomy}',
   },
   metaDescription: {
     id: 'app.container.CategoryNew.metaDescription',
