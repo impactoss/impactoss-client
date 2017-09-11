@@ -21,6 +21,7 @@ import {
   filterEntitiesWithoutAssociation,
   attributesEqual,
   testEntityEntityAssociation,
+  entitiesSetSingle,
 } from 'utils/entities';
 
 import { sortEntities, getSortOption } from 'utils/sort';
@@ -205,7 +206,7 @@ const selectSdgTargetsExpandables = createSelector(
           const dueDatesScheduled = dueDatesForIndicator && dueDatesForIndicator.filter((date) => !date.getIn(['attributes', 'has_progress_report']));
           return indicator
           .set('expanded', 'reports')
-          .set('reports', reportsForIndicator)
+          .set('reports', entitiesSetSingle(reportsForIndicator, dueDates, 'date', 'due_date_id'))
           .set('dates', Map()
             // store upcoming scheduled indicator
             .set('scheduled', dueDatesScheduled && sortEntities(dueDatesScheduled, 'asc', 'due_date', 'date').first())

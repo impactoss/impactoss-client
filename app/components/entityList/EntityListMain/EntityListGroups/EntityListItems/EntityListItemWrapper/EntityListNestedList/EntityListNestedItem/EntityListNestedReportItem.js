@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Clear from 'components/styled/Clear';
+import EntityListItemStatus from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems/EntityListItemStatus';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const Styled = styled.a`
-  padding: 5px 10px;
+  padding: 10px 15px;
   position: relative;
   background-color: ${palette('primary', 4)};
-  margin-top: 1px;
+  margin-bottom: 1px;
   display: block;
   color: ${palette('dark', 4)};
   &:hover {
@@ -18,20 +19,13 @@ const Styled = styled.a`
 `;
 const Top = styled.div`
 `;
-const Status = styled.div`
-  float: right;
-  font-weight: bold;
-  font-size: 0.8em;
-  text-transform: uppercase;
-`;
+
 const Reference = styled.div`
   float:left;
-  font-weight: bold;
   text-decoration: none;
-  font-size: 0.9em;
+  font-weight: 500;
 `;
 const Title = styled.div`
-  font-size: 0.8em;
   text-decoration: none;
 `;
 
@@ -49,18 +43,12 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
         href={`/reports/${report.get('id')}`}
       >
         <Top>
-          {report.getIn(['attributes', 'updated_at']) &&
+          {report.get('date') &&
             <Reference>
-              { this.context.intl && this.context.intl.formatDate(new Date(report.getIn(['attributes', 'updated_at'])))}
+              { this.context.intl && this.context.intl.formatDate(new Date(report.getIn(['date', 'attributes', 'due_date'])))}
             </Reference>
           }
-          {report.getIn(['attributes', 'draft']) &&
-            <Status>
-              {
-                report.getIn(['attributes', 'draft'])
-              }
-            </Status>
-          }
+          <EntityListItemStatus draft={report.getIn(['attributes', 'draft'])} />
         </Top>
         <Clear />
         <Title>

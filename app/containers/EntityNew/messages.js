@@ -11,6 +11,10 @@ export default defineMessages({
       id: 'app.container.EntityNew.categories.pageTitle',
       defaultMessage: 'New Category',
     },
+    pageTitleTaxonomy: {
+      id: 'app.container.EntityNew.categories.pageTitleTaxonomy',
+      defaultMessage: 'New {taxonomy}',
+    },
   },
   measures: {
     pageTitle: {

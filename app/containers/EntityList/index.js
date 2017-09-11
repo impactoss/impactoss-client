@@ -19,7 +19,7 @@ import Sidebar from 'components/styled/Sidebar';
 import EntityListSidebar from 'components/entityList/EntityListSidebar';
 import EntityListMain from 'components/entityList/EntityListMain';
 
-import { selectIsUserManager } from 'containers/App/selectors';
+import { selectIsUserManager, selectIsUserContributor } from 'containers/App/selectors';
 
 import {
   updatePath,
@@ -115,6 +115,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               config={this.props.config}
               locationQuery={this.props.locationQuery}
               canEdit={this.props.isManager}
+              canFilterDraft={this.props.isContributor}
               activePanel={this.props.activePanel}
               formatLabel={this.formatLabel}
               onPanelSelect={this.props.onPanelSelect}
@@ -172,6 +173,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
           dataReady={this.props.dataReady}
           isManager={this.props.isManager}
+          isContributor={this.props.isContributor}
 
           entityIcon={this.props.entityIcon}
           formatLabel={this.formatLabel}
@@ -208,6 +210,7 @@ EntityList.propTypes = {
   // selector props
   activePanel: PropTypes.string,
   isManager: PropTypes.bool,
+  isContributor: PropTypes.bool,
   entityIdsSelected: PropTypes.object,
   viewDomain: PropTypes.object,
   progress: PropTypes.number,
@@ -237,6 +240,7 @@ EntityList.contextTypes = {
 
 const mapStateToProps = (state) => ({
   isManager: selectIsUserManager(state),
+  isContributor: selectIsUserContributor(state),
   activePanel: selectActivePanel(state),
   entityIdsSelected: selectSelectedEntities(state),
   viewDomain: selectDomain(state),

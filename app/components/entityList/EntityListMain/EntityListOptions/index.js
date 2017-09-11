@@ -57,13 +57,15 @@ export class EntityListOptions extends React.PureComponent { // eslint-disable-l
     } = this.props;
     return (
       <Styled>
-        <EntityListGroupBy
-          value={groupSelectValue}
-          options={groupOptions &&
-            groupOptions.filter((option) => option.get('value') !== subgroupSelectValue).toJS()
-          }
-          onChange={onGroupSelect}
-        />
+        { groupOptions.size > 0 &&
+          <EntityListGroupBy
+            value={groupSelectValue}
+            options={groupOptions &&
+              groupOptions.filter((option) => option.get('value') !== subgroupSelectValue).toJS()
+            }
+            onChange={onGroupSelect}
+          />
+        }
         { groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET && subgroupOptions.size > 0 &&
           <EntityListGroupBy
             value={subgroupSelectValue}
