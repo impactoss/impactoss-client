@@ -7,9 +7,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fromJS } from 'immutable';
-
 import { mapToTaxonomyList } from 'utils/taxonomies';
 
 // containers
@@ -42,6 +42,9 @@ import { updateSort } from './actions';
 const Content = styled.div`
   padding: 0 4em;
 `;
+const UsersOnly = styled.h4`
+  margin-top: 4em;
+`;
 
 export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -55,9 +58,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       this.props.loadEntitiesIfNeeded();
     }
   }
-  getTaxTitle = (id) =>
-    this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
-
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
 
   render() {
     const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
@@ -75,7 +76,8 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     // //
     // console.log('categoryList render')
     // // console.log(listColumns)
-    // categories && console.log(categories.toJS())
+    const userCategories = categories ? categories.filter((cat) => cat.getIn(['attributes', 'user_only'])) : null;
+    const hasUserCategories = isManager && dataReady && userCategories && userCategories.size > 0;
 
     return (
       <div>
@@ -109,12 +111,30 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 <CategoryListItems
                   taxonomy={taxonomy}
                   reference={reference}
-                  categories={categories}
+                  categories={categories.filter((cat) => !cat.getIn(['attributes', 'user_only']))}
                   onPageLink={onPageLink}
                   onSort={this.props.onSort}
                   sortOptions={SORT_OPTIONS}
                   sortBy={this.props.location.query && this.props.location.query.sort}
                   sortOrder={this.props.location.query && this.props.location.query.order}
+                />
+              }
+              { hasUserCategories &&
+                <UsersOnly>
+                  <FormattedMessage {...messages.usersOnly} />
+                </UsersOnly>
+              }
+              { dataReady && taxonomy && hasUserCategories &&
+                <CategoryListItems
+                  taxonomy={taxonomy}
+                  reference={reference}
+                  categories={userCategories}
+                  onPageLink={onPageLink}
+                  onSort={this.props.onSort}
+                  sortOptions={SORT_OPTIONS}
+                  sortBy={this.props.location.query && this.props.location.query.sort}
+                  sortOrder={this.props.location.query && this.props.location.query.order}
+                  userOnly
                 />
               }
             </Content>

@@ -19,6 +19,9 @@ import {
   submitInvalid,
   saveErrorDismiss,
 } from 'containers/App/actions';
+
+import { selectEntity } from 'containers/App/selectors';
+
 import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -44,8 +47,15 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
   }
 
   render() {
-    const { viewDomain, path, attributes, inModal } = this.props;
+    const { viewDomain, path, attributes, inModal, taxonomy } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
+
+    let pageTitle = this.context.intl.formatMessage(messages[path].pageTitle);
+    if (taxonomy && taxonomy.get('attributes')) {
+      pageTitle = this.context.intl.formatMessage(messages[path].pageTitleTaxonomy, {
+        taxonomy: taxonomy.getIn(['attributes', 'title']),
+      });
+    }
 
     return (
       <div>
@@ -54,7 +64,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           noPaddingBottom={inModal}
         >
           <ContentHeader
-            title={this.context.intl.formatMessage(messages[path].pageTitle)}
+            title={pageTitle}
             type={CONTENT_MODAL}
             icon={path}
             buttons={[{
@@ -93,7 +103,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             )}
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
-            fields={getEntityFields(path, null, this.context.intl.formatMessage, appMessages)}
+            fields={getEntityFields(path, { taxonomy }, this.context.intl.formatMessage, appMessages)}
           />
           {saveSending &&
             <Loading />
@@ -107,6 +117,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
 EntityNew.propTypes = {
   path: PropTypes.string.isRequired,
   attributes: PropTypes.object,
+  taxonomy: PropTypes.object,
   handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
@@ -123,8 +134,11 @@ EntityNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
+  taxonomy: props.attributes.get('taxonomy_id')
+    ? selectEntity(state, { path: 'taxonomies', id: props.attributes.get('taxonomy_id') })
+    : null,
 });
 
 function mapDispatchToProps(dispatch, props) {

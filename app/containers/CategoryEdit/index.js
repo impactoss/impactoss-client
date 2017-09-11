@@ -26,6 +26,7 @@ import {
   getMarkdownField,
   getFormField,
   getConnectionUpdatesFromFormData,
+  getCheckboxField,
 } from 'utils/forms';
 
 import {
@@ -129,27 +130,50 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getHeaderAsideFields = (entity) => ([{
-    fields: [getMetaField(entity, appMessages)],
-  }]);
 
-  getBodyMainFields = (entity, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption) => ([
-    {
+  getHeaderAsideFields = (entity) => {
+    const fields = []; // fieldGroups
+    if (entity.getIn(['taxonomy', 'attributes', 'tags_users'])) {
+      fields.push({
+        fields: [
+          getCheckboxField(
+            this.context.intl.formatMessage,
+            appMessages,
+            'user_only',
+            null
+          ),
+        ],
+      });
+    }
+    fields.push({
+      fields: [getMetaField(entity, appMessages)],
+    });
+    return fields;
+  }
+
+  getBodyMainFields = (entity, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption, userOnly) => {
+    const fields = [];
+    fields.push({
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
-          renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
-        entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
-          renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
-        entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
-          renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
-      ],
-    },
-  ]);
+    });
+    if (!userOnly) {
+      fields.push(
+        {
+          label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
+          icon: 'connections',
+          fields: [
+            entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
+              renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+            entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
+              renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
+            entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
+              renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
+          ],
+        },
+      );
+    }
+    return fields;
+  };
   getBodyAsideFields = (entity, users, isAdmin) => {
     const fields = []; // fieldGroups
     fields.push({
@@ -179,6 +203,13 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
 
+    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
+    if (viewEntity && viewEntity.get('taxonomy')) {
+      pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
+        taxonomy: viewEntity.getIn(['taxonomy', 'attributes', 'title']),
+      });
+    }
+
     return (
       <div>
         <Helmet
@@ -189,7 +220,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         />
         <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={pageTitle}
             type={CONTENT_SINGLE}
             icon="categories"
             buttons={
@@ -252,7 +283,15 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption),
+                  main: this.getBodyMainFields(
+                    viewEntity,
+                    connectedTaxonomies,
+                    recommendations,
+                    measures,
+                    sdgtargets,
+                    onCreateOption,
+                    viewDomain.form.data.getIn(['attributes', 'user_only'])
+                  ),
                   aside: this.getBodyAsideFields(viewEntity, users, isAdmin),
                 },
               }}
@@ -338,7 +377,7 @@ function mapDispatchToProps(dispatch, props) {
         saveData = saveData.set(
           'measureCategories',
           getConnectionUpdatesFromFormData({
-            formData,
+            formData: !formData.getIn(['attributes', 'user_only']) ? formData : null,
             connections: measures,
             connectionAttribute: 'associatedMeasures',
             createConnectionKey: 'measure_id',
@@ -350,7 +389,7 @@ function mapDispatchToProps(dispatch, props) {
         saveData = saveData.set(
           'recommendationCategories',
           getConnectionUpdatesFromFormData({
-            formData,
+            formData: !formData.getIn(['attributes', 'user_only']) ? formData : null,
             connections: recommendations,
             connectionAttribute: 'associatedRecommendations',
             createConnectionKey: 'recommendation_id',
@@ -362,7 +401,7 @@ function mapDispatchToProps(dispatch, props) {
         saveData = saveData.set(
           'sdgtargetCategories',
           getConnectionUpdatesFromFormData({
-            formData,
+            formData: !formData.getIn(['attributes', 'user_only']) ? formData : null,
             connections: sdgtargets,
             connectionAttribute: 'associatedSdgTargets',
             createConnectionKey: 'sdgtarget_id',

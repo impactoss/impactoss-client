@@ -23,6 +23,7 @@ import {
   getMarkdownField,
   getFormField,
   getConnectionUpdatesFromFormData,
+  getCheckboxField,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -99,23 +100,43 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     },
   ]);
 
-  getBodyMainFields = (taxonomy, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption) => ([
-    {
+  getHeaderAsideFields = (taxonomy) => {
+    const fields = []; // fieldGroups
+    if (taxonomy.getIn(['attributes', 'tags_users'])) {
+      fields.push({
+        fields: [
+          getCheckboxField(
+            this.context.intl.formatMessage,
+            appMessages,
+            'user_only',
+          ),
+        ],
+      });
+    }
+    return fields;
+  }
+
+  getBodyMainFields = (taxonomy, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption, userOnly) => {
+    const fields = [];
+    fields.push({
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        taxonomy.getIn(['attributes', 'tags_measures']) && measures &&
-          renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
-        taxonomy.getIn(['attributes', 'tags_sdgtargets']) && sdgtargets &&
-          renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
-        taxonomy.getIn(['attributes', 'tags_recommendations']) && recommendations &&
-          renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
-      ],
-    },
-  ]);
+    });
+    if (!userOnly) {
+      fields.push({
+        label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
+        icon: 'connections',
+        fields: [
+          taxonomy.getIn(['attributes', 'tags_measures']) && measures &&
+            renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+          taxonomy.getIn(['attributes', 'tags_sdgtargets']) && sdgtargets &&
+            renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
+          taxonomy.getIn(['attributes', 'tags_recommendations']) && recommendations &&
+            renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
+        ],
+      });
+    }
+    return fields;
+  };
 
   getBodyAsideFields = (users, isAdmin, taxonomy) => {
     const fields = []; // fieldGroups
@@ -147,7 +168,9 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (taxonomy && taxonomy.get('attributes')) {
-      pageTitle = `${pageTitle} (${taxonomy.getIn(['attributes', 'title'])})`;
+      pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
+        taxonomy: taxonomy.getIn(['attributes', 'title']),
+      });
     }
 
     return (
@@ -209,9 +232,18 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               fields={{ // isManager, taxonomies,
                 header: {
                   main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(taxonomy),
                 },
                 body: {
-                  main: this.getBodyMainFields(taxonomy, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption),
+                  main: this.getBodyMainFields(
+                    taxonomy,
+                    connectedTaxonomies,
+                    recommendations,
+                    measures,
+                    sdgtargets,
+                    onCreateOption,
+                    viewDomain.form.data.getIn(['attributes', 'user_only'])
+                  ),
                   aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
                 },
               }}
@@ -289,41 +321,43 @@ function mapDispatchToProps(dispatch) {
     },
     handleSubmit: (formData, measures, recommendations, sdgtargets, taxonomy) => {
       let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomy.get('id'));
-      if (taxonomy.getIn(['attributes', 'tags_measures'])) {
-        saveData = saveData.set(
-          'measureCategories',
-          getConnectionUpdatesFromFormData({
-            formData,
-            connections: measures,
-            connectionAttribute: 'associatedMeasures',
-            createConnectionKey: 'measure_id',
-            createKey: 'category_id',
-          })
-        );
-      }
-      if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
-        saveData = saveData.set(
-          'recommendationCategories',
-          getConnectionUpdatesFromFormData({
-            formData,
-            connections: recommendations,
-            connectionAttribute: 'associatedRecommendations',
-            createConnectionKey: 'recommendation_id',
-            createKey: 'category_id',
-          })
-        );
-      }
-      if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
-        saveData = saveData.set(
-          'sdgtargetCategories',
-          getConnectionUpdatesFromFormData({
-            formData,
-            connections: sdgtargets,
-            connectionAttribute: 'associatedSdgTargets',
-            createConnectionKey: 'sdgtarget_id',
-            createKey: 'category_id',
-          })
-        );
+      if (!formData.getIn(['attributes', 'user_only'])) {
+        if (taxonomy.getIn(['attributes', 'tags_measures'])) {
+          saveData = saveData.set(
+            'measureCategories',
+            getConnectionUpdatesFromFormData({
+              formData,
+              connections: measures,
+              connectionAttribute: 'associatedMeasures',
+              createConnectionKey: 'measure_id',
+              createKey: 'category_id',
+            })
+          );
+        }
+        if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
+          saveData = saveData.set(
+            'recommendationCategories',
+            getConnectionUpdatesFromFormData({
+              formData,
+              connections: recommendations,
+              connectionAttribute: 'associatedRecommendations',
+              createConnectionKey: 'recommendation_id',
+              createKey: 'category_id',
+            })
+          );
+        }
+        if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
+          saveData = saveData.set(
+            'sdgtargetCategories',
+            getConnectionUpdatesFromFormData({
+              formData,
+              connections: sdgtargets,
+              connectionAttribute: 'associatedSdgTargets',
+              createConnectionKey: 'sdgtarget_id',
+              createKey: 'category_id',
+            })
+          );
+        }
       }
 
 

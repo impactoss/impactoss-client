@@ -30,6 +30,7 @@ export const FORM_INITIAL = fromJS({
     manager_id: '',
     taxonomy_id: '',
     reference: '',
+    user_only: false,
   },
   associatedSdgTargets: [],
   associatedMeasures: [],

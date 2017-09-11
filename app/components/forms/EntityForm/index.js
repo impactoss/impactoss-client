@@ -26,6 +26,7 @@ import FieldWrap from 'components/fields/FieldWrap';
 import Field from 'components/fields/Field';
 import Clear from 'components/styled/Clear';
 
+import FieldLabel from '../Label';
 import ErrorWrapper from '../ErrorWrapper';
 import UploadControl from '../UploadControl';
 import FormWrapper from '../FormWrapper';
@@ -39,6 +40,7 @@ import ControlTitle from '../ControlTitle';
 import ControlTitleText from '../ControlTitleText';
 import ControlShort from '../ControlShort';
 import ControlInput from '../ControlInput';
+import ControlCheckbox from '../ControlCheckbox';
 import ControlTextArea from '../ControlTextArea';
 import ControlSelect from '../ControlSelect';
 import MarkdownControl from '../MarkdownControl';
@@ -51,7 +53,8 @@ import messages from './messages';
 
 const Hint = styled.span`
   color: ${palette('dark', 4)};
-  padding-left: 5px;
+  display: block;
+  font-size: 0.85em;
 `;
 
 const DeleteWrapper = styled.div`
@@ -84,7 +87,7 @@ const controls = {
   date: DateControl,
   select: ControlSelect,
   radio: RadioControl,
-  checkbox: Control.checkbox,
+  checkbox: ControlCheckbox,
   button: Control.button,
   file: UploadControl,
   uploader: UploadControl,
@@ -194,17 +197,18 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     return (
       <FormFieldWrap nested={nested}>
         { field.label && field.controlType !== 'multiselect' && field.controlType !== 'info' &&
-          <Label htmlFor={field.id}>
+          <FieldLabel htmlFor={field.id} inline={field.controlType === 'checkbox'}>
+            { field.controlType === 'checkbox' && formField }
             { field.label }
             { field.validators && field.validators.required &&
               <Required>*</Required>
             }
-          </Label>
+          </FieldLabel>
         }
-        { formField }
-        {field.hint &&
+        { field.hint &&
           <Hint>{field.hint}</Hint>
         }
+        { field.controlType !== 'checkbox' && formField }
       </FormFieldWrap>
     );
   }

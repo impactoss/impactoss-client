@@ -194,7 +194,10 @@ export const prepareTaxonomiesAssociated = (taxonomies, categories, associations
   taxonomies && taxonomies
   .filter((tax) => tax.getIn(['attributes', tagsKey]))
   .map((tax) => tax.set('categories', entitiesSetAssociated(
-    categories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))),
+    categories.filter((cat) =>
+      attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))
+      && (!cat.getIn(['attributes', 'user_only']) || tagsKey === 'tags_users')
+    ),
     'category_id',
     associations,
     associationKey,
@@ -209,7 +212,10 @@ export const prepareTaxonomies = (taxonomies, categories, tagsKey) =>
   taxonomies && taxonomies
   .filter((tax) => tax.getIn(['attributes', tagsKey]))
   .map((tax) => tax.set('categories',
-    categories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id')))
+    categories.filter((cat) =>
+      attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))
+      && (!cat.getIn(['attributes', 'user_only']) || tagsKey === 'tags_users')
+    )
   ));
 
 export const prepareCategory = (category, users, taxonomies) =>
