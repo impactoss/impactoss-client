@@ -22,4 +22,8 @@ export default defineMessages({
     id: 'app.containers.CategoryList.notFound',
     defaultMessage: 'Sorry no categories found',
   },
+  usersOnly: {
+    id: 'app.containers.CategoryList.usersOnly',
+    defaultMessage: 'Additional categories applicable to users only',
+  },
 });

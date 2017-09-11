@@ -100,6 +100,22 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     },
   ]);
 
+  getHeaderAsideFields = (taxonomy) => {
+    const fields = []; // fieldGroups
+    if (taxonomy.getIn(['attributes', 'tags_users'])) {
+      fields.push({
+        fields: [
+          getCheckboxField(
+            this.context.intl.formatMessage,
+            appMessages,
+            'user_only',
+          ),
+        ],
+      });
+    }
+    return fields;
+  }
+
   getBodyMainFields = (taxonomy, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption, userOnly) => {
     const fields = [];
     fields.push({
@@ -132,18 +148,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         attribute: 'url',
       })],
     });
-    if (taxonomy.getIn(['attributes', 'tags_users'])) {
-      fields.push({
-        fields: [
-          getCheckboxField(
-            this.context.intl.formatMessage,
-            appMessages,
-            'user_only',
-            null
-          ),
-        ],
-      });
-    }
     if (isAdmin && !!taxonomy.getIn(['attributes', 'has_manager'])) {
       fields.push({
         fields: [
@@ -164,7 +168,9 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (taxonomy && taxonomy.get('attributes')) {
-      pageTitle = `${pageTitle} (${taxonomy.getIn(['attributes', 'title'])})`;
+      pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
+        taxonomy: taxonomy.getIn(['attributes', 'title']),
+      });
     }
 
     return (
@@ -226,6 +232,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               fields={{ // isManager, taxonomies,
                 header: {
                   main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(taxonomy),
                 },
                 body: {
                   main: this.getBodyMainFields(

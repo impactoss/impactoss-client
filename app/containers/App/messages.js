@@ -91,7 +91,13 @@ export default defineMessages({
     },
     user_only: {
       id: 'app.containers.App.hints.user_only',
-      defaultMessage: 'Categorise users only',
+      defaultMessage: 'Check to categorise users only',
+    },
+  },
+  textValues: {
+    user_only: {
+      id: 'app.containers.App.textValues.user_only',
+      defaultMessage: 'Categorises users only',
     },
   },
   placeholders: {

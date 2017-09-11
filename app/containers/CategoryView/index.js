@@ -73,13 +73,24 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       ],
     },
   ]);
-
-  getHeaderAsideFields = (entity, isManager) => isManager &&
-    ([{
-      fields: [
-        getMetaField(entity, appMessages),
-      ],
-    }]);
+  getHeaderAsideFields = (entity, isManager) => {
+    const fields = []; // fieldGroups
+    if (entity.getIn(['taxonomy', 'attributes', 'tags_users']) && entity.getIn(['attributes', 'user_only'])) {
+      fields.push({
+        fields: [{
+          type: 'text',
+          value: this.context.intl.formatMessage(appMessages.textValues.user_only),
+          label: appMessages.attributes.user_only,
+        }],
+      });
+    }
+    if (isManager) {
+      fields.push({
+        fields: [getMetaField(entity, appMessages)],
+      });
+    }
+    return fields;
+  }
 
   getBodyMainFields = (
     entity,
@@ -133,7 +144,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
 
   render() {
     const {
-      category,
+      viewEntity,
       dataReady,
       isManager,
       recommendations,
@@ -146,21 +157,29 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       recommendationConnections,
     } = this.props;
 
-    const buttons = dataReady && isManager
-    ? [
-      {
-        type: 'edit',
-        onClick: () => this.props.handleEdit(this.props.params.id),
-      },
-      {
+    let buttons = [];
+    if (dataReady) {
+      buttons = isManager
+      ? [
+        {
+          type: 'edit',
+          onClick: () => this.props.handleEdit(this.props.params.id),
+        },
+        {
+          type: 'close',
+          onClick: () => this.props.handleClose(this.props.viewEntity.getIn(['taxonomy', 'id'])),
+        },
+      ]
+      : [{
         type: 'close',
-        onClick: () => this.props.handleClose(this.props.category.getIn(['taxonomy', 'id'])),
-      },
-    ]
-    : [{
-      type: 'close',
-      onClick: () => this.props.handleClose(this.props.category.getIn(['taxonomy', 'id'])),
-    }];
+        onClick: () => this.props.handleClose(this.props.viewEntity.getIn(['taxonomy', 'id'])),
+      }];
+    }
+
+    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
+    if (viewEntity && viewEntity.get('taxonomy')) {
+      pageTitle = viewEntity.getIn(['taxonomy', 'attributes', 'title']);
+    }
 
     return (
       <div>
@@ -172,7 +191,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={pageTitle}
             type={CONTENT_SINGLE}
             icon="categories"
             buttons={buttons}
@@ -180,21 +199,21 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
           { !dataReady &&
             <Loading />
           }
-          { !category && dataReady &&
+          { !viewEntity && dataReady &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          { category && dataReady &&
+          { viewEntity && dataReady &&
             <EntityView
               fields={{
                 header: {
-                  main: this.getHeaderMainFields(category, isManager),
-                  aside: this.getHeaderAsideFields(category, isManager),
+                  main: this.getHeaderMainFields(viewEntity, isManager),
+                  aside: this.getHeaderAsideFields(viewEntity, isManager),
                 },
                 body: {
                   main: this.getBodyMainFields(
-                    category,
+                    viewEntity,
                     recommendations,
                     measures,
                     taxonomies,
@@ -204,7 +223,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                     measureConnections,
                     recommendationConnections
                   ),
-                  aside: this.getBodyAsideFields(category, isManager),
+                  aside: this.getBodyAsideFields(viewEntity, isManager),
                 },
               }}
             />
@@ -220,7 +239,7 @@ CategoryView.propTypes = {
   handleEdit: PropTypes.func,
   handleClose: PropTypes.func,
   onEntityClick: PropTypes.func,
-  category: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   isManager: PropTypes.bool,
@@ -240,7 +259,7 @@ CategoryView.contextTypes = {
 const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  category: selectViewEntity(state, props.params.id),
+  viewEntity: selectViewEntity(state, props.params.id),
   recommendations: selectRecommendations(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),

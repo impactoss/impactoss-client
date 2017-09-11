@@ -501,6 +501,11 @@ const getCategoryFields = (args, formatMessage, appMessages) => ({
         getShortTitleFormField(formatMessage, appMessages),
       ],
     }],
+    aside: args.taxonomy && args.taxonomy.getIn(['attributes', 'tags_users'])
+      ? [{
+        fields: [getCheckboxField(formatMessage, appMessages, 'user_only')],
+      }]
+      : null,
   },
   body: {
     main: [{

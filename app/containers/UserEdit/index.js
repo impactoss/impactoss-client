@@ -36,6 +36,7 @@ import {
   updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import {
@@ -121,16 +122,16 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     fields: [getEmailField(this.context.intl.formatMessage, appMessages)],
   }]);
 
-  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, taxonomies, roles, isManager } = this.props;
+    const { viewEntity, dataReady, viewDomain, taxonomies, roles, isManager, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, submitValid } = viewDomain.page;
 
@@ -199,7 +200,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 },
                 body: {
                   main: this.getBodyMainFields(),
-                  aside: isManager && this.getBodyAsideFields(taxonomies),
+                  aside: isManager && this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -228,6 +229,7 @@ UserEdit.propTypes = {
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   params: PropTypes.object,
+  onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
 };
@@ -310,6 +312,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

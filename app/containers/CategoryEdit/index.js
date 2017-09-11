@@ -130,9 +130,26 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getHeaderAsideFields = (entity) => ([{
-    fields: [getMetaField(entity, appMessages)],
-  }]);
+
+  getHeaderAsideFields = (entity) => {
+    const fields = []; // fieldGroups
+    if (entity.getIn(['taxonomy', 'attributes', 'tags_users'])) {
+      fields.push({
+        fields: [
+          getCheckboxField(
+            this.context.intl.formatMessage,
+            appMessages,
+            'user_only',
+            null
+          ),
+        ],
+      });
+    }
+    fields.push({
+      fields: [getMetaField(entity, appMessages)],
+    });
+    return fields;
+  }
 
   getBodyMainFields = (entity, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption, userOnly) => {
     const fields = [];
@@ -167,18 +184,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         attribute: 'url',
       })],
     });
-    if (entity.getIn(['taxonomy', 'attributes', 'tags_users'])) {
-      fields.push({
-        fields: [
-          getCheckboxField(
-            this.context.intl.formatMessage,
-            appMessages,
-            'user_only',
-            null
-          ),
-        ],
-      });
-    }
     if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({
         fields: [
@@ -198,6 +203,13 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
 
+    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
+    if (viewEntity && viewEntity.get('taxonomy')) {
+      pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
+        taxonomy: viewEntity.getIn(['taxonomy', 'attributes', 'title']),
+      });
+    }
+
     return (
       <div>
         <Helmet
@@ -208,7 +220,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         />
         <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={pageTitle}
             type={CONTENT_SINGLE}
             icon="categories"
             buttons={
