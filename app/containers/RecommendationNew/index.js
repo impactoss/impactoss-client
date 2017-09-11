@@ -22,6 +22,9 @@ import {
   getMarkdownField,
 } from 'utils/forms';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -73,6 +76,9 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     }
     if (nextProps.dataReady && !this.props.dataReady) {
       this.props.redirectIfNotPermitted();
+    }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
     }
   }
 
@@ -128,7 +134,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
             },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}

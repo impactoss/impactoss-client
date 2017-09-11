@@ -71,7 +71,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     {
       fields: [
         getMarkdownField(entity, 'description', true, appMessages),
-        getDownloadField(entity, isContributor, appMessages),
+        getDownloadField(entity, entity.getIn(['attributes', 'document_public']) || isContributor, appMessages),
       ],
     },
   ]);

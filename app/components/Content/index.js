@@ -7,7 +7,7 @@ import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
 class Content extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
-      <ContainerWrapper>
+      <ContainerWrapper innerRef={this.props.innerRef} >
         <Container noPaddingBottom={this.props.noPaddingBottom}>
           {this.props.children}
         </Container>
@@ -19,6 +19,7 @@ class Content extends React.PureComponent { // eslint-disable-line react/prefer-
 Content.propTypes = {
   children: PropTypes.node,
   noPaddingBottom: PropTypes.bool,
+  innerRef: PropTypes.func,
 };
 
 export default Content;

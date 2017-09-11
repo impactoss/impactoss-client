@@ -27,12 +27,16 @@ import {
   getRoleField,
 } from 'utils/fields';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import {
   loadEntitiesIfNeeded,
   updatePath,
   updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import {
@@ -77,6 +81,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
+    }
   }
 
   getInitialFormData = (nextProps) => {
@@ -115,16 +122,16 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     fields: [getEmailField(this.context.intl.formatMessage, appMessages)],
   }]);
 
-  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, taxonomies, roles, isManager } = this.props;
+    const { viewEntity, dataReady, viewDomain, taxonomies, roles, isManager, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, submitValid } = viewDomain.page;
 
@@ -136,7 +143,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -193,7 +200,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 },
                 body: {
                   main: this.getBodyMainFields(),
-                  aside: isManager && this.getBodyAsideFields(taxonomies),
+                  aside: isManager && this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -222,6 +229,7 @@ UserEdit.propTypes = {
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   params: PropTypes.object,
+  onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
 };
@@ -304,6 +312,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

@@ -25,7 +25,8 @@ const Item = styled(Component)`
 const MainWrapper = styled(Component)`
   display: table-cell;
   width: ${(props) => props.expandable ? 66 : 100}%;
-  border-right: 1px solid ${palette('light', 0)};
+  border-right: ${(props) => props.expandable ? '1px solid' : '0'};
+  border-right-color: ${palette('light', 0)};
 `;
 const MainInnerWrapper = styled(Component)`
   display: table;

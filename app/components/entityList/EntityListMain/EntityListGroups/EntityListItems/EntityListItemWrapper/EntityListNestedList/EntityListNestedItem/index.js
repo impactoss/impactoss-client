@@ -25,7 +25,7 @@ const Item = styled(Component)`
 const MainWrapper = styled(Component)`
   display: table-cell;
   width: ${(props) => props.expandable ? 66 : 100}%;
-  border-right: 1px solid ${(props) => props.expandable ? palette('light', 0) : 'transparent'};
+  border-right: 1px solid ${palette('light', 0)};
 `;
 export default class EntityListNestedItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 

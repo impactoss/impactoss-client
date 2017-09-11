@@ -10,6 +10,10 @@ export default defineMessages({
     id: 'app.container.CategoryEdit.pageTitle',
     defaultMessage: 'Edit Category',
   },
+  pageTitleTaxonomy: {
+    id: 'app.container.CategoryEdit.pageTitleTaxonomy',
+    defaultMessage: 'Edit {taxonomy}',
+  },
   metaDescription: {
     id: 'app.container.CategoryEdit.metaDescription',
     defaultMessage: 'Edit Category page description',

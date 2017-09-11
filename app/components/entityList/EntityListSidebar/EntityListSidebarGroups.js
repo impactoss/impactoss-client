@@ -6,7 +6,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { fromJS } from 'immutable';
 import styled from 'styled-components';
 
 import EntityListSidebarGroupLabel from './EntityListSidebarGroupLabel';
@@ -22,31 +21,33 @@ export default class EntityListSidebarGroups extends React.PureComponent { // es
   };
 
   render() {
-    const groups = fromJS(this.props.groups);
+    const groups = this.props.groups;
     return (
       <Styled>
-        { groups &&
-          groups.entrySeq().map(([groupId, group]) => (
-            <div key={groupId}>
-              <EntityListSidebarGroupLabel
-                label={group.get('label')}
-                icon={group.get('icon') || group.get('id')}
-              />
-              <div>
-                { group.get('options') &&
-                  group.get('options').valueSeq().map((option, i) => (
-                    <EntityListSidebarOption
-                      key={i}
-                      option={option}
-                      groupId={group.get('id')}
-                      onShowForm={this.props.onShowForm}
-                    />
-                  ))
-                }
+        { groups && groups.entrySeq().map(([groupId, group]) =>
+          group.get('options') && group.get('options').size > 0
+            ? (
+              <div key={groupId}>
+                <EntityListSidebarGroupLabel
+                  label={group.get('label')}
+                  icon={group.get('icon') || group.get('id')}
+                />
+                <div>
+                  { group.get('options') &&
+                    group.get('options').valueSeq().map((option, i) => (
+                      <EntityListSidebarOption
+                        key={i}
+                        option={option}
+                        groupId={group.get('id')}
+                        onShowForm={this.props.onShowForm}
+                      />
+                    ))
+                  }
+                </div>
               </div>
-            </div>
-          ))
-        }
+            )
+            : null
+        )}
       </Styled>
     );
   }

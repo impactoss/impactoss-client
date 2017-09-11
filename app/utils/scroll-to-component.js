@@ -25,8 +25,14 @@ export const scrollToY = (scrollTargetY, speed = 2000) => {
   tick();
 };
 
-export const jumpToComponent = (target, scrollReference, scrollContainer) => {
-  const targetTop = target.getBoundingClientRect().top;
-  const refTop = scrollReference.getBoundingClientRect().top;
-  scrollContainer.scrollTop = targetTop - refTop; // eslint-disable-line no-param-reassign
+export const scrollToTop = (scrollContainer) => {
+  scrollContainer.scrollTop = 0; // eslint-disable-line no-param-reassign
+};
+
+export const jumpToComponent = (scrollTarget, scrollReference, scrollContainer) => {
+  if (!scrollTarget || !scrollReference) {
+    scrollToTop(scrollContainer);
+  } else {
+    scrollContainer.scrollTop = scrollTarget.getBoundingClientRect().top - scrollReference.getBoundingClientRect().top; // eslint-disable-line no-param-reassign
+  }
 };

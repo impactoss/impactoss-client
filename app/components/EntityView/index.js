@@ -32,7 +32,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
       {
         asArray(fieldGroups).map((fieldGroup, i, list) => fieldGroup && (
           <ViewPanel key={i} borderBottom={i < (list.length - 1)}>
-            <FieldGroup group={fieldGroup} seemless={seemless} />
+            <FieldGroup group={fieldGroup} seemless={seemless} aside />
           </ViewPanel>
         ))
       }

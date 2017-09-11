@@ -42,6 +42,7 @@ export const getGroupOptions = (taxonomies, connectedTaxonomies) => {
     // first prepare taxonomy options
     options = options.concat(
       connectedTaxonomies
+        .filter((taxonomy) => !taxonomies || !taxonomies.map((tax) => tax.get('id')).includes(taxonomy.get('id')))
         .map((taxonomy) => Map({
           value: `x:${taxonomy.get('id')}`, // filterOptionId
           label: taxonomy.getIn(['attributes', 'title']),
