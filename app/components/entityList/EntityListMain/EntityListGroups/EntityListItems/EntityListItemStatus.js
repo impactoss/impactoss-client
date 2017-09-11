@@ -10,6 +10,7 @@ const Status = styled.div`
   font-size: 0.8em;
   text-transform: uppercase;
   color: ${palette('dark', 4)};
+  padding-left: 1em;
 `;
 
 class EntityListItemStatus extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

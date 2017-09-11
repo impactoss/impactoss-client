@@ -7,6 +7,9 @@ import { Link } from 'react-router';
 import { sortEntities } from 'utils/sort';
 import { truncateText } from 'utils/string';
 
+import messages from 'components/entityList/EntityListMain/EntityListGroups/messages';
+import EntityListItemStatus from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems/EntityListItemStatus';
+
 const POPUP_WIDTH = 350;
 const POPUP_LENGTH = 66;
 
@@ -23,6 +26,7 @@ const Count = styled.span`
   text-align: center;
   vertical-align: middle;
   line-height: 1.8em;
+  padding: 0 0.5em;
 `;
 
 const PopupWrapper = styled.span`
@@ -77,10 +81,13 @@ const TriangleBottom = styled.div`
 `;
 
 const PopupHeader = styled.div`
-  padding: 1em;
-  font-weight: bold;
+  padding: 0.5em 1em;
   background-color: ${palette('light', 0)};
 `;
+const PopupHeaderMain = styled.span`
+  font-weight: bold;
+`;
+const PopupHeaderDraft = styled.span``;
 
 const PopupContent = styled.div`
   position: relative;
@@ -142,6 +149,14 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
 
   render() {
     const { connection, wrapper } = this.props;
+
+    const entitiesTotal = connection.entities
+      ? connection.entities.size
+      : 0;
+    const draftEntitiesTotal = connection.entities
+      ? connection.entities.filter((entity) => entity.getIn(['attributes', 'draft'])).size
+      : 0;
+
     return (
       <PopupWrapper
         onFocus={false}
@@ -154,9 +169,11 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
         }}
       >
         <Count pIndex={connection.option.style}>
-          {connection.entities
-            ? connection.entities.size
-            : 0
+          {draftEntitiesTotal === 0 &&
+            <span>{entitiesTotal}</span>
+          }
+          {draftEntitiesTotal > 0 &&
+            <span>{`${entitiesTotal} (${draftEntitiesTotal})`}</span>
           }
         </Count>
         {this.state.popupOpen &&
@@ -165,7 +182,14 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
           >
             <PopupInner>
               <PopupHeader>
-                {`${connection.entities.size} ${connection.option.label}`}
+                <PopupHeaderMain>
+                  {`${entitiesTotal} ${connection.option.label}`}
+                </PopupHeaderMain>
+                { draftEntitiesTotal > 0 &&
+                  <PopupHeaderDraft>
+                    {` (${draftEntitiesTotal} ${this.context.intl && this.context.intl.formatMessage(messages.draft)})`}
+                  </PopupHeaderDraft>
+                }
               </PopupHeader>
               <PopupContent count={connection.entities.size}>
                 {
@@ -175,7 +199,10 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                     const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
                     return (
                       <ListItem key={i}>
-                        <ListItemLink to={`${connection.option.path}/${entity.get('id')}`} >
+                        <ListItemLink to={`/${connection.option.path}/${entity.get('id')}`} >
+                          { entity.getIn(['attributes', 'draft']) &&
+                            <EntityListItemStatus draft />
+                          }
                           <Id>{ref}</Id>
                           <IdSpacer>|</IdSpacer>
                           <ItemContent>{truncateText(entity.getIn(['attributes', 'title']), POPUP_LENGTH - ref.length)}</ItemContent>
@@ -198,5 +225,9 @@ ConnectionPopup.propTypes = {
   connection: PropTypes.object,
   wrapper: PropTypes.object,
 };
+ConnectionPopup.contextTypes = {
+  intl: PropTypes.object,
+};
+
 
 export default ConnectionPopup;
