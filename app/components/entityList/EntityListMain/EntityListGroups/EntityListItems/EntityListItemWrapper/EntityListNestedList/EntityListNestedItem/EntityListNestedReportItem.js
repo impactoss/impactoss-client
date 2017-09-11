@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Clear from 'components/styled/Clear';
-import EntityListItemStatus from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems/EntityListItemStatus';
+import ItemStatus from 'components/ItemStatus';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -48,7 +48,7 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
               { this.context.intl && this.context.intl.formatDate(new Date(report.getIn(['date', 'attributes', 'due_date'])))}
             </Reference>
           }
-          <EntityListItemStatus draft={report.getIn(['attributes', 'draft'])} />
+          <ItemStatus draft={report.getIn(['attributes', 'draft'])} />
         </Top>
         <Clear />
         <Title>

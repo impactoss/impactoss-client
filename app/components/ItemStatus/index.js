@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import messages from 'components/entityList/EntityListMain/EntityListGroups/messages';
+import messages from './messages';
 
 const Status = styled.div`
   float: right;
@@ -13,7 +13,7 @@ const Status = styled.div`
   padding-left: 1em;
 `;
 
-class EntityListItemStatus extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class ItemStatus extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { draft } = this.props;
     return draft
@@ -25,12 +25,12 @@ class EntityListItemStatus extends React.PureComponent { // eslint-disable-line 
   }
 }
 
-EntityListItemStatus.propTypes = {
+ItemStatus.propTypes = {
   draft: PropTypes.bool,
 };
 
-EntityListItemStatus.contextTypes = {
+ItemStatus.contextTypes = {
   intl: PropTypes.object,
 };
 
-export default EntityListItemStatus;
+export default ItemStatus;

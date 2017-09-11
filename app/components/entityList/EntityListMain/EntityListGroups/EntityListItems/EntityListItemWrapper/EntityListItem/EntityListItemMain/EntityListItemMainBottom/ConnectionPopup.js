@@ -7,8 +7,8 @@ import { Link } from 'react-router';
 import { sortEntities } from 'utils/sort';
 import { truncateText } from 'utils/string';
 
-import messages from 'components/entityList/EntityListMain/EntityListGroups/messages';
-import EntityListItemStatus from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems/EntityListItemStatus';
+import messages from 'components/ItemStatus/messages';
+import ItemStatus from 'components/ItemStatus';
 
 const POPUP_WIDTH = 350;
 const POPUP_LENGTH = 66;
@@ -201,7 +201,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                       <ListItem key={i}>
                         <ListItemLink to={`/${connection.option.path}/${entity.get('id')}`} >
                           { entity.getIn(['attributes', 'draft']) &&
-                            <EntityListItemStatus draft />
+                            <ItemStatus draft />
                           }
                           <Id>{ref}</Id>
                           <IdSpacer>|</IdSpacer>
