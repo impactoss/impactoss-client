@@ -19,19 +19,23 @@ const Count = styled.span`
   top: 0;
   border-radius: 999px;
   font-size: 0.8em;
-  background-color: ${(props) => palette(props.pIndex, 0)};
-  color: ${palette('primary', 4)};
+  background-color: ${(props) => props.draft ? palette('primary', 4) : palette(props.pIndex, 0)};
+  color: ${(props) => props.draft ? palette(props.pIndex, 0) : palette('primary', 4)};
+  border: 1px solid ${(props) => palette(props.pIndex, 0)};
   height: 1.8em;
   min-width: 1.8em;
   text-align: center;
   vertical-align: middle;
-  line-height: 1.8em;
+  line-height: 1.7em;
   padding: 0 0.5em;
 `;
 
 const PopupWrapper = styled.span`
   position: relative;
+  margin-right: 5px;
 `;
+
+const POPUP_WIDTH_PX = `${POPUP_WIDTH}px`;
 
 const Popup = styled.div`
   position: absolute;
@@ -42,7 +46,8 @@ const Popup = styled.div`
     if (props.align === 'left') return 'translate(-5%,0)';
     return 'translate(-50%,0)';
   }};
-  width: ${POPUP_WIDTH}px;
+  width: ${(props) => props.total > 0 ? POPUP_WIDTH_PX : 'auto'};
+  min-width: ${(props) => props.total > 0 ? POPUP_WIDTH : POPUP_WIDTH / 2}px;
   display: block;
   left: 50%;
   z-index: 1;
@@ -53,7 +58,8 @@ const PopupInner = styled.div`
   display: block;
   background-color: ${palette('primary', 4)};
   color: ${palette('dark', 1)};
-  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.4);
+  border-bottom: 10px solid ${palette('light', 0)};
 `;
 const TriangleBottom = styled.div`
    width: 20px;
@@ -72,7 +78,7 @@ const TriangleBottom = styled.div`
       position: absolute;
       width: 20px;
       height: 20px;
-      background-color: ${palette('primary', 4)};
+      background-color: ${palette('light', 0)};
       transform: rotate(45deg);
       bottom: 5px;
       left: 0px;
@@ -87,7 +93,6 @@ const PopupHeader = styled.div`
 const PopupHeaderMain = styled.span`
   font-weight: bold;
 `;
-const PopupHeaderDraft = styled.span``;
 
 const PopupContent = styled.div`
   position: relative;
@@ -148,14 +153,9 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
   }
 
   render() {
-    const { connection, wrapper } = this.props;
+    const { entities, option, wrapper, draft } = this.props;
 
-    const entitiesTotal = connection.entities
-      ? connection.entities.size
-      : 0;
-    const draftEntitiesTotal = connection.entities
-      ? connection.entities.filter((entity) => entity.getIn(['attributes', 'draft'])).size
-      : 0;
+    const entitiesTotal = entities ? entities.size : 0;
 
     return (
       <PopupWrapper
@@ -168,38 +168,32 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
           }
         }}
       >
-        <Count pIndex={connection.option.style}>
-          {draftEntitiesTotal === 0 &&
-            <span>{entitiesTotal}</span>
-          }
-          {draftEntitiesTotal > 0 &&
-            <span>{`${entitiesTotal} (${draftEntitiesTotal})`}</span>
-          }
-        </Count>
+        <Count pIndex={option.style} draft={draft}>{entitiesTotal}</Count>
         {this.state.popupOpen &&
           <Popup
             align={this.getPopupAlign(wrapper, this.state.popupRef)}
+            total={entitiesTotal}
           >
             <PopupInner>
               <PopupHeader>
                 <PopupHeaderMain>
-                  {`${entitiesTotal} ${connection.option.label}`}
+                  {`${entitiesTotal} ${option.label(entitiesTotal)}`}
                 </PopupHeaderMain>
-                { draftEntitiesTotal > 0 &&
-                  <PopupHeaderDraft>
-                    {` (${draftEntitiesTotal} ${this.context.intl && this.context.intl.formatMessage(messages.draft)})`}
-                  </PopupHeaderDraft>
+                { draft &&
+                  <PopupHeaderMain>
+                    {` (${this.context.intl && this.context.intl.formatMessage(messages.draft)})`}
+                  </PopupHeaderMain>
                 }
               </PopupHeader>
-              <PopupContent count={connection.entities.size}>
+              <PopupContent count={entities.size}>
                 {
-                  sortEntities(connection.entities, 'asc', 'reference')
+                  sortEntities(entities, 'asc', 'reference')
                   .toList()
                   .map((entity, i) => {
                     const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
                     return (
                       <ListItem key={i}>
-                        <ListItemLink to={`/${connection.option.path}/${entity.get('id')}`} >
+                        <ListItemLink to={`/${option.path}/${entity.get('id')}`} >
                           { entity.getIn(['attributes', 'draft']) &&
                             <ItemStatus draft />
                           }
@@ -222,8 +216,10 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
 }
 
 ConnectionPopup.propTypes = {
-  connection: PropTypes.object,
+  entities: PropTypes.object,
+  option: PropTypes.object,
   wrapper: PropTypes.object,
+  draft: PropTypes.bool,
 };
 ConnectionPopup.contextTypes = {
   intl: PropTypes.object,

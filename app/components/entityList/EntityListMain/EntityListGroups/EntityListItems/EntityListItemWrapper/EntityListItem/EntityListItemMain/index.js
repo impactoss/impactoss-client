@@ -37,10 +37,8 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
         const entities = entity.get(option.path).map((connectionId) => connections.getIn([option.path, connectionId.toString()]));
         return memo.concat([{
           option: {
-            label: this.context.intl && this.context.intl.formatMessage(
-              entities.size === 1
-              ? appMessages.entities[option.path].single
-              : appMessages.entities[option.path].plural
+            label: (size) => this.context.intl && this.context.intl.formatMessage(
+              size === 1 ? appMessages.entities[option.path].single : appMessages.entities[option.path].plural
             ),
             icon: option.path,
             style: option.path,
