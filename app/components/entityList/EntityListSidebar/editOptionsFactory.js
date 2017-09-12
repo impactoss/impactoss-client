@@ -128,6 +128,7 @@ export const makeConnectionEditOptions = (entities, config, connections, connect
         value: connection.get('id'),
         checked: checkedState(count, entities.size),
         tags: connection.get('categories'),
+        draft: connection.getIn(['attributes', 'draft']),
       };
     });
   }

@@ -257,21 +257,17 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
           if (locationQueryValueConnection.length > 1) {
             if (option.path === locationQueryValueConnection[0]) {
               const value = parseInt(locationQueryValueConnection[1], 10);
+              const connection = connections.get(option.path) && connections.getIn([option.path, value]);
               filterOptions.options[value] = {
-                reference: connections.get(option.path) && connections.getIn([option.path, value])
-                    ? getEntityReference(connections.getIn([option.path, value]))
-                    : '',
-                label: connections.get(option.path) && connections.getIn([option.path, value])
-                    ? getEntityTitle(connections.getIn([option.path, value]))
-                    : upperFirst(value),
+                reference: connection ? getEntityReference(connection) : '',
+                label: connection ? getEntityTitle(connection) : upperFirst(value),
                 showCount: true,
                 value: `${option.path}:${value}`,
                 count: 0,
                 query,
                 checked: true,
-                tags: connections.get(option.path) && connections.getIn([option.path, value])
-                  ? connections.getIn([option.path, value]).get('categories')
-                  : null,
+                tags: connection ? connection.get('categories') : null,
+                draft: connection && connection.getIn(['attributes', 'draft']),
               };
             }
           }
@@ -321,6 +317,7 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
                   query,
                   checked: optionChecked(locationQueryValue, value),
                   tags: connection.get('categories'),
+                  draft: connection.getIn(['attributes', 'draft']),
                 };
               }
             }
