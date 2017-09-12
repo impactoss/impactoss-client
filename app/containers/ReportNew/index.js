@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
+import styled from 'styled-components';
 
 import {
   getTitleFormField,
@@ -59,6 +60,10 @@ import {
 import messages from './messages';
 import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
+
+const Note = styled.p`
+  font-style: italic;
+`;
 
 export class ReportNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -163,7 +168,9 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
             }
           />
           { !canUserPublish &&
-            <FormattedMessage {...messages.guestNote} />
+            <Note>
+              <FormattedMessage {...messages.guestNote} />
+            </Note>
           }
           {!submitValid &&
             <ErrorMessages
