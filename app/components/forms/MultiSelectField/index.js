@@ -10,6 +10,7 @@ import Button from 'components/buttons/Button';
 import A from 'components/styled/A';
 
 import Icon from 'components/Icon';
+import ItemStatus from 'components/ItemStatus';
 
 import MultiSelectControl from '../MultiSelectControl';
 import messages from './messages';
@@ -58,7 +59,7 @@ const MultiselectActiveOptionRemove = styled(Button)`
   }
 `;
 const MultiselectActiveOption = styled.div`
-  padding-right: 40px;
+  padding-right: 50px;
 `;
 const MultiSelectDropdownIcon = styled.div`
   position: absolute;
@@ -151,6 +152,9 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
   renderMultiselectActiveOption = (option, field, i) => (
     <MultiselectActiveOptionListItem key={i}>
       <MultiselectActiveOption>
+        {option.get('draft') &&
+          <ItemStatus draft />
+        }
         { option.get('reference') &&
           <Id>{option.get('reference')}</Id>
         }

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Component from 'components/styled/Component';
 import Icon from 'components/Icon';
 
-import EntityListItemStatus from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems/EntityListItemStatus';
+import ItemStatus from 'components/ItemStatus';
 
 import EntityListItemMainTopReference from './EntityListItemMainTopReference';
 import EntityListItemMainTopIcon from './EntityListItemMainTopIcon';
@@ -30,7 +30,7 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
             <Icon name={entity.entityIcon} text iconRight />
           </EntityListItemMainTopIcon>
         }
-        <EntityListItemStatus draft={entity.draft} />
+        <ItemStatus draft={entity.draft} />
       </Component>
     );
   }

@@ -152,6 +152,7 @@ class OptionList extends React.PureComponent {
                     reference={typeof option.get('reference') !== 'undefined' && option.get('reference') !== null ? option.get('reference').toString() : ''}
                     label={option.get('label')}
                     isNew={option.get('isNew')}
+                    draft={option.get('draft')}
                   />
                 </OptionLabel>
                 { option.get('showCount') && typeof option.get('count') !== 'undefined' &&

@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { FormattedMessage } from 'react-intl';
+
+import ItemStatus from 'components/ItemStatus';
+
 import messages from './messages';
+
 
 const Label = styled.div`
   font-weight: ${(props) => props.bold ? 500 : 'normal'};
@@ -29,6 +33,9 @@ const IdSpacer = styled.span`
 // <Label bold={props.bold} italic={props.isNew}>
 const Option = (props) => (
   <Label bold={false}>
+    {props.draft &&
+      <ItemStatus draft />
+    }
     {props.reference &&
       <Id>{props.reference}</Id>
     }
@@ -47,7 +54,7 @@ const Option = (props) => (
 Option.propTypes = {
   label: PropTypes.string.isRequired,
   reference: PropTypes.string,
-  // bold: PropTypes.bool,
+  draft: PropTypes.bool,
   isNew: PropTypes.bool,
 };
 
