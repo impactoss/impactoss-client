@@ -445,7 +445,11 @@ export function* newEntitySaga({ data }) {
       data.onSuccess();
     }
     if (data.redirect) {
-      yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+      if (data.redirectWithoutCreatedId) {
+        yield put(push(`${data.redirect}`));
+      } else {
+        yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+      }
     }
   } catch (err) {
     err.response.json = yield err.response.json();

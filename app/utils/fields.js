@@ -46,8 +46,9 @@ export const getTitleField = (entity, isManager, attribute = 'title', label) => 
   label,
 });
 export const getStatusField = (entity, attribute = 'draft', options, label) => ({
+  controlType: 'info',
   type: 'status',
-  value: entity.getIn(['attributes', attribute]),
+  value: entity ? entity.getIn(['attributes', attribute]) : true,
   options,
   label,
 });

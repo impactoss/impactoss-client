@@ -90,7 +90,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         getReportsField(
           reports,
           appMessages,
-          isContributor && {
+          {
             type: 'add',
             title: this.context.intl.formatMessage(messages.addReport),
             onClick: this.props.handleNewReport,
@@ -159,10 +159,17 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         onClick: this.props.handleClose,
       },
     ]
-    : [{
-      type: 'close',
-      onClick: this.props.handleClose,
-    }];
+    : [
+      {
+        type: 'text',
+        title: this.context.intl.formatMessage(messages.addReport),
+        onClick: this.props.handleNewReport,
+      },
+      {
+        type: 'close',
+        onClick: this.props.handleClose,
+      },
+    ];
 
     return (
       <div>

@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
@@ -18,6 +19,10 @@ import {
   getMarkdownField,
   getUploadField,
 } from 'utils/forms';
+
+import { getStatusField as getStatusInfoField } from 'utils/fields';
+
+import { attributesEqual } from 'utils/entities';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
@@ -33,7 +38,12 @@ import {
   saveErrorDismiss,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectIsUserContributor,
+  selectIsUserManager,
+  selectSessionUserId,
+} from 'containers/App/selectors';
 
 import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
@@ -74,8 +84,12 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     },
   ]);
 
-  getHeaderAsideFields = () => ([{
-    fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
+  getHeaderAsideFields = (canUserPublish) => ([{
+    fields: [
+      canUserPublish
+      ? getStatusField(this.context.intl.formatMessage, appMessages)
+      : getStatusInfoField(),
+    ],
   }]);
 
   getBodyMainFields = () => ([
@@ -103,10 +117,19 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     },
   ]);
 
+  canUserPublish = (isUserContributor, isUserManager, userId, indicator) =>
+    isUserManager || (isUserContributor && attributesEqual(userId, indicator.getIn(['attributes', 'manager_id'])));
+
   render() {
-    const { dataReady, indicator, viewDomain } = this.props;
+    const { dataReady, indicator, viewDomain, isUserContributor, isUserManager, userId } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
     const indicatorReference = this.props.params.id;
+    const canUserPublish = dataReady && this.canUserPublish(
+      isUserContributor,
+      isUserManager,
+      userId,
+      indicator
+    );
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     pageTitle = `${pageTitle} for indicator ${indicatorReference}`;
@@ -139,6 +162,9 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               }] : null
             }
           />
+          { !canUserPublish &&
+            <FormattedMessage {...messages.guestNote} />
+          }
           {!submitValid &&
             <ErrorMessages
               error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
@@ -169,11 +195,11 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(),
+                  aside: this.getHeaderAsideFields(canUserPublish),
                 },
                 body: {
                   main: this.getBodyMainFields(),
-                  aside: this.getBodyAsideFields(indicator),
+                  aside: canUserPublish && this.getBodyAsideFields(indicator),
                 },
               }}
             />
@@ -201,6 +227,9 @@ ReportNew.propTypes = {
   initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  isUserContributor: PropTypes.bool,
+  isUserManager: PropTypes.bool,
+  userId: PropTypes.string,
 };
 
 ReportNew.contextTypes = {
@@ -211,6 +240,9 @@ const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   indicator: selectIndicator(state, props.params.id),
+  isUserContributor: selectIsUserContributor(state),
+  isUserManager: selectIsUserManager(state),
+  userId: selectSessionUserId(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -234,7 +266,7 @@ function mapDispatchToProps(dispatch) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, indicatorReference) => {
+    handleSubmit: (formData, indicatorReference, canUserPublish) => {
       let saveData = formData;
 
       saveData = saveData.setIn(['attributes', 'indicator_id'], indicatorReference);
@@ -244,7 +276,7 @@ function mapDispatchToProps(dispatch) {
         saveData = saveData.setIn(['attributes', 'due_date_id'], null);
       }
 
-      dispatch(save(saveData.toJS()));
+      dispatch(save(saveData.toJS(), canUserPublish ? '/reports' : `/indicators/${indicatorReference}`, !canUserPublish));
     },
     handleCancel: (indicatorReference) => {
       dispatch(updatePath(`/indicators/${indicatorReference}`));
