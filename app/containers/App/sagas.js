@@ -58,6 +58,7 @@ import {
 import {
   selectPreviousPathname,
   selectCurrentPathname,
+  selectRedirectOnAuthSuccessPath,
   selectRequestedAt,
   selectIsSignedIn,
   selectLocation,
@@ -163,11 +164,10 @@ export function* recoverSaga(payload) {
   }
 }
 
-const authRoutes = ['/login', '/register', '/logout'];
 export function* authChangeSaga() {
-  const prevPathname = yield select(selectPreviousPathname);
-  if (prevPathname && authRoutes.indexOf(prevPathname) < 0) {
-    yield put(push(prevPathname));
+  const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
+  if (redirectPathname) {
+    yield put(push(redirectPathname));
   } else {
     // forward to home
     yield put(push('/'));
@@ -495,14 +495,12 @@ export function* saveConnectionsSaga({ data }) {
   }
 }
 
-export function* updateRouteQuerySaga({ query, extend = true }) {
-  // TODO consider using history.js's updateQueryStringParams
-  const location = yield select(selectLocation);
+const getNextQuery = (query, extend, location) => {
   // figure out new query
   // get old query or new query if not extending (replacing)
   const queryPrevious = extend ? location.get('query').toJS() : {};
   // and figure out new query
-  const queryNext = asArray(query).reduce((q, param) => {
+  return asArray(query).reduce((q, param) => {
     const queryUpdated = q;
     // if already set and not replacing
     if (queryUpdated[param.arg] && !param.replace) {
@@ -532,18 +530,18 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
         }
       }
     // if not already set or replacing
-    } else if (param.add || param.replace) {
-      if (param.remove) {
-        delete queryUpdated[param.arg];
-      } else {
-        queryUpdated[param.arg] = param.value;
-      }
+    } else if (param.remove) {
+      delete queryUpdated[param.arg];
+    } else {
+      queryUpdated[param.arg] = param.value;
     }
     return queryUpdated;
   }, queryPrevious);
+};
 
-  // convert to string
-  const queryNextString = reduce(queryNext, (result, value, key) => {
+// convert to string
+const getNextQueryString = (queryNext) =>
+  reduce(queryNext, (result, value, key) => {
     let params;
     if (Array.isArray(value)) {
       params = value.reduce((memo, val) => `${memo}${memo.length > 0 ? '&' : ''}${key}=${encodeURIComponent(val)}`, '');
@@ -553,11 +551,33 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
     return `${result}${result.length > 0 ? '&' : ''}${params}`;
   }, '');
 
-  yield put(push(`${location.get('pathname')}?${queryNextString}`));
+export function* updateRouteQuerySaga({ query, extend = true }) {
+  // TODO consider using history.js's updateQueryStringParams
+  const location = yield select(selectLocation);
+  const queryNext = getNextQuery(query, extend, location);
+
+  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
-export function* updatePathSaga({ path }) {
-  yield put(push(path.startsWith('/') ? path : `/${path}`));
+export function* updatePathSaga({ path, args }) {
+  const relativePath = path.startsWith('/') ? path : `/${path}`;
+
+  if (args && (args.query || args.keepQuery)) {
+    const location = yield select(selectLocation);
+    let queryNext = {};
+    if (args.query) {
+      queryNext = getNextQuery(args.query, args.extend, location);
+    }
+    if (args.keepQuery) {
+      queryNext = location.get('query').toJS();
+    }
+    // convert to string
+    const queryNextString = getNextQueryString(queryNext);
+
+    yield put(push(`${relativePath}?${queryNextString}`));
+  } else {
+    yield put(push(relativePath));
+  }
 }
 
 const backTargetIgnore = ['/edit', '/new', 'login', '/reports'];

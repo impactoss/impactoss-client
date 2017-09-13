@@ -129,6 +129,17 @@ export const selectCurrentPathname = createSelector(
   }
 );
 
+export const selectRedirectOnAuthSuccessPath = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.getIn(['locationBeforeTransitions', 'query', 'redirectOnAuthSuccess']);
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
 export const selectPreviousPathname = createSelector(
   getRoute,
   (routeState) => {
@@ -217,6 +228,11 @@ export const selectSortOrderQuery = createSelector(
 export const selectSortByQuery = createSelector(
   (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('sort')
+);
+
+export const selectRedirectOnAuthSuccessQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('redirectOnAuthSuccess')
 );
 
 

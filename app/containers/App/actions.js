@@ -425,10 +425,11 @@ export function updateRouteQuery(query, extend) {
   };
 }
 
-export function updatePath(path) {
+export function updatePath(path, args) {
   return {
     type: UPDATE_PATH,
     path,
+    args, // { keepQuery: false, query: { arg: key, value }, extend: true }
   };
 }
 

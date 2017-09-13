@@ -7,7 +7,7 @@ function redirectIfNotSignedIn(store) {
     if (!store.getState().getIn(['global', 'user', 'isSignedIn'])) {
       replace({
         pathname: '/login',
-        pathnameOnAuthChange: nextState.location.pathname,
+        query: { redirectOnAuthSuccess: nextState.location.pathname },
       });
     }
   };
@@ -28,7 +28,7 @@ function redirectIfNotPermitted(store, roleRequired) {
     if (!store.getState().getIn(['global', 'user', 'isSignedIn'])) {
       replace({
         pathname: '/login',
-        pathnameOnAuthChange: nextState.location.pathname,
+        query: { redirectOnAuthSuccess: nextState.location.pathname },
       });
     } else if (store.getState().getIn(['global', 'user', 'attributes'])) {
       const userId = store.getState().getIn(['global', 'user', 'attributes']).id;

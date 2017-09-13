@@ -129,7 +129,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
                 href="/login"
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink('/login');
+                  this.props.handleLink('/login', { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.loginLink} />
@@ -170,8 +170,8 @@ export function mapDispatchToProps(dispatch) {
     handleCancel: () => {
       dispatch(updatePath('/'));
     },
-    handleLink: (path) => {
-      dispatch(updatePath(path));
+    handleLink: (path, args) => {
+      dispatch(updatePath(path, args));
     },
   };
 }
