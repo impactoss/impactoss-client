@@ -230,12 +230,6 @@ export const selectSortByQuery = createSelector(
   (locationQuery) => locationQuery && locationQuery.get('sort')
 );
 
-export const selectRedirectOnAuthSuccessQuery = createSelector(
-  (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('redirectOnAuthSuccess')
-);
-
-
 // NEW performant way of selecting and querying entities
 
 const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
