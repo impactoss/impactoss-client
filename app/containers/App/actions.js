@@ -64,6 +64,7 @@ import {
   OPEN_NEW_ENTITY_MODAL,
   RESET_PROGRESS,
   SUBMIT_INVALID,
+  DISMISS_QUERY_MESSAGES,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -471,5 +472,11 @@ export function openNewEntityModal(args) {
   return {
     type: OPEN_NEW_ENTITY_MODAL,
     args,
+  };
+}
+
+export function dismissQueryMessages() {
+  return {
+    type: DISMISS_QUERY_MESSAGES,
   };
 }

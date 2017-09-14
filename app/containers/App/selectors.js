@@ -140,6 +140,21 @@ export const selectRedirectOnAuthSuccessPath = createSelector(
   }
 );
 
+export const selectQueryMessages = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return ({
+        info: routeState.getIn(['locationBeforeTransitions', 'query', 'info']),
+        warning: routeState.getIn(['locationBeforeTransitions', 'query', 'warning']),
+        error: routeState.getIn(['locationBeforeTransitions', 'query', 'error']),
+      });
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
 export const selectPreviousPathname = createSelector(
   getRoute,
   (routeState) => {

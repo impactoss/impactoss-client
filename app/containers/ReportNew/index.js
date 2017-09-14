@@ -283,7 +283,11 @@ function mapDispatchToProps(dispatch) {
         saveData = saveData.setIn(['attributes', 'due_date_id'], null);
       }
 
-      dispatch(save(saveData.toJS(), canUserPublish ? '/reports' : `/indicators/${indicatorReference}`, !canUserPublish));
+      dispatch(save(
+        saveData.toJS(),
+        canUserPublish ? '/reports' : `/indicators/${indicatorReference}`,
+        !canUserPublish // do not append created id to redirect (as happens by default)
+      ));
     },
     handleCancel: (indicatorReference) => {
       dispatch(updatePath(`/indicators/${indicatorReference}`));

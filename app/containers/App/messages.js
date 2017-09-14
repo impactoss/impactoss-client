@@ -672,4 +672,22 @@ export default defineMessages({
       },
     },
   },
+  messages: {
+    info: {
+      notSignedIn: {
+        id: 'app.containers.App.messages.info.notSignedIn',
+        defaultMessage: 'Please sign in or register first to access this page',
+      },
+      alreadySignedIn: {
+        id: 'app.containers.App.messages.info.alreadySignedIn',
+        defaultMessage: 'Welcome back!',
+      },
+    },
+    warning: {
+      notPermitted: {
+        id: 'app.containers.App.messages.warning.notPermitted',
+        defaultMessage: 'We are sorry but you have not sufficient rights to access this page.',
+      },
+    },
+  },
 });

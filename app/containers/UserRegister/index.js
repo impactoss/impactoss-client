@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import Icon from 'components/Icon';
+import QueryMessages from 'components/QueryMessages';
 import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
@@ -20,7 +21,8 @@ import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
-import { updatePath } from 'containers/App/actions';
+import { selectQueryMessages } from 'containers/App/selectors';
+import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -54,6 +56,12 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
         <ContentNarrow>
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
+          />
+          <QueryMessages
+            info={this.props.queryMessages.info}
+            warning={this.props.queryMessages.warning}
+            error={this.props.queryMessages.danger}
+            onDismiss={this.props.onDismissQueryMessages}
           />
           {registerError &&
             <ErrorMessages error={registerError} />
@@ -149,6 +157,8 @@ UserRegister.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
   initialiseForm: PropTypes.func,
+  onDismissQueryMessages: PropTypes.func,
+  queryMessages: PropTypes.object,
 };
 
 UserRegister.contextTypes = {
@@ -157,6 +167,7 @@ UserRegister.contextTypes = {
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
+  queryMessages: selectQueryMessages(state),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -172,6 +183,9 @@ export function mapDispatchToProps(dispatch) {
     },
     handleLink: (path, args) => {
       dispatch(updatePath(path, args));
+    },
+    onDismissQueryMessages: () => {
+      dispatch(dismissQueryMessages());
     },
   };
 }

@@ -3,7 +3,7 @@
  */
 
 import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
-import { push, goBack } from 'react-router-redux';
+import { push, goBack, replace } from 'react-router-redux';
 import { reduce, keyBy, find } from 'lodash/collection';
 import { without } from 'lodash/array';
 
@@ -28,6 +28,7 @@ import {
   RECOVER_PASSWORD,
   CLOSE_ENTITY,
   RECORD_OUTDATED,
+  DISMISS_QUERY_MESSAGES,
 } from 'containers/App/constants';
 
 import {
@@ -119,17 +120,30 @@ export function* checkEntitiesSaga(payload) {
  */
 export function* checkRoleSaga({ role }) {
   const signedIn = yield select(selectIsSignedIn);
-  const authenticating = yield select(selectIsAuthenticating);
   if (signedIn) {
     const roleIds = yield select(selectSessionUserRoles);
     if (!(roleIds.includes(role)
       || (role === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
       || (role === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
     )) {
-      yield put(push('/login'));
+      yield put(replace({
+        query: {
+          warning: 'notPermitted',
+        },
+      }));
     }
-  } else if (!authenticating) {
-    yield put(push('/login'));
+  } else {
+    const authenticating = yield select(selectIsAuthenticating);
+    if (!authenticating) {
+      const redirectOnAuthSuccess = yield select(selectCurrentPathname);
+      yield put(replace({
+        pathname: '/login',
+        query: {
+          redirectOnAuthSuccess,
+          info: 'notSignedIn',
+        },
+      }));
+    }
   }
 }
 
@@ -511,7 +525,7 @@ const getNextQuery = (query, extend, location) => {
           queryUpdated[param.arg].push(param.value);
         }
         // remove if present
-        if (extend && param.remove && queryUpdated[param.arg].indexOf(param.value.toString()) > -1) {
+        if (extend && param.remove && param.value && queryUpdated[param.arg].indexOf(param.value.toString()) > -1) {
           queryUpdated[param.arg] = without(queryUpdated[param.arg], param.value.toString());
           // convert to single value if only one value left
           if (queryUpdated[param.arg].length === 1) {
@@ -521,18 +535,21 @@ const getNextQuery = (query, extend, location) => {
       // if single value set
       } else {
         // add if not already present and convert to array
-        if (param.add && queryUpdated[param.arg] !== param.value.toString()) {
+        if (param.value && param.add && queryUpdated[param.arg] !== param.value.toString()) {
           queryUpdated[param.arg] = [queryUpdated[param.arg], param.value];
         }
         // remove if present
-        if (extend && param.remove && queryUpdated[param.arg] === param.value.toString()) {
+        if (extend && param.remove && param.value && queryUpdated[param.arg] === param.value.toString()) {
+          delete queryUpdated[param.arg];
+        }
+        if (extend && param.remove && !param.value) {
           delete queryUpdated[param.arg];
         }
       }
     // if not already set or replacing
-    } else if (param.remove) {
+    } else if (queryUpdated[param.arg] && param.remove) {
       delete queryUpdated[param.arg];
-    } else {
+    } else if (param.arg && param.value) {
       queryUpdated[param.arg] = param.value;
     }
     return queryUpdated;
@@ -552,10 +569,24 @@ const getNextQueryString = (queryNext) =>
   }, '');
 
 export function* updateRouteQuerySaga({ query, extend = true }) {
-  // TODO consider using history.js's updateQueryStringParams
   const location = yield select(selectLocation);
   const queryNext = getNextQuery(query, extend, location);
 
+  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
+}
+
+
+export function* dismissQueryMessagesSaga() {
+  const location = yield select(selectLocation);
+  const queryNext = getNextQuery(
+    [
+      { arg: 'info', remove: true },
+      { arg: 'warning', remove: true },
+      { arg: 'error', remove: true },
+    ],
+    true,
+    location
+  );
   yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
@@ -604,7 +635,6 @@ export default function* rootSaga() {
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
-  // yield takeLatest(RESET_PASSWORD, resetSaga);
   yield takeLatest(RECOVER_PASSWORD, recoverSaga);
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
@@ -619,6 +649,7 @@ export default function* rootSaga() {
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
+  yield takeEvery(DISMISS_QUERY_MESSAGES, dismissQueryMessagesSaga);
 
   yield takeEvery(CLOSE_ENTITY, closeEntitySaga);
 }

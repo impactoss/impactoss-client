@@ -4,17 +4,15 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { FormattedMessage } from 'react-intl';
 
-import { RECORD_OUTDATED } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
-import messages from './messages';
 
 const Styled = styled.div`
   display: table;
   width: 100%;
-  color: ${palette('danger', 4)};
-  background-color: ${palette('danger', 0)};
+  color: ${(props) => palette(props.palette, 4)};
+  background-color: ${(props) => palette(props.palette, 0)};
   position: relative;
   z-index: 1;
   box-shadow: ${(props) => props.withoutShadow ? 0 : '0px 0px 15px 0px rgba(0,0,0,0.2)'};
@@ -33,30 +31,32 @@ const DismissWrapper = styled.div`
 `;
 const Dismiss = styled(Button)``;
 
-const Message = styled.div``;
-
-class ErrorMessages extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  translateMessage = (message) => {
-    if (message === RECORD_OUTDATED) {
-      return this.context.intl.formatMessage(appMessages.forms.outdatedError);
-    }
-    return message;
-  }
+class QueryMessages extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    return (
-      <Styled>
+    let messageStyle = '';
+    if (this.props.error) {
+      messageStyle = 'danger';
+    } else if (this.props.warning) {
+      messageStyle = 'alert';
+    } else if (this.props.info) {
+      messageStyle = 'info';
+    }
+
+    return !(this.props.error || this.props.warning || this.props.info)
+    ? null
+    : (
+      <Styled palette={messageStyle}>
         <MessageWrapper>
           <div>
-            <strong>
-              <FormattedMessage {...messages.preBold} />
-            </strong>
-            <FormattedMessage {...messages.preAdditional} />
-            {
-              this.props.error.messages && this.props.error.messages.map((message, i) => (
-                <Message key={i}>{this.translateMessage(message)}</Message>
-              ))
+            { this.props.info &&
+              <FormattedMessage {...appMessages.messages.info[this.props.info]} />
+            }
+            { this.props.warning &&
+              <FormattedMessage {...appMessages.messages.warning[this.props.warning]} />
+            }
+            { this.props.error &&
+              <FormattedMessage {...appMessages.messages.error[this.props.error]} />
             }
           </div>
         </MessageWrapper>
@@ -72,12 +72,14 @@ class ErrorMessages extends React.PureComponent { // eslint-disable-line react/p
   }
 }
 
-ErrorMessages.propTypes = {
+QueryMessages.propTypes = {
+  info: PropTypes.object,
+  warning: PropTypes.object,
   error: PropTypes.object,
   onDismiss: PropTypes.func,
 };
-ErrorMessages.contextTypes = {
+QueryMessages.contextTypes = {
   intl: PropTypes.object,
 };
 
-export default ErrorMessages;
+export default QueryMessages;

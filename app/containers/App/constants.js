@@ -75,6 +75,8 @@ export const CLOSE_ENTITY = 'nmrf/App/CLOSE_ENTITY';
 export const OPEN_NEW_ENTITY_MODAL = 'nmrf/App/OPEN_NEW_ENTITY_MODAL';
 export const SUBMIT_INVALID = 'nmrf/App/SUBMIT_INVALID';
 
+export const DISMISS_QUERY_MESSAGES = 'nmrf/App/DISMISS_QUERY_MESSAGES';
+
 export const PUBLISH_STATUSES = [
   { value: true, label: 'Draft' },
   { value: false, label: 'Public' },
