@@ -8,11 +8,11 @@ import {
   SAVE,
 } from './constants';
 
-export function save(data, redirect, redirectWithoutCreatedId) {
+export function save(data, redirect, createAsGuest) {
   return {
     type: SAVE,
     data,
     redirect,
-    redirectWithoutCreatedId,
+    createAsGuest,
   };
 }

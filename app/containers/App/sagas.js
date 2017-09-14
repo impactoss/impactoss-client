@@ -381,77 +381,81 @@ export function* newEntitySaga({ data }) {
     // update entity attributes
     // on the server
     const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
-    yield put(addEntity(data.path, entityCreated.data));
 
-    // check for associations/connections
-    // update recommendation-action connections
-    if (data.entity.recommendationMeasures) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'recommendation_measures',
-        updates: data.entity.recommendationMeasures,
-        keyPair: ['recommendation_id', 'measure_id'],
-      });
-    }
+    if (!data.createAsGuest) {
+      yield put(addEntity(data.path, entityCreated.data));
 
-    // update action-indicator connections
-    if (data.entity.measureIndicators) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'measure_indicators',
-        updates: data.entity.measureIndicators,
-        keyPair: ['indicator_id', 'measure_id'],
-      });
-    }
 
-    // update action-category connections
-    if (data.entity.measureCategories) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'measure_categories',
-        updates: data.entity.measureCategories,
-        keyPair: ['category_id', 'measure_id'],
-      });
-    }
+      // check for associations/connections
+      // update recommendation-action connections
+      if (data.entity.recommendationMeasures) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'recommendation_measures',
+          updates: data.entity.recommendationMeasures,
+          keyPair: ['recommendation_id', 'measure_id'],
+        });
+      }
 
-    // update sdgtarget-indicator connections
-    if (data.entity.sdgtargetIndicators) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'sdgtarget_indicators',
-        updates: data.entity.sdgtargetIndicators,
-        keyPair: ['indicator_id', 'sdgtarget_id'],
-      });
-    }
+      // update action-indicator connections
+      if (data.entity.measureIndicators) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'measure_indicators',
+          updates: data.entity.measureIndicators,
+          keyPair: ['indicator_id', 'measure_id'],
+        });
+      }
 
-    // update sdgtarget-indicator connections
-    if (data.entity.sdgtargetMeasures) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'sdgtarget_measures',
-        updates: data.entity.sdgtargetMeasures,
-        keyPair: ['measure_id', 'sdgtarget_id'],
-      });
-    }
+      // update action-category connections
+      if (data.entity.measureCategories) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'measure_categories',
+          updates: data.entity.measureCategories,
+          keyPair: ['category_id', 'measure_id'],
+        });
+      }
 
-    // update sdgtarget-category connections
-    if (data.entity.sdgtargetCategories) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'sdgtarget_categories',
-        updates: data.entity.sdgtargetCategories,
-        keyPair: ['category_id', 'sdgtarget_id'],
-      });
-    }
+      // update sdgtarget-indicator connections
+      if (data.entity.sdgtargetIndicators) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'sdgtarget_indicators',
+          updates: data.entity.sdgtargetIndicators,
+          keyPair: ['indicator_id', 'sdgtarget_id'],
+        });
+      }
 
-    // update recommendation-category connections
-    if (data.entity.recommendationCategories) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'recommendation_categories',
-        updates: data.entity.recommendationCategories,
-        keyPair: ['category_id', 'recommendation_id'],
-      });
+      // update sdgtarget-indicator connections
+      if (data.entity.sdgtargetMeasures) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'sdgtarget_measures',
+          updates: data.entity.sdgtargetMeasures,
+          keyPair: ['measure_id', 'sdgtarget_id'],
+        });
+      }
+
+      // update sdgtarget-category connections
+      if (data.entity.sdgtargetCategories) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'sdgtarget_categories',
+          updates: data.entity.sdgtargetCategories,
+          keyPair: ['category_id', 'sdgtarget_id'],
+        });
+      }
+
+      // update recommendation-category connections
+      if (data.entity.recommendationCategories) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'recommendation_categories',
+          updates: data.entity.recommendationCategories,
+          keyPair: ['category_id', 'recommendation_id'],
+        });
+      }
     }
 
     yield put(saveSuccess(dataTS));
@@ -459,7 +463,7 @@ export function* newEntitySaga({ data }) {
       data.onSuccess();
     }
     if (data.redirect) {
-      if (data.redirectWithoutCreatedId) {
+      if (data.createAsGuest) {
         yield put(push(`${data.redirect}`));
       } else {
         yield put(push(`${data.redirect}/${entityCreated.data.id}`));
