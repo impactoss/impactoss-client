@@ -615,7 +615,7 @@ export default function createRoutes(store) {
     }, {
       path: '/reports/new/:id', // the indicator id
       name: 'reportNew',
-      onEnter: redirectIfNotSignedIn,
+      onEnter: (theStore) => redirectIfNotSignedIn(theStore, 'signInGuestReport'),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ReportNew/reducer'),
@@ -824,6 +824,14 @@ export default function createRoutes(store) {
         });
 
         importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/unauthorised',
+      name: 'unauthorised',
+      getComponent(nextState, cb) {
+        import('containers/Unauthorised')
+          .then(loadModule(cb))
+          .catch(errorLoading);
       },
     }, {
       path: '*',

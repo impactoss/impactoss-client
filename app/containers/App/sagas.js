@@ -126,11 +126,7 @@ export function* checkRoleSaga({ role }) {
       || (role === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
       || (role === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
     )) {
-      yield put(replace({
-        query: {
-          warning: 'notPermitted',
-        },
-      }));
+      yield put(replace('/unauthorised'));
     }
   } else {
     const authenticating = yield select(selectIsAuthenticating);

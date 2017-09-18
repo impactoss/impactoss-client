@@ -286,7 +286,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(
         saveData.toJS(),
         canUserPublish ? '/reports' : `/indicators/${indicatorReference}`,
-        !canUserPublish // do not append created id to redirect (as happens by default)
+        !canUserPublish // createAsGuest: do not append created id to redirect, do not create locally
       ));
     },
     handleCancel: (indicatorReference) => {

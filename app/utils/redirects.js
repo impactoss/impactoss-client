@@ -2,12 +2,12 @@ import { USER_ROLES } from 'containers/App/constants';
 
 import checkStore from './checkStore';
 
-function replaceIfNotSignedIn(nextState, replace) {
+function replaceIfNotSignedIn(nextState, replace, info = 'notSignedIn') {
   replace({
     pathname: '/login',
     query: {
       redirectOnAuthSuccess: nextState.location.pathname,
-      info: 'notSignedIn',
+      info,
     },
   });
 }
@@ -44,8 +44,8 @@ function redirectIfSignedIn(store) {
   };
 }
 
-function redirectIfNotSignedIn(store) {
-  return (nextState, replace) => !isSignedIn(store) && replaceIfNotSignedIn(nextState, replace);
+function redirectIfNotSignedIn(store, info = 'notSignedIn') {
+  return (nextState, replace) => !isSignedIn(store) && replaceIfNotSignedIn(nextState, replace, info);
 }
 
 function redirectIfNotPermitted(store, roleRequired) {
@@ -54,11 +54,7 @@ function redirectIfNotPermitted(store, roleRequired) {
       replaceIfNotSignedIn(nextState, replace);
     } else if (store.getState().getIn(['global', 'user', 'attributes'])) {
       if (!hasRoleRequired(getUserRoleIds(store), roleRequired)) {
-        replace({
-          query: {
-            warning: 'notPermitted',
-          },
-        });
+        replace('/not-authorised');
       }
     }
   };

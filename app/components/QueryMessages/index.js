@@ -73,9 +73,9 @@ class QueryMessages extends React.PureComponent { // eslint-disable-line react/p
 }
 
 QueryMessages.propTypes = {
-  info: PropTypes.object,
-  warning: PropTypes.object,
-  error: PropTypes.object,
+  info: PropTypes.string,
+  warning: PropTypes.string,
+  error: PropTypes.string,
   onDismiss: PropTypes.func,
 };
 QueryMessages.contextTypes = {
