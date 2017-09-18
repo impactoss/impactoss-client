@@ -22,7 +22,10 @@ import {
   resetProgress,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectReadyForAuthCheck,
+} from 'containers/App/selectors';
 
 // import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -47,8 +50,10 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
       this.props.loadEntitiesIfNeeded();
     }
     if (nextProps.dataReady && !this.props.dataReady) {
-      this.props.redirectIfNotPermitted();
       this.props.initialiseForm('indicatorImport.form.data', FORM_INITIAL);
+    }
+    if (nextProps.authReady && !this.props.authReady) {
+      this.props.redirectIfNotPermitted();
     }
   }
 
@@ -113,6 +118,7 @@ SdgTargetImport.propTypes = {
   handleReset: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   resetProgress: PropTypes.func.isRequired,
 };
 
@@ -125,6 +131,7 @@ const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: [
     'user_roles',
   ] }),
+  authReady: selectReadyForAuthCheck(state),
 });
 
 function mapDispatchToProps(dispatch) {

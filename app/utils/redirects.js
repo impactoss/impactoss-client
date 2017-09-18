@@ -2,17 +2,21 @@ import { USER_ROLES } from 'containers/App/constants';
 
 import checkStore from './checkStore';
 
-function replaceIfNotSignedIn(nextState, replace, info = 'notSignedIn') {
-  replace({
+export function replaceIfNotSignedIn(pathname, replace, info = 'notSignedIn') {
+  return replace({
     pathname: '/login',
     query: {
-      redirectOnAuthSuccess: nextState.location.pathname,
+      redirectOnAuthSuccess: pathname,
       info,
     },
   });
 }
 
-function isSignedIn(store) {
+export function replaceUnauthorised(replace) {
+  return replace('/unauthorised');
+}
+
+export function isSignedIn(store) {
   return store.getState().getIn(['global', 'user', 'isSignedIn']);
 }
 
@@ -25,7 +29,7 @@ function getUserRoleIds(store) {
     .map((role) => role.getIn(['attributes', 'role_id']));
 }
 
-function hasRoleRequired(roleIds, roleRequired) {
+export function hasRoleRequired(roleIds, roleRequired) {
   return roleIds.includes(roleRequired)
   || (roleRequired === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
   || (roleRequired === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)));
@@ -45,16 +49,16 @@ function redirectIfSignedIn(store) {
 }
 
 function redirectIfNotSignedIn(store, info = 'notSignedIn') {
-  return (nextState, replace) => !isSignedIn(store) && replaceIfNotSignedIn(nextState, replace, info);
+  return (nextState, replace) => !isSignedIn(store) && replaceIfNotSignedIn(nextState.location.pathname, replace, info);
 }
 
 function redirectIfNotPermitted(store, roleRequired) {
   return (nextState, replace) => {
     if (!isSignedIn(store)) {
-      replaceIfNotSignedIn(nextState, replace);
+      replaceIfNotSignedIn(nextState.location.pathname, replace);
     } else if (store.getState().getIn(['global', 'user', 'attributes'])) {
       if (!hasRoleRequired(getUserRoleIds(store), roleRequired)) {
-        replace('/not-authorised');
+        replaceUnauthorised(replace);
       }
     }
   };

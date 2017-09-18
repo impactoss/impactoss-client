@@ -55,7 +55,11 @@ import {
   saveErrorDismiss,
 } from 'containers/App/actions';
 
-import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectReadyForAuthCheck,
+  selectIsUserAdmin,
+} from 'containers/App/selectors';
 
 import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
@@ -94,8 +98,10 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     }
     // repopulate if new data becomes ready
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.redirectIfNotPermitted();
       this.props.initialiseForm('indicatorEdit.form.data', this.getInitialFormData(nextProps));
+    }
+    if (nextProps.authReady && !this.props.authReady) {
+      this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
       scrollToTop(this.ScrollContainer);
@@ -302,6 +308,7 @@ IndicatorEdit.propTypes = {
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
@@ -322,6 +329,7 @@ const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   isUserAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),
   measures: selectMeasures(state, props.params.id),

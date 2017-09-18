@@ -32,7 +32,10 @@ import {
   submitInvalid,
   saveErrorDismiss,
 } from 'containers/App/actions';
-import { selectReady } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectReadyForAuthCheck,
+} from 'containers/App/selectors';
 
 import ErrorMessages from 'components/ErrorMessages';
 import Loading from 'components/Loading';
@@ -58,7 +61,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
@@ -172,6 +175,7 @@ PageNew.propTypes = {
   onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   initialiseForm: PropTypes.func,
 };
 
@@ -182,6 +186,7 @@ PageNew.contextTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
 });
 
 function mapDispatchToProps(dispatch) {

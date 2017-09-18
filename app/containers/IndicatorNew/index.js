@@ -48,6 +48,7 @@ import {
 
 import {
   selectReady,
+  selectReadyForAuthCheck,
   selectMeasuresCategorised,
   selectSdgTargetsCategorised,
 } from 'containers/App/selectors';
@@ -80,7 +81,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
@@ -248,6 +249,7 @@ IndicatorNew.propTypes = {
   onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   users: PropTypes.object,
@@ -266,6 +268,7 @@ IndicatorNew.contextTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   // all measures,
   measures: selectMeasuresCategorised(state),
   // all sdgtargets,

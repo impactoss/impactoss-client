@@ -8,6 +8,12 @@ import { reduce, keyBy, find } from 'lodash/collection';
 import { without } from 'lodash/array';
 
 import asArray from 'utils/as-array';
+import {
+  hasRoleRequired,
+  replaceUnauthorised,
+  replaceIfNotSignedIn,
+} from 'utils/redirects';
+
 
 import {
   LOAD_ENTITIES_IF_NEEDED,
@@ -22,7 +28,6 @@ import {
   SAVE_CONNECTIONS,
   UPDATE_ROUTE_QUERY,
   AUTHENTICATE_FORWARD,
-  USER_ROLES,
   UPDATE_PATH,
   // RESET_PASSWORD,
   RECOVER_PASSWORD,
@@ -122,23 +127,14 @@ export function* checkRoleSaga({ role }) {
   const signedIn = yield select(selectIsSignedIn);
   if (signedIn) {
     const roleIds = yield select(selectSessionUserRoles);
-    if (!(roleIds.includes(role)
-      || (role === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
-      || (role === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
-    )) {
-      yield put(replace('/unauthorised'));
+    if (!hasRoleRequired(roleIds, role)) {
+      yield put(replaceUnauthorised(replace));
     }
   } else {
     const authenticating = yield select(selectIsAuthenticating);
     if (!authenticating) {
       const redirectOnAuthSuccess = yield select(selectCurrentPathname);
-      yield put(replace({
-        pathname: '/login',
-        query: {
-          redirectOnAuthSuccess,
-          info: 'notSignedIn',
-        },
-      }));
+      yield put(replaceIfNotSignedIn(redirectOnAuthSuccess, replace));
     }
   }
 }

@@ -46,6 +46,7 @@ import {
 
 import {
   selectReady,
+  selectReadyForAuthCheck,
   selectIsUserAdmin,
   selectEntity,
   selectMeasuresCategorised,
@@ -82,7 +83,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
@@ -264,6 +265,7 @@ CategoryNew.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
   viewDomain: PropTypes.object,
   taxonomy: PropTypes.object,
@@ -287,6 +289,7 @@ const mapStateToProps = (state, props) => ({
   isAdmin: selectIsUserAdmin(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   taxonomy: selectEntity(state, { path: 'taxonomies', id: props.params.id }),
   users: selectUsers(state),
   measures: selectMeasuresCategorised(state),

@@ -43,6 +43,7 @@ import {
 import {
   selectEntities,
   selectReady,
+  selectReadyForAuthCheck,
   selectMeasuresCategorised,
   selectSdgTargetTaxonomies,
 } from 'containers/App/selectors';
@@ -74,7 +75,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
@@ -204,6 +205,7 @@ SdgTargetNew.propTypes = {
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   indicators: PropTypes.object,
   measures: PropTypes.object,
@@ -221,6 +223,7 @@ SdgTargetNew.contextTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   taxonomies: selectSdgTargetTaxonomies(state),
   indicators: selectEntities(state, 'indicators'),
   measures: selectMeasuresCategorised(state),

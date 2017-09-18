@@ -54,6 +54,7 @@ import {
 
 import {
   selectReady,
+  selectReadyForAuthCheck,
   selectIsUserAdmin,
 } from 'containers/App/selectors';
 
@@ -93,8 +94,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       this.props.loadEntitiesIfNeeded();
     }
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.redirectIfNotPermitted();
       this.props.initialiseForm('categoryEdit.form.data', this.getInitialFormData(nextProps));
+    }
+    if (nextProps.authReady && !this.props.authReady) {
+      this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
       scrollToTop(this.ScrollContainer);
@@ -319,6 +322,7 @@ CategoryEdit.propTypes = {
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
@@ -339,6 +343,7 @@ const mapStateToProps = (state, props) => ({
   isAdmin: selectIsUserAdmin(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
   users: selectUsers(state),
   sdgtargets: selectSdgTargets(state, props.params.id),
