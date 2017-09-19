@@ -61,7 +61,7 @@ export default defineMessages({
     },
     passwordMismatchError: {
       id: 'app.containers.App.forms.passwordMismatchError',
-      defaultMessage: 'Password confirmation doesn\'t match Password',
+      defaultMessage: 'Password confirmation does not match password',
     },
     passwordShortError: {
       id: 'app.containers.App.forms.passwordMismatchError',
@@ -69,7 +69,7 @@ export default defineMessages({
     },
     passwordInvalidError: {
       id: 'app.containers.App.forms.passwordInvalidError',
-      defaultMessage: 'Current password is invalid',
+      defaultMessage: 'Current password does not match password on file',
     },
     numberError: {
       id: 'app.containers.App.forms.numberError',

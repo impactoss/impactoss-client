@@ -10,6 +10,7 @@ import validateDateFormat from 'components/forms/validators/validate-date-format
 import validateRequired from 'components/forms/validators/validate-required';
 import validateNumber from 'components/forms/validators/validate-number';
 import validateEmailFormat from 'components/forms/validators/validate-email-format';
+import validateLength from 'components/forms/validators/validate-length';
 
 import {
   PUBLISH_STATUSES,
@@ -491,8 +492,8 @@ export const getPasswordField = (formatMessage, appMessages, model = '.attribute
     required: true,
     model,
   });
-  // field.validators.email = validateEmailFormat;
-  // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
+  field.validators.passwordLength = (val) => validateLength(val, 6);
+  field.errorMessages.passwordLength = formatMessage(appMessages.forms.passwordShortError);
   return field;
 };
 
