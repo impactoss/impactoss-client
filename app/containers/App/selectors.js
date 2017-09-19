@@ -47,39 +47,39 @@ export const selectReadyForAuthCheck = createSelector(
   (isAuthenticating, rolesReady) => !isAuthenticating && rolesReady
 );
 
-const selectSessionUser = createSelector(
+export const selectSessionUser = createSelector(
   getGlobal,
   (state) => state.get('user')
 );
 
-export const selectSessionUserId = createSelector(
-  selectSessionUser,
-  (sessionUser) =>
-    sessionUser.get('attributes')
-    && sessionUser.get('attributes').id.toString()
-);
-
 export const selectIsSignedIn = createSelector(
   selectSessionUser,
-  (sessionUser) => sessionUser.get('isSignedIn')
+  (sessionUser) => sessionUser && sessionUser.get('isSignedIn')
+);
+
+export const selectSessionUserAttributes = createSelector(
+  selectSessionUser,
+  (sessionUser) => sessionUser && sessionUser.get('attributes')
+);
+
+export const selectSessionUserId = createSelector(
+  selectSessionUserAttributes,
+  (sessionUserAttributes) => sessionUserAttributes && sessionUserAttributes.id.toString()
 );
 
 // const makeSessionUserRoles = () => selectSessionUserRoles;
 export const selectSessionUserRoles = createSelector(
   (state) => state,
-  selectSessionUser,
-  (state, sessionUser) => {
-    if (sessionUser.get('attributes') && sessionUser.get('isSignedIn')) {
-      const roles = selectEntitiesWhere(state, {
-        path: 'user_roles',
-        where: {
-          user_id: sessionUser.get('attributes').id,
-        },
-      });
-      return roles.map((role) => role.getIn(['attributes', 'role_id'])).toArray();
-    }
-    return Map();
-  }
+  selectIsSignedIn,
+  selectSessionUserId,
+  (state, isSignedIn, sessionUserId) => isSignedIn && sessionUserId
+    ? selectEntitiesWhere(state, {
+      path: 'user_roles',
+      where: { user_id: sessionUserId },
+    })
+    .map((role) => role.getIn(['attributes', 'role_id']))
+    .toArray()
+    : Map()
 );
 
 export const selectIsUserAdmin = createSelector(

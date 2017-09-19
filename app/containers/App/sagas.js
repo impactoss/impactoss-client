@@ -125,16 +125,16 @@ export function* checkEntitiesSaga(payload) {
  */
 export function* checkRoleSaga({ role }) {
   const signedIn = yield select(selectIsSignedIn);
-  if (signedIn) {
-    const roleIds = yield select(selectSessionUserRoles);
-    if (!hasRoleRequired(roleIds, role)) {
-      yield put(replaceUnauthorised(replace));
-    }
-  } else {
+  if (!signedIn) {
     const authenticating = yield select(selectIsAuthenticating);
     if (!authenticating) {
       const redirectOnAuthSuccess = yield select(selectCurrentPathname);
       yield put(replaceIfNotSignedIn(redirectOnAuthSuccess, replace));
+    }
+  } else {
+    const roleIds = yield select(selectSessionUserRoles);
+    if (!hasRoleRequired(roleIds, role)) {
+      yield put(replaceUnauthorised(replace));
     }
   }
 }
@@ -145,8 +145,8 @@ export function* authenticateSaga(payload) {
     yield put(authenticateSending());
     const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
     yield put(authenticateSuccess(response.data));
+    yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
     yield put(forwardOnAuthenticationChange());
-    yield put(invalidateEntities());
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
