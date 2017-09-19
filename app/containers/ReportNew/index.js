@@ -256,7 +256,6 @@ ReportNew.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
-
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   indicator: selectIndicator(state, props.params.id),
   isUserContributor: selectIsUserContributor(state),

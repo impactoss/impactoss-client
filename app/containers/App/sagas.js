@@ -459,7 +459,10 @@ export function* newEntitySaga({ data }) {
     }
     if (data.redirect) {
       if (data.createAsGuest) {
-        yield put(push(`${data.redirect}`));
+        yield put(push({
+          pathname: `${data.redirect}`,
+          query: { info: 'createdAsGuest', infotype: data.path },
+        }));
       } else {
         yield put(push(`${data.redirect}/${entityCreated.data.id}`));
       }

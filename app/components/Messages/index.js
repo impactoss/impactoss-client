@@ -24,6 +24,7 @@ const Styled = styled.div`
   position: relative;
   z-index: 1;
   box-shadow: ${(props) => props.withoutShadow ? 0 : '0px 0px 15px 0px rgba(0,0,0,0.2)'};
+  margin-bottom: ${(props) => !props.spaceMessage ? 0 : '20px'};
 `;
 
 const MessageWrapper = styled.div`
@@ -66,7 +67,7 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
     return !(message || messageKey || messages)
     ? null
     : (
-      <Styled palette={type}>
+      <Styled palette={type} spaceMessage={this.props.spaceMessage}>
         <MessageWrapper>
           { type === 'error' &&
             <PreMessage>
@@ -81,7 +82,10 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
           }
           { messageKey &&
             <div>
-              <FormattedMessage {...appMessages.messages[messageKey]} />
+              <FormattedMessage
+                values={this.props.messageArgs}
+                {...appMessages.messages[messageKey]}
+              />
             </div>
           }
           { messages && messages.map((m, i) => (
@@ -104,8 +108,10 @@ Messages.propTypes = {
   type: PropTypes.string,
   message: PropTypes.string,
   messageKey: PropTypes.string,
+  messageArgs: PropTypes.object,
   messages: PropTypes.array,
   onDismiss: PropTypes.func,
+  spaceMessage: PropTypes.bool,
 };
 Messages.contextTypes = {
   intl: PropTypes.object,

@@ -148,6 +148,7 @@ export const selectQueryMessages = createSelector(
         info: routeState.getIn(['locationBeforeTransitions', 'query', 'info']),
         warning: routeState.getIn(['locationBeforeTransitions', 'query', 'warning']),
         error: routeState.getIn(['locationBeforeTransitions', 'query', 'error']),
+        infotype: routeState.getIn(['locationBeforeTransitions', 'query', 'infotype']),
       });
     } catch (error) {
       return null;

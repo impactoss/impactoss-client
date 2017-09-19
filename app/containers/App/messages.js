@@ -721,5 +721,9 @@ export default defineMessages({
       id: 'app.containers.App.messages.recoverSuccess',
       defaultMessage: 'Please check your email and follow the instructions to reset your password.',
     },
+    createdAsGuest: {
+      id: 'app.containers.App.messages.createdAsGuest',
+      defaultMessage: '{entityType} created successfully. It will become publicly available once verified and published by an authorised user.',
+    },
   },
 });
