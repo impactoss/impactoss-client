@@ -31,8 +31,11 @@ function redirectIfSignedIn(store) {
 }
 
 function redirectIfNotSignedIn(store, info = 'notSignedIn') {
-  return (nextState, replace) =>
-    !selectIsSignedIn(store.getState()) && replaceIfNotSignedIn(nextState.location.pathname, replace, info);
+  return (nextState, replace) => {
+    if (!selectIsSignedIn(store.getState())) {
+      replaceIfNotSignedIn(nextState.location.pathname, replace, info);
+    }
+  };
 }
 
 function redirectIfNotPermitted(store, roleRequired) {
@@ -52,8 +55,8 @@ export function getRedirects(store) {
   checkStore(store);
 
   return {
-    redirectIfSignedIn: redirectIfSignedIn(store),
-    redirectIfNotSignedIn: redirectIfNotSignedIn(store),
+    redirectIfSignedIn: (info) => redirectIfSignedIn(store, info),
+    redirectIfNotSignedIn: (info) => redirectIfNotSignedIn(store, info),
     redirectIfNotPermitted: (roleRequired) => redirectIfNotPermitted(store, roleRequired),
   };
 }

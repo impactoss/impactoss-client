@@ -8,9 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
-import styled from 'styled-components';
 
 import {
   getTitleFormField,
@@ -46,7 +44,7 @@ import {
   selectSessionUserId,
 } from 'containers/App/selectors';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -61,12 +59,11 @@ import messages from './messages';
 import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
-const Note = styled.p`
-  font-style: italic;
-`;
-
 export class ReportNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  constructor() {
+    super();
+    this.state = { guestDismissed: false };
+  }
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     this.props.initialiseForm('reportNew.form.data', FORM_INITIAL);
@@ -80,7 +77,6 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
       scrollToTop(this.ScrollContainer);
     }
   }
-
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
@@ -121,6 +117,11 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
         )],
     },
   ]);
+
+  dismissGuestMessage = (evt) => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    this.setState({ guestDismissed: true });
+  }
 
   canUserPublish = (isUserContributor, isUserManager, userId, indicator) =>
     isUserManager || (isUserContributor && attributesEqual(userId, indicator.getIn(['attributes', 'manager_id'])));
@@ -163,24 +164,31 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('reportNew.form.data'),
+                onClick: () => {
+                  this.dismissGuestMessage();
+                  this.props.handleSubmitRemote('reportNew.form.data');
+                },
               }] : null
             }
           />
-          { !canUserPublish &&
-            <Note>
-              <FormattedMessage {...messages.guestNote} />
-            </Note>
+          { !canUserPublish && !this.state.guestDismissed && dataReady && !saveError && !!submitValid &&
+            <Messages
+              type="info"
+              message={this.context.intl.formatMessage(messages.guestNote)}
+              onDismiss={this.dismissGuestMessage}
+            />
           }
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
@@ -192,10 +200,13 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               model="reportNew.form.data"
               formData={viewDomain.form.data}
               saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(
-                formData,
-                indicatorReference
-              )}
+              handleSubmit={(formData) => {
+                this.dismissGuestMessage();
+                this.props.handleSubmit(
+                  formData,
+                  indicatorReference
+                );
+              }}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={() => this.props.handleCancel(indicatorReference)}
               handleUpdate={this.props.handleUpdate}
@@ -245,6 +256,7 @@ ReportNew.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
+
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   indicator: selectIndicator(state, props.params.id),
   isUserContributor: selectIsUserContributor(state),

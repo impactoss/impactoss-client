@@ -9,6 +9,7 @@ import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl
 import validateDateFormat from 'components/forms/validators/validate-date-format';
 import validateRequired from 'components/forms/validators/validate-required';
 import validateNumber from 'components/forms/validators/validate-number';
+import validateEmailFormat from 'components/forms/validators/validate-email-format';
 
 import {
   PUBLISH_STATUSES,
@@ -453,14 +454,93 @@ export const getUploadField = (formatMessage, appMessages) =>
     placeholder: 'url',
   });
 
-export const getEmailField = (formatMessage, appMessages) =>
-  getFormField({
+export const getEmailField = (formatMessage, appMessages, model = '.attributes.email') => {
+  const field = getFormField({
     formatMessage,
     appMessages,
     controlType: 'email',
     attribute: 'email',
+    type: 'email',
     required: true,
+    model,
   });
+  field.validators.email = validateEmailFormat;
+  field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
+  return field;
+};
+
+export const getNameField = (formatMessage, appMessages, model = '.attributes.name') => {
+  const field = getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'input',
+    attribute: 'name',
+    required: true,
+    model,
+  });
+  return field;
+};
+
+export const getPasswordField = (formatMessage, appMessages, model = '.attributes.password') => {
+  const field = getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'input',
+    attribute: 'password',
+    type: 'password',
+    required: true,
+    model,
+  });
+  // field.validators.email = validateEmailFormat;
+  // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
+  return field;
+};
+
+export const getPasswordCurrentField = (formatMessage, appMessages, model = '.attributes.password') => {
+  const field = getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'input',
+    attribute: 'password',
+    placeholder: 'passwordCurrent',
+    type: 'password',
+    required: true,
+    model,
+  });
+  // field.validators.email = validateEmailFormat;
+  // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
+  return field;
+};
+
+export const getPasswordNewField = (formatMessage, appMessages, model = '.attributes.passwordNew') => {
+  const field = getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'input',
+    attribute: 'passwordNew',
+    type: 'password',
+    required: true,
+    model,
+  });
+  // field.validators.email = validateEmailFormat;
+  // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
+  return field;
+};
+
+export const getPasswordConfirmationField = (formatMessage, appMessages, model = '.attributes.passwordConfirmation') => {
+  const field = getFormField({
+    formatMessage,
+    appMessages,
+    controlType: 'input',
+    attribute: 'passwordConfirmation',
+    type: 'password',
+    required: true,
+    model,
+  });
+  // field.validators.email = validateEmailFormat;
+  // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
+  return field;
+};
 
 export const getFormField = ({
   formatMessage,
@@ -472,11 +552,14 @@ export const getFormField = ({
   placeholder,
   hint,
   onChange,
+  type,
+  model,
 }) => {
   const field = {
     id: attribute,
     controlType,
-    model: `.attributes.${attribute}`,
+    type,
+    model: model || `.attributes.${attribute}`,
     placeholder: appMessages.placeholders[placeholder || attribute] && formatMessage(appMessages.placeholders[placeholder || attribute]),
     label: appMessages.attributes[label || attribute] && formatMessage(appMessages.attributes[label || attribute]),
     validators: {},

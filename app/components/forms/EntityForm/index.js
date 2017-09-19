@@ -79,6 +79,7 @@ const ButtonPreDelete = styled(Button)`
 const controls = {
   input: ControlInput,
   url: ControlInput,
+  email: ControlInput,
   title: ControlTitle,
   titleText: ControlTitleText,
   short: ControlShort,

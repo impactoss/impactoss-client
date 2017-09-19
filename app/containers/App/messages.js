@@ -55,6 +55,22 @@ export default defineMessages({
       id: 'app.containers.App.forms.dateFormatError',
       defaultMessage: 'Please enter the date in the required format: dd/mm/yyyy', // change to format according to locale
     },
+    emailFormatError: {
+      id: 'app.containers.App.forms.emailFormatError',
+      defaultMessage: 'Please enter a valid email address',
+    },
+    passwordMismatchError: {
+      id: 'app.containers.App.forms.passwordMismatchError',
+      defaultMessage: 'Password confirmation doesn\'t match Password',
+    },
+    passwordShortError: {
+      id: 'app.containers.App.forms.passwordMismatchError',
+      defaultMessage: 'Password is too short (minimum is 6 characters)',
+    },
+    passwordInvalidError: {
+      id: 'app.containers.App.forms.passwordInvalidError',
+      defaultMessage: 'Current password is invalid',
+    },
     numberError: {
       id: 'app.containers.App.forms.numberError',
       defaultMessage: 'Please enter a number',
@@ -66,10 +82,6 @@ export default defineMessages({
     startDateAfterEndDateError: {
       id: 'app.containers.App.forms.startDateAfterEndDateError',
       defaultMessage: 'Start date must be before end date',
-    },
-    multipleErrors: {
-      id: 'app.containers.App.forms.multipleErrors',
-      defaultMessage: 'One or more fields have errors.',
     },
     outdatedError: {
       id: 'app.containers.App.forms.outdatedError',
@@ -107,11 +119,27 @@ export default defineMessages({
     },
     name: {
       id: 'app.containers.App.placeholders.name',
-      defaultMessage: 'Enter user name',
+      defaultMessage: 'Full name',
     },
     email: {
       id: 'app.containers.App.placeholders.email',
       defaultMessage: 'Email address',
+    },
+    password: {
+      id: 'app.containers.App.placeholders.password',
+      defaultMessage: 'Password',
+    },
+    passwordCurrent: {
+      id: 'app.containers.App.placeholders.passwordCurrent',
+      defaultMessage: 'Current Password',
+    },
+    passwordNew: {
+      id: 'app.containers.App.placeholders.passwordNew',
+      defaultMessage: 'New Password',
+    },
+    passwordConfirmation: {
+      id: 'app.containers.App.placeholders.passwordConfirmation',
+      defaultMessage: 'Confirm Password',
     },
     short_title: {
       id: 'app.containers.App.placeholders.title',
@@ -673,19 +701,25 @@ export default defineMessages({
     },
   },
   messages: {
-    info: {
-      notSignedIn: {
-        id: 'app.containers.App.messages.info.notSignedIn',
-        defaultMessage: 'Please sign in or register first to access this page',
-      },
-      alreadySignedIn: {
-        id: 'app.containers.App.messages.info.alreadySignedIn',
-        defaultMessage: 'Welcome back!',
-      },
-      signInGuestReport: {
-        id: 'app.containers.App.messages.info.signInGuestReport',
-        defaultMessage: 'Please sign in or register first to submit a progress report',
-      },
+    notSignedIn: {
+      id: 'app.containers.App.messages.notSignedIn',
+      defaultMessage: 'Please sign in or register first to access this page',
+    },
+    alreadySignedIn: {
+      id: 'app.containers.App.messages.alreadySignedIn',
+      defaultMessage: 'Welcome back!',
+    },
+    signInGuestReport: {
+      id: 'app.containers.App.messages.signInGuestReport',
+      defaultMessage: 'Please sign in or register first to submit a progress report',
+    },
+    submitInvalid: {
+      id: 'app.containers.App.messages.submitInvalid',
+      defaultMessage: 'One or more fields have errors.',
+    },
+    recoverSuccess: {
+      id: 'app.containers.App.messages.recoverSuccess',
+      defaultMessage: 'Please check your email and follow the instructions to reset your password.',
     },
   },
 });

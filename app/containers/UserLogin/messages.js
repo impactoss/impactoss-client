@@ -30,20 +30,6 @@ export default defineMessages({
     id: 'app.containers.UserLogin.recoverPasswordLink',
     defaultMessage: 'I forgot my password',
   },
-  fields: {
-    email: {
-      placeholder: {
-        id: 'app.containers.UserLogin.fields.email.placeholder',
-        defaultMessage: 'Email address',
-      },
-    },
-    password: {
-      placeholder: {
-        id: 'app.containers.UserLogin.fields.password.placeholder',
-        defaultMessage: 'Password',
-      },
-    },
-  },
   submit: {
     id: 'nmrf.containers.UserLogin.submit',
     defaultMessage: 'Sign in',

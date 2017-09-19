@@ -163,7 +163,10 @@ export function* recoverSaga(payload) {
     });
     yield put(recoverSuccess());
     // forward to login
-    yield put(push('/login'));
+    yield put(replace({
+      pathname: '/login',
+      query: { info: 'recoverSuccess' },
+    }));
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(recoverError(err));
