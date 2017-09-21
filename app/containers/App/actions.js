@@ -64,6 +64,7 @@ import {
   OPEN_NEW_ENTITY_MODAL,
   RESET_PROGRESS,
   SUBMIT_INVALID,
+  DISMISS_QUERY_MESSAGES,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -425,10 +426,11 @@ export function updateRouteQuery(query, extend) {
   };
 }
 
-export function updatePath(path) {
+export function updatePath(path, args) {
   return {
     type: UPDATE_PATH,
     path,
+    args, // { keepQuery: false, query: { arg: key, value }, extend: true }
   };
 }
 
@@ -470,5 +472,11 @@ export function openNewEntityModal(args) {
   return {
     type: OPEN_NEW_ENTITY_MODAL,
     args,
+  };
+}
+
+export function dismissQueryMessages() {
+  return {
+    type: DISMISS_QUERY_MESSAGES,
   };
 }

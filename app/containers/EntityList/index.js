@@ -12,7 +12,7 @@ import { palette } from 'styled-theme';
 import { Map, List, fromJS } from 'immutable';
 
 import { getEntityReference } from 'utils/entities';
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Sidebar from 'components/styled/Sidebar';
 
@@ -134,22 +134,21 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         }
         {(errors.size > 0) &&
           <Progress error>
-            <ErrorMessages
-              error={{
-                messages: errors.reduce((memo, error, timestamp) =>
-                  error.messages
-                  ? memo.concat(error.messages.map((message) => {
-                    const recordReference = sending.get(timestamp) && sending.get(timestamp).entity
-                      ? getEntityReference(fromJS(sending.get(timestamp).entity))
-                      : 'unknown';
-                    if (message === RECORD_OUTDATED) {
-                      return this.context.intl.formatMessage(appMessages.forms.outdatedErrorList, { recordReference });
-                    }
-                    return `${this.context.intl.formatMessage(appMessages.forms.otherErrorList, { recordReference })}${message}`;
-                  }))
-                  : memo
-                , []),
-              }}
+            <Messages
+              type="error"
+              messages={errors.reduce((memo, error, timestamp) =>
+                error.messages
+                ? memo.concat(error.messages.map((message) => {
+                  const recordReference = sending.get(timestamp) && sending.get(timestamp).entity
+                    ? getEntityReference(fromJS(sending.get(timestamp).entity))
+                    : 'unknown';
+                  if (message === RECORD_OUTDATED) {
+                    return this.context.intl.formatMessage(appMessages.forms.outdatedErrorList, { recordReference });
+                  }
+                  return `${this.context.intl.formatMessage(appMessages.forms.otherErrorList, { recordReference })}${message}`;
+                }))
+                : memo
+              , [])}
               onDismiss={this.props.resetProgress}
             />
           </Progress>

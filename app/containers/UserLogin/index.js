@@ -12,7 +12,12 @@ import Helmet from 'react-helmet';
 import styled from 'styled-components';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import ErrorMessages from 'components/ErrorMessages';
+import {
+  getEmailField,
+  getPasswordField,
+} from 'utils/forms';
+
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Icon from 'components/Icon';
 import ContentNarrow from 'components/ContentNarrow';
@@ -20,7 +25,8 @@ import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
-import { updatePath } from 'containers/App/actions';
+import { selectQueryMessages } from 'containers/App/selectors';
+import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -38,7 +44,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
   }
   render() {
     const { authError, authSending } = this.props.viewDomain.page;
-    const required = (val) => val && val.length;
+
     return (
       <div>
         <Helmet
@@ -54,8 +60,18 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
+          {this.props.queryMessages.info &&
+            <Messages
+              type="info"
+              onDismiss={this.props.onDismissQueryMessages}
+              messageKey={this.props.queryMessages.info}
+            />
+          }
           {authError &&
-            <ErrorMessages error={authError} />
+            <Messages
+              type="error"
+              messages={authError.messages}
+            />
           }
           {authSending &&
             <Loading />
@@ -68,31 +84,8 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               handleCancel={this.props.handleCancel}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
               fields={[
-                {
-                  id: 'email',
-                  controlType: 'input',
-                  model: '.email',
-                  placeholder: this.context.intl.formatMessage(messages.fields.email.placeholder),
-                  validators: {
-                    required,
-                  },
-                  errorMessages: {
-                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-                  },
-                },
-                {
-                  id: 'password',
-                  controlType: 'input',
-                  model: '.password',
-                  type: 'password',
-                  placeholder: this.context.intl.formatMessage(messages.fields.password.placeholder),
-                  validators: {
-                    required,
-                  },
-                  errorMessages: {
-                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-                  },
-                },
+                getEmailField(this.context.intl.formatMessage, appMessages, '.email'),
+                getPasswordField(this.context.intl.formatMessage, appMessages, '.password'),
               ]}
             />
           }
@@ -103,7 +96,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                 href="/register"
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink('/register');
+                  this.props.handleLink('/register', { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.registerLink} />
@@ -115,7 +108,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                 href="/recoverpassword"
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink('/recoverpassword');
+                  this.props.handleLink('/recoverpassword', { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.recoverPasswordLink} />
@@ -135,6 +128,8 @@ UserLogin.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
   initialiseForm: PropTypes.func,
+  onDismissQueryMessages: PropTypes.func,
+  queryMessages: PropTypes.object,
 };
 
 UserLogin.contextTypes = {
@@ -143,6 +138,7 @@ UserLogin.contextTypes = {
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
+  queryMessages: selectQueryMessages(state),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -152,12 +148,16 @@ export function mapDispatchToProps(dispatch) {
     },
     handleSubmit: (formData) => {
       dispatch(login(formData.toJS()));
+      dispatch(dismissQueryMessages());
     },
     handleCancel: () => {
       dispatch(updatePath('/'));
     },
-    handleLink: (path) => {
-      dispatch(updatePath(path));
+    handleLink: (path, args) => {
+      dispatch(updatePath(path, args));
+    },
+    onDismissQueryMessages: () => {
+      dispatch(dismissQueryMessages());
     },
   };
 }

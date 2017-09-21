@@ -1,50 +1,49 @@
 import { USER_ROLES } from 'containers/App/constants';
+import {
+  selectIsSignedIn,
+  selectSessionUserRoles,
+  selectReadyForAuthCheck,
+} from 'containers/App/selectors';
 
 import checkStore from './checkStore';
 
-function redirectIfNotSignedIn(store) {
-  return (nextState, replace) => {
-    if (!store.getState().getIn(['global', 'user', 'isSignedIn'])) {
-      replace({
-        pathname: '/login',
-        pathnameOnAuthChange: nextState.location.pathname,
-      });
-    }
-  };
+export function replaceIfNotSignedIn(redirectOnAuthSuccess, replace, info = 'notSignedIn') {
+  return replace({ pathname: '/login', query: { redirectOnAuthSuccess, info } });
+}
+
+export function replaceUnauthorised(replace) {
+  return replace('/unauthorised');
+}
+
+export function replaceAlreadySignedIn(replace, info = 'alreadySignedIn') {
+  return replace({ pathname: '/', query: { info } });
+}
+
+export function hasRoleRequired(roleIds, roleRequired) {
+  return roleIds.includes(roleRequired)
+  || (roleRequired === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
+  || (roleRequired === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)));
 }
 
 function redirectIfSignedIn(store) {
+  return (nextState, replace) =>
+    selectIsSignedIn(store.getState()) && replaceAlreadySignedIn(replace);
+}
+
+function redirectIfNotSignedIn(store, info = 'notSignedIn') {
   return (nextState, replace) => {
-    if (store.getState().getIn(['global', 'user', 'isSignedIn'])) {
-      replace({
-        pathname: '/',
-      });
+    if (!selectIsSignedIn(store.getState())) {
+      replaceIfNotSignedIn(nextState.location.pathname, replace, info);
     }
   };
 }
 
 function redirectIfNotPermitted(store, roleRequired) {
   return (nextState, replace) => {
-    if (!store.getState().getIn(['global', 'user', 'isSignedIn'])) {
-      replace({
-        pathname: '/login',
-        pathnameOnAuthChange: nextState.location.pathname,
-      });
-    } else if (store.getState().getIn(['global', 'user', 'attributes'])) {
-      const userId = store.getState().getIn(['global', 'user', 'attributes']).id;
-      const roleIds = store.getState().getIn(['global', 'entities', 'user_roles'])
-        .filter((userRole) =>
-          userRole.getIn(['attributes', 'user_id']) === userId
-        )
-        .map((role) => role.getIn(['attributes', 'role_id']));
-      if (!(roleIds.includes(roleRequired)
-      || (roleRequired === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
-      || (roleRequired === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
-      )) {
-        replace({
-          pathname: '/login',
-        });
-      }
+    if (!selectIsSignedIn(store.getState())) {
+      replaceIfNotSignedIn(nextState.location.pathname, replace);
+    } else if (selectReadyForAuthCheck(store.getState()) && !hasRoleRequired(selectSessionUserRoles(store.getState()), roleRequired)) {
+      replaceUnauthorised(replace);
     }
   };
 }
@@ -56,8 +55,8 @@ export function getRedirects(store) {
   checkStore(store);
 
   return {
-    redirectIfNotPermitted: (role) => redirectIfNotPermitted(store, role),
-    redirectIfNotSignedIn: redirectIfNotSignedIn(store),
-    redirectIfSignedIn: redirectIfSignedIn(store),
+    redirectIfSignedIn: (info) => redirectIfSignedIn(store, info),
+    redirectIfNotSignedIn: (info) => redirectIfNotSignedIn(store, info),
+    redirectIfNotPermitted: (roleRequired) => redirectIfNotPermitted(store, roleRequired),
   };
 }

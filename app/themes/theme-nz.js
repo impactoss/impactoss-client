@@ -52,7 +52,7 @@ const light = coolorsToHex('https://coolors.co/f5f6f6-eaeced-dbdfe0-bbc1c2-aeb6b
 
 
 // other palettes (not currently used)
-const danger = coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478');
+const error = coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478');
 const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-fff2ce');
 const success = coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-c8e6c9');
 
@@ -70,7 +70,7 @@ theme.palette = {
   light,
 
   // other palettes (not currently used)
-  danger,
+  error,
   success,
   alert,
 

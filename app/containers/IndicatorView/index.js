@@ -23,10 +23,11 @@ import {
   getReportsField,
 } from 'utils/fields';
 
-import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages } from 'containers/App/actions';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
 
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -39,6 +40,7 @@ import {
   selectSdgTargetTaxonomies,
   selectMeasureConnections,
   selectSdgTargetConnections,
+  selectQueryMessages,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -90,7 +92,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         getReportsField(
           reports,
           appMessages,
-          isContributor && {
+          {
             type: 'add',
             title: this.context.intl.formatMessage(messages.addReport),
             onClick: this.props.handleNewReport,
@@ -159,10 +161,17 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         onClick: this.props.handleClose,
       },
     ]
-    : [{
-      type: 'close',
-      onClick: this.props.handleClose,
-    }];
+    : [
+      {
+        type: 'text',
+        title: this.context.intl.formatMessage(messages.addReport),
+        onClick: this.props.handleNewReport,
+      },
+      {
+        type: 'close',
+        onClick: this.props.handleClose,
+      },
+    ];
 
     return (
       <div>
@@ -179,13 +188,24 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
             icon="indicators"
             buttons={buttons}
           />
-          { !dataReady &&
-            <Loading />
-          }
           { !viewEntity && dataReady &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
+          }
+          {this.props.queryMessages.info &&
+            <Messages
+              spaceMessage
+              type="success"
+              onDismiss={this.props.onDismissQueryMessages}
+              messageKey={this.props.queryMessages.info}
+              messageArgs={{
+                entityType: this.context.intl.formatMessage(appMessages.entities[this.props.queryMessages.infotype].single),
+              }}
+            />
+          }
+          { !dataReady &&
+            <Loading />
           }
           { viewEntity && dataReady &&
             <EntityView
@@ -225,6 +245,8 @@ IndicatorView.propTypes = {
   params: PropTypes.object,
   measureConnections: PropTypes.object,
   sdgtargetConnections: PropTypes.object,
+  queryMessages: PropTypes.object,
+  onDismissQueryMessages: PropTypes.func,
 };
 
 IndicatorView.contextTypes = {
@@ -244,6 +266,7 @@ const mapStateToProps = (state, props) => ({
   dates: selectDueDates(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
   sdgtargetConnections: selectSdgTargetConnections(state),
+  queryMessages: selectQueryMessages(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -263,6 +286,9 @@ function mapDispatchToProps(dispatch, props) {
     handleClose: () => {
       dispatch(closeEntity('/indicators'));
       // TODO should be "go back" if history present or to indicators list when not
+    },
+    onDismissQueryMessages: () => {
+      dispatch(dismissQueryMessages());
     },
   };
 }

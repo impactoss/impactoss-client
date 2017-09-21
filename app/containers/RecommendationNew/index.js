@@ -42,11 +42,12 @@ import {
 
 import {
   selectReady,
+  selectReadyForAuthCheck,
   selectMeasuresCategorised,
   selectRecommendationTaxonomies,
 } from 'containers/App/selectors';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -74,7 +75,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
@@ -152,14 +153,16 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
             }
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messages={this.context.intl.formatMessage(appMessages.forms.multipleErrors)}
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
@@ -206,6 +209,7 @@ RecommendationNew.propTypes = {
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
   onCreateOption: PropTypes.func,
@@ -222,6 +226,7 @@ RecommendationNew.contextTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   taxonomies: selectRecommendationTaxonomies(state),
   measures: selectMeasuresCategorised(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),

@@ -3,11 +3,17 @@
  */
 
 import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
-import { push, goBack } from 'react-router-redux';
+import { push, goBack, replace } from 'react-router-redux';
 import { reduce, keyBy, find } from 'lodash/collection';
 import { without } from 'lodash/array';
 
 import asArray from 'utils/as-array';
+import {
+  hasRoleRequired,
+  replaceUnauthorised,
+  replaceIfNotSignedIn,
+} from 'utils/redirects';
+
 
 import {
   LOAD_ENTITIES_IF_NEEDED,
@@ -22,12 +28,12 @@ import {
   SAVE_CONNECTIONS,
   UPDATE_ROUTE_QUERY,
   AUTHENTICATE_FORWARD,
-  USER_ROLES,
   UPDATE_PATH,
   // RESET_PASSWORD,
   RECOVER_PASSWORD,
   CLOSE_ENTITY,
   RECORD_OUTDATED,
+  DISMISS_QUERY_MESSAGES,
 } from 'containers/App/constants';
 
 import {
@@ -58,6 +64,7 @@ import {
 import {
   selectPreviousPathname,
   selectCurrentPathname,
+  selectRedirectOnAuthSuccessPath,
   selectRequestedAt,
   selectIsSignedIn,
   selectLocation,
@@ -118,17 +125,17 @@ export function* checkEntitiesSaga(payload) {
  */
 export function* checkRoleSaga({ role }) {
   const signedIn = yield select(selectIsSignedIn);
-  const authenticating = yield select(selectIsAuthenticating);
-  if (signedIn) {
-    const roleIds = yield select(selectSessionUserRoles);
-    if (!(roleIds.includes(role)
-      || (role === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
-      || (role === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
-    )) {
-      yield put(push('/login'));
+  if (!signedIn) {
+    const authenticating = yield select(selectIsAuthenticating);
+    if (!authenticating) {
+      const redirectOnAuthSuccess = yield select(selectCurrentPathname);
+      yield put(replaceIfNotSignedIn(redirectOnAuthSuccess, replace));
     }
-  } else if (!authenticating) {
-    yield put(push('/login'));
+  } else {
+    const roleIds = yield select(selectSessionUserRoles);
+    if (!hasRoleRequired(roleIds, role)) {
+      yield put(replaceUnauthorised(replace));
+    }
   }
 }
 
@@ -138,8 +145,8 @@ export function* authenticateSaga(payload) {
     yield put(authenticateSending());
     const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
     yield put(authenticateSuccess(response.data));
+    yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
     yield put(forwardOnAuthenticationChange());
-    yield put(invalidateEntities());
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
@@ -156,18 +163,20 @@ export function* recoverSaga(payload) {
     });
     yield put(recoverSuccess());
     // forward to login
-    yield put(push('/login'));
+    yield put(replace({
+      pathname: '/login',
+      query: { info: 'recoverSuccess' },
+    }));
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(recoverError(err));
   }
 }
 
-const authRoutes = ['/login', '/register', '/logout'];
 export function* authChangeSaga() {
-  const prevPathname = yield select(selectPreviousPathname);
-  if (prevPathname && authRoutes.indexOf(prevPathname) < 0) {
-    yield put(push(prevPathname));
+  const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
+  if (redirectPathname) {
+    yield put(push(redirectPathname));
   } else {
     // forward to home
     yield put(push('/'));
@@ -367,77 +376,81 @@ export function* newEntitySaga({ data }) {
     // update entity attributes
     // on the server
     const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
-    yield put(addEntity(data.path, entityCreated.data));
 
-    // check for associations/connections
-    // update recommendation-action connections
-    if (data.entity.recommendationMeasures) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'recommendation_measures',
-        updates: data.entity.recommendationMeasures,
-        keyPair: ['recommendation_id', 'measure_id'],
-      });
-    }
+    if (!data.createAsGuest) {
+      yield put(addEntity(data.path, entityCreated.data));
 
-    // update action-indicator connections
-    if (data.entity.measureIndicators) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'measure_indicators',
-        updates: data.entity.measureIndicators,
-        keyPair: ['indicator_id', 'measure_id'],
-      });
-    }
 
-    // update action-category connections
-    if (data.entity.measureCategories) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'measure_categories',
-        updates: data.entity.measureCategories,
-        keyPair: ['category_id', 'measure_id'],
-      });
-    }
+      // check for associations/connections
+      // update recommendation-action connections
+      if (data.entity.recommendationMeasures) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'recommendation_measures',
+          updates: data.entity.recommendationMeasures,
+          keyPair: ['recommendation_id', 'measure_id'],
+        });
+      }
 
-    // update sdgtarget-indicator connections
-    if (data.entity.sdgtargetIndicators) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'sdgtarget_indicators',
-        updates: data.entity.sdgtargetIndicators,
-        keyPair: ['indicator_id', 'sdgtarget_id'],
-      });
-    }
+      // update action-indicator connections
+      if (data.entity.measureIndicators) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'measure_indicators',
+          updates: data.entity.measureIndicators,
+          keyPair: ['indicator_id', 'measure_id'],
+        });
+      }
 
-    // update sdgtarget-indicator connections
-    if (data.entity.sdgtargetMeasures) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'sdgtarget_measures',
-        updates: data.entity.sdgtargetMeasures,
-        keyPair: ['measure_id', 'sdgtarget_id'],
-      });
-    }
+      // update action-category connections
+      if (data.entity.measureCategories) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'measure_categories',
+          updates: data.entity.measureCategories,
+          keyPair: ['category_id', 'measure_id'],
+        });
+      }
 
-    // update sdgtarget-category connections
-    if (data.entity.sdgtargetCategories) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'sdgtarget_categories',
-        updates: data.entity.sdgtargetCategories,
-        keyPair: ['category_id', 'sdgtarget_id'],
-      });
-    }
+      // update sdgtarget-indicator connections
+      if (data.entity.sdgtargetIndicators) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'sdgtarget_indicators',
+          updates: data.entity.sdgtargetIndicators,
+          keyPair: ['indicator_id', 'sdgtarget_id'],
+        });
+      }
 
-    // update recommendation-category connections
-    if (data.entity.recommendationCategories) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'recommendation_categories',
-        updates: data.entity.recommendationCategories,
-        keyPair: ['category_id', 'recommendation_id'],
-      });
+      // update sdgtarget-indicator connections
+      if (data.entity.sdgtargetMeasures) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'sdgtarget_measures',
+          updates: data.entity.sdgtargetMeasures,
+          keyPair: ['measure_id', 'sdgtarget_id'],
+        });
+      }
+
+      // update sdgtarget-category connections
+      if (data.entity.sdgtargetCategories) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'sdgtarget_categories',
+          updates: data.entity.sdgtargetCategories,
+          keyPair: ['category_id', 'sdgtarget_id'],
+        });
+      }
+
+      // update recommendation-category connections
+      if (data.entity.recommendationCategories) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'recommendation_categories',
+          updates: data.entity.recommendationCategories,
+          keyPair: ['category_id', 'recommendation_id'],
+        });
+      }
     }
 
     yield put(saveSuccess(dataTS));
@@ -445,7 +458,14 @@ export function* newEntitySaga({ data }) {
       data.onSuccess();
     }
     if (data.redirect) {
-      yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+      if (data.createAsGuest) {
+        yield put(push({
+          pathname: `${data.redirect}`,
+          query: { info: 'createdAsGuest', infotype: data.path },
+        }));
+      } else {
+        yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+      }
     }
   } catch (err) {
     err.response.json = yield err.response.json();
@@ -491,14 +511,12 @@ export function* saveConnectionsSaga({ data }) {
   }
 }
 
-export function* updateRouteQuerySaga({ query, extend = true }) {
-  // TODO consider using history.js's updateQueryStringParams
-  const location = yield select(selectLocation);
+const getNextQuery = (query, extend, location) => {
   // figure out new query
   // get old query or new query if not extending (replacing)
   const queryPrevious = extend ? location.get('query').toJS() : {};
   // and figure out new query
-  const queryNext = asArray(query).reduce((q, param) => {
+  return asArray(query).reduce((q, param) => {
     const queryUpdated = q;
     // if already set and not replacing
     if (queryUpdated[param.arg] && !param.replace) {
@@ -509,7 +527,7 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
           queryUpdated[param.arg].push(param.value);
         }
         // remove if present
-        if (extend && param.remove && queryUpdated[param.arg].indexOf(param.value.toString()) > -1) {
+        if (extend && param.remove && param.value && queryUpdated[param.arg].indexOf(param.value.toString()) > -1) {
           queryUpdated[param.arg] = without(queryUpdated[param.arg], param.value.toString());
           // convert to single value if only one value left
           if (queryUpdated[param.arg].length === 1) {
@@ -519,27 +537,30 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
       // if single value set
       } else {
         // add if not already present and convert to array
-        if (param.add && queryUpdated[param.arg] !== param.value.toString()) {
+        if (param.value && param.add && queryUpdated[param.arg] !== param.value.toString()) {
           queryUpdated[param.arg] = [queryUpdated[param.arg], param.value];
         }
         // remove if present
-        if (extend && param.remove && queryUpdated[param.arg] === param.value.toString()) {
+        if (extend && param.remove && param.value && queryUpdated[param.arg] === param.value.toString()) {
+          delete queryUpdated[param.arg];
+        }
+        if (extend && param.remove && !param.value) {
           delete queryUpdated[param.arg];
         }
       }
     // if not already set or replacing
-    } else if (param.add || param.replace) {
-      if (param.remove) {
-        delete queryUpdated[param.arg];
-      } else {
-        queryUpdated[param.arg] = param.value;
-      }
+    } else if (queryUpdated[param.arg] && param.remove) {
+      delete queryUpdated[param.arg];
+    } else if (param.arg && param.value) {
+      queryUpdated[param.arg] = param.value;
     }
     return queryUpdated;
   }, queryPrevious);
+};
 
-  // convert to string
-  const queryNextString = reduce(queryNext, (result, value, key) => {
+// convert to string
+const getNextQueryString = (queryNext) =>
+  reduce(queryNext, (result, value, key) => {
     let params;
     if (Array.isArray(value)) {
       params = value.reduce((memo, val) => `${memo}${memo.length > 0 ? '&' : ''}${key}=${encodeURIComponent(val)}`, '');
@@ -549,11 +570,47 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
     return `${result}${result.length > 0 ? '&' : ''}${params}`;
   }, '');
 
-  yield put(push(`${location.get('pathname')}?${queryNextString}`));
+export function* updateRouteQuerySaga({ query, extend = true }) {
+  const location = yield select(selectLocation);
+  const queryNext = getNextQuery(query, extend, location);
+
+  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
-export function* updatePathSaga({ path }) {
-  yield put(push(path.startsWith('/') ? path : `/${path}`));
+
+export function* dismissQueryMessagesSaga() {
+  const location = yield select(selectLocation);
+  const queryNext = getNextQuery(
+    [
+      { arg: 'info', remove: true },
+      { arg: 'warning', remove: true },
+      { arg: 'error', remove: true },
+    ],
+    true,
+    location
+  );
+  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
+}
+
+export function* updatePathSaga({ path, args }) {
+  const relativePath = path.startsWith('/') ? path : `/${path}`;
+
+  if (args && (args.query || args.keepQuery)) {
+    const location = yield select(selectLocation);
+    let queryNext = {};
+    if (args.query) {
+      queryNext = getNextQuery(args.query, args.extend, location);
+    }
+    if (args.keepQuery) {
+      queryNext = location.get('query').toJS();
+    }
+    // convert to string
+    const queryNextString = getNextQueryString(queryNext);
+
+    yield put(push(`${relativePath}?${queryNextString}`));
+  } else {
+    yield put(push(relativePath));
+  }
 }
 
 const backTargetIgnore = ['/edit', '/new', 'login', '/reports'];
@@ -580,7 +637,6 @@ export default function* rootSaga() {
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
-  // yield takeLatest(RESET_PASSWORD, resetSaga);
   yield takeLatest(RECOVER_PASSWORD, recoverSaga);
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
@@ -595,6 +651,7 @@ export default function* rootSaga() {
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
+  yield takeEvery(DISMISS_QUERY_MESSAGES, dismissQueryMessagesSaga);
 
   yield takeEvery(CLOSE_ENTITY, closeEntitySaga);
 }

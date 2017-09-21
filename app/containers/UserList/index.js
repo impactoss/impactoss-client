@@ -15,7 +15,13 @@ import {
   redirectIfNotPermitted,
 } from 'containers/App/actions';
 
-import { selectReady, selectUserConnections, selectUserTaxonomies } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectReadyForAuthCheck,
+  selectUserConnections,
+  selectUserTaxonomies,
+} from 'containers/App/selectors';
+
 import appMessages from 'containers/App/messages';
 import { USER_ROLES } from 'containers/App/constants';
 
@@ -36,7 +42,7 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
   }
@@ -79,6 +85,7 @@ UserList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
@@ -91,6 +98,7 @@ UserList.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   entities: selectUsers(state, fromJS(props.location.query)),
   taxonomies: selectUserTaxonomies(state),
   connections: selectUserConnections(state),
