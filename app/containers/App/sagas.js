@@ -518,16 +518,16 @@ const getNextQuery = (query, extend, location) => {
   // and figure out new query
   return asArray(query).reduce((q, param) => {
     const queryUpdated = q;
-    // if already set and not replacing
+
+    // if arg already set and not replacing
     if (queryUpdated[param.arg] && !param.replace) {
       // if multiple values set
       if (Array.isArray(queryUpdated[param.arg])) {
         // add if not already present
         if (param.add && queryUpdated[param.arg].indexOf(param.value.toString()) === -1) {
           queryUpdated[param.arg].push(param.value);
-        }
         // remove if present
-        if (extend && param.remove && param.value && queryUpdated[param.arg].indexOf(param.value.toString()) > -1) {
+        } else if (extend && param.remove && param.value && queryUpdated[param.arg].indexOf(param.value.toString()) > -1) {
           queryUpdated[param.arg] = without(queryUpdated[param.arg], param.value.toString());
           // convert to single value if only one value left
           if (queryUpdated[param.arg].length === 1) {
@@ -535,23 +535,18 @@ const getNextQuery = (query, extend, location) => {
           }
         }
       // if single value set
-      } else {
-        // add if not already present and convert to array
-        if (param.value && param.add && queryUpdated[param.arg] !== param.value.toString()) {
-          queryUpdated[param.arg] = [queryUpdated[param.arg], param.value];
-        }
-        // remove if present
-        if (extend && param.remove && param.value && queryUpdated[param.arg] === param.value.toString()) {
-          delete queryUpdated[param.arg];
-        }
-        if (extend && param.remove && !param.value) {
-          delete queryUpdated[param.arg];
-        }
+      // add if not already present and convert to array
+      } else if (param.value && param.add && queryUpdated[param.arg] !== param.value.toString()) {
+        queryUpdated[param.arg] = [queryUpdated[param.arg], param.value];
+      // remove if present
+      } else if (extend && param.remove && (!param.value || (param.value && queryUpdated[param.arg] === param.value.toString()))) {
+        delete queryUpdated[param.arg];
       }
-    // if not already set or replacing
+    // if set and removing
     } else if (queryUpdated[param.arg] && param.remove) {
       delete queryUpdated[param.arg];
-    } else if (param.arg && param.value) {
+    // if not set or replacing with new value
+    } else if (typeof param.value !== 'undefined' && !param.remove) {
       queryUpdated[param.arg] = param.value;
     }
     return queryUpdated;
