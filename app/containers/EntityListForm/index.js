@@ -78,7 +78,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
               selectAll={formOptions.multiple && formOptions.selectAll}
               tagFilterGroups={formOptions.tagFilterGroups}
               panelId={activeOptionId}
-              onCancel={showCancelButton && onCancel}
+              onCancel={showCancelButton && onCancel ? onCancel : null}
               onChange={(values) => {
                 this.props.onFormChange(values, model);
                 this.props.onSelect();
