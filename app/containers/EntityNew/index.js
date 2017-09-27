@@ -138,7 +138,7 @@ EntityNew.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
-  taxonomy: props.attributes.get('taxonomy_id')
+  taxonomy: props.attributes && props.attributes.get('taxonomy_id')
     ? selectEntity(state, { path: 'taxonomies', id: props.attributes.get('taxonomy_id') })
     : null,
 });
