@@ -266,7 +266,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
               : null
             }
             onCancel={this.onHideForm}
-            showOnCancelButton={(activePanel === FILTERS_PANEL)}
+            showCancelButton={(activePanel === FILTERS_PANEL)}
             onSelect={() => {
               if (activePanel === FILTERS_PANEL) {
                 this.onHideForm();
