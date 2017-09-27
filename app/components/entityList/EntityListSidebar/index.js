@@ -21,6 +21,7 @@ import SupTitle from 'components/SupTitle';
 
 import EntityListForm from 'containers/EntityListForm';
 import appMessages from 'containers/App/messages';
+import Sidebar from 'components/styled/Sidebar';
 
 import EntityListSidebarGroups from './EntityListSidebarGroups';
 
@@ -31,8 +32,8 @@ import { makeActiveEditOptions } from './editOptionsFactory';
 
 import messages from './messages';
 
-const Styled = styled.div``;
-const Main = styled.div``;
+// const Styled = styled.div``;
+// const Main = styled.div``;
 const ScrollableWrapper = styled(Scrollable)`
   background-color: ${palette('light', 0)};
 `;
@@ -221,38 +222,40 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     }
 
     return (
-      <Styled>
-        <ScrollableWrapper>
-          <Header>
-            {canEdit &&
-              <ButtonToggle
-                options={this.getSidebarButtons()}
-                activePanel={activePanel}
-                onSelect={onPanelSelect}
-              />}
-            {!canEdit &&
-              <SupTitle title={this.context.intl.formatMessage(messages.header.filter)} />
-            }
-          </Header>
-          <Main>
-            { (activePanel === FILTERS_PANEL || (activePanel === EDIT_PANEL && hasSelected && hasEntities)) &&
-              <EntityListSidebarGroups
-                groups={fromJS(panelGroups)}
-                onShowForm={this.onShowForm}
-              />
-            }
-            { activePanel === EDIT_PANEL && !hasEntities &&
-              <ListEntitiesEmpty>
-                <FormattedMessage {...messages.entitiesNotFound} />
-              </ListEntitiesEmpty>
-            }
-            { activePanel === EDIT_PANEL && hasEntities && !hasSelected &&
-              <ListEntitiesEmpty>
-                <FormattedMessage {...messages.entitiesNotSelected} />
-              </ListEntitiesEmpty>
-            }
-          </Main>
-        </ScrollableWrapper>
+      <div>
+        <Sidebar>
+          <ScrollableWrapper>
+            <Header>
+              {canEdit &&
+                <ButtonToggle
+                  options={this.getSidebarButtons()}
+                  activePanel={activePanel}
+                  onSelect={onPanelSelect}
+                />}
+              {!canEdit &&
+                <SupTitle title={this.context.intl.formatMessage(messages.header.filter)} />
+              }
+            </Header>
+            <div>
+              { (activePanel === FILTERS_PANEL || (activePanel === EDIT_PANEL && hasSelected && hasEntities)) &&
+                <EntityListSidebarGroups
+                  groups={fromJS(panelGroups)}
+                  onShowForm={this.onShowForm}
+                />
+              }
+              { activePanel === EDIT_PANEL && !hasEntities &&
+                <ListEntitiesEmpty>
+                  <FormattedMessage {...messages.entitiesNotFound} />
+                </ListEntitiesEmpty>
+              }
+              { activePanel === EDIT_PANEL && hasEntities && !hasSelected &&
+                <ListEntitiesEmpty>
+                  <FormattedMessage {...messages.entitiesNotSelected} />
+                </ListEntitiesEmpty>
+              }
+            </div>
+          </ScrollableWrapper>
+        </Sidebar>
         { formOptions &&
           <EntityListForm
             model={formModel}
@@ -262,7 +265,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
               ? this.getFormButtons(activeOption)
               : null
             }
-            onCancel={(activePanel === FILTERS_PANEL) ? this.onHideForm : null}
+            onCancel={this.onHideForm}
+            showOnCancelButton={(activePanel === FILTERS_PANEL)}
             onSelect={() => {
               if (activePanel === FILTERS_PANEL) {
                 this.onHideForm();
@@ -278,7 +282,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             }
           />
         }
-      </Styled>
+      </div>
     );
   }
 }
