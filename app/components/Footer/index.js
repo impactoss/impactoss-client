@@ -5,16 +5,25 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
 
+import NormalImg from 'components/Img';
 import Container from 'components/styled/Container';
 import Row from 'components/styled/Row';
 
+import { SHOW_FOOTER_LOGOS } from 'containers/App/constants';
+
+import partner1 from 'media/partner1.png';
+import partner2 from 'media/partner2.png';
+import partner3 from 'media/partner3.png';
+import partner4 from 'media/partner4.png';
+// const footerImages = requireAll(require.context('media/footer', true, /^\.\/.*\.png$/));
+
 import messages from './messages';
 
-const Styled = styled.div`
+const importLogos = [partner1, partner2, partner3, partner4];
+
+const FooterMain = styled.div`
   background-color: ${palette('secondary', 1)};
   color: ${palette('primary', 4)};
-`;
-const Main = styled.div`
   padding: 2em 0 3em;
 `;
 
@@ -26,23 +35,59 @@ const FooterLink = styled.a`
     opacity: 0.8;
   }
 `;
+
+const FooterLogos = styled.div`
+  padding: 1.5em 0;
+`;
+
+const LogoList = styled.div`
+  text-align: center;
+`;
+const LogoItem = styled.div`
+  display: inline-block;
+  padding: 0 1em;
+`;
+const LogoItemLink = styled.a`
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+const PartnerLogo = styled(NormalImg)`
+  height: 80px;
+`;
+
 // const FooterProjectLink = styled.a`
 //   font-weight:bold;
 //   color: ${palette('primary', 4)};
 // `;
 
-
 class Footer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  // onClick = (evt, path) => {
-  //   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-  //   this.props.onPageLink(path);
-  // }
 
   render() {
     return (
-      <Styled >
-        <Main>
+      <div>
+        { SHOW_FOOTER_LOGOS > 0 &&
+          <FooterLogos>
+            <Container noPaddingBottom>
+              <LogoList>
+                {
+                  importLogos.map((src, i) => (
+                    <LogoItem key={i}>
+                      <LogoItemLink
+                        href={this.context.intl.formatMessage(messages.partners[`url${i + 1}`])}
+                        title={this.context.intl.formatMessage(messages.partners[`title${i + 1}`])}
+                        target="_blank"
+                      >
+                        <PartnerLogo src={src} alt={this.context.intl.formatMessage(messages.partners.title1)} />
+                      </LogoItemLink>
+                    </LogoItem>
+                  ))
+                }
+              </LogoList>
+            </Container>
+          </FooterLogos>
+        }
+        <FooterMain>
           <Container>
             <Row>
               <Grid sm={1 / 2}>
@@ -81,8 +126,8 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
               </Grid>
             </Row>
           </Container>
-        </Main>
-      </Styled>
+        </FooterMain>
+      </div>
     );
   }
 }
