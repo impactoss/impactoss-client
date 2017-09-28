@@ -99,32 +99,33 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     return (
       <div>
-        <Sidebar>
-          { this.props.dataReady &&
-            <EntityListSidebar
-              listUpdating={progress !== null && progress >= 0 && progress < 100}
-              entities={this.props.entities}
-              taxonomies={this.props.taxonomies}
-              connections={this.props.connections}
-              connectedTaxonomies={this.props.connectedTaxonomies}
-              entityIdsSelected={
-                entityIdsSelected.size === entityIdsSelectedFiltered.size
-                ? entityIdsSelected
-                : entityIdsSelectedFiltered
-              }
-              config={this.props.config}
-              locationQuery={this.props.locationQuery}
-              canEdit={this.props.isManager}
-              canFilterDraft={this.props.isContributor}
-              activePanel={this.props.activePanel}
-              formatLabel={this.formatLabel}
-              onPanelSelect={this.props.onPanelSelect}
-              onCreateOption={this.props.onCreateOption}
-              onAssign={(associations, activeEditOption) =>
-                this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
-            />
-          }
-        </Sidebar>
+        { !this.props.dataReady &&
+          <Sidebar />
+        }
+        { this.props.dataReady &&
+          <EntityListSidebar
+            listUpdating={progress !== null && progress >= 0 && progress < 100}
+            entities={this.props.entities}
+            taxonomies={this.props.taxonomies}
+            connections={this.props.connections}
+            connectedTaxonomies={this.props.connectedTaxonomies}
+            entityIdsSelected={
+              entityIdsSelected.size === entityIdsSelectedFiltered.size
+              ? entityIdsSelected
+              : entityIdsSelectedFiltered
+            }
+            config={this.props.config}
+            locationQuery={this.props.locationQuery}
+            canEdit={this.props.isManager}
+            canFilterDraft={this.props.isContributor}
+            activePanel={this.props.activePanel}
+            formatLabel={this.formatLabel}
+            onPanelSelect={this.props.onPanelSelect}
+            onCreateOption={this.props.onCreateOption}
+            onAssign={(associations, activeEditOption) =>
+              this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
+          />
+        }
         { (progress !== null && progress < 100) &&
           <Progress>
             <Loading

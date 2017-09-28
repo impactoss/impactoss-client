@@ -11,6 +11,7 @@
 
 export const DEFAULT_LOCALE = 'en-GB';
 export const DB_DATE_FORMAT = 'YYYY-MM-DD';
+export const SHOW_FOOTER_LOGOS = true;
 
 // map server error messages
 export const RECORD_OUTDATED = 'Record outdated';
