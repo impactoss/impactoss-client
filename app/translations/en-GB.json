@@ -1,5 +1,20 @@
 {
   "app.containers.App.app.title" : "Sadata",
   "app.containers.App.app.claim" : "Samoa's home of human rights implementation",
-  "app.containers.HomePage.intro" : "Welcome to Sadata, the one stop show for everything you need to know about human rights implementation in Samoa. Explore inside where you will find the Government's Implementation Plan covering all human rights and the SDGs and containing detailed actions and reports of progress to date. "
+  "app.containers.HomePage.intro" : "Welcome to Sadata, the one stop show for everything you need to know about human rights implementation in Samoa. Explore inside where you will find the Government's Implementation Plan covering all human rights and the SDGs and containing detailed actions and reports of progress to date. ",
+  "nmrf.components.Footer.disclaimer" : "Every care has been taken to ensure the accuracy of this data and information. Please send any feedback to ",
+  "nmrf.components.Footer.contact.email" : "mailto:contact@sadata.ws",
+  "nmrf.components.Footer.contact.anchor" : "contact@sadata.ws",
+  "nmrf.components.Footer.responsible.text" : "Visit Samoa's NMRF (National Mechanism for Reporting and Follow-up) online to learn more about human rights in Samoa",
+  "nmrf.components.Footer.responsible.url" : "http://www.nmrf.gov.ws",
+  "nmrf.components.Footer.responsible.anchor" : "www.nmrf.gov.ws",
+  "nmrf.components.Footer.project.text" : "Sadata is powered by",
+  "nmrf.components.Footer.partners.title1": "UNDP Cook Islands, Samoa and Tokelau",
+  "nmrf.components.Footer.partners.url1": "http://www.ws.undp.org/",
+  "nmrf.components.Footer.partners.title2": "The Office of the United Nations High Commissioner for Human Rights",
+  "nmrf.components.Footer.partners.url2": "http://www.ohchr.org",
+  "nmrf.components.Footer.partners.title3": "New Zealand High Commission, Apia, Samoa",
+  "nmrf.components.Footer.partners.url3": "https://www.mfat.govt.nz/en/countries-and-regions/pacific/samoa/new-zealand-high-commission/",
+  "nmrf.components.Footer.partners.title4": "New Zealand Human Rights Commission",
+  "nmrf.components.Footer.partners.url4": "http://www.hrc.co.nz"
 }
