@@ -27,7 +27,7 @@ export default defineMessages({
     defaultMessage: 'Sign in here',
   },
   submit: {
-    id: 'nmrf.containers.UserRegister.submit',
+    id: 'app.containers.UserRegister.submit',
     defaultMessage: 'Register',
   },
 });
