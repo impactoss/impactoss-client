@@ -92,8 +92,6 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
               data: [{
                 title: 'Title | text (required)',
                 description: 'Description | text (markdown supported)',
-                outcome: 'Desired outcome | text (markdown supported)',
-                indicator_summary: 'Indicator summary | text (markdown supported)',
                 target_date: `Target Date | date (${DB_DATE_FORMAT})`,
                 target_date_comment: 'Target date comment | text',
               }],

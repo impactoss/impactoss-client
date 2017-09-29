@@ -98,8 +98,6 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     {
       fields: [
         getMarkdownField(entity, 'description', true, appMessages),
-        getMarkdownField(entity, 'outcome', true, appMessages),
-        getMarkdownField(entity, 'indicator_summary', true, appMessages),
       ],
     },
     {
