@@ -23,7 +23,7 @@ import { reduce } from 'lodash/collection';
 import A from 'components/styled/A';
 import Field from 'components/fields/Field';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 
 import DocumentWrap from 'components/fields/DocumentWrap';
@@ -128,13 +128,14 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                     />
                   }
                   {(Object.keys(errors).length > 0) &&
-                    <ErrorMessages
-                      error={{
-                        messages: reduce(errors, (memo, error) => error.messages
+                    <Messages
+                      type="error"
+                      messages={
+                        reduce(errors, (memo, error) => error.messages
                           ? memo.concat(error.messages)
                           : memo
-                        , []),
-                      }}
+                        , [])
+                      }
                       onDismiss={this.props.resetProgress}
                     />
                   }

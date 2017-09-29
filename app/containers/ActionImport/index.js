@@ -22,7 +22,10 @@ import {
   resetProgress,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectReadyForAuthCheck,
+} from 'containers/App/selectors';
 
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -45,8 +48,10 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
       this.props.loadEntitiesIfNeeded();
     }
     if (nextProps.dataReady && !this.props.dataReady) {
-      this.props.redirectIfNotPermitted();
       this.props.initialiseForm('measureImport.form.data', FORM_INITIAL);
+    }
+    if (nextProps.authReady && !this.props.authReady) {
+      this.props.redirectIfNotPermitted();
     }
   }
 
@@ -109,6 +114,7 @@ ActionImport.propTypes = {
   handleReset: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   resetProgress: PropTypes.func.isRequired,
 };
 
@@ -121,6 +127,7 @@ const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: [
     'user_roles',
   ] }),
+  authReady: selectReadyForAuthCheck(state),
 });
 
 function mapDispatchToProps(dispatch) {

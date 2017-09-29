@@ -22,7 +22,10 @@ import {
   resetProgress,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectReadyForAuthCheck,
+} from 'containers/App/selectors';
 
 // import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -46,8 +49,10 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
       this.props.loadEntitiesIfNeeded();
     }
     if (nextProps.dataReady && !this.props.dataReady) {
-      this.props.redirectIfNotPermitted();
       this.props.initialiseForm('recommendationImport.form.data', FORM_INITIAL);
+    }
+    if (nextProps.authReady && !this.props.authReady) {
+      this.props.redirectIfNotPermitted();
     }
   }
 
@@ -108,6 +113,7 @@ RecommendationImport.propTypes = {
   handleReset: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   resetProgress: PropTypes.func.isRequired,
 };
 
@@ -120,6 +126,7 @@ const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: [
     'user_roles',
   ] }),
+  authReady: selectReadyForAuthCheck(state),
 });
 
 function mapDispatchToProps(dispatch) {

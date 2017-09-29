@@ -26,7 +26,7 @@ import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import Content from 'components/Content';
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'components/forms/EntityForm';
@@ -78,14 +78,16 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             }]}
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
@@ -136,7 +138,7 @@ EntityNew.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
-  taxonomy: props.attributes.get('taxonomy_id')
+  taxonomy: props.attributes && props.attributes.get('taxonomy_id')
     ? selectEntity(state, { path: 'taxonomies', id: props.attributes.get('taxonomy_id') })
     : null,
 });

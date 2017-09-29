@@ -27,7 +27,7 @@ import messages from './messages';
 const ButtonGroup = styled.div`
   float: ${(props) => props.left ? 'left' : 'right'}
 `;
-const ControlWrapper = styled.div``;
+// const ControlWrapper = styled.div``;
 
 const ChangeHint = styled.div`
   position: absolute;
@@ -109,6 +109,9 @@ class MultiSelect extends React.Component {
       panelId: null,
       queryTags: [],
     };
+
+    this.setWrapperRef = this.setWrapperRef.bind(this);
+    this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
   componentWillMount() {
@@ -117,6 +120,7 @@ class MultiSelect extends React.Component {
       optionsInitial: this.props.options,
       panelId: this.props.panelId,
     });
+    document.addEventListener('mousedown', this.handleClickOutside);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -130,6 +134,10 @@ class MultiSelect extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
   onSearch = (value) => {
     this.setState({
       query: value,
@@ -141,6 +149,10 @@ class MultiSelect extends React.Component {
         ? this.state.queryTags.concat([tagOption.get('value')])
         : without(this.state.queryTags, tagOption.get('value')),
     });
+  }
+
+  setWrapperRef(node) {
+    this.wrapperRef = node;
   }
 
   getNextValues = (checked, option) => {
@@ -203,6 +215,12 @@ class MultiSelect extends React.Component {
       return CHECKBOX_STATES.CHECKED;
     }
     return CHECKBOX_STATES.INDETERMINATE;
+  }
+
+  handleClickOutside(event) {
+    if (this.props.closeOnClickOutside && this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+      this.props.onCancel();
+    }
   }
 
   // props, state
@@ -302,7 +320,7 @@ class MultiSelect extends React.Component {
     const filteredOptionsSelected = options.filter((option) => option.get('checked') || this.isOptionIndeterminate(option));
 
     return (
-      <ControlWrapper>
+      <div ref={this.setWrapperRef}>
         <Header
           title={this.props.title}
           onCancel={this.props.onCancel}
@@ -391,7 +409,7 @@ class MultiSelect extends React.Component {
             </ButtonGroup>
           </ControlFooter>
         }
-      </ControlWrapper>
+      </div>
     );
   }
 }
@@ -409,6 +427,7 @@ MultiSelect.propTypes = {
   search: PropTypes.bool,
   advanced: PropTypes.bool,
   selectAll: PropTypes.bool,
+  closeOnClickOutside: PropTypes.bool,
   panelId: PropTypes.string,
   tagFilterGroups: PropTypes.array,
 };
@@ -420,6 +439,7 @@ MultiSelect.defaultProps = {
   required: false,
   search: true,
   advanced: false,
+  closeOnClickOutside: true,
 };
 
 export default MultiSelect;

@@ -11,7 +11,14 @@
 
 export const DEFAULT_LOCALE = 'en-GB';
 export const DB_DATE_FORMAT = 'YYYY-MM-DD';
+export const SHOW_FOOTER_LOGOS = true;
+
+// map server error messages
 export const RECORD_OUTDATED = 'Record outdated';
+export const EMAIL_FORMAT = 'Email: is not an email';
+export const PASSWORD_MISMATCH = 'Password confirmation doesn\'t match Password';
+export const PASSWORD_SHORT = 'Password is too short (minimum is 6 characters)';
+export const PASSWORD_INVALID = 'Current password is invalid';
 
 export const REDIRECT_IF_NOT_PERMITTED = 'nmrf/App/REDIRECT_IF_NOT_PERMITTED';
 export const LOAD_ENTITIES_IF_NEEDED = 'nmrf/App/LOAD_ENTITIES_IF_NEEDED';
@@ -74,6 +81,8 @@ export const CLOSE_ENTITY = 'nmrf/App/CLOSE_ENTITY';
 
 export const OPEN_NEW_ENTITY_MODAL = 'nmrf/App/OPEN_NEW_ENTITY_MODAL';
 export const SUBMIT_INVALID = 'nmrf/App/SUBMIT_INVALID';
+
+export const DISMISS_QUERY_MESSAGES = 'nmrf/App/DISMISS_QUERY_MESSAGES';
 
 export const PUBLISH_STATUSES = [
   { value: true, label: 'Draft' },

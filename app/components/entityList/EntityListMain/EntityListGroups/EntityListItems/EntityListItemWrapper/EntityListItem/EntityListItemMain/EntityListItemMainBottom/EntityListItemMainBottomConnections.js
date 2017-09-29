@@ -16,17 +16,29 @@ export default class EntityListItemMainBottomConnections extends React.PureCompo
     return (
       <BottomTagGroup>
         {
-          this.props.connections.map((connection, i) => (
-            <span key={i}>
-              <BottomIconWrap>
-                <Icon name={connection.option.icon} text />
-              </BottomIconWrap>
-              <ConnectionPopup
-                connection={connection}
-                wrapper={this.props.wrapper}
-              />
-            </span>
-          ))
+          this.props.connections.map((connection, i) => {
+            const draftEntities = connection.entities.filter((entity) => entity.getIn(['attributes', 'draft']));
+            return (
+              <span key={i}>
+                <BottomIconWrap>
+                  <Icon name={connection.option.icon} text />
+                </BottomIconWrap>
+                <ConnectionPopup
+                  entities={connection.entities.filter((entity) => !entity.getIn(['attributes', 'draft']))}
+                  option={connection.option}
+                  wrapper={this.props.wrapper}
+                />
+                { draftEntities.size > 0 &&
+                  <ConnectionPopup
+                    entities={draftEntities}
+                    option={connection.option}
+                    wrapper={this.props.wrapper}
+                    draft
+                  />
+                }
+              </span>
+            );
+          })
         }
       </BottomTagGroup>
     );

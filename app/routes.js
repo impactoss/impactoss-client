@@ -19,8 +19,8 @@ export default function createRoutes(store) {
   // Create reusable async injectors using getAsyncInjectors factory
   const { injectReducer, injectSagas } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
   const {
-    redirectIfNotSignedIn,
     redirectIfSignedIn,
+    redirectIfNotSignedIn,
     redirectIfNotPermitted,
   } = getRedirects(store);
 
@@ -76,7 +76,7 @@ export default function createRoutes(store) {
     }, {
       path: '/login',
       name: 'userLogin',
-      onEnter: redirectIfSignedIn,
+      onEnter: redirectIfSignedIn(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserLogin/reducer'),
@@ -97,7 +97,7 @@ export default function createRoutes(store) {
     }, {
       path: '/recoverpassword',
       name: 'userPasswordRecover',
-      onEnter: redirectIfSignedIn,
+      onEnter: redirectIfSignedIn(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserPasswordRecover/reducer'),
@@ -118,7 +118,7 @@ export default function createRoutes(store) {
     }, {
       path: '/resetpassword',
       name: 'userPasswordReset',
-      onEnter: redirectIfSignedIn,
+      onEnter: redirectIfSignedIn(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserPasswordReset/reducer'),
@@ -139,7 +139,7 @@ export default function createRoutes(store) {
     }, {
       path: '/register',
       name: 'userRegister',
-      onEnter: redirectIfSignedIn,
+      onEnter: redirectIfSignedIn(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserRegister/reducer'),
@@ -160,7 +160,7 @@ export default function createRoutes(store) {
     }, {
       path: '/users',
       name: 'userList',
-      onEnter: redirectIfNotSignedIn,
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserList'),
@@ -177,7 +177,7 @@ export default function createRoutes(store) {
     }, {
       path: '/users/:id',
       name: 'userView',
-      onEnter: redirectIfNotSignedIn,
+      onEnter: redirectIfNotSignedIn(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserView'),
@@ -194,7 +194,7 @@ export default function createRoutes(store) {
     }, {
       path: '/users/edit/:id',
       name: 'userEdit',
-      onEnter: redirectIfNotSignedIn,
+      onEnter: redirectIfNotSignedIn(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserEdit/reducer'),
@@ -215,7 +215,7 @@ export default function createRoutes(store) {
     }, {
       path: '/users/password/:id',
       name: 'userPassword',
-      onEnter: redirectIfNotSignedIn,
+      onEnter: redirectIfNotSignedIn(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserPassword/reducer'),
@@ -615,7 +615,7 @@ export default function createRoutes(store) {
     }, {
       path: '/reports/new/:id', // the indicator id
       name: 'reportNew',
-      onEnter: redirectIfNotSignedIn,
+      onEnter: redirectIfNotSignedIn('signInGuestReport'),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ReportNew/reducer'),
@@ -824,6 +824,14 @@ export default function createRoutes(store) {
         });
 
         importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/unauthorised',
+      name: 'unauthorised',
+      getComponent(nextState, cb) {
+        import('containers/Unauthorised')
+          .then(loadModule(cb))
+          .catch(errorLoading);
       },
     }, {
       path: '*',

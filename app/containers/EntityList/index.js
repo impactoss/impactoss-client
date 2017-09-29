@@ -12,7 +12,7 @@ import { palette } from 'styled-theme';
 import { Map, List, fromJS } from 'immutable';
 
 import { getEntityReference } from 'utils/entities';
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Sidebar from 'components/styled/Sidebar';
 
@@ -99,32 +99,33 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     return (
       <div>
-        <Sidebar>
-          { this.props.dataReady &&
-            <EntityListSidebar
-              listUpdating={progress !== null && progress >= 0 && progress < 100}
-              entities={this.props.entities}
-              taxonomies={this.props.taxonomies}
-              connections={this.props.connections}
-              connectedTaxonomies={this.props.connectedTaxonomies}
-              entityIdsSelected={
-                entityIdsSelected.size === entityIdsSelectedFiltered.size
-                ? entityIdsSelected
-                : entityIdsSelectedFiltered
-              }
-              config={this.props.config}
-              locationQuery={this.props.locationQuery}
-              canEdit={this.props.isManager}
-              canFilterDraft={this.props.isContributor}
-              activePanel={this.props.activePanel}
-              formatLabel={this.formatLabel}
-              onPanelSelect={this.props.onPanelSelect}
-              onCreateOption={this.props.onCreateOption}
-              onAssign={(associations, activeEditOption) =>
-                this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
-            />
-          }
-        </Sidebar>
+        { !this.props.dataReady &&
+          <Sidebar />
+        }
+        { this.props.dataReady &&
+          <EntityListSidebar
+            listUpdating={progress !== null && progress >= 0 && progress < 100}
+            entities={this.props.entities}
+            taxonomies={this.props.taxonomies}
+            connections={this.props.connections}
+            connectedTaxonomies={this.props.connectedTaxonomies}
+            entityIdsSelected={
+              entityIdsSelected.size === entityIdsSelectedFiltered.size
+              ? entityIdsSelected
+              : entityIdsSelectedFiltered
+            }
+            config={this.props.config}
+            locationQuery={this.props.locationQuery}
+            canEdit={this.props.isManager}
+            canFilterDraft={this.props.isContributor}
+            activePanel={this.props.activePanel}
+            formatLabel={this.formatLabel}
+            onPanelSelect={this.props.onPanelSelect}
+            onCreateOption={this.props.onCreateOption}
+            onAssign={(associations, activeEditOption) =>
+              this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
+          />
+        }
         { (progress !== null && progress < 100) &&
           <Progress>
             <Loading
@@ -134,22 +135,21 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         }
         {(errors.size > 0) &&
           <Progress error>
-            <ErrorMessages
-              error={{
-                messages: errors.reduce((memo, error, timestamp) =>
-                  error.messages
-                  ? memo.concat(error.messages.map((message) => {
-                    const recordReference = sending.get(timestamp) && sending.get(timestamp).entity
-                      ? getEntityReference(fromJS(sending.get(timestamp).entity))
-                      : 'unknown';
-                    if (message === RECORD_OUTDATED) {
-                      return this.context.intl.formatMessage(appMessages.forms.outdatedErrorList, { recordReference });
-                    }
-                    return `${this.context.intl.formatMessage(appMessages.forms.otherErrorList, { recordReference })}${message}`;
-                  }))
-                  : memo
-                , []),
-              }}
+            <Messages
+              type="error"
+              messages={errors.reduce((memo, error, timestamp) =>
+                error.messages
+                ? memo.concat(error.messages.map((message) => {
+                  const recordReference = sending.get(timestamp) && sending.get(timestamp).entity
+                    ? getEntityReference(fromJS(sending.get(timestamp).entity))
+                    : 'unknown';
+                  if (message === RECORD_OUTDATED) {
+                    return this.context.intl.formatMessage(appMessages.forms.outdatedErrorList, { recordReference });
+                  }
+                  return `${this.context.intl.formatMessage(appMessages.forms.otherErrorList, { recordReference })}${message}`;
+                }))
+                : memo
+              , [])}
               onDismiss={this.props.resetProgress}
             />
           </Progress>

@@ -46,6 +46,7 @@ import {
 
 import {
   selectReady,
+  selectReadyForAuthCheck,
   selectIsUserAdmin,
   selectEntity,
   selectMeasuresCategorised,
@@ -53,7 +54,7 @@ import {
   selectRecommendationsCategorised,
 } from 'containers/App/selectors';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -82,7 +83,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
@@ -201,14 +202,16 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             }
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
@@ -264,6 +267,7 @@ CategoryNew.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
   viewDomain: PropTypes.object,
   taxonomy: PropTypes.object,
@@ -287,6 +291,7 @@ const mapStateToProps = (state, props) => ({
   isAdmin: selectIsUserAdmin(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   taxonomy: selectEntity(state, { path: 'taxonomies', id: props.params.id }),
   users: selectUsers(state),
   measures: selectMeasuresCategorised(state),

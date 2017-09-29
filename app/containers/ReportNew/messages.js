@@ -34,4 +34,8 @@ export default defineMessages({
       },
     },
   },
+  guestNote: {
+    id: 'app.containers.ReportNew.guestNote',
+    defaultMessage: 'Please note: you are contributing as a guest user. Your report will only be publicly available once verified and published by an authorised user.',
+  },
 });
