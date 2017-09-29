@@ -38,6 +38,7 @@ const FooterLink = styled.a`
 
 const FooterLogos = styled.div`
   padding: 1.5em 0;
+  background-color: ${palette('light', 0)};
 `;
 
 const LogoList = styled.div`

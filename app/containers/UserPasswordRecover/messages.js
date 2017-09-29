@@ -15,7 +15,7 @@ export default defineMessages({
     defaultMessage: 'Password recover page description',
   },
   header: {
-    id: 'nmrf.containers.UserPasswordRecover.header',
+    id: 'app.containers.UserPasswordRecover.header',
     defaultMessage: 'Recover password',
   },
   fieldRequired: {
@@ -31,7 +31,7 @@ export default defineMessages({
     },
   },
   submit: {
-    id: 'nmrf.containers.UserPasswordRecover.submit',
+    id: 'app.containers.UserPasswordRecover.submit',
     defaultMessage: 'Recover',
   },
   loginLink: {

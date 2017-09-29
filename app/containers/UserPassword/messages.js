@@ -39,7 +39,7 @@ export default defineMessages({
     },
   },
   submit: {
-    id: 'nmrf.containers.UserPassword.submit',
+    id: 'app.containers.UserPassword.submit',
     defaultMessage: 'Submit',
   },
 });

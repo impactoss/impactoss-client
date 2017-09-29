@@ -15,7 +15,7 @@ export default defineMessages({
     defaultMessage: 'Sign in page description',
   },
   header: {
-    id: 'nmrf.containers.UserLogin.header',
+    id: 'app.containers.UserLogin.header',
     defaultMessage: 'Sign in',
   },
   registerLinkBefore: {
@@ -31,7 +31,7 @@ export default defineMessages({
     defaultMessage: 'I forgot my password',
   },
   submit: {
-    id: 'nmrf.containers.UserLogin.submit',
+    id: 'app.containers.UserLogin.submit',
     defaultMessage: 'Sign in',
   },
 });

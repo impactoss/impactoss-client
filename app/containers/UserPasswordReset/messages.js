@@ -15,7 +15,7 @@ export default defineMessages({
     defaultMessage: 'Password reset page description',
   },
   header: {
-    id: 'nmrf.containers.UserPasswordReset.header',
+    id: 'app.containers.UserPasswordReset.header',
     defaultMessage: 'Reset Password',
   },
   fields: {
@@ -33,7 +33,7 @@ export default defineMessages({
     },
   },
   submit: {
-    id: 'nmrf.containers.UserPasswordReset.submit',
+    id: 'app.containers.UserPasswordReset.submit',
     defaultMessage: 'Reset',
   },
 });
