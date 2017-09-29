@@ -147,7 +147,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   />
                 </EntityListSearch>
                 <EntityListOptions
-                  groupOptions={getGroupOptions(taxonomies, connectedTaxonomies)}
+                  groupOptions={getGroupOptions(taxonomies)}
                   subgroupOptions={getGroupOptions(taxonomies)}
                   groupSelectValue={groupSelectValue}
                   subgroupSelectValue={subgroupSelectValue}
