@@ -18,4 +18,8 @@ export default defineMessages({
     id: 'app.containers.IndicatorImport.header',
     defaultMessage: 'Import Indicators',
   },
+  filename: {
+    id: 'app.containers.IndicatorImport.filename',
+    defaultMessage: 'indicators_template',
+  },
 });

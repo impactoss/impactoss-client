@@ -8,7 +8,7 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   pageTitle: {
     id: 'app.container.ReportNew.pageTitle',
-    defaultMessage: 'New Report',
+    defaultMessage: 'New Report for indicator {indicatorReference}',
   },
   metaDescription: {
     id: 'app.container.ReportNew.metaDescription',

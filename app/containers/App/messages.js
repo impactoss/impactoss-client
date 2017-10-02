@@ -45,6 +45,24 @@ export default defineMessages({
       id: 'app.containers.App.buttons.assign',
       defaultMessage: 'Update',
     },
+    previous: {
+      id: 'app.containers.App.buttons.previous',
+      defaultMessage: 'Previous',
+    },
+    next: {
+      id: 'app.containers.App.buttons.next',
+      defaultMessage: 'Next',
+    },
+    import: {
+      id: 'app.containers.App.buttons.import',
+      defaultMessage: 'Import',
+    },
+  },
+  labels: {
+    perPage: {
+      id: 'app.containers.App.labels.perPage',
+      defaultMessage: 'Per page',
+    },
   },
   forms: {
     fieldRequired: {
@@ -110,6 +128,48 @@ export default defineMessages({
     user_only: {
       id: 'app.containers.App.textValues.user_only',
       defaultMessage: 'Categorises users only',
+    },
+  },
+  importFields: {
+    title: {
+      id: 'app.containers.App.importFields.title',
+      defaultMessage: 'Title | text (required)',
+    },
+    reference: {
+      id: 'app.containers.App.importFields.reference',
+      defaultMessage: 'Reference | text',
+    },
+    referenceRequired: {
+      id: 'app.containers.App.importFields.referenceRequired',
+      defaultMessage: 'Reference | text (required)',
+    },
+    description: {
+      id: 'app.containers.App.importFields.description',
+      defaultMessage: 'Description | text (markdown supported)',
+    },
+    accepted: {
+      id: 'app.containers.App.importFields.accepted',
+      defaultMessage: 'Accepted | boolean (true/false)',
+    },
+    response: {
+      id: 'app.containers.App.importFields.response',
+      defaultMessage: 'Government response | text (markdown supported)',
+    },
+    outcome: {
+      id: 'app.containers.App.importFields.outcome',
+      defaultMessage: 'Desired outcome | text (markdown supported)',
+    },
+    indicator_summary: {
+      id: 'app.containers.App.importFields.indicator_summary',
+      defaultMessage: 'Indicator summary | text (markdown supported)',
+    },
+    target_date: {
+      id: 'app.containers.App.importFields.target_date',
+      defaultMessage: 'Target Date | date ({format})',
+    },
+    target_date_comment: {
+      id: 'app.containers.App.importFields.target_date_comment',
+      defaultMessage: 'Target date comment | text',
     },
   },
   placeholders: {

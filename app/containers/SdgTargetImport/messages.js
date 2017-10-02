@@ -18,4 +18,8 @@ export default defineMessages({
     id: 'app.containers.SdgTargetImport.header',
     defaultMessage: 'Import SdgTargets',
   },
+  filename: {
+    id: 'app.containers.SdgTargetImport.filename',
+    defaultMessage: 'sdgtargets_template',
+  },
 });

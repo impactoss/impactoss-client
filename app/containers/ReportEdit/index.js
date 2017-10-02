@@ -158,12 +158,14 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (viewEntity && dataReady) {
-      pageTitle = `${pageTitle} for indicator ${viewEntity.getIn(['attributes', 'indicator_id'])}`;
+      pageTitle = this.context.intl.formatMessage(messages.pageTitleReference, {
+        indicatorReference: viewEntity.getIn(['attributes', 'indicator_id']),
+      });
     }
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={pageTitle}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}

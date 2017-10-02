@@ -18,4 +18,8 @@ export default defineMessages({
     id: 'app.containers.ActionImport.header',
     defaultMessage: 'Import Actions',
   },
+  filename: {
+    id: 'app.containers.ActionImport.filename',
+    defaultMessage: 'actions_template',
+  },
 });

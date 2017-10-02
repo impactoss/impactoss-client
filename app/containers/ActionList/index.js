@@ -45,7 +45,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       icon: 'measures',
       actions: [{
         type: 'text',
-        title: 'Import',
+        title: this.context.intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       }, {
         type: 'add',

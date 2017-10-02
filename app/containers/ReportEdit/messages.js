@@ -10,6 +10,10 @@ export default defineMessages({
     id: 'app.container.ReportEdit.pageTitle',
     defaultMessage: 'Edit Report',
   },
+  pageTitleReference: {
+    id: 'app.container.ReportEdit.pageTitleReference',
+    defaultMessage: 'Edit Report for indicator {indicatorReference}',
+  },
   metaDescription: {
     id: 'app.container.ReportEdit.metaDescription',
     defaultMessage: 'Edit Report page description',

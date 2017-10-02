@@ -6,6 +6,8 @@ import { palette } from 'styled-theme';
 import Component from 'components/styled/Component';
 import Icon from 'components/Icon';
 
+import messages from './messages';
+
 const Styled = styled(Component)`
   display: table-cell;
   text-align: center;
@@ -34,19 +36,7 @@ const Info = styled.div`
   font-weight: bold;
 `;
 
-export default class EntityListItemExpandable extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  static propTypes = {
-    column: PropTypes.object,
-    count: PropTypes.number,
-    onClick: PropTypes.func,
-    width: PropTypes.number,
-    dates: PropTypes.object,
-  }
-
-  static defaultProps = {
-    count: 0,
-  }
+class EntityListItemExpandable extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     const {
@@ -59,8 +49,8 @@ export default class EntityListItemExpandable extends React.PureComponent { // e
 
     const info = [];
     if (dates) {
-      if (dates.due) info.push(`${dates.due} due`);
-      if (dates.overdue) info.push(`${dates.overdue} overdue`);
+      if (dates.due) info.push(this.context.intl && this.context.intl.formatMessage(messages.due, { total: dates.due }));
+      if (dates.overdue) info.push(this.context.intl && this.context.intl.formatMessage(messages.overdue, { total: dates.overdue }));
     }
     return (
       <Styled width={width} onClick={onClick}>
@@ -77,3 +67,20 @@ export default class EntityListItemExpandable extends React.PureComponent { // e
     );
   }
 }
+
+EntityListItemExpandable.propTypes = {
+  column: PropTypes.object,
+  count: PropTypes.number,
+  onClick: PropTypes.func,
+  width: PropTypes.number,
+  dates: PropTypes.object,
+};
+
+EntityListItemExpandable.defaultProps = {
+  count: 0,
+};
+EntityListItemExpandable.contextTypes = {
+  intl: PropTypes.object,
+};
+
+export default EntityListItemExpandable;

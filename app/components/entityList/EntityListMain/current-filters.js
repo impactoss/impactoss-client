@@ -191,9 +191,9 @@ const getCurrentConnectionFilters = (
         // numeric means taxonomy
         if (option.path === queryValue) {
           tags.push({
-            labelPrefix: withoutMessage,
+            messagePrefix: withoutMessage,
             label: option.label,
-            message: option.label,
+            message: option.message,
             type: option.path,
             without: true,
             onClick: () => onClick({

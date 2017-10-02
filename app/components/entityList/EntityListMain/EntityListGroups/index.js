@@ -40,7 +40,7 @@ const countEntities = (entityGroups) =>
     return memo;
   }, 0);
 
-const sliceGroup = (group, pager, groupStartIndex, groupEndIndex) => {
+const sliceGroup = (group, pager, groupStartIndex, groupEndIndex, formatMessage) => {
   // group wholly contained
   if (groupStartIndex >= pager.startIndex && groupEndIndex <= pager.endIndex) {
     return group;
@@ -48,7 +48,9 @@ const sliceGroup = (group, pager, groupStartIndex, groupEndIndex) => {
   // group not wholly contained
   let slicedGroup = group;
   if (groupStartIndex < pager.startIndex) {
-    slicedGroup = slicedGroup.set('label', `${slicedGroup.get('label')} (continued)`);
+    if (formatMessage) {
+      slicedGroup = slicedGroup.set('label', formatMessage(messages.continued, { label: slicedGroup.get('label') }));
+    }
     slicedGroup = slicedGroup.set('entities', slicedGroup.get('entities').slice(pager.startIndex - groupStartIndex, group.get('entities').size));
   }
   if (groupEndIndex > pager.endIndex) {
@@ -57,7 +59,7 @@ const sliceGroup = (group, pager, groupStartIndex, groupEndIndex) => {
   return slicedGroup;
 };
 
-const pageEntityGroups = (entityGroups, pager) => {
+const pageEntityGroups = (entityGroups, pager, formatMessage) => {
   let groupStartIndex = 0;
 
   return entityGroups.reduce((slicedEntityGroups, group) => {
@@ -78,7 +80,7 @@ const pageEntityGroups = (entityGroups, pager) => {
           if (subgroup.get('entities')) {
             const subgroupEndIndex = subgroup.get('entities').size + (subgroupStartIndex - 1);
             if (subgroupStartIndex <= pager.endIndex && subgroupEndIndex >= pager.startIndex) {
-              const slicedSubgroup = sliceGroup(subgroup, pager, subgroupStartIndex, subgroupEndIndex);
+              const slicedSubgroup = sliceGroup(subgroup, pager, subgroupStartIndex, subgroupEndIndex, formatMessage);
               subgroupStartIndex += subgroup.get('entities').size;
               return slicedEntitySubgroups.push(slicedSubgroup);
             }
@@ -95,7 +97,7 @@ const pageEntityGroups = (entityGroups, pager) => {
     if (group.get('entities') && !group.get('entityGroups')) {
       const groupEndIndex = group.get('entities').size + (groupStartIndex - 1);
       if (groupStartIndex <= pager.endIndex && groupEndIndex >= pager.startIndex) {
-        const slicedGroup = sliceGroup(group, pager, groupStartIndex, groupEndIndex);
+        const slicedGroup = sliceGroup(group, pager, groupStartIndex, groupEndIndex, formatMessage);
         groupStartIndex += group.get('entities').size;
         return slicedEntityGroups.push(slicedGroup);
       }
@@ -140,7 +142,17 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     // if grouping required
     if (groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET) {
       // group all entities, regardless of page items, also sort groups
-      const entityGroups = groupEntities(entities, taxonomies, connectedTaxonomies, config, groupSelectValue, subgroupSelectValue !== PARAMS.GROUP_RESET && subgroupSelectValue);
+      const entityGroups = groupEntities(
+        entities,
+        taxonomies,
+        connectedTaxonomies,
+        config,
+        groupSelectValue,
+        subgroupSelectValue !== PARAMS.GROUP_RESET && subgroupSelectValue,
+        {
+          without: this.context.intl && this.context.intl.formatMessage(messages.without),
+        },
+      );
       // count grouped entities (includes duplicates)
       const entityGroupsCount = countEntities(entityGroups);
       // if paging required
@@ -152,7 +164,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           pageSize
         );
         // pick only entities within oage range while preserving hierarchical groups shape
-        entityGroupsPaged = pageEntityGroups(entityGroups, pager);
+        entityGroupsPaged = pageEntityGroups(entityGroups, pager, this.context.intl ? this.context.intl.formatMessage : null);
         // flatten entities for select all
         entityIdsOnPage = entityGroupsPaged.map((group) => group.get('entityGroups')
           ? group.get('entityGroups').map((subgroup) => subgroup.get('entities').map((entity) => entity.get('id'))).flatten(1)
@@ -308,10 +320,13 @@ EntityListGroups.propTypes = {
   subgroupSelectValue: PropTypes.string,
 };
 
-
 EntityListGroups.defaultProps = {
   sortBy: 'id',
   sortOrder: 'desc',
+};
+
+EntityListGroups.contextTypes = {
+  intl: PropTypes.object,
 };
 
 

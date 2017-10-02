@@ -137,13 +137,12 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
       indicator
     );
 
-    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-    pageTitle = `${pageTitle} for indicator ${indicatorReference}`;
+    const pageTitle = this.context.intl.formatMessage(messages.pageTitle, { indicatorReference });
 
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={pageTitle}
           meta={[
             {
               name: 'description',

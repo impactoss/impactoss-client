@@ -18,4 +18,8 @@ export default defineMessages({
     id: 'app.containers.RecommendationImport.header',
     defaultMessage: 'Import Recommendations',
   },
+  filename: {
+    id: 'app.containers.RecommendationImport.filename',
+    defaultMessage: 'recommendations_template',
+  },
 });
