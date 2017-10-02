@@ -726,4 +726,64 @@ export default defineMessages({
       defaultMessage: '{entityType} created successfully. It will become publicly available once verified and published by an authorised user.',
     },
   },
+  ui: {
+    publishStatuses: {
+      draft: {
+        id: 'app.containers.App.ui.publishStatuses.draft',
+        defaultMessage: 'Draft',
+      },
+      public: {
+        id: 'app.containers.App.ui.publishStatuses.public',
+        defaultMessage: 'Public',
+      },
+    },
+    docPublishStatuses: {
+      public: {
+        id: 'app.containers.App.ui.docPublishStatuses.public',
+        defaultMessage: 'Public',
+      },
+      private: {
+        id: 'app.containers.App.ui.docPublishStatuses.private',
+        defaultMessage: 'Private',
+      },
+    },
+    acceptedStatuses: {
+      accepted: {
+        id: 'app.containers.App.ui.acceptedStatuses.accepted',
+        defaultMessage: 'Accepted',
+      },
+      noted: {
+        id: 'app.containers.App.ui.publishStatuses.noted',
+        defaultMessage: 'Noted',
+      },
+    },
+    reportFrequencies: {
+      monthly: {
+        id: 'app.containers.App.ui.reportFrequencies.monthly',
+        defaultMessage: 'Monthly',
+      },
+      quarterly: {
+        id: 'app.containers.App.ui.reportFrequencies.quarterly',
+        defaultMessage: 'Quarterly',
+      },
+      semiannual: {
+        id: 'app.containers.App.ui.reportFrequencies.semiannual',
+        defaultMessage: 'Semiannual',
+      },
+      annual: {
+        id: 'app.containers.App.ui.reportFrequencies.annual',
+        defaultMessage: 'Annual',
+      },
+    },
+    sortOrderOptions: {
+      asc: {
+        id: 'app.containers.App.ui.sortOrderOptions.asc',
+        defaultMessage: 'Ascending',
+      },
+      desc: {
+        id: 'app.containers.App.ui.sortOrderOptions.desc',
+        defaultMessage: 'Descending',
+      },
+    },
+  },
 });

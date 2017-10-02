@@ -5,6 +5,7 @@ import { palette } from 'styled-theme';
 import { FormattedMessage } from 'react-intl';
 
 import ItemStatus from 'components/ItemStatus';
+import appMessage from 'utils/app-message';
 
 import messages from './messages';
 
@@ -31,31 +32,46 @@ const IdSpacer = styled.span`
   color: ${palette('dark', 4)};
 `;
 // <Label bold={props.bold} italic={props.isNew}>
-const Option = (props) => (
-  <Label bold={false}>
-    {props.draft &&
-      <ItemStatus draft />
-    }
-    {props.reference &&
-      <Id>{props.reference}</Id>
-    }
-    {props.reference &&
-      <IdSpacer>|</IdSpacer>
-    }
-    {props.label}
-    {props.isNew &&
-      <New>
-        <FormattedMessage {...messages.new} />
-      </New>
-    }
-  </Label>
-);
+class Option extends React.Component { // eslint-disable-line react/prefer-stateless-function
+
+  render() {
+    const { draft, reference, message, label, isNew } = this.props;
+
+    return (
+      <Label bold={false}>
+        {draft &&
+          <ItemStatus draft />
+        }
+        {reference &&
+          <Id>{reference}</Id>
+        }
+        {reference &&
+          <IdSpacer>|</IdSpacer>
+        }
+        { message
+           ? appMessage(this.context.intl, message)
+           : label
+        }
+        {isNew &&
+          <New>
+            <FormattedMessage {...messages.new} />
+          </New>
+        }
+      </Label>
+    );
+  }
+}
 
 Option.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  message: PropTypes.string,
   reference: PropTypes.string,
   draft: PropTypes.bool,
   isNew: PropTypes.bool,
+};
+
+Option.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default Option;

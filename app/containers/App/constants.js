@@ -90,28 +90,26 @@ export const PASSWORD_SHORT = 'Password is too short (minimum is 6 characters)';
 export const PASSWORD_INVALID = 'Current password is invalid';
 
 export const PUBLISH_STATUSES = [
-  { value: true, label: 'Draft' },
-  { value: false, label: 'Public' },
+  { value: true, label: 'Draft', message: 'ui.publishStatuses.draft' },
+  { value: false, label: 'Public', message: 'ui.publishStatuses.public' },
+];
+export const DOC_PUBLISH_STATUSES = [
+  { value: true, label: 'Public', message: 'ui.docPublishStatuses.public' },
+  { value: false, label: 'Private', message: 'ui.docPublishStatuses.private' },
 ];
 export const ACCEPTED_STATUSES = [
-  { value: true, label: 'Accepted', icon: 'recommendationAccepted' },
-  { value: false, label: 'Noted', icon: 'recommendationNoted' },
+  { value: true, label: 'Accepted', icon: 'recommendationAccepted', message: 'ui.acceptedStatuses.accepted' },
+  { value: false, label: 'Noted', icon: 'recommendationNoted', message: 'ui.acceptedStatuses.noted' },
 ];
 export const REPORT_FREQUENCIES = [
-  { value: 1, label: 'Monthly' },
-  { value: 3, label: 'Quarterly' },
-  { value: 6, label: 'Semiannual' },
-  { value: 12, label: 'Annual' },
+  { value: 1, label: 'Monthly', message: 'ui.reportFrequencies.monthly' },
+  { value: 3, label: 'Quarterly', message: 'ui.reportFrequencies.quarterly' },
+  { value: 6, label: 'Semiannual', message: 'ui.reportFrequencies.semiannual' },
+  { value: 12, label: 'Annual', message: 'ui.reportFrequencies.annual' },
 ];
-
-export const DOC_PUBLISH_STATUSES = [
-  { value: true, label: 'Public' },
-  { value: false, label: 'Private' },
-];
-
 export const SORT_ORDER_OPTIONS = [
-  { value: 'asc', label: 'Ascending', icon: 'ascending', nextValue: 'desc' },
-  { value: 'desc', label: 'Descending', icon: 'descending', nextValue: 'asc' },
+  { value: 'asc', label: 'Ascending', icon: 'ascending', nextValue: 'desc', message: 'ui.sortOrderOptions.asc' },
+  { value: 'desc', label: 'Descending', icon: 'descending', nextValue: 'asc', message: 'ui.sortOrderOptions.desc' },
 ];
 
 export const USER_ROLES = {

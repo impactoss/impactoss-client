@@ -56,12 +56,13 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
             const locationQueryValueAttribute = queryValue.split(':');
             if (locationQueryValueAttribute.length > 1) {
               const locationAttribute = locationQueryValueAttribute[1];
-              forEach(option.options, (attribute) => {
-                if (attribute.value.toString() === locationAttribute) {
-                  filterOptions.options[attribute.value] = {
-                    label: attribute.label ? attribute.label : upperFirst(attribute.value),
+              forEach(option.options, (attributeOption) => {
+                if (attributeOption.value.toString() === locationAttribute) {
+                  filterOptions.options[attributeOption.value] = {
+                    label: attributeOption.label ? attributeOption.label : upperFirst(attributeOption.value),
+                    message: attributeOption.message,
                     showCount: true,
-                    value: `${option.attribute}:${attribute.value}`,
+                    value: `${option.attribute}:${attributeOption.value}`,
                     count: 0,
                     query: 'where',
                     checked: true,
@@ -91,10 +92,11 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
               checked: optionChecked(locationQueryValue, queryValue),
             };
           } else if (option.options) {
-            const attribute = find(option.options, (o) => o.value.toString() === value);
-            const label = attribute ? attribute.label : upperFirst(value);
+            const attributeOption = find(option.options, (o) => o.value.toString() === value);
+            const label = attributeOption ? attributeOption.label : upperFirst(value);
             filterOptions.options[value] = {
               label,
+              message: attributeOption.message,
               showCount: true,
               value: queryValue,
               count: 1,

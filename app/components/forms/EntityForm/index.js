@@ -8,6 +8,7 @@ import { palette } from 'styled-theme';
 import { omit } from 'lodash/object';
 
 import asArray from 'utils/as-array';
+import appMessage from 'utils/app-message';
 
 import appMessages from 'containers/App/messages';
 
@@ -143,7 +144,12 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     switch (field.controlType) {
       case 'select':
         return field.options && field.options.map((option, i) =>
-          <option key={i} value={option.value} {...option.props}>{option.label}</option>
+          <option key={i} value={option.value} {...option.props}>
+            { option.message
+               ? appMessage(this.context.intl, option.message)
+               : (option.label || option.value)
+            }
+          </option>
         );
       case 'info' :
         return field.displayValue;
@@ -345,6 +351,10 @@ EntityForm.propTypes = {
 };
 EntityForm.defaultProps = {
   saving: false,
+};
+
+EntityForm.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default EntityForm;

@@ -59,6 +59,7 @@ export const makeAttributeEditOptions = (entities, config, activeEditOption, mes
 
       editOptions.options[attributeOption.value] = {
         label: attributeOption.label,
+        message: attributeOption.message,
         value: attributeOption.value,
         attribute: option.attribute,
         checked: checkedState(count, entities.size),
