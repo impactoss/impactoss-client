@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.PageEdit.pageTitle',
+    id: 'app.containers.PageEdit.pageTitle',
     defaultMessage: 'Edit Page',
   },
   metaDescription: {
-    id: 'app.container.PageEdit.metaDescription',
+    id: 'app.containers.PageEdit.metaDescription',
     defaultMessage: 'Edit Page page description',
   },
   header: {
@@ -21,13 +21,5 @@ export default defineMessages({
   notFound: {
     id: 'app.containers.PageEdit.notFound',
     defaultMessage: 'Sorry no page found',
-  },
-  loading: {
-    id: 'app.containers.PageEdit.loading',
-    defaultMessage: 'Loading page...',
-  },
-  fieldRequired: {
-    id: 'app.containers.PageNew.header',
-    defaultMessage: 'Required',
   },
 });

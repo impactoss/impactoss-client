@@ -71,7 +71,7 @@ export default defineMessages({
     },
     dateFormatError: {
       id: 'app.containers.App.forms.dateFormatError',
-      defaultMessage: 'Please enter the date in the required format: dd/mm/yyyy', // change to format according to locale
+      defaultMessage: 'Please enter the date in the required format: {format}',
     },
     emailFormatError: {
       id: 'app.containers.App.forms.emailFormatError',
@@ -555,7 +555,7 @@ export default defineMessages({
         defaultMessage: 'Extraordinary (no due date assigned)',
       },
       unscheduled_short: {
-        id: 'app.containers.App.entities.progress_reports.unscheduled',
+        id: 'app.containers.App.entities.progress_reports.unscheduled_short',
         defaultMessage: 'Extraordinary',
       },
       showAll: {

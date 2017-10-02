@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   due: {
-    id: 'app.containers.EntityListItem.due',
+    id: 'app.components.EntityListItem.due',
     defaultMessage: '{total} due',
   },
   overdue: {
-    id: 'app.containers.EntityListItem.overdue',
+    id: 'app.components.EntityListItem.overdue',
     defaultMessage: '{total} overdue',
   },
 });
