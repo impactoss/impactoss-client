@@ -5,7 +5,7 @@
  */
 import { fromJS } from 'immutable';
 
-export const SAVE = 'nmrf/SdgTargetEdit/SAVE';
+export const SAVE = 'impactoss/SdgTargetEdit/SAVE';
 
 export const FORM_INITIAL = fromJS({
   id: '',

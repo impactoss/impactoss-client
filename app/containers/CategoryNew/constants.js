@@ -6,7 +6,7 @@
 
 import { fromJS } from 'immutable';
 
-export const SAVE = 'nmrf/CategoryNew/SAVE';
+export const SAVE = 'impactoss/CategoryNew/SAVE';
 
 export const DEPENDENCIES = [
   'measures',
