@@ -56,12 +56,12 @@ export const CONFIG = {
     connections: [
       {
         path: 'recommendations', // filter by recommendation connection
-        title: 'entities.recommendations.plural',
+        message: 'entities.recommendations.plural',
         key: 'recommendation_id',
       },
       {
         path: 'sdgtargets', // filter by recommendation connection
-        title: 'entities.sdgtargets.plural',
+        message: 'entities.sdgtargets.plural',
         key: 'sdgtarget_id',
       },
     ],
@@ -71,7 +71,7 @@ export const CONFIG = {
     options: [
       {
         search: true,
-        label: 'entities.indicators.plural',
+        message: 'entities.indicators.plural',
         path: 'indicators', // filter by recommendation connection
         key: 'indicator_id',
         expandable: true, // used for omitting from connected counts
@@ -80,7 +80,7 @@ export const CONFIG = {
       },
       {
         search: true,
-        label: 'entities.recommendations.plural',
+        message: 'entities.recommendations.plural',
         path: 'recommendations', // filter by recommendation connection
         key: 'recommendation_id',
         connectPath: 'recommendation_measures', // filter by recommendation connection
@@ -88,7 +88,7 @@ export const CONFIG = {
       },
       {
         search: true,
-        label: 'entities.sdgtargets.plural',
+        message: 'entities.sdgtargets.plural',
         path: 'sdgtargets', // filter by recommendation connection
         key: 'sdgtarget_id',
         connectPath: 'sdgtarget_measures', // filter by recommendation connection
@@ -100,7 +100,7 @@ export const CONFIG = {
     options: [
       {
         search: false,
-        label: 'attributes.draft',
+        message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
       },

@@ -7,6 +7,9 @@ import { Form, actions as formActions } from 'react-redux-form/immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import { lowerCase } from 'utils/string';
+import appMessage from 'utils/app-message';
+
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import MultiSelectControl from 'components/forms/MultiSelectControl';
 
@@ -49,6 +52,14 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
 
   render() {
     const { model, onSubmit, onCancel, buttons, formOptions, activeOptionId, showCancelButton } = this.props;
+    let formTitle;
+    if (formOptions.message) {
+      formTitle = formOptions.messagePrefix
+        ? `${formOptions.messagePrefix} ${lowerCase(appMessage(this.context.intl, formOptions.message))}`
+        : appMessage(this.context.intl, formOptions.message);
+    } else {
+      formTitle = formOptions.title;
+    }
 
     return (
       <Styled
@@ -68,7 +79,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
             <MultiSelectControl
               model=".values"
               threeState
-              title={formOptions.title}
+              title={formTitle}
               options={fromJS(formOptions.options).toList()}
               multiple={formOptions.multiple}
               required={formOptions.required}
@@ -107,6 +118,10 @@ EntityListForm.propTypes = {
 
 EntityListForm.defaultProps = {
   showCancelButton: true,
+};
+
+EntityListForm.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({

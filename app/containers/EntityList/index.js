@@ -82,10 +82,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  formatLabel = (path) => {
-    const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
-    return this.context.intl.formatMessage(message);
-  }
+  // formatLabel = (path) => {
+  //   const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
+  //   return this.context.intl.formatMessage(message);
+  // }
 
   render() {
     // make sure selected entities are still actually on page
@@ -119,7 +119,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             canEdit={this.props.isManager}
             canFilterDraft={this.props.isContributor}
             activePanel={this.props.activePanel}
-            formatLabel={this.formatLabel}
             onPanelSelect={this.props.onPanelSelect}
             onCreateOption={this.props.onCreateOption}
             onAssign={(associations, activeEditOption) =>
@@ -176,7 +175,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           isContributor={this.props.isContributor}
 
           entityIcon={this.props.entityIcon}
-          formatLabel={this.formatLabel}
           onEntitySelect={this.props.onEntitySelect}
           onEntitySelectAll={this.props.onEntitySelectAll}
           onTagClick={this.props.onTagClick}

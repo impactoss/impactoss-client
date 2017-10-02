@@ -8,7 +8,6 @@ export const makeFilterGroups = (
   activeFilterOption,
   canFilterDraft,
   messages,
-  formatLabel
 ) => {
   const filterGroups = {};
 
@@ -65,7 +64,8 @@ export const makeFilterGroups = (
         ...options,
         [option.path]: {
           id: option.path, // filterOptionId
-          label: formatLabel(option.label),
+          label: option.label,
+          message: option.message,
           icon: option.path,
           active: !!activeFilterOption && activeFilterOption.optionId === option.path,
         },
@@ -86,7 +86,8 @@ export const makeFilterGroups = (
             ...options,
             [option.attribute]: {
               id: option.attribute, // filterOptionId
-              label: formatLabel(option.label),
+              label: option.label,
+              message: option.message,
               active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
             },
           }

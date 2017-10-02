@@ -42,7 +42,7 @@ export const CONFIG = {
       {
         edit: false,
         search: true,
-        label: 'entities.roles.plural',
+        message: 'entities.roles.plural',
         path: 'roles', // filter by recommendation connection
         key: 'role_id',
       },

@@ -4,11 +4,12 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { FormattedMessage } from 'react-intl';
 
-import ItemStatus from 'components/ItemStatus';
+import { lowerCase } from 'utils/string';
 import appMessage from 'utils/app-message';
 
-import messages from './messages';
+import ItemStatus from 'components/ItemStatus';
 
+import messages from './messages';
 
 const Label = styled.div`
   font-weight: ${(props) => props.bold ? 500 : 'normal'};
@@ -35,7 +36,17 @@ const IdSpacer = styled.span`
 class Option extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { draft, reference, message, label, isNew } = this.props;
+    const { draft, reference, message, label, messagePrefix, isNew } = this.props;
+
+    let optionLabel;
+    if (message) {
+      optionLabel = messagePrefix
+        ? `${messagePrefix} ${lowerCase(appMessage(this.context.intl, message))}`
+        : appMessage(this.context.intl, message);
+    } else {
+      optionLabel = label;
+    }
+
 
     return (
       <Label bold={false}>
@@ -48,10 +59,7 @@ class Option extends React.Component { // eslint-disable-line react/prefer-state
         {reference &&
           <IdSpacer>|</IdSpacer>
         }
-        { message
-           ? appMessage(this.context.intl, message)
-           : label
-        }
+        { optionLabel }
         {isNew &&
           <New>
             <FormattedMessage {...messages.new} />
@@ -65,6 +73,7 @@ class Option extends React.Component { // eslint-disable-line react/prefer-state
 Option.propTypes = {
   label: PropTypes.string,
   message: PropTypes.string,
+  messagePrefix: PropTypes.string,
   reference: PropTypes.string,
   draft: PropTypes.bool,
   isNew: PropTypes.bool,

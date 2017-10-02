@@ -52,7 +52,7 @@ export const CONFIG = {
     options: [
       {
         search: true,
-        label: 'entities.measures.plural',
+        message: 'entities.measures.plural',
         path: 'measures', // filter by recommendation connection
         clientPath: 'actions', // filter by recommendation connection
         key: 'measure_id',
@@ -65,13 +65,13 @@ export const CONFIG = {
     options: [
       {
         search: false,
-        label: 'attributes.accepted',
+        message: 'attributes.accepted',
         attribute: 'accepted',
         options: ACCEPTED_STATUSES,
       },
       {
         search: false,
-        label: 'attributes.draft',
+        message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
       },

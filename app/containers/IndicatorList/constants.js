@@ -50,12 +50,12 @@ export const CONFIG = {
     connections: [
       {
         path: 'measures', // filter by recommendation connection
-        title: 'entities.measures.plural',
+        message: 'entities.measures.plural',
         key: 'measure_id',
       },
       {
         path: 'sdgtargets', // filter by recommendation connection
-        title: 'entities.sdgtargets.plural',
+        message: 'entities.sdgtargets.plural',
         key: 'sdgtarget_id',
       },
     ],
@@ -65,7 +65,7 @@ export const CONFIG = {
     options: [
       {
         search: true,
-        label: 'entities.measures.plural',
+        message: 'entities.measures.plural',
         path: 'measures',
         clientPath: 'actions',
         key: 'measure_id',
@@ -74,7 +74,7 @@ export const CONFIG = {
       },
       {
         search: true,
-        label: 'entities.sdgtargets.plural',
+        message: 'entities.sdgtargets.plural',
         path: 'sdgtargets',
         key: 'sdgtarget_id',
         ownKey: 'indicator_id',
@@ -86,7 +86,7 @@ export const CONFIG = {
     options: [
       {
         search: false,
-        label: 'attributes.draft',
+        message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
       },
