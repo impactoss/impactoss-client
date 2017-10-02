@@ -82,7 +82,7 @@ export default defineMessages({
       defaultMessage: 'Password confirmation does not match password',
     },
     passwordShortError: {
-      id: 'app.containers.App.forms.passwordMismatchError',
+      id: 'app.containers.App.forms.passwordShortError',
       defaultMessage: 'Password is too short (minimum is 6 characters)',
     },
     passwordInvalidError: {
@@ -202,11 +202,11 @@ export default defineMessages({
       defaultMessage: 'Confirm Password',
     },
     short_title: {
-      id: 'app.containers.App.placeholders.title',
+      id: 'app.containers.App.placeholders.short_title',
       defaultMessage: 'Abbr.',
     },
     menu_title: {
-      id: 'app.containers.App.placeholders.title',
+      id: 'app.containers.App.placeholders.menu_title',
       defaultMessage: 'Menu title',
     },
     order: {
@@ -234,11 +234,11 @@ export default defineMessages({
       defaultMessage: 'Enter desired outcome',
     },
     indicator_summary: {
-      id: 'app.containers.App.attributes.indicator_summary',
+      id: 'app.containers.App.placeholders.indicator_summary',
       defaultMessage: 'Enter indicator summary',
     },
     target_date_comment: {
-      id: 'app.containers.App.attributes.target_date_comment',
+      id: 'app.containers.App.placeholders.target_date_comment',
       defaultMessage: 'Additional information',
     },
     url: {

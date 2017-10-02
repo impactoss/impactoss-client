@@ -15,7 +15,7 @@ export default defineMessages({
       defaultMessage: 'Created at',
     },
     reference: {
-      id: 'app.components.ColumnSelect.sortAttributes.id',
+      id: 'app.components.ColumnSelect.sortAttributes.reference',
       defaultMessage: 'Reference',
     },
     title: {
@@ -23,7 +23,7 @@ export default defineMessages({
       defaultMessage: 'Title',
     },
     name: {
-      id: 'app.components.ColumnSelect.sortAttributes.title',
+      id: 'app.components.ColumnSelect.sortAttributes.name',
       defaultMessage: 'Name',
     },
     updated_at: {

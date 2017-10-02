@@ -32,7 +32,7 @@ export default defineMessages({
       defaultMessage: 'Implementation plan',
     },
     measuresAdditional: {
-      id: 'app.containers.Overview.buttons.measures',
+      id: 'app.containers.Overview.buttons.measuresAdditional',
       defaultMessage: 'Government actions',
     },
     indicators: {
