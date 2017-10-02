@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { getSortOption } from 'utils/sort';
+import appMessage from 'utils/app-message';
 
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 import { SORT_ORDER_OPTIONS } from 'containers/App/constants';
@@ -123,7 +124,10 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
               key={i}
               isExpand={expandNo > i}
               onExpand={() => onExpand(expandNo > i ? i : i + 1)}
-              label={col.label}
+              label={ col.message
+                ? appMessage(this.context.intl, col.message)
+                : col.label
+              }
               width={(1 - firstColumnWidth) * this.getExpandableColumnWidth(i, list.length, expandNo)}
             />
           )
@@ -150,6 +154,10 @@ EntityListHeader.propTypes = {
   onSelectAll: PropTypes.func,
   onSortBy: PropTypes.func,
   onSortOrder: PropTypes.func,
+};
+
+EntityListHeader.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default EntityListHeader;

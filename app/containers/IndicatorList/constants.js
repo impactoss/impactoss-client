@@ -105,7 +105,7 @@ export const CONFIG = {
   },
   expandableColumns: [
     {
-      label: 'Progress reports',
+      message: 'entities.progress_reports.plural',
       type: 'reports',
       clientPath: 'reports',
       icon: 'reminder',

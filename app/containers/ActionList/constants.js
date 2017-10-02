@@ -108,13 +108,13 @@ export const CONFIG = {
   },
   expandableColumns: [
     {
-      label: 'Indicators',
+      message: 'entities.indicators.plural',
       type: 'indicators',
       clientPath: 'indicators',
       icon: 'indicators',
     },
     {
-      label: 'Progress reports',
+      message: 'entities.progress_reports.plural',
       type: 'reports',
       clientPath: 'reports',
       icon: 'reminder',
