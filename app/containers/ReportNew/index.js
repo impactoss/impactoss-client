@@ -10,6 +10,8 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { actions as formActions } from 'react-redux-form/immutable';
 
+import { Map } from 'immutable';
+
 import {
   getTitleFormField,
   getDueDateOptionsField,
@@ -17,6 +19,7 @@ import {
   getStatusField,
   getMarkdownField,
   getUploadField,
+  getDueDateDateOptions,
 } from 'utils/forms';
 
 import { getStatusField as getStatusInfoField } from 'utils/fields';
@@ -66,12 +69,17 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   }
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('reportNew.form.data', FORM_INITIAL);
+    if (this.props.dataReady && this.props.indicator) {
+      this.props.initialiseForm('reportNew.form.data', this.getInitialFormData());
+    }
   }
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
+      this.props.initialiseForm('reportNew.form.data', this.getInitialFormData(nextProps));
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
       scrollToTop(this.ScrollContainer);
@@ -84,6 +92,17 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
       ],
     },
   ]);
+
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const { indicator } = props;
+    return Map(FORM_INITIAL.setIn(
+      ['attributes', 'due_date_id'],
+      indicator.get('dates')
+        ? getDueDateDateOptions(indicator.get('dates'))[0].value
+        : '0'
+    ));
+  }
 
   getHeaderAsideFields = (canUserPublish) => ([{
     fields: [
@@ -111,9 +130,12 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
         [getDueDateOptionsField(
           this.context.intl.formatMessage,
           appMessages,
-          this.context.intl.formatDate,
-          indicator.get('dates'),
-          '0',
+          getDueDateDateOptions(
+            indicator.get('dates'),
+            this.context.intl.formatMessage,
+            appMessages,
+            this.context.intl.formatDate
+          )
         )],
     },
   ]);
