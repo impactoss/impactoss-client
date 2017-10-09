@@ -6,11 +6,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   preBold: {
-    id: 'app.containers.Messages.preBold',
+    id: 'app.components.Messages.preBold',
     defaultMessage: 'Oh no! ',
   },
   preAdditional: {
-    id: 'app.containers.Messages.preAdditional',
+    id: 'app.components.Messages.preAdditional',
     defaultMessage: 'Something went wrong:',
   },
 });

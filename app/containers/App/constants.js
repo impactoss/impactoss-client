@@ -79,6 +79,7 @@ export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';
 export const SIGNING_URL_ENDPOINT = '/s3/sign';
 
 export const DEFAULT_LOCALE = 'en-GB';
+export const DATE_FORMAT = 'dd/mm/yyyy'; // change to format according to locale
 export const DB_DATE_FORMAT = 'YYYY-MM-DD';
 export const SHOW_FOOTER_LOGOS = true;
 

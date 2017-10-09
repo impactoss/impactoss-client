@@ -6,19 +6,19 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   groupBy: {
-    id: 'app.containers.EntityListGroup.groupBy',
+    id: 'app.components.EntityListGroup.groupBy',
     defaultMessage: 'Group by',
   },
   subgroupBy: {
-    id: 'app.containers.EntityListGroup.subgroupBy',
+    id: 'app.components.EntityListGroup.subgroupBy',
     defaultMessage: 'Subgroup by',
   },
   placeholder: {
-    id: 'app.containers.EntityListGroup.placeholder',
+    id: 'app.components.EntityListGroup.placeholder',
     defaultMessage: 'Select category',
   },
   reset: {
-    id: 'app.containers.EntityListGroup.reset',
+    id: 'app.components.EntityListGroup.reset',
     defaultMessage: 'Ungroup',
   },
 });

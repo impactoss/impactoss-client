@@ -6,11 +6,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   expand: {
-    id: 'app.containers.EntityListGroup.expand',
+    id: 'app.components.EntityListGroup.expand',
     defaultMessage: 'Implementation view',
   },
   collapse: {
-    id: 'app.containers.EntityListGroup.collapse',
+    id: 'app.components.EntityListGroup.collapse',
     defaultMessage: 'List view',
   },
 });

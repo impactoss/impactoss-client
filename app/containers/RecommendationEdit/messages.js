@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.RecommendationEdit.pageTitle',
+    id: 'app.containers.RecommendationEdit.pageTitle',
     defaultMessage: 'Edit Recommendation',
   },
   metaDescription: {
-    id: 'app.container.RecommendationEdit.metaDescription',
+    id: 'app.containers.RecommendationEdit.metaDescription',
     defaultMessage: 'Edit Recommendation page description',
   },
   header: {
@@ -21,13 +21,5 @@ export default defineMessages({
   notFound: {
     id: 'app.containers.RecommendationEdit.notFound',
     defaultMessage: 'Sorry no recommendation found',
-  },
-  loading: {
-    id: 'app.containers.RecommendationEdit.loading',
-    defaultMessage: 'Loading recommendation...',
-  },
-  fieldRequired: {
-    id: 'app.containers.RecommendationNew.header',
-    defaultMessage: 'Required',
   },
 });

@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.RecommendationImport.pageTitle',
+    id: 'app.containers.RecommendationImport.pageTitle',
     defaultMessage: 'Import Recommendations',
   },
   metaDescription: {
-    id: 'app.container.RecommendationImport.metaDescription',
+    id: 'app.containers.RecommendationImport.metaDescription',
     defaultMessage: 'Import Recommendations page description',
   },
   header: {

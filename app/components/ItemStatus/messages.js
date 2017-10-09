@@ -7,7 +7,7 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   draft: {
-    id: 'app.containers.ItemStatus.draft',
+    id: 'app.components.ItemStatus.draft',
     defaultMessage: 'draft',
   },
 });

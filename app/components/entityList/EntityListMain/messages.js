@@ -7,7 +7,7 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   filterFormWithoutPrefix: {
-    id: 'app.containers.EntityListMain.filterFormWithoutPrefix',
+    id: 'app.components.EntityListMain.filterFormWithoutPrefix',
     defaultMessage: 'Without',
   },
 });

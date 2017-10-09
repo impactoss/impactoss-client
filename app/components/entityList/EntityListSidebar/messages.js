@@ -7,72 +7,72 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   header: {
     filter: {
-      id: 'app.containers.EntityListFilters.header.filter',
+      id: 'app.components.EntityListFilters.header.filter',
       defaultMessage: 'Filter List',
     },
     filterButton: {
-      id: 'app.containers.EntityListFilters.header.filterButton',
+      id: 'app.components.EntityListFilters.header.filterButton',
       defaultMessage: 'Filter',
     },
     editButton: {
-      id: 'app.containers.EntityListFilters.header.editButton',
+      id: 'app.components.EntityListFilters.header.editButton',
       defaultMessage: 'Edit',
     },
   },
   filterGroupLabel: {
     attributes: {
-      id: 'app.containers.EntityListFilter.filterGroupLabel.attributes',
+      id: 'app.components.EntityListFilter.filterGroupLabel.attributes',
       defaultMessage: 'By attribute',
     },
     taxonomies: {
-      id: 'app.containers.EntityListFilter.filterGroupLabel.taxonomies',
+      id: 'app.components.EntityListFilter.filterGroupLabel.taxonomies',
       defaultMessage: 'By category',
     },
     connections: {
-      id: 'app.containers.EntityListFilter.filterGroupLabel.connections',
+      id: 'app.components.EntityListFilter.filterGroupLabel.connections',
       defaultMessage: 'By connection',
     },
     connectedTaxonomies: {
-      id: 'app.containers.EntityListFilter.filterGroupLabel.connectedTaxonomies',
+      id: 'app.components.EntityListFilter.filterGroupLabel.connectedTaxonomies',
       defaultMessage: 'By connected category',
     },
   },
   editGroupLabel: {
     attributes: {
-      id: 'app.containers.EntityListFilter.editGroupLabel.attributes',
+      id: 'app.components.EntityListFilter.editGroupLabel.attributes',
       defaultMessage: 'Update attributes',
     },
     taxonomies: {
-      id: 'app.containers.EntityListFilter.editGroupLabel.taxonomies',
+      id: 'app.components.EntityListFilter.editGroupLabel.taxonomies',
       defaultMessage: 'Update categories',
     },
     connections: {
-      id: 'app.containers.EntityListFilter.editGroupLabel.connections',
+      id: 'app.components.EntityListFilter.editGroupLabel.connections',
       defaultMessage: 'Update connections',
     },
   },
   filterFormTitlePrefix: {
-    id: 'app.containers.EntityListFilter.filterFormTitlePrefix',
+    id: 'app.components.EntityListFilter.filterFormTitlePrefix',
     defaultMessage: 'Filter by',
   },
   filterFormWithoutPrefix: {
-    id: 'app.containers.EntityListFilter.filterFormWithoutPrefix',
+    id: 'app.components.EntityListFilter.filterFormWithoutPrefix',
     defaultMessage: 'Without',
   },
   editFormTitlePrefix: {
-    id: 'app.containers.EntityListFilter.editFormTitlePrefix',
+    id: 'app.components.EntityListFilter.editFormTitlePrefix',
     defaultMessage: 'Update',
   },
   editFormTitlePostfix: {
-    id: 'app.containers.EntityListFilter.editFormTitlePostfix',
+    id: 'app.components.EntityListFilter.editFormTitlePostfix',
     defaultMessage: 'selected',
   },
   entitiesNotFound: {
-    id: 'app.containers.EntityListFilter.entitiesNotFound',
+    id: 'app.components.EntityListFilter.entitiesNotFound',
     defaultMessage: 'No entities found',
   },
   entitiesNotSelected: {
-    id: 'app.containers.EntityListFilter.entitiesNotSelected',
+    id: 'app.components.EntityListFilter.entitiesNotSelected',
     defaultMessage: 'Please select one or more entities from the list for available edit options',
   },
 

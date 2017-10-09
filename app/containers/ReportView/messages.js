@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.ReportView.pageTitle',
+    id: 'app.containers.ReportView.pageTitle',
     defaultMessage: 'Progress report',
   },
   metaDescription: {
-    id: 'app.container.ReportView.metaDescription',
+    id: 'app.containers.ReportView.metaDescription',
     defaultMessage: 'Progress report page description',
   },
   notFound: {

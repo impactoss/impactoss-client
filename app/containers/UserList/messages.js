@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.UserList.pageTitle',
+    id: 'app.containers.UserList.pageTitle',
     defaultMessage: 'Users overview',
   },
   metaDescription: {
-    id: 'app.container.UserList.metaDescription',
+    id: 'app.containers.UserList.metaDescription',
     defaultMessage: 'Users page description',
   },
 });

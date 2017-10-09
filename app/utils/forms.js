@@ -17,6 +17,7 @@ import {
   REPORT_FREQUENCIES,
   ACCEPTED_STATUSES,
   DOC_PUBLISH_STATUSES,
+  DATE_FORMAT,
 } from 'containers/App/constants';
 
 export const entityOption = (entity, defaultToId, hasTags) => Map({
@@ -431,7 +432,7 @@ export const getDateField = (formatMessage, appMessages, attribute, required = f
     onChange,
   });
   field.validators.date = validateDateFormat;
-  field.errorMessages.date = formatMessage(appMessages.forms.dateFormatError);
+  field.errorMessages.date = formatMessage(appMessages.forms.dateFormatError, { format: DATE_FORMAT });
   return field;
 };
 
