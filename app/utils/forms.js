@@ -304,53 +304,55 @@ export const getStatusField = (formatMessage, appMessages, entity) => ({
   options: PUBLISH_STATUSES,
 });
 
-const getDueDateDateOptions = (dates, activeDateId, formatMessage, appMessages, formatDate) => {
-  const dateOptions = [
-    {
-      value: '0',
-      label: formatMessage(appMessages.entities.progress_reports.unscheduled_short),
-      checked: activeDateId === null || activeDateId === '0' || activeDateId === '',
-    },
-  ];
-  const NO_OF_REPORT_OPTIONS = 1;
-  let excludeCount = 0;
-  return dates && dates.reduce((memo, date, i) => {
-    const dateActive = activeDateId ? date.get('id') === activeDateId : false;
-    const optionNoNotExceeded = i - excludeCount < NO_OF_REPORT_OPTIONS;
-    const withoutReport = !date.getIn(['attributes', 'has_progress_report']);
-    // only allow upcoming and those that are not associated
-    if ((optionNoNotExceeded && withoutReport) || dateActive) {
-      if (date.getIn(['attributes', 'overdue']) || dateActive) {
-        excludeCount += 1;
-      }
-      // exclude overdue and already assigned date from max no of date options
-      const label =
-        `${formatDate(new Date(date.getIn(['attributes', 'due_date'])))} ${
-          date.getIn(['attributes', 'overdue']) ? formatMessage(appMessages.entities.due_dates.overdue) : ''} ${
-          date.getIn(['attributes', 'due']) ? formatMessage(appMessages.entities.due_dates.due) : ''}`;
-      return memo.concat([
-        {
-          value: date.get('id'),
-          label,
-          highlight: date.getIn(['attributes', 'overdue']),
-          checked: activeDateId ? date.get('id') === activeDateId : false,
-        },
-      ]);
-    }
-    excludeCount += 1;
-    return memo;
-  }, dateOptions);
+const getDueDateStatus = (date, formatMessage, appMessages) => {
+  if (date.getIn(['attributes', 'overdue'])) {
+    return ` ${formatMessage(appMessages.entities.due_dates.overdue)}`;
+  }
+  if (date.getIn(['attributes', 'due'])) {
+    return ` ${formatMessage(appMessages.entities.due_dates.due)}`;
+  }
+  return '';
 };
 
-export const getDueDateOptionsField = (formatMessage, appMessages, formatDate, dates, activeDateId) => ({
+export const getDueDateDateOptions = (dates, formatMessage, appMessages, formatDate, activeDateId) => {
+  const NO_OF_REPORT_OPTIONS = 1;
+  let excludeCount = 0;
+  const dateOptions = dates
+    ? dates.reduce((memo, date, i) => {
+      const dateActive = date.get('id') === activeDateId.toString();
+      const optionNoNotExceeded = i - excludeCount < NO_OF_REPORT_OPTIONS;
+      const withoutReport = !date.getIn(['attributes', 'has_progress_report']);
+      // only allow upcoming and those that are not associated
+      if ((optionNoNotExceeded && withoutReport) || dateActive) {
+        if (date.getIn(['attributes', 'overdue']) || dateActive) {
+          excludeCount += 1;
+        }
+        // exclude overdue and already assigned date from max no of date options
+        const label = formatDate &&
+          `${formatDate(new Date(date.getIn(['attributes', 'due_date'])))}${getDueDateStatus(date, formatMessage, appMessages)}`;
+        return memo.concat([
+          {
+            value: date.get('id'),
+            label,
+            highlight: date.getIn(['attributes', 'overdue']),
+          },
+        ]);
+      }
+      excludeCount += 1;
+      return memo;
+    }, [])
+  : [];
+  return dateOptions.concat({
+    value: '0',
+    label: formatMessage && formatMessage(appMessages.entities.progress_reports.unscheduled_short),
+  });
+};
+
+export const getDueDateOptionsField = (formatMessage, appMessages, dateOptions) => ({
   id: 'due_date_id',
   controlType: 'radio',
   model: '.attributes.due_date_id',
-  options: getDueDateDateOptions(
-    dates,
-    activeDateId || '0',
-    formatMessage, appMessages, formatDate),
-  value: activeDateId || '0',
+  options: dateOptions,
   hints: {
     1: formatMessage(appMessages.entities.due_dates.empty),
   },

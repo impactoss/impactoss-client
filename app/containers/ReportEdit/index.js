@@ -20,6 +20,7 @@ import {
   getStatusField,
   getMarkdownField,
   getUploadField,
+  getDueDateDateOptions,
 } from 'utils/forms';
 
 import {
@@ -142,11 +143,13 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         [getDueDateOptionsField(
           this.context.intl.formatMessage,
           appMessages,
-          this.context.intl.formatDate,
-          entity.getIn(['indicator', 'dates']),
-          entity.getIn(['attributes', 'due_date_id'])
-            ? entity.getIn(['attributes', 'due_date_id']).toString()
-            : '0',
+          getDueDateDateOptions(
+            entity.getIn(['indicator', 'dates']),
+            this.context.intl.formatMessage,
+            appMessages,
+            this.context.intl.formatDate,
+            entity.getIn(['attributes', 'due_date_id']) && entity.getIn(['attributes', 'due_date_id']).toString(),
+          ),
         )],
     },
   ]);

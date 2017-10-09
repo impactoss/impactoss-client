@@ -33,13 +33,12 @@ export class RadioControl extends React.PureComponent { // eslint-disable-line r
                   type="radio"
                   name={model}
                   value={option.value}
-                  checked={option.checked}
                 />
                 <LabelInner>{option.label}</LabelInner>
               </Label>
             </Option>
-          ))
-        }
+          )
+        )}
         { hints && options.length === 0 &&
           <Hint>
             {hints[0]}
