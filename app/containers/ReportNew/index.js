@@ -225,7 +225,8 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                 this.dismissGuestMessage();
                 this.props.handleSubmit(
                   formData,
-                  indicatorReference
+                  indicatorReference,
+                  canUserPublish
                 );
               }}
               handleSubmitFail={this.props.handleSubmitFail}
