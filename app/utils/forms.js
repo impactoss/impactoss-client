@@ -314,7 +314,7 @@ const getDueDateStatus = (date, formatMessage, appMessages) => {
   return '';
 };
 
-export const getDueDateDateOptions = (dates, formatMessage, appMessages, formatDate, activeDateId) => {
+export const getDueDateDateOptions = (dates, formatMessage, appMessages, formatDate, activeDateId = 'null') => {
   const NO_OF_REPORT_OPTIONS = 1;
   let excludeCount = 0;
   const dateOptions = dates
