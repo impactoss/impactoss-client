@@ -98,7 +98,7 @@ const icons = {
   measures: {
     size: 24,
     paths: [
-      'M9,4H20l-6,8h6L7,22l3-8H4Z',
+      'M6,3H19l-5,8h8L9,24V14H3Z',
     ],
   },
   indicators: {
