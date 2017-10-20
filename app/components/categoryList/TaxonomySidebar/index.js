@@ -11,7 +11,7 @@ import messages from './messages';
 
 const Header = styled.div`
   padding: 3em 2em 1em;
-  background-color: ${palette('light', 2)}
+  background-color: ${palette('asideHeader', 0)};
 `;
 
 class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

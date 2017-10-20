@@ -130,6 +130,8 @@ theme.palette = {
   //
   // aside: ['#bg']
   aside: [primary[4]],
+  // asideHeader: ['#bg']
+  asideHeader: [light[2]],
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],

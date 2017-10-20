@@ -39,7 +39,7 @@ const ScrollableWrapper = styled(Scrollable)`
 `;
 const Header = styled.div`
   padding: 3em 2em 1em;
-  background-color: ${palette('light', 2)};
+  background-color: ${palette('asideHeader', 0)};
 `;
 const ListEntitiesEmpty = styled.div`
   font-size: 1.2em;
