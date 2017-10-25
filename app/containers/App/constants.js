@@ -114,6 +114,7 @@ export const SORT_ORDER_OPTIONS = [
 ];
 
 export const USER_ROLES = {
+  NONE: 0,
   ADMIN: 1,
   MANAGER: 2,
   CONTRIBUTOR: 3,

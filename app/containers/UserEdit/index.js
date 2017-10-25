@@ -44,7 +44,7 @@ import {
   selectIsUserManager,
 } from 'containers/App/selectors';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { CONTENT_SINGLE, USER_ROLES } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import Messages from 'components/Messages';
@@ -286,7 +286,7 @@ function mapDispatchToProps(dispatch) {
       const newHighestRole = parseInt(formData.get('associatedRole'), 10);
 
       // store all higher roles
-      const newRoleIds = newHighestRole === 0
+      const newRoleIds = newHighestRole === USER_ROLES.NONE
         ? List()
         : roles.reduce((memo, role) =>
           newHighestRole <= parseInt(role.get('id'), 10)
@@ -296,9 +296,11 @@ function mapDispatchToProps(dispatch) {
 
       saveData = saveData.set('userRoles', Map({
         delete: roles.reduce((memo, role) =>
-          role.get('associated') && newRoleIds.includes(parseInt(role.get('id'), 10))
-            ? memo.push(role.getIn(['associated', 'id']))
-            : memo
+          role.get('associated')
+            && !newRoleIds.includes(role.get('id'))
+            && !newRoleIds.includes(parseInt(role.get('id'), 10))
+              ? memo.push(role.getIn(['associated', 'id']))
+              : memo
           , List()),
         create: newRoleIds.reduce((memo, id) =>
           roles.find((role) => role.get('id') === id && !role.get('associated'))
