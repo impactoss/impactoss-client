@@ -218,10 +218,10 @@ const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuery, onCl
           const valueSplit = queryValue.split(':');
           if (valueSplit[0] === option.attribute && valueSplit.length > 0) {
             const value = valueSplit[1];
-            if (option.extension) {
+            if (option.reference) {
               // TODO: show display value not query queryValue
               tags.push({
-                label: `${option.label}:${value}`,
+                label: `${option.attribute}:${value}`,
                 type: 'attributes',
                 onClick: () => onClick({
                   value: queryValue,

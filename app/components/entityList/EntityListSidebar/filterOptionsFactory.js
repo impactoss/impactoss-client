@@ -76,16 +76,16 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
       }
     } else {
       entities.forEach((entity) => {
-        if (typeof entity.getIn(['attributes', option.attribute]) !== 'undefined' && entity.getIn(['attributes', option.attribute]) !== null) {
+        if (typeof entity.getIn(['attributes', option.attribute]) !== 'undefined'
+        && entity.getIn(['attributes', option.attribute]) !== null) {
           const value = entity.getIn(['attributes', option.attribute]).toString();
           const queryValue = `${option.attribute}:${value}`;
           // add connected entities if not present otherwise increase count
           if (filterOptions.options[value]) {
             filterOptions.options[value].count += 1;
-          } else if (option.extension && !!entity.get(option.extension.key)) {
-            const extension = entity.getIn([option.extension.key, '0']);
+          } else if (option.reference && !!entity.get(option.reference.key)) {
             filterOptions.options[value] = {
-              label: extension ? extension.getIn(['attributes', option.extension.label]) : upperFirst(value),
+              label: entity.getIn([option.reference.key, 'attributes', option.reference.label]),
               showCount: true,
               value: queryValue,
               count: 1,
@@ -105,20 +105,16 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
               checked: optionChecked(locationQueryValue, queryValue),
             };
           }
-        } else if (option.extension && option.extension.without) {
+        } else if (option.reference && option.reference.without) {
           if (filterOptions.options.without) {
             // no connection present
             // add without option
             filterOptions.options.without.count += 1;
           } else {
             const queryValue = `${option.attribute}:null`;
-            filterOptions.messagePrefix = messages.titlePrefix;
-            filterOptions.message = option.message;
-            filterOptions.label = option.label;
             filterOptions.options.without = {
               messagePrefix: messages.without,
-              label: option.label,
-              message: option.label,
+              message: option.message,
               showCount: true,
               labelBold: true,
               value: queryValue,

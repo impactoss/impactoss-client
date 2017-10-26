@@ -118,6 +118,7 @@ const selectIndicatorsNested = createSelector(
   (state) => selectEntities(state, 'sdgtarget_indicators'),
   (state) => selectEntities(state, 'progress_reports'),
   (state) => selectEntities(state, 'due_dates'),
+  (state) => selectEntities(state, 'users'),
   (
     entities,
     connections,
@@ -125,6 +126,7 @@ const selectIndicatorsNested = createSelector(
     entitySdgTargets,
     progressReports,
     dueDates,
+    users
   ) =>
     entities.map((entity) => entity
     .set(
@@ -164,6 +166,10 @@ const selectIndicatorsNested = createSelector(
         return false;
       }
     ))
+    .set(
+      'manager',
+      users.find((user) => entity.getIn(['attributes', 'manager_id']) && attributesEqual(user.get('id'), entity.getIn(['attributes', 'manager_id'])))
+    )
   )
 );
 const selectIndicatorsWithout = createSelector(

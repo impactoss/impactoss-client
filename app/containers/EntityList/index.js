@@ -19,7 +19,7 @@ import Sidebar from 'components/styled/Sidebar';
 import EntityListSidebar from 'components/entityList/EntityListSidebar';
 import EntityListMain from 'components/entityList/EntityListMain';
 
-import { selectIsUserManager, selectIsUserContributor } from 'containers/App/selectors';
+import { selectHasUserRole } from 'containers/App/selectors';
 
 import {
   updatePath,
@@ -27,7 +27,7 @@ import {
 } from 'containers/App/actions';
 
 import appMessages from 'containers/App/messages';
-import { PARAMS, RECORD_OUTDATED } from 'containers/App/constants';
+import { PARAMS, RECORD_OUTDATED, USER_ROLES } from 'containers/App/constants';
 
 import {
   selectDomain,
@@ -116,8 +116,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             }
             config={this.props.config}
             locationQuery={this.props.locationQuery}
-            canEdit={this.props.isManager}
-            canFilterDraft={this.props.isContributor}
+            canEdit={this.props.hasUserRole[USER_ROLES.MANAGER]}
+            hasUserRole={this.props.hasUserRole}
             activePanel={this.props.activePanel}
             onPanelSelect={this.props.onPanelSelect}
             onCreateOption={this.props.onCreateOption}
@@ -171,8 +171,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           entityTitle={this.props.entityTitle}
 
           dataReady={this.props.dataReady}
-          isManager={this.props.isManager}
-          isContributor={this.props.isContributor}
+          isManager={this.props.hasUserRole[USER_ROLES.MANAGER]}
+          isContributor={this.props.hasUserRole[USER_ROLES.CONTRIBUTOR]}
 
           entityIcon={this.props.entityIcon}
           onEntitySelect={this.props.onEntitySelect}
@@ -207,8 +207,7 @@ EntityList.propTypes = {
   entityIcon: PropTypes.func,
   // selector props
   activePanel: PropTypes.string,
-  isManager: PropTypes.bool,
-  isContributor: PropTypes.bool,
+  hasUserRole: PropTypes.object, // { 1: isAdmin, 2: isManager, 3: isContributor}
   entityIdsSelected: PropTypes.object,
   viewDomain: PropTypes.object,
   progress: PropTypes.number,
@@ -237,8 +236,7 @@ EntityList.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  isManager: selectIsUserManager(state),
-  isContributor: selectIsUserContributor(state),
+  hasUserRole: selectHasUserRole(state),
   activePanel: selectActivePanel(state),
   entityIdsSelected: selectSelectedEntities(state),
   viewDomain: selectDomain(state),
