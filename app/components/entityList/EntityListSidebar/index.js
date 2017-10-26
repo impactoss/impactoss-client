@@ -144,7 +144,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       canEdit,
       activePanel,
       onPanelSelect,
-      formatLabel,
       entities,
       locationQuery,
       taxonomies,
@@ -173,7 +172,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
           connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
         },
-        formatLabel,
       );
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
       panelGroups = makeEditGroups(
@@ -185,7 +183,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
           connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
         },
-        formatLabel
       );
     }
     let formOptions = null;
@@ -203,7 +200,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
             without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
           },
-          formatLabel,
         );
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
         const entitiesSelected = entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
@@ -299,7 +295,6 @@ EntityListSidebar.propTypes = {
   activePanel: PropTypes.string,
   onAssign: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,
-  formatLabel: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
   listUpdating: PropTypes.bool,
 };

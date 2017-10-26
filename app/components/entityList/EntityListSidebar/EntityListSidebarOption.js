@@ -10,6 +10,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import appMessage from 'utils/app-message';
+
 import Button from 'components/buttons/Button';
 import Icon from 'components/Icon';
 
@@ -81,7 +83,10 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
         })}
       >
         <Label>
-          {option.get('label')}
+          { option.get('message')
+            ? appMessage(this.context.intl, option.get('message'))
+            : option.get('label')
+          }
         </Label>
         <DotWrapper>
           { this.renderDot(groupId, option.get('id')) }
@@ -100,6 +105,11 @@ EntityListSidebarOption.propTypes = {
   option: PropTypes.object.isRequired,
   groupId: PropTypes.string.isRequired,
   onShowForm: PropTypes.func.isRequired,
+};
+
+
+EntityListSidebarOption.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default EntityListSidebarOption;

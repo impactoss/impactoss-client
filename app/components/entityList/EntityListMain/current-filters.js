@@ -16,7 +16,6 @@ export const currentFilters = ({
   onTagClick,
 },
 withoutMessage,
-formatLabel
 ) => {
   let filterTags = [];
   if (config.taxonomies && taxonomies) {
@@ -42,8 +41,7 @@ formatLabel
       connections,
       locationQuery,
       onTagClick,
-      withoutMessage,
-      formatLabel
+      withoutMessage
     ));
   }
   if (config.attributes) {
@@ -157,8 +155,7 @@ const getCurrentConnectionFilters = (
   connections,
   locationQuery,
   onClick,
-  withoutMessage,
-  formatLabel
+  withoutMessage
 ) => {
   const tags = [];
   forEach(connectionFilters.options, (option) => {
@@ -194,7 +191,9 @@ const getCurrentConnectionFilters = (
         // numeric means taxonomy
         if (option.path === queryValue) {
           tags.push({
-            label: `${withoutMessage} ${lowerCase(formatLabel(option.label))}`,
+            messagePrefix: withoutMessage,
+            label: option.label,
+            message: option.message,
             type: option.path,
             without: true,
             onClick: () => onClick({

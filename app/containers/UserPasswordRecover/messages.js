@@ -7,28 +7,16 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.UserPasswordRecover.pageTitle',
+    id: 'app.containers.UserPasswordRecover.pageTitle',
     defaultMessage: 'Recover password',
   },
   metaDescription: {
-    id: 'app.container.UserPasswordRecover.metaDescription',
+    id: 'app.containers.UserPasswordRecover.metaDescription',
     defaultMessage: 'Password recover page description',
   },
   header: {
     id: 'app.containers.UserPasswordRecover.header',
     defaultMessage: 'Recover password',
-  },
-  fieldRequired: {
-    id: 'app.containers.UserPasswordRecover.header',
-    defaultMessage: 'Required',
-  },
-  fields: {
-    email: {
-      placeholder: {
-        id: 'app.containers.UserPasswordRecover.fields.email.placeholder',
-        defaultMessage: 'Email address',
-      },
-    },
   },
   submit: {
     id: 'app.containers.UserPasswordRecover.submit',

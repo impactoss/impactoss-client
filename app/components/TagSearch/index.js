@@ -9,6 +9,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import appMessage from 'utils/app-message';
+import { lowerCase } from 'utils/string';
+
 import Icon from 'components/Icon';
 import ButtonTagFilter from 'components/buttons/ButtonTagFilter';
 import ButtonTagFilterInverse from 'components/buttons/ButtonTagFilterInverse';
@@ -46,6 +49,14 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       active: false,
     };
   }
+  getFilterLabel = (filter) => {
+    if (filter.message) {
+      return filter.messagePrefix
+        ? `${filter.messagePrefix} ${lowerCase(appMessage(this.context.intl, filter.message))}`
+        : appMessage(this.context.intl, filter.message);
+    }
+    return filter.label;
+  }
   render() {
     const {
       filters,
@@ -59,6 +70,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     // onClick={() => {
     //   this.inputNode.focus()
     // }}
+
     return (
       <Search active={this.state.active} small={this.props.multiselect}>
         <Tags>
@@ -72,7 +84,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                   paletteHover={`${filter.type}Hover`}
                   pIndex={parseInt(filter.id, 10) || 0}
                 >
-                  {filter.label}
+                  {this.getFilterLabel(filter)}
                   <Icon name="removeSmall" text textRight />
                 </ButtonTagFilterInverse>
               )
@@ -84,7 +96,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                   paletteHover={`${filter.type}Hover`}
                   pIndex={parseInt(filter.id, 10) || 0}
                 >
-                  {filter.label}
+                  {this.getFilterLabel(filter)}
                   <Icon name="removeSmall" text textRight />
                 </ButtonTagFilter>
               )

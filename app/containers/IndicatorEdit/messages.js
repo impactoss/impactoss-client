@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.IndicatorEdit.pageTitle',
+    id: 'app.containers.IndicatorEdit.pageTitle',
     defaultMessage: 'Edit Indicator',
   },
   metaDescription: {
-    id: 'app.container.IndicatorEdit.metaDescription',
+    id: 'app.containers.IndicatorEdit.metaDescription',
     defaultMessage: 'Edit Indicator page description',
   },
   header: {
@@ -21,13 +21,5 @@ export default defineMessages({
   notFound: {
     id: 'app.containers.IndicatorEdit.notFound',
     defaultMessage: 'Sorry no indicator found',
-  },
-  loading: {
-    id: 'app.containers.IndicatorEdit.loading',
-    defaultMessage: 'Loading indicator...',
-  },
-  fieldRequired: {
-    id: 'app.containers.IndicatorNew.header',
-    defaultMessage: 'Required',
   },
 });

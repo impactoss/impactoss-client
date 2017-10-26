@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { getSortOption } from 'utils/sort';
+import appMessage from 'utils/app-message';
 
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 import { SORT_ORDER_OPTIONS } from 'containers/App/constants';
+
+import messages from 'components/entityList/EntityListMain/EntityListGroups/messages';
 
 import ColumnSelect from './ColumnSelect';
 import ColumnExpand from './ColumnExpand';
@@ -25,15 +28,33 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
   getListHeaderLabel = (entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage) => {
     if (selectedTotal > 0) {
       if (allSelected) {
-        return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected. `;
+        // return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected. `;
+        return this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.allSelected, {
+          total: selectedTotal,
+          type: selectedTotal === 1 ? entityTitle.single : entityTitle.plural,
+        });
       }
       if (allSelectedOnPage) {
-        return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} on this page are selected. `;
+        // return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} on this page are selected. `;
+        return this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.allSelectedOnPage, {
+          total: selectedTotal,
+          type: selectedTotal === 1 ? entityTitle.single : entityTitle.plural,
+        });
       }
-      return `${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected. `;
+      // return `${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected. `;
+      return this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.selected, {
+        total: selectedTotal,
+        type: selectedTotal === 1 ? entityTitle.single : entityTitle.plural,
+      });
     }
-    const hint = (pageTotal < entitiesTotal) ? ` (${pageTotal} of ${entitiesTotal})` : '';
-    return `${entityTitle.plural}${hint}`;
+    return (pageTotal < entitiesTotal)
+      ? this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.noneSelected, {
+        pageTotal,
+        entitiesTotal,
+        type: entityTitle.plural,
+      })
+      : entityTitle.plural;
+    // return `${entityTitle.plural}${hint}`;
   }
   getSelectedState = (selectedTotal, allSelected) => {
     if (selectedTotal === 0) {
@@ -123,7 +144,10 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
               key={i}
               isExpand={expandNo > i}
               onExpand={() => onExpand(expandNo > i ? i : i + 1)}
-              label={col.label}
+              label={col.message
+                ? appMessage(this.context.intl, col.message)
+                : col.label
+              }
               width={(1 - firstColumnWidth) * this.getExpandableColumnWidth(i, list.length, expandNo)}
             />
           )
@@ -150,6 +174,10 @@ EntityListHeader.propTypes = {
   onSelectAll: PropTypes.func,
   onSortBy: PropTypes.func,
   onSortOrder: PropTypes.func,
+};
+
+EntityListHeader.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default EntityListHeader;

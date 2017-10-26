@@ -27,6 +27,8 @@ import {
   selectReadyForAuthCheck,
 } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
+
 // import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -95,11 +97,11 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
             resetProgress={this.props.resetProgress}
             progressData={viewDomain.page}
             template={{
-              filename: 'sdgtargets_template.csv',
+              filename: `${this.context.intl.formatMessage(messages.filename)}.csv`,
               data: [{
-                title: 'Title | text (required)',
-                reference: 'Reference | text (required)',
-                description: 'Description | text (markdown supported)',
+                title: this.context.intl.formatMessage(appMessages.importFields.title),
+                reference: this.context.intl.formatMessage(appMessages.importFields.referenceRequired),
+                description: this.context.intl.formatMessage(appMessages.importFields.description),
               }],
             }}
           />

@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import FileReaderInput from 'react-file-reader-input';
 import Baby from 'babyparse';
-
-// import appMessages from 'containers/App/messages';
 
 import Icon from 'components/Icon';
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
@@ -14,6 +12,8 @@ import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import ButtonDefaultWithIcon from 'components/buttons/ButtonDefaultWithIcon';
 
 import DocumentWrap from 'components/fields/DocumentWrap';
+
+import messages from './messages';
 
 const Remove = styled(ButtonFlatIconOnly)`
   display: table-cell;
@@ -86,7 +86,12 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
               <Icon name="removeLarge" />
             </Remove>
             <ImportButton type="submit" primary>
-              {`Import ${this.props.value.rows.length} row(s)`}
+              { this.props.value.rows.length === 1 &&
+                <FormattedMessage {...messages.import.single} values={{ total: this.props.value.rows.length }} />
+              }
+              { this.props.value.rows.length !== 1 &&
+                <FormattedMessage {...messages.import.plural} values={{ total: this.props.value.rows.length }} />
+              }
             </ImportButton>
           </DocumentWrapEdit>
         }
@@ -96,7 +101,7 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
             accept={this.props.accept}
             onChange={this.handleChange}
           >
-            <ButtonDefaultWithIcon type="button" title="Select File" icon="add" />
+            <ButtonDefaultWithIcon type="button" title={this.context.intl.formatMessage(messages.selectFile)} icon="add" />
           </FileReaderInput>
         }
       </Styled>
@@ -109,6 +114,9 @@ SelectFile.propTypes = {
   value: PropTypes.object,
   as: PropTypes.string,
   accept: PropTypes.string,
+};
+SelectFile.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default SelectFile;

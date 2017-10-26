@@ -45,6 +45,24 @@ export default defineMessages({
       id: 'app.containers.App.buttons.assign',
       defaultMessage: 'Update',
     },
+    previous: {
+      id: 'app.containers.App.buttons.previous',
+      defaultMessage: 'Previous',
+    },
+    next: {
+      id: 'app.containers.App.buttons.next',
+      defaultMessage: 'Next',
+    },
+    import: {
+      id: 'app.containers.App.buttons.import',
+      defaultMessage: 'Import',
+    },
+  },
+  labels: {
+    perPage: {
+      id: 'app.containers.App.labels.perPage',
+      defaultMessage: 'Per page',
+    },
   },
   forms: {
     fieldRequired: {
@@ -53,7 +71,7 @@ export default defineMessages({
     },
     dateFormatError: {
       id: 'app.containers.App.forms.dateFormatError',
-      defaultMessage: 'Please enter the date in the required format: dd/mm/yyyy', // change to format according to locale
+      defaultMessage: 'Please enter the date in the required format: {format}',
     },
     emailFormatError: {
       id: 'app.containers.App.forms.emailFormatError',
@@ -64,7 +82,7 @@ export default defineMessages({
       defaultMessage: 'Password confirmation does not match password',
     },
     passwordShortError: {
-      id: 'app.containers.App.forms.passwordMismatchError',
+      id: 'app.containers.App.forms.passwordShortError',
       defaultMessage: 'Password is too short (minimum is 6 characters)',
     },
     passwordInvalidError: {
@@ -112,6 +130,48 @@ export default defineMessages({
       defaultMessage: 'Categorises users only',
     },
   },
+  importFields: {
+    title: {
+      id: 'app.containers.App.importFields.title',
+      defaultMessage: 'Title | text (required)',
+    },
+    reference: {
+      id: 'app.containers.App.importFields.reference',
+      defaultMessage: 'Reference | text',
+    },
+    referenceRequired: {
+      id: 'app.containers.App.importFields.referenceRequired',
+      defaultMessage: 'Reference | text (required)',
+    },
+    description: {
+      id: 'app.containers.App.importFields.description',
+      defaultMessage: 'Description | text (markdown supported)',
+    },
+    accepted: {
+      id: 'app.containers.App.importFields.accepted',
+      defaultMessage: 'Accepted | boolean (true/false)',
+    },
+    response: {
+      id: 'app.containers.App.importFields.response',
+      defaultMessage: 'Government response | text (markdown supported)',
+    },
+    outcome: {
+      id: 'app.containers.App.importFields.outcome',
+      defaultMessage: 'Desired outcome | text (markdown supported)',
+    },
+    indicator_summary: {
+      id: 'app.containers.App.importFields.indicator_summary',
+      defaultMessage: 'Indicator summary | text (markdown supported)',
+    },
+    target_date: {
+      id: 'app.containers.App.importFields.target_date',
+      defaultMessage: 'Target Date | date ({format})',
+    },
+    target_date_comment: {
+      id: 'app.containers.App.importFields.target_date_comment',
+      defaultMessage: 'Target date comment | text',
+    },
+  },
   placeholders: {
     title: {
       id: 'app.containers.App.placeholders.title',
@@ -142,11 +202,11 @@ export default defineMessages({
       defaultMessage: 'Confirm Password',
     },
     short_title: {
-      id: 'app.containers.App.placeholders.title',
+      id: 'app.containers.App.placeholders.short_title',
       defaultMessage: 'Abbr.',
     },
     menu_title: {
-      id: 'app.containers.App.placeholders.title',
+      id: 'app.containers.App.placeholders.menu_title',
       defaultMessage: 'Menu title',
     },
     order: {
@@ -174,11 +234,11 @@ export default defineMessages({
       defaultMessage: 'Enter desired outcome',
     },
     indicator_summary: {
-      id: 'app.containers.App.attributes.indicator_summary',
+      id: 'app.containers.App.placeholders.indicator_summary',
       defaultMessage: 'Enter indicator summary',
     },
     target_date_comment: {
-      id: 'app.containers.App.attributes.target_date_comment',
+      id: 'app.containers.App.placeholders.target_date_comment',
       defaultMessage: 'Additional information',
     },
     url: {
@@ -495,7 +555,7 @@ export default defineMessages({
         defaultMessage: 'Extraordinary (no due date assigned)',
       },
       unscheduled_short: {
-        id: 'app.containers.App.entities.progress_reports.unscheduled',
+        id: 'app.containers.App.entities.progress_reports.unscheduled_short',
         defaultMessage: 'Extraordinary',
       },
       showAll: {
@@ -724,6 +784,66 @@ export default defineMessages({
     createdAsGuest: {
       id: 'app.containers.App.messages.createdAsGuest',
       defaultMessage: '{entityType} created successfully. It will become publicly available once verified and published by an authorised user.',
+    },
+  },
+  ui: {
+    publishStatuses: {
+      draft: {
+        id: 'app.containers.App.ui.publishStatuses.draft',
+        defaultMessage: 'Draft',
+      },
+      public: {
+        id: 'app.containers.App.ui.publishStatuses.public',
+        defaultMessage: 'Public',
+      },
+    },
+    docPublishStatuses: {
+      public: {
+        id: 'app.containers.App.ui.docPublishStatuses.public',
+        defaultMessage: 'Public',
+      },
+      private: {
+        id: 'app.containers.App.ui.docPublishStatuses.private',
+        defaultMessage: 'Private',
+      },
+    },
+    acceptedStatuses: {
+      accepted: {
+        id: 'app.containers.App.ui.acceptedStatuses.accepted',
+        defaultMessage: 'Accepted',
+      },
+      noted: {
+        id: 'app.containers.App.ui.publishStatuses.noted',
+        defaultMessage: 'Noted',
+      },
+    },
+    reportFrequencies: {
+      monthly: {
+        id: 'app.containers.App.ui.reportFrequencies.monthly',
+        defaultMessage: 'Monthly',
+      },
+      quarterly: {
+        id: 'app.containers.App.ui.reportFrequencies.quarterly',
+        defaultMessage: 'Quarterly',
+      },
+      semiannual: {
+        id: 'app.containers.App.ui.reportFrequencies.semiannual',
+        defaultMessage: 'Semiannual',
+      },
+      annual: {
+        id: 'app.containers.App.ui.reportFrequencies.annual',
+        defaultMessage: 'Annual',
+      },
+    },
+    sortOrderOptions: {
+      asc: {
+        id: 'app.containers.App.ui.sortOrderOptions.asc',
+        defaultMessage: 'Ascending',
+      },
+      desc: {
+        id: 'app.containers.App.ui.sortOrderOptions.desc',
+        defaultMessage: 'Descending',
+      },
     },
   },
 });

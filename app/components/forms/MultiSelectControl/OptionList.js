@@ -151,6 +151,8 @@ class OptionList extends React.PureComponent {
                     bold={option.get('labelBold') || checked}
                     reference={typeof option.get('reference') !== 'undefined' && option.get('reference') !== null ? option.get('reference').toString() : ''}
                     label={option.get('label')}
+                    messagePrefix={option.get('messagePrefix')}
+                    message={option.get('message')}
                     isNew={option.get('isNew')}
                     draft={option.get('draft')}
                   />

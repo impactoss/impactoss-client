@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.UserEdit.pageTitle',
+    id: 'app.containers.UserEdit.pageTitle',
     defaultMessage: 'Update user profile',
   },
   metaDescription: {
-    id: 'app.container.UserEdit.metaDescription',
+    id: 'app.containers.UserEdit.metaDescription',
     defaultMessage: 'Edit User page description',
   },
   header: {
@@ -21,13 +21,5 @@ export default defineMessages({
   notFound: {
     id: 'app.containers.UserEdit.notFound',
     defaultMessage: 'Sorry user not found',
-  },
-  loading: {
-    id: 'app.containers.UserEdit.loading',
-    defaultMessage: 'Loading user profile data...',
-  },
-  fieldRequired: {
-    id: 'app.containers.UserEdit.header',
-    defaultMessage: 'Required',
   },
 });

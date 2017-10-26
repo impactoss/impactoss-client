@@ -15,7 +15,8 @@ export const groupEntities = (
   connectedTaxonomies,
   config,
   groupSelectValue,
-  subgroupSelectValue
+  subgroupSelectValue,
+  messages
 ) => subgroupSelectValue
   ? makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, groupSelectValue)
     .map((group) => group
@@ -25,25 +26,26 @@ export const groupEntities = (
       )
       .delete('entities')
     )
-  : makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, groupSelectValue);
+  : makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, groupSelectValue, messages);
 
 const makeEntityGroups = (
   entities,
   taxonomies,
   connectedTaxonomies,
   config,
-  groupSelectValue
+  groupSelectValue,
+  messages
 ) => {
   if (groupSelectValue) {
     if (isNumber(groupSelectValue)) {
       const taxonomy = taxonomies.get(groupSelectValue);
-      return makeTaxonomyGroups(entities, taxonomy);
+      return makeTaxonomyGroups(entities, taxonomy, messages);
     }
     const locationQueryGroupSplit = groupSelectValue.split(':');
     if (locationQueryGroupSplit.length > 1) {
       const taxonomy = connectedTaxonomies.get(locationQueryGroupSplit[1]);
       if (taxonomy) {
-        return makeConnectedTaxonomyGroups(entities, taxonomy, config);
+        return makeConnectedTaxonomyGroups(entities, taxonomy, config, messages);
       }
     }
     return List().push(Map({ entities }));
@@ -55,7 +57,7 @@ const getCategoryLabel = (cat) =>
   ? `${cat.getIn(['attributes', 'reference'])} ${cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name'])}`
   : cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
 
-export const makeTaxonomyGroups = (entities, taxonomy) => {
+export const makeTaxonomyGroups = (entities, taxonomy, messages) => {
   let groups = Map();
   entities.forEach((entity) => {
     let hasTaxCategory = false;
@@ -86,7 +88,7 @@ export const makeTaxonomyGroups = (entities, taxonomy) => {
         groups = groups.setIn(['without', 'entities'], groups.getIn(['without', 'entities']).push(entity));
       } else {
         groups = groups.set('without', Map({
-          label: `Without ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`, // `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
+          label: `${messages.without} ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`, // `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
           entities: List().push(entity),
           order: 'zzzzzzzz',
           id: 'without',
@@ -104,7 +106,7 @@ export const setGroup = (entity, groupId) => entity.get('group')
   ? entity.set('group', List().push(entity.get('group')).push())
   : entity.set('group', groupId);
 
-export const makeConnectedTaxonomyGroups = (entities, taxonomy, config) => {
+export const makeConnectedTaxonomyGroups = (entities, taxonomy, config, messages) => {
   let groups = Map();
   entities.forEach((entity) => {
     let hasTaxCategory = false;
@@ -139,7 +141,7 @@ export const makeConnectedTaxonomyGroups = (entities, taxonomy, config) => {
         groups = groups.setIn(['without', 'entities'], groups.getIn(['without', 'entities']).push(entity));
       } else {
         groups = groups.set('without', Map({
-          label: `Without ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`, // `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
+          label: `${messages.without} ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`, // `${messages.without} ${lowerCase(taxonomy.attributes.title)}`,
           entities: List().push(entity),
           order: 'zzzzzzzzz',
           id: 'without',

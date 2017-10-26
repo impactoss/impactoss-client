@@ -82,7 +82,6 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
 
     const field = {
       id: 'file',
-      label: 'Select file',
       model: `.${fieldModel}`,
       placeholder: 'filename',
     };
@@ -197,10 +196,5 @@ ImportEntitiesForm.propTypes = {
   progressData: PropTypes.object,
   template: PropTypes.object,
 };
-
-ImportEntitiesForm.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
-
 
 export default ImportEntitiesForm;

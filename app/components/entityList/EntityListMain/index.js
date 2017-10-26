@@ -80,7 +80,6 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       dataReady,
       isManager,
       isContributor,
-      formatLabel,
       onGroupSelect,
       onSubgroupSelect,
       onExpand,
@@ -140,7 +139,6 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                         onTagClick,
                       },
                       this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
-                      formatLabel
                     )}
                     searchQuery={locationQuery.get('search') || ''}
                     onSearch={onSearch}
@@ -216,7 +214,6 @@ EntityListMain.propTypes = {
   isContributor: PropTypes.bool,
   entityIcon: PropTypes.func,
   // functions
-  formatLabel: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
   onEntitySelect: PropTypes.func.isRequired,
   onEntitySelectAll: PropTypes.func.isRequired,

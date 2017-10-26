@@ -65,7 +65,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       icon: 'recommendations',
       actions: [{
         type: 'text',
-        title: 'Import',
+        title: this.context.intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       }, {
         type: 'add',

@@ -36,7 +36,7 @@ export const CONFIG = {
     options: [
       {
         search: false,
-        label: 'attributes.draft',
+        message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
       },

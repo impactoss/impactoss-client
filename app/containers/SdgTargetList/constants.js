@@ -58,7 +58,7 @@ export const CONFIG = {
     connections: [
       {
         path: 'measures',
-        title: 'entities.measures.plural',
+        message: 'entities.measures.plural',
         key: 'measure_id',
       },
     ],
@@ -68,7 +68,7 @@ export const CONFIG = {
     options: [
       {
         search: true,
-        label: 'entities.indicators.plural',
+        message: 'entities.indicators.plural',
         path: 'indicators',
         key: 'indicator_id',
         expandable: true, // used for omitting from connected counts
@@ -77,7 +77,7 @@ export const CONFIG = {
       },
       {
         search: true,
-        label: 'entities.measures.plural',
+        message: 'entities.measures.plural',
         path: 'measures',
         clientPath: 'actions',
         key: 'measure_id',
@@ -90,7 +90,7 @@ export const CONFIG = {
     options: [
       {
         search: false,
-        label: 'attributes.draft',
+        message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
       },
@@ -98,13 +98,13 @@ export const CONFIG = {
   },
   expandableColumns: [
     {
-      label: 'Indicators',
+      message: 'entities.indicators.plural',
       type: 'indicators',
       clientPath: 'indicators',
       icon: 'indicators',
     },
     {
-      label: 'Progress reports',
+      message: 'entities.progress_reports.plural',
       type: 'reports',
       clientPath: 'reports',
       icon: 'reminder',

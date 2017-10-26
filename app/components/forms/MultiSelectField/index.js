@@ -217,7 +217,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
             <MultiSelectControl
               id={id}
               model={model || `.${id}`}
-              title={`Update ${lowerCase(field.label)}`}
+              title={this.context.intl.formatMessage(messages.update, { type: lowerCase(field.label) })}
               onCancel={this.onCloseMultiselect}
               buttons={[
                 field.onCreate
@@ -245,6 +245,10 @@ MultiSelectField.propTypes = {
   field: PropTypes.object,
   fieldData: PropTypes.object,
   handleUpdate: PropTypes.func,
+};
+
+MultiSelectField.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default MultiSelectField;

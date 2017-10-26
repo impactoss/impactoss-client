@@ -13,6 +13,7 @@ import { isEqual } from 'lodash/lang';
 import Icon from 'components/Icon';
 import SelectReset from 'components/SelectReset';
 import { PAGE_ITEM_OPTIONS } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 const Styled = styled.div`
   padding-top: 0.5em;
@@ -96,7 +97,7 @@ export class EntityListFooter extends React.PureComponent { // eslint-disable-li
                     e.preventDefault();
                     onPageSelect(Math.max(1, pager.currentPage - 1));
                   }}
-                  title="Previous"
+                  title={this.context.intl && this.context.intl.formatMessage(appMessages.buttons.previous)}
                 >
                   <Icon name="arrowLeft" />
                 </ListInlineItemNav>
@@ -171,7 +172,7 @@ export class EntityListFooter extends React.PureComponent { // eslint-disable-li
                     e.preventDefault();
                     onPageSelect(Math.min(pager.totalPages, parseInt(pager.currentPage, 10) + 1));
                   }}
-                  title="Next"
+                  title={this.context.intl && this.context.intl.formatMessage(appMessages.buttons.next)}
                 >
                   <Icon name="arrowRight" />
                 </ListInlineItemNav>
@@ -187,7 +188,7 @@ export class EntityListFooter extends React.PureComponent { // eslint-disable-li
         <SelectWrapper>
           <SelectReset
             value={pageSize.toString()}
-            label="Per page"
+            label={this.context.intl && this.context.intl.formatMessage(appMessages.labels.perPage)}
             index="page-select"
             options={perPageOptions}
             isReset={false}
@@ -205,5 +206,10 @@ EntityListFooter.propTypes = {
   onPageSelect: PropTypes.func,
   onPageItemsSelect: PropTypes.func,
 };
+
+EntityListFooter.contextTypes = {
+  intl: PropTypes.object.isRequired,
+};
+
 
 export default EntityListFooter;

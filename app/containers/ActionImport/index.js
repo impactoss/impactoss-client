@@ -27,6 +27,8 @@ import {
   selectReadyForAuthCheck,
 } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
+
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import ImportEntitiesForm from 'components/forms/ImportEntitiesForm';
@@ -88,12 +90,12 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             resetProgress={this.props.resetProgress}
             progressData={viewDomain.page}
             template={{
-              filename: 'actions_template.csv',
+              filename: `${this.context.intl.formatMessage(messages.filename)}.csv`,
               data: [{
-                title: 'Title | text (required)',
-                description: 'Description | text (markdown supported)',
-                target_date: `Target Date | date (${DB_DATE_FORMAT})`,
-                target_date_comment: 'Target date comment | text',
+                title: this.context.intl.formatMessage(appMessages.importFields.title),
+                description: this.context.intl.formatMessage(appMessages.importFields.description),
+                target_date: this.context.intl.formatMessage(appMessages.importFields.target_date, { format: DB_DATE_FORMAT }),
+                target_date_comment: this.context.intl.formatMessage(appMessages.importFields.target_date_comment),
               }],
             }}
           />

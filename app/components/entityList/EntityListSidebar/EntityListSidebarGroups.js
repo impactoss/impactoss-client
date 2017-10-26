@@ -13,12 +13,7 @@ import EntityListSidebarOption from './EntityListSidebarOption';
 
 const Styled = styled.div``;
 
-export default class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  static propTypes = {
-    groups: PropTypes.object,
-    onShowForm: PropTypes.func.isRequired,
-    // onHideFilterForm: PropTypes.func.isRequired,
-  };
+class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
     const groups = this.props.groups;
@@ -52,3 +47,13 @@ export default class EntityListSidebarGroups extends React.PureComponent { // es
     );
   }
 }
+EntityListSidebarGroups.propTypes = {
+  groups: PropTypes.object,
+  onShowForm: PropTypes.func.isRequired,
+};
+
+EntityListSidebarGroups.contextTypes = {
+  intl: PropTypes.object.isRequired,
+};
+
+export default EntityListSidebarGroups;

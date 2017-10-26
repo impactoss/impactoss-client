@@ -8,35 +8,35 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   categories: {
     pageTitle: {
-      id: 'app.container.EntityNew.categories.pageTitle',
+      id: 'app.containers.EntityNew.categories.pageTitle',
       defaultMessage: 'New Category',
     },
     pageTitleTaxonomy: {
-      id: 'app.container.EntityNew.categories.pageTitleTaxonomy',
+      id: 'app.containers.EntityNew.categories.pageTitleTaxonomy',
       defaultMessage: 'New {taxonomy}',
     },
   },
   measures: {
     pageTitle: {
-      id: 'app.container.EntityNew.measures.pageTitle',
+      id: 'app.containers.EntityNew.measures.pageTitle',
       defaultMessage: 'New Action',
     },
   },
   indicators: {
     pageTitle: {
-      id: 'app.container.EntityNew.indicators.pageTitle',
+      id: 'app.containers.EntityNew.indicators.pageTitle',
       defaultMessage: 'New Indicator',
     },
   },
   recommendations: {
     pageTitle: {
-      id: 'app.container.EntityNew.recommendations.pageTitle',
+      id: 'app.containers.EntityNew.recommendations.pageTitle',
       defaultMessage: 'New Recommendation',
     },
   },
   sdgtargets: {
     pageTitle: {
-      id: 'app.container.EntityNew.sdgtargets.pageTitle',
+      id: 'app.containers.EntityNew.sdgtargets.pageTitle',
       defaultMessage: 'New SDG target',
     },
   },

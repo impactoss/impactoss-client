@@ -6,7 +6,7 @@
 import { fromJS } from 'immutable';
 import { REPORT_FREQUENCIES } from 'containers/App/constants';
 
-export const SAVE = 'nmrf/IndicatorNew/SAVE';
+export const SAVE = 'impactoss/IndicatorNew/SAVE';
 
 export const DEPENDENCIES = [
   'user_roles',
