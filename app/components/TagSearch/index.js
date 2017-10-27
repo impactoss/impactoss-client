@@ -51,11 +51,13 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     };
   }
   getFilterLabel = (filter) => {
+    // not used I think?
     if (filter.message) {
       return filter.messagePrefix
         ? `${filter.messagePrefix} ${lowerCase(appMessage(this.context.intl, filter.message))}`
         : appMessage(this.context.intl, filter.message);
     }
+    // <<< not used?
     if (filter.labels) {
       return reduce(filter.labels, (memo, label) => {
         let labelValue = label.appMessage ? appMessage(this.context.intl, label.label) : label.label;
