@@ -21,6 +21,7 @@ import messages from './messages';
 const Styled = styled.div`
   padding: 0.5em 0;
   position: relative;
+  min-height: 2.65em;
 `;
 // TODO treat as regular link
 const ListEntitiesHeaderOptionLink = styled(Button)`
