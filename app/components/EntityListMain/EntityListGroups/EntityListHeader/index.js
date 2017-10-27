@@ -8,7 +8,7 @@ import appMessage from 'utils/app-message';
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 import { SORT_ORDER_OPTIONS } from 'containers/App/constants';
 
-import messages from 'components/entityList/EntityListMain/EntityListGroups/messages';
+import messages from 'components/EntityListMain/EntityListGroups/messages';
 
 import ColumnSelect from './ColumnSelect';
 import ColumnExpand from './ColumnExpand';

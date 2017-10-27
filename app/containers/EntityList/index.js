@@ -16,8 +16,8 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Sidebar from 'components/styled/Sidebar';
 
-import EntityListSidebar from 'components/entityList/EntityListSidebar';
-import EntityListMain from 'components/entityList/EntityListMain';
+import EntityListSidebar from 'components/EntityListSidebar';
+import EntityListMain from 'components/EntityListMain';
 
 import { selectHasUserRole } from 'containers/App/selectors';
 

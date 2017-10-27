@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
-import EntityListItems from 'components/entityList/EntityListMain/EntityListGroups/EntityListItems';
+import EntityListItems from 'components/EntityListMain/EntityListGroups/EntityListItems';
 
 import FieldWrap from 'components/fields/FieldWrap';
 import LabelLarge from 'components/fields/LabelLarge';

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import messages from 'components/entityList/EntityListMain/EntityListGroups/messages';
+import messages from 'components/EntityListMain/EntityListGroups/messages';
 
 const Styled = styled.span`
   padding: 10px 15px;
