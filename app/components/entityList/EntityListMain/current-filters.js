@@ -1,7 +1,7 @@
 import { find, forEach } from 'lodash/collection';
 import { upperFirst } from 'lodash/string';
 
-import { getCategoryShortTitle } from 'utils/entities';
+import { getCategoryShortTitle, attributesEqual } from 'utils/entities';
 import { lowerCase, truncateText } from 'utils/string';
 import isNumber from 'utils/is-number';
 import asList from 'utils/as-list';
@@ -9,6 +9,7 @@ import asList from 'utils/as-list';
 
 export const currentFilters = ({
   config,
+  entities,
   taxonomies,
   connections,
   connectedTaxonomies,
@@ -46,9 +47,11 @@ withoutMessage,
   }
   if (config.attributes) {
     filterTags = filterTags.concat(getCurrentAttributeFilters(
+      entities,
       config.attributes.options,
       locationQuery,
-      onTagClick
+      onTagClick,
+      withoutMessage
     ));
   }
   return filterTags;
@@ -191,9 +194,11 @@ const getCurrentConnectionFilters = (
         // numeric means taxonomy
         if (option.path === queryValue) {
           tags.push({
-            messagePrefix: withoutMessage,
-            label: option.label,
-            message: option.message,
+            labels: [
+              { label: withoutMessage },
+              { appMessage: true, label: option.message },
+              { label: option.label },
+            ],
             type: option.path,
             without: true,
             onClick: () => onClick({
@@ -208,7 +213,7 @@ const getCurrentConnectionFilters = (
   }
   return tags;
 };
-const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuery, onClick) => {
+const getCurrentAttributeFilters = (entities, attributeFiltersOptions, locationQuery, onClick, withoutMessage) => {
   const tags = [];
   if (locationQuery.get('where')) {
     const locationQueryValue = locationQuery.get('where');
@@ -219,16 +224,39 @@ const getCurrentAttributeFilters = (attributeFiltersOptions, locationQuery, onCl
           if (valueSplit[0] === option.attribute && valueSplit.length > 0) {
             const value = valueSplit[1];
             if (option.reference) {
-              // TODO: show display value not query queryValue
-              tags.push({
-                label: `${option.attribute}:${value}`,
-                type: 'attributes',
-                onClick: () => onClick({
-                  value: queryValue,
-                  query: 'where',
-                  checked: false,
-                }),
-              });
+              // without
+              if (value === 'null') {
+                tags.push({
+                  labels: [
+                    { label: withoutMessage },
+                    { appMessage: !!option.message, label: option.message || option.label, lowerCase: true },
+                  ],
+                  type: 'attributes',
+                  without: true,
+                  onClick: () => onClick({
+                    value: queryValue,
+                    query: 'where',
+                    checked: false,
+                  }),
+                });
+              } else {
+                const referenceEntity = entities.find((entity) => attributesEqual(entity.getIn(['attributes', option.attribute]), value));
+                const label = referenceEntity && referenceEntity.getIn([option.reference.key, 'attributes', option.reference.label]);
+                tags.push({
+                  labels: label
+                  ? [{ label }]
+                  : [
+                    { appMessage: !!option.message, label: option.message || option.label, postfix: ':' },
+                    { label: value },
+                  ],
+                  type: 'attributes',
+                  onClick: () => onClick({
+                    value: queryValue,
+                    query: 'where',
+                    checked: false,
+                  }),
+                });
+              }
             } else if (option.options) {
               const attribute = find(option.options, (o) => o.value.toString() === value);
               let label = attribute ? attribute.label : upperFirst(value);
