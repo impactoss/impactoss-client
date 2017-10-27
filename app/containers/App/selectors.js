@@ -82,6 +82,7 @@ export const selectSessionUserRoles = createSelector(
     : Map()
 );
 
+
 export const selectIsUserAdmin = createSelector(
   selectSessionUserRoles,
   (userRoles) => userRoles.includes(USER_ROLES.ADMIN)
@@ -98,6 +99,18 @@ export const selectIsUserContributor = createSelector(
   (userRoles) => userRoles.includes(USER_ROLES.CONTRIBUTOR)
     || userRoles.includes(USER_ROLES.MANAGER)
     || userRoles.includes(USER_ROLES.ADMIN)
+);
+
+
+export const selectHasUserRole = createSelector(
+  selectIsUserAdmin,
+  selectIsUserManager,
+  selectIsUserContributor,
+  (isAdmin, isManager, isContributor) => ({
+    1: isAdmin,
+    2: isManager,
+    3: isContributor,
+  })
 );
 
 

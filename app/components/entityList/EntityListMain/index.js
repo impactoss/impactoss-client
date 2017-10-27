@@ -90,6 +90,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       connectedTaxonomies,
       locationQuery,
       entityIcon,
+      entities,
     } = this.props;
 
     const expandNo = config.expandableColumns && locationQuery.get('expand')
@@ -102,8 +103,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
         || (config.taxonomies && getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 2))
       : null;
 
-    const headerTitle = this.props.entities && dataReady
-      ? `${this.props.entities.size} ${this.props.entities.size === 1 ? entityTitle.single : entityTitle.plural}`
+    const headerTitle = entities && dataReady
+      ? `${entities.size} ${entities.size === 1 ? entityTitle.single : entityTitle.plural}`
       : entityTitle.plural;
 
     return (
@@ -132,6 +133,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     filters={currentFilters(
                       {
                         config,
+                        entities,
                         taxonomies,
                         connections,
                         connectedTaxonomies,
@@ -157,7 +159,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 />
                 <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
                   <EntityListGroups
-                    entities={this.props.entities}
+                    entities={entities}
                     taxonomies={this.props.taxonomies}
                     connections={connections}
                     connectedTaxonomies={this.props.connectedTaxonomies}

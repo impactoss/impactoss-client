@@ -4,6 +4,7 @@ export const makeEditGroups = (
   config,
   taxonomies,
   activeEditOption,
+  hasUserRole,
   messages,
 ) => {
   const editGroups = {};
@@ -70,7 +71,8 @@ export const makeEditGroups = (
       label: messages.attributes,
       show: true,
       options: reduce(config.attributes.options, (options, option) =>
-        typeof option.edit === 'undefined' || option.edit
+        (typeof option.edit === 'undefined' || option.edit)
+        && (typeof option.role === 'undefined' || hasUserRole[option.role])
         ? {
           ...options,
           [option.attribute]: {

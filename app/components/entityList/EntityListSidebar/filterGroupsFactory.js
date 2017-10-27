@@ -6,7 +6,7 @@ export const makeFilterGroups = (
   taxonomies,
   connectedTaxonomies,
   activeFilterOption,
-  canFilterDraft,
+  hasUserRole,
   messages,
 ) => {
   const filterGroups = {};
@@ -81,7 +81,7 @@ export const makeFilterGroups = (
       label: messages.attributes,
       show: true,
       options: reduce(config.attributes.options, (options, option) =>
-        option.attribute !== 'draft' || (option.attribute === 'draft' && canFilterDraft)
+        (typeof option.role === 'undefined' || hasUserRole[option.role])
           ? {
             ...options,
             [option.attribute]: {

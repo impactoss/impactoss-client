@@ -140,7 +140,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     const {
       config,
       onAssign,
-      canFilterDraft,
+      hasUserRole,
       canEdit,
       activePanel,
       onPanelSelect,
@@ -165,7 +165,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         taxonomies,
         connectedTaxonomies,
         activeOption,
-        canFilterDraft,
+        hasUserRole,
         {
           attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
           taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
@@ -178,6 +178,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         config,
         taxonomies,
         activeOption,
+        hasUserRole,
         {
           attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
           taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
@@ -290,7 +291,7 @@ EntityListSidebar.propTypes = {
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
   canEdit: PropTypes.bool,
-  canFilterDraft: PropTypes.bool,
+  hasUserRole: PropTypes.object,
   config: PropTypes.object,
   activePanel: PropTypes.string,
   onAssign: PropTypes.func.isRequired,
