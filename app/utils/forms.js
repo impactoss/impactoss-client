@@ -250,14 +250,15 @@ export const getHighestUserRoleId = (roles) =>
   , 99999);
 
 const getRoleOptions = (roles, formatMessage, appMessages) => {
-  const roleOptions = [{
-    value: USER_ROLES.DEFAULT,
-    label: formatMessage(appMessages.entities.roles.defaultRole),
-  }];
-  return roles.reduce((memo, role) => memo.concat([{
+  const roleOptions = roles.reduce((memo, role) => memo.concat([{
     value: parseInt(role.get('id'), 10),
     label: role.getIn(['attributes', 'friendly_name']),
-  }]), roleOptions);
+  }]), []);
+  roleOptions.push({
+    value: USER_ROLES.DEFAULT,
+    label: formatMessage(appMessages.entities.roles.defaultRole),
+  });
+  return roleOptions;
 };
 
 export const getRoleFormField = (formatMessage, appMessages, roles) => ({
