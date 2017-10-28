@@ -290,7 +290,7 @@
   "app.containers.App.entities.categories.plural" : "Categories",
   "app.containers.App.entities.roles.single" : "User role",
   "app.containers.App.entities.roles.plural" : "User roles",
-  "app.containers.App.entities.user_roles.defaultRole" : "No role assigned",
+  "app.containers.App.entities.user_roles.defaultRole" : "Guest",
   "app.containers.App.messages.notSignedIn" : "Please sign in or register first to access this page",
   "app.containers.App.messages.alreadySignedIn" : "Welcome back!",
   "app.containers.App.messages.signInGuestReport" : "Please sign in or register first to submit a progress report",

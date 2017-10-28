@@ -18,6 +18,7 @@ import {
   ACCEPTED_STATUSES,
   DOC_PUBLISH_STATUSES,
   DATE_FORMAT,
+  USER_ROLES,
 } from 'containers/App/constants';
 
 export const entityOption = (entity, defaultToId, hasTags) => Map({
@@ -250,7 +251,7 @@ export const getHighestUserRoleId = (roles) =>
 
 const getRoleOptions = (roles, formatMessage, appMessages) => {
   const roleOptions = [{
-    value: 0,
+    value: USER_ROLES.DEFAULT,
     label: formatMessage(appMessages.entities.roles.defaultRole),
   }];
   return roles.reduce((memo, role) => memo.concat([{
