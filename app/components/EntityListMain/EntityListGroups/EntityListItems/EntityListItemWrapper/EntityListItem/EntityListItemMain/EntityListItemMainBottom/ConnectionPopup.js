@@ -199,7 +199,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                           }
                           <Id>{ref}</Id>
                           <IdSpacer>|</IdSpacer>
-                          <ItemContent>{truncateText(entity.getIn(['attributes', 'title']), POPUP_LENGTH - ref.length)}</ItemContent>
+                          <ItemContent>{truncateText(entity.getIn(['attributes', 'title']) || entity.getIn(['attributes', 'friendly_name']), POPUP_LENGTH - ref.length)}</ItemContent>
                         </ListItemLink>
                       </ListItem>
                     );
