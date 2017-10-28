@@ -2,7 +2,7 @@ import { find, forEach } from 'lodash/collection';
 import { upperFirst } from 'lodash/string';
 
 import { getCategoryShortTitle, attributesEqual } from 'utils/entities';
-import { lowerCase, truncateText } from 'utils/string';
+import { truncateText } from 'utils/string';
 import isNumber from 'utils/is-number';
 import asList from 'utils/as-list';
 
@@ -102,7 +102,10 @@ const getCurrentTaxonomyFilters = (
         if (isNumber(queryValue) && taxonomy.get('id') === queryValue) {
           const value = queryValue.toString();
           tags.push({
-            label: `${withoutMessage} ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`,
+            labels: [
+              { label: withoutMessage },
+              { label: taxonomy.getIn(['attributes', 'title']), lowerCase: true },
+            ],
             type: 'taxonomies',
             id: taxonomy.get('id'),
             without: true,
