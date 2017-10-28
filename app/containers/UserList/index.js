@@ -49,7 +49,6 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
 
   render() {
     const { dataReady } = this.props;
-
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'users',

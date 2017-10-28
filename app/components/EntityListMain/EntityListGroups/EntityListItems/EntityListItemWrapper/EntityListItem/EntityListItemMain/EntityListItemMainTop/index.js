@@ -5,6 +5,7 @@ import Component from 'components/styled/Component';
 import Icon from 'components/Icon';
 
 import ItemStatus from 'components/ItemStatus';
+import ItemRole from 'components/ItemRole';
 
 import EntityListItemMainTopReference from './EntityListItemMainTopReference';
 import EntityListItemMainTopIcon from './EntityListItemMainTopIcon';
@@ -30,7 +31,12 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
             <Icon name={entity.entityIcon} text iconRight />
           </EntityListItemMainTopIcon>
         }
-        <ItemStatus draft={entity.draft} />
+        { entity.draft &&
+          <ItemStatus draft={entity.draft} />
+        }
+        { entity.role &&
+          <ItemRole role={entity.role} />
+        }
       </Component>
     );
   }

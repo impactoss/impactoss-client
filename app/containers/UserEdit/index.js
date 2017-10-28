@@ -41,7 +41,7 @@ import {
 
 import {
   selectReady,
-  selectIsUserManager,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import { CONTENT_SINGLE, USER_ROLES } from 'containers/App/constants';
@@ -105,9 +105,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     fields: [getTitleFormField(this.context.intl.formatMessage, appMessages, 'title', 'name')],
   }]);
 
-  getHeaderAsideFields = (entity, roles, isManager) => ([
+  getHeaderAsideFields = (entity, roles) => ([
     {
-      fields: isManager ? [
+      fields: (roles && roles.size > 0) ? [
         getRoleFormField(this.context.intl.formatMessage, appMessages, roles),
         getMetaField(entity, appMessages),
       ]
@@ -130,10 +130,27 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     },
   ]);
 
+  getEditableUserRoles = (roles, sessionUserHighestRoleId) => {
+    if (roles) {
+      const userHighestRoleId = getHighestUserRoleId(roles);
+        // roles are editable by the session user (logged on user) if
+        // unless the session user is an ADMIN
+        // the session user can only assign roles "lower" (that is higher id) than his/her own role
+        // and when the session user has a "higher" (lower id) role than the user profile being edited
+      return roles
+        .filter((role) => sessionUserHighestRoleId === USER_ROLES.ADMIN
+          || (sessionUserHighestRoleId < userHighestRoleId && sessionUserHighestRoleId < parseInt(role.get('id'), 10))
+        );
+    }
+    return Map();
+  }
+
   render() {
-    const { viewEntity, dataReady, viewDomain, taxonomies, roles, isManager, onCreateOption } = this.props;
+    const { viewEntity, dataReady, viewDomain, taxonomies, roles, sessionUserHighestRoleId, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, submitValid } = viewDomain.page;
+
+    const editableRoles = this.getEditableUserRoles(roles, sessionUserHighestRoleId);
 
     return (
       <div>
@@ -198,11 +215,11 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(viewEntity, roles, isManager),
+                  aside: this.getHeaderAsideFields(viewEntity, editableRoles),
                 },
                 body: {
                   main: this.getBodyMainFields(),
-                  aside: isManager && this.getBodyAsideFields(taxonomies, onCreateOption),
+                  aside: (sessionUserHighestRoleId >= USER_ROLES.MANAGER) && this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -229,7 +246,7 @@ UserEdit.propTypes = {
   roles: PropTypes.object,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
-  isManager: PropTypes.bool,
+  sessionUserHighestRoleId: PropTypes.number,
   params: PropTypes.object,
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
@@ -241,7 +258,7 @@ UserEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isManager: selectIsUserManager(state),
+  sessionUserHighestRoleId: selectSessionUserHighestRoleId(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
@@ -286,7 +303,7 @@ function mapDispatchToProps(dispatch) {
       const newHighestRole = parseInt(formData.get('associatedRole'), 10);
 
       // store all higher roles
-      const newRoleIds = newHighestRole === USER_ROLES.NONE
+      const newRoleIds = newHighestRole === USER_ROLES.DEFAULT
         ? List()
         : roles.reduce((memo, role) =>
           newHighestRole <= parseInt(role.get('id'), 10)

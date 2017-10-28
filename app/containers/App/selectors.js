@@ -113,6 +113,22 @@ export const selectHasUserRole = createSelector(
   })
 );
 
+export const selectSessionUserHighestRoleId = createSelector(
+  selectSessionUserRoles,
+  (userRoles) => {
+    if (userRoles.includes(USER_ROLES.ADMIN)) {
+      return USER_ROLES.ADMIN;
+    }
+    if (userRoles.includes(USER_ROLES.MANAGER)) {
+      return USER_ROLES.MANAGER;
+    }
+    if (userRoles.includes(USER_ROLES.CONTRIBUTOR)) {
+      return USER_ROLES.CONTRIBUTOR;
+    }
+    return USER_ROLES.DEFAULT;
+  }
+);
+
 
 // makeSelectLocationState expects a plain JS object for the routing state
 export const makeSelectLocationState = () => {

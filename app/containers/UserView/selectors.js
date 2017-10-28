@@ -21,8 +21,7 @@ export const selectViewEntity = createSelector(
       'roles',
       userRoles
       .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
-      .map((association) => roles
-        .find((role) => attributesEqual(role.get('id'), association.getIn(['attributes', 'role_id'])))
+      .map((association) => roles.find((role) => attributesEqual(role.get('id'), association.getIn(['attributes', 'role_id'])))
       )
     )
 );

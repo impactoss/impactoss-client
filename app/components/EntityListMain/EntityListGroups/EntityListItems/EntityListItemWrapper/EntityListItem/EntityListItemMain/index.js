@@ -33,7 +33,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
   getConnections = (entity, connectionOptions, connections) =>
     reduce(connectionOptions, (memo, option) => {
       // console.log(memo, option, entity.toJS())
-      if (!option.expandable && entity.get(option.path) && connections.get(option.path) && entity.get(option.path).size > 0) {
+      if (!option.expandable && (option.popover !== false) && entity.get(option.path) && connections.get(option.path) && entity.get(option.path).size > 0) {
         const entities = entity.get(option.path).map((connectionId) => connections.getIn([option.path, connectionId.toString()]));
         return memo.concat([{
           option: {
@@ -81,6 +81,14 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     }
     return tags;
   };
+
+  getRole = (entityRoles, roles) => {
+    const role = roles.find((r) => parseInt(r.get('id'), 10) === entityRoles.first());
+    // console.log('roles entityRoles.first()', entityRoles.first())
+    // console.log('roles role', role)
+    return role ? role.getIn(['attributes', 'friendly_name']) : '';
+  }
+
   mapToEntityListItem = () => {
     const {
       taxonomies,
@@ -98,6 +106,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
       reference: entity.getIn(['attributes', 'reference']) || entity.get('id'),
       draft: entity.getIn(['attributes', 'draft']),
+      role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
       path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
       entityIcon: entityIcon && entityIcon(entity),
       tags: taxonomies

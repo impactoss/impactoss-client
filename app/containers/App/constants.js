@@ -114,10 +114,10 @@ export const SORT_ORDER_OPTIONS = [
 ];
 
 export const USER_ROLES = {
-  NONE: 0,
   ADMIN: 1,
   MANAGER: 2,
   CONTRIBUTOR: 3,
+  DEFAULT: 9999,
 };
 
 export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
