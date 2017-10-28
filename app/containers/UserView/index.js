@@ -121,7 +121,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
   render() {
     const { user, dataReady, sessionUserHighestRoleId, taxonomies } = this.props;
-    const isManager = sessionUserHighestRoleId >= USER_ROLES.MANAGER;
+    const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER;
     return (
       <div>
         <Helmet
