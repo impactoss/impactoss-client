@@ -60,6 +60,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     // <<< not used?
     if (filter.labels) {
       return reduce(filter.labels, (memo, label) => {
+        if (!label.label) return memo;
         let labelValue = label.appMessage ? appMessage(this.context.intl, label.label) : label.label;
         labelValue = label.postfix ? `${labelValue}${label.postfix}` : labelValue;
         return `${memo}${label.lowerCase ? lowerCase(labelValue) : labelValue} `;

@@ -196,7 +196,7 @@ const getCurrentConnectionFilters = (
           tags.push({
             labels: [
               { label: withoutMessage },
-              { appMessage: true, label: option.message },
+              { appMessage: true, label: option.message, lowerCase: true },
               { label: option.label },
             ],
             type: option.path,
