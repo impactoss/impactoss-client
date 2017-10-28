@@ -23,14 +23,12 @@ export const selectViewEntity = createSelector(
   (state) => selectEntities(state, 'user_roles'),
   (state) => selectEntities(state, 'roles'),
   (entity, users, userRoles, roles) =>
-    entity && entitySetUser(
-      entity.set(
-        'roles',
-        userRoles
-        .filter((userRole) => attributesEqual(userRole.getIn(['attributes', 'user_id']), entity.get('id')))
-        .map((userRole) => roles.find((role) => attributesEqual(role.get('id'), userRole.getIn(['attributes', 'role_id']))))
-      ),
-      users
+    entity && users && userRoles && roles && entitySetUser(entity, users).set(
+      'roles',
+      userRoles
+      .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
+      .map((association) => roles.find((role) => attributesEqual(role.get('id'), association.getIn(['attributes', 'role_id'])))
+      )
     )
 );
 
@@ -47,6 +45,6 @@ export const selectRoles = createSelector(
   (state, id) => id,
   (state) => selectEntities(state, 'roles'),
   (state) => selectEntities(state, 'user_roles'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'role_id', associations, 'user_id', id)
+  (id, roles, userRoles) =>
+    entitiesSetAssociated(roles, 'role_id', userRoles, 'user_id', id)
 );
