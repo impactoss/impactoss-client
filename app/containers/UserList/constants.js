@@ -43,7 +43,7 @@ export const CONFIG = {
         edit: false,
         search: true,
         popover: false,
-        message: 'entities.roles.plural',
+        message: 'entities.roles.single',
         path: 'roles', // filter by recommendation connection
         key: 'role_id',
       },
