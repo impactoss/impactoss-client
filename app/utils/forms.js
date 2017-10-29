@@ -244,18 +244,18 @@ export const getConnectionUpdatesFromFormData = ({ formData, connections, connec
 // only show the highest rated role (lower role ids means higher)
 export const getHighestUserRoleId = (roles) =>
   roles.reduce((currentHighestRoleId, role) =>
-    role.get('associated') && parseInt(role.get('id'), 10) < currentHighestRoleId
-      ? parseInt(role.get('id'), 10)
-      : currentHighestRoleId
-  , 99999);
+    role.get('associated') && parseInt(role.get('id'), 10) < parseInt(currentHighestRoleId, 10)
+      ? role.get('id').toString()
+      : currentHighestRoleId.toString()
+  , USER_ROLES.DEFAULT);
 
 const getRoleOptions = (roles, formatMessage, appMessages) => {
   const roleOptions = roles.reduce((memo, role) => memo.concat([{
-    value: parseInt(role.get('id'), 10),
+    value: role.get('id').toString(),
     label: role.getIn(['attributes', 'friendly_name']),
   }]), []);
   roleOptions.push({
-    value: USER_ROLES.DEFAULT,
+    value: USER_ROLES.DEFAULT.toString(),
     label: formatMessage(appMessages.entities.roles.defaultRole),
   });
   return roleOptions;
@@ -266,7 +266,7 @@ export const getRoleFormField = (formatMessage, appMessages, roles) => ({
   controlType: 'select',
   model: '.associatedRole',
   label: formatMessage(appMessages.entities.roles.single),
-  value: getHighestUserRoleId(roles),
+  value: getHighestUserRoleId(roles).toString(),
   options: getRoleOptions(roles, formatMessage, appMessages),
 });
 
