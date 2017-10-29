@@ -145,13 +145,14 @@ const mapReports = (reports) => reports
   ? reports.map((report) => ({
     label: report.getIn(['attributes', 'title']),
     dueDate: report.get('due_date') ? report.getIn(['due_date', 'attributes', 'due_date']) : null,
+    updatedAt: report.getIn(['attributes', 'updated_at']),
     linkTo: `/reports/${report.get('id')}`,
   })).toArray()
   : [];
 
 export const getReportsField = (reports, appMessages, button) => ({
   type: 'reports',
-  values: mapReports(reports),
+  values: reports && mapReports(reports),
   button: button || null,
   showEmpty: true,
 });
