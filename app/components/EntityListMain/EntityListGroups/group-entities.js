@@ -18,11 +18,11 @@ export const groupEntities = (
   subgroupSelectValue,
   messages
 ) => subgroupSelectValue
-  ? makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, groupSelectValue)
+  ? makeEntityGroups(entities, taxonomies, connectedTaxonomies, config, groupSelectValue, messages)
     .map((group) => group
       .set(
         'entityGroups',
-        makeEntityGroups(group.get('entities'), taxonomies, connectedTaxonomies, config, subgroupSelectValue)
+        makeEntityGroups(group.get('entities'), taxonomies, connectedTaxonomies, config, subgroupSelectValue, messages)
       )
       .delete('entities')
     )
