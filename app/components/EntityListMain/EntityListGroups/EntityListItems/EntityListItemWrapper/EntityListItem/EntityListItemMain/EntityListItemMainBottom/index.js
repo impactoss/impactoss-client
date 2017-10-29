@@ -6,6 +6,7 @@ import Component from 'components/styled/Component';
 
 import EntityListItemMainBottomTaxonomies from './EntityListItemMainBottomTaxonomies';
 import EntityListItemMainBottomConnections from './EntityListItemMainBottomConnections';
+import EntityListItemMainBottomUser from './EntityListItemMainBottomUser';
 // import EntityListItemMainBottomTargetDate from './EntityListItemMainBottomTargetDate';
 
 const Styled = styled(Component)``;
@@ -15,10 +16,11 @@ export default class EntityListItemMainBottom extends React.PureComponent { // e
     tags: PropTypes.array,
     connections: PropTypes.array,
     wrapper: PropTypes.object,
+    assignedUser: PropTypes.object,
   }
 
   render() {
-    const { tags, connections, wrapper } = this.props;
+    const { tags, connections, wrapper, assignedUser } = this.props;
 
     return (
       <Styled>
@@ -29,6 +31,11 @@ export default class EntityListItemMainBottom extends React.PureComponent { // e
           <EntityListItemMainBottomConnections
             connections={connections}
             wrapper={wrapper}
+          />
+        }
+        { assignedUser &&
+          <EntityListItemMainBottomUser
+            user={assignedUser}
           />
         }
       </Styled>

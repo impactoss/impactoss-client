@@ -96,7 +96,7 @@ export const CONFIG = {
         edit: false,
         message: 'attributes.manager_id.indicators',
         attribute: 'manager_id',
-        role: USER_ROLES.MANAGER,
+        role: USER_ROLES.CONTRIBUTOR,
         reference: {
           key: 'manager',
           label: 'name',

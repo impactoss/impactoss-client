@@ -89,41 +89,39 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     return role ? role.getIn(['attributes', 'friendly_name']) : '';
   }
 
-  mapToEntityListItem = () => {
-    const {
-      taxonomies,
-      config,
-      onEntityClick,
-      entity,
-      nestLevel,
-      entityPath,
-      connections,
-      entityIcon,
-    } = this.props;
+  mapToEntityListItem = ({
+    taxonomies,
+    config,
+    onEntityClick,
+    entity,
+    nestLevel,
+    entityPath,
+    connections,
+    entityIcon,
+  }) => ({
+    id: entity.get('id'),
+    title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
+    reference: entity.getIn(['attributes', 'reference']) || entity.get('id'),
+    draft: entity.getIn(['attributes', 'draft']),
+    role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
+    path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
+    entityIcon: entityIcon && entityIcon(entity),
+    tags: taxonomies
+      ? this.getEntityTags(entity,
+        taxonomies,
+        onEntityClick
+      )
+      : [],
+    connectedCounts: config && config.connections
+      ? this.getConnections(entity, config.connections.options, connections)
+      : [],
+    assignedUser: entity.get('manager') && ({ name: entity.getIn(['manager', 'attributes', 'name']) }),
+  });
 
-    return {
-      id: entity.get('id'),
-      title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
-      reference: entity.getIn(['attributes', 'reference']) || entity.get('id'),
-      draft: entity.getIn(['attributes', 'draft']),
-      role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
-      path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
-      entityIcon: entityIcon && entityIcon(entity),
-      tags: taxonomies
-        ? this.getEntityTags(entity,
-          taxonomies,
-          onEntityClick
-        )
-        : [],
-      connectedCounts: config && config.connections
-        ? this.getConnections(entity, config.connections.options, connections)
-        : [],
-    };
-  };
   render() {
     const { nestLevel, onEntityClick } = this.props;
 
-    const entity = this.mapToEntityListItem();
+    const entity = this.mapToEntityListItem(this.props);
 
     return (
       <Styled isManager={this.props.isManager}>
@@ -152,6 +150,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             tags={entity.tags}
             connections={entity.connectedCounts}
             wrapper={this.props.wrapper}
+            assignedUser={entity.assignedUser}
           />
         }
       </Styled>
@@ -160,14 +159,14 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
 }
 
 EntityListItemMain.propTypes = {
-  entity: PropTypes.instanceOf(Map).isRequired,
-  taxonomies: PropTypes.instanceOf(Map),
-  connections: PropTypes.instanceOf(Map),
+  entity: PropTypes.instanceOf(Map).isRequired, // eslint-disable-line react/no-unused-prop-types
+  taxonomies: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
+  connections: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
+  config: PropTypes.object, // eslint-disable-line react/no-unused-prop-types
+  entityIcon: PropTypes.func, // eslint-disable-line react/no-unused-prop-types
+  entityPath: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
   isManager: PropTypes.bool,
   wrapper: PropTypes.object,
-  config: PropTypes.object,
-  entityIcon: PropTypes.func,
-  entityPath: PropTypes.string,
   nestLevel: PropTypes.number,
   onEntityClick: PropTypes.func,
 };
