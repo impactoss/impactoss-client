@@ -13,7 +13,6 @@ import { actions as formActions } from 'react-redux-form/immutable';
 import { fromJS } from 'immutable';
 
 import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
-// import appMessages from 'containers/App/messages';
 
 import {
   redirectIfNotPermitted,
@@ -96,7 +95,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
                 title: this.context.intl.formatMessage(appMessages.importFields.title),
                 reference: this.context.intl.formatMessage(appMessages.importFields.referenceRequired),
                 accepted: this.context.intl.formatMessage(appMessages.importFields.accepted),
-                response: this.context.intl.formatMessage(appMessages.importFields.reponse),
+                response: this.context.intl.formatMessage(appMessages.importFields.response),
               }],
             }}
           />
