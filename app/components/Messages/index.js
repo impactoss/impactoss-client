@@ -19,19 +19,32 @@ import componentMessages from './messages';
 const Styled = styled.div`
   display: table;
   width: 100%;
-  color: ${(props) => palette(props.palette, 4)};
-  background-color: ${(props) => palette(props.palette, 0)};
+  color: ${(props) => props.details ? palette('dark', 0) : palette(props.palette, 4)};
+  background-color: ${(props) => palette(props.palette, props.details ? 3 : 0)};
   position: relative;
   z-index: 1;
   box-shadow: ${(props) => props.withoutShadow ? 0 : '0px 0px 15px 0px rgba(0,0,0,0.2)'};
   margin-bottom: ${(props) => !props.spaceMessage ? 0 : '20px'};
 `;
 
+const Message = styled.div`
+  padding: ${(props) => props.details ? '0.5em 1em' : 0};
+  border: ${(props) => props.details ? '1px solid' : 0};
+  border-color: ${(props) => palette(props.palette, 0)};
+  border-bottom: 0;
+
+  &:last-child {
+    border-bottom: ${(props) => props.details ? '1px solid' : 0};
+    border-color: ${(props) => palette(props.palette, 0)};
+  }
+`;
+
 const MessageWrapper = styled.div`
   display: table-cell;
   vertical-align: middle;
-  padding: 1em;
+  padding: ${(props) => props.details ? 0 : '1em'};
 `;
+
 const DismissWrapper = styled.div`
   display: table-cell;
   vertical-align: middle;
@@ -63,13 +76,13 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
   }
 
   render() {
-    const { type, message, messageKey, messages, onDismiss } = this.props;
+    const { type, message, messageKey, messages, onDismiss, preMessage, details } = this.props;
     return !(message || messageKey || messages)
     ? null
     : (
-      <Styled palette={type} spaceMessage={this.props.spaceMessage}>
-        <MessageWrapper>
-          { type === 'error' &&
+      <Styled palette={type} details={details} withoutShadow={details} spaceMessage={this.props.spaceMessage}>
+        <MessageWrapper details={details}>
+          { type === 'error' && preMessage &&
             <PreMessage>
               <strong>
                 <FormattedMessage {...componentMessages.preBold} />
@@ -78,7 +91,12 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
             </PreMessage>
           }
           { message &&
-            <div>{message}</div>
+            <Message
+              details={details}
+              palette={type}
+            >
+              {message}
+            </Message>
           }
           { messageKey &&
             <div>
@@ -89,7 +107,13 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
             </div>
           }
           { messages && messages.map((m, i) => (
-            <div key={i}>{this.translateMessage(m)}</div>
+            <Message
+              key={i}
+              details={details}
+              palette={type}
+            >
+              {this.translateMessage(m)}
+            </Message>
           ))}
         </MessageWrapper>
         { onDismiss &&
@@ -112,6 +136,12 @@ Messages.propTypes = {
   messages: PropTypes.array,
   onDismiss: PropTypes.func,
   spaceMessage: PropTypes.bool,
+  preMessage: PropTypes.bool,
+  details: PropTypes.bool,
+};
+
+Messages.defaultProps = {
+  preMessage: true,
 };
 Messages.contextTypes = {
   intl: PropTypes.object,

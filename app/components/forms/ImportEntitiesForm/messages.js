@@ -21,13 +21,17 @@ export default defineMessages({
     id: 'app.components.ImportEntitiesForm.downloadTemplate',
     defaultMessage: 'download the CSV template',
   },
-  hasErrors: {
-    id: 'app.components.ImportEntitiesForm.hasErrors',
-    defaultMessage: 'We are sorry, some of your rows could not be imported.',
+  someErrors: {
+    id: 'app.components.ImportEntitiesForm.someErrors',
+    defaultMessage: 'We are sorry, only {successNo} of {rowNo} row(s) could be imported.',
+  },
+  allErrors: {
+    id: 'app.components.ImportEntitiesForm.allErrors',
+    defaultMessage: 'We are sorry, none of the rows could be imported.',
   },
   success: {
     id: 'app.components.ImportEntitiesForm.success',
-    defaultMessage: 'All rows successfully imported.',
+    defaultMessage: 'All {rowNo} row(s) successfully imported.',
   },
   importAgain: {
     id: 'app.components.ImportEntitiesForm.importAgain',
@@ -36,5 +40,13 @@ export default defineMessages({
   done: {
     id: 'app.components.ImportEntitiesForm.done',
     defaultMessage: 'Back to list',
+  },
+  importing: {
+    id: 'app.components.ImportEntitiesForm.importing',
+    defaultMessage: 'Importing: ',
+  },
+  rowErrorHint: {
+    id: 'app.components.ImportEntitiesForm.rowErrorHint',
+    defaultMessage: 'Import of the following rows failed:',
   },
 });
