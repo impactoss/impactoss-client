@@ -15,10 +15,12 @@ import appMessage from 'utils/app-message';
 import Button from 'components/buttons/Button';
 import Icon from 'components/Icon';
 
+import messages from './messages';
+
 // TODO compare TaxonomySidebarItem
 const Styled = styled(Button)`
   font-weight: bold;
-  padding: 0.75em 2em;
+  padding: 0.5em 1em 0.5em 1.5em;
   width: 100%;
   text-align: left;
   color:  ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
@@ -81,7 +83,9 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
           active: option.get('active'),
           create: option.get('create') && option.get('create').toJS(),
         })}
-        title="Show filter options"
+        title={this.context.intl.formatMessage(
+          option.get('active') ? messages.groupOptionSelect.hide : messages.groupOptionSelect.show
+        )}
       >
         <Label>
           { option.get('message')
