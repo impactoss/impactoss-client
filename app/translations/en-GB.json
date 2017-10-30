@@ -76,6 +76,7 @@
   "app.components.FileSelectControl.import.single" : "Import {total} row",
   "app.components.FileSelectControl.import.plural" : "Import {total} rows",
   "app.components.FileSelectControl.selectFile" : "Select File",
+  "app.components.FileSelectControl.fileSelectError" : "Error parsing file. Please make sure to use the correct format only.",
   "app.components.ImportEntitiesForm.title" : "Batch import",
   "app.components.ImportEntitiesForm.templateHint" : "Import multiple items from a CSV file. For the available fields and field types please ",
   "app.components.ImportEntitiesForm.formatHint" : "Please note: when saving from Excel, chose file type \"CSV UTF-8 (Comma delimited)\".",

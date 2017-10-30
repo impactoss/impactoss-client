@@ -12,6 +12,7 @@ import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import ButtonDefaultWithIcon from 'components/buttons/ButtonDefaultWithIcon';
 
 import DocumentWrap from 'components/fields/DocumentWrap';
+import Messages from 'components/Messages';
 
 import messages from './messages';
 
@@ -48,30 +49,43 @@ const Styled = styled.div`
 
 class SelectFile extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
+  constructor() {
+    super();
+    this.state = {
+      errors: [],
+    };
+  }
+
+  componentWillMount() {
+    this.setState({ errors: [] });
+  }
+  onDismissErrors = (evt) => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    this.setState({ errors: [] });
+  }
   handleChange = (e, results) => {
     // todo: limit to 1 file?
     results.forEach((result) => {
       const [evt, file] = result;
-      // try {
-      const parsed = Baby.parse(evt.target.result, { header: true, skipEmptyLines: true });
-      if (parsed && parsed.errors && parsed.errors.length === 0) {
-        this.props.onChange({
-          rows: parsed.data,
-          meta: parsed.meta,
-          file,
-        });
-      //  } else {
-      //    console.log('error')
+      try {
+        const parsed = Baby.parse(evt.target.result, { header: true, skipEmptyLines: true });
+        if (parsed && parsed.errors && parsed.errors.length > 0) {
+          this.setState({ errors: this.state.errors.concat(parsed.errors) });
+        } else {
+          this.props.onChange({
+            rows: parsed.data,
+            meta: parsed.meta,
+            file,
+          });
+        }
+      } catch (err) {
+        this.setState({ errors: this.state.errors.concat([{ error: 0 }]) });
       }
-      // }
-      // catch (err) {
-      //   // console.log(err)
-      // }
     });
   }
 
-  handleRemove = (e) => {
-    e.preventDefault();
+  handleRemove = (evt) => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.props.onChange(null);
   }
 
@@ -79,7 +93,14 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
     // console.log(this.props.value)
     return (
       <Styled>
-        { this.props.value &&
+        { (this.state.errors.length > 0) &&
+          <Messages
+            type="error"
+            messages={[this.context.intl.formatMessage(messages.fileSelectError)]}
+            onDismiss={this.onDismissErrors}
+          />
+        }
+        { this.props.value && (this.state.errors.length === 0) &&
           <DocumentWrapEdit>
             <FileName>{this.props.value.file.name}</FileName>
             <Remove onClick={this.handleRemove}>
@@ -95,7 +116,7 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
             </ImportButton>
           </DocumentWrapEdit>
         }
-        { !this.props.value &&
+        { !this.props.value && (this.state.errors.length === 0) &&
           <FileReaderInput
             as={this.props.as}
             accept={this.props.accept}

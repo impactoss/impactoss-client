@@ -19,4 +19,8 @@ export default defineMessages({
     id: 'app.components.FileSelectControl.selectFile',
     defaultMessage: 'Select File',
   },
+  fileSelectError: {
+    id: 'app.components.FileSelectControl.fileSelectError',
+    defaultMessage: 'Error parsing file. Please make sure to use the correct format only.',
+  },
 });
