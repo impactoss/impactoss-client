@@ -16,36 +16,50 @@ import Messages from 'components/Messages';
 
 import messages from './messages';
 
-const Remove = styled(ButtonFlatIconOnly)`
-  display: table-cell;
-  padding: 0 0.75em;
-  color: ${palette('dark', 2)};
-  &:hover {
-    color: ${palette('primary', 0)};
-  }
-`;
-const ImportButton = styled(ButtonSubmit)`
-  display: table-cell;
-`;
-
-const DocumentWrapEdit = styled(DocumentWrap)`
-  background-color: ${palette('primary', 4)};
-  position: relative;
-  padding: 0 0 0 0.75em;
-  border: 1px solid ${palette('light', 1)};
-  font-weight: bold;
-  display: table;
-`;
-
-const FileName = styled.div`
-  display: table-cell;
-`;
 
 const Styled = styled.div`
   padding-top: 1em;
   display: block;
 `;
 
+const DocumentWrapEdit = styled(DocumentWrap)`
+  background-color: ${palette('primary', 4)};
+  position: relative;
+  padding: 0;
+  border: 1px solid ${palette('light', 1)};
+  font-weight: bold;
+  max-width: 100%;
+  padding-right: 45px;
+  display: inline-block;
+  vertical-align: top;
+`;
+
+const FileName = styled.div`
+  padding: 1em 0.75em;
+  overflow: hidden;
+  line-height: normal;
+`;
+
+const Remove = styled(ButtonFlatIconOnly)`
+  display: block;
+  position:absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 0 0.75em;
+  color: ${palette('dark', 2)};
+  &:hover {
+    color: ${palette('primary', 0)};
+  }
+`;
+
+const ImportButton = styled(ButtonSubmit)`
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: top;
+  border-top: 1px solid ${palette('primary', 1)};
+  border-bottom: 1px solid ${palette('primary', 1)};
+`;
 
 class SelectFile extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -101,11 +115,15 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
           />
         }
         { this.props.value && (this.state.errors.length === 0) &&
-          <DocumentWrapEdit>
-            <FileName>{this.props.value.file.name}</FileName>
-            <Remove onClick={this.handleRemove}>
-              <Icon name="removeLarge" />
-            </Remove>
+          <div>
+            <DocumentWrapEdit>
+              <FileName>
+                {this.props.value.file.name}
+              </FileName>
+              <Remove onClick={this.handleRemove}>
+                <Icon name="removeLarge" />
+              </Remove>
+            </DocumentWrapEdit>
             <ImportButton type="submit" primary>
               { this.props.value.rows.length === 1 &&
                 <FormattedMessage {...messages.import.single} values={{ total: this.props.value.rows.length }} />
@@ -114,7 +132,7 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
                 <FormattedMessage {...messages.import.plural} values={{ total: this.props.value.rows.length }} />
               }
             </ImportButton>
-          </DocumentWrapEdit>
+          </div>
         }
         { !this.props.value && (this.state.errors.length === 0) &&
           <FileReaderInput
