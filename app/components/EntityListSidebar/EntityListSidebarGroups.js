@@ -11,7 +11,9 @@ import styled from 'styled-components';
 import EntityListSidebarGroupLabel from './EntityListSidebarGroupLabel';
 import EntityListSidebarOption from './EntityListSidebarOption';
 
-const Styled = styled.div``;
+const Group = styled.div`
+  margin-bottom: 1px;
+`;
 
 class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -19,11 +21,11 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
     const groups = this.props.groups;
 
     return (
-      <Styled>
+      <div>
         { groups && groups.entrySeq().map(([groupId, group]) =>
           group.get('options') && group.get('options').size > 0
             ? (
-              <div key={groupId}>
+              <Group key={groupId}>
                 <EntityListSidebarGroupLabel
                   label={group.get('label')}
                   icon={group.get('icon') || group.get('id')}
@@ -46,11 +48,11 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
                     }
                   </div>
                 }
-              </div>
+              </Group>
             )
             : null
         )}
-      </Styled>
+      </div>
     );
   }
 }

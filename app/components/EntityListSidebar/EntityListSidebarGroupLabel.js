@@ -36,7 +36,7 @@ export default class EntityListSidebarGroupLabel extends React.PureComponent { /
     const { label, icon, onToggle } = this.props;
 
     return (
-      <Styled onClick={onToggle}>
+      <Styled onClick={onToggle} href="#toggleFilter" title="Show filter options">
         {label}
         <Right><Icon name={icon} text /></Right>
       </Styled>

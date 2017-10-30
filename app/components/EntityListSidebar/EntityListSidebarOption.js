@@ -81,6 +81,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
           active: option.get('active'),
           create: option.get('create') && option.get('create').toJS(),
         })}
+        title="Show filter options"
       >
         <Label>
           { option.get('message')
