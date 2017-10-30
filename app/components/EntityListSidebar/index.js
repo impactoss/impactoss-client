@@ -48,24 +48,32 @@ const ListEntitiesEmpty = styled.div`
   font-weight: 500;
 `;
 
+const STATE_INITIAL = {
+  activeOption: null,
+  expandedGroups: {
+    taxonomies: true,
+    connectedTaxonomies: false,
+    connections: true,
+    attributes: true,
+  },
+};
+
 export class EntityListSidebar extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor() {
     super();
-    this.state = {
-      activeOption: null,
-    };
+    this.state = STATE_INITIAL;
   }
   componentWillMount() {
     // console.log('componentWIllMount')
-    this.setState({ activeOption: null });
+    this.setState(STATE_INITIAL);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.activePanel !== this.props.activePanel) {
       // close and reset option panel
       // console.log('componentWillReceiveProps')
-      this.setState({ activeOption: null });
+      this.setState(STATE_INITIAL);
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
@@ -102,6 +110,15 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ activeOption: null });
   };
+
+  onToggleGroup = (groupId, expanded) => {
+    const expandedGroups = { ...this.state.expandedGroups };
+    expandedGroups[groupId] = expanded;
+    this.setState({
+      expandedGroups,
+      activeOption: null,
+    });
+  }
 
   getSidebarButtons = () => ([
     {
@@ -151,7 +168,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       connections,
       entityIdsSelected,
     } = this.props;
-
     const activeOption = this.state.activeOption;
 
     const hasSelected = entityIdsSelected && entityIdsSelected.size > 0;
@@ -238,6 +254,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
                 <EntityListSidebarGroups
                   groups={fromJS(panelGroups)}
                   onShowForm={this.onShowForm}
+                  onToggleGroup={this.onToggleGroup}
+                  expanded={this.state.expandedGroups}
                 />
               }
               { activePanel === EDIT_PANEL && !hasEntities &&

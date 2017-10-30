@@ -17,6 +17,7 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
 
   render() {
     const groups = this.props.groups;
+
     return (
       <Styled>
         { groups && groups.entrySeq().map(([groupId, group]) =>
@@ -26,19 +27,25 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
                 <EntityListSidebarGroupLabel
                   label={group.get('label')}
                   icon={group.get('icon') || group.get('id')}
+                  onToggle={(evt) => {
+                    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                    this.props.onToggleGroup(groupId, !this.props.expanded[groupId]);
+                  }}
                 />
-                <div>
-                  { group.get('options') &&
-                    group.get('options').valueSeq().map((option, i) => (
-                      <EntityListSidebarOption
-                        key={i}
-                        option={option}
-                        groupId={group.get('id')}
-                        onShowForm={this.props.onShowForm}
-                      />
-                    ))
-                  }
-                </div>
+                { this.props.expanded[groupId] &&
+                  <div>
+                    { group.get('options') &&
+                      group.get('options').valueSeq().map((option, i) => (
+                        <EntityListSidebarOption
+                          key={i}
+                          option={option}
+                          groupId={group.get('id')}
+                          onShowForm={this.props.onShowForm}
+                        />
+                      ))
+                    }
+                  </div>
+                }
               </div>
             )
             : null
@@ -49,7 +56,9 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
 }
 EntityListSidebarGroups.propTypes = {
   groups: PropTypes.object,
+  expanded: PropTypes.object,
   onShowForm: PropTypes.func.isRequired,
+  onToggleGroup: PropTypes.func.isRequired,
 };
 
 EntityListSidebarGroups.contextTypes = {

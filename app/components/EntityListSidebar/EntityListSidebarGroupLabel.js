@@ -12,7 +12,8 @@ import { palette } from 'styled-theme';
 
 import Icon from 'components/Icon';
 
-const Styled = styled.div`
+const Styled = styled.a`
+  display: block;
   color: ${palette('dark', 2)};
   background-color: ${palette('light', 1)};
   padding: 0.5em 2em;
@@ -28,13 +29,14 @@ export default class EntityListSidebarGroupLabel extends React.PureComponent { /
   static propTypes = {
     label: PropTypes.string.isRequired,
     icon: PropTypes.string,
+    onToggle: PropTypes.func,
   };
 
   render() {
-    const { label, icon } = this.props;
+    const { label, icon, onToggle } = this.props;
 
     return (
-      <Styled>
+      <Styled onClick={onToggle}>
         {label}
         <Right><Icon name={icon} text /></Right>
       </Styled>
