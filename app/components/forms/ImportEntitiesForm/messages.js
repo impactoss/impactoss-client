@@ -17,8 +17,8 @@ export default defineMessages({
     id: 'app.components.ImportEntitiesForm.formatHint',
     defaultMessage: 'Please note: when saving from Excel, chose file type "CSV UTF-8 (Comma delimited)".',
   },
-  downloadTemplate: {
-    id: 'app.components.ImportEntitiesForm.downloadTemplate',
+  downloadTemplateAnchor: {
+    id: 'app.components.ImportEntitiesForm.downloadTemplateAnchor',
     defaultMessage: 'download the CSV template',
   },
   someErrors: {
@@ -48,5 +48,13 @@ export default defineMessages({
   rowErrorHint: {
     id: 'app.components.ImportEntitiesForm.rowErrorHint',
     defaultMessage: 'Import of the following rows failed:',
+  },
+  errorHintTitle: {
+    id: 'app.components.ImportEntitiesForm.errorHintTitle',
+    defaultMessage: 'Important',
+  },
+  errorHintText: {
+    id: 'app.components.ImportEntitiesForm.errorHintText',
+    defaultMessage: 'When using the import feature to add the failed rows, please make sure to first remove the successful rows from your csv file - failure to do so will lead to duplicate entries. Alternatively you can add each failed row individually by manually entering each entry.',
   },
 });

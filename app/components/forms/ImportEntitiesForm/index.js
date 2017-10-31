@@ -61,7 +61,7 @@ const DocumentWrapEdit = styled(DocumentWrap)`
 const FormTitle = styled.h2`
   padding-top:0;
 `;
-const Hint = styled.div`
+const Hint = styled.p`
   font-size: 1.2em;
 `;
 const CsvDownload = styled.span`
@@ -73,6 +73,10 @@ const DownloadTemplate = styled(A)`
 const RowErrors = styled.div`
   margin-top: 2em;
 `;
+
+const ErrorHint = styled.div``;
+const ErrorHintTitle = styled.h5``;
+const ErrorHintText = styled.p``;
 
 // These props will be omitted before being passed to the Control component
 const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
@@ -119,7 +123,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                     filename={template.filename}
                   >
                     <DownloadTemplate href="/" onClick={(evt) => evt.preventDefault()}>
-                      <FormattedMessage {...messages.downloadTemplate} />
+                      <FormattedMessage {...messages.downloadTemplateAnchor} />
                     </DownloadTemplate>
                   </CsvDownloader>
                 </CsvDownload>
@@ -141,8 +145,8 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                   }
                   { progress !== null &&
                     <div>
-                      <DocumentWrapEdit>
-                        { progress < 100 &&
+                      { progress < 100 &&
+                        <DocumentWrapEdit>
                           <Importing>
                             <ImportingText>
                               <FormattedMessage {...messages.importing} />
@@ -150,32 +154,35 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                             </ImportingText>
                             <Loading progress={progress} />
                           </Importing>
-                        }
-                        { progress >= 100 &&
-                          <div>
-                            {(errors.size > 0 && success.size === 0) &&
-                              <FormattedMessage {...messages.allErrors} />
-                            }
-                            {(errors.size > 0 && success.size > 0) &&
-                              <FormattedMessage
-                                {...messages.someErrors}
-                                values={{
-                                  successNo: success.size,
-                                  rowNo: errors.size + success.size,
-                                }}
-                              />
-                            }
-                            {(errors.size === 0) &&
-                              <FormattedMessage
-                                {...messages.success}
-                                values={{
-                                  rowNo: success.size,
-                                }}
-                              />
-                            }
-                          </div>
-                        }
-                      </DocumentWrapEdit>
+                        </DocumentWrapEdit>
+                      }
+                      { progress >= 100 &&
+                        <div>
+                          {(errors.size > 0 && success.size === 0) &&
+                            <Messages
+                              type="error"
+                              message={this.context.intl.formatMessage(messages.allErrors)}
+                            />
+                          }
+                          {(errors.size > 0 && success.size > 0) &&
+                            <Messages
+                              type="error"
+                              message={this.context.intl.formatMessage(messages.someErrors, {
+                                successNo: success.size,
+                                rowNo: errors.size + success.size,
+                              })}
+                            />
+                          }
+                          {(errors.size === 0) &&
+                            <Messages
+                              type="success"
+                              message={this.context.intl.formatMessage(messages.success, {
+                                rowNo: success.size,
+                              })}
+                            />
+                          }
+                        </div>
+                      }
                       {(errors.size > 0) &&
                         <RowErrors>
                           <FormattedMessage {...messages.rowErrorHint} />
@@ -196,6 +203,16 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                             }
                           />
                         </RowErrors>
+                      }
+                      {(errors.size > 0) &&
+                        <ErrorHint>
+                          <ErrorHintTitle>
+                            <FormattedMessage {...messages.errorHintTitle} />
+                          </ErrorHintTitle>
+                          <ErrorHintText>
+                            <FormattedMessage {...messages.errorHintText} />
+                          </ErrorHintText>
+                        </ErrorHint>
                       }
                     </div>
                   }
@@ -233,6 +250,10 @@ ImportEntitiesForm.propTypes = {
   errors: PropTypes.object,
   success: PropTypes.object,
   template: PropTypes.object,
+};
+
+ImportEntitiesForm.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default ImportEntitiesForm;
