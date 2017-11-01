@@ -27,7 +27,7 @@ import {
 } from 'containers/App/actions';
 
 import appMessages from 'containers/App/messages';
-import { PARAMS, RECORD_OUTDATED, USER_ROLES } from 'containers/App/constants';
+import { PARAMS, SERVER_ERRORS, USER_ROLES } from 'containers/App/constants';
 
 import {
   selectDomain,
@@ -142,7 +142,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                   const recordReference = sending.get(timestamp) && sending.get(timestamp).entity
                     ? getEntityReference(fromJS(sending.get(timestamp).entity))
                     : 'unknown';
-                  if (message === RECORD_OUTDATED) {
+                  if (message === SERVER_ERRORS.RECORD_OUTDATED) {
                     return this.context.intl.formatMessage(appMessages.forms.outdatedErrorList, { recordReference });
                   }
                   return `${this.context.intl.formatMessage(appMessages.forms.otherErrorList, { recordReference })}${message}`;

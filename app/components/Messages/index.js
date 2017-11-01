@@ -4,13 +4,10 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { FormattedMessage } from 'react-intl';
 
-import {
-  RECORD_OUTDATED,
-  EMAIL_FORMAT,
-  PASSWORD_MISMATCH,
-  PASSWORD_SHORT,
-  PASSWORD_INVALID,
-} from 'containers/App/constants';
+import { reduce } from 'lodash/collection';
+
+import asArray from 'utils/as-array';
+import { SERVER_ERRORS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
@@ -56,21 +53,33 @@ const Dismiss = styled(Button)``;
 
 class Messages extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
+  translateMessages = (messages) =>
+    reduce(asArray(messages), (memo, message) => memo
+      ? `${memo} ${this.translateMessage(message)}`
+      : this.translateMessage(message)
+    , null);
+
   translateMessage = (message) => {
-    if (message === RECORD_OUTDATED) {
+    if (message === SERVER_ERRORS.RECORD_OUTDATED) {
       return this.context.intl.formatMessage(appMessages.forms.outdatedError);
     }
-    if (message === EMAIL_FORMAT) {
+    if (message === SERVER_ERRORS.EMAIL_FORMAT) {
       return this.context.intl.formatMessage(appMessages.forms.emailFormatError);
     }
-    if (message === PASSWORD_MISMATCH) {
+    if (message === SERVER_ERRORS.PASSWORD_MISMATCH) {
       return this.context.intl.formatMessage(appMessages.forms.passwordMismatchError);
     }
-    if (message === PASSWORD_SHORT) {
+    if (message === SERVER_ERRORS.PASSWORD_SHORT) {
       return this.context.intl.formatMessage(appMessages.forms.passwordShortError);
     }
-    if (message === PASSWORD_INVALID) {
+    if (message === SERVER_ERRORS.PASSWORD_INVALID) {
       return this.context.intl.formatMessage(appMessages.forms.passwordInvalidError);
+    }
+    if (message === SERVER_ERRORS.TITLE_REQUIRED) {
+      return this.context.intl.formatMessage(appMessages.forms.titleRequiredError);
+    }
+    if (message === SERVER_ERRORS.REFERENCE_REQUIRED) {
+      return this.context.intl.formatMessage(appMessages.forms.referenceRequiredError);
     }
     return message;
   }
@@ -95,7 +104,7 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
               details={details}
               palette={type}
             >
-              {message}
+              {this.translateMessages(message)}
             </Message>
           }
           { messageKey &&
@@ -112,7 +121,7 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
               details={details}
               palette={type}
             >
-              {this.translateMessage(m)}
+              {this.translateMessages(m)}
             </Message>
           ))}
         </MessageWrapper>

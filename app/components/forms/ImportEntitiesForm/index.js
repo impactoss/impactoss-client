@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Form } from 'react-redux-form/immutable';
-// import { Form, Errors } from 'react-redux-form/immutable';
+
 import CsvDownloader from 'react-csv-downloader';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -10,16 +10,6 @@ import { palette } from 'styled-theme';
 import { omit } from 'lodash/object';
 import { map } from 'lodash/collection';
 
-// import asArray from 'utils/as-array';
-// import { lowerCase } from 'utils/string';
-//
-// import appMessages from 'containers/App/messages';
-
-// import Icon from 'components/Icon';
-// import FieldFactory from 'components/fields/FieldFactory';
-// import Button from 'components/buttons/Button';
-// import Label from 'components/fields/Label';
-// import FieldWrap from 'components/fields/FieldWrap';
 import A from 'components/styled/A';
 import Field from 'components/fields/Field';
 
@@ -32,7 +22,7 @@ import ButtonCancel from 'components/buttons/ButtonCancel';
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
 import Clear from 'components/styled/Clear';
 
-import FileSelectControl from '../FileSelectControl';
+import ImportFileSelectControl from '../ImportFileSelectControl';
 import FormWrapper from '../FormWrapper';
 import FormBody from '../FormBody';
 import FormFieldWrap from '../FormFieldWrap';
@@ -61,8 +51,9 @@ const DocumentWrapEdit = styled(DocumentWrap)`
 const FormTitle = styled.h2`
   padding-top:0;
 `;
-const Hint = styled.p`
+const Hint = styled.div`
   font-size: 1.2em;
+  margin-bottom: 16px;
 `;
 const CsvDownload = styled.span`
   display: inline-block;
@@ -110,7 +101,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
     return (
       <div>
         <FormWrapper white>
-          <Form model={model} onSubmit={handleSubmit} >
+          <Form model={model} onSubmit={(data) => data.get('import') !== null && handleSubmit(data)} >
             <FormBody>
               <FormTitle>
                 <FormattedMessage {...messages.title} />
@@ -127,7 +118,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                     </DownloadTemplate>
                   </CsvDownloader>
                 </CsvDownload>
-                <span>.</span>
+                <span>{'.'}</span>
               </Hint>
               <Hint>
                 <FormattedMessage {...messages.formatHint} />
@@ -135,7 +126,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
               <Field>
                 <FormFieldWrap>
                   { (progress === null) &&
-                    <FileSelectControl
+                    <ImportFileSelectControl
                       id={id}
                       model={field.model}
                       as="text"
@@ -195,7 +186,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                               .sortBy((error) => error && error.data && error.data.saveRef)
                               .reduce((memo, error) => error.error.messages
                                 ? memo.concat(map(error.error.messages, (message) => error.data.saveRef
-                                  ? `${error.data.saveRef}: "${message}"`
+                                  ? [`${error.data.saveRef}:`, message]
                                   : message
                                 ))
                                 : memo
@@ -204,7 +195,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                           />
                         </RowErrors>
                       }
-                      {(errors.size > 0) &&
+                      {(errors.size > 0 && progress >= 100) &&
                         <ErrorHint>
                           <ErrorHintTitle>
                             <FormattedMessage {...messages.errorHintTitle} />

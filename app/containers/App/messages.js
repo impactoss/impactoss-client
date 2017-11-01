@@ -113,6 +113,14 @@ export default defineMessages({
       id: 'app.containers.App.forms.otherErrorList',
       defaultMessage: 'Record {recordReference}: ',
     },
+    titleRequiredError: {
+      id: 'app.containers.App.forms.titleRequiredError',
+      defaultMessage: '"Title" is required. ',
+    },
+    referenceRequiredError: {
+      id: 'app.containers.App.forms.referenceRequiredError',
+      defaultMessage: '"Reference" is required. ',
+    },
   },
   hints: {
     autoReference: {

@@ -10,6 +10,7 @@ export function* save({ data }) {
     path: 'measures',
     entity: data,
     redirect: false,
+    saveRef: data.saveRef,
   }));
 }
 
