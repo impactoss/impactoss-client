@@ -190,7 +190,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       entityIdsOnPage = entities.map((entity) => entity.get('id'));
       entityGroupsPaged = List().push(Map({ entities }));
     }
-    // return null;
+
     return (
       <div>
         <EntityListHeader
@@ -283,12 +283,14 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
             </div>
           }
         </ListEntitiesMain>
-        <EntityListFooter
-          pageSize={pageSize}
-          pager={pager}
-          onPageSelect={this.props.onPageSelect}
-          onPageItemsSelect={this.props.onPageItemsSelect}
-        />
+        { entityGroupsPaged.size > 0 &&
+          <EntityListFooter
+            pageSize={pageSize}
+            pager={pager}
+            onPageSelect={this.props.onPageSelect}
+            onPageItemsSelect={this.props.onPageItemsSelect}
+          />
+        }
       </div>
     );
   }
