@@ -32,7 +32,7 @@ import {
   // RESET_PASSWORD,
   RECOVER_PASSWORD,
   CLOSE_ENTITY,
-  RECORD_OUTDATED,
+  SERVER_ERRORS,
   DISMISS_QUERY_MESSAGES,
 } from 'containers/App/constants';
 
@@ -347,7 +347,7 @@ export function* saveEntitySaga({ data }) {
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(saveError(err, dataTS));
-    if (err.response.json && err.response.json.error === RECORD_OUTDATED) {
+    if (err.response.json && err.response.json.error === SERVER_ERRORS.RECORD_OUTDATED) {
       yield put(invalidateEntities(data.path));
     }
   }

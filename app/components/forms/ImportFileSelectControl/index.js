@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Control } from 'react-redux-form/immutable';
 import SelectFile from './SelectFile';
 
-const FileSelectControl = (props) => {
+const ImportFileSelectControl = (props) => {
   const { model, ...otherProps } = props;
   return (
     <Control.input
@@ -14,8 +14,8 @@ const FileSelectControl = (props) => {
   );
 };
 
-FileSelectControl.propTypes = {
+ImportFileSelectControl.propTypes = {
   model: PropTypes.string.isRequired,
 };
 
-export default FileSelectControl;
+export default ImportFileSelectControl;

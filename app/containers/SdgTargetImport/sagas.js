@@ -10,7 +10,7 @@ export function* save({ data }) {
     path: 'sdgtargets',
     entity: data,
     redirect: false,
-    timestamp: Date.now(),
+    saveRef: data.saveRef,
   }));
 }
 

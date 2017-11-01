@@ -1,20 +1,34 @@
 import { createSelector } from 'reselect';
 
 /**
- * Direct selector to the actionImport state domain
+ * Direct selector to the indicatorImport state domain
  */
-const selectViewDomain = () => (state) => state.get('indicatorImport');
+export const selectViewDomain = (state) => state.get('indicatorImport');
 
-/**
- * Default selector used by IndicatorImport
- */
-
-const viewDomainSelect = createSelector(
-  selectViewDomain(),
-  (substate) => substate.toJS()
+export const selectFormData = createSelector(
+  selectViewDomain,
+  (substate) => substate.get('form').data
+    ? substate.get('form').data
+    : null
 );
 
-export default viewDomainSelect;
-export {
+const selectPage = createSelector(
   selectViewDomain,
-};
+  (substate) => substate.get('page')
+);
+
+export const selectErrors = createSelector(
+  selectPage,
+  (pageState) => pageState.get('errors')
+);
+export const selectSuccess = createSelector(
+  selectPage,
+  (pageState) => pageState.get('success')
+);
+
+export const selectProgress = createSelector(
+  selectPage,
+  (pageState) => pageState.get('sending') && pageState.get('sending').size > 0
+    ? ((pageState.get('success').size + pageState.get('errors').size) / pageState.get('sending').size) * 100
+    : null
+);

@@ -40,8 +40,8 @@ const dark = coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395
 // 4:  gray 3 (dark lines)
 const light = coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad');
 
-// other palettes (not currently used)
-const error = coolorsToHex('https://coolors.co/bf4c3a-e25646-e46556-e77467-ffffff');
+// other palettes
+const error = coolorsToHex('https://coolors.co/bf4c3a-e25646-e46556-f8edec-ffffff');
 const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-ffffff');
 const success = coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-ffffff');
 const info = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-1d3033');
