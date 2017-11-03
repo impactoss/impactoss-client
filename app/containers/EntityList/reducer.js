@@ -74,7 +74,7 @@ function entityListReducer(state = initialState, action) {
           .set('entitiesSelected', List())
           .set('sending', Map())
           .set('success', Map())
-          .set('errors', Map())
+          // .set('errors', Map())
         : state;
     case DELETE_SENDING:
     case SAVE_SENDING:
@@ -84,7 +84,12 @@ function entityListReducer(state = initialState, action) {
       return action.data ? state.setIn(['success', action.data.timestamp], action.data) : state;
     case DELETE_ERROR:
     case SAVE_ERROR:
-      return action.data ? state.setIn(['errors', action.data.timestamp], checkResponseError(action.error)) : state;
+      return action.data
+        ? state.setIn(
+          ['errors', action.data.timestamp],
+          { data: action.data, error: checkResponseError(action.error) }
+        )
+        : state;
     default:
       return state;
   }

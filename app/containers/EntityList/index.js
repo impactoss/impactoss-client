@@ -5,13 +5,14 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import { Map, List, fromJS } from 'immutable';
 
-import { getEntityReference } from 'utils/entities';
+// import { getEntityReference } from 'utils/entities';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Sidebar from 'components/styled/Sidebar';
@@ -35,6 +36,8 @@ import {
   selectActivePanel,
   selectSelectedEntities,
 } from './selectors';
+
+import messages from './messages';
 
 import {
   resetState,
@@ -68,6 +71,15 @@ const Progress = styled.div`
   z-index: 200;
 `;
 
+const ProgressText = styled.div`
+  font-weight: bold;
+  font-size: 1em;
+  color: ${palette('primary', 2)};
+  margin-bottom: 0.25em;
+  margin-top: -0.5em;
+  overflow: hidden;
+`;
+
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
@@ -92,11 +104,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     const { entityIdsSelected, entities, progress } = this.props;
     const errors = this.props.viewDomain.get('errors');
     const sending = this.props.viewDomain.get('sending');
+    const success = this.props.viewDomain.get('success');
 
     const entityIdsSelectedFiltered = entityIdsSelected.size > 0 && entities
       ? entityIdsSelected.filter((id) => entities.map((entity) => entity.get('id')).includes(id))
       : entityIdsSelected;
-
+    // errors.size > 0 && console.log('entityList', errors.toJS())
     return (
       <div>
         { !this.props.dataReady &&
@@ -121,27 +134,37 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             activePanel={this.props.activePanel}
             onPanelSelect={this.props.onPanelSelect}
             onCreateOption={this.props.onCreateOption}
-            onAssign={(associations, activeEditOption) =>
+            onUpdate={(associations, activeEditOption) =>
               this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
           />
         }
         { (progress !== null && progress < 100) &&
           <Progress>
+            <ProgressText>
+              <FormattedMessage
+                {...messages.processingUpdates}
+                values={{
+                  processNo: Math.min(success.size + errors.size + 1, sending.size),
+                  totalNo: sending.size,
+                }}
+              />
+            </ProgressText>
             <Loading
               progress={progress}
             />
           </Progress>
         }
-        {(errors.size > 0) &&
+        {(errors.size > 0 && progress >= 100) &&
           <Progress error>
             <Messages
               type="error"
-              messages={errors.reduce((memo, error, timestamp) =>
-                error.messages
-                ? memo.concat(error.messages.map((message) => {
-                  const recordReference = sending.get(timestamp) && sending.get(timestamp).entity
-                    ? getEntityReference(fromJS(sending.get(timestamp).entity))
-                    : 'unknown';
+              messages={errors.reduce((memo, error) =>
+                error.error.messages
+                ? memo.concat(error.error.messages.map((message) => {
+                  // const recordReference = sending.get(timestamp) && sending.get(timestamp).entity
+                  //   ? getEntityReference(fromJS(sending.get(timestamp).entity))
+                  //   : 'unknown';
+                  const recordReference = error.data.saveRef;
                   if (message === SERVER_ERRORS.RECORD_OUTDATED) {
                     return this.context.intl.formatMessage(appMessages.forms.outdatedErrorList, { recordReference });
                   }
@@ -344,6 +367,7 @@ function mapDispatchToProps(dispatch, props) {
               dispatch(save(Map()
                 .set('path', props.config.serverPath)
                 .set('entity', entity.setIn(['attributes', activeEditOption.optionId], newValue))
+                .set('saveRef', entity.get('id'))
                 .toJS()
               ));
             }
@@ -384,6 +408,7 @@ function mapDispatchToProps(dispatch, props) {
                   [activeEditOption.key]: id,
                 },
               },
+              saveRef: entity.get('id'),
             })));
           }
           // delete connections
@@ -394,6 +419,7 @@ function mapDispatchToProps(dispatch, props) {
                 .forEach((assigned, id) => dispatch(deleteConnection({
                   path: activeEditOption.path,
                   id,
+                  saveRef: entity.get('id'),
                 })));
             }
           }

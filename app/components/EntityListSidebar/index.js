@@ -156,7 +156,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   render() {
     const {
       config,
-      onAssign,
+      onUpdate,
       hasUserRole,
       canEdit,
       activePanel,
@@ -291,7 +291,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
               ? (associations) => {
                 // close and reset option panel
                 this.setState({ activeOption: null });
-                onAssign(associations, activeOption);
+                onUpdate(associations, activeOption);
               }
               : null
             }
@@ -312,7 +312,7 @@ EntityListSidebar.propTypes = {
   hasUserRole: PropTypes.object,
   config: PropTypes.object,
   activePanel: PropTypes.string,
-  onAssign: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
   onPanelSelect: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
   listUpdating: PropTypes.bool,
