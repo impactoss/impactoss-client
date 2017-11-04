@@ -52,8 +52,8 @@ function entityListReducer(state = initialState, action) {
     case RESET_PROGRESS:
       return state
         .set('sending', Map())
-        .set('success', Map())
-        .set('errors', Map());
+        .set('success', Map());
+        // .set('errors', Map());
     case PATH_CHANGE:
       return state.get('path') !== action.path
         ? state

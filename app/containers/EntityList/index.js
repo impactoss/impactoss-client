@@ -212,7 +212,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           <Progress error>
             <Messages
               type="error"
-              message={`${errors.size} update(s) failed. Please review the affected entities above `}
+              message={`${errors.size} update(s) failed. Please review the affected items above `}
               onDismiss={this.props.resetProgress}
             />
           </Progress>

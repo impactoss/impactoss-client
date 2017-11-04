@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { find } from 'lodash/collection';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import asList from 'utils/as-list';
+
+import Messages from 'components/Messages';
 import Component from 'components/styled/Component';
 
 import EntityListItemMain from './EntityListItemMain';
@@ -21,6 +23,10 @@ const Item = styled(Component)`
   display: table;
   width:100%;
   background-color: ${palette('primary', 4)};
+  border-bottom: ${(props) => props.error ? '1px solid' : 0};
+  border-left: ${(props) => props.error ? '1px solid' : 0};
+  border-right: ${(props) => props.error ? '1px solid' : 0};
+  border-color: ${palette('error', 0)};
 `;
 const MainWrapper = styled(Component)`
   display: table-cell;
@@ -55,12 +61,21 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       expandNo,
       entityPath,
       connections,
-      // errors,
+      error,
     } = this.props;
-
     return (
       <Styled expanded={expandNo > 0}>
-        <Item>
+        { error &&
+          <Messages
+            type="error"
+            messages={error.reduce((memo, err) =>
+              memo.concat(err.getIn(['error', 'messages']).toArray())
+            , [])}
+            preMessage={false}
+            details
+          />
+        }
+        <Item error={error}>
           <MainWrapper expandable={entity.get('expandable')}>
             <MainInnerWrapper>
               {isManager &&
@@ -102,7 +117,7 @@ EntityListItem.propTypes = {
   entity: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
-  // errors: PropTypes.instanceOf(Map),
+  error: PropTypes.instanceOf(List),
   isManager: PropTypes.bool,
   isSelected: PropTypes.bool,
   onSelect: PropTypes.func,

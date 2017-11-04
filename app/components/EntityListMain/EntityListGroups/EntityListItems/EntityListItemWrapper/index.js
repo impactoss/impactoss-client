@@ -42,7 +42,6 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       onEntityClick,
       entity,
       entityPath,
-      errors,
     } = this.props;
 
     return (
@@ -58,7 +57,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
           <div>
             <EntityListItem
               entity={entity}
-              errors={errors}
+              error={this.props.errors ? this.props.errors.get(entity.get('id')) : null}
               isManager={isManager}
               isSelected={isManager && entityIdsSelected.includes(entity.get('id'))}
               onSelect={(checked) => onEntitySelect(entity.get('id'), checked)}
