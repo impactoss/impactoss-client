@@ -23,3 +23,4 @@ export const PAGE_ITEM_CHANGE = 'impactoss/EntityList/PAGE_ITEM_CHANGE';
 export const EXPAND_CHANGE = 'impactoss/EntityList/EXPAND_CHANGE';
 export const SORTBY_CHANGE = 'impactoss/EntityList/SORTBY_CHANGE';
 export const SORTORDER_CHANGE = 'impactoss/EntityList/SORTORDER_CHANGE';
+export const PATH_CHANGE = 'impactoss/EntityList/PATH_CHANGE';

@@ -20,7 +20,7 @@ import Sidebar from 'components/styled/Sidebar';
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListMain from 'components/EntityListMain';
 
-import { selectHasUserRole } from 'containers/App/selectors';
+import { selectHasUserRole, selectCurrentPathname } from 'containers/App/selectors';
 
 import {
   updatePath,
@@ -40,7 +40,6 @@ import {
 import messages from './messages';
 
 import {
-  resetState,
   resetProgress,
   showPanel,
   save,
@@ -55,6 +54,7 @@ import {
   updatePageItems,
   updateSortBy,
   updateSortOrder,
+  setClientPath,
 } from './actions';
 
 const Progress = styled.div`
@@ -83,7 +83,7 @@ const ProgressText = styled.div`
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    this.props.resetStateOnMount();
+    this.props.updateClientPath();
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps.viewDomain.get('sending').size > 0
@@ -253,8 +253,8 @@ EntityList.propTypes = {
   onPageSelect: PropTypes.func.isRequired,
   onPageItemsSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
-  resetStateOnMount: PropTypes.func.isRequired,
   resetProgress: PropTypes.func.isRequired,
+  updateClientPath: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
@@ -270,15 +270,16 @@ const mapStateToProps = (state) => ({
   entityIdsSelected: selectSelectedEntities(state),
   viewDomain: selectDomain(state),
   progress: selectProgress(state),
+  currentPath: selectCurrentPathname(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
-    resetStateOnMount: () => {
-      dispatch(resetState());
-    },
     resetProgress: () => {
       dispatch(resetProgress());
+    },
+    updateClientPath: () => {
+      dispatch(setClientPath(props.config.clientPath));
     },
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));
