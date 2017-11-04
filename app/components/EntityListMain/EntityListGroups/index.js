@@ -129,6 +129,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       groupSelectValue,
       subgroupSelectValue,
       entities,
+      errors,
     } = this.props;
 
     const pageSize = Math.min(
@@ -247,6 +248,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             connections={this.props.connections}
                             config={config}
                             entities={entitySubGroup.get('entities')}
+                            errors={errors}
                             entityIdsSelected={entityIdsSelected}
                             entityIcon={entityIcon}
                             onEntityClick={onEntityClick}
@@ -264,6 +266,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                       <EntityListItems
                         taxonomies={this.props.taxonomies}
                         connections={this.props.connections}
+                        errors={errors}
                         config={config}
                         entities={entityGroup.get('entities')}
                         entityIdsSelected={entityIdsSelected}
@@ -303,6 +306,7 @@ EntityListGroups.propTypes = {
   connections: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
+  errors: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object,
   config: PropTypes.object,
   entityIcon: PropTypes.func,

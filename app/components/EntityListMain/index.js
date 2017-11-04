@@ -91,6 +91,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       locationQuery,
       entityIcon,
       entities,
+      errors,
     } = this.props;
 
     const expandNo = config.expandableColumns && locationQuery.get('expand')
@@ -160,6 +161,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
                   <EntityListGroups
                     entities={entities}
+                    errors={errors}
                     taxonomies={this.props.taxonomies}
                     connections={connections}
                     connectedTaxonomies={this.props.connectedTaxonomies}
@@ -206,6 +208,7 @@ EntityListMain.propTypes = {
   connectedTaxonomies: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
+  errors: PropTypes.instanceOf(Map),
   // object/arrays
   config: PropTypes.object,
   header: PropTypes.object,

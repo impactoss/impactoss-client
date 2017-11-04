@@ -27,8 +27,8 @@ import {
   openNewEntityModal,
 } from 'containers/App/actions';
 
-import appMessages from 'containers/App/messages';
-import { PARAMS, SERVER_ERRORS, USER_ROLES } from 'containers/App/constants';
+// import appMessages from 'containers/App/messages';
+import { PARAMS, USER_ROLES } from 'containers/App/constants';
 
 import {
   selectDomain,
@@ -94,22 +94,40 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  // formatLabel = (path) => {
-  //   const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
-  //   return this.context.intl.formatMessage(message);
-  // }
+  mapError = (error) =>
+    fromJS({
+      type: error.data.type,
+      error: error.error,
+    });
+
+  mapErrors = (errors) => errors.reduce((errorMap, error) => {
+    const entityId = error.data.saveRef;
+    return errorMap.has(entityId) // check if error already present for entity
+      ? errorMap.set(entityId, errorMap.get(entityId).push(this.mapError(error)))
+      : errorMap.set(entityId, List().push(this.mapError(error)));
+  }, Map());
+
+  filterByError = (entities, errors) =>
+    entities.filter((entity) =>
+      errors.has(entity.get('id'))
+    );
 
   render() {
     // make sure selected entities are still actually on page
-    const { entityIdsSelected, entities, progress } = this.props;
-    const errors = this.props.viewDomain.get('errors');
-    const sending = this.props.viewDomain.get('sending');
-    const success = this.props.viewDomain.get('success');
+    const { entityIdsSelected, progress, viewDomain } = this.props;
+
+    const sending = viewDomain.get('sending');
+    const success = viewDomain.get('success');
+    const errors = viewDomain.get('errors').size > 0 ? this.mapErrors(viewDomain.get('errors')) : Map();
+
+    const entities = (errors.size > 0)
+      ? this.filterByError(this.props.entities, errors)
+      : this.props.entities;
 
     const entityIdsSelectedFiltered = entityIdsSelected.size > 0 && entities
       ? entityIdsSelected.filter((id) => entities.map((entity) => entity.get('id')).includes(id))
       : entityIdsSelected;
-    // errors.size > 0 && console.log('entityList', errors.toJS())
+
     return (
       <div>
         { !this.props.dataReady &&
@@ -118,7 +136,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         { this.props.dataReady &&
           <EntityListSidebar
             listUpdating={progress !== null && progress >= 0 && progress < 100}
-            entities={this.props.entities}
+            entities={entities}
             taxonomies={this.props.taxonomies}
             connections={this.props.connections}
             connectedTaxonomies={this.props.connectedTaxonomies}
@@ -138,47 +156,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
           />
         }
-        { (progress !== null && progress < 100) &&
-          <Progress>
-            <ProgressText>
-              <FormattedMessage
-                {...messages.processingUpdates}
-                values={{
-                  processNo: Math.min(success.size + errors.size + 1, sending.size),
-                  totalNo: sending.size,
-                }}
-              />
-            </ProgressText>
-            <Loading
-              progress={progress}
-            />
-          </Progress>
-        }
-        {(errors.size > 0 && progress >= 100) &&
-          <Progress error>
-            <Messages
-              type="error"
-              messages={errors.reduce((memo, error) =>
-                error.error.messages
-                ? memo.concat(error.error.messages.map((message) => {
-                  // const recordReference = sending.get(timestamp) && sending.get(timestamp).entity
-                  //   ? getEntityReference(fromJS(sending.get(timestamp).entity))
-                  //   : 'unknown';
-                  const recordReference = error.data.saveRef;
-                  if (message === SERVER_ERRORS.RECORD_OUTDATED) {
-                    return this.context.intl.formatMessage(appMessages.forms.outdatedErrorList, { recordReference });
-                  }
-                  return `${this.context.intl.formatMessage(appMessages.forms.otherErrorList, { recordReference })}${message}`;
-                }))
-                : memo
-              , [])}
-              onDismiss={this.props.resetProgress}
-            />
-          </Progress>
-        }
         <EntityListMain
           listUpdating={progress !== null && progress >= 0 && progress < 100}
-          entities={this.props.entities}
+          entities={entities}
+          errors={errors}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
@@ -211,6 +192,31 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onSortBy={this.props.onSortBy}
           onSortOrder={this.props.onSortOrder}
         />
+        { (progress !== null && progress < 100) &&
+          <Progress>
+            <ProgressText>
+              <FormattedMessage
+                {...messages.processingUpdates}
+                values={{
+                  processNo: Math.min(success.size + errors.size + 1, sending.size),
+                  totalNo: sending.size,
+                }}
+              />
+            </ProgressText>
+            <Loading
+              progress={progress}
+            />
+          </Progress>
+        }
+        {(errors.size > 0 && progress >= 100) &&
+          <Progress error>
+            <Messages
+              type="error"
+              message={`${errors.size} update(s) failed. Please review the affected entities above `}
+              onDismiss={this.props.resetProgress}
+            />
+          </Progress>
+        }
       </div>
     );
   }

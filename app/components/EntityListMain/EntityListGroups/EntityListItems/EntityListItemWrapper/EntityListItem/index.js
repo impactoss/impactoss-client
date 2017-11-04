@@ -55,6 +55,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       expandNo,
       entityPath,
       connections,
+      // errors,
     } = this.props;
 
     return (
@@ -101,6 +102,7 @@ EntityListItem.propTypes = {
   entity: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
+  // errors: PropTypes.instanceOf(Map),
   isManager: PropTypes.bool,
   isSelected: PropTypes.bool,
   onSelect: PropTypes.func,
