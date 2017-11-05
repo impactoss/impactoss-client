@@ -32,6 +32,8 @@
   "app.components.ColumnSelect.sortAttributes.order" : "Menu order",
   "app.components.EntityListItem.due" : "{total} due",
   "app.components.EntityListItem.overdue" : "{total} overdue",
+  "app.components.EntityListItem.associationNotExistent" : "Connection or category assignment already removed.",
+  "app.components.EntityListItem.associationAlreadyPresent" : "Connection or category already assigned.",
   "app.components.EntityListGroups.without" : "Without",
   "app.components.EntityListGroups.continued" : "{label} (continued)",
   "app.components.EntityListGroups.draft" : "draft",

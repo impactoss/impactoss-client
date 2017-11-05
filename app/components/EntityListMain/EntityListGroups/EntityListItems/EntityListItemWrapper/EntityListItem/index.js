@@ -13,6 +13,7 @@ import EntityListItemMain from './EntityListItemMain';
 import EntityListItemSelect from './EntityListItemSelect';
 import EntityListItemExpandable from './EntityListItemExpandable';
 
+import messages from './messages';
 
 const Styled = styled.span`
   display: inline-block;
@@ -48,6 +49,20 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       || this.props.expandNo !== nextProps.expandNo;
   }
 
+  transformMessage = (type, msg) => {
+    if (type === 'delete') {
+      return this.context.intl
+        ? this.context.intl.formatMessage(messages.associationNotExistent)
+        : msg;
+    }
+    if (type === 'new') {
+      return this.context.intl
+      ? this.context.intl.formatMessage(messages.associationAlreadyPresent)
+      : msg;
+    }
+    return msg;
+  }
+
   render() {
     const {
       entity,
@@ -64,14 +79,15 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       connections,
       error,
     } = this.props;
+
     return (
       <Styled expanded={expandNo > 0}>
-        { error && error.map((err, i) => (
+        { error && error.map((updateError, i) => (
           <Messages
             key={i}
             type="error"
-            messages={err.getIn(['error', 'messages']).toArray()}
-            onDismiss={() => this.props.onDismissError(err.get('key'))}
+            messages={updateError.getIn(['error', 'messages']).map((msg) => this.transformMessage(updateError.get('type'), msg)).toArray()}
+            onDismiss={() => this.props.onDismissError(updateError.get('key'))}
             preMessage={false}
             details
           />
@@ -135,6 +151,10 @@ EntityListItem.propTypes = {
 EntityListItem.defaultProps = {
   isSelected: false,
   expandNo: 0,
+};
+
+EntityListItem.contextTypes = {
+  intl: PropTypes.object,
 };
 
 export default EntityListItem;
