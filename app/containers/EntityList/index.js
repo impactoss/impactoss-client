@@ -211,11 +211,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             />
           </Progress>
         }
-        {(errors.size > 0 && progress >= 100) &&
+        {(viewDomain.get('errors').size > 0 && progress >= 100) &&
           <Progress error>
             <Messages
               type="error"
-              message={`${errors.size} update(s) failed! Please carefully review the affected items above once we have loaded the latest server versions for you.`}
+              message={this.context.intl.formatMessage(messages.updatesFailed, { errorNo: viewDomain.get('errors').size })}
               onDismiss={this.props.resetProgress}
               preMessage={false}
             />
