@@ -39,13 +39,6 @@ const ListWrapper = styled.div``;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
-    // console.log('errors EntityListMain.shouldComponentUpdate', nextProps.listUpdating, this.props.errors !== nextProps.errors)
-    // console.log(this.props.entities !== nextProps.entities)
-    // console.log(this.props.entityIdsSelected !== nextProps.entityIdsSelected)
-    // console.log(this.props.dataReady !== nextProps.dataReady)
-    // console.log(isEqual(this.props.locationQuery, nextProps.locationQuery))
-    // console.log(this.props.locationQuery === nextProps.locationQuery)
-    // console.log(typeof this.props.scrollContainer !== typeof nextProps.scrollContainer)
     if (nextProps.listUpdating) {
       return false;
     }
@@ -60,7 +53,6 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       || typeof this.props.scrollContainer !== typeof nextProps.scrollContainer;
   }
   componentDidUpdate() {
-    // console.log('EntityListMain.componentDidUpdate')
     if (this.props.scrollContainer) {
       this.props.scrollContainer.recalculateLocations();
     }
@@ -73,7 +65,6 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     );
   }
   render() {
-    // console.log('error EntityListMain.render')
     const {
       config,
       header,
@@ -141,8 +132,10 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                         connectedTaxonomies,
                         locationQuery,
                         onTagClick,
+                        errors,
                       },
                       this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
+                      this.context.intl.formatMessage(messages.filterFormError),
                     )}
                     searchQuery={locationQuery.get('search') || ''}
                     onSearch={onSearch}

@@ -50,6 +50,7 @@
   "app.components.EntityListGroup.expand" : "Implementation view",
   "app.components.EntityListGroup.collapse" : "List view",
   "app.components.EntityListMain.filterFormWithoutPrefix" : "Without",
+  "app.components.EntityListMain.filterFormErrors" : "Errors",
   "app.components.EntityListSidebar.header.filter" : "Filter List",
   "app.components.EntityListSidebar.header.filterButton" : "Filter",
   "app.components.EntityListSidebar.header.editButton" : "Edit",
