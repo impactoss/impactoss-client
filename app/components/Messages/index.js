@@ -29,6 +29,7 @@ const Message = styled.div`
   border: ${(props) => props.details ? '1px solid' : 0};
   border-color: ${(props) => palette(props.palette, 0)};
   border-bottom: 0;
+  padding-right: ${(props) => props.details && props.dismiss ? '50px' : 0};
 
   &:last-child {
     border-bottom: ${(props) => props.details ? '1px solid' : 0};
@@ -45,8 +46,13 @@ const MessageWrapper = styled.div`
 const DismissWrapper = styled.div`
   display: table-cell;
   vertical-align: middle;
-  padding: 1em;
   text-align: right;
+  padding: ${(props) => props.details ? 0 : '1em'};
+`;
+const DismissWrapperDetails = styled.div`
+  position: absolute;
+  right: -3px;
+  top: -4px;
 `;
 const PreMessage = styled.div``;
 const Dismiss = styled(Button)``;
@@ -102,8 +108,9 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
           }
           { message &&
             <Message
-              details={details}
               palette={type}
+              details={details}
+              dismiss={!!onDismiss}
             >
               {this.translateMessages(message)}
             </Message>
@@ -119,16 +126,24 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
           { messages && messages.map((m, i) => (
             <Message
               key={i}
-              details={details}
               palette={type}
+              details={details}
+              dismiss={!!onDismiss}
             >
               {this.translateMessages(m)}
             </Message>
           ))}
+          { onDismiss && details &&
+            <DismissWrapperDetails>
+              <Dismiss onClick={onDismiss}>
+                <Icon name="removeLarge" />
+              </Dismiss>
+            </DismissWrapperDetails>
+          }
         </MessageWrapper>
-        { onDismiss &&
+        { onDismiss && !details &&
           <DismissWrapper>
-            <Dismiss onClick={onDismiss} >
+            <Dismiss onClick={onDismiss}>
               <Icon name="removeLarge" />
             </Dismiss>
           </DismissWrapper>

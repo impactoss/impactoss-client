@@ -39,7 +39,7 @@ const ListWrapper = styled.div``;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
-    // console.log('EntityListMain.shouldComponentUpdate', nextProps.listUpdating)
+    // console.log('errors EntityListMain.shouldComponentUpdate', nextProps.listUpdating, this.props.errors !== nextProps.errors)
     // console.log(this.props.entities !== nextProps.entities)
     // console.log(this.props.entityIdsSelected !== nextProps.entityIdsSelected)
     // console.log(this.props.dataReady !== nextProps.dataReady)
@@ -56,6 +56,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.dataReady !== nextProps.dataReady
       || this.props.locationQuery !== nextProps.locationQuery
+      || this.props.errors !== nextProps.errors
       || typeof this.props.scrollContainer !== typeof nextProps.scrollContainer;
   }
   componentDidUpdate() {
@@ -72,7 +73,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     );
   }
   render() {
-    // console.log('EntityListMain.render')
+    // console.log('error EntityListMain.render')
     const {
       config,
       header,
@@ -162,6 +163,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   <EntityListGroups
                     entities={entities}
                     errors={errors}
+                    onDismissError={this.props.onDismissError}
                     taxonomies={this.props.taxonomies}
                     connections={connections}
                     connectedTaxonomies={this.props.connectedTaxonomies}
@@ -231,6 +233,7 @@ EntityListMain.propTypes = {
   onPageItemsSelect: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
+  onDismissError: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,
   listUpdating: PropTypes.bool,
 };

@@ -55,6 +55,7 @@ import {
   updateSortBy,
   updateSortOrder,
   setClientPath,
+  dismissError,
 } from './actions';
 
 const Progress = styled.div`
@@ -94,17 +95,18 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  mapError = (error) =>
+  mapError = (error, key) =>
     fromJS({
       type: error.data.type,
       error: error.error,
+      key,
     });
 
-  mapErrors = (errors) => errors.reduce((errorMap, error) => {
+  mapErrors = (errors) => errors.reduce((errorMap, error, key) => {
     const entityId = error.data.saveRef;
     return errorMap.has(entityId) // check if error already present for entity
-      ? errorMap.set(entityId, errorMap.get(entityId).push(this.mapError(error)))
-      : errorMap.set(entityId, List().push(this.mapError(error)));
+      ? errorMap.set(entityId, errorMap.get(entityId).push(this.mapError(error, key)))
+      : errorMap.set(entityId, List().push(this.mapError(error, key)));
   }, Map());
 
   filterByError = (entities, errors) =>
@@ -153,7 +155,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             onPanelSelect={this.props.onPanelSelect}
             onCreateOption={this.props.onCreateOption}
             onUpdate={(associations, activeEditOption) =>
-              this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
+              this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected, viewDomain.get('errors'))}
           />
         }
         <EntityListMain
@@ -188,9 +190,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onSearch={this.props.onSearch}
           onPageSelect={this.props.onPageSelect}
           onPageItemsSelect={this.props.onPageItemsSelect}
-          onEntityClick={this.props.onEntityClick}
+          onEntityClick={(id, path) => this.props.onEntityClick(id, path, viewDomain.get('errors'))}
           onSortBy={this.props.onSortBy}
           onSortOrder={this.props.onSortOrder}
+          onDismissError={this.props.onDismissError}
         />
         { (progress !== null && progress < 100) &&
           <Progress>
@@ -212,8 +215,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           <Progress error>
             <Messages
               type="error"
-              message={`${errors.size} update(s) failed. Please review the affected items above `}
+              message={`${errors.size} update(s) failed! Please carefully review the affected items above once we have loaded the latest server versions for you.`}
               onDismiss={this.props.resetProgress}
+              preMessage={false}
             />
           </Progress>
         }
@@ -258,6 +262,7 @@ EntityList.propTypes = {
   onSortBy: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
+  onDismissError: PropTypes.func.isRequired,
 };
 
 EntityList.contextTypes = {
@@ -275,6 +280,10 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch, props) {
   return {
+    onDismissError: (key) => {
+      dispatch(resetProgress());
+      dispatch(dismissError(key));
+    },
     resetProgress: () => {
       dispatch(resetProgress());
     },
@@ -287,7 +296,15 @@ function mapDispatchToProps(dispatch, props) {
     onEntitySelect: (id, checked) => {
       dispatch(selectEntity({ id, checked }));
     },
-    onEntityClick: (id, path) => {
+    onEntityClick: (id, path, errors) => {
+      if (errors && errors.size) {
+        dispatch(resetProgress());
+        errors.forEach((error, key) => {
+          if (error.data.saveRef === id) {
+            dispatch(dismissError(key));
+          }
+        });
+      }
       dispatch(updatePath(`/${path || props.config.clientPath}/${id}`));
     },
     onEntitySelectAll: (ids) => {
@@ -352,7 +369,8 @@ function mapDispatchToProps(dispatch, props) {
     onCreateOption: (args) => {
       dispatch(openNewEntityModal(args));
     },
-    handleEditSubmit: (formData, activeEditOption, entityIdsSelected) => {
+    handleEditSubmit: (formData, activeEditOption, entityIdsSelected, errors) => {
+      dispatch(resetProgress());
       const entities = props.entities.filter(
         (entity) => entityIdsSelected.includes(entity.get('id'))
       );
@@ -370,6 +388,14 @@ function mapDispatchToProps(dispatch, props) {
           // take the first TODO multiselect should be run in single value mode and only return 1 value
           const newValue = creates.first();
           entities.forEach((entity) => {
+            if (errors && errors.size) {
+              errors.forEach((error, key) => {
+                if (error.data.saveRef === entity.get('id')) {
+                  dispatch(dismissError(key));
+                }
+              });
+            }
+
             if (entity.getIn(['attributes', activeEditOption.optionId]) !== newValue) {
               dispatch(save(Map()
                 .set('path', props.config.serverPath)
@@ -388,6 +414,13 @@ function mapDispatchToProps(dispatch, props) {
           .map((option) => option.get('value'));
 
         entities.forEach((entity) => {
+          if (errors && errors.size) {
+            errors.forEach((error, key) => {
+              if (error.data.saveRef === entity.get('id')) {
+                dispatch(dismissError(key));
+              }
+            });
+          }
           let existingAssignments;
           switch (activeEditOption.group) {
             case ('taxonomies'):

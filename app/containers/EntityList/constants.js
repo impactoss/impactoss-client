@@ -24,3 +24,4 @@ export const EXPAND_CHANGE = 'impactoss/EntityList/EXPAND_CHANGE';
 export const SORTBY_CHANGE = 'impactoss/EntityList/SORTBY_CHANGE';
 export const SORTORDER_CHANGE = 'impactoss/EntityList/SORTORDER_CHANGE';
 export const PATH_CHANGE = 'impactoss/EntityList/PATH_CHANGE';
+export const DISMISS_ERROR = 'impactoss/EntityList/DISMISS_ERROR';

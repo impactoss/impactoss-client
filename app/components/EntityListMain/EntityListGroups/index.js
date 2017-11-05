@@ -110,7 +110,7 @@ const pageEntityGroups = (entityGroups, pager, formatMessage) => {
 export class EntityListGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    // console.log('EntityListGroups.render')
+    // console.log('error EntityListGroups.render')
     const {
       entityIdsSelected,
       config,
@@ -258,6 +258,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             expandNo={expandNo}
                             onExpand={onExpand}
                             scrollContainer={this.props.scrollContainer}
+                            onDismissError={this.props.onDismissError}
                           />
                         </ListEntitiesSubGroup>
                       ))
@@ -278,6 +279,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                         expandNo={expandNo}
                         onExpand={onExpand}
                         scrollContainer={this.props.scrollContainer}
+                        onDismissError={this.props.onDismissError}
                       />
                     }
                   </ListEntitiesGroup>
@@ -321,6 +323,7 @@ EntityListGroups.propTypes = {
   onEntitySelectAll: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
+  onDismissError: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,
   groupSelectValue: PropTypes.string,
   subgroupSelectValue: PropTypes.string,

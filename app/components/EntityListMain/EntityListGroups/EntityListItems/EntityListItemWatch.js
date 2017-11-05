@@ -24,6 +24,7 @@ class EntityListItemWatch extends React.PureComponent { // eslint-disable-line r
     return this.props.isInViewport !== nextProps.isInViewport
     || this.props.expandNo !== nextProps.expandNo
     || this.props.entity !== nextProps.entity
+    || this.props.errors !== nextProps.errors
     || (nextProps.isInViewport && (this.props.entityIdsSelected !== nextProps.entityIdsSelected))
     || (!nextProps.isInViewport && (this.state.height !== nextState.height));
   }
@@ -35,7 +36,6 @@ class EntityListItemWatch extends React.PureComponent { // eslint-disable-line r
   }
 
   render() {
-    // console.log('EntityListItemWatch.render', this.props.isInViewport)
     return (
       <div>
         { this.props.isInViewport && this.props.renderEntity() }
@@ -50,6 +50,7 @@ class EntityListItemWatch extends React.PureComponent { // eslint-disable-line r
 EntityListItemWatch.propTypes = {
   entityIdsSelected: PropTypes.instanceOf(List),
   entity: PropTypes.instanceOf(Map).isRequired,
+  errors: PropTypes.instanceOf(Map),
   isInViewport: PropTypes.bool,
   // scrollContainer: PropTypes.object,
   expandNo: PropTypes.number,

@@ -21,6 +21,7 @@ import {
   SORTBY_CHANGE,
   SORTORDER_CHANGE,
   PATH_CHANGE,
+  DISMISS_ERROR,
 } from './constants';
 
 export function setClientPath(path) {
@@ -128,5 +129,12 @@ export function updateSortOrder(order) {
   return {
     type: SORTORDER_CHANGE,
     order,
+  };
+}
+
+export function dismissError(key) {
+  return {
+    type: DISMISS_ERROR,
+    key,
   };
 }

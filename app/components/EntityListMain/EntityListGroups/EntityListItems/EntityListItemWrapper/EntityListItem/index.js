@@ -44,6 +44,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
     return this.props.entity !== nextProps.entity
       || this.props.isSelected !== nextProps.isSelected
       || this.props.wrapper !== nextProps.wrapper
+      || this.props.error !== nextProps.error
       || this.props.expandNo !== nextProps.expandNo;
   }
 
@@ -65,16 +66,16 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
     } = this.props;
     return (
       <Styled expanded={expandNo > 0}>
-        { error &&
+        { error && error.map((err, i) => (
           <Messages
+            key={i}
             type="error"
-            messages={error.reduce((memo, err) =>
-              memo.concat(err.getIn(['error', 'messages']).toArray())
-            , [])}
+            messages={err.getIn(['error', 'messages']).toArray()}
+            onDismiss={() => this.props.onDismissError(err.get('key'))}
             preMessage={false}
             details
           />
-        }
+        ))}
         <Item error={error}>
           <MainWrapper expandable={entity.get('expandable')}>
             <MainInnerWrapper>
@@ -127,6 +128,7 @@ EntityListItem.propTypes = {
   entityPath: PropTypes.string,
   config: PropTypes.object,
   onEntityClick: PropTypes.func,
+  onDismissError: PropTypes.func,
   wrapper: PropTypes.object,
 };
 

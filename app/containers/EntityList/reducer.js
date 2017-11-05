@@ -27,6 +27,7 @@ import {
   ENTITY_SELECTED,
   ENTITIES_SELECT,
   PATH_CHANGE,
+  DISMISS_ERROR,
 } from './constants';
 
 const initialState = fromJS({
@@ -90,6 +91,9 @@ function entityListReducer(state = initialState, action) {
           { data: action.data, error: checkResponseError(action.error) }
         )
         : state;
+    case DISMISS_ERROR:
+      // console.log('error dismissError', action.key, state.get('errors').toJS())
+      return state.set('errors', state.get('errors').delete(action.key));
     default:
       return state;
   }
