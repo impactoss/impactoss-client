@@ -57,8 +57,8 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
     }
     if (type === 'new') {
       return this.context.intl
-      ? this.context.intl.formatMessage(messages.associationAlreadyPresent)
-      : msg;
+        ? this.context.intl.formatMessage(messages.associationAlreadyPresent)
+        : msg;
     }
     return msg;
   }

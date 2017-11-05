@@ -9,6 +9,8 @@ import { Map, List } from 'immutable';
 // import { isEqual } from 'lodash/lang';
 import { PARAMS } from 'containers/App/constants';
 
+import Messages from 'components/Messages';
+
 import EntityListItems from './EntityListItems';
 import EntityListHeader from './EntityListHeader';
 import EntityListFooter from './EntityListFooter';
@@ -107,7 +109,17 @@ const pageEntityGroups = (entityGroups, pager, formatMessage) => {
   }, List());
 };
 
+
 export class EntityListGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
+  transformMessage = (msg, entityId) => this.context.intl
+  ? this.context.intl.formatMessage(messages.entityNoLongerPresent, { entityId })
+  : msg;
+
+  hasLocationQueryFilters = (locationQuery) =>
+    locationQuery.reduce((hasFilters, value, arg) =>
+      hasFilters || ['items', 'page', 'group', 'subgroup', 'sort', 'order'].indexOf(arg) === -1
+    , false);
 
   render() {
     // console.log('error EntityListGroups.render')
@@ -192,6 +204,10 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       entityGroupsPaged = List().push(Map({ entities }));
     }
 
+    const errorsWithoutEntities = errors && errors.filter((error, id) =>
+      !entities.find((entity) => entity.get('id') === id)
+    );
+
     return (
       <div>
         <EntityListHeader
@@ -218,15 +234,36 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           }}
         />
         <ListEntitiesMain>
-          { entityGroupsPaged.size === 0 && locationQuery &&
+          { entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0) &&
             <ListEntitiesEmpty>
               <FormattedMessage {...messages.listEmptyAfterQuery} />
             </ListEntitiesEmpty>
           }
-          { entityGroupsPaged.size === 0 && !locationQuery &&
+          { entityIdsOnPage.size === 0 && !this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0) &&
             <ListEntitiesEmpty>
               <FormattedMessage {...messages.listEmpty} />
             </ListEntitiesEmpty>
+          }
+          { entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery)
+            && errorsWithoutEntities && errorsWithoutEntities.size > 0
+            && errors && errors.size > 0
+            &&
+            <ListEntitiesEmpty>
+              <FormattedMessage {...messages.listEmptyAfterQueryAndErrors} />
+            </ListEntitiesEmpty>
+          }
+          { errorsWithoutEntities && errorsWithoutEntities.size > 0 && !this.hasLocationQueryFilters(locationQuery) &&
+            errorsWithoutEntities.map((entityErrors, entityId) => (
+              entityErrors.map((updateError, i) => (
+                <Messages
+                  key={i}
+                  type="error"
+                  messages={updateError.getIn(['error', 'messages']).map((msg) => this.transformMessage(msg, entityId)).toArray()}
+                  onDismiss={() => this.props.onDismissError(updateError.get('key'))}
+                  preMessage={false}
+                />
+              ))
+            )).toList()
           }
           { entityGroupsPaged.size > 0 &&
             <div>
