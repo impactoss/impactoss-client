@@ -61,7 +61,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       <div>
         <Content
           innerRef={(node) => { this.ScrollContainer = node; }}
-          noPaddingBottom={inModal}
+          inModal={inModal}
         >
           <ContentHeader
             title={pageTitle}
