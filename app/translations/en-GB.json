@@ -343,6 +343,7 @@
   "app.containers.CategoryView.notFound" : "Sorry no category found",
   "app.containers.EntityList.processingUpdates" : "Processing {processNo} of {totalNo} updates.",
   "app.containers.EntityList.updatesFailed" : "{errorNo} update(s) failed! Please wait for the items to be updated from the server and then carefully review the affected items above.",
+  "app.containers.EntityList.updatesSuccess" : "{successNo} update(s) succeeded!",
   "app.containers.EntityNew.categories.pageTitle" : "New Category",
   "app.containers.EntityNew.categories.pageTitleTaxonomy" : "New {taxonomy}",
   "app.containers.EntityNew.measures.pageTitle" : "New Action",
