@@ -14,4 +14,8 @@ export default defineMessages({
     id: 'app.containers.EntityList.updatesFailed',
     defaultMessage: '{errorNo} update(s) failed! Please wait for the items to be updated from the server and then carefully review the affected items above.',
   },
+  updatesSuccess: {
+    id: 'app.containers.EntityList.updatesSuccess',
+    defaultMessage: 'All {successNo} update(s) succeeded!',
+  },
 });

@@ -86,14 +86,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   componentWillMount() {
     this.props.updateClientPath();
   }
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.viewDomain.get('sending').size > 0
-      && nextProps.viewDomain.get('errors').size === 0
-      && nextProps.progress > 99.9
-    ) {
-      this.props.resetProgress();
-    }
-  }
 
   mapError = (error, key) =>
     fromJS({
@@ -218,6 +210,16 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               message={this.context.intl.formatMessage(messages.updatesFailed, { errorNo: viewDomain.get('errors').size })}
               onDismiss={this.props.resetProgress}
               preMessage={false}
+            />
+          </Progress>
+        }
+        {(viewDomain.get('errors').size === 0 && progress >= 100) &&
+          <Progress error>
+            <Messages
+              type="success"
+              message={this.context.intl.formatMessage(messages.updatesSuccess, { successNo: viewDomain.get('success').size })}
+              onDismiss={this.props.resetProgress}
+              autoDismiss={2000}
             />
           </Progress>
         }

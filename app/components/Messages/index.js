@@ -58,7 +58,11 @@ const PreMessage = styled.div``;
 const Dismiss = styled(Button)``;
 
 class Messages extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  componentDidMount() {
+    if (this.props.onDismiss && typeof this.props.autoDismiss !== 'undefined') {
+      setTimeout(() => this.props.onDismiss(), this.props.autoDismiss);
+    }
+  }
   translateMessages = (messages) =>
     reduce(asArray(messages), (memo, message) => memo
       ? `${memo} ${this.translateMessage(message)}`
@@ -163,6 +167,7 @@ Messages.propTypes = {
   spaceMessage: PropTypes.bool,
   preMessage: PropTypes.bool,
   details: PropTypes.bool,
+  autoDismiss: PropTypes.number,
 };
 
 Messages.defaultProps = {

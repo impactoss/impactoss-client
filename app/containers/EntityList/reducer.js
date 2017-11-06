@@ -64,7 +64,9 @@ function entityListReducer(state = initialState, action) {
           .set('success', Map())
           .set('errors', Map())
           .set('path', action.path)
-        : state;
+        : state
+          .set('sending', Map())
+          .set('success', Map());
     case ENTITY_SELECTED: {
       const selected = state.get('entitiesSelected');
       return state
