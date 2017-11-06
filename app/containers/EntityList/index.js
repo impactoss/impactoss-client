@@ -15,9 +15,9 @@ import { Map, List, fromJS } from 'immutable';
 // import { getEntityReference } from 'utils/entities';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
-import Sidebar from 'components/styled/Sidebar';
 
 import EntityListSidebar from 'components/EntityListSidebar';
+import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 import EntityListMain from 'components/EntityListMain';
 
 import { selectHasUserRole, selectCurrentPathname } from 'containers/App/selectors';
@@ -133,7 +133,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     return (
       <div>
         { !this.props.dataReady &&
-          <Sidebar />
+          <EntityListSidebarLoading />
         }
         { this.props.dataReady &&
           <EntityListSidebar
