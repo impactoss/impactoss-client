@@ -8,6 +8,7 @@ import { palette } from 'styled-theme';
 import { getPathFromUrl } from 'utils/string';
 
 import appMessages from 'containers/App/messages';
+import { API_ENDPOINT, SIGNING_URL_ENDPOINT } from 'containers/App/constants';
 
 import Icon from 'components/Icon';
 import DocumentView from 'components/DocumentView';
@@ -15,8 +16,10 @@ import DocumentWrap from 'components/fields/DocumentWrap';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 
 import Loading from 'components/Loading';
+import Messages from 'components/Messages';
 
-import { API_ENDPOINT, SIGNING_URL_ENDPOINT } from 'containers/App/constants';
+import messages from './messages';
+
 
 const DocumentWrapEdit = styled(DocumentWrap)`
   background-color: ${palette('primary', 4)};
@@ -38,9 +41,12 @@ const Remove = styled(ButtonFlatIconOnly)`
 `;
 
 const Uploading = styled.div`
-  color: ${palette('primary', 1)};
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1em;
+  color: ${palette('primary', 2)};
+  margin-bottom: 0.25em;
+  margin-top: -0.5em;
+  overflow: hidden;
 `;
 const Styled = styled.div`
   padding-top: 1em;
@@ -99,6 +105,13 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
     next(newFile);
   }
 
+  reset = () => {
+    this.setState({
+      progress: null,
+      error: null,
+    });
+  }
+
   render() {
     return (
       <Styled>
@@ -112,6 +125,7 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
           </DocumentWrapEdit>
         }
         {
+          !this.state.error &&
           !this.props.value &&
           !this.state.progress &&
           this.state.progress !== 0 &&
@@ -132,7 +146,7 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
             />
           </ReactS3UploaderLabelWrap>
         }
-        { (this.state.progress || this.state.progress === 0) && !this.props.value &&
+        { !this.state.error && (this.state.progress || this.state.progress === 0) && !this.props.value &&
           <DocumentWrapEdit>
             <Uploading>
               <FormattedMessage {...appMessages.attributes.document_uploading} />
@@ -146,7 +160,12 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
         }
         {
           this.state.error &&
-          this.state.error
+          <Messages
+            type="error"
+            onDismiss={this.reset}
+            message={this.context.intl.formatMessage(messages.uploadError)}
+            preMessage={false}
+          />
         }
       </Styled>
     );
@@ -157,7 +176,7 @@ Upload.propTypes = {
   onChange: PropTypes.func,
   value: PropTypes.string,
 };
-// Upload.contextTypes = {
-//   intl: PropTypes.object.isRequired,
-// };
+Upload.contextTypes = {
+  intl: PropTypes.object.isRequired,
+};
 export default Upload;

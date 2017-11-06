@@ -108,6 +108,7 @@
   "app.components.MultiSelectField.empty" : "No {entities} present. ",
   "app.components.MultiSelectField.emptyLink" : "Click to select.",
   "app.components.MultiSelectField.update" : "Update {type}",
+  "app.components.UploadControl.uploadError" : "File upload failed, please try again.",
   "app.components.ItemStatus.draft" : "draft",
   "app.components.Loading.loading" : "Loading...",
   "app.components.Messages.preBold" : "Oh no! ",
