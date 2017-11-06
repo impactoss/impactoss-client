@@ -3,14 +3,17 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { find } from 'lodash/collection';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import asList from 'utils/as-list';
+
+import Messages from 'components/Messages';
 import Component from 'components/styled/Component';
 
 import EntityListItemMain from './EntityListItemMain';
 import EntityListItemSelect from './EntityListItemSelect';
 import EntityListItemExpandable from './EntityListItemExpandable';
 
+import messages from './messages';
 
 const Styled = styled.span`
   display: inline-block;
@@ -21,6 +24,10 @@ const Item = styled(Component)`
   display: table;
   width:100%;
   background-color: ${palette('primary', 4)};
+  border-bottom: ${(props) => props.error ? '1px solid' : 0};
+  border-left: ${(props) => props.error ? '1px solid' : 0};
+  border-right: ${(props) => props.error ? '1px solid' : 0};
+  border-color: ${palette('error', 0)};
 `;
 const MainWrapper = styled(Component)`
   display: table-cell;
@@ -38,7 +45,22 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
     return this.props.entity !== nextProps.entity
       || this.props.isSelected !== nextProps.isSelected
       || this.props.wrapper !== nextProps.wrapper
+      || this.props.error !== nextProps.error
       || this.props.expandNo !== nextProps.expandNo;
+  }
+
+  transformMessage = (type, msg) => {
+    if (type === 'delete') {
+      return this.context.intl
+        ? this.context.intl.formatMessage(messages.associationNotExistent)
+        : msg;
+    }
+    if (type === 'new') {
+      return this.context.intl
+        ? this.context.intl.formatMessage(messages.associationAlreadyPresent)
+        : msg;
+    }
+    return msg;
   }
 
   render() {
@@ -55,11 +77,22 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       expandNo,
       entityPath,
       connections,
+      error,
     } = this.props;
 
     return (
       <Styled expanded={expandNo > 0}>
-        <Item>
+        { error && error.map((updateError, i) => (
+          <Messages
+            key={i}
+            type="error"
+            messages={updateError.getIn(['error', 'messages']).map((msg) => this.transformMessage(updateError.get('type'), msg)).toArray()}
+            onDismiss={() => this.props.onDismissError(updateError.get('key'))}
+            preMessage={false}
+            details
+          />
+        ))}
+        <Item error={error}>
           <MainWrapper expandable={entity.get('expandable')}>
             <MainInnerWrapper>
               {isManager &&
@@ -101,6 +134,7 @@ EntityListItem.propTypes = {
   entity: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
+  error: PropTypes.instanceOf(List),
   isManager: PropTypes.bool,
   isSelected: PropTypes.bool,
   onSelect: PropTypes.func,
@@ -110,12 +144,17 @@ EntityListItem.propTypes = {
   entityPath: PropTypes.string,
   config: PropTypes.object,
   onEntityClick: PropTypes.func,
+  onDismissError: PropTypes.func,
   wrapper: PropTypes.object,
 };
 
 EntityListItem.defaultProps = {
   isSelected: false,
   expandNo: 0,
+};
+
+EntityListItem.contextTypes = {
+  intl: PropTypes.object,
 };
 
 export default EntityListItem;

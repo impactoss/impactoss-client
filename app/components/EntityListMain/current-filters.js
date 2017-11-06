@@ -15,17 +15,22 @@ export const currentFilters = ({
   connectedTaxonomies,
   locationQuery,
   onTagClick,
+  errors,
 },
-withoutMessage,
+withoutLabel,
+errorLabel,
 ) => {
   let filterTags = [];
+  if (errors && errors.size > 0) {
+    filterTags.push(getErrorTag(errorLabel));
+  }
   if (config.taxonomies && taxonomies) {
     filterTags = filterTags.concat(getCurrentTaxonomyFilters(
       config.taxonomies,
       taxonomies,
       locationQuery,
       onTagClick,
-      withoutMessage
+      withoutLabel
     ));
   }
   if (config.connectedTaxonomies && connectedTaxonomies) {
@@ -42,7 +47,7 @@ withoutMessage,
       connections,
       locationQuery,
       onTagClick,
-      withoutMessage
+      withoutLabel
     ));
   }
   if (config.attributes) {
@@ -51,13 +56,17 @@ withoutMessage,
       config.attributes.options,
       locationQuery,
       onTagClick,
-      withoutMessage
+      withoutLabel
     ));
   }
   return filterTags;
 };
 
-
+const getErrorTag = (label) => ({
+  id: 'error',
+  type: 'error',
+  label,
+});
 const getConnectionLabel = (connection, value) => {
   const label = connection
     ? connection.getIn(['attributes', 'reference']) || connection.get('id')
@@ -70,7 +79,7 @@ const getCurrentTaxonomyFilters = (
   taxonomies,
   locationQuery,
   onClick,
-  withoutMessage
+  withoutLabel
 ) => {
   const tags = [];
   if (locationQuery.get(taxonomyFilters.query)) {
@@ -103,7 +112,7 @@ const getCurrentTaxonomyFilters = (
           const value = queryValue.toString();
           tags.push({
             labels: [
-              { label: withoutMessage },
+              { label: withoutLabel },
               { label: taxonomy.getIn(['attributes', 'title']), lowerCase: true },
             ],
             type: 'taxonomies',
@@ -161,7 +170,7 @@ const getCurrentConnectionFilters = (
   connections,
   locationQuery,
   onClick,
-  withoutMessage
+  withoutLabel
 ) => {
   const tags = [];
   forEach(connectionFilters.options, (option) => {
@@ -198,7 +207,7 @@ const getCurrentConnectionFilters = (
         if (option.path === queryValue) {
           tags.push({
             labels: [
-              { label: withoutMessage },
+              { label: withoutLabel },
               { appMessage: true, label: option.message, lowerCase: true },
               { label: option.label },
             ],
@@ -216,7 +225,7 @@ const getCurrentConnectionFilters = (
   }
   return tags;
 };
-const getCurrentAttributeFilters = (entities, attributeFiltersOptions, locationQuery, onClick, withoutMessage) => {
+const getCurrentAttributeFilters = (entities, attributeFiltersOptions, locationQuery, onClick, withoutLabel) => {
   const tags = [];
   if (locationQuery.get('where')) {
     const locationQueryValue = locationQuery.get('where');
@@ -231,7 +240,7 @@ const getCurrentAttributeFilters = (entities, attributeFiltersOptions, locationQ
               if (value === 'null') {
                 tags.push({
                   labels: [
-                    { label: withoutMessage },
+                    { label: withoutLabel },
                     { appMessage: !!option.message, label: option.message || option.label, lowerCase: true },
                   ],
                   type: 'attributes',

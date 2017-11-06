@@ -21,9 +21,9 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
     this.state = { wrapper: null };
   }
   shouldComponentUpdate(nextProps, nextState) {
-    // console.log('shouldComponentUpdate', this.state.wrapper !== nextState.wrapper, this.state.wrapper, nextState.wrapper)
     return this.props.expandNo !== nextProps.expandNo
     || this.props.entity !== nextProps.entity
+    || this.props.errors !== nextProps.errors
     || this.props.entityIdsSelected !== nextProps.entityIdsSelected
     || (!this.props.simulate && this.state.wrapper !== nextState.wrapper);
   }
@@ -43,7 +43,6 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       entity,
       entityPath,
     } = this.props;
-
     return (
       <ItemWrapper
         separated={expandNo}
@@ -57,6 +56,8 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
           <div>
             <EntityListItem
               entity={entity}
+              error={this.props.errors ? this.props.errors.get(entity.get('id')) : null}
+              onDismissError={this.props.onDismissError}
               isManager={isManager}
               isSelected={isManager && entityIdsSelected.includes(entity.get('id'))}
               onSelect={(checked) => onEntitySelect(entity.get('id'), checked)}
@@ -118,6 +119,7 @@ EntityListItemWrapper.propTypes = {
   entity: PropTypes.instanceOf(Map).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
+  errors: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
   config: PropTypes.object,
   isManager: PropTypes.bool,
@@ -125,6 +127,7 @@ EntityListItemWrapper.propTypes = {
   onEntityClick: PropTypes.func,
   onEntitySelect: PropTypes.func,
   onExpand: PropTypes.func,
+  onDismissError: PropTypes.func,
   expandNo: PropTypes.number,
   entityPath: PropTypes.string,
   entityIcon: PropTypes.func,

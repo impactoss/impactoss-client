@@ -9,6 +9,8 @@ import { Map, List } from 'immutable';
 // import { isEqual } from 'lodash/lang';
 import { PARAMS } from 'containers/App/constants';
 
+import Messages from 'components/Messages';
+
 import EntityListItems from './EntityListItems';
 import EntityListHeader from './EntityListHeader';
 import EntityListFooter from './EntityListFooter';
@@ -107,10 +109,20 @@ const pageEntityGroups = (entityGroups, pager, formatMessage) => {
   }, List());
 };
 
+
 export class EntityListGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
+  transformMessage = (msg, entityId) => this.context.intl
+  ? this.context.intl.formatMessage(messages.entityNoLongerPresent, { entityId })
+  : msg;
+
+  hasLocationQueryFilters = (locationQuery) =>
+    locationQuery.reduce((hasFilters, value, arg) =>
+      hasFilters || ['items', 'page', 'group', 'subgroup', 'sort', 'order'].indexOf(arg) === -1
+    , false);
+
   render() {
-    // console.log('EntityListGroups.render')
+    // console.log('error EntityListGroups.render')
     const {
       entityIdsSelected,
       config,
@@ -129,6 +141,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       groupSelectValue,
       subgroupSelectValue,
       entities,
+      errors,
     } = this.props;
 
     const pageSize = Math.min(
@@ -190,7 +203,11 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       entityIdsOnPage = entities.map((entity) => entity.get('id'));
       entityGroupsPaged = List().push(Map({ entities }));
     }
-    // return null;
+
+    const errorsWithoutEntities = errors && errors.filter((error, id) =>
+      !entities.find((entity) => entity.get('id') === id)
+    );
+
     return (
       <div>
         <EntityListHeader
@@ -217,15 +234,36 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           }}
         />
         <ListEntitiesMain>
-          { entityGroupsPaged.size === 0 && locationQuery &&
+          { entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0) &&
             <ListEntitiesEmpty>
               <FormattedMessage {...messages.listEmptyAfterQuery} />
             </ListEntitiesEmpty>
           }
-          { entityGroupsPaged.size === 0 && !locationQuery &&
+          { entityIdsOnPage.size === 0 && !this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0) &&
             <ListEntitiesEmpty>
               <FormattedMessage {...messages.listEmpty} />
             </ListEntitiesEmpty>
+          }
+          { entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery)
+            && errorsWithoutEntities && errorsWithoutEntities.size > 0
+            && errors && errors.size > 0
+            &&
+            <ListEntitiesEmpty>
+              <FormattedMessage {...messages.listEmptyAfterQueryAndErrors} />
+            </ListEntitiesEmpty>
+          }
+          { errorsWithoutEntities && errorsWithoutEntities.size > 0 && !this.hasLocationQueryFilters(locationQuery) &&
+            errorsWithoutEntities.map((entityErrors, entityId) => (
+              entityErrors.map((updateError, i) => (
+                <Messages
+                  key={i}
+                  type="error"
+                  messages={updateError.getIn(['error', 'messages']).map((msg) => this.transformMessage(msg, entityId)).toArray()}
+                  onDismiss={() => this.props.onDismissError(updateError.get('key'))}
+                  preMessage={false}
+                />
+              ))
+            )).toList()
           }
           { entityGroupsPaged.size > 0 &&
             <div>
@@ -247,6 +285,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             connections={this.props.connections}
                             config={config}
                             entities={entitySubGroup.get('entities')}
+                            errors={errors}
                             entityIdsSelected={entityIdsSelected}
                             entityIcon={entityIcon}
                             onEntityClick={onEntityClick}
@@ -256,6 +295,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             expandNo={expandNo}
                             onExpand={onExpand}
                             scrollContainer={this.props.scrollContainer}
+                            onDismissError={this.props.onDismissError}
                           />
                         </ListEntitiesSubGroup>
                       ))
@@ -264,6 +304,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                       <EntityListItems
                         taxonomies={this.props.taxonomies}
                         connections={this.props.connections}
+                        errors={errors}
                         config={config}
                         entities={entityGroup.get('entities')}
                         entityIdsSelected={entityIdsSelected}
@@ -275,6 +316,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                         expandNo={expandNo}
                         onExpand={onExpand}
                         scrollContainer={this.props.scrollContainer}
+                        onDismissError={this.props.onDismissError}
                       />
                     }
                   </ListEntitiesGroup>
@@ -283,12 +325,14 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
             </div>
           }
         </ListEntitiesMain>
-        <EntityListFooter
-          pageSize={pageSize}
-          pager={pager}
-          onPageSelect={this.props.onPageSelect}
-          onPageItemsSelect={this.props.onPageItemsSelect}
-        />
+        { entityGroupsPaged.size > 0 &&
+          <EntityListFooter
+            pageSize={pageSize}
+            pager={pager}
+            onPageSelect={this.props.onPageSelect}
+            onPageItemsSelect={this.props.onPageItemsSelect}
+          />
+        }
       </div>
     );
   }
@@ -301,6 +345,7 @@ EntityListGroups.propTypes = {
   connections: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
+  errors: PropTypes.instanceOf(Map),
   entityTitle: PropTypes.object,
   config: PropTypes.object,
   entityIcon: PropTypes.func,
@@ -315,6 +360,7 @@ EntityListGroups.propTypes = {
   onEntitySelectAll: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
+  onDismissError: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,
   groupSelectValue: PropTypes.string,
   subgroupSelectValue: PropTypes.string,

@@ -94,9 +94,12 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                   palette={filter.type}
                   paletteHover={`${filter.type}Hover`}
                   pIndex={parseInt(filter.id, 10) || 0}
+                  disabled={!filter.onClick}
                 >
                   {this.getFilterLabel(filter)}
-                  <Icon name="removeSmall" text textRight />
+                  { filter.onClick &&
+                    <Icon name="removeSmall" text textRight />
+                  }
                 </ButtonTagFilterInverse>
               )
               : (
@@ -106,9 +109,12 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                   palette={filter.type}
                   paletteHover={`${filter.type}Hover`}
                   pIndex={parseInt(filter.id, 10) || 0}
+                  disabled={!filter.onClick}
                 >
                   {this.getFilterLabel(filter)}
-                  <Icon name="removeSmall" text textRight />
+                  { filter.onClick &&
+                    <Icon name="removeSmall" text textRight />
+                  }
                 </ButtonTagFilter>
               )
             )

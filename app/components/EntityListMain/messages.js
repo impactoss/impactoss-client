@@ -10,4 +10,8 @@ export default defineMessages({
     id: 'app.components.EntityListMain.filterFormWithoutPrefix',
     defaultMessage: 'Without',
   },
+  filterFormError: {
+    id: 'app.components.EntityListMain.filterFormError',
+    defaultMessage: 'Errors',
+  },
 });

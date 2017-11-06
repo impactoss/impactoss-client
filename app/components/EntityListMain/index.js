@@ -39,13 +39,6 @@ const ListWrapper = styled.div``;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
-    // console.log('EntityListMain.shouldComponentUpdate', nextProps.listUpdating)
-    // console.log(this.props.entities !== nextProps.entities)
-    // console.log(this.props.entityIdsSelected !== nextProps.entityIdsSelected)
-    // console.log(this.props.dataReady !== nextProps.dataReady)
-    // console.log(isEqual(this.props.locationQuery, nextProps.locationQuery))
-    // console.log(this.props.locationQuery === nextProps.locationQuery)
-    // console.log(typeof this.props.scrollContainer !== typeof nextProps.scrollContainer)
     if (nextProps.listUpdating) {
       return false;
     }
@@ -56,10 +49,10 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.dataReady !== nextProps.dataReady
       || this.props.locationQuery !== nextProps.locationQuery
+      || this.props.errors !== nextProps.errors
       || typeof this.props.scrollContainer !== typeof nextProps.scrollContainer;
   }
   componentDidUpdate() {
-    // console.log('EntityListMain.componentDidUpdate')
     if (this.props.scrollContainer) {
       this.props.scrollContainer.recalculateLocations();
     }
@@ -72,7 +65,6 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     );
   }
   render() {
-    // console.log('EntityListMain.render')
     const {
       config,
       header,
@@ -91,6 +83,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       locationQuery,
       entityIcon,
       entities,
+      errors,
     } = this.props;
 
     const expandNo = config.expandableColumns && locationQuery.get('expand')
@@ -139,8 +132,10 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                         connectedTaxonomies,
                         locationQuery,
                         onTagClick,
+                        errors,
                       },
                       this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
+                      this.context.intl.formatMessage(messages.filterFormError),
                     )}
                     searchQuery={locationQuery.get('search') || ''}
                     onSearch={onSearch}
@@ -160,6 +155,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
                   <EntityListGroups
                     entities={entities}
+                    errors={errors}
+                    onDismissError={this.props.onDismissError}
                     taxonomies={this.props.taxonomies}
                     connections={connections}
                     connectedTaxonomies={this.props.connectedTaxonomies}
@@ -206,6 +203,7 @@ EntityListMain.propTypes = {
   connectedTaxonomies: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
+  errors: PropTypes.instanceOf(Map),
   // object/arrays
   config: PropTypes.object,
   header: PropTypes.object,
@@ -228,6 +226,7 @@ EntityListMain.propTypes = {
   onPageItemsSelect: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
+  onDismissError: PropTypes.func.isRequired,
   scrollContainer: PropTypes.object,
   listUpdating: PropTypes.bool,
 };

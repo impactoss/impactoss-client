@@ -24,7 +24,15 @@ export default defineMessages({
   },
   listEmptyAfterQuery: {
     id: 'app.components.EntityListGroups.listEmptyAfterQuery',
-    defaultMessage: 'We are sorry, no results matched your search!',
+    defaultMessage: 'We are sorry, no results matched your search',
+  },
+  listEmptyAfterQueryAndErrors: {
+    id: 'app.components.EntityListGroups.listEmptyAfterQueryAndErrors',
+    defaultMessage: 'Some errors are hidden by current filter settings. Please remove your filters to see all errors.',
+  },
+  entityNoLongerPresent: {
+    id: 'app.components.EntityListGroups.entityNoLongerPresent',
+    defaultMessage: 'Item with database id \'{entityId}\' no longer exists.',
   },
   nestedListEmpty: {
     reports: {

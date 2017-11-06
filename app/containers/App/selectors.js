@@ -196,6 +196,17 @@ export const selectPreviousPathname = createSelector(
   }
 );
 
+export const selectListSearch = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.getIn(['locationBeforeTransitions', 'listSearch']);
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
 export const selectRequestedAt = createSelector(
   getGlobalRequested,
   (state, { path }) => path,

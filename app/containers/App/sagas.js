@@ -3,8 +3,8 @@
  */
 
 import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
-import { push, goBack, replace } from 'react-router-redux';
-import { reduce, keyBy, find } from 'lodash/collection';
+import { push, replace } from 'react-router-redux';
+import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
 
 import asArray from 'utils/as-array';
@@ -32,7 +32,7 @@ import {
   // RESET_PASSWORD,
   RECOVER_PASSWORD,
   CLOSE_ENTITY,
-  SERVER_ERRORS,
+  // SERVER_ERRORS,
   DISMISS_QUERY_MESSAGES,
 } from 'containers/App/constants';
 
@@ -62,7 +62,6 @@ import {
 } from 'containers/App/actions';
 
 import {
-  selectPreviousPathname,
   selectCurrentPathname,
   selectRedirectOnAuthSuccessPath,
   selectRequestedAt,
@@ -70,6 +69,7 @@ import {
   selectLocation,
   selectSessionUserRoles,
   selectIsAuthenticating,
+  selectListSearch,
 } from 'containers/App/selectors';
 
 import {
@@ -216,9 +216,10 @@ export function* validateTokenSaga() {
 }
 
 
-function stampPayload(payload) {
+function stampPayload(payload, type) {
   return Object.assign(payload, {
     timestamp: `${Date.now()}-${Math.random().toString(36).slice(-8)}`,
+    type,
   });
 }
 
@@ -236,7 +237,7 @@ function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
 }
 
 export function* saveEntitySaga({ data }) {
-  const dataTS = stampPayload(data);
+  const dataTS = stampPayload(data, 'save');
   try {
     yield put(saveSending(dataTS));
     // update entity attributes
@@ -347,14 +348,12 @@ export function* saveEntitySaga({ data }) {
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(saveError(err, dataTS));
-    if (err.response.json && err.response.json.error === SERVER_ERRORS.RECORD_OUTDATED) {
-      yield put(invalidateEntities(data.path));
-    }
+    yield put(invalidateEntities(data.path));
   }
 }
 
 export function* deleteEntitySaga({ data }) {
-  const dataTS = stampPayload(data);
+  const dataTS = stampPayload(data, 'delete');
   try {
     yield put(deleteSending(dataTS));
     yield call(deleteEntityRequest, data.path, data.id);
@@ -366,11 +365,12 @@ export function* deleteEntitySaga({ data }) {
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(deleteError(err, dataTS));
+    yield put(invalidateEntities(data.path));
   }
 }
 
 export function* newEntitySaga({ data }) {
-  const dataTS = stampPayload(data);
+  const dataTS = stampPayload(data, 'new');
   try {
     yield put(saveSending(dataTS));
     // update entity attributes
@@ -470,6 +470,7 @@ export function* newEntitySaga({ data }) {
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(saveError(err, dataTS));
+    yield put(invalidateEntities(data.path));
   }
 }
 //
@@ -608,20 +609,12 @@ export function* updatePathSaga({ path, args }) {
   }
 }
 
-const backTargetIgnore = ['/edit', '/new', 'login', '/reports'];
+// const backTargetIgnore = ['/edit', '/new', 'login', '/reports'];
 
 export function* closeEntitySaga({ path }) {
   // the close icon is to function like back if possible, otherwise go to default path provided
-  const previousPath = yield select(selectPreviousPathname);
-  const currentPath = yield select(selectCurrentPathname);
-  if (previousPath // previous path exists
-    && previousPath !== currentPath // previous path is not the same as the current path
-    && !find(backTargetIgnore, (target) => previousPath.includes(target)) // and previous path is not one of the edit or login paths
-  ) {
-    yield put(goBack());
-  } else {
-    yield put(push(path || '/'));
-  }
+  const listSearch = yield select(selectListSearch);
+  yield put(push({ pathname: path || '/', search: listSearch }));
 }
 
 /**

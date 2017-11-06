@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { List } from 'immutable';
+import { Map, List } from 'immutable';
 
 import EntityListItemWatch from './EntityListItemWatch';
 import EntityListItemWrapper from './EntityListItemWrapper';
@@ -29,6 +29,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
             scrollContainer={this.props.scrollContainer}
             key={key}
             entity={entity}
+            errors={this.props.errors}
             expandNo={this.props.expandNo}
             entityIdsSelected={this.props.entityIdsSelected}
             renderEntity={(simulate) => this.renderEntity(entity, key, simulate)}
@@ -43,6 +44,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
 EntityListItems.propTypes = {
   entities: PropTypes.instanceOf(List).isRequired,
   entityIdsSelected: PropTypes.instanceOf(List),
+  errors: PropTypes.instanceOf(Map),
   scrollContainer: PropTypes.object,
   expandNo: PropTypes.number,
 };
