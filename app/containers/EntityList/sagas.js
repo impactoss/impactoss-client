@@ -100,6 +100,7 @@ export function* save({ data }) {
   yield put(saveEntity({
     path: data.path,
     entity: data.entity,
+    saveRef: data.saveRef,
     redirect: false,
   }));
 }
@@ -108,6 +109,7 @@ export function* newConnection({ data }) {
   yield put(newEntity({
     path: data.path,
     entity: data.entity,
+    saveRef: data.saveRef,
     redirect: false,
   }));
 }
@@ -116,6 +118,7 @@ export function* deleteConnection({ data }) {
   yield put(deleteEntity({
     path: data.path,
     id: data.id,
+    saveRef: data.saveRef,
     redirect: false,
   }));
 }

@@ -23,6 +23,10 @@ const getEntitySortValueMapper = (entity, sortBy) => {
     case 'recommendations':
     case 'sdgtargets':
       return entity.get(sortBy) || 0;
+    case 'dueDateThenUpdated':
+      return entity.get('due_date')
+        ? entity.getIn(['due_date', 'attributes', 'due_date'])
+        : entity.getIn(['attributes', 'updated_at']);
     default:
       return entity.getIn(['attributes', sortBy]);
   }

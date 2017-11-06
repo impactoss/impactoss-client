@@ -6,7 +6,7 @@ import { USER_ROLES } from 'containers/App/constants';
 
 
 import {
-  usersSetRoles,
+  usersByRole,
   prepareTaxonomiesMultiple,
 } from 'utils/entities';
 
@@ -21,7 +21,7 @@ export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
   (entities, associations) =>
-    usersSetRoles(entities, associations, USER_ROLES.MANAGER)
+    usersByRole(entities, associations, USER_ROLES.MANAGER)
 );
 
 export const selectConnectedTaxonomies = createSelector(

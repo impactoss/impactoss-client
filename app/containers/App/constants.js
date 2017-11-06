@@ -84,11 +84,15 @@ export const DB_DATE_FORMAT = 'YYYY-MM-DD';
 export const SHOW_FOOTER_LOGOS = true;
 
 // map server error messages
-export const RECORD_OUTDATED = 'Record outdated';
-export const EMAIL_FORMAT = 'Email: is not an email';
-export const PASSWORD_MISMATCH = 'Password confirmation doesn\'t match Password';
-export const PASSWORD_SHORT = 'Password is too short (minimum is 6 characters)';
-export const PASSWORD_INVALID = 'Current password is invalid';
+export const SERVER_ERRORS = {
+  RECORD_OUTDATED: 'Record outdated',
+  EMAIL_FORMAT: 'Email: is not an email',
+  PASSWORD_MISMATCH: 'Password confirmation doesn\'t match Password',
+  PASSWORD_SHORT: 'Password is too short (minimum is 6 characters)',
+  PASSWORD_INVALID: 'Current password is invalid',
+  TITLE_REQUIRED: 'Title: can\'t be blank',
+  REFERENCE_REQUIRED: 'Reference: can\'t be blank',
+};
 
 export const PUBLISH_STATUSES = [
   { value: true, label: 'Draft', message: 'ui.publishStatuses.draft' },
@@ -114,10 +118,10 @@ export const SORT_ORDER_OPTIONS = [
 ];
 
 export const USER_ROLES = {
-  NONE: 0,
   ADMIN: 1,
   MANAGER: 2,
   CONTRIBUTOR: 3,
+  DEFAULT: 9999,
 };
 
 export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];

@@ -5,29 +5,30 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import { Map, List, fromJS } from 'immutable';
 
-import { getEntityReference } from 'utils/entities';
+// import { getEntityReference } from 'utils/entities';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
-import Sidebar from 'components/styled/Sidebar';
 
-import EntityListSidebar from 'components/entityList/EntityListSidebar';
-import EntityListMain from 'components/entityList/EntityListMain';
+import EntityListSidebar from 'components/EntityListSidebar';
+import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
+import EntityListMain from 'components/EntityListMain';
 
-import { selectIsUserManager, selectIsUserContributor } from 'containers/App/selectors';
+import { selectHasUserRole, selectCurrentPathname } from 'containers/App/selectors';
 
 import {
   updatePath,
   openNewEntityModal,
 } from 'containers/App/actions';
 
-import appMessages from 'containers/App/messages';
-import { PARAMS, RECORD_OUTDATED } from 'containers/App/constants';
+// import appMessages from 'containers/App/messages';
+import { PARAMS, USER_ROLES } from 'containers/App/constants';
 
 import {
   selectDomain,
@@ -36,8 +37,9 @@ import {
   selectSelectedEntities,
 } from './selectors';
 
+import messages from './messages';
+
 import {
-  resetState,
   resetProgress,
   showPanel,
   save,
@@ -52,6 +54,8 @@ import {
   updatePageItems,
   updateSortBy,
   updateSortOrder,
+  setClientPath,
+  dismissError,
 } from './actions';
 
 const Progress = styled.div`
@@ -68,30 +72,51 @@ const Progress = styled.div`
   z-index: 200;
 `;
 
+const ProgressText = styled.div`
+  font-weight: bold;
+  font-size: 1em;
+  color: ${palette('primary', 2)};
+  margin-bottom: 0.25em;
+  margin-top: -0.5em;
+  overflow: hidden;
+`;
+
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    this.props.resetStateOnMount();
-  }
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.viewDomain.get('sending').size > 0
-      && nextProps.viewDomain.get('errors').size === 0
-      && nextProps.progress > 99.9
-    ) {
-      this.props.resetProgress();
-    }
+    this.props.updateClientPath();
   }
 
-  // formatLabel = (path) => {
-  //   const message = path.split('.').reduce((m, key) => m[key] || m, appMessages);
-  //   return this.context.intl.formatMessage(message);
-  // }
+  mapError = (error, key) =>
+    fromJS({
+      type: error.data.type,
+      error: error.error,
+      key,
+    });
+
+  mapErrors = (errors) => errors.reduce((errorMap, error, key) => {
+    const entityId = error.data.saveRef;
+    return errorMap.has(entityId) // check if error already present for entity
+      ? errorMap.set(entityId, errorMap.get(entityId).push(this.mapError(error, key)))
+      : errorMap.set(entityId, List().push(this.mapError(error, key)));
+  }, Map());
+
+  filterByError = (entities, errors) =>
+    entities.filter((entity) =>
+      errors.has(entity.get('id'))
+    );
 
   render() {
     // make sure selected entities are still actually on page
-    const { entityIdsSelected, entities, progress } = this.props;
-    const errors = this.props.viewDomain.get('errors');
-    const sending = this.props.viewDomain.get('sending');
+    const { entityIdsSelected, progress, viewDomain } = this.props;
+
+    const sending = viewDomain.get('sending');
+    const success = viewDomain.get('success');
+    const errors = viewDomain.get('errors').size > 0 ? this.mapErrors(viewDomain.get('errors')) : Map();
+
+    const entities = (errors.size > 0)
+      ? this.filterByError(this.props.entities, errors)
+      : this.props.entities;
 
     const entityIdsSelectedFiltered = entityIdsSelected.size > 0 && entities
       ? entityIdsSelected.filter((id) => entities.map((entity) => entity.get('id')).includes(id))
@@ -100,12 +125,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     return (
       <div>
         { !this.props.dataReady &&
-          <Sidebar />
+          <EntityListSidebarLoading />
         }
         { this.props.dataReady &&
           <EntityListSidebar
             listUpdating={progress !== null && progress >= 0 && progress < 100}
-            entities={this.props.entities}
+            entities={entities}
             taxonomies={this.props.taxonomies}
             connections={this.props.connections}
             connectedTaxonomies={this.props.connectedTaxonomies}
@@ -116,46 +141,19 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             }
             config={this.props.config}
             locationQuery={this.props.locationQuery}
-            canEdit={this.props.isManager}
-            canFilterDraft={this.props.isContributor}
+            canEdit={this.props.hasUserRole[USER_ROLES.MANAGER]}
+            hasUserRole={this.props.hasUserRole}
             activePanel={this.props.activePanel}
             onPanelSelect={this.props.onPanelSelect}
             onCreateOption={this.props.onCreateOption}
-            onAssign={(associations, activeEditOption) =>
-              this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected)}
+            onUpdate={(associations, activeEditOption) =>
+              this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected, viewDomain.get('errors'))}
           />
-        }
-        { (progress !== null && progress < 100) &&
-          <Progress>
-            <Loading
-              progress={progress}
-            />
-          </Progress>
-        }
-        {(errors.size > 0) &&
-          <Progress error>
-            <Messages
-              type="error"
-              messages={errors.reduce((memo, error, timestamp) =>
-                error.messages
-                ? memo.concat(error.messages.map((message) => {
-                  const recordReference = sending.get(timestamp) && sending.get(timestamp).entity
-                    ? getEntityReference(fromJS(sending.get(timestamp).entity))
-                    : 'unknown';
-                  if (message === RECORD_OUTDATED) {
-                    return this.context.intl.formatMessage(appMessages.forms.outdatedErrorList, { recordReference });
-                  }
-                  return `${this.context.intl.formatMessage(appMessages.forms.otherErrorList, { recordReference })}${message}`;
-                }))
-                : memo
-              , [])}
-              onDismiss={this.props.resetProgress}
-            />
-          </Progress>
         }
         <EntityListMain
           listUpdating={progress !== null && progress >= 0 && progress < 100}
-          entities={this.props.entities}
+          entities={entities}
+          errors={errors}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
@@ -171,8 +169,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           entityTitle={this.props.entityTitle}
 
           dataReady={this.props.dataReady}
-          isManager={this.props.isManager}
-          isContributor={this.props.isContributor}
+          isManager={this.props.hasUserRole[USER_ROLES.MANAGER]}
+          isContributor={this.props.hasUserRole[USER_ROLES.CONTRIBUTOR]}
 
           entityIcon={this.props.entityIcon}
           onEntitySelect={this.props.onEntitySelect}
@@ -184,10 +182,47 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onSearch={this.props.onSearch}
           onPageSelect={this.props.onPageSelect}
           onPageItemsSelect={this.props.onPageItemsSelect}
-          onEntityClick={this.props.onEntityClick}
+          onEntityClick={(id, path) => this.props.onEntityClick(id, path, viewDomain.get('errors'))}
           onSortBy={this.props.onSortBy}
           onSortOrder={this.props.onSortOrder}
+          onDismissError={this.props.onDismissError}
         />
+        { (progress !== null && progress < 100) &&
+          <Progress>
+            <ProgressText>
+              <FormattedMessage
+                {...messages.processingUpdates}
+                values={{
+                  processNo: Math.min(success.size + errors.size + 1, sending.size),
+                  totalNo: sending.size,
+                }}
+              />
+            </ProgressText>
+            <Loading
+              progress={progress}
+            />
+          </Progress>
+        }
+        {(viewDomain.get('errors').size > 0 && progress >= 100) &&
+          <Progress error>
+            <Messages
+              type="error"
+              message={this.context.intl.formatMessage(messages.updatesFailed, { errorNo: viewDomain.get('errors').size })}
+              onDismiss={this.props.resetProgress}
+              preMessage={false}
+            />
+          </Progress>
+        }
+        {(viewDomain.get('errors').size === 0 && progress >= 100) &&
+          <Progress error>
+            <Messages
+              type="success"
+              message={this.context.intl.formatMessage(messages.updatesSuccess, { successNo: viewDomain.get('success').size })}
+              onDismiss={this.props.resetProgress}
+              autoDismiss={2000}
+            />
+          </Progress>
+        }
       </div>
     );
   }
@@ -207,8 +242,7 @@ EntityList.propTypes = {
   entityIcon: PropTypes.func,
   // selector props
   activePanel: PropTypes.string,
-  isManager: PropTypes.bool,
-  isContributor: PropTypes.bool,
+  hasUserRole: PropTypes.object, // { 1: isAdmin, 2: isManager, 3: isContributor}
   entityIdsSelected: PropTypes.object,
   viewDomain: PropTypes.object,
   progress: PropTypes.number,
@@ -225,11 +259,12 @@ EntityList.propTypes = {
   onPageSelect: PropTypes.func.isRequired,
   onPageItemsSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
-  resetStateOnMount: PropTypes.func.isRequired,
   resetProgress: PropTypes.func.isRequired,
+  updateClientPath: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
+  onDismissError: PropTypes.func.isRequired,
 };
 
 EntityList.contextTypes = {
@@ -237,21 +272,25 @@ EntityList.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  isManager: selectIsUserManager(state),
-  isContributor: selectIsUserContributor(state),
+  hasUserRole: selectHasUserRole(state),
   activePanel: selectActivePanel(state),
   entityIdsSelected: selectSelectedEntities(state),
   viewDomain: selectDomain(state),
   progress: selectProgress(state),
+  currentPath: selectCurrentPathname(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
-    resetStateOnMount: () => {
-      dispatch(resetState());
+    onDismissError: (key) => {
+      dispatch(resetProgress());
+      dispatch(dismissError(key));
     },
     resetProgress: () => {
       dispatch(resetProgress());
+    },
+    updateClientPath: () => {
+      dispatch(setClientPath(props.config.clientPath));
     },
     onPanelSelect: (activePanel) => {
       dispatch(showPanel(activePanel));
@@ -259,7 +298,15 @@ function mapDispatchToProps(dispatch, props) {
     onEntitySelect: (id, checked) => {
       dispatch(selectEntity({ id, checked }));
     },
-    onEntityClick: (id, path) => {
+    onEntityClick: (id, path, errors) => {
+      if (errors && errors.size) {
+        dispatch(resetProgress());
+        errors.forEach((error, key) => {
+          if (error.data.saveRef === id) {
+            dispatch(dismissError(key));
+          }
+        });
+      }
       dispatch(updatePath(`/${path || props.config.clientPath}/${id}`));
     },
     onEntitySelectAll: (ids) => {
@@ -324,7 +371,8 @@ function mapDispatchToProps(dispatch, props) {
     onCreateOption: (args) => {
       dispatch(openNewEntityModal(args));
     },
-    handleEditSubmit: (formData, activeEditOption, entityIdsSelected) => {
+    handleEditSubmit: (formData, activeEditOption, entityIdsSelected, errors) => {
+      dispatch(resetProgress());
       const entities = props.entities.filter(
         (entity) => entityIdsSelected.includes(entity.get('id'))
       );
@@ -342,10 +390,19 @@ function mapDispatchToProps(dispatch, props) {
           // take the first TODO multiselect should be run in single value mode and only return 1 value
           const newValue = creates.first();
           entities.forEach((entity) => {
+            if (errors && errors.size) {
+              errors.forEach((error, key) => {
+                if (error.data.saveRef === entity.get('id')) {
+                  dispatch(dismissError(key));
+                }
+              });
+            }
+
             if (entity.getIn(['attributes', activeEditOption.optionId]) !== newValue) {
               dispatch(save(Map()
                 .set('path', props.config.serverPath)
                 .set('entity', entity.setIn(['attributes', activeEditOption.optionId], newValue))
+                .set('saveRef', entity.get('id'))
                 .toJS()
               ));
             }
@@ -359,6 +416,13 @@ function mapDispatchToProps(dispatch, props) {
           .map((option) => option.get('value'));
 
         entities.forEach((entity) => {
+          if (errors && errors.size) {
+            errors.forEach((error, key) => {
+              if (error.data.saveRef === entity.get('id')) {
+                dispatch(dismissError(key));
+              }
+            });
+          }
           let existingAssignments;
           switch (activeEditOption.group) {
             case ('taxonomies'):
@@ -386,6 +450,7 @@ function mapDispatchToProps(dispatch, props) {
                   [activeEditOption.key]: id,
                 },
               },
+              saveRef: entity.get('id'),
             })));
           }
           // delete connections
@@ -396,6 +461,7 @@ function mapDispatchToProps(dispatch, props) {
                 .forEach((assigned, id) => dispatch(deleteConnection({
                   path: activeEditOption.path,
                   id,
+                  saveRef: entity.get('id'),
                 })));
             }
           }

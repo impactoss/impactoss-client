@@ -1,4 +1,4 @@
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
 
 export const DEPENDENCIES = [
   'user_roles',
@@ -89,18 +89,20 @@ export const CONFIG = {
         message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
+        role: USER_ROLES.CONTRIBUTOR,
       },
-      // {
-      //   edit: false,
-      //   filter: true,
-      //   label: 'attributes.manager_id.indicators',
-      //   attribute: 'manager_id',
-      //   extension: {
-      //     key: 'manager',
-      //     label: 'name',
-      //     without: true,
-      //   },
-      // },
+      {
+        search: false,
+        edit: false,
+        message: 'attributes.manager_id.indicators',
+        attribute: 'manager_id',
+        role: USER_ROLES.CONTRIBUTOR,
+        reference: {
+          key: 'manager',
+          label: 'name',
+          without: true,
+        },
+      },
     ],
   },
   expandableColumns: [

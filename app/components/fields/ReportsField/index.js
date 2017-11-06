@@ -54,7 +54,12 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
                 }
                 { !value.dueDate &&
                   <ReportDueDate>
-                    <FormattedMessage {...appMessages.entities.progress_reports.unscheduled} />
+                    <FormattedMessage {...appMessages.entities.progress_reports.unscheduled_short} />
+                    { value.updatedAt &&
+                      <span>
+                        {` (${this.context.intl.formatDate(new Date(value.updatedAt))})`}
+                      </span>
+                    }
                   </ReportDueDate>
                 }
                 {value.label}
@@ -88,6 +93,10 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
 
 ReportsField.propTypes = {
   field: PropTypes.object.isRequired,
+};
+
+ReportsField.contextTypes = {
+  intl: PropTypes.object,
 };
 
 export default ReportsField;

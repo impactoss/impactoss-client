@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { reduce } from 'lodash/collection';
 
 import appMessage from 'utils/app-message';
 import { lowerCase } from 'utils/string';
@@ -50,10 +51,20 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     };
   }
   getFilterLabel = (filter) => {
+    // not used I think?
     if (filter.message) {
       return filter.messagePrefix
         ? `${filter.messagePrefix} ${lowerCase(appMessage(this.context.intl, filter.message))}`
         : appMessage(this.context.intl, filter.message);
+    }
+    // <<< not used?
+    if (filter.labels) {
+      return reduce(filter.labels, (memo, label) => {
+        if (!label.label) return memo;
+        let labelValue = label.appMessage ? appMessage(this.context.intl, label.label) : label.label;
+        labelValue = label.postfix ? `${labelValue}${label.postfix}` : labelValue;
+        return `${memo}${label.lowerCase ? lowerCase(labelValue) : labelValue} `;
+      }, '').trim();
     }
     return filter.label;
   }
@@ -83,9 +94,12 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                   palette={filter.type}
                   paletteHover={`${filter.type}Hover`}
                   pIndex={parseInt(filter.id, 10) || 0}
+                  disabled={!filter.onClick}
                 >
                   {this.getFilterLabel(filter)}
-                  <Icon name="removeSmall" text textRight />
+                  { filter.onClick &&
+                    <Icon name="removeSmall" text textRight />
+                  }
                 </ButtonTagFilterInverse>
               )
               : (
@@ -95,9 +109,12 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                   palette={filter.type}
                   paletteHover={`${filter.type}Hover`}
                   pIndex={parseInt(filter.id, 10) || 0}
+                  disabled={!filter.onClick}
                 >
                   {this.getFilterLabel(filter)}
-                  <Icon name="removeSmall" text textRight />
+                  { filter.onClick &&
+                    <Icon name="removeSmall" text textRight />
+                  }
                 </ButtonTagFilter>
               )
             )

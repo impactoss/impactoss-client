@@ -82,6 +82,7 @@ export const selectSessionUserRoles = createSelector(
     : Map()
 );
 
+
 export const selectIsUserAdmin = createSelector(
   selectSessionUserRoles,
   (userRoles) => userRoles.includes(USER_ROLES.ADMIN)
@@ -98,6 +99,34 @@ export const selectIsUserContributor = createSelector(
   (userRoles) => userRoles.includes(USER_ROLES.CONTRIBUTOR)
     || userRoles.includes(USER_ROLES.MANAGER)
     || userRoles.includes(USER_ROLES.ADMIN)
+);
+
+
+export const selectHasUserRole = createSelector(
+  selectIsUserAdmin,
+  selectIsUserManager,
+  selectIsUserContributor,
+  (isAdmin, isManager, isContributor) => ({
+    1: isAdmin,
+    2: isManager,
+    3: isContributor,
+  })
+);
+
+export const selectSessionUserHighestRoleId = createSelector(
+  selectSessionUserRoles,
+  (userRoles) => {
+    if (userRoles.includes(USER_ROLES.ADMIN)) {
+      return USER_ROLES.ADMIN;
+    }
+    if (userRoles.includes(USER_ROLES.MANAGER)) {
+      return USER_ROLES.MANAGER;
+    }
+    if (userRoles.includes(USER_ROLES.CONTRIBUTOR)) {
+      return USER_ROLES.CONTRIBUTOR;
+    }
+    return USER_ROLES.DEFAULT;
+  }
 );
 
 
@@ -161,6 +190,17 @@ export const selectPreviousPathname = createSelector(
   (routeState) => {
     try {
       return routeState.getIn(['locationBeforeTransitions', 'pathnamePrevious']);
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
+export const selectListSearch = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.getIn(['locationBeforeTransitions', 'listSearch']);
     } catch (error) {
       return null;
     }

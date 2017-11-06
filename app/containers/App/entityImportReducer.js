@@ -27,7 +27,12 @@ export const entityImportReducer = (state = initialState, action) => {
     case SAVE_SUCCESS:
       return action.data ? state.setIn(['success', action.data.timestamp], action.data) : state;
     case SAVE_ERROR:
-      return action.data ? state.setIn(['errors', action.data.timestamp], checkResponseError(action.error)) : state;
+      return action.data
+        ? state.setIn(
+          ['errors', action.data.timestamp],
+          { data: action.data, error: checkResponseError(action.error) }
+        )
+        : state;
     default:
       return state;
   }

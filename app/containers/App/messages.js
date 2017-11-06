@@ -103,15 +103,15 @@ export default defineMessages({
     },
     outdatedError: {
       id: 'app.containers.App.forms.outdatedError',
-      defaultMessage: 'Sorry, this record has become outdated. Please review the latest server version below.',
+      defaultMessage: 'Item outdated: this item had been updated on the server. Please review the latest server version below.',
     },
-    outdatedErrorList: {
-      id: 'app.containers.App.forms.outdatedErrorList',
-      defaultMessage: 'Record {recordReference}: Sorry, this record has become outdated in the meantime. Please review the latest server version above.',
+    titleRequiredError: {
+      id: 'app.containers.App.forms.titleRequiredError',
+      defaultMessage: '"Title" is required. ',
     },
-    otherErrorList: {
-      id: 'app.containers.App.forms.otherErrorList',
-      defaultMessage: 'Record {recordReference}: ',
+    referenceRequiredError: {
+      id: 'app.containers.App.forms.referenceRequiredError',
+      defaultMessage: '"Reference" is required. ',
     },
   },
   hints: {

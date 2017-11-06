@@ -224,7 +224,7 @@ export const prepareCategory = (category, users, taxonomies) =>
     users
   );
 
-export const usersSetRoles = (users, userRoles, roleId) =>
+export const usersByRole = (users, userRoles, roleId) =>
   users && users
   .filter((user) => {
     const roles = userRoles.filter((association) =>
