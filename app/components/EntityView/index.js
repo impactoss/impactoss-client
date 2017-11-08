@@ -5,6 +5,8 @@
 */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { reduce } from 'lodash/collection';
+
 import asArray from 'utils/as-array';
 
 import FieldGroup from 'components/fields/FieldGroup';
@@ -14,12 +16,14 @@ import Aside from './Aside';
 import ViewWrapper from './ViewWrapper';
 import ViewPanel from './ViewPanel';
 
+const hasFields = (fieldGroup) => fieldGroup.fields && reduce(fieldGroup.fields, (memo, field) => memo && field, true);
 
 class EntityView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
   renderMain = (fieldGroups, aside = true, seamless = false) => (
     <Main aside={aside}>
       {
-        asArray(fieldGroups).map((fieldGroup, i, list) => fieldGroup && fieldGroup.fields && (
+        asArray(fieldGroups).map((fieldGroup, i, list) => fieldGroup && hasFields(fieldGroup) && (
           <ViewPanel key={i} borderRight={aside} borderBottom={i < (list.length - 1)}>
             <FieldGroup group={fieldGroup} seamless={seamless} />
           </ViewPanel>
