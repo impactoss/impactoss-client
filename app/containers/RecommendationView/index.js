@@ -18,6 +18,7 @@ import {
   getMarkdownField,
   getMeasureConnectionField,
   getTaxonomyFields,
+  hasTaxonomyCategories,
 } from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
@@ -108,11 +109,13 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   ]);
 
   getBodyAsideFields = (taxonomies) => ([ // fieldGroups
-    { // fieldGroup
+    hasTaxonomyCategories(taxonomies)
+    ? { // fieldGroup
       label: appMessages.entities.taxonomies.plural,
       icon: 'categories',
       fields: getTaxonomyFields(taxonomies, appMessages),
-    },
+    }
+    : null,
   ]);
 
   render() {
