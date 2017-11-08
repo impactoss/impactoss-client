@@ -187,9 +187,8 @@ export function* logoutSaga() {
   try {
     yield call(apiRequest, 'delete', 'auth/sign_out');
     yield call(clearAuthValues);
-    yield put(logoutSuccess());
     yield put(push('/login'));
-    // yield put(invalidateEntities());
+    yield put(logoutSuccess());
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));
