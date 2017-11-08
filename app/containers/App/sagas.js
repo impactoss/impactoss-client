@@ -189,7 +189,7 @@ export function* logoutSaga() {
     yield call(clearAuthValues);
     yield put(logoutSuccess());
     yield put(push('/login'));
-    yield put(invalidateEntities());
+    // yield put(invalidateEntities());
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));
