@@ -12,10 +12,10 @@ import Label from 'components/fields/Label';
 
 class FieldGroup extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { group, seemless } = this.props;
+    const { group, seamless } = this.props;
 
     return (
-      <FieldGroupWrapper type={group.type} seemless={seemless}>
+      <FieldGroupWrapper type={group.type} seamless={seamless}>
         { group.label &&
           <FieldGroupLabel>
             { group.icon &&
@@ -40,7 +40,7 @@ class FieldGroup extends React.PureComponent { // eslint-disable-line react/pref
 }
 FieldGroup.propTypes = {
   group: PropTypes.object.isRequired,
-  seemless: PropTypes.bool,
+  seamless: PropTypes.bool,
   aside: PropTypes.bool,
 };
 
