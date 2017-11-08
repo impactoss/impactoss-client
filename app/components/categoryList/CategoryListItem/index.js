@@ -32,9 +32,10 @@ const BarWrapInner = styled.div`
 `;
 const Bar = styled.div`
   width:${(props) => props.length}%;
-  height: 2em;
-  background-color: ${(props) => palette(props.palette, 0)};
+  height: 1.6em;
+  background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
   vertical-align: middle;
+  display: inline-block;
 `;
 const Count = styled.div`
   display: table-cell;
@@ -46,17 +47,27 @@ const Count = styled.div`
   color: ${(props) => palette(props.palette, 0)};
   padding-right: 5px;
 `;
+const CountLight = styled(Count)`
+  display: inline-block;
+  width: auto;
+  text-align: left;
+  vertical-align: middle;
+  padding-right: 0;
+  padding-left: 5px;
+  color: ${(props) => palette(props.palette, 1)};
+`;
 const Title = styled.span`
   font-size: 1.1em;
   line-height: 1.6;
 `;
 const Reference = styled.span`
   padding-right: 0.5em;
-  opacity:0.6;
+  opacity: 0.6;
 `;
 
 class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   renderColumnContent = (col, category) => {
+    const count = category.counts[col.countsIndex];
     switch (col.type) {
       case ('title'):
         return (
@@ -68,17 +79,45 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
           </Title>
         );
       case ('count'):
-        return (
+        return (count.accepted === null || typeof count.accepted === 'undefined')
+        ? (
           <BarWrap>
             <Count palette={col.entity}>
-              {category.counts[col.countsIndex]}
+              {count.public}
             </Count>
             <BarWrapInner>
-              { category.counts[col.countsIndex] > 0 &&
+              { count.public > 0 &&
                 <Bar
-                  length={(category.counts[col.countsIndex] / col.maxCount) * 100}
+                  length={(count.public / col.maxCount) * 100}
                   palette={col.entity}
                 />
+              }
+            </BarWrapInner>
+          </BarWrap>
+        )
+        : (
+          <BarWrap>
+            <Count palette={col.entity}>
+              {count.accepted}
+            </Count>
+            <BarWrapInner>
+              { count.accepted > 0 &&
+                <Bar
+                  length={(count.accepted / col.maxCount) * 100}
+                  palette={col.entity}
+                />
+              }
+              { count.noted > 0 &&
+                <Bar
+                  length={(count.noted / col.maxCount) * 100}
+                  palette={col.entity}
+                  pIndex={1}
+                />
+              }
+              { count.noted > 0 &&
+                <CountLight palette={col.entity}>
+                  {count.noted}
+                </CountLight>
               }
             </BarWrapInner>
           </BarWrap>
@@ -89,6 +128,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
   };
   render() {
     const { category, columns } = this.props;
+
     return (
       <Styled onClick={() => category.onLink()}>
         {

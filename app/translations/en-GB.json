@@ -318,7 +318,7 @@
   "app.containers.App.ui.docPublishStatuses.public" : "Public",
   "app.containers.App.ui.docPublishStatuses.private" : "Private",
   "app.containers.App.ui.acceptedStatuses.accepted" : "Accepted",
-  "app.containers.App.ui.publishStatuses.noted" : "Noted",
+  "app.containers.App.ui.acceptedStatuses.noted" : "Not accepted",
   "app.containers.App.ui.reportFrequencies.monthly" : "Monthly",
   "app.containers.App.ui.reportFrequencies.quarterly" : "Quarterly",
   "app.containers.App.ui.reportFrequencies.semiannual" : "Semiannual",
