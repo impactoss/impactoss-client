@@ -61,9 +61,7 @@ const initialState = fromJS({
 function appReducer(state = initialState, payload) {
   switch (payload.type) {
     case LOGOUT_SUCCESS:
-      return state
-          .setIn(['user', 'attributes'], null)
-          .setIn(['user', 'isSignedIn'], false);
+      return initialState.setIn(['user', 'isSignedIn'], false);
     case AUTHENTICATE_SUCCESS:
       return state
           .setIn(['user', 'attributes'], payload.user)
