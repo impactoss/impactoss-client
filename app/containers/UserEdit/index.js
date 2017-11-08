@@ -124,8 +124,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
   getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
-      icon: 'categories',
       fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);

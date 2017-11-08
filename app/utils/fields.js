@@ -179,6 +179,11 @@ export const getTaxonomyFields = (taxonomies, appMessages) =>
     values: mapCategoryOptions(taxonomy.get('categories')),
   })).toArray();
 
+export const hasTaxonomyCategories = (taxonomies) =>
+  taxonomies
+  ? taxonomies.reduce((counter, taxonomy) => counter + taxonomy.get('categories').size, 0) > 0
+  : false;
+
 const getCategoryShortTitle = (category) => {
   const title = (
     category.getIn(['attributes', 'short_title'])
