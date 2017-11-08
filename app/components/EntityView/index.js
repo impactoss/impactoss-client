@@ -16,7 +16,7 @@ import Aside from './Aside';
 import ViewWrapper from './ViewWrapper';
 import ViewPanel from './ViewPanel';
 
-const hasFields = (fieldGroup) => fieldGroup.fields && reduce(fieldGroup.fields, (memo, field) => memo && field, true);
+const hasFields = (fieldGroup) => fieldGroup.fields && reduce(fieldGroup.fields, (memo, field) => memo || field, false);
 
 class EntityView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 

@@ -181,7 +181,7 @@ export const getTaxonomyFields = (taxonomies, appMessages) =>
 
 export const hasTaxonomyCategories = (taxonomies) =>
   taxonomies
-  ? taxonomies.reduce((counter, taxonomy) => counter + taxonomy.get('categories').size, 0) > 0
+  ? taxonomies.reduce((memo, taxonomy) => memo || (taxonomy.get('categories') && taxonomy.get('categories').size > 0), false)
   : false;
 
 const getCategoryShortTitle = (category) => {
