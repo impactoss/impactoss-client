@@ -219,7 +219,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 },
                 body: {
                   main: this.getBodyMainFields(),
-                  aside: (sessionUserHighestRoleId >= USER_ROLES.MANAGER) && this.getBodyAsideFields(taxonomies, onCreateOption),
+                  aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER) && this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
