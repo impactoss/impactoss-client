@@ -89,8 +89,8 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getIndicatorConnectionField(indicators, indicatorConnections, appMessages, onEntityClick),
         getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
+        getIndicatorConnectionField(indicators, indicatorConnections, appMessages, onEntityClick),
       ],
     },
   ]);
