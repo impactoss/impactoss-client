@@ -9,7 +9,7 @@ const Styled = styled.button`
   text-align: left;
   background-color: ${palette('primary', 4)};
   margin: 0;
-  padding: 1em;
+  padding: 1em 0;
   display: block;
   margin-bottom: 2px;
   &:hover {
@@ -23,12 +23,9 @@ const Column = styled.div`
 `;
 const BarWrap = styled.div`
   width:100%;
-  display: table;
   vertical-align: middle;
-`;
-const BarWrapInner = styled.div`
-  display: table-cell;
-  vertical-align: middle;
+  padding-left: 2.5em;
+  padding-right: ${(props) => props.secondary ? 1.5 : 1}em;
 `;
 const Bar = styled.div`
   width:${(props) => props.length}%;
@@ -36,29 +33,30 @@ const Bar = styled.div`
   background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
   vertical-align: middle;
   display: inline-block;
+  position: relative;
 `;
 const Count = styled.div`
-  display: table-cell;
-  width: 40px;
   font-weight: bold;
-  text-align: right;
-  vertical-align: middle;
+  position: absolute;
   font-size: 1.1em;
-  color: ${(props) => palette(props.palette, 0)};
+  line-height: 1.6;
+  right: 100%;
+  text-align: right;
   padding-right: 5px;
+  color: ${(props) => palette(props.palette, 0)};
 `;
-const CountLight = styled(Count)`
-  display: inline-block;
-  width: auto;
+const CountSecondary = styled(Count)`
+  left: 100%;
   text-align: left;
-  vertical-align: middle;
   padding-right: 0;
   padding-left: 5px;
   color: ${(props) => palette(props.palette, 1)};
 `;
-const Title = styled.span`
+const Title = styled.div`
+  display: inline-block;
   font-size: 1.1em;
   line-height: 1.6;
+  padding: 0 1em;
 `;
 const Reference = styled.span`
   padding-right: 0.5em;
@@ -82,44 +80,37 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
         return (count.accepted === null || typeof count.accepted === 'undefined')
         ? (
           <BarWrap>
-            <Count palette={col.entity}>
-              {count.public}
-            </Count>
-            <BarWrapInner>
-              { count.public > 0 &&
-                <Bar
-                  length={(count.public / col.maxCount) * 100}
-                  palette={col.entity}
-                />
-              }
-            </BarWrapInner>
+            <Bar
+              length={(count.public / col.maxCount) * 100}
+              palette={col.entity}
+            >
+              <Count palette={col.entity}>
+                {count.public}
+              </Count>
+            </Bar>
           </BarWrap>
         )
         : (
-          <BarWrap>
-            <Count palette={col.entity}>
-              {count.accepted}
-            </Count>
-            <BarWrapInner>
-              { count.accepted > 0 &&
-                <Bar
-                  length={(count.accepted / col.maxCount) * 100}
-                  palette={col.entity}
-                />
-              }
-              { count.noted > 0 &&
-                <Bar
-                  length={(count.noted / col.maxCount) * 100}
-                  palette={col.entity}
-                  pIndex={1}
-                />
-              }
-              { count.noted > 0 &&
-                <CountLight palette={col.entity}>
+          <BarWrap secondary>
+            <Bar
+              length={(count.accepted / col.maxCount) * 100}
+              palette={col.entity}
+            >
+              <Count palette={col.entity}>
+                {count.accepted}
+              </Count>
+            </Bar>
+            { count.noted > 0 &&
+              <Bar
+                length={(count.noted / col.maxCount) * 100}
+                palette={col.entity}
+                pIndex={1}
+              >
+                <CountSecondary palette={col.entity}>
                   {count.noted}
-                </CountLight>
-              }
-            </BarWrapInner>
+                </CountSecondary>
+              </Bar>
+            }
           </BarWrap>
         );
       default:
