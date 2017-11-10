@@ -4,7 +4,11 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import { SHOW_HEADER_TITLE } from 'themes/config';
+import logo from 'themes/media/headerLogo.png';
+import logo2x from 'themes/media/headerLogo@2x.png';
 import appMessages from 'containers/App/messages';
+
 import messages from './messages';
 
 import Logo from './Logo';
@@ -20,7 +24,6 @@ import LinkAccount from './LinkAccount';
 import NavMain from './NavMain';
 import LinkMain from './LinkMain';
 
-import logo from './sadataLogo.png';
 
 const Styled = styled.div`
   position: ${(props) => props.isHome ? 'relative' : 'absolute'};
@@ -43,21 +46,27 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
 
   render() {
     const { pages, navItems, isSignedIn, currentPath, isHome } = this.props;
-
+    const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
     return (
       <Styled isHome={isHome}>
         <Banner showPattern={!isHome} isHome={isHome}>
           { !isHome &&
-            <Brand href={'/'} onClick={(evt) => this.onClick(evt, '/')}>
-              <Logo src={logo} alt="logo" />
-              <BrandText>
-                <BrandTitle>
-                  <FormattedMessage {...appMessages.app.title} />
-                </BrandTitle>
-                <BrandClaim>
-                  <FormattedMessage {...appMessages.app.claim} />
-                </BrandClaim>
-              </BrandText>
+            <Brand
+              href={'/'}
+              onClick={(evt) => this.onClick(evt, '/')}
+              title={appTitle}
+            >
+              <Logo src={[logo, logo2x]} alt={appTitle} />
+              { SHOW_HEADER_TITLE &&
+                <BrandText>
+                  <BrandTitle>
+                    <FormattedMessage {...appMessages.app.title} />
+                  </BrandTitle>
+                  <BrandClaim>
+                    <FormattedMessage {...appMessages.app.claim} />
+                  </BrandClaim>
+                </BrandText>
+              }
             </Brand>
           }
           <NavAccount>
@@ -122,6 +131,10 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     );
   }
 }
+
+Header.contextTypes = {
+  intl: PropTypes.object.isRequired,
+};
 
 Header.propTypes = {
   isSignedIn: PropTypes.bool,

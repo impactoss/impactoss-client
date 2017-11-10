@@ -12,7 +12,7 @@ import { find } from 'lodash/collection';
 import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { ACCEPTED_STATUSES } from 'containers/App/constants';
+import { ACCEPTED_STATUSES } from 'themes/config';
 import {
   selectReady,
   selectRecommendationTaxonomies,

@@ -12,8 +12,8 @@ import { isEqual } from 'lodash/lang';
 
 import Icon from 'components/Icon';
 import SelectReset from 'components/SelectReset';
-import { PAGE_ITEM_OPTIONS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
+import { PAGE_ITEM_OPTIONS } from 'themes/config';
 
 const Styled = styled.div`
   padding-top: 0.5em;

@@ -1,4 +1,4 @@
-import { USER_ROLES } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import {
   selectIsSignedIn,
   selectSessionUserRoles,
@@ -21,8 +21,8 @@ export function replaceAlreadySignedIn(replace, info = 'alreadySignedIn') {
 
 export function hasRoleRequired(roleIds, roleRequired) {
   return roleIds.includes(roleRequired)
-  || (roleRequired === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
-  || (roleRequired === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)));
+  || (roleRequired === USER_ROLES.MANAGER.value && roleIds.includes(USER_ROLES.ADMIN.value))
+  || (roleRequired === USER_ROLES.CONTRIBUTOR.value && (roleIds.includes(USER_ROLES.MANAGER.value) || roleIds.includes(USER_ROLES.ADMIN.value)));
 }
 
 function redirectIfSignedIn(store) {

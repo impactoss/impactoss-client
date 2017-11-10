@@ -4,7 +4,7 @@
  *
  */
 import { fromJS } from 'immutable';
-import { REPORT_FREQUENCIES } from 'containers/App/constants';
+import { REPORT_FREQUENCIES } from 'themes/config';
 
 export const SAVE = 'impactoss/IndicatorEdit/SAVE';
 

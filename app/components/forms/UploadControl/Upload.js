@@ -8,7 +8,7 @@ import { palette } from 'styled-theme';
 import { getPathFromUrl } from 'utils/string';
 
 import appMessages from 'containers/App/messages';
-import { API_ENDPOINT, SIGNING_URL_ENDPOINT } from 'containers/App/constants';
+import { API_ENDPOINT, SIGNING_URL_ENDPOINT } from 'themes/config';
 
 import Icon from 'components/Icon';
 import DocumentView from 'components/DocumentView';

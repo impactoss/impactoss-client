@@ -2,8 +2,7 @@ import { createSelector } from 'reselect';
 
 import { selectEntities } from 'containers/App/selectors';
 
-import { USER_ROLES } from 'containers/App/constants';
-
+import { USER_ROLES } from 'themes/config';
 
 import {
   usersByRole,
@@ -21,7 +20,7 @@ export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
   (entities, associations) =>
-    usersByRole(entities, associations, USER_ROLES.MANAGER)
+    usersByRole(entities, associations, USER_ROLES.MANAGER.value)
 );
 
 export const selectConnectedTaxonomies = createSelector(

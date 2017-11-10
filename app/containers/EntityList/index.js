@@ -28,7 +28,8 @@ import {
 } from 'containers/App/actions';
 
 // import appMessages from 'containers/App/messages';
-import { PARAMS, USER_ROLES } from 'containers/App/constants';
+import { PARAMS } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 
 import {
   selectDomain,
@@ -141,7 +142,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             }
             config={this.props.config}
             locationQuery={this.props.locationQuery}
-            canEdit={this.props.hasUserRole[USER_ROLES.MANAGER]}
+            canEdit={this.props.hasUserRole[USER_ROLES.MANAGER.value]}
             hasUserRole={this.props.hasUserRole}
             activePanel={this.props.activePanel}
             onPanelSelect={this.props.onPanelSelect}
@@ -169,8 +170,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           entityTitle={this.props.entityTitle}
 
           dataReady={this.props.dataReady}
-          isManager={this.props.hasUserRole[USER_ROLES.MANAGER]}
-          isContributor={this.props.hasUserRole[USER_ROLES.CONTRIBUTOR]}
+          isManager={this.props.hasUserRole[USER_ROLES.MANAGER.value]}
+          isContributor={this.props.hasUserRole[USER_ROLES.CONTRIBUTOR.value]}
 
           entityIcon={this.props.entityIcon}
           onEntitySelect={this.props.onEntitySelect}

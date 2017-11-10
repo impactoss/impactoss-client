@@ -7,10 +7,11 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import RetinaImage from 'react-retina-image';
 
 function Img(props) {
   return (
-    <img className={props.className} src={props.src} alt={props.alt} />
+    <RetinaImage className={props.className} src={props.src} alt={props.alt} />
   );
 }
 
@@ -18,7 +19,7 @@ function Img(props) {
 Img.propTypes = {
   src: PropTypes.oneOfType([
     PropTypes.string,
-    PropTypes.object,
+    PropTypes.array,
   ]).isRequired,
   alt: PropTypes.string.isRequired,
   className: PropTypes.string,

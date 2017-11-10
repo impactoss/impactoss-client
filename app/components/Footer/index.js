@@ -9,17 +9,25 @@ import NormalImg from 'components/Img';
 import Container from 'components/styled/Container';
 import Row from 'components/styled/Row';
 
-import { SHOW_FOOTER_LOGOS } from 'containers/App/constants';
+import { SHOW_FOOTER_LOGOS } from 'themes/config';
 
-import partner1 from 'media/partner1.png';
-import partner2 from 'media/partner2.png';
-import partner3 from 'media/partner3.png';
-import partner4 from 'media/partner4.png';
-// const footerImages = requireAll(require.context('media/footer', true, /^\.\/.*\.png$/));
+import partner1 from 'themes/media/partner1.png';
+import partner2 from 'themes/media/partner2.png';
+import partner3 from 'themes/media/partner3.png';
+import partner4 from 'themes/media/partner4.png';
+import partner1x2x from 'themes/media/partner1@2x.png';
+import partner2x2x from 'themes/media/partner2@2x.png';
+import partner3x2x from 'themes/media/partner3@2x.png';
+import partner4x2x from 'themes/media/partner4@2x.png';
 
 import messages from './messages';
 
-const importLogos = [partner1, partner2, partner3, partner4];
+const importLogos = [
+  [partner1, partner1x2x],
+  [partner2, partner2x2x],
+  [partner3, partner3x2x],
+  [partner4, partner4x2x],
+];
 
 const FooterMain = styled.div`
   background-color: ${palette('secondary', 1)};

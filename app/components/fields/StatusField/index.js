@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import appMessage from 'utils/app-message';
 import appMessages from 'containers/App/messages';
 
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES } from 'themes/config';
 
 import Label from 'components/fields/Label';
 import FieldWrapInline from 'components/fields/FieldWrapInline';

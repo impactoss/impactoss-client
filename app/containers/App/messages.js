@@ -754,10 +754,6 @@ export default defineMessages({
         id: 'app.containers.App.entities.roles.plural',
         defaultMessage: 'User roles',
       },
-      defaultRole: {
-        id: 'app.containers.App.entities.user_roles.defaultRole',
-        defaultMessage: 'No role assigned',
-      },
     },
   },
   messages: {
@@ -787,6 +783,24 @@ export default defineMessages({
     },
   },
   ui: {
+    userRoles: {
+      admin: {
+        id: 'app.containers.App.ui.userRoles.admin',
+        defaultMessage: 'Administrator',
+      },
+      manager: {
+        id: 'app.containers.App.ui.userRoles.manager',
+        defaultMessage: 'Manager',
+      },
+      contributor: {
+        id: 'app.containers.App.ui.userRoles.contributor',
+        defaultMessage: 'Contributor',
+      },
+      default: {
+        id: 'app.containers.App.ui.userRoles.default',
+        defaultMessage: 'Guest (no role assigned)',
+      },
+    },
     publishStatuses: {
       draft: {
         id: 'app.containers.App.ui.publishStatuses.draft',

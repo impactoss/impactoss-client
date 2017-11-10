@@ -1,4 +1,4 @@
-import { PUBLISH_STATUSES, USER_ROLES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES } from 'themes/config';
 
 export const DEPENDENCIES = [
   'user_roles',
@@ -89,14 +89,14 @@ export const CONFIG = {
         message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
-        role: USER_ROLES.CONTRIBUTOR,
+        role: USER_ROLES.CONTRIBUTOR.value,
       },
       {
         search: false,
         edit: false,
         message: 'attributes.manager_id.indicators',
         attribute: 'manager_id',
-        role: USER_ROLES.CONTRIBUTOR,
+        role: USER_ROLES.CONTRIBUTOR.value,
         reference: {
           key: 'manager',
           label: 'name',

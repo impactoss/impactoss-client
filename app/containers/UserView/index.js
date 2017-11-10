@@ -20,7 +20,8 @@ import {
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE, USER_ROLES } from 'containers/App/constants';
+import { CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -73,7 +74,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
         onClick: () => handleEditPassword(userId),
       });
     }
-    if (sessionUserHighestRoleId === USER_ROLES.ADMIN // is admin
+    if (sessionUserHighestRoleId === USER_ROLES.ADMIN.value // is admin
       || userId === sessionUserId // own profile
       || sessionUserHighestRoleId < this.getHighestUserRoleId(user.get('roles'))
     ) {
@@ -95,7 +96,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
   getHeaderAsideFields = (entity) => ([{
     fields: [
-      getRoleField(entity, this.context.intl.formatMessage, appMessages),
+      getRoleField(entity),
       getMetaField(entity, appMessages),
     ],
   }]);
@@ -114,12 +115,12 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
   getHighestUserRoleId = (roles) =>
     roles.reduce((memo, role) =>
       (role.get('id') < memo) ? role.get('id') : memo
-      , USER_ROLES.DEFAULT
+      , USER_ROLES.DEFAULT.value
     );
 
   render() {
     const { user, dataReady, sessionUserHighestRoleId, taxonomies } = this.props;
-    const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER;
+    const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
     return (
       <div>
         <Helmet
