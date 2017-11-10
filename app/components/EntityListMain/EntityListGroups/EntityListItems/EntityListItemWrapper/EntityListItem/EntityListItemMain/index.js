@@ -8,6 +8,7 @@ import { Map } from 'immutable';
 import { truncateText } from 'utils/string';
 import Component from 'components/styled/Component';
 import Clear from 'components/styled/Clear';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
@@ -86,7 +87,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     const role = roles.find((r) => parseInt(r.get('id'), 10) === entityRoles.first());
     // console.log('roles entityRoles.first()', entityRoles.first())
     // console.log('roles role', role)
-    return role ? role.getIn(['attributes', 'friendly_name']) : '';
+    return role ? parseInt(role.get('id'), 10) : USER_ROLES.DEFAULT.value;
   }
 
   mapToEntityListItem = ({

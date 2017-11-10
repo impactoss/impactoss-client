@@ -12,7 +12,8 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { fromJS } from 'immutable';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 
 import {
   redirectIfNotPermitted,
@@ -156,7 +157,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(formActions.load(model, formData));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     handleSubmit: (formData) => {
       if (formData.get('import') !== null) {

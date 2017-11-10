@@ -217,6 +217,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
             without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
           },
+          this.context.intl
         );
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
         const entitiesSelected = entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));

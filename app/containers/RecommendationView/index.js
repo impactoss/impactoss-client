@@ -23,7 +23,8 @@ import {
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE, ACCEPTED_STATUSES } from 'containers/App/constants';
+import { CONTENT_SINGLE } from 'containers/App/constants';
+import { ACCEPTED_STATUSES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';

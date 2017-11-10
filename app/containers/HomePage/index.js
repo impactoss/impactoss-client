@@ -13,12 +13,6 @@ import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
 import Row from 'components/styled/Row';
 
-// import {
-//   selectReady,
-//   selectEntities,
-//   selectEntitiesWhere,
-// } from 'containers/App/selectors';
-
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import ButtonHero from 'components/buttons/ButtonHero';
@@ -26,11 +20,12 @@ import NormalImg from 'components/Img';
 import Footer from 'components/Footer';
 
 import appMessages from 'containers/App/messages';
-import { DB_TABLES } from 'containers/App/constants';
-import messages from './messages';
-// import { DEPENDENCIES } from './constants';
 
-import graphicHome from './graphicHome.png';
+import { DB_TABLES, SHOW_HOME_TITLE } from 'themes/config';
+import graphicHome from 'themes/media/homeGraphic.png';
+import graphicHome2x from 'themes/media/homeGraphic@2x.png';
+
+import messages from './messages';
 
 const GraphicHome = styled(NormalImg)`
   width: 100%;
@@ -49,15 +44,15 @@ const TopActions = styled.div`
 `;
 const Title = styled.h1`
   color:${palette('headerBrand', 0)};
-  font-family: ${(props) => props.theme.fonts.homeBrandMain};
-  font-size: ${(props) => props.theme.sizes.homeBrandMain};
+  font-family: ${(props) => props.theme.fonts.brandMain};
+  font-size: ${(props) => props.theme.sizes.brandMain.home};
   text-transform: uppercase;
 `;
 
 const Claim = styled.p`
   color: ${palette('headerBrand', 1)};
-  font-family: ${(props) => props.theme.fonts.homeBrandClaim};
-  font-size: ${(props) => props.theme.sizes.homeBrandClaim};
+  font-family: ${(props) => props.theme.fonts.brandClaim};
+  font-size: ${(props) => props.theme.sizes.brandClaim.home};
   font-weight: 100;
   margin-left: auto;
   margin-right: auto;
@@ -65,7 +60,6 @@ const Claim = styled.p`
 `;
 
 const Intro = styled.p`
-  font-family: ${(props) => props.theme.fonts.secondary};
   font-size: 1.25em;
   width: 80%;
   margin-left: auto;
@@ -91,6 +85,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 
   render() {
     const { onPageLink } = this.props;
+    const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
 
     return (
       <div>
@@ -101,16 +96,24 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <SectionTop>
-          <GraphicHome src={graphicHome} alt={this.context.intl.formatMessage(messages.pageTitle)} />
+          <GraphicHome src={[graphicHome, graphicHome2x]} alt={appTitle} />
+          { SHOW_HOME_TITLE &&
+            <Row>
+              <Grid sm={1 / 6} />
+              <Grid sm={4 / 6}>
+                <Title>
+                  <FormattedMessage {...appMessages.app.title} />
+                </Title>
+                <Claim>
+                  <FormattedMessage {...appMessages.app.claim} />
+                </Claim>
+              </Grid>
+              <Grid sm={1 / 6} />
+            </Row>
+          }
           <Row>
             <Grid sm={1 / 6} />
             <Grid sm={4 / 6}>
-              <Title>
-                <FormattedMessage {...appMessages.app.title} />
-              </Title>
-              <Claim>
-                <FormattedMessage {...appMessages.app.claim} />
-              </Claim>
               <Intro>
                 <FormattedMessage {...messages.intro} />
               </Intro>

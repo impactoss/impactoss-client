@@ -1,4 +1,4 @@
-import { API_ENDPOINT } from '../containers/App/constants';
+import { API_ENDPOINT } from 'themes/config';
 import request from './request';
 import { get, set } from './session-storage';
 

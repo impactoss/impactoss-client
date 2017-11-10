@@ -5,6 +5,7 @@ import ButtonForm from './ButtonForm';
 
 const ButtonSubmit = styled(ButtonForm)`
   color: ${palette('primary', 4)};
+  letter-spacing: 1px;
   background-color: ${(props) =>
     props.disabled
     ? palette('light', 3)

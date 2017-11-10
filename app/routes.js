@@ -5,7 +5,7 @@
 import { getAsyncInjectors } from 'utils/asyncInjectors';
 import { getRedirects } from 'utils/redirects';
 
-import { USER_ROLES } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -160,7 +160,7 @@ export default function createRoutes(store) {
     }, {
       path: '/users',
       name: 'userList',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserList'),
@@ -252,7 +252,7 @@ export default function createRoutes(store) {
     }, {
       path: '/actions/new',
       name: 'actionNew',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ActionNew/reducer'),
@@ -273,7 +273,7 @@ export default function createRoutes(store) {
     }, {
       path: '/actions/import',
       name: 'actionImport',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ActionImport/reducer'),
@@ -310,7 +310,7 @@ export default function createRoutes(store) {
     }, {
       path: '/actions/edit/:id',
       name: 'actionEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ActionEdit/reducer'),
@@ -347,7 +347,7 @@ export default function createRoutes(store) {
     }, {
       path: '/sdgtargets/new',
       name: 'sdgtargetNew',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/SdgTargetNew/reducer'),
@@ -368,7 +368,7 @@ export default function createRoutes(store) {
     }, {
       path: '/sdgtargets/import',
       name: 'sdgtargetImport',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/SdgTargetImport/reducer'),
@@ -405,7 +405,7 @@ export default function createRoutes(store) {
     }, {
       path: '/sdgtargets/edit/:id',
       name: 'sdgtargetEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/SdgTargetEdit/reducer'),
@@ -462,7 +462,7 @@ export default function createRoutes(store) {
     }, {
       path: '/recommendations/import',
       name: 'recommendationImport',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/RecommendationImport/reducer'),
@@ -499,7 +499,7 @@ export default function createRoutes(store) {
     }, {
       path: '/recommendations/edit/:id',
       name: 'recommendationEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/RecommendationEdit/reducer'),
@@ -536,7 +536,7 @@ export default function createRoutes(store) {
     }, {
       path: '/indicators/new',
       name: 'indicatorNew',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/IndicatorNew/reducer'),
@@ -557,7 +557,7 @@ export default function createRoutes(store) {
     }, {
       path: '/indicators/import',
       name: 'indicatorImport',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/IndicatorImport/reducer'),
@@ -594,7 +594,7 @@ export default function createRoutes(store) {
     }, {
       path: '/indicators/edit/:id',
       name: 'indicatorEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/IndicatorEdit/reducer'),
@@ -652,7 +652,7 @@ export default function createRoutes(store) {
     }, {
       path: '/reports/edit/:id',
       name: 'reportEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR),
+      onEnter: redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ReportEdit/reducer'),
@@ -695,7 +695,7 @@ export default function createRoutes(store) {
     }, {
       path: '/categories/:id/new', // the taxonomy id
       name: 'categoryNew',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/CategoryNew/reducer'),
@@ -732,7 +732,7 @@ export default function createRoutes(store) {
     }, {
       path: '/category/edit/:id',
       name: 'categoryEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER),
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/CategoryEdit/reducer'),
@@ -753,7 +753,7 @@ export default function createRoutes(store) {
     }, {
       path: '/pages',
       name: 'pageList',
-      onEnter: redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR),
+      onEnter: redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/PageList'),
@@ -770,7 +770,7 @@ export default function createRoutes(store) {
     }, {
       path: '/pages/new',
       name: 'pageNew',
-      onEnter: redirectIfNotPermitted(USER_ROLES.ADMIN),
+      onEnter: redirectIfNotPermitted(USER_ROLES.ADMIN.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/PageNew/reducer'),
@@ -807,7 +807,7 @@ export default function createRoutes(store) {
     }, {
       path: '/pages/edit/:id',
       name: 'pageEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.ADMIN),
+      onEnter: redirectIfNotPermitted(USER_ROLES.ADMIN.value),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/PageEdit/reducer'),

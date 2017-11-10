@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { reduce } from 'lodash/collection';
 
 import asArray from 'utils/as-array';
-import { SERVER_ERRORS } from 'containers/App/constants';
+import { SERVER_ERRORS } from 'themes/config';
 import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';

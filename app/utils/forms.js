@@ -13,13 +13,13 @@ import validateEmailFormat from 'components/forms/validators/validate-email-form
 import validateLength from 'components/forms/validators/validate-length';
 
 import {
-  PUBLISH_STATUSES,
   REPORT_FREQUENCIES,
-  ACCEPTED_STATUSES,
-  DOC_PUBLISH_STATUSES,
-  DATE_FORMAT,
+  PUBLISH_STATUSES,
   USER_ROLES,
-} from 'containers/App/constants';
+  DATE_FORMAT,
+  DOC_PUBLISH_STATUSES,
+  ACCEPTED_STATUSES,
+} from 'themes/config';
 
 export const entityOption = (entity, defaultToId, hasTags) => Map({
   value: entity.get('id'),
@@ -247,19 +247,7 @@ export const getHighestUserRoleId = (roles) =>
     role.get('associated') && parseInt(role.get('id'), 10) < parseInt(currentHighestRoleId, 10)
       ? role.get('id').toString()
       : currentHighestRoleId.toString()
-  , USER_ROLES.DEFAULT);
-
-const getRoleOptions = (roles, formatMessage, appMessages) => {
-  const roleOptions = roles.reduce((memo, role) => memo.concat([{
-    value: role.get('id').toString(),
-    label: role.getIn(['attributes', 'friendly_name']),
-  }]), []);
-  roleOptions.push({
-    value: USER_ROLES.DEFAULT.toString(),
-    label: formatMessage(appMessages.entities.roles.defaultRole),
-  });
-  return roleOptions;
-};
+  , USER_ROLES.DEFAULT.value);
 
 export const getRoleFormField = (formatMessage, appMessages, roles) => ({
   id: 'role',
@@ -267,7 +255,7 @@ export const getRoleFormField = (formatMessage, appMessages, roles) => ({
   model: '.associatedRole',
   label: formatMessage(appMessages.entities.roles.single),
   value: getHighestUserRoleId(roles).toString(),
-  options: getRoleOptions(roles, formatMessage, appMessages),
+  options: Object.values(USER_ROLES),
 });
 
 export const getAcceptedField = (formatMessage, appMessages, entity) => ({

@@ -15,7 +15,7 @@ import { Map } from 'immutable';
 import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 
-import { USER_ROLES } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import {
   filterEntitiesByAttributes,
   filterEntitiesByKeywords,
@@ -85,20 +85,20 @@ export const selectSessionUserRoles = createSelector(
 
 export const selectIsUserAdmin = createSelector(
   selectSessionUserRoles,
-  (userRoles) => userRoles.includes(USER_ROLES.ADMIN)
+  (userRoles) => userRoles.includes(USER_ROLES.ADMIN.value)
 );
 
 export const selectIsUserManager = createSelector(
   selectSessionUserRoles,
-  (userRoles) => userRoles.includes(USER_ROLES.MANAGER)
-  || userRoles.includes(USER_ROLES.ADMIN)
+  (userRoles) => userRoles.includes(USER_ROLES.MANAGER.value)
+  || userRoles.includes(USER_ROLES.ADMIN.value)
 );
 
 export const selectIsUserContributor = createSelector(
   selectSessionUserRoles,
-  (userRoles) => userRoles.includes(USER_ROLES.CONTRIBUTOR)
-    || userRoles.includes(USER_ROLES.MANAGER)
-    || userRoles.includes(USER_ROLES.ADMIN)
+  (userRoles) => userRoles.includes(USER_ROLES.CONTRIBUTOR.value)
+    || userRoles.includes(USER_ROLES.MANAGER.value)
+    || userRoles.includes(USER_ROLES.ADMIN.value)
 );
 
 
@@ -107,25 +107,25 @@ export const selectHasUserRole = createSelector(
   selectIsUserManager,
   selectIsUserContributor,
   (isAdmin, isManager, isContributor) => ({
-    1: isAdmin,
-    2: isManager,
-    3: isContributor,
+    [USER_ROLES.ADMIN.value]: isAdmin,
+    [USER_ROLES.MANAGER.value]: isManager,
+    [USER_ROLES.CONTRIBUTOR.value]: isContributor,
   })
 );
 
 export const selectSessionUserHighestRoleId = createSelector(
   selectSessionUserRoles,
   (userRoles) => {
-    if (userRoles.includes(USER_ROLES.ADMIN)) {
-      return USER_ROLES.ADMIN;
+    if (userRoles.includes(USER_ROLES.ADMIN.value)) {
+      return USER_ROLES.ADMIN.value;
     }
-    if (userRoles.includes(USER_ROLES.MANAGER)) {
-      return USER_ROLES.MANAGER;
+    if (userRoles.includes(USER_ROLES.MANAGER.value)) {
+      return USER_ROLES.MANAGER.value;
     }
-    if (userRoles.includes(USER_ROLES.CONTRIBUTOR)) {
-      return USER_ROLES.CONTRIBUTOR;
+    if (userRoles.includes(USER_ROLES.CONTRIBUTOR.value)) {
+      return USER_ROLES.CONTRIBUTOR.value;
     }
-    return USER_ROLES.DEFAULT;
+    return USER_ROLES.DEFAULT.value;
   }
 );
 

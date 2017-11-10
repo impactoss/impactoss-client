@@ -32,7 +32,6 @@ import {
   // RESET_PASSWORD,
   RECOVER_PASSWORD,
   CLOSE_ENTITY,
-  // SERVER_ERRORS,
   DISMISS_QUERY_MESSAGES,
 } from 'containers/App/constants';
 

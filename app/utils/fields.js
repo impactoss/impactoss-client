@@ -1,6 +1,6 @@
 import { truncateText } from 'utils/string';
 import { sortEntities } from 'utils/sort';
-import { ACCEPTED_STATUSES } from 'containers/App/constants';
+import { ACCEPTED_STATUSES, USER_ROLES } from 'themes/config';
 import { find } from 'lodash/collection';
 
 export const getIdField = (entity) => ({
@@ -54,22 +54,16 @@ export const getStatusField = (entity, attribute = 'draft', options, label) => (
 });
 
 // only show the highest rated role (lower role ids means higher)
-const getHighestUserRoleLabel = (roles, formatMessage, appMessages) => {
-  const highestRole = roles.reduce((currentHighestRole, role) =>
-  (!currentHighestRole || role.get('id') < currentHighestRole.get('id'))
-    ? role
-    : currentHighestRole
-  , null);
-  return highestRole
-  ? highestRole.getIn(['attributes', 'friendly_name'])
-  : formatMessage(appMessages.entities.roles.defaultRole);
-};
+const getHighestUserRoleId = (roles) =>
+roles.reduce((memo, role) =>
+    role.get('id') < memo ? role.get('id') : memo
+  , USER_ROLES.DEFAULT.value);
 
-export const getRoleField = (entity, formatMessage, appMessages) => ({
+export const getRoleField = (entity) => ({
   controlType: 'info',
   type: 'role',
-  value: entity.get('roles')
-    && getHighestUserRoleLabel(entity.get('roles'), formatMessage, appMessages),
+  value: entity.get('roles') && getHighestUserRoleId(entity.get('roles')),
+  options: Object.values(USER_ROLES),
 });
 
 export const getMetaField = (entity, appMessages) => ({

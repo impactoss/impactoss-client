@@ -1,4 +1,4 @@
-import { USER_ROLES, PUBLISH_STATUSES } from 'containers/App/constants';
+import { USER_ROLES, PUBLISH_STATUSES } from 'themes/config';
 // specify the filter and query  options
 export const DEPENDENCIES = [
   'user_roles',
@@ -39,7 +39,7 @@ export const CONFIG = {
         message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
-        role: USER_ROLES.CONTRIBUTOR,
+        role: USER_ROLES.CONTRIBUTOR.value,
       },
     ],
   },
