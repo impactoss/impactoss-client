@@ -23,13 +23,13 @@ export const DATE_FORMAT = 'dd/mm/yyyy';
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
-export const SHOW_HEADER_TITLE = true;
+export const SHOW_HEADER_TITLE = false;
 
 // show app title and claim in home when not included in graphic
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
-export const SHOW_HOME_TITLE = true;
+export const SHOW_HOME_TITLE = false;
 
 // show footer logo section
 export const SHOW_FOOTER_LOGOS = true;

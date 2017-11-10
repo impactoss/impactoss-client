@@ -191,6 +191,7 @@ theme.sizes = {
     home: '1.2em',
     header: '0.85em',
   },
+  bannerHeight: 88,
 };
 
 // end styled-theme settings

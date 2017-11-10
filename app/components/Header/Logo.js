@@ -4,8 +4,8 @@ import NormalImg from 'components/Img';
 
 const Logo = styled(NormalImg)`
   float:left;
-  padding: 7px 0 0 20px;
-  width: 85px;
+  padding-left: 20px;
+  height:${(props) => props.theme.sizes.bannerHeight}px;
 `;
 
 export default Logo;
