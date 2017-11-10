@@ -93,6 +93,22 @@ const icons = {
   },
 
   // Icons
+
+  // Icons 40px
+  ticklLarge: {
+    size: 24,
+    paths: [
+      'M16.4,30.75,7.92,22.27l2.83-2.83L16.4,25.1,31.25,10.25l2.83,2.83Z',
+    ],
+  },
+  error: {
+    size: 24,
+    paths: [
+      'M22,24H18L17,6h6Zm-2,3a3,3,0,1,0,3,3A3,3,0,0,0,20,27Z',
+    ],
+  },
+
+  // Icons 24px
   measures: {
     size: 24,
     paths: [
@@ -198,8 +214,17 @@ const icons = {
   },
   columnCollapse: {
     size: 24,
-    path: 'M1,13V11H7V9l4,3L7,15V13Zm12-1,4,3V13h6V11H17V9Z',
+    path: [
+      'M1,13V11H7V9l4,3L7,15V13Zm12-1,4,3V13h6V11H17V9Z',
+    ],
   },
+  tick: {
+    size: 24,
+    path: [
+      'M18.86,8.38l-7.07,7.07-1.41,1.41L6.14,12.62l1.41-1.41L10.38,14,17.45,7Z',
+    ],
+  },
+
   // Icons 16px
   dropdownOpen: {
     size: 16,
