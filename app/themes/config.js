@@ -119,3 +119,96 @@ export const DB_TABLES = [
   'progress_reports',
   'due_dates',
 ];
+
+export const MEASURE_ENTITY = {
+  table: 'measures',
+  key: 'measures_id',
+  fields: [
+    {
+      attribute: 'title',
+      control: 'title',
+      type: 'text',
+      required: true,
+      import: true,
+      section: 'header',
+      column: 'main',
+    },
+    {
+      attribute: 'draft',
+      control: 'status',
+      type: 'bool',
+      default: true,
+      section: 'header',
+      column: 'aside',
+    },
+    {
+      attribute: 'description',
+      control: 'markdown',
+      type: 'markdown',
+      import: true,
+      section: 'body',
+      column: 'main',
+    },
+    {
+      attribute: 'outcome',
+      control: 'markdown',
+      type: 'markdown',
+      import: true,
+      disabled: true,
+      section: 'body',
+      column: 'main',
+    },
+    {
+      attribute: 'indicator_summary',
+      control: 'markdown',
+      type: 'markdown',
+      import: true,
+      disabled: true,
+      section: 'body',
+      column: 'main',
+    },
+    {
+      attribute: 'target_date',
+      control: 'date',
+      type: 'date',
+      import: true,
+      section: 'body',
+      column: 'aside',
+    },
+    {
+      attribute: 'target_date_comment',
+      control: 'textarea',
+      type: 'text',
+      import: true,
+      section: 'body',
+      column: 'aside',
+    },
+  ],
+  taxonomies: {
+    table: 'measure_categories',
+    key: 'category_id',
+    section: 'body',
+    column: 'aside',
+  },
+  connections: {
+    tables: [
+      {
+        table: 'recommendations',
+        via: 'recommendation_measures',
+        key: 'recommendation_id',
+      },
+      {
+        table: 'sdgtargets',
+        via: 'sdgtarget_measures',
+        key: 'sdgtarget_id',
+      },
+      {
+        table: 'indicators',
+        via: 'measure_indicators',
+        key: 'indicator_id',
+      },
+    ],
+    section: 'body',
+    column: 'main',
+  },
+};
