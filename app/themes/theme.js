@@ -172,18 +172,23 @@ theme.palette = {
 // fonts
 theme.fonts = {
   // also see global-styles.js for primary font
-  secondary: 'Rubik, Helvetica, Arial, sans-serif', // used for brand title, claim, nav items, buttons and labels
   pre: 'Consolas, Liberation Mono, Menlo, Courier, monospace',
   quote: 'Georgia, serif',
-  headerBrandMain: 'Rubik, Helvetica, Arial, sans-serif',
-  headerBrandClaim: 'Rubik, Helvetica, Arial, sans-serif',
+  brandMain: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif', // only used for fallback
+  brandClaim: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif', // only used for fallback
 };
 
 // sizes
 theme.sizes = {
   // also see global-styles.js for other sizes
-  headerBrandMain: '2.2em',
-  headerBrandClaim: '0.85em',
+  brandMain: {
+    home: '3em',
+    header: '2.2em',
+  },
+  brandClaim: {
+    home: '1.2em',
+    header: '0.85em',
+  },
 };
 
 // end styled-theme settings

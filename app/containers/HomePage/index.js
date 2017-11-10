@@ -49,15 +49,15 @@ const TopActions = styled.div`
 `;
 const Title = styled.h1`
   color:${palette('headerBrand', 0)};
-  font-family: ${(props) => props.theme.fonts.homeBrandMain};
-  font-size: ${(props) => props.theme.sizes.homeBrandMain};
+  font-family: ${(props) => props.theme.fonts.brandMain};
+  font-size: ${(props) => props.theme.sizes.brandMain.home};
   text-transform: uppercase;
 `;
 
 const Claim = styled.p`
   color: ${palette('headerBrand', 1)};
-  font-family: ${(props) => props.theme.fonts.homeBrandClaim};
-  font-size: ${(props) => props.theme.sizes.homeBrandClaim};
+  font-family: ${(props) => props.theme.fonts.brandClaim};
+  font-size: ${(props) => props.theme.sizes.brandClaim.home};
   font-weight: 100;
   margin-left: auto;
   margin-right: auto;
@@ -65,7 +65,6 @@ const Claim = styled.p`
 `;
 
 const Intro = styled.p`
-  font-family: ${(props) => props.theme.fonts.secondary};
   font-size: 1.25em;
   width: 80%;
   margin-left: auto;
