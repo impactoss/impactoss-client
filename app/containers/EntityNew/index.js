@@ -162,13 +162,9 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.submit(model));
     },
     handleSubmit: (formData, attributes) => {
-      let saveData = attributes
+      const saveData = attributes
         ? formData.mergeIn(['attributes'], attributes)
         : formData;
-
-      if (props.path === 'categories') {
-        saveData = saveData.setIn(['attributes', 'draft'], false);
-      }
 
       dispatch(newEntity({
         entity: saveData.toJS(),

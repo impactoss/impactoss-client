@@ -35,6 +35,7 @@ export const mapToCategoryList = (categories, onLink, countAttributes) =>
       ? cat.getIn(['attributes', 'reference'])
       : null,
     title: cat.getIn(['attributes', 'title']),
+    draft: cat.getIn(['attributes', 'draft']),
     onLink: () => onLink(`/category/${cat.get('id')}`),
     counts: countAttributes
       ? countAttributes.map((countAttribute) => ({

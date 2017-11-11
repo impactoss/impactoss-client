@@ -5,7 +5,7 @@ import { palette } from 'styled-theme';
 
 const Status = styled.div`
   float: right;
-  font-size: 0.8em;
+  font-size: 13px;
   color: ${palette('dark', 4)};
   padding-left: 1em;
 `;

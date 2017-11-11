@@ -11,6 +11,7 @@ import ListLink from 'components/fields/ListLink';
 import EmptyHint from 'components/fields/EmptyHint';
 import Dot from 'components/fields/Dot';
 import DotWrapper from 'components/fields/DotWrapper';
+import ItemStatus from 'components/ItemStatus';
 
 const Id = styled.div`
   font-weight: 500;
@@ -34,6 +35,9 @@ class ListField extends React.PureComponent { // eslint-disable-line react/prefe
           <ListItem key={i}>
             {value.linkTo
               ? <ListLink to={value.linkTo}>
+                {value.draft &&
+                  <ItemStatus draft />
+                }
                 {value.reference &&
                   <Id>
                     {value.reference}
@@ -42,6 +46,9 @@ class ListField extends React.PureComponent { // eslint-disable-line react/prefe
                 {value.label}
               </ListLink>
               : <div>
+                {value.draft &&
+                  <ItemStatus draft />
+                }
                 {value.reference &&
                   <Id>
                     {value.reference}
