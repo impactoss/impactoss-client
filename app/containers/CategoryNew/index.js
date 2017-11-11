@@ -24,6 +24,7 @@ import {
   getFormField,
   getConnectionUpdatesFromFormData,
   getCheckboxField,
+  getStatusField,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -116,6 +117,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         ],
       });
     }
+    fields.push({
+      fields: [
+        getStatusField(this.context.intl.formatMessage, appMessages),
+      ],
+    });
     return fields;
   }
 

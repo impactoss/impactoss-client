@@ -86,7 +86,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       <Search active={this.state.active} small={this.props.multiselect}>
         <Tags>
           {
-            filters.map((filter, i) => filter.without
+            filters.map((filter, i) => filter.inverse
               ? (
                 <ButtonTagFilterInverse
                   key={i}

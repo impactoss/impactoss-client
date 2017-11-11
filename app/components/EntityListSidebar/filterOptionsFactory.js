@@ -151,15 +151,17 @@ export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQu
         const locationQueryValue = locationQuery.get(config.query);
         forEach(asArray(locationQueryValue), (queryValue) => {
           const value = parseInt(queryValue, 10);
-          if (taxonomy.getIn(['categories', value])) {
+          const category = taxonomy.getIn(['categories', value]);
+          if (category) {
             filterOptions.options[value] = {
-              reference: getEntityReference(taxonomy.getIn(['categories', value]), false),
-              label: getEntityTitle(taxonomy.getIn(['categories', value])),
+              reference: getEntityReference(category, false),
+              label: getEntityTitle(category),
               showCount: true,
               value,
               count: 0,
               query: config.query,
               checked: true,
+              draft: category && category.getIn(['attributes', 'draft']),
             };
           }
         });
@@ -205,6 +207,7 @@ export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQu
                   count: 1,
                   query: config.query,
                   checked: optionChecked(locationQuery.get(config.query), catId),
+                  draft: category && category.getIn(['attributes', 'draft']),
                 };
               }
             }

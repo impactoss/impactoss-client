@@ -27,6 +27,7 @@ import {
   getFormField,
   getConnectionUpdatesFromFormData,
   getCheckboxField,
+  getStatusField,
 } from 'utils/forms';
 
 import {
@@ -150,7 +151,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       });
     }
     fields.push({
-      fields: [getMetaField(entity, appMessages)],
+      fields: [
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
+        getMetaField(entity, appMessages),
+      ],
     });
     return fields;
   }

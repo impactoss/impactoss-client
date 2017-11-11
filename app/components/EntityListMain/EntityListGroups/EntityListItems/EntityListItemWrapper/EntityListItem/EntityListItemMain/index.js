@@ -57,7 +57,10 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       taxonomies
       .sortBy((tax) => !tax.getIn(['attributes', 'is_smart']))
       .forEach((tax) => {
-        tax.get('categories').forEach((category, catId) => {
+        tax
+        .get('categories')
+        .sortBy((category) => category.getIn(['attributes', 'draft']))
+        .forEach((category, catId) => {
           if (entity.get('categories').includes(parseInt(catId, 10))) {
             const label = (category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
               ? category.getIn(['attributes', 'short_title'])
@@ -66,6 +69,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
               tags.push({
                 taxId: tax.get('id'),
                 title: category.getIn(['attributes', 'title']),
+                inverse: category.getIn(['attributes', 'draft']),
                 label: truncateText(label, 10),
                 onClick: () => onClick(catId, 'category'),
               });
@@ -73,6 +77,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
               tags.push({
                 taxId: tax.get('id'),
                 title: category.getIn(['attributes', 'title']),
+                inverse: category.getIn(['attributes', 'draft']),
                 label: truncateText(label, 10),
               });
             }
