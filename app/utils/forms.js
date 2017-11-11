@@ -707,12 +707,13 @@ export const getEntityFields = (path, args, formatMessage) => {
 
 
 const getSectionFields = (shape, section, column, entity, associations, onCreateOption, formatMessage) => {
-  const fields = filter(shape.fields, (field) => field.section === section && field.column === column);
+  const fields = filter(shape.fields, (field) =>
+    field.section === section
+    && field.column === column
+    && !field.disabled
+  );
   const sectionGroups = [{
     fields: reduce(fields, (memo, field) => {
-      if (field.disabled) {
-        return memo;
-      }
       if (field.control === 'title') {
         return memo.concat([getTitleFormField(formatMessage)]);
       }

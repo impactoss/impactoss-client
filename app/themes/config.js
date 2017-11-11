@@ -120,7 +120,14 @@ export const DB_TABLES = [
   'due_dates',
 ];
 
-export const MEASURE_ENTITY = {
+// Table shapes
+// - define fields for each table
+// - set field location in entity forms and views (section/column)
+// - define fields for csv import (import)
+// - disable fields by setting 'disabled: true'
+
+// shape for table 'measures' (Actions)
+export const MEASURE_SHAPE = {
   table: 'measures',
   key: 'measures_id',
   fields: [
@@ -140,6 +147,7 @@ export const MEASURE_ENTITY = {
       default: true,
       section: 'header',
       column: 'aside',
+      role: USER_ROLES.MANAGER.value,
     },
     {
       attribute: 'description',
@@ -150,20 +158,20 @@ export const MEASURE_ENTITY = {
       column: 'main',
     },
     {
+      disabled: true,
       attribute: 'outcome',
       control: 'markdown',
       type: 'markdown',
       import: true,
-      disabled: true,
       section: 'body',
       column: 'main',
     },
     {
+      disabled: true,
       attribute: 'indicator_summary',
       control: 'markdown',
       type: 'markdown',
       import: true,
-      disabled: true,
       section: 'body',
       column: 'main',
     },
@@ -174,6 +182,7 @@ export const MEASURE_ENTITY = {
       import: true,
       section: 'body',
       column: 'aside',
+      groupType: 'dark',
     },
     {
       attribute: 'target_date_comment',
@@ -182,6 +191,7 @@ export const MEASURE_ENTITY = {
       import: true,
       section: 'body',
       column: 'aside',
+      groupType: 'dark',
     },
   ],
   taxonomies: {

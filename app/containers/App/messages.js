@@ -130,46 +130,68 @@ export default defineMessages({
       defaultMessage: 'Categorises users only',
     },
   },
+  import: {
+    required: {
+      id: 'app.containers.App.import.required',
+      defaultMessage: 'Required: ',
+    },
+    text: {
+      id: 'app.containers.App.import.text',
+      defaultMessage: 'text',
+    },
+    markdown: {
+      id: 'app.containers.App.import.text',
+      defaultMessage: 'text (markdown supported)',
+    },
+    bool: {
+      id: 'app.containers.App.import.bool',
+      defaultMessage: 'boolean (true/false)',
+    },
+    date: {
+      id: 'app.containers.App.import.date',
+      defaultMessage: 'date ({format})',
+    },
+  },
   importFields: {
     title: {
       id: 'app.containers.App.importFields.title',
-      defaultMessage: 'Title | text (required)',
+      defaultMessage: 'Title',
     },
     reference: {
       id: 'app.containers.App.importFields.reference',
-      defaultMessage: 'Reference | text',
+      defaultMessage: 'Reference',
     },
     referenceRequired: {
       id: 'app.containers.App.importFields.referenceRequired',
-      defaultMessage: 'Reference | text (required)',
+      defaultMessage: 'Reference',
     },
     description: {
       id: 'app.containers.App.importFields.description',
-      defaultMessage: 'Description | text (markdown supported)',
+      defaultMessage: 'Description',
     },
     accepted: {
       id: 'app.containers.App.importFields.accepted',
-      defaultMessage: 'Accepted | boolean (true/false)',
+      defaultMessage: 'Accepted',
     },
     response: {
       id: 'app.containers.App.importFields.response',
-      defaultMessage: 'Government response | text (markdown supported)',
+      defaultMessage: 'Government response',
     },
     outcome: {
       id: 'app.containers.App.importFields.outcome',
-      defaultMessage: 'Desired outcome | text (markdown supported)',
+      defaultMessage: 'Desired outcome',
     },
     indicator_summary: {
       id: 'app.containers.App.importFields.indicator_summary',
-      defaultMessage: 'Indicator summary | text (markdown supported)',
+      defaultMessage: 'Indicator summary',
     },
     target_date: {
       id: 'app.containers.App.importFields.target_date',
-      defaultMessage: 'Target Date | date ({format})',
+      defaultMessage: 'Target Date',
     },
     target_date_comment: {
       id: 'app.containers.App.importFields.target_date_comment',
-      defaultMessage: 'Target date comment | text',
+      defaultMessage: 'Target date comment',
     },
   },
   placeholders: {

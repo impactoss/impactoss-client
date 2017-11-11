@@ -1,7 +1,9 @@
 import { truncateText } from 'utils/string';
 import { sortEntities } from 'utils/sort';
 import { ACCEPTED_STATUSES, USER_ROLES } from 'themes/config';
-import { find } from 'lodash/collection';
+import { find, filter, reduce } from 'lodash/collection';
+
+import appMessages from 'containers/App/messages';
 
 export const getIdField = (entity) => ({
   controlType: 'info',
@@ -66,7 +68,7 @@ export const getRoleField = (entity) => ({
   options: Object.values(USER_ROLES),
 });
 
-export const getMetaField = (entity, appMessages) => ({
+export const getMetaField = (entity) => ({
   controlType: 'info',
   type: 'meta',
   fields: [
@@ -82,7 +84,7 @@ export const getMetaField = (entity, appMessages) => ({
   ],
 });
 
-export const getMarkdownField = (entity, attribute, hasLabel, appMessages) =>
+export const getMarkdownField = (entity, attribute, hasLabel = true) =>
   !!entity.getIn(['attributes', attribute]) &&
   (entity.getIn(['attributes', attribute]).trim().length > 0) &&
   ({
@@ -91,7 +93,7 @@ export const getMarkdownField = (entity, attribute, hasLabel, appMessages) =>
     label: hasLabel && appMessages.attributes[attribute],
   });
 
-export const getDateField = (entity, attribute, appMessages, showEmpty, emptyMessage) =>
+export const getDateField = (entity, attribute, obsoleteAppMessages, showEmpty, emptyMessage) =>
   (showEmpty || (
     !!entity.getIn(['attributes', attribute]) &&
     (entity.getIn(['attributes', attribute]).trim().length > 0)
@@ -103,7 +105,7 @@ export const getDateField = (entity, attribute, appMessages, showEmpty, emptyMes
     showEmpty: showEmpty && (emptyMessage || appMessages.attributes[`${attribute}_empty`]),
   });
 
-export const getDateRelatedField = (value, attribute, appMessages, showEmpty, emptyMessage) =>
+export const getDateRelatedField = (value, attribute, obsoleteAppMessages, showEmpty, emptyMessage) =>
   (showEmpty || (!!value && (value.trim().length > 0))) &&
   ({
     type: 'date',
@@ -112,7 +114,7 @@ export const getDateRelatedField = (value, attribute, appMessages, showEmpty, em
     showEmpty: showEmpty && (emptyMessage || appMessages.attributes[`${attribute}_empty`]),
   });
 
-export const getTextField = (entity, attribute, appMessages) =>
+export const getTextField = (entity, attribute) =>
   !!entity.getIn(['attributes', attribute]) &&
   (entity.getIn(['attributes', attribute]).trim().length > 0) &&
   ({
@@ -144,7 +146,7 @@ const mapReports = (reports) => reports
   })).toArray()
   : [];
 
-export const getReportsField = (reports, appMessages, button) => ({
+export const getReportsField = (reports, obsoleteAppMessages, button) => ({
   type: 'reports',
   values: reports && mapReports(reports),
   button: button || null,
@@ -164,7 +166,7 @@ export const getScheduleField = (dates) => ({
   values: mapDates(dates),
 });
 
-export const getTaxonomyFields = (taxonomies, appMessages) =>
+export const getTaxonomyFields = (taxonomies) =>
   taxonomies && taxonomies.map((taxonomy) => ({
     type: 'list',
     label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
@@ -202,7 +204,6 @@ const getConnectionField = ({
   entityType,
   entityIcon,
   entityPath,
-  appMessages,
   onEntityClick,
 }) => ({
   type: 'connections',
@@ -221,25 +222,23 @@ const getConnectionField = ({
   })),
 });
 
-export const getIndicatorConnectionField = (entities, connections, appMessages, onEntityClick) =>
+export const getIndicatorConnectionField = (entities, connections, obsoleteAppMessages, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies: null,
     connections,
     connectionOptions: ['measures', 'sdgtargets'],
     entityType: 'indicators',
-    appMessages,
     onEntityClick,
   });
 
-export const getRecommendationConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
+export const getRecommendationConnectionField = (entities, taxonomies, connections, obsoleteAppMessages, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies,
     connections,
     connectionOptions: ['measures'],
     entityType: 'recommendations',
-    appMessages,
     onEntityClick,
     entityIcon: (entity) => {
       const status = find(ACCEPTED_STATUSES,
@@ -249,18 +248,17 @@ export const getRecommendationConnectionField = (entities, taxonomies, connectio
     },
   });
 
-export const getSdgTargetConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
+export const getSdgTargetConnectionField = (entities, taxonomies, connections, obsoleteAppMessages, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies,
     connections,
     connectionOptions: ['indicators', 'measures'],
     entityType: 'sdgtargets',
-    appMessages,
     onEntityClick,
   });
 
-export const getMeasureConnectionField = (entities, taxonomies, connections, appMessages, onEntityClick) =>
+export const getMeasureConnectionField = (entities, taxonomies, connections, obsoleteAppMessages, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'id'),
     taxonomies,
@@ -268,7 +266,6 @@ export const getMeasureConnectionField = (entities, taxonomies, connections, app
     connectionOptions: ['indicators', 'recommendations', 'sdgtargets'],
     entityType: 'measures',
     entityPath: 'actions',
-    appMessages,
     onEntityClick,
   });
 
@@ -280,7 +277,7 @@ export const getManagerField = (entity, messageLabel, messageEmpty) =>
     showEmpty: messageEmpty,
   });
 
-export const getDownloadField = (entity, isManager, appMessages) => ({
+export const getDownloadField = (entity, isManager) => ({
   type: 'download',
   value: entity.getIn(['attributes', 'document_url']),
   isManager,
@@ -291,4 +288,134 @@ export const getDownloadField = (entity, isManager, appMessages) => ({
 export const getEmailField = (entity) => ({
   type: 'email',
   value: entity.getIn(['attributes', 'email']),
+});
+
+const getSectionFields = (shape, section, column, entity, associations, onEntityClick, hasUserRole) => {
+  const fields = filter(shape.fields, (field) =>
+    field.section === section
+    && field.column === column
+    && !field.disabled
+    && (typeof field.role === 'undefined' || hasUserRole[field.role])
+  );
+  const groupType = reduce(fields, (memo, field) =>
+    field.groupType && (memo === '' || memo === field.groupType) ? field.groupType : null
+  , '');
+  let groupFields = [];
+  // add id field in main header if not reference present
+  if (section === 'header' && column === 'main' && !reduce(fields, (memo, field) =>
+    memo || field.attribute === 'reference'
+  , false)) {
+    groupFields = groupFields.concat([getIdField(entity)]);
+  }
+  groupFields = reduce(fields, (memo, field) => {
+    if (field.control === 'title') {
+      return memo.concat([getTitleField(entity, hasUserRole[USER_ROLES.MANAGER.value])]);
+    }
+    if (field.control === 'textarea') {
+      return memo.concat([getTextField(entity, field.attribute)]);
+    }
+    if (field.control === 'status') {
+      return memo.concat([getStatusField(entity)]);
+    }
+    if (field.control === 'date') {
+      return memo.concat([getDateField(entity, field.attribute, null, true)]);
+    }
+    if (field.control === 'markdown') {
+      return memo.concat([getMarkdownField(entity, field.attribute)]);
+    }
+    return memo;
+  }, groupFields);
+  // add id field in aside header if manager
+  if (section === 'header' && column === 'aside' && hasUserRole[USER_ROLES.MANAGER.value]) {
+    groupFields = groupFields.concat([getMetaField(entity)]);
+  }
+  const sectionGroups = [{
+    type: groupType,
+    fields: groupFields,
+  }];
+
+  if (shape.taxonomies
+    && shape.taxonomies.section === section
+    && shape.taxonomies.column === column
+    && associations
+    && associations.taxonomies
+    && hasTaxonomyCategories(associations.taxonomies)
+  ) {
+    sectionGroups.push({ // fieldGroup
+      label: appMessages.entities.taxonomies.plural,
+      icon: 'categories',
+      fields: getTaxonomyFields(associations.taxonomies),
+    });
+  }
+
+  if (shape.connections
+    && shape.connections.tables
+    && shape.connections.section === section
+    && shape.connections.column === column
+    && associations
+  ) {
+    sectionGroups.push({
+      label: appMessages.entities.connections.plural,
+      icon: 'connections',
+      fields: reduce(shape.connections.tables, (memo, table) => {
+        // if (table.table === 'measures' && associations.measures) {
+        //   return memo.concat([renderMeasureControl(associations.measures, associations.connectedTaxonomies, onCreateOption)]);
+        // }
+        if (table.table === 'recommendations' && associations.recommendations && associations.recTaxonomies && associations.recConnections) {
+          return memo.concat([getRecommendationConnectionField(associations.recommendations, associations.recTaxonomies, associations.recConnections, null, onEntityClick)]);
+        }
+        if (table.table === 'sdgtargets' && associations.sdgtargets && associations.sdgtargetTaxonomies && associations.sdgtargetConnections) {
+          return memo.concat([getSdgTargetConnectionField(associations.sdgtargets, associations.sdgtargetTaxonomies, associations.sdgtargetConnections, null, onEntityClick)]);
+        }
+        if (table.table === 'indicators' && associations.indicators && associations.indicatorConnections) {
+          return memo.concat([getIndicatorConnectionField(associations.indicators, associations.indicatorConnections, null, onEntityClick)]);
+        }
+        return memo;
+      }, []),
+    });
+  }
+  return sectionGroups;
+};
+
+export const getFields = ({ entity, hasUserRole, associations, onEntityClick, shape }) => ({
+  header: {
+    main: getSectionFields(
+      shape,
+      'header',
+      'main',
+      entity,
+      associations,
+      onEntityClick,
+      hasUserRole
+    ),
+    aside: getSectionFields(
+      shape,
+      'header',
+      'aside',
+      entity,
+      associations,
+      onEntityClick,
+      hasUserRole
+    ),
+  },
+  body: {
+    main: getSectionFields(
+      shape,
+      'body',
+      'main',
+      entity,
+      associations,
+      onEntityClick,
+      hasUserRole
+    ),
+    aside: getSectionFields(
+      shape,
+      'body',
+      'aside',
+      entity,
+      associations,
+      onEntityClick,
+      hasUserRole
+    ),
+  },
 });

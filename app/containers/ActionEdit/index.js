@@ -24,7 +24,7 @@ import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES, MEASURE_ENTITY } from 'themes/config';
+import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
 
 import {
   loadEntitiesIfNeeded,
@@ -101,7 +101,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       id: viewEntity.get('id'),
       attributes: viewEntity.get('attributes').mergeWith(
         (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-        getInitialFormData(MEASURE_ENTITY).get('attributes')
+        getInitialFormData(MEASURE_SHAPE).get('attributes')
       ),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRecommendations: entityOptions(recommendations, true),
@@ -194,7 +194,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                   sdgtargets,
                 },
                 onCreateOption,
-                shape: MEASURE_ENTITY,
+                shape: MEASURE_SHAPE,
                 formatMessage: this.context.intl.formatMessage,
               })}
             />
