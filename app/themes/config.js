@@ -32,7 +32,7 @@ export const SHOW_HEADER_TITLE = true;
 export const SHOW_HOME_TITLE = true;
 
 // show footer logo section
-export const SHOW_FOOTER_LOGOS = true;
+export const SHOW_FOOTER_PARTNERS = true;
 
 // entitylists items-per-page options
 export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];

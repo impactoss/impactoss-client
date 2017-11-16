@@ -100,6 +100,11 @@ theme.palette = {
   home: [secondary[1]],
   homeIntro: [light[2]],
 
+  // footer: [ '#color, #bg-main', #bg-partners, #borderColor ],
+  footer: [primary[4], secondary[1], light[0], dark[4]],
+  footerLinks: [primary[4]],
+  footerLinksHover: [primary[0]],
+
   // header: [ '#bg' ],
   header: [secondary[1]],
 

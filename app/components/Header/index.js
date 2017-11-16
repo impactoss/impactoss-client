@@ -71,6 +71,18 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
               onPageLink={this.props.onPageLink}
               currentPath={currentPath}
             />
+            <NavPages>
+              { pages && pages.map((page, i) => (
+                <LinkPage
+                  key={i}
+                  href={page.path}
+                  active={page.active || currentPath === page.path}
+                  onClick={(evt) => this.onClick(evt, page.path)}
+                >
+                  {page.title}
+                </LinkPage>
+              ))}
+            </NavPages>
           </HomeNavWrap>
         }
         { !isHome &&
