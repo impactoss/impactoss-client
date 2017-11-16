@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import Link from './Link';
+import LinkSecondary from './LinkSecondary';
 
-export default styled(Link)`
+export default styled(LinkSecondary)`
   color: ${(props) => props.active ? palette('headerNavAccountItem', 1) : palette('headerNavAccountItem', 0)};
   background-color: ${(props) => props.active ? palette('headerNavAccountItem', 3) : palette('headerNavAccountItem', 2)};
   &:hover {

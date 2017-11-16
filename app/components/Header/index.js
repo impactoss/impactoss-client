@@ -30,7 +30,10 @@ const Styled = styled.div`
   top:0;
   left:0;
   right:0;
-  height:${(props) => props.isHome ? 0 : 115}px;
+  height:${(props) => props.isHome
+    ? 0
+    : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
+  }px;
   background-color: ${palette('header', 0)};
   box-shadow: ${(props) => props.isHome ? 'none' : '0px 0px 15px 0px rgba(0,0,0,0.5)'};
   z-index: 101;
