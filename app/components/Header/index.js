@@ -10,8 +10,6 @@ import logo from 'themes/media/headerLogo.png';
 import logo2x from 'themes/media/headerLogo@2x.png';
 import appMessages from 'containers/App/messages';
 
-import messages from './messages';
-
 import Logo from './Logo';
 import Banner from './Banner';
 import Brand from './Brand';
@@ -22,7 +20,6 @@ import NavPages from './NavPages';
 import NavAdmin from './NavAdmin';
 import LinkPage from './LinkPage';
 import NavAccount from './NavAccount';
-import LinkAccount from './LinkAccount';
 import NavMain from './NavMain';
 import LinkMain from './LinkMain';
 import LinkAdmin from './LinkAdmin';
@@ -38,21 +35,21 @@ const Styled = styled.div`
   box-shadow: ${(props) => props.isHome ? 'none' : '0px 0px 15px 0px rgba(0,0,0,0.5)'};
   z-index: 101;
 `;
+const HomeNavWrap = styled.div`
+  position: absolute;
+  top:0;
+  left:0;
+  right:0;
+  wdith: 100%;
+  z-index: 101;
+`;
 
 
 class Header extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  onClick = (evt, path, currentPath) => {
+  onClick = (evt, path) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    if (currentPath) {
-      if (currentPath === '/login' || currentPath === '/register') {
-        this.props.onPageLink(path, { keepQuery: true });
-      } else {
-        this.props.onPageLink(path, { query: { arg: 'redirectOnAuthSuccess', value: currentPath } });
-      }
-    } else {
-      this.props.onPageLink(path);
-    }
+    this.props.onPageLink(path);
   }
 
   render() {
@@ -63,8 +60,18 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
     return (
       <Styled isHome={isHome}>
-        <Banner showPattern={!isHome} isHome={isHome}>
-          { !isHome &&
+        { isHome &&
+          <HomeNavWrap>
+            <NavAccount
+              isSignedIn={isSignedIn}
+              user={this.props.user}
+              onPageLink={this.props.onPageLink}
+              currentPath={currentPath}
+            />
+          </HomeNavWrap>
+        }
+        { !isHome &&
+          <Banner showPattern={!isHome}>
             <Brand
               href={'/'}
               onClick={(evt) => this.onClick(evt, '/')}
@@ -82,61 +89,40 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </BrandText>
               }
             </Brand>
-          }
-          <NavAccount>
-            {isSignedIn &&
-              <span>
-                {this.props.userId &&
-                  <LinkAccount
-                    href={`/users/${this.props.userId}`}
-                    onClick={(evt) => this.onClick(evt, `/users/${this.props.userId}`)}
-                  >
-                    <FormattedMessage {...messages.user} />
-                  </LinkAccount>
-                }
-                <LinkAccount href={'/logout'} onClick={(evt) => this.onClick(evt, '/logout')}>
-                  <FormattedMessage {...messages.logout} />
-                </LinkAccount>
-              </span>
-            }
-            {!isSignedIn &&
-              <span>
-                <LinkAccount href={'/register'} onClick={(evt) => this.onClick(evt, '/register', currentPath)}>
-                  <FormattedMessage {...messages.register} />
-                </LinkAccount>
-                <LinkAccount href={'/login'} onClick={(evt) => this.onClick(evt, '/login', currentPath)}>
-                  <FormattedMessage {...messages.login} />
-                </LinkAccount>
-              </span>
-            }
-          </NavAccount>
-          <NavPages>
-            { pages && pages.map((page, i) => (
-              <LinkPage
-                key={i}
-                href={page.path}
-                active={page.active || currentPath === page.path}
-                onClick={(evt) => this.onClick(evt, page.path)}
-              >
-                {page.title}
-              </LinkPage>
-            ))}
-          </NavPages>
-          { !isHome && navItemsAdmin &&
-            <NavAdmin>
-              { navItemsAdmin.map((item, i) => (
-                <LinkAdmin
+            <NavAccount
+              isSignedIn={isSignedIn}
+              user={this.props.user}
+              onPageLink={this.props.onPageLink}
+              currentPath={currentPath}
+            />
+            <NavPages>
+              { pages && pages.map((page, i) => (
+                <LinkPage
                   key={i}
-                  href={item.path}
-                  active={item.active || currentPath.startsWith(item.path)}
-                  onClick={(evt) => this.onClick(evt, item.path)}
+                  href={page.path}
+                  active={page.active || currentPath === page.path}
+                  onClick={(evt) => this.onClick(evt, page.path)}
                 >
-                  {item.title}
-                </LinkAdmin>
+                  {page.title}
+                </LinkPage>
               ))}
-            </NavAdmin>
-          }
-        </Banner>
+            </NavPages>
+            { navItemsAdmin &&
+              <NavAdmin>
+                { navItemsAdmin.map((item, i) => (
+                  <LinkAdmin
+                    key={i}
+                    href={item.path}
+                    active={item.active || currentPath.startsWith(item.path)}
+                    onClick={(evt) => this.onClick(evt, item.path)}
+                  >
+                    {item.title}
+                  </LinkAdmin>
+                ))}
+              </NavAdmin>
+            }
+          </Banner>
+        }
         { !isHome &&
           <NavMain hasBorder>
             { navItems && navItems.map((item, i) => (
@@ -162,7 +148,7 @@ Header.contextTypes = {
 
 Header.propTypes = {
   isSignedIn: PropTypes.bool,
-  userId: PropTypes.string,
+  user: PropTypes.object,
   currentPath: PropTypes.string,
   pages: PropTypes.array,
   navItems: PropTypes.array,

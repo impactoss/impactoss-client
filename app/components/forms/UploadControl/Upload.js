@@ -8,7 +8,7 @@ import { palette } from 'styled-theme';
 import { getPathFromUrl } from 'utils/string';
 
 import appMessages from 'containers/App/messages';
-import { API_ENDPOINT, SIGNING_URL_ENDPOINT } from 'themes/config';
+import { ENDPOINTS } from 'themes/config';
 
 import Icon from 'components/Icon';
 import DocumentView from 'components/DocumentView';
@@ -134,13 +134,13 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
             <Icon name="add" text textRight />
             <ReactS3Uploader
               style={{ display: 'none' }}
-              signingUrl={SIGNING_URL_ENDPOINT}
+              signingUrl={ENDPOINTS.SIGNING_URL}
               signingUrlMethod="GET"
               signingUrlWithCredentials
               onProgress={this.onUploadProgress}
               onError={this.onUploadError}
               onFinish={this.onUploadFinish}
-              server={API_ENDPOINT}
+              server={ENDPOINTS.API}
               preprocess={this.modifyFileType}
               scrubFilename={(filename) => filename.replace(/(\.[\w\d_-]+)$/i, `_${Date.now()}$1`)}
             />

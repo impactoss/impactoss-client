@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 export default styled.div`
-  height:${(props) => props.isHome ? 0 : 79}px;
-  background-image: ${(props) => props.showPattern ? props.theme.backgroundImages.header : 'none'};
+  height:${(props) => props.theme.sizes.header.banner.height}px;
+  background-image: ${(props) => props.theme.backgroundImages.header};
   background-repeat: repeat;
   position: ${(props) => props.isHome ? 'absolute' : 'static'};
   right: 0px;
