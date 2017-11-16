@@ -77,41 +77,43 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     let navItems = ([
       {
         path: '/overview',
-        title: this.context.intl.formatMessage(messages.overview),
+        title: this.context.intl.formatMessage(messages.nav.overview),
         active: currentPath.startsWith('/overview'),
       },
       {
         path: '/categories',
-        title: this.context.intl.formatMessage(messages.entities.taxonomies.plural),
+        title: this.context.intl.formatMessage(messages.nav.taxonomies),
         active: currentPath.startsWith('/category'),
       },
       {
         path: '/actions',
-        title: this.context.intl.formatMessage(messages.entities.measures.plural),
+        title: this.context.intl.formatMessage(messages.nav.measures),
       },
       {
         path: '/indicators',
-        title: this.context.intl.formatMessage(messages.entities.indicators.plural),
+        title: this.context.intl.formatMessage(messages.nav.indicators),
         active: currentPath.startsWith('/reports'),
       },
       {
         path: '/recommendations',
-        title: this.context.intl.formatMessage(messages.entities.recommendations.plural),
+        title: this.context.intl.formatMessage(messages.nav.recommendations),
       },
       {
         path: '/sdgtargets',
-        title: this.context.intl.formatMessage(messages.entities.sdgtargets.plural),
+        title: this.context.intl.formatMessage(messages.nav.sdgtargets),
       },
     ]);
     if (isManager) {
       navItems = navItems.concat([
         {
           path: '/users',
-          title: this.context.intl.formatMessage(messages.entities.users.plural),
+          title: this.context.intl.formatMessage(messages.nav.users),
+          isAdmin: true,
         },
         {
           path: '/pages',
-          title: this.context.intl.formatMessage(messages.entities.pages.plural),
+          title: this.context.intl.formatMessage(messages.nav.pages),
+          isAdmin: true,
         },
       ]);
     }

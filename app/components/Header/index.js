@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { filter } from 'lodash/collection';
 
 import { SHOW_HEADER_TITLE } from 'themes/config';
 import logo from 'themes/media/headerLogo.png';
@@ -18,11 +19,13 @@ import BrandText from './BrandText';
 import BrandTitle from './BrandTitle';
 import BrandClaim from './BrandClaim';
 import NavPages from './NavPages';
+import NavAdmin from './NavAdmin';
 import LinkPage from './LinkPage';
 import NavAccount from './NavAccount';
 import LinkAccount from './LinkAccount';
 import NavMain from './NavMain';
 import LinkMain from './LinkMain';
+import LinkAdmin from './LinkAdmin';
 
 
 const Styled = styled.div`
@@ -53,7 +56,10 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
   }
 
   render() {
-    const { pages, navItems, isSignedIn, currentPath, isHome } = this.props;
+    const { pages, isSignedIn, currentPath, isHome } = this.props;
+    const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
+    const navItemsAdmin = filter(this.props.navItems, (item) => item.isAdmin);
+
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
     return (
       <Styled isHome={isHome}>
@@ -105,34 +111,44 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             }
           </NavAccount>
           <NavPages>
-            { pages &&
-              pages.map((page, i) => (
-                <LinkPage
-                  key={i}
-                  href={page.path}
-                  active={page.active || currentPath === page.path}
-                  onClick={(evt) => this.onClick(evt, page.path)}
-                >
-                  {page.title}
-                </LinkPage>
-              ))
-            }
+            { pages && pages.map((page, i) => (
+              <LinkPage
+                key={i}
+                href={page.path}
+                active={page.active || currentPath === page.path}
+                onClick={(evt) => this.onClick(evt, page.path)}
+              >
+                {page.title}
+              </LinkPage>
+            ))}
           </NavPages>
-        </Banner>
-        { !isHome &&
-          <NavMain hasBorder>
-            { navItems &&
-              navItems.map((item, i) => (
-                <LinkMain
+          { !isHome && navItemsAdmin &&
+            <NavAdmin>
+              { navItemsAdmin.map((item, i) => (
+                <LinkAdmin
                   key={i}
                   href={item.path}
                   active={item.active || currentPath.startsWith(item.path)}
                   onClick={(evt) => this.onClick(evt, item.path)}
                 >
                   {item.title}
-                </LinkMain>
-              ))
-            }
+                </LinkAdmin>
+              ))}
+            </NavAdmin>
+          }
+        </Banner>
+        { !isHome &&
+          <NavMain hasBorder>
+            { navItems && navItems.map((item, i) => (
+              <LinkMain
+                key={i}
+                href={item.path}
+                active={item.active || currentPath.startsWith(item.path)}
+                onClick={(evt) => this.onClick(evt, item.path)}
+              >
+                {item.title}
+              </LinkMain>
+            ))}
           </NavMain>
         }
       </Styled>

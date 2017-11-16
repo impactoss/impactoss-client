@@ -16,10 +16,6 @@ export default defineMessages({
       defaultMessage: 'Samoa\'s home of human rights implementation',
     },
   },
-  overview: {
-    id: 'app.containers.App.overview',
-    defaultMessage: 'Overview',
-  },
   buttons: {
     cancel: {
       id: 'app.containers.App.buttons.cancel',
@@ -452,6 +448,40 @@ export default defineMessages({
         id: 'app.containers.App.attributes.meta.updated_at',
         defaultMessage: 'Last updated',
       },
+    },
+  },
+  nav: {
+    overview: {
+      id: 'app.containers.App.nav.overview',
+      defaultMessage: 'Overview',
+    },
+    taxonomies: {
+      id: 'app.containers.App.nav.taxonomies',
+      defaultMessage: 'Categories',
+    },
+    measures: {
+      id: 'app.containers.App.nav.measures',
+      defaultMessage: 'Actions',
+    },
+    indicators: {
+      id: 'app.containers.App.nav.indicators',
+      defaultMessage: 'Indicators',
+    },
+    recommendations: {
+      id: 'app.containers.App.nav.recommendations',
+      defaultMessage: 'Recommendations',
+    },
+    sdgtargets: {
+      id: 'app.containers.App.nav.sdgtargets',
+      defaultMessage: 'SDG targets',
+    },
+    pages: {
+      id: 'app.containers.App.nav.pages',
+      defaultMessage: 'Page admin',
+    },
+    users: {
+      id: 'app.containers.App.nav.users',
+      defaultMessage: 'User admin',
     },
   },
   entities: {
