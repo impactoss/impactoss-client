@@ -4,6 +4,7 @@ import { ACCEPTED_STATUSES, USER_ROLES } from 'themes/config';
 import { find, filter, reduce } from 'lodash/collection';
 
 import appMessages from 'containers/App/messages';
+import { PATHS } from 'containers/App/constants';
 
 export const getIdField = (entity) => ({
   controlType: 'info',
@@ -133,7 +134,7 @@ const mapCategoryOptions = (categories) => categories
       label: cat.getIn(['attributes', 'title']),
       reference: cat.getIn(['attributes', 'reference']) || null,
       draft: cat.getIn(['attributes', 'draft']) || null,
-      linkTo: `/category/${cat.get('id')}`,
+      linkTo: `${PATHS.CATEGORIES}/${cat.get('id')}`,
     }))
     .toArray()
   : [];
@@ -143,7 +144,7 @@ const mapReports = (reports) => reports
     label: report.getIn(['attributes', 'title']),
     dueDate: report.get('due_date') ? report.getIn(['due_date', 'attributes', 'due_date']) : null,
     updatedAt: report.getIn(['attributes', 'updated_at']),
-    linkTo: `/reports/${report.get('id')}`,
+    linkTo: `${PATHS.PROGRESS_REPORTS}/${report.get('id')}`,
   })).toArray()
   : [];
 

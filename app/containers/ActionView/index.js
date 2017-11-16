@@ -14,7 +14,7 @@ import { getFields } from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { MEASURE_SHAPE, USER_ROLES } from 'themes/config';
 
 import Loading from 'components/Loading';
@@ -188,10 +188,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (measureId) => {
-      dispatch(updatePath(`/actions/edit/${measureId}`));
+      dispatch(updatePath(`${PATHS.MEASURES}${PATHS.EDIT}/${measureId}`));
     },
     handleClose: () => {
-      dispatch(closeEntity('/actions'));
+      dispatch(closeEntity(PATHS.MEASURES));
     },
   };
 }

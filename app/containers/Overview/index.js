@@ -21,7 +21,7 @@ import {
   selectEntities,
   selectReady,
 } from 'containers/App/selectors';
-import { CONTENT_LIST } from 'containers/App/constants';
+import { PATHS, CONTENT_LIST } from 'containers/App/constants';
 
 // components
 import Button from 'components/buttons/Button';
@@ -432,7 +432,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                     <DiagramTop>
                       <DiagramButtonWrap>
                         <DiagramButton
-                          onClick={() => onPageLink('/recommendations')}
+                          onClick={() => onPageLink(PATHS.RECOMMENDATIONS)}
                           innerRef={(node) => {
                             if (!this.state.buttonRecs) {
                               this.setState({ buttonRecs: node });
@@ -458,7 +458,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                     <DiagramBottom>
                       <DiagramButtonWrap>
                         <DiagramButton
-                          onClick={() => onPageLink('/sdgtargets')}
+                          onClick={() => onPageLink(PATHS.SDG_TARGETS)}
                           innerRef={(node) => {
                             if (!this.state.buttonSdgtargets) {
                               this.setState({ buttonSdgtargets: node });
@@ -489,7 +489,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                     <DiagramVCenter>
                       <DiagramButtonWrap>
                         <DiagramButtonMain
-                          onClick={() => onPageLink('/actions')}
+                          onClick={() => onPageLink(PATHS.MEASURES)}
                           innerRef={(node) => {
                             if (!this.state.buttonMeasures) {
                               this.setState({ buttonMeasures: node });
@@ -524,7 +524,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                   <DiagramRight>
                     <DiagramVCenter>
                       <DiagramButton
-                        onClick={() => onPageLink('/indicators')}
+                        onClick={() => onPageLink(PATHS.INDICATORS)}
                         innerRef={(node) => {
                           if (!this.state.buttonIndicators) {
                             this.setState({ buttonIndicators: node });

@@ -3,6 +3,7 @@
   "app.components.Header.login" : "Sign in",
   "app.components.Header.logout" : "Sign out",
   "app.components.Header.user" : "User profile",
+  "app.components.Header.userLoading" : "Signing in...",
   "app.components.Header.register" : "Register",
   "app.components.Footer.disclaimer" : "Every care has been taken to ensure the accuracy of this data and information. Please send any feedback to ",
   "app.components.Footer.contact.email" : "mailto:contact@sadata.ws",

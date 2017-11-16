@@ -24,7 +24,7 @@ import {
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -220,10 +220,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (sdgtargetId) => {
-      dispatch(updatePath(`/sdgtargets/edit/${sdgtargetId}`));
+      dispatch(updatePath(`${PATHS.SDG_TARGETS}${PATHS.EDIT}/${sdgtargetId}`));
     },
     handleClose: () => {
-      dispatch(closeEntity('/sdgtargets'));
+      dispatch(closeEntity(PATHS.SDG_TARGETS));
     },
   };
 }

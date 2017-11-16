@@ -1,3 +1,5 @@
+import { PATHS } from 'containers/App/constants';
+
 const getTaxonomyTagList = (taxonomy) => {
   const tags = [];
   if (taxonomy.getIn(['attributes', 'tags_measures'])) {
@@ -23,7 +25,7 @@ const getTaxonomyTagList = (taxonomy) => {
 export const mapToTaxonomyList = (taxonomies, onLink, activeId, tags = false) => taxonomies.map((tax) => ({
   id: tax.get('id'),
   count: tax.count,
-  onLink: () => onLink(`/categories/${tax.get('id')}`),
+  onLink: () => onLink(`${PATHS.TAXONOMIES}/${tax.get('id')}`),
   tags: tags ? getTaxonomyTagList(tax) : null,
   active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
 })).toArray();
@@ -36,7 +38,7 @@ export const mapToCategoryList = (categories, onLink, countAttributes) =>
       : null,
     title: cat.getIn(['attributes', 'title']),
     draft: cat.getIn(['attributes', 'draft']),
-    onLink: () => onLink(`/category/${cat.get('id')}`),
+    onLink: () => onLink(`${PATHS.CATEGORIES}/${cat.get('id')}`),
     counts: countAttributes
       ? countAttributes.map((countAttribute) => ({
         total: cat.get(countAttribute.total),

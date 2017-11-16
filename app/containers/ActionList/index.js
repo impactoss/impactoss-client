@@ -17,6 +17,7 @@ import {
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
+import { PATHS } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
 import { CONFIG, DEPENDENCIES } from './constants';
@@ -109,10 +110,10 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
-      dispatch(updatePath('/actions/new/'));
+      dispatch(updatePath(`${PATHS.MEASURES}${PATHS.NEW}`));
     },
     handleImport: () => {
-      dispatch(updatePath('/actions/import/'));
+      dispatch(updatePath(`${PATHS.MEASURES}${PATHS.IMPORT}`));
     },
   };
 }

@@ -91,4 +91,31 @@ export const SORT_ORDER_OPTIONS = [
 ];
 export const PARAMS = {
   GROUP_RESET: 'OFF',
+  REDIRECT_ON_AUTH_SUCCESS: 'redirectOnAuthSuccess',
+  RECOVER_SUCCESS: 'recoverSuccess',
+  ALREADY_SIGNED_IN: 'alreadySignedIn',
+  NOT_SIGNED_IN: 'notSignedIn',
+};
+export const PATHS = {
+  ID: '/:id',
+  NEW: '/new',
+  EDIT: '/edit',
+  IMPORT: '/import',
+  PASSWORD: '/password',
+  OVERVIEW: '/overview',
+  LOGIN: '/login',
+  LOGOUT: '/logout',
+  REGISTER: '/register',
+  RESET_PASSWORD: '/resetpassword',
+  RECOVER_PASSWORD: '/recoverpassword',
+  UNAUTHORISED: '/unauthorised',
+  USERS: '/users',
+  MEASURES: '/actions',
+  INDICATORS: '/indicators',
+  SDG_TARGETS: '/sdgtargets',
+  RECOMMENDATIONS: '/recommendations',
+  PROGRESS_REPORTS: '/reports',
+  TAXONOMIES: '/categories',
+  CATEGORIES: '/category',
+  PAGES: '/pages',
 };

@@ -116,7 +116,7 @@ theme.palette = {
   // headerNavAccount: [ '#bg' ],
   headerNavAccount: ['transparent'],
   // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border' ]
-  headerNavAccountItem: [primary[4], primary[4], primary[0], primary[0], primary[1]],
+  headerNavAccountItem: [primary[4], primary[4], primary[0], primary[1], primary[1]],
   headerNavAccountItemHover: [primary[4], primary[4], primary[1], primary[1], primary[1]],
 
   // headerNavMain: [ '#bg', '#border'  ],
@@ -174,20 +174,30 @@ theme.fonts = {
   // also see global-styles.js for primary font
   pre: 'Consolas, Liberation Mono, Menlo, Courier, monospace',
   quote: 'Georgia, serif',
-  brandMain: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif', // only used for fallback
-  brandClaim: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif', // only used for fallback
+  title: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif', // only used for fallback
+  claim: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif', // only used for fallback
 };
 
 // sizes
 theme.sizes = {
   // also see global-styles.js for other sizes
-  brandMain: {
-    home: '3em',
-    header: '2.2em',
+  header: {
+    banner: {
+      height: 88,
+    },
+    nav: {
+      height: 38,
+    },
+    text: {
+      title: '2.2em',
+      claim: '0.85em',
+    },
   },
-  brandClaim: {
-    home: '1.2em',
-    header: '0.85em',
+  home: {
+    text: {
+      title: '3em',
+      claim: '1.2em',
+    },
   },
 };
 

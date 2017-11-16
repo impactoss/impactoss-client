@@ -33,7 +33,7 @@ import validateDateAfterDate from 'components/forms/validators/validate-date-aft
 import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
 import validateRequired from 'components/forms/validators/validate-required';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -421,7 +421,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath('/indicators'));
+      dispatch(updatePath(PATHS.INDICATORS));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

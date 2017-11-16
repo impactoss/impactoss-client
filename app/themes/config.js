@@ -43,13 +43,28 @@ export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
 
 // General ********************
 
-// server API endpoint
-export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';
-// server AWS S3 signing url endpoint
-export const SIGNING_URL_ENDPOINT = '/s3/sign';
+export const ENDPOINTS = {
+  API: 'https://undp-sadata-staging.herokuapp.com', // server API endpoint
+  SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
+  SIGN_IN: 'auth/sign_in',
+  SIGN_OUT: 'auth/sign_out',
+  PASSWORD: 'auth/password',
+  VALIDATE_TOKEN: 'auth/validate_token',
+};
+
+// API request Authentification keys
+export const KEYS = {
+  ACCESS_TOKEN: 'access-token',
+  TOKEN_TYPE: 'token-type',
+  CLIENT: 'client',
+  EXPIRY: 'expiry',
+  UID: 'uid',
+  RESET_PASSWORD: 'reset_password',
+};
 
 // database date format
 export const DB_DATE_FORMAT = 'YYYY-MM-DD';
+
 
 // Map server messages *********************************
 

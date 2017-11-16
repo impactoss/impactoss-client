@@ -24,6 +24,7 @@ import AuthForm from 'components/forms/AuthForm';
 
 import { updatePath } from 'containers/App/actions';
 
+import { PATHS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 import messages from './messages';
 
@@ -108,7 +109,7 @@ export function mapDispatchToProps(dispatch) {
       dispatch(save(saveData));
     },
     handleCancel: (userId) => {
-      dispatch(updatePath(`/users/${userId}`));
+      dispatch(updatePath(`${PATHS.USERS}/${userId}`));
     },
   };
 }

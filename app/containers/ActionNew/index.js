@@ -19,7 +19,7 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
 
 import {
@@ -273,7 +273,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath('/actions'));
+      dispatch(updatePath(PATHS.MEASURES));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

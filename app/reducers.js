@@ -9,7 +9,7 @@ import { browserHistory } from 'react-router';
 
 import { startsWith } from 'utils/string';
 
-import { LOGOUT_SUCCESS } from 'containers/App/constants';
+import { PATHS, LOGOUT_SUCCESS } from 'containers/App/constants';
 import globalReducer from 'containers/App/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import entityNewReducer from 'containers/EntityNew/reducer';
@@ -31,7 +31,7 @@ const routeInitialState = fromJS({
   }),
 });
 
-const listPaths = ['/actions', '/recommendations', '/indicators', '/sdgtargets'];
+const listPaths = [PATHS.MEASURES, PATHS.RECOMMENDATIONS, PATHS.INDICATORS, PATHS.SDG_TARGETS];
 
 /**
  * Merge route into the global application state and remember previous route
@@ -46,7 +46,7 @@ function routeReducer(state = routeInitialState, action) {
       return state.merge({
         locationBeforeTransitions: {
           ...action.payload,
-          listSearch: listPaths.indexOf(pathName) > -1 || startsWith(pathName, '/categories')
+          listSearch: listPaths.indexOf(pathName) > -1 || startsWith(pathName, PATHS.TAXONOMIES)
             ? state.getIn(['locationBeforeTransitions', 'search'])
             : state.getIn(['locationBeforeTransitions', 'listSearch']),
           pathnamePrevious: state.getIn(['locationBeforeTransitions', 'pathname']),

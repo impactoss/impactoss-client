@@ -19,7 +19,7 @@ import { sortEntities } from 'utils/sort';
 import {
   selectIsSignedIn,
   selectIsUserManager,
-  selectSessionUserId,
+  selectSessionUserAttributes,
   selectReady,
   selectEntitiesWhere,
   selectNewEntityModal,
@@ -32,13 +32,16 @@ import {
   openNewEntityModal,
 } from './actions';
 
-import { DEPENDENCIES } from './constants';
+import { PATHS, DEPENDENCIES } from './constants';
 
 import messages from './messages';
 
 const Main = styled.div`
   position: ${(props) => props.isHome ? 'relative' : 'absolute'};
-  top: ${(props) => props.isHome ? 0 : '115px'};
+  top: ${(props) => props.isHome
+    ? 0
+    : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
+  }px;
   overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
   left: 0;
   right: 0;
@@ -68,7 +71,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       'number'
     )
     .map((page) => ({
-      path: `/pages/${page.get('id')}`,
+      path: `${PATHS.PAGES}/${page.get('id')}`,
       title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
     }))
     .toArray();
@@ -76,44 +79,49 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   prepareMainMenuItems = (isManager, currentPath) => {
     let navItems = ([
       {
-        path: '/overview',
+        path: PATHS.OVERVIEW,
         title: this.context.intl.formatMessage(messages.nav.overview),
-        active: currentPath.startsWith('/overview'),
+        active: currentPath.startsWith(PATHS.OVERVIEW),
       },
       {
-        path: '/categories',
+        path: PATHS.TAXONOMIES,
         title: this.context.intl.formatMessage(messages.nav.taxonomies),
-        active: currentPath.startsWith('/category'),
+        active: currentPath.startsWith(PATHS.TAXONOMIES) || currentPath.startsWith(PATHS.CATEGORIES),
       },
       {
-        path: '/actions',
+        path: PATHS.MEASURES,
         title: this.context.intl.formatMessage(messages.nav.measures),
+        active: currentPath.startsWith(PATHS.MEASURES),
       },
       {
-        path: '/indicators',
+        path: PATHS.INDICATORS,
         title: this.context.intl.formatMessage(messages.nav.indicators),
-        active: currentPath.startsWith('/reports'),
+        active: currentPath.startsWith(PATHS.INDICATORS) || currentPath.startsWith(PATHS.PROGRESS_REPORTS),
       },
       {
-        path: '/recommendations',
+        path: PATHS.RECOMMENDATIONS,
         title: this.context.intl.formatMessage(messages.nav.recommendations),
+        active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
       },
       {
-        path: '/sdgtargets',
+        path: PATHS.SDG_TARGETS,
         title: this.context.intl.formatMessage(messages.nav.sdgtargets),
+        active: currentPath.startsWith(PATHS.SDG_TARGETS),
       },
     ]);
     if (isManager) {
       navItems = navItems.concat([
         {
-          path: '/users',
+          path: PATHS.USERS,
           title: this.context.intl.formatMessage(messages.nav.users),
           isAdmin: true,
+          active: currentPath === PATHS.USERS,
         },
         {
-          path: '/pages',
+          path: PATHS.PAGES,
           title: this.context.intl.formatMessage(messages.nav.pages),
           isAdmin: true,
+          active: currentPath === PATHS.PAGES,
         },
       ]);
     }
@@ -128,7 +136,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       <div>
         <Header
           isSignedIn={isUserSignedIn}
-          userId={this.props.userId}
+          user={this.props.user}
           pages={pages && this.preparePageMenuPages(pages)}
           navItems={this.prepareMainMenuItems(isUserSignedIn && isManager, location.pathname)}
           onPageLink={onPageLink}
@@ -167,7 +175,7 @@ App.propTypes = {
   children: PropTypes.node,
   isUserSignedIn: PropTypes.bool,
   isManager: PropTypes.bool,
-  userId: PropTypes.string,
+  user: PropTypes.object,
   pages: PropTypes.object,
   validateToken: PropTypes.func,
   loadEntitiesIfNeeded: PropTypes.func,
@@ -184,7 +192,7 @@ const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   isManager: selectIsUserManager(state),
   isUserSignedIn: selectIsSignedIn(state),
-  userId: selectSessionUserId(state),
+  user: selectSessionUserAttributes(state),
   pages: selectEntitiesWhere(state, {
     path: 'pages',
     where: { draft: false },

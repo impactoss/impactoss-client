@@ -19,7 +19,7 @@ import {
   selectReady,
   selectIsUserManager,
 } from 'containers/App/selectors';
-import { CONTENT_LIST } from 'containers/App/constants';
+import { PATHS, CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 // components
@@ -182,7 +182,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: (taxonomyId) => {
-      dispatch(updatePath(`/categories/${taxonomyId}/new`));
+      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyId}${PATHS.NEW}`));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));
