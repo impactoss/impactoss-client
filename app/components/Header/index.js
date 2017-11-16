@@ -116,7 +116,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                   <LinkAdmin
                     key={i}
                     href={item.path}
-                    active={item.active || currentPath.startsWith(item.path)}
+                    active={item.active}
                     onClick={(evt) => this.onClick(evt, item.path)}
                   >
                     {item.title}

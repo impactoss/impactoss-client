@@ -110,7 +110,7 @@ theme.palette = {
   // headerNavPages: [ '#bg' ],
   headerNavPages: [secondary[1]],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
-  headerNavPagesItem: [light[3], light[2], 'transparent', 'transparent'],
+  headerNavPagesItem: [light[3], primary[4], 'transparent', 'transparent'],
   headerNavPagesItemHover: [primary[4], primary[4], 'transparent', 'transparent'],
 
   // headerNavAccount: [ '#bg' ],
