@@ -9,6 +9,9 @@ import Container from 'components/styled/Container';
 
 import { SHOW_FOOTER_PARTNERS } from 'themes/config';
 
+import impactossLogo from 'themes/media/impactoss.png';
+import impactossLogo2x from 'themes/media/impactoss@2x.png';
+
 import partner1 from 'themes/media/partner1.png';
 import partner2 from 'themes/media/partner2.png';
 import partner3 from 'themes/media/partner3.png';
@@ -20,7 +23,7 @@ import partner4x2x from 'themes/media/partner4@2x.png';
 
 import messages from './messages';
 
-const importLogos = [
+const partnerLogos = [
   [partner1, partner1x2x],
   [partner2, partner2x2x],
   [partner3, partner3x2x],
@@ -45,6 +48,14 @@ const FooterLink = styled.a`
     color: ${palette('footerLinksHover', 0)};
   }
 `;
+const ImpactLink = styled.a`
+  font-weight:bold;
+  color: ${palette('footerLinks', 0)};
+  &:hover {
+    color: ${palette('footerLinksHover', 0)};
+    opacity: 0.8;
+  }
+`;
 
 const LogoList = styled.div`
   text-align: center;
@@ -60,6 +71,9 @@ const LogoItemLink = styled.a`
   }
 `;
 const PartnerLogo = styled(NormalImg)`
+  height: 80px;
+`;
+const ImpactLogo = styled(NormalImg)`
   height: 80px;
 `;
 
@@ -93,7 +107,7 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
             <Container noPaddingBottom>
               <LogoList>
                 {
-                  importLogos.map((src, i) => (
+                  partnerLogos.map((src, i) => (
                     <LogoItem key={i}>
                       <LogoItemLink
                         href={this.context.intl.formatMessage(messages.partners[`url${i + 1}`])}
@@ -137,13 +151,16 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
               <TableCellSmall>
                 <FormattedMessage {...messages.project.text} />
                 <div>
-                  <FooterLink
+                  <ImpactLink
                     target="_blank"
                     href={this.context.intl.formatMessage(messages.project.url)}
                     title={this.context.intl.formatMessage(messages.project.anchor)}
                   >
-                    <FormattedMessage {...messages.project.anchor} />
-                  </FooterLink>
+                    <div>
+                      <FormattedMessage {...messages.project.anchor} />
+                    </div>
+                    <ImpactLogo src={[impactossLogo, impactossLogo2x]} alt={this.context.intl.formatMessage(messages.project.anchor)} />
+                  </ImpactLink>
                 </div>
               </TableCellSmall>
             </Table>
