@@ -272,7 +272,7 @@ export const getInitialFormData = (shape) => {
   });
   if (shape.fields) {
     fields = reduce(shape.fields, (memo, field) =>
-      field.disabled ? fields : fields.setIn(['attributes', field.attribute], getInitialValue(field))
+      field.disabled ? memo : memo.setIn(['attributes', field.attribute], getInitialValue(field))
     , fields);
   }
   if (shape.taxonomies) {
