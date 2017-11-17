@@ -164,6 +164,7 @@ theme.palette = {
   // asideHeader: ['#bg']
   asideHeader: [light[0]],
 
+
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
   asideCatNavItem: [dark[2], primary[4], primary[4], primary[0], light[0]],
@@ -173,6 +174,10 @@ theme.palette = {
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
   asideListItem: [dark[1], primary[4], primary[4], dark[2], light[0]],
   asideListItemHover: [dark[3], primary[4], primary[4], dark[2], light[0]],
+
+  // asideHeader: [#color, '#bg',]
+  asideListGroup: [dark[2], light[1]],
+  asideListGroupHover: [dark[3], light[0]],
 
   //
   // BUTTONS / LINKS

@@ -36,7 +36,7 @@ import messages from './messages';
 // const Styled = styled.div``;
 // const Main = styled.div``;
 const ScrollableWrapper = styled(Scrollable)`
-  background-color: ${palette('light', 0)};
+  background-color: ${palette('aside', 0)};
 `;
 
 const ListEntitiesEmpty = styled.div`

@@ -22,7 +22,7 @@ const Styled = styled(Button)`
   display: table;
   width: 100%;
   font-weight: bold;
-  padding: 0.5em 1em 0.5em 1.5em;
+  padding: 0.75em 1em 0.75em 1.5em;
   width: 100%;
   text-align: left;
   color:  ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
@@ -32,6 +32,9 @@ const Styled = styled(Button)`
     color: ${(props) => props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0)};
     background-color: ${(props) => props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2)};
     border-bottom-color: ${palette('asideListItemHover', 4)}
+  }
+  &:last-child {
+    border-bottom: 0;
   }
 `;
 const Label = styled.div`
