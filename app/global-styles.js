@@ -17,7 +17,9 @@ injectGlobal`
   button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
-
+  :focus, :visited:focus {
+    outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
+  }
   #app {
     background-color: #F1F3F3;
     min-height: 100%;

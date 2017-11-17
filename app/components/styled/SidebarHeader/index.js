@@ -10,6 +10,6 @@ export default styled.div`
     : 'none'
   };
   background-repeat: repeat;
-  padding: ${(props) => props.hasButtons ? '2.5em 2em 1em' : '3em 2em 1em'};
+  padding: ${(props) => props.hasButtons ? '2.5em 1.5em 1em' : '3em 1.5em 1em'};
   background-color: ${palette('asideHeader', 0)}
 `;

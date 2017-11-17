@@ -136,9 +136,8 @@ const Categorised = styled.div`
   font-size: 0.85em;
 `;
 
-const CategorisedIcons = styled.div`
-  padding-top: 5px;
-`;
+const CategorisedIcons = styled.div``;
+
 const CategorisedIcon = styled.a`
   display: inline-block;
   padding: 0 2px;

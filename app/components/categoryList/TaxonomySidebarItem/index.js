@@ -13,7 +13,7 @@ const Styled = styled(Button)`
   display: table;
   width: 100%;
   padding: 1em;
-  padding: 0.5em;
+  padding: 0.5em 0.5em 0.5em 1.5em;
   text-align: left;
   color:  ${(props) => props.active ? palette('asideCatNavItem', 1) : palette('asideCatNavItem', 0)};
   background-color: ${(props) => props.active ? palette('asideCatNavItem', 3) : palette('asideCatNavItem', 2)};
@@ -21,7 +21,7 @@ const Styled = styled(Button)`
   &:hover {
     color: ${(props) => props.active ? palette('asideCatNavItemHover', 1) : palette('asideCatNavItemHover', 0)};
     background-color: ${(props) => props.active ? palette('asideCatNavItemHover', 3) : palette('asideCatNavItemHover', 2)};
-    border-bottom-color: ${palette('asideCatNavItemHover', 4)}
+    border-bottom-color: ${palette('asideCatNavItemHover', 4)};
   }
 `;
 
@@ -32,7 +32,7 @@ const TaxTitle = styled.div`
   width: 99%;
 `;
 const TaxIcon = styled.div`
-  padding: 0 1.5em;
+  padding-right: 0.75em;
   vertical-align: middle;
   display: table-cell;
   width: 90px;
