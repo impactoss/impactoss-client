@@ -36,11 +36,13 @@ const Bar = styled.div`
   vertical-align: middle;
   display: inline-block;
   position: relative;
+  border-right: ${(props) => props.secondary ? '1px solid' : 0};
+  border-right-color: ${palette('primary', 4)};
 `;
 const Count = styled.div`
   font-weight: bold;
   position: absolute;
-  font-size: 1.1em;
+  font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
   line-height: 1.6;
   right: 100%;
   text-align: right;
@@ -56,7 +58,7 @@ const CountSecondary = styled(Count)`
 `;
 const Title = styled.div`
   display: inline-block;
-  font-size: 1.1em;
+  font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
   line-height: 1.6;
   padding: 0 18px;
 `;
@@ -100,6 +102,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
             <Bar
               length={(count.accepted / col.maxCount) * 100}
               palette={col.entity}
+              secondary
             >
               <Count palette={col.entity}>
                 {count.accepted}

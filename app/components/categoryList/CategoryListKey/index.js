@@ -16,7 +16,7 @@ const KeyItem = styled.span`
 `;
 
 const Title = styled.div`
-  font-size: 0.85em;
+  font-size: 0.8em;
   padding-left: 0.25em;
   display: inline-block;
   vertical-align: middle;

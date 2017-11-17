@@ -158,6 +158,7 @@ const DiagramButton = styled(Button)`
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   font-weight: bold;
   min-width: 180px;
+  font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 `;
 const DiagramButtonWrap = styled.div`
   position: relative;
@@ -197,12 +198,11 @@ const DraftEntities = styled.div`
 `;
 
 const DiagramButtonMainTop = styled.div`
-  font-size: 1.3em;
+  font-size: ${(props) => props.theme.sizes.text.aaLarge};
   padding-bottom: 5px;
-`;
-const DiagramButtonMainBottom = styled.div`
   font-weight: normal;
 `;
+const DiagramButtonMainBottom = styled.div``;
 
 const DiagramSvgWrapper = styled.div`
   position: absolute;

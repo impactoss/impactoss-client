@@ -12,12 +12,12 @@ theme.breakpoints = {
 
 // global color palettes
 // primary color palette: dark to light
-// 0: main colour, darker, used for links and navigation elements, hover
-// 1: main colour, used for links and navigation elements
+// 0: main colour, darker, used for links and navigation elements, hover (AA)
+// 1: main colour, used for links and navigation elements (AA Large)
 // 2: main colour, light
 // 3: main colour, lighter (UNUSED)
 // 4: white
-const primary = coolorsToHex('https://coolors.co/d66149-eb6e51-ff9b69-ffb996-ffffff');
+const primary = coolorsToHex('https://coolors.co/cc482e-eb6e51-ff9b69-ffb996-ffffff');
   // secondary color palette: dark to light
   // 0: dark header colour, darker
   // 1: dark header colour
@@ -26,11 +26,11 @@ const primary = coolorsToHex('https://coolors.co/d66149-eb6e51-ff9b69-ffb996-fff
   // 4: white/placeholder
 const secondary = coolorsToHex('https://coolors.co/162331-182635-34404d-ffffff-ffffff');
 // dark grayscale: dark to light
-// 0:  darkest
-// 1:  darker
-// 2:  dark
-// 3:  medium gray 1 (AA conform)
-// 4:  medium gray 2 (AA large conform on white)
+// 0:  darkest (AA)
+// 1:  darker (AA)
+// 2:  dark (AA)
+// 3:  medium gray 1 (AA)
+// 4:  medium gray 2 (AA large)
 const dark = coolorsToHex('https://coolors.co/1d3033-344547-4a595c-6c787a-899395');
 // light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js
@@ -64,32 +64,57 @@ theme.palette = {
   info,
 
   // taxonomy/category colours
-  // 0: default/fallback
-  // 1: Human Rights Body
-  // 2: UN session
-  // 3: Human right
-  // 4: Affected persons
-  // 5: Thematic cluster
-  // 6: Organisation
-  // 7: SDGs
-  taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF'],
-  taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#65C99B', '#238680', '#4EA53C', '#006096', '#178EC1', '#08C4F8'],
+  // [default, 1: Human Rights Body, 2: UN session, 3: Human right, 4: Affected persons, 5: Thematic cluster, 6: Organisation, 7: SDGs, 8: unused]
+  // taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF'],
+  taxonomies: ['#8C969B', '#6B3285', '#5149AD', '#31A573', '#26938C', '#4DA53B', '#0069A4', '#199CD4', '#8C969B'],
+  // [#AA compliant]
+  taxonomiesHover: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
+  taxonomiesAA: ['#6D787E', '#6B3285', '#5149AD', '#28865D', '#21827B', '#3D832F', '#0069A4', '#147CA9', '#6D787E'],
+  taxonomiesHoverAA: ['#555E62', '#3A1D49', '#3B3681', '#1B5A3E', '#175956', '#2A5520', '#003A5C', '#0C4A64', '#393F41'],
 
   // other entities
-  measures: ['#FFC107'],
-  measuresHover: ['#F2B200'],
-  sdgtargets: ['#40D7FF'],
-  sdgtargetsHover: ['#08C4F8'],
+  // [#AA-Large compliant] 18pt/24px or 14pt/19px bold
+  measures: ['#BD8D00'], // FFC107
+  // [#AA compliant]
+  measuresHover: ['#987000'],
+  measuresAA: ['#987000'],
+  measuresHoverAA: ['#664B00'],
+  // [#AA-Large compliant]
+  sdgtargets: ['#00A0CC'], // 40D7FF
+  // [#AA compliant]
+  sdgtargetsHover: ['#0080A3'],
+  sdgtargetsAA: ['#0080A3'],
+  sdgtargetsHoverAA: ['#006480'],
+  // [#AA-Large compliant]
   indicators: ['#EB6E51'],
-  indicatorsHover: ['#D66149'],
+  // [#AA compliant]
+  indicatorsHover: ['#D73C19'],
+  indicatorsAA: ['#D73C19'],
+  indicatorsHoverAA: ['#972A12'],
+  // [#AA-Large compliant]
   reports: ['#EB6E51'],
-  reportsHover: ['#D66149'],
-  recommendations: ['#FF9B69', '#FFB28B'], // accepted, noted
-  recommendationsHover: ['#F48B5D'],
+  // [#AA compliant]
+  reportsHover: ['#D73C19'],
+  reportsAA: ['#D73C19'],
+  reportsHoverAA: ['#972A12'],
+  // [#AA-Large compliant]
+  recommendations: ['#E04B00', '#FF5F0F'], // accepted, noted ['#FF9B69', '#FFB28B'],
+  // [#AA compliant]
+  recommendationsHover: ['#D14600'],
+  recommendationsAA: ['#D14600', '#D14600'], // accepted, noted
+  recommendationsHoverAA: ['#752700'],
+  // [#AA-Large compliant]
   attributes: ['#6C787A'],
-  attributesHover: ['#4A595C'],
+  // [#AA compliant]
+  attributesHover: ['#434A4C'],
+  attributesAA: ['#6C787A'],
+  attributesHoverAA: ['#434A4C'],
+  // [#AA-Large compliant]
   roles: ['#6C787A'],
-  rolesHover: ['#4A595C'],
+  // [#AA compliant]
+  rolesHover: ['#434A4C'],
+  rolesAA: ['#6C787A'],
+  rolesHoverAA: ['#434A4C'],
 
 
   //
@@ -127,8 +152,8 @@ theme.palette = {
   // headerNavMain: [ '#bg', '#border'  ],
   headerNavMain: [secondary[1], secondary[0]],
   // headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
-  headerNavMainItem: [light[2], primary[0], 'transparent', 'transparent'],
-  headerNavMainItemHover: [primary[1], primary[1], 'transparent', 'transparent'],
+  headerNavMainItem: [light[2], primary[1], 'transparent', 'transparent'],
+  headerNavMainItemHover: [primary[1], primary[2], 'transparent', 'transparent'],
 
   //
   // SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
@@ -141,8 +166,8 @@ theme.palette = {
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
-  asideCatNavItem: [dark[2], primary[4], primary[4], primary[1], light[0]],
-  asideCatNavItemHover: [dark[0], primary[4], primary[4], primary[0], light[0]],
+  asideCatNavItem: [dark[2], primary[4], primary[4], primary[0], light[0]],
+  asideCatNavItemHover: [dark[0], primary[4], primary[4], primary[1], light[0]],
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
@@ -153,15 +178,15 @@ theme.palette = {
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary', #disabled],
-  buttonFlat: [primary[1], dark[3], light[4]],
-  buttonFlatHover: [primary[0], primary[1]],
+  buttonFlat: [primary[0], dark[3], light[4]],
+  buttonFlatHover: [primary[1], primary[1]],
   // buttonDefault: ['#text', '#bg'],
-  buttonDefault: [primary[4], primary[1]],
-  buttonDefaultInactive: [primary[4], primary[1]],
-  buttonDefaultHover: [primary[4], primary[0]],
+  buttonDefault: [primary[4], primary[0]],
+  buttonDefaultInactive: [primary[4], primary[0]],
+  buttonDefaultHover: [primary[4], primary[1]],
   // buttonPrimary: ['#text', '#bg', '#border'],
-  buttonDefaultIconOnly: [primary[4], primary[1], primary[1]],
-  buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],
+  buttonDefaultIconOnly: [primary[4], primary[0], primary[0]],
+  buttonDefaultIconOnlyHover: [primary[4], primary[1], primary[1]],
   // buttonSecondary: ['#text', '#bg'],
   buttonSecondary: [secondary[4], secondary[1]],
   buttonSecondaryHover: [secondary[4], secondary[0]],
@@ -170,8 +195,8 @@ theme.palette = {
   buttonToggleInactiveHover: [dark[1], primary[4]],
   // links
   // also see global-styles.js for default link "a"
-  linkDefault: [primary[1]],
-  linkDefaultHover: [primary[0]],
+  linkDefault: [primary[0]],
+  linkDefaultHover: [primary[1]],
   linkSecondary: [secondary[1]],
   linkSecondaryHover: [secondary[0]],
 
@@ -189,6 +214,10 @@ theme.fonts = {
 // sizes
 theme.sizes = {
   // also see global-styles.js for other sizes
+  text: {
+    aaLargeBold: '19px',
+    aaLarge: '24px',
+  },
   aside: {
     header: {
       height: 90,
