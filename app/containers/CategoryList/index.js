@@ -90,7 +90,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         <Sidebar>
           <Scrollable>
             <TaxonomySidebar
-              taxonomies={mapToTaxonomyList(taxonomies, onPageLink, reference, false)}
+              taxonomies={mapToTaxonomyList(taxonomies, onPageLink, reference)}
             />
           </Scrollable>
         </Sidebar>

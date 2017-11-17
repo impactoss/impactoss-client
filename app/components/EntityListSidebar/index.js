@@ -184,9 +184,10 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         hasUserRole,
         {
           attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
-          taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
+          taxonomyGroup: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
           connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
           connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
+          taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
         },
       );
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {

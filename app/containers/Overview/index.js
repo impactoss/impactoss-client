@@ -23,6 +23,8 @@ import {
 } from 'containers/App/selectors';
 import { PATHS, CONTENT_LIST } from 'containers/App/constants';
 
+import appMessages from 'containers/App/messages';
+
 // components
 import Button from 'components/buttons/Button';
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
@@ -133,8 +135,13 @@ const Categorised = styled.div`
 const CategorisedIcons = styled.div`
   padding-top: 5px;
 `;
-const CategorisedIcon = styled.span`
-  padding: 0 4px;
+const CategorisedIcon = styled.a`
+  display: inline-block;
+  padding: 0 2px;
+  color: ${(props) => props.active ? palette('linkDefaultHover', 0) : palette('dark', 4)};
+  &:hover {
+    color: ${palette('linkDefaultHover', 0)};
+  }
 `;
 
 const DiagramButton = styled(Button)`
@@ -216,6 +223,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       buttonMeasures: null,
       buttonIndicators: null,
       buttonSdgtargets: null,
+      mouseOverTaxonomy: null,
     };
   }
   // make sure to load all data from server
@@ -231,6 +239,12 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
   }
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
+  }
+
+  onTaxonomyIconMouseOver = (taxonomyId, isOver = true) => {
+    this.setState({
+      mouseOverTaxonomy: isOver ? taxonomyId : null,
+    });
   }
 
   getTaxonomiesByTagging = (taxonomies, tags) =>
@@ -250,60 +264,49 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
 
   getConnectionPath = (start, end) =>
     [
-      {
-        x: start.x + 5,
-        y: start.y,
-      },
-      {
-        x: end.x - 5,
-        y: end.y,
-      },
+      { x: start.x + 5, y: start.y },
+      { x: end.x - 5, y: end.y },
     ];
 
   getCurvedConnectionPath = (start, end, curve = 0.2) =>
     [
-      {
-        x: start.x + 5,
-        y: start.y,
-      },
-      {
-        x: start.x + ((end.x - start.x) * curve),
-        y: start.y,
-      },
-      {
-        x: start.x + ((end.x - start.x) * curve),
-        y: end.y,
-      },
-      {
-        x: end.x - 5,
-        y: end.y,
-      },
+      { x: start.x + 5, y: start.y },
+      { x: start.x + ((end.x - start.x) * curve), y: start.y },
+      { x: start.x + ((end.x - start.x) * curve), y: end.y },
+      { x: end.x - 5, y: end.y },
     ];
 
   getConnectionPathArrow = (connectionPath) => {
     const point = connectionPath[connectionPath.length - 1];
     return [
       point,
-      {
-        x: point.x - 5,
-        y: point.y - 5,
-      },
-      {
-        x: point.x - 5,
-        y: point.y + 5,
-      },
+      { x: point.x - 5, y: point.y - 5 },
+      { x: point.x - 5, y: point.y + 5 },
       point,
     ];
   }
 
   resize = () => this.forceUpdate();
 
-  renderTaxonomyIcons = (taxonomies) => (
+  renderTaxonomyIcons = (taxonomies, activeTaxonomyId) => (
     <CategorisedIcons>
       {
         taxonomies.toList().map((tax, i) =>
           (
-            <CategorisedIcon key={i}>
+            <CategorisedIcon
+              key={i}
+              href={`${PATHS.TAXONOMIES}/${tax.get('id')}`}
+              onClick={(evt) => {
+                if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                this.props.onPageLink(`${PATHS.TAXONOMIES}/${tax.get('id')}`);
+              }}
+              onMouseOver={() => this.onTaxonomyIconMouseOver(tax.get('id'))}
+              onFocus={() => this.onTaxonomyIconMouseOver(tax.get('id'))}
+              onMouseOut={() => this.onTaxonomyIconMouseOver(tax.get('id'), false)}
+              onBlur={() => this.onTaxonomyIconMouseOver(tax.get('id'), false)}
+              active={activeTaxonomyId === tax.get('id')}
+              title={this.context.intl.formatMessage(appMessages.entities.taxonomies[tax.get('id')].plural)}
+            >
               <Icon name={`taxonomy_${tax.get('id')}`} size="2em" />
             </CategorisedIcon>
           )
@@ -356,7 +359,12 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         <Sidebar>
           <Scrollable>
             <TaxonomySidebar
-              taxonomies={mapToTaxonomyList(taxonomies, onPageLink)}
+              taxonomies={mapToTaxonomyList(
+                taxonomies,
+                onPageLink,
+                this.state.mouseOverTaxonomy,
+                this.onTaxonomyIconMouseOver,
+              )}
             />
           </Scrollable>
         </Sidebar>
@@ -450,7 +458,10 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                         <Categorised>
                           <FormattedMessage {...messages.diagram.categorised} />
                           {
-                            this.renderTaxonomyIcons(this.getTaxonomiesByTagging(taxonomies, 'tags_recommendations'))
+                            this.renderTaxonomyIcons(
+                              this.getTaxonomiesByTagging(taxonomies, 'tags_recommendations'),
+                              this.state.mouseOverTaxonomy
+                            )
                           }
                         </Categorised>
                       </DiagramButtonWrap>
@@ -476,7 +487,10 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                         <Categorised>
                           <FormattedMessage {...messages.diagram.categorised} />
                           {
-                            this.renderTaxonomyIcons(this.getTaxonomiesByTagging(taxonomies, 'tags_sdgtargets'))
+                            this.renderTaxonomyIcons(
+                              this.getTaxonomiesByTagging(taxonomies, 'tags_sdgtargets'),
+                              this.state.mouseOverTaxonomy
+                            )
                           }
                         </Categorised>
                       </DiagramButtonWrap>
@@ -512,7 +526,10 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                         <Categorised>
                           <FormattedMessage {...messages.diagram.categorised} />
                           {
-                            this.renderTaxonomyIcons(this.getTaxonomiesByTagging(taxonomies, 'tags_measures'))
+                            this.renderTaxonomyIcons(
+                              this.getTaxonomiesByTagging(taxonomies, 'tags_measures'),
+                              this.state.mouseOverTaxonomy
+                            )
                           }
                         </Categorised>
                       </DiagramButtonWrap>

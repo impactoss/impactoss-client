@@ -1,6 +1,6 @@
 import { PATHS } from 'containers/App/constants';
 
-const getTaxonomyTagList = (taxonomy) => {
+export const getTaxonomyTagList = (taxonomy) => {
   const tags = [];
   if (taxonomy.getIn(['attributes', 'tags_measures'])) {
     tags.push({
@@ -22,11 +22,11 @@ const getTaxonomyTagList = (taxonomy) => {
   }
   return tags;
 };
-export const mapToTaxonomyList = (taxonomies, onLink, activeId, tags = false) => taxonomies.map((tax) => ({
+export const mapToTaxonomyList = (taxonomies, onLink, activeId, onMouseOver) => taxonomies.map((tax) => ({
   id: tax.get('id'),
   count: tax.count,
   onLink: () => onLink(`${PATHS.TAXONOMIES}/${tax.get('id')}`),
-  tags: tags ? getTaxonomyTagList(tax) : null,
+  onMouseOver: (isOver = true) => onMouseOver && onMouseOver(tax.get('id'), isOver),
   active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
 })).toArray();
 
