@@ -45,6 +45,10 @@ import {
   selectIndicatorCount,
   selectMeasureCount,
   selectSdgtargetCount,
+  selectRecommendationDraftCount,
+  selectIndicatorDraftCount,
+  selectMeasureDraftCount,
+  selectSdgtargetDraftCount,
 } from './selectors';
 
 const Content = styled.div`
@@ -151,7 +155,7 @@ const DiagramButton = styled(Button)`
   }
   background-color: ${palette('primary', 4)};
   border-radius: 999px;
-  padding: 0.8em 1em 1.2em;
+  padding: 0.6em 1em 1.4em;
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   font-weight: bold;
   min-width: 180px;
@@ -170,24 +174,29 @@ const DiagramButtonMain = styled(DiagramButton)`
     background-color: ${palette('primary', 0)};
   }
   &:before {
-    content:'';
-    display:inline-block;
-    vertical-align:middle;
-    padding-top:100%;
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    padding-top: 100%;
   }
 `;
 const DiagramButtonMainInside = styled.span`
-  display:inline-block;
-  vertical-align:middle;
+  display: inline-block;
+  vertical-align: middle;
   margin-top: -30px;
 `;
 const DiagramButtonIcon = styled.div`
   padding-bottom: 5px;
 `;
 
-const Count = styled.span`
-  padding-right: 5px;
+const DraftEntities = styled.div`
+  font-size: 0.85em;
+  font-weight: normal;
+  position: absolute;
+  left: 0;
+  right: 0;
 `;
+
 const DiagramButtonMainTop = styled.div`
   font-size: 1.3em;
   padding-bottom: 5px;
@@ -324,6 +333,10 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       sdgtargetCount,
       measureCount,
       indicatorCount,
+      recommendationDraftCount,
+      sdgtargetDraftCount,
+      measureDraftCount,
+      indicatorDraftCount,
     } = this.props;
 
     const connectRecommendationsMeasures = this.state.buttonRecs && this.state.buttonMeasures && this.state.diagram &&
@@ -451,9 +464,13 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                             <Icon name="recommendations" />
                           </DiagramButtonIcon>
                           <div>
-                            <Count>{recommendationCount}</Count>
-                            <FormattedMessage {...messages.buttons.recommendations} />
+                            <FormattedMessage {...messages.buttons.recommendations} values={{ count: recommendationCount }} />
                           </div>
+                          { recommendationDraftCount > 0 &&
+                            <DraftEntities>
+                              <FormattedMessage {...messages.buttons.draft} values={{ count: recommendationDraftCount }} />
+                            </DraftEntities>
+                          }
                         </DiagramButton>
                         <Categorised>
                           <FormattedMessage {...messages.diagram.categorised} />
@@ -480,9 +497,13 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                             <Icon name="sdgtargets" />
                           </DiagramButtonIcon>
                           <div>
-                            <Count>{sdgtargetCount}</Count>
-                            <FormattedMessage {...messages.buttons.sdgtargets} />
+                            <FormattedMessage {...messages.buttons.sdgtargets} values={{ count: sdgtargetCount }} />
                           </div>
+                          { sdgtargetDraftCount > 0 &&
+                            <DraftEntities>
+                              <FormattedMessage {...messages.buttons.draft} values={{ count: sdgtargetDraftCount }} />
+                            </DraftEntities>
+                          }
                         </DiagramButton>
                         <Categorised>
                           <FormattedMessage {...messages.diagram.categorised} />
@@ -518,9 +539,13 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                               <FormattedMessage {...messages.buttons.measures} />
                             </DiagramButtonMainTop>
                             <DiagramButtonMainBottom>
-                              <Count>{measureCount}</Count>
-                              <FormattedMessage {...messages.buttons.measuresAdditional} />
+                              <FormattedMessage {...messages.buttons.measuresAdditional} values={{ count: measureCount }} />
                             </DiagramButtonMainBottom>
+                            { measureDraftCount > 0 &&
+                              <DraftEntities>
+                                <FormattedMessage {...messages.buttons.draft} values={{ count: measureDraftCount }} />
+                              </DraftEntities>
+                            }
                           </DiagramButtonMainInside>
                         </DiagramButtonMain>
                         <Categorised>
@@ -552,9 +577,13 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                           <Icon name="indicators" />
                         </DiagramButtonIcon>
                         <div>
-                          <Count>{indicatorCount}</Count>
-                          <FormattedMessage {...messages.buttons.indicators} />
+                          <FormattedMessage {...messages.buttons.indicators} values={{ count: indicatorCount }} />
                         </div>
+                        { indicatorDraftCount > 0 &&
+                          <DraftEntities>
+                            <FormattedMessage {...messages.buttons.draft} values={{ count: indicatorDraftCount }} />
+                          </DraftEntities>
+                        }
                       </DiagramButton>
                     </DiagramVCenter>
                   </DiagramRight>
@@ -576,6 +605,10 @@ Overview.propTypes = {
   measureCount: PropTypes.number,
   sdgtargetCount: PropTypes.number,
   indicatorCount: PropTypes.number,
+  recommendationDraftCount: PropTypes.number,
+  measureDraftCount: PropTypes.number,
+  sdgtargetDraftCount: PropTypes.number,
+  indicatorDraftCount: PropTypes.number,
 };
 
 Overview.contextTypes = {
@@ -589,6 +622,10 @@ const mapStateToProps = (state) => ({
   measureCount: selectMeasureCount(state),
   sdgtargetCount: selectSdgtargetCount(state),
   indicatorCount: selectIndicatorCount(state),
+  recommendationDraftCount: selectRecommendationDraftCount(state),
+  measureDraftCount: selectMeasureDraftCount(state),
+  sdgtargetDraftCount: selectSdgtargetDraftCount(state),
+  indicatorDraftCount: selectIndicatorDraftCount(state),
 });
 
 function mapDispatchToProps(dispatch) {
