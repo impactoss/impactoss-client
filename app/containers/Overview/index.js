@@ -233,6 +233,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       buttonIndicators: null,
       buttonSdgtargets: null,
       mouseOverTaxonomy: null,
+      mouseOverTaxonomyDiagram: null,
     };
   }
   // make sure to load all data from server
@@ -251,6 +252,12 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
   }
 
   onTaxonomyIconMouseOver = (taxonomyId, isOver = true) => {
+    this.setState({
+      mouseOverTaxonomyDiagram: isOver ? taxonomyId : null,
+    });
+  }
+
+  onTaxonomyMouseOver = (taxonomyId, isOver = true) => {
     this.setState({
       mouseOverTaxonomy: isOver ? taxonomyId : null,
     });
@@ -375,8 +382,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
               taxonomies={mapToTaxonomyList(
                 taxonomies,
                 onPageLink,
-                this.state.mouseOverTaxonomy,
-                this.onTaxonomyIconMouseOver,
+                this.state.mouseOverTaxonomyDiagram,
+                this.onTaxonomyMouseOver,
               )}
             />
           </Scrollable>
@@ -477,7 +484,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                           {
                             this.renderTaxonomyIcons(
                               this.getTaxonomiesByTagging(taxonomies, 'tags_recommendations'),
-                              this.state.mouseOverTaxonomy
+                              this.state.mouseOverTaxonomy || this.state.mouseOverTaxonomyDiagram
                             )
                           }
                         </Categorised>
@@ -510,7 +517,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                           {
                             this.renderTaxonomyIcons(
                               this.getTaxonomiesByTagging(taxonomies, 'tags_sdgtargets'),
-                              this.state.mouseOverTaxonomy
+                              this.state.mouseOverTaxonomy || this.state.mouseOverTaxonomyDiagram
                             )
                           }
                         </Categorised>
@@ -553,7 +560,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                           {
                             this.renderTaxonomyIcons(
                               this.getTaxonomiesByTagging(taxonomies, 'tags_measures'),
-                              this.state.mouseOverTaxonomy
+                              this.state.mouseOverTaxonomy || this.state.mouseOverTaxonomyDiagram
                             )
                           }
                         </Categorised>

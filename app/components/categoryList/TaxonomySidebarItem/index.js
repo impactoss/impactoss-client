@@ -47,7 +47,7 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
     const { taxonomy } = this.props;
     return (
       <Styled
-        onClick={() => taxonomy.onLink()}
+        onClick={() => taxonomy.onLink(taxonomy.active)}
         active={taxonomy.active}
         onMouseOver={() => taxonomy.onMouseOver && taxonomy.onMouseOver()}
         onFocus={() => taxonomy.onMouseOver && taxonomy.onMouseOver()}

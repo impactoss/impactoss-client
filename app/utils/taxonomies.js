@@ -25,7 +25,7 @@ export const getTaxonomyTagList = (taxonomy) => {
 export const mapToTaxonomyList = (taxonomies, onLink, activeId, onMouseOver) => taxonomies.map((tax) => ({
   id: tax.get('id'),
   count: tax.count,
-  onLink: () => onLink(`${PATHS.TAXONOMIES}/${tax.get('id')}`),
+  onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${tax.get('id')}`),
   onMouseOver: (isOver = true) => onMouseOver && onMouseOver(tax.get('id'), isOver),
   active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
 })).toArray();
