@@ -25,6 +25,14 @@ export const DATE_FORMAT = 'dd/mm/yyyy';
 // - app.containers.App.app.claim
 export const SHOW_HEADER_TITLE = true;
 
+// show header pattern
+// specified in themes/[theme].js: theme.backgroundImages.header
+export const SHOW_HEADER_PATTERN = true;
+
+// show header pattern
+// specified in themes/[theme].js: theme.backgroundImages.sidebarHeader
+export const SHOW_SIDEBAR_HEADER_PATTERN = true;
+
 // show app title and claim in home when not included in graphic
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
