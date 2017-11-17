@@ -56,7 +56,7 @@ const Content = styled.div`
 `;
 const Description = styled.p`
   margin-bottom: 2em;
-  font-size: 1.25em;
+  font-size: 1.1em;
 `;
 const Diagram = styled.div`
   position: relative;
