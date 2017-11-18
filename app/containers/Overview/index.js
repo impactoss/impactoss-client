@@ -141,18 +141,22 @@ const CategorisedIcons = styled.div``;
 const CategorisedIcon = styled.a`
   display: inline-block;
   padding: 0 2px;
-  color: ${(props) => props.active ? palette('primary', 0) : palette('dark', 3)};
+  color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : palette('dark', 4)};
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${(props) => palette('taxonomies', props.paletteId)};
   }
 `;
+// color: ${(props) => props.active ? palette('primary', 0) : palette('dark', 3)};
+// &:hover {
+//   color: ${palette('primary', 0)};
+// }
 
 const DiagramButton = styled(Button)`
-  color: ${palette('primary', 0)};
+  background-color: ${(props) => palette(props.palette, 0)};
   &:hover {
-    color: ${palette('primary', 1)};
+    background-color: ${(props) => palette(props.paletteHover, 0)};
   }
-  background-color: ${palette('primary', 4)};
+  color: ${palette('primary', 4)};
   border-radius: 999px;
   padding: 0.6em 1em 1.4em;
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
@@ -165,14 +169,14 @@ const DiagramButtonWrap = styled.div`
   padding: 1em 0;
   display: inline-block;
 `;
+// color: ${palette('primary', 4)};
+// &:hover {
+//   color: ${palette('primary', 4)};
+//   background-color: ${palette('primary', 1)};
+// }
 const DiagramButtonMain = styled(DiagramButton)`
-  color: ${palette('primary', 4)};
   background-color: ${palette('primary', 0)};
   min-width: 230px;
-  &:hover {
-    color: ${palette('primary', 4)};
-    background-color: ${palette('primary', 1)};
-  }
   &:before {
     content: '';
     display: inline-block;
@@ -314,6 +318,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             <CategorisedIcon
               key={i}
               href={`${PATHS.TAXONOMIES}/${tax.get('id')}`}
+              paletteId={parseInt(tax.get('id'), 10)}
               onClick={(evt) => {
                 if (evt !== undefined && evt.preventDefault) evt.preventDefault();
                 this.props.onPageLink(`${PATHS.TAXONOMIES}/${tax.get('id')}`);
@@ -463,6 +468,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                       <DiagramButtonWrap>
                         <DiagramButton
                           onClick={() => onPageLink(PATHS.RECOMMENDATIONS)}
+                          palette={'recommendations'}
+                          paletteHover={'recommendationsHover'}
                           innerRef={(node) => {
                             if (!this.state.buttonRecs) {
                               this.setState({ buttonRecs: node });
@@ -496,6 +503,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                       <DiagramButtonWrap>
                         <DiagramButton
                           onClick={() => onPageLink(PATHS.SDG_TARGETS)}
+                          palette={'sdgtargets'}
+                          paletteHover={'sdgtargetsHover'}
                           innerRef={(node) => {
                             if (!this.state.buttonSdgtargets) {
                               this.setState({ buttonSdgtargets: node });
@@ -534,6 +543,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                       <DiagramButtonWrap>
                         <DiagramButtonMain
                           onClick={() => onPageLink(PATHS.MEASURES)}
+                          palette={'measures'}
+                          paletteHover={'measuresHover'}
                           innerRef={(node) => {
                             if (!this.state.buttonMeasures) {
                               this.setState({ buttonMeasures: node });
@@ -576,6 +587,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                     <DiagramVCenter>
                       <DiagramButton
                         onClick={() => onPageLink(PATHS.INDICATORS)}
+                        palette={'indicators'}
+                        paletteHover={'indicatorsHover'}
                         innerRef={(node) => {
                           if (!this.state.buttonIndicators) {
                             this.setState({ buttonIndicators: node });

@@ -16,14 +16,22 @@ const Styled = styled(Button)`
   padding: 0.5em 0.5em 0.5em 1.5em;
   text-align: left;
   color:  ${(props) => props.active ? palette('asideCatNavItem', 1) : palette('asideCatNavItem', 0)};
-  background-color: ${(props) => props.active ? palette('asideCatNavItem', 3) : palette('asideCatNavItem', 2)};
+  background-color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : palette('asideCatNavItem', 2)};
   border-bottom: 1px solid ${palette('asideCatNavItem', 4)};
   &:hover {
-    color: ${(props) => props.active ? palette('asideCatNavItemHover', 1) : palette('asideCatNavItemHover', 0)};
-    background-color: ${(props) => props.active ? palette('asideCatNavItemHover', 3) : palette('asideCatNavItemHover', 2)};
+    color: ${palette('asideCatNavItemHover', 1)};
+    background-color: ${(props) => props.active ? palette('taxonomiesHover', props.paletteId) : palette('taxonomies', props.paletteId)};
     border-bottom-color: ${palette('asideCatNavItemHover', 4)};
   }
 `;
+// color:  ${(props) => props.active ? palette('asideCatNavItem', 1) : palette('asideCatNavItem', 0)};
+// background-color: ${(props) => props.active ? palette('asideCatNavItem', 3) : palette('asideCatNavItem', 2)};
+// border-bottom: 1px solid ${palette('asideCatNavItem', 4)};
+// &:hover {
+//   color: ${(props) => props.active ? palette('asideCatNavItemHover', 1) : palette('asideCatNavItemHover', 0)};
+//   background-color: ${(props) => props.active ? palette('asideCatNavItemHover', 3) : palette('asideCatNavItemHover', 2)};
+//   border-bottom-color: ${palette('asideCatNavItemHover', 4)};
+// }
 
 const TaxTitle = styled.div`
   font-weight: bold;
@@ -50,6 +58,7 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
       <Styled
         onClick={() => taxonomy.onLink(taxonomy.active)}
         active={taxonomy.active}
+        paletteId={parseInt(taxonomy.id, 10)}
         onMouseOver={() => taxonomy.onMouseOver && taxonomy.onMouseOver()}
         onFocus={() => taxonomy.onMouseOver && taxonomy.onMouseOver()}
         onMouseOut={() => taxonomy.onMouseOver && taxonomy.onMouseOver(false)}

@@ -19,7 +19,7 @@ theme.breakpoints = {
 // 4: white
 const primary = coolorsToHex('https://coolors.co/cc482e-eb6e51-ff9b69-ffb996-ffffff');
   // secondary color palette: dark to light
-  // 0: dark header colour, darker
+  // 0: dark header colour, darker // 162331
   // 1: dark header colour
   // 2: dark header colour, lighter (UNUSED)
   // 3: white/placeholder
@@ -83,14 +83,14 @@ theme.palette = {
   // sdgtargets: ['#00A0CC'], // 40D7FF
   // [#AA compliant]
   sdgtargets: ['#0080A3'], // 40D7FF, 00A0CC
-  sdgtargetsHover: ['#0080A3'],
+  sdgtargetsHover: ['#00546B'],
   // sdgtargetsAA: ['#0080A3'],
   // sdgtargetsHoverAA: ['#006480'],
   // [#AA-Large compliant]
   // indicators: ['#EB6E51'],
   // [#AA compliant]
   indicators: ['#553529'],
-  indicatorsHover: ['#D73C19'],
+  indicatorsHover: ['#2A1913'],
   // indicatorsAA: ['#D73C19'],
   // indicatorsHoverAA: ['#972A12'],
   // [#AA-Large compliant]
@@ -106,7 +106,7 @@ theme.palette = {
   // [#AA compliant]
   recommendations: [secondary[1], secondary[3]], // accepted, noted ['#FF9B69', '#FFB28B'],
   // recommendationsHover: ['#261812'],
-  recommendationsHover: [secondary[0]],
+  recommendationsHover: ['#191D29'],
   // recommendationsAA: ['#D14600', '#D14600'], // accepted, noted
   // recommendationsHoverAA: ['#752700'],
   // [#AA-Large compliant]
