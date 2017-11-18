@@ -57,6 +57,7 @@ import {
   updateSortOrder,
   setClientPath,
   dismissError,
+  resetSearchQuery,
 } from './actions';
 
 const Progress = styled.div`
@@ -181,6 +182,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onGroupSelect={this.props.onGroupSelect}
           onSubgroupSelect={this.props.onSubgroupSelect}
           onSearch={this.props.onSearch}
+          onResetFilters={this.props.onResetFilters}
           onPageSelect={this.props.onPageSelect}
           onPageItemsSelect={this.props.onPageItemsSelect}
           onEntityClick={(id, path) => this.props.onEntityClick(id, path, viewDomain.get('errors'))}
@@ -257,6 +259,7 @@ EntityList.propTypes = {
   onGroupSelect: PropTypes.func.isRequired,
   onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
+  onResetFilters: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
   onPageItemsSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
@@ -332,6 +335,9 @@ function mapDispatchToProps(dispatch, props) {
           checked: value !== '',
         },
       ])));
+    },
+    onResetFilters: (values) => {
+      dispatch(resetSearchQuery(values));
     },
     onGroupSelect: (value) => {
       dispatch(updateGroup(fromJS([

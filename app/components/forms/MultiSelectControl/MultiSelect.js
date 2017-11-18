@@ -67,7 +67,7 @@ const ControlFooter = styled.div`
 `;
 
 const Search = styled.div`
-  padding: 0.5em 1em;
+  padding: 0.75em 1em;
   background-color: ${palette('light', 0)};
 `;
 
@@ -141,6 +141,12 @@ class MultiSelect extends React.Component {
   onSearch = (value) => {
     this.setState({
       query: value,
+    });
+  }
+  onResetFilters = () => {
+    this.setState({
+      query: null,
+      queryTags: [],
     });
   }
   onTagSelected = (active, tagOption) => {
@@ -334,6 +340,7 @@ class MultiSelect extends React.Component {
             <Search>
               <TagSearch
                 onSearch={this.onSearch}
+                onClear={this.onResetFilters}
                 filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}
                 searchQuery={this.state.query || ''}
                 multiselect

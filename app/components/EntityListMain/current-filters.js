@@ -7,6 +7,30 @@ import isNumber from 'utils/is-number';
 import asList from 'utils/as-list';
 
 
+export const currentFilterArgs = (config, locationQuery) => {
+  let args = [];
+  if (config.taxonomies && locationQuery.get(config.taxonomies.query)) {
+    args = args.concat(config.taxonomies.query);
+  }
+  if (config.connectedTaxonomies && locationQuery.get(config.connectedTaxonomies.query)) {
+    args = args.concat(config.connectedTaxonomies.query);
+  }
+  if (config.connections && locationQuery.get(config.connections.query)) {
+    args = args.concat(config.connections.query);
+  }
+  if (locationQuery.get('where')) {
+    args = args.concat('where');
+  }
+  if (locationQuery.get('without')) {
+    args = args.concat('without');
+  }
+  if (locationQuery.get('search')) {
+    args = args.concat('search');
+  }
+  return args;
+};
+
+
 export const currentFilters = ({
   config,
   entities,
