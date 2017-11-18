@@ -9,7 +9,7 @@ const Status = styled.div`
   font-weight: bold;
   font-size: 13px;
   text-transform: uppercase;
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
   padding-left: 1em;
 `;
 

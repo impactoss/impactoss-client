@@ -15,7 +15,7 @@ import ItemStatus from 'components/ItemStatus';
 
 const Id = styled.div`
   font-weight: 500;
-  color: ${palette('dark', 4)}
+  color: ${palette('dark', 3)}
 `;
 
 class ListField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

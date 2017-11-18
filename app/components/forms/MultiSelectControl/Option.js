@@ -24,13 +24,12 @@ const New = styled.span`
   border-radius: 4px;
 `;
 const Id = styled.span`
-  font-weight: bold;
-  color: ${palette('dark', 4)}
+  color: ${palette('dark', 3)}
 `;
 const IdSpacer = styled.span`
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  color: ${palette('dark', 4)};
+  padding-left: 0.25em;
+  padding-right: 0.25em;
+  color: ${palette('dark', 3)};
 `;
 // <Label bold={props.bold} italic={props.isNew}>
 class Option extends React.Component { // eslint-disable-line react/prefer-stateless-function

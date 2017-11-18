@@ -9,7 +9,7 @@ import messages from './messages';
 
 const MarkdownHint = styled.div`
   text-align: right;
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
   font-size: 0.85em;
   font-weight: bold;
 `;

@@ -21,7 +21,7 @@ import {
 } from './actions';
 
 const Styled = styled(ContainerWithSidebar)`
-  z-index: 100;
+  z-index: 99;
   background-color: rgba(0,0,0,0.2);
 `;
 

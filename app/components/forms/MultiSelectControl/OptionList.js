@@ -23,6 +23,7 @@ const ListWrapper = styled.div`
 const OptionWrapper = styled.div`
   display: table-row;
   width: 100%;
+  line-height: 1.33;
 `;
 // background-color: ${(props) => {
 //   if (props.changedToChecked) {
@@ -43,12 +44,16 @@ const CheckboxWrapper = styled.div`
   width: 10px;
   border-bottom: 1px solid ${palette('light', 1)};
 `;
+
+const OPTION_PADDING = '1em';
+const OPTION_PADDING_SECONDARY = '0.5em';
+
 const OptionLabel = styled.label`
   display: table-cell;
   vertical-align:middle;
   cursor: pointer;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+  padding-top: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
+  padding-bottom: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
   padding-left: 0.5em;
   padding-right: 0.5em;
   border-bottom: 1px solid ${palette('light', 1)};
@@ -62,9 +67,9 @@ const OptionLabel = styled.label`
 const OptionCount = styled.span`
   display: table-cell;
   vertical-align:top;
-  color: ${palette('dark', 4)};
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+  color: ${palette('dark', 3)};
+  padding-top: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
+  padding-bottom: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
   padding-right: 1em;
   text-align: right;
   border-bottom: 1px solid ${palette('light', 1)};
@@ -73,6 +78,7 @@ const OptionCount = styled.span`
 const Empty = styled.div`
   padding: 1em;
   font-style: italic;
+  color: ${palette('dark', 3)};
 `;
 
 const More = styled.div`
@@ -119,6 +125,7 @@ class OptionList extends React.PureComponent {
                 key={id}
                 changedToChecked={option.get('changedToChecked')}
                 changedToUnchecked={option.get('changedToUnchecked')}
+                secondary={this.props.secondary}
               >
                 <CheckboxWrapper>
                   { isIndeterminate &&
@@ -146,6 +153,7 @@ class OptionList extends React.PureComponent {
                   htmlFor={id}
                   changedToChecked={option.get('changedToChecked')}
                   changedToUnchecked={option.get('changedToUnchecked')}
+                  secondary={this.props.secondary}
                 >
                   <Option
                     bold={option.get('labelBold') || checked}
@@ -158,7 +166,7 @@ class OptionList extends React.PureComponent {
                   />
                 </OptionLabel>
                 { option.get('showCount') && typeof option.get('count') !== 'undefined' &&
-                  <OptionCount>
+                  <OptionCount secondary={this.props.secondary}>
                     {option.get('count')}
                   </OptionCount>
                 }
@@ -200,6 +208,7 @@ class OptionList extends React.PureComponent {
 OptionList.propTypes = {
   options: PropTypes.object,
   onCheckboxChange: PropTypes.func,
+  secondary: PropTypes.bool,
 };
 
 export default OptionList;

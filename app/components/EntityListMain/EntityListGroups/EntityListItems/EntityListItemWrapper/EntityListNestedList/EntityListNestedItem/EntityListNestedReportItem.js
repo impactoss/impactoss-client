@@ -13,7 +13,7 @@ const Styled = styled.a`
   background-color: ${palette('primary', 4)};
   margin-bottom: 1px;
   display: block;
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
   &:hover {
     color: ${palette('dark', 2)};
   }

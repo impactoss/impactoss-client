@@ -56,7 +56,7 @@ import MultiSelectField from 'components/forms/MultiSelectField';
 import messages from './messages';
 
 const Hint = styled.span`
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
   display: block;
   font-size: 0.85em;
 `;

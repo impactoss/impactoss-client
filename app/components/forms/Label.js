@@ -4,7 +4,7 @@ import { palette } from 'styled-theme';
 const Label = styled.label`
   display: ${(props) => props.inline ? 'inline-block' : 'block'};
   position: relative;
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
   font-weight: 500;
   font-size: 0.85em;
 `;

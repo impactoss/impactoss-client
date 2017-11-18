@@ -111,7 +111,7 @@ const Annotation = styled.div`
   text-align: center;
   word-spacing: 1000000px;
   width: 200px;
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
   line-height: 1.1em;
   font-size: 0.85em;
   margin-top: -2em;
@@ -131,7 +131,7 @@ const Categorised = styled.div`
   text-align: left;
   left: 0;
   padding-top: 5px;
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
   font-weight: normal;
   font-size: 0.85em;
 `;
@@ -141,7 +141,7 @@ const CategorisedIcons = styled.div``;
 const CategorisedIcon = styled.a`
   display: inline-block;
   padding: 0 2px;
-  color: ${(props) => props.active ? palette('primary', 0) : palette('dark', 4)};
+  color: ${(props) => props.active ? palette('primary', 0) : palette('dark', 3)};
   &:hover {
     color: ${palette('primary', 0)};
   }

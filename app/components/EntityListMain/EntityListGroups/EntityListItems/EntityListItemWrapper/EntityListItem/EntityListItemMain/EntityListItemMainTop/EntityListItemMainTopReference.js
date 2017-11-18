@@ -6,7 +6,7 @@ const EntityListItemMainTopReference = styled.a`
   text-decoration: none;
   display: block;
   float:left;
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
   &:hover {
     color: ${palette('dark', 2)};
   }

@@ -108,6 +108,7 @@ class TagFilters extends React.PureComponent {
               { key === this.state.active &&
                 <Dropdown>
                   <OptionList
+                    secondary
                     options={this.prepareOptions(group.options, this.props.queryTags)}
                     onCheckboxChange={(active, tagOption) => {
                       this.setState({ active: null });

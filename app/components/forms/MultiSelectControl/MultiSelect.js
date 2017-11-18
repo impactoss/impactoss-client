@@ -83,7 +83,8 @@ const LabelWrap = styled.div`
   display: table-cell;
   padding-left: 0.5em;
   padding-right: 1em;
-  font-size: 0.9em;
+  font-size: 0.8em;
+  vertical-align: middle;
 `;
 const CheckboxWrap = styled.div`
   text-align: center;
@@ -91,13 +92,12 @@ const CheckboxWrap = styled.div`
   padding-left: 1em;
   padding-right: 0.5em;
   width: 10px;
+  vertical-align: middle;
 `;
 const Checkbox = styled(IndeterminateCheckbox)`
   vertical-align: middle;
 `;
-const Label = styled.label`
-  vertical-align: middle;
-`;
+const Label = styled.label``;
 
 
 class MultiSelect extends React.Component {
