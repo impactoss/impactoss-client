@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import Link from './Link';
+import LinkSecondary from './LinkSecondary';
 
-export default styled(Link)`
+export default styled(LinkSecondary)`
   cursor: default;
   color: ${palette('headerNavAccountItem', 0)};
   background-color: ${palette('headerNavAccountItem', 2)};

@@ -141,16 +141,16 @@ const CategorisedIcons = styled.div``;
 const CategorisedIcon = styled.a`
   display: inline-block;
   padding: 0 2px;
-  color: ${(props) => props.active ? palette('linkDefaultHover', 0) : palette('dark', 4)};
+  color: ${(props) => props.active ? palette('primary', 0) : palette('dark', 4)};
   &:hover {
-    color: ${palette('linkDefaultHover', 0)};
+    color: ${palette('primary', 0)};
   }
 `;
 
 const DiagramButton = styled(Button)`
-  color: ${palette('primary', 1)};
+  color: ${palette('primary', 0)};
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${palette('primary', 1)};
   }
   background-color: ${palette('primary', 4)};
   border-radius: 999px;
@@ -158,8 +158,8 @@ const DiagramButton = styled(Button)`
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   font-weight: bold;
   min-width: 180px;
-  font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 `;
+// font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 const DiagramButtonWrap = styled.div`
   position: relative;
   padding: 1em 0;
@@ -167,11 +167,11 @@ const DiagramButtonWrap = styled.div`
 `;
 const DiagramButtonMain = styled(DiagramButton)`
   color: ${palette('primary', 4)};
-  background-color: ${palette('primary', 1)};
+  background-color: ${palette('primary', 0)};
   min-width: 230px;
   &:hover {
     color: ${palette('primary', 4)};
-    background-color: ${palette('primary', 0)};
+    background-color: ${palette('primary', 1)};
   }
   &:before {
     content: '';
@@ -198,11 +198,14 @@ const DraftEntities = styled.div`
 `;
 
 const DiagramButtonMainTop = styled.div`
-  font-size: ${(props) => props.theme.sizes.text.aaLarge};
+  font-size: 1.3em;
   padding-bottom: 5px;
+  font-weight: bold;
+`;
+// font-size: ${(props) => props.theme.sizes.text.aaLarge};
+const DiagramButtonMainBottom = styled.div`
   font-weight: normal;
 `;
-const DiagramButtonMainBottom = styled.div``;
 
 const DiagramSvgWrapper = styled.div`
   position: absolute;
