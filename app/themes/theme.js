@@ -24,7 +24,7 @@ const primary = coolorsToHex('https://coolors.co/cc482e-eb6e51-ff9b69-ffb996-fff
   // 2: dark header colour, lighter (UNUSED)
   // 3: white/placeholder
   // 4: white/placeholder
-const secondary = coolorsToHex('https://coolors.co/162331-182635-34404d-ffffff-ffffff');
+const secondary = coolorsToHex('https://coolors.co/162331-182635-34404d-465867-ffffff');
 // dark grayscale: dark to light
 // 0:  darkest (AA)
 // 1:  darker (AA)
@@ -66,43 +66,49 @@ theme.palette = {
   // taxonomy/category colours
   // [default, 1: Human Rights Body, 2: UN session, 3: Human right, 4: Affected persons, 5: Thematic cluster, 6: Organisation, 7: SDGs, 8: unused]
   // taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF'],
-  taxonomies: ['#8C969B', '#6B3285', '#5149AD', '#31A573', '#26938C', '#4DA53B', '#0069A4', '#199CD4', '#8C969B'],
+  // taxonomiesAAL: ['#8C969B', '#6B3285', '#5149AD', '#31A573', '#26938C', '#4DA53B', '#0069A4', '#199CD4', '#8C969B'],
   // [#AA compliant]
-  taxonomiesHover: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
-  taxonomiesAA: ['#6D787E', '#6B3285', '#5149AD', '#28865D', '#21827B', '#3D832F', '#0069A4', '#147CA9', '#6D787E'],
-  taxonomiesHoverAA: ['#555E62', '#3A1D49', '#3B3681', '#1B5A3E', '#175956', '#2A5520', '#003A5C', '#0C4A64', '#393F41'],
+  // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
+  taxonomies: ['#6D787E', '#6B3285', '#5149AD', '#28865D', '#257F93', '#3D832F', '#0069A4', '#147CA9', '#6D787E'],
+  taxonomiesHover: ['#555E62', '#3A1D49', '#3B3681', '#1B5A3E', '#195561', '#2A5520', '#003A5C', '#0C4A64', '#393F41'],
 
   // other entities
-  // [#AA-Large compliant] 18pt/24px or 14pt/19px bold
-  measures: ['#BD8D00'], // FFC107
+  // at least [#AA-Large compliant] 18pt/24px or 14pt/19px bold
   // [#AA compliant]
-  measuresHover: ['#987000'],
-  measuresAA: ['#987000'],
-  measuresHoverAA: ['#664B00'],
+  measures: [primary[0]], // FFC107  AA compliant
+  measuresHover: ['#AA3D27'],
+  // measuresAA: ['#987000'],
+  // measuresHoverAA: ['#664B00'],
   // [#AA-Large compliant]
-  sdgtargets: ['#00A0CC'], // 40D7FF
+  // sdgtargets: ['#00A0CC'], // 40D7FF
   // [#AA compliant]
+  sdgtargets: ['#0080A3'], // 40D7FF, 00A0CC
   sdgtargetsHover: ['#0080A3'],
-  sdgtargetsAA: ['#0080A3'],
-  sdgtargetsHoverAA: ['#006480'],
+  // sdgtargetsAA: ['#0080A3'],
+  // sdgtargetsHoverAA: ['#006480'],
   // [#AA-Large compliant]
-  indicators: ['#EB6E51'],
+  // indicators: ['#EB6E51'],
   // [#AA compliant]
+  indicators: ['#553529'],
   indicatorsHover: ['#D73C19'],
-  indicatorsAA: ['#D73C19'],
-  indicatorsHoverAA: ['#972A12'],
+  // indicatorsAA: ['#D73C19'],
+  // indicatorsHoverAA: ['#972A12'],
   // [#AA-Large compliant]
-  reports: ['#EB6E51'],
+  // reports: ['#EB6E51'],
   // [#AA compliant]
+  reports: ['#553529'],
   reportsHover: ['#D73C19'],
-  reportsAA: ['#D73C19'],
-  reportsHoverAA: ['#972A12'],
+  // reportsAA: ['#D73C19'],
+  // reportsHoverAA: ['#972A12'],
   // [#AA-Large compliant]
-  recommendations: ['#E04B00', '#FF5F0F'], // accepted, noted ['#FF9B69', '#FFB28B'],
+  // AA
+  // recommendations: ['#553529', '#804D3C'], // accepted, noted ['#FF9B69', '#FFB28B'],
   // [#AA compliant]
-  recommendationsHover: ['#D14600'],
-  recommendationsAA: ['#D14600', '#D14600'], // accepted, noted
-  recommendationsHoverAA: ['#752700'],
+  recommendations: [secondary[1], secondary[3]], // accepted, noted ['#FF9B69', '#FFB28B'],
+  // recommendationsHover: ['#261812'],
+  recommendationsHover: [secondary[0]],
+  // recommendationsAA: ['#D14600', '#D14600'], // accepted, noted
+  // recommendationsHoverAA: ['#752700'],
   // [#AA-Large compliant]
   attributes: ['#6C787A'],
   // [#AA compliant]

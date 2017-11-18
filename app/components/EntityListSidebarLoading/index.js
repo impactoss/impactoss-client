@@ -12,7 +12,7 @@ import Sidebar from 'components/styled/Sidebar';
 import SidebarHeader from 'components/styled/SidebarHeader';
 
 const Group = styled.div`
-  height: 40px;
+  height: 31px;
   display: block;
   width: 100%;
   background-color: ${palette('light', 1)};
