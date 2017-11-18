@@ -69,8 +69,8 @@ theme.palette = {
   // taxonomiesAAL: ['#8C969B', '#6B3285', '#5149AD', '#31A573', '#26938C', '#4DA53B', '#0069A4', '#199CD4', '#8C969B'],
   // [#AA compliant]
   // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
-  taxonomies: ['#6D787E', '#6B3285', '#5149AD', '#28865D', '#257F93', '#3D832F', '#0069A4', '#147CA9', '#6D787E'],
-  taxonomiesHover: ['#555E62', '#3A1D49', '#3B3681', '#1B5A3E', '#195561', '#2A5520', '#003A5C', '#0C4A64', '#393F41'],
+  taxonomies: ['#6D787E', '#6B3285', '#5149AD', '#257F93', '#28865D', '#004747', '#8A7300', '#147CA9', '#6D787E'],
+  taxonomiesHover: ['#555E62', '#3A1D49', '#3B3681', '#195561', '#1B5A3E', '#002E2E', '#524400', '#0C4A64', '#393F41'],
 
   // other entities
   // at least [#AA-Large compliant] 18pt/24px or 14pt/19px bold
