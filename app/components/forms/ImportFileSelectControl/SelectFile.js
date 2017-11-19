@@ -49,7 +49,7 @@ const Remove = styled(ButtonFlatIconOnly)`
   padding: 0 0.75em;
   color: ${palette('dark', 2)};
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${palette('primary', 1)};
   }
 `;
 

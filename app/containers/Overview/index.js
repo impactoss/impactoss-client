@@ -174,8 +174,8 @@ const DiagramButtonWrap = styled.div`
 //   color: ${palette('primary', 4)};
 //   background-color: ${palette('primary', 1)};
 // }
+// background-color: ${palette('primary', 1)};
 const DiagramButtonMain = styled(DiagramButton)`
-  background-color: ${palette('primary', 0)};
   min-width: 230px;
   &:before {
     content: '';

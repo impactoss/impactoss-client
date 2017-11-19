@@ -43,7 +43,7 @@ const ChangeHint = styled.div`
 `;
 
 const ChangeHintHighlighted = styled.span`
-  color: ${palette('primary', 0)};
+  color: ${palette('primary', 1)};
 `;
 
 const ControlMain = styled.div`

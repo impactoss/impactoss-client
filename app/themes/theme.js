@@ -14,14 +14,14 @@ theme.breakpoints = {
 // primary color palette: dark to light
 // 0: main colour, darker, used for links and navigation elements, hover (AA)
 // 1: main colour, used for links and navigation elements (AA Large)
-// 2: main colour, light
+// 2: main colour, light -- !!! AA compatible with secondary[1]
 // 3: main colour, lighter (UNUSED)
 // 4: white
-const primary = coolorsToHex('https://coolors.co/cc482e-eb6e51-ff9b69-ffb996-ffffff');
+const primary = coolorsToHex('https://coolors.co/aa3d27-cc482e-EA5E3F-EF8871-ffffff');
   // secondary color palette: dark to light
   // 0: dark header colour, darker // 162331
-  // 1: dark header colour
-  // 2: dark header colour, lighter (UNUSED)
+  // 1: dark header colour -- !!! AA compatible with primary[2]
+  // 2: dark header colour, lighter
   // 3: white/placeholder
   // 4: white/placeholder
 const secondary = coolorsToHex('https://coolors.co/162331-182635-34404d-465867-ffffff');
@@ -29,11 +29,11 @@ const secondary = coolorsToHex('https://coolors.co/162331-182635-34404d-465867-f
 // 0:  darkest (AA)
 // 1:  darker (AA)
 // 2:  dark (AA)
-// 3:  medium gray 1 (AA), including on light[0]
+// 3:  medium gray 1 (AA) --- !!! AA compatible with light[0]
 // 4:  medium gray 2 (AA large)
 const dark = coolorsToHex('https://coolors.co/1d3033-344547-4a595c-657072-899395');
 // light grayscale: light to dark
-// 0:  lightest gray (background colour) - also used in global-styles.js
+// 0:  lightest gray (background colour) - also used in global-styles.js !!! AA compatible with dark[3]
 // 1:  light gray (light lines, navigation filter panel)
 // 2:  gray 1 (gray pattern)
 // 3:  gray 2 (icons light)
@@ -42,9 +42,9 @@ const light = coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5aca
 
 // other palettes
 const error = coolorsToHex('https://coolors.co/bf4c3a-e25646-e46556-f8edec-ffffff');
-const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-ffffff');
 const success = coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-ffffff');
-const info = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-1d3033');
+// const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-ffffff');
+// const info = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-1d3033');
 
 // colour palettes, usage:
 //   import { palette } from 'styled-theme';
@@ -60,8 +60,8 @@ theme.palette = {
   // other palettes
   error,
   success,
-  alert,
-  info,
+  // alert,
+  // info,
 
   // taxonomy/category colours
   // [default, 1: Human Rights Body, 2: UN session, 3: Human right, 4: Affected persons, 5: Thematic cluster, 6: Organisation, 7: SDGs, 8: unused]
@@ -73,55 +73,22 @@ theme.palette = {
   taxonomiesHover: ['#555E62', '#3A1D49', '#3B3681', '#195561', '#1B5A3E', '#002E2E', '#524400', '#0C4A64', '#393F41'],
 
   // other entities
-  // at least [#AA-Large compliant] 18pt/24px or 14pt/19px bold
-  // [#AA compliant]
-  measures: [primary[0]], // FFC107  AA compliant
-  measuresHover: ['#AA3D27'],
-  // measuresAA: ['#987000'],
-  // measuresHoverAA: ['#664B00'],
-  // [#AA-Large compliant]
-  // sdgtargets: ['#00A0CC'], // 40D7FF
-  // [#AA compliant]
+  // [aqll #AA compliant]
+  // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
+  measures: [primary[1]], // FFC107  AA compliant
+  measuresHover: [primary[0]],
+  recommendations: [secondary[1], secondary[3]], // accepted, noted ['#FF9B69', '#FFB28B'],
+  recommendationsHover: [secondary[0]],
   sdgtargets: ['#0080A3'], // 40D7FF, 00A0CC
   sdgtargetsHover: ['#00546B'],
-  // sdgtargetsAA: ['#0080A3'],
-  // sdgtargetsHoverAA: ['#006480'],
-  // [#AA-Large compliant]
-  // indicators: ['#EB6E51'],
-  // [#AA compliant]
   indicators: ['#553529'],
   indicatorsHover: ['#2A1913'],
-  // indicatorsAA: ['#D73C19'],
-  // indicatorsHoverAA: ['#972A12'],
-  // [#AA-Large compliant]
-  // reports: ['#EB6E51'],
-  // [#AA compliant]
   reports: ['#553529'],
   reportsHover: ['#D73C19'],
-  // reportsAA: ['#D73C19'],
-  // reportsHoverAA: ['#972A12'],
-  // [#AA-Large compliant]
-  // AA
-  // recommendations: ['#553529', '#804D3C'], // accepted, noted ['#FF9B69', '#FFB28B'],
-  // [#AA compliant]
-  recommendations: [secondary[1], secondary[3]], // accepted, noted ['#FF9B69', '#FFB28B'],
-  // recommendationsHover: ['#261812'],
-  recommendationsHover: ['#191D29'],
-  // recommendationsAA: ['#D14600', '#D14600'], // accepted, noted
-  // recommendationsHoverAA: ['#752700'],
-  // [#AA-Large compliant]
   attributes: ['#6C787A'],
-  // [#AA compliant]
   attributesHover: ['#434A4C'],
-  attributesAA: ['#6C787A'],
-  attributesHoverAA: ['#434A4C'],
-  // [#AA-Large compliant]
   roles: ['#6C787A'],
-  // [#AA compliant]
   rolesHover: ['#434A4C'],
-  rolesAA: ['#6C787A'],
-  rolesHoverAA: ['#434A4C'],
-
 
   //
   // HEADER "PALETTES" //////////////////////////////////////////////////////////////
@@ -132,16 +99,16 @@ theme.palette = {
   homeIntro: [light[2]],
 
   // footer: [ '#color, #bg-main', #bg-partners, #borderColor ],
-  footer: [primary[4], secondary[1], light[0], dark[4]],
+  footer: [primary[4], secondary[1], light[0], secondary[0]],
   footerLinks: [primary[4]],
-  footerLinksHover: [primary[0]],
+  footerLinksHover: [primary[1]],
 
   // header: [ '#bg' ],
   header: [secondary[1]],
 
   // headerBrand: [ '#title', '#claim' ],
-  headerBrand: [primary[1], primary[2]],
-  headerBrandHover: [primary[1], primary[2]], // WARNING component sets opacity
+  headerBrand: [primary[2], primary[2]],
+  headerBrandHover: [primary[2], primary[2]], // WARNING component sets opacity
 
   // headerNavPages: [ '#bg' ],
   headerNavPages: [secondary[1]],
@@ -152,14 +119,14 @@ theme.palette = {
   // headerNavAccount: [ '#bg' ],
   headerNavAccount: ['transparent'],
   // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border' ]
-  headerNavAccountItem: [primary[4], primary[4], primary[0], primary[1], primary[1]],
-  headerNavAccountItemHover: [primary[4], primary[4], primary[1], primary[1], primary[1]],
+  headerNavAccountItem: [primary[4], primary[4], primary[1], primary[0], primary[2]],
+  headerNavAccountItemHover: [primary[4], primary[4], primary[0], primary[1], primary[2]],
 
   // headerNavMain: [ '#bg', '#border'  ],
-  headerNavMain: [secondary[1], secondary[0]],
+  headerNavMain: [secondary[1], secondary[1]],
   // headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
-  headerNavMainItem: [light[2], primary[1], 'transparent', 'transparent'],
-  headerNavMainItemHover: [primary[1], primary[2], 'transparent', 'transparent'],
+  headerNavMainItem: [light[2], primary[2], 'transparent', 'transparent'],
+  headerNavMainItemHover: [primary[2], primary[3], 'transparent', 'transparent'],
 
   //
   // SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
@@ -173,8 +140,8 @@ theme.palette = {
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
-  asideCatNavItem: [dark[2], primary[4], primary[4], primary[0], light[0]],
-  asideCatNavItemHover: [dark[0], primary[4], primary[4], primary[1], light[0]],
+  asideCatNavItem: [dark[2], primary[4], primary[4], primary[1], light[0]],
+  asideCatNavItemHover: [dark[0], primary[4], primary[4], primary[0], light[0]],
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
@@ -189,15 +156,15 @@ theme.palette = {
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary', #disabled],
-  buttonFlat: [primary[0], dark[3], light[4]],
-  buttonFlatHover: [primary[1], primary[1]],
+  buttonFlat: [primary[1], dark[3], light[4]],
+  buttonFlatHover: [primary[0], primary[2]],
   // buttonDefault: ['#text', '#bg'],
-  buttonDefault: [primary[4], primary[0]],
-  buttonDefaultInactive: [primary[4], primary[0]],
-  buttonDefaultHover: [primary[4], primary[1]],
+  buttonDefault: [primary[4], primary[1]],
+  buttonDefaultInactive: [primary[4], primary[1]],
+  buttonDefaultHover: [primary[4], primary[0]],
   // buttonPrimary: ['#text', '#bg', '#border'],
-  buttonDefaultIconOnly: [primary[4], primary[0], primary[0]],
-  buttonDefaultIconOnlyHover: [primary[4], primary[1], primary[1]],
+  buttonDefaultIconOnly: [primary[4], primary[1], primary[1]],
+  buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],
   // buttonSecondary: ['#text', '#bg'],
   buttonSecondary: [secondary[4], secondary[1]],
   buttonSecondaryHover: [secondary[4], secondary[0]],
@@ -206,8 +173,8 @@ theme.palette = {
   buttonToggleInactiveHover: [dark[1], light[0]],
   // links
   // also see global-styles.js for default link "a"
-  linkDefault: [primary[0]],
-  linkDefaultHover: [primary[1]],
+  linkDefault: [primary[1]],
+  linkDefaultHover: [primary[0]],
   linkSecondary: [secondary[1]],
   linkSecondaryHover: [secondary[0]],
 

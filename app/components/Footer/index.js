@@ -31,14 +31,14 @@ const partnerLogos = [
 ];
 
 const FooterLogos = styled.div`
-  padding: 1.5em 0;
+  padding: 1.2em 0;
   background-color: ${palette('footer', 2)};
 `;
 
 const FooterMain = styled.div`
   background-color: ${palette('footer', 1)};
   color: ${palette('footer', 0)};
-  padding: 2em 0 3em;
+  padding: 0;
 `;
 
 const FooterLink = styled.a`
@@ -71,10 +71,10 @@ const LogoItemLink = styled.a`
   }
 `;
 const PartnerLogo = styled(NormalImg)`
-  height: 80px;
+  height: 90px;
 `;
 const ImpactLogo = styled(NormalImg)`
-  height: 80px;
+  height: 90px;
 `;
 
 const Table = styled.div`
@@ -88,6 +88,8 @@ const TableCell = styled.div`
   vertical-align: top;
   padding-left: 35px;
   padding-right: 35px;
+  padding-top: 2em;
+  padding-bottom: 2em;
   border-right: 1px solid ${palette('footer', 3)};
   &:last-child {
     border-right: none;

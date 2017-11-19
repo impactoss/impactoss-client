@@ -17,7 +17,7 @@ const Styled = styled.div`
 const ListWrapper = styled.div`
   display: table;
   width: 100%;
-  border-top: 2px solid ${palette('light', 1)};
+  border-top: 1px solid ${palette('light', 1)};
 `;
 
 const OptionWrapper = styled.div`
@@ -57,11 +57,12 @@ const OptionLabel = styled.label`
   padding-left: 0.5em;
   padding-right: 0.5em;
   border-bottom: 1px solid ${palette('light', 1)};
-  border-right: 0.5em solid ${(props) =>
+  border-right: ${(props) =>
     (props.changedToChecked || props.changedToUnchecked)
-      ? palette('primary', 1)
-      : 'transparent'
+      ? '0.5em solid'
+      : 'none'
   };
+  border-right-color: ${palette('primary', 1)}
 `;
 
 const OptionCount = styled.span`

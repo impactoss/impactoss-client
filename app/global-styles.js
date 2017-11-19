@@ -27,11 +27,11 @@ injectGlobal`
   }
 
   a {
-    color: #eb6e51;
+    color: #cc482e;
     text-decoration: none;
 
     &:hover {
-      color: #d66149;
+      color: #aa3d27;
     }
   }
   h1, h2, h3, h4, h5, h6 {

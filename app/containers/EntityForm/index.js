@@ -76,7 +76,7 @@ const ButtonDelete = styled(ButtonForm)`
 const ButtonPreDelete = styled(Button)`
   color: ${palette('dark', 3)};
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${palette('primary', 1)};
   }
 `;
 
