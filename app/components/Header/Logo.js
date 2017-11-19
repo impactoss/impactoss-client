@@ -4,7 +4,7 @@ import NormalImg from 'components/Img';
 
 const Logo = styled(NormalImg)`
   float:left;
-  padding: 0 0 0 20px;
+  padding-left: 20px;
   height:${(props) => props.theme.sizes.header.banner.height}px;
 `;
 
