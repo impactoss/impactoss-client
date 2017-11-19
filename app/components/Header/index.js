@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { filter } from 'lodash/collection';
 
 import { SHOW_HEADER_TITLE } from 'themes/config';
-import logo from 'themes/media/headerLogo.png';
-import logo2x from 'themes/media/headerLogo@2x.png';
+
 import appMessages from 'containers/App/messages';
 
 import Logo from './Logo';
@@ -92,7 +91,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
               onClick={(evt) => this.onClick(evt, '/')}
               title={appTitle}
             >
-              <Logo src={[logo, logo2x]} alt={appTitle} />
+              <Logo src={this.props.theme.media.headerLogo} alt={appTitle} />
               { SHOW_HEADER_TITLE &&
                 <BrandText>
                   <BrandTitle>
@@ -169,10 +168,11 @@ Header.propTypes = {
   navItems: PropTypes.array,
   onPageLink: PropTypes.func.isRequired,
   isHome: PropTypes.bool, // not shown on home page
+  theme: PropTypes.object.isRequired, // not shown on home page
 };
 
 Header.defaultProps = {
   isHome: true,
 };
 
-export default Header;
+export default withTheme(Header);

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 
 import NormalImg from 'components/Img';
@@ -9,26 +9,7 @@ import Container from 'components/styled/Container';
 
 import { SHOW_FOOTER_PARTNERS } from 'themes/config';
 
-import impactossLogo from 'themes/media/impactoss.png';
-import impactossLogo2x from 'themes/media/impactoss@2x.png';
-
-import partner1 from 'themes/media/partner1.png';
-import partner2 from 'themes/media/partner2.png';
-import partner3 from 'themes/media/partner3.png';
-import partner4 from 'themes/media/partner4.png';
-import partner1x2x from 'themes/media/partner1@2x.png';
-import partner2x2x from 'themes/media/partner2@2x.png';
-import partner3x2x from 'themes/media/partner3@2x.png';
-import partner4x2x from 'themes/media/partner4@2x.png';
-
 import messages from './messages';
-
-const partnerLogos = [
-  [partner1, partner1x2x],
-  [partner2, partner2x2x],
-  [partner3, partner3x2x],
-  [partner4, partner4x2x],
-];
 
 const FooterLogos = styled.div`
   padding: 1.2em 0;
@@ -102,6 +83,7 @@ const TableCellSmall = styled(TableCell)`
 class Footer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
+    const { theme } = this.props;
     return (
       <div>
         { SHOW_FOOTER_PARTNERS > 0 &&
@@ -109,7 +91,7 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
             <Container noPaddingBottom>
               <LogoList>
                 {
-                  partnerLogos.map((src, i) => (
+                  theme.media.partnerLogos.map((src, i) => (
                     <LogoItem key={i}>
                       <LogoItemLink
                         href={this.context.intl.formatMessage(messages.partners[`url${i + 1}`])}
@@ -161,7 +143,7 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
                     <div>
                       <FormattedMessage {...messages.project.anchor} />
                     </div>
-                    <ImpactLogo src={[impactossLogo, impactossLogo2x]} alt={this.context.intl.formatMessage(messages.project.anchor)} />
+                    <ImpactLogo src={theme.media.impactossLogo} alt={this.context.intl.formatMessage(messages.project.anchor)} />
                   </ImpactLink>
                 </div>
               </TableCellSmall>
@@ -173,8 +155,12 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
   }
 }
 
+Footer.propTypes = {
+  theme: PropTypes.object.isRequired,
+};
+
 Footer.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default Footer;
+export default withTheme(Footer);

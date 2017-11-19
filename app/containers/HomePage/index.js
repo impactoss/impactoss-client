@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
 import Row from 'components/styled/Row';
@@ -23,10 +23,6 @@ import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
 
 import { DB_TABLES, SHOW_HOME_TITLE } from 'themes/config';
-import graphicHome from 'themes/media/homeGraphic.png';
-import graphicHome2x from 'themes/media/homeGraphic@2x.png';
-import titleHome from 'themes/media/homeTitle.png';
-import titleHome2x from 'themes/media/homeTitle@2x.png';
 
 import messages from './messages';
 
@@ -82,7 +78,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const { onPageLink } = this.props;
+    const { onPageLink, theme } = this.props;
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
 
     return (
@@ -95,9 +91,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
         />
         <SectionTop>
           <SectionWrapper>
-            <GraphicHome src={[graphicHome, graphicHome2x]} alt={this.context.intl.formatMessage(appMessages.app.title)} />
+            <GraphicHome src={theme.media.graphicHome} alt={this.context.intl.formatMessage(appMessages.app.title)} />
             { !SHOW_HOME_TITLE &&
-              <GraphicHome src={[titleHome, titleHome2x]} alt={appTitle} />
+              <GraphicHome src={theme.media.titleHome} alt={appTitle} />
             }
             { SHOW_HOME_TITLE &&
               <Row>
@@ -140,7 +136,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 HomePage.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func.isRequired,
   onPageLink: PropTypes.func.isRequired,
-  // pages: PropTypes.object,
+  theme: PropTypes.object.isRequired,
 };
 
 HomePage.contextTypes = {
@@ -169,4 +165,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 // Wrap the component to inject dispatch and state into it
-export default connect(null, mapDispatchToProps)(HomePage);
+export default connect(null, mapDispatchToProps)(withTheme(HomePage));
