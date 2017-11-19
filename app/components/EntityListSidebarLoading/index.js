@@ -9,14 +9,10 @@ import { palette } from 'styled-theme';
 
 import Scrollable from 'components/styled/Scrollable';
 import Sidebar from 'components/styled/Sidebar';
-
-const Header = styled.div`
-  height: 114px;
-  background-color: ${palette('light', 2)};
-`;
+import SidebarHeader from 'components/styled/SidebarHeader';
 
 const Group = styled.div`
-  height: 40px;
+  height: 31px;
   display: block;
   width: 100%;
   background-color: ${palette('light', 1)};
@@ -50,7 +46,7 @@ export class EntityListSidebarLoading extends React.Component { // eslint-disabl
       <div>
         <Sidebar>
           <ScrollableWrapper>
-            <Header />
+            <SidebarHeader />
             <Group />
             <Option><Label width={30} /></Option>
             <Option><Label width={35} /></Option>

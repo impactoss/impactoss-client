@@ -16,6 +16,8 @@ import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 
 import { USER_ROLES } from 'themes/config';
+import { PARAMS } from 'containers/App/constants';
+
 import {
   filterEntitiesByAttributes,
   filterEntitiesByKeywords,
@@ -162,7 +164,7 @@ export const selectRedirectOnAuthSuccessPath = createSelector(
   getRoute,
   (routeState) => {
     try {
-      return routeState.getIn(['locationBeforeTransitions', 'query', 'redirectOnAuthSuccess']);
+      return routeState.getIn(['locationBeforeTransitions', 'query', PARAMS.REDIRECT_ON_AUTH_SUCCESS]);
     } catch (error) {
       return null;
     }

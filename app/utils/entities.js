@@ -1,4 +1,5 @@
-import { Map } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
+
 import { find, reduce } from 'lodash/collection';
 
 import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
@@ -259,3 +260,40 @@ export const getCategoryShortTitle = (category) =>
       : category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']),
     10
   );
+
+
+const getInitialValue = (field) =>
+  typeof field.default !== 'undefined' ? field.default : '';
+
+export const getInitialFormData = (shape) => {
+  let fields = fromJS({
+    id: '',
+    attributes: {},
+  });
+  if (shape.fields) {
+    fields = reduce(shape.fields, (memo, field) =>
+      field.disabled ? memo : memo.setIn(['attributes', field.attribute], getInitialValue(field))
+    , fields);
+  }
+  if (shape.taxonomies) {
+    fields = fields.set('associatedTaxonomies', Map());
+  }
+  if (shape.connections) {
+    fields = reduce(shape.connections.tables, (memo, table) => {
+      if (table.table === 'recommendations') {
+        return fields.set('associatedRecommendations', List());
+      }
+      if (table.table === 'indicators') {
+        return fields.set('associatedIndicators', List());
+      }
+      if (table.table === 'measures') {
+        return fields.set('associatedMeasures', List());
+      }
+      if (table.table === 'sdgtargets') {
+        return fields.set('associatedSdgTargets', List());
+      }
+      return memo;
+    }, fields);
+  }
+  return fields;
+};

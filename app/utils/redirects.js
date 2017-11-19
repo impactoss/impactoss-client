@@ -1,4 +1,5 @@
 import { USER_ROLES } from 'themes/config';
+import { PATHS, PARAMS } from 'containers/App/constants';
 import {
   selectIsSignedIn,
   selectSessionUserRoles,
@@ -7,15 +8,15 @@ import {
 
 import checkStore from './checkStore';
 
-export function replaceIfNotSignedIn(redirectOnAuthSuccess, replace, info = 'notSignedIn') {
-  return replace({ pathname: '/login', query: { redirectOnAuthSuccess, info } });
+export function replaceIfNotSignedIn(redirectOnAuthSuccess, replace, info = PARAMS.NOT_SIGNED_IN) {
+  return replace({ pathname: PATHS.LOGIN, query: { redirectOnAuthSuccess, info } });
 }
 
 export function replaceUnauthorised(replace) {
-  return replace('/unauthorised');
+  return replace(PATHS.UNAUTHORISED);
 }
 
-export function replaceAlreadySignedIn(replace, info = 'alreadySignedIn') {
+export function replaceAlreadySignedIn(replace, info = PARAMS.ALREADY_SIGNED_IN) {
   return replace({ pathname: '/', query: { info } });
 }
 
@@ -30,7 +31,7 @@ function redirectIfSignedIn(store) {
     selectIsSignedIn(store.getState()) && replaceAlreadySignedIn(replace);
 }
 
-function redirectIfNotSignedIn(store, info = 'notSignedIn') {
+function redirectIfNotSignedIn(store, info = PARAMS.NOT_SIGNED_IN) {
   return (nextState, replace) => {
     if (!selectIsSignedIn(store.getState())) {
       replaceIfNotSignedIn(nextState.location.pathname, replace, info);

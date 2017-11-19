@@ -27,6 +27,7 @@ import {
   getFormField,
   getConnectionUpdatesFromFormData,
   getCheckboxField,
+  getStatusField,
 } from 'utils/forms';
 
 import {
@@ -38,7 +39,7 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -63,7 +64,7 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -150,7 +151,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       });
     }
     fields.push({
-      fields: [getMetaField(entity, appMessages)],
+      fields: [
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
+        getMetaField(entity, appMessages),
+      ],
     });
     return fields;
   }
@@ -428,7 +432,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`/category/${reference}`));
+      dispatch(updatePath(`${PATHS.CATEGORIES}/${reference}`));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

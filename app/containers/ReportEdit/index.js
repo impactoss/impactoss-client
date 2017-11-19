@@ -30,7 +30,7 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -54,7 +54,7 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -327,7 +327,7 @@ function mapDispatchToProps(dispatch, props) {
       ));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`/reports/${reference}`));
+      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}/${reference}`));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
@@ -336,7 +336,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(deleteEntity({
         path: 'progress_reports',
         id: props.params.id,
-        redirect: `indicators/${indicatorId}`,
+        redirect: `${PATHS.INDICATORS}/${indicatorId}`,
       }));
     },
   };

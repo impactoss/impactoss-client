@@ -22,6 +22,7 @@ import SupTitle from 'components/SupTitle';
 import EntityListForm from 'containers/EntityListForm';
 import appMessages from 'containers/App/messages';
 import Sidebar from 'components/styled/Sidebar';
+import SidebarHeader from 'components/styled/SidebarHeader';
 
 import EntityListSidebarGroups from './EntityListSidebarGroups';
 
@@ -35,12 +36,9 @@ import messages from './messages';
 // const Styled = styled.div``;
 // const Main = styled.div``;
 const ScrollableWrapper = styled(Scrollable)`
-  background-color: ${palette('light', 0)};
+  background-color: ${palette('aside', 0)};
 `;
-const Header = styled.div`
-  padding: 3em 2em 1em;
-  background-color: ${palette('asideHeader', 0)};
-`;
+
 const ListEntitiesEmpty = styled.div`
   font-size: 1.2em;
   padding: 1.5em;
@@ -184,9 +182,10 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         hasUserRole,
         {
           attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
-          taxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
+          taxonomyGroup: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
           connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
           connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
+          taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
         },
       );
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
@@ -239,7 +238,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       <div>
         <Sidebar>
           <ScrollableWrapper>
-            <Header>
+            <SidebarHeader hasButtons={canEdit}>
               {canEdit &&
                 <ButtonToggle
                   options={this.getSidebarButtons()}
@@ -249,7 +248,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
               {!canEdit &&
                 <SupTitle title={this.context.intl.formatMessage(messages.header.filter)} />
               }
-            </Header>
+            </SidebarHeader>
             <div>
               { (activePanel === FILTERS_PANEL || (activePanel === EDIT_PANEL && hasSelected && hasEntities)) &&
                 <EntityListSidebarGroups

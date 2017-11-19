@@ -21,7 +21,7 @@ import {
 } from './actions';
 
 const Styled = styled(ContainerWithSidebar)`
-  z-index: 100;
+  z-index: 99;
   background-color: rgba(0,0,0,0.2);
 `;
 
@@ -30,7 +30,7 @@ const FormWrapper = styled.div`
   top: 0;
   bottom: 0;
   left: 0;
-  min-width: ${(props) => props.wide ? 700 : 350}px;
+  width: ${(props) => props.wide ? 700 : 350}px;
   background: ${palette('primary', 4)};
   overflow: hidden;
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);

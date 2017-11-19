@@ -219,14 +219,15 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
               model={model || `.${id}`}
               title={this.context.intl.formatMessage(messages.update, { type: lowerCase(field.label) })}
               onCancel={this.onCloseMultiselect}
+              closeOnClickOutside={this.props.closeOnClickOutside}
               buttons={[
                 field.onCreate
-                ? {
-                  type: 'addFromMultiselect',
-                  position: 'left',
-                  onClick: field.onCreate,
-                }
-                : null,
+                  ? {
+                    type: 'addFromMultiselect',
+                    position: 'left',
+                    onClick: field.onCreate,
+                  }
+                  : null,
                 {
                   type: 'closeText',
                   onClick: this.onCloseMultiselect,
@@ -245,6 +246,7 @@ MultiSelectField.propTypes = {
   field: PropTypes.object,
   fieldData: PropTypes.object,
   handleUpdate: PropTypes.func,
+  closeOnClickOutside: PropTypes.bool,
 };
 
 MultiSelectField.contextTypes = {

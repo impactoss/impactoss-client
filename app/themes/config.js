@@ -25,6 +25,14 @@ export const DATE_FORMAT = 'dd/mm/yyyy';
 // - app.containers.App.app.claim
 export const SHOW_HEADER_TITLE = false;
 
+// show header pattern
+// specified in themes/[theme].js: theme.backgroundImages.header
+export const SHOW_HEADER_PATTERN = true;
+
+// show header pattern
+// specified in themes/[theme].js: theme.backgroundImages.sidebarHeader
+export const SHOW_SIDEBAR_HEADER_PATTERN = true;
+
 // show app title and claim in home when not included in graphic
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
@@ -32,7 +40,7 @@ export const SHOW_HEADER_TITLE = false;
 export const SHOW_HOME_TITLE = false;
 
 // show footer logo section
-export const SHOW_FOOTER_LOGOS = true;
+export const SHOW_FOOTER_PARTNERS = true;
 
 // entitylists items-per-page options
 export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
@@ -43,13 +51,28 @@ export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
 
 // General ********************
 
-// server API endpoint
-export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';
-// server AWS S3 signing url endpoint
-export const SIGNING_URL_ENDPOINT = '/s3/sign';
+export const ENDPOINTS = {
+  API: 'https://undp-sadata-staging.herokuapp.com', // server API endpoint
+  SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
+  SIGN_IN: 'auth/sign_in',
+  SIGN_OUT: 'auth/sign_out',
+  PASSWORD: 'auth/password',
+  VALIDATE_TOKEN: 'auth/validate_token',
+};
+
+// API request Authentification keys
+export const KEYS = {
+  ACCESS_TOKEN: 'access-token',
+  TOKEN_TYPE: 'token-type',
+  CLIENT: 'client',
+  EXPIRY: 'expiry',
+  UID: 'uid',
+  RESET_PASSWORD: 'reset_password',
+};
 
 // database date format
 export const DB_DATE_FORMAT = 'YYYY-MM-DD';
+
 
 // Map server messages *********************************
 
@@ -119,3 +142,106 @@ export const DB_TABLES = [
   'progress_reports',
   'due_dates',
 ];
+
+// Table shapes
+// - define fields for each table
+// - set field location in entity forms and views (section/column)
+// - define fields for csv import (import)
+// - disable fields by setting 'disabled: true'
+
+// shape for table 'measures' (Actions)
+export const MEASURE_SHAPE = {
+  table: 'measures',
+  key: 'measures_id',
+  fields: [
+    {
+      attribute: 'title',
+      control: 'title',
+      type: 'text',
+      required: true,
+      import: true,
+      section: 'header',
+      column: 'main',
+    },
+    {
+      attribute: 'draft',
+      control: 'status',
+      type: 'bool',
+      default: true,
+      section: 'header',
+      column: 'aside',
+      role: USER_ROLES.MANAGER.value,
+    },
+    {
+      attribute: 'description',
+      control: 'markdown',
+      type: 'markdown',
+      import: true,
+      section: 'body',
+      column: 'main',
+    },
+    {
+      disabled: true,
+      attribute: 'outcome',
+      control: 'markdown',
+      type: 'markdown',
+      import: true,
+      section: 'body',
+      column: 'main',
+    },
+    {
+      disabled: true,
+      attribute: 'indicator_summary',
+      control: 'markdown',
+      type: 'markdown',
+      import: true,
+      section: 'body',
+      column: 'main',
+    },
+    {
+      attribute: 'target_date',
+      control: 'date',
+      type: 'date',
+      import: true,
+      section: 'body',
+      column: 'aside',
+      groupType: 'dark',
+    },
+    {
+      attribute: 'target_date_comment',
+      control: 'textarea',
+      type: 'text',
+      import: true,
+      section: 'body',
+      column: 'aside',
+      groupType: 'dark',
+    },
+  ],
+  taxonomies: {
+    table: 'measure_categories',
+    key: 'category_id',
+    section: 'body',
+    column: 'aside',
+  },
+  connections: {
+    tables: [
+      {
+        table: 'recommendations',
+        via: 'recommendation_measures',
+        key: 'recommendation_id',
+      },
+      {
+        table: 'sdgtargets',
+        via: 'sdgtarget_measures',
+        key: 'sdgtarget_id',
+      },
+      {
+        table: 'indicators',
+        via: 'measure_indicators',
+        key: 'indicator_id',
+      },
+    ],
+    section: 'body',
+    column: 'main',
+  },
+};

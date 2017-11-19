@@ -12,8 +12,9 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { fromJS } from 'immutable';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES, DB_DATE_FORMAT } from 'themes/config';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
+import { getImportFields } from 'utils/import';
 
 import {
   redirectIfNotPermitted,
@@ -26,8 +27,6 @@ import {
   selectReady,
   selectReadyForAuthCheck,
 } from 'containers/App/selectors';
-
-import appMessages from 'containers/App/messages';
 
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -98,14 +97,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             progress={this.props.progress}
             template={{
               filename: `${this.context.intl.formatMessage(messages.filename)}.csv`,
-              data: [{
-                title: this.context.intl.formatMessage(appMessages.importFields.title),
-                description: this.context.intl.formatMessage(appMessages.importFields.description),
-                // outcome: this.context.intl.formatMessage(appMessages.importFields.outcome),
-                // indicator_summary: this.context.intl.formatMessage(appMessages.importFields.indicator_summary),
-                target_date: this.context.intl.formatMessage(appMessages.importFields.target_date, { format: DB_DATE_FORMAT }),
-                target_date_comment: this.context.intl.formatMessage(appMessages.importFields.target_date_comment),
-              }],
+              data: getImportFields(MEASURE_SHAPE, this.context.intl.formatMessage),
             }}
           />
         </Content>
@@ -171,7 +163,7 @@ function mapDispatchToProps(dispatch) {
       }
     },
     handleCancel: () => {
-      dispatch(updatePath('/actions'));
+      dispatch(updatePath(PATHS.MEASURES));
     },
     handleReset: () => {
       dispatch(resetProgress());

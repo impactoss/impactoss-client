@@ -12,6 +12,7 @@ const ButtonTagCategory = styled(Button)`
   border-radius: 3px;
   font-size: 0.85em;
   cursor:${(props) => props.disabled ? 'default' : 'pointer'};
+  border: 1px solid ${(props) => palette('taxonomies', props.taxId || 0)};
   &:hover {
     color: ${palette('primary', 4)};
     background-color: ${(props) => props.disabled

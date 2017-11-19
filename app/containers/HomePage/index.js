@@ -20,10 +20,13 @@ import NormalImg from 'components/Img';
 import Footer from 'components/Footer';
 
 import appMessages from 'containers/App/messages';
+import { PATHS } from 'containers/App/constants';
 
 import { DB_TABLES, SHOW_HOME_TITLE } from 'themes/config';
 import graphicHome from 'themes/media/homeGraphic.png';
 import graphicHome2x from 'themes/media/homeGraphic@2x.png';
+import titleHome from 'themes/media/homeTitle.png';
+import titleHome2x from 'themes/media/homeTitle@2x.png';
 
 import messages from './messages';
 
@@ -37,6 +40,13 @@ const SectionTop = styled.div`
   background-color: ${palette('home', 0)};
   color: ${palette('homeIntro', 0)};
   text-align: center;
+  display: table;
+`;
+
+const SectionWrapper = styled.div`
+  display: table-cell;
+  vertical-align: middle;
+  padding-bottom: 2em;
 `;
 
 const TopActions = styled.div`
@@ -44,15 +54,15 @@ const TopActions = styled.div`
 `;
 const Title = styled.h1`
   color:${palette('headerBrand', 0)};
-  font-family: ${(props) => props.theme.fonts.brandMain};
-  font-size: ${(props) => props.theme.sizes.brandMain.home};
+  font-family: ${(props) => props.theme.fonts.title};
+  font-size: ${(props) => props.theme.sizes.home.text.title};
   text-transform: uppercase;
 `;
 
 const Claim = styled.p`
   color: ${palette('headerBrand', 1)};
-  font-family: ${(props) => props.theme.fonts.brandClaim};
-  font-size: ${(props) => props.theme.sizes.brandClaim.home};
+  font-family: ${(props) => props.theme.fonts.claim};
+  font-size: ${(props) => props.theme.sizes.home.text.claim};
   font-weight: 100;
   margin-left: auto;
   margin-right: auto;
@@ -70,18 +80,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  // componentWillReceiveProps(nextProps) {
-  //   // reload entities if invalidated
-  //   // if (!nextProps.dataReady) {
-  //     this.props.loadEntitiesIfNeeded();
-  //   }
-  // }
-
-  // preparePageMenuPages = (pages) =>
-  //   pages.map((page) => ({
-  //     path: `/pages/${page.get('id')}`,
-  //     title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
-  //   })).toArray();
 
   render() {
     const { onPageLink } = this.props;
@@ -96,37 +94,42 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <SectionTop>
-          <GraphicHome src={[graphicHome, graphicHome2x]} alt={appTitle} />
-          { SHOW_HOME_TITLE &&
+          <SectionWrapper>
+            <GraphicHome src={[graphicHome, graphicHome2x]} alt={this.context.intl.formatMessage(appMessages.app.title)} />
+            { !SHOW_HOME_TITLE &&
+              <GraphicHome src={[titleHome, titleHome2x]} alt={appTitle} />
+            }
+            { SHOW_HOME_TITLE &&
+              <Row>
+                <Grid sm={1 / 6} />
+                <Grid sm={4 / 6}>
+                  <Title>
+                    <FormattedMessage {...appMessages.app.title} />
+                  </Title>
+                  <Claim>
+                    <FormattedMessage {...appMessages.app.claim} />
+                  </Claim>
+                </Grid>
+                <Grid sm={1 / 6} />
+              </Row>
+            }
             <Row>
               <Grid sm={1 / 6} />
               <Grid sm={4 / 6}>
-                <Title>
-                  <FormattedMessage {...appMessages.app.title} />
-                </Title>
-                <Claim>
-                  <FormattedMessage {...appMessages.app.claim} />
-                </Claim>
+                <Intro>
+                  <FormattedMessage {...messages.intro} />
+                </Intro>
+                <TopActions>
+                  <div>
+                    <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
+                      <FormattedMessage {...messages.explore} />
+                    </ButtonHero>
+                  </div>
+                </TopActions>
               </Grid>
               <Grid sm={1 / 6} />
             </Row>
-          }
-          <Row>
-            <Grid sm={1 / 6} />
-            <Grid sm={4 / 6}>
-              <Intro>
-                <FormattedMessage {...messages.intro} />
-              </Intro>
-              <TopActions>
-                <div>
-                  <ButtonHero onClick={() => onPageLink('/overview')}>
-                    <FormattedMessage {...messages.explore} />
-                  </ButtonHero>
-                </div>
-              </TopActions>
-            </Grid>
-            <Grid sm={1 / 6} />
-          </Row>
+          </SectionWrapper>
         </SectionTop>
         <Footer />
       </div>

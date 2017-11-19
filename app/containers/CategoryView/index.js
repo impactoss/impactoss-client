@@ -14,6 +14,7 @@ import {
   getReferenceField,
   getTitleField,
   getCategoryShortTitleField,
+  getStatusField,
   getMetaField,
   getMarkdownField,
   getLinkField,
@@ -25,7 +26,7 @@ import {
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -86,7 +87,10 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     }
     if (isManager) {
       fields.push({
-        fields: [getMetaField(entity, appMessages)],
+        fields: [
+          getStatusField(entity),
+          getMetaField(entity, appMessages),
+        ],
       });
     }
     return fields;
@@ -278,10 +282,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (categoryId) => {
-      dispatch(updatePath(`/category/edit/${categoryId}`));
+      dispatch(updatePath(`${PATHS.CATEGORIES}${PATHS.EDIT}/${categoryId}`));
     },
     handleClose: (taxonomyId) => {
-      dispatch(closeEntity(`/categories/${taxonomyId}`));
+      dispatch(closeEntity(`${PATHS.TAXONOMIES}/${taxonomyId}`));
     },
   };
 }

@@ -7,6 +7,30 @@ import isNumber from 'utils/is-number';
 import asList from 'utils/as-list';
 
 
+export const currentFilterArgs = (config, locationQuery) => {
+  let args = [];
+  if (config.taxonomies && locationQuery.get(config.taxonomies.query)) {
+    args = args.concat(config.taxonomies.query);
+  }
+  if (config.connectedTaxonomies && locationQuery.get(config.connectedTaxonomies.query)) {
+    args = args.concat(config.connectedTaxonomies.query);
+  }
+  if (config.connections && locationQuery.get(config.connections.query)) {
+    args = args.concat(config.connections.query);
+  }
+  if (locationQuery.get('where')) {
+    args = args.concat('where');
+  }
+  if (locationQuery.get('without')) {
+    args = args.concat('without');
+  }
+  if (locationQuery.get('search')) {
+    args = args.concat('search');
+  }
+  return args;
+};
+
+
 export const currentFilters = ({
   config,
   entities,
@@ -93,6 +117,7 @@ const getCurrentTaxonomyFilters = (
             label: getCategoryShortTitle(category),
             type: 'taxonomies',
             id: taxonomy.get('id'),
+            inverse: category.getIn(['attributes', 'draft']),
             onClick: () => onClick({
               value,
               query: taxonomyFilters.query,
@@ -117,7 +142,6 @@ const getCurrentTaxonomyFilters = (
             ],
             type: 'taxonomies',
             id: taxonomy.get('id'),
-            without: true,
             onClick: () => onClick({
               value,
               query: 'without',
@@ -152,6 +176,7 @@ const getCurrentConnectedTaxonomyFilters = (
               label: getCategoryShortTitle(category),
               type: 'taxonomies',
               id: taxonomy.get('id'),
+              inverse: category.getIn(['attributes', 'draft']),
               onClick: () => onClick({
                 value: queryValue,
                 query: taxonomyFilters.query,
@@ -186,6 +211,7 @@ const getCurrentConnectionFilters = (
               tags.push({
                 label: getConnectionLabel(connection, value),
                 type: option.path,
+                inverse: connection.getIn(['attributes', 'draft']),
                 onClick: () => onClick({
                   value: queryValue,
                   query: connectionFilters.query,
@@ -212,7 +238,6 @@ const getCurrentConnectionFilters = (
               { label: option.label },
             ],
             type: option.path,
-            without: true,
             onClick: () => onClick({
               value: queryValue,
               query: 'without',
@@ -244,7 +269,6 @@ const getCurrentAttributeFilters = (entities, attributeFiltersOptions, locationQ
                     { appMessage: !!option.message, label: option.message || option.label, lowerCase: true },
                   ],
                   type: 'attributes',
-                  without: true,
                   onClick: () => onClick({
                     value: queryValue,
                     query: 'where',

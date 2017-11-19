@@ -16,14 +16,14 @@ export const makeFilterGroups = (
     // first prepare taxonomy options
     filterGroups.taxonomies = {
       id: 'taxonomies', // filterGroupId
-      label: messages.taxonomies,
+      label: messages.taxonomyGroup,
       show: true,
       icon: 'categories',
       options: taxonomies.reduce((taxOptions, taxonomy) => ({
         ...taxOptions,
         [taxonomy.get('id')]: {
           id: taxonomy.get('id'), // filterOptionId
-          label: taxonomy.getIn(['attributes', 'title']),
+          label: messages.taxonomies(taxonomy.get('id')),
           active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
         },
       }), {}),
@@ -45,7 +45,7 @@ export const makeFilterGroups = (
             ...taxOptions,
             [taxonomy.get('id')]: {
               id: taxonomy.get('id'), // filterOptionId
-              label: taxonomy.getIn(['attributes', 'title']),
+              label: messages.taxonomies(taxonomy.get('id')),
               active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
             },
           })

@@ -34,7 +34,7 @@ import {
   getMetaField,
 } from 'utils/fields';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -59,7 +59,7 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -333,7 +333,7 @@ function mapDispatchToProps(dispatch, props) {
       // dispatch(save(formData, props.params.id));
     },
     handleCancel: () => {
-      dispatch(updatePath(`/recommendations/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}/${props.params.id}`));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

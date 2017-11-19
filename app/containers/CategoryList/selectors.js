@@ -143,10 +143,15 @@ export const selectCategories = createSelector(
   (categories, sort, order) => {
     const sortOption = getSortOption(SORT_OPTIONS, sort, 'query');
     return sortEntities(
-      categories,
-      order || (sortOption ? sortOption.order : 'asc'),
-      sortOption ? sortOption.field : 'title',
-      sortOption ? sortOption.type : 'string',
+      sortEntities(
+        categories,
+        order || (sortOption ? sortOption.order : 'asc'),
+        sortOption ? sortOption.field : 'title',
+        sortOption ? sortOption.type : 'string',
+      ),
+      'asc',
+      'draft',
+      'bool',
     );
   }
 );

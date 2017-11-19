@@ -7,9 +7,9 @@ import messages from './messages';
 const Status = styled.div`
   float: right;
   font-weight: bold;
-  font-size: 0.8em;
+  font-size: 13px;
   text-transform: uppercase;
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
   padding-left: 1em;
 `;
 

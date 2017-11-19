@@ -20,7 +20,7 @@ import {
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 
 import Loading from 'components/Loading';
@@ -195,13 +195,13 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: (userId) => {
-      dispatch(updatePath(`/users/edit/${userId}`));
+      dispatch(updatePath(`${PATHS.USERS}${PATHS.EDIT}/${userId}`));
     },
     handleEditPassword: (userId) => {
-      dispatch(updatePath(`/users/password/${userId}`));
+      dispatch(updatePath(`${PATHS.USERS}${PATHS.PASSWORD}/${userId}`));
     },
     handleClose: () => {
-      dispatch(closeEntity('/users'));
+      dispatch(closeEntity(PATHS.USERS));
     },
   };
 }

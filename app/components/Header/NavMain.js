@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 export default styled.div`
-  height: 35px;
+  height:${(props) => props.theme.sizes.header.nav.height}px;
   text-align: center;
   border-top: 1px solid;
   border-bottom: 1px solid;

@@ -29,7 +29,7 @@ import { attributesEqual } from 'utils/entities';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -51,7 +51,7 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -318,12 +318,12 @@ function mapDispatchToProps(dispatch) {
 
       dispatch(save(
         saveData.toJS(),
-        canUserPublish ? '/reports' : `/indicators/${indicatorReference}`,
+        canUserPublish ? PATHS.PROGRESS_REPORTS : `${PATHS.INDICATORS}/${indicatorReference}`,
         !canUserPublish // createAsGuest: do not append created id to redirect, do not create locally
       ));
     },
     handleCancel: (indicatorReference) => {
-      dispatch(updatePath(`/indicators/${indicatorReference}`));
+      dispatch(updatePath(`${PATHS.INDICATORS}/${indicatorReference}`));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

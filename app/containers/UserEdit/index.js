@@ -44,7 +44,7 @@ import {
   selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -52,7 +52,7 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -328,7 +328,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`/users/${reference}`));
+      dispatch(updatePath(`${PATHS.USERS}/${reference}`));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

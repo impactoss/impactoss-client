@@ -10,6 +10,8 @@ import { palette } from 'styled-theme';
 import { omit } from 'lodash/object';
 import { map } from 'lodash/collection';
 
+import asArray from 'utils/as-array';
+
 import A from 'components/styled/A';
 import Field from 'components/fields/Field';
 
@@ -110,7 +112,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                 <FormattedMessage {...messages.templateHint} />
                 <CsvDownload>
                   <CsvDownloader
-                    datas={template.data}
+                    datas={asArray(template.data)}
                     filename={template.filename}
                   >
                     <DownloadTemplate href="/" onClick={(evt) => evt.preventDefault()}>

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { PATHS } from 'containers/App/constants';
 import Clear from 'components/styled/Clear';
 import ItemStatus from 'components/ItemStatus';
 
@@ -12,7 +13,7 @@ const Styled = styled.a`
   background-color: ${palette('primary', 4)};
   margin-bottom: 1px;
   display: block;
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
   &:hover {
     color: ${palette('dark', 2)};
   }
@@ -40,7 +41,7 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
           evt.preventDefault();
           onEntityClick(report.get('id'), 'reports');
         }}
-        href={`/reports/${report.get('id')}`}
+        href={`${PATHS.PROGRESS_REPORTS}/${report.get('id')}`}
       >
         <Top>
           {report.get('date') &&

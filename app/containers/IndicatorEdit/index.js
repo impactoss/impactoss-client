@@ -41,7 +41,7 @@ import validateDateAfterDate from 'components/forms/validators/validate-date-aft
 import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
 import validateRequired from 'components/forms/validators/validate-required';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -66,7 +66,7 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 
 import {
@@ -484,7 +484,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath(`/indicators/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.INDICATORS}/${props.params.id}`));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

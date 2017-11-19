@@ -33,7 +33,14 @@ import {
   RECOVER_PASSWORD,
   CLOSE_ENTITY,
   DISMISS_QUERY_MESSAGES,
+  PATHS,
+  PARAMS,
 } from 'containers/App/constants';
+
+import {
+  ENDPOINTS,
+  KEYS,
+} from 'themes/config';
 
 import {
   entitiesLoaded,
@@ -142,7 +149,7 @@ export function* authenticateSaga(payload) {
   const { password, email } = payload.data;
   try {
     yield put(authenticateSending());
-    const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
+    const response = yield call(apiRequest, 'post', ENDPOINTS.SIGN_IN, { email, password });
     yield put(authenticateSuccess(response.data));
     yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
     yield put(forwardOnAuthenticationChange());
@@ -156,15 +163,15 @@ export function* recoverSaga(payload) {
   const { email } = payload.data;
   try {
     yield put(recoverSending());
-    yield call(apiRequest, 'post', 'auth/password', {
+    yield call(apiRequest, 'post', ENDPOINTS.PASSWORD, {
       email,
-      redirect_url: `${window.location.origin}/resetpassword`, // TODO WIP
+      redirect_url: `${window.location.origin}${PATHS.RESET_PASSWORD}`,
     });
     yield put(recoverSuccess());
     // forward to login
     yield put(replace({
-      pathname: '/login',
-      query: { info: 'recoverSuccess' },
+      pathname: PATHS.LOGIN,
+      query: { info: PARAMS.RECOVER_SUCCESS },
     }));
   } catch (err) {
     err.response.json = yield err.response.json();
@@ -184,10 +191,10 @@ export function* authChangeSaga() {
 
 export function* logoutSaga() {
   try {
-    yield call(apiRequest, 'delete', 'auth/sign_out');
+    yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
-    yield put(push('/login'));
     yield put(logoutSuccess());
+    yield put(push(PATHS.LOGIN));
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));
@@ -196,10 +203,23 @@ export function* logoutSaga() {
 
 export function* validateTokenSaga() {
   try {
-    const { uid, client, 'access-token': accessToken } = yield getAuthValues();
+    const {
+      [KEYS.UID]: uid,
+      [KEYS.CLIENT]: client,
+      [KEYS.ACCESS_TOKEN]: accessToken,
+    } = yield getAuthValues();
+
     if (uid && client && accessToken) {
       yield put(authenticateSending());
-      const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
+      const response = yield call(
+        apiRequest,
+        'get',
+        ENDPOINTS.VALIDATE_TOKEN, {
+          [KEYS.UID]: uid,
+          [KEYS.CLIENT]: client,
+          [KEYS.ACCESS_TOKEN]: accessToken,
+        }
+      );
       if (!response.success) {
         yield call(clearAuthValues);
         yield put(invalidateEntities());
@@ -606,8 +626,6 @@ export function* updatePathSaga({ path, args }) {
     yield put(push(relativePath));
   }
 }
-
-// const backTargetIgnore = ['/edit', '/new', 'login', '/reports'];
 
 export function* closeEntitySaga({ path }) {
   // the close icon is to function like back if possible, otherwise go to default path provided

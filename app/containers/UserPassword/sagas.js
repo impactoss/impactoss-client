@@ -3,6 +3,7 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { updatePasswordRequest } from 'utils/entities-update';
 
+import { PATHS } from 'containers/App/constants';
 import { updatePath } from 'containers/App/actions';
 import { actions as formActions } from 'react-redux-form/immutable';
 
@@ -26,7 +27,7 @@ export function* save({ data }) {
 
     yield put(passwordSuccess());
 
-    yield put(updatePath(`/users/${data.id}`));
+    yield put(updatePath(`${PATHS.USERS}/${data.id}`));
     yield put(formActions.reset('userPassword.form.data'));
   } catch (error) {
     error.response.json = yield error.response.json();

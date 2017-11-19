@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import ItemStatus from 'components/ItemStatus';
+import Clear from 'components/styled/Clear';
 
 const Styled = styled.button`
   width:100%;
@@ -24,8 +26,8 @@ const Column = styled.div`
 const BarWrap = styled.div`
   width:100%;
   vertical-align: middle;
-  padding-left: 2.5em;
-  padding-right: ${(props) => props.secondary ? 1.5 : 1}em;
+  padding-left: 40px;
+  padding-right: ${(props) => props.secondary ? 27 : 18}px;
 `;
 const Bar = styled.div`
   width:${(props) => props.length}%;
@@ -34,11 +36,13 @@ const Bar = styled.div`
   vertical-align: middle;
   display: inline-block;
   position: relative;
+  border-right: ${(props) => props.secondary ? '1px solid' : 0};
+  border-right-color: ${palette('primary', 4)};
 `;
 const Count = styled.div`
   font-weight: bold;
   position: absolute;
-  font-size: 1.1em;
+  font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
   line-height: 1.6;
   right: 100%;
   text-align: right;
@@ -54,9 +58,12 @@ const CountSecondary = styled(Count)`
 `;
 const Title = styled.div`
   display: inline-block;
-  font-size: 1.1em;
+  font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
   line-height: 1.6;
-  padding: 0 1em;
+  padding: 0 18px;
+`;
+const StatusWrap = styled.div`
+  padding: 0 18px;
 `;
 const Reference = styled.span`
   padding-right: 0.5em;
@@ -95,6 +102,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
             <Bar
               length={(count.accepted / col.maxCount) * 100}
               palette={col.entity}
+              secondary
             >
               <Count palette={col.entity}>
                 {count.accepted}
@@ -125,6 +133,12 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
         {
           columns.map((col, i) => (
             <Column key={i} colWidth={col.width}>
+              { col.type === 'title' && category.draft &&
+              <StatusWrap>
+                <ItemStatus draft />
+                <Clear />
+              </StatusWrap>
+              }
               {this.renderColumnContent(col, category)}
             </Column>
           ))

@@ -7,12 +7,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import EntityListSidebarGroupLabel from './EntityListSidebarGroupLabel';
 import EntityListSidebarOption from './EntityListSidebarOption';
 
 const Group = styled.div`
-  margin-bottom: 1px;
+  border-bottom: 1px solid;
+  border-color: ${palette('aside', 0)};
+  &:last-child {
+    border-bottom: 0;
+  }
 `;
 
 class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

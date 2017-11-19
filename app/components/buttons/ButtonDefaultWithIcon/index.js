@@ -9,14 +9,15 @@ import Icon from 'components/Icon';
 const Button = styled(ButtonDefault)`
   padding: 0.25em 1.25em;
   width: ${(props) => props.fullWidth ? '100%' : 'auto'};
-  min-height: 3em;
+  min-height: 2.5em;
   text-align: ${(props) => props.align};
   text-transform: ${(props) => props.uppercase ? 'uppercase' : 'none'};
   font-weight: ${(props) => props.strong ? 'bold' : 'normal'};
-  font-size: 0.85em;
   border: ${(props) => props.border ? '1px solid' : 0};
   border-color: ${(props) => props.border ? palette(props.border.palette, props.border.pIndex) : 'transparent'};
+  font-size: 0.85em;
 `;
+// font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 
 const Title = styled.span`
   padding-right: 0;

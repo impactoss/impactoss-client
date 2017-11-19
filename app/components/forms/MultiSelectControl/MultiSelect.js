@@ -43,7 +43,7 @@ const ChangeHint = styled.div`
 `;
 
 const ChangeHintHighlighted = styled.span`
-  color: ${palette('primary', 0)};
+  color: ${palette('primary', 1)};
 `;
 
 const ControlMain = styled.div`
@@ -67,7 +67,7 @@ const ControlFooter = styled.div`
 `;
 
 const Search = styled.div`
-  padding: 0.5em 1em;
+  padding: 0.75em 1em;
   background-color: ${palette('light', 0)};
 `;
 
@@ -83,7 +83,8 @@ const LabelWrap = styled.div`
   display: table-cell;
   padding-left: 0.5em;
   padding-right: 1em;
-  font-size: 0.9em;
+  font-size: 0.8em;
+  vertical-align: middle;
 `;
 const CheckboxWrap = styled.div`
   text-align: center;
@@ -91,13 +92,12 @@ const CheckboxWrap = styled.div`
   padding-left: 1em;
   padding-right: 0.5em;
   width: 10px;
+  vertical-align: middle;
 `;
 const Checkbox = styled(IndeterminateCheckbox)`
   vertical-align: middle;
 `;
-const Label = styled.label`
-  vertical-align: middle;
-`;
+const Label = styled.label``;
 
 
 class MultiSelect extends React.Component {
@@ -141,6 +141,12 @@ class MultiSelect extends React.Component {
   onSearch = (value) => {
     this.setState({
       query: value,
+    });
+  }
+  onResetFilters = () => {
+    this.setState({
+      query: null,
+      queryTags: [],
     });
   }
   onTagSelected = (active, tagOption) => {
@@ -334,6 +340,7 @@ class MultiSelect extends React.Component {
             <Search>
               <TagSearch
                 onSearch={this.onSearch}
+                onClear={this.onResetFilters}
                 filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}
                 searchQuery={this.state.query || ''}
                 multiselect

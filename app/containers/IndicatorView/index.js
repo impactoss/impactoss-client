@@ -25,7 +25,7 @@ import {
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
@@ -278,13 +278,13 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: () => {
-      dispatch(updatePath(`/indicators/edit/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.INDICATORS}${PATHS.EDIT}/${props.params.id}`));
     },
     handleNewReport: () => {
-      dispatch(updatePath(`/reports/new/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}${PATHS.NEW}/${props.params.id}`));
     },
     handleClose: () => {
-      dispatch(closeEntity('/indicators'));
+      dispatch(closeEntity(PATHS.INDICATORS));
       // TODO should be "go back" if history present or to indicators list when not
     },
     onDismissQueryMessages: () => {
