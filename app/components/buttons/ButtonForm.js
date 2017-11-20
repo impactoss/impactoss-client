@@ -7,6 +7,7 @@ const ButtonForm = styled(Button)`
   text-transform: uppercase;
   font-size: 1em;
   padding: 1em 1.2em;
+  letter-spacing: 1px;
 `;
 
 export default ButtonForm;
