@@ -20,7 +20,7 @@ const Title = styled.div`
   padding-left: 0.25em;
   display: inline-block;
   vertical-align: middle;
-  color: ${palette('dark', 2)};
+  color: ${palette('text', 1)};
 `;
 
 const Square = styled.div`

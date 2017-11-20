@@ -1,21 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
-
 import appMessage from 'utils/app-message';
 
+import Label from 'components/styled/Label';
 import { find } from 'lodash/collection';
 
 import { USER_ROLES } from 'themes/config';
 
-const Status = styled.div`
+const Role = styled(Label)`
   float: right;
-  font-size: 13px;
-  color: ${palette('dark', 3)};
   padding-left: 1em;
+  font-size: 12px;
 `;
-// font-weight: bold;
 
 class ItemRole extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -23,12 +20,12 @@ class ItemRole extends React.PureComponent { // eslint-disable-line react/prefer
       && find(USER_ROLES, { value: parseInt(this.props.role, 10) });
 
     return role
-      ? (<Status>
+      ? (<Role>
         { role && role.message
           ? appMessage(this.context.intl, role.message)
           : ((role && role.label) || this.props.role)
         }
-      </Status>)
+      </Role>)
       : null
     ;
   }

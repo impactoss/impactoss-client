@@ -7,8 +7,8 @@ import Close from './Close';
 const Styled = styled.div`
   display: table;
   width: 100%;
-  background-color: ${palette('dark', 2)};
-  color: ${palette('primary', 4)};
+  color: ${palette('multiSelectHeader', 0)};
+  background-color: ${palette('multiSelectHeader', 1)};
   height: 60px;
   padding-left: 1em;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);

@@ -25,7 +25,7 @@ const Search = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 0)};
   color: ${palette('dark', 2)};
   padding: ${(props) => props.small ? '0 7px' : '7px'};
   border: 1px solid ${(props) => props.active ? palette('light', 4) : palette('light', 2)};
@@ -35,7 +35,7 @@ const Search = styled.div`
   position: relative;
 `;
 const SearchInput = styled(DebounceInput)`
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 0)};
   border: none;
   padding: 3px;
   &:focus {
@@ -51,7 +51,7 @@ const Clear = styled(Button)`
   position: absolute;
   top: 0;
   right: 0;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 4)};
 `;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function

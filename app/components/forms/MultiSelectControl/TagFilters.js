@@ -30,7 +30,7 @@ const Dropdown = styled.div`
   right: 0;
   width: 100%;
   z-index: 2;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 0)};
   box-shadow: 0 8px 8px 0 rgba(0,0,0,0.2);
   overflow-y: auto;
   max-height: 320px;

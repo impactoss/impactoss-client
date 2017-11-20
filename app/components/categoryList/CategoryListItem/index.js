@@ -9,13 +9,15 @@ const Styled = styled.button`
   width:100%;
   cursor: pointer;
   text-align: left;
-  background-color: ${palette('primary', 4)};
+  color: ${palette('mainListItem', 0)};
+  background-color: ${palette('mainListItem', 1)};
   margin: 0;
   padding: 1em 0;
   display: block;
   margin-bottom: 2px;
   &:hover {
-    opacity: 0.85;
+    color: ${palette('mainListItemHover', 0)};
+    background-color: ${palette('mainListItemHover', 1)};
   }
 `;
 const Column = styled.div`
@@ -37,7 +39,7 @@ const Bar = styled.div`
   display: inline-block;
   position: relative;
   border-right: ${(props) => props.secondary ? '1px solid' : 0};
-  border-right-color: ${palette('primary', 4)};
+  border-right-color: ${palette('mainListItem', 1)};
 `;
 const Count = styled.div`
   font-weight: bold;
@@ -67,7 +69,7 @@ const StatusWrap = styled.div`
 `;
 const Reference = styled.span`
   padding-right: 0.5em;
-  opacity: 0.6;
+  color: ${palette('text', 1)};
 `;
 
 class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

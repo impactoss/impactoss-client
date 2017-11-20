@@ -36,7 +36,7 @@ const Label = styled.div`
 `;
 
 const ScrollableWrapper = styled(Scrollable)`
-  background-color: ${palette('light', 0)};
+  background-color: ${palette('background', 0)};
 `;
 
 export class EntityListSidebarLoading extends React.Component { // eslint-disable-line react/prefer-stateless-function

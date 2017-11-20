@@ -22,7 +22,7 @@ import messages from './messages';
 
 
 const DocumentWrapEdit = styled(DocumentWrap)`
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 0)};
   position: relative;
   padding: 1em 0.75em;
   border: 1px solid ${palette('light', 1)};
@@ -34,16 +34,16 @@ const Remove = styled(ButtonFlatIconOnly)`
   right: 0;
   top: 0;
   padding: 1em 0.75em;
-  color: ${palette('dark', 2)};
+  color: ${palette('link', 2)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('linkHover', 2)};
   }
 `;
 
 const Uploading = styled.div`
   font-weight: bold;
   font-size: 1em;
-  color: ${palette('primary', 2)};
+  color: ${palette('primary', 1)};
   margin-bottom: 0.25em;
   margin-top: -0.5em;
   overflow: hidden;
@@ -55,16 +55,16 @@ const Styled = styled.div`
 const ReactS3UploaderLabelWrap = styled.label`
   vertical-align: middle;
   display: inline-block;
-  color: ${palette('primary', 4)};
-  background-color: ${palette('primary', 1)};
+  color: ${palette('buttonDefault', 0)};
+  background-color: ${palette('buttonDefault', 1)};
   border-radius: 999px;
   cursor:pointer;
   padding: 0.5em 1em 0.5em 1.25em;
   font-size: 1.25em;
   width: auto;
   &:hover {
-    color: ${palette('primary', 4)};
-    background-color: ${palette('primary', 0)};
+    color: ${palette('buttonDefaultHover', 0)};
+    background-color: ${palette('buttonDefaultHover', 1)};
   }
 `;
 

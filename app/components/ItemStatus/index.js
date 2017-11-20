@@ -1,16 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
+import Label from 'components/styled/Label';
 import messages from './messages';
 
-const Status = styled.div`
+const Status = styled(Label)`
   float: right;
-  font-weight: bold;
-  font-size: 13px;
-  text-transform: uppercase;
-  color: ${palette('dark', 3)};
   padding-left: 1em;
+  font-weight: bold;
+  font-size: 12px;
 `;
 
 class ItemStatus extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

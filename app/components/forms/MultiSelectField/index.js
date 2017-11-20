@@ -25,7 +25,7 @@ const MultiSelectWrapper = styled.div`
   overflow: hidden;
   display: block;
   z-index: 10;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 0)};
   border-left: 1px solid;
   border-right: 1px solid;
   border-bottom: 1px solid;
@@ -43,9 +43,10 @@ const MultiselectActiveOptionList = styled.div`
 `;
 const MultiselectActiveOptionListItem = styled.div`
   position: relative;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('mainListItem', 1)};
   border-bottom: 1px solid ${palette('light', 1)};
   padding: 12px 0 12px 16px;
+  line-height: 1.4;
 `;
 const MultiselectActiveOptionRemove = styled(Button)`
   position: absolute;
@@ -54,8 +55,9 @@ const MultiselectActiveOptionRemove = styled(Button)`
   display: block;
   padding: 0 16px;
   bottom: 0;
+  color: ${palette('link', 2)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('linkHover', 2)};
   }
 `;
 const MultiselectActiveOption = styled.div`
@@ -72,29 +74,32 @@ const MultiSelectDropdown = styled(Button)`
   width: 100%;
   font-size: 0.85em;
   text-align: left;
-  color: ${palette('dark', 0)};
-  background-color: ${palette('light', 1)};
+  color: ${palette('multiSelectFieldButton', 0)};
+  background-color: ${palette('multiSelectFieldButton', 1)};
   &:hover {
-    color: ${palette('dark', 0)}
-    background-color: ${palette('light', 2)}
+    color: ${palette('multiSelectFieldButtonHover', 0)};
+    background-color: ${palette('multiSelectFieldButtonHover', 1)}
   }
   padding: 12px 0 12px 16px;
 `;
 
 const MultiSelectWithout = styled.div`
   padding: 12px 0 12px 16px;
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
 `;
 const MultiSelectWithoutLink = styled(A)`
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
   &:hover {
-    color: ${palette('linkDefault', 1)};
+    color: ${palette('link', 0)};
   }
 `;
 
-const Id = styled.div`
-  font-weight: bold;
-  color: ${palette('dark', 3)}
+const Reference = styled.div`
+  color: ${palette('text', 1)};
+  &:hover {
+    color: ${palette('text', 0)};
+  }
+  font-size: 0.85em;
 `;
 
 const NON_CONTROL_PROPS = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages'];
@@ -156,7 +161,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
           <ItemStatus draft />
         }
         { option.get('reference') &&
-          <Id>{option.get('reference')}</Id>
+          <Reference>{option.get('reference')}</Reference>
         }
         {option.get('label')}
       </MultiselectActiveOption>

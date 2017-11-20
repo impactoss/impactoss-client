@@ -62,13 +62,15 @@ const OptionLabel = styled.label`
       ? '0.5em solid'
       : 'none'
   };
-  border-right-color: ${palette('primary', 1)}
+  border-right-color: ${palette('buttonDefault', 1)};
+}
 `;
 
 const OptionCount = styled.span`
   display: table-cell;
-  vertical-align:top;
-  color: ${palette('dark', 3)};
+  vertical-align: middle;
+  color: ${palette('text', 1)};
+  font-size: 0.9em;
   padding-top: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
   padding-bottom: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
   padding-right: 1em;
@@ -79,7 +81,7 @@ const OptionCount = styled.span`
 const Empty = styled.div`
   padding: 1em;
   font-style: italic;
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
 `;
 
 const More = styled.div`

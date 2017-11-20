@@ -1,6 +1,6 @@
 /*
  *
- * EntityListGroup
+ * SelectReset
  *
  */
 import React from 'react';
@@ -14,25 +14,25 @@ import ButtonSimple from 'components/buttons/ButtonSimple';
 import Icon from 'components/Icon';
 
 const Label = styled.label`
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
   padding: 0 0.5em 0 0;
 `;
 const Select = styled.select`
-  font-weight: ${(props) => props.active ? 'bold' : 'normal'};
+  font-weight: ${(props) => props.active ? 500 : 'normal'};
 `;
 // border-bottom: 1px dotted #ccc;
 const Option = styled.option`
-  color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 4) : palette('dark', 2)};
-  background-color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 1) : palette('primary', 4)};
+  color: ${(props) => props.active && (!props.isPlaceholder) ? palette('text', 2) : palette('text', 0)};
+  background-color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 1) : palette('background', 0)};
 `;
-// color: ${palette('primary', 1)};
 const Reset = styled(ButtonSimple)`
   padding: 0 0.5em;
+  color: ${palette('link', 2)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('linkHover', 2)};
   }
   margin-right: 20px;
-  font-weight: bold;
+  font-weight: 500;
 `;
 
 export class SelectReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

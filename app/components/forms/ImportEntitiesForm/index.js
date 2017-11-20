@@ -38,14 +38,14 @@ const Importing = styled.div``;
 const ImportingText = styled.div`
   font-weight: bold;
   font-size: 1em;
-  color: ${palette('primary', 2)};
+  color: ${palette('text', 1)};
   margin-bottom: 0.25em;
   margin-top: -0.5em;
   overflow: hidden;
 `;
 
 const DocumentWrapEdit = styled(DocumentWrap)`
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 0)};
   position: relative;
   padding: 1em 0.75em;
 `;

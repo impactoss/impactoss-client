@@ -9,9 +9,8 @@ import messages from './messages';
 
 const MarkdownHint = styled.div`
   text-align: right;
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
   font-size: 0.85em;
-  font-weight: bold;
 `;
 export class MarkdownControl extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 

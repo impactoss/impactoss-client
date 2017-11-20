@@ -10,7 +10,7 @@ const Styled = styled(Button)`
   right:0;
   top:0;
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('link', 0)};
   }
 `;
 

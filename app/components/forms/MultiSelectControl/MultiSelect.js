@@ -34,8 +34,8 @@ const ChangeHint = styled.div`
   left: 0;
   right: 0;
   bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
-  background-color: ${palette('light', 0)};
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
+  background-color: ${palette('background', 1)};
   font-style: italic;
   padding: 0.5em 1em;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
@@ -43,7 +43,7 @@ const ChangeHint = styled.div`
 `;
 
 const ChangeHintHighlighted = styled.span`
-  color: ${palette('primary', 1)};
+  color: ${palette('buttonDefault', 1)};
 `;
 
 const ControlMain = styled.div`
@@ -61,19 +61,19 @@ const ControlFooter = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: ${palette('light', 0)};
+  background-color: ${palette('background', 1)};
   height: 50px;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
 `;
 
 const Search = styled.div`
   padding: 0.75em 1em;
-  background-color: ${palette('light', 0)};
+  background-color: ${palette('background', 1)};
 `;
 
 const SelectAll = styled.div`
   padding: 0.5em 1em 0.5em 0;
-  background-color: ${palette('light', 0)};
+  background-color: ${palette('background', 1)};
   display: table;
   width: 100%;
   line-height: 1.1;
