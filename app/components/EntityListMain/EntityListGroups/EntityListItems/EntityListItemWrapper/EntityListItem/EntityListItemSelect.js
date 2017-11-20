@@ -6,8 +6,11 @@ import { palette } from 'styled-theme';
 const Select = styled.div`
   display: table-cell;
   width: 40px;
-  background-color: ${palette('primary', 4)};
-  padding: 5px;
+  background-color: ${palette('mainListItem', 1)};
+  padding-right: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
+  padding-left: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
+  padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
+  padding-bottom: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingBottom}px;
   text-align: center;
 `;
 

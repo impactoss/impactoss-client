@@ -43,7 +43,7 @@ const ListInlineItemLink = styled.a`
   height:2em;
   line-height: 2em;
   font-weight: bold;
-  color: ${palette('primary', 1)};
+  color: ${palette('link', 0)};
   display: block;
 `;
 const ListInlineItemActive = styled.div`
@@ -52,8 +52,8 @@ const ListInlineItemActive = styled.div`
   line-height: 2em;
   border-radius: 9999px;
   font-weight: bold;
-  background-color: ${palette('primary', 1)};
-  color: ${palette('primary', 4)};
+  background-color: ${palette('buttonDefault', 1)};
+  color: ${palette('buttonDefault', 0)};
 `;
 const ListInlineItemNav = styled.a`
   padding: 0 0.5em;
@@ -61,7 +61,7 @@ const ListInlineItemNav = styled.a`
 `;
 
 const ListInlineItemNavDisabled = styled.div`
-  color: ${palette('dark', 4)};
+  color: ${palette('text', 1)};
   padding: 0 0.5em;
 `;
 

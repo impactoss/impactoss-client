@@ -3,28 +3,32 @@ import PropTypes from 'prop-types';
 import { PATHS } from 'containers/App/constants';
 import Clear from 'components/styled/Clear';
 import ItemStatus from 'components/ItemStatus';
+import Label from 'components/styled/Label';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const Styled = styled.a`
-  padding: 10px 15px;
+  padding-right: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
+  padding-left: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
+  padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
+  padding-bottom: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingBottom}px;
   position: relative;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('mainListItem', 1)};
   margin-bottom: 1px;
   display: block;
-  color: ${palette('dark', 3)};
+  color: ${palette('mainListItem', 0)};
   &:hover {
-    color: ${palette('dark', 2)};
+    color: ${palette('mainListItemHover', 0)};
   }
 `;
 const Top = styled.div`
 `;
 
-const Reference = styled.div`
+const Reference = styled(Label)`
   float:left;
   text-decoration: none;
-  font-weight: 500;
+  font-size: 12px;
 `;
 const Title = styled.div`
   text-decoration: none;

@@ -6,9 +6,9 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const ListEntitiesGroupHeaderLink = styled(Link)`
-  color: ${palette('dark', 1)};
+  color: ${palette('link', 2)};
   &:hover {
-    color: ${palette('dark', 0)};
+    color: ${palette('linkHover', 2)};
     text-decoration: underline;
   }
 `;

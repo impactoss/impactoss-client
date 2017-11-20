@@ -6,11 +6,14 @@ import { palette } from 'styled-theme';
 import messages from 'components/EntityListMain/EntityListGroups/messages';
 
 const Styled = styled.span`
-  padding: 10px 15px;
-  font-weight: 500;
+  padding-right: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
+  padding-left: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
+  padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
+  padding-bottom: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingBottom}px;
   display:inline-block;
   vertical-align: top;
-  color: ${palette('light', 3)};
+  color: ${palette('text', 1)};
+  font-size: 0.9em;
 `;
 
 class EntityListNestedNoItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

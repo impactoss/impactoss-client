@@ -2,14 +2,14 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const EntityListItemMainTopReference = styled.a`
-  font-weight: 500;
   text-decoration: none;
   display: block;
-  float:left;
-  color: ${palette('dark', 3)};
+  float: left;
+  color: ${palette('text', 1)};
   &:hover {
-    color: ${palette('dark', 2)};
+    color: ${palette('text', 0)};
   }
+  font-size: 0.85em; 
 `;
 
 export default EntityListItemMainTopReference;

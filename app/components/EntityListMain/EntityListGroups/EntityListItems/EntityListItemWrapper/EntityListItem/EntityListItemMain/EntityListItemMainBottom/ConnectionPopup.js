@@ -19,8 +19,8 @@ const Count = styled.span`
   top: 0;
   border-radius: 999px;
   font-size: 0.8em;
-  background-color: ${(props) => props.draft ? palette('primary', 4) : palette(props.pIndex, 0)};
-  color: ${(props) => props.draft ? palette(props.pIndex, 0) : palette('primary', 4)};
+  background-color: ${(props) => props.draft ? palette('buttonInverse', 1) : palette(props.pIndex, 0)};
+  color: ${(props) => props.draft ? palette(props.pIndex, 0) : palette('buttonDefault', 0)};
   border: 1px solid ${(props) => palette(props.pIndex, 0)};
   height: 1.8em;
   min-width: 1.8em;
@@ -56,10 +56,10 @@ const Popup = styled.div`
 const PopupInner = styled.div`
   width: 100%;
   display: block;
-  background-color: ${palette('primary', 4)};
-  color: ${palette('dark', 1)};
+  background-color: ${palette('background', 0)};
+  color: ${palette('text', 0)};
   box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.4);
-  border-bottom: 10px solid ${palette('light', 0)};
+  border-bottom: 10px solid ${palette('background', 1)};
 `;
 const TriangleBottom = styled.div`
    width: 20px;
@@ -78,7 +78,7 @@ const TriangleBottom = styled.div`
       position: absolute;
       width: 20px;
       height: 20px;
-      background-color: ${palette('light', 0)};
+      background-color: ${palette('background', 1)};
       transform: rotate(45deg);
       bottom: 5px;
       left: 0px;
@@ -88,7 +88,7 @@ const TriangleBottom = styled.div`
 
 const PopupHeader = styled.div`
   padding: 0.5em 1em;
-  background-color: ${palette('light', 0)};
+  background-color: ${palette('background', 1)};
 `;
 const PopupHeaderMain = styled.span`
   font-weight: bold;
@@ -97,31 +97,31 @@ const PopupHeaderMain = styled.span`
 const PopupContent = styled.div`
   position: relative;
   max-height: 200px;
-  height: ${(props) => props.count * 5}em;
+  height: ${(props) => props.count * 4}em;
   overflow: auto;
 `;
 
 const Id = styled.span`
-  font-weight: bold;
-  color: ${palette('dark', 3)}
+  color: ${palette('text', 1)};
+  font-size: 0.9em;
 `;
 const IdSpacer = styled.span`
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  color: ${palette('dark', 3)};
+  padding-left: 0.25em;
+  padding-right: 0.25em;
+  color: ${palette('text', 1)};
 `;
-const ItemContent = styled.span`
-  color: ${palette('dark', 1)};
-`;
+const ItemContent = styled.span``;
 
 const ListItem = styled.div`
-  padding: 1em;
-  border-top: 1px solid ${palette('light', 0)};
+  padding: 0.5em 1em;
+  border-top: 1px solid ${palette('background', 1)};
+  line-height: 1.4;
 `;
 
 const ListItemLink = styled(Link)`
+  color: ${palette('mainListItem', 0)};
   &:hover {
-    opacity: 0.75;
+    color: ${palette('mainListItemHover', 0)};
   }
 `;
 
@@ -198,7 +198,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                             <ItemStatus draft />
                           }
                           <Id>{ref}</Id>
-                          <IdSpacer>|</IdSpacer>
+                          <IdSpacer />
                           <ItemContent>{truncateText(entity.getIn(['attributes', 'title']), POPUP_LENGTH - ref.length)}</ItemContent>
                         </ListItemLink>
                       </ListItem>

@@ -17,16 +17,22 @@ import EntityListItemMainBottom from './EntityListItemMainBottom';
 
 
 const Styled = styled(Component)`
-  padding: ${(props) => props.isManager ? '10px 15px 10px 0px' : '10px 15px'};
+  padding-right: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
+  padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
+  padding-bottom: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingBottom}px;
+  padding-left: ${(props) => (!props.theme.sizes || props.isManager)
+    ? 0
+    : props.theme.sizes.mainListItem.paddingHorizontal
+  }px;
 `;
 
 const EntityListItemMainTitleWrap = styled.a`
   text-decoration: none;
   display: block;
-  padding: 3px 12px 3px 0;
-  color: ${palette('dark', 0)};
+  padding: 0px 12px 6px 0;
+  color: ${palette('mainListItem', 0)};
   &:hover {
-    color: ${palette('dark', 2)};
+    color: ${palette('mainListItemHover', 0)};
   }
 `;
 

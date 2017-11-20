@@ -9,7 +9,7 @@ import BottomIconWrap from './BottomIconWrap';
 const Styled = styled.span`
   display: inline-block;
   margin-right: 1em;
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
 `;
 
 export default class EntityListItemMainBottomUser extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

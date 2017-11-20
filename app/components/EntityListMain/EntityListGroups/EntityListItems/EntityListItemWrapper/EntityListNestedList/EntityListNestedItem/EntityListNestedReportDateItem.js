@@ -9,21 +9,32 @@ import Icon from 'components/Icon';
 import appMessages from 'containers/App/messages';
 
 const Styled = styled.div`
+  padding-right: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
+  padding-left: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
+  padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
+  padding-bottom: ${(props) => {
+    if (props.theme.sizes) {
+      return props.scheduled
+        ? props.theme.sizes.mainListItem.paddingBottom
+        : props.theme.sizes.mainListItem.paddingTop;
+    }
+    return 0;
+  }}px;
   position: relative;
-  padding: 10px 15px;
-  background-color: ${palette('primary', 4)};
-  color:  ${(props) => props.overdue ? palette('reports', 0) : palette('light', 4)};
+  color:  ${(props) => props.overdue ? palette('reports', 0) : palette('text', 1)};
+  background-color: ${palette('mainListItem', 1)};
   margin-bottom: 1px;
 `;
 const Status = styled.div`
   font-size: 1em;
-  color:  ${(props) => props.unscheduled ? palette('light', 3) : 'inherit'};
+  color:  ${(props) => props.unscheduled ? palette('text', 1) : 'inherit'};
 `;
 const DueDate = styled.div`
+  font-weight: 500;
 `;
 const IconWrap = styled.div`
-  color: ${palette('primary', 4)};
-  background-color:  ${(props) => props.overdue ? palette('reports', 0) : palette('light', 4)};
+  color: ${palette('text', 2)};
+  background-color:  ${(props) => props.overdue ? palette('reports', 0) : palette('text', 1)};
   position: absolute;
   top: 0;
   right: 0;
@@ -52,7 +63,7 @@ class EntityListNestedReportDateItem extends React.PureComponent { // eslint-dis
     const due = scheduled && date.getIn(['attributes', 'due']);
 
     return (
-      <Styled overdue={overdue}>
+      <Styled overdue={overdue} scheduled={scheduled}>
         { scheduled &&
           <span>
             <IconWrap overdue={overdue}>

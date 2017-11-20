@@ -20,12 +20,12 @@ const Styled = styled.span`
 const Item = styled(Component)`
   display: table;
   width:100%;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('mainListItem', 1)};
 `;
 const MainWrapper = styled(Component)`
   display: table-cell;
   width: ${(props) => props.expandable ? 66 : 100}%;
-  border-right: 1px solid ${palette('light', 0)};
+  border-right: 1px solid ${palette('background', 1)};
 `;
 export default class EntityListNestedItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 

@@ -26,7 +26,7 @@ const IconWrap = styled.span`
 
 const Count = styled.span`
   display: inline-block;
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
   padding: 0 8px;
   font-size: 1.5em;
 `;

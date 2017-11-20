@@ -23,7 +23,8 @@ const Styled = styled.span`
 const Item = styled(Component)`
   display: table;
   width:100%;
-  background-color: ${palette('primary', 4)};
+  color: ${palette('mainListItem', 0)};
+  background-color: ${palette('mainListItem', 1)};
   border-bottom: ${(props) => props.error ? '1px solid' : 0};
   border-left: ${(props) => props.error ? '1px solid' : 0};
   border-right: ${(props) => props.error ? '1px solid' : 0};
@@ -33,7 +34,7 @@ const MainWrapper = styled(Component)`
   display: table-cell;
   width: ${(props) => props.expandable ? 66 : 100}%;
   border-right: ${(props) => props.expandable ? '1px solid' : '0'};
-  border-right-color: ${palette('light', 0)};
+  border-right-color: ${palette('background', 1)};
 `;
 const MainInnerWrapper = styled(Component)`
   display: table;
