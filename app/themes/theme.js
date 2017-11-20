@@ -55,7 +55,7 @@ theme.breakpoints = {
 // 2: main colour, light -- !!! AA compatible with secondary[1]
 // 3: main colour, lighter (UNUSED)
 // 4: white
-const primary = coolorsToHex('https://coolors.co/aa3d27-cc482e-EA5E3F-EF8871-ffffff');
+const primary = coolorsToHex('https://coolors.co/bc432b-cc482e-ea5e3f-ef8871-ffffff');
   // secondary color palette: dark to light
   // 0: dark header colour, darker // 162331
   // 1: dark header colour -- !!! AA compatible with primary[2]
@@ -79,7 +79,9 @@ const dark = coolorsToHex('https://coolors.co/1d3033-344547-4a595c-657072-899395
 const light = coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad');
 
 // other palettes
-const error = coolorsToHex('https://coolors.co/bf4c3a-e25646-e46556-f8edec-ffffff');
+// 0: AA on light[0] and on error[3]
+// 1: AA on white
+const error = coolorsToHex('https://coolors.co/BB4B3A-dd3522-e46556-f8edec-ffffff');
 const success = coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-ffffff');
 // const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-ffffff');
 // const info = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-1d3033');
@@ -121,16 +123,27 @@ theme.palette = {
   sdgtargetsHover: ['#00546B'],
   indicators: ['#553529'],
   indicatorsHover: ['#2A1913'],
-  reports: ['#553529'],
-  reportsHover: ['#D73C19'],
+  reports: [primary[1]],
+  reportsHover: [primary[0]],
   attributes: ['#6C787A'],
   attributesHover: ['#434A4C'],
   roles: ['#6C787A'],
   rolesHover: ['#434A4C'],
 
   //
-  // HEADER "PALETTES" //////////////////////////////////////////////////////////////
+  // UI PALETTES //////////////////////////////////////////////////////////////
   //
+
+  // text
+  // [#primaryFont, #secondaryFont, #inverse]
+  text: [dark[0], dark[3], primary[4]],
+  background: [primary[4], light[0], secondary[0]],
+
+  // links
+  // also see global-styles.js for default link "a"
+  // [#primaryLink, #secondaryLink, #textColorLink]
+  link: [primary[1], secondary[1], dark[0]],
+  linkHover: [primary[0], secondary[0], primary[1]],
 
   // home: [ '#bg' ],
   home: [secondary[1]],
@@ -172,36 +185,43 @@ theme.palette = {
   // aside: ['#bg']
   aside: [primary[4]],
   // asideHeader: ['#bg']
-  asideHeader: [light[2]],
-
-  // asideHeader: ['#bg']
   asideHeader: [light[0]],
-
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
-  asideCatNavItem: [dark[2], primary[4], primary[4], primary[1], light[0]],
-  asideCatNavItemHover: [dark[0], primary[4], primary[4], primary[0], light[0]],
+  asideCatNavItem: [dark[0], primary[4], primary[4], primary[1], light[0]],
+  asideCatNavItemHover: [dark[2], primary[4], primary[4], primary[0], light[0]],
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
-  asideListItem: [dark[1], primary[4], primary[4], dark[2], light[0]],
-  asideListItemHover: [dark[3], primary[4], primary[4], dark[2], light[0]],
+  asideListItem: [dark[0], primary[4], primary[4], dark[2], light[0]],
+  asideListItemHover: [dark[2], primary[4], primary[4], dark[2], light[0]],
 
   // asideHeader: [#color, '#bg',]
   asideListGroup: [dark[2], light[1]],
   asideListGroupHover: [dark[3], light[0]],
 
+  // mainListItem: [#color, '#bg',], eg category and entity list items
+  mainListItem: [dark[0], primary[4]],
+  mainListItemHover: [dark[3], primary[4]],
+
+  // multiselect header [#color, #bg]
+  // compare asideListItem
+  multiSelectHeader: [primary[4], dark[2]],
+  multiSelectFieldButton: [dark[0], light[1]],
+  multiSelectFieldButtonHover: [dark[0], light[2]],
   //
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary', #disabled],
   buttonFlat: [primary[1], dark[3], light[4]],
-  buttonFlatHover: [primary[0], primary[2]],
+  buttonFlatHover: [primary[0], primary[1]],
+  buttonCancel: [dark[3]],
+  buttonCancelHover: [primary[1]],
   // buttonDefault: ['#text', '#bg'],
   buttonDefault: [primary[4], primary[1]],
-  buttonDefaultInactive: [primary[4], primary[1]],
   buttonDefaultHover: [primary[4], primary[0]],
+  buttonDefaultDisabled: [light[0], dark[3]],
   // buttonPrimary: ['#text', '#bg', '#border'],
   buttonDefaultIconOnly: [primary[4], primary[1], primary[1]],
   buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],
@@ -209,14 +229,12 @@ theme.palette = {
   buttonSecondary: [secondary[4], secondary[1]],
   buttonSecondaryHover: [secondary[4], secondary[0]],
   // buttonToggleInactive: ['#color', '#bg'],
-  buttonToggleInactive: [dark[1], light[1]],
-  buttonToggleInactiveHover: [dark[1], light[0]],
-  // links
-  // also see global-styles.js for default link "a"
-  linkDefault: [primary[1]],
-  linkDefaultHover: [primary[0]],
-  linkSecondary: [secondary[1]],
-  linkSecondaryHover: [secondary[0]],
+  buttonToggleInactive: [dark[2], light[1]],
+  buttonToggleInactiveHover: [dark[2], light[0]],
+  // ButtonInverse: ['#color', '#bg'],
+  buttonInverse: [primary[1], primary[4]],
+  buttonInverseHover: [primary[1], light[0]],
+
 
 };
 
@@ -240,6 +258,11 @@ theme.sizes = {
     header: {
       height: 90,
     },
+  },
+  mainListItem: {
+    paddingHorizontal: 15,
+    paddingTop: 5,
+    paddingBottom: 10,
   },
   header: {
     banner: {

@@ -111,7 +111,7 @@ const Annotation = styled.div`
   text-align: center;
   word-spacing: 1000000px;
   width: 200px;
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
   line-height: 1.1em;
   font-size: 0.85em;
   margin-top: -2em;
@@ -131,7 +131,7 @@ const Categorised = styled.div`
   text-align: left;
   left: 0;
   padding-top: 5px;
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
   font-weight: normal;
   font-size: 0.85em;
 `;
@@ -220,7 +220,7 @@ const DiagramSvgWrapper = styled.div`
 `;
 
 const PathLineCustom = styled(PathLine)`
-  stroke: ${palette('dark', 1)};
+  stroke: ${palette('dark', 2)};
   stroke-width: 0.5px;
   fill: none;
 `;

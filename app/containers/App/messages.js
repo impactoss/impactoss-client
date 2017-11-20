@@ -409,10 +409,6 @@ export default defineMessages({
       id: 'app.containers.App.attributes.due_date_id',
       defaultMessage: 'Due date',
     },
-    due_date_id_empty: {
-      id: 'app.containers.App.attributes.due_date_id_empty',
-      defaultMessage: 'No report scheduled',
-    },
     user_only: {
       id: 'app.containers.App.attributes.user_only',
       defaultMessage: 'Users only',

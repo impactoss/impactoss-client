@@ -37,7 +37,7 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = true;
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
-export const SHOW_HOME_TITLE = false;
+export const SHOW_HOME_TITLE = true;
 
 // show footer logo section
 export const SHOW_FOOTER_PARTNERS = true;

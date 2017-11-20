@@ -12,7 +12,7 @@ injectGlobal`
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.64em;
-    color: #344547;
+    color: #1D3033;
   }
   button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;

@@ -189,8 +189,8 @@ theme.palette = {
   buttonToggleInactiveHover: [dark[1], light[0]],
   // links
   // also see global-styles.js for default link "a"
-  linkDefault: [secondary[3]],
-  linkDefaultHover: [secondary[2]],
+  link: [secondary[3]],
+  linkHover: [secondary[2]],
   linkSecondary: [secondary[3]],
   linkSecondaryHover: [secondary[2]],
 

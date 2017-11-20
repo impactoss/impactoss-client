@@ -12,7 +12,7 @@ import { FormattedMessage } from 'react-intl';
 
 import {
   getReferenceField,
-  getTitleField,
+  getTitleTextField,
   getStatusField,
   getMetaField,
   getMarkdownField,
@@ -66,7 +66,7 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
     { // fieldGroup
       fields: [
         getReferenceField(entity),
-        getTitleField(entity, isManager),
+        getTitleTextField(entity, isManager),
       ],
     },
   ]);

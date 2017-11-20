@@ -12,7 +12,7 @@ import { FormattedMessage } from 'react-intl';
 
 import {
   getReferenceField,
-  getTitleField,
+  getTitleTextField,
   getStatusField,
   getMetaField,
   getMarkdownField,
@@ -78,7 +78,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     { // fieldGroup
       fields: [
         getReferenceField(entity),
-        getTitleField(entity, isManager),
+        getTitleTextField(entity, isManager),
       ],
     },
   ]);

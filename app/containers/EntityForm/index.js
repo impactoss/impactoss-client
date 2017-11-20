@@ -25,7 +25,7 @@ import ButtonForm from 'components/buttons/ButtonForm';
 import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
 import FieldGroupLabel from 'components/fields/FieldGroupLabel';
 import GroupIcon from 'components/fields/GroupIcon';
-import Label from 'components/fields/Label';
+import GroupLabel from 'components/fields/GroupLabel';
 import FieldWrap from 'components/fields/FieldWrap';
 import Field from 'components/fields/Field';
 import Clear from 'components/styled/Clear';
@@ -56,7 +56,7 @@ import MultiSelectField from 'components/forms/MultiSelectField';
 import messages from './messages';
 
 const Hint = styled.span`
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
   display: block;
   font-size: 0.85em;
 `;
@@ -74,9 +74,9 @@ const ButtonDelete = styled(ButtonForm)`
 `;
 
 const ButtonPreDelete = styled(Button)`
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('linkHover', 2)};
   }
 `;
 
@@ -228,14 +228,14 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     <FieldGroupWrapper type={group.type}>
       { group.label &&
         <FieldGroupLabel>
+          <GroupLabel>
+            {group.label}
+          </GroupLabel>
           { group.icon &&
             <GroupIcon>
               <Icon name={group.icon} />
             </GroupIcon>
           }
-          <Label>
-            {group.label}
-          </Label>
         </FieldGroupLabel>
       }
       {
