@@ -23,7 +23,7 @@ export const DATE_FORMAT = 'dd/mm/yyyy';
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
-export const SHOW_HEADER_TITLE = true;
+export const SHOW_HEADER_TITLE = false;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
@@ -37,7 +37,7 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = true;
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
-export const SHOW_HOME_TITLE = true;
+export const SHOW_HOME_TITLE = false;
 
 // show footer logo section
 export const SHOW_FOOTER_PARTNERS = true;

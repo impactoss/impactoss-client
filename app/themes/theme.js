@@ -171,6 +171,8 @@ theme.palette = {
   //
   // aside: ['#bg']
   aside: [primary[4]],
+  // asideHeader: ['#bg']
+  asideHeader: [light[2]],
 
   // asideHeader: ['#bg']
   asideHeader: [light[0]],
@@ -257,6 +259,7 @@ theme.sizes = {
       claim: '1.2em',
     },
   },
+  bannerHeight: 88,
 };
 
 // end styled-theme settings
