@@ -6,7 +6,7 @@ import ListLink from './ListLink';
 const ReportListLink = styled(ListLink)`
   font-weight: 500;
   font-size: 1.2em;
-  color: ${palette('dark', 1)};
+  color: ${palette('link', 2)};
   display: block;
 `;
 

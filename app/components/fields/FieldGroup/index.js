@@ -8,7 +8,7 @@ import FieldFactory from 'components/fields/FieldFactory';
 import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
 import FieldGroupLabel from 'components/fields/FieldGroupLabel';
 import GroupIcon from 'components/fields/GroupIcon';
-import Label from 'components/fields/Label';
+import GroupLabel from 'components/fields/GroupLabel';
 
 class FieldGroup extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -18,14 +18,14 @@ class FieldGroup extends React.PureComponent { // eslint-disable-line react/pref
       <FieldGroupWrapper type={group.type} seamless={seamless}>
         { group.label &&
           <FieldGroupLabel>
+            <GroupLabel>
+              <FormattedMessage {...group.label} />
+            </GroupLabel>
             { group.icon &&
               <GroupIcon>
                 <Icon name={group.icon} />
               </GroupIcon>
             }
-            <Label>
-              <FormattedMessage {...group.label} />
-            </Label>
           </FieldGroupLabel>
         }
         {

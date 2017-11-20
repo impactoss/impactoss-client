@@ -6,7 +6,8 @@ import appMessages from 'containers/App/messages';
 import EntityListItems from 'components/EntityListMain/EntityListGroups/EntityListItems';
 
 import FieldWrap from 'components/fields/FieldWrap';
-import LabelLarge from 'components/fields/LabelLarge';
+import ConnectionLabel from 'components/fields/ConnectionLabel';
+import ConnectionLabelWrap from 'components/fields/ConnectionLabelWrap';
 import Dot from 'components/fields/Dot';
 import DotWrapper from 'components/fields/DotWrapper';
 import EntityListItemsWrap from 'components/fields/EntityListItemsWrap';
@@ -31,14 +32,16 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
 
     return (
       <FieldWrap>
-        <LabelLarge>
-          {label}
+        <ConnectionLabelWrap>
+          <ConnectionLabel>
+            {label}
+          </ConnectionLabel>
           {field.entityType &&
             <DotWrapper>
               <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
             </DotWrapper>
           }
-        </LabelLarge>
+        </ConnectionLabelWrap>
         { (field.values && field.values.size > 0) &&
           <EntityListItemsWrap>
             <EntityListItems

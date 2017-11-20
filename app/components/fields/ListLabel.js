@@ -4,8 +4,10 @@ import { palette } from 'styled-theme';
 import Label from './Label';
 
 const ListLabel = styled(Label)`
-  padding-bottom: 8px;
-  border-bottom: 1px solid ${palette('light', 0)};
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 1.1em;
+  color: ${palette('text', 0)};
 `;
 
 export default ListLabel;
