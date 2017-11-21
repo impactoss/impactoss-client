@@ -115,20 +115,20 @@ theme.palette = {
   // other entities
   // [aqll #AA compliant]
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
-  measures: ['#BF5803'], // FFC107  AA compliant
-  measuresHover: ['#DE6603'],
-  recommendations: ['#108A10', '#0C640C'], // accepted, noted ['#FF9B69', '#FFB28B'],
-  recommendationsHover: ['#16AC1B', '#0C640C'],
-  sdgtargets: ['#0080A3'],
-  sdgtargetsHover: ['#039CE2'], // 40D7FF, 00A0CC
-  indicators: ['#003C80'],
-  indicatorsHover: ['#00499A'],
-  reports: [error[1]],
-  reportsHover: [error[0]],
-  attributes: [dark[2]],
-  attributesHover: [dark[3]],
-  roles: [dark[2]],
-  rolesHover: [dark[3]],
+  measuresHover: ['#BF5803'], // FFC107  AA compliant
+  measures: ['#DE6603'],
+  recommendationsHover: ['#108A10', '#0C640C'], // accepted, noted ['#FF9B69', '#FFB28B'],
+  recommendations: ['#16AC1B', '#0C640C'],
+  sdgtargetsHover: ['#0080A3'],
+  sdgtargets: ['#039CE2'], // 40D7FF, 00A0CC
+  indicatorsHover: ['#003C80'],
+  indicators: ['#00499A'],
+  reportsHover: [error[1]],
+  reports: [error[0]],
+  attributesHover: [dark[2]],
+  attributes: [dark[3]],
+  rolesHover: [dark[2]],
+  roles: [dark[3]],
 
   //
   // UI PALETTES //////////////////////////////////////////////////////////////
