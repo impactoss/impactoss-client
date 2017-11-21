@@ -193,7 +193,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {this.props.queryMessages.info &&
+          {this.props.queryMessages.info && appMessages.entities[this.props.queryMessages.infotype] &&
             <Messages
               spaceMessage
               type="success"
