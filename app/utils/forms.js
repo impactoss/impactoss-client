@@ -595,11 +595,11 @@ const getCategoryFields = (args, formatMessage, appMessages) => ({
       ? [{
         fields: [
           getCheckboxField(formatMessage, appMessages, 'user_only'),
-          getStatusField(formatMessage),
+          getStatusField(formatMessage, appMessages),
         ],
       }]
       : [{
-        fields: [getStatusField(formatMessage)],
+        fields: [getStatusField(formatMessage, appMessages)],
       }],
   },
   body: {
