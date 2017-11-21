@@ -813,8 +813,8 @@ export default defineMessages({
         defaultMessage: 'Accepted',
       },
       noted: {
-        id: 'app.containers.App.ui.publishStatuses.noted',
-        defaultMessage: 'Noted',
+        id: 'app.containers.App.ui.acceptedStatuses.noted',
+        defaultMessage: 'Not accepted',
       },
     },
     reportFrequencies: {

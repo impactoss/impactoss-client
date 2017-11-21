@@ -121,7 +121,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
             { page && dataReady &&
               <EntityView
                 fields={this.getFields(page, isContributor)}
-                seemless
+                seamless
               />
             }
           </ViewContainer>

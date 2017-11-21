@@ -9,6 +9,7 @@ import { browserHistory } from 'react-router';
 
 import { startsWith } from 'utils/string';
 
+import { LOGOUT_SUCCESS } from 'containers/App/constants';
 import globalReducer from 'containers/App/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import entityNewReducer from 'containers/EntityNew/reducer';
@@ -38,6 +39,8 @@ const listPaths = ['/actions', '/recommendations', '/indicators', '/sdgtargets']
 function routeReducer(state = routeInitialState, action) {
   switch (action.type) {
     /* istanbul ignore next */
+    case LOGOUT_SUCCESS:
+      return routeInitialState;
     case LOCATION_CHANGE: {
       const pathName = state.getIn(['locationBeforeTransitions', 'pathname']);
       return state.merge({

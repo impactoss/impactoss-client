@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import { Control, Form, Errors } from 'react-redux-form/immutable';
 import styled from 'styled-components';
@@ -9,6 +10,8 @@ import { omit } from 'lodash/object';
 
 import asArray from 'utils/as-array';
 import appMessage from 'utils/app-message';
+
+import { selectNewEntityModal } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
 
@@ -27,28 +30,28 @@ import FieldWrap from 'components/fields/FieldWrap';
 import Field from 'components/fields/Field';
 import Clear from 'components/styled/Clear';
 
-import FieldLabel from '../Label';
-import ErrorWrapper from '../ErrorWrapper';
-import UploadControl from '../UploadControl';
-import FormWrapper from '../FormWrapper';
-import FormPanel from '../FormPanel';
-import FormFooter from '../FormFooter';
-import FormFooterButtons from '../FormFooterButtons';
-import Aside from '../Aside';
-import Main from '../Main';
-import FormFieldWrap from '../FormFieldWrap';
-import ControlTitle from '../ControlTitle';
-import ControlTitleText from '../ControlTitleText';
-import ControlShort from '../ControlShort';
-import ControlInput from '../ControlInput';
-import ControlCheckbox from '../ControlCheckbox';
-import ControlTextArea from '../ControlTextArea';
-import ControlSelect from '../ControlSelect';
-import MarkdownControl from '../MarkdownControl';
-import DateControl from '../DateControl';
-import RadioControl from '../RadioControl';
-import Required from '../Required';
-import MultiSelectField from '../MultiSelectField';
+import FieldLabel from 'components/forms/Label';
+import ErrorWrapper from 'components/forms/ErrorWrapper';
+import UploadControl from 'components/forms/UploadControl';
+import FormPanel from 'components/forms/FormPanel';
+import FormFooter from 'components/forms/FormFooter';
+import FormWrapper from 'components/forms/FormWrapper';
+import FormFooterButtons from 'components/forms/FormFooterButtons';
+import Aside from 'components/forms/Aside';
+import Main from 'components/forms/Main';
+import FormFieldWrap from 'components/forms/FormFieldWrap';
+import ControlTitle from 'components/forms/ControlTitle';
+import ControlTitleText from 'components/forms/ControlTitleText';
+import ControlShort from 'components/forms/ControlShort';
+import ControlInput from 'components/forms/ControlInput';
+import ControlCheckbox from 'components/forms/ControlCheckbox';
+import ControlTextArea from 'components/forms/ControlTextArea';
+import ControlSelect from 'components/forms/ControlSelect';
+import MarkdownControl from 'components/forms/MarkdownControl';
+import DateControl from 'components/forms/DateControl';
+import RadioControl from 'components/forms/RadioControl';
+import Required from 'components/forms/Required';
+import MultiSelectField from 'components/forms/MultiSelectField';
 
 import messages from './messages';
 
@@ -131,10 +134,11 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     this.setState({ deleteConfirmed: confirm });
   }
 
-  renderMultiSelect = (field, formData) => (
+  renderMultiSelect = (field, formData, hasEntityNewModal) => (
     <MultiSelectField
       field={field}
       fieldData={formData.getIn(field.dataPath)}
+      closeOnClickOutside={!hasEntityNewModal}
       handleUpdate={(fieldData) => this.props.handleUpdate(formData.setIn(field.dataPath, fieldData))}
     />
   )
@@ -181,7 +185,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       }
     </FieldWrap>
   );
-  renderFormField = (field, nested) => {
+  renderFormField = (field, nested, hasEntityNewModal) => {
     // field.controlType === 'date' && console.log('field', field)
     let formField;
     if (!field.controlType) {
@@ -195,7 +199,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
           formField = this.renderCombo(field);
           break;
         case 'multiselect':
-          formField = this.renderMultiSelect(field, this.props.formData);
+          formField = this.renderMultiSelect(field, this.props.formData, hasEntityNewModal);
           break;
         default:
           formField = this.renderComponent(field);
@@ -220,7 +224,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     );
   }
 
-  renderGroup = (group) => (
+  renderGroup = (group, hasEntityNewModal) => (
     <FieldGroupWrapper type={group.type}>
       { group.label &&
         <FieldGroupLabel>
@@ -238,7 +242,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         group.fields.map((field, i) => field
           ? (
             <Field key={i}>
-              {this.renderFormField(field)}
+              {this.renderFormField(field, false, hasEntityNewModal)}
               {
                 field.errorMessages &&
                 <ErrorWrapper>
@@ -258,23 +262,23 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     </FieldGroupWrapper>
   )
 
-  renderMain = (fieldGroups, aside) => (
+  renderMain = (fieldGroups, aside, hasEntityNewModal) => (
     <Main aside={aside}>
       {
         asArray(fieldGroups).map((fieldGroup, i, list) => fieldGroup.fields && (
           <FormPanel key={i} borderRight={aside} borderBottom={i < (list.length - 1)}>
-            {this.renderGroup(fieldGroup)}
+            {this.renderGroup(fieldGroup, hasEntityNewModal)}
           </FormPanel>
         ))
       }
     </Main>
   );
-  renderAside = (fieldGroups) => (
+  renderAside = (fieldGroups, hasEntityNewModal) => (
     <Aside>
       {
         asArray(fieldGroups).map((fieldGroup, i, list) => (
           <FormPanel key={i} borderBottom={i < (list.length - 1)}>
-            {this.renderGroup(fieldGroup)}
+            {this.renderGroup(fieldGroup, hasEntityNewModal)}
           </FormPanel>
         ))
       }
@@ -282,21 +286,21 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   );
 
   render() {
-    const { fields, model, handleSubmit, handleCancel, handleSubmitFail, inModal, validators } = this.props;
-
+    const { fields, model, handleSubmit, handleCancel, handleSubmitFail, inModal, validators, newEntityModal } = this.props;
+    const hasEntityNewModal = !!newEntityModal;
     return (
       <FormWrapper withoutShadow={inModal}>
         <Form model={model} onSubmit={handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
           { fields.header &&
             <FormPanel borderBottom>
-              { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside) }
-              { fields.header.aside && this.renderAside(fields.header.aside) }
+              { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, hasEntityNewModal) }
+              { fields.header.aside && this.renderAside(fields.header.aside, hasEntityNewModal) }
             </FormPanel>
           }
           { fields.body &&
             <FormPanel>
-              { fields.body.main && this.renderMain(fields.body.main, true) }
-              { fields.body.aside && this.renderAside(fields.body.aside) }
+              { fields.body.main && this.renderMain(fields.body.main, true, hasEntityNewModal) }
+              { fields.body.aside && this.renderAside(fields.body.aside, hasEntityNewModal) }
             </FormPanel>
           }
           <FormFooter>
@@ -336,6 +340,10 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   }
 }
 
+const mapStateToProps = (state) => ({
+  newEntityModal: selectNewEntityModal(state),
+});
+
 EntityForm.propTypes = {
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
@@ -347,6 +355,7 @@ EntityForm.propTypes = {
   formData: PropTypes.object,
   inModal: PropTypes.bool,
   saving: PropTypes.bool,
+  newEntityModal: PropTypes.object,
   validators: PropTypes.object,
 };
 EntityForm.defaultProps = {
@@ -357,4 +366,4 @@ EntityForm.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default EntityForm;
+export default connect(mapStateToProps)(EntityForm);

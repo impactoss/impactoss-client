@@ -593,9 +593,14 @@ const getCategoryFields = (args, formatMessage, appMessages) => ({
     }],
     aside: args.taxonomy && args.taxonomy.getIn(['attributes', 'tags_users'])
       ? [{
-        fields: [getCheckboxField(formatMessage, appMessages, 'user_only')],
+        fields: [
+          getCheckboxField(formatMessage, appMessages, 'user_only'),
+          getStatusField(formatMessage, appMessages),
+        ],
       }]
-      : null,
+      : [{
+        fields: [getStatusField(formatMessage, appMessages)],
+      }],
   },
   body: {
     main: [{

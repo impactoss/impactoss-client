@@ -51,7 +51,7 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -312,7 +312,7 @@ function mapDispatchToProps(dispatch) {
       saveData = saveData.setIn(['attributes', 'indicator_id'], indicatorReference);
 
       const dateAssigned = formData.getIn(['attributes', 'due_date_id']);
-      if (dateAssigned === 0) {
+      if (dateAssigned === 0 || dateAssigned === '0') {
         saveData = saveData.setIn(['attributes', 'due_date_id'], null);
       }
 

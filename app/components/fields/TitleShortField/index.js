@@ -16,7 +16,7 @@ class TitleShortField extends React.PureComponent { // eslint-disable-line react
         <Label>
           <FormattedMessage {...(field.label || appMessages.attributes.short_title)} />
         </Label>
-        <ShortTitleTag pIndex={field.taxonomyId}>{field.value}</ShortTitleTag>
+        <ShortTitleTag inverse={field.inverse} pIndex={field.taxonomyId}>{field.value}</ShortTitleTag>
       </FieldWrap>
     );
   }

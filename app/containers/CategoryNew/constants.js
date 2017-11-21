@@ -31,7 +31,7 @@ export const FORM_INITIAL = fromJS({
     taxonomy_id: '',
     reference: '',
     user_only: false,
-    draft: false,
+    draft: true,
   },
   associatedSdgTargets: [],
   associatedMeasures: [],

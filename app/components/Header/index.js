@@ -36,9 +36,17 @@ const Styled = styled.div`
 
 class Header extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  onClick = (evt, path) => {
+  onClick = (evt, path, currentPath) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.props.onPageLink(path);
+    if (currentPath) {
+      if (currentPath === '/login' || currentPath === '/register') {
+        this.props.onPageLink(path, { keepQuery: true });
+      } else {
+        this.props.onPageLink(path, { query: { arg: 'redirectOnAuthSuccess', value: currentPath } });
+      }
+    } else {
+      this.props.onPageLink(path);
+    }
   }
 
   render() {
@@ -78,10 +86,10 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             }
             {!isSignedIn &&
               <span>
-                <LinkAccount href={'/register'} onClick={(evt) => this.onClick(evt, '/register')}>
+                <LinkAccount href={'/register'} onClick={(evt) => this.onClick(evt, '/register', currentPath)}>
                   <FormattedMessage {...messages.register} />
                 </LinkAccount>
-                <LinkAccount href={'/login'} onClick={(evt) => this.onClick(evt, '/login')}>
+                <LinkAccount href={'/login'} onClick={(evt) => this.onClick(evt, '/login', currentPath)}>
                   <FormattedMessage {...messages.login} />
                 </LinkAccount>
               </span>

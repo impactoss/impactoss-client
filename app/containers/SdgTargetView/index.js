@@ -19,6 +19,7 @@ import {
   getIndicatorConnectionField,
   getMeasureConnectionField,
   getTaxonomyFields,
+  hasTaxonomyCategories,
 } from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
@@ -88,17 +89,19 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getIndicatorConnectionField(indicators, indicatorConnections, appMessages, onEntityClick),
         getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
+        getIndicatorConnectionField(indicators, indicatorConnections, appMessages, onEntityClick),
       ],
     },
   ]);
   getBodyAsideFields = (entity, taxonomies) => ([
-    { // fieldGroup
+    hasTaxonomyCategories(taxonomies)
+    ? { // fieldGroup
       label: appMessages.entities.taxonomies.plural,
       icon: 'categories',
       fields: getTaxonomyFields(taxonomies, appMessages),
-    },
+    }
+    : null,
   ]);
 
   render() {

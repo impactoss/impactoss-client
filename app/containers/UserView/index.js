@@ -106,8 +106,6 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
   getBodyAsideFields = (taxonomies) => ([
     { // fieldGroup
-      label: appMessages.entities.taxonomies.plural,
-      icon: 'categories',
       fields: getTaxonomyFields(taxonomies, appMessages),
     },
   ]);

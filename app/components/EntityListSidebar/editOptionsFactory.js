@@ -94,6 +94,7 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
         label: getEntityTitle(category),
         value: category.get('id'),
         checked: checkedState(count, entities.size),
+        draft: category && category.getIn(['attributes', 'draft']),
       };
     });
   }
