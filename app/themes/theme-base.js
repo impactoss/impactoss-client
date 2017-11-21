@@ -51,37 +51,37 @@ theme.breakpoints = {
 // global color palettes
 // primary color palette: dark to light
 // 0: main colour, darker, used for links and navigation elements, hover (AA)
-// 1: main colour, used for links and navigation elements (AA)
-// 2: main colour, light -- !!! AA compatible with secondary[1]
-// 3: main colour, lighter (UNUSED)
+// 1: main colour, used for links and navigation elements (AA Large)
+// 2: main colour, light
+// 3: main colour, lighter
 // 4: white
-const primary = coolorsToHex('https://coolors.co/bc432b-cc482e-ea5e3f-ef8871-ffffff');
+const primary = coolorsToHex('https://coolors.co/0072a3-007db3-4cb1dc-a2daf1-ffffff');
   // secondary color palette: dark to light
-  // 0: dark header colour, darker // 162331
-  // 1: dark header colour -- !!! AA compatible with primary[2]
-  // 2: dark header colour, lighter
+  // 0: secondary colour, darker
+  // 1: secondary colour
+  // 2: secondary colour, lighter
   // 3: white/placeholder
   // 4: white/placeholder
-const secondary = coolorsToHex('https://coolors.co/162331-182635-34404d-465867-ffffff');
+const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-ffffff');
 // dark grayscale: dark to light
 // 0:  darkest (AA)
 // 1:  darker (AA)
 // 2:  dark (AA)
 // 3:  medium gray 1 (AA) --- !!! AA compatible with light[0]
 // 4:  medium gray 2 (AA large)
-const dark = coolorsToHex('https://coolors.co/1d3033-344547-4a595c-657072-899395');
+const dark = coolorsToHex('https://coolors.co/1c2121-232c2c-323e3e-697070-8d9696');
 // light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js !!! AA compatible with dark[3]
 // 1:  light gray (light lines, navigation filter panel)
 // 2:  gray 1 (gray pattern)
 // 3:  gray 2 (icons light)
 // 4:  gray 3 (dark lines)
-const light = coolorsToHex('https://coolors.co/f1f3f3-e8eaeb-d2d6d6-bbc1c2-a5acad');
+const light = coolorsToHex('https://coolors.co/f1f4f4-e0e6e6-d5dddd-cdd6d6-c7d1d1');
 
 // other palettes
 // 0: AA on light[0] and on error[3]
 // 1: AA on white
-const error = coolorsToHex('https://coolors.co/BB4B3A-dd3522-e46556-f8edec-ffffff');
+const error = coolorsToHex('https://coolors.co/b2221f-dd3630-ef443e-f9c9c7-ffffff');
 const success = coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-ffffff');
 // const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-ffffff');
 // const info = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-1d3033');
@@ -115,20 +115,20 @@ theme.palette = {
   // other entities
   // [aqll #AA compliant]
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
-  measures: [primary[1]], // FFC107  AA compliant
-  measuresHover: [primary[0]],
-  recommendations: [secondary[1], secondary[3]], // accepted, noted ['#FF9B69', '#FFB28B'],
-  recommendationsHover: [secondary[0]],
-  sdgtargets: ['#0080A3'], // 40D7FF, 00A0CC
-  sdgtargetsHover: ['#00546B'],
-  indicators: ['#553529'],
-  indicatorsHover: ['#2A1913'],
-  reports: [primary[1]],
-  reportsHover: [primary[0]],
-  attributes: ['#6C787A'],
-  attributesHover: ['#434A4C'],
-  roles: ['#6C787A'],
-  rolesHover: ['#434A4C'],
+  measures: ['#BF5803'], // FFC107  AA compliant
+  measuresHover: ['#DE6603'],
+  recommendations: ['#108A10', '#0C640C'], // accepted, noted ['#FF9B69', '#FFB28B'],
+  recommendationsHover: ['#16AC1B', '#0C640C'],
+  sdgtargets: ['#0080A3'],
+  sdgtargetsHover: ['#039CE2'], // 40D7FF, 00A0CC
+  indicators: ['#003C80'],
+  indicatorsHover: ['#00499A'],
+  reports: [error[1]],
+  reportsHover: [error[0]],
+  attributes: [dark[2]],
+  attributesHover: [dark[3]],
+  roles: [dark[2]],
+  rolesHover: [dark[3]],
 
   //
   // UI PALETTES //////////////////////////////////////////////////////////////
@@ -146,38 +146,38 @@ theme.palette = {
   linkHover: [primary[0], secondary[0], primary[1]],
 
   // home: [ '#bg' ],
-  home: [secondary[1]],
-  homeIntro: [light[2]],
+  home: [primary[4]],
+  homeIntro: [dark[2]],
 
   // footer: [ '#color, #bg-main', #bg-partners, #borderColor ],
-  footer: [primary[4], secondary[1], light[0], secondary[0]],
+  footer: [primary[4], dark[2], light[0], secondary[0]],
   footerLinks: [primary[4]],
-  footerLinksHover: [primary[1]],
+  footerLinksHover: [primary[2]],
 
   // header: [ '#bg' ],
   header: [secondary[1]],
 
   // headerBrand: [ '#title', '#claim' ],
-  headerBrand: [primary[2], primary[2]],
-  headerBrandHover: [primary[2], primary[2]], // WARNING component sets opacity
+  headerBrand: [dark[0], dark[2]],
+  headerBrandHover: [dark[1], dark[3]], // WARNING component sets opacity
 
   // headerNavPages: [ '#bg' ],
-  headerNavPages: [secondary[1]],
+  headerNavPages: [light[0]],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
-  headerNavPagesItem: [light[3], primary[4], 'transparent', 'transparent'],
-  headerNavPagesItemHover: [primary[4], primary[4], 'transparent', 'transparent'],
+  headerNavPagesItem: [dark[3], primary[4], 'transparent', dark[2]],
+  headerNavPagesItemHover: [dark[2], light[2], 'transparent', dark[2]],
 
   // headerNavAccount: [ '#bg' ],
   headerNavAccount: ['transparent'],
   // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border' ]
-  headerNavAccountItem: [primary[4], primary[4], primary[1], primary[0], primary[2]],
-  headerNavAccountItemHover: [primary[4], primary[4], primary[0], primary[1], primary[2]],
+  headerNavAccountItem: [primary[4], primary[4], dark[2], primary[1], dark[3]],
+  headerNavAccountItemHover: [primary[4], primary[4], dark[1], primary[1], dark[2]],
 
   // headerNavMain: [ '#bg', '#border'  ],
-  headerNavMain: [secondary[1], secondary[1]],
+  headerNavMain: [secondary[4], secondary[4]],
   // headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
-  headerNavMainItem: [light[2], primary[2], 'transparent', 'transparent'],
-  headerNavMainItemHover: [primary[2], primary[3], 'transparent', 'transparent'],
+  headerNavMainItem: [dark[3], primary[4], 'transparent', dark[2]],
+  headerNavMainItemHover: [dark[2], primary[4], 'transparent', dark[1]],
 
   //
   // SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
@@ -190,12 +190,12 @@ theme.palette = {
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
   asideCatNavItem: [dark[0], primary[4], primary[4], primary[1], light[0]],
-  asideCatNavItemHover: [dark[2], primary[4], primary[4], primary[0], light[0]],
+  asideCatNavItemHover: [dark[1], primary[4], light[0], primary[1], light[0]],
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
-  asideListItem: [dark[0], primary[4], primary[4], dark[2], light[0]],
-  asideListItemHover: [dark[2], primary[4], primary[4], dark[2], light[0]],
+  asideListItem: [dark[2], primary[4], primary[4], dark[2], light[0]],
+  asideListItemHover: [dark[1], primary[4], primary[4], dark[2], light[0]],
 
   // asideHeader: [#color, '#bg',]
   asideListGroup: [dark[2], light[1]],
