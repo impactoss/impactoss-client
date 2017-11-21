@@ -16,6 +16,7 @@ import {
   DELETE_SUCCESS,
   FILTERS_PANEL,
   EDIT_PANEL,
+  LOGOUT_SUCCESS,
 } from 'containers/App/constants';
 
 import { checkResponseError } from 'utils/request';
@@ -48,6 +49,7 @@ function entityListReducer(state = initialState, action) {
         ? updated.set('entitiesSelected', List())
         : updated;
     }
+    case LOGOUT_SUCCESS:
     case RESET_STATE:
       return initialState;
     case RESET_PROGRESS:

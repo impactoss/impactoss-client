@@ -6,16 +6,16 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   confirmDeleteQuestion: {
-    id: 'app.components.EntityForm.confirmDeleteQuestion',
+    id: 'app.containers.EntityForm.confirmDeleteQuestion',
     defaultMessage: 'Delete forever?',
   },
   buttons: {
     cancelDelete: {
-      id: 'app.components.EntityForm.buttons.cancelDelete',
+      id: 'app.containers.EntityForm.buttons.cancelDelete',
       defaultMessage: 'Cancel',
     },
     confirmDelete: {
-      id: 'app.components.EntityForm.buttons.donfirmDelete',
+      id: 'app.containers.EntityForm.buttons.donfirmDelete',
       defaultMessage: 'Delete',
     },
   },

@@ -14,6 +14,7 @@ import {
   getReferenceField,
   getTitleField,
   getCategoryShortTitleField,
+  getStatusField,
   getMetaField,
   getMarkdownField,
   getLinkField,
@@ -86,7 +87,10 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     }
     if (isManager) {
       fields.push({
-        fields: [getMetaField(entity, appMessages)],
+        fields: [
+          getStatusField(entity),
+          getMetaField(entity, appMessages),
+        ],
       });
     }
     return fields;

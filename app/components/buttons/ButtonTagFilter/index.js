@@ -11,6 +11,7 @@ const ButtonTagFilter = styled(Button)`
   border-radius: 3px;
   font-size: 0.85em;
   line-height: 1.25em;
+  border: 1px solid ${(props) => palette(props.palette, props.pIndex || 0)};
   &:hover {
     color: ${palette('primary', 4)};
     background-color: ${(props) => palette(props.disabled ? props.paletteHover : props.palette, props.pIndex || 0)};

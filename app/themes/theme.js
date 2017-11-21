@@ -84,7 +84,7 @@ theme.palette = {
   indicatorsHover: ['#D66149'],
   reports: ['#EB6E51'],
   reportsHover: ['#D66149'],
-  recommendations: ['#FF9B69'],
+  recommendations: ['#FF9B69', '#FFB28B'], // accepted, noted
   recommendationsHover: ['#F48B5D'],
   attributes: ['#6C787A'],
   attributesHover: ['#4A595C'],
@@ -130,6 +130,8 @@ theme.palette = {
   //
   // aside: ['#bg']
   aside: [primary[4]],
+  // asideHeader: ['#bg']
+  asideHeader: [light[2]],
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],

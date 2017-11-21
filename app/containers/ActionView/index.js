@@ -22,6 +22,7 @@ import {
   getRecommendationConnectionField,
   getSdgTargetConnectionField,
   getTaxonomyFields,
+  hasTaxonomyCategories,
 } from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
@@ -120,11 +121,13 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
         getTextField(entity, 'target_date_comment', appMessages),
       ],
     },
-    { // fieldGroup
+    hasTaxonomyCategories(taxonomies)
+    ? { // fieldGroup
       label: appMessages.entities.taxonomies.plural,
       icon: 'categories',
       fields: getTaxonomyFields(taxonomies, appMessages),
-    },
+    }
+    : null,
   ]);
 
 
@@ -144,9 +147,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       sdgtargetConnections,
       indicatorConnections,
     } = this.props;
-    // viewEntity && console.log(viewEntity.toJS())
-    // indicators && console.log(indicators.toJS())
-    // console.log('ActionView.render', dataReady)
+
     const buttons = isManager
     ? [
       {

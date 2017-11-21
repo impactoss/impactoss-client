@@ -198,8 +198,8 @@ export function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    onPageLink: (path) => {
-      dispatch(updatePath(path));
+    onPageLink: (path, args) => {
+      dispatch(updatePath(path, args));
     },
     onCloseModal: () => {
       dispatch(openNewEntityModal(null));

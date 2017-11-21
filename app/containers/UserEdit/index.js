@@ -51,7 +51,7 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -124,8 +124,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
   getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
-      icon: 'categories',
       fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);
@@ -219,7 +217,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 },
                 body: {
                   main: this.getBodyMainFields(),
-                  aside: (sessionUserHighestRoleId >= USER_ROLES.MANAGER) && this.getBodyAsideFields(taxonomies, onCreateOption),
+                  aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER) && this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />

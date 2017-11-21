@@ -104,7 +104,7 @@ export const DOC_PUBLISH_STATUSES = [
 ];
 export const ACCEPTED_STATUSES = [
   { value: true, label: 'Accepted', icon: 'recommendationAccepted', message: 'ui.acceptedStatuses.accepted' },
-  { value: false, label: 'Noted', icon: 'recommendationNoted', message: 'ui.acceptedStatuses.noted' },
+  { value: false, label: 'Not accepted', icon: 'recommendationNoted', message: 'ui.acceptedStatuses.noted' },
 ];
 export const REPORT_FREQUENCIES = [
   { value: 1, label: 'Monthly', message: 'ui.reportFrequencies.monthly' },

@@ -136,6 +136,7 @@ const mapCategoryOptions = (categories) => categories
     .map((cat) => ({
       label: cat.getIn(['attributes', 'title']),
       reference: cat.getIn(['attributes', 'reference']) || null,
+      draft: cat.getIn(['attributes', 'draft']) || null,
       linkTo: `/category/${cat.get('id')}`,
     }))
     .toArray()
@@ -179,6 +180,11 @@ export const getTaxonomyFields = (taxonomies, appMessages) =>
     values: mapCategoryOptions(taxonomy.get('categories')),
   })).toArray();
 
+export const hasTaxonomyCategories = (taxonomies) =>
+  taxonomies
+  ? taxonomies.reduce((memo, taxonomy) => memo || (taxonomy.get('categories') && taxonomy.get('categories').size > 0), false)
+  : false;
+
 const getCategoryShortTitle = (category) => {
   const title = (
     category.getIn(['attributes', 'short_title'])
@@ -192,6 +198,7 @@ const getCategoryShortTitle = (category) => {
 export const getCategoryShortTitleField = (entity) => ({
   type: 'short_title',
   value: getCategoryShortTitle(entity),
+  inverse: entity.getIn(['attributes', 'draft']),
   taxonomyId: entity.getIn(['attributes', 'taxonomy_id']),
 });
 

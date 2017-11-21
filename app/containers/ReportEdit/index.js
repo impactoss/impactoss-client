@@ -53,7 +53,7 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -95,9 +95,10 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     const props = nextProps || this.props;
     const { viewEntity } = props;
     let attributes = viewEntity.get('attributes');
-    if (attributes.get('due_date_id')) {
-      attributes = attributes.set('due_date_id', attributes.get('due_date_id').toString());
-    }
+    attributes = attributes.set('due_date_id', attributes.get('due_date_id')
+      ? attributes.get('due_date_id').toString()
+      : '0'
+    );
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
@@ -148,7 +149,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             this.context.intl.formatMessage,
             appMessages,
             this.context.intl.formatDate,
-            entity.getIn(['attributes', 'due_date_id']) && entity.getIn(['attributes', 'due_date_id']).toString(),
+            entity.getIn(['attributes', 'due_date_id'])
+              ? entity.getIn(['attributes', 'due_date_id']).toString()
+              : '0',
           ),
         )],
     },

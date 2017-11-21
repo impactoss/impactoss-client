@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import ItemStatus from 'components/ItemStatus';
+import Clear from 'components/styled/Clear';
 
 const Styled = styled.button`
   width:100%;
@@ -9,7 +11,7 @@ const Styled = styled.button`
   text-align: left;
   background-color: ${palette('primary', 4)};
   margin: 0;
-  padding: 1em;
+  padding: 1em 0;
   display: block;
   margin-bottom: 2px;
   &:hover {
@@ -23,40 +25,52 @@ const Column = styled.div`
 `;
 const BarWrap = styled.div`
   width:100%;
-  display: table;
   vertical-align: middle;
-`;
-const BarWrapInner = styled.div`
-  display: table-cell;
-  vertical-align: middle;
+  padding-left: 40px;
+  padding-right: ${(props) => props.secondary ? 27 : 18}px;
 `;
 const Bar = styled.div`
   width:${(props) => props.length}%;
-  height: 2em;
-  background-color: ${(props) => palette(props.palette, 0)};
+  height: 1.6em;
+  background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
   vertical-align: middle;
+  display: inline-block;
+  position: relative;
 `;
 const Count = styled.div`
-  display: table-cell;
-  width: 40px;
   font-weight: bold;
-  text-align: right;
-  vertical-align: middle;
-  font-size: 1.1em;
-  color: ${(props) => palette(props.palette, 0)};
-  padding-right: 5px;
-`;
-const Title = styled.span`
+  position: absolute;
   font-size: 1.1em;
   line-height: 1.6;
+  right: 100%;
+  text-align: right;
+  padding-right: 5px;
+  color: ${(props) => palette(props.palette, 0)};
+`;
+const CountSecondary = styled(Count)`
+  left: 100%;
+  text-align: left;
+  padding-right: 0;
+  padding-left: 5px;
+  color: ${(props) => palette(props.palette, 1)};
+`;
+const Title = styled.div`
+  display: inline-block;
+  font-size: 1.1em;
+  line-height: 1.6;
+  padding: 0 18px;
+`;
+const StatusWrap = styled.div`
+  padding: 0 18px;
 `;
 const Reference = styled.span`
   padding-right: 0.5em;
-  opacity:0.6;
+  opacity: 0.6;
 `;
 
 class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   renderColumnContent = (col, category) => {
+    const count = category.counts[col.countsIndex];
     switch (col.type) {
       case ('title'):
         return (
@@ -68,19 +82,40 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
           </Title>
         );
       case ('count'):
-        return (
+        return (count.accepted === null || typeof count.accepted === 'undefined')
+        ? (
           <BarWrap>
-            <Count palette={col.entity}>
-              {category.counts[col.countsIndex]}
-            </Count>
-            <BarWrapInner>
-              { category.counts[col.countsIndex] > 0 &&
-                <Bar
-                  length={(category.counts[col.countsIndex] / col.maxCount) * 100}
-                  palette={col.entity}
-                />
-              }
-            </BarWrapInner>
+            <Bar
+              length={(count.public / col.maxCount) * 100}
+              palette={col.entity}
+            >
+              <Count palette={col.entity}>
+                {count.public}
+              </Count>
+            </Bar>
+          </BarWrap>
+        )
+        : (
+          <BarWrap secondary>
+            <Bar
+              length={(count.accepted / col.maxCount) * 100}
+              palette={col.entity}
+            >
+              <Count palette={col.entity}>
+                {count.accepted}
+              </Count>
+            </Bar>
+            { count.noted > 0 &&
+              <Bar
+                length={(count.noted / col.maxCount) * 100}
+                palette={col.entity}
+                pIndex={1}
+              >
+                <CountSecondary palette={col.entity}>
+                  {count.noted}
+                </CountSecondary>
+              </Bar>
+            }
           </BarWrap>
         );
       default:
@@ -89,11 +124,18 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
   };
   render() {
     const { category, columns } = this.props;
+
     return (
       <Styled onClick={() => category.onLink()}>
         {
           columns.map((col, i) => (
             <Column key={i} colWidth={col.width}>
+              { col.type === 'title' && category.draft &&
+              <StatusWrap>
+                <ItemStatus draft />
+                <Clear />
+              </StatusWrap>
+              }
               {this.renderColumnContent(col, category)}
             </Column>
           ))
