@@ -14,7 +14,7 @@ const Hint = styled.div`
 // see also ScheduleItem
 const Label = styled.label`
   font-weight: bold;
-  color:  ${(props) => props.highlight ? palette('primary', 1) : palette('dark', 2)};
+  color:  ${(props) => props.highlight ? palette('primary', 1) : palette('text', 0)};
 `;
 const LabelInner = styled.span`
   padding-left: 5px;
@@ -33,13 +33,12 @@ export class RadioControl extends React.PureComponent { // eslint-disable-line r
                   type="radio"
                   name={model}
                   value={option.value}
-                  checked={option.checked}
                 />
                 <LabelInner>{option.label}</LabelInner>
               </Label>
             </Option>
-          ))
-        }
+          )
+        )}
         { hints && options.length === 0 &&
           <Hint>
             {hints[0]}

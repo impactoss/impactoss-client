@@ -30,7 +30,7 @@ const Dropdown = styled.div`
   right: 0;
   width: 100%;
   z-index: 2;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 0)};
   box-shadow: 0 8px 8px 0 rgba(0,0,0,0.2);
   overflow-y: auto;
   max-height: 320px;
@@ -83,41 +83,44 @@ class TagFilters extends React.PureComponent {
     );
 
   render() {
-    return (
-      <Styled>
-        { this.props.tagFilterGroups.map((group, key) =>
-          group.options && group.options.length > 0
-          ? (<GroupWrapper key={key}>
-            <Group
-              onClick={(evt) => {
-                if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                this.toggleGroup(key);
-              }}
-              active={key === this.state.active}
-            >
-              <DotWrapper>
-                <Dot palette={group.palette[0]} pIndex={parseInt(group.palette[1], 10)} />
-              </DotWrapper>
-              <Label>
-                {group.title}
-              </Label>
-              <Icon name={this.state.active === key ? 'dropdownClose' : 'dropdownOpen'} text textRight />
-            </Group>
-            { key === this.state.active &&
-              <Dropdown>
-                <OptionList
-                  options={this.prepareOptions(group.options, this.props.queryTags)}
-                  onCheckboxChange={(active, tagOption) => {
-                    this.setState({ active: null });
-                    this.props.onTagSelected(active, tagOption);
-                  }}
-                />
-              </Dropdown>
-            }
-          </GroupWrapper>)
-          : null
-        )}
-      </Styled>
+    return this.props.tagFilterGroups.length === 0
+      ? null
+      : (
+        <Styled>
+          { this.props.tagFilterGroups.map((group, key) =>
+            group.options && group.options.length > 0
+            ? (<GroupWrapper key={key}>
+              <Group
+                onClick={(evt) => {
+                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                  this.toggleGroup(key);
+                }}
+                active={key === this.state.active}
+              >
+                <DotWrapper>
+                  <Dot palette={group.palette[0]} pIndex={parseInt(group.palette[1], 10)} />
+                </DotWrapper>
+                <Label>
+                  {group.title}
+                </Label>
+                <Icon name={this.state.active === key ? 'dropdownClose' : 'dropdownOpen'} text textRight />
+              </Group>
+              { key === this.state.active &&
+                <Dropdown>
+                  <OptionList
+                    secondary
+                    options={this.prepareOptions(group.options, this.props.queryTags)}
+                    onCheckboxChange={(active, tagOption) => {
+                      this.setState({ active: null });
+                      this.props.onTagSelected(active, tagOption);
+                    }}
+                  />
+                </Dropdown>
+              }
+            </GroupWrapper>)
+            : null
+          )}
+        </Styled>
     );
   }
 }

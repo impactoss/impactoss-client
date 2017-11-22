@@ -7,8 +7,6 @@
 import { fromJS, List, Map } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 
-import { LOCATION_CHANGE } from 'react-router-redux';
-
 import {
   SAVE_SENDING,
   SAVE_ERROR,
@@ -18,6 +16,7 @@ import {
   DELETE_SUCCESS,
   FILTERS_PANEL,
   EDIT_PANEL,
+  LOGOUT_SUCCESS,
 } from 'containers/App/constants';
 
 import { checkResponseError } from 'utils/request';
@@ -28,6 +27,8 @@ import {
   RESET_PROGRESS,
   ENTITY_SELECTED,
   ENTITIES_SELECT,
+  PATH_CHANGE,
+  DISMISS_ERROR,
 } from './constants';
 
 const initialState = fromJS({
@@ -36,6 +37,7 @@ const initialState = fromJS({
   sending: {},
   success: {},
   errors: {},
+  path: '',
 });
 
 function entityListReducer(state = initialState, action) {
@@ -47,13 +49,26 @@ function entityListReducer(state = initialState, action) {
         ? updated.set('entitiesSelected', List())
         : updated;
     }
+    case LOGOUT_SUCCESS:
     case RESET_STATE:
       return initialState;
     case RESET_PROGRESS:
       return state
         .set('sending', Map())
-        .set('success', Map())
-        .set('errors', Map());
+        .set('success', Map());
+        // .set('errors', Map());
+    case PATH_CHANGE:
+      return state.get('path') !== action.path
+        ? state
+          .set('activePanel', FILTERS_PANEL)
+          .set('entitiesSelected', List())
+          .set('sending', Map())
+          .set('success', Map())
+          .set('errors', Map())
+          .set('path', action.path)
+        : state
+          .set('sending', Map())
+          .set('success', Map());
     case ENTITY_SELECTED: {
       const selected = state.get('entitiesSelected');
       return state
@@ -66,16 +81,6 @@ function entityListReducer(state = initialState, action) {
       return state
         .set('entitiesSelected', fromJS(action.ids))
         .set('activePanel', EDIT_PANEL);
-    case LOCATION_CHANGE:
-      // reset selected entities on query change (location changes but not path)
-      // TODO do not reset entitiesSelected on 'expand'
-      return state.getIn(['route', 'locationBeforeTransition', 'pathname']) === state.getIn(['route', 'locationBeforeTransition', 'pathnamePrevious'])
-        ? state
-          .set('entitiesSelected', List())
-          .set('sending', Map())
-          .set('success', Map())
-          .set('errors', Map())
-        : state;
     case DELETE_SENDING:
     case SAVE_SENDING:
       return action.data ? state.setIn(['sending', action.data.timestamp], action.data) : state;
@@ -84,7 +89,15 @@ function entityListReducer(state = initialState, action) {
       return action.data ? state.setIn(['success', action.data.timestamp], action.data) : state;
     case DELETE_ERROR:
     case SAVE_ERROR:
-      return action.data ? state.setIn(['errors', action.data.timestamp], checkResponseError(action.error)) : state;
+      return action.data
+        ? state.setIn(
+          ['errors', action.data.timestamp],
+          { data: action.data, error: checkResponseError(action.error) }
+        )
+        : state;
+    case DISMISS_ERROR:
+      // console.log('error dismissError', action.key, state.get('errors').toJS())
+      return state.set('errors', state.get('errors').delete(action.key));
     default:
       return state;
   }

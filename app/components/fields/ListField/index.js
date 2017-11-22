@@ -7,14 +7,16 @@ import { palette } from 'styled-theme';
 import FieldWrap from 'components/fields/FieldWrap';
 import ListItem from 'components/fields/ListItem';
 import ListLabel from 'components/fields/ListLabel';
+import ListLabelWrap from 'components/fields/ListLabelWrap';
 import ListLink from 'components/fields/ListLink';
 import EmptyHint from 'components/fields/EmptyHint';
 import Dot from 'components/fields/Dot';
 import DotWrapper from 'components/fields/DotWrapper';
+import ItemStatus from 'components/ItemStatus';
 
-const Id = styled.div`
-  font-weight: 500;
-  color: ${palette('dark', 4)}
+const Reference = styled.div`
+  color: ${palette('text', 1)};
+  font-size: 0.85em;
 `;
 
 class ListField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -22,30 +24,38 @@ class ListField extends React.PureComponent { // eslint-disable-line react/prefe
     const { field } = this.props;
     return (
       <FieldWrap>
-        <ListLabel>
-          <FormattedMessage {...field.label} />
+        <ListLabelWrap>
+          <ListLabel>
+            <FormattedMessage {...field.label} />
+          </ListLabel>
           {field.entityType &&
             <DotWrapper>
               <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
             </DotWrapper>
           }
-        </ListLabel>
+        </ListLabelWrap>
         {field.values.map((value, i) => (
           <ListItem key={i}>
             {value.linkTo
               ? <ListLink to={value.linkTo}>
+                {value.draft &&
+                  <ItemStatus draft />
+                }
                 {value.reference &&
-                  <Id>
+                  <Reference>
                     {value.reference}
-                  </Id>
+                  </Reference>
                 }
                 {value.label}
               </ListLink>
               : <div>
+                {value.draft &&
+                  <ItemStatus draft />
+                }
                 {value.reference &&
-                  <Id>
+                  <Reference>
                     {value.reference}
-                  </Id>
+                  </Reference>
                 }
                 {value.label}
               </div>

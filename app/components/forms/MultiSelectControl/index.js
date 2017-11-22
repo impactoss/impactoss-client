@@ -27,6 +27,7 @@ const MultiSelectControl = (props) => {
     advanced,
     selectAll,
     tagFilterGroups,
+    closeOnClickOutside,
      ...otherProps
   } = props;
 
@@ -52,6 +53,7 @@ const MultiSelectControl = (props) => {
         advanced,
         selectAll,
         tagFilterGroups,
+        closeOnClickOutside,
       }}
       {...otherProps}
     />
@@ -66,6 +68,7 @@ MultiSelectControl.propTypes = {
   search: PropTypes.bool,
   selectAll: PropTypes.bool,
   advanced: PropTypes.bool,
+  closeOnClickOutside: PropTypes.bool,
   options: PropTypes.instanceOf(List),
   title: PropTypes.string,
   panelId: PropTypes.string,
@@ -79,6 +82,7 @@ MultiSelectControl.defaultProps = {
   multiple: true,
   required: false,
   threeState: false,
+  closeOnClickOutside: true,
 };
 
 export default MultiSelectControl;

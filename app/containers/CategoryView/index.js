@@ -14,6 +14,7 @@ import {
   getReferenceField,
   getTitleField,
   getCategoryShortTitleField,
+  getStatusField,
   getMetaField,
   getMarkdownField,
   getLinkField,
@@ -25,7 +26,7 @@ import {
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -73,33 +74,59 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       ],
     },
   ]);
+  getHeaderAsideFields = (entity, isManager) => {
+    const fields = []; // fieldGroups
+    if (entity.getIn(['taxonomy', 'attributes', 'tags_users']) && entity.getIn(['attributes', 'user_only'])) {
+      fields.push({
+        fields: [{
+          type: 'text',
+          value: this.context.intl.formatMessage(appMessages.textValues.user_only),
+          label: appMessages.attributes.user_only,
+        }],
+      });
+    }
+    if (isManager) {
+      fields.push({
+        fields: [
+          getStatusField(entity),
+          getMetaField(entity, appMessages),
+        ],
+      });
+    }
+    return fields;
+  }
 
-  getHeaderAsideFields = (entity, isManager) => isManager &&
-    ([{
-      fields: [
-        getMetaField(entity, appMessages),
-      ],
-    }]);
-
-  getBodyMainFields = (entity, recommendations, measures, taxonomies, sdgtargets, onEntityClick, sdgtargetConnections, measureConnections, recommendationConnections) => ([
-    {
-      fields: [
-        getMarkdownField(entity, 'description', true, appMessages),
-      ],
-    },
-    {
-      label: appMessages.entities.connections.plural,
-      icon: 'connections',
-      fields: [
-        entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
-          getMeasureConnectionField(measures, taxonomies, measureConnections, appMessages, onEntityClick),
-        entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
-          getSdgTargetConnectionField(sdgtargets, taxonomies, sdgtargetConnections, appMessages, onEntityClick),
-        entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
-          getRecommendationConnectionField(recommendations, taxonomies, recommendationConnections, appMessages, onEntityClick),
-      ],
-    },
-  ]);
+  getBodyMainFields = (
+    entity,
+    recommendations,
+    measures,
+    taxonomies,
+    sdgtargets,
+    onEntityClick,
+    sdgtargetConnections,
+    measureConnections,
+    recommendationConnections
+  ) => {
+    const fields = [];
+    fields.push({
+      fields: [getMarkdownField(entity, 'description', true, appMessages)],
+    });
+    if (!entity.getIn(['attributes', 'user_only'])) {
+      fields.push({
+        label: appMessages.entities.connections.plural,
+        icon: 'connections',
+        fields: [
+          entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
+            getMeasureConnectionField(measures, taxonomies, measureConnections, appMessages, onEntityClick),
+          entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
+            getSdgTargetConnectionField(sdgtargets, taxonomies, sdgtargetConnections, appMessages, onEntityClick),
+          entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
+            getRecommendationConnectionField(recommendations, taxonomies, recommendationConnections, appMessages, onEntityClick),
+        ],
+      });
+    }
+    return fields;
+  };
 
   getBodyAsideFields = (entity, isManager) => ([
     (entity.getIn(['attributes', 'url']) &&
@@ -121,7 +148,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
 
   render() {
     const {
-      category,
+      viewEntity,
       dataReady,
       isManager,
       recommendations,
@@ -134,21 +161,29 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       recommendationConnections,
     } = this.props;
 
-    const buttons = dataReady && isManager
-    ? [
-      {
-        type: 'edit',
-        onClick: () => this.props.handleEdit(this.props.params.id),
-      },
-      {
+    let buttons = [];
+    if (dataReady) {
+      buttons = isManager
+      ? [
+        {
+          type: 'edit',
+          onClick: () => this.props.handleEdit(this.props.params.id),
+        },
+        {
+          type: 'close',
+          onClick: () => this.props.handleClose(this.props.viewEntity.getIn(['taxonomy', 'id'])),
+        },
+      ]
+      : [{
         type: 'close',
-        onClick: () => this.props.handleClose(this.props.category.getIn(['taxonomy', 'id'])),
-      },
-    ]
-    : [{
-      type: 'close',
-      onClick: () => this.props.handleClose(this.props.category.getIn(['taxonomy', 'id'])),
-    }];
+        onClick: () => this.props.handleClose(this.props.viewEntity.getIn(['taxonomy', 'id'])),
+      }];
+    }
+
+    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
+    if (viewEntity && viewEntity.get('taxonomy')) {
+      pageTitle = viewEntity.getIn(['taxonomy', 'attributes', 'title']);
+    }
 
     return (
       <div>
@@ -160,29 +195,39 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={pageTitle}
             type={CONTENT_SINGLE}
             icon="categories"
             buttons={buttons}
           />
-          { !category && !dataReady &&
+          { !dataReady &&
             <Loading />
           }
-          { !category && dataReady &&
+          { !viewEntity && dataReady &&
             <div>
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          { category && dataReady &&
+          { viewEntity && dataReady &&
             <EntityView
               fields={{
                 header: {
-                  main: this.getHeaderMainFields(category, isManager),
-                  aside: this.getHeaderAsideFields(category, isManager),
+                  main: this.getHeaderMainFields(viewEntity, isManager),
+                  aside: this.getHeaderAsideFields(viewEntity, isManager),
                 },
                 body: {
-                  main: this.getBodyMainFields(category, recommendations, measures, taxonomies, sdgtargets, onEntityClick, sdgtargetConnections, measureConnections, recommendationConnections),
-                  aside: this.getBodyAsideFields(category, isManager),
+                  main: this.getBodyMainFields(
+                    viewEntity,
+                    recommendations,
+                    measures,
+                    taxonomies,
+                    sdgtargets,
+                    onEntityClick,
+                    sdgtargetConnections,
+                    measureConnections,
+                    recommendationConnections
+                  ),
+                  aside: this.getBodyAsideFields(viewEntity, isManager),
                 },
               }}
             />
@@ -198,7 +243,7 @@ CategoryView.propTypes = {
   handleEdit: PropTypes.func,
   handleClose: PropTypes.func,
   onEntityClick: PropTypes.func,
-  category: PropTypes.object,
+  viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   isManager: PropTypes.bool,
@@ -218,7 +263,7 @@ CategoryView.contextTypes = {
 const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  category: selectViewEntity(state, props.params.id),
+  viewEntity: selectViewEntity(state, props.params.id),
   recommendations: selectRecommendations(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),
@@ -237,10 +282,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (categoryId) => {
-      dispatch(updatePath(`/category/edit/${categoryId}`));
+      dispatch(updatePath(`${PATHS.CATEGORIES}${PATHS.EDIT}/${categoryId}`));
     },
     handleClose: (taxonomyId) => {
-      dispatch(closeEntity(`/categories/${taxonomyId}`));
+      dispatch(closeEntity(`${PATHS.TAXONOMIES}/${taxonomyId}`));
     },
   };
 }

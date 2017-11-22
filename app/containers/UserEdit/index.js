@@ -27,27 +27,32 @@ import {
   getRoleField,
 } from 'utils/fields';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import {
   loadEntitiesIfNeeded,
   updatePath,
   updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
+  openNewEntityModal,
 } from 'containers/App/actions';
 
 import {
   selectReady,
-  selectIsUserManager,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -77,6 +82,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
+    }
   }
 
   getInitialFormData = (nextProps) => {
@@ -98,14 +106,14 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     fields: [getTitleFormField(this.context.intl.formatMessage, appMessages, 'title', 'name')],
   }]);
 
-  getHeaderAsideFields = (entity, roles, isManager) => ([
+  getHeaderAsideFields = (entity, roles) => ([
     {
-      fields: isManager ? [
+      fields: (roles && roles.size > 0) ? [
         getRoleFormField(this.context.intl.formatMessage, appMessages, roles),
         getMetaField(entity, appMessages),
       ]
       : [
-        getRoleField(entity, this.context.intl.formatMessage, appMessages),
+        getRoleField(entity),
         getMetaField(entity, appMessages),
       ],
     },
@@ -115,18 +123,33 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     fields: [getEmailField(this.context.intl.formatMessage, appMessages)],
   }]);
 
-  getBodyAsideFields = (taxonomies) => ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
-      icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption),
     },
   ]);
 
+  getEditableUserRoles = (roles, sessionUserHighestRoleId) => {
+    if (roles) {
+      const userHighestRoleId = getHighestUserRoleId(roles);
+        // roles are editable by the session user (logged on user) if
+        // unless the session user is an ADMIN
+        // the session user can only assign roles "lower" (that is higher id) than his/her own role
+        // and when the session user has a "higher" (lower id) role than the user profile being edited
+      return roles
+        .filter((role) => sessionUserHighestRoleId === USER_ROLES.ADMIN.value
+          || (sessionUserHighestRoleId < userHighestRoleId && sessionUserHighestRoleId < parseInt(role.get('id'), 10))
+        );
+    }
+    return Map();
+  }
+
   render() {
-    const { viewEntity, dataReady, viewDomain, taxonomies, roles, isManager } = this.props;
+    const { viewEntity, dataReady, viewDomain, taxonomies, roles, sessionUserHighestRoleId, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, submitValid } = viewDomain.page;
+
+    const editableRoles = this.getEditableUserRoles(roles, sessionUserHighestRoleId);
 
     return (
       <div>
@@ -136,7 +159,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -154,14 +177,16 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             }
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
@@ -189,11 +214,11 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(viewEntity, roles, isManager),
+                  aside: this.getHeaderAsideFields(viewEntity, editableRoles),
                 },
                 body: {
                   main: this.getBodyMainFields(),
-                  aside: isManager && this.getBodyAsideFields(taxonomies),
+                  aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER.value) && this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -220,8 +245,9 @@ UserEdit.propTypes = {
   roles: PropTypes.object,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
-  isManager: PropTypes.bool,
+  sessionUserHighestRoleId: PropTypes.number,
   params: PropTypes.object,
+  onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
 };
@@ -231,7 +257,7 @@ UserEdit.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isManager: selectIsUserManager(state),
+  sessionUserHighestRoleId: selectSessionUserHighestRoleId(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
@@ -276,7 +302,7 @@ function mapDispatchToProps(dispatch) {
       const newHighestRole = parseInt(formData.get('associatedRole'), 10);
 
       // store all higher roles
-      const newRoleIds = newHighestRole === 0
+      const newRoleIds = newHighestRole === USER_ROLES.DEFAULT.value
         ? List()
         : roles.reduce((memo, role) =>
           newHighestRole <= parseInt(role.get('id'), 10)
@@ -286,9 +312,11 @@ function mapDispatchToProps(dispatch) {
 
       saveData = saveData.set('userRoles', Map({
         delete: roles.reduce((memo, role) =>
-          role.get('associated') && newRoleIds.includes(parseInt(role.get('id'), 10))
-            ? memo.push(role.getIn(['associated', 'id']))
-            : memo
+          role.get('associated')
+            && !newRoleIds.includes(role.get('id'))
+            && !newRoleIds.includes(parseInt(role.get('id'), 10))
+              ? memo.push(role.getIn(['associated', 'id']))
+              : memo
           , List()),
         create: newRoleIds.reduce((memo, id) =>
           roles.find((role) => role.get('id') === id && !role.get('associated'))
@@ -300,10 +328,13 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`/users/${reference}`));
+      dispatch(updatePath(`${PATHS.USERS}/${reference}`));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
+    },
+    onCreateOption: (args) => {
+      dispatch(openNewEntityModal(args));
     },
   };
 }

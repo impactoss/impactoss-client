@@ -10,6 +10,8 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { actions as formActions } from 'react-redux-form/immutable';
 
+import { Map } from 'immutable';
+
 import {
   getTitleFormField,
   getDueDateOptionsField,
@@ -17,9 +19,17 @@ import {
   getStatusField,
   getMarkdownField,
   getUploadField,
+  getDueDateDateOptions,
 } from 'utils/forms';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { getStatusField as getStatusInfoField } from 'utils/fields';
+
+import { attributesEqual } from 'utils/entities';
+
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -30,13 +40,18 @@ import {
   saveErrorDismiss,
 } from 'containers/App/actions';
 
-import { selectReady } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectIsUserContributor,
+  selectIsUserManager,
+  selectSessionUserId,
+} from 'containers/App/selectors';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -48,18 +63,28 @@ import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class ReportNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  constructor() {
+    super();
+    this.state = { guestDismissed: false };
+  }
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('reportNew.form.data', FORM_INITIAL);
+    if (this.props.dataReady && this.props.indicator) {
+      this.props.initialiseForm('reportNew.form.data', this.getInitialFormData());
+    }
   }
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
+    if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
+      this.props.initialiseForm('reportNew.form.data', this.getInitialFormData(nextProps));
+    }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
+    }
   }
-
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
@@ -68,8 +93,23 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     },
   ]);
 
-  getHeaderAsideFields = () => ([{
-    fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const { indicator } = props;
+    return Map(FORM_INITIAL.setIn(
+      ['attributes', 'due_date_id'],
+      indicator.get('dates')
+        ? getDueDateDateOptions(indicator.get('dates'))[0].value
+        : '0'
+    ));
+  }
+
+  getHeaderAsideFields = (canUserPublish) => ([{
+    fields: [
+      canUserPublish
+      ? getStatusField(this.context.intl.formatMessage, appMessages)
+      : getStatusInfoField(),
+    ],
   }]);
 
   getBodyMainFields = () => ([
@@ -90,25 +130,41 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
         [getDueDateOptionsField(
           this.context.intl.formatMessage,
           appMessages,
-          this.context.intl.formatDate,
-          indicator.get('dates'),
-          '0',
+          getDueDateDateOptions(
+            indicator.get('dates'),
+            this.context.intl.formatMessage,
+            appMessages,
+            this.context.intl.formatDate
+          )
         )],
     },
   ]);
 
+  dismissGuestMessage = (evt) => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    this.setState({ guestDismissed: true });
+  }
+
+  canUserPublish = (isUserContributor, isUserManager, userId, indicator) =>
+    isUserManager || (isUserContributor && attributesEqual(userId, indicator.getIn(['attributes', 'manager_id'])));
+
   render() {
-    const { dataReady, indicator, viewDomain } = this.props;
+    const { dataReady, indicator, viewDomain, isUserContributor, isUserManager, userId } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
     const indicatorReference = this.props.params.id;
+    const canUserPublish = dataReady && this.canUserPublish(
+      isUserContributor,
+      isUserManager,
+      userId,
+      indicator
+    );
 
-    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-    pageTitle = `${pageTitle} for indicator ${indicatorReference}`;
+    const pageTitle = this.context.intl.formatMessage(messages.pageTitle, { indicatorReference });
 
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={pageTitle}
           meta={[
             {
               name: 'description',
@@ -116,7 +172,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
             },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -129,19 +185,31 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('reportNew.form.data'),
+                onClick: () => {
+                  this.dismissGuestMessage();
+                  this.props.handleSubmitRemote('reportNew.form.data');
+                },
               }] : null
             }
           />
+          { !canUserPublish && !this.state.guestDismissed && dataReady && !saveError && !!submitValid &&
+            <Messages
+              type="info"
+              message={this.context.intl.formatMessage(messages.guestNote)}
+              onDismiss={this.dismissGuestMessage}
+            />
+          }
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
@@ -153,21 +221,25 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               model="reportNew.form.data"
               formData={viewDomain.form.data}
               saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(
-                formData,
-                indicatorReference
-              )}
+              handleSubmit={(formData) => {
+                this.dismissGuestMessage();
+                this.props.handleSubmit(
+                  formData,
+                  indicatorReference,
+                  canUserPublish
+                );
+              }}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={() => this.props.handleCancel(indicatorReference)}
               handleUpdate={this.props.handleUpdate}
               fields={{
                 header: {
                   main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(),
+                  aside: this.getHeaderAsideFields(canUserPublish),
                 },
                 body: {
                   main: this.getBodyMainFields(),
-                  aside: this.getBodyAsideFields(indicator),
+                  aside: canUserPublish && this.getBodyAsideFields(indicator),
                 },
               }}
             />
@@ -195,6 +267,9 @@ ReportNew.propTypes = {
   initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  isUserContributor: PropTypes.bool,
+  isUserManager: PropTypes.bool,
+  userId: PropTypes.string,
 };
 
 ReportNew.contextTypes = {
@@ -205,6 +280,9 @@ const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   indicator: selectIndicator(state, props.params.id),
+  isUserContributor: selectIsUserContributor(state),
+  isUserManager: selectIsUserManager(state),
+  userId: selectSessionUserId(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -228,7 +306,7 @@ function mapDispatchToProps(dispatch) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, indicatorReference) => {
+    handleSubmit: (formData, indicatorReference, canUserPublish) => {
       let saveData = formData;
 
       saveData = saveData.setIn(['attributes', 'indicator_id'], indicatorReference);
@@ -238,10 +316,14 @@ function mapDispatchToProps(dispatch) {
         saveData = saveData.setIn(['attributes', 'due_date_id'], null);
       }
 
-      dispatch(save(saveData.toJS()));
+      dispatch(save(
+        saveData.toJS(),
+        canUserPublish ? PATHS.PROGRESS_REPORTS : `${PATHS.INDICATORS}/${indicatorReference}`,
+        !canUserPublish // createAsGuest: do not append created id to redirect, do not create locally
+      ));
     },
     handleCancel: (indicatorReference) => {
-      dispatch(updatePath(`/indicators/${indicatorReference}`));
+      dispatch(updatePath(`${PATHS.INDICATORS}/${indicatorReference}`));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

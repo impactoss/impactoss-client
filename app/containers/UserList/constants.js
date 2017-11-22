@@ -1,3 +1,5 @@
+import { USER_ROLES } from 'themes/config';
+
 export const DEPENDENCIES = [
   'user_roles',
   'users',
@@ -42,9 +44,11 @@ export const CONFIG = {
       {
         edit: false,
         search: true,
-        label: 'entities.roles.plural',
+        popover: false,
+        message: 'entities.roles.single',
         path: 'roles', // filter by recommendation connection
         key: 'role_id',
+        labels: Object.values(USER_ROLES),
       },
     ],
   },

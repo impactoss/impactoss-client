@@ -13,4 +13,8 @@ export default defineMessages({
     id: 'app.components.MultiSelectField.emptyLink',
     defaultMessage: 'Click to select.',
   },
+  update: {
+    id: 'app.components.MultiSelectField.update',
+    defaultMessage: 'Update {type}',
+  },
 });

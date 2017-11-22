@@ -5,13 +5,19 @@
  */
 import { fromJS } from 'immutable';
 
-export const SAVE = 'nmrf/CategoryEdit/SAVE';
+export const SAVE = 'impactoss/CategoryEdit/SAVE';
 
 export const DEPENDENCIES = [
+  'measures',
+  'sdgtargets',
+  'recommendations',
   'users',
   'user_roles',
   'categories',
   'taxonomies',
+  'measure_categories',
+  'sdgtarget_categories',
+  'recommendation_categories',
 ];
 
 export const FORM_INITIAL = fromJS({
@@ -24,6 +30,11 @@ export const FORM_INITIAL = fromJS({
     manager_id: '',
     taxonomy_id: '',
     reference: '',
+    user_only: false,
+    draft: true,
   },
+  associatedSdgTargets: [],
+  associatedMeasures: [],
+  associatedRecommendations: [],
   associatedUser: [],
 });

@@ -18,15 +18,16 @@ import {
   PAGE_ITEM_CHANGE,
   SORTBY_CHANGE,
   SORTORDER_CHANGE,
+  RESET_SEARCH_QUERY,
 } from './constants';
 
-export function* updateQuery(args) {
-  const params = args.value.map((value) => ({
-    arg: value.get('query'),
-    value: value.get('value'),
-    replace: value.get('replace'),
-    add: value.get('checked'),
-    remove: !value.get('checked'),
+export function* updateQuery({ value }) {
+  const params = value.map((val) => ({
+    arg: val.get('query'),
+    value: val.get('value'),
+    replace: val.get('replace'),
+    add: val.get('checked'),
+    remove: !val.get('checked'),
   })).toJS();
   yield params.push({
     arg: 'page',
@@ -36,10 +37,21 @@ export function* updateQuery(args) {
   });
   yield put(updateRouteQuery(params));
 }
-export function* updateGroup(args) {
-  const params = args.value.map((value) => ({
-    arg: value.get('query'),
-    value: value.get('value'),
+
+export function* resetSearchQuery({ values }) {
+  const params = values.map((arg) => ({
+    arg,
+    value: '',
+    replace: true,
+    remove: true,
+  }));
+  yield put(updateRouteQuery(params));
+}
+
+export function* updateGroup({ value }) {
+  const params = value.map((val) => ({
+    arg: val.get('query'),
+    value: val.get('value'),
     replace: true,
     // add: value.get('value') !== '',
     // remove: value.get('value') === '',
@@ -52,18 +64,18 @@ export function* updateGroup(args) {
   });
   yield put(updateRouteQuery(params));
 }
-export function* updatePage(args) {
+export function* updatePage({ page }) {
   yield put(updateRouteQuery({
     arg: 'page',
-    value: args.page,
+    value: page,
     replace: true,
   }));
 }
-export function* updatePageItems(args) {
+export function* updatePageItems({ no }) {
   yield put(updateRouteQuery([
     {
       arg: 'items',
-      value: args.no,
+      value: no,
       replace: true,
     },
     {
@@ -74,24 +86,24 @@ export function* updatePageItems(args) {
     },
   ]));
 }
-export function* updateExpand(args) {
+export function* updateExpand({ expand }) {
   yield put(updateRouteQuery({
     arg: 'expand',
-    value: args.expand,
+    value: expand,
     replace: true,
   }));
 }
-export function* updateSortBy(args) {
+export function* updateSortBy({ sort }) {
   yield put(updateRouteQuery({
     arg: 'sort',
-    value: args.sort,
+    value: sort,
     replace: true,
   }));
 }
-export function* updateSortOrder(args) {
+export function* updateSortOrder({ order }) {
   yield put(updateRouteQuery({
     arg: 'order',
-    value: args.order,
+    value: order,
     replace: true,
   }));
 }
@@ -100,6 +112,7 @@ export function* save({ data }) {
   yield put(saveEntity({
     path: data.path,
     entity: data.entity,
+    saveRef: data.saveRef,
     redirect: false,
   }));
 }
@@ -108,6 +121,7 @@ export function* newConnection({ data }) {
   yield put(newEntity({
     path: data.path,
     entity: data.entity,
+    saveRef: data.saveRef,
     redirect: false,
   }));
 }
@@ -116,6 +130,7 @@ export function* deleteConnection({ data }) {
   yield put(deleteEntity({
     path: data.path,
     id: data.id,
+    saveRef: data.saveRef,
     redirect: false,
   }));
 }
@@ -128,6 +143,7 @@ export default function* entityList() {
   yield takeLatest(EXPAND_CHANGE, updateExpand);
   yield takeLatest(SORTBY_CHANGE, updateSortBy);
   yield takeLatest(SORTORDER_CHANGE, updateSortOrder);
+  yield takeLatest(RESET_SEARCH_QUERY, resetSearchQuery);
 
   yield takeLatest(SAVE, save);
   yield takeLatest(NEW_CONNECTION, newConnection);

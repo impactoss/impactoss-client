@@ -52,7 +52,7 @@ const light = coolorsToHex('https://coolors.co/f5f6f6-eaeced-dbdfe0-bbc1c2-aeb6b
 
 
 // other palettes (not currently used)
-const danger = coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478');
+const error = coolorsToHex('https://coolors.co/ce4f40-e25646-e46556-e77467-e98478');
 const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-fff2ce');
 const success = coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-c8e6c9');
 
@@ -70,7 +70,7 @@ theme.palette = {
   light,
 
   // other palettes (not currently used)
-  danger,
+  error,
   success,
   alert,
 
@@ -189,8 +189,8 @@ theme.palette = {
   buttonToggleInactiveHover: [dark[1], light[0]],
   // links
   // also see global-styles.js for default link "a"
-  linkDefault: [secondary[3]],
-  linkDefaultHover: [secondary[2]],
+  link: [secondary[3]],
+  linkHover: [secondary[2]],
   linkSecondary: [secondary[3]],
   linkSecondaryHover: [secondary[2]],
 
@@ -202,19 +202,15 @@ theme.fonts = {
   secondary: 'Rubik, Helvetica, Arial, sans-serif', // used for brand title, claim, nav items, buttons and labels
   pre: 'Consolas, Liberation Mono, Menlo, Courier, monospace',
   quote: 'Georgia, serif',
-  headerBrandMain: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
-  headerBrandClaim: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
-  homeBrandMain: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
-  homeBrandClaim: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
+  brandMain: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
+  brandClaim: 'Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
 };
 
 // sizes
 theme.sizes = {
   // also see global-styles.js for other sizes
-  headerBrandMain: '1.6em',
-  headerBrandClaim: '1.6em',
-  homeBrandMain: '1.8em',
-  homeBrandClaim: '1.8em',
+  brandMain: '1.6em',
+  brandClaim: '1.8em',
 };
 
 // end styled-theme settings

@@ -1,4 +1,4 @@
-import { PUBLISH_STATUSES } from 'containers/App/constants';
+import { PUBLISH_STATUSES, USER_ROLES } from 'themes/config';
 
 export const DEPENDENCIES = [
   'user_roles',
@@ -50,12 +50,12 @@ export const CONFIG = {
     connections: [
       {
         path: 'measures', // filter by recommendation connection
-        title: 'entities.measures.plural',
+        message: 'entities.measures.plural',
         key: 'measure_id',
       },
       {
         path: 'sdgtargets', // filter by recommendation connection
-        title: 'entities.sdgtargets.plural',
+        message: 'entities.sdgtargets.plural',
         key: 'sdgtarget_id',
       },
     ],
@@ -65,7 +65,7 @@ export const CONFIG = {
     options: [
       {
         search: true,
-        label: 'entities.measures.plural',
+        message: 'entities.measures.plural',
         path: 'measures',
         clientPath: 'actions',
         key: 'measure_id',
@@ -74,7 +74,7 @@ export const CONFIG = {
       },
       {
         search: true,
-        label: 'entities.sdgtargets.plural',
+        message: 'entities.sdgtargets.plural',
         path: 'sdgtargets',
         key: 'sdgtarget_id',
         ownKey: 'indicator_id',
@@ -86,26 +86,28 @@ export const CONFIG = {
     options: [
       {
         search: false,
-        label: 'attributes.draft',
+        message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
+        role: USER_ROLES.CONTRIBUTOR.value,
       },
-      // {
-      //   edit: false,
-      //   filter: true,
-      //   label: 'attributes.manager_id.indicators',
-      //   attribute: 'manager_id',
-      //   extension: {
-      //     key: 'manager',
-      //     label: 'name',
-      //     without: true,
-      //   },
-      // },
+      {
+        search: false,
+        edit: false,
+        message: 'attributes.manager_id.indicators',
+        attribute: 'manager_id',
+        role: USER_ROLES.CONTRIBUTOR.value,
+        reference: {
+          key: 'manager',
+          label: 'name',
+          without: true,
+        },
+      },
     ],
   },
   expandableColumns: [
     {
-      label: 'Progress reports',
+      message: 'entities.progress_reports.plural',
       type: 'reports',
       clientPath: 'reports',
       icon: 'reminder',

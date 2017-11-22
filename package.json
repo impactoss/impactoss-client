@@ -1,16 +1,16 @@
 {
-  "name": "hr-nmrf-client",
-  "version": "3.4.0",
-  "description": "A highly scalable, offline-first foundation with the best DX and a focus on performance and best practices",
+  "name": "impact-oss",
+  "version": "0.1.2",
+  "description": "Integrated Management and Planning of ACTions Open Source Software",
   "repository": {
     "type": "git",
-    "url": "git://github.com/dumparkltd/hr-nmrf-client.git"
+    "url": "git://github.com/impactoss/impactoss.git"
   },
   "engines": {
     "npm": ">=3",
     "node": ">=5"
   },
-  "author": "dumpark ltd",
+  "author": "tmfrnz",
   "license": "MIT",
   "scripts": {
     "analyze:clean": "rimraf stats.json",
@@ -243,6 +243,7 @@
     "react-redux": "^5.0.5",
     "react-redux-form": "^1.12.1",
     "react-rendered-size": "^1.1.0",
+    "react-retina-image": "^2.0.5",
     "react-router": "3.0.5",
     "react-router-redux": "4.0.8",
     "react-router-scroll": "^0.4.2",

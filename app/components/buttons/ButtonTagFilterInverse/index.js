@@ -5,7 +5,7 @@ import Button from '../Button';
 
 const ButtonTagFilterInverse = styled(Button)`
   color: ${(props) => palette(props.palette, props.pIndex || 0)};
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('buttonInverse', 1)};
   padding: 1px 6px;
   margin-right: 2px;
   border-radius: 3px;
@@ -13,7 +13,7 @@ const ButtonTagFilterInverse = styled(Button)`
   border: 1px solid;
   &:hover {
     color: ${(props) => palette(props.paletteHover, props.pIndex || 0)};
-    background-color: ${palette('light', 0)};
+    background-color: ${palette('buttonInverseHover', 1)};
   }
 `;
 

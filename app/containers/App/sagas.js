@@ -3,11 +3,17 @@
  */
 
 import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
-import { push, goBack } from 'react-router-redux';
-import { reduce, keyBy, find } from 'lodash/collection';
+import { push, replace } from 'react-router-redux';
+import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
 
 import asArray from 'utils/as-array';
+import {
+  hasRoleRequired,
+  replaceUnauthorised,
+  replaceIfNotSignedIn,
+} from 'utils/redirects';
+
 
 import {
   LOAD_ENTITIES_IF_NEEDED,
@@ -22,13 +28,19 @@ import {
   SAVE_CONNECTIONS,
   UPDATE_ROUTE_QUERY,
   AUTHENTICATE_FORWARD,
-  USER_ROLES,
   UPDATE_PATH,
   // RESET_PASSWORD,
   RECOVER_PASSWORD,
   CLOSE_ENTITY,
-  RECORD_OUTDATED,
+  DISMISS_QUERY_MESSAGES,
+  PATHS,
+  PARAMS,
 } from 'containers/App/constants';
+
+import {
+  ENDPOINTS,
+  KEYS,
+} from 'themes/config';
 
 import {
   entitiesLoaded,
@@ -56,13 +68,14 @@ import {
 } from 'containers/App/actions';
 
 import {
-  selectPreviousPathname,
   selectCurrentPathname,
+  selectRedirectOnAuthSuccessPath,
   selectRequestedAt,
   selectIsSignedIn,
   selectLocation,
   selectSessionUserRoles,
   selectIsAuthenticating,
+  selectListSearch,
 } from 'containers/App/selectors';
 
 import {
@@ -118,17 +131,17 @@ export function* checkEntitiesSaga(payload) {
  */
 export function* checkRoleSaga({ role }) {
   const signedIn = yield select(selectIsSignedIn);
-  const authenticating = yield select(selectIsAuthenticating);
-  if (signedIn) {
-    const roleIds = yield select(selectSessionUserRoles);
-    if (!(roleIds.includes(role)
-      || (role === USER_ROLES.MANAGER && roleIds.includes(USER_ROLES.ADMIN))
-      || (role === USER_ROLES.CONTRIBUTOR && (roleIds.includes(USER_ROLES.MANAGER) || roleIds.includes(USER_ROLES.ADMIN)))
-    )) {
-      yield put(push('/login'));
+  if (!signedIn) {
+    const authenticating = yield select(selectIsAuthenticating);
+    if (!authenticating) {
+      const redirectOnAuthSuccess = yield select(selectCurrentPathname);
+      yield put(replaceIfNotSignedIn(redirectOnAuthSuccess, replace));
     }
-  } else if (!authenticating) {
-    yield put(push('/login'));
+  } else {
+    const roleIds = yield select(selectSessionUserRoles);
+    if (!hasRoleRequired(roleIds, role)) {
+      yield put(replaceUnauthorised(replace));
+    }
   }
 }
 
@@ -136,10 +149,10 @@ export function* authenticateSaga(payload) {
   const { password, email } = payload.data;
   try {
     yield put(authenticateSending());
-    const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
+    const response = yield call(apiRequest, 'post', ENDPOINTS.SIGN_IN, { email, password });
     yield put(authenticateSuccess(response.data));
+    yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
     yield put(forwardOnAuthenticationChange());
-    yield put(invalidateEntities());
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
@@ -150,24 +163,26 @@ export function* recoverSaga(payload) {
   const { email } = payload.data;
   try {
     yield put(recoverSending());
-    yield call(apiRequest, 'post', 'auth/password', {
+    yield call(apiRequest, 'post', ENDPOINTS.PASSWORD, {
       email,
-      redirect_url: `${window.location.origin}/resetpassword`, // TODO WIP
+      redirect_url: `${window.location.origin}${PATHS.RESET_PASSWORD}`,
     });
     yield put(recoverSuccess());
     // forward to login
-    yield put(push('/login'));
+    yield put(replace({
+      pathname: PATHS.LOGIN,
+      query: { info: PARAMS.RECOVER_SUCCESS },
+    }));
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(recoverError(err));
   }
 }
 
-const authRoutes = ['/login', '/register', '/logout'];
 export function* authChangeSaga() {
-  const prevPathname = yield select(selectPreviousPathname);
-  if (prevPathname && authRoutes.indexOf(prevPathname) < 0) {
-    yield put(push(prevPathname));
+  const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
+  if (redirectPathname) {
+    yield put(push(redirectPathname));
   } else {
     // forward to home
     yield put(push('/'));
@@ -176,11 +191,10 @@ export function* authChangeSaga() {
 
 export function* logoutSaga() {
   try {
-    yield call(apiRequest, 'delete', 'auth/sign_out');
+    yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(push('/login'));
-    yield put(invalidateEntities());
+    yield put(push(PATHS.LOGIN));
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));
@@ -189,10 +203,23 @@ export function* logoutSaga() {
 
 export function* validateTokenSaga() {
   try {
-    const { uid, client, 'access-token': accessToken } = yield getAuthValues();
+    const {
+      [KEYS.UID]: uid,
+      [KEYS.CLIENT]: client,
+      [KEYS.ACCESS_TOKEN]: accessToken,
+    } = yield getAuthValues();
+
     if (uid && client && accessToken) {
       yield put(authenticateSending());
-      const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
+      const response = yield call(
+        apiRequest,
+        'get',
+        ENDPOINTS.VALIDATE_TOKEN, {
+          [KEYS.UID]: uid,
+          [KEYS.CLIENT]: client,
+          [KEYS.ACCESS_TOKEN]: accessToken,
+        }
+      );
       if (!response.success) {
         yield call(clearAuthValues);
         yield put(invalidateEntities());
@@ -207,9 +234,10 @@ export function* validateTokenSaga() {
 }
 
 
-function stampPayload(payload) {
+function stampPayload(payload, type) {
   return Object.assign(payload, {
     timestamp: `${Date.now()}-${Math.random().toString(36).slice(-8)}`,
+    type,
   });
 }
 
@@ -227,7 +255,7 @@ function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
 }
 
 export function* saveEntitySaga({ data }) {
-  const dataTS = stampPayload(data);
+  const dataTS = stampPayload(data, 'save');
   try {
     yield put(saveSending(dataTS));
     // update entity attributes
@@ -338,14 +366,12 @@ export function* saveEntitySaga({ data }) {
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(saveError(err, dataTS));
-    if (err.response.json && err.response.json.error === RECORD_OUTDATED) {
-      yield put(invalidateEntities(data.path));
-    }
+    yield put(invalidateEntities(data.path));
   }
 }
 
 export function* deleteEntitySaga({ data }) {
-  const dataTS = stampPayload(data);
+  const dataTS = stampPayload(data, 'delete');
   try {
     yield put(deleteSending(dataTS));
     yield call(deleteEntityRequest, data.path, data.id);
@@ -357,87 +383,92 @@ export function* deleteEntitySaga({ data }) {
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(deleteError(err, dataTS));
+    yield put(invalidateEntities(data.path));
   }
 }
 
 export function* newEntitySaga({ data }) {
-  const dataTS = stampPayload(data);
+  const dataTS = stampPayload(data, 'new');
   try {
     yield put(saveSending(dataTS));
     // update entity attributes
     // on the server
     const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
-    yield put(addEntity(data.path, entityCreated.data));
 
-    // check for associations/connections
-    // update recommendation-action connections
-    if (data.entity.recommendationMeasures) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'recommendation_measures',
-        updates: data.entity.recommendationMeasures,
-        keyPair: ['recommendation_id', 'measure_id'],
-      });
-    }
+    if (!data.createAsGuest) {
+      yield put(addEntity(data.path, entityCreated.data));
 
-    // update action-indicator connections
-    if (data.entity.measureIndicators) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'measure_indicators',
-        updates: data.entity.measureIndicators,
-        keyPair: ['indicator_id', 'measure_id'],
-      });
-    }
 
-    // update action-category connections
-    if (data.entity.measureCategories) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'measure_categories',
-        updates: data.entity.measureCategories,
-        keyPair: ['category_id', 'measure_id'],
-      });
-    }
+      // check for associations/connections
+      // update recommendation-action connections
+      if (data.entity.recommendationMeasures) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'recommendation_measures',
+          updates: data.entity.recommendationMeasures,
+          keyPair: ['recommendation_id', 'measure_id'],
+        });
+      }
 
-    // update sdgtarget-indicator connections
-    if (data.entity.sdgtargetIndicators) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'sdgtarget_indicators',
-        updates: data.entity.sdgtargetIndicators,
-        keyPair: ['indicator_id', 'sdgtarget_id'],
-      });
-    }
+      // update action-indicator connections
+      if (data.entity.measureIndicators) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'measure_indicators',
+          updates: data.entity.measureIndicators,
+          keyPair: ['indicator_id', 'measure_id'],
+        });
+      }
 
-    // update sdgtarget-indicator connections
-    if (data.entity.sdgtargetMeasures) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'sdgtarget_measures',
-        updates: data.entity.sdgtargetMeasures,
-        keyPair: ['measure_id', 'sdgtarget_id'],
-      });
-    }
+      // update action-category connections
+      if (data.entity.measureCategories) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'measure_categories',
+          updates: data.entity.measureCategories,
+          keyPair: ['category_id', 'measure_id'],
+        });
+      }
 
-    // update sdgtarget-category connections
-    if (data.entity.sdgtargetCategories) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'sdgtarget_categories',
-        updates: data.entity.sdgtargetCategories,
-        keyPair: ['category_id', 'sdgtarget_id'],
-      });
-    }
+      // update sdgtarget-indicator connections
+      if (data.entity.sdgtargetIndicators) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'sdgtarget_indicators',
+          updates: data.entity.sdgtargetIndicators,
+          keyPair: ['indicator_id', 'sdgtarget_id'],
+        });
+      }
 
-    // update recommendation-category connections
-    if (data.entity.recommendationCategories) {
-      yield call(createConnectionsSaga, {
-        entityId: entityCreated.data.id,
-        path: 'recommendation_categories',
-        updates: data.entity.recommendationCategories,
-        keyPair: ['category_id', 'recommendation_id'],
-      });
+      // update sdgtarget-indicator connections
+      if (data.entity.sdgtargetMeasures) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'sdgtarget_measures',
+          updates: data.entity.sdgtargetMeasures,
+          keyPair: ['measure_id', 'sdgtarget_id'],
+        });
+      }
+
+      // update sdgtarget-category connections
+      if (data.entity.sdgtargetCategories) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'sdgtarget_categories',
+          updates: data.entity.sdgtargetCategories,
+          keyPair: ['category_id', 'sdgtarget_id'],
+        });
+      }
+
+      // update recommendation-category connections
+      if (data.entity.recommendationCategories) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'recommendation_categories',
+          updates: data.entity.recommendationCategories,
+          keyPair: ['category_id', 'recommendation_id'],
+        });
+      }
     }
 
     yield put(saveSuccess(dataTS));
@@ -445,11 +476,19 @@ export function* newEntitySaga({ data }) {
       data.onSuccess();
     }
     if (data.redirect) {
-      yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+      if (data.createAsGuest) {
+        yield put(push({
+          pathname: `${data.redirect}`,
+          query: { info: 'createdAsGuest', infotype: data.path },
+        }));
+      } else {
+        yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+      }
     }
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(saveError(err, dataTS));
+    yield put(invalidateEntities(data.path));
   }
 }
 //
@@ -491,25 +530,23 @@ export function* saveConnectionsSaga({ data }) {
   }
 }
 
-export function* updateRouteQuerySaga({ query, extend = true }) {
-  // TODO consider using history.js's updateQueryStringParams
-  const location = yield select(selectLocation);
+const getNextQuery = (query, extend, location) => {
   // figure out new query
   // get old query or new query if not extending (replacing)
   const queryPrevious = extend ? location.get('query').toJS() : {};
   // and figure out new query
-  const queryNext = asArray(query).reduce((q, param) => {
+  return asArray(query).reduce((q, param) => {
     const queryUpdated = q;
-    // if already set and not replacing
+
+    // if arg already set and not replacing
     if (queryUpdated[param.arg] && !param.replace) {
       // if multiple values set
       if (Array.isArray(queryUpdated[param.arg])) {
         // add if not already present
         if (param.add && queryUpdated[param.arg].indexOf(param.value.toString()) === -1) {
           queryUpdated[param.arg].push(param.value);
-        }
         // remove if present
-        if (extend && param.remove && queryUpdated[param.arg].indexOf(param.value.toString()) > -1) {
+        } else if (extend && param.remove && param.value && queryUpdated[param.arg].indexOf(param.value.toString()) > -1) {
           queryUpdated[param.arg] = without(queryUpdated[param.arg], param.value.toString());
           // convert to single value if only one value left
           if (queryUpdated[param.arg].length === 1) {
@@ -517,29 +554,27 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
           }
         }
       // if single value set
-      } else {
-        // add if not already present and convert to array
-        if (param.add && queryUpdated[param.arg] !== param.value.toString()) {
-          queryUpdated[param.arg] = [queryUpdated[param.arg], param.value];
-        }
-        // remove if present
-        if (extend && param.remove && queryUpdated[param.arg] === param.value.toString()) {
-          delete queryUpdated[param.arg];
-        }
-      }
-    // if not already set or replacing
-    } else if (param.add || param.replace) {
-      if (param.remove) {
+      // add if not already present and convert to array
+      } else if (param.value && param.add && queryUpdated[param.arg] !== param.value.toString()) {
+        queryUpdated[param.arg] = [queryUpdated[param.arg], param.value];
+      // remove if present
+      } else if (extend && param.remove && (!param.value || (param.value && queryUpdated[param.arg] === param.value.toString()))) {
         delete queryUpdated[param.arg];
-      } else {
-        queryUpdated[param.arg] = param.value;
       }
+    // if set and removing
+    } else if (queryUpdated[param.arg] && param.remove) {
+      delete queryUpdated[param.arg];
+    // if not set or replacing with new value
+    } else if (typeof param.value !== 'undefined' && !param.remove) {
+      queryUpdated[param.arg] = param.value;
     }
     return queryUpdated;
   }, queryPrevious);
+};
 
-  // convert to string
-  const queryNextString = reduce(queryNext, (result, value, key) => {
+// convert to string
+const getNextQueryString = (queryNext) =>
+  reduce(queryNext, (result, value, key) => {
     let params;
     if (Array.isArray(value)) {
       params = value.reduce((memo, val) => `${memo}${memo.length > 0 ? '&' : ''}${key}=${encodeURIComponent(val)}`, '');
@@ -549,27 +584,53 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
     return `${result}${result.length > 0 ? '&' : ''}${params}`;
   }, '');
 
-  yield put(push(`${location.get('pathname')}?${queryNextString}`));
+export function* updateRouteQuerySaga({ query, extend = true }) {
+  const location = yield select(selectLocation);
+  const queryNext = getNextQuery(query, extend, location);
+
+  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
-export function* updatePathSaga({ path }) {
-  yield put(push(path.startsWith('/') ? path : `/${path}`));
+
+export function* dismissQueryMessagesSaga() {
+  const location = yield select(selectLocation);
+  const queryNext = getNextQuery(
+    [
+      { arg: 'info', remove: true },
+      { arg: 'warning', remove: true },
+      { arg: 'error', remove: true },
+    ],
+    true,
+    location
+  );
+  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
-const backTargetIgnore = ['/edit', '/new', 'login', '/reports'];
+export function* updatePathSaga({ path, args }) {
+  const relativePath = path.startsWith('/') ? path : `/${path}`;
+
+  if (args && (args.query || args.keepQuery)) {
+    const location = yield select(selectLocation);
+    let queryNext = {};
+    if (args.query) {
+      queryNext = getNextQuery(args.query, args.extend, location);
+    }
+    if (args.keepQuery) {
+      queryNext = location.get('query').toJS();
+    }
+    // convert to string
+    const queryNextString = getNextQueryString(queryNext);
+
+    yield put(push(`${relativePath}?${queryNextString}`));
+  } else {
+    yield put(push(relativePath));
+  }
+}
 
 export function* closeEntitySaga({ path }) {
   // the close icon is to function like back if possible, otherwise go to default path provided
-  const previousPath = yield select(selectPreviousPathname);
-  const currentPath = yield select(selectCurrentPathname);
-  if (previousPath // previous path exists
-    && previousPath !== currentPath // previous path is not the same as the current path
-    && !find(backTargetIgnore, (target) => previousPath.includes(target)) // and previous path is not one of the edit or login paths
-  ) {
-    yield put(goBack());
-  } else {
-    yield put(push(path || '/'));
-  }
+  const listSearch = yield select(selectListSearch);
+  yield put(push({ pathname: path || '/', search: listSearch }));
 }
 
 /**
@@ -580,7 +641,6 @@ export default function* rootSaga() {
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
-  // yield takeLatest(RESET_PASSWORD, resetSaga);
   yield takeLatest(RECOVER_PASSWORD, recoverSaga);
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
@@ -595,6 +655,7 @@ export default function* rootSaga() {
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
+  yield takeEvery(DISMISS_QUERY_MESSAGES, dismissQueryMessagesSaga);
 
   yield takeEvery(CLOSE_ENTITY, closeEntitySaga);
 }

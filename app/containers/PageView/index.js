@@ -18,7 +18,7 @@ import {
   // closeEntity
 } from 'containers/App/actions';
 
-import { CONTENT_PAGE } from 'containers/App/constants';
+import { PATHS, CONTENT_PAGE } from 'containers/App/constants';
 
 import Footer from 'components/Footer';
 import Loading from 'components/Loading';
@@ -110,7 +110,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
               type={CONTENT_PAGE}
               buttons={buttons}
             />
-            { !page && !dataReady &&
+            { !dataReady &&
               <Loading />
             }
             { !page && dataReady &&
@@ -121,7 +121,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
             { page && dataReady &&
               <EntityView
                 fields={this.getFields(page, isContributor)}
-                seemless
+                seamless
               />
             }
           </ViewContainer>
@@ -161,11 +161,8 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: () => {
-      dispatch(updatePath(`/pages/edit/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.PAGES}${PATHS.EDIT}/${props.params.id}`));
     },
-    // handleClose: () => {
-    //   dispatch(closeEntity('/pages'));
-    // },
   };
 }
 

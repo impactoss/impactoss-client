@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import { USER_ROLES } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 
 import {
   selectEntity,
@@ -12,7 +12,7 @@ import {
 import {
   entitiesSetAssociated,
   entitySetUser,
-  usersSetRoles,
+  usersByRole,
   prepareTaxonomiesMultiple,
 } from 'utils/entities';
 
@@ -59,5 +59,5 @@ export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
   (entities, associations) =>
-    usersSetRoles(entities, associations, USER_ROLES.CONTRIBUTOR)
+    usersByRole(entities, associations, USER_ROLES.CONTRIBUTOR.value)
 );

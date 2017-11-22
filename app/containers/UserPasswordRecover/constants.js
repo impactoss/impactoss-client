@@ -3,4 +3,4 @@
  * UserPasswordRecover constants
  *
  */
- export const RECOVER = 'nmrf/UserPasswordRecover/RECOVER';
+ export const RECOVER = 'impactoss/UserPasswordRecover/RECOVER';

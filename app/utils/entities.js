@@ -1,9 +1,11 @@
-import { Map } from 'immutable';
-import { reduce } from 'lodash/collection';
+import { Map, List, fromJS } from 'immutable';
+
+import { find, reduce } from 'lodash/collection';
 
 import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
 import asList from 'utils/as-list';
 import isNumber from 'utils/is-number';
+import appMessage from 'utils/app-message';
 
 // check if entity has nested connection by id
 export const testEntityEntityAssociation = (entity, path, associatedId) =>
@@ -158,6 +160,9 @@ export const entitiesIsAssociated = (entities, entityKey, associations, associat
       && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
     )
   );
+export const entitiesSetSingle = (entities, related, key, relatedKey) =>
+  entities && entities.map((entity) =>
+    entitySetSingle(entity, related, key, relatedKey));
 
 export const entitySetSingle = (entity, related, key, relatedKey) =>
   entity && entity.set(key,
@@ -191,7 +196,10 @@ export const prepareTaxonomiesAssociated = (taxonomies, categories, associations
   taxonomies && taxonomies
   .filter((tax) => tax.getIn(['attributes', tagsKey]))
   .map((tax) => tax.set('categories', entitiesSetAssociated(
-    categories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))),
+    categories.filter((cat) =>
+      attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))
+      && (!cat.getIn(['attributes', 'user_only']) || tagsKey === 'tags_users')
+    ),
     'category_id',
     associations,
     associationKey,
@@ -206,7 +214,10 @@ export const prepareTaxonomies = (taxonomies, categories, tagsKey) =>
   taxonomies && taxonomies
   .filter((tax) => tax.getIn(['attributes', tagsKey]))
   .map((tax) => tax.set('categories',
-    categories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id')))
+    categories.filter((cat) =>
+      attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))
+      && (!cat.getIn(['attributes', 'user_only']) || tagsKey === 'tags_users')
+    )
   ));
 
 export const prepareCategory = (category, users, taxonomies) =>
@@ -215,7 +226,7 @@ export const prepareCategory = (category, users, taxonomies) =>
     users
   );
 
-export const usersSetRoles = (users, userRoles, roleId) =>
+export const usersByRole = (users, userRoles, roleId) =>
   users && users
   .filter((user) => {
     const roles = userRoles.filter((association) =>
@@ -225,10 +236,15 @@ export const usersSetRoles = (users, userRoles, roleId) =>
     return roles && roles.size > 0;
   });
 
-export const getEntityTitle = (entity) =>
-  entity.getIn(['attributes', 'title'])
-  || entity.getIn(['attributes', 'friendly_name'])
-  || entity.getIn(['attributes', 'name']);
+export const getEntityTitle = (entity, labels, contextIntl) => {
+  if (labels && contextIntl) {
+    const label = find(labels, { value: parseInt(entity.get('id'), 10) });
+    if (label && label.message) {
+      return appMessage(contextIntl, label.message);
+    }
+  }
+  return entity.getIn(['attributes', 'title']) || entity.getIn(['attributes', 'name']);
+};
 
 export const getEntityReference = (entity, defaultToId = true) =>
   defaultToId
@@ -244,3 +260,40 @@ export const getCategoryShortTitle = (category) =>
       : category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']),
     10
   );
+
+
+const getInitialValue = (field) =>
+  typeof field.default !== 'undefined' ? field.default : '';
+
+export const getInitialFormData = (shape) => {
+  let fields = fromJS({
+    id: '',
+    attributes: {},
+  });
+  if (shape.fields) {
+    fields = reduce(shape.fields, (memo, field) =>
+      field.disabled ? memo : memo.setIn(['attributes', field.attribute], getInitialValue(field))
+    , fields);
+  }
+  if (shape.taxonomies) {
+    fields = fields.set('associatedTaxonomies', Map());
+  }
+  if (shape.connections) {
+    fields = reduce(shape.connections.tables, (memo, table) => {
+      if (table.table === 'recommendations') {
+        return fields.set('associatedRecommendations', List());
+      }
+      if (table.table === 'indicators') {
+        return fields.set('associatedIndicators', List());
+      }
+      if (table.table === 'measures') {
+        return fields.set('associatedMeasures', List());
+      }
+      if (table.table === 'sdgtargets') {
+        return fields.set('associatedSdgTargets', List());
+      }
+      return memo;
+    }, fields);
+  }
+  return fields;
+};

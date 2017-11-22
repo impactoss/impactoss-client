@@ -69,7 +69,7 @@ export function checkErrorMessagesExist(response) {
     return response.json.errors;
   } else if (response && response.json && response.json.error) {
     return response.json.error === Object(response.json.error)
-      ? mapErrors(response.json.errors)
+      ? mapErrors(response.json.error)
       : [response.json.error];
   } else if (response && response.json) {
     return response.json === Object(response.json)

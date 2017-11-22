@@ -42,4 +42,4 @@ export const SORT_OPTIONS = [
   },
 ];
 
-export const SORT_CHANGE = 'nmrf/CategoryList/SORT_CHANGE';
+export const SORT_CHANGE = 'impactoss/CategoryList/SORT_CHANGE';

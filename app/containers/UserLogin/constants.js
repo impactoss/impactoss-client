@@ -3,4 +3,4 @@
  * UserLogin constants
  *
  */
- export const LOGIN = 'nmrf/UserLogin/LOGIN';
+ export const LOGIN = 'impactoss/UserLogin/LOGIN';

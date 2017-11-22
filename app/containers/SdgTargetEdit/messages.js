@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.SdgTargetEdit.pageTitle',
+    id: 'app.containers.SdgTargetEdit.pageTitle',
     defaultMessage: 'Edit SDG target',
   },
   metaDescription: {
-    id: 'app.container.SdgTargetEdit.metaDescription',
+    id: 'app.containers.SdgTargetEdit.metaDescription',
     defaultMessage: 'Edit SDG target page description',
   },
   header: {
@@ -21,9 +21,5 @@ export default defineMessages({
   notFound: {
     id: 'app.containers.SdgTargetEdit.notFound',
     defaultMessage: 'Sorry no SDG target found',
-  },
-  fieldRequired: {
-    id: 'app.containers.SdgTargetNew.header',
-    defaultMessage: 'Required',
   },
 });

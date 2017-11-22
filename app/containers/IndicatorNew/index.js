@@ -25,12 +25,16 @@ import {
   getCheckboxField,
 } from 'utils/forms';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
 import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
 import validateRequired from 'components/forms/validators/validate-required';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -45,15 +49,16 @@ import {
 
 import {
   selectReady,
+  selectReadyForAuthCheck,
   selectMeasuresCategorised,
   selectSdgTargetsCategorised,
 } from 'containers/App/selectors';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -77,8 +82,11 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
+    }
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
     }
   }
 
@@ -118,10 +126,31 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
       icon: 'reminder',
       fields: [
-        getDateField(this.context.intl.formatMessage, appMessages, 'start_date', repeat, repeat ? 'start_date' : 'start_date_only'),
-        getCheckboxField(this.context.intl.formatMessage, appMessages, 'repeat', null, (model, value) => this.props.resetValidityOnRepeatChange(model, value, this.props.viewDomain.form.data)),
+        getDateField(
+          this.context.intl.formatMessage,
+          appMessages,
+          'start_date',
+          repeat,
+          repeat ? 'start_date' : 'start_date_only',
+          (model, value) => this.props.onStartDateChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
+        ),
+        getCheckboxField(
+          this.context.intl.formatMessage,
+          appMessages,
+          'repeat',
+          null,
+          (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
+        ),
         repeat ? getFrequencyField(this.context.intl.formatMessage, appMessages) : null,
-        repeat ? getDateField(this.context.intl.formatMessage, appMessages, 'end_date', repeat) : null,
+        repeat ? getDateField(
+          this.context.intl.formatMessage,
+          appMessages,
+          'end_date',
+          repeat,
+          'end_date',
+          (model, value) => this.props.onEndDateChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
+        )
+        : null,
         renderUserControl(
           users,
           this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
@@ -144,7 +173,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             },
           ]}
         />
-        <Content>
+        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -161,14 +190,16 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             }
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
@@ -221,13 +252,16 @@ IndicatorNew.propTypes = {
   onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
-  resetValidityOnRepeatChange: PropTypes.func,
+  onRepeatChange: PropTypes.func,
+  onStartDateChange: PropTypes.func,
+  onEndDateChange: PropTypes.func,
 };
 
 IndicatorNew.contextTypes = {
@@ -237,6 +271,7 @@ IndicatorNew.contextTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   // all measures,
   measures: selectMeasuresCategorised(state),
   // all sdgtargets,
@@ -256,16 +291,66 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    resetValidityOnRepeatChange: (repeatModel, repeat, formData) => {
-      dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
-        required: repeat,
-      }));
-      dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', {
-        required: repeat && !validateRequired(formData.getIn(['attributes', 'start_date'])),
-      }));
+    onRepeatChange: (repeatModel, repeat, formData, formatMessage) => {
+      // reset repeat erros when repeat turned off
+      if (!repeat) {
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', {
+          required: false,
+          startDateAfterEndDateError: false,
+        }));
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', {
+          required: false,
+          endDateBeforeStartDateError: false,
+        }));
+      } else if (validateRequired(formData.getIn(['attributes', 'start_date']))
+        && validateRequired(formData.getIn(['attributes', 'end_date']))
+        && !validateDateAfterDate(formData.getIn(['attributes', 'end_date']), formData.getIn(['attributes', 'start_date']))
+      ) {
+        dispatch(formActions.setErrors(
+          'indicatorNew.form.data.attributes.start_date',
+          { startDateAfterEndDateError: formatMessage(appMessages.forms.startDateAfterEndDateError) }
+        ));
+        dispatch(formActions.setErrors(
+          'indicatorNew.form.data.attributes.end_date',
+          { endDateBeforeStartDateError: formatMessage(appMessages.forms.endDateBeforeStartDateError) }
+        ));
+      }
       dispatch(formActions.change(repeatModel, repeat));
+    },
+    onStartDateChange: (dateModel, dateValue, formData, formatMessage) => {
+      // validateDateAfterDate if repeat and both dates present
+      if (formData.getIn(['attributes', 'repeat'])
+        && validateRequired(formData.getIn(['attributes', 'end_date']))
+        && validateRequired(dateValue)
+        && !validateDateAfterDate(formData.getIn(['attributes', 'end_date']), dateValue)
+      ) {
+        dispatch(formActions.setErrors(
+          'indicatorNew.form.data.attributes.start_date',
+          { startDateAfterEndDateError: formatMessage(appMessages.forms.startDateAfterEndDateError) }
+        ));
+      } else {
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', { startDateAfterEndDateError: false }));
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', { endDateBeforeStartDateError: false }));
+      }
+      dispatch(formActions.change(dateModel, dateValue));
+    },
+    onEndDateChange: (dateModel, dateValue, formData, formatMessage) => {
+      if (formData.getIn(['attributes', 'repeat'])
+        && validateRequired(dateValue)
+        && validateRequired(formData.getIn(['attributes', 'start_date']))
+        && !validateDateAfterDate(dateValue, formData.getIn(['attributes', 'start_date']))
+      ) {
+        dispatch(formActions.setErrors(
+          'indicatorNew.form.data.attributes.end_date',
+          { endDateBeforeStartDateError: formatMessage(appMessages.forms.endDateBeforeStartDateError) }
+        ));
+      } else {
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', { endDateBeforeStartDateError: false }));
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', { startDateAfterEndDateError: false }));
+      }
+      dispatch(formActions.change(dateModel, dateValue));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
@@ -275,12 +360,12 @@ function mapDispatchToProps(dispatch) {
     },
     handleSubmitFail: (formData, formatMessage) => {
       if (formData.$form.errors.endDatePresent) {
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', {
           required: true,
         }));
       }
       if (formData.$form.errors.startDatePresent) {
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
+        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', {
           required: true,
         }));
       }
@@ -336,7 +421,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath('/indicators'));
+      dispatch(updatePath(PATHS.INDICATORS));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

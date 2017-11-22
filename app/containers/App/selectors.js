@@ -15,7 +15,9 @@ import { Map } from 'immutable';
 import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 
-import { USER_ROLES } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
+import { PARAMS } from 'containers/App/constants';
+
 import {
   filterEntitiesByAttributes,
   filterEntitiesByKeywords,
@@ -47,57 +49,86 @@ export const selectReadyForAuthCheck = createSelector(
   (isAuthenticating, rolesReady) => !isAuthenticating && rolesReady
 );
 
-const selectSessionUser = createSelector(
+export const selectSessionUser = createSelector(
   getGlobal,
   (state) => state.get('user')
 );
 
-export const selectSessionUserId = createSelector(
-  selectSessionUser,
-  (sessionUser) =>
-    sessionUser.get('attributes')
-    && sessionUser.get('attributes').id.toString()
-);
-
 export const selectIsSignedIn = createSelector(
   selectSessionUser,
-  (sessionUser) => sessionUser.get('isSignedIn')
+  (sessionUser) => sessionUser && sessionUser.get('isSignedIn')
+);
+
+export const selectSessionUserAttributes = createSelector(
+  selectSessionUser,
+  (sessionUser) => sessionUser && sessionUser.get('attributes')
+);
+
+export const selectSessionUserId = createSelector(
+  selectSessionUserAttributes,
+  (sessionUserAttributes) => sessionUserAttributes && sessionUserAttributes.id.toString()
 );
 
 // const makeSessionUserRoles = () => selectSessionUserRoles;
 export const selectSessionUserRoles = createSelector(
   (state) => state,
-  selectSessionUser,
-  (state, sessionUser) => {
-    if (sessionUser.get('attributes') && sessionUser.get('isSignedIn')) {
-      const roles = selectEntitiesWhere(state, {
-        path: 'user_roles',
-        where: {
-          user_id: sessionUser.get('attributes').id,
-        },
-      });
-      return roles.map((role) => role.getIn(['attributes', 'role_id'])).toArray();
-    }
-    return Map();
-  }
+  selectIsSignedIn,
+  selectSessionUserId,
+  (state, isSignedIn, sessionUserId) => isSignedIn && sessionUserId
+    ? selectEntitiesWhere(state, {
+      path: 'user_roles',
+      where: { user_id: sessionUserId },
+    })
+    .map((role) => role.getIn(['attributes', 'role_id']))
+    .toArray()
+    : Map()
 );
+
 
 export const selectIsUserAdmin = createSelector(
   selectSessionUserRoles,
-  (userRoles) => userRoles.includes(USER_ROLES.ADMIN)
+  (userRoles) => userRoles.includes(USER_ROLES.ADMIN.value)
 );
 
 export const selectIsUserManager = createSelector(
   selectSessionUserRoles,
-  (userRoles) => userRoles.includes(USER_ROLES.MANAGER)
-  || userRoles.includes(USER_ROLES.ADMIN)
+  (userRoles) => userRoles.includes(USER_ROLES.MANAGER.value)
+  || userRoles.includes(USER_ROLES.ADMIN.value)
 );
 
 export const selectIsUserContributor = createSelector(
   selectSessionUserRoles,
-  (userRoles) => userRoles.includes(USER_ROLES.CONTRIBUTOR)
-    || userRoles.includes(USER_ROLES.MANAGER)
-    || userRoles.includes(USER_ROLES.ADMIN)
+  (userRoles) => userRoles.includes(USER_ROLES.CONTRIBUTOR.value)
+    || userRoles.includes(USER_ROLES.MANAGER.value)
+    || userRoles.includes(USER_ROLES.ADMIN.value)
+);
+
+
+export const selectHasUserRole = createSelector(
+  selectIsUserAdmin,
+  selectIsUserManager,
+  selectIsUserContributor,
+  (isAdmin, isManager, isContributor) => ({
+    [USER_ROLES.ADMIN.value]: isAdmin,
+    [USER_ROLES.MANAGER.value]: isManager,
+    [USER_ROLES.CONTRIBUTOR.value]: isContributor,
+  })
+);
+
+export const selectSessionUserHighestRoleId = createSelector(
+  selectSessionUserRoles,
+  (userRoles) => {
+    if (userRoles.includes(USER_ROLES.ADMIN.value)) {
+      return USER_ROLES.ADMIN.value;
+    }
+    if (userRoles.includes(USER_ROLES.MANAGER.value)) {
+      return USER_ROLES.MANAGER.value;
+    }
+    if (userRoles.includes(USER_ROLES.CONTRIBUTOR.value)) {
+      return USER_ROLES.CONTRIBUTOR.value;
+    }
+    return USER_ROLES.DEFAULT.value;
+  }
 );
 
 
@@ -129,11 +160,49 @@ export const selectCurrentPathname = createSelector(
   }
 );
 
+export const selectRedirectOnAuthSuccessPath = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.getIn(['locationBeforeTransitions', 'query', PARAMS.REDIRECT_ON_AUTH_SUCCESS]);
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
+export const selectQueryMessages = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return ({
+        info: routeState.getIn(['locationBeforeTransitions', 'query', 'info']),
+        warning: routeState.getIn(['locationBeforeTransitions', 'query', 'warning']),
+        error: routeState.getIn(['locationBeforeTransitions', 'query', 'error']),
+        infotype: routeState.getIn(['locationBeforeTransitions', 'query', 'infotype']),
+      });
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
 export const selectPreviousPathname = createSelector(
   getRoute,
   (routeState) => {
     try {
       return routeState.getIn(['locationBeforeTransitions', 'pathnamePrevious']);
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
+export const selectListSearch = createSelector(
+  getRoute,
+  (routeState) => {
+    try {
+      return routeState.getIn(['locationBeforeTransitions', 'listSearch']);
     } catch (error) {
       return null;
     }
@@ -218,7 +287,6 @@ export const selectSortByQuery = createSelector(
   (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('sort')
 );
-
 
 // NEW performant way of selecting and querying entities
 

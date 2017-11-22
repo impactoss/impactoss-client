@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.HomePage.pageTitle',
+    id: 'app.containers.HomePage.pageTitle',
     defaultMessage: 'Sadata Home',
   },
   metaDescription: {
-    id: 'app.container.HomePage.metaDescription',
+    id: 'app.containers.HomePage.metaDescription',
     defaultMessage: 'Home page description',
   },
   intro: {

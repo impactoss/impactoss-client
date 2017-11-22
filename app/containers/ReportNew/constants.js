@@ -5,7 +5,7 @@
  */
 import { fromJS } from 'immutable';
 
-export const SAVE = 'nmrf/ReportNew/SAVE';
+export const SAVE = 'impactoss/ReportNew/SAVE';
 
 export const FORM_INITIAL = fromJS({
   attributes: {

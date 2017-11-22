@@ -1,18 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 import Component from 'components/styled/Component';
 import SupTitle from 'components/SupTitle';
 import TaxonomySidebarItem from 'components/categoryList/TaxonomySidebarItem';
 
-import messages from './messages';
+import SidebarHeader from 'components/styled/SidebarHeader';
 
-const Header = styled.div`
-  padding: 3em 2em 1em;
-  background-color: ${palette('light', 2)}
-`;
+import messages from './messages';
 
 class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -20,9 +15,9 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
 
     return (
       <Component>
-        <Header>
+        <SidebarHeader>
           <SupTitle title={this.context.intl.formatMessage(messages.title)} />
-        </Header>
+        </SidebarHeader>
         {taxonomies.map((taxonomy, i) =>
           <TaxonomySidebarItem key={i} taxonomy={taxonomy} />
         )}

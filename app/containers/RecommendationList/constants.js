@@ -1,4 +1,4 @@
-import { PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'containers/App/constants';
+import { USER_ROLES, PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'themes/config';
 
 export const DEPENDENCIES = [
   'user_roles',
@@ -52,7 +52,7 @@ export const CONFIG = {
     options: [
       {
         search: true,
-        label: 'entities.measures.plural',
+        message: 'entities.measures.plural',
         path: 'measures', // filter by recommendation connection
         clientPath: 'actions', // filter by recommendation connection
         key: 'measure_id',
@@ -65,15 +65,16 @@ export const CONFIG = {
     options: [
       {
         search: false,
-        label: 'attributes.accepted',
+        message: 'attributes.accepted',
         attribute: 'accepted',
         options: ACCEPTED_STATUSES,
       },
       {
         search: false,
-        label: 'attributes.draft',
+        message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
+        role: USER_ROLES.CONTRIBUTOR.value,
       },
     ],
   },

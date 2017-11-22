@@ -12,24 +12,26 @@ injectGlobal`
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.64em;
-    color: #344547;
+    color: #1c2121;
   }
   button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
-
+  :focus, :visited:focus {
+    outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
+  }
   #app {
-    background-color: #F1F3F3;
+    background-color: #f1f4f4;
     min-height: 100%;
     min-width: 100%;
   }
 
   a {
-    color: #eb6e51;
+    color: #007db3;
     text-decoration: none;
 
     &:hover {
-      color: #d66149;
+      color: #0072a3;
     }
   }
   h1, h2, h3, h4, h5, h6 {
@@ -117,7 +119,6 @@ injectGlobal`
     right: 40px;
     bottom: 40px;
     border: 0;
-    background: #F1F3F3;
     overflow: auto;
     --webkit-overflow-scrolling: touch;
     border-radius: 0;
@@ -135,5 +136,11 @@ injectGlobal`
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.85);
+  }
+
+  [type="checkbox"] {
+    vertical-align: middle;
+    position: relative;
+    bottom: 1px;
   }
 `;

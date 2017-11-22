@@ -125,9 +125,14 @@ export const selectReports = createSelector(
   (state) => selectEntities(state, 'progress_reports'),
   (state) => selectEntities(state, 'due_dates'),
   (id, reports, dates) =>
-    reports && reports
-      .filter((report) => attributesEqual(report.getIn(['attributes', 'indicator_id']), id))
-      .map((report) => entitySetSingle(report, dates, 'due_date', 'due_date_id'))
+    reports && sortEntities(
+      reports
+        .filter((report) => attributesEqual(report.getIn(['attributes', 'indicator_id']), id))
+        .map((report) => entitySetSingle(report, dates, 'due_date', 'due_date_id')),
+      'desc',
+      'dueDateThenUpdated',
+      'date'
+    )
 );
 
 export const selectDueDates = createSelector(

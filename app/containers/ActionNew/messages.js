@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.ActionNew.pageTitle',
+    id: 'app.containers.ActionNew.pageTitle',
     defaultMessage: 'New Action',
   },
   metaDescription: {
-    id: 'app.container.ActionNew.metaDescription',
+    id: 'app.containers.ActionNew.metaDescription',
     defaultMessage: 'New Action page description',
   },
   header: {

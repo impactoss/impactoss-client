@@ -15,9 +15,15 @@ import {
   redirectIfNotPermitted,
 } from 'containers/App/actions';
 
-import { selectReady, selectUserConnections, selectUserTaxonomies } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectReadyForAuthCheck,
+  selectUserConnections,
+  selectUserTaxonomies,
+} from 'containers/App/selectors';
+
 import appMessages from 'containers/App/messages';
-import { USER_ROLES } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 
 import EntityList from 'containers/EntityList';
 
@@ -36,14 +42,13 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
   }
 
   render() {
     const { dataReady } = this.props;
-
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'users',
@@ -79,6 +84,7 @@ UserList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
@@ -91,6 +97,7 @@ UserList.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   entities: selectUsers(state, fromJS(props.location.query)),
   taxonomies: selectUserTaxonomies(state),
   connections: selectUserConnections(state),
@@ -101,7 +108,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
   };
 }

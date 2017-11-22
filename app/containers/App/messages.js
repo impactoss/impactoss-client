@@ -16,10 +16,6 @@ export default defineMessages({
       defaultMessage: 'Samoa\'s home of human rights implementation',
     },
   },
-  overview: {
-    id: 'app.containers.App.overview',
-    defaultMessage: 'Overview',
-  },
   buttons: {
     cancel: {
       id: 'app.containers.App.buttons.cancel',
@@ -45,6 +41,24 @@ export default defineMessages({
       id: 'app.containers.App.buttons.assign',
       defaultMessage: 'Update',
     },
+    previous: {
+      id: 'app.containers.App.buttons.previous',
+      defaultMessage: 'Previous',
+    },
+    next: {
+      id: 'app.containers.App.buttons.next',
+      defaultMessage: 'Next',
+    },
+    import: {
+      id: 'app.containers.App.buttons.import',
+      defaultMessage: 'Import',
+    },
+  },
+  labels: {
+    perPage: {
+      id: 'app.containers.App.labels.perPage',
+      defaultMessage: 'Per page',
+    },
   },
   forms: {
     fieldRequired: {
@@ -53,7 +67,23 @@ export default defineMessages({
     },
     dateFormatError: {
       id: 'app.containers.App.forms.dateFormatError',
-      defaultMessage: 'Please enter the date in the required format: dd/mm/yyyy', // change to format according to locale
+      defaultMessage: 'Please enter the date in the required format: {format}',
+    },
+    emailFormatError: {
+      id: 'app.containers.App.forms.emailFormatError',
+      defaultMessage: 'Please enter a valid email address',
+    },
+    passwordMismatchError: {
+      id: 'app.containers.App.forms.passwordMismatchError',
+      defaultMessage: 'Password confirmation does not match password',
+    },
+    passwordShortError: {
+      id: 'app.containers.App.forms.passwordShortError',
+      defaultMessage: 'Password is too short (minimum is 6 characters)',
+    },
+    passwordInvalidError: {
+      id: 'app.containers.App.forms.passwordInvalidError',
+      defaultMessage: 'Current password does not match password on file',
     },
     numberError: {
       id: 'app.containers.App.forms.numberError',
@@ -67,27 +97,97 @@ export default defineMessages({
       id: 'app.containers.App.forms.startDateAfterEndDateError',
       defaultMessage: 'Start date must be before end date',
     },
-    multipleErrors: {
-      id: 'app.containers.App.forms.multipleErrors',
-      defaultMessage: 'One or more fields have errors.',
-    },
     outdatedError: {
       id: 'app.containers.App.forms.outdatedError',
-      defaultMessage: 'Sorry, this record has become outdated. Please review the latest server version below.',
+      defaultMessage: 'Item outdated: this item had been updated on the server. Please review the latest server version below.',
     },
-    outdatedErrorList: {
-      id: 'app.containers.App.forms.outdatedErrorList',
-      defaultMessage: 'Record {recordReference}: Sorry, this record has become outdated in the meantime. Please review the latest server version above.',
+    titleRequiredError: {
+      id: 'app.containers.App.forms.titleRequiredError',
+      defaultMessage: '"Title" is required. ',
     },
-    otherErrorList: {
-      id: 'app.containers.App.forms.otherErrorList',
-      defaultMessage: 'Record {recordReference}: ',
+    referenceRequiredError: {
+      id: 'app.containers.App.forms.referenceRequiredError',
+      defaultMessage: '"Reference" is required. ',
     },
   },
   hints: {
     autoReference: {
       id: 'app.containers.App.hints.autoReference',
       defaultMessage: 'Leave blank to assign database id',
+    },
+    user_only: {
+      id: 'app.containers.App.hints.user_only',
+      defaultMessage: 'Check to categorise users only',
+    },
+  },
+  textValues: {
+    user_only: {
+      id: 'app.containers.App.textValues.user_only',
+      defaultMessage: 'Categorises users only',
+    },
+  },
+  import: {
+    required: {
+      id: 'app.containers.App.import.required',
+      defaultMessage: 'Required: ',
+    },
+    text: {
+      id: 'app.containers.App.import.text',
+      defaultMessage: 'text',
+    },
+    markdown: {
+      id: 'app.containers.App.import.text',
+      defaultMessage: 'text (markdown supported)',
+    },
+    bool: {
+      id: 'app.containers.App.import.bool',
+      defaultMessage: 'boolean (true/false)',
+    },
+    date: {
+      id: 'app.containers.App.import.date',
+      defaultMessage: 'date ({format})',
+    },
+  },
+  importFields: {
+    title: {
+      id: 'app.containers.App.importFields.title',
+      defaultMessage: 'Title',
+    },
+    reference: {
+      id: 'app.containers.App.importFields.reference',
+      defaultMessage: 'Reference',
+    },
+    referenceRequired: {
+      id: 'app.containers.App.importFields.referenceRequired',
+      defaultMessage: 'Reference',
+    },
+    description: {
+      id: 'app.containers.App.importFields.description',
+      defaultMessage: 'Description',
+    },
+    accepted: {
+      id: 'app.containers.App.importFields.accepted',
+      defaultMessage: 'Accepted',
+    },
+    response: {
+      id: 'app.containers.App.importFields.response',
+      defaultMessage: 'Government response',
+    },
+    outcome: {
+      id: 'app.containers.App.importFields.outcome',
+      defaultMessage: 'Desired outcome',
+    },
+    indicator_summary: {
+      id: 'app.containers.App.importFields.indicator_summary',
+      defaultMessage: 'Indicator summary',
+    },
+    target_date: {
+      id: 'app.containers.App.importFields.target_date',
+      defaultMessage: 'Target Date',
+    },
+    target_date_comment: {
+      id: 'app.containers.App.importFields.target_date_comment',
+      defaultMessage: 'Target date comment',
     },
   },
   placeholders: {
@@ -97,18 +197,34 @@ export default defineMessages({
     },
     name: {
       id: 'app.containers.App.placeholders.name',
-      defaultMessage: 'Enter user name',
+      defaultMessage: 'Full name',
     },
     email: {
       id: 'app.containers.App.placeholders.email',
       defaultMessage: 'Email address',
     },
+    password: {
+      id: 'app.containers.App.placeholders.password',
+      defaultMessage: 'Password',
+    },
+    passwordCurrent: {
+      id: 'app.containers.App.placeholders.passwordCurrent',
+      defaultMessage: 'Current Password',
+    },
+    passwordNew: {
+      id: 'app.containers.App.placeholders.passwordNew',
+      defaultMessage: 'New Password',
+    },
+    passwordConfirmation: {
+      id: 'app.containers.App.placeholders.passwordConfirmation',
+      defaultMessage: 'Confirm Password',
+    },
     short_title: {
-      id: 'app.containers.App.placeholders.title',
+      id: 'app.containers.App.placeholders.short_title',
       defaultMessage: 'Abbr.',
     },
     menu_title: {
-      id: 'app.containers.App.placeholders.title',
+      id: 'app.containers.App.placeholders.menu_title',
       defaultMessage: 'Menu title',
     },
     order: {
@@ -136,11 +252,11 @@ export default defineMessages({
       defaultMessage: 'Enter desired outcome',
     },
     indicator_summary: {
-      id: 'app.containers.App.attributes.indicator_summary',
+      id: 'app.containers.App.placeholders.indicator_summary',
       defaultMessage: 'Enter indicator summary',
     },
     target_date_comment: {
-      id: 'app.containers.App.attributes.target_date_comment',
+      id: 'app.containers.App.placeholders.target_date_comment',
       defaultMessage: 'Additional information',
     },
     url: {
@@ -293,9 +409,9 @@ export default defineMessages({
       id: 'app.containers.App.attributes.due_date_id',
       defaultMessage: 'Due date',
     },
-    due_date_id_empty: {
-      id: 'app.containers.App.attributes.due_date_id_empty',
-      defaultMessage: 'No report scheduled',
+    user_only: {
+      id: 'app.containers.App.attributes.user_only',
+      defaultMessage: 'Users only',
     },
     manager_id: {
       indicators: {
@@ -328,6 +444,40 @@ export default defineMessages({
         id: 'app.containers.App.attributes.meta.updated_at',
         defaultMessage: 'Last updated',
       },
+    },
+  },
+  nav: {
+    overview: {
+      id: 'app.containers.App.nav.overview',
+      defaultMessage: 'Overview',
+    },
+    taxonomies: {
+      id: 'app.containers.App.nav.taxonomies',
+      defaultMessage: 'Categories',
+    },
+    measures: {
+      id: 'app.containers.App.nav.measures',
+      defaultMessage: 'Actions',
+    },
+    indicators: {
+      id: 'app.containers.App.nav.indicators',
+      defaultMessage: 'Indicators',
+    },
+    recommendations: {
+      id: 'app.containers.App.nav.recommendations',
+      defaultMessage: 'Recommendations',
+    },
+    sdgtargets: {
+      id: 'app.containers.App.nav.sdgtargets',
+      defaultMessage: 'SDG targets',
+    },
+    pages: {
+      id: 'app.containers.App.nav.pages',
+      defaultMessage: 'Page admin',
+    },
+    users: {
+      id: 'app.containers.App.nav.users',
+      defaultMessage: 'User admin',
     },
   },
   entities: {
@@ -453,7 +603,7 @@ export default defineMessages({
         defaultMessage: 'Extraordinary (no due date assigned)',
       },
       unscheduled_short: {
-        id: 'app.containers.App.entities.progress_reports.unscheduled',
+        id: 'app.containers.App.entities.progress_reports.unscheduled_short',
         defaultMessage: 'Extraordinary',
       },
       showAll: {
@@ -605,8 +755,20 @@ export default defineMessages({
         defaultMessage: 'Report due',
       },
       scheduled: {
-        id: 'app.containers.App.entities.due_dates.due',
+        id: 'app.containers.App.entities.due_dates.scheduled',
         defaultMessage: 'Report scheduled',
+      },
+      overdueNext: {
+        id: 'app.containers.App.entities.due_dates.overdueNext',
+        defaultMessage: 'Next report overdue',
+      },
+      dueNext: {
+        id: 'app.containers.App.entities.due_dates.dueNext',
+        defaultMessage: 'Next report due',
+      },
+      scheduledNext: {
+        id: 'app.containers.App.entities.due_dates.scheduledNext',
+        defaultMessage: 'Next report scheduled',
       },
       showAll: {
         id: 'app.containers.App.entities.due_dates.showAll',
@@ -640,9 +802,109 @@ export default defineMessages({
         id: 'app.containers.App.entities.roles.plural',
         defaultMessage: 'User roles',
       },
-      defaultRole: {
-        id: 'app.containers.App.entities.user_roles.defaultRole',
-        defaultMessage: 'No role assigned',
+    },
+  },
+  messages: {
+    notSignedIn: {
+      id: 'app.containers.App.messages.notSignedIn',
+      defaultMessage: 'Please sign in or register first to access this page',
+    },
+    alreadySignedIn: {
+      id: 'app.containers.App.messages.alreadySignedIn',
+      defaultMessage: 'Welcome back!',
+    },
+    signInGuestReport: {
+      id: 'app.containers.App.messages.signInGuestReport',
+      defaultMessage: 'Please sign in or register first to submit a progress report',
+    },
+    submitInvalid: {
+      id: 'app.containers.App.messages.submitInvalid',
+      defaultMessage: 'One or more fields have errors.',
+    },
+    recoverSuccess: {
+      id: 'app.containers.App.messages.recoverSuccess',
+      defaultMessage: 'Please check your email and follow the instructions to reset your password.',
+    },
+    createdAsGuest: {
+      id: 'app.containers.App.messages.createdAsGuest',
+      defaultMessage: '{entityType} created successfully. It will become publicly available once verified and published by an authorised user.',
+    },
+  },
+  ui: {
+    userRoles: {
+      admin: {
+        id: 'app.containers.App.ui.userRoles.admin',
+        defaultMessage: 'Administrator',
+      },
+      manager: {
+        id: 'app.containers.App.ui.userRoles.manager',
+        defaultMessage: 'Manager',
+      },
+      contributor: {
+        id: 'app.containers.App.ui.userRoles.contributor',
+        defaultMessage: 'Contributor',
+      },
+      default: {
+        id: 'app.containers.App.ui.userRoles.default',
+        defaultMessage: 'Guest (no role assigned)',
+      },
+    },
+    publishStatuses: {
+      draft: {
+        id: 'app.containers.App.ui.publishStatuses.draft',
+        defaultMessage: 'Draft',
+      },
+      public: {
+        id: 'app.containers.App.ui.publishStatuses.public',
+        defaultMessage: 'Public',
+      },
+    },
+    docPublishStatuses: {
+      public: {
+        id: 'app.containers.App.ui.docPublishStatuses.public',
+        defaultMessage: 'Public',
+      },
+      private: {
+        id: 'app.containers.App.ui.docPublishStatuses.private',
+        defaultMessage: 'Private',
+      },
+    },
+    acceptedStatuses: {
+      accepted: {
+        id: 'app.containers.App.ui.acceptedStatuses.accepted',
+        defaultMessage: 'Accepted',
+      },
+      noted: {
+        id: 'app.containers.App.ui.acceptedStatuses.noted',
+        defaultMessage: 'Not accepted',
+      },
+    },
+    reportFrequencies: {
+      monthly: {
+        id: 'app.containers.App.ui.reportFrequencies.monthly',
+        defaultMessage: 'Monthly',
+      },
+      quarterly: {
+        id: 'app.containers.App.ui.reportFrequencies.quarterly',
+        defaultMessage: 'Quarterly',
+      },
+      semiannual: {
+        id: 'app.containers.App.ui.reportFrequencies.semiannual',
+        defaultMessage: 'Semiannual',
+      },
+      annual: {
+        id: 'app.containers.App.ui.reportFrequencies.annual',
+        defaultMessage: 'Annual',
+      },
+    },
+    sortOrderOptions: {
+      asc: {
+        id: 'app.containers.App.ui.sortOrderOptions.asc',
+        defaultMessage: 'Ascending',
+      },
+      desc: {
+        id: 'app.containers.App.ui.sortOrderOptions.desc',
+        defaultMessage: 'Descending',
       },
     },
   },

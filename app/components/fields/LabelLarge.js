@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import ListLabel from './ListLabel';
+import Label from './Label';
 
-const LabelLarge = styled(ListLabel)`
+const LabelLarge = styled(Label)`
+  font-size: 1.8em;
+  color: ${palette('text', 0)};
   padding-bottom: 0.85em;
   border-bottom: none;
-  font-size: 1.8em;
-  color: ${palette('dark', 0)};
 `;
 
 export default LabelLarge;

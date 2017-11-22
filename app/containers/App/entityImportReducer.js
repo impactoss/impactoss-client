@@ -7,6 +7,7 @@ import {
   SAVE_ERROR,
   SAVE_SUCCESS,
   RESET_PROGRESS,
+  LOGOUT_SUCCESS,
 } from 'containers/App/constants';
 
 import { checkResponseError } from 'utils/request';
@@ -19,6 +20,8 @@ const initialState = fromJS({
 
 export const entityImportReducer = (state = initialState, action) => {
   switch (action.type) {
+    case LOGOUT_SUCCESS:
+      return initialState;
     case RESET_PROGRESS:
     case LOCATION_CHANGE:
       return initialState;
@@ -27,7 +30,12 @@ export const entityImportReducer = (state = initialState, action) => {
     case SAVE_SUCCESS:
       return action.data ? state.setIn(['success', action.data.timestamp], action.data) : state;
     case SAVE_ERROR:
-      return action.data ? state.setIn(['errors', action.data.timestamp], checkResponseError(action.error)) : state;
+      return action.data
+        ? state.setIn(
+          ['errors', action.data.timestamp],
+          { data: action.data, error: checkResponseError(action.error) }
+        )
+        : state;
     default:
       return state;
   }

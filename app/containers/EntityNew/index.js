@@ -11,19 +11,25 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { getEntityFields } from 'utils/forms';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+import { hasNewError } from 'utils/entity-form';
+
 import {
   newEntity,
   submitInvalid,
   saveErrorDismiss,
 } from 'containers/App/actions';
+
+import { selectEntity } from 'containers/App/selectors';
+
 import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import Content from 'components/Content';
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import { selectDomain } from './selectors';
 import { FORM_INITIAL } from './constants';
@@ -34,16 +40,31 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
   componentWillMount() {
     this.props.initialiseForm('entityNew.form.data', FORM_INITIAL);
   }
+  componentWillReceiveProps(nextProps) {
+    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
+      scrollToTop(this.ScrollContainer);
+    }
+  }
 
   render() {
-    const { viewDomain, path, attributes, inModal } = this.props;
+    const { viewDomain, path, attributes, inModal, taxonomy } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
+
+    let pageTitle = this.context.intl.formatMessage(messages[path].pageTitle);
+    if (taxonomy && taxonomy.get('attributes')) {
+      pageTitle = this.context.intl.formatMessage(messages[path].pageTitleTaxonomy, {
+        taxonomy: taxonomy.getIn(['attributes', 'title']),
+      });
+    }
 
     return (
       <div>
-        <Content noPaddingBottom={inModal}>
+        <Content
+          innerRef={(node) => { this.ScrollContainer = node; }}
+          inModal={inModal}
+        >
           <ContentHeader
-            title={this.context.intl.formatMessage(messages[path].pageTitle)}
+            title={pageTitle}
             type={CONTENT_MODAL}
             icon={path}
             buttons={[{
@@ -57,14 +78,16 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             }]}
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
@@ -82,7 +105,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             )}
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
-            fields={getEntityFields(path, null, this.context.intl.formatMessage, appMessages)}
+            fields={getEntityFields(path, { taxonomy }, this.context.intl.formatMessage, appMessages)}
           />
           {saveSending &&
             <Loading />
@@ -96,6 +119,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
 EntityNew.propTypes = {
   path: PropTypes.string.isRequired,
   attributes: PropTypes.object,
+  taxonomy: PropTypes.object,
   handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
@@ -112,8 +136,11 @@ EntityNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
+  taxonomy: props.attributes && props.attributes.get('taxonomy_id')
+    ? selectEntity(state, { path: 'taxonomies', id: props.attributes.get('taxonomy_id') })
+    : null,
 });
 
 function mapDispatchToProps(dispatch, props) {

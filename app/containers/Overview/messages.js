@@ -19,25 +19,29 @@ export default defineMessages({
     defaultMessage: 'Start exploring by selecting a category group from the sidebar or one of the subjects from the diagram below.',
   },
   buttons: {
+    draft: {
+      id: 'app.containers.Overview.buttons.draft',
+      defaultMessage: '({count} draft)',
+    },
     recommendations: {
       id: 'app.containers.Overview.buttons.recommendations',
-      defaultMessage: 'Recommendations',
+      defaultMessage: '{count} Recommendations',
     },
     sdgtargets: {
       id: 'app.containers.Overview.buttons.sdgtargets',
-      defaultMessage: 'SDG targets',
+      defaultMessage: '{count} SDG targets',
     },
     measures: {
       id: 'app.containers.Overview.buttons.measures',
       defaultMessage: 'Implementation plan',
     },
     measuresAdditional: {
-      id: 'app.containers.Overview.buttons.measures',
-      defaultMessage: 'Government actions',
+      id: 'app.containers.Overview.buttons.measuresAdditional',
+      defaultMessage: '{count} Government actions',
     },
     indicators: {
       id: 'app.containers.Overview.buttons.indicators',
-      defaultMessage: 'Indicators',
+      defaultMessage: '{count} Indicators',
     },
   },
   diagram: {

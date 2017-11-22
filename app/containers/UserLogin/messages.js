@@ -7,15 +7,15 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.UserLogin.pageTitle',
+    id: 'app.containers.UserLogin.pageTitle',
     defaultMessage: 'Sign in',
   },
   metaDescription: {
-    id: 'app.container.UserLogin.metaDescription',
+    id: 'app.containers.UserLogin.metaDescription',
     defaultMessage: 'Sign in page description',
   },
   header: {
-    id: 'nmrf.containers.UserLogin.header',
+    id: 'app.containers.UserLogin.header',
     defaultMessage: 'Sign in',
   },
   registerLinkBefore: {
@@ -30,22 +30,8 @@ export default defineMessages({
     id: 'app.containers.UserLogin.recoverPasswordLink',
     defaultMessage: 'I forgot my password',
   },
-  fields: {
-    email: {
-      placeholder: {
-        id: 'app.containers.UserLogin.fields.email.placeholder',
-        defaultMessage: 'Email address',
-      },
-    },
-    password: {
-      placeholder: {
-        id: 'app.containers.UserLogin.fields.password.placeholder',
-        defaultMessage: 'Password',
-      },
-    },
-  },
   submit: {
-    id: 'nmrf.containers.UserLogin.submit',
+    id: 'app.containers.UserLogin.submit',
     defaultMessage: 'Sign in',
   },
 });

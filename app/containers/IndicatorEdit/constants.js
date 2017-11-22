@@ -4,9 +4,9 @@
  *
  */
 import { fromJS } from 'immutable';
-import { REPORT_FREQUENCIES } from 'containers/App/constants';
+import { REPORT_FREQUENCIES } from 'themes/config';
 
-export const SAVE = 'nmrf/IndicatorEdit/SAVE';
+export const SAVE = 'impactoss/IndicatorEdit/SAVE';
 
 export const DEPENDENCIES = [
   'user_roles',
