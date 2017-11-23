@@ -127,6 +127,10 @@ export default defineMessages({
     },
   },
   import: {
+    hint: {
+      id: 'app.containers.App.import.hint',
+      defaultMessage: 'This row provides additional information about the columns. Please replace or remove it before importing',
+    },
     required: {
       id: 'app.containers.App.import.required',
       defaultMessage: 'Required: ',
@@ -136,7 +140,7 @@ export default defineMessages({
       defaultMessage: 'text',
     },
     markdown: {
-      id: 'app.containers.App.import.text',
+      id: 'app.containers.App.import.markdown',
       defaultMessage: 'text (markdown supported)',
     },
     bool: {

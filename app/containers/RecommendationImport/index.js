@@ -14,6 +14,7 @@ import { fromJS } from 'immutable';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
+import { getImportFields } from 'utils/import';
 
 import {
   redirectIfNotPermitted,
@@ -26,8 +27,6 @@ import {
   selectReady,
   selectReadyForAuthCheck,
 } from 'containers/App/selectors';
-
-import appMessages from 'containers/App/messages';
 
 // import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -99,12 +98,32 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
             progress={this.props.progress}
             template={{
               filename: `${this.context.intl.formatMessage(messages.filename)}.csv`,
-              data: [{
-                title: this.context.intl.formatMessage(appMessages.importFields.title),
-                reference: this.context.intl.formatMessage(appMessages.importFields.referenceRequired),
-                accepted: this.context.intl.formatMessage(appMessages.importFields.accepted),
-                response: this.context.intl.formatMessage(appMessages.importFields.response),
-              }],
+              data: getImportFields({
+                fields: [
+                  {
+                    attribute: 'reference',
+                    type: 'text',
+                    required: true,
+                    import: true,
+                  },
+                  {
+                    attribute: 'title',
+                    type: 'text',
+                    required: true,
+                    import: true,
+                  },
+                  {
+                    attribute: 'accepted',
+                    type: 'bool',
+                    import: true,
+                  },
+                  {
+                    attribute: 'response',
+                    type: 'markdown',
+                    import: true,
+                  },
+                ],
+              }, this.context.intl.formatMessage),
             }}
           />
         </Content>
