@@ -4,6 +4,7 @@ build
 node_modules
 stats.json
 functions
+firebase-debug.log
 
 # Cruft
 .DS_Store
