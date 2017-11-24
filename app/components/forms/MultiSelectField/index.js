@@ -15,6 +15,10 @@ import ItemStatus from 'components/ItemStatus';
 import MultiSelectControl from '../MultiSelectControl';
 import messages from './messages';
 
+const Status = styled(ItemStatus)`
+  padding-top: 0;
+  margin-top: -5px;
+`;
 const MultiSelectWrapper = styled.div`
   position: absolute;
   top: 38px;
@@ -158,7 +162,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
     <MultiselectActiveOptionListItem key={i}>
       <MultiselectActiveOption>
         {option.get('draft') &&
-          <ItemStatus draft />
+          <Status draft />
         }
         { option.get('reference') &&
           <Reference>{option.get('reference')}</Reference>

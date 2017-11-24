@@ -8,7 +8,7 @@ import { Map } from 'immutable';
 import { truncateText } from 'utils/string';
 import Component from 'components/styled/Component';
 import Clear from 'components/styled/Clear';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
@@ -77,7 +77,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
                 taxId: tax.get('id'),
                 title: category.getIn(['attributes', 'title']),
                 inverse: category.getIn(['attributes', 'draft']),
-                label: truncateText(label, 10),
+                label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG),
                 onClick: () => onClick(catId, 'category'),
               });
             } else {
@@ -85,7 +85,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
                 taxId: tax.get('id'),
                 title: category.getIn(['attributes', 'title']),
                 inverse: category.getIn(['attributes', 'draft']),
-                label: truncateText(label, 10),
+                label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG),
               });
             }
           }

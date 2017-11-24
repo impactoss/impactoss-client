@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Link } from 'react-router';
 
+import { TEXT_TRUNCATE } from 'themes/config';
+
 import { sortEntities } from 'utils/sort';
 import { truncateText } from 'utils/string';
 
@@ -11,7 +13,6 @@ import messages from 'components/ItemStatus/messages';
 import ItemStatus from 'components/ItemStatus';
 
 const POPUP_WIDTH = 330;
-const POPUP_LENGTH = 80;
 
 const Count = styled.span`
   display: inline-block;
@@ -199,7 +200,8 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                           }
                           <Id>{ref}</Id>
                           <IdSpacer />
-                          <ItemContent>{truncateText(entity.getIn(['attributes', 'title']), POPUP_LENGTH - ref.length)}</ItemContent>
+                          <ItemContent>
+                            {truncateText(entity.getIn(['attributes', 'title']), TEXT_TRUNCATE.CONNECTION_POPUP - ref.length)}</ItemContent>
                         </ListItemLink>
                       </ListItem>
                     );

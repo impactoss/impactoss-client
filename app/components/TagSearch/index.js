@@ -44,7 +44,10 @@ const SearchInput = styled(DebounceInput)`
   flex: 1;
   font-size: 0.85em;
 `;
-const Tags = styled.div``;
+const Tags = styled.div`
+  margin-top: -2px;
+  margin-bottom: -2px;
+`;
 
 const Clear = styled(Button)`
   padding: ${(props) => props.small ? '4px 6px' : '10px 6px'};

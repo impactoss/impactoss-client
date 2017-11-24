@@ -1,6 +1,6 @@
 import { truncateText } from 'utils/string';
 import { sortEntities } from 'utils/sort';
-import { ACCEPTED_STATUSES, USER_ROLES } from 'themes/config';
+import { ACCEPTED_STATUSES, USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
 import { find, filter, reduce } from 'lodash/collection';
 
 import appMessages from 'containers/App/messages';
@@ -27,7 +27,7 @@ export const getReferenceField = (entity, defaultToId) => {
   return false;
 };
 const getLinkAnchor = (url) =>
-  truncateText(url.replace(/^https?:\/\//i, ''), 40);
+  truncateText(url.replace(/^https?:\/\//i, ''), TEXT_TRUNCATE.LINK_FIELD);
 
 export const getLinkField = (entity) => ({
   type: 'link',
@@ -195,7 +195,7 @@ const getCategoryShortTitle = (category) => {
   )
     ? category.getIn(['attributes', 'short_title'])
     : category.getIn(['attributes', 'title']);
-  return truncateText(title, 10);
+  return truncateText(title, TEXT_TRUNCATE.ENTITY_TAG);
 };
 
 export const getCategoryShortTitleField = (entity) => ({
