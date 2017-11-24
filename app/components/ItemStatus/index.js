@@ -9,6 +9,7 @@ const Status = styled(Label)`
   padding-left: 1em;
   font-weight: bold;
   font-size: 12px;
+  padding-top: 2px;
 `;
 
 class ItemStatus extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

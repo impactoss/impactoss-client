@@ -12,7 +12,7 @@ import EntityListNestedNoItem from './EntityListNestedList/EntityListNestedItem/
 const ItemWrapper = styled.div`
   border-top: 1px solid;
   padding: ${(props) => props.separated ? '0.5em 0 2.5em' : '0'};
-  border-color: ${(props) => props.separated ? palette('light', 4) : palette('light', 0)};
+  border-color: ${(props) => props.separated ? palette('light', 3) : palette('light', 0)};
 `;
 
 export class EntityListItemWrapper extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

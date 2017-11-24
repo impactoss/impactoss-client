@@ -19,6 +19,7 @@ const ShowAll = styled.a`
   font-size: 0.8em;
   display: block;
   text-align: center;
+  font-weight: 500;
 `;
 
 const REPORT_MAX = 5;

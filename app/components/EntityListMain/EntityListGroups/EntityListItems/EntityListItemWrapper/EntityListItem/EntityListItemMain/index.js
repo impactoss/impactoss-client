@@ -24,6 +24,7 @@ const Styled = styled(Component)`
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
   }px;
+  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
 `;
 
 const EntityListItemMainTitleWrap = styled.a`
@@ -139,11 +140,6 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       <Styled isManager={this.props.isManager}>
         <EntityListItemMainTop
           entity={entity}
-          onEntityClick={(evt) => {
-            evt.preventDefault();
-            onEntityClick(entity.id, entity.path);
-          }}
-          path={`/${entity.path}/${entity.id}`}
         />
         <Clear />
         <EntityListItemMainTitleWrap
