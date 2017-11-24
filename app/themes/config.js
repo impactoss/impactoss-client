@@ -27,7 +27,7 @@ export const SHOW_HEADER_TITLE = false;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
-export const SHOW_HEADER_PATTERN = false;
+export const SHOW_HEADER_PATTERN = true;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.sidebarHeader
