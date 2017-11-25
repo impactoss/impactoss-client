@@ -59,6 +59,9 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     }
   }
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+  getTaxButtonTitle = (id) => this.context.intl.formatMessage(
+    appMessages.entities.taxonomies[id].shortSingle || appMessages.entities.taxonomies[id].single
+  );
 
   render() {
     const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
@@ -68,7 +71,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     const buttons = dataReady && isManager
       ? [{
         type: 'add',
-        title: this.context.intl.formatMessage(messages.add),
+        title: this.context.intl.formatMessage(messages.add, { category: this.getTaxButtonTitle(reference) }),
         onClick: () => this.props.handleNew(reference),
       }]
       : null;

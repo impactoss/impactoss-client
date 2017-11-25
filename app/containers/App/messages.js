@@ -735,6 +735,14 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.7.empty',
           defaultMessage: 'No SDG assigned yet',
         },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.7.shortSingle',
+          defaultMessage: 'SDG',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.7.shortPlural',
+          defaultMessage: 'SDGs',
+        },
       },
     },
     due_dates: {
