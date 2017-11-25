@@ -9,6 +9,7 @@ import { TEXT_TRUNCATE } from 'themes/config';
 import { sortEntities } from 'utils/sort';
 import { truncateText } from 'utils/string';
 
+import Button from 'components/buttons/Button';
 import messages from 'components/ItemStatus/messages';
 import ItemStatus from 'components/ItemStatus';
 
@@ -31,9 +32,11 @@ const Count = styled.span`
   padding: 0 0.5em;
 `;
 
-const PopupWrapper = styled.span`
+const PopupWrapper = styled(Button)`
+  padding: 0;
   position: relative;
-  margin-right: 5px;
+  margin-right: 10px;
+  text-align: left;
 `;
 
 const POPUP_WIDTH_PX = `${POPUP_WIDTH}px`;
@@ -163,6 +166,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
         onFocus={false}
         onMouseOver={() => this.openPopup()}
         onMouseLeave={() => this.closePopup()}
+        onClick={() => this.state.popupOpen ? this.closePopup() : this.openPopup()}
         innerRef={(node) => {
           if (!this.state.popupRef) {
             this.setState({ popupRef: node });
