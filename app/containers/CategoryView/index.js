@@ -76,21 +76,22 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
   ]);
   getHeaderAsideFields = (entity, isManager) => {
     const fields = []; // fieldGroups
-    if (entity.getIn(['taxonomy', 'attributes', 'tags_users']) && entity.getIn(['attributes', 'user_only'])) {
-      fields.push({
-        fields: [{
-          type: 'text',
-          value: this.context.intl.formatMessage(appMessages.textValues.user_only),
-          label: appMessages.attributes.user_only,
-        }],
-      });
-    }
     if (isManager) {
       fields.push({
         fields: [
           getStatusField(entity),
           getMetaField(entity, appMessages),
         ],
+      });
+    }
+    if (entity.getIn(['taxonomy', 'attributes', 'tags_users']) && entity.getIn(['attributes', 'user_only'])) {
+      fields.push({
+        type: 'dark',
+        fields: [{
+          type: 'text',
+          value: this.context.intl.formatMessage(appMessages.textValues.user_only),
+          label: appMessages.attributes.user_only,
+        }],
       });
     }
     return fields;
@@ -128,23 +129,26 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     return fields;
   };
 
-  getBodyAsideFields = (entity, isManager) => ([
-    (entity.getIn(['attributes', 'url']) &&
-    (entity.getIn(['attributes', 'url']).trim().length > 0)) &&
-      {
+  getBodyAsideFields = (entity, isManager) => {
+    const fields = [];
+    if (entity.getIn(['attributes', 'url']) && entity.getIn(['attributes', 'url']).trim().length > 0) {
+      fields.push({
         type: 'dark',
         fields: [getLinkField(entity)],
-      },
-    (isManager && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) &&
-      {
+      });
+    }
+    if (isManager && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
+      fields.push({
         type: 'dark',
         fields: [getManagerField(
           entity,
           appMessages.attributes.manager_id.categories,
           appMessages.attributes.manager_id.categoriesEmpty
         )],
-      },
-  ]);
+      });
+    }
+    return fields;
+  };
 
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
 

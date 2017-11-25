@@ -138,6 +138,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
   getHeaderAsideFields = (entity) => {
     const fields = []; // fieldGroups
+    fields.push({
+      fields: [
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
+        getMetaField(entity, appMessages),
+      ],
+    });
     if (entity.getIn(['taxonomy', 'attributes', 'tags_users'])) {
       fields.push({
         fields: [
@@ -150,12 +156,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         ],
       });
     }
-    fields.push({
-      fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages, entity),
-        getMetaField(entity, appMessages),
-      ],
-    });
     return fields;
   }
 
