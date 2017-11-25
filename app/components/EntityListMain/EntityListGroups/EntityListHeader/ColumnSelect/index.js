@@ -26,7 +26,6 @@ const LabelWrap = styled.div`
 `;
 const CheckboxWrap = styled.div`
   width: 40px;
-  padding: 5px;
   display: table-cell;
   text-align: center;
 `;
