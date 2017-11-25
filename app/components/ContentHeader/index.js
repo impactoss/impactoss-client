@@ -42,6 +42,7 @@ const ButtonWrap = styled.span`
 const Table = styled.span`
   display: table;
   width: 100%;
+  min-height: 62px;
 `;
 const TableCell = styled.span`
   display: table-cell;
@@ -49,8 +50,9 @@ const TableCell = styled.span`
 `;
 
 const ButtonGroup = styled.div`
-  vertical-align: middle;
+  display: table;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    float: right;
     text-align:right;
   }
 `;
@@ -96,9 +98,11 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
               <ButtonGroup>
                 {
                   buttons.map((button, i) => (
-                    <ButtonWrap key={i}>
-                      <ButtonFactory button={button} />
-                    </ButtonWrap>
+                    <TableCell key={i}>
+                      <ButtonWrap>
+                        <ButtonFactory button={button} />
+                      </ButtonWrap>
+                    </TableCell>
                   ))
                 }
               </ButtonGroup>
