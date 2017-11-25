@@ -48,7 +48,7 @@ injectGlobal`
     font-weight: 500;
   }
   h3 {
-    font-size: 1.7em;
+    font-size: 1.9em;
   }
   h4 {
     font-size: 1.5em;

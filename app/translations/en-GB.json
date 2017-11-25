@@ -242,6 +242,7 @@
   "app.containers.App.attributes.meta.title" : "Meta",
   "app.containers.App.attributes.meta.updated_by" : "Updated by",
   "app.containers.App.attributes.meta.updated_at" : "Last updated",
+  "app.containers.App.attributes.meta.created_at" : "Created",
   "app.containers.App.nav.overview" : "Overview",
   "app.containers.App.nav.taxonomies" : "Categories",
   "app.containers.App.nav.measures" : "Actions",

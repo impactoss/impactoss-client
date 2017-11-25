@@ -14,7 +14,7 @@
 
 // default language locale
 export const DEFAULT_LOCALE = 'en-GB';
-// date format - change to format according to locale
+// date format - change to format according to locale, only used for form error message
 export const DATE_FORMAT = 'dd/mm/yyyy';
 
 // UI settings ************************

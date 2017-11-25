@@ -448,6 +448,10 @@ export default defineMessages({
         id: 'app.containers.App.attributes.meta.updated_at',
         defaultMessage: 'Last updated',
       },
+      created_at: {
+        id: 'app.containers.App.attributes.meta.created_at',
+        defaultMessage: 'Created',
+      },
     },
   },
   nav: {

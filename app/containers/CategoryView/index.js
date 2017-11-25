@@ -68,7 +68,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
   getHeaderMainFields = (entity, isManager) => ([
     { // fieldGroup
       fields: [
-        getReferenceField(entity),
+        getReferenceField(entity, isManager),
         getTitleField(entity, isManager),
         getCategoryShortTitleField(entity, isManager),
       ],

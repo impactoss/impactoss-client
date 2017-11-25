@@ -65,7 +65,7 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceField(entity),
+        getReferenceField(entity, isManager),
         getTitleTextField(entity, isManager),
       ],
     },

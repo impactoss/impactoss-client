@@ -12,7 +12,7 @@ export const getIdField = (entity) => ({
   value: entity.get('id'),
   large: true,
 });
-export const getReferenceField = (entity, defaultToId) => {
+export const getReferenceField = (entity, isManager, defaultToId) => {
   const value = defaultToId
     ? entity.getIn(['attributes', 'reference']) || entity.get('id')
     : entity.getIn(['attributes', 'reference']);
@@ -22,6 +22,7 @@ export const getReferenceField = (entity, defaultToId) => {
       type: 'reference',
       value,
       large: true,
+      isManager,
     });
   }
   return false;
@@ -75,21 +76,31 @@ export const getRoleField = (entity) => ({
   options: Object.values(USER_ROLES),
 });
 
-export const getMetaField = (entity) => ({
-  controlType: 'info',
-  type: 'meta',
-  fields: [
-    {
-      label: appMessages.attributes.meta.updated_at,
-      value: entity.getIn(['attributes', 'updated_at']),
-      date: true,
-    },
-    {
+export const getMetaField = (entity) => {
+  const fields = [];
+  if (entity.get('user') && entity.getIn(['user', 'attributes', 'name'])) {
+    fields.push({
       label: appMessages.attributes.meta.updated_by,
       value: entity.get('user') && entity.getIn(['user', 'attributes', 'name']),
-    },
-  ],
-});
+    });
+  }
+  fields.push({
+    label: appMessages.attributes.meta.updated_at,
+    value: entity.getIn(['attributes', 'updated_at']),
+    date: true,
+    time: true,
+  });
+  fields.push({
+    label: appMessages.attributes.meta.created_at,
+    value: entity.getIn(['attributes', 'created_at']),
+    date: true,
+  });
+  return {
+    controlType: 'info',
+    type: 'meta',
+    fields,
+  };
+};
 
 export const getMarkdownField = (entity, attribute, hasLabel = true) =>
   !!entity.getIn(['attributes', attribute]) &&
