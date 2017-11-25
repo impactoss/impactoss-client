@@ -5,7 +5,7 @@ const ColumnHeader = styled.div`
   width:${(props) => props.width * 100}%;
   position: relative;
   display: table-cell;
-  padding: 0.25em 1em;
+  padding: 0 1em;
   border-right: 1px solid ${palette('light', 2)};
   font-size: 0.85em;
   &:last-child {

@@ -17,7 +17,8 @@ const SortButton = styled(ButtonFlatIconOnly)`
   color: inherit;
 `;
 const Styled = styled(ColumnHeader)`
-  padding: 0.25em 0;
+  padding-left: 0;
+  padding-right: 0;
 `;
 const LabelWrap = styled.div`
   display: table-cell;
