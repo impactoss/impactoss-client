@@ -651,6 +651,14 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.1.empty',
           defaultMessage: 'No human rights body assigned yet',
         },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.1.shortSingle',
+          defaultMessage: 'HR body',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.1.shortPlural',
+          defaultMessage: 'HR bodies',
+        },
       },
       2: {
         single: {
@@ -679,6 +687,14 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.3.empty',
           defaultMessage: 'No human rights issue assigned yet',
         },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.3.shortSingle',
+          defaultMessage: 'HR issue',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.3.shortPlural',
+          defaultMessage: 'HR issues',
+        },
       },
       4: {
         single: {
@@ -706,6 +722,14 @@ export default defineMessages({
         empty: {
           id: 'app.containers.App.entities.taxonomies.5.empty',
           defaultMessage: 'No thematic cluster assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.5.shortSingle',
+          defaultMessage: 'Cluster',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.5.shortPlural',
+          defaultMessage: 'Clusters',
         },
       },
       6: {
