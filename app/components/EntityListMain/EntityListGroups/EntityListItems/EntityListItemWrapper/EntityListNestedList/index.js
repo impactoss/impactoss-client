@@ -15,7 +15,7 @@ const Styled = styled.span`
 const ItemWrapper = styled.div`
   border-top: ${(props) => props.separated ? '1px solid' : 'none'};
   border-top-color: ${(props) => props.separated ? palette('light', 3) : 'transparent'};
-  padding: ${(props) => props.separated ? '0.5em 0 2em' : '0 0 2em'};
+  padding: ${(props) => props.separated ? '5px 0 20px' : '0 0 10px'};
   border-bottom: 1px solid transparent;
 `;
 export class EntityListNestedList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

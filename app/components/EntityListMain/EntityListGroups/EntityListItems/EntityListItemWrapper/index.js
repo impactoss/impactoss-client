@@ -11,7 +11,7 @@ import EntityListNestedNoItem from './EntityListNestedList/EntityListNestedItem/
 
 const ItemWrapper = styled.div`
   border-top: 1px solid;
-  padding: ${(props) => props.separated ? '0.5em 0 2.5em' : '0'};
+  padding: ${(props) => props.separated ? '5px 0 10px' : '0'};
   border-color: ${(props) => props.separated ? palette('light', 3) : palette('light', 0)};
 `;
 
