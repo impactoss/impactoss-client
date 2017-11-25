@@ -289,7 +289,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath(PATHS.RECOMMENDATIONS));
+      dispatch(updatePath(PATHS.RECOMMENDATIONS, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

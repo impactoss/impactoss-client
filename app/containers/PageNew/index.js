@@ -220,7 +220,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(formData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath(PATHS.PAGES));
+      dispatch(updatePath(PATHS.PAGES, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

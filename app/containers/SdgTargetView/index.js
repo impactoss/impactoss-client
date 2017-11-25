@@ -220,7 +220,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (sdgtargetId) => {
-      dispatch(updatePath(`${PATHS.SDG_TARGETS}${PATHS.EDIT}/${sdgtargetId}`));
+      dispatch(updatePath(`${PATHS.SDG_TARGETS}${PATHS.EDIT}/${sdgtargetId}`, { replace: true }));
     },
     handleClose: () => {
       dispatch(closeEntity(PATHS.SDG_TARGETS));

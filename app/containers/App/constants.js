@@ -90,7 +90,7 @@ export const SORT_ORDER_OPTIONS = [
   { value: 'desc', icon: 'descending', nextValue: 'asc', message: 'ui.sortOrderOptions.desc' },
 ];
 export const PARAMS = {
-  GROUP_RESET: 'OFF',
+  GROUP_RESET: '0',
   REDIRECT_ON_AUTH_SUCCESS: 'redirectOnAuthSuccess',
   RECOVER_SUCCESS: 'recoverSuccess',
   ALREADY_SIGNED_IN: 'alreadySignedIn',

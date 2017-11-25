@@ -282,7 +282,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (categoryId) => {
-      dispatch(updatePath(`${PATHS.CATEGORIES}${PATHS.EDIT}/${categoryId}`));
+      dispatch(updatePath(`${PATHS.CATEGORIES}${PATHS.EDIT}/${categoryId}`, { replace: true }));
     },
     handleClose: (taxonomyId) => {
       dispatch(closeEntity(`${PATHS.TAXONOMIES}/${taxonomyId}`));

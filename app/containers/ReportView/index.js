@@ -174,7 +174,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: () => {
-      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}${PATHS.EDIT}/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}${PATHS.EDIT}/${props.params.id}`, { replace: true }));
     },
     handleClose: (indicatorId) => {
       dispatch(closeEntity(`${PATHS.INDICATORS}/${indicatorId}`));

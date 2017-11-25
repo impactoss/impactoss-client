@@ -161,7 +161,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: () => {
-      dispatch(updatePath(`${PATHS.PAGES}${PATHS.EDIT}/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.PAGES}${PATHS.EDIT}/${props.params.id}`, { replace: true }));
     },
   };
 }

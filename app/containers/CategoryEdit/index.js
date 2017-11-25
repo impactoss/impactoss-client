@@ -432,7 +432,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`${PATHS.CATEGORIES}/${reference}`));
+      dispatch(updatePath(`${PATHS.CATEGORIES}/${reference}`), { replace: true });
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
