@@ -8,6 +8,7 @@ import SelectReset from 'components/SelectReset';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import Icon from 'components/Icon';
 
+import A from 'components/styled/A';
 import ColumnHeader from 'components/styled/ColumnHeader';
 
 import messages from './messages';
@@ -44,7 +45,7 @@ const SelectWrapper = styled.div`
   text-align:right;
 `;
 
-const SelectAll = styled.a`
+const SelectAll = styled(A)`
   vertical-align: middle;
 `;
 

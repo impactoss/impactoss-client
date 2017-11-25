@@ -221,7 +221,7 @@ theme.palette = {
   // buttonDefault: ['#text', '#bg'],
   buttonDefault: [primary[4], primary[1]],
   buttonDefaultHover: [primary[4], primary[0]],
-  buttonDefaultDisabled: [light[0], dark[3]],
+  buttonDefaultDisabled: [light[0], light[3]],
   // buttonPrimary: ['#text', '#bg', '#border'],
   buttonDefaultIconOnly: [primary[4], primary[1], primary[1]],
   buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],

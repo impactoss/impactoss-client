@@ -6,6 +6,7 @@ import { palette } from 'styled-theme';
 
 import NormalImg from 'components/Img';
 import Container from 'components/styled/Container';
+import A from 'components/styled/A';
 
 import { SHOW_FOOTER_PARTNERS } from 'themes/config';
 
@@ -44,7 +45,7 @@ const LogoList = styled.div`
 const LogoItem = styled.div`
   display: inline-block;
 `;
-const LogoItemLink = styled.a`
+const LogoItemLink = styled(A)`
   padding: 0 1.5em;
   display: block;
   &:hover {
