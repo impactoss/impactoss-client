@@ -182,10 +182,10 @@ export function* recoverSaga(payload) {
 export function* authChangeSaga() {
   const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
   if (redirectPathname) {
-    yield put(push(redirectPathname));
+    yield put(replace(redirectPathname));
   } else {
     // forward to home
-    yield put(push('/'));
+    yield put(replace('/'));
   }
 }
 
@@ -194,7 +194,7 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(push(PATHS.LOGIN));
+    yield put(replace(PATHS.LOGIN));
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));
@@ -588,7 +588,7 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
   const location = yield select(selectLocation);
   const queryNext = getNextQuery(query, extend, location);
 
-  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
+  yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
 
@@ -603,7 +603,7 @@ export function* dismissQueryMessagesSaga() {
     true,
     location
   );
-  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
+  yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
 export function* updatePathSaga({ path, args }) {

@@ -146,6 +146,8 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       },
   ]);
 
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+
   render() {
     const {
       viewEntity,
@@ -182,7 +184,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (viewEntity && viewEntity.get('taxonomy')) {
-      pageTitle = viewEntity.getIn(['taxonomy', 'attributes', 'title']);
+      pageTitle = this.getTaxTitle(viewEntity.getIn(['taxonomy', 'id']));
     }
 
     return (
