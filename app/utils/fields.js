@@ -6,11 +6,13 @@ import { find, filter, reduce } from 'lodash/collection';
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
 
-export const getIdField = (entity) => ({
+export const getIdField = (entity, isManager) => ({
   controlType: 'info',
   type: 'reference',
   value: entity.get('id'),
   large: true,
+  isManager,
+  label: appMessages.attributes.id,
 });
 export const getReferenceField = (entity, isManager, defaultToId) => {
   const value = defaultToId
@@ -325,7 +327,7 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
   if (section === 'header' && column === 'main' && !reduce(fields, (memo, field) =>
     memo || field.attribute === 'reference'
   , false)) {
-    groupFields = groupFields.concat([getIdField(entity)]);
+    groupFields = groupFields.concat([getIdField(entity, hasUserRole[USER_ROLES.MANAGER.value])]);
   }
   groupFields = reduce(fields, (memo, field) => {
     if (field.control === 'title') {
