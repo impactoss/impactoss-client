@@ -115,14 +115,14 @@ theme.palette = {
   // other entities
   // [aqll #AA compliant]
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
-  measuresHover: ['#15a21a'], // FFC107  AA compliant
-  measures: ['#e56700'],
-  recommendationsHover: ['#108A10', '#0C640C'], // accepted, noted ['#FF9B69', '#FFB28B'],
-  recommendations: ['#11327f', '#0C640C'],
+  measuresHover: ['#C75300'], // FFC107  AA compliant
+  measures: ['#ED7000'],
+  recommendationsHover: ['#15881A', '#0C640C'], // accepted, noted ['#FF9B69', '#FFB28B'],
+  recommendations: ['#0A41A3', '#0C640C'],
   sdgtargetsHover: ['#0080A3'],
   sdgtargets: ['#0096cc'], // 40D7FF, 00A0CC
-  indicatorsHover: ['#003C80'],
-  indicators: ['#15a21a'],
+  indicatorsHover: ['#15881A'],
+  indicators: ['#1BAC29'],
   reportsHover: [error[1]],
   reports: [error[0]],
   attributesHover: [dark[2]],
