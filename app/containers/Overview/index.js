@@ -343,6 +343,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       taxonomies,
       dataReady,
       onPageLink,
+      onTaxonomyLink,
       recommendationCount,
       sdgtargetCount,
       measureCount,
@@ -388,7 +389,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             <TaxonomySidebar
               taxonomies={mapToTaxonomyList(
                 taxonomies,
-                onPageLink,
+                onTaxonomyLink,
                 this.state.mouseOverTaxonomyDiagram,
                 this.onTaxonomyMouseOver,
               )}
@@ -621,6 +622,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
 Overview.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onPageLink: PropTypes.func,
+  onTaxonomyLink: PropTypes.func,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
   recommendationCount: PropTypes.number,
@@ -657,6 +659,9 @@ function mapDispatchToProps(dispatch) {
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));
+    },
+    onTaxonomyLink: (path) => {
+      dispatch(updatePath(path, { keepQuery: true }));
     },
   };
 }

@@ -195,10 +195,10 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: (userId) => {
-      dispatch(updatePath(`${PATHS.USERS}${PATHS.EDIT}/${userId}`));
+      dispatch(updatePath(`${PATHS.USERS}${PATHS.EDIT}/${userId}`, { replace: true }));
     },
     handleEditPassword: (userId) => {
-      dispatch(updatePath(`${PATHS.USERS}${PATHS.PASSWORD}/${userId}`));
+      dispatch(updatePath(`${PATHS.USERS}${PATHS.PASSWORD}/${userId}`, { replace: true }));
     },
     handleClose: () => {
       dispatch(closeEntity(PATHS.USERS));

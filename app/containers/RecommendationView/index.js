@@ -77,7 +77,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceField(entity),
+        getReferenceField(entity, isManager),
         getTitleTextField(entity, isManager),
       ],
     },
@@ -215,7 +215,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: () => {
-      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}${PATHS.EDIT}/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}${PATHS.EDIT}/${props.params.id}`, { replace: true }));
     },
     handleClose: () => {
       dispatch(closeEntity(PATHS.RECOMMENDATIONS));

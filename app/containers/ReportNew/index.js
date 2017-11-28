@@ -323,7 +323,7 @@ function mapDispatchToProps(dispatch) {
       ));
     },
     handleCancel: (indicatorReference) => {
-      dispatch(updatePath(`${PATHS.INDICATORS}/${indicatorReference}`));
+      dispatch(updatePath(`${PATHS.INDICATORS}/${indicatorReference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

@@ -32,7 +32,7 @@ const Count = styled.span`
 `;
 
 const Info = styled.div`
-  color: ${(props) => palette(props.type, 0)};
+  color: ${(props) => props.palette ? palette(props.palette, 0) : palette('text', 1)};
   font-weight: bold;
 `;
 
@@ -49,8 +49,17 @@ class EntityListItemExpandable extends React.PureComponent { // eslint-disable-l
 
     const info = [];
     if (dates) {
-      if (dates.due) info.push(this.context.intl && this.context.intl.formatMessage(messages.due, { total: dates.due }));
-      if (dates.overdue) info.push(this.context.intl && this.context.intl.formatMessage(messages.overdue, { total: dates.overdue }));
+      if (dates.due) {
+        info.push({
+          label: this.context.intl && this.context.intl.formatMessage(messages.due, { total: dates.due }),
+        });
+      }
+      if (dates.overdue) {
+        info.push({
+          style: type,
+          label: this.context.intl && this.context.intl.formatMessage(messages.overdue, { total: dates.overdue }),
+        });
+      }
     }
     return (
       <Styled width={width} onClick={onClick}>
@@ -59,8 +68,8 @@ class EntityListItemExpandable extends React.PureComponent { // eslint-disable-l
         </IconWrap>
         <Count type={type} count={count}>{count}</Count>
         { info &&
-          info.map((infoLine, i) =>
-            (<Info key={i} type={type}>{infoLine}</Info>)
+          info.map((infoItem, i) =>
+            (<Info key={i} palette={infoItem.style}>{infoItem.label}</Info>)
           )
         }
       </Styled>

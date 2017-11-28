@@ -22,7 +22,11 @@ import Footer from 'components/Footer';
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
 
-import { DB_TABLES, SHOW_HOME_TITLE } from 'themes/config';
+import {
+  DB_TABLES,
+  SHOW_HOME_TITLE,
+  SHOW_BRAND_ON_HOME,
+} from 'themes/config';
 
 import messages from './messages';
 
@@ -32,16 +36,16 @@ const GraphicHome = styled(NormalImg)`
 `;
 
 const SectionTop = styled.div`
-  min-height: 100vH;
+  min-height: ${(props) => props.hasBrand ? 0 : '100vH'};
+  display: ${(props) => props.hasBrand ? 'static' : 'table'};
   background-color: ${palette('home', 0)};
   color: ${palette('homeIntro', 0)};
   text-align: center;
-  display: table;
 `;
 
 const SectionWrapper = styled.div`
-  display: table-cell;
-  vertical-align: middle;
+  display: ${(props) => props.hasBrand ? 'static' : 'table-cell'};
+  vertical-align: ${(props) => props.hasBrand ? 'baseline' : 'middle'};
   padding-bottom: 2em;
 `;
 
@@ -88,8 +92,8 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <SectionTop>
-          <SectionWrapper>
+        <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
+          <SectionWrapper hasBrand={SHOW_BRAND_ON_HOME}>
             <GraphicHome src={theme.media.graphicHome} alt={this.context.intl.formatMessage(appMessages.app.title)} />
             { !SHOW_HOME_TITLE &&
               <GraphicHome src={theme.media.titleHome} alt={appTitle} />

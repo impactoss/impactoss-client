@@ -9,7 +9,9 @@ import EntityListItemMainBottomConnections from './EntityListItemMainBottomConne
 import EntityListItemMainBottomUser from './EntityListItemMainBottomUser';
 // import EntityListItemMainBottomTargetDate from './EntityListItemMainBottomTargetDate';
 
-const Styled = styled(Component)``;
+const Styled = styled(Component)`
+  margin-bottom: -5px;
+`;
 
 export default class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {

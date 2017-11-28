@@ -22,6 +22,15 @@ const ButtonDefault = styled(Button)`
     ? palette('buttonToggleInactive', 1)
     : palette('buttonDefault', 1)
   };
+  box-shadow: ${(props) => {
+    if (props.outline) {
+      const color = props.inactive
+        ? props.theme.palette.buttonToggleInactive[1]
+        : props.theme.palette.buttonDefault[1];
+      return `0 0 0 2px ${color}`;
+    }
+    return 'none';
+  }};
   border-radius: 999px;
   padding: 0.5em 1.75em;
   cursor:${(props) => props.disabled ? 'default' : 'pointer'};
@@ -34,6 +43,15 @@ const ButtonDefault = styled(Button)`
       ? getInactiveHoverBackground(props.disabled)
       : getActiveHoverBackground(props.disabled)
     };
+    box-shadow: ${(props) => {
+      if (props.outline) {
+        const color = props.inactive
+          ? props.theme.palette.buttonToggleInactiveHover[1]
+          : props.theme.palette.buttonDefaultHover[1];
+        return `0 0 0 2px ${color}`;
+      }
+      return 'none';
+    }};
   }
 `;
 

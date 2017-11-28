@@ -333,7 +333,7 @@ function mapDispatchToProps(dispatch, props) {
       // dispatch(save(formData, props.params.id));
     },
     handleCancel: () => {
-      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}/${props.params.id}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

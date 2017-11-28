@@ -1,6 +1,8 @@
 import { find, forEach } from 'lodash/collection';
 import { upperFirst } from 'lodash/string';
 
+import { TEXT_TRUNCATE } from 'themes/config';
+
 import { getCategoryShortTitle, attributesEqual } from 'utils/entities';
 import { truncateText } from 'utils/string';
 import isNumber from 'utils/is-number';
@@ -95,8 +97,10 @@ const getConnectionLabel = (connection, value) => {
   const label = connection
     ? connection.getIn(['attributes', 'reference']) || connection.get('id')
     : upperFirst(value);
-  return truncateText(label, 20);
+  return truncateText(label, TEXT_TRUNCATE.CONNECTION_TAG);
 };
+const getCategoryLabel = (category) =>
+  truncateText(getCategoryShortTitle(category), TEXT_TRUNCATE.ENTITY_TAG);
 
 const getCurrentTaxonomyFilters = (
   taxonomyFilters,
@@ -114,7 +118,7 @@ const getCurrentTaxonomyFilters = (
         if (taxonomy.getIn(['categories', value])) {
           const category = taxonomy.getIn(['categories', value]);
           tags.push({
-            label: getCategoryShortTitle(category),
+            label: getCategoryLabel(category),
             type: 'taxonomies',
             id: taxonomy.get('id'),
             inverse: category.getIn(['attributes', 'draft']),
@@ -173,7 +177,7 @@ const getCurrentConnectedTaxonomyFilters = (
           if (taxonomy.getIn(['categories', value])) {
             const category = taxonomy.getIn(['categories', value]);
             tags.push({
-              label: getCategoryShortTitle(category),
+              label: getCategoryLabel(category),
               type: 'taxonomies',
               id: taxonomy.get('id'),
               inverse: category.getIn(['attributes', 'draft']),
@@ -294,11 +298,14 @@ const getCurrentAttributeFilters = (entities, attributeFiltersOptions, locationQ
                 });
               }
             } else if (option.options) {
-              const attribute = find(option.options, (o) => o.value.toString() === value);
-              let label = attribute ? attribute.label : upperFirst(value);
-              label = truncateText(label, 10);
+              const attribute = find(option.options, (o) => o.value.toString() === value.toString());
+              let label = attribute ? attribute.message : upperFirst(value);
+              label = truncateText(label, TEXT_TRUNCATE.ATTRIBUTE_TAG);
               tags.push({
-                label,
+                labels: [{
+                  appMessage: !!attribute.message,
+                  label,
+                }],
                 type: 'attributes',
                 onClick: () => onClick({
                   value: queryValue,

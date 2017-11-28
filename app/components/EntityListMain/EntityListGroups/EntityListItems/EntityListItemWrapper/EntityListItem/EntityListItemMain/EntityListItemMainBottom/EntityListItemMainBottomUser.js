@@ -10,6 +10,7 @@ const Styled = styled.span`
   display: inline-block;
   margin-right: 1em;
   color: ${palette('text', 1)};
+  padding-bottom: 5px;
 `;
 
 export default class EntityListItemMainBottomUser extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

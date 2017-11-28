@@ -8,7 +8,7 @@ import { Map } from 'immutable';
 import { truncateText } from 'utils/string';
 import Component from 'components/styled/Component';
 import Clear from 'components/styled/Clear';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
@@ -24,6 +24,7 @@ const Styled = styled(Component)`
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
   }px;
+  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
 `;
 
 const EntityListItemMainTitleWrap = styled.a`
@@ -76,7 +77,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
                 taxId: tax.get('id'),
                 title: category.getIn(['attributes', 'title']),
                 inverse: category.getIn(['attributes', 'draft']),
-                label: truncateText(label, 10),
+                label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG),
                 onClick: () => onClick(catId, 'category'),
               });
             } else {
@@ -84,7 +85,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
                 taxId: tax.get('id'),
                 title: category.getIn(['attributes', 'title']),
                 inverse: category.getIn(['attributes', 'draft']),
-                label: truncateText(label, 10),
+                label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG),
               });
             }
           }
@@ -139,11 +140,6 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       <Styled isManager={this.props.isManager}>
         <EntityListItemMainTop
           entity={entity}
-          onEntityClick={(evt) => {
-            evt.preventDefault();
-            onEntityClick(entity.id, entity.path);
-          }}
-          path={`/${entity.path}/${entity.id}`}
         />
         <Clear />
         <EntityListItemMainTitleWrap

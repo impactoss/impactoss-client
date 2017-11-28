@@ -3,7 +3,7 @@
  */
 
 import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
-import { push, replace } from 'react-router-redux';
+import { push, replace, goBack } from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
 
@@ -69,13 +69,13 @@ import {
 
 import {
   selectCurrentPathname,
+  selectPreviousPathname,
   selectRedirectOnAuthSuccessPath,
   selectRequestedAt,
   selectIsSignedIn,
   selectLocation,
   selectSessionUserRoles,
   selectIsAuthenticating,
-  selectListSearch,
 } from 'containers/App/selectors';
 
 import {
@@ -182,10 +182,10 @@ export function* recoverSaga(payload) {
 export function* authChangeSaga() {
   const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
   if (redirectPathname) {
-    yield put(push(redirectPathname));
+    yield put(replace(redirectPathname));
   } else {
     // forward to home
-    yield put(push('/'));
+    yield put(replace('/'));
   }
 }
 
@@ -194,7 +194,7 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(push(PATHS.LOGIN));
+    yield put(replace(PATHS.LOGIN));
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));
@@ -358,7 +358,7 @@ export function* saveEntitySaga({ data }) {
 
     yield put(saveSuccess(dataTS));
     if (data.redirect) {
-      yield put(push(data.redirect));
+      yield put(replace(data.redirect));
     }
     if (data.invalidateEntitiesOnSuccess) {
       yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
@@ -376,7 +376,7 @@ export function* deleteEntitySaga({ data }) {
     yield put(deleteSending(dataTS));
     yield call(deleteEntityRequest, data.path, data.id);
     if (data.redirect !== false) {
-      yield put(push(`/${data.redirect || data.path}`));
+      yield put(replace(`/${data.redirect || data.path}`));
     }
     yield put(removeEntity(data.path, data.id));
     yield put(deleteSuccess(dataTS));
@@ -477,12 +477,12 @@ export function* newEntitySaga({ data }) {
     }
     if (data.redirect) {
       if (data.createAsGuest) {
-        yield put(push({
+        yield put(replace({
           pathname: `${data.redirect}`,
           query: { info: 'createdAsGuest', infotype: data.path },
         }));
       } else {
-        yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+        yield put(replace(`${data.redirect}/${entityCreated.data.id}`));
       }
     }
   } catch (err) {
@@ -588,7 +588,7 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
   const location = yield select(selectLocation);
   const queryNext = getNextQuery(query, extend, location);
 
-  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
+  yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
 
@@ -603,12 +603,11 @@ export function* dismissQueryMessagesSaga() {
     true,
     location
   );
-  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
+  yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
 export function* updatePathSaga({ path, args }) {
   const relativePath = path.startsWith('/') ? path : `/${path}`;
-
   if (args && (args.query || args.keepQuery)) {
     const location = yield select(selectLocation);
     let queryNext = {};
@@ -622,6 +621,8 @@ export function* updatePathSaga({ path, args }) {
     const queryNextString = getNextQueryString(queryNext);
 
     yield put(push(`${relativePath}?${queryNextString}`));
+  } else if (args && args.replace) {
+    yield put(replace(relativePath));
   } else {
     yield put(push(relativePath));
   }
@@ -629,8 +630,12 @@ export function* updatePathSaga({ path, args }) {
 
 export function* closeEntitySaga({ path }) {
   // the close icon is to function like back if possible, otherwise go to default path provided
-  const listSearch = yield select(selectListSearch);
-  yield put(push({ pathname: path || '/', search: listSearch }));
+  const previousPath = yield select(selectPreviousPathname);
+  if (previousPath) {
+    yield put(goBack());
+  } else {
+    yield put(push({ pathname: path || '/' }));
+  }
 }
 
 /**

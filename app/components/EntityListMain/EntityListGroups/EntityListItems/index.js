@@ -7,7 +7,7 @@ import EntityListItemWatch from './EntityListItemWatch';
 import EntityListItemWrapper from './EntityListItemWrapper';
 
 const Styled = styled.div`
-  padding: ${(props) => props.separated ? '1em 0 2em' : '0 0 2em'};
+  padding-bottom: 50px;
 `;
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

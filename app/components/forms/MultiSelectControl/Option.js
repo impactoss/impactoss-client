@@ -51,7 +51,7 @@ class Option extends React.Component { // eslint-disable-line react/prefer-state
     return (
       <Label bold={false}>
         {draft &&
-          <ItemStatus draft />
+          <ItemStatus draft top />
         }
         {reference &&
           <Id>{reference}</Id>

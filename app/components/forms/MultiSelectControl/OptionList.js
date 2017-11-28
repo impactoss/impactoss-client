@@ -5,6 +5,7 @@ import { palette } from 'styled-theme';
 import { kebabCase } from 'lodash/string';
 import { FormattedMessage } from 'react-intl';
 
+import A from 'components/styled/A';
 import IndeterminateCheckbox from 'components/forms/IndeterminateCheckbox';
 
 import Option from './Option';
@@ -91,7 +92,7 @@ const More = styled.div`
   text-align: center;
   font-size: 0.85em;
 `;
-const MoreLink = styled.a`
+const MoreLink = styled(A)`
   font-weight: bold;
 `;
 

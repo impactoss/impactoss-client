@@ -14,7 +14,7 @@ import EntityListSidebarOption from './EntityListSidebarOption';
 
 const Group = styled.div`
   border-bottom: 1px solid;
-  border-color: ${palette('aside', 0)};
+  border-color: ${(props) => props.expanded ? palette('aside', 0) : palette('light', 2)};
   &:last-child {
     border-bottom: 0;
   }
@@ -30,7 +30,7 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
         { groups && groups.entrySeq().map(([groupId, group]) =>
           group.get('options') && group.get('options').size > 0
             ? (
-              <Group key={groupId}>
+              <Group key={groupId} expanded={this.props.expanded[groupId]}>
                 <EntityListSidebarGroupLabel
                   label={group.get('label')}
                   icon={group.get('icon') || group.get('id')}

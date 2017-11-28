@@ -196,8 +196,9 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         hasUserRole,
         {
           attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
-          taxonomies: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
+          taxonomyGroup: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
           connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
+          taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
         },
       );
     }

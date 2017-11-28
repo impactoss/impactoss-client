@@ -299,7 +299,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath(PATHS.SDG_TARGETS));
+      dispatch(updatePath(PATHS.SDG_TARGETS, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

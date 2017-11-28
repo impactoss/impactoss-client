@@ -93,7 +93,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
-      dispatch(updatePath(`${PATHS.PAGES}${PATHS.NEW}`));
+      dispatch(updatePath(`${PATHS.PAGES}${PATHS.NEW}`, { replace: true }));
     },
   };
 }

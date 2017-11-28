@@ -112,7 +112,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
-      dispatch(updatePath(`${PATHS.SDG_TARGETS}${PATHS.NEW}`));
+      dispatch(updatePath(`${PATHS.SDG_TARGETS}${PATHS.NEW}`, { replace: true }));
     },
     handleImport: () => {
       dispatch(updatePath(`${PATHS.SDG_TARGETS}${PATHS.IMPORT}`));

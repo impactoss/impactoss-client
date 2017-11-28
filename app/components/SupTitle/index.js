@@ -10,6 +10,7 @@ const Styled = styled.span`
   color: ${palette('text', 1)};
   font-weight: bold;
   font-size: 0.85em;
+  letter-spacing: 0.75px;
 `;
 
 const SupIconWrap = styled.span`
