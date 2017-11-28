@@ -253,6 +253,12 @@ theme.sizes = {
   text: {
     aaLargeBold: '19px',
     aaLarge: '24px',
+    mainListItem: '18px',
+    nestedListItem: '15px',
+    listItemTop: '14px',
+  },
+  lineHeights: {
+    mainListItem: 1.4,
   },
   aside: {
     header: {
