@@ -9,16 +9,16 @@ const ListEntitiesGroupHeaderLink = styled(Link)`
   color: ${palette('link', 2)};
   &:hover {
     color: ${palette('linkHover', 2)};
-    text-decoration: underline;
   }
 `;
 
 
 const ListEntitiesGroupHeader = styled.h3`
   margin-top: 30px;
+  margin-bottom: 20px;
 `;
 const ListEntitiesSubgroupHeader = styled.h5`
-  margin-top: 12px;
+  margin-top: -10px;
   font-weight: normal;
   margin-bottom: 20px;
 `;

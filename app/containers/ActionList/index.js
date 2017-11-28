@@ -110,7 +110,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
-      dispatch(updatePath(`${PATHS.MEASURES}${PATHS.NEW}`));
+      dispatch(updatePath(`${PATHS.MEASURES}${PATHS.NEW}`, { replace: true }));
     },
     handleImport: () => {
       dispatch(updatePath(`${PATHS.MEASURES}${PATHS.IMPORT}`));

@@ -13,7 +13,8 @@ const Styled = styled.span`
   display:inline-block;
   vertical-align: top;
   color: ${palette('text', 1)};
-  font-size: 0.9em;
+  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
+  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
 `;
 
 class EntityListNestedNoItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

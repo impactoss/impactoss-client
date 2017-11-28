@@ -8,6 +8,7 @@ import SelectReset from 'components/SelectReset';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import Icon from 'components/Icon';
 
+import A from 'components/styled/A';
 import ColumnHeader from 'components/styled/ColumnHeader';
 
 import messages from './messages';
@@ -17,7 +18,8 @@ const SortButton = styled(ButtonFlatIconOnly)`
   color: inherit;
 `;
 const Styled = styled(ColumnHeader)`
-  padding: 0.25em 0;
+  padding-left: 0;
+  padding-right: 0;
 `;
 const LabelWrap = styled.div`
   display: table-cell;
@@ -25,7 +27,6 @@ const LabelWrap = styled.div`
 `;
 const CheckboxWrap = styled.div`
   width: 40px;
-  padding: 5px;
   display: table-cell;
   text-align: center;
 `;
@@ -44,7 +45,7 @@ const SelectWrapper = styled.div`
   text-align:right;
 `;
 
-const SelectAll = styled.a`
+const SelectAll = styled(A)`
   vertical-align: middle;
 `;
 

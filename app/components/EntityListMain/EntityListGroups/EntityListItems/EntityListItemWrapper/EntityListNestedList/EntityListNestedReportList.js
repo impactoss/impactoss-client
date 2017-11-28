@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Map, List } from 'immutable';
 
+import A from 'components/styled/A';
 import appMessages from 'containers/App/messages';
 
 import EntityListNestedReportItem from './EntityListNestedItem/EntityListNestedReportItem';
@@ -15,10 +16,11 @@ const ChildItems = styled.span`
   vertical-align: top;
 `;
 
-const ShowAll = styled.a`
+const ShowAll = styled(A)`
   font-size: 0.8em;
   display: block;
   text-align: center;
+  font-weight: 500;
 `;
 
 const REPORT_MAX = 5;

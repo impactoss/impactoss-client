@@ -19,6 +19,7 @@ const Button = styled.button`
   user-select: none;
   background-image: none;
   border: none;
+  border-radius: 0;
 `;
 
 export default Button;

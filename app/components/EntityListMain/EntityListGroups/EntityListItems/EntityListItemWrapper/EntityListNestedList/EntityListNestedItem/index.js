@@ -19,7 +19,7 @@ const Styled = styled.span`
 
 const Item = styled(Component)`
   display: table;
-  width:100%;
+  width: 100%;
   background-color: ${palette('mainListItem', 1)};
 `;
 const MainWrapper = styled(Component)`

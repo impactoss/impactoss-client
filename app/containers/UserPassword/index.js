@@ -109,7 +109,7 @@ export function mapDispatchToProps(dispatch) {
       dispatch(save(saveData));
     },
     handleCancel: (userId) => {
-      dispatch(updatePath(`${PATHS.USERS}/${userId}`));
+      dispatch(updatePath(`${PATHS.USERS}/${userId}`, { replace: true }));
     },
   };
 }
