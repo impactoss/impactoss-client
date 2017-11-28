@@ -203,6 +203,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('categoryNew.form.data'),
               }] : null
             }
@@ -228,6 +229,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             <EntityForm
               model="categoryNew.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 measures,
