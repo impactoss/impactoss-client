@@ -49,10 +49,6 @@ const GraphicHomeWrapper = styled.div`
 const GraphicHome = styled(NormalImg)`
   width: 100%;
   max-width: 1200px;
-  padding-top: ${(props) => props.hasBrand
-    ? props.theme.sizes.header.banner.height
-    : 0
-  }px;
 `;
 
 const SectionTop = styled.div`
@@ -66,7 +62,7 @@ const SectionTop = styled.div`
 const SectionWrapper = styled.div`
   display: ${(props) => props.hasBrand ? 'static' : 'table-cell'};
   vertical-align: ${(props) => props.hasBrand ? 'baseline' : 'middle'};
-  padding-bottom: 2em;
+  padding-bottom: 74px;
 `;
 
 const TopActions = styled.div`
@@ -76,6 +72,7 @@ const Title = styled.h1`
   color:${palette('headerBrand', 0)};
   font-family: ${(props) => props.theme.fonts.title};
   font-size: ${(props) => props.theme.sizes.home.text.title};
+  margin-top: 46px;
 `;
 
 const Claim = styled.p`
