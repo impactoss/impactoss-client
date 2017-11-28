@@ -5,7 +5,12 @@ import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { filter } from 'lodash/collection';
 
-import { SHOW_HEADER_TITLE } from 'themes/config';
+import {
+  SHOW_HEADER_TITLE,
+  SHOW_HEADER_PATTERN,
+  SHOW_BRAND_ON_HOME,
+  SHOW_HEADER_PATTERN_ON_HOME,
+} from 'themes/config';
 
 import appMessages from 'containers/App/messages';
 
@@ -25,16 +30,21 @@ import LinkAdmin from './LinkAdmin';
 
 
 const Styled = styled.div`
-  position: ${(props) => props.isHome ? 'relative' : 'absolute'};
+  position: ${(props) => props.sticky ? 'absolute' : 'relative'};
   top:0;
   left:0;
   right:0;
-  height:${(props) => props.isHome
-    ? 0
-    : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
-  }px;
+  height:${(props) => {
+    if (props.hasBrand) {
+      if (props.hasNav) {
+        return props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height;
+      }
+      return props.theme.sizes.header.banner.height;
+    }
+    return 0;
+  }}px;
   background-color: ${palette('header', 0)};
-  box-shadow: ${(props) => props.isHome ? 'none' : '0px 0px 15px 0px rgba(0,0,0,0.5)'};
+  box-shadow: ${(props) => props.hasShadow ? '0px 0px 15px 0px rgba(0,0,0,0.5)' : 'none'};
   z-index: 101;
 `;
 const HomeNavWrap = styled.div`
@@ -61,8 +71,13 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
 
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
     return (
-      <Styled isHome={isHome}>
-        { isHome &&
+      <Styled
+        sticky={!isHome}
+        hasShadow={!isHome}
+        hasNav={!isHome}
+        hasBrand={SHOW_BRAND_ON_HOME || !isHome}
+      >
+        { !SHOW_BRAND_ON_HOME && isHome &&
           <HomeNavWrap>
             <NavAccount
               isSignedIn={isSignedIn}
@@ -84,8 +99,10 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             </NavPages>
           </HomeNavWrap>
         }
-        { !isHome &&
-          <Banner showPattern={!isHome}>
+        { (SHOW_BRAND_ON_HOME || !isHome) &&
+          <Banner
+            showPattern={(!isHome && SHOW_HEADER_PATTERN) || SHOW_HEADER_PATTERN_ON_HOME}
+          >
             <Brand
               href={'/'}
               onClick={(evt) => this.onClick(evt, '/')}
