@@ -52,7 +52,6 @@ const Title = styled.h1`
   color:${palette('headerBrand', 0)};
   font-family: ${(props) => props.theme.fonts.title};
   font-size: ${(props) => props.theme.sizes.home.text.title};
-  text-transform: uppercase;
 `;
 
 const Claim = styled.p`

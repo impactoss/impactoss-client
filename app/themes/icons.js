@@ -112,7 +112,7 @@ const icons = {
   measures: {
     size: 24,
     paths: [
-      'M6,3H19l-5,8h8L9,24V14H3Z',
+      'M4.81,2.92H19l-5,8h8L8.76,24V14.87H4.81Z',
     ],
   },
   indicators: {
