@@ -21,7 +21,7 @@ injectGlobal`
     outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
   }
   #app {
-    background-color: #f1f4f4;
+    background-color: #ffffff;
     min-height: 100%;
     min-width: 100%;
   }

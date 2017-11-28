@@ -26,13 +26,33 @@ import {
   DB_TABLES,
   SHOW_HOME_TITLE,
   SHOW_BRAND_ON_HOME,
+  HEADER_PATTERN_HEIGHT,
+  SHOW_HEADER_PATTERN_HOME_GRAPHIC,
 } from 'themes/config';
 
 import messages from './messages';
 
+const GraphicHomeWrapper = styled.div`
+  width: 100%;
+  padding-top: ${(props) => props.hasBrand
+    ? props.theme.sizes.header.banner.height
+    : 0
+  }px;
+  background-image: ${(props) => (props.showPattern && props.theme.backgroundImages.header)
+    ? props.theme.backgroundImages.header
+    : 'none'
+  };
+  background-repeat: repeat;
+  background-size: ${HEADER_PATTERN_HEIGHT}px auto;
+`;
+
 const GraphicHome = styled(NormalImg)`
   width: 100%;
   max-width: 1200px;
+  padding-top: ${(props) => props.hasBrand
+    ? props.theme.sizes.header.banner.height
+    : 0
+  }px;
 `;
 
 const SectionTop = styled.div`
@@ -95,7 +115,12 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
         />
         <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
           <SectionWrapper hasBrand={SHOW_BRAND_ON_HOME}>
-            <GraphicHome src={theme.media.graphicHome} alt={this.context.intl.formatMessage(appMessages.app.title)} />
+            <GraphicHomeWrapper
+              hasBrand={SHOW_BRAND_ON_HOME}
+              showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
+            >
+              <GraphicHome src={theme.media.graphicHome} alt={this.context.intl.formatMessage(appMessages.app.title)} />
+            </GraphicHomeWrapper>
             { !SHOW_HOME_TITLE &&
               <GraphicHome src={theme.media.titleHome} alt={appTitle} />
             }

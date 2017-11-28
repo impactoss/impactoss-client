@@ -9,7 +9,6 @@ import {
   SHOW_HEADER_TITLE,
   SHOW_HEADER_PATTERN,
   SHOW_BRAND_ON_HOME,
-  SHOW_HEADER_PATTERN_ON_HOME,
 } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
@@ -30,10 +29,15 @@ import LinkAdmin from './LinkAdmin';
 
 
 const Styled = styled.div`
-  position: ${(props) => props.sticky ? 'absolute' : 'relative'};
-  top:0;
-  left:0;
-  right:0;
+  position: ${(props) => {
+    if (props.fixed) {
+      return 'fixed';
+    }
+    return props.sticky ? 'absolute' : 'relative';
+  }};
+  top: 0;
+  left: 0;
+  right: 0;
   height:${(props) => {
     if (props.hasBrand) {
       if (props.hasNav) {
@@ -43,7 +47,7 @@ const Styled = styled.div`
     }
     return 0;
   }}px;
-  background-color: ${palette('header', 0)};
+  background-color: ${(props) => props.hasBackground ? palette('header', 0) : 'transparent'};
   box-shadow: ${(props) => props.hasShadow ? '0px 0px 15px 0px rgba(0,0,0,0.5)' : 'none'};
   z-index: 101;
 `;
@@ -72,7 +76,9 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
     return (
       <Styled
+        fixed={isHome}
         sticky={!isHome}
+        hasBackground={!isHome}
         hasShadow={!isHome}
         hasNav={!isHome}
         hasBrand={SHOW_BRAND_ON_HOME || !isHome}
@@ -101,7 +107,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         }
         { (SHOW_BRAND_ON_HOME || !isHome) &&
           <Banner
-            showPattern={(!isHome && SHOW_HEADER_PATTERN) || SHOW_HEADER_PATTERN_ON_HOME}
+            showPattern={(!isHome && SHOW_HEADER_PATTERN)}
           >
             <Brand
               href={'/'}

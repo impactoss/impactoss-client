@@ -27,7 +27,8 @@ export const SHOW_HEADER_TITLE = false;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
-export const SHOW_HEADER_PATTERN = false;
+export const SHOW_HEADER_PATTERN = true;
+export const HEADER_PATTERN_HEIGHT = 254;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.sidebarHeader
@@ -40,7 +41,7 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = false;
 export const SHOW_HOME_TITLE = true;
 
 export const SHOW_BRAND_ON_HOME = true;
-export const SHOW_HEADER_PATTERN_ON_HOME = false;
+export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = true;
 
 // show footer logo section
 export const SHOW_FOOTER_PARTNERS = true;
