@@ -81,7 +81,6 @@ const OptionCount = styled.span`
 
 const Empty = styled.div`
   padding: 1em;
-  font-style: italic;
   color: ${palette('text', 1)};
 `;
 

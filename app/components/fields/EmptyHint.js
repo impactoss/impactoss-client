@@ -3,7 +3,6 @@ import { palette } from 'styled-theme';
 
 const EmptyHint = styled.span`
   color: ${palette('text', 1)};
-  font-style: italic;
   font-size: 0.85em;
 `;
 

@@ -8,7 +8,6 @@ const Option = styled.div`
   padding: 0.25em 0;
 `;
 const Hint = styled.div`
-  font-style: italic;
   font-size: 0.85em;
 `;
 // see also ScheduleItem
