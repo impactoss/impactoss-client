@@ -256,6 +256,7 @@ theme.sizes = {
     mainListItem: '18px',
     nestedListItem: '15px',
     listItemTop: '14px',
+    markdown: '18px',
   },
   lineHeights: {
     mainListItem: 1.4,
