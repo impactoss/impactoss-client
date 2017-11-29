@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import appMessages from 'containers/App/messages';
 import EntityListItems from 'components/EntityListMain/EntityListGroups/EntityListItems';
@@ -10,11 +11,15 @@ import ConnectionLabel from 'components/fields/ConnectionLabel';
 import ConnectionLabelWrap from 'components/fields/ConnectionLabelWrap';
 import Dot from 'components/fields/Dot';
 import DotWrapper from 'components/fields/DotWrapper';
-import EntityListItemsWrap from 'components/fields/EntityListItemsWrap';
+// import EntityListItemsWrap from 'components/fields/EntityListItemsWrap';
 import ToggleAllItems from 'components/fields/ToggleAllItems';
 import EmptyHint from 'components/fields/EmptyHint';
 
 const CONNECTIONMAX = 5;
+
+const StyledFieldWrap = styled(FieldWrap)`
+  padding-top: 15px;
+`;
 
 class ConnectionsField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -31,7 +36,7 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
     )}`;
 
     return (
-      <FieldWrap>
+      <StyledFieldWrap>
         <ConnectionLabelWrap>
           <ConnectionLabel>
             {label}
@@ -43,7 +48,7 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
           }
         </ConnectionLabelWrap>
         { (field.values && field.values.size > 0) &&
-          <EntityListItemsWrap>
+          <div>
             <EntityListItems
               taxonomies={field.taxonomies}
               connections={field.connections}
@@ -69,14 +74,14 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
                 }
               </ToggleAllItems>
             }
-          </EntityListItemsWrap>
+          </div>
         }
         { (!field.values || field.values.size === 0) &&
           <EmptyHint>
             <FormattedMessage {...field.showEmpty} />
           </EmptyHint>
         }
-      </FieldWrap>
+      </StyledFieldWrap>
     );
   }
 }

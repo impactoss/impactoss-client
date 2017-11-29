@@ -18,7 +18,6 @@ const ListEntitiesGroupHeader = styled.h3`
   margin-bottom: 20px;
 `;
 const ListEntitiesSubgroupHeader = styled.h5`
-  margin-top: -10px;
   font-weight: normal;
   margin-bottom: 20px;
 `;
