@@ -49,9 +49,17 @@ const HomeNavWrap = styled.div`
 
 class Header extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  onClick = (evt, path) => {
+  onClick = (evt, path, currentPath) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.props.onPageLink(path);
+    if (currentPath) {
+      if (currentPath === '/login' || currentPath === '/register') {
+        this.props.onPageLink(path, { keepQuery: true });
+      } else {
+        this.props.onPageLink(path, { query: { arg: 'redirectOnAuthSuccess', value: currentPath } });
+      }
+    } else {
+      this.props.onPageLink(path);
+    }
   }
 
   render() {
