@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Map, List } from 'immutable';
 
-import EntityListItem from './EntityListItem';
-import EntityListNestedList from './EntityListNestedList';
-import EntityListNestedReportList from './EntityListNestedList/EntityListNestedReportList';
-import EntityListNestedNoItem from './EntityListNestedList/EntityListNestedItem/EntityListNestedNoItem';
+import EntityListItem from 'components/EntityListItem';
+import EntityListNestedList from 'components/EntityListNestedList';
+import EntityListNestedReportList from 'components/EntityListNestedList/EntityListNestedReportList';
+import EntityListNestedNoItem from 'components/EntityListNestedList/EntityListNestedItem/EntityListNestedNoItem';
 
 const ItemWrapper = styled.div`
   border-top: 1px solid;

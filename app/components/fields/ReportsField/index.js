@@ -7,7 +7,7 @@ import appMessages from 'containers/App/messages';
 
 import ButtonFactory from 'components/buttons/ButtonFactory';
 
-import EntityListItemMainTop from 'components/EntityListMain/EntityListGroups/EntityListItems/EntityListItemWrapper/EntityListItem/EntityListItemMain/EntityListItemMainTop';
+import EntityListItemMainTop from 'components/EntityListItem/EntityListItemMain/EntityListItemMainTop';
 import FieldWrap from 'components/fields/FieldWrap';
 import ConnectionLabel from 'components/fields/ConnectionLabel';
 import ConnectionLabelWrap from 'components/fields/ConnectionLabelWrap';
