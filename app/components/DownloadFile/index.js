@@ -25,7 +25,6 @@ const DownloadIcon = styled.div`
   right: 0;
   top: 0;
   bottom: 0;
-  padding: 0 0.75em;
 `;
 
 const DownloadFile = ({ url }) => {
