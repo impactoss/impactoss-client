@@ -23,61 +23,59 @@ import TitleShortField from 'components/fields/TitleShortField';
 
 class FieldFactory extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   renderField = (field) => {
-    if ((typeof field.value !== 'undefined' && field.value !== null)
-      || (field.values && field.values.length)
-      || (field.fields && field.fields.length)
-      || field.showEmpty
-    ) {
-      switch (field.type) {
-        case 'title':
-          return (<TitleField field={field} />);
-        case 'titleText':
-          return (<TitleTextField field={field} />);
-        case 'short_title':
-          return (<TitleShortField field={field} />);
-        case 'meta':
-          return (<MetaField field={field} />);
-        case 'reference':
-          return (<ReferenceField field={field} />);
-        case 'status':
-          return (<StatusField field={field} />);
-        case 'role':
-          return (<RoleField field={field} />);
-        case 'link':
-          return (<LinkField field={field} />);
-        case 'email':
-          return (<EmailField field={field} />);
-        case 'date':
-          return (<DateField field={field} />);
-        case 'manager':
-          return (<ManagerField field={field} />);
-        case 'list':
-          return (<ListField field={field} />);
-        case 'schedule':
-          return (<ScheduleField field={field} />);
-        case 'download':
-          return (<DownloadField field={field} />);
-        case 'description':
-        case 'markdown':
-          return (<MarkdownField field={field} />);
-        case 'connections':
-          return (<ConnectionsField field={field} />);
-        case 'reports':
-          return (<ReportsField field={field} />);
-        case 'text':
-        default:
-          return (<TextField field={field} />);
-      }
+    switch (field.type) {
+      case 'title':
+        return (<TitleField field={field} />);
+      case 'titleText':
+        return (<TitleTextField field={field} />);
+      case 'short_title':
+        return (<TitleShortField field={field} />);
+      case 'meta':
+        return (<MetaField field={field} />);
+      case 'reference':
+        return (<ReferenceField field={field} />);
+      case 'status':
+        return (<StatusField field={field} />);
+      case 'role':
+        return (<RoleField field={field} />);
+      case 'link':
+        return (<LinkField field={field} />);
+      case 'email':
+        return (<EmailField field={field} />);
+      case 'date':
+        return (<DateField field={field} />);
+      case 'manager':
+        return (<ManagerField field={field} />);
+      case 'list':
+        return (<ListField field={field} />);
+      case 'schedule':
+        return (<ScheduleField field={field} />);
+      case 'download':
+        return (<DownloadField field={field} />);
+      case 'description':
+      case 'markdown':
+        return (<MarkdownField field={field} />);
+      case 'connections':
+        return (<ConnectionsField field={field} />);
+      case 'reports':
+        return (<ReportsField field={field} />);
+      case 'text':
+      default:
+        return (<TextField field={field} />);
     }
-    return null;
   };
   render() {
     const { field, nested } = this.props;
-    return (
+    return ((typeof field.value !== 'undefined' && field.value !== null)
+      || (typeof field.values !== 'undefined' && field.values.length > 0)
+      || (typeof field.fields !== 'undefined' && field.fields.length > 0)
+      || typeof field.showEmpty !== 'undefined')
+    ? (
       <Field nested={nested}>
         {this.renderField(field)}
       </Field>
-    );
+    )
+    : null;
   }
 }
 FieldFactory.propTypes = {
