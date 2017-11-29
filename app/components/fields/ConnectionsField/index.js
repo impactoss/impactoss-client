@@ -61,6 +61,7 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
               entityIcon={field.entityIcon}
               onEntityClick={field.onEntityClick}
               entityPath={field.entityPath}
+              isConnection
             />
             { field.values.size > CONNECTIONMAX &&
               <ToggleAllItems

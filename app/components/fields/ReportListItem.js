@@ -1,13 +1,13 @@
 
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 import ListItem from './ListItem';
 
 const ReportListItem = styled(ListItem)`
-  padding: 1.25em 0;
-  border-top: 1px solid ${palette('light', 0)};
-  position: relative;
+  padding: 0px 12px 6px 0;
+  font-weight: normal;
+  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.mainListItem};
+  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
 `;
 
 export default ReportListItem;

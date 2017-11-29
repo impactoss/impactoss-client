@@ -6,7 +6,6 @@ const ListLabel = styled.h4`
   vertical-align: middle;
   font-weight: 500;
   color: ${palette('text', 0)};
-  width: 100%;
   margin: 0;
   font-size: 1em;
 `;

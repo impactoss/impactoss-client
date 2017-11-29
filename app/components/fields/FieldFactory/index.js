@@ -67,7 +67,10 @@ class FieldFactory extends React.PureComponent { // eslint-disable-line react/pr
   render() {
     const { field, nested } = this.props;
     return ((typeof field.value !== 'undefined' && field.value !== null)
-      || (typeof field.values !== 'undefined' && field.values.length > 0)
+      || (typeof field.values !== 'undefined' && (
+        (field.values.length && field.values.length > 0)
+        || (field.values.size && field.values.size > 0)
+      ))
       || (typeof field.fields !== 'undefined' && field.fields.length > 0)
       || typeof field.showEmpty !== 'undefined')
     ? (

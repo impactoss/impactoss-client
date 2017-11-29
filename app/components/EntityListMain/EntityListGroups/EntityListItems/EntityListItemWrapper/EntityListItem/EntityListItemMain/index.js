@@ -17,10 +17,13 @@ import EntityListItemMainBottom from './EntityListItemMainBottom';
 
 
 const Styled = styled(Component)`
-  padding-right: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
+  padding-right: ${(props) => (!props.theme.sizes || props.isConnection)
+    ? 0
+    : props.theme.sizes.mainListItem.paddingHorizontal
+  }px;
   padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
   padding-bottom: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingBottom}px;
-  padding-left: ${(props) => (!props.theme.sizes || props.isManager)
+  padding-left: ${(props) => (!props.theme.sizes || props.isManager || props.isConnection)
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
   }px;
@@ -137,7 +140,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     const entity = this.mapToEntityListItem(this.props);
 
     return (
-      <Styled isManager={this.props.isManager}>
+      <Styled isManager={this.props.isManager} isConnection={this.props.isConnection}>
         <EntityListItemMainTop
           entity={entity}
         />
@@ -177,6 +180,7 @@ EntityListItemMain.propTypes = {
   wrapper: PropTypes.object,
   nestLevel: PropTypes.number,
   onEntityClick: PropTypes.func,
+  isConnection: PropTypes.bool,
 };
 EntityListItemMain.contextTypes = {
   intl: PropTypes.object,

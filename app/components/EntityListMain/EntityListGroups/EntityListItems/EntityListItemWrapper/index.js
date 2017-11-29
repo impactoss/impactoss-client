@@ -42,6 +42,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
       onEntityClick,
       entity,
       entityPath,
+      isConnection,
     } = this.props;
     return (
       <ItemWrapper
@@ -59,6 +60,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
               error={this.props.errors ? this.props.errors.get(entity.get('id')) : null}
               onDismissError={this.props.onDismissError}
               isManager={isManager}
+              isConnection={isConnection}
               isSelected={isManager && entityIdsSelected.includes(entity.get('id'))}
               onSelect={(checked) => onEntitySelect(entity.get('id'), checked)}
               onExpand={onExpand}
@@ -132,6 +134,7 @@ EntityListItemWrapper.propTypes = {
   entityPath: PropTypes.string,
   entityIcon: PropTypes.func,
   simulate: PropTypes.bool,
+  isConnection: PropTypes.bool,
 };
 
 export default EntityListItemWrapper;

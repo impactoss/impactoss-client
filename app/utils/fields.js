@@ -163,6 +163,7 @@ const mapReports = (reports) => reports
     label: report.getIn(['attributes', 'title']),
     dueDate: report.get('due_date') ? report.getIn(['due_date', 'attributes', 'due_date']) : null,
     updatedAt: report.getIn(['attributes', 'updated_at']),
+    createdAt: report.getIn(['attributes', 'created_at']),
     linkTo: `${PATHS.PROGRESS_REPORTS}/${report.get('id')}`,
   })).toArray()
   : [];
