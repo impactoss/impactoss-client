@@ -27,7 +27,7 @@ const DocumentWrapEdit = styled(DocumentWrap)`
   position: relative;
   padding: 0;
   border: 1px solid ${palette('light', 1)};
-  font-weight: bold;
+  font-weight: 500;
   max-width: 100%;
   padding-right: 45px;
   display: inline-block;
