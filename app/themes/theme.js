@@ -257,6 +257,7 @@ theme.sizes = {
     nestedListItem: '15px',
     listItemTop: '14px',
     markdown: '18px',
+    small: '13px', // used for labels
   },
   lineHeights: {
     mainListItem: 1.4,
