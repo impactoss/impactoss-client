@@ -165,6 +165,7 @@ const mapReports = (reports) => reports
     updatedAt: report.getIn(['attributes', 'updated_at']),
     createdAt: report.getIn(['attributes', 'created_at']),
     linkTo: `${PATHS.PROGRESS_REPORTS}/${report.get('id')}`,
+    updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
   })).toArray()
   : [];
 

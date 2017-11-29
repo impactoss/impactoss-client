@@ -8,20 +8,21 @@ import appMessages from 'containers/App/messages';
 import ButtonFactory from 'components/buttons/ButtonFactory';
 
 import EntityListItemMainTop from 'components/EntityListItem/EntityListItemMain/EntityListItemMainTop';
+import EntityListItemMainTitle from 'components/EntityListItem/EntityListItemMain/EntityListItemMainTitle';
 import FieldWrap from 'components/fields/FieldWrap';
 import ConnectionLabel from 'components/fields/ConnectionLabel';
 import ConnectionLabelWrap from 'components/fields/ConnectionLabelWrap';
 import ButtonWrap from 'components/fields/ButtonWrap';
-import ReportListLink from 'components/fields/ReportListLink';
 import ReportListItem from 'components/fields/ReportListItem';
+import ReportListTitleLink from 'components/fields/ReportListTitleLink';
 import ToggleAllItems from 'components/fields/ToggleAllItems';
 import EmptyHint from 'components/fields/EmptyHint';
 import Clear from 'components/styled/Clear';
+
 const REPORTSMAX = 5;
 const StyledFieldWrap = styled(FieldWrap)`
   padding-top: 15px;
 `;
-
 
 class ReportsField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -45,7 +46,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
 
     return (
       <StyledFieldWrap>
-        <ConnectionLabelWrap>
+        <ConnectionLabelWrap hasButton={field.button}>
           <ConnectionLabel>
             <FormattedMessage {...appMessages.entities.progress_reports.plural} />
           </ConnectionLabel>
@@ -58,7 +59,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
         { (field.values && field.values.length > 0) &&
           <div>
             { field.values.map((report, i) => (this.state.showAllReports || i < REPORTSMAX) && (
-              <ReportListLink key={i} to={report.linkTo}>
+              <ReportListItem key={i}>
                 <EntityListItemMainTop
                   entity={{
                     reference: this.getReportReference(report),
@@ -66,10 +67,12 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
                   }}
                 />
                 <Clear />
-                <ReportListItem>
-                  {report.label}
-                </ReportListItem>
-              </ReportListLink>
+                <ReportListTitleLink to={report.linkTo}>
+                  <EntityListItemMainTitle>
+                    {report.label}
+                  </EntityListItemMainTitle>
+                </ReportListTitleLink>
+              </ReportListItem>
             ))}
             { field.values && field.values.length > REPORTSMAX &&
               <ToggleAllItems

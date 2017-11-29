@@ -161,7 +161,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             tags={entity.tags}
             connections={entity.connectedCounts}
             wrapper={this.props.wrapper}
-            assignedUser={entity.assignedUser}
+            user={entity.assignedUser}
           />
         }
       </Styled>
