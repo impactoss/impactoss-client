@@ -1,13 +1,12 @@
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import Label from './Label';
-
-const ListLabel = styled(Label)`
+const ListLabel = styled.div`
   display: table-cell;
   vertical-align: middle;
-  font-size: 1.1em;
+  font-weight: 500;
   color: ${palette('text', 0)};
+  width: 100%;
 `;
 
 export default ListLabel;

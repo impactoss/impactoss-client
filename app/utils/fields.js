@@ -189,7 +189,7 @@ export const getScheduleField = (dates) => ({
 
 export const getTaxonomyFields = (taxonomies) =>
   taxonomies && taxonomies.map((taxonomy) => ({
-    type: 'list',
+    type: 'taxonomy',
     label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
     entityType: 'taxonomies',
     id: taxonomy.get('id'),

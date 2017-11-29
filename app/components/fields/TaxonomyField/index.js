@@ -16,14 +16,18 @@ import ItemStatus from 'components/ItemStatus';
 
 const Reference = styled.div`
   color: ${palette('text', 1)};
-  font-size: 0.85em;
+  font-size: ${(props) => props.theme.sizes.text.small};
 `;
 
-class ListField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+const StyledFieldWrap = styled(FieldWrap)`
+  padding-top: 15px;
+`;
+
+class TaxonomyField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { field } = this.props;
     return (
-      <FieldWrap>
+      <StyledFieldWrap>
         <ListLabelWrap>
           <ListLabel>
             <FormattedMessage {...field.label} />
@@ -67,13 +71,13 @@ class ListField extends React.PureComponent { // eslint-disable-line react/prefe
             <FormattedMessage {...field.showEmpty} />
           </EmptyHint>
         }
-      </FieldWrap>
+      </StyledFieldWrap>
     );
   }
 }
 
-ListField.propTypes = {
+TaxonomyField.propTypes = {
   field: PropTypes.object.isRequired,
 };
 
-export default ListField;
+export default TaxonomyField;
