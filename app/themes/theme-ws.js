@@ -290,7 +290,6 @@ theme.sizes = {
       claim: '1.2em',
     },
   },
-  bannerHeight: 88,
 };
 
 // end styled-theme settings

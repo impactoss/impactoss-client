@@ -250,16 +250,20 @@ theme.fonts = {
 // sizes
 theme.sizes = {
   // also see global-styles.js for other sizes
+  // px or em
   text: {
     aaLargeBold: '19px',
     aaLarge: '24px',
     mainListItem: '18px',
     nestedListItem: '15px',
     listItemTop: '14px',
+    markdown: '18px',
+    small: '13px', // used for labels
   },
   lineHeights: {
     mainListItem: 1.4,
   },
+  // px only
   aside: {
     header: {
       height: 90,
@@ -277,18 +281,19 @@ theme.sizes = {
     nav: {
       height: 38,
     },
+    // px or em
     text: {
       title: '2.2em',
       claim: '0.85em',
     },
   },
   home: {
+    // px or em
     text: {
       title: '3em',
       claim: '1.2em',
     },
   },
-  bannerHeight: 88,
 };
 
 // end styled-theme settings
