@@ -14,7 +14,7 @@
 
 // default language locale
 export const DEFAULT_LOCALE = 'en-GB';
-// date format - change to format according to locale
+// date format - change to format according to locale, only used for form error message
 export const DATE_FORMAT = 'dd/mm/yyyy';
 
 // UI settings ************************
@@ -27,7 +27,8 @@ export const SHOW_HEADER_TITLE = false;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
-export const SHOW_HEADER_PATTERN = false;
+export const SHOW_HEADER_PATTERN = true;
+export const HEADER_PATTERN_HEIGHT = 254;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.sidebarHeader
@@ -39,11 +40,22 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = false;
 // - app.containers.App.app.claim
 export const SHOW_HOME_TITLE = true;
 
+export const SHOW_BRAND_ON_HOME = true;
+export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = true;
+
 // show footer logo section
 export const SHOW_FOOTER_PARTNERS = true;
 
 // entitylists items-per-page options
 export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
+
+export const TEXT_TRUNCATE = {
+  CONNECTION_TAG: 20,
+  ATTRIBUTE_TAG: 10,
+  ENTITY_TAG: 10,
+  CONNECTION_POPUP: 80,
+  LINK_FIELD: 30,
+};
 
 /**
  * Server settings

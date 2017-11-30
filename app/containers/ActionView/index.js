@@ -188,7 +188,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (measureId) => {
-      dispatch(updatePath(`${PATHS.MEASURES}${PATHS.EDIT}/${measureId}`));
+      dispatch(updatePath(`${PATHS.MEASURES}${PATHS.EDIT}/${measureId}`, { replace: true }));
     },
     handleClose: () => {
       dispatch(closeEntity(PATHS.MEASURES));

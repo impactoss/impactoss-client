@@ -7,9 +7,7 @@ import { combineReducers } from 'redux-immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import { browserHistory } from 'react-router';
 
-import { startsWith } from 'utils/string';
-
-import { PATHS, LOGOUT_SUCCESS } from 'containers/App/constants';
+import { LOGOUT_SUCCESS } from 'containers/App/constants';
 import globalReducer from 'containers/App/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import entityNewReducer from 'containers/EntityNew/reducer';
@@ -26,12 +24,9 @@ import entityListFormReducer from 'containers/EntityListForm/reducer';
 // Initial routing state
 const routeInitialState = fromJS({
   locationBeforeTransitions: Object.assign(browserHistory.getCurrentLocation(), {
-    listSearch: '',
     pathnamePrevious: '',
   }),
 });
-
-const listPaths = [PATHS.MEASURES, PATHS.RECOMMENDATIONS, PATHS.INDICATORS, PATHS.SDG_TARGETS];
 
 /**
  * Merge route into the global application state and remember previous route
@@ -42,13 +37,9 @@ function routeReducer(state = routeInitialState, action) {
     case LOGOUT_SUCCESS:
       return routeInitialState;
     case LOCATION_CHANGE: {
-      const pathName = state.getIn(['locationBeforeTransitions', 'pathname']);
       return state.merge({
         locationBeforeTransitions: {
           ...action.payload,
-          listSearch: listPaths.indexOf(pathName) > -1 || startsWith(pathName, PATHS.TAXONOMIES)
-            ? state.getIn(['locationBeforeTransitions', 'search'])
-            : state.getIn(['locationBeforeTransitions', 'listSearch']),
           pathnamePrevious: state.getIn(['locationBeforeTransitions', 'pathname']),
         },
       });

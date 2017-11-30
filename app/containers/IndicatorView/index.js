@@ -71,7 +71,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceField(entity, true),
+        getReferenceField(entity, isManager, true),
         getTitleField(entity, isManager),
       ],
     },
@@ -193,7 +193,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
               <FormattedMessage {...messages.notFound} />
             </div>
           }
-          {this.props.queryMessages.info &&
+          {this.props.queryMessages.info && appMessages.entities[this.props.queryMessages.infotype] &&
             <Messages
               spaceMessage
               type="success"
@@ -278,10 +278,10 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: () => {
-      dispatch(updatePath(`${PATHS.INDICATORS}${PATHS.EDIT}/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.INDICATORS}${PATHS.EDIT}/${props.params.id}`, { replace: true }));
     },
     handleNewReport: () => {
-      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}${PATHS.NEW}/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}${PATHS.NEW}/${props.params.id}`, { replace: true }));
     },
     handleClose: () => {
       dispatch(closeEntity(PATHS.INDICATORS));

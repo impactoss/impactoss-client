@@ -134,6 +134,8 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     this.setState({ deleteConfirmed: confirm });
   }
 
+  handleSubmit = (formData) => !this.props.saving && this.props.handleSubmit(formData);
+
   renderMultiSelect = (field, formData, hasEntityNewModal) => (
     <MultiSelectField
       field={field}
@@ -286,11 +288,12 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   );
 
   render() {
-    const { fields, model, handleSubmit, handleCancel, handleSubmitFail, inModal, validators, newEntityModal } = this.props;
+    const { fields, model, handleCancel, handleSubmitFail, inModal, validators, newEntityModal } = this.props;
     const hasEntityNewModal = !!newEntityModal;
+
     return (
       <FormWrapper withoutShadow={inModal}>
-        <Form model={model} onSubmit={handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
+        <Form model={model} onSubmit={this.handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
           { fields.header &&
             <FormPanel borderBottom>
               { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, hasEntityNewModal) }

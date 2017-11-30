@@ -96,9 +96,10 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     const props = nextProps || this.props;
     const { viewEntity } = props;
     let attributes = viewEntity.get('attributes');
-    if (attributes.get('due_date_id')) {
-      attributes = attributes.set('due_date_id', attributes.get('due_date_id').toString());
-    }
+    attributes = attributes.set('due_date_id', attributes.get('due_date_id')
+      ? attributes.get('due_date_id').toString()
+      : '0'
+    );
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
@@ -149,7 +150,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             this.context.intl.formatMessage,
             appMessages,
             this.context.intl.formatDate,
-            entity.getIn(['attributes', 'due_date_id']) && entity.getIn(['attributes', 'due_date_id']).toString(),
+            entity.getIn(['attributes', 'due_date_id'])
+              ? entity.getIn(['attributes', 'due_date_id']).toString()
+              : '0',
           ),
         )],
     },
@@ -327,7 +330,7 @@ function mapDispatchToProps(dispatch, props) {
       ));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}/${reference}`));
+      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}/${reference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

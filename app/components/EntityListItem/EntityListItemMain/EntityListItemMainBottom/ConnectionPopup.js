@@ -4,14 +4,16 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Link } from 'react-router';
 
+import { TEXT_TRUNCATE } from 'themes/config';
+
 import { sortEntities } from 'utils/sort';
 import { truncateText } from 'utils/string';
 
+import Button from 'components/buttons/Button';
 import messages from 'components/ItemStatus/messages';
 import ItemStatus from 'components/ItemStatus';
 
-const POPUP_WIDTH = 350;
-const POPUP_LENGTH = 66;
+const POPUP_WIDTH = 330;
 
 const Count = styled.span`
   display: inline-block;
@@ -30,9 +32,11 @@ const Count = styled.span`
   padding: 0 0.5em;
 `;
 
-const PopupWrapper = styled.span`
+const PopupWrapper = styled(Button)`
+  padding: 0;
   position: relative;
-  margin-right: 5px;
+  margin-right: 10px;
+  text-align: left;
 `;
 
 const POPUP_WIDTH_PX = `${POPUP_WIDTH}px`;
@@ -52,6 +56,7 @@ const Popup = styled.div`
   left: 50%;
   z-index: 1;
   padding-bottom: 4px;
+  font-size: 0.8em;
 `;
 const PopupInner = styled.div`
   width: 100%;
@@ -59,7 +64,6 @@ const PopupInner = styled.div`
   background-color: ${palette('background', 0)};
   color: ${palette('text', 0)};
   box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.4);
-  border-bottom: 10px solid ${palette('background', 1)};
 `;
 const TriangleBottom = styled.div`
    width: 20px;
@@ -78,11 +82,11 @@ const TriangleBottom = styled.div`
       position: absolute;
       width: 20px;
       height: 20px;
-      background-color: ${palette('background', 1)};
+      background-color: ${palette('background', 0)};
       transform: rotate(45deg);
       bottom: 5px;
       left: 0px;
-      box-shadow: -1px -1px 10px -2px rgba(0,0,0,0.5);
+      box-shadow: -1px -1px 3px 1px rgba(0,0,0,0.5)
    }
 `;
 
@@ -103,7 +107,7 @@ const PopupContent = styled.div`
 
 const Id = styled.span`
   color: ${palette('text', 1)};
-  font-size: 0.9em;
+  font-size: 0.8em;
 `;
 const IdSpacer = styled.span`
   padding-left: 0.25em;
@@ -115,7 +119,7 @@ const ItemContent = styled.span``;
 const ListItem = styled.div`
   padding: 0.5em 1em;
   border-top: 1px solid ${palette('background', 1)};
-  line-height: 1.4;
+  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
 `;
 
 const ListItemLink = styled(Link)`
@@ -162,6 +166,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
         onFocus={false}
         onMouseOver={() => this.openPopup()}
         onMouseLeave={() => this.closePopup()}
+        onClick={() => this.state.popupOpen ? this.closePopup() : this.openPopup()}
         innerRef={(node) => {
           if (!this.state.popupRef) {
             this.setState({ popupRef: node });
@@ -199,7 +204,8 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                           }
                           <Id>{ref}</Id>
                           <IdSpacer />
-                          <ItemContent>{truncateText(entity.getIn(['attributes', 'title']), POPUP_LENGTH - ref.length)}</ItemContent>
+                          <ItemContent>
+                            {truncateText(entity.getIn(['attributes', 'title']), TEXT_TRUNCATE.CONNECTION_POPUP - ref.length)}</ItemContent>
                         </ListItemLink>
                       </ListItem>
                     );

@@ -14,6 +14,7 @@ import messages from './messages';
 
 const Styled = styled.div`
   display: inline-block;
+  font-size: 0.85em;
 `;
 
 export class EntityListGroupBy extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

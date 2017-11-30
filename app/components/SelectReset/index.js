@@ -16,6 +16,7 @@ import Icon from 'components/Icon';
 const Label = styled.label`
   color: ${palette('text', 1)};
   padding: 0 0.5em 0 0;
+  vertical-align: middle;
 `;
 const Select = styled.select`
   font-weight: ${(props) => props.active ? 500 : 'normal'};
@@ -26,7 +27,8 @@ const Option = styled.option`
   background-color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 1) : palette('background', 0)};
 `;
 const Reset = styled(ButtonSimple)`
-  padding: 0 0.5em;
+  padding: 0 0.5em 0 0;
+  vertical-align: middle;
   color: ${palette('link', 2)};
   &:hover {
     color: ${palette('linkHover', 2)};

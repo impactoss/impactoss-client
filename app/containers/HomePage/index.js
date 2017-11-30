@@ -22,9 +22,29 @@ import Footer from 'components/Footer';
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
 
-import { DB_TABLES, SHOW_HOME_TITLE } from 'themes/config';
+import {
+  DB_TABLES,
+  SHOW_HOME_TITLE,
+  SHOW_BRAND_ON_HOME,
+  HEADER_PATTERN_HEIGHT,
+  SHOW_HEADER_PATTERN_HOME_GRAPHIC,
+} from 'themes/config';
 
 import messages from './messages';
+
+const GraphicHomeWrapper = styled.div`
+  width: 100%;
+  padding-top: ${(props) => props.hasBrand
+    ? props.theme.sizes.header.banner.height
+    : 0
+  }px;
+  background-image: ${(props) => (props.showPattern && props.theme.backgroundImages.header)
+    ? props.theme.backgroundImages.header
+    : 'none'
+  };
+  background-repeat: repeat;
+  background-size: ${HEADER_PATTERN_HEIGHT}px auto;
+`;
 
 const GraphicHome = styled(NormalImg)`
   width: 100%;
@@ -32,17 +52,17 @@ const GraphicHome = styled(NormalImg)`
 `;
 
 const SectionTop = styled.div`
-  min-height: 100vH;
+  min-height: ${(props) => props.hasBrand ? 0 : '100vH'};
+  display: ${(props) => props.hasBrand ? 'static' : 'table'};
   background-color: ${palette('home', 0)};
   color: ${palette('homeIntro', 0)};
   text-align: center;
-  display: table;
 `;
 
 const SectionWrapper = styled.div`
-  display: table-cell;
-  vertical-align: middle;
-  padding-bottom: 2em;
+  display: ${(props) => props.hasBrand ? 'static' : 'table-cell'};
+  vertical-align: ${(props) => props.hasBrand ? 'baseline' : 'middle'};
+  padding-bottom: 74px;
 `;
 
 const TopActions = styled.div`
@@ -52,7 +72,7 @@ const Title = styled.h1`
   color:${palette('headerBrand', 0)};
   font-family: ${(props) => props.theme.fonts.title};
   font-size: ${(props) => props.theme.sizes.home.text.title};
-  text-transform: uppercase;
+  margin-top: 46px;
 `;
 
 const Claim = styled.p`
@@ -89,9 +109,14 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <SectionTop>
-          <SectionWrapper>
-            <GraphicHome src={theme.media.graphicHome} alt={this.context.intl.formatMessage(appMessages.app.title)} />
+        <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
+          <SectionWrapper hasBrand={SHOW_BRAND_ON_HOME}>
+            <GraphicHomeWrapper
+              hasBrand={SHOW_BRAND_ON_HOME}
+              showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
+            >
+              <GraphicHome src={theme.media.graphicHome} alt={this.context.intl.formatMessage(appMessages.app.title)} />
+            </GraphicHomeWrapper>
             { !SHOW_HOME_TITLE &&
               <GraphicHome src={theme.media.titleHome} alt={appTitle} />
             }

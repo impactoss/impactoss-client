@@ -59,16 +59,19 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     }
   }
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+  getTaxButtonTitle = (id) => this.context.intl.formatMessage(
+    appMessages.entities.taxonomies[id].shortSingle || appMessages.entities.taxonomies[id].single
+  );
 
   render() {
-    const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
+    const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, onTaxonomyLink, params } = this.props;
     const reference = typeof params.id !== 'undefined' ? params.id : '1';
     const contentTitle = this.getTaxTitle(reference);
 
     const buttons = dataReady && isManager
       ? [{
         type: 'add',
-        title: this.context.intl.formatMessage(messages.add),
+        title: this.context.intl.formatMessage(messages.add, { category: this.getTaxButtonTitle(reference) }),
         onClick: () => this.props.handleNew(reference),
       }]
       : null;
@@ -90,7 +93,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         <Sidebar>
           <Scrollable>
             <TaxonomySidebar
-              taxonomies={mapToTaxonomyList(taxonomies, onPageLink, reference)}
+              taxonomies={mapToTaxonomyList(taxonomies, onTaxonomyLink, reference)}
             />
           </Scrollable>
         </Sidebar>
@@ -132,7 +135,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                   onPageLink={onPageLink}
                   onSort={this.props.onSort}
                   sortOptions={SORT_OPTIONS}
-                  sortBy={this.props.location.query && this.props.location.query.sort}
+                  sortBy={'title'}
                   sortOrder={this.props.location.query && this.props.location.query.order}
                   userOnly
                 />
@@ -147,6 +150,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
 CategoryList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onPageLink: PropTypes.func,
+  onTaxonomyLink: PropTypes.func,
   onSort: PropTypes.func,
   handleNew: PropTypes.func,
   taxonomy: PropTypes.object,
@@ -182,10 +186,13 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: (taxonomyId) => {
-      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyId}${PATHS.NEW}`));
+      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyId}${PATHS.NEW}`, { replace: true }));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));
+    },
+    onTaxonomyLink: (path) => {
+      dispatch(updatePath(path, { keepQuery: true }));
     },
     onSort: (sort, order) => {
       dispatch(updateSort({ sort, order }));

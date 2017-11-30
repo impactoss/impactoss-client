@@ -106,6 +106,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
   getHeaderAsideFields = (taxonomy) => {
     const fields = []; // fieldGroups
+    fields.push({
+      fields: [
+        getStatusField(this.context.intl.formatMessage, appMessages),
+      ],
+    });
     if (taxonomy.getIn(['attributes', 'tags_users'])) {
       fields.push({
         fields: [
@@ -117,11 +122,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         ],
       });
     }
-    fields.push({
-      fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages),
-      ],
-    });
     return fields;
   }
 
@@ -170,6 +170,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return fields;
   }
 
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+
   render() {
     const { taxonomy, dataReady, isAdmin, viewDomain, users, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
@@ -178,7 +180,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (taxonomy && taxonomy.get('attributes')) {
       pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
-        taxonomy: taxonomy.getIn(['attributes', 'title']),
+        taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     }
 
@@ -205,6 +207,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('categoryNew.form.data'),
               }] : null
             }
@@ -230,6 +233,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             <EntityForm
               model="categoryNew.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 measures,
@@ -384,7 +388,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (taxonomyReference) => {
-      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyReference}`));
+      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyReference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

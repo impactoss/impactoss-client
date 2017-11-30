@@ -123,7 +123,7 @@ theme.palette = {
   sdgtargetsHover: ['#00546B'],
   indicators: ['#553529'],
   indicatorsHover: ['#2A1913'],
-  reports: [primary[1]],
+  reports: [primary[1]], // note: can stand on light grey
   reportsHover: [primary[0]],
   attributes: ['#6C787A'],
   attributesHover: ['#434A4C'],
@@ -203,7 +203,7 @@ theme.palette = {
 
   // mainListItem: [#color, '#bg',], eg category and entity list items
   mainListItem: [dark[0], primary[4]],
-  mainListItemHover: [dark[3], primary[4]],
+  mainListItemHover: [primary[0], primary[4]],
 
   // multiselect header [#color, #bg]
   // compare asideListItem
@@ -221,7 +221,7 @@ theme.palette = {
   // buttonDefault: ['#text', '#bg'],
   buttonDefault: [primary[4], primary[1]],
   buttonDefaultHover: [primary[4], primary[0]],
-  buttonDefaultDisabled: [light[0], dark[3]],
+  buttonDefaultDisabled: [light[0], light[3]],
   // buttonPrimary: ['#text', '#bg', '#border'],
   buttonDefaultIconOnly: [primary[4], primary[1], primary[1]],
   buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],
@@ -253,6 +253,14 @@ theme.sizes = {
   text: {
     aaLargeBold: '19px',
     aaLarge: '24px',
+    mainListItem: '18px',
+    nestedListItem: '15px',
+    listItemTop: '14px',
+    markdown: '18px',
+    small: '13px', // used for labels
+  },
+  lineHeights: {
+    mainListItem: 1.4,
   },
   aside: {
     header: {
@@ -261,7 +269,7 @@ theme.sizes = {
   },
   mainListItem: {
     paddingHorizontal: 15,
-    paddingTop: 5,
+    paddingTop: 10,
     paddingBottom: 10,
   },
   header: {
@@ -282,7 +290,6 @@ theme.sizes = {
       claim: '1.2em',
     },
   },
-  bannerHeight: 88,
 };
 
 // end styled-theme settings

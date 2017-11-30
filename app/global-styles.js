@@ -21,7 +21,7 @@ injectGlobal`
     outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
   }
   #app {
-    background-color: #f1f4f4;
+    background-color: #ffffff;
     min-height: 100%;
     min-width: 100%;
   }
@@ -48,7 +48,7 @@ injectGlobal`
     font-weight: 500;
   }
   h3 {
-    font-size: 1.7em;
+    font-size: 1.9em;
   }
   h4 {
     font-size: 1.5em;

@@ -10,6 +10,8 @@ import { palette } from 'styled-theme';
 
 import { isEqual } from 'lodash/lang';
 
+import A from 'components/styled/A';
+
 import Icon from 'components/Icon';
 import SelectReset from 'components/SelectReset';
 import appMessages from 'containers/App/messages';
@@ -37,13 +39,13 @@ const ListInlineItem = styled.li`
   display: inline-block;
   padding: 0;
   font-size: 1.25em;
+  color: ${palette('linkHover', 0)};
 `;
-const ListInlineItemLink = styled.a`
+const ListInlineItemLink = styled(A)`
   width:2em;
   height:2em;
   line-height: 2em;
   font-weight: bold;
-  color: ${palette('link', 0)};
   display: block;
 `;
 const ListInlineItemActive = styled.div`
@@ -55,13 +57,13 @@ const ListInlineItemActive = styled.div`
   background-color: ${palette('buttonDefault', 1)};
   color: ${palette('buttonDefault', 0)};
 `;
-const ListInlineItemNav = styled.a`
+const ListInlineItemNav = styled(A)`
   padding: 0 0.5em;
   display: block;
 `;
 
 const ListInlineItemNavDisabled = styled.div`
-  color: ${palette('text', 1)};
+  color: ${palette('buttonDefaultDisabled', 1)};
   padding: 0 0.5em;
 `;
 

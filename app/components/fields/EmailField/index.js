@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
+import { TEXT_TRUNCATE } from 'themes/config';
 import { truncateText } from 'utils/string';
 
 import appMessages from 'containers/App/messages';
@@ -19,7 +20,7 @@ class EmailField extends React.PureComponent { // eslint-disable-line react/pref
           <FormattedMessage {...(field.label || appMessages.attributes.email)} />
         </Label>
         <Url target="_blank" href={`mailto:${field.value}`} title={field.value}>
-          {truncateText(field.value, 30, false)}
+          {truncateText(field.value, TEXT_TRUNCATE.LINK_FIELD, false)}
         </Url>
       </FieldWrap>
     );

@@ -53,7 +53,10 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
             { fields.header.aside && this.renderAside(fields.header.aside) }
           </ViewPanel>
         }
-        { fields.body &&
+        { fields.body
+          && ((fields.body.main && fields.body.main[0] && fields.body.main[0].fields)
+            || (fields.body.aside && fields.body.aside[0] && fields.body.aside[0].fields)
+          ) &&
           <ViewPanel>
             { fields.body.main && this.renderMain(fields.body.main, !!fields.body.aside, seamless) }
             { fields.body.aside && this.renderAside(fields.body.aside) }

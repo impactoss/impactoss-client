@@ -25,8 +25,15 @@ const ListEntitiesMain = styled.div`
   padding-top: 0.5em;
 `;
 const ListEntitiesEmpty = styled.div``;
-const ListEntitiesGroup = styled.div``;
-const ListEntitiesSubGroup = styled.div``;
+const ListEntitiesGroup = styled.div`
+  padding-bottom: 40px;
+`;
+const ListEntitiesSubGroup = styled.div`
+  padding-bottom: 25px;
+  &:last-child {
+    padding-bottom: 0;
+  }
+`;
 
 const PAGE_SIZE = 20;
 const PAGE_SIZE_MAX = 100;

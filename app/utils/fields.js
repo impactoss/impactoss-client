@@ -1,18 +1,20 @@
 import { truncateText } from 'utils/string';
 import { sortEntities } from 'utils/sort';
-import { ACCEPTED_STATUSES, USER_ROLES } from 'themes/config';
+import { ACCEPTED_STATUSES, USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
 import { find, filter, reduce } from 'lodash/collection';
 
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
 
-export const getIdField = (entity) => ({
+export const getIdField = (entity, isManager) => ({
   controlType: 'info',
   type: 'reference',
   value: entity.get('id'),
   large: true,
+  isManager,
+  label: appMessages.attributes.id,
 });
-export const getReferenceField = (entity, defaultToId) => {
+export const getReferenceField = (entity, isManager, defaultToId) => {
   const value = defaultToId
     ? entity.getIn(['attributes', 'reference']) || entity.get('id')
     : entity.getIn(['attributes', 'reference']);
@@ -22,12 +24,13 @@ export const getReferenceField = (entity, defaultToId) => {
       type: 'reference',
       value,
       large: true,
+      isManager,
     });
   }
   return false;
 };
 const getLinkAnchor = (url) =>
-  truncateText(url.replace(/^https?:\/\//i, ''), 40);
+  truncateText(url.replace(/^https?:\/\//i, ''), TEXT_TRUNCATE.LINK_FIELD);
 
 export const getLinkField = (entity) => ({
   type: 'link',
@@ -75,21 +78,31 @@ export const getRoleField = (entity) => ({
   options: Object.values(USER_ROLES),
 });
 
-export const getMetaField = (entity) => ({
-  controlType: 'info',
-  type: 'meta',
-  fields: [
-    {
-      label: appMessages.attributes.meta.updated_at,
-      value: entity.getIn(['attributes', 'updated_at']),
-      date: true,
-    },
-    {
+export const getMetaField = (entity) => {
+  const fields = [];
+  if (entity.get('user') && entity.getIn(['user', 'attributes', 'name'])) {
+    fields.push({
       label: appMessages.attributes.meta.updated_by,
       value: entity.get('user') && entity.getIn(['user', 'attributes', 'name']),
-    },
-  ],
-});
+    });
+  }
+  fields.push({
+    label: appMessages.attributes.meta.updated_at,
+    value: entity.getIn(['attributes', 'updated_at']),
+    date: true,
+    time: true,
+  });
+  fields.push({
+    label: appMessages.attributes.meta.created_at,
+    value: entity.getIn(['attributes', 'created_at']),
+    date: true,
+  });
+  return {
+    controlType: 'info',
+    type: 'meta',
+    fields,
+  };
+};
 
 export const getMarkdownField = (entity, attribute, hasLabel = true) =>
   !!entity.getIn(['attributes', attribute]) &&
@@ -150,7 +163,9 @@ const mapReports = (reports) => reports
     label: report.getIn(['attributes', 'title']),
     dueDate: report.get('due_date') ? report.getIn(['due_date', 'attributes', 'due_date']) : null,
     updatedAt: report.getIn(['attributes', 'updated_at']),
+    createdAt: report.getIn(['attributes', 'created_at']),
     linkTo: `${PATHS.PROGRESS_REPORTS}/${report.get('id')}`,
+    updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
   })).toArray()
   : [];
 
@@ -176,7 +191,7 @@ export const getScheduleField = (dates) => ({
 
 export const getTaxonomyFields = (taxonomies) =>
   taxonomies && taxonomies.map((taxonomy) => ({
-    type: 'list',
+    type: 'taxonomy',
     label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
     entityType: 'taxonomies',
     id: taxonomy.get('id'),
@@ -195,7 +210,7 @@ const getCategoryShortTitle = (category) => {
   )
     ? category.getIn(['attributes', 'short_title'])
     : category.getIn(['attributes', 'title']);
-  return truncateText(title, 10);
+  return truncateText(title, TEXT_TRUNCATE.ENTITY_TAG);
 };
 
 export const getCategoryShortTitleField = (entity) => ({
@@ -314,7 +329,7 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
   if (section === 'header' && column === 'main' && !reduce(fields, (memo, field) =>
     memo || field.attribute === 'reference'
   , false)) {
-    groupFields = groupFields.concat([getIdField(entity)]);
+    groupFields = groupFields.concat([getIdField(entity, hasUserRole[USER_ROLES.MANAGER.value])]);
   }
   groupFields = reduce(fields, (memo, field) => {
     if (field.control === 'title') {

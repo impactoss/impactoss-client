@@ -127,6 +127,10 @@ export default defineMessages({
     },
   },
   import: {
+    hint: {
+      id: 'app.containers.App.import.hint',
+      defaultMessage: 'This row provides additional information about the columns. Please replace or remove it before importing',
+    },
     required: {
       id: 'app.containers.App.import.required',
       defaultMessage: 'Required: ',
@@ -136,7 +140,7 @@ export default defineMessages({
       defaultMessage: 'text',
     },
     markdown: {
-      id: 'app.containers.App.import.text',
+      id: 'app.containers.App.import.markdown',
       defaultMessage: 'text (markdown supported)',
     },
     bool: {
@@ -444,6 +448,10 @@ export default defineMessages({
         id: 'app.containers.App.attributes.meta.updated_at',
         defaultMessage: 'Last updated',
       },
+      created_at: {
+        id: 'app.containers.App.attributes.meta.created_at',
+        defaultMessage: 'Created',
+      },
     },
   },
   nav: {
@@ -647,6 +655,14 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.1.empty',
           defaultMessage: 'No human rights body assigned yet',
         },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.1.shortSingle',
+          defaultMessage: 'HR body',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.1.shortPlural',
+          defaultMessage: 'HR bodies',
+        },
       },
       2: {
         single: {
@@ -674,6 +690,14 @@ export default defineMessages({
         empty: {
           id: 'app.containers.App.entities.taxonomies.3.empty',
           defaultMessage: 'No human rights issue assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.3.shortSingle',
+          defaultMessage: 'HR issue',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.3.shortPlural',
+          defaultMessage: 'HR issues',
         },
       },
       4: {
@@ -703,6 +727,14 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.5.empty',
           defaultMessage: 'No thematic cluster assigned yet',
         },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.5.shortSingle',
+          defaultMessage: 'Cluster',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.5.shortPlural',
+          defaultMessage: 'Clusters',
+        },
       },
       6: {
         single: {
@@ -730,6 +762,80 @@ export default defineMessages({
         empty: {
           id: 'app.containers.App.entities.taxonomies.7.empty',
           defaultMessage: 'No SDG assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.7.shortSingle',
+          defaultMessage: 'SDG',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.7.shortPlural',
+          defaultMessage: 'SDGs',
+        },
+      },
+      8: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.8.single',
+          defaultMessage: 'Taxonomy 8',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.8.plural',
+          defaultMessage: 'Taxonomy 8s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.8.empty',
+          defaultMessage: 'No Taxonomy 8 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.8.shortSingle',
+          defaultMessage: 'Taxonomy 8',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.8.shortPlural',
+          defaultMessage: 'Taxonomy 8s',
+        },
+      },
+      9: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.9.single',
+          defaultMessage: 'Taxonomy 9',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.9.plural',
+          defaultMessage: 'Taxonomy 9s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.9.empty',
+          defaultMessage: 'No Taxonomy 9 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.9.shortSingle',
+          defaultMessage: 'Taxonomy 9',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.9.shortPlural',
+          defaultMessage: 'Taxonomy 9s',
+        },
+      },
+      10: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.10.single',
+          defaultMessage: 'Taxonomy 10',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.10.plural',
+          defaultMessage: 'Taxonomy 10s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.10.empty',
+          defaultMessage: 'No Taxonomy 10 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.10.shortSingle',
+          defaultMessage: 'Taxonomy 10',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.10.shortPlural',
+          defaultMessage: 'Taxonomy 10s',
         },
       },
     },

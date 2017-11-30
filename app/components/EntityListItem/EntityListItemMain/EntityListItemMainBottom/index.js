@@ -9,18 +9,20 @@ import EntityListItemMainBottomConnections from './EntityListItemMainBottomConne
 import EntityListItemMainBottomUser from './EntityListItemMainBottomUser';
 // import EntityListItemMainBottomTargetDate from './EntityListItemMainBottomTargetDate';
 
-const Styled = styled(Component)``;
+const Styled = styled(Component)`
+  margin-bottom: -5px;
+`;
 
 export default class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     tags: PropTypes.array,
     connections: PropTypes.array,
     wrapper: PropTypes.object,
-    assignedUser: PropTypes.object,
+    user: PropTypes.object,
   }
 
   render() {
-    const { tags, connections, wrapper, assignedUser } = this.props;
+    const { tags, connections, wrapper, user } = this.props;
 
     return (
       <Styled>
@@ -33,9 +35,9 @@ export default class EntityListItemMainBottom extends React.PureComponent { // e
             wrapper={wrapper}
           />
         }
-        { assignedUser &&
+        { user &&
           <EntityListItemMainBottomUser
-            user={assignedUser}
+            user={user}
           />
         }
       </Styled>
