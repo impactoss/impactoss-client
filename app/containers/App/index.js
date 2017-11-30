@@ -11,6 +11,7 @@ import Perf from 'react-addons-perf';
 import ReactModal from 'react-modal';
 
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 import Header from 'components/Header';
 import EntityNew from 'containers/EntityNew';
 
@@ -46,6 +47,7 @@ const Main = styled.div`
   left: 0;
   right: 0;
   bottom:0;
+  background-color: ${(props) => props.isHome ? 'transparent' : palette('light', 0)};
   overflow: hidden;
 `;
 
