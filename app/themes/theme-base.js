@@ -55,7 +55,7 @@ theme.breakpoints = {
 // 2: main colour, light
 // 3: main colour, lighter
 // 4: white
-const primary = coolorsToHex('https://coolors.co/057cbc-0690db-069aea-ffffff-ffffff');
+const primary = coolorsToHex('https://coolors.co/0063B5-0077D8-0077D8-ffffff-ffffff');
   // secondary color palette: dark to light
   // 0: secondary colour, darker
   // 1: secondary colour
@@ -110,7 +110,7 @@ theme.palette = {
   // [#AA compliant]
   // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
   // [0: Default, 1: HR Body, 2: UN session, 3: HR, 4: Affected P, 5: Cluster, 6: Orga, 7: SDGs, 8: unused]
-  taxonomies: ['#fff', '#006E96', '#007FAD', '#6D03DD', '#8B1F9E', '#D32168', '#6E8081', '#009ED8', '#7B02FC'],
+  taxonomies: ['#fff', '#737D84', '#9BA6B1', '#007034', '#05A763', '#D61D39', '#023066', '#009ED8', '#7B02FC'],
   taxonomiesHover: ['#fff', '#033A89', '#0541C2', '#8B1F9E', '#1B5A3E', '#002E2E', '#524400', '#007FAD', '#393F41'],
 
   // other entities
