@@ -104,14 +104,14 @@ theme.palette = {
   // info,
 
   // taxonomy/category colours
-  // [0: default, 1: Human Rights Body, 2: UN session, 3: Human right, 4: Affected persons, 5: Thematic cluster, 6: Organisation, 7: SDGs, 8: unused]
+  // [0: default, 1: Human Rights Body, 2: UN session, 3: Human right, 4: Affected persons, 5: Thematic cluster, 6: Organisation, 7: SDGs, 8: State, 9: SMART]
   // taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF'],
   // taxonomiesAAL: ['#8C969B', '#6B3285', '#5149AD', '#31A573', '#26938C', '#4DA53B', '#0069A4', '#199CD4', '#8C969B'],
   // [#AA compliant]
   // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
   // [0: Default, 1: HR Body, 2: UN session, 3: HR, 4: Affected P, 5: Cluster, 6: Orga, 7: SDGs, 8: unused]
-  taxonomies: ['#8D95A0', '#0059A3', '#0077D8', '#007C70', '#05A763', '#B7177A', '#114060', '#009ED8', '#8D95A0'],
-  taxonomiesHover: ['#656F75', '#005296', '#0070CC', '#007267', '#069651', '#A5156E', '#0F364C', '#007FAD', '#656F75'],
+  taxonomies: ['#8D95A0', '#0059A3', '#0077D8', '#007C70', '#05A763', '#B7177A', '#114060', '#009ED8', '#8D95A0', '#8D95A0'],
+  taxonomiesHover: ['#656F75', '#005296', '#0070CC', '#007267', '#069651', '#A5156E', '#0F364C', '#007FAD', '#656F75', '#656F75'],
 
   // other entities
   // [aqll #AA compliant]

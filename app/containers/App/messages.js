@@ -772,6 +772,72 @@ export default defineMessages({
           defaultMessage: 'SDGs',
         },
       },
+      8: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.8.single',
+          defaultMessage: 'Taxonomy 8',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.8.plural',
+          defaultMessage: 'Taxonomy 8s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.8.empty',
+          defaultMessage: 'No Taxonomy 8 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.8.shortSingle',
+          defaultMessage: 'Taxonomy 8',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.8.shortPlural',
+          defaultMessage: 'Taxonomy 8s',
+        },
+      },
+      9: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.9.single',
+          defaultMessage: 'Taxonomy 9',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.9.plural',
+          defaultMessage: 'Taxonomy 9s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.9.empty',
+          defaultMessage: 'No Taxonomy 9 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.9.shortSingle',
+          defaultMessage: 'Taxonomy 9',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.9.shortPlural',
+          defaultMessage: 'Taxonomy 9s',
+        },
+      },
+      10: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.10.single',
+          defaultMessage: 'Taxonomy 10',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.10.plural',
+          defaultMessage: 'Taxonomy 10s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.10.empty',
+          defaultMessage: 'No Taxonomy 10 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.10.shortSingle',
+          defaultMessage: 'Taxonomy 10',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.10.shortPlural',
+          defaultMessage: 'Taxonomy 10s',
+        },
+      },
     },
     due_dates: {
       single: {
