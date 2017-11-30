@@ -64,7 +64,7 @@ export const TEXT_TRUNCATE = {
 // General ********************
 
 export const ENDPOINTS = {
-  API: 'https://undp-sadata-staging.herokuapp.com', // server API endpoint
+  API: 'https://api.impactoss.org', // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
