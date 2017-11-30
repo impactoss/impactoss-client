@@ -110,20 +110,20 @@ theme.palette = {
   // [#AA compliant]
   // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
   // [0: Default, 1: HR Body, 2: UN session, 3: HR, 4: Affected P, 5: Cluster, 6: Orga, 7: SDGs, 8: unused]
-  taxonomies: ['#fff', '#737D84', '#9BA6B1', '#007034', '#05A763', '#D61D39', '#023066', '#009ED8', '#7B02FC'],
-  taxonomiesHover: ['#fff', '#033A89', '#0541C2', '#8B1F9E', '#1B5A3E', '#002E2E', '#524400', '#007FAD', '#393F41'],
+  taxonomies: ['#8D95A0', '#0059A3', '#0077D8', '#007C70', '#05A763', '#B7177A', '#114060', '#009ED8', '#8D95A0'],
+  taxonomiesHover: ['#656F75', '#005296', '#0070CC', '#007267', '#069651', '#A5156E', '#0F364C', '#007FAD', '#656F75'],
 
   // other entities
   // [aqll #AA compliant]
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
   measuresHover: ['#C75300'], // FFC107  AA compliant
   measures: ['#ED7000'],
-  recommendationsHover: ['#004884', '#4F75AC'], // accepted, noted ['#FF9B69', '#FFB28B'],
-  recommendations: ['#005296', '#5C82C6'],
+  recommendationsHover: ['#023066', '#426BA6'], // accepted, noted ['#FF9B69', '#FFB28B'],
+  recommendations: ['#033A89', '#6889B8'],
   sdgtargetsHover: ['#007FAD'],
   sdgtargets: ['#009ED8'], // 40D7FF, 00A0CC
   indicatorsHover: ['#15881A'],
-  indicators: ['#1BAC29'],
+  indicators: ['#15a21a'],
   reportsHover: [error[1]],
   reports: [error[0]],
   attributesHover: [dark[2]],
