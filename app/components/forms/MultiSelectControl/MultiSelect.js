@@ -36,7 +36,6 @@ const ChangeHint = styled.div`
   bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
   color: ${palette('text', 1)};
   background-color: ${palette('background', 1)};
-  font-style: italic;
   padding: 0.5em 1em;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
   text-align: right;

@@ -24,7 +24,10 @@ import messages from './messages';
 const DocumentWrapEdit = styled(DocumentWrap)`
   background-color: ${palette('background', 0)};
   position: relative;
-  padding: 1em 0.75em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  padding-left: 0.75em;
+  padding-right: ${(props) => props.remove ? '56px' : '0.75em'};
   border: 1px solid ${palette('light', 1)};
   font-weight: bold;
 `;
@@ -33,7 +36,7 @@ const Remove = styled(ButtonFlatIconOnly)`
   position: absolute;
   right: 0;
   top: 0;
-  padding: 1em 0.75em;
+  padding: 14px 0.75em;
   color: ${palette('link', 2)};
   &:hover {
     color: ${palette('linkHover', 2)};
@@ -117,7 +120,7 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
       <Styled>
         {
           this.props.value &&
-          <DocumentWrapEdit>
+          <DocumentWrapEdit remove>
             <DocumentView url={this.props.value} status />
             <Remove onClick={this.handleRemove}>
               <Icon name="removeLarge" />

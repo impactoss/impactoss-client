@@ -8,8 +8,8 @@ import asList from 'utils/as-list';
 
 import Component from 'components/styled/Component';
 
-import EntityListItemMain from '../../EntityListItem/EntityListItemMain';
-import EntityListItemExpandable from '../../EntityListItem/EntityListItemExpandable';
+import EntityListItemMain from 'components/EntityListItem/EntityListItemMain';
+import EntityListItemExpandable from 'components/EntityListItem/EntityListItemExpandable';
 
 const Styled = styled.span`
   display: inline-block;

@@ -18,11 +18,11 @@ export default class EntityListItemMainBottom extends React.PureComponent { // e
     tags: PropTypes.array,
     connections: PropTypes.array,
     wrapper: PropTypes.object,
-    assignedUser: PropTypes.object,
+    user: PropTypes.object,
   }
 
   render() {
-    const { tags, connections, wrapper, assignedUser } = this.props;
+    const { tags, connections, wrapper, user } = this.props;
 
     return (
       <Styled>
@@ -35,9 +35,9 @@ export default class EntityListItemMainBottom extends React.PureComponent { // e
             wrapper={wrapper}
           />
         }
-        { assignedUser &&
+        { user &&
           <EntityListItemMainBottomUser
-            user={assignedUser}
+            user={user}
           />
         }
       </Styled>

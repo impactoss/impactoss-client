@@ -1,14 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { Map, List } from 'immutable';
 
 import EntityListItemWatch from './EntityListItemWatch';
 import EntityListItemWrapper from './EntityListItemWrapper';
-
-const Styled = styled.div`
-  padding-bottom: 50px;
-`;
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -22,7 +17,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
   );
   render() {
     return (
-      <Styled separated={this.props.expandNo}>
+      <div>
         { this.props.entities.map((entity, key) =>
           this.props.scrollContainer
           ? <EntityListItemWatch
@@ -36,7 +31,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
           />
           : this.renderEntity(entity, key)
         )}
-      </Styled>
+      </div>
     );
   }
 }

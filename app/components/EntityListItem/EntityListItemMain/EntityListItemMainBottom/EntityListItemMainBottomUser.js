@@ -22,7 +22,7 @@ export default class EntityListItemMainBottomUser extends React.PureComponent { 
     return (
       <Styled>
         <BottomIconWrap>
-          <Icon name="report" text />
+          <Icon name="reminder" text />
         </BottomIconWrap>
         {this.props.user.name}
       </Styled>

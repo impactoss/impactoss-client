@@ -6,7 +6,7 @@ const Label = styled.label`
   position: relative;
   color: ${palette('text', 1)};
   font-weight: 500;
-  font-size: 0.8em;
+  font-size: ${(props) => props.theme.sizes.text.small};  
 `;
 
 export default Label;

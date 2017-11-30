@@ -163,7 +163,9 @@ const mapReports = (reports) => reports
     label: report.getIn(['attributes', 'title']),
     dueDate: report.get('due_date') ? report.getIn(['due_date', 'attributes', 'due_date']) : null,
     updatedAt: report.getIn(['attributes', 'updated_at']),
+    createdAt: report.getIn(['attributes', 'created_at']),
     linkTo: `${PATHS.PROGRESS_REPORTS}/${report.get('id')}`,
+    updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
   })).toArray()
   : [];
 
@@ -189,7 +191,7 @@ export const getScheduleField = (dates) => ({
 
 export const getTaxonomyFields = (taxonomies) =>
   taxonomies && taxonomies.map((taxonomy) => ({
-    type: 'list',
+    type: 'taxonomy',
     label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
     entityType: 'taxonomies',
     id: taxonomy.get('id'),
