@@ -55,7 +55,7 @@ theme.breakpoints = {
 // 2: main colour, light
 // 3: main colour, lighter
 // 4: white
-const primary = coolorsToHex('https://coolors.co/0072a3-127ac4-4cb1dc-a2daf1-ffffff');
+const primary = coolorsToHex('https://coolors.co/057cbc-0690db-069aea-ffffff-ffffff');
   // secondary color palette: dark to light
   // 0: secondary colour, darker
   // 1: secondary colour
@@ -104,23 +104,24 @@ theme.palette = {
   // info,
 
   // taxonomy/category colours
-  // [default, 1: Human Rights Body, 2: UN session, 3: Human right, 4: Affected persons, 5: Thematic cluster, 6: Organisation, 7: SDGs, 8: unused]
+  // [0: default, 1: Human Rights Body, 2: UN session, 3: Human right, 4: Affected persons, 5: Thematic cluster, 6: Organisation, 7: SDGs, 8: unused]
   // taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF'],
   // taxonomiesAAL: ['#8C969B', '#6B3285', '#5149AD', '#31A573', '#26938C', '#4DA53B', '#0069A4', '#199CD4', '#8C969B'],
   // [#AA compliant]
   // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
-  taxonomies: ['#0080A3', '#6D787E', '#5149AD', '#257F93', '#28865D', '#004747', '#8A7300', '#147CA9', '#6D787E'],
-  taxonomiesHover: ['#555E62', '#3A1D49', '#3B3681', '#195561', '#1B5A3E', '#002E2E', '#524400', '#0C4A64', '#393F41'],
+  // [0: Default, 1: HR Body, 2: UN session, 3: HR, 4: Affected P, 5: Cluster, 6: Orga, 7: SDGs, 8: unused]
+  taxonomies: ['#fff', '#006E96', '#007FAD', '#6D03DD', '#8B1F9E', '#D32168', '#6E8081', '#009ED8', '#7B02FC'],
+  taxonomiesHover: ['#fff', '#033A89', '#0541C2', '#8B1F9E', '#1B5A3E', '#002E2E', '#524400', '#007FAD', '#393F41'],
 
   // other entities
   // [aqll #AA compliant]
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
   measuresHover: ['#C75300'], // FFC107  AA compliant
   measures: ['#ED7000'],
-  recommendationsHover: ['#15881A', '#0C640C'], // accepted, noted ['#FF9B69', '#FFB28B'],
-  recommendations: ['#0A41A3', '#0C640C'],
-  sdgtargetsHover: ['#0080A3'],
-  sdgtargets: ['#0096cc'], // 40D7FF, 00A0CC
+  recommendationsHover: ['#004884', '#4F75AC'], // accepted, noted ['#FF9B69', '#FFB28B'],
+  recommendations: ['#005296', '#5C82C6'],
+  sdgtargetsHover: ['#007FAD'],
+  sdgtargets: ['#009ED8'], // 40D7FF, 00A0CC
   indicatorsHover: ['#15881A'],
   indicators: ['#1BAC29'],
   reportsHover: [error[1]],
