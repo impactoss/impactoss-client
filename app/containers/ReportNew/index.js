@@ -312,7 +312,7 @@ function mapDispatchToProps(dispatch) {
       saveData = saveData.setIn(['attributes', 'indicator_id'], indicatorReference);
 
       const dateAssigned = formData.getIn(['attributes', 'due_date_id']);
-      if (dateAssigned === 0) {
+      if (dateAssigned === 0 || dateAssigned === '0') {
         saveData = saveData.setIn(['attributes', 'due_date_id'], null);
       }
 

@@ -79,6 +79,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       entityPath,
       connections,
       error,
+      isConnection,
     } = this.props;
 
     return (
@@ -109,6 +110,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
                 onEntityClick={onEntityClick}
                 wrapper={this.props.wrapper}
                 isManager={isManager}
+                isConnection={isConnection}
               />
             </MainInnerWrapper>
           </MainWrapper>
@@ -138,6 +140,7 @@ EntityListItem.propTypes = {
   error: PropTypes.instanceOf(List),
   isManager: PropTypes.bool,
   isSelected: PropTypes.bool,
+  isConnection: PropTypes.bool,
   onSelect: PropTypes.func,
   expandNo: PropTypes.number,
   onExpand: PropTypes.func,

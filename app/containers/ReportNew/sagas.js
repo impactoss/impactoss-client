@@ -11,7 +11,7 @@ export function* save({ data, redirect, createAsGuest }) {
     redirect,
     createAsGuest,
   }));
-  if (data.attributes.due_date_id) {
+  if (data.attributes.due_date_id && !createAsGuest) {
     yield put(dueDateAssigned(data.attributes.due_date_id));
   }
 }

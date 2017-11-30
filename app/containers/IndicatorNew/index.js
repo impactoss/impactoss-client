@@ -185,6 +185,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('indicatorNew.form.data'),
               }] : null
             }
@@ -210,6 +211,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             <EntityForm
               model="indicatorNew.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={this.props.handleSubmit}
               handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}

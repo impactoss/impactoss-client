@@ -118,7 +118,7 @@ export const CONFIG = {
       message: 'entities.progress_reports.plural',
       type: 'reports',
       clientPath: 'reports',
-      icon: 'reminder',
+      icon: 'report',
     },
   ],
 };

@@ -33,7 +33,7 @@ class ScheduleField extends React.PureComponent { // eslint-disable-line react/p
               <FormattedDate value={new Date(value.date)} />
               {
                 value.overdue &&
-                <ScheduleItemStatus>
+                <ScheduleItemStatus overdue>
                   <FormattedMessage {...appMessages.entities.due_dates.overdue} />
                 </ScheduleItemStatus>
               }

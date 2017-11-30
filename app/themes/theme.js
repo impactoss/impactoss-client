@@ -123,7 +123,7 @@ theme.palette = {
   sdgtargetsHover: ['#00546B'],
   indicators: ['#553529'],
   indicatorsHover: ['#2A1913'],
-  reports: [primary[1]],
+  reports: [primary[1]], // note: can stand on light grey
   reportsHover: [primary[0]],
   attributes: ['#6C787A'],
   attributesHover: ['#434A4C'],
@@ -256,6 +256,8 @@ theme.sizes = {
     mainListItem: '18px',
     nestedListItem: '15px',
     listItemTop: '14px',
+    markdown: '18px',
+    small: '13px', // used for labels
   },
   lineHeights: {
     mainListItem: 1.4,

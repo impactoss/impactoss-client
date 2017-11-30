@@ -371,7 +371,7 @@
   "app.containers.CategoryView.notFound" : "Sorry no category found",
   "app.containers.EntityForm.confirmDeleteQuestion" : "Delete forever?",
   "app.containers.EntityForm.buttons.cancelDelete" : "Cancel",
-  "app.containers.EntityForm.buttons.donfirmDelete" : "Delete",
+  "app.containers.EntityForm.buttons.confirmDelete" : "Delete",
   "app.containers.EntityList.processingUpdates" : "Processing {processNo} of {totalNo} updates.",
   "app.containers.EntityList.updatesFailed" : "{errorNo} update(s) failed! Please wait for the items to be updated from the server and then carefully review the affected items above.",
   "app.containers.EntityList.updatesSuccess" : "{successNo} update(s) succeeded!",
