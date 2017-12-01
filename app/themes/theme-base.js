@@ -81,8 +81,8 @@ const light = coolorsToHex('https://coolors.co/f1f4f4-e0e6e6-d5dddd-cdd6d6-c7d1d
 // other palettes
 // 0: AA on light[0] and on error[3]
 // 1: AA on white
-const error = coolorsToHex('https://coolors.co/b20e0e-c10f0f-d31717-efe6e6-ffffff');
-const success = coolorsToHex('https://coolors.co/00632e-007034-007c3a-ceddd9-ffffff');
+const error = coolorsToHex('https://coolors.co/b20e0e-c10f0f-d31717-f2e3e3-ffffff');
+const success = coolorsToHex('https://coolors.co/00632e-007034-007c3a-e1f2ed-ffffff');
 // const alert = coolorsToHex('https://coolors.co/c75300-e56700-ed7000-f97807-ffffff');
 // const info = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-118ef4-ffffff');
 
