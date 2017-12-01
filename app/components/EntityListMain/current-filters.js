@@ -4,6 +4,7 @@ import { upperFirst } from 'lodash/string';
 import { TEXT_TRUNCATE } from 'themes/config';
 
 import { getCategoryShortTitle, attributesEqual } from 'utils/entities';
+import { sortEntities } from 'utils/sort';
 import { truncateText } from 'utils/string';
 import isNumber from 'utils/is-number';
 import asList from 'utils/as-list';
@@ -53,7 +54,7 @@ errorLabel,
   if (config.taxonomies && taxonomies) {
     filterTags = filterTags.concat(getCurrentTaxonomyFilters(
       config.taxonomies,
-      taxonomies,
+      sortEntities(taxonomies, 'asc', 'priority'),
       locationQuery,
       onTagClick,
       withoutLabel
@@ -62,7 +63,7 @@ errorLabel,
   if (config.connectedTaxonomies && connectedTaxonomies) {
     filterTags = filterTags.concat(getCurrentConnectedTaxonomyFilters(
       config.connectedTaxonomies,
-      connectedTaxonomies,
+      sortEntities(connectedTaxonomies, 'asc', 'priority'),
       locationQuery,
       onTagClick
     ));

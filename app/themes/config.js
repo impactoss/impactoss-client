@@ -57,6 +57,20 @@ export const TEXT_TRUNCATE = {
   LINK_FIELD: 30,
 };
 
+export const TAXONOMY_GROUPS = [
+  {
+    id: 1,
+    priorityMin: 0,
+    priorityMax: 9,
+    default: true,
+  },
+  {
+    id: 2,
+    priorityMin: 10,
+    priorityMax: 19,
+  },
+];
+
 /**
  * Server settings
  **/

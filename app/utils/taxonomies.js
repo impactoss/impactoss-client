@@ -1,4 +1,6 @@
 import { PATHS } from 'containers/App/constants';
+import { find } from 'lodash/collection';
+import { TAXONOMY_GROUPS } from 'themes/config';
 
 export const getTaxonomyTagList = (taxonomy) => {
   const tags = [];
@@ -24,6 +26,13 @@ export const getTaxonomyTagList = (taxonomy) => {
 };
 export const mapToTaxonomyList = (taxonomies, onLink, activeId, onMouseOver) => taxonomies.map((tax) => ({
   id: tax.get('id'),
+  group: find(TAXONOMY_GROUPS, (taxGroup) => {
+    const priority = tax.getIn(['attributes', 'priority']);
+    return priority
+      ? priority <= taxGroup.priorityMax
+        && priority >= taxGroup.priorityMin
+      : taxGroup.default;
+  }),
   count: tax.count,
   onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${tax.get('id')}`),
   onMouseOver: (isOver = true) => onMouseOver && onMouseOver(tax.get('id'), isOver),

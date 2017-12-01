@@ -15,7 +15,7 @@ import { mapToTaxonomyList } from 'utils/taxonomies';
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
-  selectEntities,
+  selectTaxonomiesSorted,
   selectReady,
   selectIsUserManager,
 } from 'containers/App/selectors';
@@ -32,6 +32,7 @@ import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import CategoryListItems from 'components/categoryList/CategoryListItems';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
+import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
 // relative
 import messages from './messages';
@@ -92,9 +93,14 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         />
         <Sidebar>
           <Scrollable>
-            <TaxonomySidebar
-              taxonomies={mapToTaxonomyList(taxonomies, onTaxonomyLink, reference)}
-            />
+            { !dataReady &&
+              <EntityListSidebarLoading />
+            }
+            { dataReady &&
+              <TaxonomySidebar
+                taxonomies={mapToTaxonomyList(taxonomies, onTaxonomyLink, reference)}
+              />
+            }
           </Scrollable>
         </Sidebar>
         <ContainerWithSidebar>
@@ -169,7 +175,7 @@ CategoryList.contextTypes = {
 const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectEntities(state, 'taxonomies'),
+  taxonomies: selectTaxonomiesSorted(state),
   taxonomy: selectTaxonomy(state, { id: props.params.id }),
   categories: selectCategories(
     state,
