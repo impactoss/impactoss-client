@@ -165,8 +165,8 @@ theme.palette = {
   // headerNavPages: [ '#bg' ],
   headerNavPages: [light[0]],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
-  headerNavPagesItem: [dark[3], primary[4], 'transparent', dark[2]],
-  headerNavPagesItemHover: [dark[2], light[2], 'transparent', dark[2]],
+  headerNavPagesItem: [dark[3], primary[4], 'transparent', primary[1]],
+  headerNavPagesItemHover: [dark[2], primary[4], 'transparent', primary[0]],
 
   // headerNavAccount: [ '#bg' ],
   headerNavAccount: ['transparent'],
