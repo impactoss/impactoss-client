@@ -43,7 +43,7 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
                 { this.props.expanded[groupId] &&
                   <div>
                     { group.get('options') &&
-                      group.get('options').valueSeq().map((option, i) => (
+                      group.get('options').map((option, i) => (
                         <EntityListSidebarOption
                           key={i}
                           option={option}

@@ -1,4 +1,5 @@
 import { Map, List } from 'immutable';
+import { sortEntities } from 'utils/sort';
 
 import { filter, reduce } from 'lodash/collection';
 
@@ -68,14 +69,14 @@ export const dateOption = (entity, activeDateId) => Map({
 //   : List();
 
 export const taxonomyOptions = (taxonomies) => taxonomies
-  ? taxonomies.reduce((values, tax) =>
+  ? sortEntities(taxonomies, 'asc', 'priority').reduce((values, tax) =>
     values.set(tax.get('id'), entityOptions(tax.get('categories'), false, false)), Map())
   : Map();
 
 
 // turn taxonomies into multiselect options
 export const makeTagFilterGroups = (taxonomies) =>
-  taxonomies && taxonomies.map((taxonomy) => ({
+  taxonomies && sortEntities(taxonomies, 'asc', 'priority').map((taxonomy) => ({
     title: taxonomy.getIn(['attributes', 'title']),
     palette: ['taxonomies', parseInt(taxonomy.get('id'), 10)],
     options: taxonomy.get('categories').map((category) => ({
@@ -168,7 +169,7 @@ export const renderUserControl = (entities, label, activeUserId) => entities
 : null;
 
 export const renderTaxonomyControl = (taxonomies, onCreateOption) => taxonomies
-? taxonomies.reduce((controls, taxonomy) => controls.concat({
+? sortEntities(taxonomies, 'asc', 'priority').reduce((controls, taxonomy) => controls.concat({
   id: taxonomy.get('id'),
   model: `.associatedTaxonomies.${taxonomy.get('id')}`,
   dataPath: ['associatedTaxonomies', taxonomy.get('id')],

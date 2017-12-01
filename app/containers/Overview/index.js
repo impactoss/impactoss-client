@@ -18,7 +18,7 @@ import { mapToTaxonomyList } from 'utils/taxonomies';
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
-  selectEntities,
+  selectTaxonomiesSorted,
   selectReady,
 } from 'containers/App/selectors';
 import { PATHS, CONTENT_LIST } from 'containers/App/constants';
@@ -641,7 +641,7 @@ Overview.contextTypes = {
 
 const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectEntities(state, 'taxonomies'),
+  taxonomies: selectTaxonomiesSorted(state),
   recommendationCount: selectRecommendationCount(state),
   measureCount: selectMeasureCount(state),
   sdgtargetCount: selectSdgtargetCount(state),

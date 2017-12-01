@@ -15,7 +15,7 @@ import { mapToTaxonomyList } from 'utils/taxonomies';
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
-  selectEntities,
+  selectTaxonomiesSorted,
   selectReady,
   selectIsUserManager,
 } from 'containers/App/selectors';
@@ -169,7 +169,7 @@ CategoryList.contextTypes = {
 const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectEntities(state, 'taxonomies'),
+  taxonomies: selectTaxonomiesSorted(state),
   taxonomy: selectTaxonomy(state, { id: props.params.id }),
   categories: selectCategories(
     state,
