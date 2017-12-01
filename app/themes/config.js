@@ -62,6 +62,7 @@ export const TAXONOMY_GROUPS = [
     id: 1,
     priorityMin: 0,
     priorityMax: 9,
+    default: true,
   },
   {
     id: 2,

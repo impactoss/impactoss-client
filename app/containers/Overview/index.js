@@ -36,6 +36,7 @@ import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
+import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
 // relative
 import messages from './messages';
@@ -386,14 +387,19 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         />
         <Sidebar>
           <Scrollable>
-            <TaxonomySidebar
-              taxonomies={mapToTaxonomyList(
-                taxonomies,
-                onTaxonomyLink,
-                this.state.mouseOverTaxonomyDiagram,
-                this.onTaxonomyMouseOver,
-              )}
-            />
+            { !dataReady &&
+              <EntityListSidebarLoading />
+            }
+            { dataReady &&
+              <TaxonomySidebar
+                taxonomies={mapToTaxonomyList(
+                  taxonomies,
+                  onTaxonomyLink,
+                  this.state.mouseOverTaxonomyDiagram,
+                  this.onTaxonomyMouseOver,
+                )}
+              />
+            }
           </Scrollable>
         </Sidebar>
         <ContainerWithSidebar>
