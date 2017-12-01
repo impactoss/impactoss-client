@@ -164,8 +164,8 @@ theme.palette = {
   // links
   // also see global-styles.js for default link "a"
   // [#primaryLink, #secondaryLink, #textColorLink]
-  link: [primary[2], secondary[1], dark[0]],
-  linkHover: [primary[0], secondary[0], primary[2]],
+  link: [primary[2], primary[1], dark[0]],
+  linkHover: [primary[0], primary[0], primary[2]],
 
   // home: [ '#bg' ],
   home: [primary[4]],
@@ -236,28 +236,26 @@ theme.palette = {
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary', #disabled],
-  buttonFlat: [primary[1], dark[3], light[4]],
+  buttonFlat: [primary[1], dark[3], light[4]], // aka ghost button
   buttonFlatHover: [primary[0], primary[1]],
-  buttonCancel: [dark[3]],
+  buttonCancel: [dark[3]], // form footer cancel
   buttonCancelHover: [primary[1]],
   // buttonDefault: ['#text', '#bg'],
-  buttonDefault: [primary[4], primary[2]],
+  buttonDefault: [primary[4], primary[2]], // with background
   buttonDefaultHover: [primary[4], primary[0]],
-  buttonDefaultDisabled: [light[0], dark[3]],
+  buttonDefaultDisabled: [light[0], dark[3]], // with background disabled
   // buttonPrimary: ['#text', '#bg', '#border'],
-  buttonDefaultIconOnly: [primary[4], primary[2], primary[1]],
+  buttonDefaultIconOnly: [primary[4], primary[2], primary[1]], // with background, without text
   buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],
   // buttonSecondary: ['#text', '#bg'],
-  buttonSecondary: [secondary[4], secondary[1]],
-  buttonSecondaryHover: [secondary[4], secondary[0]],
+  // buttonSecondary: [secondary[4], secondary[1]],
+  // buttonSecondaryHover: [secondary[4], secondary[0]],
   // buttonToggleInactive: ['#color', '#bg'],
-  buttonToggleInactive: [dark[2], light[1]],
+  buttonToggleInactive: [dark[2], light[1]], // list sidebar filter/edit toggle button
   buttonToggleInactiveHover: [dark[2], light[0]],
   // ButtonInverse: ['#color', '#bg'],
-  buttonInverse: [primary[2], primary[4]],
-  buttonInverseHover: [primary[2], light[0]],
-
-
+  buttonInverse: [primary[2], primary[4]], // used for taxonomy tags, background only
+  buttonInverseHover: [primary[0], primary[4]],
 };
 
 // fonts
