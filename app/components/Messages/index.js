@@ -16,8 +16,8 @@ import componentMessages from './messages';
 const Styled = styled.div`
   display: table;
   width: 100%;
-  color: ${(props) => props.details ? palette('dark', 0) : palette(props.palette, 4)};
-  background-color: ${(props) => palette(props.palette, props.details ? 3 : 0)};
+  color: ${(props) => palette(props.palette, props.details ? 0 : 4)};
+  background-color: ${(props) => palette(props.palette, props.details ? 3 : 1)};
   position: relative;
   z-index: 1;
   box-shadow: ${(props) => props.withoutShadow ? 0 : '0px 0px 15px 0px rgba(0,0,0,0.2)'};
