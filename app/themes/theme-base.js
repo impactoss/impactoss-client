@@ -81,10 +81,10 @@ const light = coolorsToHex('https://coolors.co/f1f4f4-e0e6e6-d5dddd-cdd6d6-c7d1d
 // other palettes
 // 0: AA on light[0] and on error[3]
 // 1: AA on white
-const error = coolorsToHex('https://coolors.co/b2221f-dd3630-ef443e-f9c9c7-ffffff');
-const success = coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-ffffff');
-// const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-ffffff');
-// const info = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-1d3033');
+const error = coolorsToHex('https://coolors.co/c10f0f-d81717-e82020-f73636-ffffff');
+const success = coolorsToHex('https://coolors.co/007034-007c3a-008740-069651-ffffff');
+// const alert = coolorsToHex('https://coolors.co/c75300-e56700-ed7000-f97807-ffffff');
+// const info = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-118ef4-ffffff');
 
 // colour palettes, usage:
 //   import { palette } from 'styled-theme';
