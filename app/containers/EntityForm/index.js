@@ -35,6 +35,7 @@ import ErrorWrapper from 'components/forms/ErrorWrapper';
 import UploadControl from 'components/forms/UploadControl';
 import FormPanel from 'components/forms/FormPanel';
 import FormFooter from 'components/forms/FormFooter';
+import FormBody from 'components/forms/FormBody';
 import FormWrapper from 'components/forms/FormWrapper';
 import FormFooterButtons from 'components/forms/FormFooterButtons';
 import Aside from 'components/forms/Aside';
@@ -54,6 +55,11 @@ import Required from 'components/forms/Required';
 import MultiSelectField from 'components/forms/MultiSelectField';
 
 import messages from './messages';
+
+const StyledForm = styled(Form)`
+  display: table;
+  width: 100%;
+`;
 
 const Hint = styled.span`
   color: ${palette('text', 1)};
@@ -264,24 +270,24 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     </FieldGroupWrapper>
   )
 
-  renderMain = (fieldGroups, aside, hasEntityNewModal) => (
-    <Main aside={aside}>
+  renderMain = (fieldGroups, hasAside = true, bottom = false, hasEntityNewModal = false) => (
+    <Main hasAside={hasAside} bottom={bottom}>
       {
-        asArray(fieldGroups).map((fieldGroup, i, list) => fieldGroup.fields && (
-          <FormPanel key={i} borderRight={aside} borderBottom={i < (list.length - 1)}>
+        asArray(fieldGroups).map((fieldGroup, i) => fieldGroup.fields && (
+          <div key={i}>
             {this.renderGroup(fieldGroup, hasEntityNewModal)}
-          </FormPanel>
+          </div>
         ))
       }
     </Main>
   );
-  renderAside = (fieldGroups, hasEntityNewModal) => (
-    <Aside>
+  renderAside = (fieldGroups, bottom = false, hasEntityNewModal = false) => (
+    <Aside bottom={bottom}>
       {
-        asArray(fieldGroups).map((fieldGroup, i, list) => (
-          <FormPanel key={i} borderBottom={i < (list.length - 1)}>
+        asArray(fieldGroups).map((fieldGroup, i) => (
+          <div key={i}>
             {this.renderGroup(fieldGroup, hasEntityNewModal)}
-          </FormPanel>
+          </div>
         ))
       }
     </Aside>
@@ -293,19 +299,21 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
 
     return (
       <FormWrapper withoutShadow={inModal}>
-        <Form model={model} onSubmit={this.handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
-          { fields.header &&
-            <FormPanel borderBottom>
-              { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, hasEntityNewModal) }
-              { fields.header.aside && this.renderAside(fields.header.aside, hasEntityNewModal) }
-            </FormPanel>
-          }
-          { fields.body &&
-            <FormPanel>
-              { fields.body.main && this.renderMain(fields.body.main, true, hasEntityNewModal) }
-              { fields.body.aside && this.renderAside(fields.body.aside, hasEntityNewModal) }
-            </FormPanel>
-          }
+        <StyledForm model={model} onSubmit={this.handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
+          <FormBody>
+            { fields.header &&
+              <FormPanel>
+                { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, false, hasEntityNewModal) }
+                { fields.header.aside && this.renderAside(fields.header.aside, false, hasEntityNewModal) }
+              </FormPanel>
+            }
+            { fields.body &&
+              <FormPanel>
+                { fields.body.main && this.renderMain(fields.body.main, true, true, hasEntityNewModal) }
+                { fields.body.aside && this.renderAside(fields.body.aside, true, hasEntityNewModal) }
+              </FormPanel>
+            }
+          </FormBody>
           <FormFooter>
             {this.props.handleDelete && !this.state.deleteConfirmed &&
               <DeleteWrapper>
@@ -337,7 +345,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             }
             <Clear />
           </FormFooter>
-        </Form>
+        </StyledForm>
       </FormWrapper>
     );
   }
