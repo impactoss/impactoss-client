@@ -168,6 +168,7 @@
   "app.containers.App.forms.referenceRequiredError" : "\"Reference\" is required. ",
   "app.containers.App.hints.autoReference" : "Leave blank to assign database id",
   "app.containers.App.hints.user_only" : "Check to categorise users only",
+  "app.containers.App.hints.content" : "Note: first paragraph styled as lead paragraph",
   "app.containers.App.textValues.user_only" : "Categorises users only",
   "app.containers.App.import.hint" : "Note: This row provides additional information about the columns only. Please replace or remove it before importing.",
   "app.containers.App.import.required" : "Required: ",

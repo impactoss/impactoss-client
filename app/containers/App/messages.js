@@ -137,6 +137,10 @@ export default defineMessages({
       id: 'app.containers.App.hints.user_only',
       defaultMessage: 'Check to categorise users only',
     },
+    content: {
+      id: 'app.containers.App.hints.content',
+      defaultMessage: 'Note: first paragraph styled as lead paragraph',
+    },
   },
   textValues: {
     user_only: {
