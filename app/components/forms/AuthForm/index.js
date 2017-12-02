@@ -12,14 +12,14 @@ import appMessages from 'containers/App/messages';
 import ButtonCancel from 'components/buttons/ButtonCancel';
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
 import Clear from 'components/styled/Clear';
+import Main from 'components/EntityView/Main';
+import ViewPanel from 'components/EntityView/ViewPanel';
 import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
 import Field from 'components/fields/Field';
 
 import ErrorWrapper from '../ErrorWrapper';
 import FormWrapper from '../FormWrapper';
 import FormBody from '../FormBody';
-import FormPanel from '../FormPanel';
-import Main from '../Main';
 import FormFooter from '../FormFooter';
 import FormFooterButtons from '../FormFooterButtons';
 import Label from '../Label';
@@ -49,7 +49,7 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
 
   renderBody = (fields) => (
     <FormBody>
-      <FormPanel>
+      <ViewPanel>
         <Main bottom>
           <FieldGroupWrapper>
             {fields.map((field, i) => (
@@ -78,7 +78,7 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
             ))}
           </FieldGroupWrapper>
         </Main>
-      </FormPanel>
+      </ViewPanel>
     </FormBody>
   );
 

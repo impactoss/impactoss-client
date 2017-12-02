@@ -29,17 +29,17 @@ import GroupLabel from 'components/fields/GroupLabel';
 import FieldWrap from 'components/fields/FieldWrap';
 import Field from 'components/fields/Field';
 import Clear from 'components/styled/Clear';
+import ViewPanel from 'components/EntityView/ViewPanel';
 
 import FieldLabel from 'components/forms/Label';
 import ErrorWrapper from 'components/forms/ErrorWrapper';
 import UploadControl from 'components/forms/UploadControl';
-import FormPanel from 'components/forms/FormPanel';
 import FormFooter from 'components/forms/FormFooter';
 import FormBody from 'components/forms/FormBody';
 import FormWrapper from 'components/forms/FormWrapper';
 import FormFooterButtons from 'components/forms/FormFooterButtons';
-import Aside from 'components/forms/Aside';
-import Main from 'components/forms/Main';
+import Aside from 'components/EntityView/Aside';
+import Main from 'components/EntityView/Main';
 import FormFieldWrap from 'components/forms/FormFieldWrap';
 import ControlTitle from 'components/forms/ControlTitle';
 import ControlTitleText from 'components/forms/ControlTitleText';
@@ -312,16 +312,16 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         <StyledForm model={model} onSubmit={this.handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
           <FormBody>
             { fields.header &&
-              <FormPanel>
+              <ViewPanel>
                 { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, false, hasEntityNewModal) }
                 { fields.header.aside && this.renderAside(fields.header.aside, false, hasEntityNewModal) }
-              </FormPanel>
+              </ViewPanel>
             }
             { fields.body &&
-              <FormPanel>
+              <ViewPanel>
                 { fields.body.main && this.renderMain(fields.body.main, true, true, hasEntityNewModal) }
                 { fields.body.aside && this.renderAside(fields.body.aside, true, hasEntityNewModal) }
-              </FormPanel>
+              </ViewPanel>
             }
           </FormBody>
           <FormFooter>
