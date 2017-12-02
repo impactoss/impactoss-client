@@ -282,6 +282,7 @@ theme.sizes = {
   },
   lineHeights: {
     mainListItem: 1.4,
+    markdown: 1.4,
   },
   // px only
   aside: {

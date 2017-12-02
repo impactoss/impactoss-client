@@ -63,7 +63,7 @@ injectGlobal`
 
   p {
     margin-top: 0;
-    margin-bottom:16px;
+    margin-bottom: 16px;
   }
 
   * {
@@ -103,10 +103,9 @@ injectGlobal`
     .react-markdown {
       p {
         &:first-child{
-          font-size: 1.75em;
-          line-height: 1.4em;
+          font-size: 1.5em;
           color: #6A7880;
-          padding-bottom: 15px;
+          padding-bottom: 20px;
         }
       }
     }
