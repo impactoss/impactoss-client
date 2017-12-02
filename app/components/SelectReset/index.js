@@ -17,9 +17,12 @@ const Label = styled.label`
   color: ${palette('text', 1)};
   padding: 0 0.5em 0 0;
   vertical-align: middle;
+  display: inline-block;
 `;
 const Select = styled.select`
   font-weight: ${(props) => props.active ? 500 : 'normal'};
+  vertical-align: middle;
+  display: inline-block;
 `;
 // border-bottom: 1px dotted #ccc;
 const Option = styled.option`
