@@ -163,9 +163,9 @@ theme.palette = {
 
   // links
   // also see global-styles.js for default link "a"
-  // [#primaryLink, #secondaryLink, #textColorLink]
-  link: [primary[2], primary[1], dark[0]],
-  linkHover: [primary[0], primary[0], primary[2]],
+  // [#primaryLink, #linkOnLightBackground, #textColorLink, #linkOnDark]
+  link: [primary[2], primary[1], dark[0], primary[4]],
+  linkHover: [primary[0], primary[0], primary[2], light[1]],
 
   // home: [ '#bg' ],
   home: [primary[4]],

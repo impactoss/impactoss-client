@@ -7,7 +7,6 @@ const FieldGroupLabel = styled.div`
   border-bottom: 2px solid ${palette('light', 3)};
   padding: 10px 0 3px;
   font-weight: bold;
-  color: ${palette('text', 0)};
   font-size: ${(props) => props.theme.sizes.text.small};
   margin-bottom: 20px;
 `;

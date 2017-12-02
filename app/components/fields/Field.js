@@ -2,7 +2,15 @@ import styled from 'styled-components';
 
 const Field = styled.div`
   display: ${(props) => props.nested ? 'inline-block' : 'block'};
-  padding-bottom: ${(props) => props.nested ? 0 : 30}px;
+  padding-bottom: ${(props) => {
+    if (props.nested) {
+      return 0;
+    }
+    if (props.labelledGroup) {
+      return 15;
+    }
+    return 30;
+  }}px;
 `;
 
 export default Field;

@@ -61,15 +61,20 @@ const StyledForm = styled(Form)`
   width: 100%;
 `;
 
-const Hint = styled.span`
+const Hint = styled.div`
   color: ${palette('text', 1)};
-  display: block;
-  font-size: 0.85em;
+  font-size: ${(props) => props.theme.sizes.text.small};
+  margin-top: -6px;
 `;
 
-const DeleteWrapper = styled.div`
-  float: left;
+const DeleteConfirmText = styled.span`
   padding-left: 40px;
+`;
+const DeleteWrapper = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
 `;
 
 const ButtonDelete = styled(ButtonForm)`
@@ -80,6 +85,10 @@ const ButtonDelete = styled(ButtonForm)`
 `;
 
 const ButtonPreDelete = styled(Button)`
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
   color: ${palette('text', 1)};
   &:hover {
     color: ${palette('linkHover', 2)};
@@ -249,7 +258,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       {
         group.fields.map((field, i) => field
           ? (
-            <Field key={i}>
+            <Field labelledGroup={!!group.label} key={i}>
               {this.renderFormField(field, false, hasEntityNewModal)}
               {
                 field.errorMessages &&
@@ -323,15 +332,17 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
               </DeleteWrapper>
             }
             {this.props.handleDelete && this.state.deleteConfirmed &&
-              <DeleteWrapper>
-                <FormattedMessage {...messages.confirmDeleteQuestion} />
+              <FormFooterButtons left>
+                <DeleteConfirmText>
+                  <FormattedMessage {...messages.confirmDeleteQuestion} />
+                </DeleteConfirmText>
                 <ButtonCancel type="button" onClick={() => this.preDelete(false)}>
                   <FormattedMessage {...messages.buttons.cancelDelete} />
                 </ButtonCancel>
                 <ButtonDelete type="button" onClick={this.props.handleDelete}>
                   <FormattedMessage {...messages.buttons.confirmDelete} />
                 </ButtonDelete>
-              </DeleteWrapper>
+              </FormFooterButtons>
             }
             {!this.state.deleteConfirmed &&
               <FormFooterButtons>
