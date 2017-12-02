@@ -631,11 +631,11 @@ export function* updatePathSaga({ path, args }) {
 export function* closeEntitySaga({ path }) {
   // the close icon is to function like back if possible, otherwise go to default path provided
   const previousPath = yield select(selectPreviousPathname);
-  if (previousPath) {
-    yield put(goBack());
-  } else {
-    yield put(push({ pathname: path || '/' }));
-  }
+  const currentPath = yield select(selectCurrentPathname);
+  yield put(previousPath && (previousPath !== currentPath)
+    ? goBack()
+    : push({ pathname: path || '/' })
+  );
 }
 
 /**

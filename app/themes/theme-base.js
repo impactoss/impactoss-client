@@ -55,7 +55,7 @@ theme.breakpoints = {
 // 2: main colour, light
 // 3: main colour, lighter
 // 4: white
-const primary = coolorsToHex('https://coolors.co/0063B5-0077D8-0077D8-ffffff-ffffff');
+const primary = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-ffffff-ffffff');
   // secondary color palette: dark to light
   // 0: secondary colour, darker
   // 1: secondary colour
@@ -81,10 +81,10 @@ const light = coolorsToHex('https://coolors.co/f1f4f4-e0e6e6-d5dddd-cdd6d6-c7d1d
 // other palettes
 // 0: AA on light[0] and on error[3]
 // 1: AA on white
-const error = coolorsToHex('https://coolors.co/b2221f-dd3630-ef443e-f9c9c7-ffffff');
-const success = coolorsToHex('https://coolors.co/388e3c-4caf50-7cc47f-9fd4a1-ffffff');
-// const alert = coolorsToHex('https://coolors.co/ffa000-ffc107-ffd761-ffecb3-ffffff');
-// const info = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-1d3033');
+const error = coolorsToHex('https://coolors.co/b20e0e-c10f0f-d31717-f2e3e3-ffffff');
+const success = coolorsToHex('https://coolors.co/00632e-007034-007c3a-e1f2ed-ffffff');
+// const alert = coolorsToHex('https://coolors.co/c75300-e56700-ed7000-f97807-ffffff');
+// const info = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-118ef4-ffffff');
 
 // colour palettes, usage:
 //   import { palette } from 'styled-theme';
@@ -109,9 +109,30 @@ theme.palette = {
   // taxonomiesAAL: ['#8C969B', '#6B3285', '#5149AD', '#31A573', '#26938C', '#4DA53B', '#0069A4', '#199CD4', '#8C969B'],
   // [#AA compliant]
   // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
-  // [0: Default, 1: HR Body, 2: UN session, 3: HR, 4: Affected P, 5: Cluster, 6: Orga, 7: SDGs, 8:  State, 9: SMART]
-  taxonomies: ['#8D95A0', '#0059A3', '#0077D8', '#007C70', '#05A763', '#B7177A', '#114060', '#009ED8', '#416680', '#E56700'],
-  taxonomiesHover: ['#656F75', '#005296', '#0070CC', '#007267', '#069651', '#A5156E', '#0F364C', '#007FAD', '#416680', '#C75300'],
+  taxonomies: [
+    '#8D95A0', // default, not used
+    '#0059A3', // 1: Human Rights Body
+    '#0077D8', // 2: UN session
+    '#007C70', // 3: Human right
+    '#05A763', // 4: Affected persons
+    '#B7177A', // 5: Thematic cluster
+    '#114060', // 6: Organisation
+    '#009ED8', // 7: SDGs
+    '#416680', // 8: State
+    '#E56700', // 9: SMART
+  ],
+  taxonomiesHover: [
+    '#656F75', // default, not used
+    '#005296', // 1: Human Rights Body
+    '#0070CC', // 2: UN session
+    '#007267', // 3: Human right
+    '#008740', // 4: Affected persons
+    '#A5156E', // 5: Thematic cluster
+    '#0F364C', // 6: Organisation
+    '#007FAD', // 7: SDGs
+    '#416680', // 8: State
+    '#C75300', // 9: SMART
+  ],
 
   // other entities
   // [aqll #AA compliant]
@@ -123,7 +144,7 @@ theme.palette = {
   sdgtargetsHover: ['#007FAD'],
   sdgtargets: ['#009ED8'], // 40D7FF, 00A0CC
   indicatorsHover: ['#15881A'],
-  indicators: ['#15a21a'],
+  indicators: ['#1BAC29'],
   reportsHover: [error[1]],
   reports: [error[0]],
   attributesHover: [dark[2]],
@@ -142,9 +163,9 @@ theme.palette = {
 
   // links
   // also see global-styles.js for default link "a"
-  // [#primaryLink, #secondaryLink, #textColorLink]
-  link: [primary[1], secondary[1], dark[0]],
-  linkHover: [primary[0], secondary[0], primary[1]],
+  // [#primaryLink, #linkOnLightBackground, #textColorLink, #linkOnDark]
+  link: [primary[2], primary[1], dark[0], primary[4]],
+  linkHover: [primary[0], primary[0], primary[2], light[1]],
 
   // home: [ '#bg' ],
   home: [primary[4]],
@@ -165,14 +186,14 @@ theme.palette = {
   // headerNavPages: [ '#bg' ],
   headerNavPages: [light[0]],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
-  headerNavPagesItem: [dark[3], primary[4], 'transparent', dark[2]],
-  headerNavPagesItemHover: [dark[2], light[2], 'transparent', dark[2]],
+  headerNavPagesItem: [dark[3], primary[4], 'transparent', primary[2]],
+  headerNavPagesItemHover: [dark[2], primary[4], 'transparent', primary[0]],
 
   // headerNavAccount: [ '#bg' ],
   headerNavAccount: ['transparent'],
   // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border' ]
-  headerNavAccountItem: [primary[4], primary[4], dark[2], primary[1], dark[0]],
-  headerNavAccountItemHover: [primary[4], primary[4], dark[1], primary[1], dark[2]],
+  headerNavAccountItem: [primary[4], primary[4], dark[2], primary[2], dark[0]],
+  headerNavAccountItemHover: [primary[4], primary[4], dark[1], primary[2], dark[2]],
 
   // headerNavMain: [ '#bg', '#border'  ],
   headerNavMain: [secondary[4], secondary[4]],
@@ -190,8 +211,8 @@ theme.palette = {
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
-  asideCatNavItem: [dark[0], primary[4], primary[4], primary[1], light[0]],
-  asideCatNavItemHover: [dark[1], primary[4], light[0], primary[1], light[0]],
+  asideCatNavItem: [dark[0], primary[4], primary[4], primary[2], light[0]],
+  asideCatNavItemHover: [dark[1], primary[4], light[0], primary[2], light[0]],
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
@@ -215,28 +236,26 @@ theme.palette = {
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary', #disabled],
-  buttonFlat: [primary[1], dark[3], light[4]],
+  buttonFlat: [primary[1], dark[3], light[4]], // aka ghost button
   buttonFlatHover: [primary[0], primary[1]],
-  buttonCancel: [dark[3]],
+  buttonCancel: [dark[3]], // form footer cancel
   buttonCancelHover: [primary[1]],
   // buttonDefault: ['#text', '#bg'],
-  buttonDefault: [primary[4], primary[1]],
+  buttonDefault: [primary[4], primary[2]], // with background
   buttonDefaultHover: [primary[4], primary[0]],
-  buttonDefaultDisabled: [light[0], dark[3]],
+  buttonDefaultDisabled: [light[0], dark[3]], // with background disabled
   // buttonPrimary: ['#text', '#bg', '#border'],
-  buttonDefaultIconOnly: [primary[4], primary[1], primary[1]],
+  buttonDefaultIconOnly: [primary[4], primary[2], primary[1]], // with background, without text
   buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],
   // buttonSecondary: ['#text', '#bg'],
-  buttonSecondary: [secondary[4], secondary[1]],
-  buttonSecondaryHover: [secondary[4], secondary[0]],
+  // buttonSecondary: [secondary[4], secondary[1]],
+  // buttonSecondaryHover: [secondary[4], secondary[0]],
   // buttonToggleInactive: ['#color', '#bg'],
-  buttonToggleInactive: [dark[2], light[1]],
+  buttonToggleInactive: [dark[2], light[1]], // list sidebar filter/edit toggle button
   buttonToggleInactiveHover: [dark[2], light[0]],
   // ButtonInverse: ['#color', '#bg'],
-  buttonInverse: [primary[1], primary[4]],
-  buttonInverseHover: [primary[1], light[0]],
-
-
+  buttonInverse: [primary[2], primary[4]], // used for taxonomy tags, background only
+  buttonInverseHover: [primary[0], primary[4]],
 };
 
 // fonts
@@ -263,6 +282,7 @@ theme.sizes = {
   },
   lineHeights: {
     mainListItem: 1.4,
+    markdown: 1.4,
   },
   // px only
   aside: {

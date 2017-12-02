@@ -16,6 +16,24 @@ export default defineMessages({
       defaultMessage: 'Samoa\'s home of human rights implementation',
     },
   },
+  taxonomyGroups: {
+    1: {
+      id: 'app.containers.App.taxonomyGroups.1',
+      defaultMessage: 'International classifications',
+    },
+    2: {
+      id: 'app.containers.App.taxonomyGroups.2',
+      defaultMessage: 'National classifications',
+    },
+    3: {
+      id: 'app.containers.App.taxonomyGroups.3',
+      defaultMessage: 'Other classifications',
+    },
+    4: {
+      id: 'app.containers.App.taxonomyGroups.4',
+      defaultMessage: 'Yet other classifications',
+    },
+  },
   buttons: {
     cancel: {
       id: 'app.containers.App.buttons.cancel',
@@ -118,6 +136,10 @@ export default defineMessages({
     user_only: {
       id: 'app.containers.App.hints.user_only',
       defaultMessage: 'Check to categorise users only',
+    },
+    content: {
+      id: 'app.containers.App.hints.content',
+      defaultMessage: 'Note: first paragraph styled as lead paragraph',
     },
   },
   textValues: {

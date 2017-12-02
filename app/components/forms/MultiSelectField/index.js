@@ -17,9 +17,9 @@ import messages from './messages';
 
 const MultiSelectWrapper = styled.div`
   position: absolute;
-  top: 38px;
+  top: 0;
   right: 0;
-  height:450px;
+  height: 450px;
   width: 100%;
   min-width: 350px;
   overflow: hidden;
@@ -34,6 +34,7 @@ const MultiSelectWrapper = styled.div`
 `;
 const MultiSelectFieldWrapper = styled.div`
   position: relative;
+  padding: 10px 0;
 `;
 const MultiselectActiveOptions = styled.div`
   position: relative;

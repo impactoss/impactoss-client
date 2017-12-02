@@ -14,6 +14,7 @@ import { Map } from 'immutable';
 
 import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
+import { sortEntities } from 'utils/sort';
 
 import { USER_ROLES } from 'themes/config';
 import { PARAMS } from 'containers/App/constants';
@@ -285,6 +286,11 @@ export const selectEntities = createSelector(
   selectEntitiesAll,
   (state, path) => path,
   (entities, path) => entities.get(path)
+);
+
+export const selectTaxonomiesSorted = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (taxonomies) => taxonomies && sortEntities(taxonomies, 'asc', 'priority')
 );
 
 export const selectEntity = createSelector(

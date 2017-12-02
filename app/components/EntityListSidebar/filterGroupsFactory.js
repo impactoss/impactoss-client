@@ -1,4 +1,5 @@
 import { reduce } from 'lodash/collection';
+import { sortEntities } from 'utils/sort';
 
 // figure out filter groups for filter panel
 export const makeFilterGroups = (
@@ -19,14 +20,15 @@ export const makeFilterGroups = (
       label: messages.taxonomyGroup,
       show: true,
       icon: 'categories',
-      options: taxonomies.reduce((taxOptions, taxonomy) => ({
-        ...taxOptions,
-        [taxonomy.get('id')]: {
-          id: taxonomy.get('id'), // filterOptionId
-          label: messages.taxonomies(taxonomy.get('id')),
-          active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
-        },
-      }), {}),
+      options: sortEntities(taxonomies, 'asc', 'priority').reduce((memo, taxonomy) =>
+        memo.concat([
+          {
+            id: taxonomy.get('id'), // filterOptionId
+            label: messages.taxonomies(taxonomy.get('id')),
+            active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+          },
+        ])
+      , []),
     };
   }
 
@@ -38,18 +40,17 @@ export const makeFilterGroups = (
       label: messages.connectedTaxonomies,
       show: true,
       icon: 'connectedCategories',
-      options: connectedTaxonomies.reduce((taxOptions, taxonomy) =>
+      options: sortEntities(connectedTaxonomies, 'asc', 'priority').reduce((taxOptions, taxonomy) =>
         config.connectedTaxonomies.exclude && taxonomy.getIn(['attributes', config.connectedTaxonomies.exclude])
           ? taxOptions
-          : ({
-            ...taxOptions,
-            [taxonomy.get('id')]: {
+          : taxOptions.concat([
+            {
               id: taxonomy.get('id'), // filterOptionId
               label: messages.taxonomies(taxonomy.get('id')),
               active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
             },
-          })
-      , {}),
+          ])
+      , []),
     };
   }
 
