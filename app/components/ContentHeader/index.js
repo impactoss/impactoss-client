@@ -13,7 +13,7 @@ import ButtonFactory from 'components/buttons/ButtonFactory';
 const Styled = styled.div`
   padding: ${(props) => props.isModal ? '20px 0 20px 40px' : '3em 0 1em'};
   border-bottom: ${(props) => props.hasBottomBorder ? '1px solid' : 'none'};
-  border-color: ${palette('light', 2)};
+  border-color: ${palette('light', 1)};
 `;
 
 const TitleLarge = styled.h1`
