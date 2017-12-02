@@ -68,7 +68,8 @@ const Hint = styled.div`
 `;
 
 const DeleteConfirmText = styled.span`
-  padding-left: 40px;
+  padding-left: 1em;
+  padding-right: 1em;
 `;
 const DeleteWrapper = styled.div`
   position: absolute;
