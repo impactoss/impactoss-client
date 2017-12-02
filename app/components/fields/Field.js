@@ -3,7 +3,7 @@ import styled from 'styled-components';
 const Field = styled.div`
   display: ${(props) => props.nested ? 'inline-block' : 'block'};
   padding-bottom: ${(props) => {
-    if (props.nested) {
+    if (props.nested || props.noPadding) {
       return 0;
     }
     if (props.labelledGroup) {
