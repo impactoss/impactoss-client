@@ -27,25 +27,25 @@ injectGlobal`
   }
 
   a {
-    color: #007db3;
+    color: #0077d8;
     text-decoration: none;
 
     &:hover {
-      color: #0072a3;
+      color: #0063b5;
     }
   }
   h1, h2, h3, h4, h5, h6 {
     line-height: 1.25;
-    font-weight: 700;
+    font-weight: 500;
     margin-top: 20px;
     margin-bottom: 10px;
   }
   h1 {
+    font-weight: 700;
     font-size: 2.6em;
   }
   h2 {
     font-size: 2.25em;
-    font-weight: 500;
   }
   h3 {
     font-size: 1.9em;
@@ -63,7 +63,7 @@ injectGlobal`
 
   p {
     margin-top: 0;
-    margin-bottom:16px;
+    margin-bottom: 16px;
   }
 
   * {
@@ -103,10 +103,9 @@ injectGlobal`
     .react-markdown {
       p {
         &:first-child{
-          font-size: 1.75em;
-          line-height: 1.4em;
+          font-size: 1.5em;
           color: #6A7880;
-          padding-bottom: 15px;
+          padding-bottom: 20px;
         }
       }
     }
@@ -142,5 +141,9 @@ injectGlobal`
     vertical-align: middle;
     position: relative;
     bottom: 1px;
+  }
+
+  ._react-file-reader-input {
+    display: inline-block;
   }
 `;

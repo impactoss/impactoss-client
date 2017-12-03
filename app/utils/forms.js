@@ -403,6 +403,7 @@ export const getMarkdownField = (formatMessage, obsoleteAppMessages, attribute =
     formatMessage,
     controlType: 'markdown',
     attribute,
+    hint: appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute]),
   });
 
 export const getTextareaField = (formatMessage, obsoleteAppMessages, attribute = 'description') =>

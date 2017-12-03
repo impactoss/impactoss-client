@@ -29,16 +29,17 @@ import GroupLabel from 'components/fields/GroupLabel';
 import FieldWrap from 'components/fields/FieldWrap';
 import Field from 'components/fields/Field';
 import Clear from 'components/styled/Clear';
+import ViewPanel from 'components/EntityView/ViewPanel';
 
 import FieldLabel from 'components/forms/Label';
 import ErrorWrapper from 'components/forms/ErrorWrapper';
 import UploadControl from 'components/forms/UploadControl';
-import FormPanel from 'components/forms/FormPanel';
 import FormFooter from 'components/forms/FormFooter';
+import FormBody from 'components/forms/FormBody';
 import FormWrapper from 'components/forms/FormWrapper';
 import FormFooterButtons from 'components/forms/FormFooterButtons';
-import Aside from 'components/forms/Aside';
-import Main from 'components/forms/Main';
+import Aside from 'components/EntityView/Aside';
+import Main from 'components/EntityView/Main';
 import FormFieldWrap from 'components/forms/FormFieldWrap';
 import ControlTitle from 'components/forms/ControlTitle';
 import ControlTitleText from 'components/forms/ControlTitleText';
@@ -55,15 +56,26 @@ import MultiSelectField from 'components/forms/MultiSelectField';
 
 import messages from './messages';
 
-const Hint = styled.span`
-  color: ${palette('text', 1)};
-  display: block;
-  font-size: 0.85em;
+const StyledForm = styled(Form)`
+  display: table;
+  width: 100%;
 `;
 
+const Hint = styled.div`
+  color: ${palette('text', 1)};
+  font-size: ${(props) => props.theme.sizes.text.small};
+  margin-top: -6px;
+`;
+
+const DeleteConfirmText = styled.span`
+  padding-left: 1em;
+  padding-right: 1em;
+`;
 const DeleteWrapper = styled.div`
-  float: left;
-  padding-left: 40px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
 `;
 
 const ButtonDelete = styled(ButtonForm)`
@@ -74,6 +86,10 @@ const ButtonDelete = styled(ButtonForm)`
 `;
 
 const ButtonPreDelete = styled(Button)`
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
   color: ${palette('text', 1)};
   &:hover {
     color: ${palette('linkHover', 2)};
@@ -243,7 +259,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       {
         group.fields.map((field, i) => field
           ? (
-            <Field key={i}>
+            <Field labelledGroup={!!group.label} key={i}>
               {this.renderFormField(field, false, hasEntityNewModal)}
               {
                 field.errorMessages &&
@@ -264,24 +280,24 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     </FieldGroupWrapper>
   )
 
-  renderMain = (fieldGroups, aside, hasEntityNewModal) => (
-    <Main aside={aside}>
+  renderMain = (fieldGroups, hasAside = true, bottom = false, hasEntityNewModal = false) => (
+    <Main hasAside={hasAside} bottom={bottom}>
       {
-        asArray(fieldGroups).map((fieldGroup, i, list) => fieldGroup.fields && (
-          <FormPanel key={i} borderRight={aside} borderBottom={i < (list.length - 1)}>
+        asArray(fieldGroups).map((fieldGroup, i) => fieldGroup.fields && (
+          <div key={i}>
             {this.renderGroup(fieldGroup, hasEntityNewModal)}
-          </FormPanel>
+          </div>
         ))
       }
     </Main>
   );
-  renderAside = (fieldGroups, hasEntityNewModal) => (
-    <Aside>
+  renderAside = (fieldGroups, bottom = false, hasEntityNewModal = false) => (
+    <Aside bottom={bottom}>
       {
-        asArray(fieldGroups).map((fieldGroup, i, list) => (
-          <FormPanel key={i} borderBottom={i < (list.length - 1)}>
+        asArray(fieldGroups).map((fieldGroup, i) => (
+          <div key={i}>
             {this.renderGroup(fieldGroup, hasEntityNewModal)}
-          </FormPanel>
+          </div>
         ))
       }
     </Aside>
@@ -293,19 +309,21 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
 
     return (
       <FormWrapper withoutShadow={inModal}>
-        <Form model={model} onSubmit={this.handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
-          { fields.header &&
-            <FormPanel borderBottom>
-              { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, hasEntityNewModal) }
-              { fields.header.aside && this.renderAside(fields.header.aside, hasEntityNewModal) }
-            </FormPanel>
-          }
-          { fields.body &&
-            <FormPanel>
-              { fields.body.main && this.renderMain(fields.body.main, true, hasEntityNewModal) }
-              { fields.body.aside && this.renderAside(fields.body.aside, hasEntityNewModal) }
-            </FormPanel>
-          }
+        <StyledForm model={model} onSubmit={this.handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
+          <FormBody>
+            { fields.header &&
+              <ViewPanel>
+                { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, false, hasEntityNewModal) }
+                { fields.header.aside && this.renderAside(fields.header.aside, false, hasEntityNewModal) }
+              </ViewPanel>
+            }
+            { fields.body &&
+              <ViewPanel>
+                { fields.body.main && this.renderMain(fields.body.main, true, true, hasEntityNewModal) }
+                { fields.body.aside && this.renderAside(fields.body.aside, true, hasEntityNewModal) }
+              </ViewPanel>
+            }
+          </FormBody>
           <FormFooter>
             {this.props.handleDelete && !this.state.deleteConfirmed &&
               <DeleteWrapper>
@@ -315,15 +333,17 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
               </DeleteWrapper>
             }
             {this.props.handleDelete && this.state.deleteConfirmed &&
-              <DeleteWrapper>
-                <FormattedMessage {...messages.confirmDeleteQuestion} />
+              <FormFooterButtons left>
+                <DeleteConfirmText>
+                  <FormattedMessage {...messages.confirmDeleteQuestion} />
+                </DeleteConfirmText>
                 <ButtonCancel type="button" onClick={() => this.preDelete(false)}>
                   <FormattedMessage {...messages.buttons.cancelDelete} />
                 </ButtonCancel>
                 <ButtonDelete type="button" onClick={this.props.handleDelete}>
                   <FormattedMessage {...messages.buttons.confirmDelete} />
                 </ButtonDelete>
-              </DeleteWrapper>
+              </FormFooterButtons>
             }
             {!this.state.deleteConfirmed &&
               <FormFooterButtons>
@@ -337,7 +357,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             }
             <Clear />
           </FormFooter>
-        </Form>
+        </StyledForm>
       </FormWrapper>
     );
   }

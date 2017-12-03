@@ -42,8 +42,7 @@ const ScrollableWrapper = styled(Scrollable)`
 const ListEntitiesEmpty = styled.div`
   font-size: 1.2em;
   padding: 1.5em;
-  color: ${palette('light', 4)};
-  font-weight: 500;
+  color: ${palette('text', 1)};
 `;
 
 const STATE_INITIAL = {

@@ -6,10 +6,10 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const A = styled.a`
-  color: ${palette('link', 0)};
+  color: ${(props) => props.onLightBackground ? palette('link', 1) : palette('link', 0)};
 
   &:hover {
-    color: ${palette('linkHover', 0)};
+    color: ${(props) => props.onLightBackground ? palette('linkHover', 1) : palette('linkHover', 0)};
   }
 `;
 
