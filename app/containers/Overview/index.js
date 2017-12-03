@@ -142,7 +142,7 @@ const CategorisedIcons = styled.div``;
 const CategorisedIcon = styled.a`
   display: inline-block;
   padding: 0 2px;
-  color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : palette('dark', 4)};
+  color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : palette('text', 1)};
   &:hover {
     color: ${(props) => palette('taxonomies', props.paletteId)};
   }

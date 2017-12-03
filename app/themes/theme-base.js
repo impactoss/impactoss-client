@@ -51,15 +51,15 @@ theme.breakpoints = {
 // global color palettes
 // primary color palette: dark to light
 // 0: main colour, darker, used for links and navigation elements, hover (AA)
-// 1: main colour, used for links and navigation elements (AA Large)
-// 2: main colour, light
-// 3: main colour, lighter
-// 4: white
+// 1: main colour, used for text links/buttons on light grey (AA Large on f1f4f4 )
+// 2: main colour, used for links and navigation elements (AA large on white)
+// 3: white/placeholder
+// 4: white/placeholder
 const primary = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-ffffff-ffffff');
   // secondary color palette: dark to light
-  // 0: secondary colour, darker
-  // 1: secondary colour
-  // 2: secondary colour, lighter
+  // 0: secondary colour, dark / white/placeholder
+  // 1: secondary colour, medium / white/placeholder
+  // 2: secondary colour, main / white/placeholder
   // 3: white/placeholder
   // 4: white/placeholder
 const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-ffffff');
@@ -69,7 +69,7 @@ const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-f
 // 2:  dark (AA)
 // 3:  medium gray 1 (AA) --- !!! AA compatible with light[0]
 // 4:  medium gray 2 (AA large)
-const dark = coolorsToHex('https://coolors.co/1c2121-232c2c-323e3e-697070-8d9696');
+const dark = coolorsToHex('https://coolors.co/1c2121-232b2b-323e3e-687271-8d9696');
 // light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js !!! AA compatible with dark[3]
 // 1:  light gray (light lines, navigation filter panel)
@@ -130,7 +130,7 @@ theme.palette = {
     '#A5156E', // 5: Thematic cluster
     '#0F364C', // 6: Organisation
     '#007FAD', // 7: SDGs
-    '#416680', // 8: State
+    '#395970', // 8: State
     '#C75300', // 9: SMART
   ],
 
@@ -211,7 +211,7 @@ theme.palette = {
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
-  asideCatNavItem: [dark[0], primary[4], primary[4], primary[2], light[0]],
+  asideCatNavItem: [dark[2], primary[4], primary[4], primary[2], light[0]],
   asideCatNavItemHover: [dark[1], primary[4], light[0], primary[2], light[0]],
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
