@@ -44,7 +44,8 @@ import {
   selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
-import { CONTENT_SINGLE, USER_ROLES } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import Messages from 'components/Messages';
@@ -112,7 +113,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
         getMetaField(entity, appMessages),
       ]
       : [
-        getRoleField(entity, this.context.intl.formatMessage, appMessages),
+        getRoleField(entity),
         getMetaField(entity, appMessages),
       ],
     },
@@ -136,7 +137,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
         // the session user can only assign roles "lower" (that is higher id) than his/her own role
         // and when the session user has a "higher" (lower id) role than the user profile being edited
       return roles
-        .filter((role) => sessionUserHighestRoleId === USER_ROLES.ADMIN
+        .filter((role) => sessionUserHighestRoleId === USER_ROLES.ADMIN.value
           || (sessionUserHighestRoleId < userHighestRoleId && sessionUserHighestRoleId < parseInt(role.get('id'), 10))
         );
     }
@@ -217,7 +218,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 },
                 body: {
                   main: this.getBodyMainFields(),
-                  aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER) && this.getBodyAsideFields(taxonomies, onCreateOption),
+                  aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER.value) && this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
             />
@@ -301,7 +302,7 @@ function mapDispatchToProps(dispatch) {
       const newHighestRole = parseInt(formData.get('associatedRole'), 10);
 
       // store all higher roles
-      const newRoleIds = newHighestRole === USER_ROLES.DEFAULT
+      const newRoleIds = newHighestRole === USER_ROLES.DEFAULT.value
         ? List()
         : roles.reduce((memo, role) =>
           newHighestRole <= parseInt(role.get('id'), 10)
@@ -327,7 +328,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`/users/${reference}`));
+      dispatch(updatePath(`${PATHS.USERS}/${reference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

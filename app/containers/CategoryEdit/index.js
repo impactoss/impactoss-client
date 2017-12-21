@@ -39,7 +39,8 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -137,6 +138,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
   getHeaderAsideFields = (entity) => {
     const fields = []; // fieldGroups
+    fields.push({
+      fields: [
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
+        getMetaField(entity, appMessages),
+      ],
+    });
     if (entity.getIn(['taxonomy', 'attributes', 'tags_users'])) {
       fields.push({
         fields: [
@@ -149,12 +156,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         ],
       });
     }
-    fields.push({
-      fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages, entity),
-        getMetaField(entity, appMessages),
-      ],
-    });
     return fields;
   }
 
@@ -205,6 +206,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     return fields;
   }
 
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+
   render() {
     const { viewEntity, dataReady, isAdmin, viewDomain, users, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption } = this.props;
     const reference = this.props.params.id;
@@ -213,7 +216,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (viewEntity && viewEntity.get('taxonomy')) {
       pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
-        taxonomy: viewEntity.getIn(['taxonomy', 'attributes', 'title']),
+        taxonomy: this.getTaxTitle(viewEntity.getIn(['taxonomy', 'id'])),
       });
     }
 
@@ -364,7 +367,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
@@ -431,7 +434,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`/category/${reference}`));
+      dispatch(updatePath(`${PATHS.CATEGORIES}/${reference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

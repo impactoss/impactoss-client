@@ -19,7 +19,7 @@ import {
   attributeOptionChecked,
 } from './utils';
 
-export const makeActiveFilterOptions = (entities, config, activeFilterOption, locationQuery, taxonomies, connections, connectedTaxonomies, messages) => {
+export const makeActiveFilterOptions = (entities, config, activeFilterOption, locationQuery, taxonomies, connections, connectedTaxonomies, messages, contextIntl) => {
   // create filterOptions
   switch (activeFilterOption.group) {
     case 'taxonomies':
@@ -27,7 +27,7 @@ export const makeActiveFilterOptions = (entities, config, activeFilterOption, lo
     case 'connectedTaxonomies':
       return makeConnectedTaxonomyFilterOptions(entities, config, connectedTaxonomies, activeFilterOption.optionId, locationQuery, messages);
     case 'connections':
-      return makeConnectionFilterOptions(entities, config.connections, connections, connectedTaxonomies, activeFilterOption.optionId, locationQuery, messages);
+      return makeConnectionFilterOptions(entities, config.connections, connections, connectedTaxonomies, activeFilterOption.optionId, locationQuery, messages, contextIntl);
     case 'attributes':
       return makeAttributeFilterOptions(entities, config.attributes, activeFilterOption.optionId, locationQuery.get('where'), messages);
     default:
@@ -237,7 +237,7 @@ export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQu
 //
 //
 //
-export const makeConnectionFilterOptions = (entities, connectionFilters, connections, connectedTaxonomies, activeOptionId, locationQuery, messages) => {
+export const makeConnectionFilterOptions = (entities, config, connections, connectedTaxonomies, activeOptionId, locationQuery, messages, contextIntl) => {
   const filterOptions = {
     groupId: 'connections',
     options: {},
@@ -249,13 +249,13 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
   };
 
   // get the active option
-  const option = find(connectionFilters.options, (o) => o.path === activeOptionId);
+  const option = find(config.options, (o) => o.path === activeOptionId);
   // if option active
   if (option) {
     filterOptions.messagePrefix = messages.titlePrefix;
     filterOptions.message = option.message;
     filterOptions.search = option.search;
-    const query = connectionFilters.query;
+    const query = config.query;
     let locationQueryValue = locationQuery.get(query);
     // if no entities found show any active options
     if (entities.size === 0) {
@@ -268,7 +268,7 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
               const connection = connections.get(option.path) && connections.getIn([option.path, value]);
               filterOptions.options[value] = {
                 reference: connection ? getEntityReference(connection) : '',
-                label: connection ? getEntityTitle(connection) : upperFirst(value),
+                label: connection ? getEntityTitle(connection, option.labels, contextIntl) : upperFirst(value),
                 showCount: true,
                 value: `${option.path}:${value}`,
                 count: 0,
@@ -317,7 +317,7 @@ export const makeConnectionFilterOptions = (entities, connectionFilters, connect
               } else {
                 const value = `${option.path}:${connectedId}`;
                 const reference = getEntityReference(connection);
-                const label = getEntityTitle(connection);
+                const label = getEntityTitle(connection, option.labels, contextIntl);
                 filterOptions.options[connectedId] = {
                   label,
                   reference,

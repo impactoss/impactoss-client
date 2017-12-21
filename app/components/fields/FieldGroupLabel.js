@@ -3,12 +3,12 @@ import { palette } from 'styled-theme';
 
 const FieldGroupLabel = styled.div`
   position: relative;
-  display: block;
-  width: 100%;
+  display: table;
   border-bottom: 2px solid ${palette('light', 3)};
   padding: 10px 0 3px;
   font-weight: bold;
-  color: ${palette('dark', 1)};
+  font-size: ${(props) => props.theme.sizes.text.small};
+  margin-bottom: 20px;
 `;
 
 export default FieldGroupLabel;

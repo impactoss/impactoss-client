@@ -32,7 +32,9 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
+
 import appMessages from 'containers/App/messages';
 
 import {
@@ -104,6 +106,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
   getHeaderAsideFields = (taxonomy) => {
     const fields = []; // fieldGroups
+    fields.push({
+      fields: [
+        getStatusField(this.context.intl.formatMessage, appMessages),
+      ],
+    });
     if (taxonomy.getIn(['attributes', 'tags_users'])) {
       fields.push({
         fields: [
@@ -115,11 +122,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         ],
       });
     }
-    fields.push({
-      fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages),
-      ],
-    });
     return fields;
   }
 
@@ -168,6 +170,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return fields;
   }
 
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+
   render() {
     const { taxonomy, dataReady, isAdmin, viewDomain, users, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
@@ -176,7 +180,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (taxonomy && taxonomy.get('attributes')) {
       pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
-        taxonomy: taxonomy.getIn(['attributes', 'title']),
+        taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     }
 
@@ -318,7 +322,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
@@ -384,7 +388,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (taxonomyReference) => {
-      dispatch(updatePath(`/categories/${taxonomyReference}`));
+      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyReference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

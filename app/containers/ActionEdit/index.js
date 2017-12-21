@@ -15,28 +15,16 @@ import { Map } from 'immutable';
 import {
   taxonomyOptions,
   entityOptions,
-  renderRecommendationControl,
-  renderIndicatorControl,
-  renderTaxonomyControl,
-  renderSdgTargetControl,
   getCategoryUpdatesFromFormData,
   getConnectionUpdatesFromFormData,
-  getTitleFormField,
-  getStatusField,
-  getMarkdownField,
-  getDateField,
-  getFormField,
+  getFields,
 } from 'utils/forms';
-
-import {
-  getMetaField,
-} from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
-import appMessages from 'containers/App/messages';
+import { CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
 
 import {
   loadEntitiesIfNeeded,
@@ -61,6 +49,8 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
+import { getInitialFormData } from 'utils/entities';
+
 import {
   selectDomain,
   selectViewEntity,
@@ -73,7 +63,7 @@ import {
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES, FORM_INITIAL } from './constants';
+import { DEPENDENCIES } from './constants';
 
 export class ActionEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -111,7 +101,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       id: viewEntity.get('id'),
       attributes: viewEntity.get('attributes').mergeWith(
         (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-        FORM_INITIAL.get('attributes')
+        getInitialFormData(MEASURE_SHAPE).get('attributes')
       ),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRecommendations: entityOptions(recommendations, true),
@@ -120,61 +110,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     })
     : Map();
   }
-
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage, appMessages),
-      ],
-    },
-  ]);
-
-  getHeaderAsideFields = (entity) => ([
-    {
-      fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages, entity),
-        getMetaField(entity, appMessages),
-      ],
-    },
-  ]);
-
-  getBodyMainFields = (connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption) => ([
-    {
-      fields: [
-        getMarkdownField(this.context.intl.formatMessage, appMessages),
-        getMarkdownField(this.context.intl.formatMessage, appMessages, 'outcome'),
-        getMarkdownField(this.context.intl.formatMessage, appMessages, 'indicator_summary'),
-      ],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
-        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
-        renderIndicatorControl(indicators, onCreateOption),
-      ],
-    },
-  ]);
-
-  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getDateField(this.context.intl.formatMessage, appMessages, 'target_date'),
-        getFormField({
-          formatMessage: this.context.intl.formatMessage,
-          appMessages,
-          controlType: 'textarea',
-          attribute: 'target_date_comment',
-        }),
-      ],
-    },
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
-      icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies, onCreateOption),
-    },
-  ]);
 
   render() {
     const { viewEntity, dataReady, viewDomain, taxonomies, connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption } = this.props;
@@ -249,16 +184,19 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
               handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(viewEntity),
+              fields={getFields({
+                entity: viewEntity,
+                associations: {
+                  taxonomies,
+                  connectedTaxonomies,
+                  recommendations,
+                  indicators,
+                  sdgtargets,
                 },
-                body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption),
-                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
-                },
-              }}
+                onCreateOption,
+                shape: MEASURE_SHAPE,
+                formatMessage: this.context.intl.formatMessage,
+              })}
             />
           }
           {(saveSending || deleteSending) &&
@@ -319,7 +257,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
@@ -381,7 +319,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath(`/actions/${props.params.id}`));
+      dispatch(updatePath(`/actions/${props.params.id}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

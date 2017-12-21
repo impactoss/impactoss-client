@@ -16,9 +16,23 @@ export default defineMessages({
       defaultMessage: 'Samoa\'s home of human rights implementation',
     },
   },
-  overview: {
-    id: 'app.containers.App.overview',
-    defaultMessage: 'Overview',
+  taxonomyGroups: {
+    1: {
+      id: 'app.containers.App.taxonomyGroups.1',
+      defaultMessage: 'International classifications',
+    },
+    2: {
+      id: 'app.containers.App.taxonomyGroups.2',
+      defaultMessage: 'National classifications',
+    },
+    3: {
+      id: 'app.containers.App.taxonomyGroups.3',
+      defaultMessage: 'Other classifications',
+    },
+    4: {
+      id: 'app.containers.App.taxonomyGroups.4',
+      defaultMessage: 'Yet other classifications',
+    },
   },
   buttons: {
     cancel: {
@@ -123,6 +137,10 @@ export default defineMessages({
       id: 'app.containers.App.hints.user_only',
       defaultMessage: 'Check to categorise users only',
     },
+    content: {
+      id: 'app.containers.App.hints.content',
+      defaultMessage: 'Note: first paragraph styled as lead paragraph',
+    },
   },
   textValues: {
     user_only: {
@@ -130,46 +148,72 @@ export default defineMessages({
       defaultMessage: 'Categorises users only',
     },
   },
+  import: {
+    hint: {
+      id: 'app.containers.App.import.hint',
+      defaultMessage: 'This row provides additional information about the columns. Please replace or remove it before importing',
+    },
+    required: {
+      id: 'app.containers.App.import.required',
+      defaultMessage: 'Required: ',
+    },
+    text: {
+      id: 'app.containers.App.import.text',
+      defaultMessage: 'text',
+    },
+    markdown: {
+      id: 'app.containers.App.import.markdown',
+      defaultMessage: 'text (markdown supported)',
+    },
+    bool: {
+      id: 'app.containers.App.import.bool',
+      defaultMessage: 'boolean (true/false)',
+    },
+    date: {
+      id: 'app.containers.App.import.date',
+      defaultMessage: 'date ({format})',
+    },
+  },
   importFields: {
     title: {
       id: 'app.containers.App.importFields.title',
-      defaultMessage: 'Title | text (required)',
+      defaultMessage: 'Title',
     },
     reference: {
       id: 'app.containers.App.importFields.reference',
-      defaultMessage: 'Reference | text',
+      defaultMessage: 'Reference',
     },
     referenceRequired: {
       id: 'app.containers.App.importFields.referenceRequired',
-      defaultMessage: 'Reference | text (required)',
+      defaultMessage: 'Reference',
     },
     description: {
       id: 'app.containers.App.importFields.description',
-      defaultMessage: 'Description | text (markdown supported)',
+      defaultMessage: 'Description',
     },
     accepted: {
       id: 'app.containers.App.importFields.accepted',
-      defaultMessage: 'Accepted | boolean (true/false)',
+      defaultMessage: 'Accepted',
     },
     response: {
       id: 'app.containers.App.importFields.response',
-      defaultMessage: 'Government response | text (markdown supported)',
+      defaultMessage: 'Government response',
     },
     outcome: {
       id: 'app.containers.App.importFields.outcome',
-      defaultMessage: 'Desired outcome | text (markdown supported)',
+      defaultMessage: 'Desired outcome',
     },
     indicator_summary: {
       id: 'app.containers.App.importFields.indicator_summary',
-      defaultMessage: 'Indicator summary | text (markdown supported)',
+      defaultMessage: 'Indicator summary',
     },
     target_date: {
       id: 'app.containers.App.importFields.target_date',
-      defaultMessage: 'Target Date | date ({format})',
+      defaultMessage: 'Target Date',
     },
     target_date_comment: {
       id: 'app.containers.App.importFields.target_date_comment',
-      defaultMessage: 'Target date comment | text',
+      defaultMessage: 'Target date comment',
     },
   },
   placeholders: {
@@ -391,10 +435,6 @@ export default defineMessages({
       id: 'app.containers.App.attributes.due_date_id',
       defaultMessage: 'Due date',
     },
-    due_date_id_empty: {
-      id: 'app.containers.App.attributes.due_date_id_empty',
-      defaultMessage: 'No report scheduled',
-    },
     user_only: {
       id: 'app.containers.App.attributes.user_only',
       defaultMessage: 'Users only',
@@ -430,6 +470,44 @@ export default defineMessages({
         id: 'app.containers.App.attributes.meta.updated_at',
         defaultMessage: 'Last updated',
       },
+      created_at: {
+        id: 'app.containers.App.attributes.meta.created_at',
+        defaultMessage: 'Created',
+      },
+    },
+  },
+  nav: {
+    overview: {
+      id: 'app.containers.App.nav.overview',
+      defaultMessage: 'Overview',
+    },
+    taxonomies: {
+      id: 'app.containers.App.nav.taxonomies',
+      defaultMessage: 'Categories',
+    },
+    measures: {
+      id: 'app.containers.App.nav.measures',
+      defaultMessage: 'Actions',
+    },
+    indicators: {
+      id: 'app.containers.App.nav.indicators',
+      defaultMessage: 'Indicators',
+    },
+    recommendations: {
+      id: 'app.containers.App.nav.recommendations',
+      defaultMessage: 'Recommendations',
+    },
+    sdgtargets: {
+      id: 'app.containers.App.nav.sdgtargets',
+      defaultMessage: 'SDG targets',
+    },
+    pages: {
+      id: 'app.containers.App.nav.pages',
+      defaultMessage: 'Page admin',
+    },
+    users: {
+      id: 'app.containers.App.nav.users',
+      defaultMessage: 'User admin',
     },
   },
   entities: {
@@ -599,6 +677,14 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.1.empty',
           defaultMessage: 'No human rights body assigned yet',
         },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.1.shortSingle',
+          defaultMessage: 'HR body',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.1.shortPlural',
+          defaultMessage: 'HR bodies',
+        },
       },
       2: {
         single: {
@@ -626,6 +712,14 @@ export default defineMessages({
         empty: {
           id: 'app.containers.App.entities.taxonomies.3.empty',
           defaultMessage: 'No human rights issue assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.3.shortSingle',
+          defaultMessage: 'HR issue',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.3.shortPlural',
+          defaultMessage: 'HR issues',
         },
       },
       4: {
@@ -655,6 +749,14 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.5.empty',
           defaultMessage: 'No thematic cluster assigned yet',
         },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.5.shortSingle',
+          defaultMessage: 'Cluster',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.5.shortPlural',
+          defaultMessage: 'Clusters',
+        },
       },
       6: {
         single: {
@@ -682,6 +784,80 @@ export default defineMessages({
         empty: {
           id: 'app.containers.App.entities.taxonomies.7.empty',
           defaultMessage: 'No SDG assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.7.shortSingle',
+          defaultMessage: 'SDG',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.7.shortPlural',
+          defaultMessage: 'SDGs',
+        },
+      },
+      8: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.8.single',
+          defaultMessage: 'Taxonomy 8',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.8.plural',
+          defaultMessage: 'Taxonomy 8s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.8.empty',
+          defaultMessage: 'No Taxonomy 8 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.8.shortSingle',
+          defaultMessage: 'Taxonomy 8',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.8.shortPlural',
+          defaultMessage: 'Taxonomy 8s',
+        },
+      },
+      9: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.9.single',
+          defaultMessage: 'Taxonomy 9',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.9.plural',
+          defaultMessage: 'Taxonomy 9s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.9.empty',
+          defaultMessage: 'No Taxonomy 9 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.9.shortSingle',
+          defaultMessage: 'Taxonomy 9',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.9.shortPlural',
+          defaultMessage: 'Taxonomy 9s',
+        },
+      },
+      10: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.10.single',
+          defaultMessage: 'Taxonomy 10',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.10.plural',
+          defaultMessage: 'Taxonomy 10s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.10.empty',
+          defaultMessage: 'No Taxonomy 10 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.10.shortSingle',
+          defaultMessage: 'Taxonomy 10',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.10.shortPlural',
+          defaultMessage: 'Taxonomy 10s',
         },
       },
     },
@@ -754,10 +930,6 @@ export default defineMessages({
         id: 'app.containers.App.entities.roles.plural',
         defaultMessage: 'User roles',
       },
-      defaultRole: {
-        id: 'app.containers.App.entities.user_roles.defaultRole',
-        defaultMessage: 'No role assigned',
-      },
     },
   },
   messages: {
@@ -787,6 +959,24 @@ export default defineMessages({
     },
   },
   ui: {
+    userRoles: {
+      admin: {
+        id: 'app.containers.App.ui.userRoles.admin',
+        defaultMessage: 'Administrator',
+      },
+      manager: {
+        id: 'app.containers.App.ui.userRoles.manager',
+        defaultMessage: 'Manager',
+      },
+      contributor: {
+        id: 'app.containers.App.ui.userRoles.contributor',
+        defaultMessage: 'Contributor',
+      },
+      default: {
+        id: 'app.containers.App.ui.userRoles.default',
+        defaultMessage: 'Guest (no role assigned)',
+      },
+    },
     publishStatuses: {
       draft: {
         id: 'app.containers.App.ui.publishStatuses.draft',

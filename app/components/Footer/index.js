@@ -1,44 +1,42 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
-import Grid from 'grid-styled';
 
 import NormalImg from 'components/Img';
 import Container from 'components/styled/Container';
-import Row from 'components/styled/Row';
+import A from 'components/styled/A';
 
-import { SHOW_FOOTER_LOGOS } from 'containers/App/constants';
-
-import partner1 from 'media/partner1.png';
-import partner2 from 'media/partner2.png';
-import partner3 from 'media/partner3.png';
-import partner4 from 'media/partner4.png';
-// const footerImages = requireAll(require.context('media/footer', true, /^\.\/.*\.png$/));
+import { SHOW_FOOTER_PARTNERS } from 'themes/config';
 
 import messages from './messages';
 
-const importLogos = [partner1, partner2, partner3, partner4];
+const FooterLogos = styled.div`
+  padding: 1.2em 0;
+  background-color: ${palette('footer', 2)};
+`;
 
 const FooterMain = styled.div`
-  background-color: ${palette('secondary', 1)};
-  color: ${palette('primary', 4)};
-  padding: 2em 0 3em;
+  background-color: ${palette('footer', 1)};
+  color: ${palette('footer', 0)};
+  padding: 0;
 `;
 
 const FooterLink = styled.a`
   font-weight:bold;
-  color: ${palette('primary', 4)};
+  color: ${palette('footerLinks', 0)};
   &:hover {
-    color: ${palette('primary', 4)};
-    opacity: 0.8;
+    color: ${palette('footerLinksHover', 0)};
   }
 `;
-
-const FooterLogos = styled.div`
-  padding: 1.5em 0;
-  background-color: ${palette('light', 0)};
+const ImpactLink = styled.a`
+  font-weight:bold;
+  color: ${palette('footerLinks', 0)};
+  &:hover {
+    color: ${palette('footerLinksHover', 0)};
+    opacity: 0.8;
+  }
 `;
 
 const LogoList = styled.div`
@@ -46,33 +44,55 @@ const LogoList = styled.div`
 `;
 const LogoItem = styled.div`
   display: inline-block;
-  padding: 0 1em;
 `;
-const LogoItemLink = styled.a`
+const LogoItemLink = styled(A)`
+  padding: 0 1.5em;
+  display: block;
   &:hover {
     opacity: 0.8;
   }
 `;
 const PartnerLogo = styled(NormalImg)`
-  height: 80px;
+  height: 90px;
+`;
+const ImpactLogo = styled(NormalImg)`
+  height: 90px;
 `;
 
-// const FooterProjectLink = styled.a`
-//   font-weight:bold;
-//   color: ${palette('primary', 4)};
-// `;
+const Table = styled.div`
+  display: table;
+  margin-left: -35px;
+  margin-right: -35px;
+`;
+const TableCell = styled.div`
+  display: table-cell;
+  width: 50%;
+  vertical-align: top;
+  padding-left: 35px;
+  padding-right: 35px;
+  padding-top: 2em;
+  padding-bottom: 2em;
+  border-right: 1px solid ${palette('footer', 3)};
+  &:last-child {
+    border-right: none;
+  }
+`;
+const TableCellSmall = styled(TableCell)`
+  width: 25%;
+`;
 
 class Footer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
+    const { theme } = this.props;
     return (
       <div>
-        { SHOW_FOOTER_LOGOS > 0 &&
+        { SHOW_FOOTER_PARTNERS > 0 &&
           <FooterLogos>
             <Container noPaddingBottom>
               <LogoList>
                 {
-                  importLogos.map((src, i) => (
+                  theme.media.partnerLogos.map((src, i) => (
                     <LogoItem key={i}>
                       <LogoItemLink
                         href={this.context.intl.formatMessage(messages.partners[`url${i + 1}`])}
@@ -89,9 +109,9 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
           </FooterLogos>
         }
         <FooterMain>
-          <Container>
-            <Row>
-              <Grid sm={1 / 2}>
+          <Container noPaddingBottom>
+            <Table>
+              <TableCell>
                 <FormattedMessage {...messages.disclaimer} />
                 <FooterLink
                   target="_blank"
@@ -100,8 +120,8 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
                 >
                   <FormattedMessage {...messages.contact.anchor} />
                 </FooterLink>
-              </Grid>
-              <Grid sm={1 / 4}>
+              </TableCell>
+              <TableCellSmall>
                 <FormattedMessage {...messages.responsible.text} />
                 <div>
                   <FooterLink
@@ -112,20 +132,23 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
                     <FormattedMessage {...messages.responsible.anchor} />
                   </FooterLink>
                 </div>
-              </Grid>
-              <Grid sm={1 / 4}>
+              </TableCellSmall>
+              <TableCellSmall>
                 <FormattedMessage {...messages.project.text} />
                 <div>
-                  <FooterLink
+                  <ImpactLink
                     target="_blank"
                     href={this.context.intl.formatMessage(messages.project.url)}
                     title={this.context.intl.formatMessage(messages.project.anchor)}
                   >
-                    <FormattedMessage {...messages.project.anchor} />
-                  </FooterLink>
+                    <div>
+                      <FormattedMessage {...messages.project.anchor} />
+                    </div>
+                    <ImpactLogo src={theme.media.impactossLogo} alt={this.context.intl.formatMessage(messages.project.anchor)} />
+                  </ImpactLink>
                 </div>
-              </Grid>
-            </Row>
+              </TableCellSmall>
+            </Table>
           </Container>
         </FooterMain>
       </div>
@@ -133,8 +156,12 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
   }
 }
 
+Footer.propTypes = {
+  theme: PropTypes.object.isRequired,
+};
+
 Footer.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default Footer;
+export default withTheme(Footer);

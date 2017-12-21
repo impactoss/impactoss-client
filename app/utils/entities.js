@@ -1,9 +1,12 @@
-import { Map } from 'immutable';
-import { reduce } from 'lodash/collection';
+import { Map, List, fromJS } from 'immutable';
+
+import { TEXT_TRUNCATE } from 'themes/config';
+import { find, reduce } from 'lodash/collection';
 
 import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
 import asList from 'utils/as-list';
 import isNumber from 'utils/is-number';
+import appMessage from 'utils/app-message';
 
 // check if entity has nested connection by id
 export const testEntityEntityAssociation = (entity, path, associatedId) =>
@@ -234,10 +237,15 @@ export const usersByRole = (users, userRoles, roleId) =>
     return roles && roles.size > 0;
   });
 
-export const getEntityTitle = (entity) =>
-  entity.getIn(['attributes', 'title'])
-  || entity.getIn(['attributes', 'friendly_name'])
-  || entity.getIn(['attributes', 'name']);
+export const getEntityTitle = (entity, labels, contextIntl) => {
+  if (labels && contextIntl) {
+    const label = find(labels, { value: parseInt(entity.get('id'), 10) });
+    if (label && label.message) {
+      return appMessage(contextIntl, label.message);
+    }
+  }
+  return entity.getIn(['attributes', 'title']) || entity.getIn(['attributes', 'name']);
+};
 
 export const getEntityReference = (entity, defaultToId = true) =>
   defaultToId
@@ -251,5 +259,42 @@ export const getCategoryShortTitle = (category) =>
     category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
       ? category.getIn(['attributes', 'short_title'])
       : category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']),
-    10
+    TEXT_TRUNCATE.ENTITY_TAG
   );
+
+
+const getInitialValue = (field) =>
+  typeof field.default !== 'undefined' ? field.default : '';
+
+export const getInitialFormData = (shape) => {
+  let fields = fromJS({
+    id: '',
+    attributes: {},
+  });
+  if (shape.fields) {
+    fields = reduce(shape.fields, (memo, field) =>
+      field.disabled ? memo : memo.setIn(['attributes', field.attribute], getInitialValue(field))
+    , fields);
+  }
+  if (shape.taxonomies) {
+    fields = fields.set('associatedTaxonomies', Map());
+  }
+  if (shape.connections) {
+    fields = reduce(shape.connections.tables, (memo, table) => {
+      if (table.table === 'recommendations') {
+        return fields.set('associatedRecommendations', List());
+      }
+      if (table.table === 'indicators') {
+        return fields.set('associatedIndicators', List());
+      }
+      if (table.table === 'measures') {
+        return fields.set('associatedMeasures', List());
+      }
+      if (table.table === 'sdgtargets') {
+        return fields.set('associatedSdgTargets', List());
+      }
+      return memo;
+    }, fields);
+  }
+  return fields;
+};

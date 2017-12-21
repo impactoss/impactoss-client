@@ -22,7 +22,7 @@ import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 import EntityListGroups from './EntityListGroups';
 
 import EntityListOptions from './EntityListOptions';
-import { currentFilters } from './current-filters';
+import { currentFilters, currentFilterArgs } from './current-filters';
 import { getGroupOptions, getGroupValue } from './group-options';
 
 import messages from './messages';
@@ -76,6 +76,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       onSubgroupSelect,
       onExpand,
       onSearch,
+      onResetFilters,
       onTagClick,
       taxonomies,
       connections,
@@ -139,6 +140,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     )}
                     searchQuery={locationQuery.get('search') || ''}
                     onSearch={onSearch}
+                    onClear={() => onResetFilters(currentFilterArgs(config, locationQuery))}
                   />
                 </EntityListSearch>
                 <EntityListOptions
@@ -222,6 +224,7 @@ EntityListMain.propTypes = {
   onGroupSelect: PropTypes.func.isRequired,
   onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
+  onResetFilters: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
   onPageItemsSelect: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,

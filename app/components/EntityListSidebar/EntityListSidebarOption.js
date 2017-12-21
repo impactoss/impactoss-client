@@ -19,8 +19,10 @@ import messages from './messages';
 
 // TODO compare TaxonomySidebarItem
 const Styled = styled(Button)`
+  display: table;
+  width: 100%;
   font-weight: bold;
-  padding: 0.5em 1em 0.5em 1.5em;
+  padding: 0.75em 1em 0.75em 1.5em;
   width: 100%;
   text-align: left;
   color:  ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
@@ -31,17 +33,21 @@ const Styled = styled(Button)`
     background-color: ${(props) => props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2)};
     border-bottom-color: ${palette('asideListItemHover', 4)}
   }
+  &:last-child {
+    border-bottom: 0;
+  }
 `;
-const Label = styled.span`
+const Label = styled.div`
   vertical-align: middle;
-  position: relative;
-  top: 2px;
+  display: table-cell;
+  width: 99%;
 `;
-const IconWrapper = styled.span`
+const IconWrapper = styled.div`
   color: ${palette('light', 3)};
   vertical-align: middle;
-  float: right;
   padding: 0 5px;
+  display: table-cell;
+  width: 35px;
 `;
 const Dot = styled.div`
   background-color: ${(props) => palette(props.palette, props.pIndex)};
@@ -52,7 +58,9 @@ const Dot = styled.div`
 `;
 const DotWrapper = styled.div`
   padding: 5px;
-  float: right;
+  width: 26px;
+  display: table-cell;
+  vertical-align: middle;
 `;
 
 class EntityListSidebarOption extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -93,14 +101,14 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
             : option.get('label')
           }
         </Label>
-        <DotWrapper>
-          { this.renderDot(groupId, option.get('id')) }
-        </DotWrapper>
         { option.get('icon') &&
           <IconWrapper>
             <Icon name={option.get('icon')} />
           </IconWrapper>
         }
+        <DotWrapper>
+          { this.renderDot(groupId, option.get('id')) }
+        </DotWrapper>
       </Styled>
     );
   }

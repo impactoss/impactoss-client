@@ -10,10 +10,12 @@ import { palette } from 'styled-theme';
 
 import { isEqual } from 'lodash/lang';
 
+import A from 'components/styled/A';
+
 import Icon from 'components/Icon';
 import SelectReset from 'components/SelectReset';
-import { PAGE_ITEM_OPTIONS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
+import { PAGE_ITEM_OPTIONS } from 'themes/config';
 
 const Styled = styled.div`
   padding-top: 0.5em;
@@ -37,13 +39,13 @@ const ListInlineItem = styled.li`
   display: inline-block;
   padding: 0;
   font-size: 1.25em;
+  color: ${palette('linkHover', 0)};
 `;
-const ListInlineItemLink = styled.a`
+const ListInlineItemLink = styled(A)`
   width:2em;
   height:2em;
   line-height: 2em;
   font-weight: bold;
-  color: ${palette('primary', 1)};
   display: block;
 `;
 const ListInlineItemActive = styled.div`
@@ -52,16 +54,16 @@ const ListInlineItemActive = styled.div`
   line-height: 2em;
   border-radius: 9999px;
   font-weight: bold;
-  background-color: ${palette('primary', 1)};
-  color: ${palette('primary', 4)};
+  background-color: ${palette('buttonDefault', 1)};
+  color: ${palette('buttonDefault', 0)};
 `;
-const ListInlineItemNav = styled.a`
+const ListInlineItemNav = styled(A)`
   padding: 0 0.5em;
   display: block;
 `;
 
 const ListInlineItemNavDisabled = styled.div`
-  color: ${palette('dark', 4)};
+  color: ${palette('buttonDefaultDisabled', 1)};
   padding: 0 0.5em;
 `;
 

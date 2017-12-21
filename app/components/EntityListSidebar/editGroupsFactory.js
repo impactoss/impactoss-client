@@ -1,4 +1,5 @@
 import { reduce } from 'lodash/collection';
+import { sortEntities } from 'utils/sort';
 
 export const makeEditGroups = (
   config,
@@ -14,14 +15,14 @@ export const makeEditGroups = (
     // first prepare taxonomy options
     editGroups.taxonomies = {
       id: 'taxonomies', // filterGroupId
-      label: messages.taxonomies,
+      label: messages.taxonomyGroup,
       show: true,
       icon: 'categories',
-      options: taxonomies.reduce((taxOptions, taxonomy) => ({
+      options: sortEntities(taxonomies, 'asc', 'priority').reduce((taxOptions, taxonomy) => ({
         ...taxOptions,
         [taxonomy.get('id')]: {
           id: taxonomy.get('id'), // filterOptionId
-          label: taxonomy.getIn(['attributes', 'title']),
+          label: messages.taxonomies(taxonomy.get('id')),
           path: config.taxonomies.connectPath,
           key: config.taxonomies.key,
           ownKey: config.taxonomies.ownKey,

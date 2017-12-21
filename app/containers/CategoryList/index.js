@@ -15,11 +15,11 @@ import { mapToTaxonomyList } from 'utils/taxonomies';
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
-  selectEntities,
+  selectTaxonomiesSorted,
   selectReady,
   selectIsUserManager,
 } from 'containers/App/selectors';
-import { CONTENT_LIST } from 'containers/App/constants';
+import { PATHS, CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 // components
@@ -32,6 +32,7 @@ import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import CategoryListItems from 'components/categoryList/CategoryListItems';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
+import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
 // relative
 import messages from './messages';
@@ -59,16 +60,19 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     }
   }
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+  getTaxButtonTitle = (id) => this.context.intl.formatMessage(
+    appMessages.entities.taxonomies[id].shortSingle || appMessages.entities.taxonomies[id].single
+  );
 
   render() {
-    const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
+    const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, onTaxonomyLink, params } = this.props;
     const reference = typeof params.id !== 'undefined' ? params.id : '1';
     const contentTitle = this.getTaxTitle(reference);
 
     const buttons = dataReady && isManager
       ? [{
         type: 'add',
-        title: this.context.intl.formatMessage(messages.add),
+        title: this.context.intl.formatMessage(messages.add, { category: this.getTaxButtonTitle(reference) }),
         onClick: () => this.props.handleNew(reference),
       }]
       : null;
@@ -89,9 +93,14 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         />
         <Sidebar>
           <Scrollable>
-            <TaxonomySidebar
-              taxonomies={mapToTaxonomyList(taxonomies, onPageLink, reference, false)}
-            />
+            { !dataReady &&
+              <EntityListSidebarLoading />
+            }
+            { dataReady &&
+              <TaxonomySidebar
+                taxonomies={mapToTaxonomyList(taxonomies, onTaxonomyLink, reference)}
+              />
+            }
           </Scrollable>
         </Sidebar>
         <ContainerWithSidebar>
@@ -132,7 +141,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                   onPageLink={onPageLink}
                   onSort={this.props.onSort}
                   sortOptions={SORT_OPTIONS}
-                  sortBy={this.props.location.query && this.props.location.query.sort}
+                  sortBy={'title'}
                   sortOrder={this.props.location.query && this.props.location.query.order}
                   userOnly
                 />
@@ -147,6 +156,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
 CategoryList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onPageLink: PropTypes.func,
+  onTaxonomyLink: PropTypes.func,
   onSort: PropTypes.func,
   handleNew: PropTypes.func,
   taxonomy: PropTypes.object,
@@ -165,7 +175,7 @@ CategoryList.contextTypes = {
 const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectEntities(state, 'taxonomies'),
+  taxonomies: selectTaxonomiesSorted(state),
   taxonomy: selectTaxonomy(state, { id: props.params.id }),
   categories: selectCategories(
     state,
@@ -182,10 +192,13 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: (taxonomyId) => {
-      dispatch(updatePath(`/categories/${taxonomyId}/new`));
+      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyId}${PATHS.NEW}`, { replace: true }));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));
+    },
+    onTaxonomyLink: (path) => {
+      dispatch(updatePath(path, { keepQuery: true }));
     },
     onSort: (sort, order) => {
       dispatch(updateSort({ sort, order }));

@@ -7,9 +7,10 @@ import Icon from 'components/Icon';
 
 const Styled = styled.span`
   text-transform: uppercase;
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
   font-weight: bold;
   font-size: 0.85em;
+  letter-spacing: 0.75px;
 `;
 
 const SupIconWrap = styled.span`

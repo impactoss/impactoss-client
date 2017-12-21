@@ -9,13 +9,15 @@ const Styled = styled.button`
   width:100%;
   cursor: pointer;
   text-align: left;
-  background-color: ${palette('primary', 4)};
+  color: ${palette('mainListItem', 0)};
+  background-color: ${palette('mainListItem', 1)};
   margin: 0;
   padding: 1em 0;
   display: block;
   margin-bottom: 2px;
   &:hover {
-    opacity: 0.85;
+    color: ${palette('mainListItemHover', 0)};
+    background-color: ${palette('mainListItemHover', 1)};
   }
 `;
 const Column = styled.div`
@@ -36,11 +38,13 @@ const Bar = styled.div`
   vertical-align: middle;
   display: inline-block;
   position: relative;
+  border-right: ${(props) => props.secondary ? '1px solid' : 0};
+  border-right-color: ${palette('mainListItem', 1)};
 `;
 const Count = styled.div`
   font-weight: bold;
   position: absolute;
-  font-size: 1.1em;
+  font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
   line-height: 1.6;
   right: 100%;
   text-align: right;
@@ -56,7 +60,7 @@ const CountSecondary = styled(Count)`
 `;
 const Title = styled.div`
   display: inline-block;
-  font-size: 1.1em;
+  font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
   line-height: 1.6;
   padding: 0 18px;
 `;
@@ -65,7 +69,7 @@ const StatusWrap = styled.div`
 `;
 const Reference = styled.span`
   padding-right: 0.5em;
-  opacity: 0.6;
+  color: ${palette('text', 1)};
 `;
 
 class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -100,6 +104,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
             <Bar
               length={(count.accepted / col.maxCount) * 100}
               palette={col.entity}
+              secondary
             >
               <Count palette={col.entity}>
                 {count.accepted}

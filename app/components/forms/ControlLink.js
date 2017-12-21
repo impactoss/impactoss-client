@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import A from 'components/styled/A';
 
-const ControlMain = styled.a`
-`;
+const ControlMain = styled(A)``;
 
 export default class ControlLink extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 

@@ -34,7 +34,8 @@ import {
   getMetaField,
 } from 'utils/fields';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -289,7 +290,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
@@ -332,7 +333,7 @@ function mapDispatchToProps(dispatch, props) {
       // dispatch(save(formData, props.params.id));
     },
     handleCancel: () => {
-      dispatch(updatePath(`/recommendations/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}/${props.params.id}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

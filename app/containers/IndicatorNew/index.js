@@ -33,7 +33,8 @@ import validateDateAfterDate from 'components/forms/validators/validate-date-aft
 import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
 import validateRequired from 'components/forms/validators/validate-required';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -292,7 +293,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     onRepeatChange: (repeatModel, repeat, formData, formatMessage) => {
       // reset repeat erros when repeat turned off
@@ -422,7 +423,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath('/indicators'));
+      dispatch(updatePath(PATHS.INDICATORS, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

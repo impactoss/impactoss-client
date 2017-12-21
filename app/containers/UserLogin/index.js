@@ -29,6 +29,7 @@ import { selectQueryMessages } from 'containers/App/selectors';
 import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
 import appMessages from 'containers/App/messages';
+import { PATHS } from 'containers/App/constants';
 import messages from './messages';
 
 import { login } from './actions';
@@ -93,10 +94,10 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
             <p>
               <FormattedMessage {...messages.registerLinkBefore} />
               <A
-                href="/register"
+                href={PATHS.REGISTER}
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink('/register', { keepQuery: true });
+                  this.props.handleLink(PATHS.REGISTER, { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.registerLink} />
@@ -105,10 +106,10 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
             </p>
             <p>
               <A
-                href="/recoverpassword"
+                href={PATHS.RECOVER_PASSWORD}
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink('/recoverpassword', { keepQuery: true });
+                  this.props.handleLink(PATHS.RECOVER_PASSWORD, { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.recoverPasswordLink} />

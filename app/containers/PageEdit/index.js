@@ -28,7 +28,8 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -247,7 +248,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
+      dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
@@ -269,7 +270,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(formData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath(`/pages/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.PAGES}/${props.params.id}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

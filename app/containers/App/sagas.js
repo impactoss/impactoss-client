@@ -3,7 +3,7 @@
  */
 
 import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
-import { push, replace } from 'react-router-redux';
+import { push, replace, goBack } from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
 
@@ -32,9 +32,15 @@ import {
   // RESET_PASSWORD,
   RECOVER_PASSWORD,
   CLOSE_ENTITY,
-  // SERVER_ERRORS,
   DISMISS_QUERY_MESSAGES,
+  PATHS,
+  PARAMS,
 } from 'containers/App/constants';
+
+import {
+  ENDPOINTS,
+  KEYS,
+} from 'themes/config';
 
 import {
   entitiesLoaded,
@@ -63,13 +69,13 @@ import {
 
 import {
   selectCurrentPathname,
+  selectPreviousPathname,
   selectRedirectOnAuthSuccessPath,
   selectRequestedAt,
   selectIsSignedIn,
   selectLocation,
   selectSessionUserRoles,
   selectIsAuthenticating,
-  selectListSearch,
 } from 'containers/App/selectors';
 
 import {
@@ -143,7 +149,7 @@ export function* authenticateSaga(payload) {
   const { password, email } = payload.data;
   try {
     yield put(authenticateSending());
-    const response = yield call(apiRequest, 'post', 'auth/sign_in', { email, password });
+    const response = yield call(apiRequest, 'post', ENDPOINTS.SIGN_IN, { email, password });
     yield put(authenticateSuccess(response.data));
     yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
     yield put(forwardOnAuthenticationChange());
@@ -157,15 +163,15 @@ export function* recoverSaga(payload) {
   const { email } = payload.data;
   try {
     yield put(recoverSending());
-    yield call(apiRequest, 'post', 'auth/password', {
+    yield call(apiRequest, 'post', ENDPOINTS.PASSWORD, {
       email,
-      redirect_url: `${window.location.origin}/resetpassword`, // TODO WIP
+      redirect_url: `${window.location.origin}${PATHS.RESET_PASSWORD}`,
     });
     yield put(recoverSuccess());
     // forward to login
     yield put(replace({
-      pathname: '/login',
-      query: { info: 'recoverSuccess' },
+      pathname: PATHS.LOGIN,
+      query: { info: PARAMS.RECOVER_SUCCESS },
     }));
   } catch (err) {
     err.response.json = yield err.response.json();
@@ -176,19 +182,19 @@ export function* recoverSaga(payload) {
 export function* authChangeSaga() {
   const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
   if (redirectPathname) {
-    yield put(push(redirectPathname));
+    yield put(replace(redirectPathname));
   } else {
     // forward to home
-    yield put(push('/'));
+    yield put(replace('/'));
   }
 }
 
 export function* logoutSaga() {
   try {
-    yield call(apiRequest, 'delete', 'auth/sign_out');
+    yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(push('/login'));
+    yield put(replace(PATHS.LOGIN));
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));
@@ -197,10 +203,23 @@ export function* logoutSaga() {
 
 export function* validateTokenSaga() {
   try {
-    const { uid, client, 'access-token': accessToken } = yield getAuthValues();
+    const {
+      [KEYS.UID]: uid,
+      [KEYS.CLIENT]: client,
+      [KEYS.ACCESS_TOKEN]: accessToken,
+    } = yield getAuthValues();
+
     if (uid && client && accessToken) {
       yield put(authenticateSending());
-      const response = yield call(apiRequest, 'get', 'auth/validate_token', { uid, client, 'access-token': accessToken });
+      const response = yield call(
+        apiRequest,
+        'get',
+        ENDPOINTS.VALIDATE_TOKEN, {
+          [KEYS.UID]: uid,
+          [KEYS.CLIENT]: client,
+          [KEYS.ACCESS_TOKEN]: accessToken,
+        }
+      );
       if (!response.success) {
         yield call(clearAuthValues);
         yield put(invalidateEntities());
@@ -339,7 +358,7 @@ export function* saveEntitySaga({ data }) {
 
     yield put(saveSuccess(dataTS));
     if (data.redirect) {
-      yield put(push(data.redirect));
+      yield put(replace(data.redirect));
     }
     if (data.invalidateEntitiesOnSuccess) {
       yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
@@ -357,7 +376,7 @@ export function* deleteEntitySaga({ data }) {
     yield put(deleteSending(dataTS));
     yield call(deleteEntityRequest, data.path, data.id);
     if (data.redirect !== false) {
-      yield put(push(`/${data.redirect || data.path}`));
+      yield put(replace(`/${data.redirect || data.path}`));
     }
     yield put(removeEntity(data.path, data.id));
     yield put(deleteSuccess(dataTS));
@@ -458,12 +477,12 @@ export function* newEntitySaga({ data }) {
     }
     if (data.redirect) {
       if (data.createAsGuest) {
-        yield put(push({
+        yield put(replace({
           pathname: `${data.redirect}`,
           query: { info: 'createdAsGuest', infotype: data.path },
         }));
       } else {
-        yield put(push(`${data.redirect}/${entityCreated.data.id}`));
+        yield put(replace(`${data.redirect}/${entityCreated.data.id}`));
       }
     }
   } catch (err) {
@@ -569,7 +588,7 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
   const location = yield select(selectLocation);
   const queryNext = getNextQuery(query, extend, location);
 
-  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
+  yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
 
@@ -584,12 +603,11 @@ export function* dismissQueryMessagesSaga() {
     true,
     location
   );
-  yield put(push(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
+  yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
 export function* updatePathSaga({ path, args }) {
   const relativePath = path.startsWith('/') ? path : `/${path}`;
-
   if (args && (args.query || args.keepQuery)) {
     const location = yield select(selectLocation);
     let queryNext = {};
@@ -603,17 +621,21 @@ export function* updatePathSaga({ path, args }) {
     const queryNextString = getNextQueryString(queryNext);
 
     yield put(push(`${relativePath}?${queryNextString}`));
+  } else if (args && args.replace) {
+    yield put(replace(relativePath));
   } else {
     yield put(push(relativePath));
   }
 }
 
-// const backTargetIgnore = ['/edit', '/new', 'login', '/reports'];
-
 export function* closeEntitySaga({ path }) {
   // the close icon is to function like back if possible, otherwise go to default path provided
-  const listSearch = yield select(selectListSearch);
-  yield put(push({ pathname: path || '/', search: listSearch }));
+  const previousPath = yield select(selectPreviousPathname);
+  const currentPath = yield select(selectCurrentPathname);
+  yield put(previousPath && (previousPath !== currentPath)
+    ? goBack()
+    : push({ pathname: path || '/' })
+  );
 }
 
 /**

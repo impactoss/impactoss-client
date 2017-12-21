@@ -9,7 +9,8 @@ import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 
 const Styled = styled(ColumnHeader)`
   text-align: left;
-  padding: 0 0.5em 0 1em;
+  padding-right: 0.5em;
+  padding-left: 1em;
 `;
 
 const Wrapper = styled.div`

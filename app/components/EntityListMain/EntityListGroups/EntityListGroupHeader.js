@@ -6,19 +6,18 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const ListEntitiesGroupHeaderLink = styled(Link)`
-  color: ${palette('dark', 1)};
+  color: ${palette('link', 2)};
   &:hover {
-    color: ${palette('dark', 0)};
-    text-decoration: underline;
+    color: ${palette('linkHover', 2)};
   }
 `;
 
 
 const ListEntitiesGroupHeader = styled.h3`
   margin-top: 30px;
+  margin-bottom: 20px;
 `;
 const ListEntitiesSubgroupHeader = styled.h5`
-  margin-top: 12px;
   font-weight: normal;
   margin-bottom: 20px;
 `;

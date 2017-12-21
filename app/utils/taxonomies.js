@@ -1,4 +1,8 @@
-const getTaxonomyTagList = (taxonomy) => {
+import { PATHS } from 'containers/App/constants';
+import { find } from 'lodash/collection';
+import { TAXONOMY_GROUPS } from 'themes/config';
+
+export const getTaxonomyTagList = (taxonomy) => {
   const tags = [];
   if (taxonomy.getIn(['attributes', 'tags_measures'])) {
     tags.push({
@@ -20,11 +24,18 @@ const getTaxonomyTagList = (taxonomy) => {
   }
   return tags;
 };
-export const mapToTaxonomyList = (taxonomies, onLink, activeId, tags = false) => taxonomies.map((tax) => ({
+export const mapToTaxonomyList = (taxonomies, onLink, activeId, onMouseOver) => taxonomies.map((tax) => ({
   id: tax.get('id'),
+  group: find(TAXONOMY_GROUPS, (taxGroup) => {
+    const priority = tax.getIn(['attributes', 'priority']);
+    return priority
+      ? priority <= taxGroup.priorityMax
+        && priority >= taxGroup.priorityMin
+      : taxGroup.default;
+  }),
   count: tax.count,
-  onLink: () => onLink(`/categories/${tax.get('id')}`),
-  tags: tags ? getTaxonomyTagList(tax) : null,
+  onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${tax.get('id')}`),
+  onMouseOver: (isOver = true) => onMouseOver && onMouseOver(tax.get('id'), isOver),
   active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
 })).toArray();
 
@@ -36,7 +47,7 @@ export const mapToCategoryList = (categories, onLink, countAttributes) =>
       : null,
     title: cat.getIn(['attributes', 'title']),
     draft: cat.getIn(['attributes', 'draft']),
-    onLink: () => onLink(`/category/${cat.get('id')}`),
+    onLink: () => onLink(`${PATHS.CATEGORIES}/${cat.get('id')}`),
     counts: countAttributes
       ? countAttributes.map((countAttribute) => ({
         total: cat.get(countAttribute.total),
