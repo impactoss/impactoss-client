@@ -39,6 +39,23 @@ export const mapToTaxonomyList = (taxonomies, onLink, activeId, onMouseOver) => 
   active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
 })).toArray();
 
+export const getDefaultTaxonomy = (taxonomies) => {
+  const taxGroup = TAXONOMY_GROUPS[0];
+  return taxonomies.reduce((memo, tax) => {
+    if (memo) {
+      const priority = tax.getIn(['attributes', 'priority']);
+      if (priority
+        && priority <= taxGroup.priorityMax
+        && priority >= taxGroup.priorityMin
+        && priority < memo.getIn(['attributes', 'priority'])) {
+        return tax;
+      }
+      return memo;
+    }
+    return tax;
+  }, null);
+};
+
 export const mapToCategoryList = (categories, onLink, countAttributes) =>
   categories.map((cat) => ({
     id: cat.get('id'),

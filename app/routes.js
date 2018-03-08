@@ -671,12 +671,12 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
+    // }, {
+    //   path: PATHS.TAXONOMIES,
+    //   name: 'taxonomies',
+    //   onEnter: (nextState, replace) => replace(`${PATHS.TAXONOMIES}/1`),
     }, {
-      path: PATHS.TAXONOMIES,
-      name: 'taxonomies',
-      onEnter: (nextState, replace) => replace(`${PATHS.TAXONOMIES}/1`),
-    }, {
-      path: `${PATHS.TAXONOMIES}${PATHS.ID}`, // the taxonomy id
+      path: `${PATHS.TAXONOMIES}(${PATHS.ID})`, // the taxonomy id
       name: 'categoryList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
