@@ -10,7 +10,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fromJS } from 'immutable';
-import { mapToTaxonomyList } from 'utils/taxonomies';
+import { mapToTaxonomyList, getDefaultTaxonomy } from 'utils/taxonomies';
 
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
@@ -52,11 +52,19 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
   // make sure to load all data from server
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+    // redirect to default taxonomy if needed
+    if (this.props.dataReady && typeof this.props.taxonomy === 'undefined') {
+      this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(this.props.taxonomies).get('id'));
+    }
   }
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    // redirect to default taxonomy if needed
+    if (nextProps.dataReady && typeof nextProps.taxonomy === 'undefined') {
+      this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(nextProps.taxonomies).get('id'));
     }
   }
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
@@ -65,11 +73,11 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
   );
 
   render() {
-    const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, onTaxonomyLink, params } = this.props;
-    const reference = typeof params.id !== 'undefined' ? params.id : '1';
-    const contentTitle = this.getTaxTitle(reference);
+    const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, onTaxonomyLink } = this.props;
+    const reference = taxonomy && taxonomy.get('id');
+    const contentTitle = typeof reference !== 'undefined' ? this.getTaxTitle(reference) : '';
 
-    const buttons = dataReady && isManager
+    const buttons = dataReady && isManager && typeof reference !== 'undefined'
       ? [{
         type: 'add',
         title: this.context.intl.formatMessage(messages.add, { category: this.getTaxButtonTitle(reference) }),
@@ -78,8 +86,9 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       : null;
 
     // //
-    // console.log('categoryList render')
-    // // console.log(listColumns)
+    // console.log('categoryList render', this.props)
+    // dataReady && console.log('getDefaultTaxonomy', getDefaultTaxonomy(taxonomies).get('id'))
+
     const userCategories = categories ? categories.filter((cat) => cat.getIn(['attributes', 'user_only'])) : null;
     const hasUserCategories = isManager && dataReady && userCategories && userCategories.size > 0;
 
@@ -96,7 +105,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             { !dataReady &&
               <EntityListSidebarLoading />
             }
-            { dataReady &&
+            { dataReady && typeof reference !== 'undefined' &&
               <TaxonomySidebar
                 taxonomies={mapToTaxonomyList(taxonomies, onTaxonomyLink, reference)}
               />
@@ -155,6 +164,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
 }
 CategoryList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  redirectToDefaultTaxonomy: PropTypes.func,
   onPageLink: PropTypes.func,
   onTaxonomyLink: PropTypes.func,
   onSort: PropTypes.func,
@@ -164,7 +174,6 @@ CategoryList.propTypes = {
   categories: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
-  params: PropTypes.object,
   location: PropTypes.object,
 };
 
@@ -190,6 +199,9 @@ function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
+    redirectToDefaultTaxonomy: (taxonomyId) => {
+      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyId}`, { replace: true }));
     },
     handleNew: (taxonomyId) => {
       dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyId}${PATHS.NEW}`, { replace: true }));
