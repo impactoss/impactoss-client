@@ -52,6 +52,10 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
   // make sure to load all data from server
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+    // redirect to default taxonomy if needed
+    if (this.props.dataReady && typeof this.props.taxonomy === 'undefined') {
+      this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(this.props.taxonomies).get('id'));
+    }
   }
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
@@ -82,7 +86,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       : null;
 
     // //
-    // console.log('categoryList render')
+    // console.log('categoryList render', this.props)
     // dataReady && console.log('getDefaultTaxonomy', getDefaultTaxonomy(taxonomies).get('id'))
 
     const userCategories = categories ? categories.filter((cat) => cat.getIn(['attributes', 'user_only'])) : null;
