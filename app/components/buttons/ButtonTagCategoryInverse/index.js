@@ -20,6 +20,9 @@ const ButtonTagCategoryInverse = styled(Button)`
       : palette('taxonomiesHover', props.taxId || 0)
     };
   }
+  &:last-child {
+    margin-right: 0;
+  }
 `;
 
 export default ButtonTagCategoryInverse;

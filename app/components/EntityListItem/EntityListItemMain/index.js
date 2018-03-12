@@ -5,10 +5,9 @@ import { palette } from 'styled-theme';
 // import { isEqual } from 'lodash/lang';
 import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
-import { truncateText } from 'utils/string';
 import Component from 'components/styled/Component';
 import Clear from 'components/styled/Clear';
-import { USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
@@ -61,43 +60,6 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       return memo;
     }, []);
 
-  getEntityTags = (entity, taxonomies, onClick) => {
-    const tags = [];
-    if (entity.get('categories')) {
-      taxonomies
-      .sortBy((tax) => !tax.getIn(['attributes', 'is_smart']))
-      .forEach((tax) => {
-        tax
-        .get('categories')
-        .sortBy((category) => category.getIn(['attributes', 'draft']))
-        .forEach((category, catId) => {
-          if (entity.get('categories').includes(parseInt(catId, 10))) {
-            const label = (category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
-              ? category.getIn(['attributes', 'short_title'])
-              : category.getIn(['attributes', 'title']));
-            if (onClick) {
-              tags.push({
-                taxId: tax.get('id'),
-                title: category.getIn(['attributes', 'title']),
-                inverse: category.getIn(['attributes', 'draft']),
-                label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG),
-                onClick: () => onClick(catId, 'category'),
-              });
-            } else {
-              tags.push({
-                taxId: tax.get('id'),
-                title: category.getIn(['attributes', 'title']),
-                inverse: category.getIn(['attributes', 'draft']),
-                label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG),
-              });
-            }
-          }
-        });
-      });
-    }
-    return tags;
-  };
-
   getRole = (entityRoles, roles) => {
     const role = roles.find((r) => parseInt(r.get('id'), 10) === entityRoles.first());
     // console.log('roles entityRoles.first()', entityRoles.first())
@@ -106,9 +68,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
   }
 
   mapToEntityListItem = ({
-    taxonomies,
     config,
-    onEntityClick,
     entity,
     nestLevel,
     entityPath,
@@ -122,12 +82,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
     path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
     entityIcon: entityIcon && entityIcon(entity),
-    tags: taxonomies
-      ? this.getEntityTags(entity,
-        taxonomies,
-        onEntityClick
-      )
-      : [],
+    categories: entity.get('categories'),
     connectedCounts: config && config.connections
       ? this.getConnections(entity, config.connections.options, connections)
       : [],
@@ -135,7 +90,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
   });
 
   render() {
-    const { nestLevel, onEntityClick } = this.props;
+    const { nestLevel, onEntityClick, taxonomies } = this.props;
 
     const entity = this.mapToEntityListItem(this.props);
 
@@ -156,9 +111,11 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             {entity.title}
           </EntityListItemMainTitle>
         </EntityListItemMainTitleWrap>
-        { (entity.tags || (entity.connectedCounts && this.props.wrapper)) &&
+        { (entity.categories || (entity.connectedCounts && this.props.wrapper)) &&
           <EntityListItemMainBottom
-            tags={entity.tags}
+            categories={entity.categories}
+            taxonomies={taxonomies}
+            onEntityClick={onEntityClick}
             connections={entity.connectedCounts}
             wrapper={this.props.wrapper}
             user={entity.assignedUser}

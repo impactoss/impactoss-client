@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Map } from 'immutable';
 
 import Component from 'components/styled/Component';
 
@@ -13,21 +14,19 @@ const Styled = styled(Component)`
   margin-bottom: -5px;
 `;
 
-export default class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  static propTypes = {
-    tags: PropTypes.array,
-    connections: PropTypes.array,
-    wrapper: PropTypes.object,
-    user: PropTypes.object,
-  }
+class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { tags, connections, wrapper, user } = this.props;
+    const { categories, taxonomies, onEntityClick, connections, wrapper, user } = this.props;
 
     return (
       <Styled>
-        { tags && tags.length > 0 &&
-          <EntityListItemMainBottomTaxonomies tags={tags} />
+        { categories && categories.size > 0 &&
+          <EntityListItemMainBottomTaxonomies
+            categories={categories}
+            taxonomies={taxonomies}
+            onEntityClick={onEntityClick}
+          />
         }
         { connections && connections.length > 0 &&
           <EntityListItemMainBottomConnections
@@ -44,3 +43,14 @@ export default class EntityListItemMainBottom extends React.PureComponent { // e
     );
   }
 }
+
+EntityListItemMainBottom.propTypes = {
+  categories: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
+  taxonomies: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
+  onEntityClick: PropTypes.func,
+  connections: PropTypes.array,
+  wrapper: PropTypes.object,
+  user: PropTypes.object,
+};
+
+export default EntityListItemMainBottom;

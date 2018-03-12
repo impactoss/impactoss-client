@@ -77,6 +77,16 @@ export default defineMessages({
       id: 'app.containers.App.labels.perPage',
       defaultMessage: 'Per page',
     },
+    smart: {
+      met: {
+        id: 'app.containers.App.labels.smart.met',
+        defaultMessage: 'Met',
+      },
+      notMet: {
+        id: 'app.containers.App.labels.smart.notMet',
+        defaultMessage: 'Not met',
+      },
+    },
   },
   forms: {
     fieldRequired: {

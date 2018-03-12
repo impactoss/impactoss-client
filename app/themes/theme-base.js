@@ -133,6 +133,11 @@ theme.palette = {
     '#395970', // 8: State
     '#C75300', // 9: SMART
   ],
+  // inactive, hover
+  smartInactive: [
+    '#DBE1E1', // SMART inactive - NOT ACCESSIBLE
+    '#656F75', // SMART inactive hover
+  ],
 
   // other entities
   // [aqll #AA compliant]
