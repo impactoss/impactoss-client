@@ -146,13 +146,13 @@ export const entitiesSetAssociated = (entities, entityKey, associations, associa
   entities && entities.map((entity) =>
     entitySetAssociated(entity, entityKey, associations, associationKey, associationId));
 
-export const entitySetAssociated = (entity, entityKey, associations, associationKey, associationId) =>
-  entity.set('associated',
-    associations.find((association) =>
-      attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id'))
-      && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
-    )
+export const entitySetAssociated = (entity, entityKey, associations, associationKey, associationId) => {
+  const entityAssociation = associations.find((association) =>
+    attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id'))
+    && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
   );
+  return entity.set('associated', entityAssociation || false);
+};
 
 export const entitiesIsAssociated = (entities, entityKey, associations, associationKey, associationId) =>
   entities && associations && entities.filter((entity) =>

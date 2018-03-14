@@ -40,7 +40,6 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   );
   render() {
     const { fields, seamless } = this.props;
-
     return (
       <ViewWrapper seamless={seamless}>
         { fields.header &&
