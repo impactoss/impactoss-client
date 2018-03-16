@@ -280,7 +280,7 @@ export const selectSortByQuery = createSelector(
 
 // NEW performant way of selecting and querying entities
 
-const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
+export const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
 
 export const selectEntities = createSelector(
   selectEntitiesAll,
