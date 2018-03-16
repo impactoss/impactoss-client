@@ -26,7 +26,7 @@ const SmartIcon = styled.div`
   border-radius: 999px;
   text-align: center;
   vertical-align: middle;
-  padding: 10px;
+  padding: 14px;
   background-color: ${(props) => props.active ? palette('taxonomies', props.pIndex) : palette('smartInactive', 0)};
   color: ${(props) => props.active ? palette('text', 2) : palette('smartInactive', 2)};
   margin-bottom: 10px;
