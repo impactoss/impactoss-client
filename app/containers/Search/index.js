@@ -86,21 +86,37 @@ const ScrollableWrapper = styled(Scrollable)`
 const Target = styled(Button)`
   display: table;
   width: 100%;
-  padding: 0.25em 1em 0.25em 1.5em;
+  padding: 0.4em 1em 0.4em 1.5em;
   width: 100%;
   text-align: left;
-  color:  ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
+  color:  ${(props) => {
+    if (props.disabled) {
+      return props.active ? palette('asideListItem', 1) : palette('dark', 4);
+    }
+    return props.active ? palette('asideListItem', 1) : palette('asideListItem', 0);
+  }};
   background-color: ${(props) => props.active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
   border-bottom: 1px solid ${palette('asideListItem', 4)};
   &:hover {
-    color: ${(props) => props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0)};
-    background-color: ${(props) => props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2)};
+    color: ${(props) => {
+      if (props.disabled) {
+        return props.active ? palette('asideListItem', 1) : palette('dark', 4);
+      }
+      return props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0);
+    }};
+    background-color: ${(props) => {
+      if (props.disabled) {
+        return props.active ? palette('asideListItem', 3) : palette('asideListItem', 2);
+      }
+      return props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2);
+    }};
     border-bottom-color: ${palette('asideListItemHover', 4)}
   }
   &:last-child {
     border-bottom: 0;
   }
   font-size: 0.85em;
+  font-weight: ${(props) => props.active ? 'bold' : 'normal'};
 `;
 
 const TargetTitle = styled.div`
@@ -112,10 +128,24 @@ const TargetTitle = styled.div`
 const TargetCount = styled.div`
   padding-left: 5px;
   padding-right: 5px;
-  width: 26px;
+  width: 32px;
   display: table-cell;
   vertical-align: middle;
 `;
+
+const Count = styled.div`
+  color:  ${(props) => (props.active || props.disabled) ? 'inherit' : palette('dark', 3)};
+  background-color: ${(props) => {
+    if (props.active) return 'inherit';
+    return props.disabled ? 'transparent' : palette('light', 0);
+  }};
+  border-radius: 999px;
+  padding: 3px;
+  font-size: 0.85em;
+  text-align: center;
+  min-width: 32px;
+`;
+
 
 const ListWrapper = styled.div``;
 
@@ -142,9 +172,11 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     const { dataReady, location, onSearch, onClear, entities, onTargetSelect, onEntityClick } = this.props;
     // console.log('render')
 
-    const activeTarget = entities.reduce((memo, group) =>
-      group.get('targets').find((target) => target.get('active')) || memo
-    , Map());
+    const activeTarget = fromJS(location.query).get('search')
+      ? entities.reduce((memo, group) =>
+        group.get('targets').find((target) => target.get('active')) || memo
+      , Map())
+      : Map();
 
     return (
       <div>
@@ -186,7 +218,9 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                 {this.getTargetTitle(target)}
                               </TargetTitle>
                               <TargetCount>
-                                {target.get('results').size}
+                                <Count active={target.get('active')} disabled={target.get('results').size === 0}>
+                                  {target.get('results').size}
+                                </Count>
                               </TargetCount>
                             </Target>
                           ))
