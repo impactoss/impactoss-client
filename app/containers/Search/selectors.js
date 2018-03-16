@@ -66,6 +66,7 @@ export const selectEntitiesByQuery = createSelector(
               .set('clientPath', 'category')
               .set('taxId', tax.get('id'))
               .set('active', true)
+              .set('sorting', group.get('sorting'))
               .set('results', sortEntities(filteredCategories,
                 order || (sortOption ? sortOption.order : 'desc'),
                 sort || (sortOption ? sortOption.attribute : 'id'),

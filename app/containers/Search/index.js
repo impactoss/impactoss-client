@@ -36,6 +36,7 @@ import Component from 'components/styled/Component';
 
 
 // import EntityListItem from 'components/EntityListItem';
+import EntityListHeader from 'components/EntityListMain/EntityListGroups/EntityListHeader';
 import EntityListItemWrapper from 'components/EntityListMain/EntityListGroups/EntityListItems/EntityListItemWrapper';
 
 
@@ -48,6 +49,8 @@ import { selectEntitiesByQuery } from './selectors';
 import {
   updateQuery,
   resetSearchQuery,
+  updateSortBy,
+  updateSortOrder,
 } from './actions';
 // import { selectConnections, selectMeasures, selectConnectedTaxonomies } from './selectors';
 
@@ -146,9 +149,13 @@ const Count = styled.div`
   min-width: 32px;
 `;
 
-
+const ListEntitiesEmpty = styled.div`
+  color:  ${palette('dark', 3)};
+`;
 const ListWrapper = styled.div``;
-
+const ListEntitiesMain = styled.div`
+  padding-top: 0.5em;
+`;
 export class Search extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
@@ -161,22 +168,38 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       this.props.loadEntitiesIfNeeded();
     }
   }
+
   getTargetTitle = (target) => {
     if (startsWith(target.get('path'), 'taxonomies')) {
-      return this.context.intl.formatMessage(appMessages.entities.taxonomies[target.get('taxId')].plural);
+      return appMessages.entities.taxonomies[target.get('taxId')];
     }
-    return this.context.intl.formatMessage(appMessages.entities[target.get('path')].plural);
+    return appMessages.entities[target.get('path')];
   }
 
   render() {
-    const { dataReady, location, onSearch, onClear, entities, onTargetSelect, onEntityClick } = this.props;
+    const { dataReady, location, onSearch, onClear, entities, onTargetSelect, onEntityClick, onSortOrder, onSortBy } = this.props;
     // console.log('render')
 
-    const activeTarget = fromJS(location.query).get('search')
-      ? entities.reduce((memo, group) =>
+    const activeTarget = entities.reduce((memo, group) =>
         group.get('targets').find((target) => target.get('active')) || memo
-      , Map())
-      : Map();
+      , Map());
+
+    const hasResults = location.query.search
+      && activeTarget.get('results')
+      && activeTarget.get('results').size > 0;
+
+    const noResults = location.query.search
+      && (!activeTarget.get('results') || activeTarget.get('results').size === 0);
+
+    const noResultsNoAlternative = noResults
+      && !entities.reduce((memo, group) =>
+        group.get('targets').find((target) =>
+          target.get('results') && target.get('results').size > 0
+        ) || memo
+      , false);
+
+    const noEntry = !location.query.search;
+
 
     return (
       <div>
@@ -215,7 +238,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                               disabled={target.get('results').size === 0}
                             >
                               <TargetTitle>
-                                {this.getTargetTitle(target)}
+                                {this.getTargetTitle(target) && this.context.intl.formatMessage(this.getTargetTitle(target).plural)}
                               </TargetTitle>
                               <TargetCount>
                                 <Count active={target.get('active')} disabled={target.get('results').size === 0}>
@@ -250,20 +273,57 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                     <TagSearch
                       filters={[]}
                       placeholder={this.context.intl.formatMessage(messages.placeholder)}
-                      searchQuery={fromJS(location.query).get('search') || ''}
+                      searchQuery={location.query.search || ''}
                       onSearch={onSearch}
                       onClear={() => onClear(['search'])}
                     />
                   </EntityListSearch>
                   <ListWrapper>
                     {
-                      activeTarget && activeTarget.get('results') && activeTarget.get('results').map((entity, key) =>
-                        <EntityListItemWrapper
-                          key={key}
-                          entity={entity}
-                          entityPath={activeTarget.get('clientPath') || activeTarget.get('path')}
-                          onEntityClick={onEntityClick}
+                      noEntry && (
+                        <ListEntitiesEmpty>
+                          <FormattedMessage {...messages.hints.noEntry} />
+                        </ListEntitiesEmpty>
+                      )
+                    }
+                    { hasResults &&
+                      <div>
+                        <EntityListHeader
+                          entitiesTotal={activeTarget.get('results').size}
+                          entityTitle={{
+                            single: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).single),
+                            plural: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).plural),
+                          }}
+                          sortOptions={activeTarget.get('sorting') && activeTarget.get('sorting').toJS()}
+                          sortBy={location.query.sort}
+                          sortOrder={location.query.order}
+                          onSortBy={onSortBy}
+                          onSortOrder={onSortOrder}
                         />
+                        <ListEntitiesMain>
+                          { activeTarget.get('results').map((entity, key) =>
+                            <EntityListItemWrapper
+                              key={key}
+                              entity={entity}
+                              entityPath={activeTarget.get('clientPath') || activeTarget.get('path')}
+                              onEntityClick={onEntityClick}
+                            />
+                          )}
+                        </ListEntitiesMain>
+                      </div>
+                    }
+                    {
+                      noResultsNoAlternative && (
+                        <ListEntitiesEmpty>
+                          <FormattedMessage {...messages.hints.noResultsNoAlternative} />
+                        </ListEntitiesEmpty>
+                      )
+                    }
+                    {
+                      noResults && !noResultsNoAlternative && (
+                        <ListEntitiesEmpty>
+                          <FormattedMessage {...messages.hints.noResults} />
+                        </ListEntitiesEmpty>
                       )
                     }
                   </ListWrapper>
@@ -300,6 +360,8 @@ Search.propTypes = {
   onClear: PropTypes.func.isRequired,
   onTargetSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
+  onSortOrder: PropTypes.func.isRequired,
+  onSortBy: PropTypes.func.isRequired,
 };
 
 Search.contextTypes = {
@@ -342,6 +404,12 @@ function mapDispatchToProps(dispatch) {
     },
     onEntityClick: (id, path) => {
       dispatch(updatePath(`/${path}/${id}`));
+    },
+    onSortOrder: (order) => {
+      dispatch(updateSortOrder(order));
+    },
+    onSortBy: (sort) => {
+      dispatch(updateSortBy(sort));
     },
   };
 }

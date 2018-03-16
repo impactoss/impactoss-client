@@ -40,4 +40,18 @@ export default defineMessages({
       defaultMessage: 'Content',
     },
   },
+  hints: {
+    noEntry: {
+      id: 'app.containers.Search.hints.noEntry',
+      defaultMessage: 'Please enter a search text to start your search.',
+    },
+    noResults: {
+      id: 'app.containers.Search.hints.noResults',
+      defaultMessage: 'We are sorry, there are no results for the selected search target. Please select a different target or try a different search text.',
+    },
+    noResultsNoAlternative: {
+      id: 'app.containers.Search.hints.noResultsNoAlternative',
+      defaultMessage: 'We are sorry, no content matched your search! Please try a different search text.',
+    },
+  },
 });
