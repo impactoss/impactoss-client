@@ -33,8 +33,8 @@ export const selectEntitiesByQuery = createSelector(
   selectPathQuery,
   selectSortByQuery,
   selectSortOrderQuery,
-  (allEntities, taxonomies, query, path, sort, order) => {
-    // console.log('selectEntitiesByQuery', query)
+  (allEntities, taxonomies, searchQuery, path, sort, order) => {
+    // console.log('selectEntitiesByQuery', searchQuery)
     let active = false;// || CONFIG.search[0].targets[0].path;
     return fromJS(CONFIG.search).map((group) => {
       if (group.get('group') === 'taxonomies') {
@@ -50,10 +50,10 @@ export const selectEntitiesByQuery = createSelector(
               , cat)
             );
 
-          const filteredCategories = query
+          const filteredCategories = searchQuery
             ? filterEntitiesByKeywords(
               categories,
-              query,
+              searchQuery,
               group.get('categorySearch').toArray()
             )
             : categories;
@@ -65,7 +65,7 @@ export const selectEntitiesByQuery = createSelector(
               // .set('icon', `taxonomy_${tax.get('id')}`)
               .set('clientPath', 'category')
               .set('taxId', tax.get('id'))
-              .set('active', true)
+              .set('active', searchQuery && true)
               .set('sorting', group.get('sorting'))
               .set('results', sortEntities(filteredCategories,
                 order || (sortOption ? sortOption.order : 'desc'),
@@ -81,10 +81,10 @@ export const selectEntitiesByQuery = createSelector(
         }));
       }
       return group.set('targets', group.get('targets').map((target) => {
-        const filteredEntities = query
+        const filteredEntities = searchQuery
           ? filterEntitiesByKeywords(
             allEntities.get(target.get('path')),
-            query,
+            searchQuery,
             target.get('search').toArray()
           )
           : allEntities.get(target.get('path'));
@@ -93,7 +93,7 @@ export const selectEntitiesByQuery = createSelector(
           // only sort the active entities that will be displayed
           const sortOption = getSortOption(target.get('sorting') && target.get('sorting').toJS(), sort);
           return target
-            .set('active', true)
+            .set('active', searchQuery && true)
             .set('results', sortEntities(
               filteredEntities,
               order || (sortOption ? sortOption.order : 'desc'),

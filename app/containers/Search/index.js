@@ -263,6 +263,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                 type={CONTENT_LIST}
                 supTitle={this.context.intl.formatMessage(messages.pageTitle)}
                 title={this.context.intl.formatMessage(messages.search)}
+                icon="search"
               />
               { !dataReady &&
                 <Loading />
