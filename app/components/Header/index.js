@@ -12,6 +12,7 @@ import {
 } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
+import Icon from 'components/Icon';
 
 import Logo from './Logo';
 import Banner from './Banner';
@@ -176,8 +177,13 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 href={item.path}
                 active={item.active || currentPath.startsWith(item.path)}
                 onClick={(evt) => this.onClick(evt, item.path)}
+                align={item.align}
+                icon={item.icon}
               >
                 {item.title}
+                { item.icon &&
+                  <Icon title={item.title} name={item.icon} text textRight size={'1em'} />
+                }
               </LinkMain>
             ))}
           </NavMain>

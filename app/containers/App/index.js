@@ -110,6 +110,13 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         title: this.context.intl.formatMessage(messages.nav.sdgtargets),
         active: currentPath.startsWith(PATHS.SDG_TARGETS),
       },
+      {
+        path: PATHS.SEARCH,
+        title: this.context.intl.formatMessage(messages.nav.search),
+        active: currentPath.startsWith(PATHS.SEARCH),
+        icon: 'search',
+        align: 'right',
+      },
     ]);
     if (isManager) {
       navItems = navItems.concat([

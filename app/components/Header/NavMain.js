@@ -8,4 +8,5 @@ export default styled.div`
   border-bottom: 1px solid;
   border-color: ${(props) => props.hasBorder ? palette('headerNavMain', 1) : 'transparent'};
   background-color: ${palette('headerNavMain', 0)};
+  position: relative;
 `;
