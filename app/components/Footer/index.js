@@ -9,8 +9,15 @@ import Container from 'components/styled/Container';
 import A from 'components/styled/A';
 
 import { SHOW_FOOTER_PARTNERS } from 'themes/config';
+import responsibleLogo from 'themes/media/publisher-logo.png';
 
 import messages from './messages';
+
+const ResponsibleLogo = styled(NormalImg)`
+  width: 100%;
+  max-width: 170px;
+  margin-top: 1em;
+`;
 
 const FooterLogos = styled.div`
   padding: 1.2em 0;
@@ -131,6 +138,7 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
                   >
                     <FormattedMessage {...messages.responsible.anchor} />
                   </FooterLink>
+                  <ResponsibleLogo src={responsibleLogo} alt={this.context.intl.formatMessage(messages.responsible.logo)} />
                 </div>
               </TableCellSmall>
               <TableCellSmall>

@@ -33,6 +33,10 @@ export default defineMessages({
       id: 'app.components.Footer.responsible.anchor',
       defaultMessage: 'www.publisher.org',
     },
+    logo: {
+      id: 'app.components.Footer.responsible.logo',
+      defaultMessage: 'Logo of the Publisher',
+    },
   },
   project: {
     text: {

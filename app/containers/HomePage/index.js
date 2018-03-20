@@ -48,8 +48,10 @@ const GraphicHomeWrapper = styled.div`
 
 const GraphicHome = styled(NormalImg)`
   width: 100%;
-  max-width: 1200px;
+  max-width: 800px;
 `;
+// TODO @tmfrnz config
+// max-width
 
 const SectionTop = styled.div`
   min-height: ${(props) => props.hasBrand ? 0 : '100vH'};
@@ -72,8 +74,10 @@ const Title = styled.h1`
   color:${palette('headerBrand', 0)};
   font-family: ${(props) => props.theme.fonts.title};
   font-size: ${(props) => props.theme.sizes.home.text.title};
-  margin-top: 46px;
+  margin-top: 20px;
 `;
+// TODO @tmfrnz config
+// margin-top
 
 const Claim = styled.p`
   color: ${palette('headerBrand', 1)};

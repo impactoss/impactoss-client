@@ -15,10 +15,12 @@ const Group = styled.div`
   height: 31px;
   display: block;
   width: 100%;
-  background-color: ${palette('light', 1)};
+  background-color: ${palette('asideListGroup', 1)};
   padding: 0.5em 1em 0.5em 1.5em;
   margin-bottom: 1px;
 `;
+// TODO @tmfrnz config
+// background color
 
 const Option = styled.div`
   height: 50px;

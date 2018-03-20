@@ -23,7 +23,7 @@ export const DATE_FORMAT = 'dd/mm/yyyy';
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
-export const SHOW_HEADER_TITLE = false;
+export const SHOW_HEADER_TITLE = true;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
@@ -40,11 +40,13 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = false;
 // - app.containers.App.app.claim
 export const SHOW_HOME_TITLE = true;
 
-export const SHOW_BRAND_ON_HOME = true;
-export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = true;
+// show app logo on home page header
+export const SHOW_BRAND_ON_HOME = false;
+// show header pattern on home page
+export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
 // show footer logo section
-export const SHOW_FOOTER_PARTNERS = true;
+export const SHOW_FOOTER_PARTNERS = false;
 
 // entitylists items-per-page options
 export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
@@ -78,7 +80,7 @@ export const TAXONOMY_GROUPS = [
 // General ********************
 
 export const ENDPOINTS = {
-  API: 'https://api.impactoss.org', // server API endpoint
+  API: 'https://nmrf-nz-staging.herokuapp.com', // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',

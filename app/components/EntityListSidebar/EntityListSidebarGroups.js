@@ -19,6 +19,8 @@ const Group = styled.div`
     border-bottom: 0;
   }
 `;
+// TODO @tmfrnz config
+// border color
 
 class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
