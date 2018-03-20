@@ -20,7 +20,8 @@ const SmartGroup = styled.div`
   display: inline-block;
   margin-right: 0.75em;
   padding-right: 0.75em;
-  border-right: 1px solid ${palette('light', 3)};
+  border-right: ${(props) => props.border ? '1px solid' : 'none'};
+  border-right-color: ${palette('light', 3)};
 `;
 
 class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -80,16 +81,16 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
   render() {
     const { categories, taxonomies, onEntityClick } = this.props;
     const smartTaxonomy = taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
+    const entityTags = this.getEntityTags(categories, taxonomies, onEntityClick);
 
-    // console.log('smartTaxonomy', smartTaxonomy)
     return (
       <BottomTagGroup>
         <BottomIconWrap>
           <Icon name="categories" text />
         </BottomIconWrap>
         <span>
-          { smartTaxonomy && smartTaxonomy.size > 0 &&
-            <SmartGroup>
+          { smartTaxonomy &&
+            <SmartGroup border={entityTags && entityTags.length > 0}>
               { this.getEntitySmartTags(categories, smartTaxonomy, onEntityClick).map((tag, i) =>
                 <ButtonTagCategory
                   key={i}
@@ -104,7 +105,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
               )}
             </SmartGroup>
           }
-          { this.getEntityTags(categories, taxonomies, onEntityClick).map((tag, i) => tag.inverse
+          { entityTags.map((tag, i) => tag.inverse
             ? (
               <ButtonTagCategoryInverse
                 key={i}
