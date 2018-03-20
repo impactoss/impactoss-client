@@ -61,16 +61,15 @@ export const makeFilterGroups = (
       id: 'connections', // filterGroupId
       label: messages.connections,
       show: true,
-      options: reduce(config.connections.options, (options, option) => ({
-        ...options,
-        [option.path]: {
+      options: reduce(config.connections.options, (options, option) =>
+        options.concat({
           id: option.path, // filterOptionId
           label: option.label,
           message: option.message,
           icon: option.path,
           active: !!activeFilterOption && activeFilterOption.optionId === option.path,
-        },
-      }), {}),
+        })
+      , []),
     };
   }
 
@@ -83,17 +82,14 @@ export const makeFilterGroups = (
       show: true,
       options: reduce(config.attributes.options, (options, option) =>
         (typeof option.role === 'undefined' || hasUserRole[option.role])
-          ? {
-            ...options,
-            [option.attribute]: {
-              id: option.attribute, // filterOptionId
-              label: option.label,
-              message: option.message,
-              active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
-            },
-          }
+          ? options.concat([{
+            id: option.attribute, // filterOptionId
+            label: option.label,
+            message: option.message,
+            active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
+          }])
           : options
-      , {}),
+      , []),
     };
   }
 

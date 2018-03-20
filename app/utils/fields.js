@@ -158,6 +158,22 @@ const mapCategoryOptions = (categories) => categories
     .toArray()
   : [];
 
+const mapSmartCategoryOptions = (categories) => categories
+  ? sortEntities(
+      categories,
+      'asc',
+      'referenceThenTitle',
+    )
+    .map((cat) => ({
+      label: cat.getIn(['attributes', 'title']),
+      isSmart: cat.get('associated') && cat.get('associated').size > 0,
+      reference: cat.getIn(['attributes', 'reference']) || null,
+      draft: cat.getIn(['attributes', 'draft']) || null,
+      linkTo: `${PATHS.CATEGORIES}/${cat.get('id')}`,
+    }))
+    .toArray()
+  : [];
+
 const mapReports = (reports) => reports
   ? reports.map((report) => ({
     label: report.getIn(['attributes', 'title']),
@@ -197,6 +213,13 @@ export const getTaxonomyFields = (taxonomies) =>
     id: taxonomy.get('id'),
     values: mapCategoryOptions(taxonomy.get('categories')),
   })).toArray();
+
+export const getSmartTaxonomyField = (taxonomy) => ({
+  type: 'smartTaxonomy',
+  entityType: 'taxonomies',
+  id: taxonomy.get('id'),
+  values: mapSmartCategoryOptions(taxonomy.get('categories')),
+});
 
 export const hasTaxonomyCategories = (taxonomies) =>
   taxonomies
@@ -315,12 +338,32 @@ export const getEmailField = (entity) => ({
 });
 
 const getSectionFields = (shape, section, column, entity, associations, onEntityClick, hasUserRole) => {
+  const sectionGroups = [];
+
+  // SMART field
+  if (shape.taxonomies
+    && shape.taxonomies.smart
+    && section === 'body'
+    && column === 'main'
+  ) {
+    const smartTaxonomy = associations.taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
+    if (smartTaxonomy) {
+      sectionGroups.push({ // fieldGroup
+        type: 'smartTaxonomy',
+        label: appMessages.entities.taxonomies[smartTaxonomy.get('id')].plural,
+        fields: [getSmartTaxonomyField(smartTaxonomy)],
+      });
+    }
+  }
+
+  // attribute fields
   const fields = filter(shape.fields, (field) =>
     field.section === section
     && field.column === column
     && !field.disabled
     && (typeof field.role === 'undefined' || hasUserRole[field.role])
   );
+
   const groupType = reduce(fields, (memo, field) =>
     field.groupType && (memo === '' || memo === field.groupType) ? field.groupType : null
   , '');
@@ -353,25 +396,37 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
   if (section === 'header' && column === 'aside' && hasUserRole[USER_ROLES.MANAGER.value]) {
     groupFields = groupFields.concat([getMetaField(entity)]);
   }
-  const sectionGroups = [{
+  sectionGroups.push({
     type: groupType,
     fields: groupFields,
-  }];
+  });
 
+  // taxonomy fields
   if (shape.taxonomies
     && shape.taxonomies.section === section
     && shape.taxonomies.column === column
     && associations
     && associations.taxonomies
-    && hasTaxonomyCategories(associations.taxonomies)
   ) {
-    sectionGroups.push({ // fieldGroup
-      label: appMessages.entities.taxonomies.plural,
-      icon: 'categories',
-      fields: getTaxonomyFields(associations.taxonomies),
-    });
+    const taxonomiesFiltered = shape.taxonomies.smart
+      ? associations.taxonomies.filter((tax) => !tax.getIn(['attributes', 'is_smart']))
+      : associations.taxonomies;
+    const taxonomies = taxonomiesFiltered.map((tax) =>
+      tax.set('categories', tax.get('categories').filter((cat) =>
+        typeof cat.get('associated') === 'undefined' || (cat.get('associated') && cat.get('associated').size > 0)
+      ))
+    );
+
+    if (hasTaxonomyCategories(taxonomies)) {
+      sectionGroups.push({ // fieldGroup
+        label: appMessages.entities.taxonomies.plural,
+        icon: 'categories',
+        fields: getTaxonomyFields(taxonomies),
+      });
+    }
   }
 
+  // connection fields
   if (shape.connections
     && shape.connections.tables
     && shape.connections.section === section

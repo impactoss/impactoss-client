@@ -45,22 +45,19 @@ export const makeEditGroups = (
       show: true,
       options: reduce(config.connections.options, (options, option) =>
         typeof option.edit === 'undefined' || option.edit
-        ? {
-          ...options,
-          [option.path]: {
-            id: option.path, // filterOptionId
-            label: option.label,
-            message: option.message,
-            path: option.connectPath,
-            key: option.key,
-            ownKey: option.ownKey,
-            icon: option.path,
-            active: !!activeEditOption && activeEditOption.optionId === option.path,
-            create: { path: option.path },
-          },
-        }
+        ? options.concat({
+          id: option.path, // filterOptionId
+          label: option.label,
+          message: option.message,
+          path: option.connectPath,
+          key: option.key,
+          ownKey: option.ownKey,
+          icon: option.path,
+          active: !!activeEditOption && activeEditOption.optionId === option.path,
+          create: { path: option.path },
+        })
         : options
-      , {}),
+      , []),
     };
   }
 
@@ -74,17 +71,14 @@ export const makeEditGroups = (
       options: reduce(config.attributes.options, (options, option) =>
         (typeof option.edit === 'undefined' || option.edit)
         && (typeof option.role === 'undefined' || hasUserRole[option.role])
-        ? {
-          ...options,
-          [option.attribute]: {
-            id: option.attribute, // filterOptionId
-            label: option.label,
-            message: option.message,
-            active: !!activeEditOption && activeEditOption.optionId === option.attribute,
-          },
-        }
+        ? options.concat({
+          id: option.attribute, // filterOptionId
+          label: option.label,
+          message: option.message,
+          active: !!activeEditOption && activeEditOption.optionId === option.attribute,
+        })
         : options
-      , {}),
+      , []),
     };
   }
 

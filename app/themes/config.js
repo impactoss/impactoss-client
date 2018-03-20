@@ -248,6 +248,7 @@ export const MEASURE_SHAPE = {
     key: 'category_id',
     section: 'body',
     column: 'aside',
+    smart: true,
   },
   connections: {
     tables: [

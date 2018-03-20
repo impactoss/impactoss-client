@@ -17,7 +17,7 @@ class FieldGroup extends React.PureComponent { // eslint-disable-line react/pref
     return (
       <FieldGroupWrapper type={group.type} seamless={seamless}>
         { group.label &&
-          <FieldGroupLabel>
+          <FieldGroupLabel basic={group.type === 'smartTaxonomy'}>
             <GroupLabel>
               <FormattedMessage {...group.label} />
             </GroupLabel>

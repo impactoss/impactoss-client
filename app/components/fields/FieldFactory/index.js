@@ -20,6 +20,7 @@ import TextField from 'components/fields/TextField';
 import TitleField from 'components/fields/TitleField';
 import TitleTextField from 'components/fields/TitleTextField';
 import TitleShortField from 'components/fields/TitleShortField';
+import SmartTaxonomyField from 'components/fields/SmartTaxonomyField';
 
 class FieldFactory extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   renderField = (field) => {
@@ -59,6 +60,8 @@ class FieldFactory extends React.PureComponent { // eslint-disable-line react/pr
         return (<ConnectionsField field={field} />);
       case 'reports':
         return (<ReportsField field={field} />);
+      case 'smartTaxonomy':
+        return (<SmartTaxonomyField field={field} />);
       case 'text':
       default:
         return (<TextField field={field} />);
@@ -74,7 +77,7 @@ class FieldFactory extends React.PureComponent { // eslint-disable-line react/pr
       || (typeof field.fields !== 'undefined' && field.fields.length > 0)
       || typeof field.showEmpty !== 'undefined')
     ? (
-      <Field nested={nested}>
+      <Field nested={nested} noPadding={field.type === 'smartTaxonomy'}>
         {this.renderField(field)}
       </Field>
     )
