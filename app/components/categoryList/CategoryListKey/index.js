@@ -5,6 +5,9 @@ import { palette } from 'styled-theme';
 
 const Styled = styled.div`
   text-align: right;
+  position: absolute;
+  right: 0;
+  bottom: 100%;
 `;
 
 const ColumnKey = styled.span`

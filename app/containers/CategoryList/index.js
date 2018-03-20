@@ -46,7 +46,11 @@ const Content = styled.div`
 const UsersOnly = styled.h4`
   margin-top: 4em;
 `;
-
+const Description = styled.p`
+  margin-bottom: 2em;
+  font-size: 1em;
+  line-height: 1.4em;
+`;
 export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   // make sure to load all data from server
@@ -68,6 +72,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     }
   }
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+  getTaxDescription = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].description);
   getTaxButtonTitle = (id) => this.context.intl.formatMessage(
     appMessages.entities.taxonomies[id].shortSingle || appMessages.entities.taxonomies[id].single
   );
@@ -76,6 +81,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, onTaxonomyLink } = this.props;
     const reference = taxonomy && taxonomy.get('id');
     const contentTitle = typeof reference !== 'undefined' ? this.getTaxTitle(reference) : '';
+    const contentDescription = typeof reference !== 'undefined' && this.getTaxDescription(reference);
 
     const buttons = dataReady && isManager && typeof reference !== 'undefined'
       ? [{
@@ -122,6 +128,9 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 title={contentTitle}
                 buttons={buttons}
               />
+              { contentDescription &&
+                <Description>{contentDescription}</Description>
+              }
               { !dataReady &&
                 <Loading />
               }
