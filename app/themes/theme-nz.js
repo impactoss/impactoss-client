@@ -124,38 +124,29 @@ theme.palette = {
   // taxonomiesAAL: ['#8C969B', '#6B3285', '#5149AD', '#31A573', '#26938C', '#4DA53B', '#0069A4', '#199CD4', '#8C969B'],
   // [#AA compliant]
   // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
-  // 0: default/fallback
-  // 1: Human Rights Body
-  // 2: UN session
-  // 3: Country
-  // 4: SDGs
-  // 5: Issue
-  // 6: Population group
-  // 7: SMART
-  // 8: Agency
   taxonomies: [
-    '#E8EAEB',
-    '#6444AF',
-    '#88338E',
-    '#C27DE0',
-    '#00AEEF',
-    '#00A088',
-    '#00C4B3',
-    '#027DBB',
-    '#01527A',
-    '#01527A',
+    '#E8EAEB', // 0: default/fallback
+    '#6444AF', // 1: Human Rights Body
+    '#88338E', // 2: UN session
+    '#416680', // 3: Country
+    '#009ED8', // 4: SDGs
+    '#00A088', // 5: Issue
+    '#00C4B3', // 6: Population group
+    '#099B50', // 7: SMART // '#E56700',
+    '#01527A', // 8: Agency
+    '#01527A', // unused
   ],
   taxonomiesHover: [
-    '#DBDCDD',
-    '#523890',
-    '#924598',
-    '#B172CC',
-    '#0099D1',
-    '#00927C',
-    '#00B3A3',
-    '#026B9F',
-    '#014A6F',
-    '#014A6F',
+    '#DBDCDD', // 0: default/fallback
+    '#523890', // 1: Human Rights Body
+    '#924598', // 2: UN session
+    '#395970', // 3: Country
+    '#007FAD', // 4: SDGs
+    '#00927C', // 5: Issue
+    '#00B3A3', // 6: Population group
+    '#048E47', // 7: SMART // '#C75300',
+    '#014A6F', // 8: Agency
+    '#014A6F', // unused
   ],
   // bg inactive, bg hover, icon
   smartInactive: [
@@ -167,12 +158,12 @@ theme.palette = {
   // other entities
   // [aqll #AA compliant]
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
-  measuresHover: ['#048E47'], // ['#C75300'], // ['#E3B707'],
-  measures: ['#099B50'], // ['#E56700'], // ['#F9C907'],
+  measuresHover: ['#C75300'], // ['#E3B707'],
+  measures: ['#E56700'], // ['#F9C907'],
   recommendationsHover: ['#026B9F', '#03405F'], // accepted, noted ['#FF9B69', '#FFB28B'],
   recommendations: ['#027DBB', '#045984'],
-  sdgtargetsHover: ['#009FDA'],
-  sdgtargets: ['#00AEEF'],
+  sdgtargetsHover: ['#007FAD'],
+  sdgtargets: ['#009ED8'],
   indicatorsHover: ['#C81438'],
   indicators: ['#DB153D'],
   reportsHover: [error[1]],
