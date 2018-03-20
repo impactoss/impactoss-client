@@ -699,6 +699,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.1.shortPlural',
           defaultMessage: 'HR bodies',
         },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.1.description',
+          defaultMessage: 'About human rights bodies',
+        },
       },
       2: {
         single: {
@@ -712,6 +716,18 @@ export default defineMessages({
         empty: {
           id: 'app.containers.App.entities.taxonomies.2.empty',
           defaultMessage: 'No cycle assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.2.shortSingle',
+          defaultMessage: 'Cycle',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.2.shortPlural',
+          defaultMessage: 'Cycles',
+        },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.2.description',
+          defaultMessage: 'About cycles',
         },
       },
       3: {
@@ -735,6 +751,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.3.shortPlural',
           defaultMessage: 'HR issues',
         },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.3.description',
+          defaultMessage: 'About human rights issues',
+        },
       },
       4: {
         single: {
@@ -748,6 +768,18 @@ export default defineMessages({
         empty: {
           id: 'app.containers.App.entities.taxonomies.4.empty',
           defaultMessage: 'No affected persons assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.4.shortSingle',
+          defaultMessage: 'Persons',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.4.shortPlural',
+          defaultMessage: 'Persons',
+        },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.4.description',
+          defaultMessage: 'About affected persons',
         },
       },
       5: {
@@ -771,6 +803,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.5.shortPlural',
           defaultMessage: 'Clusters',
         },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.5.description',
+          defaultMessage: 'About thematic clusters',
+        },
       },
       6: {
         single: {
@@ -785,15 +821,27 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.6.empty',
           defaultMessage: 'No organisation assigned yet',
         },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.6.shortSingle',
+          defaultMessage: 'Organisation',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.6.shortPlural',
+          defaultMessage: 'Organisations',
+        },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.6.description',
+          defaultMessage: 'About organisations',
+        },
       },
       7: {
         single: {
           id: 'app.containers.App.entities.taxonomies.7.single',
-          defaultMessage: 'SDG',
+          defaultMessage: 'Sustainable Development Goals',
         },
         plural: {
           id: 'app.containers.App.entities.taxonomies.7.plural',
-          defaultMessage: 'SDGs',
+          defaultMessage: 'Sustainable Development Goals',
         },
         empty: {
           id: 'app.containers.App.entities.taxonomies.7.empty',
@@ -806,6 +854,10 @@ export default defineMessages({
         shortPlural: {
           id: 'app.containers.App.entities.taxonomies.7.shortPlural',
           defaultMessage: 'SDGs',
+        },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.7.description',
+          defaultMessage: 'About Sustainable Development Goals',
         },
       },
       8: {
@@ -829,6 +881,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.8.shortPlural',
           defaultMessage: 'Taxonomy 8s',
         },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.8.description',
+          defaultMessage: 'About tax 8',
+        },
       },
       9: {
         single: {
@@ -851,6 +907,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.9.shortPlural',
           defaultMessage: 'Taxonomy 9s',
         },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.9.description',
+          defaultMessage: 'About tax 9',
+        },
       },
       10: {
         single: {
@@ -872,6 +932,10 @@ export default defineMessages({
         shortPlural: {
           id: 'app.containers.App.entities.taxonomies.10.shortPlural',
           defaultMessage: 'Taxonomy 10s',
+        },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.10.description',
+          defaultMessage: 'About tax 10',
         },
       },
     },
