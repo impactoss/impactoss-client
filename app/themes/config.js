@@ -209,7 +209,7 @@ export const MEASURE_SHAPE = {
       column: 'main',
     },
     {
-      disabled: true,
+      disabled: false,
       attribute: 'outcome',
       control: 'markdown',
       type: 'markdown',
@@ -218,7 +218,7 @@ export const MEASURE_SHAPE = {
       column: 'main',
     },
     {
-      disabled: true,
+      disabled: false,
       attribute: 'indicator_summary',
       control: 'markdown',
       type: 'markdown',
