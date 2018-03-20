@@ -519,6 +519,10 @@ export default defineMessages({
       id: 'app.containers.App.nav.users',
       defaultMessage: 'User admin',
     },
+    search: {
+      id: 'app.containers.App.nav.search',
+      defaultMessage: 'Search',
+    },
   },
   entities: {
     showAll: {

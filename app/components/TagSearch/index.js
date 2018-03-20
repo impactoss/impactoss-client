@@ -87,6 +87,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       filters,
       searchQuery,
       onSearch,
+      placeholder,
     } = this.props;
     // TODO set focus to input when clicking wrapper
     //  see https://github.com/nkbt/react-debounce-input/issues/65
@@ -144,11 +145,11 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
           onChange={(e) => onSearch(e.target.value)}
           onFocus={() => this.setState({ active: true })}
           onBlur={() => this.setState({ active: false })}
-          placeholder={this.context.intl.formatMessage(
+          placeholder={placeholder || (this.context.intl.formatMessage(
             this.props.multiselect
             ? messages.searchPlaceholderMultiSelect
             : messages.searchPlaceholderEntities
-          )}
+          ))}
         />
         { (searchQuery || filters.length > 0) &&
           <Clear
@@ -166,6 +167,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
 TagSearch.propTypes = {
   filters: PropTypes.array,
   searchQuery: PropTypes.string,
+  placeholder: PropTypes.string,
   onSearch: PropTypes.func,
   onClear: PropTypes.func,
   multiselect: PropTypes.bool,

@@ -53,7 +53,7 @@ class EntityListSidebarGroupLabel extends React.PureComponent { // eslint-disabl
         )}
       >
         <GroupLabel>{label}</GroupLabel>
-        <GroupIcon><Icon name={icon} text /></GroupIcon>
+        <GroupIcon><Icon name={icon} /></GroupIcon>
       </Styled>
     );
   }

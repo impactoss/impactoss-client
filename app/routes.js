@@ -827,6 +827,24 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: PATHS.SEARCH,
+      name: 'indicatorList',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Search/sagas'),
+          import('containers/Search'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([sagas, component]) => {
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: PATHS.UNAUTHORISED,
       name: 'unauthorised',
       getComponent(nextState, cb) {

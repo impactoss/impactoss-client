@@ -52,6 +52,7 @@
   "app.components.EntityListGroups.entityListHeader.allSelectedOnPage" : "All {total} {type} on this page are selected. ",
   "app.components.EntityListGroups.entityListHeader.selected" : "{total} {type} selected. ",
   "app.components.EntityListGroups.entityListHeader.noneSelected" : "{type} (showing {pageTotal} of {entitiesTotal} total)",
+  "app.components.EntityListGroups.entityListHeader.notPaged" : "{entitiesTotal} {type}",
   "app.components.EntityListGroup.groupBy" : "Group by",
   "app.components.EntityListGroup.subgroupBy" : "Subgroup by",
   "app.components.EntityListGroup.placeholder" : "Select category",
@@ -260,6 +261,7 @@
   "app.containers.App.nav.sdgtargets" : "SDG targets",
   "app.containers.App.nav.pages" : "Page admin",
   "app.containers.App.nav.users" : "User admin",
+  "app.containers.App.nav.search" : "Search",
   "app.containers.App.entities.showAll" : "Show all",
   "app.containers.App.entities.showLess" : "Show less",
   "app.containers.App.entities.connected" : "(inferred)",
@@ -551,5 +553,16 @@
   "app.containers.UserView.pageTitle" : "User profile",
   "app.containers.UserView.metaDescription" : "User profile page description",
   "app.containers.UserView.notFound" : "Sorry no user found",
-  "app.containers.UserView.editPassword" : "Change password"
+  "app.containers.UserView.editPassword" : "Change password",
+  "app.containers.Search.pageTitle" : "Search",
+  "app.containers.Search.metaDescription" : "Search page description",
+  "app.containers.Search.sidebarTitle" : "Select search target",
+  "app.containers.Search.search" : "Search database",
+  "app.containers.Search.placeholder" : "Search database by keyword",
+  "app.containers.Search.groups.entities" : "Subjects",
+  "app.containers.Search.groups.taxonomies" : "Category groups",
+  "app.containers.Search.groups.content" : "Content",
+  "app.containers.Search.hints.noEntry" : "Please enter a search text to start your search.",
+  "app.containers.Search.hints.noResults" : "We are sorry, there are no results for the selected search target. Please select a different target or try a different search text.",
+  "app.containers.Search.hints.noResultsNoAlternative" : "We are sorry, no content matched your search! Please try a different search text."
 }

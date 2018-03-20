@@ -11,11 +11,7 @@ const Styled = styled.span`
   font-weight: bold;
   font-size: 0.85em;
   letter-spacing: 0.75px;
-`;
-
-const SupIconWrap = styled.span`
-  position: relative;
-  top: -1px;
+  display: inline-block;
 `;
 
 class SupTitle extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -25,9 +21,7 @@ class SupTitle extends React.PureComponent { // eslint-disable-line react/prefer
     return (
       <Styled>
         { icon &&
-          <SupIconWrap>
-            <Icon name={icon} text textLeft />
-          </SupIconWrap>
+          <Icon name={icon} text textLeft />
         }
         { title }
       </Styled>

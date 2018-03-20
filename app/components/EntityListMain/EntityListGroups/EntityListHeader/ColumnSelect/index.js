@@ -54,7 +54,7 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
   render() {
     const { isSelect, isSelected, onSelect, width, label, hasSelectAll, onSelectAll, entitiesTotal } = this.props;
 
-    const sortOptions = this.props.sortOptions.map((option) => ({
+    const sortOptions = this.props.sortOptions && this.props.sortOptions.map((option) => ({
       value: option.attribute,
       label: this.context.intl.formatMessage(messages.sortAttributes[option.attribute]),
     }));
@@ -100,25 +100,27 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
               <Label>{label}</Label>
             </LabelWrap>
           }
-          <SelectWrapper>
-            <SelectReset
-              value={this.props.sortBy}
-              index="sortby"
-              options={sortOptions}
-              isReset={false}
-              onChange={this.props.onSortBy}
-            />
-            {nextSortOrderOption &&
-              <SortButton
-                onClick={(e) => {
-                  e.preventDefault();
-                  this.props.onSortOrder(nextSortOrderOption.value);
-                }}
-              >
-                <Icon name={sortOrderOption.icon} />
-              </SortButton>
-            }
-          </SelectWrapper>
+          { sortOptions &&
+            <SelectWrapper>
+              <SelectReset
+                value={this.props.sortBy}
+                index="sortby"
+                options={sortOptions}
+                isReset={false}
+                onChange={this.props.onSortBy}
+              />
+              {nextSortOrderOption &&
+                <SortButton
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.props.onSortOrder(nextSortOrderOption.value);
+                  }}
+                >
+                  <Icon name={sortOrderOption.icon} />
+                </SortButton>
+              }
+            </SelectWrapper>
+          }
         </Wrapper>
       </Styled>
     );

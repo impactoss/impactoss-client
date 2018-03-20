@@ -47,14 +47,18 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
         type: selectedTotal === 1 ? entityTitle.single : entityTitle.plural,
       });
     }
-    return (pageTotal < entitiesTotal)
-      ? this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.noneSelected, {
+    if (pageTotal && (pageTotal < entitiesTotal)) {
+      return this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.noneSelected, {
         pageTotal,
         entitiesTotal,
         type: entityTitle.plural,
-      })
-      : entityTitle.plural;
-    // return `${entityTitle.plural}${hint}`;
+      });
+    }
+    // console.log((entitiesTotal === 1) ? entityTitle.single : entityTitle.plural)
+    return this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.notPaged, {
+      entitiesTotal,
+      type: (entitiesTotal === 1) ? entityTitle.single : entityTitle.plural,
+    });
   }
   getSelectedState = (selectedTotal, allSelected) => {
     if (selectedTotal === 0) {

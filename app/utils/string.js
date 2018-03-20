@@ -10,6 +10,7 @@ export const getFilenameFromUrl = (url) => url.split('/').pop();
 
 export const cleanupSearchTarget = (str) =>
   loCase(str)
+    .replace(/[’]/, '\'')
     .replace(/[ā]/, 'a')
     .replace(/[ē]/, 'e')
     .replace(/[ī]/, 'i')

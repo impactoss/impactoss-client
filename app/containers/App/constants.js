@@ -118,4 +118,5 @@ export const PATHS = {
   TAXONOMIES: '/categories',
   CATEGORIES: '/category',
   PAGES: '/pages',
+  SEARCH: '/search',
 };
