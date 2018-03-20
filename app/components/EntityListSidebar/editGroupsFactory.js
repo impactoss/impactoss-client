@@ -18,21 +18,22 @@ export const makeEditGroups = (
       label: messages.taxonomyGroup,
       show: true,
       icon: 'categories',
-      options: sortEntities(taxonomies, 'asc', 'priority').reduce((taxOptions, taxonomy) => ({
-        ...taxOptions,
-        [taxonomy.get('id')]: {
-          id: taxonomy.get('id'), // filterOptionId
-          label: messages.taxonomies(taxonomy.get('id')),
-          path: config.taxonomies.connectPath,
-          key: config.taxonomies.key,
-          ownKey: config.taxonomies.ownKey,
-          active: !!activeEditOption && activeEditOption.optionId === taxonomy.get('id'),
-          create: {
-            path: 'categories',
-            attributes: { taxonomy_id: taxonomy.get('id') },
+      options: sortEntities(taxonomies, 'asc', 'priority').reduce((taxOptions, taxonomy) =>
+        memo.concat([
+          {
+            id: taxonomy.get('id'), // filterOptionId
+            label: messages.taxonomies(taxonomy.get('id')),
+            path: config.taxonomies.connectPath,
+            key: config.taxonomies.key,
+            ownKey: config.taxonomies.ownKey,
+            active: !!activeEditOption && activeEditOption.optionId === taxonomy.get('id'),
+            create: {
+              path: 'categories',
+              attributes: { taxonomy_id: taxonomy.get('id') },
+            },
           },
-        },
-      }), {}),
+        ])
+      , []),
     };
   }
 
