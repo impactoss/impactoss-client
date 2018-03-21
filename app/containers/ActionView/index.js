@@ -130,6 +130,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                 },
                 onEntityClick,
                 shape: MEASURE_SHAPE,
+                contextIntl: this.context.intl,
               })}
             />
           }

@@ -115,8 +115,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
-        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
+        renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption, this.context.intl),
       ],
     },
   ]);

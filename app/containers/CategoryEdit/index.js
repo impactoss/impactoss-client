@@ -171,11 +171,11 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           icon: 'connections',
           fields: [
             entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
-              renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+              renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
             entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
-              renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
+              renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption, this.context.intl),
             entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
-              renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
+              renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
           ],
         },
       );
