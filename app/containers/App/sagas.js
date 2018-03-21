@@ -40,6 +40,7 @@ import {
 import {
   ENDPOINTS,
   KEYS,
+  DB_TABLES,
 } from 'themes/config';
 
 import {
@@ -90,39 +91,41 @@ import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
  * Check if entities already present
  */
 export function* checkEntitiesSaga(payload) {
-  // requestedSelector returns the times that entities where fetched from the API
-  const requestedAt = yield select(selectRequestedAt, { path: payload.path });
+  if (DB_TABLES.indexOf(payload.path) > -1) {
+    // requestedSelector returns the times that entities where fetched from the API
+    const requestedAt = yield select(selectRequestedAt, { path: payload.path });
 
-  // If haven't requested yet, do so now.
-  if (!requestedAt) {
-    const signedIn = yield select(selectIsSignedIn);
+    // If haven't requested yet, do so now.
+    if (!requestedAt) {
+      const signedIn = yield select(selectIsSignedIn);
 
-    try {
-      // First record that we are requesting
-      yield put(entitiesRequested(payload.path, Date.now()));
-      // check role to prevent requesting endpoints not authorised
-      // TODO check could be refactored
-      if (!signedIn && (payload.path === 'user_roles' || payload.path === 'users')) {
-        // store empty response so the app wont wait for the results
-        yield put(entitiesLoaded({}, payload.path, Date.now()));
-      } else {
-        // Call the API, cancel on invalidate
-        const { response } = yield race({
-          response: call(apiRequest, 'get', payload.path),
-          cancel: take(INVALIDATE_ENTITIES), // will also reset entities requested
-        });
-        if (response) {
-          // Save response
-          yield put(entitiesLoaded(keyBy(response.data, 'id'), payload.path, Date.now()));
+      try {
+        // First record that we are requesting
+        yield put(entitiesRequested(payload.path, Date.now()));
+        // check role to prevent requesting endpoints not authorised
+        // TODO check could be refactored
+        if (!signedIn && (payload.path === 'user_roles' || payload.path === 'users')) {
+          // store empty response so the app wont wait for the results
+          yield put(entitiesLoaded({}, payload.path, Date.now()));
         } else {
-          yield call(checkEntitiesSaga, payload);
+          // Call the API, cancel on invalidate
+          const { response } = yield race({
+            response: call(apiRequest, 'get', payload.path),
+            cancel: take(INVALIDATE_ENTITIES), // will also reset entities requested
+          });
+          if (response) {
+            // Save response
+            yield put(entitiesLoaded(keyBy(response.data, 'id'), payload.path, Date.now()));
+          } else {
+            yield call(checkEntitiesSaga, payload);
+          }
         }
+      } catch (err) {
+        // Whoops Save error
+        yield put(entitiesLoadingError(err, payload.path));
+        // Clear the request time on error, This will cause us to try again next time, which we probably want to do?
+        yield put(entitiesRequested(payload.path, null));
       }
-    } catch (err) {
-      // Whoops Save error
-      yield put(entitiesLoadingError(err, payload.path));
-      // Clear the request time on error, This will cause us to try again next time, which we probably want to do?
-      yield put(entitiesRequested(payload.path, null));
     }
   }
 }

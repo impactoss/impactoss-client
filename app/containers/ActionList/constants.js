@@ -1,6 +1,7 @@
-import { USER_ROLES, PUBLISH_STATUSES } from 'themes/config';
+import { USER_ROLES, PUBLISH_STATUSES, ENABLE_SDGS } from 'themes/config';
 
-export const DEPENDENCIES = [
+export const DEPENDENCIES = ENABLE_SDGS
+? [
   'user_roles',
   'measures',
   'measure_categories',
@@ -13,6 +14,21 @@ export const DEPENDENCIES = [
   'sdgtargets',
   'sdgtarget_measures',
   'sdgtarget_categories',
+  'indicators',
+  'measure_indicators',
+  'due_dates',
+  'progress_reports',
+]
+: [
+  'user_roles',
+  'measures',
+  'measure_categories',
+  'users',
+  'taxonomies',
+  'categories',
+  'recommendations',
+  'recommendation_measures',
+  'recommendation_categories',
   'indicators',
   'measure_indicators',
   'due_dates',
@@ -53,7 +69,8 @@ export const CONFIG = {
     query: 'catx',
     search: true,
     exclude: 'tags_measures',
-    connections: [
+    connections: ENABLE_SDGS
+    ? [
       {
         path: 'recommendations', // filter by recommendation connection
         message: 'entities.recommendations.plural',
@@ -64,11 +81,19 @@ export const CONFIG = {
         message: 'entities.sdgtargets.plural',
         key: 'sdgtarget_id',
       },
+    ]
+    : [
+      {
+        path: 'recommendations', // filter by recommendation connection
+        message: 'entities.recommendations.plural',
+        key: 'recommendation_id',
+      },
     ],
   },
   connections: { // filter by associated entity
     query: 'connected',
-    options: [
+    options: ENABLE_SDGS
+    ? [
       {
         search: true,
         message: 'entities.indicators.plural',
@@ -92,6 +117,25 @@ export const CONFIG = {
         path: 'sdgtargets', // filter by recommendation connection
         key: 'sdgtarget_id',
         connectPath: 'sdgtarget_measures', // filter by recommendation connection
+        ownKey: 'measure_id',
+      },
+    ]
+    : [
+      {
+        search: true,
+        message: 'entities.indicators.plural',
+        path: 'indicators', // filter by recommendation connection
+        key: 'indicator_id',
+        expandable: true, // used for omitting from connected counts
+        connectPath: 'measure_indicators', // filter by recommendation connection
+        ownKey: 'measure_id',
+      },
+      {
+        search: true,
+        message: 'entities.recommendations.plural',
+        path: 'recommendations', // filter by recommendation connection
+        key: 'recommendation_id',
+        connectPath: 'recommendation_measures', // filter by recommendation connection
         ownKey: 'measure_id',
       },
     ],

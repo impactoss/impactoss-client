@@ -145,8 +145,9 @@ export const REPORT_FREQUENCIES = [
   { value: 12, message: 'ui.reportFrequencies.annual' },
 ];
 
-// Map server database tables **************************
+export const ENABLE_SDGS = true;
 
+// Map server database tables **************************
 export const DB_TABLES = [
   'users',
   'user_roles',
@@ -160,13 +161,13 @@ export const DB_TABLES = [
   'recommendation_categories',
   'recommendation_measures',
   'recommendations',
+  'user_categories',
+  'progress_reports',
+  'due_dates',
   'sdgtarget_categories',
   'sdgtarget_indicators',
   'sdgtarget_measures',
   'sdgtargets',
-  'user_categories',
-  'progress_reports',
-  'due_dates',
 ];
 
 // Table shapes
@@ -256,11 +257,6 @@ export const MEASURE_SHAPE = {
         table: 'recommendations',
         via: 'recommendation_measures',
         key: 'recommendation_id',
-      },
-      {
-        table: 'sdgtargets',
-        via: 'sdgtarget_measures',
-        key: 'sdgtarget_id',
       },
       {
         table: 'indicators',

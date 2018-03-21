@@ -2,6 +2,8 @@ import { createSelector } from 'reselect';
 import { Map } from 'immutable';
 import { reduce } from 'lodash/collection';
 
+import { ENABLE_SDGS } from 'themes/config';
+
 import {
   selectEntities,
   selectEntitiesSearchQuery,
@@ -49,7 +51,7 @@ export const selectConnections = createSelector(
     )
     .set(
       'sdgtargets',
-      sdgtargets.map((sdgtarget) =>
+      ENABLE_SDGS && sdgtargets.map((sdgtarget) =>
         sdgtarget.set(
           'categories',
           sdgtargetCategories
@@ -77,7 +79,7 @@ export const selectConnectedTaxonomies = createSelector(
         key: 'measure_id',
         associations: categoryMeasures,
       },
-      {
+      ENABLE_SDGS && {
         tags: 'tags_sdgtargets',
         path: 'sdgtargets',
         key: 'sdgtarget_id',
@@ -86,7 +88,8 @@ export const selectConnectedTaxonomies = createSelector(
     ], (connectedTaxonomies, connection) =>
       // merge connected taxonomies.
       // TODO deal with conflicts
-      connectedTaxonomies.merge(
+      connection
+      ? connectedTaxonomies.merge(
         taxonomies
           .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]))
           .map((taxonomy) => taxonomy.set(
@@ -104,6 +107,7 @@ export const selectConnectedTaxonomies = createSelector(
               ))
           ))
       )
+      : connectedTaxonomies
     , Map())
 );
 
@@ -140,7 +144,7 @@ const selectIndicatorsNested = createSelector(
     )
     .set(
       'sdgtargets',
-      entitySdgTargets
+      ENABLE_SDGS && entitySdgTargets
       .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'indicator_id']), entity.get('id'))
         && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])

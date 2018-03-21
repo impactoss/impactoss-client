@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import { USER_ROLES } from 'themes/config';
+import { ENABLE_SDGS, USER_ROLES } from 'themes/config';
 
 import {
   selectEntity,
@@ -43,8 +43,9 @@ export const selectMeasures = createSelector(
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_sdgtargets'])
+  (taxonomies, categories) => ENABLE_SDGS
+    ? prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_sdgtargets'])
+    : prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
 );
 
 export const selectSdgTargets = createSelector(
