@@ -8,7 +8,7 @@ class Content extends React.PureComponent { // eslint-disable-line react/prefer-
   render() {
     return (
       <ContainerWrapper innerRef={this.props.innerRef} >
-        <Container noPaddingBottom={this.props.noPaddingBottom}>
+        <Container inModal={this.props.inModal}>
           {this.props.children}
         </Container>
       </ContainerWrapper>
@@ -18,7 +18,7 @@ class Content extends React.PureComponent { // eslint-disable-line react/prefer-
 
 Content.propTypes = {
   children: PropTypes.node,
-  noPaddingBottom: PropTypes.bool,
+  inModal: PropTypes.bool,
   innerRef: PropTypes.func,
 };
 

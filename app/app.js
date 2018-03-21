@@ -33,6 +33,13 @@ import theme from 'themes/theme-nz';
 // Load the favicon, and the .htaccess file
 /* eslint-disable import/no-unresolved, import/extensions */
 import '!file-loader?name=[name].[ext]!./favicon.ico';
+import '!file-loader?name=[name].[ext]!./favicon-16x16.png';
+import '!file-loader?name=[name].[ext]!./favicon-32x32.png';
+import '!file-loader?name=[name].[ext]!./android-chrome-192x192.png';
+import '!file-loader?name=[name].[ext]!./android-chrome-256x256.png';
+import '!file-loader?name=[name].[ext]!./mstile-150x150.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon.png';
+import '!file-loader?name=[name].[ext]!./safari-pinned-tab.svg';
 import 'file-loader?name=[name].[ext]!./.htaccess';
 /* eslint-enable import/no-unresolved, import/extensions */
 

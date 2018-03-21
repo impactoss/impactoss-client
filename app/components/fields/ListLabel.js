@@ -1,11 +1,13 @@
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import Label from './Label';
-
-const ListLabel = styled(Label)`
-  padding-bottom: 8px;
-  border-bottom: 1px solid ${palette('light', 0)};
+const ListLabel = styled.h4`
+  display: table-cell;
+  vertical-align: middle;
+  font-weight: 500;
+  color: ${palette('text', 0)};
+  margin: 0;
+  font-size: 1em;
 `;
 
 export default ListLabel;

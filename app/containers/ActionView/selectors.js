@@ -1,18 +1,19 @@
 import { createSelector } from 'reselect';
-
+import { ENABLE_SDGS } from 'themes/config';
 import {
   selectEntity,
   selectEntities,
   selectRecommendationConnections,
   selectSdgTargetConnections,
   selectIndicatorConnections,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import {
   entitySetUser,
   attributesEqual,
   entitiesIsAssociated,
-  prepareTaxonomiesIsAssociated,
+  prepareTaxonomiesAssociated,
 } from 'utils/entities';
 
 export const selectViewEntity = createSelector(
@@ -23,11 +24,11 @@ export const selectViewEntity = createSelector(
 
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'measure_categories'),
   (id, taxonomies, categories, associations) =>
-    prepareTaxonomiesIsAssociated(taxonomies, categories, associations, 'tags_measures', 'measure_id', id)
+    prepareTaxonomiesAssociated(taxonomies, categories, associations, 'tags_measures', 'measure_id', id)
   );
 
 export const selectRecommendationsAssociated = createSelector(
@@ -124,7 +125,7 @@ export const selectIndicators = createSelector(
         )
         .map((association) => association.getIn(['attributes', 'measure_id']))
       )
-      .set('sdgtargets', indicatorTargets
+      .set('sdgtargets', ENABLE_SDGS && indicatorTargets
         .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'indicator_id']), indicator.get('id'))
           && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])

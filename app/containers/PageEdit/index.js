@@ -28,7 +28,8 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -41,13 +42,17 @@ import {
   saveErrorDismiss,
   } from 'containers/App/actions';
 
-import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectReadyForAuthCheck,
+  selectIsUserAdmin,
+} from 'containers/App/selectors';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -74,8 +79,10 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     }
     // repopulate if new data becomes ready
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.redirectIfNotPermitted();
       this.props.initialiseForm('pageEdit.form.data', this.getInitialFormData(nextProps));
+    }
+    if (nextProps.authReady && !this.props.authReady) {
+      this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
       scrollToTop(this.ScrollContainer);
@@ -149,19 +156,21 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
             }
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
           {deleteError &&
-            <ErrorMessages error={deleteError} />
+            <Messages type="error" messages={deleteError} />
           }
           {(saveSending || deleteSending || !dataReady) &&
             <Loading />
@@ -213,6 +222,7 @@ PageEdit.propTypes = {
   handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   viewEntity: PropTypes.object,
@@ -228,6 +238,7 @@ const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   isUserAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
 });
 
@@ -237,7 +248,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
+      dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
@@ -259,7 +270,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(formData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath(`/pages/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.PAGES}/${props.params.id}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

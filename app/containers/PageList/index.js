@@ -13,6 +13,7 @@ import { List, fromJS } from 'immutable';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
+import { PATHS } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
 
@@ -92,7 +93,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
-      dispatch(updatePath('/pages/new/'));
+      dispatch(updatePath(`${PATHS.PAGES}${PATHS.NEW}`, { replace: true }));
     },
   };
 }

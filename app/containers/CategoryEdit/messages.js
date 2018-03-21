@@ -7,15 +7,15 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.CategoryEdit.pageTitle',
+    id: 'app.containers.CategoryEdit.pageTitle',
     defaultMessage: 'Edit Category',
   },
   pageTitleTaxonomy: {
-    id: 'app.container.CategoryEdit.pageTitleTaxonomy',
+    id: 'app.containers.CategoryEdit.pageTitleTaxonomy',
     defaultMessage: 'Edit {taxonomy}',
   },
   metaDescription: {
-    id: 'app.container.CategoryEdit.metaDescription',
+    id: 'app.containers.CategoryEdit.metaDescription',
     defaultMessage: 'Edit Category page description',
   },
   header: {
@@ -25,13 +25,5 @@ export default defineMessages({
   notFound: {
     id: 'app.containers.CategoryEdit.notFound',
     defaultMessage: 'Sorry no category found',
-  },
-  loading: {
-    id: 'app.containers.CategoryEdit.loading',
-    defaultMessage: 'Loading category...',
-  },
-  fieldRequired: {
-    id: 'app.containers.CategoryEdit.header',
-    defaultMessage: 'Required',
   },
 });

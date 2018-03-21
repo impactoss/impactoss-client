@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 export default styled.a`
+  cursor:${(props) => props.disabled ? 'default' : 'pointer'};
   display: inline-flex;
   padding: 0.25em 1em;
   text-decoration: none;

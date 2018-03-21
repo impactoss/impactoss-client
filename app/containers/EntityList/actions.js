@@ -20,8 +20,17 @@ import {
   PAGE_ITEM_CHANGE,
   SORTBY_CHANGE,
   SORTORDER_CHANGE,
+  PATH_CHANGE,
+  DISMISS_ERROR,
+  RESET_SEARCH_QUERY,
 } from './constants';
 
+export function setClientPath(path) {
+  return {
+    type: PATH_CHANGE,
+    path,
+  };
+}
 export function showPanel(activePanel) {
   return {
     type: SHOW_PANEL,
@@ -48,9 +57,10 @@ export function deleteConnection(data) {
   };
 }
 
-export function resetState() {
+export function resetState(path) {
   return {
     type: RESET_STATE,
+    path,
   };
 }
 
@@ -78,6 +88,13 @@ export function updateQuery(value) {
   return {
     type: UPDATE_QUERY,
     value,
+  };
+}
+
+export function resetSearchQuery(values) {
+  return {
+    type: RESET_SEARCH_QUERY,
+    values,
   };
 }
 
@@ -120,5 +137,12 @@ export function updateSortOrder(order) {
   return {
     type: SORTORDER_CHANGE,
     order,
+  };
+}
+
+export function dismissError(key) {
+  return {
+    type: DISMISS_ERROR,
+    key,
   };
 }

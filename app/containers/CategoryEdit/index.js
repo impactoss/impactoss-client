@@ -27,6 +27,7 @@ import {
   getFormField,
   getConnectionUpdatesFromFormData,
   getCheckboxField,
+  getStatusField,
 } from 'utils/forms';
 
 import {
@@ -38,7 +39,8 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -54,14 +56,15 @@ import {
 
 import {
   selectReady,
+  selectReadyForAuthCheck,
   selectIsUserAdmin,
 } from 'containers/App/selectors';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -93,8 +96,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       this.props.loadEntitiesIfNeeded();
     }
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.redirectIfNotPermitted();
       this.props.initialiseForm('categoryEdit.form.data', this.getInitialFormData(nextProps));
+    }
+    if (nextProps.authReady && !this.props.authReady) {
+      this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
       scrollToTop(this.ScrollContainer);
@@ -133,6 +138,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
   getHeaderAsideFields = (entity) => {
     const fields = []; // fieldGroups
+    fields.push({
+      fields: [
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
+        getMetaField(entity, appMessages),
+      ],
+    });
     if (entity.getIn(['taxonomy', 'attributes', 'tags_users'])) {
       fields.push({
         fields: [
@@ -145,9 +156,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         ],
       });
     }
-    fields.push({
-      fields: [getMetaField(entity, appMessages)],
-    });
     return fields;
   }
 
@@ -198,6 +206,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     return fields;
   }
 
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+
   render() {
     const { viewEntity, dataReady, isAdmin, viewDomain, users, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption } = this.props;
     const reference = this.props.params.id;
@@ -206,7 +216,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (viewEntity && viewEntity.get('taxonomy')) {
       pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
-        taxonomy: viewEntity.getIn(['taxonomy', 'attributes', 'title']),
+        taxonomy: this.getTaxTitle(viewEntity.getIn(['taxonomy', 'id'])),
       });
     }
 
@@ -236,19 +246,21 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             }
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
           {deleteError &&
-            <ErrorMessages error={deleteError} />
+            <Messages type="error" messages={deleteError} />
           }
           {(saveSending || deleteSending || !dataReady) &&
             <Loading />
@@ -319,6 +331,7 @@ CategoryEdit.propTypes = {
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
@@ -339,6 +352,7 @@ const mapStateToProps = (state, props) => ({
   isAdmin: selectIsUserAdmin(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
   users: selectUsers(state),
   sdgtargets: selectSdgTargets(state, props.params.id),
@@ -353,7 +367,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
@@ -420,7 +434,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`/category/${reference}`));
+      dispatch(updatePath(`${PATHS.CATEGORIES}/${reference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

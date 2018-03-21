@@ -4,13 +4,13 @@ import { reduce } from 'lodash/collection';
 export const lowerCase = (str) =>
   loCase(str).replace('un', 'UN').replace('hr', 'HR').replace('upr', 'UPR').replace('sdg', 'SDG');
 
-
 export const getPathFromUrl = (url) => url.split(/[?#]/)[0];
 
 export const getFilenameFromUrl = (url) => url.split('/').pop();
 
 export const cleanupSearchTarget = (str) =>
   loCase(str)
+    .replace(/[’]/, '\'')
     .replace(/[ā]/, 'a')
     .replace(/[ē]/, 'e')
     .replace(/[ī]/, 'i')
@@ -37,9 +37,9 @@ export const truncateText = (text, limit, keepWords = true) => {
       truncated = truncated.length > 0 ? `${truncated} ${word}` : word;
     }
     // check if really truncated (not a given as we accept full words)
-    return text.length > truncated.length
-      ? `${truncated}\u2026`
-      : text;
+    return text.length > truncated.length ? `${truncated}\u2026` : text;
   }
   return text;
 };
+
+export const startsWith = (str, searchString) => str.substr(0, searchString.length) === searchString;

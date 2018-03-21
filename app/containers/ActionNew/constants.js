@@ -3,28 +3,12 @@
  * ActionNew constants
  *
  */
+import { ENABLE_SDGS } from 'themes/config';
 
-import { fromJS } from 'immutable';
+export const SAVE = 'impactoss/ActionNew/SAVE';
 
-export const SAVE = 'nmrf/ActionNew/SAVE';
-
-export const FORM_INITIAL = fromJS({
-  attributes: {
-    title: '',
-    description: '',
-    draft: true,
-    target_date: '',
-    target_date_comment: '',
-    outcome: '',
-    indicator_summary: '',
-  },
-  associatedTaxonomies: {},
-  associatedRecommendations: [],
-  associatedIndicators: [],
-  associatedSdgTargets: [],
-});
-
-export const DEPENDENCIES = [
+export const DEPENDENCIES = ENABLE_SDGS
+? [
   'user_roles',
   'categories',
   'taxonomies',
@@ -33,4 +17,12 @@ export const DEPENDENCIES = [
   'sdgtargets',
   'recommendation_categories',
   'sdgtarget_categories',
+]
+: [
+  'user_roles',
+  'categories',
+  'taxonomies',
+  'recommendations',
+  'indicators',
+  'recommendation_categories',
 ];

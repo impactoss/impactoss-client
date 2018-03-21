@@ -1,10 +1,12 @@
 import { createSelector } from 'reselect';
+import { ENABLE_SDGS } from 'themes/config';
 
 import {
   selectEntity,
   selectEntities,
   selectRecommendationsCategorised,
   selectSdgTargetsCategorised,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import {
@@ -26,7 +28,7 @@ export const selectViewEntity = createSelector(
 );
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'measure_categories'),
   (id, taxonomies, categories, associations) =>
@@ -34,10 +36,11 @@ export const selectTaxonomies = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations', 'tags_sdgtargets'])
+  (taxonomies, categories) => ENABLE_SDGS
+    ? prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations', 'tags_sdgtargets'])
+    : prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations'])
 );
 
 

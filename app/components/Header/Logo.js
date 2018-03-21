@@ -4,8 +4,11 @@ import NormalImg from 'components/Img';
 
 const Logo = styled(NormalImg)`
   float:left;
-  width: 105px;
-  margin: 0 0 0 16px;
+  padding-left: 16px;
+  height:${(props) => props.theme.sizes.header.banner.height}px;
 `;
 
 export default Logo;
+
+// TODO @tmfrnz config
+// padding

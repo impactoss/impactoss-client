@@ -22,7 +22,7 @@ import {
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -174,10 +174,10 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: () => {
-      dispatch(updatePath(`/reports/edit/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}${PATHS.EDIT}/${props.params.id}`, { replace: true }));
     },
     handleClose: (indicatorId) => {
-      dispatch(closeEntity(`/indicators/${indicatorId}`));
+      dispatch(closeEntity(`${PATHS.INDICATORS}/${indicatorId}`));
     },
   };
 }

@@ -1,4 +1,7 @@
-export const DEPENDENCIES = [
+import { ENABLE_SDGS } from 'themes/config';
+
+export const DEPENDENCIES = ENABLE_SDGS
+? [
   'user_roles',
   'categories',
   'taxonomies',
@@ -10,6 +13,16 @@ export const DEPENDENCIES = [
   'sdgtarget_categories',
   'sdgtarget_measures',
   'sdgtargets',
+]
+: [
+  'user_roles',
+  'categories',
+  'taxonomies',
+  'recommendation_categories',
+  'recommendations',
+  'measure_categories',
+  'recommendation_measures',
+  'measures',
 ];
 
 export const TAXONOMY_DEFAULT = 1;
@@ -42,4 +55,4 @@ export const SORT_OPTIONS = [
   },
 ];
 
-export const SORT_CHANGE = 'nmrf/CategoryList/SORT_CHANGE';
+export const SORT_CHANGE = 'impactoss/CategoryList/SORT_CHANGE';

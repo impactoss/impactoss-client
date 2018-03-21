@@ -7,28 +7,29 @@ import ButtonDefault from 'components/buttons/ButtonDefault';
 import Icon from 'components/Icon';
 
 const Button = styled(ButtonDefault)`
-  padding: 0.25em 1.25em;
+  padding: 0.3em 1.5em 0.2em;
   width: ${(props) => props.fullWidth ? '100%' : 'auto'};
   min-height: 3em;
   text-align: ${(props) => props.align};
   text-transform: ${(props) => props.uppercase ? 'uppercase' : 'none'};
   font-weight: ${(props) => props.strong ? 'bold' : 'normal'};
-  font-size: 0.85em;
-  border: ${(props) => props.border ? '1px solid' : 0};
+  border: 1px solid;
   border-color: ${(props) => props.border ? palette(props.border.palette, props.border.pIndex) : 'transparent'};
+  font-size: 0.85em;
 `;
+// font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 
-const Title = styled.span`
-  padding-right: 0;
-  padding-left: 0;
-  position: relative;
-  top: 0.05em;
-`;
+// const Title = styled.span`
+//   padding-right: 0;
+//   padding-left: 0;
+//   position: relative;
+//   top: 0.05em;
+// `;
 
 class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong, border } = this.props;
+    const { icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong, border, outline } = this.props;
     return (
       <Button
         onClick={onClick}
@@ -39,14 +40,11 @@ class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line
         strong={strong}
         title={title}
         border={border}
+        outline={outline}
       >
-        { iconRight &&
-          <Title iconRight>{title}</Title>
-        }
+        { iconRight && title }
         <Icon name={icon} text textRight={iconRight} textLeft={!iconRight} />
-        { !iconRight &&
-          <Title>{title}</Title>
-        }
+        { !iconRight && title }
       </Button>
     );
   }
@@ -60,6 +58,7 @@ ButtonDefaultWithIcon.propTypes = {
   disabled: PropTypes.bool,
   inactive: PropTypes.bool,
   strong: PropTypes.bool,
+  outline: PropTypes.bool,
   align: PropTypes.string,
   border: PropTypes.object,
 };

@@ -1,8 +1,10 @@
 import styled from 'styled-components';
 
 export default styled.h1`
-  font-family: ${(props) => props.theme.fonts.headerBrandMain};
-  font-size: ${(props) => props.theme.sizes.headerBrandMain};
-  margin: 8px 0 0 0;
+  font-family: ${(props) => props.theme.fonts.title};
+  font-size: ${(props) => props.theme.sizes.header.text.title};
+  margin: 0;
 `;
+// TODO @tmfrnz config
+// text-transform
 // text-transform: uppercase;

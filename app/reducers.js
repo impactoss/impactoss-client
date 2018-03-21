@@ -7,6 +7,7 @@ import { combineReducers } from 'redux-immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import { browserHistory } from 'react-router';
 
+import { LOGOUT_SUCCESS } from 'containers/App/constants';
 import globalReducer from 'containers/App/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import entityNewReducer from 'containers/EntityNew/reducer';
@@ -21,7 +22,11 @@ import entityListFormReducer from 'containers/EntityListForm/reducer';
  *
  */
 // Initial routing state
-const routeInitialState = fromJS({ locationBeforeTransitions: browserHistory.getCurrentLocation() });
+const routeInitialState = fromJS({
+  locationBeforeTransitions: Object.assign(browserHistory.getCurrentLocation(), {
+    pathnamePrevious: '',
+  }),
+});
 
 /**
  * Merge route into the global application state and remember previous route
@@ -29,13 +34,16 @@ const routeInitialState = fromJS({ locationBeforeTransitions: browserHistory.get
 function routeReducer(state = routeInitialState, action) {
   switch (action.type) {
     /* istanbul ignore next */
-    case LOCATION_CHANGE:
+    case LOGOUT_SUCCESS:
+      return routeInitialState;
+    case LOCATION_CHANGE: {
       return state.merge({
         locationBeforeTransitions: {
           ...action.payload,
           pathnamePrevious: state.getIn(['locationBeforeTransitions', 'pathname']),
         },
       });
+    }
     default:
       return state;
   }

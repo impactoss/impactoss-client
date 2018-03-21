@@ -7,23 +7,27 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   home: {
-    id: 'nmrf.components.Header.home',
+    id: 'app.components.Header.home',
     defaultMessage: 'Home',
   },
   login: {
-    id: 'nmrf.components.Header.login',
+    id: 'app.components.Header.login',
     defaultMessage: 'Sign in',
   },
   logout: {
-    id: 'nmrf.components.Header.logout',
+    id: 'app.components.Header.logout',
     defaultMessage: 'Sign out',
   },
   user: {
-    id: 'nmrf.components.Header.user',
+    id: 'app.components.Header.user',
     defaultMessage: 'User profile',
   },
+  userLoading: {
+    id: 'app.components.Header.userLoading',
+    defaultMessage: 'Signing in...',
+  },
   register: {
-    id: 'nmrf.components.Header.register',
+    id: 'app.components.Header.register',
     defaultMessage: 'Register',
   },
 });

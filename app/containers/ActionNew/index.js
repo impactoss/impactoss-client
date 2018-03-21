@@ -12,25 +12,15 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List } from 'immutable';
 
-import {
-  renderRecommendationControl,
-  renderSdgTargetControl,
-  renderIndicatorControl,
-  renderTaxonomyControl,
-  getTitleFormField,
-  getStatusField,
-  getMarkdownField,
-  getDateField,
-  getFormField,
-} from 'utils/forms';
+import { getFields } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
-import appMessages from 'containers/App/messages';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
 
 import {
   loadEntitiesIfNeeded,
@@ -45,16 +35,19 @@ import {
 import {
   selectEntities,
   selectReady,
+  selectReadyForAuthCheck,
   selectSdgTargetsCategorised,
   selectRecommendationsCategorised,
   selectMeasureTaxonomies,
 } from 'containers/App/selectors';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
+
+import { getInitialFormData } from 'utils/entities';
 
 import {
   selectDomain,
@@ -62,14 +55,14 @@ import {
 } from './selectors';
 
 import messages from './messages';
-import { DEPENDENCIES, FORM_INITIAL } from './constants';
+import { DEPENDENCIES } from './constants';
 import { save } from './actions';
 
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('measureNew.form.data', FORM_INITIAL);
+    this.props.initialiseForm('measureNew.form.data', getInitialFormData(MEASURE_SHAPE));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -77,67 +70,13 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
       scrollToTop(this.ScrollContainer);
     }
   }
-
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage, appMessages),
-      ],
-    },
-  ]);
-
-  getHeaderAsideFields = () => ([
-    {
-      fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages),
-      ],
-    },
-  ]);
-
-  getBodyMainFields = (connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption) => ([
-    {
-      fields: [
-        getMarkdownField(this.context.intl.formatMessage, appMessages),
-        getMarkdownField(this.context.intl.formatMessage, appMessages, 'outcome'),
-        getMarkdownField(this.context.intl.formatMessage, appMessages, 'indicator_summary'),
-      ],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
-        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
-        renderIndicatorControl(indicators, onCreateOption),
-      ],
-    },
-  ]);
-
-  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getDateField(this.context.intl.formatMessage, appMessages, 'target_date'),
-        getFormField({
-          formatMessage: this.context.intl.formatMessage,
-          appMessages,
-          controlType: 'textarea',
-          attribute: 'target_date_comment',
-        }),
-      ],
-    },
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
-      icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies, onCreateOption),
-    },
-  ]);
 
   render() {
     const { dataReady, viewDomain, connectedTaxonomies, recommendations, indicators, taxonomies, sdgtargets, onCreateOption } = this.props;
@@ -171,14 +110,16 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             }
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
@@ -194,16 +135,18 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(),
+              fields={getFields({
+                associations: {
+                  taxonomies,
+                  connectedTaxonomies,
+                  recommendations,
+                  indicators,
+                  sdgtargets,
                 },
-                body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption),
-                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
-                },
-              }}
+                onCreateOption,
+                shape: MEASURE_SHAPE,
+                formatMessage: this.context.intl.formatMessage,
+              })}
             />
           }
           {saveSending &&
@@ -225,6 +168,7 @@ ActionNew.propTypes = {
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
@@ -242,6 +186,7 @@ ActionNew.contextTypes = {
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
+  authReady: selectReadyForAuthCheck(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectMeasureTaxonomies(state),
   sdgtargets: selectSdgTargetsCategorised(state),
@@ -260,7 +205,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
@@ -328,7 +273,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath('/actions'));
+      dispatch(updatePath(PATHS.MEASURES), { replace: true });
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

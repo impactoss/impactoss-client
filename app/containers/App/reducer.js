@@ -14,6 +14,8 @@ import { fromJS } from 'immutable';
 
 import { checkResponseError } from 'utils/request';
 import { isSignedIn } from 'utils/api-request';
+import { DB_TABLES } from 'themes/config';
+
 import {
   AUTHENTICATE_SENDING,
   AUTHENTICATE_SUCCESS,
@@ -30,7 +32,6 @@ import {
   ENTITIES_REQUESTED,
   INVALIDATE_ENTITIES,
   DUEDATE_ASSIGNED,
-  DB_TABLES,
   OPEN_NEW_ENTITY_MODAL,
 } from './constants';
 
@@ -61,9 +62,7 @@ const initialState = fromJS({
 function appReducer(state = initialState, payload) {
   switch (payload.type) {
     case LOGOUT_SUCCESS:
-      return state
-          .setIn(['user', 'attributes'], null)
-          .setIn(['user', 'isSignedIn'], false);
+      return initialState.setIn(['user', 'isSignedIn'], false);
     case AUTHENTICATE_SUCCESS:
       return state
           .setIn(['user', 'attributes'], payload.user)

@@ -20,7 +20,8 @@ import {
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -29,8 +30,8 @@ import EntityView from 'components/EntityView';
 
 import {
   selectReady,
-  selectIsUserManager,
   selectSessionUserId,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -56,28 +57,37 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     }
   }
 
-  getButtons = () => {
-    const userId = this.props.user.get('id') || this.props.user.getIn(['attributes', 'id']);
-    const edit = {
-      type: 'edit',
-      onClick: () => this.props.handleEdit(userId),
-    };
-    const close = {
-      type: 'close',
-      onClick: this.props.handleClose,
-    };
-    if (userId === this.props.sessionUserId) {
-      return [
-        {
-          type: 'edit',
-          title: this.context.intl.formatMessage(messages.editPassword),
-          onClick: () => this.props.handleEditPassword(userId),
-        },
-        edit,
-        close,
-      ];
+  getButtons = ({
+    user,
+    sessionUserId,
+    sessionUserHighestRoleId,
+    handleEdit,
+    handleClose,
+    handleEditPassword,
+  }) => {
+    const userId = user.get('id') || user.getIn(['attributes', 'id']);
+    const buttons = [];
+    if (userId === sessionUserId) {
+      buttons.push({
+        type: 'edit',
+        title: this.context.intl.formatMessage(messages.editPassword),
+        onClick: () => handleEditPassword(userId),
+      });
     }
-    return [edit, close];
+    if (sessionUserHighestRoleId === USER_ROLES.ADMIN.value // is admin
+      || userId === sessionUserId // own profile
+      || sessionUserHighestRoleId < this.getHighestUserRoleId(user.get('roles'))
+    ) {
+      buttons.push({
+        type: 'edit',
+        onClick: () => handleEdit(userId),
+      });
+    }
+    buttons.push({
+      type: 'close',
+      onClick: handleClose,
+    });
+    return buttons;
   };
 
   getHeaderMainFields = (entity, isManager) => ([{ // fieldGroup
@@ -86,7 +96,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
   getHeaderAsideFields = (entity) => ([{
     fields: [
-      getRoleField(entity, this.context.intl.formatMessage, appMessages),
+      getRoleField(entity),
       getMetaField(entity, appMessages),
     ],
   }]);
@@ -97,15 +107,20 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
   getBodyAsideFields = (taxonomies) => ([
     { // fieldGroup
-      label: appMessages.entities.taxonomies.plural,
-      icon: 'categories',
       fields: getTaxonomyFields(taxonomies, appMessages),
     },
   ]);
 
-  render() {
-    const { user, dataReady, isManager, taxonomies } = this.props;
+  // only show the highest rated role (lower role ids means higher)
+  getHighestUserRoleId = (roles) =>
+    roles.reduce((memo, role) =>
+      (role.get('id') < memo) ? role.get('id') : memo
+      , USER_ROLES.DEFAULT.value
+    );
 
+  render() {
+    const { user, dataReady, sessionUserHighestRoleId, taxonomies } = this.props;
+    const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
     return (
       <div>
         <Helmet
@@ -119,7 +134,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="users"
-            buttons={user && this.getButtons()}
+            buttons={user && this.getButtons(this.props)}
           />
           { !user && !dataReady &&
             <Loading />
@@ -151,14 +166,14 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
 UserView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  handleEdit: PropTypes.func,
-  handleEditPassword: PropTypes.func,
-  handleClose: PropTypes.func,
+  // handleEdit: PropTypes.func,
+  // handleEditPassword: PropTypes.func,
+  // handleClose: PropTypes.func,
   user: PropTypes.object,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
-  isManager: PropTypes.bool,
-  sessionUserId: PropTypes.string,
+  sessionUserHighestRoleId: PropTypes.number,
+  // sessionUserId: PropTypes.string,
 };
 
 UserView.contextTypes = {
@@ -166,7 +181,7 @@ UserView.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  isManager: selectIsUserManager(state),
+  sessionUserHighestRoleId: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   sessionUserId: selectSessionUserId(state),
   user: selectViewEntity(state, props.params.id),
@@ -180,13 +195,13 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: (userId) => {
-      dispatch(updatePath(`/users/edit/${userId}`));
+      dispatch(updatePath(`${PATHS.USERS}${PATHS.EDIT}/${userId}`, { replace: true }));
     },
     handleEditPassword: (userId) => {
-      dispatch(updatePath(`/users/password/${userId}`));
+      dispatch(updatePath(`${PATHS.USERS}${PATHS.PASSWORD}/${userId}`, { replace: true }));
     },
     handleClose: () => {
-      dispatch(closeEntity('/users'));
+      dispatch(closeEntity(PATHS.USERS));
     },
   };
 }

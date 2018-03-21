@@ -10,16 +10,16 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fromJS } from 'immutable';
-import { mapToTaxonomyList } from 'utils/taxonomies';
+import { mapToTaxonomyList, getDefaultTaxonomy } from 'utils/taxonomies';
 
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
-  selectEntities,
+  selectTaxonomiesSorted,
   selectReady,
   selectIsUserManager,
 } from 'containers/App/selectors';
-import { CONTENT_LIST } from 'containers/App/constants';
+import { PATHS, CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 // components
@@ -32,6 +32,7 @@ import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import CategoryListItems from 'components/categoryList/CategoryListItems';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
+import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
 // relative
 import messages from './messages';
@@ -45,37 +46,55 @@ const Content = styled.div`
 const UsersOnly = styled.h4`
   margin-top: 4em;
 `;
-
+const Description = styled.p`
+  margin-bottom: 2em;
+  font-size: 1em;
+  line-height: 1.4em;
+`;
 export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   // make sure to load all data from server
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+    // redirect to default taxonomy if needed
+    if (this.props.dataReady && typeof this.props.taxonomy === 'undefined') {
+      this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(this.props.taxonomies).get('id'));
+    }
   }
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
+    // redirect to default taxonomy if needed
+    if (nextProps.dataReady && typeof nextProps.taxonomy === 'undefined') {
+      this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(nextProps.taxonomies).get('id'));
+    }
   }
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+  getTaxDescription = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].description);
+  getTaxButtonTitle = (id) => this.context.intl.formatMessage(
+    appMessages.entities.taxonomies[id].shortSingle || appMessages.entities.taxonomies[id].single
+  );
 
   render() {
-    const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, params } = this.props;
-    const reference = typeof params.id !== 'undefined' ? params.id : '1';
-    const contentTitle = this.getTaxTitle(reference);
+    const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, onTaxonomyLink } = this.props;
+    const reference = taxonomy && taxonomy.get('id');
+    const contentTitle = typeof reference !== 'undefined' ? this.getTaxTitle(reference) : '';
+    const contentDescription = typeof reference !== 'undefined' && this.getTaxDescription(reference);
 
-    const buttons = dataReady && isManager
+    const buttons = dataReady && isManager && typeof reference !== 'undefined'
       ? [{
         type: 'add',
-        title: this.context.intl.formatMessage(messages.add),
+        title: this.context.intl.formatMessage(messages.add, { category: this.getTaxButtonTitle(reference) }),
         onClick: () => this.props.handleNew(reference),
       }]
       : null;
 
     // //
-    // console.log('categoryList render')
-    // // console.log(listColumns)
+    // console.log('categoryList render', this.props)
+    // dataReady && console.log('getDefaultTaxonomy', getDefaultTaxonomy(taxonomies).get('id'))
+
     const userCategories = categories ? categories.filter((cat) => cat.getIn(['attributes', 'user_only'])) : null;
     const hasUserCategories = isManager && dataReady && userCategories && userCategories.size > 0;
 
@@ -89,9 +108,14 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         />
         <Sidebar>
           <Scrollable>
-            <TaxonomySidebar
-              taxonomies={mapToTaxonomyList(taxonomies, onPageLink, reference, false)}
-            />
+            { !dataReady &&
+              <EntityListSidebarLoading />
+            }
+            { dataReady && typeof reference !== 'undefined' &&
+              <TaxonomySidebar
+                taxonomies={mapToTaxonomyList(taxonomies.toList(), onTaxonomyLink, reference)}
+              />
+            }
           </Scrollable>
         </Sidebar>
         <ContainerWithSidebar>
@@ -104,6 +128,9 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 title={contentTitle}
                 buttons={buttons}
               />
+              { contentDescription &&
+                <Description>{contentDescription}</Description>
+              }
               { !dataReady &&
                 <Loading />
               }
@@ -132,7 +159,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                   onPageLink={onPageLink}
                   onSort={this.props.onSort}
                   sortOptions={SORT_OPTIONS}
-                  sortBy={this.props.location.query && this.props.location.query.sort}
+                  sortBy={'title'}
                   sortOrder={this.props.location.query && this.props.location.query.order}
                   userOnly
                 />
@@ -146,7 +173,9 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
 }
 CategoryList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  redirectToDefaultTaxonomy: PropTypes.func,
   onPageLink: PropTypes.func,
+  onTaxonomyLink: PropTypes.func,
   onSort: PropTypes.func,
   handleNew: PropTypes.func,
   taxonomy: PropTypes.object,
@@ -154,7 +183,6 @@ CategoryList.propTypes = {
   categories: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
-  params: PropTypes.object,
   location: PropTypes.object,
 };
 
@@ -165,7 +193,7 @@ CategoryList.contextTypes = {
 const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectEntities(state, 'taxonomies'),
+  taxonomies: selectTaxonomiesSorted(state),
   taxonomy: selectTaxonomy(state, { id: props.params.id }),
   categories: selectCategories(
     state,
@@ -181,11 +209,17 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
+    redirectToDefaultTaxonomy: (taxonomyId) => {
+      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyId}`, { replace: true }));
+    },
     handleNew: (taxonomyId) => {
-      dispatch(updatePath(`/categories/${taxonomyId}/new`));
+      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyId}${PATHS.NEW}`, { replace: true }));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));
+    },
+    onTaxonomyLink: (path) => {
+      dispatch(updatePath(path, { keepQuery: true }));
     },
     onSort: (sort, order) => {
       dispatch(updateSort({ sort, order }));

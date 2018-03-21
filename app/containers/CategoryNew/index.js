@@ -24,6 +24,7 @@ import {
   getFormField,
   getConnectionUpdatesFromFormData,
   getCheckboxField,
+  getStatusField,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -31,7 +32,9 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
+
 import appMessages from 'containers/App/messages';
 
 import {
@@ -46,6 +49,7 @@ import {
 
 import {
   selectReady,
+  selectReadyForAuthCheck,
   selectIsUserAdmin,
   selectEntity,
   selectMeasuresCategorised,
@@ -53,11 +57,11 @@ import {
   selectRecommendationsCategorised,
 } from 'containers/App/selectors';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -82,7 +86,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
@@ -102,6 +106,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
   getHeaderAsideFields = (taxonomy) => {
     const fields = []; // fieldGroups
+    fields.push({
+      fields: [
+        getStatusField(this.context.intl.formatMessage, appMessages),
+      ],
+    });
     if (taxonomy.getIn(['attributes', 'tags_users'])) {
       fields.push({
         fields: [
@@ -161,6 +170,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return fields;
   }
 
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+
   render() {
     const { taxonomy, dataReady, isAdmin, viewDomain, users, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
@@ -169,7 +180,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (taxonomy && taxonomy.get('attributes')) {
       pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
-        taxonomy: taxonomy.getIn(['attributes', 'title']),
+        taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     }
 
@@ -196,19 +207,22 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('categoryNew.form.data'),
               }] : null
             }
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
@@ -219,6 +233,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             <EntityForm
               model="categoryNew.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 measures,
@@ -264,6 +279,7 @@ CategoryNew.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleUpdate: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
   viewDomain: PropTypes.object,
   taxonomy: PropTypes.object,
@@ -287,6 +303,7 @@ const mapStateToProps = (state, props) => ({
   isAdmin: selectIsUserAdmin(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   taxonomy: selectEntity(state, { path: 'taxonomies', id: props.params.id }),
   users: selectUsers(state),
   measures: selectMeasuresCategorised(state),
@@ -305,7 +322,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
@@ -371,7 +388,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (taxonomyReference) => {
-      dispatch(updatePath(`/categories/${taxonomyReference}`));
+      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyReference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

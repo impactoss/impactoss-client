@@ -6,13 +6,14 @@ import {
   selectMeasuresCategorised,
   selectSdgTargetsCategorised,
   selectRecommendationsCategorised,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
-import { USER_ROLES } from 'containers/App/constants';
+import { USER_ROLES, ENABLE_SDGS } from 'themes/config';
 
 import {
   prepareCategory,
-  usersSetRoles,
+  usersByRole,
   entitiesSetAssociated,
   prepareTaxonomiesMultiple,
 } from 'utils/entities';
@@ -25,7 +26,7 @@ export const selectDomain = createSelector(
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
   (state) => selectEntities(state, 'users'),
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies)
 );
 
@@ -33,7 +34,7 @@ export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
   (entities, associations) =>
-    usersSetRoles(entities, associations, USER_ROLES.MANAGER)
+    usersByRole(entities, associations, USER_ROLES.MANAGER.value)
 );
 
 export const selectMeasures = createSelector(
@@ -61,8 +62,9 @@ export const selectRecommendations = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_sdgtargets', 'tags_recommendations'])
+  (taxonomies, categories) => ENABLE_SDGS
+    ? prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_sdgtargets', 'tags_recommendations'])
+    : prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
 );

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router';
 
+import { TEXT_TRUNCATE } from 'themes/config';
 import { truncateText } from 'utils/string';
 
 import appMessages from 'containers/App/messages';
@@ -22,7 +23,7 @@ class LinkField extends React.PureComponent { // eslint-disable-line react/prefe
         { !field.internal &&
           <Url target="_blank" href={field.value} title={field.anchor || field.value}>
             {field.aside
-              ? truncateText(field.anchor || field.value, field.length || 30, false)
+              ? truncateText(field.anchor || field.value, field.length || TEXT_TRUNCATE.LINK_FIELD, false)
               : field.anchor || field.value
             }
           </Url>
@@ -30,7 +31,7 @@ class LinkField extends React.PureComponent { // eslint-disable-line react/prefe
         { field.internal &&
           <Link to={field.value} title={field.anchor || field.value}>
             {field.aside
-              ? truncateText(field.anchor || field.value, field.length || 30, false)
+              ? truncateText(field.anchor || field.value, field.length || TEXT_TRUNCATE.LINK_FIELD, false)
               : field.anchor || field.value
             }
           </Link>

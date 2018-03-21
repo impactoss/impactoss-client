@@ -7,15 +7,15 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.UserLogout.pageTitle',
+    id: 'app.containers.UserLogout.pageTitle',
     defaultMessage: 'Logging out',
   },
   metaDescription: {
-    id: 'app.container.UserLogout.metaDescription',
+    id: 'app.containers.UserLogout.metaDescription',
     defaultMessage: 'Log out page description',
   },
   header: {
-    id: 'nmrf.containers.LogoutPage.header',
+    id: 'app.containers.LogoutPage.header',
     defaultMessage: 'You are being logged out...',
   },
 

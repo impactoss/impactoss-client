@@ -12,7 +12,7 @@ export default defineMessages({
   },
   add: {
     id: 'app.containers.CategoryList.add',
-    defaultMessage: 'Add category',
+    defaultMessage: 'Add {category}',
   },
   metaDescription: {
     id: 'app.containers.CategoryList.metaDescription',

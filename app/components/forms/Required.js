@@ -2,12 +2,10 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const Required = styled.span`
-  color: ${palette('secondary', 3)};
+  color: ${palette('primary', 1)};
   font-weight: bold;
-  font-size: 2em;
-  padding-left: 5px;
-  position: absolute;
-  top: -0.25em;
+  font-size: 1.3em;
+  padding-left: 3px;
 `;
 
 export default Required;

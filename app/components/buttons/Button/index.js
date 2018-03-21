@@ -8,7 +8,7 @@ const Button = styled.button`
   display: inline-block;
   padding: 6px 12px;
   cursor:${(props) => props.disabled ? 'default' : 'pointer'};
-  font-size:1em;
+  font-size: 1em;
   text-align: center;
   vertical-align: middle;
   -ms-touch-action: manipulation;
@@ -19,6 +19,7 @@ const Button = styled.button`
   user-select: none;
   background-image: none;
   border: none;
+  border-radius: 0;
 `;
 
 export default Button;

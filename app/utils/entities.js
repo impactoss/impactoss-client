@@ -1,9 +1,12 @@
-import { Map } from 'immutable';
-import { reduce } from 'lodash/collection';
+import { Map, List, fromJS } from 'immutable';
+
+import { TEXT_TRUNCATE } from 'themes/config';
+import { find, reduce } from 'lodash/collection';
 
 import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
 import asList from 'utils/as-list';
 import isNumber from 'utils/is-number';
+import appMessage from 'utils/app-message';
 
 // check if entity has nested connection by id
 export const testEntityEntityAssociation = (entity, path, associatedId) =>
@@ -53,7 +56,7 @@ export const getConnectedCategories = (entityConnectedIds, taxonomyCategories, p
 // filter entities by absence of association either by taxonomy id or connection type
 // assumes prior nesting of relationships
 export const filterEntitiesWithoutAssociation = (entities, categories, query) =>
-  entities.filter((entity) =>
+  entities && entities.filter((entity) =>
     asList(query).reduce((passing, pathOrTax) =>
       passing && !(isNumber(pathOrTax)
         ? testEntityTaxonomyAssociation(entity, categories, parseInt(pathOrTax, 10))
@@ -65,7 +68,7 @@ export const filterEntitiesWithoutAssociation = (entities, categories, query) =>
 // filter entities by association with one or more categories
 // assumes prior nesting of relationships
 export const filterEntitiesByCategories = (entities, query) =>
-  entities.filter((entity) =>
+  entities && entities.filter((entity) =>
     asList(query).reduce((passing, categoryId) =>
       passing && testEntityCategoryAssociation(entity, parseInt(categoryId, 10))
     , true)
@@ -74,7 +77,7 @@ export const filterEntitiesByCategories = (entities, query) =>
 // filter entities by association with one or more categories
 // assumes prior nesting of relationships
 export const filterEntitiesByConnectedCategories = (entities, connections, query) =>
-  entities.filter((entity) =>
+  entities && entities.filter((entity) =>
     asList(query).reduce((passing, queryArg) => {
       const pathValue = queryArg.split(':');
       const path = pathValue[0];
@@ -96,7 +99,7 @@ export const filterEntitiesByConnectedCategories = (entities, connections, query
 // filter entities by by association with one or more entities of specific connection type
 // assumes prior nesting of relationships
 export const filterEntitiesByConnection = (entities, query) =>
-  entities.filter((entity) =>
+  entities && entities.filter((entity) =>
     asList(query).reduce((passing, queryArg) => {
       const pathValue = queryArg.split(':');
       const path = pathValue[0];
@@ -108,7 +111,7 @@ export const filterEntitiesByConnection = (entities, query) =>
 
 // query is object not string!
 export const filterEntitiesByAttributes = (entities, query) =>
-  entities.filter((entity) =>
+  entities && entities.filter((entity) =>
     reduce(query, (passing, value, attribute) =>
       // TODO if !passing return false, no point going further
       passing && ((attribute === 'id')
@@ -120,7 +123,7 @@ export const filterEntitiesByAttributes = (entities, query) =>
 export const filterEntitiesByKeywords = (entities, query, searchAttributes) => {
   try {
     const regex = new RegExp(regExMultipleWords(query), 'i');
-    return entities.filter((entity) =>
+    return entities && entities.filter((entity) =>
       regex.test(prepareEntitySearchTarget(entity, searchAttributes, query.length))
     );
   } catch (e) {
@@ -143,13 +146,13 @@ export const entitiesSetAssociated = (entities, entityKey, associations, associa
   entities && entities.map((entity) =>
     entitySetAssociated(entity, entityKey, associations, associationKey, associationId));
 
-export const entitySetAssociated = (entity, entityKey, associations, associationKey, associationId) =>
-  entity.set('associated',
-    associations.find((association) =>
-      attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id'))
-      && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
-    )
+export const entitySetAssociated = (entity, entityKey, associations, associationKey, associationId) => {
+  const entityAssociation = associations.find((association) =>
+    attributesEqual(association.getIn(['attributes', entityKey]), entity.get('id'))
+    && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
   );
+  return entity.set('associated', entityAssociation || false);
+};
 
 export const entitiesIsAssociated = (entities, entityKey, associations, associationKey, associationId) =>
   entities && associations && entities.filter((entity) =>
@@ -224,7 +227,7 @@ export const prepareCategory = (category, users, taxonomies) =>
     users
   );
 
-export const usersSetRoles = (users, userRoles, roleId) =>
+export const usersByRole = (users, userRoles, roleId) =>
   users && users
   .filter((user) => {
     const roles = userRoles.filter((association) =>
@@ -234,10 +237,15 @@ export const usersSetRoles = (users, userRoles, roleId) =>
     return roles && roles.size > 0;
   });
 
-export const getEntityTitle = (entity) =>
-  entity.getIn(['attributes', 'title'])
-  || entity.getIn(['attributes', 'friendly_name'])
-  || entity.getIn(['attributes', 'name']);
+export const getEntityTitle = (entity, labels, contextIntl) => {
+  if (labels && contextIntl) {
+    const label = find(labels, { value: parseInt(entity.get('id'), 10) });
+    if (label && label.message) {
+      return appMessage(contextIntl, label.message);
+    }
+  }
+  return entity.getIn(['attributes', 'title']) || entity.getIn(['attributes', 'name']);
+};
 
 export const getEntityReference = (entity, defaultToId = true) =>
   defaultToId
@@ -251,5 +259,42 @@ export const getCategoryShortTitle = (category) =>
     category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
       ? category.getIn(['attributes', 'short_title'])
       : category.getIn(['attributes', 'title']) || category.getIn(['attributes', 'name']),
-    10
+    TEXT_TRUNCATE.ENTITY_TAG
   );
+
+
+const getInitialValue = (field) =>
+  typeof field.default !== 'undefined' ? field.default : '';
+
+export const getInitialFormData = (shape) => {
+  let fields = fromJS({
+    id: '',
+    attributes: {},
+  });
+  if (shape.fields) {
+    fields = reduce(shape.fields, (memo, field) =>
+      field.disabled ? memo : memo.setIn(['attributes', field.attribute], getInitialValue(field))
+    , fields);
+  }
+  if (shape.taxonomies) {
+    fields = fields.set('associatedTaxonomies', Map());
+  }
+  if (shape.connections) {
+    fields = reduce(shape.connections.tables, (memo, table) => {
+      if (table.table === 'recommendations') {
+        return fields.set('associatedRecommendations', List());
+      }
+      if (table.table === 'indicators') {
+        return fields.set('associatedIndicators', List());
+      }
+      if (table.table === 'measures') {
+        return fields.set('associatedMeasures', List());
+      }
+      if (table.table === 'sdgtargets') {
+        return fields.set('associatedSdgTargets', List());
+      }
+      return memo;
+    }, fields);
+  }
+  return fields;
+};

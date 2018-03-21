@@ -5,13 +5,16 @@ import styled from 'styled-components';
 import { mapToCategoryList } from 'utils/taxonomies';
 import { getSortOption } from 'utils/sort';
 
+import CategoryListKey from 'components/categoryList/CategoryListKey';
 import CategoryListHeader from 'components/categoryList/CategoryListHeader';
 import CategoryListItem from 'components/categoryList/CategoryListItem';
 
 import { SORT_ORDER_OPTIONS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
-const Styled = styled.div``;
+const Styled = styled.div`
+  position: relative;
+`;
 const CategoryListBody = styled.div`
   padding-top: 1em
 `;
@@ -22,39 +25,39 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     const attributes = [];
     if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
       attributes.push({
-        attribute: 'recommendations',
-        attributePublic: 'recommendationsPublic',
-        attributeAccepted: 'recommendationsAccepted',
+        total: 'recommendationsTotal',
+        public: 'recommendations',
+        accepted: 'recommendationsAccepted',
         label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
       });
       if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
         attributes.push({
           via: this.context.intl.formatMessage(appMessages.entities.connected),
-          attribute: 'measures',
-          attributePublic: 'measuresPublic',
+          total: 'measuresTotal',
+          public: 'measures',
           label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
         });
       }
     }
     if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
       attributes.push({
-        attribute: 'sdgtargets',
-        attributePublic: 'sdgtargetsPublic',
+        total: 'sdgtargetsTotal',
+        public: 'sdgtargets',
         label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
       });
       if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
         attributes.push({
           via: this.context.intl.formatMessage(appMessages.entities.connected),
-          attribute: 'measures',
-          attributePublic: 'measuresPublic',
+          total: 'measuresTotal',
+          public: 'measures',
           label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
         });
       }
     }
     if (taxonomy.getIn(['attributes', 'tags_measures'])) {
       attributes.push({
-        attribute: 'measures',
-        attributePublic: 'measuresPublic',
+        total: 'measuresTotal',
+        public: 'measures',
         label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
       });
     }
@@ -93,7 +96,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       },
     ];
     return columns.concat(countAttributes.map((attribute, i) => {
-      const columnSortOption = sortOptions.find((option) => option.query === attribute.attribute);
+      const columnSortOption = sortOptions.find((option) => option.query === attribute.public);
       const columnActive = columnSortOption.query === sortOptionActive.query;
       const columnSortOrderOption = SORT_ORDER_OPTIONS.find((option) => (sortOrder || columnSortOption.order) === option.value);
       return {
@@ -101,9 +104,23 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         header: attribute.label,
         via: attribute.via,
         width: ((1 - TITLE_COL_RATIO) / countAttributes.length) * 100,
-        maxCount: this.getCategoryMaxCount(categories, attribute.attribute),
+        maxCount: this.getCategoryMaxCount(categories, attribute.public),
         countsIndex: i,
-        entity: attribute.attribute,
+        entity: attribute.public,
+        key: attribute.accepted !== null && typeof attribute.accepted !== 'undefined'
+        ? [
+          {
+            label: this.context.intl.formatMessage(appMessages.ui.acceptedStatuses.accepted),
+            palette: attribute.public,
+            pIndex: 0,
+          },
+          {
+            label: this.context.intl.formatMessage(appMessages.ui.acceptedStatuses.noted),
+            palette: attribute.public,
+            pIndex: 1,
+          },
+        ]
+        : null,
         sortIcon: columnActive && columnSortOrderOption
           ? columnSortOrderOption.icon
           : 'sorting',
@@ -142,9 +159,9 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       sortOrder,
       onSort,
     });
-
     return (
       <Styled>
+        <CategoryListKey columns={columns} />
         <CategoryListHeader columns={columns} />
         <CategoryListBody>
           {categoriesMapped.map((cat, i) =>

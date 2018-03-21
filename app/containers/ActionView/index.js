@@ -10,23 +10,12 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
-import {
-  getIdField,
-  getTitleField,
-  getTextField,
-  getStatusField,
-  getMetaField,
-  getMarkdownField,
-  getDateField,
-  getIndicatorConnectionField,
-  getRecommendationConnectionField,
-  getSdgTargetConnectionField,
-  getTaxonomyFields,
-} from 'utils/fields';
+import { getFields } from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { MEASURE_SHAPE, USER_ROLES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -35,7 +24,7 @@ import EntityView from 'components/EntityView';
 
 import {
   selectReady,
-  selectIsUserManager,
+  selectHasUserRole,
   selectRecommendationTaxonomies,
   selectSdgTargetTaxonomies,
   selectRecommendationConnections,
@@ -43,7 +32,6 @@ import {
   selectIndicatorConnections,
 } from 'containers/App/selectors';
 
-import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import {
@@ -67,74 +55,12 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       this.props.loadEntitiesIfNeeded();
     }
   }
-  getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getIdField(entity),
-        getTitleField(entity, isManager),
-      ],
-    },
-  ]);
-  getHeaderAsideFields = (entity) => ([
-    {
-      fields: [
-        getStatusField(entity),
-        getMetaField(entity, appMessages),
-      ],
-    },
-  ]);
-  getBodyMainFields = (
-    entity,
-    recommendations,
-    indicators,
-    recTaxonomies,
-    sdgtargets,
-    sdgtargetTaxonomies,
-    onEntityClick,
-    recConnections,
-    indicatorConnections,
-    sdgtargetConnections,
-  ) => ([
-    {
-      fields: [
-        getMarkdownField(entity, 'description', true, appMessages),
-        getMarkdownField(entity, 'outcome', true, appMessages),
-        getMarkdownField(entity, 'indicator_summary', true, appMessages),
-      ],
-    },
-    {
-      label: appMessages.entities.connections.plural,
-      icon: 'connections',
-      fields: [
-        getIndicatorConnectionField(indicators, indicatorConnections, appMessages, onEntityClick),
-        getRecommendationConnectionField(recommendations, recTaxonomies, recConnections, appMessages, onEntityClick),
-        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, appMessages, onEntityClick),
-      ],
-    },
-  ]);
-
-  getBodyAsideFields = (entity, taxonomies) => ([
-    // fieldGroup
-    {
-      type: 'dark',
-      fields: [
-        getDateField(entity, 'target_date', appMessages, true),
-        getTextField(entity, 'target_date_comment', appMessages),
-      ],
-    },
-    { // fieldGroup
-      label: appMessages.entities.taxonomies.plural,
-      icon: 'categories',
-      fields: getTaxonomyFields(taxonomies, appMessages),
-    },
-  ]);
-
 
   render() {
     const {
       viewEntity,
       dataReady,
-      isManager,
+      hasUserRole,
       recommendations,
       indicators,
       taxonomies,
@@ -146,10 +72,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       sdgtargetConnections,
       indicatorConnections,
     } = this.props;
-    // viewEntity && console.log(viewEntity.toJS())
-    // indicators && console.log(indicators.toJS())
-    // console.log('ActionView.render', dataReady)
-    const buttons = isManager
+
+    const buttons = hasUserRole[USER_ROLES.ADMIN.value]
     ? [
       {
         type: 'edit',
@@ -190,27 +114,23 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           }
           { viewEntity && dataReady &&
             <EntityView
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(viewEntity, isManager),
-                  aside: isManager ? this.getHeaderAsideFields(viewEntity) : null,
+              fields={getFields({
+                entity: viewEntity,
+                hasUserRole,
+                associations: {
+                  taxonomies,
+                  recommendations,
+                  recTaxonomies,
+                  recConnections,
+                  indicators,
+                  indicatorConnections,
+                  sdgtargets,
+                  sdgtargetTaxonomies,
+                  sdgtargetConnections,
                 },
-                body: {
-                  main: this.getBodyMainFields(
-                    viewEntity,
-                    recommendations,
-                    indicators,
-                    recTaxonomies,
-                    sdgtargets,
-                    sdgtargetTaxonomies,
-                    onEntityClick,
-                    recConnections,
-                    indicatorConnections,
-                    sdgtargetConnections,
-                  ),
-                  aside: this.getBodyAsideFields(viewEntity, taxonomies),
-                },
-              }}
+                onEntityClick,
+                shape: MEASURE_SHAPE,
+              })}
             />
           }
         </Content>
@@ -226,7 +146,7 @@ ActionView.propTypes = {
   onEntityClick: PropTypes.func,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
-  isManager: PropTypes.bool,
+  hasUserRole: PropTypes.object,
   taxonomies: PropTypes.object,
   recTaxonomies: PropTypes.object,
   recommendations: PropTypes.object,
@@ -245,7 +165,7 @@ ActionView.contextTypes = {
 
 
 const mapStateToProps = (state, props) => ({
-  isManager: selectIsUserManager(state),
+  hasUserRole: selectHasUserRole(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
@@ -268,10 +188,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (measureId) => {
-      dispatch(updatePath(`/actions/edit/${measureId}`));
+      dispatch(updatePath(`${PATHS.MEASURES}${PATHS.EDIT}/${measureId}`, { replace: true }));
     },
     handleClose: () => {
-      dispatch(closeEntity('/actions'));
+      dispatch(closeEntity(PATHS.MEASURES));
     },
   };
 }

@@ -11,5 +11,7 @@ const ButtonHero = styled(ButtonDefault)`
     background-color: ${palette('secondary', 1)};
   }
 `;
+// TODO @tmfrnz config
+// background-color
 
 export default ButtonHero;

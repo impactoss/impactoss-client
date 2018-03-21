@@ -1,25 +1,19 @@
-import { API_ENDPOINT } from '../containers/App/constants';
+import { ENDPOINTS, KEYS } from 'themes/config';
 import request from './request';
 import { get, set } from './session-storage';
 
-const KEY_ACCESS_TOKEN = 'access-token';
-const KEY_TOKEN_TYPE = 'token-type';
-const KEY_CLIENT = 'client';
-const KEY_EXPIRY = 'expiry';
-const KEY_UID = 'uid';
-
 // We will look for these headers, and save them to localStorage
-const authKeys = [
-  KEY_ACCESS_TOKEN,
-  KEY_TOKEN_TYPE,
-  KEY_CLIENT,
-  KEY_UID,
-  KEY_EXPIRY,
+const AUTH_KEYS = [
+  KEYS.ACCESS_TOKEN,
+  KEYS.TOKEN_TYPE,
+  KEYS.CLIENT,
+  KEYS.UID,
+  KEYS.EXPIRY,
 ];
 
 // Look at each authKey in session-storage, if found add to returned object
 export function getAuthValues() {
-  return authKeys.reduce((headers, key) => {
+  return AUTH_KEYS.reduce((headers, key) => {
     const value = get(key);
     return value ? { // value found in storage, add it to the headers object
       ...headers,
@@ -32,7 +26,7 @@ export function getAuthValues() {
 // Look at each authKey, if its in the response header save it to session-storage
 // This method will be passed as the middleware param to `request`
 function saveAuthHeaders(response) {
-  authKeys.forEach((key) => {
+  AUTH_KEYS.forEach((key) => {
     const headerValue = response.headers.get(key);
     if (headerValue) {
       set(key, headerValue);
@@ -43,7 +37,7 @@ function saveAuthHeaders(response) {
 }
 
 export function clearAuthValues() {
-  authKeys.forEach((key) => {
+  AUTH_KEYS.forEach((key) => {
     set(key, null);
   });
 }
@@ -53,10 +47,10 @@ function addAuthHeaders(headers = {}) {
   const authValues = getAuthValues();
 
   // If we have access-token in session-storage going to presume we have the rest
-  return 'access-token' in authValues ? {
+  return KEYS.ACCESS_TOKEN in authValues ? {
     ...headers,
     ...authValues,
-    authorization: `Bearer ${authValues[KEY_ACCESS_TOKEN]}`,
+    authorization: `Bearer ${authValues[KEYS.ACCESS_TOKEN]}`,
   }
   : headers; // can't find access-token, no auth headers to add
 }
@@ -82,12 +76,12 @@ function urlParamify(params = {}) {
 }
 
 export function isSignedIn() {
-  return !!get(KEY_ACCESS_TOKEN);
+  return !!get(KEYS.ACCESS_TOKEN);
 }
 
 export default function apiRequest(method, action, params = {}, headerArgs = {}) {
   const headers = getHeaders(headerArgs);
-  let url = `${API_ENDPOINT}/${action}`;
+  let url = `${ENDPOINTS.API}/${action}`;
   let options = {
     method,
     headers,

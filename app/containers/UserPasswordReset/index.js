@@ -10,7 +10,12 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import ErrorMessages from 'components/ErrorMessages';
+import {
+  getPasswordField,
+  getPasswordConfirmationField,
+} from 'utils/forms';
+
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
@@ -30,7 +35,6 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
   }
   render() {
     const { resetSending, resetError } = this.props.viewDomain.page;
-    const required = (val) => val && val.length;
 
     return (
       <div>
@@ -48,7 +52,7 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
           {resetError &&
-            <ErrorMessages error={resetError} />
+            <Messages type="error" messages={resetError.messages} />
           }
           {resetSending &&
             <Loading />
@@ -61,32 +65,8 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
               handleCancel={this.props.handleCancel}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
               fields={[
-                {
-                  id: 'password',
-                  controlType: 'input',
-                  model: '.password',
-                  type: 'password',
-                  placeholder: this.context.intl.formatMessage(messages.fields.password.placeholder),
-                  validators: {
-                    required,
-                  },
-                  errorMessages: {
-                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-                  },
-                },
-                {
-                  id: 'passwordConfirmation',
-                  controlType: 'input',
-                  model: '.passwordConfirmation',
-                  type: 'password',
-                  placeholder: this.context.intl.formatMessage(messages.fields.passwordConfirmation.placeholder),
-                  validators: {
-                    required,
-                  },
-                  errorMessages: {
-                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-                  },
-                },
+                getPasswordField(this.context.intl.formatMessage, appMessages, '.password'),
+                getPasswordConfirmationField(this.context.intl.formatMessage, appMessages, '.passwordConfirmation'),
               ]}
             />
           }

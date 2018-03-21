@@ -20,6 +20,7 @@ import {
   getStatusField,
   getMarkdownField,
   getUploadField,
+  getDueDateDateOptions,
 } from 'utils/forms';
 
 import {
@@ -29,7 +30,8 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -42,13 +44,17 @@ import {
   saveErrorDismiss,
 } from 'containers/App/actions';
 
-import { selectReady, selectIsUserAdmin } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectReadyForAuthCheck,
+  selectIsUserAdmin,
+} from 'containers/App/selectors';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -76,8 +82,10 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     }
 
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.redirectIfNotPermitted();
       this.props.initialiseForm('reportEdit.form.data', this.getInitialFormData(nextProps));
+    }
+    if (nextProps.authReady && !this.props.authReady) {
+      this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
       scrollToTop(this.ScrollContainer);
@@ -88,9 +96,10 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     const props = nextProps || this.props;
     const { viewEntity } = props;
     let attributes = viewEntity.get('attributes');
-    if (attributes.get('due_date_id')) {
-      attributes = attributes.set('due_date_id', attributes.get('due_date_id').toString());
-    }
+    attributes = attributes.set('due_date_id', attributes.get('due_date_id')
+      ? attributes.get('due_date_id').toString()
+      : '0'
+    );
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
@@ -136,11 +145,15 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         [getDueDateOptionsField(
           this.context.intl.formatMessage,
           appMessages,
-          this.context.intl.formatDate,
-          entity.getIn(['indicator', 'dates']),
-          entity.getIn(['attributes', 'due_date_id'])
-            ? entity.getIn(['attributes', 'due_date_id']).toString()
-            : '0',
+          getDueDateDateOptions(
+            entity.getIn(['indicator', 'dates']),
+            this.context.intl.formatMessage,
+            appMessages,
+            this.context.intl.formatDate,
+            entity.getIn(['attributes', 'due_date_id'])
+              ? entity.getIn(['attributes', 'due_date_id']).toString()
+              : '0',
+          ),
         )],
     },
   ]);
@@ -152,12 +165,14 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (viewEntity && dataReady) {
-      pageTitle = `${pageTitle} for indicator ${viewEntity.getIn(['attributes', 'indicator_id'])}`;
+      pageTitle = this.context.intl.formatMessage(messages.pageTitleReference, {
+        indicatorReference: viewEntity.getIn(['attributes', 'indicator_id']),
+      });
     }
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={pageTitle}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
@@ -180,19 +195,21 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             }
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
           {deleteError &&
-            <ErrorMessages error={deleteError} />
+            <Messages type="error" messages={deleteError} />
           }
           {(saveSending || deleteSending || !dataReady) &&
             <Loading />
@@ -249,6 +266,7 @@ ReportEdit.propTypes = {
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
@@ -263,6 +281,7 @@ const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   isUserAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
 });
 
@@ -275,7 +294,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('indicators'));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR));
+      dispatch(redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
@@ -311,7 +330,7 @@ function mapDispatchToProps(dispatch, props) {
       ));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`/reports/${reference}`));
+      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}/${reference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
@@ -320,7 +339,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(deleteEntity({
         path: 'progress_reports',
         id: props.params.id,
-        redirect: `indicators/${indicatorId}`,
+        redirect: `${PATHS.INDICATORS}/${indicatorId}`,
       }));
     },
   };

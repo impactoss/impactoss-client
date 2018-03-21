@@ -18,7 +18,7 @@ import {
   // closeEntity
 } from 'containers/App/actions';
 
-import { CONTENT_PAGE } from 'containers/App/constants';
+import { PATHS, CONTENT_PAGE } from 'containers/App/constants';
 
 import Footer from 'components/Footer';
 import Loading from 'components/Loading';
@@ -45,7 +45,7 @@ import { selectViewEntity } from './selectors';
 import { DEPENDENCIES } from './constants';
 
 const Styled = styled(ContainerWrapper)`
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('primary', 4)}
 `;
 
 const ViewContainer = styled(Container)`
@@ -121,7 +121,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
             { page && dataReady &&
               <EntityView
                 fields={this.getFields(page, isContributor)}
-                seemless
+                seamless
               />
             }
           </ViewContainer>
@@ -161,11 +161,8 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: () => {
-      dispatch(updatePath(`/pages/edit/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.PAGES}${PATHS.EDIT}/${props.params.id}`, { replace: true }));
     },
-    // handleClose: () => {
-    //   dispatch(closeEntity('/pages'));
-    // },
   };
 }
 

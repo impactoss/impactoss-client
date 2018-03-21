@@ -7,7 +7,12 @@ import { Form, actions as formActions } from 'react-redux-form/immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import { lowerCase } from 'utils/string';
+import appMessage from 'utils/app-message';
+
+import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import MultiSelectControl from 'components/forms/MultiSelectControl';
+
 import {
   FILTER_FORM_MODEL,
 } from './constants';
@@ -15,20 +20,22 @@ import {
   setFilter,
 } from './actions';
 
+const Styled = styled(ContainerWithSidebar)`
+  z-index: 99;
+  background-color: rgba(0,0,0,0.2);
+`;
+
 const FormWrapper = styled.div`
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 100%;
-  min-width: ${(props) => props.wide ? 700 : 350}px;
+  left: 0;
+  width: ${(props) => props.wide ? 700 : 350}px;
   background: ${palette('primary', 4)};
   overflow: hidden;
-  border-left: 1px solid ${palette('light', 2)};
-  border-right: 1px solid ${palette('light', 2)};
-  border-bottom: 1px solid ${palette('light', 2)};
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
-  z-index:-1;
 `;
+// z-index:-1;
 
 class EntityListForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -44,35 +51,54 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
   }
 
   render() {
-    const { model, onSubmit, onCancel, buttons, formOptions, activeOptionId } = this.props;
+    const { model, onSubmit, onCancel, buttons, formOptions, activeOptionId, showCancelButton } = this.props;
+    let formTitle;
+    if (formOptions.message) {
+      formTitle = formOptions.messagePrefix
+        ? `${formOptions.messagePrefix} ${lowerCase(appMessage(this.context.intl, formOptions.message))}`
+        : appMessage(this.context.intl, formOptions.message);
+    } else {
+      formTitle = formOptions.title;
+    }
 
     return (
-      <FormWrapper wide={formOptions.advanced}>
-        <Form
-          model={model}
-          onSubmit={onSubmit}
+      <Styled
+        onClick={(evt) => {
+          evt.preventDefault();
+          onCancel();
+        }}
+      >
+        <FormWrapper
+          wide={formOptions.advanced}
+          onClick={(evt) => evt.stopPropagation()}
         >
-          <MultiSelectControl
-            model=".values"
-            threeState
-            title={formOptions.title}
-            options={fromJS(formOptions.options).toList()}
-            multiple={formOptions.multiple}
-            required={formOptions.required}
-            search={formOptions.search}
-            advanced={formOptions.advanced}
-            selectAll={formOptions.multiple && formOptions.selectAll}
-            tagFilterGroups={formOptions.tagFilterGroups}
-            panelId={activeOptionId}
-            onCancel={onCancel}
-            onChange={(values) => {
-              this.props.onFormChange(values, model);
-              this.props.onSelect();
-            }}
-            buttons={buttons}
-          />
-        </Form>
-      </FormWrapper>
+          <Form
+            model={model}
+            onSubmit={onSubmit}
+          >
+            <MultiSelectControl
+              model=".values"
+              threeState
+              title={formTitle}
+              options={fromJS(formOptions.options).toList()}
+              multiple={formOptions.multiple}
+              required={formOptions.required}
+              search={formOptions.search}
+              advanced={formOptions.advanced}
+              closeOnClickOutside={false}
+              selectAll={formOptions.multiple && formOptions.selectAll}
+              tagFilterGroups={formOptions.tagFilterGroups}
+              panelId={activeOptionId}
+              onCancel={showCancelButton && onCancel ? onCancel : null}
+              onChange={(values) => {
+                this.props.onFormChange(values, model);
+                this.props.onSelect();
+              }}
+              buttons={buttons}
+            />
+          </Form>
+        </FormWrapper>
+      </Styled>
     );
   }
 }
@@ -87,6 +113,15 @@ EntityListForm.propTypes = {
   onCancel: PropTypes.func,
   buttons: PropTypes.array,
   activeOptionId: PropTypes.string,
+  showCancelButton: PropTypes.bool,
+};
+
+EntityListForm.defaultProps = {
+  showCancelButton: true,
+};
+
+EntityListForm.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({

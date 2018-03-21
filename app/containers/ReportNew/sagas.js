@@ -4,13 +4,14 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 import { newEntity, dueDateAssigned } from 'containers/App/actions';
 import { SAVE } from './constants';
 
-export function* save({ data }) {
+export function* save({ data, redirect, createAsGuest }) {
   yield put(newEntity({
     path: 'progress_reports',
     entity: data,
-    redirect: '/reports',
+    redirect,
+    createAsGuest,
   }));
-  if (data.attributes.due_date_id) {
+  if (data.attributes.due_date_id && !createAsGuest) {
     yield put(dueDateAssigned(data.attributes.due_date_id));
   }
 }

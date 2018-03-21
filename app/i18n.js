@@ -7,7 +7,7 @@
 import { addLocaleData } from 'react-intl';
 import enLocaleData from 'react-intl/locale-data/en';
 
-import { DEFAULT_LOCALE } from './containers/App/constants'; // eslint-disable-line
+import { DEFAULT_LOCALE } from 'themes/config'; // eslint-disable-line
 import enTranslationMessages from './translations/en-GB.json';
 
 export const appLocales = [

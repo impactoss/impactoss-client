@@ -5,7 +5,7 @@
  */
 import { fromJS } from 'immutable';
 
-export const SAVE = 'nmrf/RecommendationNew/SAVE';
+export const SAVE = 'impactoss/RecommendationNew/SAVE';
 
 export const DEPENDENCIES = [
   'user_roles',

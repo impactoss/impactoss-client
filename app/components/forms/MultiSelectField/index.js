@@ -10,21 +10,22 @@ import Button from 'components/buttons/Button';
 import A from 'components/styled/A';
 
 import Icon from 'components/Icon';
+import ItemStatus from 'components/ItemStatus';
 
 import MultiSelectControl from '../MultiSelectControl';
 import messages from './messages';
 
 const MultiSelectWrapper = styled.div`
   position: absolute;
-  top: 38px;
+  top: 0;
   right: 0;
-  height:450px;
+  height: 450px;
   width: 100%;
   min-width: 350px;
   overflow: hidden;
   display: block;
   z-index: 10;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 0)};
   border-left: 1px solid;
   border-right: 1px solid;
   border-bottom: 1px solid;
@@ -33,6 +34,7 @@ const MultiSelectWrapper = styled.div`
 `;
 const MultiSelectFieldWrapper = styled.div`
   position: relative;
+  padding: 10px 0;
 `;
 const MultiselectActiveOptions = styled.div`
   position: relative;
@@ -42,9 +44,10 @@ const MultiselectActiveOptionList = styled.div`
 `;
 const MultiselectActiveOptionListItem = styled.div`
   position: relative;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('mainListItem', 1)};
   border-bottom: 1px solid ${palette('light', 1)};
   padding: 12px 0 12px 16px;
+  line-height: 1.4;
 `;
 const MultiselectActiveOptionRemove = styled(Button)`
   position: absolute;
@@ -53,12 +56,13 @@ const MultiselectActiveOptionRemove = styled(Button)`
   display: block;
   padding: 0 16px;
   bottom: 0;
+  color: ${palette('link', 2)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('linkHover', 2)};
   }
 `;
 const MultiselectActiveOption = styled.div`
-  padding-right: 40px;
+  padding-right: 50px;
 `;
 const MultiSelectDropdownIcon = styled.div`
   position: absolute;
@@ -71,29 +75,32 @@ const MultiSelectDropdown = styled(Button)`
   width: 100%;
   font-size: 0.85em;
   text-align: left;
-  color: ${palette('dark', 0)};
-  background-color: ${palette('light', 1)};
+  color: ${palette('multiSelectFieldButton', 0)};
+  background-color: ${palette('multiSelectFieldButton', 1)};
   &:hover {
-    color: ${palette('dark', 0)}
-    background-color: ${palette('light', 2)}
+    color: ${palette('multiSelectFieldButtonHover', 0)};
+    background-color: ${palette('multiSelectFieldButtonHover', 1)}
   }
   padding: 12px 0 12px 16px;
 `;
 
 const MultiSelectWithout = styled.div`
   padding: 12px 0 12px 16px;
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
 `;
 const MultiSelectWithoutLink = styled(A)`
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
   &:hover {
-    color: ${palette('linkDefault', 1)};
+    color: ${palette('link', 0)};
   }
 `;
 
-const Id = styled.div`
-  font-weight: bold;
-  color: ${palette('dark', 3)}
+const Reference = styled.div`
+  color: ${palette('text', 1)};
+  &:hover {
+    color: ${palette('text', 0)};
+  }
+  font-size: 0.85em;
 `;
 
 const NON_CONTROL_PROPS = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages'];
@@ -151,8 +158,11 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
   renderMultiselectActiveOption = (option, field, i) => (
     <MultiselectActiveOptionListItem key={i}>
       <MultiselectActiveOption>
+        {option.get('draft') &&
+          <ItemStatus draft />
+        }
         { option.get('reference') &&
-          <Id>{option.get('reference')}</Id>
+          <Reference>{option.get('reference')}</Reference>
         }
         {option.get('label')}
       </MultiselectActiveOption>
@@ -213,16 +223,17 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
             <MultiSelectControl
               id={id}
               model={model || `.${id}`}
-              title={`Update ${lowerCase(field.label)}`}
+              title={this.context.intl.formatMessage(messages.update, { type: lowerCase(field.label) })}
               onCancel={this.onCloseMultiselect}
+              closeOnClickOutside={this.props.closeOnClickOutside}
               buttons={[
                 field.onCreate
-                ? {
-                  type: 'addFromMultiselect',
-                  position: 'left',
-                  onClick: field.onCreate,
-                }
-                : null,
+                  ? {
+                    type: 'addFromMultiselect',
+                    position: 'left',
+                    onClick: field.onCreate,
+                  }
+                  : null,
                 {
                   type: 'closeText',
                   onClick: this.onCloseMultiselect,
@@ -241,6 +252,11 @@ MultiSelectField.propTypes = {
   field: PropTypes.object,
   fieldData: PropTypes.object,
   handleUpdate: PropTypes.func,
+  closeOnClickOutside: PropTypes.bool,
+};
+
+MultiSelectField.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default MultiSelectField;

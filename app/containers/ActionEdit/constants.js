@@ -3,11 +3,11 @@
  * ActionEdit constants
  *
  */
-import { fromJS } from 'immutable';
+import { ENABLE_SDGS } from 'themes/config';
+export const SAVE = 'impactoss/ActionEdit/SAVE';
 
-export const SAVE = 'nmrf/ActionEdit/SAVE';
-
-export const DEPENDENCIES = [
+export const DEPENDENCIES = ENABLE_SDGS
+? [
   'user_roles',
   'measures',
   'users',
@@ -22,21 +22,17 @@ export const DEPENDENCIES = [
   'sdgtarget_measures',
   'recommendation_categories',
   'sdgtarget_categories',
+]
+: [
+  'user_roles',
+  'measures',
+  'users',
+  'categories',
+  'taxonomies',
+  'recommendations',
+  'recommendation_measures',
+  'measure_categories',
+  'indicators',
+  'measure_indicators',
+  'recommendation_categories',
 ];
-
-export const FORM_INITIAL = fromJS({
-  id: '',
-  attributes: {
-    title: '',
-    description: '',
-    draft: '',
-    target_date: '',
-    target_date_comment: '',
-    outcome: '',
-    indicator_summary: '',
-  },
-  associatedTaxonomies: {},
-  associatedRecommendations: [],
-  associatedIndicators: [],
-  associatedSdgTargets: [],
-});

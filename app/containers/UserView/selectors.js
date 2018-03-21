@@ -3,6 +3,7 @@ import { createSelector } from 'reselect';
 import {
   selectEntity,
   selectEntities,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import {
@@ -21,15 +22,14 @@ export const selectViewEntity = createSelector(
       'roles',
       userRoles
       .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
-      .map((association) => roles
-        .find((role) => attributesEqual(role.get('id'), association.getIn(['attributes', 'role_id'])))
+      .map((association) => roles.find((role) => attributesEqual(role.get('id'), association.getIn(['attributes', 'role_id'])))
       )
     )
 );
 
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'user_categories'),
   (id, taxonomies, categories, associations) =>

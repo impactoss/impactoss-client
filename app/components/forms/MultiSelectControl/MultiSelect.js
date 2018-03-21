@@ -27,23 +27,22 @@ import messages from './messages';
 const ButtonGroup = styled.div`
   float: ${(props) => props.left ? 'left' : 'right'}
 `;
-const ControlWrapper = styled.div``;
+// const ControlWrapper = styled.div``;
 
 const ChangeHint = styled.div`
   position: absolute;
   left: 0;
   right: 0;
   bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
-  background-color: ${palette('light', 0)};
-  color: ${palette('dark', 3)};
-  font-style: italic;
+  color: ${palette('text', 1)};
+  background-color: ${palette('background', 1)};
   padding: 0.5em 1em;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
   text-align: right;
 `;
 
 const ChangeHintHighlighted = styled.span`
-  color: ${palette('primary', 0)};
+  color: ${palette('buttonDefault', 1)};
 `;
 
 const ControlMain = styled.div`
@@ -61,19 +60,19 @@ const ControlFooter = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: ${palette('light', 0)};
+  background-color: ${palette('background', 1)};
   height: 50px;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
 `;
 
 const Search = styled.div`
-  padding: 0.5em 1em;
-  background-color: ${palette('light', 0)};
+  padding: 0.75em 1em;
+  background-color: ${palette('background', 1)};
 `;
 
 const SelectAll = styled.div`
   padding: 0.5em 1em 0.5em 0;
-  background-color: ${palette('light', 0)};
+  background-color: ${palette('background', 1)};
   display: table;
   width: 100%;
   line-height: 1.1;
@@ -83,7 +82,8 @@ const LabelWrap = styled.div`
   display: table-cell;
   padding-left: 0.5em;
   padding-right: 1em;
-  font-size: 0.9em;
+  font-size: 0.8em;
+  vertical-align: middle;
 `;
 const CheckboxWrap = styled.div`
   text-align: center;
@@ -91,13 +91,12 @@ const CheckboxWrap = styled.div`
   padding-left: 1em;
   padding-right: 0.5em;
   width: 10px;
+  vertical-align: middle;
 `;
 const Checkbox = styled(IndeterminateCheckbox)`
   vertical-align: middle;
 `;
-const Label = styled.label`
-  vertical-align: middle;
-`;
+const Label = styled.label``;
 
 
 class MultiSelect extends React.Component {
@@ -109,6 +108,9 @@ class MultiSelect extends React.Component {
       panelId: null,
       queryTags: [],
     };
+
+    this.setWrapperRef = this.setWrapperRef.bind(this);
+    this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
   componentWillMount() {
@@ -117,6 +119,7 @@ class MultiSelect extends React.Component {
       optionsInitial: this.props.options,
       panelId: this.props.panelId,
     });
+    document.addEventListener('mousedown', this.handleClickOutside);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -130,9 +133,19 @@ class MultiSelect extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
   onSearch = (value) => {
     this.setState({
       query: value,
+    });
+  }
+  onResetFilters = () => {
+    this.setState({
+      query: null,
+      queryTags: [],
     });
   }
   onTagSelected = (active, tagOption) => {
@@ -141,6 +154,10 @@ class MultiSelect extends React.Component {
         ? this.state.queryTags.concat([tagOption.get('value')])
         : without(this.state.queryTags, tagOption.get('value')),
     });
+  }
+
+  setWrapperRef(node) {
+    this.wrapperRef = node;
   }
 
   getNextValues = (checked, option) => {
@@ -203,6 +220,12 @@ class MultiSelect extends React.Component {
       return CHECKBOX_STATES.CHECKED;
     }
     return CHECKBOX_STATES.INDETERMINATE;
+  }
+
+  handleClickOutside(event) {
+    if (this.props.closeOnClickOutside && this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+      this.props.onCancel();
+    }
   }
 
   // props, state
@@ -302,7 +325,7 @@ class MultiSelect extends React.Component {
     const filteredOptionsSelected = options.filter((option) => option.get('checked') || this.isOptionIndeterminate(option));
 
     return (
-      <ControlWrapper>
+      <div ref={this.setWrapperRef}>
         <Header
           title={this.props.title}
           onCancel={this.props.onCancel}
@@ -316,6 +339,7 @@ class MultiSelect extends React.Component {
             <Search>
               <TagSearch
                 onSearch={this.onSearch}
+                onClear={this.onResetFilters}
                 filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}
                 searchQuery={this.state.query || ''}
                 multiselect
@@ -391,7 +415,7 @@ class MultiSelect extends React.Component {
             </ButtonGroup>
           </ControlFooter>
         }
-      </ControlWrapper>
+      </div>
     );
   }
 }
@@ -409,6 +433,7 @@ MultiSelect.propTypes = {
   search: PropTypes.bool,
   advanced: PropTypes.bool,
   selectAll: PropTypes.bool,
+  closeOnClickOutside: PropTypes.bool,
   panelId: PropTypes.string,
   tagFilterGroups: PropTypes.array,
 };
@@ -420,6 +445,7 @@ MultiSelect.defaultProps = {
   required: false,
   search: true,
   advanced: false,
+  closeOnClickOutside: true,
 };
 
 export default MultiSelect;

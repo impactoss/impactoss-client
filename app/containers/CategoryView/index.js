@@ -14,6 +14,7 @@ import {
   getReferenceField,
   getTitleField,
   getCategoryShortTitleField,
+  getStatusField,
   getMetaField,
   getMarkdownField,
   getLinkField,
@@ -25,7 +26,7 @@ import {
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -67,7 +68,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
   getHeaderMainFields = (entity, isManager) => ([
     { // fieldGroup
       fields: [
-        getReferenceField(entity),
+        getReferenceField(entity, isManager),
         getTitleField(entity, isManager),
         getCategoryShortTitleField(entity, isManager),
       ],
@@ -75,18 +76,22 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
   ]);
   getHeaderAsideFields = (entity, isManager) => {
     const fields = []; // fieldGroups
+    if (isManager) {
+      fields.push({
+        fields: [
+          getStatusField(entity),
+          getMetaField(entity, appMessages),
+        ],
+      });
+    }
     if (entity.getIn(['taxonomy', 'attributes', 'tags_users']) && entity.getIn(['attributes', 'user_only'])) {
       fields.push({
+        type: 'dark',
         fields: [{
           type: 'text',
           value: this.context.intl.formatMessage(appMessages.textValues.user_only),
           label: appMessages.attributes.user_only,
         }],
-      });
-    }
-    if (isManager) {
-      fields.push({
-        fields: [getMetaField(entity, appMessages)],
       });
     }
     return fields;
@@ -124,23 +129,28 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     return fields;
   };
 
-  getBodyAsideFields = (entity, isManager) => ([
-    (entity.getIn(['attributes', 'url']) &&
-    (entity.getIn(['attributes', 'url']).trim().length > 0)) &&
-      {
+  getBodyAsideFields = (entity, isManager) => {
+    const fields = [];
+    if (entity.getIn(['attributes', 'url']) && entity.getIn(['attributes', 'url']).trim().length > 0) {
+      fields.push({
         type: 'dark',
         fields: [getLinkField(entity)],
-      },
-    (isManager && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) &&
-      {
+      });
+    }
+    if (isManager && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
+      fields.push({
         type: 'dark',
         fields: [getManagerField(
           entity,
           appMessages.attributes.manager_id.categories,
           appMessages.attributes.manager_id.categoriesEmpty
         )],
-      },
-  ]);
+      });
+    }
+    return fields;
+  };
+
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
 
   render() {
     const {
@@ -178,7 +188,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (viewEntity && viewEntity.get('taxonomy')) {
-      pageTitle = viewEntity.getIn(['taxonomy', 'attributes', 'title']);
+      pageTitle = this.getTaxTitle(viewEntity.getIn(['taxonomy', 'id']));
     }
 
     return (
@@ -278,10 +288,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (categoryId) => {
-      dispatch(updatePath(`/category/edit/${categoryId}`));
+      dispatch(updatePath(`${PATHS.CATEGORIES}${PATHS.EDIT}/${categoryId}`, { replace: true }));
     },
     handleClose: (taxonomyId) => {
-      dispatch(closeEntity(`/categories/${taxonomyId}`));
+      dispatch(closeEntity(`${PATHS.TAXONOMIES}/${taxonomyId}`));
     },
   };
 }

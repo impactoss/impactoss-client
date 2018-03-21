@@ -21,7 +21,7 @@ export const getOptionSortCheckedValueMapper = (option) => {
   if (option.get('isIndeterminate')) {
     return -1;
   }
-  if (option.get('query') === 'without') {
+  if (option.get('query') === 'without' || (typeof option.get('value') === 'string' && option.get('value').slice(-5) === ':null')) {
     return 0;
   }
   return 1;

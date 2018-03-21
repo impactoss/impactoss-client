@@ -17,7 +17,9 @@ injectGlobal`
   button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
-
+  :focus, :visited:focus {
+    outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
+  }
   #app {
     background-color: #F5F6F6;
     min-height: 100%;
@@ -34,19 +36,19 @@ injectGlobal`
   }
   h1, h2, h3, h4, h5, h6 {
     line-height: 1.25;
-    font-weight: 700;
+    font-weight: 500;
     margin-top: 20px;
     margin-bottom: 10px;
   }
   h1 {
-    font-size: 2.5em;
+    font-weight: 700;
+    font-size: 2.6em;
   }
   h2 {
     font-size: 2.25em;
-    font-weight: 500;
   }
   h3 {
-    font-size: 1.7em;
+    font-size: 1.9em;
   }
   h4 {
     font-size: 1.5em;
@@ -61,7 +63,7 @@ injectGlobal`
 
   p {
     margin-top: 0;
-    margin-bottom:16px;
+    margin-bottom: 16px;
   }
 
   * {
@@ -101,10 +103,9 @@ injectGlobal`
     .react-markdown {
       p {
         &:first-child{
-          font-size: 1.75em;
-          line-height: 1.4em;
+          font-size: 1.5em;
           color: #6A7880;
-          padding-bottom: 15px;
+          padding-bottom: 20px;
         }
       }
     }
@@ -117,7 +118,6 @@ injectGlobal`
     right: 40px;
     bottom: 40px;
     border: 0;
-    background: #F5F6F6;
     overflow: auto;
     --webkit-overflow-scrolling: touch;
     border-radius: 0;
@@ -141,5 +141,9 @@ injectGlobal`
     vertical-align: middle;
     position: relative;
     bottom: 1px;
+  }
+
+  ._react-file-reader-input {
+    display: inline-block;
   }
 `;

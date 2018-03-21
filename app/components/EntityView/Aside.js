@@ -1,12 +1,11 @@
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
-import Section from './Section';
+import Main from './Main';
 
-const Aside = styled(Section)`
+const Aside = styled(Main)`
   width: 30%;
-  border-left: 1px solid ${palette('light', 0)};
-  margin: 0 -1px;
+  border-right-style: 'none';
+  border-bottom-style: ${(props) => props.bottom ? 'none' : 'solid'};
 `;
 
 export default Aside;

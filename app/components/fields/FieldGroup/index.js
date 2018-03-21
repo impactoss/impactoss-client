@@ -8,24 +8,24 @@ import FieldFactory from 'components/fields/FieldFactory';
 import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
 import FieldGroupLabel from 'components/fields/FieldGroupLabel';
 import GroupIcon from 'components/fields/GroupIcon';
-import Label from 'components/fields/Label';
+import GroupLabel from 'components/fields/GroupLabel';
 
 class FieldGroup extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { group, seemless } = this.props;
+    const { group, seamless } = this.props;
 
     return (
-      <FieldGroupWrapper type={group.type} seemless={seemless}>
+      <FieldGroupWrapper type={group.type} seamless={seamless}>
         { group.label &&
-          <FieldGroupLabel>
+          <FieldGroupLabel basic={group.type === 'smartTaxonomy'}>
+            <GroupLabel>
+              <FormattedMessage {...group.label} />
+            </GroupLabel>
             { group.icon &&
               <GroupIcon>
                 <Icon name={group.icon} />
               </GroupIcon>
             }
-            <Label>
-              <FormattedMessage {...group.label} />
-            </Label>
           </FieldGroupLabel>
         }
         {
@@ -40,7 +40,7 @@ class FieldGroup extends React.PureComponent { // eslint-disable-line react/pref
 }
 FieldGroup.propTypes = {
   group: PropTypes.object.isRequired,
-  seemless: PropTypes.bool,
+  seamless: PropTypes.bool,
   aside: PropTypes.bool,
 };
 

@@ -12,17 +12,28 @@ import Helmet from 'react-helmet';
 import styled from 'styled-components';
 import { actions as formActions } from 'react-redux-form/immutable';
 
+import {
+  getNameField,
+  getEmailField,
+  getPasswordField,
+  getPasswordConfirmationField,
+} from 'utils/forms';
+
 import Icon from 'components/Icon';
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
-import { updatePath } from 'containers/App/actions';
+import { selectQueryMessages } from 'containers/App/selectors';
+import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
 import appMessages from 'containers/App/messages';
+
+import { PATHS } from 'containers/App/constants';
+
 import messages from './messages';
 
 import { register } from './actions';
@@ -38,7 +49,6 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
   }
   render() {
     const { registerError, registerSending } = this.props.viewDomain.page;
-    const required = (val) => val && val.length;
 
     return (
       <div>
@@ -55,8 +65,18 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
           />
+          {this.props.queryMessages.info &&
+            <Messages
+              type="info"
+              onDismiss={this.props.onDismissQueryMessages}
+              messageKey={this.props.queryMessages.info}
+            />
+          }
           {registerError &&
-            <ErrorMessages error={registerError} />
+            <Messages
+              type="error"
+              messages={registerError.messages}
+            />
           }
           {registerSending &&
             <Loading />
@@ -69,56 +89,10 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
               handleCancel={this.props.handleCancel}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
               fields={[
-                {
-                  id: 'name',
-                  controlType: 'input',
-                  model: '.attributes.name',
-                  placeholder: this.context.intl.formatMessage(messages.fields.name.placeholder),
-                  validators: {
-                    required,
-                  },
-                  errorMessages: {
-                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-                  },
-                },
-                {
-                  id: 'email',
-                  controlType: 'input',
-                  model: '.attributes.email',
-                  placeholder: this.context.intl.formatMessage(messages.fields.email.placeholder),
-                  validators: {
-                    required,
-                  },
-                  errorMessages: {
-                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-                  },
-                },
-                {
-                  id: 'password',
-                  controlType: 'input',
-                  type: 'password',
-                  model: '.attributes.password',
-                  placeholder: this.context.intl.formatMessage(messages.fields.password.placeholder),
-                  validators: {
-                    required,
-                  },
-                  errorMessages: {
-                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-                  },
-                },
-                {
-                  id: 'passwordConfirmation',
-                  controlType: 'input',
-                  type: 'password',
-                  model: '.attributes.passwordConfirmation',
-                  placeholder: this.context.intl.formatMessage(messages.fields.passwordConfirmation.placeholder),
-                  validators: {
-                    required,
-                  },
-                  errorMessages: {
-                    required: this.context.intl.formatMessage(appMessages.forms.fieldRequired),
-                  },
-                },
+                getNameField(this.context.intl.formatMessage, appMessages),
+                getEmailField(this.context.intl.formatMessage, appMessages),
+                getPasswordField(this.context.intl.formatMessage, appMessages),
+                getPasswordConfirmationField(this.context.intl.formatMessage, appMessages),
               ]}
             />
           }
@@ -126,10 +100,10 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
             <p>
               <FormattedMessage {...messages.loginLinkBefore} />
               <A
-                href="/login"
+                href={PATHS.LOGIN}
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink('/login');
+                  this.props.handleLink(PATHS.LOGIN, { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.loginLink} />
@@ -149,6 +123,8 @@ UserRegister.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
   initialiseForm: PropTypes.func,
+  onDismissQueryMessages: PropTypes.func,
+  queryMessages: PropTypes.object,
 };
 
 UserRegister.contextTypes = {
@@ -157,6 +133,7 @@ UserRegister.contextTypes = {
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
+  queryMessages: selectQueryMessages(state),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -170,8 +147,11 @@ export function mapDispatchToProps(dispatch) {
     handleCancel: () => {
       dispatch(updatePath('/'));
     },
-    handleLink: (path) => {
-      dispatch(updatePath(path));
+    handleLink: (path, args) => {
+      dispatch(updatePath(path, args));
+    },
+    onDismissQueryMessages: () => {
+      dispatch(dismissQueryMessages());
     },
   };
 }

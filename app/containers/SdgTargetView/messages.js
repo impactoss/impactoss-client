@@ -7,11 +7,11 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.SdgTargetView.pageTitle',
+    id: 'app.containers.SdgTargetView.pageTitle',
     defaultMessage: 'SDG target',
   },
   metaDescription: {
-    id: 'app.container.SdgTargetView.metaDescription',
+    id: 'app.containers.SdgTargetView.metaDescription',
     defaultMessage: 'SDG target page description',
   },
   header: {

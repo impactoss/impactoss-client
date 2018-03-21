@@ -18,6 +18,7 @@ import {
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
+import { PATHS } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
 import { CONFIG, DEPENDENCIES } from './constants';
@@ -46,7 +47,7 @@ export class SdgTargetList extends React.PureComponent { // eslint-disable-line 
       icon: 'sdgtargets',
       actions: [{
         type: 'text',
-        title: 'Import',
+        title: this.context.intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       }, {
         type: 'add',
@@ -111,10 +112,10 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
-      dispatch(updatePath('/sdgtargets/new/'));
+      dispatch(updatePath(`${PATHS.SDG_TARGETS}${PATHS.NEW}`, { replace: true }));
     },
     handleImport: () => {
-      dispatch(updatePath('/sdgtargets/import/'));
+      dispatch(updatePath(`${PATHS.SDG_TARGETS}${PATHS.IMPORT}`));
     },
   };
 }

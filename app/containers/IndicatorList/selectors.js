@@ -2,6 +2,8 @@ import { createSelector } from 'reselect';
 import { Map } from 'immutable';
 import { reduce } from 'lodash/collection';
 
+import { ENABLE_SDGS } from 'themes/config';
+
 import {
   selectEntities,
   selectEntitiesSearchQuery,
@@ -12,6 +14,7 @@ import {
   selectSortByQuery,
   selectSortOrderQuery,
   selectExpandQuery,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import {
@@ -49,7 +52,7 @@ export const selectConnections = createSelector(
     )
     .set(
       'sdgtargets',
-      sdgtargets.map((sdgtarget) =>
+      ENABLE_SDGS && sdgtargets.map((sdgtarget) =>
         sdgtarget.set(
           'categories',
           sdgtargetCategories
@@ -64,7 +67,7 @@ export const selectConnections = createSelector(
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectConnections(state),
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'sdgtarget_categories'),
@@ -77,7 +80,7 @@ export const selectConnectedTaxonomies = createSelector(
         key: 'measure_id',
         associations: categoryMeasures,
       },
-      {
+      ENABLE_SDGS && {
         tags: 'tags_sdgtargets',
         path: 'sdgtargets',
         key: 'sdgtarget_id',
@@ -86,7 +89,8 @@ export const selectConnectedTaxonomies = createSelector(
     ], (connectedTaxonomies, connection) =>
       // merge connected taxonomies.
       // TODO deal with conflicts
-      connectedTaxonomies.merge(
+      connection
+      ? connectedTaxonomies.merge(
         taxonomies
           .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]))
           .map((taxonomy) => taxonomy.set(
@@ -104,6 +108,7 @@ export const selectConnectedTaxonomies = createSelector(
               ))
           ))
       )
+      : connectedTaxonomies
     , Map())
 );
 
@@ -118,6 +123,7 @@ const selectIndicatorsNested = createSelector(
   (state) => selectEntities(state, 'sdgtarget_indicators'),
   (state) => selectEntities(state, 'progress_reports'),
   (state) => selectEntities(state, 'due_dates'),
+  (state) => selectEntities(state, 'users'),
   (
     entities,
     connections,
@@ -125,6 +131,7 @@ const selectIndicatorsNested = createSelector(
     entitySdgTargets,
     progressReports,
     dueDates,
+    users
   ) =>
     entities.map((entity) => entity
     .set(
@@ -138,7 +145,7 @@ const selectIndicatorsNested = createSelector(
     )
     .set(
       'sdgtargets',
-      entitySdgTargets
+      ENABLE_SDGS && entitySdgTargets
       .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'indicator_id']), entity.get('id'))
         && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
@@ -164,6 +171,10 @@ const selectIndicatorsNested = createSelector(
         return false;
       }
     ))
+    .set(
+      'manager',
+      users.find((user) => entity.getIn(['attributes', 'manager_id']) && attributesEqual(user.get('id'), entity.getIn(['attributes', 'manager_id'])))
+    )
   )
 );
 const selectIndicatorsWithout = createSelector(

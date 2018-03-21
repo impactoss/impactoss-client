@@ -7,6 +7,7 @@ const Dot = styled.div`
   border-radius: 999px;
   width: 14px;
   height: 14px;
+  float: right;
 `;
 
 

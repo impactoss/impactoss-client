@@ -9,8 +9,9 @@ const Styled = styled(Button)`
   position: absolute;
   right:0;
   top:0;
+  color: ${palette('link', 3)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('linkHover', 3)};
   }
 `;
 

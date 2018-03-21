@@ -1,9 +1,13 @@
 import styled from 'styled-components';
 
+import { HEADER_PATTERN_HEIGHT } from 'themes/config';
+
 export default styled.div`
-  height:${(props) => props.isHome ? 0 : 105}px;
-  background-image: ${(props) => props.showPattern ? props.theme.backgroundImages.header : 'none'};
+  height:${(props) => props.theme.sizes.header.banner.height}px;
+  background-image: ${(props) => (props.showPattern && props.theme.backgroundImages.header)
+    ? props.theme.backgroundImages.header
+    : 'none'
+  };
   background-repeat: repeat;
-  position: ${(props) => props.isHome ? 'absolute' : 'static'};
-  right: 0px;
+  background-size: ${HEADER_PATTERN_HEIGHT}px auto;
 `;

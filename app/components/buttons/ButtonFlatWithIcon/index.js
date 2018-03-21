@@ -17,12 +17,12 @@ const Button = styled(ButtonFlat)`
   border-color: ${(props) => props.border ? palette(props.border.palette, props.border.pIndex) : 'transparent'};
 `;
 
-const Title = styled.span`
-  padding-right: 0;
-  padding-left: 0;
-  position: relative;
-  top: 0.05em;
-`;
+// const Title = styled.span`
+//   padding-right: 0;
+//   padding-left: 0;
+//   position: relative;
+//   top: 0.05em;
+// `;
 
 class ButtonFlatWithIcon extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -33,13 +33,9 @@ class ButtonFlatWithIcon extends React.PureComponent { // eslint-disable-line re
         title={title}
         {...props}
       >
-        { iconRight &&
-          <Title iconRight>{title}</Title>
-        }
+        { iconRight && title }
         <Icon name={icon} text textRight={iconRight} textLeft={!iconRight} />
-        { !iconRight &&
-          <Title>{title}</Title>
-        }
+        { !iconRight && title }
       </Button>
     );
   }

@@ -12,17 +12,19 @@ import { FormattedMessage } from 'react-intl';
 
 import {
   getReferenceField,
-  getTitleField,
+  getTitleTextField,
   getStatusField,
   getMetaField,
   getMarkdownField,
   getMeasureConnectionField,
   getTaxonomyFields,
+  hasTaxonomyCategories,
 } from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE, ACCEPTED_STATUSES } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ACCEPTED_STATUSES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -75,8 +77,8 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceField(entity),
-        getTitleField(entity, isManager),
+        getReferenceField(entity, isManager),
+        getTitleTextField(entity, isManager),
       ],
     },
   ]);
@@ -108,11 +110,13 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   ]);
 
   getBodyAsideFields = (taxonomies) => ([ // fieldGroups
-    { // fieldGroup
+    hasTaxonomyCategories(taxonomies)
+    ? { // fieldGroup
       label: appMessages.entities.taxonomies.plural,
       icon: 'categories',
       fields: getTaxonomyFields(taxonomies, appMessages),
-    },
+    }
+    : null,
   ]);
 
   render() {
@@ -211,10 +215,10 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: () => {
-      dispatch(updatePath(`/recommendations/edit/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}${PATHS.EDIT}/${props.params.id}`, { replace: true }));
     },
     handleClose: () => {
-      dispatch(closeEntity('/recommendations'));
+      dispatch(closeEntity(PATHS.RECOMMENDATIONS));
     },
     onEntityClick: (id, path) => {
       dispatch(updatePath(`/${path}/${id}`));

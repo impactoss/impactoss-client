@@ -33,7 +33,8 @@ import validateDateAfterDate from 'components/forms/validators/validate-date-aft
 import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
 import validateRequired from 'components/forms/validators/validate-required';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -48,15 +49,16 @@ import {
 
 import {
   selectReady,
+  selectReadyForAuthCheck,
   selectMeasuresCategorised,
   selectSdgTargetsCategorised,
 } from 'containers/App/selectors';
 
-import ErrorMessages from 'components/ErrorMessages';
+import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import EntityForm from 'components/forms/EntityForm';
+import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
@@ -80,7 +82,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady) {
+    if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
@@ -183,19 +185,22 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('indicatorNew.form.data'),
               }] : null
             }
           />
           {!submitValid &&
-            <ErrorMessages
-              error={{ messages: [this.context.intl.formatMessage(appMessages.forms.multipleErrors)] }}
+            <Messages
+              type="error"
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
           {saveError &&
-            <ErrorMessages
-              error={saveError}
+            <Messages
+              type="error"
+              messages={saveError.messages}
               onDismiss={this.props.onServerErrorDismiss}
             />
           }
@@ -206,6 +211,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             <EntityForm
               model="indicatorNew.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={this.props.handleSubmit}
               handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}
@@ -248,6 +254,7 @@ IndicatorNew.propTypes = {
   onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   users: PropTypes.object,
@@ -266,6 +273,7 @@ IndicatorNew.contextTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   // all measures,
   measures: selectMeasuresCategorised(state),
   // all sdgtargets,
@@ -285,7 +293,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     onRepeatChange: (repeatModel, repeat, formData, formatMessage) => {
       // reset repeat erros when repeat turned off
@@ -415,7 +423,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath('/indicators'));
+      dispatch(updatePath(PATHS.INDICATORS, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

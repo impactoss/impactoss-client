@@ -8,16 +8,10 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
 import Row from 'components/styled/Row';
-
-// import {
-//   selectReady,
-//   selectEntities,
-//   selectEntitiesWhere,
-// } from 'containers/App/selectors';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
@@ -26,22 +20,51 @@ import NormalImg from 'components/Img';
 import Footer from 'components/Footer';
 
 import appMessages from 'containers/App/messages';
-import { DB_TABLES } from 'containers/App/constants';
-import messages from './messages';
-// import { DEPENDENCIES } from './constants';
+import { PATHS } from 'containers/App/constants';
 
-import graphicHome from './graphicHome.png';
+import {
+  DB_TABLES,
+  SHOW_HOME_TITLE,
+  SHOW_BRAND_ON_HOME,
+  HEADER_PATTERN_HEIGHT,
+  SHOW_HEADER_PATTERN_HOME_GRAPHIC,
+} from 'themes/config';
+
+import messages from './messages';
+
+const GraphicHomeWrapper = styled.div`
+  width: 100%;
+  padding-top: ${(props) => props.hasBrand
+    ? props.theme.sizes.header.banner.height
+    : 0
+  }px;
+  background-image: ${(props) => (props.showPattern && props.theme.backgroundImages.header)
+    ? props.theme.backgroundImages.header
+    : 'none'
+  };
+  background-repeat: repeat;
+  background-size: ${HEADER_PATTERN_HEIGHT}px auto;
+`;
 
 const GraphicHome = styled(NormalImg)`
   width: 100%;
   max-width: 800px;
 `;
+// TODO @tmfrnz config
+// max-width
 
 const SectionTop = styled.div`
-  min-height: 100vH;
+  min-height: ${(props) => props.hasBrand ? 0 : '100vH'};
+  display: ${(props) => props.hasBrand ? 'static' : 'table'};
   background-color: ${palette('home', 0)};
   color: ${palette('homeIntro', 0)};
   text-align: center;
+`;
+
+const SectionWrapper = styled.div`
+  display: ${(props) => props.hasBrand ? 'static' : 'table-cell'};
+  vertical-align: ${(props) => props.hasBrand ? 'baseline' : 'middle'};
+  padding-bottom: 74px;
 `;
 
 const TopActions = styled.div`
@@ -49,14 +72,17 @@ const TopActions = styled.div`
 `;
 const Title = styled.h1`
   color:${palette('headerBrand', 0)};
-  font-family: ${(props) => props.theme.fonts.homeBrandMain};
-  font-size: ${(props) => props.theme.sizes.homeBrandMain};
+  font-family: ${(props) => props.theme.fonts.title};
+  font-size: ${(props) => props.theme.sizes.home.text.title};
+  margin-top: 20px;
 `;
+// TODO @tmfrnz config
+// margin-top
 
 const Claim = styled.p`
   color: ${palette('headerBrand', 1)};
-  font-family: ${(props) => props.theme.fonts.homeBrandClaim};
-  font-size: ${(props) => props.theme.sizes.homeBrandClaim};
+  font-family: ${(props) => props.theme.fonts.claim};
+  font-size: ${(props) => props.theme.sizes.home.text.claim};
   font-weight: 100;
   margin-left: auto;
   margin-right: auto;
@@ -64,7 +90,6 @@ const Claim = styled.p`
 `;
 
 const Intro = styled.p`
-  font-family: ${(props) => props.theme.fonts.secondary};
   font-size: 1.25em;
   width: 80%;
   margin-left: auto;
@@ -75,21 +100,10 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  // componentWillReceiveProps(nextProps) {
-  //   // reload entities if invalidated
-  //   // if (!nextProps.dataReady) {
-  //     this.props.loadEntitiesIfNeeded();
-  //   }
-  // }
-
-  // preparePageMenuPages = (pages) =>
-  //   pages.map((page) => ({
-  //     path: `/pages/${page.get('id')}`,
-  //     title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
-  //   })).toArray();
 
   render() {
-    const { onPageLink } = this.props;
+    const { onPageLink, theme } = this.props;
+    const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
 
     return (
       <div>
@@ -99,30 +113,48 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <SectionTop>
-          <GraphicHome src={graphicHome} alt={this.context.intl.formatMessage(messages.pageTitle)} />
-          <Row>
-            <Grid sm={1 / 6} />
-            <Grid sm={4 / 6}>
-              <Title>
-                <FormattedMessage {...appMessages.app.title} />
-              </Title>
-              <Claim>
-                <FormattedMessage {...appMessages.app.claim} />
-              </Claim>
-              <Intro>
-                <FormattedMessage {...messages.intro} />
-              </Intro>
-              <TopActions>
-                <div>
-                  <ButtonHero onClick={() => onPageLink('/overview')}>
-                    <FormattedMessage {...messages.explore} />
-                  </ButtonHero>
-                </div>
-              </TopActions>
-            </Grid>
-            <Grid sm={1 / 6} />
-          </Row>
+        <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
+          <SectionWrapper hasBrand={SHOW_BRAND_ON_HOME}>
+            <GraphicHomeWrapper
+              hasBrand={SHOW_BRAND_ON_HOME}
+              showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
+            >
+              <GraphicHome src={theme.media.graphicHome} alt={this.context.intl.formatMessage(appMessages.app.title)} />
+            </GraphicHomeWrapper>
+            { !SHOW_HOME_TITLE &&
+              <GraphicHome src={theme.media.titleHome} alt={appTitle} />
+            }
+            { SHOW_HOME_TITLE &&
+              <Row>
+                <Grid sm={1 / 6} />
+                <Grid sm={4 / 6}>
+                  <Title>
+                    <FormattedMessage {...appMessages.app.title} />
+                  </Title>
+                  <Claim>
+                    <FormattedMessage {...appMessages.app.claim} />
+                  </Claim>
+                </Grid>
+                <Grid sm={1 / 6} />
+              </Row>
+            }
+            <Row>
+              <Grid sm={1 / 6} />
+              <Grid sm={4 / 6}>
+                <Intro>
+                  <FormattedMessage {...messages.intro} />
+                </Intro>
+                <TopActions>
+                  <div>
+                    <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
+                      <FormattedMessage {...messages.explore} />
+                    </ButtonHero>
+                  </div>
+                </TopActions>
+              </Grid>
+              <Grid sm={1 / 6} />
+            </Row>
+          </SectionWrapper>
         </SectionTop>
         <Footer />
       </div>
@@ -133,7 +165,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 HomePage.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func.isRequired,
   onPageLink: PropTypes.func.isRequired,
-  // pages: PropTypes.object,
+  theme: PropTypes.object.isRequired,
 };
 
 HomePage.contextTypes = {
@@ -162,4 +194,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 // Wrap the component to inject dispatch and state into it
-export default connect(null, mapDispatchToProps)(HomePage);
+export default connect(null, mapDispatchToProps)(withTheme(HomePage));

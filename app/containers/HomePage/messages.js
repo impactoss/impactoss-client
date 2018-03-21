@@ -7,16 +7,16 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.container.HomePage.pageTitle',
-    defaultMessage: 'NPA Home',
+    id: 'app.containers.HomePage.pageTitle',
+    defaultMessage: 'Sadata Home',
   },
   metaDescription: {
-    id: 'app.container.HomePage.metaDescription',
+    id: 'app.containers.HomePage.metaDescription',
     defaultMessage: 'Home page description',
   },
   intro: {
     id: 'app.containers.HomePage.intro',
-    defaultMessage: 'Welcome, this is the introductory text that provides the user with some context and a brief overview about this site and its purpose. Two or three sentences will likely be sufficient to provide the user with some guidance.',
+    defaultMessage: 'Welcome to Sadata, this is the introductory text that provides the user with some context and a brief overview about this site and its purpose. Two or three sentences will likely be sufficient to provide the user with some guidance.',
   },
   explore: {
     id: 'app.containers.HomePage.explore',

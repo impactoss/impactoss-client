@@ -1,24 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedDate } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import appMessages from 'containers/App/messages';
 
-import Icon from 'components/Icon';
 import ButtonFactory from 'components/buttons/ButtonFactory';
 
+import EntityListItemMainTop from 'components/EntityListItem/EntityListItemMain/EntityListItemMainTop';
+import EntityListItemMainTitle from 'components/EntityListItem/EntityListItemMain/EntityListItemMainTitle';
 import FieldWrap from 'components/fields/FieldWrap';
-import LabelLarge from 'components/fields/LabelLarge';
+import ConnectionLabel from 'components/fields/ConnectionLabel';
+import ConnectionLabelWrap from 'components/fields/ConnectionLabelWrap';
 import ButtonWrap from 'components/fields/ButtonWrap';
-import EntityListItemsWrap from 'components/fields/EntityListItemsWrap';
-import ReportListLink from 'components/fields/ReportListLink';
 import ReportListItem from 'components/fields/ReportListItem';
-import ListItemIcon from 'components/fields/ListItemIcon';
-import ReportDueDate from 'components/fields/ReportDueDate';
+import ReportListTitleLink from 'components/fields/ReportListTitleLink';
 import ToggleAllItems from 'components/fields/ToggleAllItems';
 import EmptyHint from 'components/fields/EmptyHint';
+import Clear from 'components/styled/Clear';
 
 const REPORTSMAX = 5;
+const StyledFieldWrap = styled(FieldWrap)`
+  padding-top: 15px;
+`;
 
 class ReportsField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -27,67 +31,81 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
       showAllReports: false,
     };
   }
+  getReportReference = (report) => {
+    if (report.dueDate) {
+      return this.context.intl.formatDate(report.dueDate);
+    }
+    const unscheduledShort = this.context.intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short);
+    return report.createdAt
+      ? `${unscheduledShort} (${this.context.intl.formatDate(new Date(report.createdAt))})`
+      : unscheduledShort;
+  }
+
   render() {
     const { field } = this.props;
 
     return (
-      <FieldWrap>
-        <LabelLarge>
-          <FormattedMessage {...appMessages.entities.progress_reports.plural} />
-        </LabelLarge>
-        { field.button &&
-          <ButtonWrap>
-            <ButtonFactory button={field.button} />
-          </ButtonWrap>
-        }
-        <EntityListItemsWrap>
-          { field.values.map((value, i) => (this.state.showAllReports || i < REPORTSMAX) && (
-            <ReportListLink key={i} to={value.linkTo}>
-              <ReportListItem>
-                <ListItemIcon>
-                  <Icon name="report" />
-                </ListItemIcon>
-                { value.dueDate &&
-                  <ReportDueDate>
-                    <FormattedDate value={new Date(value.dueDate)} />
-                  </ReportDueDate>
-                }
-                { !value.dueDate &&
-                  <ReportDueDate>
-                    <FormattedMessage {...appMessages.entities.progress_reports.unscheduled} />
-                  </ReportDueDate>
-                }
-                {value.label}
+      <StyledFieldWrap>
+        <ConnectionLabelWrap hasButton={field.button}>
+          <ConnectionLabel>
+            <FormattedMessage {...appMessages.entities.progress_reports.plural} />
+          </ConnectionLabel>
+          { field.button &&
+            <ButtonWrap>
+              <ButtonFactory button={field.button} />
+            </ButtonWrap>
+          }
+        </ConnectionLabelWrap>
+        { (field.values && field.values.length > 0) &&
+          <div>
+            { field.values.map((report, i) => (this.state.showAllReports || i < REPORTSMAX) && (
+              <ReportListItem key={i}>
+                <EntityListItemMainTop
+                  entity={{
+                    reference: this.getReportReference(report),
+                    entityIcon: 'report',
+                  }}
+                />
+                <Clear />
+                <ReportListTitleLink to={report.linkTo}>
+                  <EntityListItemMainTitle>
+                    {report.label}
+                  </EntityListItemMainTitle>
+                </ReportListTitleLink>
               </ReportListItem>
-            </ReportListLink>
-          ))}
-        </EntityListItemsWrap>
-        { field.values && field.values.length > REPORTSMAX &&
-          <ToggleAllItems
-            onClick={() =>
-              this.setState({ showAllReports: !this.state.showAllReports })
+            ))}
+            { field.values && field.values.length > REPORTSMAX &&
+              <ToggleAllItems
+                onClick={() =>
+                  this.setState({ showAllReports: !this.state.showAllReports })
+                }
+              >
+                { this.state.showAllReports &&
+                  <FormattedMessage {...appMessages.entities.progress_reports.showLess} />
+                }
+                { !this.state.showAllReports &&
+                  <FormattedMessage {...appMessages.entities.progress_reports.showAll} />
+                }
+              </ToggleAllItems>
             }
-          >
-            { this.state.showAllReports &&
-              <FormattedMessage {...appMessages.entities.progress_reports.showLess} />
-            }
-            { !this.state.showAllReports &&
-              <FormattedMessage {...appMessages.entities.progress_reports.showAll} />
-            }
-          </ToggleAllItems>
+          </div>
         }
         { (!field.values || field.values.length === 0) &&
           <EmptyHint>
             <FormattedMessage {...appMessages.entities.progress_reports.empty} />
           </EmptyHint>
         }
-      </FieldWrap>
+      </StyledFieldWrap>
     );
   }
 }
 
 ReportsField.propTypes = {
   field: PropTypes.object.isRequired,
+};
+
+ReportsField.contextTypes = {
+  intl: PropTypes.object,
 };
 
 export default ReportsField;

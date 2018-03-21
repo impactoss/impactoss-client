@@ -12,18 +12,19 @@ import { FormattedMessage } from 'react-intl';
 
 import {
   getReferenceField,
-  getTitleField,
+  getTitleTextField,
   getStatusField,
   getMetaField,
   getMarkdownField,
   getIndicatorConnectionField,
   getMeasureConnectionField,
   getTaxonomyFields,
+  hasTaxonomyCategories,
 } from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -64,8 +65,8 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceField(entity),
-        getTitleField(entity, isManager),
+        getReferenceField(entity, isManager),
+        getTitleTextField(entity, isManager),
       ],
     },
   ]);
@@ -88,17 +89,19 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getIndicatorConnectionField(indicators, indicatorConnections, appMessages, onEntityClick),
         getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
+        getIndicatorConnectionField(indicators, indicatorConnections, appMessages, onEntityClick),
       ],
     },
   ]);
   getBodyAsideFields = (entity, taxonomies) => ([
-    { // fieldGroup
+    hasTaxonomyCategories(taxonomies)
+    ? { // fieldGroup
       label: appMessages.entities.taxonomies.plural,
       icon: 'categories',
       fields: getTaxonomyFields(taxonomies, appMessages),
-    },
+    }
+    : null,
   ]);
 
   render() {
@@ -217,10 +220,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (sdgtargetId) => {
-      dispatch(updatePath(`/sdgtargets/edit/${sdgtargetId}`));
+      dispatch(updatePath(`${PATHS.SDG_TARGETS}${PATHS.EDIT}/${sdgtargetId}`, { replace: true }));
     },
     handleClose: () => {
-      dispatch(closeEntity('/sdgtargets'));
+      dispatch(closeEntity(PATHS.SDG_TARGETS));
     },
   };
 }

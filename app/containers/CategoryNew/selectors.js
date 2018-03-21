@@ -1,12 +1,10 @@
 import { createSelector } from 'reselect';
+import { selectEntities, selectTaxonomiesSorted } from 'containers/App/selectors';
 
-import { selectEntities } from 'containers/App/selectors';
-
-import { USER_ROLES } from 'containers/App/constants';
-
+import { USER_ROLES, ENABLE_SDGS } from 'themes/config';
 
 import {
-  usersSetRoles,
+  usersByRole,
   prepareTaxonomiesMultiple,
 } from 'utils/entities';
 
@@ -21,12 +19,13 @@ export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
   (entities, associations) =>
-    usersSetRoles(entities, associations, USER_ROLES.MANAGER)
+    usersByRole(entities, associations, USER_ROLES.MANAGER.value)
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_sdgtargets', 'tags_recommendations'])
+  (taxonomies, categories) => ENABLE_SDGS
+    ? prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_sdgtargets', 'tags_recommendations'])
+    : prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
 );

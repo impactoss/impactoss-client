@@ -4,11 +4,12 @@
  *
  */
 import { fromJS } from 'immutable';
-import { REPORT_FREQUENCIES } from 'containers/App/constants';
+import { REPORT_FREQUENCIES, ENABLE_SDGS } from 'themes/config';
 
-export const SAVE = 'nmrf/IndicatorEdit/SAVE';
+export const SAVE = 'impactoss/IndicatorEdit/SAVE';
 
-export const DEPENDENCIES = [
+export const DEPENDENCIES = ENABLE_SDGS
+? [
   'user_roles',
   'measures',
   'sdgtargets',
@@ -18,6 +19,16 @@ export const DEPENDENCIES = [
   'sdgtarget_indicators',
   'measure_categories',
   'sdgtarget_categories',
+  'taxonomies',
+  'categories',
+]
+: [
+  'user_roles',
+  'measures',
+  'users',
+  'indicators',
+  'measure_indicators',
+  'measure_categories',
   'taxonomies',
   'categories',
 ];

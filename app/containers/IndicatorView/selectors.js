@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect';
 
+import { ENABLE_SDGS } from 'themes/config';
+
 import {
   selectEntity,
   selectEntities,
@@ -56,7 +58,7 @@ export const selectMeasures = createSelector(
         )
         .map((association) => association.getIn(['attributes', 'category_id']))
       )
-      .set('sdgtargets', measureTargets
+      .set('sdgtargets', ENABLE_SDGS && measureTargets
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
           && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
@@ -124,10 +126,25 @@ export const selectReports = createSelector(
   (state, id) => id,
   (state) => selectEntities(state, 'progress_reports'),
   (state) => selectEntities(state, 'due_dates'),
-  (id, reports, dates) =>
-    reports && reports
-      .filter((report) => attributesEqual(report.getIn(['attributes', 'indicator_id']), id))
-      .map((report) => entitySetSingle(report, dates, 'due_date', 'due_date_id'))
+  (state) => selectEntities(state, 'users'),
+  (id, reports, dates, users) =>
+    reports && sortEntities(
+      reports
+        .filter((report) => attributesEqual(report.getIn(['attributes', 'indicator_id']), id))
+        .map((report) =>
+          entitySetSingle(
+            report.set('user',
+              users.find((user) => report.getIn(['attributes', 'last_modified_user_id']) && attributesEqual(user.get('id'), report.getIn(['attributes', 'last_modified_user_id'])))
+            ),
+            dates,
+            'due_date',
+            'due_date_id'
+          )
+        ),
+      'desc',
+      'dueDateThenUpdated',
+      'date'
+    )
 );
 
 export const selectDueDates = createSelector(

@@ -5,6 +5,7 @@ import { palette } from 'styled-theme';
 import { kebabCase } from 'lodash/string';
 import { FormattedMessage } from 'react-intl';
 
+import A from 'components/styled/A';
 import IndeterminateCheckbox from 'components/forms/IndeterminateCheckbox';
 
 import Option from './Option';
@@ -17,12 +18,13 @@ const Styled = styled.div`
 const ListWrapper = styled.div`
   display: table;
   width: 100%;
-  border-top: 2px solid ${palette('light', 1)};
+  border-top: 1px solid ${palette('light', 1)};
 `;
 
 const OptionWrapper = styled.div`
   display: table-row;
   width: 100%;
+  line-height: 1.33;
 `;
 // background-color: ${(props) => {
 //   if (props.changedToChecked) {
@@ -43,28 +45,35 @@ const CheckboxWrapper = styled.div`
   width: 10px;
   border-bottom: 1px solid ${palette('light', 1)};
 `;
+
+const OPTION_PADDING = '1em';
+const OPTION_PADDING_SECONDARY = '0.5em';
+
 const OptionLabel = styled.label`
   display: table-cell;
   vertical-align:middle;
   cursor: pointer;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+  padding-top: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
+  padding-bottom: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
   padding-left: 0.5em;
   padding-right: 0.5em;
   border-bottom: 1px solid ${palette('light', 1)};
-  border-right: 0.5em solid ${(props) =>
+  border-right: ${(props) =>
     (props.changedToChecked || props.changedToUnchecked)
-      ? palette('primary', 1)
-      : 'transparent'
+      ? '0.5em solid'
+      : 'none'
   };
+  border-right-color: ${palette('buttonDefault', 1)};
+}
 `;
 
 const OptionCount = styled.span`
   display: table-cell;
-  vertical-align:top;
-  color: ${palette('dark', 4)};
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+  vertical-align: middle;
+  color: ${palette('text', 1)};
+  font-size: 0.9em;
+  padding-top: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
+  padding-bottom: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
   padding-right: 1em;
   text-align: right;
   border-bottom: 1px solid ${palette('light', 1)};
@@ -72,7 +81,7 @@ const OptionCount = styled.span`
 
 const Empty = styled.div`
   padding: 1em;
-  font-style: italic;
+  color: ${palette('text', 1)};
 `;
 
 const More = styled.div`
@@ -82,7 +91,7 @@ const More = styled.div`
   text-align: center;
   font-size: 0.85em;
 `;
-const MoreLink = styled.a`
+const MoreLink = styled(A)`
   font-weight: bold;
 `;
 
@@ -119,6 +128,7 @@ class OptionList extends React.PureComponent {
                 key={id}
                 changedToChecked={option.get('changedToChecked')}
                 changedToUnchecked={option.get('changedToUnchecked')}
+                secondary={this.props.secondary}
               >
                 <CheckboxWrapper>
                   { isIndeterminate &&
@@ -146,16 +156,20 @@ class OptionList extends React.PureComponent {
                   htmlFor={id}
                   changedToChecked={option.get('changedToChecked')}
                   changedToUnchecked={option.get('changedToUnchecked')}
+                  secondary={this.props.secondary}
                 >
                   <Option
                     bold={option.get('labelBold') || checked}
                     reference={typeof option.get('reference') !== 'undefined' && option.get('reference') !== null ? option.get('reference').toString() : ''}
                     label={option.get('label')}
+                    messagePrefix={option.get('messagePrefix')}
+                    message={option.get('message')}
                     isNew={option.get('isNew')}
+                    draft={option.get('draft')}
                   />
                 </OptionLabel>
                 { option.get('showCount') && typeof option.get('count') !== 'undefined' &&
-                  <OptionCount>
+                  <OptionCount secondary={this.props.secondary}>
                     {option.get('count')}
                   </OptionCount>
                 }
@@ -197,6 +211,7 @@ class OptionList extends React.PureComponent {
 OptionList.propTypes = {
   options: PropTypes.object,
   onCheckboxChange: PropTypes.func,
+  secondary: PropTypes.bool,
 };
 
 export default OptionList;
