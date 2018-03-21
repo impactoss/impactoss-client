@@ -113,7 +113,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             }
             { dataReady && typeof reference !== 'undefined' &&
               <TaxonomySidebar
-                taxonomies={mapToTaxonomyList(taxonomies, onTaxonomyLink, reference)}
+                taxonomies={mapToTaxonomyList(taxonomies.toList(), onTaxonomyLink, reference)}
               />
             }
           </Scrollable>

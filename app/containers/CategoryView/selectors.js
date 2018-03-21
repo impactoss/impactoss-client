@@ -7,6 +7,7 @@ import {
   selectRecommendationConnections,
   selectSdgTargetConnections,
   selectMeasureConnections,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import {
@@ -21,7 +22,7 @@ export const selectCategory = createSelector(
 );
 export const selectTaxonomy = createSelector(
   selectCategory,
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (category, taxonomies) => category && taxonomies &&
     taxonomies.get(category.getIn(['attributes', 'taxonomy_id']).toString())
 );
@@ -29,7 +30,7 @@ export const selectTaxonomy = createSelector(
 export const selectViewEntity = createSelector(
   selectCategory,
   (state) => selectEntities(state, 'users'),
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (entity, users, taxonomies) => entitySetSingles(entity, [
     {
       related: users,
@@ -191,7 +192,7 @@ export const selectSdgTargets = createSelector(
 );
 
 export const selectTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>
     taxonomies.map((tax) => tax.set(

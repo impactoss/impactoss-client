@@ -9,6 +9,7 @@ import {
   entitySetUser,
   attributesEqual,
   prepareTaxonomiesIsAssociated,
+  selectTaxonomiesSorted,
 } from 'utils/entities';
 
 export const selectViewEntity = createSelector(
@@ -28,7 +29,7 @@ export const selectViewEntity = createSelector(
 
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'user_categories'),
   (id, taxonomies, categories, associations) =>
