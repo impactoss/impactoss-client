@@ -293,7 +293,7 @@ export const selectEntities = createSelector(
 
 export const selectTaxonomiesSorted = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
-  (taxonomies) => taxonomies && sortEntities(taxonomies, 'asc', 'priority')
+  (taxonomies) => taxonomies && sortEntities(taxonomies, 'asc', 'priority', null, false)
 );
 
 export const selectEntity = createSelector(
@@ -366,25 +366,25 @@ export const selectMeasureConnections = createSelector(
 );
 
 export const selectMeasureTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_measures')
 );
 
 export const selectRecommendationTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_recommendations')
 );
 
 export const selectSdgTargetTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_sdgtargets')
 );
 
 export const selectUserTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_users')
 );

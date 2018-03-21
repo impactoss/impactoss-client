@@ -7,6 +7,7 @@ import {
   selectEntities,
   selectSortByQuery,
   selectSortOrderQuery,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import { attributesEqual } from 'utils/entities';
@@ -16,7 +17,7 @@ import { TAXONOMY_DEFAULT, SORT_OPTIONS } from './constants';
 
 export const selectTaxonomy = createSelector(
   (state, { id }) => id,
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (taxonomyId, taxonomies) =>
     taxonomies && taxonomies.get(typeof taxonomyId !== 'undefined' ? taxonomyId : TAXONOMY_DEFAULT)
 );
