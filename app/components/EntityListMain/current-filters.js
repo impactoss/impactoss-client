@@ -143,7 +143,11 @@ const getCurrentTaxonomyFilters = (
           tags.push({
             labels: [
               { label: withoutLabel },
-              { label: taxonomy.getIn(['attributes', 'title']), lowerCase: true },
+              {
+                label: `entities.taxonomies.${parseInt(taxonomy.get('id'), 10)}.single`,
+                lowerCase: true,
+                appMessage: true,
+              },
             ],
             type: 'taxonomies',
             id: taxonomy.get('id'),

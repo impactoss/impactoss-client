@@ -195,7 +195,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 },
                 onCreateOption,
                 shape: MEASURE_SHAPE,
-                formatMessage: this.context.intl.formatMessage,
+                contextIntl: this.context.intl,
               })}
             />
           }
