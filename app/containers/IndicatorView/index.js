@@ -104,8 +104,8 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
-        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, appMessages, onEntityClick),
+        measures && getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
+        sdgtargets && getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, appMessages, onEntityClick),
       ],
     },
   ]);

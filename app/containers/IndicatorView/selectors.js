@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect';
 
+import { ENABLE_SDGS } from 'themes/config';
+
 import {
   selectEntity,
   selectEntities,
@@ -56,7 +58,7 @@ export const selectMeasures = createSelector(
         )
         .map((association) => association.getIn(['attributes', 'category_id']))
       )
-      .set('sdgtargets', measureTargets
+      .set('sdgtargets', ENABLE_SDGS && measureTargets
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
           && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])

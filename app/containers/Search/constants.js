@@ -1,4 +1,7 @@
-export const DEPENDENCIES = [
+import { ENABLE_SDGS } from 'themes/config';
+
+export const DEPENDENCIES = ENABLE_SDGS
+? [
   'pages',
   'taxonomies',
   'categories',
@@ -6,6 +9,15 @@ export const DEPENDENCIES = [
   'measures',
   'recommendations',
   'sdgtargets',
+  'progress_reports',
+]
+: [
+  'pages',
+  'taxonomies',
+  'categories',
+  'indicators',
+  'measures',
+  'recommendations',
   'progress_reports',
 ];
 
@@ -96,7 +108,7 @@ export const CONFIG = {
             },
           ],
         },
-        {
+        ENABLE_SDGS && {
           path: 'sdgtargets',
           search: ['title', 'description', 'reference'],
           sorting: [

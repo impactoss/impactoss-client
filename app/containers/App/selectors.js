@@ -16,7 +16,7 @@ import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 import { sortEntities } from 'utils/sort';
 
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, DB_TABLES } from 'themes/config';
 import { PARAMS } from 'containers/App/constants';
 
 import {
@@ -207,7 +207,10 @@ export const selectRequestedAt = createSelector(
 
 export const selectReady = (state, { path }) =>
   reduce(asArray(path),
-    (areReady, readyPath) => areReady && !!state.getIn(['global', 'ready', readyPath]),
+    (areReady, readyPath) => areReady && (
+      !!state.getIn(['global', 'ready', readyPath])
+      || DB_TABLES.indexOf(readyPath) === -1
+    ),
     true
   );
 
