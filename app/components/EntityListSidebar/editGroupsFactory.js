@@ -18,7 +18,7 @@ export const makeEditGroups = (
       label: messages.taxonomyGroup,
       show: true,
       icon: 'categories',
-      options: sortEntities(taxonomies, 'asc', 'priority').reduce((taxOptions, taxonomy) =>
+      options: sortEntities(taxonomies, 'asc', 'priority').reduce((memo, taxonomy) =>
         memo.concat([
           {
             id: taxonomy.get('id'), // filterOptionId
