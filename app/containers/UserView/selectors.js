@@ -3,13 +3,13 @@ import { createSelector } from 'reselect';
 import {
   selectEntity,
   selectEntities,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import {
   entitySetUser,
   attributesEqual,
   prepareTaxonomiesIsAssociated,
-  selectTaxonomiesSorted,
 } from 'utils/entities';
 
 export const selectViewEntity = createSelector(
