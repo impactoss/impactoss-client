@@ -1,9 +1,11 @@
+import { ENABLE_SDGS } from 'themes/config';
 import { createSelector } from 'reselect';
 
 import {
   selectEntity,
   selectEntities,
   selectMeasureConnections,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import {
@@ -21,7 +23,7 @@ export const selectViewEntity = createSelector(
 
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'recommendation_categories'),
   (id, taxonomies, categories, associations) =>
@@ -52,7 +54,7 @@ export const selectMeasures = createSelector(
         )
         .map((association) => association.getIn(['attributes', 'category_id']))
       )
-      .set('sdgtargets', measureTargets
+      .set('sdgtargets', ENABLE_SDGS && measureTargets
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
           && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])

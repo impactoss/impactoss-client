@@ -81,9 +81,10 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
   return sortOrder === 'desc' ? result * -1 : result;
 };
 
-export const sortEntities = (entities, sortOrder, sortBy, type) =>
-  entities
-    .sortBy(
-      (entity) => getEntitySortValueMapper(entity, sortBy || 'id'),
-      (a, b) => getEntitySortComparator(a, b, sortOrder || 'asc', type)
-    ).toList();
+export const sortEntities = (entities, sortOrder, sortBy, type, asList = true) => {
+  const sorted = entities.sortBy(
+    (entity) => getEntitySortValueMapper(entity, sortBy || 'id'),
+    (a, b) => getEntitySortComparator(a, b, sortOrder || 'asc', type)
+  );
+  return asList ? sorted.toList() : sorted;
+};

@@ -2,6 +2,8 @@ import { createSelector } from 'reselect';
 import { Map, List } from 'immutable';
 import { reduce } from 'lodash/collection';
 
+import { ENABLE_SDGS } from 'themes/config';
+
 import {
   selectEntities,
   selectEntitiesSearchQuery,
@@ -12,6 +14,7 @@ import {
   selectSortByQuery,
   selectSortOrderQuery,
   selectExpandQuery,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import {
@@ -42,13 +45,13 @@ export const selectConnections = createSelector(
       entitiesSetCategoryIds(recommendations, 'recommendation_id', recommendationCategories)
     )
     .set('sdgtargets',
-      entitiesSetCategoryIds(sdgtargets, 'sdgtarget_id', sdgtargetCategories)
+      ENABLE_SDGS && entitiesSetCategoryIds(sdgtargets, 'sdgtarget_id', sdgtargetCategories)
     )
 );
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectConnections(state),
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'sdgtarget_categories'),
@@ -61,7 +64,7 @@ export const selectConnectedTaxonomies = createSelector(
         key: 'recommendation_id',
         associations: categoryRecommendations,
       },
-      {
+      ENABLE_SDGS && {
         tags: 'tags_sdgtargets',
         path: 'sdgtargets',
         key: 'sdgtarget_id',
@@ -70,7 +73,8 @@ export const selectConnectedTaxonomies = createSelector(
     ], (connectedTaxonomies, connection) =>
       // TODO deal with conflicts
       // merge connected taxonomies.
-      connectedTaxonomies.merge(
+      connection
+      ? connectedTaxonomies.merge(
         taxonomies
         .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]))
         .map((taxonomy) => taxonomy.set(
@@ -88,6 +92,7 @@ export const selectConnectedTaxonomies = createSelector(
           ))
         ))
       )
+      : connectedTaxonomies
     , Map())
 );
 
@@ -130,7 +135,7 @@ const selectMeasuresNested = createSelector(
     // nest connected sdgtarget ids
     .set(
       'sdgtargets',
-      measureSdgTargets
+      ENABLE_SDGS && measureSdgTargets
       .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
         && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])

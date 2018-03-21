@@ -1,6 +1,7 @@
-import { PUBLISH_STATUSES, USER_ROLES } from 'themes/config';
+import { PUBLISH_STATUSES, USER_ROLES, ENABLE_SDGS } from 'themes/config';
 
-export const DEPENDENCIES = [
+export const DEPENDENCIES = ENABLE_SDGS
+? [
   'user_roles',
   'indicators',
   'users',
@@ -12,6 +13,18 @@ export const DEPENDENCIES = [
   'sdgtargets',
   'sdgtarget_indicators',
   'sdgtarget_categories',
+  'due_dates',
+  'progress_reports',
+]
+: [
+  'user_roles',
+  'indicators',
+  'users',
+  'taxonomies',
+  'categories',
+  'measures',
+  'measure_indicators',
+  'measure_categories',
   'due_dates',
   'progress_reports',
 ];
@@ -47,7 +60,8 @@ export const CONFIG = {
     query: 'catx',
     search: true,
     exclude: 'tags_indicators',
-    connections: [
+    connections: ENABLE_SDGS
+    ? [
       {
         path: 'measures', // filter by recommendation connection
         message: 'entities.measures.plural',
@@ -58,11 +72,19 @@ export const CONFIG = {
         message: 'entities.sdgtargets.plural',
         key: 'sdgtarget_id',
       },
+    ]
+    : [
+      {
+        path: 'measures', // filter by recommendation connection
+        message: 'entities.measures.plural',
+        key: 'measure_id',
+      },
     ],
   },
   connections: { // filter by associated entity
     query: 'connected',
-    options: [
+    options: ENABLE_SDGS
+    ? [
       {
         search: true,
         message: 'entities.measures.plural',
@@ -79,6 +101,17 @@ export const CONFIG = {
         key: 'sdgtarget_id',
         ownKey: 'indicator_id',
         connectPath: 'sdgtarget_indicators',
+      },
+    ]
+    : [
+      {
+        search: true,
+        message: 'entities.measures.plural',
+        path: 'measures',
+        clientPath: 'actions',
+        key: 'measure_id',
+        connectPath: 'measure_indicators',
+        ownKey: 'indicator_id',
       },
     ],
   },

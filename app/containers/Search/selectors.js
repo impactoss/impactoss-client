@@ -80,29 +80,32 @@ export const selectEntitiesByQuery = createSelector(
             .set('results', filteredCategories);
         }));
       }
-      return group.set('targets', group.get('targets').map((target) => {
-        const filteredEntities = searchQuery
-          ? filterEntitiesByKeywords(
-            allEntities.get(target.get('path')),
-            searchQuery,
-            target.get('search').toArray()
-          )
-          : allEntities.get(target.get('path'));
-        if (path === target.get('path') || (!path && !active && filteredEntities.size > 0)) {
-          active = true;
-          // only sort the active entities that will be displayed
-          const sortOption = getSortOption(target.get('sorting') && target.get('sorting').toJS(), sort);
-          return target
-            .set('active', searchQuery && true)
-            .set('results', sortEntities(
-              filteredEntities,
-              order || (sortOption ? sortOption.order : 'desc'),
-              sort || (sortOption ? sortOption.attribute : 'id'),
-              sortOption ? sortOption.type : 'number'
-            ));
-        }
-        return target.set('results', filteredEntities);
-      }));
+      return group.set('targets', group.get('targets')
+        .filter((target) => !!target)
+        .map((target) => {
+          const filteredEntities = searchQuery
+            ? filterEntitiesByKeywords(
+              allEntities.get(target.get('path')),
+              searchQuery,
+              target.get('search').toArray()
+            )
+            : allEntities.get(target.get('path'));
+          if (path === target.get('path') || (!path && !active && filteredEntities.size > 0)) {
+            active = true;
+            // only sort the active entities that will be displayed
+            const sortOption = getSortOption(target.get('sorting') && target.get('sorting').toJS(), sort);
+            return target
+              .set('active', searchQuery && true)
+              .set('results', sortEntities(
+                filteredEntities,
+                order || (sortOption ? sortOption.order : 'desc'),
+                sort || (sortOption ? sortOption.attribute : 'id'),
+                sortOption ? sortOption.type : 'number'
+              ));
+          }
+          return target.set('results', filteredEntities);
+        })
+      );
     });
   }
 );
