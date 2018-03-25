@@ -78,7 +78,7 @@ export const TAXONOMY_GROUPS = [
 // General ********************
 
 export const ENDPOINTS = {
-  API: 'https://api.impactoss.org', // server API endpoint
+  API: 'https://api2.impactoss.org', // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
@@ -145,7 +145,7 @@ export const REPORT_FREQUENCIES = [
   { value: 12, message: 'ui.reportFrequencies.annual' },
 ];
 
-export const ENABLE_SDGS = true;
+export const ENABLE_SDGS = false;
 
 // Map server database tables **************************
 export const DB_TABLES = [
