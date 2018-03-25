@@ -164,10 +164,10 @@ export const DB_TABLES = [
   'user_categories',
   'progress_reports',
   'due_dates',
-  'sdgtarget_categories',
-  'sdgtarget_indicators',
-  'sdgtarget_measures',
-  'sdgtargets',
+//  'sdgtarget_categories',
+//  'sdgtarget_indicators',
+//  'sdgtarget_measures',
+//  'sdgtargets',
 ];
 
 // Table shapes
