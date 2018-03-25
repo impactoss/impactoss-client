@@ -191,10 +191,12 @@ const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
   : Map();
 
 const getAssociatedEntities = (entities) =>
-  entities.reduce((entitiesAssociated, entity) => entity.get('associated')
+  entities
+  ? entities.reduce((entitiesAssociated, entity) => entity.get('associated')
     ? entitiesAssociated.set(entity.get('id'), entity.getIn(['associated', 'id']))
     : entitiesAssociated
-  , Map());
+  , Map())
+  : Map();
 
 export const getCategoryUpdatesFromFormData = ({ formData, taxonomies, createKey }) =>
   taxonomies.reduce((updates, tax, taxId) => {
