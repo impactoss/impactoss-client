@@ -432,7 +432,7 @@
   "app.containers.EntityNew.sdgtargets.pageTitle" : "New SDG target",
   "app.containers.HomePage.pageTitle" : "IMPACT OSS Home",
   "app.containers.HomePage.metaDescription" : "Home page description",
-  "app.containers.HomePage.intro" : "This site demonstrates a minimal set up of IMPACT OSS focusing on the core concepts: **Recomendations** as provided by the different UN and regional human rights mechanisms, **Implementing Actions** that States commit to to address the Recommendations, and **Progress Indicators** for updating implementation progress.",
+  "app.containers.HomePage.intro" : "This site demonstrates a minimal set up of IMPACT OSS focusing on the core concepts: **Recommendations** as provided by the different UN and regional human rights mechanisms, **Implementing Actions** that States commit to to address the Recommendations, and **Progress Indicators** for updating implementation progress.",
   "app.containers.HomePage.explore" : "Explore",
   "app.containers.HomePage.exploreCategories" : "Explore by category",
   "app.containers.HomePage.exploreCategoriesLead" : "Explore UN recommendations and government actions by category",
