@@ -146,6 +146,7 @@ export const ENABLE_SDGS = false;
 export const DB_TABLES = [
   'users',
   'user_roles',
+  'roles',
   'pages',
   'taxonomies',
   'categories',
