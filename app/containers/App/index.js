@@ -92,6 +92,11 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         active: currentPath.startsWith(PATHS.TAXONOMIES) || currentPath.startsWith(PATHS.CATEGORIES),
       },
       {
+        path: PATHS.RECOMMENDATIONS,
+        title: this.context.intl.formatMessage(messages.nav.recommendations),
+        active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
+      },
+      {
         path: PATHS.MEASURES,
         title: this.context.intl.formatMessage(messages.nav.measures),
         active: currentPath.startsWith(PATHS.MEASURES),
@@ -100,11 +105,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         path: PATHS.INDICATORS,
         title: this.context.intl.formatMessage(messages.nav.indicators),
         active: currentPath.startsWith(PATHS.INDICATORS) || currentPath.startsWith(PATHS.PROGRESS_REPORTS),
-      },
-      {
-        path: PATHS.RECOMMENDATIONS,
-        title: this.context.intl.formatMessage(messages.nav.recommendations),
-        active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
       },
     ]);
     if (ENABLE_SDGS) {
