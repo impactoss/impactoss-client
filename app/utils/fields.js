@@ -396,11 +396,12 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
   if (section === 'header' && column === 'aside' && hasUserRole[USER_ROLES.MANAGER.value]) {
     groupFields = groupFields.concat([getMetaField(entity)]);
   }
-  sectionGroups.push({
-    type: groupType,
-    fields: groupFields,
-  });
-
+  if (groupFields && groupFields.length > 1) {
+    sectionGroups.push({
+      type: groupType,
+      fields: groupFields,
+    });
+  }
   // taxonomy fields
   if (shape.taxonomies
     && shape.taxonomies.section === section
@@ -450,7 +451,7 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
       }, []),
     });
   }
-  return sectionGroups;
+  return sectionGroups.length > 0 ? sectionGroups : null;
 };
 
 export const getFields = ({ entity, hasUserRole, associations, onEntityClick, shape }) => ({

@@ -238,7 +238,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                               disabled={target.get('results').size === 0}
                             >
                               <TargetTitle>
-                                {this.getTargetTitle(target) && this.context.intl.formatMessage(this.getTargetTitle(target).plural)}
+                                {this.getTargetTitle(target) && this.context.intl.formatMessage(this.getTargetTitle(target).pluralLong || this.getTargetTitle(target).plural)}
                               </TargetTitle>
                               <TargetCount>
                                 <Count active={target.get('active')} disabled={target.get('results').size === 0}>
@@ -292,8 +292,8 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                         <EntityListHeader
                           entitiesTotal={activeTarget.get('results').size}
                           entityTitle={{
-                            single: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).single),
-                            plural: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).plural),
+                            single: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).singleLong || this.getTargetTitle(activeTarget).single),
+                            plural: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).pluralLong || this.getTargetTitle(activeTarget).plural),
                           }}
                           sortOptions={activeTarget.get('sorting') && activeTarget.get('sorting').toJS()}
                           sortBy={location.query.sort}
