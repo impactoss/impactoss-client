@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 const ViewPanel = styled.div`
-  display: table-row;
+  display: table;
+  width: 100%;
 `;
 export default ViewPanel;
