@@ -145,7 +145,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                 },
                 onCreateOption,
                 shape: MEASURE_SHAPE,
-                formatMessage: this.context.intl.formatMessage,
+                contextIntl: this.context.intl,
               })}
             />
           }

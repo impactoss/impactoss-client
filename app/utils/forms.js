@@ -73,11 +73,12 @@ export const taxonomyOptions = (taxonomies) => taxonomies
     values.set(tax.get('id'), entityOptions(tax.get('categories'), false, false)), Map())
   : Map();
 
+const getTaxTitle = (id, contextIntl) => contextIntl ? contextIntl.formatMessage(appMessages.entities.taxonomies[id].single) : '';
 
 // turn taxonomies into multiselect options
-export const makeTagFilterGroups = (taxonomies) =>
+export const makeTagFilterGroups = (taxonomies, contextIntl) =>
   taxonomies && sortEntities(taxonomies, 'asc', 'priority').map((taxonomy) => ({
-    title: taxonomy.getIn(['attributes', 'title']),
+    title: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
     palette: ['taxonomies', parseInt(taxonomy.get('id'), 10)],
     options: taxonomy.get('categories').map((category) => ({
       reference: getEntityReference(category, false),
@@ -88,7 +89,7 @@ export const makeTagFilterGroups = (taxonomies) =>
     })).toList().toArray(),
   })).toList().toArray();
 
-export const renderMeasureControl = (entities, taxonomies, onCreateOption) => entities
+export const renderMeasureControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
 ? {
   id: 'actions',
   model: '.associatedMeasures',
@@ -98,14 +99,14 @@ export const renderMeasureControl = (entities, taxonomies, onCreateOption) => en
   options: entityOptions(entities, true),
   advanced: true,
   selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies),
+  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'measures' })
     : null,
 }
 : null;
 
-export const renderSdgTargetControl = (entities, taxonomies, onCreateOption) => entities
+export const renderSdgTargetControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
 ? {
   id: 'sdgtargets',
   model: '.associatedSdgTargets',
@@ -115,7 +116,7 @@ export const renderSdgTargetControl = (entities, taxonomies, onCreateOption) => 
   options: entityOptions(entities, true),
   advanced: true,
   selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies),
+  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'sdgtargets' })
     : null,
@@ -123,7 +124,7 @@ export const renderSdgTargetControl = (entities, taxonomies, onCreateOption) => 
 : null;
 
 
-export const renderRecommendationControl = (entities, taxonomies, onCreateOption) => entities
+export const renderRecommendationControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
 ? {
   id: 'recommendations',
   model: '.associatedRecommendations',
@@ -133,7 +134,7 @@ export const renderRecommendationControl = (entities, taxonomies, onCreateOption
   options: entityOptions(entities),
   advanced: true,
   selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies),
+  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'recommendations' })
     : null,
@@ -168,12 +169,12 @@ export const renderUserControl = (entities, label, activeUserId) => entities
 }
 : null;
 
-export const renderTaxonomyControl = (taxonomies, onCreateOption) => taxonomies
+export const renderTaxonomyControl = (taxonomies, onCreateOption, contextIntl) => taxonomies
 ? sortEntities(taxonomies, 'asc', 'priority').reduce((controls, taxonomy) => controls.concat({
   id: taxonomy.get('id'),
   model: `.associatedTaxonomies.${taxonomy.get('id')}`,
   dataPath: ['associatedTaxonomies', taxonomy.get('id')],
-  label: taxonomy.getIn(['attributes', 'title']),
+  label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
   controlType: 'multiselect',
   multiple: taxonomy.getIn(['attributes', 'allow_multiple']),
   options: entityOptions(taxonomy.get('categories'), false),
@@ -713,7 +714,7 @@ export const getEntityFields = (path, args, formatMessage) => {
 };
 
 
-const getSectionFields = (shape, section, column, entity, associations, onCreateOption, formatMessage) => {
+const getSectionFields = (shape, section, column, entity, associations, onCreateOption, contextIntl) => {
   const fields = filter(shape.fields, (field) =>
     field.section === section
     && field.column === column
@@ -722,29 +723,29 @@ const getSectionFields = (shape, section, column, entity, associations, onCreate
   const sectionGroups = [{
     fields: reduce(fields, (memo, field) => {
       if (field.control === 'title') {
-        return memo.concat([getTitleFormField(formatMessage)]);
+        return memo.concat([getTitleFormField(contextIntl.formatMessage)]);
       }
       if (field.control === 'status') {
-        return memo.concat([getStatusField(formatMessage, null, entity)]);
+        return memo.concat([getStatusField(contextIntl.formatMessage, null, entity)]);
       }
       if (field.control === 'date') {
-        return memo.concat([getDateField(formatMessage, null, field.attribute)]);
+        return memo.concat([getDateField(contextIntl.formatMessage, null, field.attribute)]);
       }
       if (field.control === 'markdown') {
-        return memo.concat([getMarkdownField(formatMessage, null, field.attribute)]);
+        return memo.concat([getMarkdownField(contextIntl.formatMessage, null, field.attribute)]);
       }
       return memo.concat([getFormField({
         controlType: field.control,
         attribute: field.attribute,
-        formatMessage,
+        formatMessage: contextIntl.formatMessage,
       })]);
     }, []),
   }];
   if (associations && associations.taxonomies && shape.taxonomies && shape.taxonomies.section === section && shape.taxonomies.column === column) {
     sectionGroups.push({ // fieldGroup
-      label: formatMessage(appMessages.entities.taxonomies.plural),
+      label: contextIntl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(associations.taxonomies, onCreateOption),
+      fields: renderTaxonomyControl(associations.taxonomies, onCreateOption, contextIntl),
     });
   }
   if (associations
@@ -760,17 +761,17 @@ const getSectionFields = (shape, section, column, entity, associations, onCreate
     && shape.connections.column === column
   ) {
     sectionGroups.push({
-      label: formatMessage(appMessages.entities.connections.plural),
+      label: contextIntl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: reduce(shape.connections.tables, (memo, table) => {
         if (table.table === 'measures' && associations.measures) {
-          return memo.concat([renderMeasureControl(associations.measures, associations.connectedTaxonomies, onCreateOption)]);
+          return memo.concat([renderMeasureControl(associations.measures, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
         }
         if (table.table === 'recommendations' && associations.recommendations) {
-          return memo.concat([renderRecommendationControl(associations.recommendations, associations.connectedTaxonomies, onCreateOption)]);
+          return memo.concat([renderRecommendationControl(associations.recommendations, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
         }
         if (table.table === 'sdgtargets' && associations.sdgtargets) {
-          return memo.concat([renderSdgTargetControl(associations.sdgtargets, associations.connectedTaxonomies, onCreateOption)]);
+          return memo.concat([renderSdgTargetControl(associations.sdgtargets, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
         }
         if (table.table === 'indicators' && associations.indicators) {
           return memo.concat([renderIndicatorControl(associations.indicators, onCreateOption)]);
@@ -796,7 +797,7 @@ export const getFields = ({
   associations,
   onCreateOption,
   shape,
-  formatMessage,
+  contextIntl,
 }) => ({
   header: {
     main: getSectionFields(
@@ -806,7 +807,7 @@ export const getFields = ({
       entity,
       associations,
       onCreateOption,
-      formatMessage
+      contextIntl
     ),
     aside: getSectionFields(
       shape,
@@ -815,7 +816,7 @@ export const getFields = ({
       entity,
       associations,
       onCreateOption,
-      formatMessage
+      contextIntl
     ),
   },
   body: {
@@ -826,7 +827,7 @@ export const getFields = ({
       entity,
       associations,
       onCreateOption,
-      formatMessage
+      contextIntl
     ),
     aside: getSectionFields(
       shape,
@@ -835,7 +836,7 @@ export const getFields = ({
       entity,
       associations,
       onCreateOption,
-      formatMessage
+      contextIntl
     ),
   },
 });

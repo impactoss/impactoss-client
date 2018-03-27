@@ -143,7 +143,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+        renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
       ],
     },
   ]);
@@ -152,7 +152,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies, onCreateOption),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption, this.context.intl),
     },
   ]);
 

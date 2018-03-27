@@ -172,6 +172,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
         {
           without: this.context.intl && this.context.intl.formatMessage(messages.without),
         },
+        this.context.intl || null
       );
       // count grouped entities (includes duplicates)
       const entityGroupsCount = countEntities(entityGroups);

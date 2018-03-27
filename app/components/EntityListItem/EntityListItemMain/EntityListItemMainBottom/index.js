@@ -18,7 +18,7 @@ class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-l
 
   render() {
     const { categories, taxonomies, onEntityClick, connections, wrapper, user } = this.props;
-    const smartTaxonomy = taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
+    const smartTaxonomy = taxonomies && taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
 
     return (
       <Styled>
