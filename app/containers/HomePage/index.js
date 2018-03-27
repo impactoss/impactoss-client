@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
+import ReactMarkdown from 'react-markdown';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
@@ -89,11 +90,11 @@ const Claim = styled.p`
   margin-bottom: 1.5em;
 `;
 
-const Intro = styled.p`
+const Intro = styled(ReactMarkdown)`
   font-size: 1.25em;
   width: 80%;
   margin-left: auto;
-  margin-right: auto;
+  margin-right: auto;  
 `;
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -141,9 +142,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             <Row>
               <Grid sm={1 / 6} />
               <Grid sm={4 / 6}>
-                <Intro>
-                  <FormattedMessage {...messages.intro} />
-                </Intro>
+                <Intro source={this.context.intl.formatMessage(messages.intro)} />
                 <TopActions>
                   <div>
                     <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>

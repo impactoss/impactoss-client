@@ -15,6 +15,7 @@ import Main from './Main';
 import Aside from './Aside';
 import ViewWrapper from './ViewWrapper';
 import ViewPanel from './ViewPanel';
+import ViewPanelInside from './ViewPanelInside';
 
 const hasFields = (fieldGroup) => fieldGroup.fields && reduce(fieldGroup.fields, (memo, field) => memo || field, false);
 
@@ -40,12 +41,15 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
   );
   render() {
     const { fields, seamless } = this.props;
+
     return (
       <ViewWrapper seamless={seamless}>
         { fields.header &&
           <ViewPanel>
-            { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, false, seamless) }
-            { fields.header.aside && this.renderAside(fields.header.aside, false) }
+            <ViewPanelInside>
+              { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, false, seamless) }
+              { fields.header.aside && this.renderAside(fields.header.aside, false) }
+            </ViewPanelInside>
           </ViewPanel>
         }
         { fields.body
@@ -53,8 +57,10 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
             || (fields.body.aside && fields.body.aside[0] && fields.body.aside[0].fields)
           ) &&
           <ViewPanel>
-            { fields.body.main && this.renderMain(fields.body.main, !!fields.body.aside, true, seamless) }
-            { fields.body.aside && this.renderAside(fields.body.aside, true) }
+            <ViewPanelInside>
+              { fields.body.main && this.renderMain(fields.body.main, !!fields.body.aside, true, seamless) }
+              { fields.body.aside && this.renderAside(fields.body.aside, true) }
+            </ViewPanelInside>
           </ViewPanel>
         }
       </ViewWrapper>

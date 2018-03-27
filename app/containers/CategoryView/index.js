@@ -94,7 +94,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         }],
       });
     }
-    return fields;
+    return fields.length > 0 ? fields : null;
   }
 
   getBodyMainFields = (
@@ -147,7 +147,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         )],
       });
     }
-    return fields;
+    return fields.length > 0 ? fields : null;
   };
 
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);

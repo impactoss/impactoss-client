@@ -494,7 +494,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                               <Icon name="recommendations" />
                             </DiagramButtonIcon>
                             <div>
-                              <FormattedMessage {...messages.buttons.recommendations} values={{ count: recommendationCount }} />
+                              <FormattedMessage {...messages.buttons.recommendations} values={{ count: recommendationCount || '0' }} />
                             </div>
                             { recommendationDraftCount > 0 &&
                               <DraftEntities>
@@ -531,7 +531,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                               <Icon name="recommendations" />
                             </DiagramButtonIcon>
                             <div>
-                              <FormattedMessage {...messages.buttons.recommendations} values={{ count: recommendationCount }} />
+                              <FormattedMessage {...messages.buttons.recommendations} values={{ count: recommendationCount || '0' }} />
                             </div>
                             { recommendationDraftCount > 0 &&
                               <DraftEntities>
@@ -570,7 +570,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                               <Icon name="sdgtargets" />
                             </DiagramButtonIcon>
                             <div>
-                              <FormattedMessage {...messages.buttons.sdgtargets} values={{ count: sdgtargetCount }} />
+                              <FormattedMessage {...messages.buttons.sdgtargets} values={{ count: sdgtargetCount || '0' }} />
                             </div>
                             { sdgtargetDraftCount > 0 &&
                               <DraftEntities>
@@ -615,7 +615,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                               <FormattedMessage {...messages.buttons.measures} />
                             </DiagramButtonMainTop>
                             <DiagramButtonMainBottom>
-                              <FormattedMessage {...messages.buttons.measuresAdditional} values={{ count: measureCount }} />
+                              <FormattedMessage {...messages.buttons.measuresAdditional} values={{ count: measureCount || '0' }} />
                             </DiagramButtonMainBottom>
                             { measureDraftCount > 0 &&
                               <DraftEntities>
@@ -657,7 +657,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                           <Icon name="indicators" />
                         </DiagramButtonIcon>
                         <div>
-                          <FormattedMessage {...messages.buttons.indicators} values={{ count: indicatorCount }} />
+                          <FormattedMessage {...messages.buttons.indicators} values={{ count: indicatorCount || '0' }} />
                         </div>
                         { indicatorDraftCount > 0 &&
                           <DraftEntities>
