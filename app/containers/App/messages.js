@@ -590,6 +590,14 @@ export default defineMessages({
         id: 'app.containers.App.entities.sdgtargets.plural',
         defaultMessage: 'SDG targets',
       },
+      singleLong: {
+        id: 'app.containers.App.entities.sdgtargets.singleLong',
+        defaultMessage: 'SDG target',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.sdgtargets.pluralLong',
+        defaultMessage: 'SDG targets',
+      },
       empty: {
         id: 'app.containers.App.entities.sdgtargets.empty',
         defaultMessage: 'No SDG targets yet',
@@ -602,6 +610,14 @@ export default defineMessages({
       },
       plural: {
         id: 'app.containers.App.entities.indicators.plural',
+        defaultMessage: 'Indicators',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.indicators.singleLong',
+        defaultMessage: 'Indicator',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.indicators.pluralLong',
         defaultMessage: 'Indicators',
       },
       empty: {
@@ -636,6 +652,14 @@ export default defineMessages({
       },
       plural: {
         id: 'app.containers.App.entities.progress_reports.plural',
+        defaultMessage: 'Progress reports',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.progress_reports.singleLong',
+        defaultMessage: 'Progress report',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.progress_reports.pluralLong',
         defaultMessage: 'Progress reports',
       },
       empty: {
