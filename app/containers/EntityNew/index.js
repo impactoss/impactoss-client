@@ -107,7 +107,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             )}
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
-            fields={getEntityFields(path, { taxonomy }, this.context.intl.formatMessage, appMessages)}
+            fields={getEntityFields(path, { taxonomy }, this.context.intl, appMessages)}
           />
           {saveSending &&
             <Loading />

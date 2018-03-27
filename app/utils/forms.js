@@ -23,6 +23,7 @@ import {
   DATE_FORMAT,
   DOC_PUBLISH_STATUSES,
   ACCEPTED_STATUSES,
+  MEASURE_SHAPE,
 } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
@@ -598,40 +599,6 @@ const getCategoryFields = (args, formatMessage) => ({
   },
 });
 
-const getMeasureFields = (args, formatMessage) => ({
-  header: {
-    main: [{ // fieldGroup
-      fields: [
-        getTitleFormField(formatMessage),
-      ],
-    }],
-    aside: [{ // fieldGroup
-      fields: [
-        getStatusField(formatMessage),
-      ],
-    }],
-  },
-  body: {
-    main: [{
-      fields: [
-        getMarkdownField(formatMessage),
-        getMarkdownField(formatMessage, null, 'outcome'),
-        getMarkdownField(formatMessage, null, 'indicator_summary'),
-      ],
-    }],
-    aside: [{
-      fields: [
-        getDateField(formatMessage, null, 'target_date'),
-        getFormField({
-          formatMessage,
-          controlType: 'textarea',
-          attribute: 'target_date_comment',
-        }),
-      ],
-    }],
-  },
-});
-
 const getIndicatorFields = (args, formatMessage) => ({
   header: {
     main: [{ // fieldGroup
@@ -698,18 +665,21 @@ const getSdgtargetFields = (args, formatMessage) => ({
   },
 });
 
-export const getEntityFields = (path, args, formatMessage) => {
+export const getEntityFields = (path, args, contextIntl) => {
   switch (path) {
     case 'categories':
-      return getCategoryFields(args, formatMessage);
+      return getCategoryFields(args, contextIntl.formatMessage);
     case 'measures':
-      return getMeasureFields(args, formatMessage);
+      return getFields({
+        shape: MEASURE_SHAPE,
+        contextIntl,
+      });
     case 'indicators':
-      return getIndicatorFields(args, formatMessage);
+      return getIndicatorFields(args, contextIntl.formatMessage);
     case 'recommendations':
-      return getRecommendationFields(args, formatMessage);
+      return getRecommendationFields(args, contextIntl.formatMessage);
     case 'sdgtargets':
-      return getSdgtargetFields(args, formatMessage);
+      return getSdgtargetFields(args, contextIntl.formatMessage);
     default:
       return {};
   }
