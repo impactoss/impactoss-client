@@ -229,7 +229,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           connectedTaxonomies,
           {
             title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.size} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}`,
-          }
+          },
+          this.context.intl
         );
       }
     }

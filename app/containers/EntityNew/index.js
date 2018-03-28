@@ -46,6 +46,8 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
     }
   }
 
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+
   render() {
     const { viewDomain, path, attributes, inModal, taxonomy } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
@@ -53,7 +55,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
     let pageTitle = this.context.intl.formatMessage(messages[path].pageTitle);
     if (taxonomy && taxonomy.get('attributes')) {
       pageTitle = this.context.intl.formatMessage(messages[path].pageTitleTaxonomy, {
-        taxonomy: taxonomy.getIn(['attributes', 'title']),
+        taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     }
 
@@ -105,7 +107,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             )}
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
-            fields={getEntityFields(path, { taxonomy }, this.context.intl.formatMessage, appMessages)}
+            fields={getEntityFields(path, { taxonomy }, this.context.intl, appMessages)}
           />
           {saveSending &&
             <Loading />

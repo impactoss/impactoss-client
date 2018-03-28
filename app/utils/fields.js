@@ -396,11 +396,12 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
   if (section === 'header' && column === 'aside' && hasUserRole[USER_ROLES.MANAGER.value]) {
     groupFields = groupFields.concat([getMetaField(entity)]);
   }
-  sectionGroups.push({
-    type: groupType,
-    fields: groupFields,
-  });
-
+  if (groupFields && groupFields.length > 1) {
+    sectionGroups.push({
+      type: groupType,
+      fields: groupFields,
+    });
+  }
   // taxonomy fields
   if (shape.taxonomies
     && shape.taxonomies.section === section
@@ -437,9 +438,6 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: reduce(shape.connections.tables, (memo, table) => {
-        // if (table.table === 'measures' && associations.measures) {
-        //   return memo.concat([renderMeasureControl(associations.measures, associations.connectedTaxonomies, onCreateOption)]);
-        // }
         if (table.table === 'recommendations' && associations.recommendations && associations.recTaxonomies && associations.recConnections) {
           return memo.concat([getRecommendationConnectionField(associations.recommendations, associations.recTaxonomies, associations.recConnections, null, onEntityClick)]);
         }
@@ -453,7 +451,7 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
       }, []),
     });
   }
-  return sectionGroups;
+  return sectionGroups.length > 0 ? sectionGroups : null;
 };
 
 export const getFields = ({ entity, hasUserRole, associations, onEntityClick, shape }) => ({

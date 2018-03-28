@@ -5,6 +5,9 @@ import { lowerCase } from 'utils/string';
 import isNumber from 'utils/is-number';
 import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
+
+import appMessages from 'containers/App/messages';
+
 import {
   getConnectedCategories,
   testEntityCategoryAssociation,
@@ -23,9 +26,9 @@ export const makeActiveFilterOptions = (entities, config, activeFilterOption, lo
   // create filterOptions
   switch (activeFilterOption.group) {
     case 'taxonomies':
-      return makeTaxonomyFilterOptions(entities, config.taxonomies, taxonomies.get(activeFilterOption.optionId), locationQuery, messages);
+      return makeTaxonomyFilterOptions(entities, config.taxonomies, taxonomies.get(activeFilterOption.optionId), locationQuery, messages, contextIntl);
     case 'connectedTaxonomies':
-      return makeConnectedTaxonomyFilterOptions(entities, config, connectedTaxonomies, activeFilterOption.optionId, locationQuery, messages);
+      return makeConnectedTaxonomyFilterOptions(entities, config, connectedTaxonomies, activeFilterOption.optionId, locationQuery, messages, contextIntl);
     case 'connections':
       return makeConnectionFilterOptions(entities, config.connections, connections, connectedTaxonomies, activeFilterOption.optionId, locationQuery, messages, contextIntl);
     case 'attributes':
@@ -133,7 +136,9 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
 //
 //
 //
-export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQuery, messages) => {
+const getTaxTitle = (id, contextIntl) => contextIntl.formatMessage(appMessages.entities.taxonomies[id].single);
+
+export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQuery, messages, contextIntl) => {
   const filterOptions = {
     groupId: 'taxonomies',
     search: config.search,
@@ -145,7 +150,7 @@ export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQu
   // get the active taxonomy
 
   if (taxonomy && taxonomy.get('categories')) {
-    filterOptions.title = `${messages.titlePrefix} ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`;
+    filterOptions.title = `${messages.titlePrefix} ${lowerCase(getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl))}`;
     if (entities.size === 0) {
       if (locationQuery.get(config.query)) {
         const locationQueryValue = locationQuery.get(config.query);
@@ -174,7 +179,7 @@ export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQu
           if (isNumber(queryValue) && taxonomy.get('id') === queryValue) {
             const value = parseInt(queryValue, 10);
             filterOptions.options[value] = {
-              label: `${messages.without} ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`,
+              label: `${messages.without} ${lowerCase(getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl))}`,
               showCount: true,
               labelBold: true,
               value,
@@ -218,7 +223,7 @@ export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQu
             filterOptions.options.without.count += 1;
           } else {
             filterOptions.options.without = {
-              label: `${messages.without} ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`,
+              label: `${messages.without} ${lowerCase(getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl))}`,
               showCount: true,
               labelBold: true,
               value: taxonomy.get('id'),
@@ -355,12 +360,12 @@ export const makeConnectionFilterOptions = (entities, config, connections, conne
       });  // for each entities
     }
   }
-  filterOptions.tagFilterGroups = option && makeTagFilterGroups(connectedTaxonomies);
+  filterOptions.tagFilterGroups = option && makeTagFilterGroups(connectedTaxonomies, contextIntl);
   return filterOptions;
 };
 
 
-export const makeConnectedTaxonomyFilterOptions = (entities, config, connectedTaxonomies, activeOptionId, locationQuery, messages) => {
+export const makeConnectedTaxonomyFilterOptions = (entities, config, connectedTaxonomies, activeOptionId, locationQuery, messages, contextIntl) => {
   const filterOptions = {
     groupId: 'connectedTaxonomies',
     search: config.connectedTaxonomies.search,
@@ -372,7 +377,7 @@ export const makeConnectedTaxonomyFilterOptions = (entities, config, connectedTa
 
   const taxonomy = connectedTaxonomies.get(activeOptionId);
   if (taxonomy) {
-    filterOptions.title = `${messages.titlePrefix} ${lowerCase(taxonomy.getIn(['attributes', 'title']))}`;
+    filterOptions.title = `${messages.titlePrefix} ${lowerCase(getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl))}`;
     const query = config.connectedTaxonomies.query;
     const locationQueryValue = locationQuery.get(query);
     if (entities.size === 0) {
