@@ -432,7 +432,7 @@
   "app.containers.EntityNew.sdgtargets.pageTitle" : "New SDG target",
   "app.containers.HomePage.pageTitle" : "IMPACT OSS Home",
   "app.containers.HomePage.metaDescription" : "Home page description",
-  "app.containers.HomePage.intro" : "This demo site showcases the basic \"Rights\" configuration of IMPACT OSS (Integrated Management and Planning of Actions - Open Source Software) that focuses on the core concepts: **Recommendations** as provided by the different UN and regional human rights mechanisms, **Implementing Actions** that States commit to to address those Recommendations, and **Progress Indicators** for updating implementation progress. This \"Rights\" configuration does not include the optional \"Sustainable Development\" Goals component.",
+  "app.containers.HomePage.intro" : "This demo site showcases the basic \"Rights\" configuration of IMPACT OSS (Integrated Management and Planning of Actions - Open Source Software) that focuses on the core concepts: **Recommendations** as provided by the different UN and regional human rights mechanisms, **Implementing Actions** that States commit to to address those Recommendations, and **Progress Indicators** for updating implementation progress. This \"Rights\" configuration does not include the optional \"Sustainable Development Goals\" component.",
   "app.containers.HomePage.explore" : "Explore \"Rights\" demo",
   "app.containers.IndicatorEdit.pageTitle" : "Edit Indicator",
   "app.containers.IndicatorEdit.metaDescription" : "Edit Indicator page description",
