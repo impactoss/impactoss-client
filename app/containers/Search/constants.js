@@ -32,56 +32,6 @@ export const CONFIG = {
       group: 'entities',
       targets: [
         {
-          path: 'measures',
-          clientPath: 'actions',
-          search: ['title', 'description', 'outcome', 'indicator_summary'],
-          sorting: [
-            {
-              attribute: 'id', // proxy for created at
-              type: 'number',
-              order: 'desc',
-              default: true,
-            },
-            {
-              attribute: 'title',
-              type: 'string',
-              order: 'asc',
-            },
-            {
-              attribute: 'updated_at',
-              type: 'date',
-              order: 'desc',
-            },
-          ],
-        },
-        {
-          path: 'indicators',
-          search: ['title', 'description', 'reference'],
-          sorting: [
-            {
-              attribute: 'id', // proxy for created at
-              type: 'number',
-              order: 'desc',
-              default: true,
-            },
-            {
-              attribute: 'reference',
-              type: 'string',
-              order: 'asc',
-            },
-            {
-              attribute: 'title',
-              type: 'string',
-              order: 'asc',
-            },
-            {
-              attribute: 'updated_at',
-              type: 'date',
-              order: 'desc',
-            },
-          ],
-        },
-        {
           path: 'recommendations',
           search: ['title', 'response', 'reference'],
           sorting: [
@@ -110,6 +60,56 @@ export const CONFIG = {
         },
         ENABLE_SDGS && {
           path: 'sdgtargets',
+          search: ['title', 'description', 'reference'],
+          sorting: [
+            {
+              attribute: 'id', // proxy for created at
+              type: 'number',
+              order: 'desc',
+              default: true,
+            },
+            {
+              attribute: 'reference',
+              type: 'string',
+              order: 'asc',
+            },
+            {
+              attribute: 'title',
+              type: 'string',
+              order: 'asc',
+            },
+            {
+              attribute: 'updated_at',
+              type: 'date',
+              order: 'desc',
+            },
+          ],
+        },
+        {
+          path: 'measures',
+          clientPath: 'actions',
+          search: ['title', 'description', 'outcome', 'indicator_summary'],
+          sorting: [
+            {
+              attribute: 'id', // proxy for created at
+              type: 'number',
+              order: 'desc',
+              default: true,
+            },
+            {
+              attribute: 'title',
+              type: 'string',
+              order: 'asc',
+            },
+            {
+              attribute: 'updated_at',
+              type: 'date',
+              order: 'desc',
+            },
+          ],
+        },
+        {
+          path: 'indicators',
           search: ['title', 'description', 'reference'],
           sorting: [
             {
