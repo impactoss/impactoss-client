@@ -264,6 +264,11 @@ export const MEASURE_SHAPE = {
         via: 'measure_indicators',
         key: 'indicator_id',
       },
+      {
+        table: 'sdgtargets',
+        via: 'sdgtarget_measures',
+        key: 'sdgtarget_id',
+      },
     ],
     section: 'body',
     column: 'main',
