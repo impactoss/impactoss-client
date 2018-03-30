@@ -282,7 +282,7 @@ export const getIndicatorConnectionField = (entities, connections, obsoleteAppMe
 export const getRecommendationConnectionField = (entities, taxonomies, connections, obsoleteAppMessages, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'reference'),
-    taxonomies,
+    taxonomies: taxonomies && taxonomies.filter((tax) => tax.getIn(['attributes', 'tags_recommendations'])),
     connections,
     connectionOptions: ['measures'],
     entityType: 'recommendations',
@@ -298,7 +298,7 @@ export const getRecommendationConnectionField = (entities, taxonomies, connectio
 export const getSdgTargetConnectionField = (entities, taxonomies, connections, obsoleteAppMessages, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'reference'),
-    taxonomies,
+    taxonomies: taxonomies && taxonomies.filter((tax) => tax.getIn(['attributes', 'tags_sdgtargets'])),
     connections,
     connectionOptions: ['indicators', 'measures'],
     entityType: 'sdgtargets',
@@ -308,7 +308,7 @@ export const getSdgTargetConnectionField = (entities, taxonomies, connections, o
 export const getMeasureConnectionField = (entities, taxonomies, connections, obsoleteAppMessages, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'id'),
-    taxonomies,
+    taxonomies: taxonomies && taxonomies.filter((tax) => tax.getIn(['attributes', 'tags_measures'])),
     connections,
     connectionOptions: ['indicators', 'recommendations', 'sdgtargets'],
     entityType: 'measures',
