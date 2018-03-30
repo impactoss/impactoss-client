@@ -396,7 +396,7 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
   if (section === 'header' && column === 'aside' && hasUserRole[USER_ROLES.MANAGER.value]) {
     groupFields = groupFields.concat([getMetaField(entity)]);
   }
-  if (groupFields && groupFields.length > 1) {
+  if (groupFields && groupFields.length > 0) {
     sectionGroups.push({
       type: groupType,
       fields: groupFields,
