@@ -63,7 +63,7 @@ export const TAXONOMY_GROUPS = [
     priorityMin: 0,
     priorityMax: 9999,
     default: true,
-  },  
+  },
 ];
 
 /**
@@ -258,11 +258,6 @@ export const MEASURE_SHAPE = {
         table: 'indicators',
         via: 'measure_indicators',
         key: 'indicator_id',
-      },
-      {
-        table: 'sdgtargets',
-        via: 'sdgtarget_measures',
-        key: 'sdgtarget_id',
       },
     ],
     section: 'body',
