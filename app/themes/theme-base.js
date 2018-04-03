@@ -115,9 +115,9 @@ theme.palette = {
     '#0077D8', // 2: UN session
     '#B7177A', // 3: Thematic cluster
     '#114060', // 4: Organisation
-    '#05A763', // 5: Affected persons
-    '#007C70', // 6: Human right
-    '#009ED8', // 7: SDGs
+    '#007C70', // 5: Human right issue
+    '#009ED8', // 6: Human right
+    '#05A763', // 7: Affected persons
     '#416680', // 8: State
     '#E56700', // 9: SMART
   ],
@@ -127,9 +127,9 @@ theme.palette = {
     '#0070CC', // 2: UN session
     '#A5156E', // 3: Thematic cluster
     '#0F364C', // 4: Organisation
-    '#008740', // 5: Affected persons
-    '#007267', // 6: Human right
-    '#007FAD', // 7: SDGs
+    '#007267', // 5: Human right issue
+    '#007FAD', // 6: Human right
+    '#008740', // 7: Affected persons
     '#395970', // 8: State
     '#C75300', // 9: SMART
   ],
