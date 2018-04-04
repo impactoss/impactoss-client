@@ -50,8 +50,8 @@ const STATE_INITIAL = {
   expandedGroups: {
     taxonomies: true,
     connectedTaxonomies: false,
-    connections: true,
-    attributes: true,
+    connections: false,
+    attributes: false,
   },
 };
 
