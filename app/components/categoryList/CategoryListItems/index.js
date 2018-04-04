@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { mapToCategoryList } from 'utils/taxonomies';
 import { getSortOption } from 'utils/sort';
 
-import CategoryListKey from 'components/categoryList/CategoryListKey';
+// import CategoryListKey from 'components/categoryList/CategoryListKey';
 import CategoryListHeader from 'components/categoryList/CategoryListHeader';
 import CategoryListItem from 'components/categoryList/CategoryListItem';
 
@@ -159,9 +159,9 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       sortOrder,
       onSort,
     });
+    // <CategoryListKey columns={columns} />
     return (
       <Styled>
-        <CategoryListKey columns={columns} />
         <CategoryListHeader columns={columns} />
         <CategoryListBody>
           {categoriesMapped.map((cat, i) =>

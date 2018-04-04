@@ -101,7 +101,8 @@ const selectCategoriesCounts = createSelector(
             const associatedRecsPublic = associatedRecs.filter((rec) => !rec.getIn(['attributes', 'draft']));
             category = category.set('recommendations', associatedRecsPublic ? associatedRecsPublic.size : 0);
             // get all public accepted associated recs
-            const publicAccepted = associatedRecsPublic.filter((rec) => !!rec.getIn(['attributes', 'accepted']));
+            const publicAccepted = associatedRecsPublic;
+            // .filter((rec) => !!rec.getIn(['attributes', 'accepted']));
             category = category.set('recommendationsAccepted', publicAccepted ? publicAccepted.size : 0);
 
             // measures connected via recommendation
