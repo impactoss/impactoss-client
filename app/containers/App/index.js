@@ -87,15 +87,15 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 
   prepareMainMenuItems = (isManager, currentPath) => {
     let navItems = ([
+      // {
+      //   path: PATHS.OVERVIEW,
+      //   title: this.context.intl.formatMessage(messages.nav.overview),
+      //   active: currentPath.startsWith(PATHS.OVERVIEW),
+      // },
       {
         path: PATHS.OVERVIEW,
         title: this.context.intl.formatMessage(messages.nav.overview),
-        active: currentPath.startsWith(PATHS.OVERVIEW),
-      },
-      {
-        path: PATHS.TAXONOMIES,
-        title: this.context.intl.formatMessage(messages.nav.taxonomies),
-        active: currentPath.startsWith(PATHS.TAXONOMIES) || currentPath.startsWith(PATHS.CATEGORIES),
+        active: currentPath.startsWith(PATHS.OVERVIEW) || currentPath.startsWith(PATHS.TAXONOMIES) || currentPath.startsWith(PATHS.CATEGORIES),
       },
       {
         path: PATHS.MEASURES,
