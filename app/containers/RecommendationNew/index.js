@@ -17,9 +17,9 @@ import {
   renderTaxonomyControl,
   getTitleFormField,
   getReferenceFormField,
-  getAcceptedField,
+  // getAcceptedField,
   getStatusField,
-  getMarkdownField,
+  // getMarkdownField,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -98,12 +98,12 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
   }]);
 
   getBodyMainFields = (connectedTaxonomies, measures, onCreateOption) => ([
-    {
-      fields: [
-        getAcceptedField(this.context.intl.formatMessage, appMessages),
-        getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
-      ],
-    },
+    // {
+    //   fields: [
+    //     getAcceptedField(this.context.intl.formatMessage, appMessages),
+    //     getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
+    //   ],
+    // },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',

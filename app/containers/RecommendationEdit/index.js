@@ -22,9 +22,9 @@ import {
   getConnectionUpdatesFromFormData,
   getTitleFormField,
   getReferenceFormField,
-  getAcceptedField,
+  // getAcceptedField,
   getStatusField,
-  getMarkdownField,
+  // getMarkdownField,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -133,12 +133,12 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     },
   ]);
   getBodyMainFields = (connectedTaxonomies, entity, measures, onCreateOption) => ([
-    {
-      fields: [
-        getAcceptedField(this.context.intl.formatMessage, appMessages, entity),
-        getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
-      ],
-    },
+    // {
+    //   fields: [
+    //     // getAcceptedField(this.context.intl.formatMessage, appMessages, entity),
+    //     getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
+    //   ],
+    // },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',

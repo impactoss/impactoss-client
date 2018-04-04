@@ -1,4 +1,4 @@
-import { USER_ROLES, PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'themes/config';
+import { USER_ROLES, PUBLISH_STATUSES } from 'themes/config';
 
 export const DEPENDENCIES = [
   'user_roles',
@@ -63,12 +63,12 @@ export const CONFIG = {
   },
   attributes: {  // filter by attribute value
     options: [
-      {
-        search: false,
-        message: 'attributes.accepted',
-        attribute: 'accepted',
-        options: ACCEPTED_STATUSES,
-      },
+      // {
+      //   search: false,
+      //   message: 'attributes.accepted',
+      //   attribute: 'accepted',
+      //   options: ACCEPTED_STATUSES,
+      // },
       {
         search: false,
         message: 'attributes.draft',

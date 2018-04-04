@@ -112,16 +112,16 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
                     required: true,
                     import: true,
                   },
-                  {
-                    attribute: 'accepted',
-                    type: 'bool',
-                    import: true,
-                  },
-                  {
-                    attribute: 'response',
-                    type: 'markdown',
-                    import: true,
-                  },
+                  // {
+                  //   attribute: 'accepted',
+                  //   type: 'bool',
+                  //   import: true,
+                  // },
+                  // {
+                  //   attribute: 'response',
+                  //   type: 'markdown',
+                  //   import: true,
+                  // },
                 ],
               }, this.context.intl.formatMessage),
             }}

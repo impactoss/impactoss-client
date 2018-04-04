@@ -15,7 +15,7 @@ import {
   getTitleTextField,
   getStatusField,
   getMetaField,
-  getMarkdownField,
+  // getMarkdownField,
   getMeasureConnectionField,
   getTaxonomyFields,
   hasTaxonomyCategories,
@@ -24,7 +24,7 @@ import {
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
-import { ACCEPTED_STATUSES } from 'themes/config';
+// import { ACCEPTED_STATUSES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -94,12 +94,12 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
 
 
   getBodyMainFields = (entity, measures, measureTaxonomies, measureConnections, onEntityClick) => ([
-    {
-      fields: [
-        getStatusField(entity, 'accepted', ACCEPTED_STATUSES, appMessages.attributes.accepted),
-        getMarkdownField(entity, 'response', true, appMessages),
-      ],
-    },
+    // {
+    //   fields: [
+    //     getStatusField(entity, 'accepted', ACCEPTED_STATUSES, appMessages.attributes.accepted),
+    //     getMarkdownField(entity, 'response', true, appMessages),
+    //   ],
+    // },
     {
       label: appMessages.entities.connections.plural,
       icon: 'connections',

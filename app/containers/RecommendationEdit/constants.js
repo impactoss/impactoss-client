@@ -24,8 +24,8 @@ export const FORM_INITIAL = fromJS({
   attributes: {
     title: '',
     reference: '',
-    accepted: '',
-    response: '',
+    // accepted: '',
+    // response: '',
     draft: '',
   },
   associatedTaxonomies: {},
