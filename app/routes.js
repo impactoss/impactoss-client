@@ -725,7 +725,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.OVERVIEW}${PATHS.ID}${PATHS.NEW}`, // the taxonomy id
+      path: `${PATHS.TAXONOMIES}${PATHS.ID}${PATHS.NEW}`, // the taxonomy id
       name: 'categoryNew',
       onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
