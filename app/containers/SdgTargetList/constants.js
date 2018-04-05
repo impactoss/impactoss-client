@@ -65,6 +65,7 @@ export const CONFIG = {
   },
   connections: { // filter by associated entity
     query: 'connected',
+    role: USER_ROLES.MANAGER,
     options: [
       {
         search: true,
