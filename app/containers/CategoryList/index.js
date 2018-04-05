@@ -71,7 +71,10 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(nextProps.taxonomies).get('id'));
     }
   }
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+  getTaxTitle = (id, count) => count === 1
+    ? `${count} ${this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single)}`
+    : `${count} ${this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural)}`
+  ;
   getTaxDescription = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].description);
   getTaxButtonTitle = (id) => this.context.intl.formatMessage(
     appMessages.entities.taxonomies[id].shortSingle || appMessages.entities.taxonomies[id].single
@@ -80,8 +83,6 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
   render() {
     const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, onTaxonomyLink } = this.props;
     const reference = taxonomy && taxonomy.get('id');
-    const contentTitle = typeof reference !== 'undefined' ? this.getTaxTitle(reference) : '';
-    const contentDescription = typeof reference !== 'undefined' && this.getTaxDescription(reference);
 
     const buttons = dataReady && isManager && typeof reference !== 'undefined'
       ? [{
@@ -96,8 +97,14 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     // dataReady && console.log('getDefaultTaxonomy', getDefaultTaxonomy(taxonomies).get('id'))
 
     const userCategories = categories ? categories.filter((cat) => cat.getIn(['attributes', 'user_only'])) : null;
+    const nonUserCategories = categories ? categories.filter((cat) => !cat.getIn(['attributes', 'user_only'])) : null;
     const hasUserCategories = isManager && dataReady && userCategories && userCategories.size > 0;
 
+    const contentTitle = nonUserCategories && nonUserCategories.size && typeof reference !== 'undefined'
+      ? this.getTaxTitle(reference, nonUserCategories.size)
+      : '';
+
+    const contentDescription = typeof reference !== 'undefined' && this.getTaxDescription(reference);
     return (
       <div>
         <Helmet
@@ -138,7 +145,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 <CategoryListItems
                   taxonomy={taxonomy}
                   reference={reference}
-                  categories={categories.filter((cat) => !cat.getIn(['attributes', 'user_only']))}
+                  categories={nonUserCategories}
                   onPageLink={onPageLink}
                   onSort={this.props.onSort}
                   sortOptions={SORT_OPTIONS}
