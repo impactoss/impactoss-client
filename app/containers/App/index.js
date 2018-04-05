@@ -102,17 +102,19 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         title: this.context.intl.formatMessage(messages.nav.measures),
         active: currentPath.startsWith(PATHS.MEASURES),
       },
-      {
+    ]);
+    if (isManager) {
+      navItems = navItems.concat([{
         path: PATHS.INDICATORS,
         title: this.context.intl.formatMessage(messages.nav.indicators),
         active: currentPath.startsWith(PATHS.INDICATORS) || currentPath.startsWith(PATHS.PROGRESS_REPORTS),
-      },
-      {
-        path: PATHS.RECOMMENDATIONS,
-        title: this.context.intl.formatMessage(messages.nav.recommendations),
-        active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
-      },
-    ]);
+      }]);
+    }
+    navItems = navItems.concat([{
+      path: PATHS.RECOMMENDATIONS,
+      title: this.context.intl.formatMessage(messages.nav.recommendations),
+      active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
+    }]);
     if (ENABLE_SDGS) {
       navItems = navItems.concat([{
         path: PATHS.SDG_TARGETS,
