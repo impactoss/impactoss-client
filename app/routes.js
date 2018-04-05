@@ -551,6 +551,7 @@ export default function createRoutes(store) {
     }, {
       path: PATHS.INDICATORS,
       name: 'indicatorList',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value, PATHS.MEASURES),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/IndicatorList'),

@@ -8,12 +8,14 @@ import {
 
 import checkStore from './checkStore';
 
-export function replaceIfNotSignedIn(redirectOnAuthSuccess, replace, info = PARAMS.NOT_SIGNED_IN) {
-  return replace({ pathname: PATHS.LOGIN, query: { redirectOnAuthSuccess, info } });
+export function replaceIfNotSignedIn(redirectOnAuthSuccess, replace, info = PARAMS.NOT_SIGNED_IN, replacePath) {
+  return replacePath
+  ? replace(replacePath)
+  : replace({ pathname: PATHS.LOGIN, query: { redirectOnAuthSuccess, info } });
 }
 
-export function replaceUnauthorised(replace) {
-  return replace(PATHS.UNAUTHORISED);
+export function replaceUnauthorised(replace, replacePath) {
+  return replace(replacePath || PATHS.UNAUTHORISED);
 }
 
 export function replaceAlreadySignedIn(replace, info = PARAMS.ALREADY_SIGNED_IN) {
@@ -39,12 +41,12 @@ function redirectIfNotSignedIn(store, info = PARAMS.NOT_SIGNED_IN) {
   };
 }
 
-function redirectIfNotPermitted(store, roleRequired) {
+function redirectIfNotPermitted(store, roleRequired, replacePath) {
   return (nextState, replace) => {
     if (!selectIsSignedIn(store.getState())) {
-      replaceIfNotSignedIn(nextState.location.pathname, replace);
+      replaceIfNotSignedIn(nextState.location.pathname, replace, false, replacePath);
     } else if (selectReadyForAuthCheck(store.getState()) && !hasRoleRequired(selectSessionUserRoles(store.getState()), roleRequired)) {
-      replaceUnauthorised(replace);
+      replaceUnauthorised(replace, replacePath);
     }
   };
 }
@@ -58,6 +60,6 @@ export function getRedirects(store) {
   return {
     redirectIfSignedIn: (info) => redirectIfSignedIn(store, info),
     redirectIfNotSignedIn: (info) => redirectIfNotSignedIn(store, info),
-    redirectIfNotPermitted: (roleRequired) => redirectIfNotPermitted(store, roleRequired),
+    redirectIfNotPermitted: (roleRequired, replacePath) => redirectIfNotPermitted(store, roleRequired, replacePath),
   };
 }
