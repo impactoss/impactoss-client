@@ -135,12 +135,12 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
         icon: 'connections',
         fields: [
+          taxonomy.getIn(['attributes', 'tags_recommendations']) && recommendations &&
+            renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
           taxonomy.getIn(['attributes', 'tags_measures']) && measures &&
             renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
           taxonomy.getIn(['attributes', 'tags_sdgtargets']) && sdgtargets &&
             renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption, this.context.intl),
-          taxonomy.getIn(['attributes', 'tags_recommendations']) && recommendations &&
-            renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
         ],
       });
     }
