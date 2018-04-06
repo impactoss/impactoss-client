@@ -17,7 +17,7 @@ import EntityListFooter from './EntityListFooter';
 import EntityListGroupHeader from './EntityListGroupHeader';
 
 import { getPager } from './pagination';
-import { groupEntities } from './group-entities';
+// import { groupEntities } from './group-entities';
   // getGroupedEntitiesForPage,
 import messages from './messages';
 
@@ -149,12 +149,11 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       entityTitle,
       onEntitySelectAll,
       locationQuery,
-      taxonomies,
-      connectedTaxonomies,
       groupSelectValue,
       subgroupSelectValue,
       entities,
       errors,
+      entityGroups,
     } = this.props;
 
     const pageSize = Math.min(
@@ -167,19 +166,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     // grouping and paging
     // if grouping required
     if (groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET) {
-      // group all entities, regardless of page items, also sort groups
-      const entityGroups = groupEntities(
-        entities,
-        taxonomies,
-        connectedTaxonomies,
-        config,
-        groupSelectValue,
-        subgroupSelectValue !== PARAMS.GROUP_RESET && subgroupSelectValue,
-        {
-          without: this.context.intl && this.context.intl.formatMessage(messages.without),
-        },
-        this.context.intl || null
-      );
       // count grouped entities (includes duplicates)
       const entityGroupsCount = countEntities(entityGroups);
       // if paging required
@@ -354,8 +340,8 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
 
 EntityListGroups.propTypes = {
   entities: PropTypes.instanceOf(List),
+  entityGroups: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
-  connectedTaxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
