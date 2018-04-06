@@ -57,6 +57,10 @@ const ButtonGroup = styled.div`
   }
 `;
 
+const SubTitle = styled.p`
+  font-size: 1.1em;
+`;
+
 class ContentHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   renderTitle = (type, title, icon) => {
@@ -80,7 +84,8 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
     }
   }
   render() {
-    const { type, icon, supTitle, title, buttons } = this.props;
+    const { type, icon, supTitle, title, buttons, subTitle } = this.props;
+
     return (
       <Styled
         hasBottomBorder={type === CONTENT_PAGE || type === CONTENT_MODAL}
@@ -109,6 +114,9 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
             </TableCell>
           }
         </Table>
+        { subTitle &&
+          <SubTitle>{subTitle}</SubTitle>
+        }
       </Styled>
     );
   }
@@ -118,6 +126,7 @@ ContentHeader.propTypes = {
   title: PropTypes.string.isRequired,
   buttons: PropTypes.array,
   supTitle: PropTypes.string,
+  subTitle: PropTypes.string,
   icon: PropTypes.string,
   type: PropTypes.string,
 };
