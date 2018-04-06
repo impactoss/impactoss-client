@@ -287,12 +287,12 @@ export const getRecommendationConnectionField = (entities, taxonomies, connectio
     connectionOptions: ['measures'],
     entityType: 'recommendations',
     onEntityClick,
-    entityIcon: (entity) => {
-      const status = find(ACCEPTED_STATUSES,
-        (option) => option.value === entity.getIn(['attributes', 'accepted'])
-      );
-      return status ? status.icon : null;
-    },
+    // entityIcon: (entity) => {
+    //   const status = find(ACCEPTED_STATUSES,
+    //     (option) => option.value === entity.getIn(['attributes', 'accepted'])
+    //   );
+    //   return status ? status.icon : null;
+    // },
   });
 
 export const getSdgTargetConnectionField = (entities, taxonomies, connections, obsoleteAppMessages, onEntityClick) =>
