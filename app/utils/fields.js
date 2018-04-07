@@ -180,6 +180,7 @@ const mapReports = (reports) => reports
     dueDate: report.get('due_date') ? report.getIn(['due_date', 'attributes', 'due_date']) : null,
     updatedAt: report.getIn(['attributes', 'updated_at']),
     createdAt: report.getIn(['attributes', 'created_at']),
+    draft: report.getIn(['attributes', 'draft']),
     linkTo: `${PATHS.PROGRESS_REPORTS}/${report.get('id')}`,
     updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
   })).toArray()
