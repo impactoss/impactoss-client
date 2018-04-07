@@ -36,6 +36,7 @@ import EntityView from 'components/EntityView';
 import {
   selectReady,
   selectIsUserContributor,
+  selectIsUserManager,
   selectMeasureTaxonomies,
   selectSdgTargetTaxonomies,
   selectMeasureConnections,
@@ -134,6 +135,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       viewEntity,
       dataReady,
       isContributor,
+      isManager,
       measures,
       sdgtargets,
       reports,
@@ -145,7 +147,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       measureConnections,
     } = this.props;
 
-    const buttons = isContributor
+    const buttons = isManager
     ? [
       {
         type: 'text',
@@ -236,6 +238,7 @@ IndicatorView.propTypes = {
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   isContributor: PropTypes.bool,
+  isManager: PropTypes.bool,
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   reports: PropTypes.object,
@@ -256,6 +259,7 @@ IndicatorView.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isContributor: selectIsUserContributor(state),
+  isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),

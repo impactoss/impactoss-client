@@ -41,7 +41,7 @@ export const prepareEntitySearchTarget = (entity, fields, queryLength) =>
   );
 // comparison of attribute values, force string, check 'null' if unspecified
 export const attributesEqual = (testValue, value) =>
-  typeof value !== 'undefined' && value.toString() === ((typeof testValue === 'undefined' || testValue === null)
+  typeof value !== 'undefined' && value !== null && value.toString() === ((typeof testValue === 'undefined' || testValue === null)
     ? 'null'
     : testValue.toString());
 

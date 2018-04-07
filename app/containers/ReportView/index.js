@@ -32,6 +32,8 @@ import EntityView from 'components/EntityView';
 import {
   selectReady,
   selectIsUserContributor,
+  selectIsUserManager,
+  selectSessionUserId,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -86,7 +88,16 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
 
 
   render() {
-    const { viewEntity, dataReady, isContributor } = this.props;
+    const { viewEntity, dataReady, isContributor, isManager, sessionUserId } = this.props;
+
+    const canEdit = isManager
+      || (
+        isContributor
+        && viewEntity
+        && viewEntity.get('indicator')
+        && viewEntity.get('indicator').getIn(['attributes', 'manager_id'])
+        && viewEntity.get('indicator').getIn(['attributes', 'manager_id']).toString() === sessionUserId
+      );
 
     return (
       <div>
@@ -101,7 +112,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="report"
-            buttons={isContributor
+            buttons={canEdit
               ? [
                 {
                   type: 'edit',
@@ -153,8 +164,10 @@ ReportView.propTypes = {
   handleClose: PropTypes.func,
   handleEdit: PropTypes.func,
   viewEntity: PropTypes.object,
+  sessionUserId: PropTypes.string,
   dataReady: PropTypes.bool,
   isContributor: PropTypes.bool,
+  isManager: PropTypes.bool,
   params: PropTypes.object,
 };
 
@@ -163,7 +176,9 @@ ReportView.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
+  sessionUserId: selectSessionUserId(state),
   isContributor: selectIsUserContributor(state),
+  isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
 });
