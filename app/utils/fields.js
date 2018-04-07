@@ -1,7 +1,7 @@
 import { truncateText } from 'utils/string';
 import { sortEntities } from 'utils/sort';
-import { ACCEPTED_STATUSES, USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
-import { find, filter, reduce } from 'lodash/collection';
+import { USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
+import { filter, reduce } from 'lodash/collection';
 
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
