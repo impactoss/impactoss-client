@@ -80,6 +80,11 @@ const TableCell = styled.div`
 const TableCellSmall = styled(TableCell)`
   width: 25%;
 `;
+const PartnerNote = styled.div`
+  text-align: center;
+  color: ${palette('text', 1)};
+  font-size: ${(props) => props.theme.sizes.text.small};
+`;
 
 class Footer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -90,6 +95,11 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
         { SHOW_FOOTER_PARTNERS > 0 &&
           <FooterLogos>
             <Container noPaddingBottom>
+              { messages.partners.note && messages.partners.note !== '' &&
+                <PartnerNote>
+                  <FormattedMessage {...messages.partners.note} />
+                </PartnerNote>
+              }
               <LogoList>
                 {
                   theme.media.partnerLogos.map((src, i) => (
