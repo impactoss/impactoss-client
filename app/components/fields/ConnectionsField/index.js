@@ -37,16 +37,18 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
 
     return (
       <StyledFieldWrap>
-        <ConnectionLabelWrap>
-          <ConnectionLabel>
-            {label}
-          </ConnectionLabel>
-          {field.entityType &&
-            <DotWrapper>
-              <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
-            </DotWrapper>
-          }
-        </ConnectionLabelWrap>
+        { label &&
+          <ConnectionLabelWrap>
+            <ConnectionLabel>
+              {label}
+            </ConnectionLabel>
+            {field.entityType &&
+              <DotWrapper>
+                <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
+              </DotWrapper>
+            }
+          </ConnectionLabelWrap>
+        }
         { (field.values && field.values.size > 0) &&
           <div>
             <EntityListItems

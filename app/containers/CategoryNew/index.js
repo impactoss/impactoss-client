@@ -132,8 +132,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     });
     if (!userOnly) {
       fields.push({
-        label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-        icon: 'connections',
         fields: [
           taxonomy.getIn(['attributes', 'tags_recommendations']) && recommendations &&
             renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),

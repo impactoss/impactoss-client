@@ -114,8 +114,6 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     });
     if (!entity.getIn(['attributes', 'user_only'])) {
       fields.push({
-        label: appMessages.entities.connections.plural,
-        icon: 'connections',
         fields: [
           entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
             getRecommendationConnectionField(recommendations, taxonomies, recommendationConnections, appMessages, onEntityClick),

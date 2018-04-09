@@ -167,8 +167,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     if (!userOnly) {
       fields.push(
         {
-          label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-          icon: 'connections',
           fields: [
             entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
               renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
