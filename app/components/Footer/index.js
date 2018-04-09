@@ -59,10 +59,14 @@ const ImpactLogo = styled(NormalImg)`
   height: 90px;
 `;
 
-const Table = styled.div`
-  display: table;
+const TableWrapper = styled.div`
   margin-left: -35px;
   margin-right: -35px;
+`;
+const Table = styled.div`
+  display: table;
+  width: 100%;
+  table-layout: fixed;
 `;
 const TableCell = styled.div`
   display: table-cell;
@@ -79,6 +83,10 @@ const TableCell = styled.div`
 `;
 const TableCellSmall = styled(TableCell)`
   width: 25%;
+`;
+
+const PartnerNote = styled.div`
+
 `;
 
 class Footer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -110,45 +118,47 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
         }
         <FooterMain>
           <Container noPaddingBottom>
-            <Table>
-              <TableCell>
-                <FormattedMessage {...messages.disclaimer} />
-                <FooterLink
-                  target="_blank"
-                  href={`mailto:${this.context.intl.formatMessage(messages.contact.email)}`}
-                  title={this.context.intl.formatMessage(messages.contact.anchor)}
-                >
-                  <FormattedMessage {...messages.contact.anchor} />
-                </FooterLink>
-              </TableCell>
-              <TableCellSmall>
-                <FormattedMessage {...messages.responsible.text} />
-                <div>
+            <TableWrapper>
+              <Table>
+                <TableCell>
+                  <FormattedMessage {...messages.disclaimer} />
                   <FooterLink
                     target="_blank"
-                    href={this.context.intl.formatMessage(messages.responsible.url)}
-                    title={this.context.intl.formatMessage(messages.responsible.anchor)}
+                    href={`mailto:${this.context.intl.formatMessage(messages.contact.email)}`}
+                    title={this.context.intl.formatMessage(messages.contact.anchor)}
                   >
-                    <FormattedMessage {...messages.responsible.anchor} />
+                    <FormattedMessage {...messages.contact.anchor} />
                   </FooterLink>
-                </div>
-              </TableCellSmall>
-              <TableCellSmall>
-                <FormattedMessage {...messages.project.text} />
-                <div>
-                  <ImpactLink
-                    target="_blank"
-                    href={this.context.intl.formatMessage(messages.project.url)}
-                    title={this.context.intl.formatMessage(messages.project.anchor)}
-                  >
-                    <div>
-                      <FormattedMessage {...messages.project.anchor} />
-                    </div>
-                    <ImpactLogo src={theme.media.impactossLogo} alt={this.context.intl.formatMessage(messages.project.anchor)} />
-                  </ImpactLink>
-                </div>
-              </TableCellSmall>
-            </Table>
+                </TableCell>
+                <TableCellSmall>
+                  <FormattedMessage {...messages.responsible.text} />
+                  <div>
+                    <FooterLink
+                      target="_blank"
+                      href={this.context.intl.formatMessage(messages.responsible.url)}
+                      title={this.context.intl.formatMessage(messages.responsible.anchor)}
+                    >
+                      <FormattedMessage {...messages.responsible.anchor} />
+                    </FooterLink>
+                  </div>
+                </TableCellSmall>
+                <TableCellSmall>
+                  <FormattedMessage {...messages.project.text} />
+                  <div>
+                    <ImpactLink
+                      target="_blank"
+                      href={this.context.intl.formatMessage(messages.project.url)}
+                      title={this.context.intl.formatMessage(messages.project.anchor)}
+                    >
+                      <div>
+                        <FormattedMessage {...messages.project.anchor} />
+                      </div>
+                      <ImpactLogo src={theme.media.impactossLogo} alt={this.context.intl.formatMessage(messages.project.anchor)} />
+                    </ImpactLink>
+                  </div>
+                </TableCellSmall>
+              </Table>
+            </TableWrapper>
           </Container>
         </FooterMain>
       </div>
