@@ -556,11 +556,19 @@ export default defineMessages({
       },
       singleLong: {
         id: 'app.containers.App.entities.recommendations.singleLong',
-        defaultMessage: 'HR body recommendation',
+        defaultMessage: 'Recommendation',
       },
       pluralLong: {
         id: 'app.containers.App.entities.recommendations.pluralLong',
-        defaultMessage: 'HR body recommendations',
+        defaultMessage: 'Recommendations',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.recommendations.singleShort',
+        defaultMessage: 'Recommendation',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.recommendations.pluralShort',
+        defaultMessage: 'Recommendations',
       },
       empty: {
         id: 'app.containers.App.entities.recommendations.empty',
@@ -584,6 +592,14 @@ export default defineMessages({
         id: 'app.containers.App.entities.measures.pluralLong',
         defaultMessage: 'Government actions',
       },
+      singleShort: {
+        id: 'app.containers.App.entities.measures.singleShort',
+        defaultMessage: 'Action',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.measures.pluralShort',
+        defaultMessage: 'Actions',
+      },
       empty: {
         id: 'app.containers.App.entities.measures.empty',
         defaultMessage: 'No actions yet',
@@ -606,6 +622,14 @@ export default defineMessages({
         id: 'app.containers.App.entities.sdgtargets.pluralLong',
         defaultMessage: 'SDG targets',
       },
+      singleShort: {
+        id: 'app.containers.App.entities.sdgtargets.singleShort',
+        defaultMessage: 'Target',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.sdgtargets.pluralShort',
+        defaultMessage: 'Targets',
+      },
       empty: {
         id: 'app.containers.App.entities.sdgtargets.empty',
         defaultMessage: 'No SDG targets yet',
@@ -626,6 +650,14 @@ export default defineMessages({
       },
       pluralLong: {
         id: 'app.containers.App.entities.indicators.pluralLong',
+        defaultMessage: 'Indicators',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.indicators.singleShort',
+        defaultMessage: 'Indicator',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.indicators.pluralShort',
         defaultMessage: 'Indicators',
       },
       empty: {
@@ -669,6 +701,14 @@ export default defineMessages({
       pluralLong: {
         id: 'app.containers.App.entities.progress_reports.pluralLong',
         defaultMessage: 'Progress reports',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.progress_reports.singleShort',
+        defaultMessage: 'Report',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.progress_reports.pluralShort',
+        defaultMessage: 'Reports',
       },
       empty: {
         id: 'app.containers.App.entities.progress_reports.empty',
