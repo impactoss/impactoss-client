@@ -172,7 +172,7 @@ theme.palette = {
   homeIntro: [dark[2]],
 
   // footer: [ '#color, #bg-main', #bg-partners, #borderColor ],
-  footer: [dark[4], dark[2], light[0], dark[1]],
+  footer: [light[4], dark[2], light[0], dark[1]],
   footerLinks: [primary[4]],
   footerLinksHover: [primary[2]],
 
