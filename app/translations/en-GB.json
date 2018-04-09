@@ -14,6 +14,7 @@
   "app.components.Footer.project.text" : "This demo site is powered by",
   "app.components.Footer.project.url" : "http://impactoss.org",
   "app.components.Footer.project.anchor" : " ",
+  "app.components.Footer.partners.note": "This demo site was set up and configured with kind support of",
   "app.components.Footer.partners.title1": "UNDP Cook Islands, Samoa and Tokelau",
   "app.components.Footer.partners.url1": "http://www.ws.undp.org/",
   "app.components.Footer.partners.title2": "The Office of the United Nations High Commissioner for Human Rights",
