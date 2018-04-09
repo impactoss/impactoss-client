@@ -67,6 +67,10 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     return role ? parseInt(role.get('id'), 10) : USER_ROLES.DEFAULT.value;
   }
 
+  getReference = (entity) => this.context.intl && appMessages.entities[entity.get('type')]
+    ? `${this.context.intl.formatMessage(appMessages.entities[entity.get('type')].singleShort)} ${entity.getIn(['attributes', 'reference']) || entity.get('id')}`
+    : entity.getIn(['attributes', 'reference']) || entity.get('id');
+
   mapToEntityListItem = ({
     config,
     entity,
@@ -77,7 +81,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
   }) => ({
     id: entity.get('id'),
     title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
-    reference: entity.getIn(['attributes', 'reference']) || entity.get('id'),
+    reference: this.getReference(entity, config),
     draft: entity.getIn(['attributes', 'draft']),
     role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
     path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
