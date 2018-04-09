@@ -89,9 +89,6 @@ const PartnerNote = styled.div`
   font-size: ${(props) => props.theme.sizes.text.small};
 `;
 
-const PartnerNote = styled.div`
-
-`;
 
 class Footer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
