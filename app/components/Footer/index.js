@@ -85,10 +85,10 @@ const TableCellSmall = styled(TableCell)`
   width: 25%;
 `;
 const PartnerNote = styled.div`
+  text-align: center;
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes.text.small};
 `;
-
 
 class Footer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
