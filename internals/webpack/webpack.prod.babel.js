@@ -3,6 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
+const WebpackGitHash = require('webpack-git-hash');
 
 module.exports = require('./webpack.base.babel')({
   // In production, we skip all hot-reloading stuff
@@ -12,11 +13,13 @@ module.exports = require('./webpack.base.babel')({
 
   // Utilize long-term caching by adding content hashes (not compilation hashes) to compiled assets
   output: {
-    filename: '[name].[chunkhash].js',
-    chunkFilename: '[name].[chunkhash].chunk.js',
+    filename: '[name].[chunkhash].[githash].js',
+    chunkFilename: '[name].[chunkhash].[githash].chunk.js',
   },
 
   plugins: [
+    new WebpackGitHash(),
+
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       children: true,
