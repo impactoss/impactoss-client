@@ -13,7 +13,7 @@ import { SHOW_FOOTER_PARTNERS } from 'themes/config';
 import messages from './messages';
 
 const FooterLogos = styled.div`
-  padding: 1.2em 0;
+  padding: 0.8em 0;
   background-color: ${palette('footer', 2)};
 `;
 
@@ -85,7 +85,6 @@ const TableCellSmall = styled(TableCell)`
   width: 25%;
 `;
 const PartnerNote = styled.div`
-  text-align: center;
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes.text.small};
 `;
