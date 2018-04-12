@@ -55,7 +55,7 @@ export const makeFilterGroups = (
   }
 
   // connections option group
-  if (config.connections && (typeof config.connections.role === 'undefined' || hasUserRole[config.connections.role])) {
+  if (config.connections && (typeof config.connections.role === 'undefined' || hasUserRole[config.connections.role.value])) {
     // first prepare taxonomy options
     filterGroups.connections = {
       id: 'connections', // filterGroupId
