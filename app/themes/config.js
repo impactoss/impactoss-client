@@ -73,7 +73,7 @@ export const TAXONOMY_GROUPS = [
 // General ********************
 
 export const ENDPOINTS = {
-  API: 'https://api2.impactoss.org', // server API endpoint
+  API: 'https://api3.impactoss.org', // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
@@ -140,7 +140,7 @@ export const REPORT_FREQUENCIES = [
   { value: 12, message: 'ui.reportFrequencies.annual' },
 ];
 
-export const ENABLE_SDGS = false;
+export const ENABLE_SDGS = true;
 
 // Map server database tables **************************
 export const DB_TABLES = [
@@ -160,10 +160,10 @@ export const DB_TABLES = [
   'user_categories',
   'progress_reports',
   'due_dates',
-//  'sdgtarget_categories',
-//  'sdgtarget_indicators',
-//  'sdgtarget_measures',
-//  'sdgtargets',
+  'sdgtarget_categories',
+  'sdgtarget_indicators',
+  'sdgtarget_measures',
+  'sdgtargets',
 ];
 
 // Table shapes
@@ -258,6 +258,11 @@ export const MEASURE_SHAPE = {
         table: 'indicators',
         via: 'measure_indicators',
         key: 'indicator_id',
+      },
+      {
+        table: 'sdgtargets',
+        via: 'sdgtarget_measures',
+        key: 'sdgtarget_id',
       },
     ],
     section: 'body',

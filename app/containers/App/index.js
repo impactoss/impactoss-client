@@ -102,18 +102,18 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         active: currentPath.startsWith(PATHS.MEASURES),
       },
     ]);
-    if (isManager) {
-      navItems = navItems.concat([{
-        path: PATHS.INDICATORS,
-        title: this.context.intl.formatMessage(messages.nav.indicators),
-        active: currentPath.startsWith(PATHS.INDICATORS) || currentPath.startsWith(PATHS.PROGRESS_REPORTS),
-      }]);
-    }
     if (ENABLE_SDGS) {
       navItems = navItems.concat([{
         path: PATHS.SDG_TARGETS,
         title: this.context.intl.formatMessage(messages.nav.sdgtargets),
         active: currentPath.startsWith(PATHS.SDG_TARGETS),
+      }]);
+    }
+    if (isManager) {
+      navItems = navItems.concat([{
+        path: PATHS.INDICATORS,
+        title: this.context.intl.formatMessage(messages.nav.indicators),
+        active: currentPath.startsWith(PATHS.INDICATORS) || currentPath.startsWith(PATHS.PROGRESS_REPORTS),
       }]);
     }
     navItems = navItems.concat([{
