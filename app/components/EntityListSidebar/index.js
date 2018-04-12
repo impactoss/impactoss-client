@@ -49,7 +49,7 @@ const STATE_INITIAL = {
   activeOption: null,
   expandedGroups: {
     taxonomies: true,
-    connectedTaxonomies: false,
+    connectedTaxonomies: true,
     connections: false,
     attributes: false,
   },
