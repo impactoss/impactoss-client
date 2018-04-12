@@ -84,9 +84,9 @@ const STATE_INITIAL = {
   activeOption: null,
   expandedGroups: {
     taxonomies: true,
-    connectedTaxonomies: false,
-    connections: true,
-    attributes: true,
+    connectedTaxonomies: true,
+    connections: false,
+    attributes: false,
   },
   visible: false,
   viewport: null,
