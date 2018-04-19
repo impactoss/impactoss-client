@@ -105,7 +105,7 @@ const PopupHeaderMain = styled.span`
 const PopupContent = styled.div`
   position: relative;
   max-height: 200px;
-  height: ${(props) => props.count * 4}em;
+  height: ${(props) => props.height || 200}px;
   overflow: auto;
 `;
 
@@ -139,6 +139,9 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
     this.state = {
       popupOpen: false,
       popupRef: null,
+      listItem_0: 0,
+      listItem_1: 0,
+      listItem_2: 0,
     };
   }
 
@@ -150,6 +153,14 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
       return 'left';
     }
     return 'center';
+  }
+
+  calcHeight = () => {
+    let height = 1;
+    if (this.state.listItem_0) height += this.state.listItem_0.clientHeight;
+    if (this.state.listItem_1) height += this.state.listItem_1.clientHeight;
+    if (this.state.listItem_2) height += this.state.listItem_2.clientHeight;
+    return height;
   }
 
   openPopup() {
@@ -194,14 +205,17 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                   </PopupHeaderMain>
                 }
               </PopupHeader>
-              <PopupContent count={entities.size}>
+              <PopupContent height={this.calcHeight()}>
                 {
                   sortEntities(entities, 'asc', 'reference')
                   .toList()
                   .map((entity, i) => {
                     const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
                     return (
-                      <ListItem key={i}>
+                      <ListItem
+                        key={i}
+                        innerRef={(node) => i < 3 && this.setState({ [`listItem_${i}`]: node })}
+                      >
                         <ListItemLink to={`/${option.path}/${entity.get('id')}`} >
                           { entity.getIn(['attributes', 'draft']) &&
                             <ItemStatus draft />
