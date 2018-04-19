@@ -9,7 +9,6 @@ import { TEXT_TRUNCATE } from 'themes/config';
 import { sortEntities } from 'utils/sort';
 import { truncateText } from 'utils/string';
 
-import Button from 'components/buttons/Button';
 import messages from 'components/ItemStatus/messages';
 import ItemStatus from 'components/ItemStatus';
 
@@ -32,8 +31,14 @@ const Count = styled.span`
   padding: 0 0.5em;
 `;
 
-const PopupWrapper = styled(Button)`
-  padding: 0;
+const PopupWrapper = styled.div`
+  display: inline-block;
+  cursor: pointer;
+  font-size: 1em;
+  text-align: center;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
   position: relative;
   margin-right: 10px;
   text-align: left;
@@ -53,7 +58,6 @@ const Popup = styled.div`
   width: ${(props) => props.total > 0 ? POPUP_WIDTH_PX : 'auto'};
   min-width: ${(props) => props.total > 0 ? POPUP_WIDTH : POPUP_WIDTH / 2}px;
   display: block;
-  left: 50%;
   z-index: 1;
   padding-bottom: 4px;
   font-size: 0.8em;
