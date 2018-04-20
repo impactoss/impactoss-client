@@ -59,6 +59,12 @@ import { DEPENDENCIES } from './constants';
 import { save } from './actions';
 
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -73,8 +79,8 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -92,7 +98,13 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -147,6 +159,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                 shape: MEASURE_SHAPE,
                 contextIntl: this.context.intl,
               })}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           {saveSending &&

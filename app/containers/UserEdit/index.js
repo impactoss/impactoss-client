@@ -66,6 +66,12 @@ import messages from './messages';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class UserEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -82,8 +88,8 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -159,7 +165,13 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -221,6 +233,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                   aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER.value) && this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           { saveSending &&

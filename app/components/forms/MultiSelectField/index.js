@@ -5,6 +5,9 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { lowerCase } from 'utils/string';
 import { getEntitySortComparator } from 'utils/sort';
+
+import { fitComponent, SCROLL_PADDING } from 'utils/scroll-to-component';
+
 import { omit } from 'lodash/object';
 import Button from 'components/buttons/Button';
 import A from 'components/styled/A';
@@ -19,7 +22,9 @@ const MultiSelectWrapper = styled.div`
   position: absolute;
   top: 0;
   right: 0;
-  height: 450px;
+  max-height: 450px;
+  min-height: 300px;
+  height: ${(props) => props.wrapperHeight ? props.wrapperHeight : 450}px;
   width: 100%;
   min-width: 350px;
   overflow: hidden;
@@ -111,9 +116,14 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
     super();
     this.state = {
       multiselectOpen: null,
+      controlRef: null,
     };
   }
-
+  componentDidUpdate() {
+    if (this.state.controlRef && this.props.scrollContainer) {
+      fitComponent(this.state.controlRef, this.props.scrollContainer);
+    }
+  }
   // MULTISELECT
   onToggleMultiselect = (field) => {
     this.setState({
@@ -123,6 +133,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
   onCloseMultiselect = () => {
     this.setState({
       multiselectOpen: null,
+      controlRef: null,
     });
   }
   onMultiSelectItemRemove = (option) =>
@@ -219,7 +230,17 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
           }
         </MultiselectActiveOptions>
         { this.state.multiselectOpen === id &&
-          <MultiSelectWrapper>
+          <MultiSelectWrapper
+            wrapperHeight={this.props.scrollContainer
+              ? this.props.scrollContainer.getBoundingClientRect().height - (SCROLL_PADDING * 2)
+              : 450
+            }
+            innerRef={(node) => {
+              if (!this.state.controlRef) {
+                this.setState({ controlRef: node });
+              }
+            }}
+          >
             <MultiSelectControl
               id={id}
               model={model || `.${id}`}
@@ -253,6 +274,7 @@ MultiSelectField.propTypes = {
   fieldData: PropTypes.object,
   handleUpdate: PropTypes.func,
   closeOnClickOutside: PropTypes.bool,
+  scrollContainer: PropTypes.object,
 };
 
 MultiSelectField.contextTypes = {
