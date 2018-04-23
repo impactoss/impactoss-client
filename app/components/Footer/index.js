@@ -78,6 +78,7 @@ const Table = styled.div`
     line-height: 1.64em;
   }
 `;
+
 const TableCell = styled.div`
   display: table-cell;
   width: 50%;
