@@ -295,6 +295,10 @@ theme.sizes = {
     header: {
       height: 90,
     },
+    width: {
+      small: 250,
+      large: 300,
+    },
   },
   mainListItem: {
     paddingHorizontal: 15,
@@ -314,8 +318,8 @@ theme.sizes = {
       claim: '0.85em',
     },
     paddingLeft: {
-      s: 12,
-      l: 20,
+      small: 12,
+      large: 20,
     },
   },
   home: {

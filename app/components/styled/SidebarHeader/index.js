@@ -10,6 +10,18 @@ export default styled.div`
     : 'none'
   };
   background-repeat: repeat;
-  padding: ${(props) => props.hasButtons ? '2.5em 1.5em 1em' : '3em 1.5em 1em'};
-  background-color: ${palette('asideHeader', 0)}
+  padding: ${(props) => {
+    if (props.hasButtons) {
+      return '2.5em 24px 1em';
+    }
+    if (props.responsiveSmall) {
+      return '3em 12px 1em';
+    }
+    return '3em 24px 1em';
+  }};
+  background-color: ${palette('asideHeader', 0)};
+
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding: ${(props) => props.hasButtons ? '2.5em 24px 1em' : '3em 24px 1em'};
+  }
 `;

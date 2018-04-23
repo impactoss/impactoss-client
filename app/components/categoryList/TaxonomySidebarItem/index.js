@@ -11,9 +11,9 @@ import appMessages from 'containers/App/messages';
 // TODO compare EntityListSidebarOption
 const Styled = styled(Button)`
   display: table;
+  table-layout: fixed;
   width: 100%;
-  padding: 1em;
-  padding: 0.5em 0.5em 0.5em 1.5em;
+  padding: 0.3em 8px 0.3em 12px;
   text-align: left;
   color:  ${(props) => props.active ? palette('asideCatNavItem', 1) : palette('asideCatNavItem', 0)};
   background-color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : palette('asideCatNavItem', 2)};
@@ -23,28 +23,25 @@ const Styled = styled(Button)`
     background-color: ${(props) => props.active ? palette('taxonomiesHover', props.paletteId) : palette('taxonomies', props.paletteId)};
     border-bottom-color: ${palette('asideCatNavItemHover', 4)};
   }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding: 0.5em 8px 0.5em 24px
+  }
 `;
-// color:  ${(props) => props.active ? palette('asideCatNavItem', 1) : palette('asideCatNavItem', 0)};
-// background-color: ${(props) => props.active ? palette('asideCatNavItem', 3) : palette('asideCatNavItem', 2)};
-// border-bottom: 1px solid ${palette('asideCatNavItem', 4)};
-// &:hover {
-//   color: ${(props) => props.active ? palette('asideCatNavItemHover', 1) : palette('asideCatNavItemHover', 0)};
-//   background-color: ${(props) => props.active ? palette('asideCatNavItemHover', 3) : palette('asideCatNavItemHover', 2)};
-//   border-bottom-color: ${palette('asideCatNavItemHover', 4)};
-// }
 
 const TaxTitle = styled.div`
   font-weight: bold;
   vertical-align: middle;
   display: table-cell;
-  width: 99%;
 `;
+
 // font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 const TaxIcon = styled.div`
-  padding-right: 0.75em;
+  padding-right: 8px;
   vertical-align: middle;
   display: table-cell;
-  width: 90px;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding-right: 12px;
+  }
 `;
 
 class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

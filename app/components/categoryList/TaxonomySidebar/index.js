@@ -21,9 +21,12 @@ const GroupLabel = styled.div`
   text-align: left;
   color: ${palette('asideListGroup', 0)};
   background-color: ${palette('asideListGroup', 1)};
-  padding: 0.25em 1em 0.25em 1.5em;
+  padding: 0.25em 12px;
   font-size: 0.9em;
   line-height: 1.64em;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding: 0.25em 24px;
+  }
 `;
 
 class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -32,7 +35,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
 
     return (
       <Component>
-        <SidebarHeader>
+        <SidebarHeader responsiveSmall>
           <SupTitle title={this.context.intl.formatMessage(messages.title)} />
         </SidebarHeader>
         {map(taxonomyGroups, (taxonomies, i) => (

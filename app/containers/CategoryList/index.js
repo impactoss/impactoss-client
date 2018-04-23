@@ -106,7 +106,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Sidebar>
+        <Sidebar responsiveSmall>
           <Scrollable>
             { !dataReady &&
               <EntityListSidebarLoading />
@@ -118,7 +118,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             }
           </Scrollable>
         </Sidebar>
-        <ContainerWithSidebar>
+        <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
               <ContentHeader

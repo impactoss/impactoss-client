@@ -391,7 +391,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Sidebar>
+        <Sidebar responsiveSmall>
           <Scrollable>
             { !dataReady &&
               <EntityListSidebarLoading />
@@ -408,7 +408,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             }
           </Scrollable>
         </Sidebar>
-        <ContainerWithSidebar>
+        <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
               <ContentHeader
