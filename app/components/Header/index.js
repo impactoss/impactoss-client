@@ -61,6 +61,10 @@ const HomeNavWrap = styled.div`
   z-index: 101;
 `;
 
+const NavSecondary = styled.div `
+  position: relative;
+  z-index: 300;
+`;
 
 class Header extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -135,38 +139,40 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </BrandText>
               }
             </Brand>
-            <NavAccount
-              isSignedIn={isSignedIn}
-              user={this.props.user}
-              onPageLink={this.props.onPageLink}
-              currentPath={currentPath}
-            />
-            <NavPages>
-              { pages && pages.map((page, i) => (
-                <LinkPage
-                  key={i}
-                  href={page.path}
-                  active={page.active || currentPath === page.path}
-                  onClick={(evt) => this.onClick(evt, page.path)}
-                >
-                  {page.title}
-                </LinkPage>
-              ))}
-            </NavPages>
-            { navItemsAdmin &&
-              <NavAdmin>
-                { navItemsAdmin.map((item, i) => (
-                  <LinkAdmin
+            <NavSecondary>
+              <NavAccount
+                isSignedIn={isSignedIn}
+                user={this.props.user}
+                onPageLink={this.props.onPageLink}
+                currentPath={currentPath}
+              />
+              <NavPages>
+                { pages && pages.map((page, i) => (
+                  <LinkPage
                     key={i}
-                    href={item.path}
-                    active={item.active}
-                    onClick={(evt) => this.onClick(evt, item.path)}
+                    href={page.path}
+                    active={page.active || currentPath === page.path}
+                    onClick={(evt) => this.onClick(evt, page.path)}
                   >
-                    {item.title}
-                  </LinkAdmin>
+                    {page.title}
+                  </LinkPage>
                 ))}
-              </NavAdmin>
-            }
+              </NavPages>
+              { navItemsAdmin &&
+                <NavAdmin>
+                  { navItemsAdmin.map((item, i) => (
+                    <LinkAdmin
+                      key={i}
+                      href={item.path}
+                      active={item.active}
+                      onClick={(evt) => this.onClick(evt, item.path)}
+                    >
+                      {item.title}
+                    </LinkAdmin>
+                  ))}
+                </NavAdmin>
+              }
+            </NavSecondary>
           </Banner>
         }
         { !isHome &&
