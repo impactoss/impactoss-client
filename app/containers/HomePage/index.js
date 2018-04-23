@@ -63,17 +63,26 @@ const SectionTop = styled.div`
 const SectionWrapper = styled.div`
   display: ${(props) => props.hasBrand ? 'static' : 'table-cell'};
   vertical-align: ${(props) => props.hasBrand ? 'baseline' : 'middle'};
-  padding-bottom: 74px;
+  padding-bottom: 3em;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding-bottom: 6em;
+  }
 `;
 
-const TopActions = styled.div`
-  padding-top: 2em;
+const HomeActions = styled.div`
+  padding-top: 1em;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding-top: 2em;
+  }
 `;
 const Title = styled.h1`
   color:${palette('headerBrand', 0)};
   font-family: ${(props) => props.theme.fonts.title};
   font-size: ${(props) => props.theme.sizes.home.text.title};
-  margin-top: 46px;
+  margin-top: 0.5em;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    margin-top: 1em;
+  }
 `;
 
 const Claim = styled.p`
@@ -87,10 +96,13 @@ const Claim = styled.p`
 `;
 
 const Intro = styled(ReactMarkdown)`
-  font-size: 1.25em;
-  width: 80%;
+  font-size: 1.1em;
   margin-left: auto;
-  margin-right: auto;  
+  margin-right: auto;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    font-size: 1.25em;
+    width: 80%;
+  }
 `;
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -123,8 +135,8 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             }
             { SHOW_HOME_TITLE &&
               <Row>
-                <Grid sm={1 / 6} />
-                <Grid sm={4 / 6}>
+                <Grid lg={1 / 6} sm={1 / 8} />
+                <Grid lg={4 / 6} sm={6 / 8}>
                   <Title>
                     <FormattedMessage {...appMessages.app.title} />
                   </Title>
@@ -132,22 +144,20 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                     <FormattedMessage {...appMessages.app.claim} />
                   </Claim>
                 </Grid>
-                <Grid sm={1 / 6} />
+                <Grid lg={1 / 6} sm={1 / 8} />
               </Row>
             }
             <Row>
-              <Grid sm={1 / 6} />
-              <Grid sm={4 / 6}>
+              <Grid lg={1 / 6} sm={1 / 12} />
+              <Grid lg={4 / 6} sm={10 / 12}>
                 <Intro source={this.context.intl.formatMessage(messages.intro)} />
-                <TopActions>
-                  <div>
-                    <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
-                      <FormattedMessage {...messages.explore} />
-                    </ButtonHero>
-                  </div>
-                </TopActions>
+                <HomeActions>
+                  <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
+                    <FormattedMessage {...messages.explore} />
+                  </ButtonHero>
+                </HomeActions>
               </Grid>
-              <Grid sm={1 / 6} />
+              <Grid lg={1 / 6} sm={1 / 12} />
             </Row>
           </SectionWrapper>
         </SectionTop>

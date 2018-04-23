@@ -43,8 +43,8 @@ theme.media = {
 // grid-styles settings https://github.com/jxnblk/grid-styled
 theme.gutter = 20;
 theme.breakpoints = {
-  small: '768px',
-  medium: '992px',
+  small: '769px',
+  medium: '993px',
   large: '1200px',
 };
 
