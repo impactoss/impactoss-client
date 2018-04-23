@@ -60,25 +60,41 @@ const ImpactLogo = styled(NormalImg)`
 `;
 
 const TableWrapper = styled.div`
-  margin-left: -35px;
-  margin-right: -35px;
+  margin-left: -15px;
+  margin-right: -15px;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    margin-left: -35px;
+    margin-right: -35px;
+  }
 `;
 const Table = styled.div`
   display: table;
   width: 100%;
   table-layout: fixed;
+  font-size: 0.9em;
+  line-height: 1.4em;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    font-size: 1em;
+    line-height: 1.64em;
+  }
 `;
 const TableCell = styled.div`
   display: table-cell;
   width: 50%;
   vertical-align: top;
-  padding-left: 35px;
-  padding-right: 35px;
-  padding-top: 2em;
-  padding-bottom: 2em;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
   border-right: 1px solid ${palette('footer', 3)};
   &:last-child {
     border-right: none;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding-left: 35px;
+    padding-right: 35px;
+    padding-top: 1.6em;
+    padding-bottom: 1.6em;
   }
 `;
 const TableCellSmall = styled(TableCell)`
