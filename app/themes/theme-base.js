@@ -313,6 +313,10 @@ theme.sizes = {
       title: '2.2em',
       claim: '0.85em',
     },
+    paddingLeft: {
+      s: 12,
+      l: 20,
+    },
   },
   home: {
     // px or em
