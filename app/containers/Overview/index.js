@@ -204,7 +204,7 @@ const DiagramButtonWrap = styled.div`
 // background-color: ${palette('primary', 1)};
 
 const DiagramButton = styled(Button)`
-  background-color: ${(props) => palette(props.palette, 0)};
+  background-color: ${(props) => palette(props.paletteDefault, 0)};
   &:hover {
     background-color: ${(props) => palette(props.paletteHover, 0)};
   }
@@ -503,7 +503,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
   renderButton = ({ path, paletteDefault, paletteHover, icon, message, count, draftCount, stateButton }) => (
     <DiagramButton
       onClick={() => this.props.onPageLink(path)}
-      palette={paletteDefault}
+      paletteDefault={paletteDefault}
       paletteHover={paletteHover}
       innerRef={(node) => {
         if (!this.state[stateButton]) {
