@@ -41,7 +41,10 @@ import { selectTaxonomy, selectCategories } from './selectors';
 import { updateSort } from './actions';
 
 const Content = styled.div`
-  padding: 0 4em;
+  padding: 0 1em;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding: 0 2em;
+  }
 `;
 const UsersOnly = styled.h4`
   margin-top: 4em;

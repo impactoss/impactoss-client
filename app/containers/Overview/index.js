@@ -11,7 +11,7 @@ import { FormattedMessage } from 'react-intl';
 import { PathLine } from 'react-svg-pathline';
 import { palette } from 'styled-theme';
 
-import styled from 'styled-components';
+import styled, { withTheme } from 'styled-components';
 
 import { mapToTaxonomyList } from 'utils/taxonomies';
 
@@ -54,7 +54,10 @@ import {
 } from './selectors';
 
 const Content = styled.div`
-  padding: 0 4em;
+  padding: 0 1em;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding: 0 2em;
+  }
 `;
 const Description = styled.p`
   margin-bottom: 2em;
@@ -63,49 +66,63 @@ const Description = styled.p`
 const Diagram = styled.div`
   position: relative;
   width: 100%;
-  margin-bottom: 180px;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    margin-bottom: 180px;
+  }
 `;
-const DiagramLeft = styled.div`
+const DiagramSectionHorizontalHalf = styled.div`
   display: inline-block;
-  width: 30%;
-  position: relative;
-  height: 300px;
-`;
-const DiagramHCenter = styled.div`
-  display: inline-block;
-  width: 40%;
-  position: relative;
-  height: 300px;
-`;
-const DiagramRight = styled.div`
-  display: inline-block;
-  width: 30%;
+  width: 25%;
   position: relative;
   height: 300px;
 `;
 
-const DiagramTop = styled.div`
+const DiagramSectionHorizontalCenter = styled.div`
+  display: inline-block;
+  width: 50%;
+  position: relative;
+  height: 300px;
+`;
+
+const DiagramSectionHorizontalTop = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   text-align: center;
   width: 100%;
 `;
-const DiagramBottom = styled.div`
-  position: absolute;
+const DiagramSectionHorizontalBottom = styled(DiagramSectionHorizontalTop)`
   bottom: 0;
-  left: 0;
-  width: 100%;
-  text-align: center;
+  top: auto;
 `;
-const DiagramVCenter = styled.div`
+
+const DiagramSectionHorizontalVCenter = styled.div`
   position: absolute;
   left: 0;
-  width: 100%;
   text-align: center;
+  width: 100%;
   top: 50%;
   transform: translate(0, -50%);
 `;
+
+const DiagramSectionVertical = styled.div`
+  display: block;
+  position: relative;
+  text-align: center;
+`;
+
+const DiagramSectionVerticalHalf = styled.div`
+  display: inline-block;
+  width: 50%;
+  position: relative;
+`;
+
+const DiagramSectionVerticalCenter = styled.div`
+  display: block;
+  margin: 0 auto;
+  position: relative;
+`;
+
 const Annotation = styled.div`
   position: absolute;
   transform: translate(-50%, -50%);
@@ -117,25 +134,42 @@ const Annotation = styled.div`
   line-height: 1.1em;
   font-size: 0.85em;
   margin-top: -2em;
+  left: ${(props) => props.hasSDGs ? 31 : 30}%;
 `;
-const Addressed = styled(Annotation)`
-  left: ${(props) => props.hasSDGs ? 33 : 31}%;
+const AnnotationMeasured = styled(Annotation)`
+  left: 71%;
 `;
-const Measured = styled(Annotation)`
-  left: 69%;
+const AnnotationVertical = styled.div`
+  text-align: center;
+  color: ${palette('text', 1)};
+  line-height: 1.1em;
+  font-size: 0.85em;
+  background-color: ${palette('background', 1)};
+  position: relative;
+  width: 200px;
+  margin: 0 auto;
 `;
+
 const Categorised = styled.div`
-  position: absolute;
-  top: 100%;
-  border-top: 1px solid ${palette('light', 4)};
-  width: 100%;
-  -webkit-text-align: left;
-  text-align: left;
-  left: 0;
+  border-bottom: 1px solid ${palette('light', 4)};
   padding-top: 5px;
+  padding-bottom: 5px;
+  margin: 0 5px;
   color: ${palette('text', 1)};
   font-weight: normal;
-  font-size: 0.85em;
+  font-size: 0.75em;
+  line-height: 1.4em;
+  background-color: ${palette('background', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    text-align: left;
+    border-top: 1px solid ${palette('light', 4)};
+    border-bottom: 0;
+    padding-bottom: 0;
+    margin: 0;
+  }
 `;
 
 const CategorisedIcons = styled.div``;
@@ -152,6 +186,22 @@ const CategorisedIcon = styled.a`
 // &:hover {
 //   color: ${palette('primary', 0)};
 // }
+const DiagramButtonWrap = styled.div`
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1.1em;
+  padding: 1.1em 0;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    margin-bottom: 0;
+    padding: 1em 0;
+  }
+`;
+// color: ${palette('primary', 4)};
+// &:hover {
+//   color: ${palette('primary', 4)};
+//   background-color: ${palette('primary', 1)};
+// }
+// background-color: ${palette('primary', 1)};
 
 const DiagramButton = styled(Button)`
   background-color: ${(props) => palette(props.palette, 0)};
@@ -166,17 +216,7 @@ const DiagramButton = styled(Button)`
   min-width: 180px;
 `;
 // font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
-const DiagramButtonWrap = styled.div`
-  position: relative;
-  padding: 1em 0;
-  display: inline-block;
-`;
-// color: ${palette('primary', 4)};
-// &:hover {
-//   color: ${palette('primary', 4)};
-//   background-color: ${palette('primary', 1)};
-// }
-// background-color: ${palette('primary', 1)};
+
 const DiagramButtonMain = styled(DiagramButton)`
   min-width: 230px;
   &:before {
@@ -242,11 +282,15 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       buttonSdgtargets: null,
       mouseOverTaxonomy: null,
       mouseOverTaxonomyDiagram: null,
+      viewport: null,
     };
   }
   // make sure to load all data from server
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
+  }
+  componentDidMount() {
+    this.updateViewport();
     window.addEventListener('resize', this.resize);
   }
   componentWillReceiveProps(nextProps) {
@@ -277,40 +321,113 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
   getConnectionPoint = (node, nodeReference, side = 'right') => {
     const boundingRect = node.getBoundingClientRect();
     const boundingRectReference = nodeReference.getBoundingClientRect();
+
+    if (side === 'right' || side === 'left') {
+      return ({
+        x: side === 'right'
+          ? (boundingRect.right - boundingRectReference.left)
+          : (boundingRect.left - boundingRectReference.left),
+        y: (boundingRect.top - boundingRectReference.top)
+          + (((boundingRect.bottom - boundingRectReference.top) - (boundingRect.top - boundingRectReference.top)) / 2),
+      });
+    }
     return ({
-      x: side === 'right'
-        ? (boundingRect.right - boundingRectReference.left)
-        : (boundingRect.left - boundingRectReference.left),
-      y: (boundingRect.top - boundingRectReference.top)
-        + (((boundingRect.bottom - boundingRectReference.top) - (boundingRect.top - boundingRectReference.top)) / 2),
+      x: (boundingRect.left - boundingRectReference.left)
+        + (((boundingRect.right - boundingRectReference.left) - (boundingRect.left - boundingRectReference.left)) / 2),
+      y: side === 'bottom'
+        ? (boundingRect.bottom - boundingRectReference.top)
+        : (boundingRect.top - boundingRectReference.top),
     });
   }
 
-  getConnectionPath = (start, end) =>
-    [
+  getConnectionPath = (vertical = false, start, end) => vertical
+    ? [
+      { x: start.x, y: start.y + 5 },
+      { x: end.x, y: end.y - 5 },
+    ]
+    : [
       { x: start.x + 5, y: start.y },
       { x: end.x - 5, y: end.y },
     ];
 
-  getCurvedConnectionPath = (start, end, curve = 0.2) =>
-    [
+  getCurvedConnectionPath = (vertical = false, start, end, curve = 0.2) => vertical
+    ? [
+      { x: start.x, y: start.y + 5 },
+      { x: start.x, y: start.y + ((end.y - start.y) * curve) },
+      { x: end.x, y: start.y + ((end.y - start.y) * curve) },
+      { x: end.x, y: end.y - 5 },
+    ]
+    : [
       { x: start.x + 5, y: start.y },
       { x: start.x + ((end.x - start.x) * curve), y: start.y },
       { x: start.x + ((end.x - start.x) * curve), y: end.y },
       { x: end.x - 5, y: end.y },
     ];
 
-  getConnectionPathArrow = (connectionPath) => {
+
+  getConnectionPathArrow = (connectionPath, vertical = false) => {
     const point = connectionPath[connectionPath.length - 1];
-    return [
+    return vertical
+    ? [
+      point,
+      { x: point.x - 5, y: point.y - 5 },
+      { x: point.x + 5, y: point.y - 5 },
+      point,
+    ]
+    : [
       point,
       { x: point.x - 5, y: point.y - 5 },
       { x: point.x - 5, y: point.y + 5 },
       point,
     ];
   }
+  updateViewport() {
+    let viewport = 'mobile';
+    if (window.innerWidth >= parseInt(this.props.theme.breakpoints.large, 10)) {
+      viewport = 'large';
+    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.medium, 10)) {
+      viewport = 'medium';
+    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.small, 10)) {
+      viewport = 'small';
+    }
+    this.setState({ viewport });
+  }
+  connectRecommendationsMeasures = (vertical = false) => ENABLE_SDGS
+    ? this.getCurvedConnectionPath(
+      vertical,
+      this.getConnectionPoint(this.state.buttonRecs, this.state.diagram, vertical ? 'bottom' : 'right'),
+      this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'top' : 'left'),
+      vertical ? 0.6 : 0.2
+    )
+    : this.getConnectionPath(
+      vertical,
+      this.getConnectionPoint(this.state.buttonRecs, this.state.diagram, vertical ? 'bottom' : 'right'),
+      this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'top' : 'left'),
+    );
+  connectSdgtargetsMeasures = (vertical = false) => this.getCurvedConnectionPath(
+    vertical,
+    this.getConnectionPoint(this.state.buttonSdgtargets, this.state.diagram, vertical ? 'bottom' : 'right'),
+    this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'top' : 'left'),
+    vertical ? 0.6 : 0.2
+  );
+  connectMeasuresIndicators = (vertical = false) => this.getConnectionPath(
+    vertical,
+    this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'bottom' : 'right'),
+    this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, vertical ? 'top' : 'left'),
+    vertical ? 0.6 : 0.2
+  );
+  connectSdgtargetsIndicators = (vertical = false) =>
+    this.getCurvedConnectionPath(
+      vertical,
+      this.getConnectionPoint(this.state.buttonSdgtargets, this.state.diagram, vertical ? 'bottom' : 'right'),
+      this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, vertical ? 'top' : 'left'),
+      0.9
+    );
 
-  resize = () => this.forceUpdate();
+  resize = () => {
+    this.updateViewport();
+    this.forceUpdate();
+  };
 
   renderTaxonomyIcons = (taxonomies, activeTaxonomyId) => (
     <CategorisedIcons>
@@ -340,48 +457,170 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     </CategorisedIcons>
   )
 
+  renderPath = (points = [], dashed = false, r = 20) => (
+    <PathLineCustom
+      points={points}
+      strokeDasharray={dashed ? '5,5' : null}
+      r={r}
+    />
+  );
+  renderArrow = (points = [], vertical = false) => (
+    <PathLineArrow
+      points={this.getConnectionPathArrow(points, vertical)}
+      r={0}
+    />
+  );
+  renderPathsSVG = (vertical = false) => (
+    <DiagramSvgWrapper>
+      { this.state.diagram &&
+        <svg
+          width={this.state.diagram.getBoundingClientRect().width}
+          height={this.state.diagram.getBoundingClientRect().height}
+        >
+          {ENABLE_SDGS && this.state.buttonSdgtargets && this.state.buttonIndicators &&
+            this.renderPath(this.connectSdgtargetsIndicators(vertical), true)
+          }
+          { this.state.buttonRecs && this.state.buttonMeasures &&
+            this.renderPath(this.connectRecommendationsMeasures(vertical))
+          }
+          { this.state.buttonRecs && this.state.buttonMeasures &&
+            this.renderArrow(this.connectRecommendationsMeasures(vertical), vertical)
+          }
+          {ENABLE_SDGS && this.state.buttonSdgtargets && this.state.buttonMeasures &&
+            this.renderPath(this.connectSdgtargetsMeasures(vertical))
+          }
+          { this.state.buttonIndicators && this.state.buttonMeasures &&
+            this.renderPath(this.connectMeasuresIndicators(vertical))
+          }
+          { this.state.buttonIndicators && this.state.buttonMeasures &&
+            this.renderArrow(this.connectMeasuresIndicators(vertical), vertical)
+          }
+        </svg>
+      }
+    </DiagramSvgWrapper>
+  );
+
+  renderButton = ({ path, paletteDefault, paletteHover, icon, message, count, draftCount, stateButton }) => (
+    <DiagramButton
+      onClick={() => this.props.onPageLink(path)}
+      palette={paletteDefault}
+      paletteHover={paletteHover}
+      innerRef={(node) => {
+        if (!this.state[stateButton]) {
+          this.setState({ [stateButton]: node });
+        }
+      }}
+    >
+      <DiagramButtonIcon>
+        <Icon name={icon} />
+      </DiagramButtonIcon>
+      <div>
+        <FormattedMessage {...messages.buttons[message]} values={{ count: count || '0' }} />
+      </div>
+      { draftCount > 0 &&
+        <DraftEntities>
+          <FormattedMessage {...messages.buttons.draft} values={{ count: draftCount }} />
+        </DraftEntities>
+      }
+    </DiagramButton>
+  )
+  renderCategoryIcons = (tags) => (
+    <Categorised>
+      <FormattedMessage {...messages.diagram.categorised} />
+      {
+        this.renderTaxonomyIcons(
+          this.getTaxonomiesByTagging(this.props.taxonomies, tags),
+          this.state.mouseOverTaxonomy || this.state.mouseOverTaxonomyDiagram
+        )
+      }
+    </Categorised>
+  );
+
+  renderRecommendationsButton = () => (
+    <DiagramButtonWrap>
+      {this.renderButton({
+        path: PATHS.RECOMMENDATIONS,
+        paletteDefault: 'recommendations',
+        paletteHover: 'recommendationsHover',
+        stateButton: 'buttonRecs',
+        icon: 'recommendations',
+        message: 'recommendations',
+        count: this.props.recommendationCount,
+        draftCount: this.props.recommendationDraftCount,
+      })}
+      {this.renderCategoryIcons('tags_recommendations')}
+    </DiagramButtonWrap>
+  );
+  renderMeasuresButton = () => (
+    <DiagramButtonWrap>
+      <DiagramButtonMain
+        onClick={() => this.props.onPageLink(PATHS.MEASURES)}
+        paletteDefault={'measures'}
+        paletteHover={'measuresHover'}
+        innerRef={(node) => {
+          if (!this.state.buttonMeasures) {
+            this.setState({ buttonMeasures: node });
+          }
+        }}
+      >
+        <DiagramButtonMainInside>
+          <DiagramButtonIcon>
+            <Icon name="measures" size="5em" />
+          </DiagramButtonIcon>
+          <DiagramButtonMainTop>
+            <FormattedMessage {...messages.buttons.measures} />
+          </DiagramButtonMainTop>
+          <DiagramButtonMainBottom>
+            <FormattedMessage {...messages.buttons.measuresAdditional} values={{ count: this.props.measureCount || '0' }} />
+          </DiagramButtonMainBottom>
+          { this.props.measureDraftCount > 0 &&
+            <DraftEntities>
+              <FormattedMessage {...messages.buttons.draft} values={{ count: this.props.measureDraftCount }} />
+            </DraftEntities>
+          }
+        </DiagramButtonMainInside>
+      </DiagramButtonMain>
+      { this.getTaxonomiesByTagging(this.props.taxonomies, 'tags_measures').size > 0 &&
+        this.renderCategoryIcons('tags_measures')
+      }
+    </DiagramButtonWrap>
+  );
+
+  renderIndicatorButton = () => (
+    <DiagramButtonWrap>
+      {this.renderButton({
+        path: PATHS.INDICATORS,
+        paletteDefault: 'indicators',
+        paletteHover: 'indicatorsHover',
+        stateButton: 'buttonIndicators',
+        icon: 'indicators',
+        message: 'indicators',
+        count: this.props.indicatorCount,
+        draftCount: this.props.indicatorDraftCount,
+      })}
+    </DiagramButtonWrap>
+  );
+  renderSdgtargetButton = () => (
+    <DiagramButtonWrap>
+      { this.renderButton({
+        path: PATHS.SDG_TARGETS,
+        paletteDefault: 'sdgtargets',
+        paletteHover: 'sdgtargetsHover',
+        stateButton: 'buttonSdgtargets',
+        icon: 'sdgtargets',
+        message: 'sdgtargets',
+        count: this.props.sdgtargetCount,
+        draftCount: this.props.sdgtargetDraftCount,
+      }) }
+      { this.renderCategoryIcons('tags_sdgtargets') }
+    </DiagramButtonWrap>
+  );
   render() {
     const {
-      taxonomies,
       dataReady,
-      onPageLink,
       onTaxonomyLink,
-      recommendationCount,
-      sdgtargetCount,
-      measureCount,
-      indicatorCount,
-      recommendationDraftCount,
-      sdgtargetDraftCount,
-      measureDraftCount,
-      indicatorDraftCount,
+      taxonomies,
     } = this.props;
-
-    const connectRecommendationsMeasures = this.state.buttonRecs && this.state.buttonMeasures && this.state.diagram && (ENABLE_SDGS
-      ? this.getCurvedConnectionPath(
-        this.getConnectionPoint(this.state.buttonRecs, this.state.diagram, 'right'),
-        this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, 'left'),
-      )
-      : this.getConnectionPath(
-        this.getConnectionPoint(this.state.buttonRecs, this.state.diagram, 'right'),
-        this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, 'left'),
-      )
-    );
-    const connectSdgtargetsMeasures = this.state.buttonSdgtargets && this.state.buttonMeasures && this.state.diagram &&
-      this.getCurvedConnectionPath(
-        this.getConnectionPoint(this.state.buttonSdgtargets, this.state.diagram, 'right'),
-        this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, 'left'),
-      );
-    const connectMeasuresIndicators = this.state.buttonIndicators && this.state.buttonMeasures && this.state.diagram &&
-      this.getConnectionPath(
-        this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, 'right'),
-        this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, 'left'),
-      );
-    const connectSdgtargetsIndicators = this.state.buttonIndicators && this.state.buttonSdgtargets && this.state.diagram &&
-      this.getCurvedConnectionPath(
-        this.getConnectionPoint(this.state.buttonSdgtargets, this.state.diagram, 'right'),
-        this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, 'left'),
-        0.9
-      );
 
     return (
       <div>
@@ -430,243 +669,81 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                     }
                   }}
                 >
-                  <DiagramSvgWrapper>
-                    { this.state.diagram &&
-                      <svg
-                        width={this.state.diagram.getBoundingClientRect().width}
-                        height={this.state.diagram.getBoundingClientRect().height}
-                      >
-                        {ENABLE_SDGS && connectSdgtargetsIndicators &&
-                          <PathLineCustom
-                            points={connectSdgtargetsIndicators}
-                            strokeDasharray="5,5"
-                            r={20}
-                          />
+                  { this.renderPathsSVG(this.state.viewport !== 'large') }
+                  { this.state.viewport !== 'large' && // VERTICAL
+                    <div>
+                      <DiagramSectionVertical>
+                        { ENABLE_SDGS &&
+                          <DiagramSectionVerticalHalf>
+                            {this.renderRecommendationsButton()}
+                          </DiagramSectionVerticalHalf>
                         }
-                        {connectRecommendationsMeasures &&
-                          <PathLineCustom
-                            points={connectRecommendationsMeasures}
-                            r={20}
-                          />
+                        { !ENABLE_SDGS &&
+                          <DiagramSectionVerticalCenter>
+                            {this.renderRecommendationsButton()}
+                          </DiagramSectionVerticalCenter>
                         }
-                        {connectRecommendationsMeasures &&
-                          <PathLineArrow
-                            points={this.getConnectionPathArrow(connectRecommendationsMeasures)}
-                            r={0}
-                          />
+                        { ENABLE_SDGS &&
+                          <DiagramSectionVerticalHalf>
+                            {this.renderSdgtargetButton()}
+                          </DiagramSectionVerticalHalf>
                         }
-                        {ENABLE_SDGS && connectSdgtargetsMeasures &&
-                          <PathLineCustom
-                            points={connectSdgtargetsMeasures}
-                            r={20}
-                          />
+                      </DiagramSectionVertical>
+                      <AnnotationVertical hasSDGs={ENABLE_SDGS}>
+                        <FormattedMessage {...messages.diagram.addressed} />
+                      </AnnotationVertical>
+                      <DiagramSectionVertical>
+                        <DiagramSectionVerticalCenter>
+                          {this.renderMeasuresButton()}
+                        </DiagramSectionVerticalCenter>
+                      </DiagramSectionVertical>
+                      <AnnotationVertical>
+                        <FormattedMessage {...messages.diagram.measured} />
+                      </AnnotationVertical>
+                      <DiagramSectionVertical>
+                        <DiagramSectionVerticalCenter>
+                          {this.renderIndicatorButton()}
+                        </DiagramSectionVerticalCenter>
+                      </DiagramSectionVertical>
+                    </div>
+                  }
+                  { this.state.viewport === 'large' && // HORIZONTAL
+                    <div>
+                      <DiagramSectionHorizontalHalf>
+                        { ENABLE_SDGS &&
+                          <DiagramSectionHorizontalTop>
+                            {this.renderRecommendationsButton()}
+                          </DiagramSectionHorizontalTop>
                         }
-                        {connectMeasuresIndicators &&
-                          <PathLineCustom
-                            points={connectMeasuresIndicators}
-                            r={20}
-                          />
+                        { !ENABLE_SDGS &&
+                          <DiagramSectionHorizontalVCenter>
+                            {this.renderRecommendationsButton()}
+                          </DiagramSectionHorizontalVCenter>
                         }
-                        {connectMeasuresIndicators &&
-                          <PathLineArrow
-                            points={this.getConnectionPathArrow(connectMeasuresIndicators)}
-                            r={0}
-                          />
+                        { ENABLE_SDGS &&
+                          <DiagramSectionHorizontalBottom>
+                            {this.renderSdgtargetButton()}
+                          </DiagramSectionHorizontalBottom>
                         }
-                      </svg>
-                    }
-                  </DiagramSvgWrapper>
-                  <DiagramLeft>
-                    { ENABLE_SDGS &&
-                      <DiagramTop>
-                        <DiagramButtonWrap>
-                          <DiagramButton
-                            onClick={() => onPageLink(PATHS.RECOMMENDATIONS)}
-                            palette={'recommendations'}
-                            paletteHover={'recommendationsHover'}
-                            innerRef={(node) => {
-                              if (!this.state.buttonRecs) {
-                                this.setState({ buttonRecs: node });
-                              }
-                            }}
-                          >
-                            <DiagramButtonIcon>
-                              <Icon name="recommendations" />
-                            </DiagramButtonIcon>
-                            <div>
-                              <FormattedMessage {...messages.buttons.recommendations} values={{ count: recommendationCount || '0' }} />
-                            </div>
-                            { recommendationDraftCount > 0 &&
-                              <DraftEntities>
-                                <FormattedMessage {...messages.buttons.draft} values={{ count: recommendationDraftCount }} />
-                              </DraftEntities>
-                            }
-                          </DiagramButton>
-                          <Categorised>
-                            <FormattedMessage {...messages.diagram.categorised} />
-                            {
-                              this.renderTaxonomyIcons(
-                                this.getTaxonomiesByTagging(taxonomies, 'tags_recommendations'),
-                                this.state.mouseOverTaxonomy || this.state.mouseOverTaxonomyDiagram
-                              )
-                            }
-                          </Categorised>
-                        </DiagramButtonWrap>
-                      </DiagramTop>
-                    }
-                    { !ENABLE_SDGS &&
-                      <DiagramVCenter>
-                        <DiagramButtonWrap>
-                          <DiagramButton
-                            onClick={() => onPageLink(PATHS.RECOMMENDATIONS)}
-                            palette={'recommendations'}
-                            paletteHover={'recommendationsHover'}
-                            innerRef={(node) => {
-                              if (!this.state.buttonRecs) {
-                                this.setState({ buttonRecs: node });
-                              }
-                            }}
-                          >
-                            <DiagramButtonIcon>
-                              <Icon name="recommendations" />
-                            </DiagramButtonIcon>
-                            <div>
-                              <FormattedMessage {...messages.buttons.recommendations} values={{ count: recommendationCount || '0' }} />
-                            </div>
-                            { recommendationDraftCount > 0 &&
-                              <DraftEntities>
-                                <FormattedMessage {...messages.buttons.draft} values={{ count: recommendationDraftCount }} />
-                              </DraftEntities>
-                            }
-                          </DiagramButton>
-                          { this.getTaxonomiesByTagging(taxonomies, 'tags_recommendations').size > 0 &&
-                            <Categorised>
-                              <FormattedMessage {...messages.diagram.categorised} />
-                              {
-                                this.renderTaxonomyIcons(
-                                  this.getTaxonomiesByTagging(taxonomies, 'tags_recommendations'),
-                                  this.state.mouseOverTaxonomy || this.state.mouseOverTaxonomyDiagram
-                                )
-                              }
-                            </Categorised>
-                          }
-                        </DiagramButtonWrap>
-                      </DiagramVCenter>
-                    }
-                    { ENABLE_SDGS &&
-                      <DiagramBottom>
-                        <DiagramButtonWrap>
-                          <DiagramButton
-                            onClick={() => onPageLink(PATHS.SDG_TARGETS)}
-                            palette={'sdgtargets'}
-                            paletteHover={'sdgtargetsHover'}
-                            innerRef={(node) => {
-                              if (!this.state.buttonSdgtargets) {
-                                this.setState({ buttonSdgtargets: node });
-                              }
-                            }}
-                          >
-                            <DiagramButtonIcon>
-                              <Icon name="sdgtargets" />
-                            </DiagramButtonIcon>
-                            <div>
-                              <FormattedMessage {...messages.buttons.sdgtargets} values={{ count: sdgtargetCount || '0' }} />
-                            </div>
-                            { sdgtargetDraftCount > 0 &&
-                              <DraftEntities>
-                                <FormattedMessage {...messages.buttons.draft} values={{ count: sdgtargetDraftCount }} />
-                              </DraftEntities>
-                            }
-                          </DiagramButton>
-                          <Categorised>
-                            <FormattedMessage {...messages.diagram.categorised} />
-                            {
-                              this.renderTaxonomyIcons(
-                                this.getTaxonomiesByTagging(taxonomies, 'tags_sdgtargets'),
-                                this.state.mouseOverTaxonomy || this.state.mouseOverTaxonomyDiagram
-                              )
-                            }
-                          </Categorised>
-                        </DiagramButtonWrap>
-                      </DiagramBottom>
-                    }
-                  </DiagramLeft>
-                  <Addressed hasSDGs={ENABLE_SDGS}>
-                    <FormattedMessage {...messages.diagram.addressed} />
-                  </Addressed>
-                  <DiagramHCenter>
-                    <DiagramVCenter>
-                      <DiagramButtonWrap>
-                        <DiagramButtonMain
-                          onClick={() => onPageLink(PATHS.MEASURES)}
-                          palette={'measures'}
-                          paletteHover={'measuresHover'}
-                          innerRef={(node) => {
-                            if (!this.state.buttonMeasures) {
-                              this.setState({ buttonMeasures: node });
-                            }
-                          }}
-                        >
-                          <DiagramButtonMainInside>
-                            <DiagramButtonIcon>
-                              <Icon name="measures" size="5em" />
-                            </DiagramButtonIcon>
-                            <DiagramButtonMainTop>
-                              <FormattedMessage {...messages.buttons.measures} />
-                            </DiagramButtonMainTop>
-                            <DiagramButtonMainBottom>
-                              <FormattedMessage {...messages.buttons.measuresAdditional} values={{ count: measureCount || '0' }} />
-                            </DiagramButtonMainBottom>
-                            { measureDraftCount > 0 &&
-                              <DraftEntities>
-                                <FormattedMessage {...messages.buttons.draft} values={{ count: measureDraftCount }} />
-                              </DraftEntities>
-                            }
-                          </DiagramButtonMainInside>
-                        </DiagramButtonMain>
-                        { this.getTaxonomiesByTagging(taxonomies, 'tags_measures').size > 0 &&
-                          <Categorised>
-                            <FormattedMessage {...messages.diagram.categorised} />
-                            {
-                              this.renderTaxonomyIcons(
-                                this.getTaxonomiesByTagging(taxonomies, 'tags_measures'),
-                                this.state.mouseOverTaxonomy || this.state.mouseOverTaxonomyDiagram
-                              )
-                            }
-                          </Categorised>
-                        }
-                      </DiagramButtonWrap>
-                    </DiagramVCenter>
-                  </DiagramHCenter>
-                  <Measured>
-                    <FormattedMessage {...messages.diagram.measured} />
-                  </Measured>
-                  <DiagramRight>
-                    <DiagramVCenter>
-                      <DiagramButton
-                        onClick={() => onPageLink(PATHS.INDICATORS)}
-                        palette={'indicators'}
-                        paletteHover={'indicatorsHover'}
-                        innerRef={(node) => {
-                          if (!this.state.buttonIndicators) {
-                            this.setState({ buttonIndicators: node });
-                          }
-                        }}
-                      >
-                        <DiagramButtonIcon>
-                          <Icon name="indicators" />
-                        </DiagramButtonIcon>
-                        <div>
-                          <FormattedMessage {...messages.buttons.indicators} values={{ count: indicatorCount || '0' }} />
-                        </div>
-                        { indicatorDraftCount > 0 &&
-                          <DraftEntities>
-                            <FormattedMessage {...messages.buttons.draft} values={{ count: indicatorDraftCount }} />
-                          </DraftEntities>
-                        }
-                      </DiagramButton>
-                    </DiagramVCenter>
-                  </DiagramRight>
+                      </DiagramSectionHorizontalHalf>
+                      <Annotation hasSDGs={ENABLE_SDGS}>
+                        <FormattedMessage {...messages.diagram.addressed} />
+                      </Annotation>
+                      <DiagramSectionHorizontalCenter>
+                        <DiagramSectionHorizontalVCenter>
+                          {this.renderMeasuresButton()}
+                        </DiagramSectionHorizontalVCenter>
+                      </DiagramSectionHorizontalCenter>
+                      <AnnotationMeasured>
+                        <FormattedMessage {...messages.diagram.measured} />
+                      </AnnotationMeasured>
+                      <DiagramSectionHorizontalHalf>
+                        <DiagramSectionHorizontalVCenter>
+                          {this.renderIndicatorButton()}
+                        </DiagramSectionHorizontalVCenter>
+                      </DiagramSectionHorizontalHalf>
+                    </div>
+                  }
                 </Diagram>
               }
             </Content>
@@ -676,6 +753,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     );
   }
 }
+
 Overview.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onPageLink: PropTypes.func,
@@ -690,6 +768,7 @@ Overview.propTypes = {
   measureDraftCount: PropTypes.number,
   sdgtargetDraftCount: PropTypes.number,
   indicatorDraftCount: PropTypes.number,
+  theme: PropTypes.object,
 };
 
 Overview.contextTypes = {
@@ -723,4 +802,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Overview);
+export default withTheme(connect(mapStateToProps, mapDispatchToProps)(Overview));

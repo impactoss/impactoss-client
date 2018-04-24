@@ -42,10 +42,21 @@ injectGlobal`
   }
   h1 {
     font-weight: 700;
-    font-size: 2.6em;
+    font-size: 2.3em;
+  }
+  @media (min-width: 1200px) {
+    h1 {
+      font-weight: 700;
+      font-size: 2.6em;
+    }
   }
   h2 {
-    font-size: 2.25em;
+    font-size: 2.15em;
+  }
+  @media (min-width: 1200px) {
+    h2 {
+      font-size: 2.25em;
+    }
   }
   h3 {
     font-size: 1.9em;
