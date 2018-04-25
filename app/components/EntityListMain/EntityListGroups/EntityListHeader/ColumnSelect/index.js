@@ -42,7 +42,8 @@ const Wrapper = styled.div`
 `;
 const SelectWrapper = styled.div`
   display: table-cell;
-  text-align:right;
+  text-align: right;
+  padding-right: 2px;  
 `;
 
 const SelectAll = styled(A)`

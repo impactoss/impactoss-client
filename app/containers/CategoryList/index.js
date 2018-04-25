@@ -25,6 +25,7 @@ import appMessages from 'containers/App/messages';
 // components
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
+import Content from 'components/styled/Content';
 import Sidebar from 'components/styled/Sidebar';
 import Scrollable from 'components/styled/Scrollable';
 import Loading from 'components/Loading';
@@ -40,14 +41,6 @@ import { DEPENDENCIES, SORT_OPTIONS } from './constants';
 import { selectTaxonomy, selectCategories } from './selectors';
 import { updateSort } from './actions';
 
-const Content = styled.div`
-  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
-    padding: 0 16px;
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding: 0 32px;
-  }
-`;
 const UsersOnly = styled.h4`
   margin-top: 4em;
 `;

@@ -13,7 +13,6 @@ const ColumnHeader = styled.div`
   border-right: 1px solid ${palette('light', 2)};
   font-size: 0.85em;
   &:last-child {
-    padding-left: 1em;
     border-right: none;
   }
 `;

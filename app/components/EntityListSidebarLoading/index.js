@@ -12,21 +12,24 @@ import Sidebar from 'components/styled/Sidebar';
 import SidebarHeader from 'components/styled/SidebarHeader';
 
 const Group = styled.div`
-  height: 31px;
+  height: 28px;
   display: block;
   width: 100%;
   background-color: ${palette('light', 1)};
-  padding: 0.5em 1em 0.5em 1.5em;
   margin-bottom: 1px;
 `;
 
 const Option = styled.div`
-  height: 50px;
+  height: 30px;
   font-weight: bold;
-  padding: 1em 1em 0 1.5em;
+  padding: 0.5em 8px 0.5em 12px;
   width: 100%;
   background-color: ${palette('asideListItem', 2)};
-  border-bottom: 1px solid ${palette('asideListItem', 4)};
+  border-bottom: 1px solid ${palette('asideListItem', 4)};  
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding: 1em 8px 1em 24px
+    height: 50px;
+  }
 `;
 
 const Label = styled.div`
@@ -44,7 +47,7 @@ export class EntityListSidebarLoading extends React.Component { // eslint-disabl
   render() {
     return (
       <div>
-        <Sidebar>
+        <Sidebar responsiveSmall>
           <ScrollableWrapper>
             <SidebarHeader />
             <Group />

@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 import { map, groupBy } from 'lodash/collection';
 
@@ -11,22 +9,12 @@ import SupTitle from 'components/SupTitle';
 import TaxonomySidebarItem from 'components/categoryList/TaxonomySidebarItem';
 
 import SidebarHeader from 'components/styled/SidebarHeader';
+import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
 
 
 import appMessages from 'containers/App/messages';
 
 import messages from './messages';
-
-const GroupLabel = styled.div`
-  text-align: left;
-  color: ${palette('asideListGroup', 0)};
-  background-color: ${palette('asideListGroup', 1)};
-  padding: 0.25em 12px;
-  font-size: 0.9em;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding: 0.25em 24px;
-  }
-`;
 
 class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -39,9 +27,9 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
         </SidebarHeader>
         {map(taxonomyGroups, (taxonomies, i) => (
           <div key={i}>
-            <GroupLabel>
+            <SidebarGroupLabel>
               <FormattedMessage {... appMessages.taxonomyGroups[i]} />
-            </GroupLabel>
+            </SidebarGroupLabel>
             <div>
               {taxonomies.map((taxonomy, j) =>
                 <TaxonomySidebarItem key={j} taxonomy={taxonomy} />

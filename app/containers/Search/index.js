@@ -31,8 +31,10 @@ import TagSearch from 'components/TagSearch';
 import Scrollable from 'components/styled/Scrollable';
 import Sidebar from 'components/styled/Sidebar';
 import SidebarHeader from 'components/styled/SidebarHeader';
+import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
 import SupTitle from 'components/SupTitle';
 import Component from 'components/styled/Component';
+import Content from 'components/styled/Content';
 
 
 // import EntityListItem from 'components/EntityListItem';
@@ -56,9 +58,6 @@ import {
 
 import messages from './messages';
 
-const Content = styled.div`
-  padding: 0 4em;
-`;
 const EntityListSearch = styled.div`
   padding: 0 0 2em;
 `;
@@ -71,15 +70,6 @@ const Group = styled.div`
   }
 `;
 
-const GroupLabel = styled.div`
-  text-align: left;
-  color: ${palette('asideListGroup', 0)};
-  background-color: ${palette('asideListGroup', 1)};
-  padding: 0.25em 1em 0.25em 1.5em;
-  font-size: 0.9em;
-`;
-
-
 const ScrollableWrapper = styled(Scrollable)`
   background-color: ${palette('aside', 0)};
 `;
@@ -88,8 +78,7 @@ const ScrollableWrapper = styled(Scrollable)`
 const Target = styled(Button)`
   display: table;
   width: 100%;
-  padding: 0.4em 1em 0.4em 1.5em;
-  width: 100%;
+  padding: 0.3em 8px 0.3em 12px;
   text-align: left;
   color:  ${(props) => {
     if (props.disabled) {
@@ -119,6 +108,9 @@ const Target = styled(Button)`
   }
   font-size: 0.85em;
   font-weight: ${(props) => props.active ? 'bold' : 'normal'};
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding: 0.4em 20px 0.4em 24px
+  }
 `;
 
 const TargetTitle = styled.div`
@@ -129,10 +121,12 @@ const TargetTitle = styled.div`
 // font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 const TargetCount = styled.div`
   padding-left: 5px;
-  padding-right: 5px;
   width: 32px;
   display: table-cell;
   vertical-align: middle;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding-right: 5px;
+  }
 `;
 
 const Count = styled.div`
@@ -213,17 +207,17 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
         }
         { this.props.dataReady &&
           <div>
-            <Sidebar>
+            <Sidebar responsiveSmall>
               <ScrollableWrapper>
                 <Component>
-                  <SidebarHeader>
+                  <SidebarHeader responsiveSmall>
                     <SupTitle title={this.context.intl.formatMessage(messages.sidebarTitle)} />
                   </SidebarHeader>
                   { entities && entities.map((group) => (
                     <Group key={group.get('group')}>
-                      <GroupLabel>
+                      <SidebarGroupLabel>
                         <FormattedMessage {...messages.groups[group.get('group')]} />
-                      </GroupLabel>
+                      </SidebarGroupLabel>
                       <div>
                         {
                           group.get('targets') && group.get('targets').map((target, i) => (
@@ -255,7 +249,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
             </Sidebar>
           </div>
         }
-        <ContainerWithSidebar>
+        <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
               <ContentHeader

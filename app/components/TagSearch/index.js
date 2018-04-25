@@ -50,7 +50,7 @@ const Tags = styled.div`
 `;
 
 const Clear = styled(Button)`
-  padding: ${(props) => props.small ? '4px 6px' : '10px 6px'};
+  padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
   position: absolute;
   top: 0;
   right: 0;
