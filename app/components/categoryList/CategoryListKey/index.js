@@ -8,6 +8,11 @@ const Styled = styled.div`
   position: absolute;
   right: 0;
   bottom: 100%;
+  padding-bottom: 2px;
+  font-size: 0.7em;
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    font-size: 0.8em;
+  }
 `;
 
 const ColumnKey = styled.span`
@@ -19,7 +24,6 @@ const KeyItem = styled.span`
 `;
 
 const Title = styled.div`
-  font-size: 0.8em;
   padding-left: 0.25em;
   display: inline-block;
   vertical-align: middle;
@@ -29,9 +33,12 @@ const Title = styled.div`
 const Square = styled.div`
   display: inline-block;
   background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
-  height: 0.8em;
+  height: 0.7em;
   width: 0.6em;
   vertical-align: middle;
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    height: 0.8em;
+  }
 `;
 
 

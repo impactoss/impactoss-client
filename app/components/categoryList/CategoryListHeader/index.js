@@ -11,33 +11,39 @@ const Styled = styled.div`
   width:100%;
   background-color: ${palette('light', 1)};
   display: table;
+  table-layout: fixed;
 `;
 
 
 const Column = styled(ColumnHeader)`
   width:${(props) => props.colWidth}%;
+  font-size: 0.75em;
+  padding-right: 30px;
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    font-size: 0.85em;
+  }
 `;
 
-const ColumnInner = styled.div`
-  display: table;
-  width: 100%;
-`;
-
-const Title = styled.span`
-  display: table-cell;
-`;
+const Title = styled.span``;
 
 const Via = styled.span`
   font-style: italic;
 `;
 
+
 const SortWrapper = styled.div`
-  text-align:right;
-  display: table-cell;
+  padding: 4px 2px 0 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: ${palette('light', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    padding: 6px 2px 0 0;
+  }
 `;
 const SortButton = styled(ButtonFlatIconOnly)`
-  padding: 0;
   color: inherit;
+  padding: 0;
 `;
 
 
@@ -51,21 +57,19 @@ class CategoryListHeader extends React.PureComponent { // eslint-disable-line re
         {
           columns.map((col, i) => (
             <Column key={i} colWidth={col.width}>
-              <ColumnInner>
-                <Title>
-                  {col.header}
-                  {col.via &&
-                    <Via>{` ${col.via}`}</Via>
-                  }
-                </Title>
-                {col.onClick &&
-                  <SortWrapper>
-                    <SortButton onClick={col.onClick}>
-                      <Icon name={col.sortIcon} />
-                    </SortButton>
-                  </SortWrapper>
+              <Title>
+                {col.header}
+                {col.via &&
+                  <Via>{` ${col.via}`}</Via>
                 }
-              </ColumnInner>
+              </Title>
+              {col.onClick &&
+                <SortWrapper>
+                  <SortButton onClick={col.onClick}>
+                    <Icon name={col.sortIcon} />
+                  </SortButton>
+                </SortWrapper>
+              }
             </Column>
           ))
         }

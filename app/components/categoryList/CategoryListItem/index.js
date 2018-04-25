@@ -12,16 +12,20 @@ const Styled = styled.button`
   color: ${palette('mainListItem', 0)};
   background-color: ${palette('mainListItem', 1)};
   margin: 0;
-  padding: 1em 0;
+  padding: 0.75em 0;
   display: block;
   margin-bottom: 2px;
+  line-height: 1.428571429;
   &:hover {
     color: ${palette('mainListItemHover', 0)};
     background-color: ${palette('mainListItemHover', 1)};
   }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding: 1em 0;
+  }
 `;
 const Column = styled.div`
-  width:${(props) => props.colWidth}%;
+  width: ${(props) => props.colWidth}%;
   display: inline-block;
   vertical-align: middle;
 `;
@@ -29,27 +33,33 @@ const BarWrap = styled.div`
   width:100%;
   vertical-align: middle;
   padding-left: 40px;
-  padding-right: ${(props) => props.secondary ? 27 : 18}px;
+  padding-right: ${(props) => props.secondary ? 36 : 18}px;
 `;
 const Bar = styled.div`
   width:${(props) => props.length}%;
-  height: 1.6em;
+  height: 15px;
   background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
   vertical-align: middle;
   display: inline-block;
   position: relative;
   border-right: ${(props) => props.secondary ? '1px solid' : 0};
   border-right-color: ${palette('mainListItem', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    height: 25px;
+  }
 `;
 const Count = styled.div`
   font-weight: bold;
   position: absolute;
   font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
-  line-height: 1.6;
+  line-height: 15px;
   right: 100%;
   text-align: right;
   padding-right: 5px;
   color: ${(props) => palette(props.palette, 0)};
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    line-height: 25px;
+  }
 `;
 const CountSecondary = styled(Count)`
   left: 100%;
@@ -60,16 +70,21 @@ const CountSecondary = styled(Count)`
 `;
 const Title = styled.div`
   display: inline-block;
-  font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
-  line-height: 1.6;
-  padding: 0 18px;
+  padding: 0 8px;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding: 0 18px;
+    font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
+  }
 `;
 const StatusWrap = styled.div`
   padding: 0 18px;
 `;
 const Reference = styled.span`
-  padding-right: 0.5em;
+  padding-right: 5px;
   color: ${palette('text', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding-right: 8px;    
+  }
 `;
 
 class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
