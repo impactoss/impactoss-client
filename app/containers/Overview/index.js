@@ -269,20 +269,21 @@ const PathLineArrow = styled(PathLine)`
   fill: ${palette('dark', 2)};
 `;
 
+const INITIAL_STATE = {
+  diagram: null,
+  buttonRecs: null,
+  buttonMeasures: null,
+  buttonIndicators: null,
+  buttonSdgtargets: null,
+  mouseOverTaxonomy: null,
+  mouseOverTaxonomyDiagram: null,
+  viewport: null,
+};
 
 export class Overview extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      diagram: null,
-      buttonRecs: null,
-      buttonMeasures: null,
-      buttonIndicators: null,
-      buttonSdgtargets: null,
-      mouseOverTaxonomy: null,
-      mouseOverTaxonomyDiagram: null,
-      viewport: null,
-    };
+    this.state = INITIAL_STATE;
   }
   // make sure to load all data from server
   componentWillMount() {
@@ -424,6 +425,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     );
 
   resize = () => {
+    // reset
+    this.setState(INITIAL_STATE);
     this.updateViewport();
     this.forceUpdate();
   };
@@ -669,7 +672,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                   }}
                 >
                   { this.renderPathsSVG(this.state.viewport !== 'large') }
-                  { this.state.viewport !== 'large' && // VERTICAL
+                  { this.state.viewport && this.state.viewport !== 'large' && // VERTICAL
                     <div>
                       <DiagramSectionVertical>
                         { ENABLE_SDGS &&
