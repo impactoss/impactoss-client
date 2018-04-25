@@ -11,6 +11,7 @@ const Button = styled.button`
   font-size: 1em;
   text-align: center;
   vertical-align: middle;
+  line-height: 1.25;
   -ms-touch-action: manipulation;
   touch-action: manipulation;
   -webkit-user-select: none;

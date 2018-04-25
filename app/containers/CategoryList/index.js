@@ -52,7 +52,6 @@ const UsersOnly = styled.h4`
 const Description = styled.p`
   margin-bottom: 2em;
   font-size: 1em;
-  line-height: 1.4em;
 `;
 export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 

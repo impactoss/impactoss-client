@@ -52,7 +52,6 @@ const MultiselectActiveOptionListItem = styled.div`
   background-color: ${palette('mainListItem', 1)};
   border-bottom: 1px solid ${palette('light', 1)};
   padding: 12px 0 12px 16px;
-  line-height: 1.4;
 `;
 const MultiselectActiveOptionRemove = styled(Button)`
   position: absolute;

@@ -18,14 +18,12 @@ const Styled = styled.a`
   margin-bottom: 1px;
   display: block;
   color: ${palette('mainListItem', 0)};
-  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
   &:hover {
     color: ${palette('mainListItemHover', 0)};
   }
 `;
 const Top = styled.div`
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
-  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};  
 `;
 
 const Reference = styled(Label)`

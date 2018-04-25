@@ -26,7 +26,6 @@ const Styled = styled(Component)`
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
   }px;
-  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
 `;
 
 const EntityListItemMainTitleWrap = styled.a`

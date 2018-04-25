@@ -6,7 +6,6 @@ const EntityListItemMainTitle = styled.div`
     ? (props.theme.sizes && props.theme.sizes.text.nestedListItem)
     : (props.theme.sizes && props.theme.sizes.text.mainListItem)
   };
-  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
 `;
 
 export default EntityListItemMainTitle;

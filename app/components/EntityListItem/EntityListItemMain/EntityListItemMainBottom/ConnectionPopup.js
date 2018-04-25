@@ -27,7 +27,7 @@ const Count = styled.span`
   min-width: 1.8em;
   text-align: center;
   vertical-align: middle;
-  line-height: 1.7em;
+  line-height: 1.6;
   padding: 0 0.5em;
 `;
 
@@ -123,7 +123,6 @@ const ItemContent = styled.span``;
 const ListItem = styled.div`
   padding: 0.5em 1em;
   border-top: 1px solid ${palette('background', 1)};
-  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
 `;
 
 const ListItemLink = styled(Link)`

@@ -17,10 +17,10 @@ const StyledFieldWrap = styled(FieldWrap)`
 
 const SmartLabel = styled.div`
   font-weight: bold;
-  line-height: 1em;
+  line-height: 1;
 `;
-const SmartLabelMet = styled.div`
-`;
+const SmartLabelMet = styled.div``;
+
 const SmartIcon = styled.div`
   display: inline-block;
   border-radius: 999px;

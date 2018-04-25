@@ -93,14 +93,16 @@ const Claim = styled.p`
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 1.5em;
+  line-height: 1.3;
 `;
 
 const Intro = styled(ReactMarkdown)`
   font-size: 1.1em;
   margin-left: auto;
   margin-right: auto;
+  line-height: 1.3;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    font-size: 1.25em;
+    font-size: 1.25em;    
     width: 80%;
   }
 `;

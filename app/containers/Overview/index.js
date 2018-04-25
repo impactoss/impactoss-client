@@ -131,7 +131,7 @@ const Annotation = styled.div`
   word-spacing: 1000000px;
   width: 200px;
   color: ${palette('text', 1)};
-  line-height: 1.1em;
+  line-height: 1.1;
   font-size: 0.85em;
   margin-top: -2em;
   left: ${(props) => props.hasSDGs ? 31 : 30}%;
@@ -142,7 +142,7 @@ const AnnotationMeasured = styled(Annotation)`
 const AnnotationVertical = styled.div`
   text-align: center;
   color: ${palette('text', 1)};
-  line-height: 1.1em;
+  line-height: 1.1;
   font-size: 0.85em;
   background-color: ${palette('background', 1)};
   position: relative;
@@ -158,7 +158,6 @@ const Categorised = styled.div`
   color: ${palette('text', 1)};
   font-weight: normal;
   font-size: 0.75em;
-  line-height: 1.4em;
   background-color: ${palette('background', 1)};
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     position: absolute;

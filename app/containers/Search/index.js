@@ -77,7 +77,6 @@ const GroupLabel = styled.div`
   background-color: ${palette('asideListGroup', 1)};
   padding: 0.25em 1em 0.25em 1.5em;
   font-size: 0.9em;
-  line-height: 1.64em;
 `;
 
 

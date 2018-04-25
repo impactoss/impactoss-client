@@ -10,7 +10,6 @@ import Label from 'components/fields/Label';
 
 const Markdown = styled(ReactMarkdown)`
   font-size: ${(props) => props.theme.sizes.text.markdown};
-  line-height: ${(props) => props.theme.sizes.lineHeights.markdown};
 `;
 
 class MarkdownField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

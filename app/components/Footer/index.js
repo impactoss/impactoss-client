@@ -72,10 +72,8 @@ const Table = styled.div`
   width: 100%;
   table-layout: fixed;
   font-size: 0.9em;
-  line-height: 1.4em;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-size: 1em;
-    line-height: 1.64em;
   }
 `;
 
@@ -105,6 +103,7 @@ const PartnerNote = styled.div`
   text-align: center;
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes.text.small};
+  line-height: 1;
 `;
 
 class Footer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

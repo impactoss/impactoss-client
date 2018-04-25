@@ -44,14 +44,14 @@ const ListInlineItem = styled.li`
 const ListInlineItemLink = styled(A)`
   width:2em;
   height:2em;
-  line-height: 2em;
+  line-height: 2;
   font-weight: bold;
   display: block;
 `;
 const ListInlineItemActive = styled.div`
   width:2em;
   height:2em;
-  line-height: 2em;
+  line-height: 2;
   border-radius: 9999px;
   font-weight: bold;
   background-color: ${palette('buttonDefault', 1)};

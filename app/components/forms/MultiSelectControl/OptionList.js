@@ -24,7 +24,7 @@ const ListWrapper = styled.div`
 const OptionWrapper = styled.div`
   display: table-row;
   width: 100%;
-  line-height: 1.33;
+  line-height: 1.3;
 `;
 // background-color: ${(props) => {
 //   if (props.changedToChecked) {

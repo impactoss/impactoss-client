@@ -286,10 +286,6 @@ theme.sizes = {
     markdown: '18px',
     small: '13px', // used for labels
   },
-  lineHeights: {
-    mainListItem: 1.4,
-    markdown: 1.4,
-  },
   // px only
   aside: {
     header: {

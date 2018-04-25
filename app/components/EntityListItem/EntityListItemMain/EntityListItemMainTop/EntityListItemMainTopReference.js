@@ -7,7 +7,6 @@ const EntityListItemMainTopReference = styled.div`
   float: left;
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
-  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
 `;
 
 export default EntityListItemMainTopReference;
