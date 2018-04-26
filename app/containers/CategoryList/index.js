@@ -106,7 +106,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         <Sidebar responsiveSmall>
           <Scrollable>
             { !dataReady &&
-              <EntityListSidebarLoading />
+              <EntityListSidebarLoading responsiveSmall />
             }
             { dataReady && typeof reference !== 'undefined' &&
               <TaxonomySidebar

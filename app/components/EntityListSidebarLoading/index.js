@@ -4,12 +4,20 @@
  *
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import Scrollable from 'components/styled/Scrollable';
 import Sidebar from 'components/styled/Sidebar';
 import SidebarHeader from 'components/styled/SidebarHeader';
+
+const Styled = styled.div`
+  display: ${(props) => props.responsiveSmall ? 'block' : 'none'};
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    display: block;
+  }
+`;
 
 const Group = styled.div`
   height: 28px;
@@ -25,7 +33,7 @@ const Option = styled.div`
   padding: 0.5em 8px 0.5em 12px;
   width: 100%;
   background-color: ${palette('asideListItem', 2)};
-  border-bottom: 1px solid ${palette('asideListItem', 4)};  
+  border-bottom: 1px solid ${palette('asideListItem', 4)};
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 1em 8px 1em 24px
     height: 50px;
@@ -46,8 +54,8 @@ export class EntityListSidebarLoading extends React.Component { // eslint-disabl
 
   render() {
     return (
-      <div>
-        <Sidebar responsiveSmall>
+      <Styled responsiveSmall={this.props.responsiveSmall}>
+        <Sidebar responsiveSmall={this.props.responsiveSmall}>
           <ScrollableWrapper>
             <SidebarHeader />
             <Group />
@@ -58,9 +66,17 @@ export class EntityListSidebarLoading extends React.Component { // eslint-disabl
             <Option><Label width={25} /></Option>
           </ScrollableWrapper>
         </Sidebar>
-      </div>
+      </Styled>
     );
   }
 }
+
+EntityListSidebarLoading.propTypes = {
+  responsiveSmall: PropTypes.bool,
+};
+
+EntityListSidebarLoading.defaultProps = {
+  responsiveSmall: false,
+};
 
 export default EntityListSidebarLoading;

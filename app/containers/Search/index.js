@@ -203,7 +203,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
           ]}
         />
         { !this.props.dataReady &&
-          <EntityListSidebarLoading />
+          <EntityListSidebarLoading responsiveSmall />
         }
         { this.props.dataReady &&
           <div>

@@ -21,7 +21,7 @@ import {
   selectTaxonomiesSorted,
   selectReady,
 } from 'containers/App/selectors';
-import { PATHS, CONTENT_LIST } from 'containers/App/constants';
+import { PATHS, CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
 import { ENABLE_SDGS } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
@@ -269,7 +269,7 @@ const PathLineArrow = styled(PathLine)`
   fill: ${palette('dark', 2)};
 `;
 
-const INITIAL_STATE = {
+const STATE_INITIAL = {
   diagram: null,
   buttonRecs: null,
   buttonMeasures: null,
@@ -283,7 +283,7 @@ const INITIAL_STATE = {
 export class Overview extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = INITIAL_STATE;
+    this.state = STATE_INITIAL;
   }
   // make sure to load all data from server
   componentWillMount() {
@@ -382,13 +382,13 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     ];
   }
   updateViewport() {
-    let viewport = 'mobile';
+    let viewport = VIEWPORTS.MOBILE;
     if (window.innerWidth >= parseInt(this.props.theme.breakpoints.large, 10)) {
-      viewport = 'large';
+      viewport = VIEWPORTS.LARGE;
     } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.medium, 10)) {
-      viewport = 'medium';
+      viewport = VIEWPORTS.MEDIUM;
     } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.small, 10)) {
-      viewport = 'small';
+      viewport = VIEWPORTS.SMALL;
     }
     this.setState({ viewport });
   }
@@ -426,7 +426,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
 
   resize = () => {
     // reset
-    this.setState(INITIAL_STATE);
+    this.setState(STATE_INITIAL);
     this.updateViewport();
     this.forceUpdate();
   };
@@ -635,7 +635,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         <Sidebar responsiveSmall>
           <Scrollable>
             { !dataReady &&
-              <EntityListSidebarLoading />
+              <EntityListSidebarLoading responsiveSmall />
             }
             { dataReady &&
               <TaxonomySidebar
@@ -671,8 +671,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                     }
                   }}
                 >
-                  { this.renderPathsSVG(this.state.viewport !== 'large') }
-                  { this.state.viewport && this.state.viewport !== 'large' && // VERTICAL
+                  { this.renderPathsSVG(this.state.viewport !== VIEWPORTS.LARGE) }
+                  { this.state.viewport && this.state.viewport !== VIEWPORTS.LARGE && // VERTICAL
                     <div>
                       <DiagramSectionVertical>
                         { ENABLE_SDGS &&
@@ -709,7 +709,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                       </DiagramSectionVertical>
                     </div>
                   }
-                  { this.state.viewport === 'large' && // HORIZONTAL
+                  { this.state.viewport === VIEWPORTS.LARGE && // HORIZONTAL
                     <div>
                       <DiagramSectionHorizontalHalf>
                         { ENABLE_SDGS &&
