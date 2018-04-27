@@ -136,17 +136,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     window.removeEventListener('resize', this.resize);
   }
 
-  updateViewport() {
-    let viewport = VIEWPORTS.MOBILE;
-    if (window.innerWidth >= parseInt(this.props.theme.breakpoints.large, 10)) {
-      viewport = VIEWPORTS.LARGE;
-    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.medium, 10)) {
-      viewport = VIEWPORTS.MEDIUM;
-    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.small, 10)) {
-      viewport = VIEWPORTS.SMALL;
-    }
-    this.setState({ viewport });
-  }
   onShowForm = (option) => {
     this.setState({ activeOption: option.active ? null : option });
   };
@@ -206,6 +195,18 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       submit: true,
     },
   ];
+
+  updateViewport() {
+    let viewport = VIEWPORTS.MOBILE;
+    if (window.innerWidth >= parseInt(this.props.theme.breakpoints.large, 10)) {
+      viewport = VIEWPORTS.LARGE;
+    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.medium, 10)) {
+      viewport = VIEWPORTS.MEDIUM;
+    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.small, 10)) {
+      viewport = VIEWPORTS.SMALL;
+    }
+    this.setState({ viewport });
+  }
 
   resize = () => {
     // reset
