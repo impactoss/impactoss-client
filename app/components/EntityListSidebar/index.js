@@ -52,12 +52,13 @@ const ToggleShow = styled(ButtonDefault)`
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 101;
+  z-index: 100;
   padding: 0.5em 1em;
   letter-spacing: 0;
   border-radius: 0;
   box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
   font-size: 0.85em;
+  width: ${(props) => props.theme.sizes.aside.width.large}px;
 `;
 
 const ToggleHide = styled(Button)`
