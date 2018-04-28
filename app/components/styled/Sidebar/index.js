@@ -4,7 +4,10 @@ import { palette } from 'styled-theme';
 const Sidebar = styled.div`
   position: absolute;
   top:0;
-  width: ${(props) => props.responsiveSmall ? props.theme.sizes.aside.width.small : props.theme.sizes.aside.width.large}px;
+  width: ${(props) => props.responsiveSmall
+    ? props.theme.sizes.aside.width.small
+    : props.theme.sizes.aside.width.large
+  }px;
   bottom:0;
   background-color: ${palette('aside', 0)};
   z-index:100;

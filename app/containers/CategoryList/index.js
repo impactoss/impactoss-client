@@ -83,7 +83,13 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     const buttons = dataReady && isManager && typeof reference !== 'undefined'
       ? [{
         type: 'add',
-        title: this.context.intl.formatMessage(messages.add, { category: this.getTaxButtonTitle(reference) }),
+        title: [
+          this.context.intl.formatMessage(appMessages.buttons.add),
+          {
+            title: this.getTaxButtonTitle(reference),
+            hiddenSmall: true,
+          },
+        ],
         onClick: () => this.props.handleNew(reference),
       }]
       : null;

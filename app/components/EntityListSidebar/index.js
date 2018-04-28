@@ -50,10 +50,10 @@ const ListEntitiesEmpty = styled.div`
 
 const ToggleShow = styled(ButtonDefault)`
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
   z-index: 100;
-  padding: 0.5em 1em;
+  padding: 0.75em 1em;
   letter-spacing: 0;
   border-radius: 0;
   box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);

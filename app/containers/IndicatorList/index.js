@@ -47,7 +47,13 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         onClick: () => this.props.handleImport(),
       }, {
         type: 'add',
-        title: this.context.intl.formatMessage(messages.add),
+        title: [
+          this.context.intl.formatMessage(appMessages.buttons.add),
+          {
+            title: this.context.intl.formatMessage(appMessages.entities.indicators.single),
+            hiddenSmall: true,
+          },
+        ],
         onClick: () => this.props.handleNew(),
       }],
     };

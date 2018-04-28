@@ -14,8 +14,4 @@ export default defineMessages({
     id: 'app.containers.IndicatorList.metaDescription',
     defaultMessage: 'Indicators page description',
   },
-  add: {
-    id: 'app.containers.IndicatorList.add',
-    defaultMessage: 'Add indicator',
-  },
 });

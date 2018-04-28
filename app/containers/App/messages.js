@@ -49,7 +49,7 @@ export default defineMessages({
     },
     add: {
       id: 'app.containers.App.buttons.add',
-      defaultMessage: 'Add',
+      defaultMessage: 'New',
     },
     edit: {
       id: 'app.containers.App.buttons.edit',
