@@ -309,7 +309,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     const hasEntityNewModal = !!newEntityModal;
 
     return (
-      <FormWrapper withoutShadow={inModal} >
+      <FormWrapper withoutShadow={inModal} hasMarginBottom>
         <StyledForm model={model} onSubmit={this.handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
           <FormBody>
             { fields.header &&
