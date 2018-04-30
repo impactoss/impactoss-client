@@ -74,14 +74,20 @@ const DiagramSectionHorizontalHalf = styled.div`
   display: inline-block;
   width: 25%;
   position: relative;
-  height: 300px;
+  height: 260px;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    height: 300px;
+  }
 `;
 
 const DiagramSectionHorizontalCenter = styled.div`
   display: inline-block;
   width: 50%;
   position: relative;
-  height: 300px;
+  height: 260px;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    height: 300px;
+  }
 `;
 
 const DiagramSectionHorizontalTop = styled.div`
@@ -137,7 +143,7 @@ const Annotation = styled.div`
   left: ${(props) => props.hasSDGs ? 31 : 30}%;
 `;
 const AnnotationMeasured = styled(Annotation)`
-  left: 71%;
+  left: 70%;
 `;
 const AnnotationVertical = styled.div`
   text-align: center;
@@ -159,9 +165,10 @@ const Categorised = styled.div`
   font-weight: normal;
   font-size: 0.75em;
   background-color: ${palette('background', 1)};
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     position: absolute;
     top: 100%;
+    width: 100%;
     left: 0;
     text-align: left;
     border-top: 1px solid ${palette('light', 4)};
@@ -190,8 +197,11 @@ const DiagramButtonWrap = styled.div`
   display: inline-block;
   margin-bottom: 1.1em;
   padding: 1.1em 0;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     margin-bottom: 0;
+    padding: 0.5em 0;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 1em 0;
   }
 `;
@@ -209,15 +219,21 @@ const DiagramButton = styled(Button)`
   }
   color: ${palette('primary', 4)};
   border-radius: 999px;
-  padding: 0.6em 1em 1.4em;
+  padding: 0.4em 0.5em 1em;
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   font-weight: bold;
   min-width: 180px;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding: 0.6em 1em 1.4em;
+  }
 `;
 // font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 
 const DiagramButtonMain = styled(DiagramButton)`
-  min-width: 230px;
+  padding: 0.4em 0.75em 1em;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    min-width: 230px;
+  }
   &:before {
     content: '';
     display: inline-block;
@@ -243,9 +259,19 @@ const DraftEntities = styled.div`
 `;
 
 const DiagramButtonMainTop = styled.div`
-  font-size: 1.3em;
-  padding-bottom: 5px;
+  padding-bottom: 0.2px;
   font-weight: bold;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: 1.3em;
+    padding-bottom: 5px;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    font-size: 1.1em;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    font-size: 1.3em;
+    padding-bottom: 5px;
+  }
 `;
 // font-size: ${(props) => props.theme.sizes.text.aaLarge};
 const DiagramButtonMainBottom = styled.div`
@@ -353,14 +379,14 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
   getCurvedConnectionPath = (vertical = false, start, end, curve = 0.2) => vertical
     ? [
       { x: start.x, y: start.y + 5 },
-      { x: start.x, y: start.y + ((end.y - start.y) * curve) },
-      { x: end.x, y: start.y + ((end.y - start.y) * curve) },
+      { x: start.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
+      { x: end.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
       { x: end.x, y: end.y - 5 },
     ]
     : [
       { x: start.x + 5, y: start.y },
-      { x: start.x + ((end.x - start.x) * curve), y: start.y },
-      { x: start.x + ((end.x - start.x) * curve), y: end.y },
+      { x: (start.x + 5) + ((end.x - start.x - 10) * curve), y: start.y },
+      { x: (start.x + 5) + ((end.x - start.x - 10) * curve), y: end.y },
       { x: end.x - 5, y: end.y },
     ];
 
@@ -459,7 +485,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     </CategorisedIcons>
   )
 
-  renderPath = (points = [], dashed = false, r = 20) => (
+  renderPath = (points = [], dashed = false, r = 10) => (
     <PathLineCustom
       points={points}
       strokeDasharray={dashed ? '5,5' : null}
@@ -479,23 +505,23 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
           width={this.state.diagram.getBoundingClientRect().width}
           height={this.state.diagram.getBoundingClientRect().height}
         >
-          {ENABLE_SDGS && this.state.buttonSdgtargets && this.state.buttonIndicators &&
-            this.renderPath(this.connectSdgtargetsIndicators(vertical), true)
-          }
           { this.state.buttonRecs && this.state.buttonMeasures &&
             this.renderPath(this.connectRecommendationsMeasures(vertical))
           }
           { this.state.buttonRecs && this.state.buttonMeasures &&
             this.renderArrow(this.connectRecommendationsMeasures(vertical), vertical)
           }
-          {ENABLE_SDGS && this.state.buttonSdgtargets && this.state.buttonMeasures &&
-            this.renderPath(this.connectSdgtargetsMeasures(vertical))
-          }
           { this.state.buttonIndicators && this.state.buttonMeasures &&
             this.renderPath(this.connectMeasuresIndicators(vertical))
           }
           { this.state.buttonIndicators && this.state.buttonMeasures &&
             this.renderArrow(this.connectMeasuresIndicators(vertical), vertical)
+          }
+          {ENABLE_SDGS && this.state.buttonSdgtargets && this.state.buttonIndicators &&
+            this.renderPath(this.connectSdgtargetsIndicators(vertical), true)
+          }
+          {ENABLE_SDGS && this.state.buttonSdgtargets && this.state.buttonMeasures &&
+            this.renderPath(this.connectSdgtargetsMeasures(vertical))
           }
         </svg>
       }
@@ -553,7 +579,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       {this.renderCategoryIcons('tags_recommendations')}
     </DiagramButtonWrap>
   );
-  renderMeasuresButton = () => (
+  renderMeasuresButton = (large = true) => (
     <DiagramButtonWrap>
       <DiagramButtonMain
         onClick={() => this.props.onPageLink(PATHS.MEASURES)}
@@ -567,7 +593,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       >
         <DiagramButtonMainInside>
           <DiagramButtonIcon>
-            <Icon name="measures" size="5em" />
+            <Icon name="measures" size={large ? '5em' : '4em'} />
           </DiagramButtonIcon>
           <DiagramButtonMainTop>
             <FormattedMessage {...messages.buttons.measures} />
@@ -671,8 +697,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                     }
                   }}
                 >
-                  { this.renderPathsSVG(this.state.viewport !== VIEWPORTS.LARGE) }
-                  { this.state.viewport && this.state.viewport !== VIEWPORTS.LARGE && // VERTICAL
+                  { this.renderPathsSVG(this.state.viewport < VIEWPORTS.MEDIUM) }
+                  { this.state.viewport && this.state.viewport < VIEWPORTS.MEDIUM && // VERTICAL
                     <div>
                       <DiagramSectionVertical>
                         { ENABLE_SDGS &&
@@ -696,7 +722,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                       </AnnotationVertical>
                       <DiagramSectionVertical>
                         <DiagramSectionVerticalCenter>
-                          {this.renderMeasuresButton()}
+                          {this.renderMeasuresButton(this.state.viewport < VIEWPORTS.SMALL)}
                         </DiagramSectionVerticalCenter>
                       </DiagramSectionVertical>
                       <AnnotationVertical>
@@ -709,7 +735,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                       </DiagramSectionVertical>
                     </div>
                   }
-                  { this.state.viewport === VIEWPORTS.LARGE && // HORIZONTAL
+                  { this.state.viewport >= VIEWPORTS.MEDIUM && // HORIZONTAL
                     <div>
                       <DiagramSectionHorizontalHalf>
                         { ENABLE_SDGS &&
@@ -733,7 +759,9 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                       </Annotation>
                       <DiagramSectionHorizontalCenter>
                         <DiagramSectionHorizontalVCenter>
-                          {this.renderMeasuresButton()}
+                          {
+                            this.renderMeasuresButton(this.state.viewport !== VIEWPORTS.MEDIUM)
+                          }
                         </DiagramSectionHorizontalVCenter>
                       </DiagramSectionHorizontalCenter>
                       <AnnotationMeasured>
