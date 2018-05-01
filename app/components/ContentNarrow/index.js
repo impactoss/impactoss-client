@@ -1,22 +1,45 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import Grid from 'grid-styled';
 
 import Content from 'components/Content';
 import Row from 'components/styled/Row';
 
+
+const RowStyled = styled(Row)`
+  margin: 0;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    margin-right: -${(props) => props.theme.gutter}px;
+    margin-left: -${(props) => props.theme.gutter}px;
+  }
+`;
+const GridSpace = styled(Grid)`
+  display: none;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
+  }
+`;
+const GridMain = styled(Grid)`
+  padding-right: 0;
+  padding-left: 0;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-right: ${(props) => props.theme.gutter}px;
+    padding-left: ${(props) => props.theme.gutter}px;
+  }
+`;
+
 class ContentNarrow extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
       <Content>
-        <Row>
-          <Grid lg={1 / 3} md={3 / 10} sm={1 / 4} xs={1 / 12} />
-          <Grid lg={1 / 3} md={2 / 5} sm={1 / 2} xs={5 / 6}>
+        <RowStyled>
+          <GridSpace lg={1 / 3} md={3 / 10} sm={1 / 4} />
+          <GridMain lg={1 / 3} md={2 / 5} sm={1 / 2} xs={1}>
             {this.props.children}
-          </Grid>
-          <Grid lg={1 / 3} md={3 / 10} sm={1 / 4} xs={1 / 12} />
-        </Row>
+          </GridMain>
+        </RowStyled>
       </Content>
     );
   }
