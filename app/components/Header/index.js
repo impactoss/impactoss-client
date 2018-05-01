@@ -42,12 +42,23 @@ const Styled = styled.div`
   height:${(props) => {
     if (props.hasBrand) {
       if (props.hasNav) {
-        return props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height;
+        return props.theme.sizes.header.banner.heightMobile + props.theme.sizes.header.nav.heightMobile;
       }
-      return props.theme.sizes.header.banner.height;
+      return props.theme.sizes.header.banner.heightMobile;
     }
     return 0;
   }}px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    height:${(props) => {
+      if (props.hasBrand) {
+        if (props.hasNav) {
+          return props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height;
+        }
+        return props.theme.sizes.header.banner.height;
+      }
+      return 0;
+    }}px;
+  }
   background-color: ${(props) => props.hasBackground ? palette('header', 0) : 'transparent'};
   box-shadow: ${(props) => props.hasShadow ? '0px 0px 15px 0px rgba(0,0,0,0.5)' : 'none'};
   z-index: 101;

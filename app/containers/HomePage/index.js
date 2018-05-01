@@ -36,9 +36,15 @@ import messages from './messages';
 const GraphicHomeWrapper = styled.div`
   width: 100%;
   padding-top: ${(props) => props.hasBrand
-    ? props.theme.sizes.header.banner.height
+    ? props.theme.sizes.header.banner.heightMobile
     : 0
   }px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-top: ${(props) => props.hasBrand
+      ? props.theme.sizes.header.banner.height
+      : 0
+    }px;
+  }
   background-image: ${(props) => (props.showPattern && props.theme.backgroundImages.header)
     ? props.theme.backgroundImages.header
     : 'none'
@@ -102,7 +108,7 @@ const Intro = styled(ReactMarkdown)`
   margin-right: auto;
   line-height: 1.3;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    font-size: 1.25em;    
+    font-size: 1.25em;
     width: 80%;
   }
 `;

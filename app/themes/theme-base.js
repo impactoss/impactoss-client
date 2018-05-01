@@ -304,9 +304,11 @@ theme.sizes = {
   header: {
     banner: {
       height: 88,
+      heightMobile: 50,
     },
     nav: {
       height: 38,
+      heightMobile: 24,
     },
     // px or em
     text: {
@@ -314,6 +316,7 @@ theme.sizes = {
       claim: '0.85em',
     },
     paddingLeft: {
+      mobile: 6,
       small: 12,
       large: 20,
     },
