@@ -13,8 +13,10 @@ import messages from './messages';
 
 
 const Styled = styled.div`
-  float:right;
   background-color: ${palette('headerNavAccount', 0)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    float: right;
+  }
 `;
 
 
@@ -24,9 +26,9 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     if (currentPath) {
       if (currentPath === PATHS.LOGIN || currentPath === PATHS.REGISTER) {
-        this.props.onPageLink(path, { keepQuery: true });
+        this.props.onPageLink(evt, path, { keepQuery: true });
       } else {
-        this.props.onPageLink(path, {
+        this.props.onPageLink(evt, path, {
           query: {
             arg: PARAMS.REDIRECT_ON_AUTH_SUCCESS,
             value: currentPath,
@@ -34,7 +36,7 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
         });
       }
     } else {
-      this.props.onPageLink(path);
+      this.props.onPageLink(evt, path);
     }
   }
   render() {

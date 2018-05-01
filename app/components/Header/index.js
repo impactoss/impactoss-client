@@ -13,6 +13,7 @@ import {
 
 import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
+import Button from 'components/buttons/Button';
 
 import Logo from './Logo';
 import Banner from './Banner';
@@ -65,20 +66,77 @@ const Styled = styled.div`
 `;
 const HomeNavWrap = styled.div`
   position: absolute;
-  top:0;
-  left:0;
-  right:0;
+  top: 0;
+  left: 0;
+  right: 0;
   wdith: 100%;
   z-index: 101;
 `;
 
-const NavSecondary = styled.div `
-  position: relative;
-  z-index: 300;
+const NavSecondary = styled.div`
+  display: ${(props) => props.visible ? 'block' : 'none'};
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 99999;
+  background-color: rgba(0,0,0,0.3);
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    position: relative;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    z-index: 300;
+    display: block;
+  }
 `;
+const ShowSecondary = styled(Button)`
+  display: ${(props) => props.visible ? 'block' : 'none'};
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 300;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: none;
+  }
+  background-color: transparent;
+`;
+const HideSecondaryWrap = styled.div`
+  background-color: white;
+  text-align: right;
+  display: block;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: none;
+  }
+`;
+const HideSecondary = styled(Button)``;
+
+const STATE_INITIAL = {
+  showSecondary: false,
+};
 
 class Header extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  constructor() {
+    super();
+    this.state = STATE_INITIAL;
+  }
+  componentWillMount() {
+    this.setState(STATE_INITIAL);
+  }
+  componentDidMount() {
+    window.addEventListener('resize', this.resize);
+  }
+  onShowSecondary = (evt) => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    this.setState({ showSecondary: true });
+  };
+  onHideSecondary = (evt) => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    this.setState({ showSecondary: false });
+  };
   onClick = (evt, path, currentPath) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     if (currentPath) {
@@ -91,7 +149,11 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       this.props.onPageLink(path);
     }
   }
-
+  resize = () => {
+    // reset
+    this.setState(STATE_INITIAL);
+    this.forceUpdate();
+  };
   render() {
     const { pages, isSignedIn, currentPath, isHome } = this.props;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
@@ -112,7 +174,11 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             <NavAccount
               isSignedIn={isSignedIn}
               user={this.props.user}
-              onPageLink={this.props.onPageLink}
+              onPageLink={(evt, path, query) => {
+                if (evt !== undefined && evt.stopPropagation) evt.stopPropagation();
+                this.onHideSecondary();
+                this.props.onPageLink(path, query);
+              }}
               currentPath={currentPath}
             />
             <NavPages>
@@ -150,11 +216,34 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </BrandText>
               }
             </Brand>
-            <NavSecondary>
+            <ShowSecondary
+              visible={!this.state.showSecondary}
+              onClick={this.onShowSecondary}
+            >
+              Nav
+            </ShowSecondary>
+            <NavSecondary
+              visible={this.state.showSecondary}
+              onClick={(evt) => {
+                evt.stopPropagation();
+                this.onHideSecondary();
+              }}
+            >
+              <HideSecondaryWrap>
+                <HideSecondary
+                  onClick={this.onHideSecondary}
+                >
+                  Close
+                </HideSecondary>
+              </HideSecondaryWrap>
               <NavAccount
                 isSignedIn={isSignedIn}
                 user={this.props.user}
-                onPageLink={this.props.onPageLink}
+                onPageLink={(evt, path, query) => {
+                  if (evt !== undefined && evt.stopPropagation) evt.stopPropagation();
+                  this.onHideSecondary();
+                  this.props.onPageLink(path, query);
+                }}
                 currentPath={currentPath}
               />
               <NavPages>
@@ -163,7 +252,11 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                     key={i}
                     href={page.path}
                     active={page.active || currentPath === page.path}
-                    onClick={(evt) => this.onClick(evt, page.path)}
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      this.onHideSecondary();
+                      this.onClick(evt, page.path);
+                    }}
                   >
                     {page.title}
                   </LinkPage>
@@ -176,7 +269,11 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                       key={i}
                       href={item.path}
                       active={item.active}
-                      onClick={(evt) => this.onClick(evt, item.path)}
+                      onClick={(evt) => {
+                        evt.stopPropagation();
+                        this.onHideSecondary();
+                        this.onClick(evt, item.path);
+                      }}
                     >
                       {item.title}
                     </LinkAdmin>
