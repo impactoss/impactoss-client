@@ -14,6 +14,7 @@ import {
 import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 
 import Logo from './Logo';
 import Banner from './Banner';
@@ -220,7 +221,10 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
               visible={!this.state.showSecondary}
               onClick={this.onShowSecondary}
             >
-              Nav
+              <ScreenReaderOnly>
+                <FormattedMessage {...appMessages.buttons.showSecondaryNavigation} />
+              </ScreenReaderOnly>
+              <Icon name="menu" stroke />
             </ShowSecondary>
             <NavSecondary
               visible={this.state.showSecondary}
@@ -233,7 +237,10 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 <HideSecondary
                   onClick={this.onHideSecondary}
                 >
-                  Close
+                  <ScreenReaderOnly>
+                    <FormattedMessage {...appMessages.buttons.hideSecondaryNavigation} />
+                  </ScreenReaderOnly>
+                  <Icon name="close" size="30px" />
                 </HideSecondary>
               </HideSecondaryWrap>
               <NavAccount

@@ -71,6 +71,14 @@ export default defineMessages({
       id: 'app.containers.App.buttons.import',
       defaultMessage: 'Import',
     },
+    hideSecondaryNavigation: {
+      id: 'app.containers.App.buttons.hideSecondaryNavigation',
+      defaultMessage: 'Hide top menu',
+    },
+    showSecondaryNavigation: {
+      id: 'app.containers.App.buttons.showSecondaryNavigation',
+      defaultMessage: 'Show top menu',
+    },
   },
   labels: {
     perPage: {
