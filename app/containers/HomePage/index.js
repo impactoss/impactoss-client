@@ -123,7 +123,7 @@ const Intro = styled(ReactMarkdown)`
   }
 `;
 const GridSpace = styled(Grid)`
-  display: none;
+  display: none !important;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
   }
@@ -168,7 +168,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                       <FormattedMessage {...appMessages.app.claim} />
                     </Claim>
                   </Grid>
-                  <GridSpace lg={1 / 6} sm={1 / 8} />
                 </Row>
               }
               <Row>
@@ -181,7 +180,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                     </ButtonHero>
                   </HomeActions>
                 </Grid>
-                <GridSpace lg={1 / 6} sm={1 / 12} />
               </Row>
             </Container>
           </SectionWrapper>

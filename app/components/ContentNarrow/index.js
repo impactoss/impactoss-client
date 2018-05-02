@@ -16,7 +16,7 @@ const RowStyled = styled(Row)`
   }
 `;
 const GridSpace = styled(Grid)`
-  display: none;
+  display: none !important;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
   }
