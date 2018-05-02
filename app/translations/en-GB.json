@@ -126,7 +126,7 @@
   "app.components.TagSearch.searchPlaceholderEntities" : "Filter items by reference or title",
   "app.components.TagSearch.searchPlaceholderMultiSelect" : "Filter options by reference or title",
   "app.components.TaxonomySidebar.title": "Select category group",
-  "app.components.TaxonomySidebar.show": "Show category groups",
+  "app.components.TaxonomySidebar.show": "Select category group",
   "app.components.TaxonomySidebar.hide": "Hide category groups",
   "app.components.TaxonomySidebarItem.tagging": "Categorising: ",
   "app.containers.ActionEdit.pageTitle" : "Edit Action",

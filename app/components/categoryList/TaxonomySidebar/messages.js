@@ -11,7 +11,7 @@ export default defineMessages({
   },
   show: {
     id: 'app.components.TaxonomySidebar.show',
-    defaultMessage: 'Show category groups',
+    defaultMessage: 'Select category group',
   },
   hide: {
     id: 'app.components.TaxonomySidebar.hide',

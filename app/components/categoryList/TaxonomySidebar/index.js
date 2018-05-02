@@ -122,7 +122,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                     </SidebarGroupLabel>
                     <div>
                       {taxonomies.map((taxonomy, j) =>
-                        <TaxonomySidebarItem key={j} taxonomy={taxonomy} />
+                        <TaxonomySidebarItem key={j} taxonomy={taxonomy} onTaxonomyClick={this.onHideSidebar} />
                       )}
                     </div>
                   </div>

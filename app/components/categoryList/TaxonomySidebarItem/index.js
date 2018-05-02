@@ -50,10 +50,13 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
     this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
 
   render() {
-    const { taxonomy } = this.props;
+    const { taxonomy, onTaxonomyClick } = this.props;
     return (
       <Styled
-        onClick={() => taxonomy.onLink(taxonomy.active)}
+        onClick={(evt) => {
+          onTaxonomyClick(evt);
+          taxonomy.onLink(taxonomy.active);
+        }}
         active={taxonomy.active}
         paletteId={parseInt(taxonomy.id, 10)}
         onMouseOver={() => taxonomy.onMouseOver && taxonomy.onMouseOver()}
@@ -74,6 +77,7 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
 
 TaxonomySidebarItem.propTypes = {
   taxonomy: PropTypes.object,
+  onTaxonomyClick: PropTypes.function,
 };
 
 TaxonomySidebarItem.contextTypes = {
