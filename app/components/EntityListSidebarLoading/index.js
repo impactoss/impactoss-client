@@ -13,7 +13,10 @@ import Sidebar from 'components/styled/Sidebar';
 import SidebarHeader from 'components/styled/SidebarHeader';
 
 const Styled = styled.div`
-  display: ${(props) => props.responsiveSmall ? 'block' : 'none'};
+  display: none;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: ${(props) => props.responsiveSmall ? 'block' : 'none'};
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     display: block;
   }

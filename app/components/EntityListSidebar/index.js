@@ -58,7 +58,10 @@ const ToggleShow = styled(ButtonDefault)`
   border-radius: 0;
   box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
   font-size: 0.85em;
-  width: ${(props) => props.theme.sizes.aside.width.large}px;
+  width: 100%;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    width: ${(props) => props.theme.sizes.aside.width.large}px;
+  }
 `;
 
 const ToggleHide = styled(Button)`

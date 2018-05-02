@@ -11,7 +11,10 @@ import SupTitle from 'components/SupTitle';
 import ButtonFactory from 'components/buttons/ButtonFactory';
 
 const Styled = styled.div`
-  padding: ${(props) => props.isModal ? '20px 0 20px 40px' : '3em 0 1em'};
+  padding: 2em 0 0.5em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: ${(props) => props.isModal ? '20px 0 20px 40px' : '3em 0 1em'};
+  }
   border-bottom: ${(props) => props.hasBottomBorder ? '1px solid' : 'none'};
   border-color: ${palette('light', 1)};
 `;

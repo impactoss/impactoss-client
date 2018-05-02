@@ -31,8 +31,6 @@ import Button from 'components/buttons/Button';
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
 import Icon from 'components/Icon';
-import Sidebar from 'components/styled/Sidebar';
-import Scrollable from 'components/styled/Scrollable';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
@@ -54,14 +52,20 @@ import {
 } from './selectors';
 
 const Content = styled.div`
-  padding: 0 1em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0 1em;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 0 2em;
   }
 `;
 const Description = styled.p`
-  margin-bottom: 2em;
-  font-size: 1.1em;
+  margin-bottom: 1.5em;
+  font-size: 1em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    margin-bottom: 2em;
+    font-size: 1.1em;
+  }
 `;
 const Diagram = styled.div`
   position: relative;
@@ -149,11 +153,14 @@ const AnnotationVertical = styled.div`
   text-align: center;
   color: ${palette('text', 1)};
   line-height: 1.1;
-  font-size: 0.85em;
   background-color: ${palette('background', 1)};
   position: relative;
   width: 200px;
   margin: 0 auto;
+  font-size: 0.8em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: 0.85em;
+  }
 `;
 
 const Categorised = styled.div`
@@ -182,10 +189,13 @@ const CategorisedIcons = styled.div``;
 
 const CategorisedIcon = styled.a`
   display: inline-block;
-  padding: 0 2px;
+  padding: 0;
   color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : palette('text', 1)};
   &:hover {
     color: ${(props) => palette('taxonomies', props.paletteId)};
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0 2px;
   }
 `;
 // color: ${(props) => props.active ? palette('primary', 0) : palette('dark', 3)};
@@ -218,11 +228,17 @@ const DiagramButton = styled(Button)`
     background-color: ${(props) => palette(props.paletteHover, 0)};
   }
   color: ${palette('primary', 4)};
-  border-radius: 999px;
-  padding: 0.4em 0.5em 1em;
+  padding: 0.4em 0.5em 0.75em;
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
-  font-weight: bold;
-  min-width: 180px;
+  font-size: 0.8em;
+  border-radius: 10px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 0.4em 0.5em 1em;
+    min-width: 180px;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 0.6em 1em 1.4em;
   }
@@ -230,32 +246,40 @@ const DiagramButton = styled(Button)`
 // font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 
 const DiagramButtonMain = styled(DiagramButton)`
-  padding: 0.4em 0.75em 1em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0.4em 0.75em 1em;
+    &:before {
+      content: '';
+      display: inline-block;
+      vertical-align: middle;
+      padding-top: 100%;
+    }
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     min-width: 230px;
   }
-  &:before {
-    content: '';
-    display: inline-block;
-    vertical-align: middle;
-    padding-top: 100%;
-  }
 `;
 const DiagramButtonMainInside = styled.span`
-  display: inline-block;
-  vertical-align: middle;
-  margin-top: -30px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: -30px;
+  }
 `;
 const DiagramButtonIcon = styled.div`
   padding-bottom: 5px;
 `;
 
 const DraftEntities = styled.div`
-  font-size: 0.85em;
-  font-weight: normal;
-  position: absolute;
-  left: 0;
-  right: 0;
+  display: none;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: block;
+    font-size: 0.85em;
+    font-weight: normal;
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
 `;
 
 const DiagramButtonMainTop = styled.div`
@@ -477,7 +501,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
               active={activeTaxonomyId === tax.get('id')}
               title={this.context.intl.formatMessage(appMessages.entities.taxonomies[tax.get('id')].plural)}
             >
-              <Icon name={`taxonomy_${tax.get('id')}`} size="2em" />
+              <Icon name={`taxonomy_${tax.get('id')}`} size={this.state.viewport < VIEWPORTS.SMALL ? '1.6em' : '2em'} />
             </CategorisedIcon>
           )
         )
@@ -579,40 +603,49 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       {this.renderCategoryIcons('tags_recommendations')}
     </DiagramButtonWrap>
   );
-  renderMeasuresButton = (large = true) => (
-    <DiagramButtonWrap>
-      <DiagramButtonMain
-        onClick={() => this.props.onPageLink(PATHS.MEASURES)}
-        paletteDefault={'measures'}
-        paletteHover={'measuresHover'}
-        innerRef={(node) => {
-          if (!this.state.buttonMeasures) {
-            this.setState({ buttonMeasures: node });
-          }
-        }}
-      >
-        <DiagramButtonMainInside>
-          <DiagramButtonIcon>
-            <Icon name="measures" size={large ? '5em' : '4em'} />
-          </DiagramButtonIcon>
-          <DiagramButtonMainTop>
-            <FormattedMessage {...messages.buttons.measures} />
-          </DiagramButtonMainTop>
-          <DiagramButtonMainBottom>
-            <FormattedMessage {...messages.buttons.measuresAdditional} values={{ count: this.props.measureCount || '0' }} />
-          </DiagramButtonMainBottom>
-          { this.props.measureDraftCount > 0 &&
-            <DraftEntities>
-              <FormattedMessage {...messages.buttons.draft} values={{ count: this.props.measureDraftCount }} />
-            </DraftEntities>
-          }
-        </DiagramButtonMainInside>
-      </DiagramButtonMain>
-      { this.getTaxonomiesByTagging(this.props.taxonomies, 'tags_measures').size > 0 &&
-        this.renderCategoryIcons('tags_measures')
-      }
-    </DiagramButtonWrap>
-  );
+  renderMeasuresButton = () => {
+    let iconSize = '5em';
+    if (this.state.viewport === VIEWPORTS.MOBILE) {
+      iconSize = null;
+    }
+    if (this.state.viewport === VIEWPORTS.MEDIUM) {
+      iconSize = '4em';
+    }
+    return (
+      <DiagramButtonWrap>
+        <DiagramButtonMain
+          onClick={() => this.props.onPageLink(PATHS.MEASURES)}
+          paletteDefault={'measures'}
+          paletteHover={'measuresHover'}
+          innerRef={(node) => {
+            if (!this.state.buttonMeasures) {
+              this.setState({ buttonMeasures: node });
+            }
+          }}
+        >
+          <DiagramButtonMainInside>
+            <DiagramButtonIcon>
+              <Icon name="measures" size={iconSize} />
+            </DiagramButtonIcon>
+            <DiagramButtonMainTop>
+              <FormattedMessage {...messages.buttons.measures} />
+            </DiagramButtonMainTop>
+            <DiagramButtonMainBottom>
+              <FormattedMessage {...messages.buttons.measuresAdditional} values={{ count: this.props.measureCount || '0' }} />
+            </DiagramButtonMainBottom>
+            { this.props.measureDraftCount > 0 &&
+              <DraftEntities>
+                <FormattedMessage {...messages.buttons.draft} values={{ count: this.props.measureDraftCount }} />
+              </DraftEntities>
+            }
+          </DiagramButtonMainInside>
+        </DiagramButtonMain>
+        { this.getTaxonomiesByTagging(this.props.taxonomies, 'tags_measures').size > 0 &&
+          this.renderCategoryIcons('tags_measures')
+        }
+      </DiagramButtonWrap>
+    );
+  };
 
   renderIndicatorButton = () => (
     <DiagramButtonWrap>
@@ -658,23 +691,19 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Sidebar responsiveSmall>
-          <Scrollable>
-            { !dataReady &&
-              <EntityListSidebarLoading responsiveSmall />
-            }
-            { dataReady &&
-              <TaxonomySidebar
-                taxonomies={mapToTaxonomyList(
-                  taxonomies,
-                  onTaxonomyLink,
-                  this.state.mouseOverTaxonomyDiagram,
-                  this.onTaxonomyMouseOver,
-                )}
-              />
-            }
-          </Scrollable>
-        </Sidebar>
+        { !dataReady &&
+          <EntityListSidebarLoading responsiveSmall />
+        }
+        { dataReady &&
+          <TaxonomySidebar
+            taxonomies={mapToTaxonomyList(
+              taxonomies,
+              onTaxonomyLink,
+              this.state.mouseOverTaxonomyDiagram,
+              this.onTaxonomyMouseOver,
+            )}
+          />
+        }
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
@@ -722,7 +751,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                       </AnnotationVertical>
                       <DiagramSectionVertical>
                         <DiagramSectionVerticalCenter>
-                          {this.renderMeasuresButton(this.state.viewport < VIEWPORTS.SMALL)}
+                          {this.renderMeasuresButton()}
                         </DiagramSectionVerticalCenter>
                       </DiagramSectionVertical>
                       <AnnotationVertical>
@@ -760,7 +789,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                       <DiagramSectionHorizontalCenter>
                         <DiagramSectionHorizontalVCenter>
                           {
-                            this.renderMeasuresButton(this.state.viewport !== VIEWPORTS.MEDIUM)
+                            this.renderMeasuresButton()
                           }
                         </DiagramSectionHorizontalVCenter>
                       </DiagramSectionHorizontalCenter>

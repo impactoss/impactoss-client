@@ -26,8 +26,6 @@ import appMessages from 'containers/App/messages';
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
 import Content from 'components/styled/Content';
-import Sidebar from 'components/styled/Sidebar';
-import Scrollable from 'components/styled/Scrollable';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
@@ -109,18 +107,14 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Sidebar responsiveSmall>
-          <Scrollable>
-            { !dataReady &&
-              <EntityListSidebarLoading responsiveSmall />
-            }
-            { dataReady && typeof reference !== 'undefined' &&
-              <TaxonomySidebar
-                taxonomies={mapToTaxonomyList(taxonomies.toList(), onTaxonomyLink, reference)}
-              />
-            }
-          </Scrollable>
-        </Sidebar>
+        { !dataReady &&
+          <EntityListSidebarLoading responsiveSmall />
+        }
+        { dataReady && typeof reference !== 'undefined' &&
+          <TaxonomySidebar
+            taxonomies={mapToTaxonomyList(taxonomies.toList(), onTaxonomyLink, reference)}
+          />
+        }
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>

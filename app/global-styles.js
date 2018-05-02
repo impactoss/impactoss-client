@@ -42,35 +42,51 @@ injectGlobal`
   }
   h1 {
     font-weight: 700;
-    font-size: 2.3em;
-  }
-  @media (min-width: 1200px) {
-    h1 {
-      font-weight: 700;
-      font-size: 2.6em;
-    }
+    font-size: 2em;
   }
   h2 {
-    font-size: 2.15em;
-  }
-  @media (min-width: 1200px) {
-    h2 {
-      font-size: 2.25em;
-    }
+    font-size: 1.8em;
   }
   h3 {
-    font-size: 1.9em;
-  }
-  h4 {
     font-size: 1.5em;
   }
+  h4 {
+    font-size: 1.3em;
+  }
   h5 {
-    font-size: 1.25em;
+    font-size: 1.1em;
   }
   h6 {
     font-size: 1em;
   }
-
+  @media (min-width: 769px) {
+    h1 {
+      font-size: 2.3em;
+    }
+    h2 {
+      font-size: 2.15em;
+    }
+    h3 {
+      font-size: 1.9em;
+    }
+    h4 {
+      font-size: 1.5em;
+    }
+    h5 {
+      font-size: 1.25em;
+    }
+    h6 {
+      font-size: 1em;
+    }
+  }
+  @media (min-width: 1200px) {
+    h1 {
+      font-size: 2.6em;
+    }
+    h2 {
+      font-size: 2.25em;
+    }
+  }
 
   p {
     margin-top: 0;
