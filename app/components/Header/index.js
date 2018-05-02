@@ -83,7 +83,7 @@ const NavSecondary = styled.div`
   bottom: 0;
   width: 100%;
   z-index: 99999;
-  background-color: rgba(0,0,0,0.3);
+  background-color:  ${palette('header', 0)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     position: relative;
     top: auto;
@@ -106,7 +106,7 @@ const ShowSecondary = styled(Button)`
   background-color: transparent;
 `;
 const HideSecondaryWrap = styled.div`
-  background-color: white;
+  background-color: ${palette('header', 0)};
   text-align: right;
   display: block;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
