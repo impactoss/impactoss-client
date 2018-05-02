@@ -285,6 +285,7 @@ theme.sizes = {
     listItemTop: '14px',
     markdown: '18px',
     small: '13px', // used for labels
+    smallMobile: '11px', // used for labels
   },
   // px only
   aside: {
@@ -325,7 +326,9 @@ theme.sizes = {
     // px or em
     text: {
       title: '2.8em',
+      titleMobile: '1.4em',
       claim: '1.3em',
+      claimMobile: '1em',
     },
   },
 };

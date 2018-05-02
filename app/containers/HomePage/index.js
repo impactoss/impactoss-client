@@ -13,6 +13,7 @@ import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
 import Row from 'components/styled/Row';
+import Container from 'components/styled/Container';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
@@ -84,8 +85,11 @@ const HomeActions = styled.div`
 const Title = styled.h1`
   color:${palette('headerBrand', 0)};
   font-family: ${(props) => props.theme.fonts.title};
-  font-size: ${(props) => props.theme.sizes.home.text.title};
+  font-size: ${(props) => props.theme.sizes.home.text.titleMobile};
   margin-top: 0.5em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.home.text.title};
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     margin-top: 1em;
   }
@@ -94,25 +98,36 @@ const Title = styled.h1`
 const Claim = styled.p`
   color: ${palette('headerBrand', 1)};
   font-family: ${(props) => props.theme.fonts.claim};
-  font-size: ${(props) => props.theme.sizes.home.text.claim};
+  font-size: ${(props) => props.theme.sizes.home.text.claimMobile};
   font-weight: 100;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 1.5em;
   line-height: 1.3;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.home.text.claim};
+    margin-bottom: 1.5em;
+  }
 `;
 
 const Intro = styled(ReactMarkdown)`
-  font-size: 1.1em;
+  font-size: 1em;
   margin-left: auto;
   margin-right: auto;
   line-height: 1.3;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: 1.1em;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-size: 1.25em;
     width: 80%;
   }
 `;
-
+const GridSpace = styled(Grid)`
+  display: none;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
+  }
+`;
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -141,32 +156,34 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             { !SHOW_HOME_TITLE &&
               <GraphicHome src={theme.media.titleHome} alt={appTitle} />
             }
-            { SHOW_HOME_TITLE &&
+            <Container noPaddingBottom >
+              { SHOW_HOME_TITLE &&
+                <Row>
+                  <GridSpace lg={1 / 6} sm={1 / 8} />
+                  <Grid lg={4 / 6} sm={6 / 8} xs={1}>
+                    <Title>
+                      <FormattedMessage {...appMessages.app.title} />
+                    </Title>
+                    <Claim>
+                      <FormattedMessage {...appMessages.app.claim} />
+                    </Claim>
+                  </Grid>
+                  <GridSpace lg={1 / 6} sm={1 / 8} />
+                </Row>
+              }
               <Row>
-                <Grid lg={1 / 6} sm={1 / 8} />
-                <Grid lg={4 / 6} sm={6 / 8}>
-                  <Title>
-                    <FormattedMessage {...appMessages.app.title} />
-                  </Title>
-                  <Claim>
-                    <FormattedMessage {...appMessages.app.claim} />
-                  </Claim>
+                <GridSpace lg={1 / 6} sm={1 / 12} />
+                <Grid lg={4 / 6} sm={10 / 12} xs={1}>
+                  <Intro source={this.context.intl.formatMessage(messages.intro)} />
+                  <HomeActions>
+                    <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
+                      <FormattedMessage {...messages.explore} />
+                    </ButtonHero>
+                  </HomeActions>
                 </Grid>
-                <Grid lg={1 / 6} sm={1 / 8} />
+                <GridSpace lg={1 / 6} sm={1 / 12} />
               </Row>
-            }
-            <Row>
-              <Grid lg={1 / 6} sm={1 / 12} />
-              <Grid lg={4 / 6} sm={10 / 12}>
-                <Intro source={this.context.intl.formatMessage(messages.intro)} />
-                <HomeActions>
-                  <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
-                    <FormattedMessage {...messages.explore} />
-                  </ButtonHero>
-                </HomeActions>
-              </Grid>
-              <Grid lg={1 / 6} sm={1 / 12} />
-            </Row>
+            </Container>
           </SectionWrapper>
         </SectionTop>
         <Footer />
