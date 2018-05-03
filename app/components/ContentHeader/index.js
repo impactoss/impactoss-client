@@ -78,6 +78,10 @@ const ButtonGroup = styled.div`
   display: table;
   float: right;
   text-align: right;
+  margin-bottom: 10px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    margin-bottom: 0;
+  }
 `;
 
 class ContentHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

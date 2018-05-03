@@ -8,9 +8,13 @@ import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 
 
 const Styled = styled(ColumnHeader)`
-  text-align: left;
-  padding-right: 0.5em;
-  padding-left: 1em;
+  display: none;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    display: table-cell;
+    text-align: left;
+    padding-right: 0.5em;
+    padding-left: 1em;
+  }
 `;
 
 const Wrapper = styled.div`

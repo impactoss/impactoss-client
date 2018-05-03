@@ -8,7 +8,7 @@ const Button = styled.button`
   display: inline-block;
   padding: 4px 8px;
   cursor:${(props) => props.disabled ? 'default' : 'pointer'};
-  font-size: 0.8em;
+  font-size: 0.9em;
   text-align: center;
   vertical-align: middle;
   line-height: 1.25;

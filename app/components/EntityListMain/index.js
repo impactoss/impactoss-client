@@ -29,7 +29,10 @@ import { getGroupOptions, getGroupValue } from './group-options';
 import messages from './messages';
 
 const EntityListSearch = styled.div`
-  padding: 0 0 2em;
+  padding-bottom: 1em;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding-bottom: 2em;
+  }
 `;
 
 const ListEntities = styled.div``;

@@ -26,12 +26,18 @@ const ListEntitiesMain = styled.div`
 `;
 const ListEntitiesEmpty = styled.div``;
 const ListEntitiesGroup = styled.div`
-  padding-bottom: 40px;
+  padding-bottom: 20px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding-bottom: 40px;
+  }
 `;
 const ListEntitiesSubGroup = styled.div`
-  padding-bottom: 25px;
+  padding-bottom: 10px;
   &:last-child {
     padding-bottom: 0;
+  }
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding-bottom: 25px;
   }
 `;
 

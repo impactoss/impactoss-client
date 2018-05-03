@@ -45,19 +45,19 @@ injectGlobal`
     font-size: 2em;
   }
   h2 {
-    font-size: 1.8em;
+    font-size: 1.6em;
   }
   h3 {
-    font-size: 1.5em;
-  }
-  h4 {
     font-size: 1.3em;
   }
-  h5 {
+  h4 {
     font-size: 1.1em;
   }
-  h6 {
+  h5 {
     font-size: 1em;
+  }
+  h6 {
+    font-size: 0.9em;
   }
   @media (min-width: 769px) {
     h1 {
