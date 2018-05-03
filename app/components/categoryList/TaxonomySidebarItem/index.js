@@ -77,7 +77,7 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
 
 TaxonomySidebarItem.propTypes = {
   taxonomy: PropTypes.object,
-  onTaxonomyClick: PropTypes.function,
+  onTaxonomyClick: PropTypes.func,
 };
 
 TaxonomySidebarItem.contextTypes = {
