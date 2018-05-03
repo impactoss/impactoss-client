@@ -17,7 +17,6 @@ const SVG = styled.svg`
   vertical-align: middle;
   margin-right: ${(props) => props.textLeft ? (parseFloat(props.size) / 4) + props.size.split(/[0-9]+/)[1] : 0};
   margin-left: ${(props) => props.textRight ? (parseFloat(props.size) / 4) + props.size.split(/[0-9]+/)[1] : 0};
-
 `;
 
 SVG.defaultProps = {
