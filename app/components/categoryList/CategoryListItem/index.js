@@ -80,10 +80,11 @@ const StatusWrap = styled.div`
   padding: 0 18px;
 `;
 const Reference = styled.span`
+  float: left;
   padding-right: 5px;
   color: ${palette('text', 1)};
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding-right: 8px;    
+    padding-right: 8px;
   }
 `;
 
