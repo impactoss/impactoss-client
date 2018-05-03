@@ -18,11 +18,14 @@ const Styled = styled.div`
 const Column = styled(ColumnHeader)`
   width:${(props) => props.colWidth}%;
   font-size: 0.75em;
-  padding-right: 4px;
+  padding: 4px;
   overflow: hidden;
   word-break: break-word;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-right: 30px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 8px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     font-size: 0.85em;

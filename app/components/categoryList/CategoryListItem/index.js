@@ -12,13 +12,16 @@ const Styled = styled.button`
   color: ${palette('mainListItem', 0)};
   background-color: ${palette('mainListItem', 1)};
   margin: 0;
-  padding: 0.75em 0;
+  padding: 5px 0;
   display: block;
   margin-bottom: 2px;
   line-height: 1.428571429;
   &:hover {
     color: ${palette('mainListItemHover', 0)};
     background-color: ${palette('mainListItemHover', 1)};
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0.75em 0;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 1em 0;
@@ -32,8 +35,11 @@ const Column = styled.div`
 const BarWrap = styled.div`
   width:100%;
   vertical-align: middle;
-  padding-left: 40px;
-  padding-right: ${(props) => props.secondary ? 36 : 18}px;
+  padding: 10px 6px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-left: 40px;
+    padding-right: ${(props) => props.secondary ? 36 : 18}px;
+  }
 `;
 const Bar = styled.div`
   width:${(props) => props.length}%;
@@ -49,28 +55,45 @@ const Bar = styled.div`
   }
 `;
 const Count = styled.div`
-  font-weight: bold;
   position: absolute;
-  font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
   line-height: 15px;
-  right: 100%;
-  text-align: right;
-  padding-right: 5px;
+  left: 0;
+  bottom: 100%;
+  padding: 2px 0;
   color: ${(props) => palette(props.palette, 0)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
+    font-weight: bold;
+    text-align: right;
+    padding: 0 5px 0 0;
+    right: 100%;
+    bottom: auto;
+    left: auto;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     line-height: 25px;
   }
 `;
 const CountSecondary = styled(Count)`
-  left: 100%;
-  text-align: left;
-  padding-right: 0;
-  padding-left: 5px;
+  right: 0;
+  top: 100%;
   color: ${(props) => palette(props.palette, 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    text-align: left;
+    padding: 0 0 0 5px;
+    left: 100%;
+    right: auto;
+    bottom: auto;
+    top: auto;
+  }
 `;
 const Title = styled.div`
   display: inline-block;
-  padding: 0 8px;
+  padding: 0 4px;
+  width: 100%;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0 8px;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 0 18px;
     font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
