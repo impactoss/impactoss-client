@@ -18,10 +18,16 @@ const Styled = styled.div`
 const Column = styled(ColumnHeader)`
   width:${(props) => props.colWidth}%;
   font-size: 0.75em;
-  padding-right: 30px;
+  padding-right: 4px;
+  overflow: hidden;
+  word-break: break-word;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-right: 30px;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     font-size: 0.85em;
   }
+  overflow: hidden;
 `;
 
 const Title = styled.span``;
@@ -32,11 +38,15 @@ const Via = styled.span`
 
 
 const SortWrapper = styled.div`
-  padding: 4px 2px 0 0;
-  position: absolute;
-  right: 0;
-  top: 0;
+  float: right;
   background-color: ${palette('light', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 4px 2px 0 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    float: none;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     padding: 6px 2px 0 0;
   }
