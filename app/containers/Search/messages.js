@@ -53,5 +53,13 @@ export default defineMessages({
       id: 'app.containers.Search.hints.noResultsNoAlternative',
       defaultMessage: 'We are sorry, no content matched your search! Please try a different search text.',
     },
+    targetMobile: {
+      id: 'app.containers.Search.hints.targetMobile',
+      defaultMessage: 'Select search target - see results below',
+    },
+    resultsMobile: {
+      id: 'app.containers.Search.hints.resultsMobile',
+      defaultMessage: 'Search results',
+    },
   },
 });

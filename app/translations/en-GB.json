@@ -583,5 +583,7 @@
   "app.containers.Search.groups.content" : "Content",
   "app.containers.Search.hints.noEntry" : "Please enter a search text to start your search.",
   "app.containers.Search.hints.noResults" : "We are sorry, there are no results for the selected search target. Please select a different target or try a different search text.",
-  "app.containers.Search.hints.noResultsNoAlternative" : "We are sorry, no content matched your search! Please try a different search text."
+  "app.containers.Search.hints.noResultsNoAlternative" : "We are sorry, no content matched your search! Please try a different search text.",
+  "app.containers.Search.hints.targetMobile" : "Select search target - see results below",
+  "app.containers.Search.hints.resultsMobile" : "Search results"
 }
