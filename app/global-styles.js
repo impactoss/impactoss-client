@@ -130,9 +130,20 @@ injectGlobal`
     .react-markdown {
       p {
         &:first-child{
-          font-size: 1.5em;
+          font-size: 1.2em;
           color: #6A7880;
-          padding-bottom: 20px;
+        }
+      }
+    }
+  }
+  @media (min-width: 769px) {
+    .content-page {
+      .react-markdown {
+        p {
+          &:first-child{
+            font-size: 1.5em;
+            padding-bottom: 20px;
+          }
         }
       }
     }
