@@ -70,7 +70,13 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         onClick: () => this.props.handleImport(),
       }, {
         type: 'add',
-        title: this.context.intl.formatMessage(messages.add),
+        title: [
+          this.context.intl.formatMessage(appMessages.buttons.add),
+          {
+            title: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
+            hiddenSmall: true,
+          },
+        ],
         onClick: () => this.props.handleNew(),
       }],
     };

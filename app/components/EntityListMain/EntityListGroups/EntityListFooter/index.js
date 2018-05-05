@@ -23,12 +23,14 @@ const Styled = styled.div`
   text-align: center;
 `;
 const SelectWrapper = styled.div`
-  position: absolute;
-  right:0;
-  bottom:0;
-  text-align:right;
-  display: block;
-  height: 2em;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    position: absolute;
+    right:0;
+    bottom:0;
+    text-align:right;
+    display: block;
+    height: 2em;
+  }
 `;
 const ListInline = styled.ul`
   list-style: none;
@@ -38,34 +40,53 @@ const ListInlineItem = styled.li`
   position: relative;
   display: inline-block;
   padding: 0;
-  font-size: 1.25em;
+  font-size: 1em;
   color: ${palette('linkHover', 0)};
+  vertical-align: middle;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    font-size: 1.25em;
+  }
 `;
 const ListInlineItemLink = styled(A)`
-  width:2em;
-  height:2em;
-  line-height: 2em;
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.6;
   font-weight: bold;
   display: block;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    width: 2em;
+    height: 2em;
+    line-height: 2;
+  }
 `;
 const ListInlineItemActive = styled.div`
-  width:2em;
-  height:2em;
-  line-height: 2em;
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.6;
   border-radius: 9999px;
   font-weight: bold;
   background-color: ${palette('buttonDefault', 1)};
   color: ${palette('buttonDefault', 0)};
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    width: 2em;
+    height: 2em;
+    line-height: 2;
+  }
 `;
 const ListInlineItemNav = styled(A)`
-  padding: 0 0.5em;
+  padding: 0;
   display: block;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding: 0 0.5em;
+  }
 `;
 
 const ListInlineItemNavDisabled = styled.div`
   color: ${palette('buttonDefaultDisabled', 1)};
-  padding: 0 0.5em;
-`;
+  padding: 0;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding: 0 0.5em;
+  }`;
 
 export class EntityListFooter extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {

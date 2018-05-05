@@ -25,8 +25,7 @@ import appMessages from 'containers/App/messages';
 // components
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
-import Sidebar from 'components/styled/Sidebar';
-import Scrollable from 'components/styled/Scrollable';
+import Content from 'components/styled/Content';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
@@ -40,16 +39,12 @@ import { DEPENDENCIES, SORT_OPTIONS } from './constants';
 import { selectTaxonomy, selectCategories } from './selectors';
 import { updateSort } from './actions';
 
-const Content = styled.div`
-  padding: 0 4em;
-`;
 const UsersOnly = styled.h4`
   margin-top: 4em;
 `;
 const Description = styled.p`
   margin-bottom: 2em;
   font-size: 1em;
-  line-height: 1.4em;
 `;
 export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -86,7 +81,13 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     const buttons = dataReady && isManager && typeof reference !== 'undefined'
       ? [{
         type: 'add',
-        title: this.context.intl.formatMessage(messages.add, { category: this.getTaxButtonTitle(reference) }),
+        title: [
+          this.context.intl.formatMessage(appMessages.buttons.add),
+          {
+            title: this.getTaxButtonTitle(reference),
+            hiddenSmall: true,
+          },
+        ],
         onClick: () => this.props.handleNew(reference),
       }]
       : null;
@@ -106,19 +107,15 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Sidebar>
-          <Scrollable>
-            { !dataReady &&
-              <EntityListSidebarLoading />
-            }
-            { dataReady && typeof reference !== 'undefined' &&
-              <TaxonomySidebar
-                taxonomies={mapToTaxonomyList(taxonomies.toList(), onTaxonomyLink, reference)}
-              />
-            }
-          </Scrollable>
-        </Sidebar>
-        <ContainerWithSidebar>
+        { !dataReady &&
+          <EntityListSidebarLoading responsiveSmall />
+        }
+        { dataReady && typeof reference !== 'undefined' &&
+          <TaxonomySidebar
+            taxonomies={mapToTaxonomyList(taxonomies.toList(), onTaxonomyLink, reference)}
+          />
+        }
+        <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
               <ContentHeader

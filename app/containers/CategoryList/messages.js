@@ -10,10 +10,6 @@ export default defineMessages({
     id: 'app.containers.CategoryList.supTitle',
     defaultMessage: 'Categories',
   },
-  add: {
-    id: 'app.containers.CategoryList.add',
-    defaultMessage: 'Add {category}',
-  },
   metaDescription: {
     id: 'app.containers.CategoryList.metaDescription',
     defaultMessage: 'Categories overview',

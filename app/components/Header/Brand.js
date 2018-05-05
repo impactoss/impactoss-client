@@ -12,4 +12,6 @@ export default styled.a`
     color: ${palette('headerBrandHover', 0)};
     opacity: 0.95;
   }
+
+  z-index: 110;
 `;

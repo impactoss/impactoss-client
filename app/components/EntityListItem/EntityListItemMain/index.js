@@ -16,17 +16,22 @@ import EntityListItemMainBottom from './EntityListItemMainBottom';
 
 
 const Styled = styled(Component)`
-  padding-right: ${(props) => (!props.theme.sizes || props.isConnection)
-    ? 0
-    : props.theme.sizes.mainListItem.paddingHorizontal
-  }px;
-  padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
-  padding-bottom: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingBottom}px;
-  padding-left: ${(props) => (!props.theme.sizes || props.isManager || props.isConnection)
-    ? 0
-    : props.theme.sizes.mainListItem.paddingHorizontal
-  }px;
-  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
+  padding-right: ${(props) => props.isConnection ? 0 : 4}px;
+  padding-top: 2px;
+  padding-bottom: 4px;
+  padding-left: ${(props) => (props.isManager || props.isConnection) ? 0 : 4}px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding-right: ${(props) => (!props.theme.sizes || props.isConnection)
+      ? 0
+      : props.theme.sizes.mainListItem.paddingHorizontal
+    }px;
+    padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
+    padding-bottom: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingBottom}px;
+    padding-left: ${(props) => (!props.theme.sizes || props.isManager || props.isConnection)
+      ? 0
+      : props.theme.sizes.mainListItem.paddingHorizontal
+    }px;
+  }
 `;
 
 const EntityListItemMainTitleWrap = styled.a`

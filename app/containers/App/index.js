@@ -42,8 +42,14 @@ const Main = styled.div`
   position: ${(props) => props.isHome ? 'relative' : 'absolute'};
   top: ${(props) => props.isHome
     ? 0
-    : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
+    : props.theme.sizes.header.banner.heightMobile + props.theme.sizes.header.nav.heightMobile
   }px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    top: ${(props) => props.isHome
+      ? 0
+      : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
+    }px;
+  }
   overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
   left: 0;
   right: 0;

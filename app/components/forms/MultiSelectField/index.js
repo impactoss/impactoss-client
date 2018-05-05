@@ -26,7 +26,6 @@ const MultiSelectWrapper = styled.div`
   min-height: 300px;
   height: ${(props) => props.wrapperHeight ? props.wrapperHeight : 450}px;
   width: 100%;
-  min-width: 350px;
   overflow: hidden;
   display: block;
   z-index: 10;
@@ -36,6 +35,9 @@ const MultiSelectWrapper = styled.div`
   border-bottom: 1px solid;
   border-color: ${palette('light', 2)};
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    min-width: 350px;
+  }
 `;
 const MultiSelectFieldWrapper = styled.div`
   position: relative;
@@ -51,29 +53,42 @@ const MultiselectActiveOptionListItem = styled.div`
   position: relative;
   background-color: ${palette('mainListItem', 1)};
   border-bottom: 1px solid ${palette('light', 1)};
-  padding: 12px 0 12px 16px;
-  line-height: 1.4;
+  padding: 6px 0 6px 8px;
+  font-size: 0.8em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 12px 0 12px 16px;
+    font-size: 1em;
+  }
 `;
 const MultiselectActiveOptionRemove = styled(Button)`
   position: absolute;
   top: 0;
   right: 0;
   display: block;
-  padding: 0 16px;
   bottom: 0;
   color: ${palette('link', 2)};
   &:hover {
     color: ${palette('linkHover', 2)};
   }
+  padding: 0 8px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0 16px;
+  }
 `;
 const MultiselectActiveOption = styled.div`
-  padding-right: 50px;
+  padding-right: 30px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-right: 50px;
+  }
 `;
 const MultiSelectDropdownIcon = styled.div`
   position: absolute;
   right: 0;
   top: 0;
-  padding: 12px 16px 0 0;
+  padding: 12px 8px 0 0;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-right: 16px;
+  }
 `;
 const MultiSelectDropdown = styled(Button)`
   position: relative;
@@ -86,12 +101,18 @@ const MultiSelectDropdown = styled(Button)`
     color: ${palette('multiSelectFieldButtonHover', 0)};
     background-color: ${palette('multiSelectFieldButtonHover', 1)}
   }
-  padding: 12px 0 12px 16px;
+  padding: 12px 0 12px 8px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-left: 16px;
+  }
 `;
 
 const MultiSelectWithout = styled.div`
-  padding: 12px 0 12px 16px;
   color: ${palette('text', 1)};
+  padding: 12px 0 12px 8px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-left: 16px;
+  }
 `;
 const MultiSelectWithoutLink = styled(A)`
   color: ${palette('text', 1)};

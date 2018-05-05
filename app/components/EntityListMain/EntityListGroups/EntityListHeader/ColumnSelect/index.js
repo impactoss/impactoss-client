@@ -18,17 +18,22 @@ const SortButton = styled(ButtonFlatIconOnly)`
   color: inherit;
 `;
 const Styled = styled(ColumnHeader)`
-  padding-left: 0;
   padding-right: 0;
 `;
 const LabelWrap = styled.div`
   display: table-cell;
-  padding-left: ${(props) => props.isSelect ? 0 : 15}px;
+  padding-right: 4px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding-left: ${(props) => props.isSelect ? 0 : 7}px;
+  }
 `;
 const CheckboxWrap = styled.div`
-  width: 40px;
   display: table-cell;
   text-align: center;
+  width: 20px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    width: 40px;
+  }
 `;
 const Checkbox = styled(IndeterminateCheckbox)`
   vertical-align: middle;
@@ -42,7 +47,8 @@ const Wrapper = styled.div`
 `;
 const SelectWrapper = styled.div`
   display: table-cell;
-  text-align:right;
+  text-align: right;
+  padding-right: 2px;
 `;
 
 const SelectAll = styled(A)`

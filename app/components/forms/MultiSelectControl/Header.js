@@ -9,10 +9,14 @@ const Styled = styled.div`
   width: 100%;
   color: ${palette('multiSelectHeader', 0)};
   background-color: ${palette('multiSelectHeader', 1)};
-  height: 60px;
-  padding-left: 1em;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
   z-index: 1;
+  height: 40px;
+  padding-left: 0.75em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    height: 60px;
+    padding-left: 1em;
+  }
 `;
 
 const Title = styled.div`

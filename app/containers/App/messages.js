@@ -49,7 +49,7 @@ export default defineMessages({
     },
     add: {
       id: 'app.containers.App.buttons.add',
-      defaultMessage: 'Add',
+      defaultMessage: 'New',
     },
     edit: {
       id: 'app.containers.App.buttons.edit',
@@ -70,6 +70,14 @@ export default defineMessages({
     import: {
       id: 'app.containers.App.buttons.import',
       defaultMessage: 'Import',
+    },
+    hideSecondaryNavigation: {
+      id: 'app.containers.App.buttons.hideSecondaryNavigation',
+      defaultMessage: 'Hide top menu',
+    },
+    showSecondaryNavigation: {
+      id: 'app.containers.App.buttons.showSecondaryNavigation',
+      defaultMessage: 'Show top menu',
     },
   },
   labels: {
