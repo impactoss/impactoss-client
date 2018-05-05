@@ -88,7 +88,7 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
                 }}
               >
                 <FormattedMessage {...messages.loginLink} />
-                <Icon name="arrowRight" text textRight />
+                <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
               </A>
             </p>
           </BottomLinks>

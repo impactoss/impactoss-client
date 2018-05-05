@@ -18,15 +18,15 @@ const RowStyled = styled(Row)`
 const GridSpace = styled(Grid)`
   display: none !important;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    display: inline-block;
+    display: inline-block !important;
   }
 `;
 const GridMain = styled(Grid)`
-  padding-right: 0;
-  padding-left: 0;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding-right: ${(props) => props.theme.gutter}px;
-    padding-left: ${(props) => props.theme.gutter}px;
+    padding-right: ${(props) => props.theme.gutter}px !important;
+    padding-left: ${(props) => props.theme.gutter}px !important;
   }
 `;
 
