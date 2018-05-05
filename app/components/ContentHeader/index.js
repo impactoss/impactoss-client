@@ -11,7 +11,7 @@ import SupTitle from 'components/SupTitle';
 import ButtonFactory from 'components/buttons/ButtonFactory';
 
 const Styled = styled.div`
-  padding: 1em 0 0.5em;
+  padding: ${(props) => props.isModal ? '0 0 10px' : '1em 0 0.5em'};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: ${(props) => props.isModal ? '20px 0 20px 40px' : '3em 0 1em'};
   }

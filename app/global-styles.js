@@ -151,19 +151,27 @@ injectGlobal`
 
   .new-entity-modal {
     position: absolute;
-    top: 40px;
-    left: 40px;
-    right: 40px;
-    bottom: 40px;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
     border: 0;
     overflow: auto;
     --webkit-overflow-scrolling: touch;
     border-radius: 0;
     outline: none;
-    padding: 20px;
     margin-right: auto;
     margin-left: auto;
     max-width: 1170px;
+  }
+  @media (min-width: 769px) {
+    .new-entity-modal {
+      padding: 20px;
+      top: 40px;
+      left: 40px;
+      right: 40px;
+      bottom: 40px;
+    }
   }
 
   .new-entity-modal-overlay {
