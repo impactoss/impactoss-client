@@ -47,13 +47,16 @@ const ChangeHintHighlighted = styled.span`
 
 const ControlMain = styled.div`
   position: absolute;
-  top: 60px;
+  top: 40px;
   bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
   left: 0;
   right: 0;
   overflow-y: auto;
   padding:0;
   padding-bottom: ${(props) => props.hasChangeNote ? '50px' : '0px'};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    top: 60px;
+  }
 `;
 const ControlFooter = styled.div`
   position: absolute;
@@ -66,8 +69,11 @@ const ControlFooter = styled.div`
 `;
 
 const Search = styled.div`
-  padding: 0.75em 1em;
+  padding: 0.75em;
   background-color: ${palette('background', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0.75em 1em;
+  }
 `;
 
 const SelectAll = styled.div`
@@ -88,10 +94,14 @@ const LabelWrap = styled.div`
 const CheckboxWrap = styled.div`
   text-align: center;
   display: table-cell;
-  padding-left: 1em;
-  padding-right: 0.5em;
   width: 10px;
   vertical-align: middle;
+  padding-left: 0.75em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-right: 0.5em;
+    padding-left: 1em;
+  }
+
 `;
 const Checkbox = styled(IndeterminateCheckbox)`
   vertical-align: middle;
