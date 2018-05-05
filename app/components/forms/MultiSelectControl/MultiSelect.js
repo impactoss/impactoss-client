@@ -33,12 +33,15 @@ const ChangeHint = styled.div`
   position: absolute;
   left: 0;
   right: 0;
-  bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
+  bottom: ${(props) => props.hasFooter ? '30px' : '0px'};
   color: ${palette('text', 1)};
   background-color: ${palette('background', 1)};
   padding: 0.5em 1em;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
   text-align: right;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
+  }
 `;
 
 const ChangeHintHighlighted = styled.span`
@@ -64,8 +67,10 @@ const ControlFooter = styled.div`
   left: 0;
   right: 0;
   background-color: ${palette('background', 1)};
-  height: 50px;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    height: 50px;
+  }
 `;
 
 const Search = styled.div`

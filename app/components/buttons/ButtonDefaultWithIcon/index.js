@@ -10,15 +10,17 @@ import Icon from 'components/Icon';
 const Button = styled(ButtonDefault)`
   padding: 0.3em 1em 0.2em;
   width: ${(props) => props.fullWidth ? '100%' : 'auto'};
-  min-height: 3em;
   text-align: ${(props) => props.align};
   text-transform: ${(props) => props.uppercase ? 'uppercase' : 'none'};
   font-weight: ${(props) => props.strong ? 'bold' : 'normal'};
   border: 1px solid;
   border-color: ${(props) => props.border ? palette(props.border.palette, props.border.pIndex) : 'transparent'};
   font-size: 0.85em;
-  min-width: 90px;
+  min-width: 80px;
+  min-height: 2.2em;
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    min-width: 90px;
+    min-height: 3em;
     padding: 0.3em 1.5em 0.2em;
   }
 `;

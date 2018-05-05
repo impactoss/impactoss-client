@@ -7,6 +7,7 @@ import ButtonDefaultWithIcon from 'components/buttons/ButtonDefaultWithIcon';
 const Styled = styled.div`
   position: relative;
   height: 50px;
+  max-width: 230px;
 `;
 
 const ButtonActive = styled.span`

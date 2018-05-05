@@ -28,9 +28,12 @@ const LabelWrap = styled.div`
   }
 `;
 const CheckboxWrap = styled.div`
-  width: 40px;
   display: table-cell;
   text-align: center;
+  width: 20px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    width: 40px;
+  }
 `;
 const Checkbox = styled(IndeterminateCheckbox)`
   vertical-align: middle;
