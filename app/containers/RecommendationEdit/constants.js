@@ -23,6 +23,7 @@ export const FORM_INITIAL = fromJS({
   id: '',
   attributes: {
     title: '',
+    description: '',
     reference: '',
     accepted: '',
     response: '',

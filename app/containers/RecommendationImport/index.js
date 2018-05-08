@@ -113,6 +113,12 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
                     import: true,
                   },
                   {
+                    attribute: 'description',
+                    label: 'fullRecommendation',
+                    type: 'markdown',
+                    import: true,
+                  },
+                  {
                     attribute: 'accepted',
                     type: 'bool',
                     import: true,

@@ -106,6 +106,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
   getBodyMainFields = (connectedTaxonomies, measures, onCreateOption) => ([
     {
       fields: [
+        getMarkdownField(this.context.intl.formatMessage, appMessages, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
         getAcceptedField(this.context.intl.formatMessage, appMessages),
         getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
       ],
