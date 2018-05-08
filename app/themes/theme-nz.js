@@ -43,8 +43,8 @@ theme.media = {
 // grid-styles settings https://github.com/jxnblk/grid-styled
 theme.gutter = 20;
 theme.breakpoints = {
-  small: '768px',
-  medium: '992px',
+  small: '769px',
+  medium: '993px',
   large: '1200px',
 };
 
@@ -273,8 +273,8 @@ theme.palette = {
   buttonDefaultIconOnly: [primary[1], 'transparent', primary[1]],
   buttonDefaultIconOnlyHover: [primary[0], 'transparent', primary[0]],
   // buttonSecondary: ['#text', '#bg'],
-  buttonSecondary: [secondary[4], secondary[1]],
-  buttonSecondaryHover: [secondary[4], secondary[0]],
+  // buttonSecondary: [secondary[4], secondary[1]],
+  // buttonSecondaryHover: [secondary[4], secondary[0]],
   // buttonToggleInactive: ['#color', '#bg'],
   buttonToggleInactive: [dark[1], light[1]], // list sidebar filter/edit toggle button
   buttonToggleInactiveHover: [dark[1], light[0]],
@@ -304,16 +304,18 @@ theme.sizes = {
     nestedListItem: '15px',
     listItemTop: '14px',
     markdown: '18px',
+    markdownMobile: '16px',
     small: '13px', // used for labels
-  },
-  lineHeights: {
-    mainListItem: 1.4,
-    markdown: 1.4,
+    smallMobile: '11px', // used for labels
   },
   // px only
   aside: {
     header: {
       height: 90,
+    },
+    width: {
+      small: 250,
+      large: 300,
     },
   },
   mainListItem: {
@@ -324,21 +326,32 @@ theme.sizes = {
   header: {
     banner: {
       height: 105,
+      heightMobile: 50,
     },
     nav: {
-      height: 43,
+      height: 38,
+      heightMobile: 24,
     },
     // px or em
     text: {
       title: '1.6em',
       claim: '1.6em',
+      titleMobile: '0.75em',
+      claimMobile: '0.75em',
+    },
+    paddingLeft: {
+      mobile: 6,
+      small: 12,
+      large: 20,
     },
   },
   home: {
     // px or em
     text: {
       title: '1.8em',
+      titleMobile: '1.4em',
       claim: '1.8em',
+      claimMobile: '1em',
     },
   },
 };

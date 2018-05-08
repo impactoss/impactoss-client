@@ -7847,6 +7847,10 @@ webpack-dev-middleware@1.9.0:
     path-is-absolute "^1.0.0"
     range-parser "^1.0.3"
 
+webpack-git-hash@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/webpack-git-hash/-/webpack-git-hash-1.0.2.tgz#03f0663fdfc93bcfae55a333dae27dde7eb4b6da"
+
 webpack-hot-middleware@2.15.0:
   version "2.15.0"
   resolved "https://registry.yarnpkg.com/webpack-hot-middleware/-/webpack-hot-middleware-2.15.0.tgz#71995af7c0025f109df482f86f1e10379526d026"

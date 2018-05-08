@@ -14,8 +14,4 @@ export default defineMessages({
     id: 'app.containers.PageList.metaDescription',
     defaultMessage: 'Pages page description',
   },
-  add: {
-    id: 'app.containers.PageList.add',
-    defaultMessage: 'Add page',
-  },
 });

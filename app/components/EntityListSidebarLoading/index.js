@@ -4,6 +4,7 @@
  *
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
@@ -11,8 +12,18 @@ import Scrollable from 'components/styled/Scrollable';
 import Sidebar from 'components/styled/Sidebar';
 import SidebarHeader from 'components/styled/SidebarHeader';
 
+const Styled = styled.div`
+  display: none;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: ${(props) => props.responsiveSmall ? 'block' : 'none'};
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    display: block;
+  }
+`;
+
 const Group = styled.div`
-  height: 31px;
+  height: 28px;
   display: block;
   width: 100%;
   background-color: ${palette('asideListGroup', 1)};
@@ -23,12 +34,16 @@ const Group = styled.div`
 // background color
 
 const Option = styled.div`
-  height: 50px;
+  height: 30px;
   font-weight: bold;
-  padding: 1em 1em 0 1.5em;
+  padding: 0.5em 8px 0.5em 12px;
   width: 100%;
   background-color: ${palette('asideListItem', 2)};
   border-bottom: 1px solid ${palette('asideListItem', 4)};
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding: 1em 8px 1em 24px
+    height: 50px;
+  }
 `;
 
 const Label = styled.div`
@@ -45,8 +60,8 @@ export class EntityListSidebarLoading extends React.Component { // eslint-disabl
 
   render() {
     return (
-      <div>
-        <Sidebar>
+      <Styled responsiveSmall={this.props.responsiveSmall}>
+        <Sidebar responsiveSmall={this.props.responsiveSmall}>
           <ScrollableWrapper>
             <SidebarHeader />
             <Group />
@@ -57,9 +72,17 @@ export class EntityListSidebarLoading extends React.Component { // eslint-disabl
             <Option><Label width={25} /></Option>
           </ScrollableWrapper>
         </Sidebar>
-      </div>
+      </Styled>
     );
   }
 }
+
+EntityListSidebarLoading.propTypes = {
+  responsiveSmall: PropTypes.bool,
+};
+
+EntityListSidebarLoading.defaultProps = {
+  responsiveSmall: false,
+};
 
 export default EntityListSidebarLoading;

@@ -42,8 +42,14 @@ const Main = styled.div`
   position: ${(props) => props.isHome ? 'relative' : 'absolute'};
   top: ${(props) => props.isHome
     ? 0
-    : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
+    : props.theme.sizes.header.banner.heightMobile + props.theme.sizes.header.nav.heightMobile
   }px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    top: ${(props) => props.isHome
+      ? 0
+      : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
+    }px;
+  }
   overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
   left: 0;
   right: 0;
@@ -81,32 +87,34 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 
   prepareMainMenuItems = (isManager, currentPath) => {
     let navItems = ([
+      // {
+      //   path: PATHS.OVERVIEW,
+      //   title: this.context.intl.formatMessage(messages.nav.overview),
+      //   active: currentPath.startsWith(PATHS.OVERVIEW),
+      // },
       {
         path: PATHS.OVERVIEW,
         title: this.context.intl.formatMessage(messages.nav.overview),
-        active: currentPath.startsWith(PATHS.OVERVIEW),
-      },
-      {
-        path: PATHS.TAXONOMIES,
-        title: this.context.intl.formatMessage(messages.nav.taxonomies),
-        active: currentPath.startsWith(PATHS.TAXONOMIES) || currentPath.startsWith(PATHS.CATEGORIES),
+        active: currentPath.startsWith(PATHS.OVERVIEW) || currentPath.startsWith(PATHS.TAXONOMIES) || currentPath.startsWith(PATHS.CATEGORIES),
       },
       {
         path: PATHS.MEASURES,
         title: this.context.intl.formatMessage(messages.nav.measures),
         active: currentPath.startsWith(PATHS.MEASURES),
       },
-      {
+    ]);
+    if (isManager) {
+      navItems = navItems.concat([{
         path: PATHS.INDICATORS,
         title: this.context.intl.formatMessage(messages.nav.indicators),
         active: currentPath.startsWith(PATHS.INDICATORS) || currentPath.startsWith(PATHS.PROGRESS_REPORTS),
-      },
-      {
-        path: PATHS.RECOMMENDATIONS,
-        title: this.context.intl.formatMessage(messages.nav.recommendations),
-        active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
-      },
-    ]);
+      }]);
+    }
+    navItems = navItems.concat([{
+      path: PATHS.RECOMMENDATIONS,
+      title: this.context.intl.formatMessage(messages.nav.recommendations),
+      active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
+    }]);
     if (ENABLE_SDGS) {
       navItems = navItems.concat([{
         path: PATHS.SDG_TARGETS,

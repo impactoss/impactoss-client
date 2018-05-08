@@ -17,12 +17,15 @@ import messages from './messages';
 
 const Styled = styled.span`
   display: inline-block;
-  width: ${(props) => props.expanded ? 50 : 100}%;
   vertical-align: top;
+  width: 100%;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    width: ${(props) => props.expanded ? 50 : 100}%;
+  }
 `;
 const Item = styled(Component)`
   display: table;
-  width:100%;
+  width: 100%;
   color: ${palette('mainListItem', 0)};
   background-color: ${palette('mainListItem', 1)};
   border-bottom: ${(props) => props.error ? '1px solid' : 0};
@@ -31,10 +34,13 @@ const Item = styled(Component)`
   border-color: ${palette('error', 0)};
 `;
 const MainWrapper = styled(Component)`
-  display: table-cell;
-  width: ${(props) => props.expandable ? 66 : 100}%;
-  border-right: ${(props) => props.expandable ? '1px solid' : '0'};
-  border-right-color: ${palette('background', 1)};
+  width:100%;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    display: table-cell;
+    width: ${(props) => props.expandable ? 66 : 100}%;
+    border-right: ${(props) => props.expandable ? '1px solid' : '0'};
+    border-right-color: ${palette('background', 1)};
+  }
 `;
 const MainInnerWrapper = styled(Component)`
   display: table;

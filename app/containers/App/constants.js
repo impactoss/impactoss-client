@@ -96,6 +96,14 @@ export const PARAMS = {
   ALREADY_SIGNED_IN: 'alreadySignedIn',
   NOT_SIGNED_IN: 'notSignedIn',
 };
+
+export const VIEWPORTS = {
+  MOBILE: 1,
+  SMALL: 2,
+  MEDIUM: 3,
+  LARGE: 4,
+};
+
 export const PATHS = {
   ID: '/:id',
   NEW: '/new',

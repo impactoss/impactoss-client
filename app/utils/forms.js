@@ -259,13 +259,16 @@ export const getHighestUserRoleId = (roles) =>
       : currentHighestRoleId.toString()
   , USER_ROLES.DEFAULT.value);
 
-export const getRoleFormField = (formatMessage, obsoleteAppMessages, roles) => ({
+export const getRoleFormField = (formatMessage, obsoleteAppMessages, roleOptions) => ({
   id: 'role',
   controlType: 'select',
   model: '.associatedRole',
   label: formatMessage(appMessages.entities.roles.single),
-  value: getHighestUserRoleId(roles).toString(),
-  options: Object.values(USER_ROLES),
+  value: getHighestUserRoleId(roleOptions).toString(),
+  options: Object.values(filter(USER_ROLES, (userRole) =>
+    roleOptions.map((roleOption) => parseInt(roleOption.get('id'), 10)).includes(userRole.value)
+    || userRole.value === USER_ROLES.DEFAULT.value
+  )),
 });
 
 export const getAcceptedField = (formatMessage, obsoleteAppMessages, entity) => ({
@@ -402,12 +405,16 @@ export const getMenuOrderFormField = (formatMessage) => {
   return field;
 };
 
-export const getMarkdownField = (formatMessage, obsoleteAppMessages, attribute = 'description') =>
+export const getMarkdownField = (formatMessage, obsoleteAppMessages, attribute = 'description', label, placeholder, hint) =>
   getFormField({
     formatMessage,
     controlType: 'markdown',
     attribute,
-    hint: appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute]),
+    label: label || attribute,
+    placeholder: placeholder || attribute,
+    hint: hint
+      ? (appMessages.hints[hint] && formatMessage(appMessages.hints[hint]))
+      : (appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute])),
   });
 
 export const getTextareaField = (formatMessage, obsoleteAppMessages, attribute = 'description') =>

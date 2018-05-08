@@ -145,6 +145,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
         { expandableColumns && expandableColumns.length > 0 &&
           expandableColumns.map((col, i, list) =>
             <ColumnExpand
+              hiddenMobile
               key={i}
               isExpand={expandNo > i}
               onExpand={() => onExpand(expandNo > i ? i : i + 1)}

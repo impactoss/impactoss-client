@@ -73,7 +73,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       indicatorConnections,
     } = this.props;
 
-    const buttons = hasUserRole[USER_ROLES.ADMIN.value]
+    const buttons = hasUserRole[USER_ROLES.MANAGER.value]
     ? [
       {
         type: 'edit',

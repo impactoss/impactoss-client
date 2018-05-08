@@ -11,7 +11,7 @@ injectGlobal`
   body {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
-    line-height: 1.64em;
+    line-height: 1.428571429;
     color: #21282B;
   }
   button, input, select, textarea {
@@ -42,24 +42,51 @@ injectGlobal`
   }
   h1 {
     font-weight: 700;
-    font-size: 2.6em;
+    font-size: 2em;
   }
   h2 {
-    font-size: 2.25em;
+    font-size: 1.6em;
   }
   h3 {
-    font-size: 1.9em;
+    font-size: 1.3em;
   }
   h4 {
-    font-size: 1.5em;
+    font-size: 1.1em;
   }
   h5 {
-    font-size: 1.25em;
-  }
-  h6 {
     font-size: 1em;
   }
-
+  h6 {
+    font-size: 0.9em;
+  }
+  @media (min-width: 769px) {
+    h1 {
+      font-size: 2.3em;
+    }
+    h2 {
+      font-size: 2.15em;
+    }
+    h3 {
+      font-size: 1.9em;
+    }
+    h4 {
+      font-size: 1.5em;
+    }
+    h5 {
+      font-size: 1.25em;
+    }
+    h6 {
+      font-size: 1em;
+    }
+  }
+  @media (min-width: 1200px) {
+    h1 {
+      font-size: 2.6em;
+    }
+    h2 {
+      font-size: 2.25em;
+    }
+  }
 
   p {
     margin-top: 0;
@@ -103,9 +130,20 @@ injectGlobal`
     .react-markdown {
       p {
         &:first-child{
-          font-size: 1.5em;
+          font-size: 1.2em;
           color: #6A7880;
-          padding-bottom: 20px;
+        }
+      }
+    }
+  }
+  @media (min-width: 769px) {
+    .content-page {
+      .react-markdown {
+        p {
+          &:first-child{
+            font-size: 1.5em;
+            padding-bottom: 20px;
+          }
         }
       }
     }
@@ -113,19 +151,27 @@ injectGlobal`
 
   .new-entity-modal {
     position: absolute;
-    top: 40px;
-    left: 40px;
-    right: 40px;
-    bottom: 40px;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
     border: 0;
     overflow: auto;
     --webkit-overflow-scrolling: touch;
     border-radius: 0;
     outline: none;
-    padding: 20px;
     margin-right: auto;
     margin-left: auto;
     max-width: 1170px;
+  }
+  @media (min-width: 769px) {
+    .new-entity-modal {
+      padding: 20px;
+      top: 40px;
+      left: 40px;
+      right: 40px;
+      bottom: 40px;
+    }
   }
 
   .new-entity-modal-overlay {

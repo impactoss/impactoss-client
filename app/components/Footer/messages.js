@@ -53,6 +53,10 @@ export default defineMessages({
     },
   },
   partners: {
+    note: {
+      id: 'app.components.Footer.partners.note',
+      defaultMessage: 'With kind support of',
+    },
     title1: {
       id: 'app.components.Footer.partners.title1',
       defaultMessage: 'Partner 1',

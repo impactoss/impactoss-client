@@ -13,6 +13,7 @@ import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import Grid from 'grid-styled';
 import Row from 'components/styled/Row';
+import Container from 'components/styled/Container';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
@@ -36,9 +37,15 @@ import messages from './messages';
 const GraphicHomeWrapper = styled.div`
   width: 100%;
   padding-top: ${(props) => props.hasBrand
-    ? props.theme.sizes.header.banner.height
+    ? props.theme.sizes.header.banner.heightMobile
     : 0
   }px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-top: ${(props) => props.hasBrand
+      ? props.theme.sizes.header.banner.height
+      : 0
+    }px;
+  }
   background-image: ${(props) => (props.showPattern && props.theme.backgroundImages.header)
     ? props.theme.backgroundImages.header
     : 'none'
@@ -65,17 +72,29 @@ const SectionTop = styled.div`
 const SectionWrapper = styled.div`
   display: ${(props) => props.hasBrand ? 'static' : 'table-cell'};
   vertical-align: ${(props) => props.hasBrand ? 'baseline' : 'middle'};
-  padding-bottom: 74px;
+  padding-bottom: 3em;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding-bottom: 6em;
+  }
 `;
 
-const TopActions = styled.div`
-  padding-top: 2em;
+const HomeActions = styled.div`
+  padding-top: 1em;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding-top: 2em;
+  }
 `;
 const Title = styled.h1`
   color:${palette('headerBrand', 0)};
   font-family: ${(props) => props.theme.fonts.title};
-  font-size: ${(props) => props.theme.sizes.home.text.title};
-  margin-top: 20px;
+  font-size: ${(props) => props.theme.sizes.home.text.titleMobile};
+  margin-top: 0.5em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.home.text.title};
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    margin-top: 1em;
+  }
 `;
 // TODO @tmfrnz config
 // margin-top
@@ -83,20 +102,36 @@ const Title = styled.h1`
 const Claim = styled.p`
   color: ${palette('headerBrand', 1)};
   font-family: ${(props) => props.theme.fonts.claim};
-  font-size: ${(props) => props.theme.sizes.home.text.claim};
+  font-size: ${(props) => props.theme.sizes.home.text.claimMobile};
   font-weight: 100;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 1.5em;
+  line-height: 1.3;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.home.text.claim};
+    margin-bottom: 1.5em;
+  }
 `;
 
 const Intro = styled(ReactMarkdown)`
-  font-size: 1.25em;
-  width: 80%;
+  font-size: 1em;
   margin-left: auto;
-  margin-right: auto;  
+  margin-right: auto;
+  line-height: 1.3;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: 1.1em;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    font-size: 1.25em;
+    width: 80%;
+  }
 `;
-
+const GridSpace = styled(Grid)`
+  display: none !important;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
+  }
+`;
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -125,34 +160,32 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             { !SHOW_HOME_TITLE &&
               <GraphicHome src={theme.media.titleHome} alt={appTitle} />
             }
-            { SHOW_HOME_TITLE &&
+            <Container noPaddingBottom >
+              { SHOW_HOME_TITLE &&
+                <Row>
+                  <GridSpace lg={1 / 6} sm={1 / 8} />
+                  <Grid lg={4 / 6} sm={6 / 8} xs={1}>
+                    <Title>
+                      <FormattedMessage {...appMessages.app.title} />
+                    </Title>
+                    <Claim>
+                      <FormattedMessage {...appMessages.app.claim} />
+                    </Claim>
+                  </Grid>
+                </Row>
+              }
               <Row>
-                <Grid sm={1 / 6} />
-                <Grid sm={4 / 6}>
-                  <Title>
-                    <FormattedMessage {...appMessages.app.title} />
-                  </Title>
-                  <Claim>
-                    <FormattedMessage {...appMessages.app.claim} />
-                  </Claim>
-                </Grid>
-                <Grid sm={1 / 6} />
-              </Row>
-            }
-            <Row>
-              <Grid sm={1 / 6} />
-              <Grid sm={4 / 6}>
-                <Intro source={this.context.intl.formatMessage(messages.intro)} />
-                <TopActions>
-                  <div>
+                <GridSpace lg={1 / 6} sm={1 / 12} />
+                <Grid lg={4 / 6} sm={10 / 12} xs={1}>
+                  <Intro source={this.context.intl.formatMessage(messages.intro)} />
+                  <HomeActions>
                     <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
                       <FormattedMessage {...messages.explore} />
                     </ButtonHero>
-                  </div>
-                </TopActions>
-              </Grid>
-              <Grid sm={1 / 6} />
-            </Row>
+                  </HomeActions>
+                </Grid>
+              </Row>
+            </Container>
           </SectionWrapper>
         </SectionTop>
         <Footer />

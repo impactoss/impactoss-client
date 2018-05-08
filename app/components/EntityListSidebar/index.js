@@ -6,17 +6,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
+import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { Map, List, fromJS } from 'immutable';
 
 import { isEqual } from 'lodash/lang';
 
-import { FILTERS_PANEL, EDIT_PANEL } from 'containers/App/constants';
+import { FILTERS_PANEL, EDIT_PANEL, VIEWPORTS } from 'containers/App/constants';
 import { FILTER_FORM_MODEL, EDIT_FORM_MODEL } from 'containers/EntityListForm/constants';
 
 import Scrollable from 'components/styled/Scrollable';
+import Icon from 'components/Icon';
+import Button from 'components/buttons/Button';
 import ButtonToggle from 'components/buttons/ButtonToggle';
+import ButtonDefault from 'components/buttons/ButtonDefault';
 import SupTitle from 'components/SupTitle';
 
 import EntityListForm from 'containers/EntityListForm';
@@ -45,14 +48,48 @@ const ListEntitiesEmpty = styled.div`
   color: ${palette('text', 1)};
 `;
 
+const ToggleShow = styled(ButtonDefault)`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  padding: 0.75em 1em;
+  letter-spacing: 0;
+  border-radius: 0;
+  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
+  font-size: 0.85em;
+  width: 100%;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    width: ${(props) => props.theme.sizes.aside.width.large}px;
+  }
+`;
+
+const ToggleHide = styled(Button)`
+  position: absolute;
+  right:0;
+  top:0;
+`;
+// color: ${palette('link', 3)};
+// &:hover {
+//   color: ${palette('linkHover', 3)};
+// }
+const SidebarWrapper = styled.div`
+  ${(props) => props.sidebarAbsolute
+    ? 'position: absolute;width: 100%;top: 0;bottom: 0;left: 0;right: 0;background-color: rgba(0,0,0,0.2); z-index: 98;'
+    : ''
+  }
+`;
+
 const STATE_INITIAL = {
   activeOption: null,
   expandedGroups: {
     taxonomies: true,
-    connectedTaxonomies: false,
-    connections: true,
-    attributes: true,
+    connectedTaxonomies: true,
+    connections: false,
+    attributes: false,
   },
+  visible: false,
+  viewport: null,
 };
 
 export class EntityListSidebar extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -62,15 +99,16 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     this.state = STATE_INITIAL;
   }
   componentWillMount() {
-    // console.log('componentWIllMount')
     this.setState(STATE_INITIAL);
   }
-
+  componentDidMount() {
+    this.updateViewport();
+    window.addEventListener('resize', this.resize);
+  }
   componentWillReceiveProps(nextProps) {
     if (nextProps.activePanel !== this.props.activePanel) {
       // close and reset option panel
-      // console.log('componentWillReceiveProps')
-      this.setState(STATE_INITIAL);
+      this.setState({ activeOption: null });
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
@@ -98,9 +136,21 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       || this.props.connections !== nextProps.connections
       || !isEqual(this.state, nextState);
   }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize);
+  }
 
   onShowForm = (option) => {
     this.setState({ activeOption: option.active ? null : option });
+  };
+  onShowSidebar = (evt) => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    this.setState({ visible: true });
+  };
+  onHideSidebar = (evt) => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    this.onHideForm(evt);
+    this.setState({ visible: false });
   };
 
   onHideForm = (evt) => {
@@ -149,6 +199,25 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       submit: true,
     },
   ];
+
+  updateViewport() {
+    let viewport = VIEWPORTS.MOBILE;
+    if (window.innerWidth >= parseInt(this.props.theme.breakpoints.large, 10)) {
+      viewport = VIEWPORTS.LARGE;
+    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.medium, 10)) {
+      viewport = VIEWPORTS.MEDIUM;
+    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.small, 10)) {
+      viewport = VIEWPORTS.SMALL;
+    }
+    this.setState({ viewport });
+  }
+
+  resize = () => {
+    // reset
+    this.setState(STATE_INITIAL);
+    this.updateViewport();
+    this.forceUpdate();
+  };
 
   render() {
     const {
@@ -234,44 +303,65 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         );
       }
     }
-
     return (
       <div>
-        <Sidebar>
-          <ScrollableWrapper>
-            <SidebarHeader hasButtons={canEdit}>
-              {canEdit &&
-                <ButtonToggle
-                  options={this.getSidebarButtons()}
-                  activePanel={activePanel}
-                  onSelect={onPanelSelect}
-                />}
-              {!canEdit &&
-                <SupTitle title={this.context.intl.formatMessage(messages.header.filter)} />
-              }
-            </SidebarHeader>
-            <div>
-              { (activePanel === FILTERS_PANEL || (activePanel === EDIT_PANEL && hasSelected && hasEntities)) &&
-                <EntityListSidebarGroups
-                  groups={fromJS(panelGroups)}
-                  onShowForm={this.onShowForm}
-                  onToggleGroup={this.onToggleGroup}
-                  expanded={this.state.expandedGroups}
-                />
-              }
-              { activePanel === EDIT_PANEL && !hasEntities &&
-                <ListEntitiesEmpty>
-                  <FormattedMessage {...messages.entitiesNotFound} />
-                </ListEntitiesEmpty>
-              }
-              { activePanel === EDIT_PANEL && hasEntities && !hasSelected &&
-                <ListEntitiesEmpty>
-                  <FormattedMessage {...messages.entitiesNotSelected} />
-                </ListEntitiesEmpty>
-              }
-            </div>
-          </ScrollableWrapper>
-        </Sidebar>
+        { (!this.state.visible && this.state.viewport < VIEWPORTS.LARGE) &&
+          <ToggleShow onClick={this.onShowSidebar}>
+            { canEdit &&
+              <FormattedMessage {...messages.sidebarToggle.showFilterEdit} />
+            }
+            { !canEdit &&
+              <FormattedMessage {...messages.sidebarToggle.showFilter} />
+            }
+          </ToggleShow>
+        }
+        { (this.state.visible || this.state.viewport === VIEWPORTS.LARGE) &&
+          <SidebarWrapper
+            sidebarAbsolute={this.state.viewport < VIEWPORTS.LARGE}
+            onClick={this.onHideSidebar}
+          >
+            <Sidebar onClick={(evt) => evt.stopPropagation()}>
+              <ScrollableWrapper>
+                <SidebarHeader hasButtons={canEdit}>
+                  {canEdit &&
+                    <ButtonToggle
+                      options={this.getSidebarButtons()}
+                      activePanel={activePanel}
+                      onSelect={onPanelSelect}
+                    />}
+                  {!canEdit &&
+                    <SupTitle title={this.context.intl.formatMessage(messages.header.filter)} />
+                  }
+                  { this.state.viewport < VIEWPORTS.LARGE &&
+                    <ToggleHide onClick={this.onHideSidebar} >
+                      <Icon name="close" />
+                    </ToggleHide>
+                  }
+                </SidebarHeader>
+                <div>
+                  { (activePanel === FILTERS_PANEL || (activePanel === EDIT_PANEL && hasSelected && hasEntities)) &&
+                    <EntityListSidebarGroups
+                      groups={fromJS(panelGroups)}
+                      onShowForm={this.onShowForm}
+                      onToggleGroup={this.onToggleGroup}
+                      expanded={this.state.expandedGroups}
+                    />
+                  }
+                  { activePanel === EDIT_PANEL && !hasEntities &&
+                    <ListEntitiesEmpty>
+                      <FormattedMessage {...messages.entitiesNotFound} />
+                    </ListEntitiesEmpty>
+                  }
+                  { activePanel === EDIT_PANEL && hasEntities && !hasSelected &&
+                    <ListEntitiesEmpty>
+                      <FormattedMessage {...messages.entitiesNotSelected} />
+                    </ListEntitiesEmpty>
+                  }
+                </div>
+              </ScrollableWrapper>
+            </Sidebar>
+          </SidebarWrapper>
+        }
         { formOptions &&
           <EntityListForm
             model={formModel}
@@ -286,6 +376,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             onSelect={() => {
               if (activePanel === FILTERS_PANEL) {
                 this.onHideForm();
+                this.onHideSidebar();
               }
             }}
             onSubmit={activePanel === EDIT_PANEL
@@ -317,10 +408,11 @@ EntityListSidebar.propTypes = {
   onPanelSelect: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
   listUpdating: PropTypes.bool,
+  theme: PropTypes.object,
 };
 
 EntityListSidebar.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default EntityListSidebar;
+export default withTheme(EntityListSidebar);

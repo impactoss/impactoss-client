@@ -50,7 +50,13 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         onClick: () => this.props.handleImport(),
       }, {
         type: 'add',
-        title: this.context.intl.formatMessage(messages.add),
+        title: [
+          this.context.intl.formatMessage(appMessages.buttons.add),
+          {
+            title: this.context.intl.formatMessage(appMessages.entities.measures.single),
+            hiddenSmall: true,
+          },
+        ],
         onClick: () => this.props.handleNew(),
       }],
     };

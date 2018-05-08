@@ -5,7 +5,10 @@ export default styled.div`
   display: inline-block;
   padding: 2px 0;
   font-family: ${(props) => props.theme.fonts.claim};
-  font-size: ${(props) => props.theme.sizes.header.text.claim};
+  font-size: ${(props) => props.theme.sizes.header.text.claimMobile};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.header.text.claim};
+  }
   font-weight: 100;
   background-color: ${palette('header', 0)};
   color: ${palette('headerBrand', 1)};

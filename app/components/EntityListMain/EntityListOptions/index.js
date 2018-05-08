@@ -19,23 +19,31 @@ import EntityListGroupBy from './EntityListGroupBy';
 import messages from './messages';
 
 const Styled = styled.div`
-  padding: 0.5em 0;
+  padding: 0.25em 0;
   position: relative;
-  min-height: 2.65em;
+  min-height: 2em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    min-height: 2.65em;
+    padding: 0.5em 0;
+  }
 `;
 // TODO treat as regular link
 const ListEntitiesHeaderOptionLink = styled(Button)`
-  position: absolute;
-  right: 0;
-  top: 0.5em;
-  font-weight: 500;
-  padding: 0 0.5em;
-  color: ${palette('link', 0)};
-  &:hover {
-    color: ${palette('linkHover', 0)};
-  }
-  &:last-child {
-    padding: 0 0 0 0.5em;
+  display: none;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    top: 0.5em;
+    font-weight: 500;
+    padding: 0 0.5em;
+    color: ${palette('buttonFlat', 0)};
+    &:hover {
+      color: ${palette('buttonFlatHover', 0)};
+    }
+    &:last-child {
+      padding: 0 0 0 0.5em;
+    }
   }
 `;
 

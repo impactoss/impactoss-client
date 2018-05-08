@@ -17,7 +17,7 @@ const Styled = styled(Button)`
 
 const Close = (props) => (
   <Styled onClick={props.onCancel} >
-    <Icon name="close" />
+    <Icon name="close" sizes={{ mobile: '2em' }} />
   </Styled>
 );
 

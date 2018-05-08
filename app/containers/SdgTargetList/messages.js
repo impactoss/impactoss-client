@@ -14,8 +14,4 @@ export default defineMessages({
     id: 'app.containers.SdgTargetList.metaDescription',
     defaultMessage: 'SDG targets page description',
   },
-  add: {
-    id: 'app.containers.SdgTargetList.add',
-    defaultMessage: 'Add SDG target',
-  },
 });
