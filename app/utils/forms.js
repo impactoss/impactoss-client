@@ -405,12 +405,16 @@ export const getMenuOrderFormField = (formatMessage) => {
   return field;
 };
 
-export const getMarkdownField = (formatMessage, obsoleteAppMessages, attribute = 'description') =>
+export const getMarkdownField = (formatMessage, obsoleteAppMessages, attribute = 'description', label, placeholder, hint) =>
   getFormField({
     formatMessage,
     controlType: 'markdown',
     attribute,
-    hint: appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute]),
+    label: label || attribute,
+    placeholder: placeholder || attribute,
+    hint: hint
+      ? (appMessages.hints[hint] && formatMessage(appMessages.hints[hint]))
+      : (appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute])),
   });
 
 export const getTextareaField = (formatMessage, obsoleteAppMessages, attribute = 'description') =>

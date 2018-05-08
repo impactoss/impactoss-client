@@ -83,7 +83,7 @@ export const CONFIG = {
         },
         {
           path: 'recommendations',
-          search: ['title', 'response', 'reference'],
+          search: ['title', 'description', 'response', 'reference'],
           sorting: [
             {
               attribute: 'id', // proxy for created at

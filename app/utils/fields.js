@@ -104,13 +104,13 @@ export const getMetaField = (entity) => {
   };
 };
 
-export const getMarkdownField = (entity, attribute, hasLabel = true) =>
+export const getMarkdownField = (entity, attribute, hasLabel = true, label) =>
   !!entity.getIn(['attributes', attribute]) &&
   (entity.getIn(['attributes', attribute]).trim().length > 0) &&
   ({
     type: 'markdown',
     value: entity.getIn(['attributes', attribute]),
-    label: hasLabel && appMessages.attributes[attribute],
+    label: hasLabel && (appMessages.attributes[label || attribute]),
   });
 
 export const getDateField = (entity, attribute, obsoleteAppMessages, showEmpty, emptyMessage) =>

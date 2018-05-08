@@ -96,8 +96,9 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   getBodyMainFields = (entity, measures, measureTaxonomies, measureConnections, onEntityClick) => ([
     {
       fields: [
+        getMarkdownField(entity, 'description', true, 'fullRecommendation'),
         getStatusField(entity, 'accepted', ACCEPTED_STATUSES, appMessages.attributes.accepted),
-        getMarkdownField(entity, 'response', true, appMessages),
+        getMarkdownField(entity, 'response', true),
       ],
     },
     {
