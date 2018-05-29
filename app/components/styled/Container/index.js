@@ -14,7 +14,7 @@ const Container = styled.div`
     padding-left: 12px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    max-width: ${(props) => props.isNarrow ? '960' : (props.theme.breakpoints.large - 30)}px;
+    max-width: ${(props) => props.isNarrow ? '960' : (parseInt(props.theme.breakpoints.large, 10) - 30)}px;
   }
 `;
 export default Container;
