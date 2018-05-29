@@ -6,6 +6,7 @@ import Link from './Link';
 export default styled(Link)`
   font-weight: ${(props) => props.align ? 'normal' : 'bold'};
   display: inline-block;
+  vertical-align: top;
   color: ${(props) => props.active ? palette('headerNavMainItem', 1) : palette('headerNavMainItem', 0)};
   background-color:${(props) => props.active ? palette('headerNavMainItem', 3) : palette('headerNavMainItem', 2)};
   &:hover {

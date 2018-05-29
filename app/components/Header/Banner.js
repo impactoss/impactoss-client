@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import { HEADER_PATTERN_HEIGHT } from 'themes/config';
 
@@ -13,4 +14,5 @@ export default styled.div`
   };
   background-repeat: repeat;
   background-size: ${HEADER_PATTERN_HEIGHT}px auto;
+  color: ${palette('headerBrand', 0)};
 `;

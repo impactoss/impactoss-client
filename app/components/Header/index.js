@@ -155,8 +155,79 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     this.setState(STATE_INITIAL);
     this.forceUpdate();
   };
+  renderSecondary = (navItemsAdmin) => (
+    <div>
+      <ShowSecondary
+        visible={!this.state.showSecondary}
+        onClick={this.onShowSecondary}
+      >
+        <ScreenReaderOnly>
+          <FormattedMessage {...appMessages.buttons.showSecondaryNavigation} />
+        </ScreenReaderOnly>
+        <Icon name="menu" stroke />
+      </ShowSecondary>
+      <NavSecondary
+        visible={this.state.showSecondary}
+        onClick={(evt) => {
+          evt.stopPropagation();
+          this.onHideSecondary();
+        }}
+      >
+        <HideSecondaryWrap>
+          <HideSecondary
+            onClick={this.onHideSecondary}
+          >
+            <ScreenReaderOnly>
+              <FormattedMessage {...appMessages.buttons.hideSecondaryNavigation} />
+            </ScreenReaderOnly>
+            <Icon name="close" size="30px" />
+          </HideSecondary>
+        </HideSecondaryWrap>
+        <NavAccount
+          isSignedIn={this.props.isSignedIn}
+          user={this.props.user}
+          onPageLink={(evt, path, query) => {
+            if (evt !== undefined && evt.stopPropagation) evt.stopPropagation();
+            this.onHideSecondary();
+            this.props.onPageLink(path, query);
+          }}
+          currentPath={this.props.currentPath}
+        />
+        <NavPages>
+          { this.props.pages && this.props.pages.map((page, i) => (
+            <LinkPage
+              key={i}
+              href={page.path}
+              active={page.active || this.props.currentPath === page.path}
+              onClick={(evt) => this.onClick(evt, page.path)}
+            >
+              {page.title}
+            </LinkPage>
+          ))}
+        </NavPages>
+        { navItemsAdmin &&
+          <NavAdmin>
+            { navItemsAdmin.map((item, i) => (
+              <LinkAdmin
+                key={i}
+                href={item.path}
+                active={item.active}
+                onClick={(evt) => {
+                  evt.stopPropagation();
+                  this.onHideSecondary();
+                  this.onClick(evt, item.path);
+                }}
+              >
+                {item.title}
+              </LinkAdmin>
+            ))}
+          </NavAdmin>
+        }
+      </NavSecondary>
+    </div>
+  );
   render() {
-    const { pages, isSignedIn, currentPath, isHome } = this.props;
+    const { currentPath, isHome } = this.props;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
     const navItemsAdmin = filter(this.props.navItems, (item) => item.isAdmin);
 
@@ -172,28 +243,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       >
         { !SHOW_BRAND_ON_HOME && isHome &&
           <HomeNavWrap>
-            <NavAccount
-              isSignedIn={isSignedIn}
-              user={this.props.user}
-              onPageLink={(evt, path, query) => {
-                if (evt !== undefined && evt.stopPropagation) evt.stopPropagation();
-                this.onHideSecondary();
-                this.props.onPageLink(path, query);
-              }}
-              currentPath={currentPath}
-            />
-            <NavPages>
-              { pages && pages.map((page, i) => (
-                <LinkPage
-                  key={i}
-                  href={page.path}
-                  active={page.active || currentPath === page.path}
-                  onClick={(evt) => this.onClick(evt, page.path)}
-                >
-                  {page.title}
-                </LinkPage>
-              ))}
-            </NavPages>
+            { this.renderSecondary(navItemsAdmin) }
           </HomeNavWrap>
         }
         { (SHOW_BRAND_ON_HOME || !isHome) &&
@@ -217,77 +267,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </BrandText>
               }
             </Brand>
-            <ShowSecondary
-              visible={!this.state.showSecondary}
-              onClick={this.onShowSecondary}
-            >
-              <ScreenReaderOnly>
-                <FormattedMessage {...appMessages.buttons.showSecondaryNavigation} />
-              </ScreenReaderOnly>
-              <Icon name="menu" stroke />
-            </ShowSecondary>
-            <NavSecondary
-              visible={this.state.showSecondary}
-              onClick={(evt) => {
-                evt.stopPropagation();
-                this.onHideSecondary();
-              }}
-            >
-              <HideSecondaryWrap>
-                <HideSecondary
-                  onClick={this.onHideSecondary}
-                >
-                  <ScreenReaderOnly>
-                    <FormattedMessage {...appMessages.buttons.hideSecondaryNavigation} />
-                  </ScreenReaderOnly>
-                  <Icon name="close" size="30px" />
-                </HideSecondary>
-              </HideSecondaryWrap>
-              <NavAccount
-                isSignedIn={isSignedIn}
-                user={this.props.user}
-                onPageLink={(evt, path, query) => {
-                  if (evt !== undefined && evt.stopPropagation) evt.stopPropagation();
-                  this.onHideSecondary();
-                  this.props.onPageLink(path, query);
-                }}
-                currentPath={currentPath}
-              />
-              <NavPages>
-                { pages && pages.map((page, i) => (
-                  <LinkPage
-                    key={i}
-                    href={page.path}
-                    active={page.active || currentPath === page.path}
-                    onClick={(evt) => {
-                      evt.stopPropagation();
-                      this.onHideSecondary();
-                      this.onClick(evt, page.path);
-                    }}
-                  >
-                    {page.title}
-                  </LinkPage>
-                ))}
-              </NavPages>
-              { navItemsAdmin &&
-                <NavAdmin>
-                  { navItemsAdmin.map((item, i) => (
-                    <LinkAdmin
-                      key={i}
-                      href={item.path}
-                      active={item.active}
-                      onClick={(evt) => {
-                        evt.stopPropagation();
-                        this.onHideSecondary();
-                        this.onClick(evt, item.path);
-                      }}
-                    >
-                      {item.title}
-                    </LinkAdmin>
-                  ))}
-                </NavAdmin>
-              }
-            </NavSecondary>
+            { this.renderSecondary(navItemsAdmin) }
           </Banner>
         }
         { !isHome &&
