@@ -128,6 +128,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       active: currentPath.startsWith(PATHS.SEARCH),
       icon: 'search',
       align: 'right',
+      role: 'search',
     }]);
 
     if (isManager) {
@@ -163,8 +164,9 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           onPageLink={onPageLink}
           currentPath={location.pathname}
           isHome={location.pathname === '/'}
+          role="banner"
         />
-        <Main isHome={location.pathname === '/'}>
+        <Main isHome={location.pathname === '/'} role="main">
           {React.Children.toArray(this.props.children)}
         </Main>
         {newEntityModal &&

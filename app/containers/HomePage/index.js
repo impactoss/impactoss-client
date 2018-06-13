@@ -65,6 +65,7 @@ const SectionTop = styled.div`
   background-color: ${palette('home', 0)};
   color: ${palette('homeIntro', 0)};
   text-align: center;
+  width: 100%;  
 `;
 
 const SectionWrapper = styled.div`

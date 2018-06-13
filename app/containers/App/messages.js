@@ -71,12 +71,14 @@ export default defineMessages({
       id: 'app.containers.App.buttons.import',
       defaultMessage: 'Import',
     },
+  },
+  screenreader: {
     hideSecondaryNavigation: {
-      id: 'app.containers.App.buttons.hideSecondaryNavigation',
+      id: 'app.containers.App.screenreader.hideSecondaryNavigation',
       defaultMessage: 'Hide top menu',
     },
     showSecondaryNavigation: {
-      id: 'app.containers.App.buttons.showSecondaryNavigation',
+      id: 'app.containers.App.screenreader.showSecondaryNavigation',
       defaultMessage: 'Show top menu',
     },
   },

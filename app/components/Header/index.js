@@ -155,6 +155,26 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     this.setState(STATE_INITIAL);
     this.forceUpdate();
   };
+  renderPrimary = (navItems, currentPath) => (
+    <NavMain hasBorder role="navigation" aria-label="Primary">
+      { navItems && navItems.map((item, i) => (
+        <LinkMain
+          key={i}
+          href={item.path}
+          active={item.active || currentPath.startsWith(item.path)}
+          onClick={(evt) => this.onClick(evt, item.path)}
+          align={item.align}
+          icon={item.icon}
+          role={item.role}
+        >
+          {item.title}
+          { item.icon &&
+            <Icon title={item.title} name={item.icon} text textRight size={'1em'} />
+          }
+        </LinkMain>
+      ))}
+    </NavMain>
+  );
   renderSecondary = (navItemsAdmin) => (
     <div>
       <ShowSecondary
@@ -162,7 +182,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         onClick={this.onShowSecondary}
       >
         <ScreenReaderOnly>
-          <FormattedMessage {...appMessages.buttons.showSecondaryNavigation} />
+          <FormattedMessage {...appMessages.screenreader.showSecondaryNavigation} />
         </ScreenReaderOnly>
         <Icon name="menu" stroke />
       </ShowSecondary>
@@ -172,13 +192,15 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           evt.stopPropagation();
           this.onHideSecondary();
         }}
+        role="navigation"
+        aria-label="Secondary"
       >
         <HideSecondaryWrap>
           <HideSecondary
             onClick={this.onHideSecondary}
           >
             <ScreenReaderOnly>
-              <FormattedMessage {...appMessages.buttons.hideSecondaryNavigation} />
+              <FormattedMessage {...appMessages.screenreader.hideSecondaryNavigation} />
             </ScreenReaderOnly>
             <Icon name="close" size="30px" />
           </HideSecondary>
@@ -271,23 +293,12 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           </Banner>
         }
         { !isHome &&
-          <NavMain hasBorder>
-            { navItems && navItems.map((item, i) => (
-              <LinkMain
-                key={i}
-                href={item.path}
-                active={item.active || currentPath.startsWith(item.path)}
-                onClick={(evt) => this.onClick(evt, item.path)}
-                align={item.align}
-                icon={item.icon}
-              >
-                {item.title}
-                { item.icon &&
-                  <Icon title={item.title} name={item.icon} text textRight size={'1em'} />
-                }
-              </LinkMain>
-            ))}
-          </NavMain>
+          this.renderPrimary(navItems, currentPath)
+        }
+        { isHome &&
+          <ScreenReaderOnly>
+            { this.renderPrimary(navItems, currentPath)}
+          </ScreenReaderOnly>
         }
       </Styled>
     );
