@@ -6,7 +6,7 @@
   "app.components.Header.userLoading" : "Signing in...",
   "app.components.Header.register" : "Register",
   "app.components.Footer.disclaimer" : "Every care has been taken to ensure the accuracy of this data and information. Please send any feedback to ",
-  "app.components.Footer.contact.email" : "mailto:infoline@hrc.co.nz",
+  "app.components.Footer.contact.email" : "infoline@hrc.co.nz",
   "app.components.Footer.contact.anchor" : "infoline@hrc.co.nz",
   "app.components.Footer.responsible.text" : "Visit our website to learn more about Human Rights in New Zealand",
   "app.components.Footer.responsible.url" : "https://www.hrc.co.nz/",
