@@ -315,7 +315,9 @@ theme.sizes = {
     // px or em
     text: {
       title: '2.2em',
+      titleMobile: '1em',
       claim: '0.85em',
+      claimMobile: '1em',
     },
     paddingLeft: {
       mobile: 6,

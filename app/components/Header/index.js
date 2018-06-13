@@ -156,7 +156,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     this.setState(STATE_INITIAL);
     this.forceUpdate();
   };
-
   renderSecondary = (navItemsAdmin) => (
     <div>
       <ShowSecondary
@@ -228,7 +227,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       </NavSecondary>
     </div>
   );
-
   render() {
     const { currentPath, isHome } = this.props;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);

@@ -67,6 +67,7 @@ const SectionTop = styled.div`
   background-color: ${palette('home', 0)};
   color: ${palette('homeIntro', 0)};
   text-align: center;
+  width: 100%;
 `;
 
 const SectionWrapper = styled.div`
@@ -123,7 +124,6 @@ const Intro = styled(ReactMarkdown)`
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-size: 1.25em;
-    width: 80%;
   }
 `;
 const GridSpace = styled(Grid)`
@@ -163,8 +163,8 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             <Container noPaddingBottom >
               { SHOW_HOME_TITLE &&
                 <Row>
-                  <GridSpace lg={1 / 6} sm={1 / 8} />
-                  <Grid lg={4 / 6} sm={6 / 8} xs={1}>
+                  <GridSpace lg={1 / 8} />
+                  <Grid lg={3 / 4} sm={1}>
                     <Title>
                       <FormattedMessage {...appMessages.app.title} />
                     </Title>
@@ -175,8 +175,8 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                 </Row>
               }
               <Row>
-                <GridSpace lg={1 / 6} sm={1 / 12} />
-                <Grid lg={4 / 6} sm={10 / 12} xs={1}>
+                <GridSpace lg={1 / 6} sm={1 / 8} />
+                <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                   <Intro source={this.context.intl.formatMessage(messages.intro)} />
                   <HomeActions>
                     <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
