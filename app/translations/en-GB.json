@@ -6,7 +6,7 @@
   "app.components.Header.userLoading" : "Signing in...",
   "app.components.Header.register" : "Register",
   "app.components.Footer.disclaimer" : "Please note that all data in this database has been entered for demonstrative purposes only. Please send any feedback to ",
-  "app.components.Footer.contact.email" : "mailto:contact@impactoss.org",
+  "app.components.Footer.contact.email" : "contact@impactoss.org",
   "app.components.Footer.contact.anchor" : "contact@impactoss.org",
   "app.components.Footer.responsible.text" : "Learn more about IMPACT OSS, the Open Source Software for Integrated Management and Planning of Actions",
   "app.components.Footer.responsible.url" : "http://impactoss.org",
