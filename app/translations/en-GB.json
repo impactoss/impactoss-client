@@ -165,6 +165,7 @@
   "app.containers.App.buttons.next" : "Next",
   "app.containers.App.buttons.import" : "Import",
   "app.containers.App.screenreader.skipToContent" : "Skip to content",
+  "app.containers.App.screenreader.skipToListFilter" : "Skip to list filter options",
   "app.containers.App.screenreader.hideSecondaryNavigation" : "Hide secondary menu",
   "app.containers.App.screenreader.showSecondaryNavigation" : "Show secondary menu",
   "app.containers.App.labels.perPage" : "Per page",

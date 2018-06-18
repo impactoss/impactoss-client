@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { ScrollContainer } from 'scrollmonitor-react';
 import { Map, List } from 'immutable';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import { jumpToComponent } from 'utils/scroll-to-component';
 import { lowerCase } from 'utils/string';
@@ -38,8 +39,28 @@ const EntityListSearch = styled.div`
   }
 `;
 
-const ListEntities = styled.div``;
+const ListEntities = styled.div`
+  position: relative;
+`;
 const ListWrapper = styled.div``;
+
+const SkipContent = styled.a`
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+
+  &:focus{
+    position: absolute;
+    left: 0;
+    width: auto;
+    height: auto;
+    background-color: #fff;
+    z-index: 99999;
+    box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  }
+`;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
@@ -174,6 +195,12 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     onClear={() => onResetFilters(currentFilterArgs(config, locationQuery))}
                   />
                 </EntityListSearch>
+                <SkipContent
+                  href="#filter-options"
+                  title={this.context.intl.formatMessage(appMessages.screenreader.skipToListFilter)}
+                >
+                  <FormattedMessage {...appMessages.screenreader.skipToListFilter} />
+                </SkipContent>
                 <EntityListOptions
                   groupOptions={getGroupOptions(taxonomies, null, this.context.intl)}
                   subgroupOptions={getGroupOptions(taxonomies, null, this.context.intl)}

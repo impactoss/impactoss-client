@@ -107,14 +107,6 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !dataReady &&
-          <EntityListSidebarLoading responsiveSmall />
-        }
-        { dataReady && typeof reference !== 'undefined' &&
-          <TaxonomySidebar
-            taxonomies={mapToTaxonomyList(taxonomies.toList(), onTaxonomyLink, reference)}
-          />
-        }
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
@@ -164,6 +156,14 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             </Content>
           </Container>
         </ContainerWithSidebar>
+        { !dataReady &&
+          <EntityListSidebarLoading responsiveSmall />
+        }
+        { dataReady && typeof reference !== 'undefined' &&
+          <TaxonomySidebar
+            taxonomies={mapToTaxonomyList(taxonomies.toList(), onTaxonomyLink, reference)}
+          />
+        }
       </div>
     );
   }

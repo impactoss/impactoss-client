@@ -691,19 +691,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !dataReady &&
-          <EntityListSidebarLoading responsiveSmall />
-        }
-        { dataReady &&
-          <TaxonomySidebar
-            taxonomies={mapToTaxonomyList(
-              taxonomies,
-              onTaxonomyLink,
-              this.state.mouseOverTaxonomyDiagram,
-              this.onTaxonomyMouseOver,
-            )}
-          />
-        }
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
@@ -808,6 +795,19 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             </Content>
           </Container>
         </ContainerWithSidebar>
+        { !dataReady &&
+          <EntityListSidebarLoading responsiveSmall />
+        }
+        { dataReady &&
+          <TaxonomySidebar
+            taxonomies={mapToTaxonomyList(
+              taxonomies,
+              onTaxonomyLink,
+              this.state.mouseOverTaxonomyDiagram,
+              this.onTaxonomyMouseOver,
+            )}
+          />
+        }
       </div>
     );
   }

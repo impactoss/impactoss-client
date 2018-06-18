@@ -126,32 +126,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     return (
       <div>
-        { !this.props.dataReady &&
-          <EntityListSidebarLoading />
-        }
-        { this.props.dataReady &&
-          <EntityListSidebar
-            listUpdating={progress !== null && progress >= 0 && progress < 100}
-            entities={entities}
-            taxonomies={this.props.taxonomies}
-            connections={this.props.connections}
-            connectedTaxonomies={this.props.connectedTaxonomies}
-            entityIdsSelected={
-              entityIdsSelected.size === entityIdsSelectedFiltered.size
-              ? entityIdsSelected
-              : entityIdsSelectedFiltered
-            }
-            config={this.props.config}
-            locationQuery={this.props.locationQuery}
-            canEdit={this.props.hasUserRole[USER_ROLES.MANAGER.value]}
-            hasUserRole={this.props.hasUserRole}
-            activePanel={this.props.activePanel}
-            onPanelSelect={this.props.onPanelSelect}
-            onCreateOption={this.props.onCreateOption}
-            onUpdate={(associations, activeEditOption) =>
-              this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected, viewDomain.get('errors'))}
-          />
-        }
         <EntityListMain
           listUpdating={progress !== null && progress >= 0 && progress < 100}
           entities={entities}
@@ -190,6 +164,32 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onSortOrder={this.props.onSortOrder}
           onDismissError={this.props.onDismissError}
         />
+        { !this.props.dataReady &&
+          <EntityListSidebarLoading />
+        }
+        { this.props.dataReady &&
+          <EntityListSidebar
+            listUpdating={progress !== null && progress >= 0 && progress < 100}
+            entities={entities}
+            taxonomies={this.props.taxonomies}
+            connections={this.props.connections}
+            connectedTaxonomies={this.props.connectedTaxonomies}
+            entityIdsSelected={
+              entityIdsSelected.size === entityIdsSelectedFiltered.size
+              ? entityIdsSelected
+              : entityIdsSelectedFiltered
+            }
+            config={this.props.config}
+            locationQuery={this.props.locationQuery}
+            canEdit={this.props.hasUserRole[USER_ROLES.MANAGER.value]}
+            hasUserRole={this.props.hasUserRole}
+            activePanel={this.props.activePanel}
+            onPanelSelect={this.props.onPanelSelect}
+            onCreateOption={this.props.onCreateOption}
+            onUpdate={(associations, activeEditOption) =>
+              this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected, viewDomain.get('errors'))}
+          />
+        }
         { (progress !== null && progress < 100) &&
           <Progress>
             <ProgressText>

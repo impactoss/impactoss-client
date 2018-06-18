@@ -80,6 +80,25 @@ const SidebarWrapper = styled.div`
   }
 `;
 
+const SkipContent = styled.a`
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+
+  &:focus{
+    position: absolute;
+    left: 0;
+    width: auto;
+    height: auto;
+    background-color: #fff;
+    z-index: 99999;
+    box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  }
+`;
+
 const STATE_INITIAL = {
   activeOption: null,
   expandedGroups: {
@@ -304,7 +323,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       }
     }
     return (
-      <div>
+      <div id="filter-options">
         { (!this.state.visible && this.state.viewport < VIEWPORTS.LARGE) &&
           <ToggleShow onClick={this.onShowSidebar}>
             { canEdit &&
@@ -362,6 +381,12 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             </Sidebar>
           </SidebarWrapper>
         }
+        <SkipContent
+          href="#main-content"
+          title={this.context.intl.formatMessage(appMessages.screenreader.skipToContent)}
+        >
+          <FormattedMessage {...appMessages.screenreader.skipToContent} />
+        </SkipContent>
         { formOptions &&
           <EntityListForm
             model={formModel}
