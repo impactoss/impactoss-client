@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Perf from 'react-addons-perf';
 import ReactModal from 'react-modal';
+import { FormattedMessage } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -56,6 +57,25 @@ const Main = styled.div`
   bottom:0;
   background-color: ${(props) => props.isHome ? 'transparent' : palette('light', 0)};
   overflow: hidden;
+`;
+
+const SkipContent = styled.a`
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+
+  &:focus{
+    position: absolute;
+    left: 0;
+    width: auto;
+    height: auto;
+    background-color: #fff;
+    z-index: 99999;
+    box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  }
 `;
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -156,6 +176,12 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 
     return (
       <div>
+        <SkipContent
+          href="#main-content"
+          title={this.context.intl.formatMessage(messages.screenreader.skipToContent)}
+        >
+          <FormattedMessage {...messages.screenreader.skipToContent} />
+        </SkipContent>
         <Header
           isSignedIn={isUserSignedIn}
           user={this.props.user}
@@ -166,7 +192,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           isHome={location.pathname === '/'}
           role="banner"
         />
-        <Main isHome={location.pathname === '/'} role="main">
+        <Main isHome={location.pathname === '/'} role="main" id="main-content">
           {React.Children.toArray(this.props.children)}
         </Main>
         {newEntityModal &&

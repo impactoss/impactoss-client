@@ -73,6 +73,10 @@ export default defineMessages({
     },
   },
   screenreader: {
+    skipToContent: {
+      id: 'app.containers.App.screenreader.skipToContent',
+      defaultMessage: 'Skip to content',
+    },
     hideSecondaryNavigation: {
       id: 'app.containers.App.screenreader.hideSecondaryNavigation',
       defaultMessage: 'Hide top menu',
