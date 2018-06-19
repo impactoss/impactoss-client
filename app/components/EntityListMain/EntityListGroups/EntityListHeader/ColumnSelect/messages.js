@@ -30,6 +30,10 @@ export default defineMessages({
       id: 'app.components.ColumnSelect.sortAttributes.updated_at',
       defaultMessage: 'Updated at',
     },
+    order: {
+      id: 'app.components.ColumnSelect.sortAttributes.order',
+      defaultMessage: 'Menu order',
+    },
     target_date: {
       id: 'app.components.ColumnSelect.sortAttributes.target_date',
       defaultMessage: 'Target date',
