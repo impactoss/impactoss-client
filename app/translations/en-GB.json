@@ -38,6 +38,7 @@
   "app.components.ColumnSelect.sortAttributes.name" : "Name",
   "app.components.ColumnSelect.sortAttributes.updated_at" : "Updated at",
   "app.components.ColumnSelect.sortAttributes.order" : "Menu order",
+  "app.components.ColumnSelect.sortAttributes.target_date" : "Target date",
   "app.components.EntityListItem.due" : "{total} due",
   "app.components.EntityListItem.overdue" : "{total} overdue",
   "app.components.EntityListItem.associationNotExistent" : "Connection or category assignment already removed.",

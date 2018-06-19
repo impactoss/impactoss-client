@@ -99,6 +99,9 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       ? this.getConnections(entity, config.connections.options, connections)
       : [],
     assignedUser: entity.get('manager') && ({ name: entity.getIn(['manager', 'attributes', 'name']) }),
+    targetDate: entity.getIn(['attributes', 'target_date'])
+      && this.context.intl
+      && this.context.intl.formatDate(entity.getIn(['attributes', 'target_date'])),
   });
 
   render() {
@@ -131,6 +134,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             connections={entity.connectedCounts}
             wrapper={this.props.wrapper}
             user={entity.assignedUser}
+            targetDate={entity.targetDate}
           />
         }
       </Styled>
