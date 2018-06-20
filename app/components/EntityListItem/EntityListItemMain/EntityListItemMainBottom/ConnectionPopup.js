@@ -27,7 +27,7 @@ const Count = styled.span`
   min-width: 1.8em;
   text-align: center;
   vertical-align: middle;
-  line-height: 1.6;
+  line-height: 1.7;
   padding: 0 0.5em;
 `;
 
@@ -42,6 +42,9 @@ const PopupWrapper = styled.div`
   position: relative;
   margin-right: 10px;
   text-align: left;
+  &:last-child {
+    margin-right: 0;
+  }
 `;
 
 const POPUP_WIDTH_PX = `${POPUP_WIDTH}px`;

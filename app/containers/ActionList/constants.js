@@ -52,6 +52,11 @@ export const CONFIG = {
       order: 'asc',
     },
     {
+      attribute: 'target_date',
+      type: 'date',
+      order: 'desc',
+    },
+    {
       attribute: 'updated_at',
       type: 'date',
       order: 'desc',
