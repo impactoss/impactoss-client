@@ -10,7 +10,15 @@ const Styled = styled.span`
   display: inline-block;
   margin-right: 1em;
   color: ${palette('text', 1)};
-  padding-bottom: 5px;
+  margin-bottom: 3px;
+  margin-top: 3px;  
+  &:last-child: {
+    margin-right: 0;
+  }
+`;
+
+const DateWrap = styled.span`
+  vertical-align: bottom;
 `;
 
 export default class EntityListItemMainBottomTargetDate extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -23,7 +31,9 @@ export default class EntityListItemMainBottomTargetDate extends React.PureCompon
         <BottomIconWrap>
           <Icon name="calendar" text />
         </BottomIconWrap>
-        {this.props.targetDate}
+        <DateWrap>
+          {this.props.targetDate}
+        </DateWrap>
       </Styled>
     );
   }
