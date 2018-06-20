@@ -18,10 +18,20 @@ import BottomTagGroup from './BottomTagGroup';
 
 const SmartGroup = styled.div`
   display: inline-block;
-  margin-right: 0.75em;
-  padding-right: 0.75em;
+  margin-right: 0.5em;
+  padding-right: 0.5em;
   border-right: ${(props) => props.border ? '1px solid' : 'none'};
   border-right-color: ${palette('light', 3)};
+`;
+
+const MyButtonTagCategory = styled(ButtonTagCategory)`
+  margin-bottom: 3px;
+  margin-top: 3px;
+`;
+
+const MyButtonTagCategoryInverse = styled(ButtonTagCategoryInverse)`
+  margin-bottom: 3px;
+  margin-top: 3px;
 `;
 
 class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -92,7 +102,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
           { smartTaxonomy &&
             <SmartGroup border={entityTags && entityTags.length > 0}>
               { this.getEntitySmartTags(categories, smartTaxonomy, onEntityClick).map((tag, i) =>
-                <ButtonTagCategory
+                <MyButtonTagCategory
                   key={i}
                   onClick={tag.onClick}
                   taxId={parseInt(tag.taxId, 10)}
@@ -101,13 +111,13 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
                   isSmart={tag.isSmart}
                 >
                   {tag.label}
-                </ButtonTagCategory>
+                </MyButtonTagCategory>
               )}
             </SmartGroup>
           }
           { entityTags.map((tag, i) => tag.inverse
             ? (
-              <ButtonTagCategoryInverse
+              <MyButtonTagCategoryInverse
                 key={i}
                 onClick={tag.onClick}
                 taxId={parseInt(tag.taxId, 10)}
@@ -115,10 +125,10 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
                 title={tag.title}
               >
                 {tag.label}
-              </ButtonTagCategoryInverse>
+              </MyButtonTagCategoryInverse>
             )
             : (
-              <ButtonTagCategory
+              <MyButtonTagCategory
                 key={i}
                 onClick={tag.onClick}
                 taxId={parseInt(tag.taxId, 10)}
@@ -126,7 +136,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
                 title={tag.title}
               >
                 {tag.label}
-              </ButtonTagCategory>
+              </MyButtonTagCategory>
             )
           )}
         </span>
