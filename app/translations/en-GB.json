@@ -379,7 +379,7 @@
   "app.containers.App.entities.taxonomies.9.empty" : "No progress status",
   "app.containers.App.entities.taxonomies.9.shortSingle" : "Progress status",
   "app.containers.App.entities.taxonomies.9.shortPlural" : "Progress statuses",
-  "app.containers.App.entities.taxonomies.9.description" : "The action progress status",
+  "app.containers.App.entities.taxonomies.9.description" : "The progress status at last update of all the actions the government has committed to.",
   "app.containers.App.entities.due_dates.single" : "Due date",
   "app.containers.App.entities.due_dates.plural" : "Due dates",
   "app.containers.App.entities.due_dates.empty" : "No report scheduled",
