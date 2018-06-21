@@ -1,9 +1,9 @@
-### `hr-nmrf-client`
+### `hrcnz/impactoss-client`
 - tmfrnz
 - tim-field
 - tony-luisi 
 - dmprk
-- dankerk
+- hannahnorthover
 
 ### `react-boilerplate`
 - mxstbr
