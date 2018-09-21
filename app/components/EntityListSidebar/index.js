@@ -86,7 +86,7 @@ const STATE_INITIAL = {
     taxonomies: true,
     connectedTaxonomies: true,
     connections: false,
-    attributes: false,
+    attributes: true,
   },
   visible: false,
   viewport: null,
