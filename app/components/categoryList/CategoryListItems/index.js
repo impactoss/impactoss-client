@@ -30,7 +30,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         accepted: 'recommendationsAccepted',
         label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
       });
-      if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
+      if (!taxonomy.getIn(['attributes', 'tags_measures']) && !taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
         attributes.push({
           via: this.context.intl.formatMessage(appMessages.entities.connected),
           total: 'measuresTotal',
@@ -45,7 +45,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         public: 'sdgtargets',
         label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
       });
-      if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
+      if (!taxonomy.getIn(['attributes', 'tags_measures']) && !taxonomy.getIn(['attributes', 'tags_recommendations'])) {
         attributes.push({
           via: this.context.intl.formatMessage(appMessages.entities.connected),
           total: 'measuresTotal',
