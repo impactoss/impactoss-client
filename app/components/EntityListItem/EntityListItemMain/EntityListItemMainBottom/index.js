@@ -12,6 +12,10 @@ import EntityListItemMainBottomUser from './EntityListItemMainBottomUser';
 
 const Styled = styled(Component)`
   margin-bottom: -5px;
+  display: none;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    display: block;
+  }
 `;
 
 class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

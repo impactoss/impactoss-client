@@ -14,8 +14,4 @@ export default defineMessages({
     id: 'app.containers.ActionList.metaDescription',
     defaultMessage: 'Actions page description',
   },
-  add: {
-    id: 'app.containers.ActionList.add',
-    defaultMessage: 'Add action',
-  },
 });

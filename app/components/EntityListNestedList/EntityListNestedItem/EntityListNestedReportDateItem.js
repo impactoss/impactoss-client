@@ -27,7 +27,6 @@ const Styled = styled.div`
 `;
 const Status = styled.div`
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
-  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
   color:  ${(props) => props.unscheduled ? palette('text', 1) : 'inherit'};
 `;
 const DueDate = styled.div`

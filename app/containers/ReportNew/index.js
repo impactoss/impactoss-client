@@ -63,10 +63,14 @@ import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class ReportNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor() {
-    super();
-    this.state = { guestDismissed: false };
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+      guestDismissed: false,
+    };
   }
+
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.indicator) {
@@ -81,8 +85,8 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
       this.props.initialiseForm('reportNew.form.data', this.getInitialFormData(nextProps));
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
   getHeaderMainFields = () => ([ // fieldGroups
@@ -172,7 +176,13 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
             },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -242,6 +252,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                   aside: canUserPublish && this.getBodyAsideFields(indicator),
                 },
               }}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           { saveSending &&

@@ -14,6 +14,7 @@ import { lowerCase } from 'utils/string';
 
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
+import Content from 'components/styled/Content';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
@@ -31,12 +32,12 @@ import { groupEntities } from './group-entities';
 import messages from './messages';
 
 const EntityListSearch = styled.div`
-  padding: 0 0 2em;
+  padding-bottom: 1em;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding-bottom: 2em;
+  }
 `;
 
-const Content = styled.div`
-  padding: 0 4em;
-`;
 const ListEntities = styled.div``;
 const ListWrapper = styled.div``;
 

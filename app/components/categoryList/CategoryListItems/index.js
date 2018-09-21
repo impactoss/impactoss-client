@@ -135,6 +135,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       };
     }));
   };
+
   render() {
     const {
       taxonomy,

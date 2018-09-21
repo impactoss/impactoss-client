@@ -66,6 +66,12 @@ import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class ReportEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -87,8 +93,8 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -177,7 +183,13 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -242,6 +254,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                   aside: this.getBodyAsideFields(viewEntity),
                 },
               }}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           { (saveSending || deleteSending) &&

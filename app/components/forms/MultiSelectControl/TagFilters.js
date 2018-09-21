@@ -12,8 +12,11 @@ import { sortOptions } from './utils';
 
 const Styled = styled.div`
   background-color: ${palette('light', 0)};
-  padding: 0 0.5em 0.5em;
+  padding: 0 0.25em 0.5em;
   position: relative;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0 0.5em 0.5em;
+  }
 `;
 
 // padding: 0.75em 2em;
@@ -33,7 +36,10 @@ const Dropdown = styled.div`
   background-color: ${palette('background', 0)};
   box-shadow: 0 8px 8px 0 rgba(0,0,0,0.2);
   overflow-y: auto;
-  max-height: 320px;
+  max-height: 200px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    max-height: 320px;
+  }
 `;
 // box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
 

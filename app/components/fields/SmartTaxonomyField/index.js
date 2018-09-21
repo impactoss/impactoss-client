@@ -13,23 +13,28 @@ import ListLink from 'components/fields/ListLink';
 
 const StyledFieldWrap = styled(FieldWrap)`
   padding-top: 15px;
+  font-size: 0.65em;
 `;
 
 const SmartLabel = styled.div`
   font-weight: bold;
-  line-height: 1em;
+  line-height: 1;
 `;
-const SmartLabelMet = styled.div`
-`;
+const SmartLabelMet = styled.div``;
+
 const SmartIcon = styled.div`
   display: inline-block;
   border-radius: 999px;
   text-align: center;
   vertical-align: middle;
-  padding: 14px;
   background-color: ${(props) => props.active ? palette('taxonomies', props.pIndex) : palette('smartInactive', 0)};
   color: ${(props) => props.active ? palette('text', 2) : palette('smartInactive', 2)};
-  margin-bottom: 10px;
+  margin-bottom: 5px;
+  padding: 5px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    margin-bottom: 10px;
+    padding: 14px;
+  }
 `;
 
 class SmartTaxonomyField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -41,7 +46,7 @@ class SmartTaxonomyField extends React.PureComponent { // eslint-disable-line re
       <StyledFieldWrap>
         <ListInline>
           {field.values.map((value, i) => (
-            <ListInlineItem key={i} width={100 / field.values.length}>
+            <ListInlineItem key={i} itemWidth={100 / field.values.length}>
               <ListLink
                 to={value.linkTo}
                 paletteName={value.isSmart ? field.entityType : 'text'}
@@ -54,6 +59,8 @@ class SmartTaxonomyField extends React.PureComponent { // eslint-disable-line re
                   <Icon
                     name={`smart_${i}`}
                     title={`${value.label}: ${this.context.intl.formatMessage(value.isSmart ? appMessages.labels.smart.met : appMessages.labels.smart.notMet)}`}
+                    size="40px"
+                    sizes={{ mobile: '30px' }}
                   />
                 </SmartIcon>
                 <SmartLabel>{value.label}</SmartLabel>

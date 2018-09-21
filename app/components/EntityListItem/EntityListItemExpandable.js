@@ -9,13 +9,16 @@ import Icon from 'components/Icon';
 import messages from './messages';
 
 const Styled = styled(Component)`
-  display: table-cell;
-  text-align: center;
-  cursor: pointer;
-  width:${(props) => props.width * 100}%;
-  border-right: 1px solid ${palette('light', 0)};
-  vertical-align: middle;
-  padding: 5px 10px;
+  display: none;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    display: table-cell;
+    text-align: center;
+    cursor: pointer;
+    width:${(props) => props.width * 100}%;
+    border-right: 1px solid ${palette('light', 0)};
+    vertical-align: middle;
+    padding: 5px 10px;
+  }
 `;
 const IconWrap = styled.span`
   display: inline-block;

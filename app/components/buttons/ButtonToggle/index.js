@@ -7,6 +7,7 @@ import ButtonDefaultWithIcon from 'components/buttons/ButtonDefaultWithIcon';
 const Styled = styled.div`
   position: relative;
   height: 50px;
+  max-width: 230px;
 `;
 
 const ButtonActive = styled.span`
@@ -45,7 +46,10 @@ class ButtonToggle extends React.PureComponent { // eslint-disable-line react/pr
                     icon={option.icon}
                     iconRight={i !== 0}
                     title={option.label}
-                    onClick={() => onSelect(optionInactive.panel)}
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      onSelect(optionInactive.panel);
+                    }}
                     fullWidth
                     strong
                     outline

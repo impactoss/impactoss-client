@@ -66,6 +66,12 @@ import { save } from './actions';
 import { DEPENDENCIES } from './constants';
 
 export class ActionEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -87,8 +93,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -124,7 +130,13 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -197,6 +209,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 shape: MEASURE_SHAPE,
                 contextIntl: this.context.intl,
               })}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           {(saveSending || deleteSending) &&

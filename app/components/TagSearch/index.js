@@ -27,7 +27,7 @@ const Search = styled.div`
   width: 100%;
   background-color: ${palette('background', 0)};
   color: ${palette('dark', 2)};
-  padding: ${(props) => props.small ? '0 7px' : '7px'};
+  padding: ${(props) => props.small ? '2px 7px' : '7px'};
   border: 1px solid ${(props) => props.active ? palette('light', 4) : palette('light', 2)};
   box-shadow: 0 0 3px 0 ${(props) => props.active ? palette('dark', 2) : 'transparent'};
   min-height: ${(props) => props.small ? 30 : 36}px;
@@ -50,7 +50,7 @@ const Tags = styled.div`
 `;
 
 const Clear = styled(Button)`
-  padding: ${(props) => props.small ? '4px 6px' : '10px 6px'};
+  padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
   position: absolute;
   top: 0;
   right: 0;

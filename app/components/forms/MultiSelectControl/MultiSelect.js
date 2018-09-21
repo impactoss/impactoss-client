@@ -33,12 +33,15 @@ const ChangeHint = styled.div`
   position: absolute;
   left: 0;
   right: 0;
-  bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
+  bottom: ${(props) => props.hasFooter ? '30px' : '0px'};
   color: ${palette('text', 1)};
   background-color: ${palette('background', 1)};
   padding: 0.5em 1em;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
   text-align: right;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
+  }
 `;
 
 const ChangeHintHighlighted = styled.span`
@@ -47,13 +50,16 @@ const ChangeHintHighlighted = styled.span`
 
 const ControlMain = styled.div`
   position: absolute;
-  top: 60px;
+  top: 40px;
   bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
   left: 0;
   right: 0;
   overflow-y: auto;
   padding:0;
   padding-bottom: ${(props) => props.hasChangeNote ? '50px' : '0px'};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    top: 60px;
+  }
 `;
 const ControlFooter = styled.div`
   position: absolute;
@@ -61,13 +67,18 @@ const ControlFooter = styled.div`
   left: 0;
   right: 0;
   background-color: ${palette('background', 1)};
-  height: 50px;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    height: 50px;
+  }
 `;
 
 const Search = styled.div`
-  padding: 0.75em 1em;
+  padding: 0.75em;
   background-color: ${palette('background', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0.75em 1em;
+  }
 `;
 
 const SelectAll = styled.div`
@@ -88,10 +99,14 @@ const LabelWrap = styled.div`
 const CheckboxWrap = styled.div`
   text-align: center;
   display: table-cell;
-  padding-left: 1em;
-  padding-right: 0.5em;
   width: 10px;
   vertical-align: middle;
+  padding-left: 0.75em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-right: 0.5em;
+    padding-left: 1em;
+  }
+
 `;
 const Checkbox = styled(IndeterminateCheckbox)`
   vertical-align: middle;
