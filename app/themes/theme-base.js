@@ -110,9 +110,9 @@ theme.palette = {
     '#B7177A', // 3: Thematic cluster
     '#114060', // 4: Organisation
     '#007C70', // 5: Human right issue
-    '#009ED8', // 6: Human right
+    '#416680', // 6: Human right
     '#05A763', // 7: Affected persons
-    '#416680', // 8: State
+    '#009ED8', // 8: SDG
     '#E56700', // 9: SMART
   ],
   taxonomiesHover: [
@@ -122,9 +122,9 @@ theme.palette = {
     '#A5156E', // 3: Thematic cluster
     '#0F364C', // 4: Organisation
     '#007267', // 5: Human right issue
-    '#007FAD', // 6: Human right
+    '#395970', // 6: Human right
     '#008740', // 7: Affected persons
-    '#395970', // 8: State
+    '#007FAD', // 8: SDG
     '#C75300', // 9: SMART
   ],
   // bg inactive, bg hover, icon
