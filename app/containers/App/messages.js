@@ -49,7 +49,7 @@ export default defineMessages({
     },
     add: {
       id: 'app.containers.App.buttons.add',
-      defaultMessage: 'Add',
+      defaultMessage: 'New',
     },
     edit: {
       id: 'app.containers.App.buttons.edit',
@@ -70,6 +70,14 @@ export default defineMessages({
     import: {
       id: 'app.containers.App.buttons.import',
       defaultMessage: 'Import',
+    },
+    hideSecondaryNavigation: {
+      id: 'app.containers.App.buttons.hideSecondaryNavigation',
+      defaultMessage: 'Hide top menu',
+    },
+    showSecondaryNavigation: {
+      id: 'app.containers.App.buttons.showSecondaryNavigation',
+      defaultMessage: 'Show top menu',
     },
   },
   labels: {
@@ -151,6 +159,10 @@ export default defineMessages({
       id: 'app.containers.App.hints.content',
       defaultMessage: 'Note: first paragraph styled as lead paragraph',
     },
+    fullRecommendation: {
+      id: 'app.containers.App.hints.fullRecommendation',
+      defaultMessage: 'Note: use only if title field does not already contain full text',
+    },
   },
   textValues: {
     user_only: {
@@ -200,6 +212,10 @@ export default defineMessages({
     description: {
       id: 'app.containers.App.importFields.description',
       defaultMessage: 'Description',
+    },
+    fullRecommendation: {
+      id: 'app.containers.App.importFields.fullRecommendation',
+      defaultMessage: 'Full recommendation text',
     },
     accepted: {
       id: 'app.containers.App.importFields.accepted',
@@ -275,6 +291,10 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.description',
       defaultMessage: 'Enter description',
     },
+    fullRecommendation: {
+      id: 'app.containers.App.placeholders.fullRecommendation',
+      defaultMessage: 'Enter full recommendation text',
+    },
     content: {
       id: 'app.containers.App.placeholders.content',
       defaultMessage: 'Enter content',
@@ -316,6 +336,10 @@ export default defineMessages({
     description: {
       id: 'app.containers.App.attributes.description',
       defaultMessage: 'Description',
+    },
+    fullRecommendation: {
+      id: 'app.containers.App.attributes.fullRecommendation',
+      defaultMessage: 'Full recommendation text',
     },
     content: {
       id: 'app.containers.App.attributes.content',

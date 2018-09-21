@@ -152,9 +152,10 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
 
   handleSubmit = (formData) => !this.props.saving && this.props.handleSubmit(formData);
 
-  renderMultiSelect = (field, formData, hasEntityNewModal) => (
+  renderMultiSelect = (field, formData, hasEntityNewModal, scrollContainer) => (
     <MultiSelectField
       field={field}
+      scrollContainer={scrollContainer}
       fieldData={formData.getIn(field.dataPath)}
       closeOnClickOutside={!hasEntityNewModal}
       handleUpdate={(fieldData) => this.props.handleUpdate(formData.setIn(field.dataPath, fieldData))}
@@ -203,7 +204,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       }
     </FieldWrap>
   );
-  renderFormField = (field, nested, hasEntityNewModal) => {
+  renderFormField = (field, nested, hasEntityNewModal, scrollContainer) => {
     // field.controlType === 'date' && console.log('field', field)
     let formField;
     if (!field.controlType) {
@@ -217,7 +218,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
           formField = this.renderCombo(field);
           break;
         case 'multiselect':
-          formField = this.renderMultiSelect(field, this.props.formData, hasEntityNewModal);
+          formField = this.renderMultiSelect(field, this.props.formData, hasEntityNewModal, scrollContainer);
           break;
         default:
           formField = this.renderComponent(field);
@@ -242,7 +243,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     );
   }
 
-  renderGroup = (group, hasEntityNewModal) => (
+  renderGroup = (group, hasEntityNewModal, scrollContainer) => (
     <FieldGroupWrapper type={group.type}>
       { group.label &&
         <FieldGroupLabel>
@@ -260,7 +261,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         group.fields.map((field, i) => field
           ? (
             <Field labelledGroup={!!group.label} key={i}>
-              {this.renderFormField(field, false, hasEntityNewModal)}
+              {this.renderFormField(field, false, hasEntityNewModal, scrollContainer)}
               {
                 field.errorMessages &&
                 <ErrorWrapper>
@@ -280,23 +281,23 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     </FieldGroupWrapper>
   )
 
-  renderMain = (fieldGroups, hasAside = true, bottom = false, hasEntityNewModal = false) => (
+  renderMain = (fieldGroups, hasAside = true, bottom = false, hasEntityNewModal = false, scrollContainer) => (
     <Main hasAside={hasAside} bottom={bottom}>
       {
         asArray(fieldGroups).map((fieldGroup, i) => fieldGroup.fields && (
           <div key={i}>
-            {this.renderGroup(fieldGroup, hasEntityNewModal)}
+            {this.renderGroup(fieldGroup, hasEntityNewModal, scrollContainer)}
           </div>
         ))
       }
     </Main>
   );
-  renderAside = (fieldGroups, bottom = false, hasEntityNewModal = false) => (
+  renderAside = (fieldGroups, bottom = false, hasEntityNewModal = false, scrollContainer) => (
     <Aside bottom={bottom}>
       {
         asArray(fieldGroups).map((fieldGroup, i) => (
           <div key={i}>
-            {this.renderGroup(fieldGroup, hasEntityNewModal)}
+            {this.renderGroup(fieldGroup, hasEntityNewModal, scrollContainer)}
           </div>
         ))
       }
@@ -304,23 +305,23 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   );
 
   render() {
-    const { fields, model, handleCancel, handleSubmitFail, inModal, validators, newEntityModal } = this.props;
+    const { fields, model, handleCancel, handleSubmitFail, inModal, validators, newEntityModal, scrollContainer } = this.props;
     const hasEntityNewModal = !!newEntityModal;
 
     return (
-      <FormWrapper withoutShadow={inModal}>
+      <FormWrapper withoutShadow={inModal} hasMarginBottom>
         <StyledForm model={model} onSubmit={this.handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
           <FormBody>
             { fields.header &&
               <ViewPanel>
-                { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, false, hasEntityNewModal) }
-                { fields.header.aside && this.renderAside(fields.header.aside, false, hasEntityNewModal) }
+                { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, false, hasEntityNewModal, scrollContainer) }
+                { fields.header.aside && this.renderAside(fields.header.aside, false, hasEntityNewModal, scrollContainer) }
               </ViewPanel>
             }
             { fields.body &&
               <ViewPanel>
-                { fields.body.main && this.renderMain(fields.body.main, true, true, hasEntityNewModal) }
-                { fields.body.aside && this.renderAside(fields.body.aside, true, hasEntityNewModal) }
+                { fields.body.main && this.renderMain(fields.body.main, true, true, hasEntityNewModal, scrollContainer) }
+                { fields.body.aside && this.renderAside(fields.body.aside, true, hasEntityNewModal, scrollContainer) }
               </ViewPanel>
             }
           </FormBody>
@@ -328,7 +329,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             {this.props.handleDelete && !this.state.deleteConfirmed &&
               <DeleteWrapper>
                 <ButtonPreDelete type="button" onClick={this.preDelete}>
-                  <Icon name="trash" />
+                  <Icon name="trash" sizes={{ mobile: '1.8em' }} />
                 </ButtonPreDelete>
               </DeleteWrapper>
             }
@@ -380,6 +381,7 @@ EntityForm.propTypes = {
   saving: PropTypes.bool,
   newEntityModal: PropTypes.object,
   validators: PropTypes.object,
+  scrollContainer: PropTypes.object,
 };
 EntityForm.defaultProps = {
   saving: false,

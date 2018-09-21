@@ -9,7 +9,6 @@ import { TEXT_TRUNCATE } from 'themes/config';
 import { sortEntities } from 'utils/sort';
 import { truncateText } from 'utils/string';
 
-import Button from 'components/buttons/Button';
 import messages from 'components/ItemStatus/messages';
 import ItemStatus from 'components/ItemStatus';
 
@@ -28,12 +27,18 @@ const Count = styled.span`
   min-width: 1.8em;
   text-align: center;
   vertical-align: middle;
-  line-height: 1.7em;
+  line-height: 1.6;
   padding: 0 0.5em;
 `;
 
-const PopupWrapper = styled(Button)`
-  padding: 0;
+const PopupWrapper = styled.div`
+  display: inline-block;
+  cursor: pointer;
+  font-size: 1em;
+  text-align: center;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
   position: relative;
   margin-right: 10px;
   text-align: left;
@@ -53,7 +58,6 @@ const Popup = styled.div`
   width: ${(props) => props.total > 0 ? POPUP_WIDTH_PX : 'auto'};
   min-width: ${(props) => props.total > 0 ? POPUP_WIDTH : POPUP_WIDTH / 2}px;
   display: block;
-  left: 50%;
   z-index: 1;
   padding-bottom: 4px;
   font-size: 0.8em;
@@ -101,7 +105,7 @@ const PopupHeaderMain = styled.span`
 const PopupContent = styled.div`
   position: relative;
   max-height: 200px;
-  height: ${(props) => props.count * 4}em;
+  height: ${(props) => props.height || 200}px;
   overflow: auto;
 `;
 
@@ -119,7 +123,6 @@ const ItemContent = styled.span``;
 const ListItem = styled.div`
   padding: 0.5em 1em;
   border-top: 1px solid ${palette('background', 1)};
-  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
 `;
 
 const ListItemLink = styled(Link)`
@@ -135,6 +138,9 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
     this.state = {
       popupOpen: false,
       popupRef: null,
+      listItem_0: 0,
+      listItem_1: 0,
+      listItem_2: 0,
     };
   }
 
@@ -146,6 +152,14 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
       return 'left';
     }
     return 'center';
+  }
+
+  calcHeight = () => {
+    let height = 1;
+    if (this.state.listItem_0) height += this.state.listItem_0.clientHeight;
+    if (this.state.listItem_1) height += this.state.listItem_1.clientHeight;
+    if (this.state.listItem_2) height += this.state.listItem_2.clientHeight;
+    return height;
   }
 
   openPopup() {
@@ -190,14 +204,17 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                   </PopupHeaderMain>
                 }
               </PopupHeader>
-              <PopupContent count={entities.size}>
+              <PopupContent height={this.calcHeight()}>
                 {
                   sortEntities(entities, 'asc', 'reference')
                   .toList()
                   .map((entity, i) => {
                     const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
                     return (
-                      <ListItem key={i}>
+                      <ListItem
+                        key={i}
+                        innerRef={(node) => i < 3 && this.setState({ [`listItem_${i}`]: node })}
+                      >
                         <ListItemLink to={`/${option.path}/${entity.get('id')}`} >
                           { entity.getIn(['attributes', 'draft']) &&
                             <ItemStatus draft />

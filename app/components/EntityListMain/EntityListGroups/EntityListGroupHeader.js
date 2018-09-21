@@ -14,12 +14,21 @@ const ListEntitiesGroupHeaderLink = styled(Link)`
 
 
 const ListEntitiesGroupHeader = styled.h3`
-  margin-top: 30px;
-  margin-bottom: 20px;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    margin-top: 30px;
+    margin-bottom: 20px;
+  }
 `;
 const ListEntitiesSubgroupHeader = styled.h5`
   font-weight: normal;
-  margin-bottom: 20px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
 `;
 
 export class EntityListGroupHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

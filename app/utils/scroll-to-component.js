@@ -36,3 +36,15 @@ export const jumpToComponent = (scrollTarget, scrollReference, scrollContainer) 
     scrollContainer.scrollTop = scrollTarget.getBoundingClientRect().top - scrollReference.getBoundingClientRect().top; // eslint-disable-line no-param-reassign
   }
 };
+export const SCROLL_PADDING = 5;
+export const fitComponent = (scrollTarget, scrollContainer) => {
+  if (scrollTarget && scrollContainer) {
+    if (scrollTarget.getBoundingClientRect().height > scrollContainer.getBoundingClientRect().height
+      || scrollTarget.getBoundingClientRect().top < scrollContainer.getBoundingClientRect().top) {
+      scrollContainer.scrollTop += scrollTarget.getBoundingClientRect().top - scrollContainer.getBoundingClientRect().top - SCROLL_PADDING; // eslint-disable-line no-param-reassign
+    }
+    if (scrollTarget.getBoundingClientRect().bottom > scrollContainer.getBoundingClientRect().bottom) {
+      scrollContainer.scrollTop += ((scrollTarget.getBoundingClientRect().bottom - scrollContainer.getBoundingClientRect().bottom) + SCROLL_PADDING); // eslint-disable-line no-param-reassign
+    }
+  }
+};

@@ -20,6 +20,12 @@
 */
 
 const icons = {
+  menu: {
+    size: 30,
+    paths: [
+      'M4 7h22M4 15h22M4 23h22',
+    ],
+  },
   placeholder: {
     size: 24,
     paths: [

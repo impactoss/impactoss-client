@@ -9,8 +9,10 @@ import Label from 'components/fields/Label';
 // import appMessages from 'containers/App/messages';
 
 const Markdown = styled(ReactMarkdown)`
-  font-size: ${(props) => props.theme.sizes.text.markdown};
-  line-height: ${(props) => props.theme.sizes.lineHeights.markdown};
+  font-size: ${(props) => props.theme.sizes.text.markdownMobile};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.text.markdown};
+  }
 `;
 
 class MarkdownField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

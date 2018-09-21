@@ -21,7 +21,6 @@ const Styled = styled.a`
   margin-bottom: 1px;
   display: block;
   color: ${palette('mainListItem', 0)};
-  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
   &:hover {
     color: ${palette('mainListItemHover', 0)};
   }

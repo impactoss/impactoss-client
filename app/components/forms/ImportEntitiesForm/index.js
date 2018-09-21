@@ -64,12 +64,17 @@ const FormTitle = styled.h2`
   margin-top: 0;
 `;
 const Intro = styled.div`
-  font-size: 1.2em;
-  margin-bottom: 16px;
+margin-bottom: 10px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    margin-bottom: 16px;
+    font-size: 1.2em;
+  }
 `;
 const Hint = styled.div`
-  font-size: 1.2em;
-  margin-bottom: 16px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    margin-bottom: 16px;
+    font-size: 1.2em;
+  }
 `;
 const CsvDownload = styled.span`
   display: inline-block;

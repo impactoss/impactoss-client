@@ -37,8 +37,8 @@ theme.media = {
 // grid-styles settings https://github.com/jxnblk/grid-styled
 theme.gutter = 20;
 theme.breakpoints = {
-  small: '768px',
-  medium: '992px',
+  small: '769px',
+  medium: '993px',
   large: '1200px',
 };
 
@@ -278,16 +278,18 @@ theme.sizes = {
     nestedListItem: '15px',
     listItemTop: '14px',
     markdown: '18px',
+    markdownMobile: '16px',
     small: '13px', // used for labels
-  },
-  lineHeights: {
-    mainListItem: 1.4,
-    markdown: 1.4,
+    smallMobile: '11px', // used for labels
   },
   // px only
   aside: {
     header: {
       height: 90,
+    },
+    width: {
+      small: 250,
+      large: 300,
     },
   },
   mainListItem: {
@@ -298,21 +300,32 @@ theme.sizes = {
   header: {
     banner: {
       height: 88,
+      heightMobile: 50,
     },
     nav: {
       height: 38,
+      heightMobile: 24,
     },
     // px or em
     text: {
       title: '2.2em',
+      titleMobile: '1em',
       claim: '0.85em',
+      claimMobile: '1em',
+    },
+    paddingLeft: {
+      mobile: 6,
+      small: 12,
+      large: 20,
     },
   },
   home: {
     // px or em
     text: {
       title: '2.8em',
+      titleMobile: '1.4em',
       claim: '1.3em',
+      claimMobile: '1em',
     },
   },
 };

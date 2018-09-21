@@ -21,8 +21,11 @@ import {
 } from './actions';
 
 const Styled = styled(ContainerWithSidebar)`
-  z-index: 99;
+  z-index: ${(props) => props.sidebarResponsiveLarge ? 99 : 101};
   background-color: rgba(0,0,0,0.2);
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    z-index: 99;
+  }
 `;
 
 const FormWrapper = styled.div`
@@ -30,10 +33,17 @@ const FormWrapper = styled.div`
   top: 0;
   bottom: 0;
   left: 0;
-  width: ${(props) => props.wide ? 700 : 350}px;
   background: ${palette('primary', 4)};
   overflow: hidden;
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  width: 100%;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    width: ${(props) => props.wide ? '100%' : '350px'};
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    width: ${(props) => props.wide ? 692 : 350}px;
+    z-index: 99;
+  }
 `;
 // z-index:-1;
 
@@ -63,6 +73,8 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
 
     return (
       <Styled
+        sidebarResponsiveLarge={!formOptions.advanced}
+        sidebarAbsolute
         onClick={(evt) => {
           evt.preventDefault();
           onCancel();

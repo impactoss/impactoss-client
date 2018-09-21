@@ -42,7 +42,13 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
       icon: 'pages',
       actions: [{
         type: 'add',
-        title: this.context.intl.formatMessage(messages.add),
+        title: [
+          this.context.intl.formatMessage(appMessages.buttons.add),
+          {
+            title: this.context.intl.formatMessage(appMessages.entities.pages.single),
+            hiddenSmall: true,
+          },
+        ],
         onClick: () => this.props.handleNew(),
       }],
     };

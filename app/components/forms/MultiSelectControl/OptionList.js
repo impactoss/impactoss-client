@@ -24,7 +24,11 @@ const ListWrapper = styled.div`
 const OptionWrapper = styled.div`
   display: table-row;
   width: 100%;
-  line-height: 1.33;
+  line-height: 1.3;
+  font-size: 0.8em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: 1em;
+  }
 `;
 // background-color: ${(props) => {
 //   if (props.changedToChecked) {
@@ -37,13 +41,16 @@ const OptionWrapper = styled.div`
 // }}
 const CheckboxWrapper = styled.div`
   display: table-cell;
-  vertical-align:middle;
+  vertical-align: middle;
   padding-top: 0.5em;
   padding-bottom: 0.5em;
-  padding-left: 1em;
-  padding-right: 0.5em;
+  padding-left: 0.75em;
   width: 10px;
   border-bottom: 1px solid ${palette('light', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-right: 0.5em;
+    padding-left: 1em;
+  }
 `;
 
 const OPTION_PADDING = '1em';
@@ -51,10 +58,10 @@ const OPTION_PADDING_SECONDARY = '0.5em';
 
 const OptionLabel = styled.label`
   display: table-cell;
-  vertical-align:middle;
+  vertical-align: middle;
   cursor: pointer;
-  padding-top: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
-  padding-bottom: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
+  padding-top: ${OPTION_PADDING_SECONDARY};
+  padding-bottom: ${OPTION_PADDING_SECONDARY};
   padding-left: 0.5em;
   padding-right: 0.5em;
   border-bottom: 1px solid ${palette('light', 1)};
@@ -64,6 +71,10 @@ const OptionLabel = styled.label`
       : 'none'
   };
   border-right-color: ${palette('buttonDefault', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-top: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
+    padding-bottom: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
+  }
 }
 `;
 

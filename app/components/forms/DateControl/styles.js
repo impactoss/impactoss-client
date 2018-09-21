@@ -38,7 +38,10 @@ injectGlobal`
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
-    margin: 0 1rem;
+    margin: 0 .5rem;
+    @media (min-width: 769px) {
+      margin: 0 1rem;
+    }
   }
 
   .DayPicker-NavBar {
@@ -105,11 +108,14 @@ injectGlobal`
 
   .DayPicker-Day {
     display: table-cell;
-    padding: .5rem;
+    padding: .125rem;
     border: 1px solid #eaecec;
     text-align: center;
     cursor: pointer;
     vertical-align: middle;
+    @media (min-width: 769px) {
+      padding: .5rem;
+    }
   }
 
   .DayPicker-WeekNumber {
@@ -188,10 +194,14 @@ injectGlobal`
   }
 
   .DayPickerInput-Overlay {
-    right: 0;
+    left: 0;
     position: absolute;
     background: white;
     z-index: 1;
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+    @media (min-width: 769px) {
+      right: 0;
+      left: auto;
+    }
   }
 `;

@@ -75,6 +75,12 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 
 export class CategoryNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -89,8 +95,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -193,7 +199,13 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -260,6 +272,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                   aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
                 },
               }}
+              scrollContainer={this.state.scrollContainer}
             />
           }
         </Content>

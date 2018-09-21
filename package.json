@@ -119,7 +119,12 @@
       "import/no-dynamic-require": 0,
       "import/no-extraneous-dependencies": 0,
       "import/no-named-as-default": 0,
-      "import/no-unresolved": 2,
+      "import/no-unresolved": [
+        2,
+        {
+          "caseSensitive": false
+        }
+      ],
       "import/prefer-default-export": 0,
       "indent": [
         2,
@@ -313,7 +318,7 @@
     "url-loader": "0.5.7",
     "webpack": "2.2.0-rc.3",
     "webpack-dev-middleware": "1.9.0",
-    "webpack-git-hash": "^1.0.2",    
+    "webpack-git-hash": "^1.0.2",
     "webpack-hot-middleware": "2.15.0"
   }
 }
