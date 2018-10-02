@@ -14,7 +14,7 @@ import { fromJS } from 'immutable';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
-import { getImportFields } from 'utils/import';
+import { getImportFields, getColumnAttribute } from 'utils/import';
 
 import {
   redirectIfNotPermitted,
@@ -178,7 +178,10 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('import') !== null) {
         fromJS(formData.get('import').rows).forEach((row, index) => {
           dispatch(save({
-            attributes: row.set('draft', true).toJS(),
+            attributes: row
+              .mapKeys((k) => getColumnAttribute(k))
+              .set('draft', true)
+              .toJS(),
             saveRef: index + 1,
           }));
         });
