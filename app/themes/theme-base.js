@@ -303,7 +303,7 @@ theme.sizes = {
       heightMobile: 50,
     },
     nav: {
-      height: 38,
+      height: 48,
       heightMobile: 24,
     },
     // px or em
@@ -315,7 +315,7 @@ theme.sizes = {
     },
     paddingLeft: {
       mobile: 6,
-      small: 12,
+      small: 16,
       large: 20,
     },
   },

@@ -19,15 +19,17 @@ export default styled(Link)`
   height: ${(props) => props.theme.sizes.header.nav.heightMobile - 1}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 0.9em;
-    padding: 8px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
+    padding: 14px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
     height: ${(props) => props.theme.sizes.header.nav.height - 1}px;
     position: ${(props) => props.align ? 'absolute' : 'static'};
     right: ${(props) => props.align === 'right' ? 0 : 'auto'};
     left: ${(props) => props.align === 'left' ? 0 : 'auto'};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    font-size: 1em;
-    padding-left: ${(props) => props.align ? props.theme.sizes.header.paddingLeft.small : 24}px;
-    padding-right: ${(props) => props.align ? props.theme.sizes.header.paddingLeft.small : 24}px;
+    font-size: 1.1em;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: ${(props) => props.align ? props.theme.sizes.header.paddingLeft.small : 28}px;
+    padding-right: ${(props) => props.align ? props.theme.sizes.header.paddingLeft.small : 28}px;
   }
 `;
