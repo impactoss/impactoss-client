@@ -5,9 +5,10 @@ import { palette } from 'styled-theme';
 // import { isEqual } from 'lodash/lang';
 import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
+import { attributesEqual } from 'utils/entities';
 import Component from 'components/styled/Component';
 import Clear from 'components/styled/Clear';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, PROGRESS_TAXONOMY_ID } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
@@ -37,7 +38,7 @@ const Styled = styled(Component)`
 const EntityListItemMainTitleWrap = styled.a`
   text-decoration: none;
   display: block;
-  padding: 0px 12px 6px 0;
+  padding: 6px 15px 6px 0;
   color: ${palette('mainListItem', 0)};
   &:hover {
     color: ${palette('mainListItemHover', 0)};
@@ -79,6 +80,11 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     return entity.getIn(['attributes', 'reference']) || entity.get('id');
   }
 
+  getProgressCategory = (taxonomies, categoryIds) => {
+    const progressTaxonomy = taxonomies && taxonomies.find((tax) => attributesEqual(tax.get('id'), PROGRESS_TAXONOMY_ID));
+    return progressTaxonomy && progressTaxonomy.get('categories').find((cat) => categoryIds.includes(parseInt(cat.get('id'), 10))).toJS();
+  }
+
   mapToEntityListItem = ({
     config,
     entity,
@@ -86,6 +92,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     entityPath,
     connections,
     entityIcon,
+    taxonomies,
   }) => ({
     id: entity.get('id'),
     title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
@@ -102,12 +109,14 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     targetDate: entity.getIn(['attributes', 'target_date'])
       && this.context.intl
       && this.context.intl.formatDate(entity.getIn(['attributes', 'target_date'])),
+    progressCategory: taxonomies && this.getProgressCategory(taxonomies, entity.get('categories')),
   });
 
   render() {
     const { nestLevel, onEntityClick, taxonomies } = this.props;
-
     const entity = this.mapToEntityListItem(this.props);
+
+    const bottomTaxonomies = taxonomies && taxonomies.filter((tax) => !attributesEqual(tax.get('id'), PROGRESS_TAXONOMY_ID));
 
     return (
       <Styled isManager={this.props.isManager} isConnection={this.props.isConnection}>
@@ -129,7 +138,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
         { (entity.categories || (entity.connectedCounts && this.props.wrapper)) &&
           <EntityListItemMainBottom
             categories={entity.categories}
-            taxonomies={taxonomies}
+            taxonomies={bottomTaxonomies}
             onEntityClick={onEntityClick}
             connections={entity.connectedCounts}
             wrapper={this.props.wrapper}

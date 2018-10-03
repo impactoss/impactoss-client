@@ -120,7 +120,7 @@ theme.palette = {
     '#009ED8', // 7: SDGs
     '#416680', // 8: State
     '#E56700', // 9: SMART
-    '#232b2b', // 10: Progress status
+    '#007c3a', // 10: Progress status
   ],
   taxonomiesHover: [
     '#656F75', // default, not used
@@ -133,7 +133,7 @@ theme.palette = {
     '#007FAD', // 7: SDGs
     '#395970', // 8: State
     '#C75300', // 9: SMART
-    '#1c2121', // 10: Progress status
+    '#007034', // 10: Progress status
   ],
   // bg inactive, bg hover, icon
   smartInactive: [
