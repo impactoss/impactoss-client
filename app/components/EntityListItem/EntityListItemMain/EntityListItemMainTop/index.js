@@ -6,6 +6,7 @@ import Icon from 'components/Icon';
 
 import ItemStatus from 'components/ItemStatus';
 import ItemRole from 'components/ItemRole';
+import ItemProgress from 'components/ItemProgress';
 
 import EntityListItemMainTopReference from './EntityListItemMainTopReference';
 import EntityListItemMainTopIcon from './EntityListItemMainTopIcon';
@@ -18,7 +19,6 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
 
   render() {
     const { entity } = this.props;
-
     return (
       <Component>
         <EntityListItemMainTopReference>
@@ -28,6 +28,10 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
           <EntityListItemMainTopIcon>
             <Icon name={entity.entityIcon} text iconRight />
           </EntityListItemMainTopIcon>
+        }
+        {
+          entity.progressCategory &&
+          <ItemProgress status={entity.progressCategory} />
         }
         { entity.draft &&
           <ItemStatus draft={entity.draft} />
