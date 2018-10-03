@@ -10,8 +10,11 @@ import ButtonTagCategoryInverse from 'components/buttons/ButtonTagCategoryInvers
 const Status = styled.div`
   float: right;
   padding-left: 1em;
-  margin-top: -3px;
-  margin-right: -10px;
+  margin-top: -1px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    margin-top: -3px;
+    margin-right: -10px;
+  }
 `;
 
 class ItemProgress extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
