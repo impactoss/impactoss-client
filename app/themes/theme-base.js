@@ -113,8 +113,8 @@ theme.palette = {
     '#416680', // 6: Human right
     '#05A763', // 7: Affected persons
     '#009ED8', // 8: SDG
-    '#E56700', // 9: SMART
-    '#007c3a', // 10: Progress status
+    '#007c3a', // 9: Progress status
+    '#E56700', // 10: SMART
   ],
   taxonomiesHover: [
     '#656F75', // default, not used
@@ -126,8 +126,8 @@ theme.palette = {
     '#395970', // 6: Human right
     '#008740', // 7: Affected persons
     '#007FAD', // 8: SDG
-    '#C75300', // 9: SMART
-    '#007034', // 10: Progress status
+    '#007034', // 9: Progress status
+    '#C75300', // 10: SMART
   ],
   // bg inactive, bg hover, icon
   smartInactive: [
