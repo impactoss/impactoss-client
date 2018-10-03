@@ -12,6 +12,26 @@ export const makeFilterGroups = (
 ) => {
   const filterGroups = {};
 
+  // attributes
+  if (config.attributes && (typeof config.attributes.role === 'undefined' || hasUserRole[config.attributes.role])) {
+    // first prepare taxonomy options
+    filterGroups.attributes = {
+      id: 'attributes', // filterGroupId
+      label: messages.attributes,
+      show: true,
+      options: reduce(config.attributes.options, (options, option) =>
+        (typeof option.role === 'undefined' || hasUserRole[option.role])
+          ? options.concat([{
+            id: option.attribute, // filterOptionId
+            label: option.label,
+            message: option.message,
+            active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
+          }])
+          : options
+      , []),
+    };
+  }
+
   // taxonomy option group
   if (config.taxonomies && taxonomies) {
     // first prepare taxonomy options
@@ -69,26 +89,6 @@ export const makeFilterGroups = (
           icon: option.path,
           active: !!activeFilterOption && activeFilterOption.optionId === option.path,
         })
-      , []),
-    };
-  }
-
-  // attributes
-  if (config.attributes && (typeof config.attributes.role === 'undefined' || hasUserRole[config.attributes.role])) {
-    // first prepare taxonomy options
-    filterGroups.attributes = {
-      id: 'attributes', // filterGroupId
-      label: messages.attributes,
-      show: true,
-      options: reduce(config.attributes.options, (options, option) =>
-        (typeof option.role === 'undefined' || hasUserRole[option.role])
-          ? options.concat([{
-            id: option.attribute, // filterOptionId
-            label: option.label,
-            message: option.message,
-            active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
-          }])
-          : options
       , []),
     };
   }
