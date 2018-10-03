@@ -112,7 +112,7 @@ const icons = {
     ],
   },
   // 9: SMART
-  taxonomy_9: {
+  taxonomy_11: {
     size: 40,
     paths: [
       'M18,17h9v2H18Zm0,7h9V22H18Zm0,5h9V27H18Z',
@@ -121,7 +121,7 @@ const icons = {
     ],
   },
   // 10: Progress status
-  taxonomy_10: {
+  taxonomy_9: {
     size: 40,
     paths: [
       'M15.31,9.5,14.09,6.76a14.68,14.68,0,0,0-3.27,2l1.91,2.32A11.2,11.2,0,0,1,15.31,9.5Z',
