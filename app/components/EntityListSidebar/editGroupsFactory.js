@@ -10,6 +10,27 @@ export const makeEditGroups = (
 ) => {
   const editGroups = {};
 
+  // attributes
+  if (config.attributes) {
+    // first prepare taxonomy options
+    editGroups.attributes = {
+      id: 'attributes', // filterGroupId
+      label: messages.attributes,
+      show: true,
+      options: reduce(config.attributes.options, (options, option) =>
+        (typeof option.edit === 'undefined' || option.edit)
+        && (typeof option.role === 'undefined' || hasUserRole[option.role])
+        ? options.concat({
+          id: option.attribute, // filterOptionId
+          label: option.label,
+          message: option.message,
+          active: !!activeEditOption && activeEditOption.optionId === option.attribute,
+        })
+        : options
+      , []),
+    };
+  }
+
   // taxonomy option group
   if (config.taxonomies && taxonomies) {
     // first prepare taxonomy options
@@ -56,27 +77,6 @@ export const makeEditGroups = (
           icon: option.path,
           active: !!activeEditOption && activeEditOption.optionId === option.path,
           create: { path: option.path },
-        })
-        : options
-      , []),
-    };
-  }
-
-  // attributes
-  if (config.attributes) {
-    // first prepare taxonomy options
-    editGroups.attributes = {
-      id: 'attributes', // filterGroupId
-      label: messages.attributes,
-      show: true,
-      options: reduce(config.attributes.options, (options, option) =>
-        (typeof option.edit === 'undefined' || option.edit)
-        && (typeof option.role === 'undefined' || hasUserRole[option.role])
-        ? options.concat({
-          id: option.attribute, // filterOptionId
-          label: option.label,
-          message: option.message,
-          active: !!activeEditOption && activeEditOption.optionId === option.attribute,
         })
         : options
       , []),
