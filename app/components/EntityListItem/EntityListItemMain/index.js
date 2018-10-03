@@ -80,9 +80,21 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     return entity.getIn(['attributes', 'reference']) || entity.get('id');
   }
 
+  getProgressTaxonomy = (taxonomies) =>
+    taxonomies && taxonomies.find((tax) => attributesEqual(tax.get('id'), PROGRESS_TAXONOMY_ID));
+
   getProgressCategory = (taxonomies, categoryIds) => {
-    const progressTaxonomy = taxonomies && taxonomies.find((tax) => attributesEqual(tax.get('id'), PROGRESS_TAXONOMY_ID));
-    return progressTaxonomy && progressTaxonomy.get('categories').find((cat) => categoryIds.includes(parseInt(cat.get('id'), 10))).toJS();
+    const progressTaxonomy = taxonomies && this.getProgressTaxonomy(taxonomies);
+    const progressCategory = progressTaxonomy && progressTaxonomy.get('categories').find((cat) => categoryIds.includes(parseInt(cat.get('id'), 10)));
+    return progressCategory && progressCategory.toJS();
+  }
+
+  getWithoutProgressCategories = (taxonomies, categoryIds) => {
+    const progressTaxonomy = taxonomies && this.getProgressTaxonomy(taxonomies);
+    return progressTaxonomy && categoryIds.filter((cat) => {
+      const progressCategoryIds = progressTaxonomy.get('categories').map((pCat) => parseInt(pCat.get('id'), 10));
+      return !progressCategoryIds || !progressCategoryIds.includes(parseInt(cat, 10));
+    });
   }
 
   mapToEntityListItem = ({
@@ -101,7 +113,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
     path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
     entityIcon: entityIcon && entityIcon(entity),
-    categories: entity.get('categories'),
+    categories: taxonomies && this.getWithoutProgressCategories(taxonomies, entity.get('categories')),
     connectedCounts: config && config.connections
       ? this.getConnections(entity, config.connections.options, connections)
       : [],
