@@ -44,7 +44,17 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
   } else if (typeof valueB === 'undefined' || valueB === null) {
     result = -1;
   } else if (type === 'date') {
-    result = new Date(valueA) < new Date(valueB) ? -1 : 1;
+    const aIsDate = new Date(valueA) instanceof Date && !isNaN(new Date(valueA));
+    const bIsDate = new Date(valueB) instanceof Date && !isNaN(new Date(valueB));
+    if (aIsDate && !bIsDate) {
+      result = 1;
+    } else if (!aIsDate && bIsDate) {
+      result = -1;
+    } else if (aIsDate && bIsDate) {
+      result = new Date(valueA) < new Date(valueB) ? -1 : 1;
+    } else {
+      result = 0;
+    }
   } else {
     const intA = parseInt(valueA, 10);
     const intB = parseInt(valueB, 10);

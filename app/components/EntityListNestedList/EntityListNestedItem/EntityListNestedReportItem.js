@@ -26,8 +26,7 @@ const Styled = styled.a`
   }
 `;
 const Top = styled.div`
-  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
-  line-height: ${(props) => props.theme.sizes && props.theme.sizes.lineHeights.mainListItem};
+  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};  
 `;
 
 const Reference = styled(Label)`

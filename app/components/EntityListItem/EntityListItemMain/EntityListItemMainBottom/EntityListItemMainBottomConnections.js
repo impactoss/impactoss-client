@@ -1,10 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import Icon from 'components/Icon';
 import BottomTagGroup from './BottomTagGroup';
 import BottomIconWrap from './BottomIconWrap';
 import ConnectionPopup from './ConnectionPopup';
+
+const ConnectionWrap = styled.span`
+  display: inline-block;
+`;
 
 export default class EntityListItemMainBottomConnections extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
@@ -19,7 +24,7 @@ export default class EntityListItemMainBottomConnections extends React.PureCompo
           this.props.connections.map((connection, i) => {
             const draftEntities = connection.entities.filter((entity) => entity.getIn(['attributes', 'draft']));
             return (
-              <span key={i}>
+              <ConnectionWrap key={i}>
                 <BottomIconWrap>
                   <Icon name={connection.option.icon} text />
                 </BottomIconWrap>
@@ -36,7 +41,7 @@ export default class EntityListItemMainBottomConnections extends React.PureCompo
                     draft
                   />
                 }
-              </span>
+              </ConnectionWrap>
             );
           })
         }
