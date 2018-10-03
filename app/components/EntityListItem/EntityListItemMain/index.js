@@ -91,10 +91,12 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
 
   getWithoutProgressCategories = (taxonomies, categoryIds) => {
     const progressTaxonomy = taxonomies && this.getProgressTaxonomy(taxonomies);
-    return progressTaxonomy && categoryIds.filter((cat) => {
-      const progressCategoryIds = progressTaxonomy.get('categories').map((pCat) => parseInt(pCat.get('id'), 10));
-      return !progressCategoryIds || !progressCategoryIds.includes(parseInt(cat, 10));
-    });
+    return progressTaxonomy
+      ? categoryIds.filter((cat) => {
+        const progressCategoryIds = progressTaxonomy.get('categories').map((pCat) => parseInt(pCat.get('id'), 10));
+        return !progressCategoryIds || !progressCategoryIds.includes(parseInt(cat, 10));
+      })
+      : categoryIds;
   }
 
   mapToEntityListItem = ({
