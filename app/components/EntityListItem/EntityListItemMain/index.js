@@ -82,7 +82,8 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
 
   getProgressCategory = (taxonomies, categoryIds) => {
     const progressTaxonomy = taxonomies && taxonomies.find((tax) => attributesEqual(tax.get('id'), PROGRESS_TAXONOMY_ID));
-    return progressTaxonomy && progressTaxonomy.get('categories').find((cat) => categoryIds.includes(parseInt(cat.get('id'), 10))).toJS();
+    const progressCategory = progressTaxonomy && progressTaxonomy.get('categories').find((cat) => categoryIds.includes(parseInt(cat.get('id'), 10)));
+    return progressCategory && progressCategory.toJS();
   }
 
   mapToEntityListItem = ({
