@@ -71,6 +71,14 @@ export const TAXONOMY_GROUPS = [
   },
 ];
 
+export const PROGRESS_TAXONOMY_ID = 10;
+
+// WARNING: references as assigned by user
+export const PROGRESS_CATEGORY_REFERENCES = {
+  ONGOING: 1,
+  COMPLETED: 2,
+};
+
 /**
  * Server settings
  **/
