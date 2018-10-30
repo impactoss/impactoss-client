@@ -8,6 +8,7 @@ import SelectReset from 'components/SelectReset';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import Icon from 'components/Icon';
 
+import A from 'components/styled/A';
 import ColumnHeader from 'components/styled/ColumnHeader';
 
 import messages from './messages';
@@ -17,17 +18,22 @@ const SortButton = styled(ButtonFlatIconOnly)`
   color: inherit;
 `;
 const Styled = styled(ColumnHeader)`
-  padding: 0.25em 0;
+  padding-right: 0;
 `;
 const LabelWrap = styled.div`
   display: table-cell;
-  padding-left: ${(props) => props.isSelect ? 0 : 15}px;
+  padding-right: 4px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding-left: ${(props) => props.isSelect ? 0 : 7}px;
+  }
 `;
 const CheckboxWrap = styled.div`
-  width: 40px;
-  padding: 5px;
   display: table-cell;
   text-align: center;
+  width: 20px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    width: 40px;
+  }
 `;
 const Checkbox = styled(IndeterminateCheckbox)`
   vertical-align: middle;
@@ -41,10 +47,11 @@ const Wrapper = styled.div`
 `;
 const SelectWrapper = styled.div`
   display: table-cell;
-  text-align:right;
+  text-align: right;
+  padding-right: 2px;
 `;
 
-const SelectAll = styled.a`
+const SelectAll = styled(A)`
   vertical-align: middle;
 `;
 
@@ -53,7 +60,7 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
   render() {
     const { isSelect, isSelected, onSelect, width, label, hasSelectAll, onSelectAll, entitiesTotal } = this.props;
 
-    const sortOptions = this.props.sortOptions.map((option) => ({
+    const sortOptions = this.props.sortOptions && this.props.sortOptions.map((option) => ({
       value: option.attribute,
       label: this.context.intl.formatMessage(messages.sortAttributes[option.attribute]),
     }));
@@ -99,25 +106,27 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
               <Label>{label}</Label>
             </LabelWrap>
           }
-          <SelectWrapper>
-            <SelectReset
-              value={this.props.sortBy}
-              index="sortby"
-              options={sortOptions}
-              isReset={false}
-              onChange={this.props.onSortBy}
-            />
-            {nextSortOrderOption &&
-              <SortButton
-                onClick={(e) => {
-                  e.preventDefault();
-                  this.props.onSortOrder(nextSortOrderOption.value);
-                }}
-              >
-                <Icon name={sortOrderOption.icon} />
-              </SortButton>
-            }
-          </SelectWrapper>
+          { sortOptions &&
+            <SelectWrapper>
+              <SelectReset
+                value={this.props.sortBy}
+                index="sortby"
+                options={sortOptions}
+                isReset={false}
+                onChange={this.props.onSortBy}
+              />
+              {nextSortOrderOption &&
+                <SortButton
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.props.onSortOrder(nextSortOrderOption.value);
+                  }}
+                >
+                  <Icon name={sortOrderOption.icon} />
+                </SortButton>
+              }
+            </SelectWrapper>
+          }
         </Wrapper>
       </Styled>
     );

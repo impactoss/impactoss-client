@@ -25,7 +25,7 @@ import {
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages } from 'containers/App/actions';
 
-import { CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
@@ -36,6 +36,7 @@ import EntityView from 'components/EntityView';
 import {
   selectReady,
   selectIsUserContributor,
+  selectIsUserManager,
   selectMeasureTaxonomies,
   selectSdgTargetTaxonomies,
   selectMeasureConnections,
@@ -71,7 +72,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceField(entity, true),
+        getReferenceField(entity, isManager, true),
         getTitleField(entity, isManager),
       ],
     },
@@ -104,8 +105,8 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
-        getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, appMessages, onEntityClick),
+        measures && getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
+        sdgtargets && getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, appMessages, onEntityClick),
       ],
     },
   ]);
@@ -134,6 +135,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       viewEntity,
       dataReady,
       isContributor,
+      isManager,
       measures,
       sdgtargets,
       reports,
@@ -145,7 +147,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       measureConnections,
     } = this.props;
 
-    const buttons = isContributor
+    const buttons = isManager
     ? [
       {
         type: 'text',
@@ -236,6 +238,7 @@ IndicatorView.propTypes = {
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   isContributor: PropTypes.bool,
+  isManager: PropTypes.bool,
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   reports: PropTypes.object,
@@ -256,6 +259,7 @@ IndicatorView.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isContributor: selectIsUserContributor(state),
+  isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),
@@ -278,13 +282,13 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: () => {
-      dispatch(updatePath(`/indicators/edit/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.INDICATORS}${PATHS.EDIT}/${props.params.id}`, { replace: true }));
     },
     handleNewReport: () => {
-      dispatch(updatePath(`/reports/new/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}${PATHS.NEW}/${props.params.id}`, { replace: true }));
     },
     handleClose: () => {
-      dispatch(closeEntity('/indicators'));
+      dispatch(closeEntity(PATHS.INDICATORS));
       // TODO should be "go back" if history present or to indicators list when not
     },
     onDismissQueryMessages: () => {

@@ -49,6 +49,10 @@ export default defineMessages({
     },
   },
   partners: {
+    note: {
+      id: 'app.components.Footer.partners.note',
+      defaultMessage: 'With kind support of',
+    },
     title1: {
       id: 'app.components.Footer.partners.title1',
       defaultMessage: 'Partner 1',
@@ -65,6 +69,14 @@ export default defineMessages({
       id: 'app.components.Footer.partners.title4',
       defaultMessage: 'Partner 4',
     },
+    title5: {
+      id: 'app.components.Footer.partners.title5',
+      defaultMessage: 'Partner 5',
+    },
+    title6: {
+      id: 'app.components.Footer.partners.title6',
+      defaultMessage: 'Partner 6',
+    },
     url1: {
       id: 'app.components.Footer.partners.url1',
       defaultMessage: 'http://www.partner1.org',
@@ -80,6 +92,14 @@ export default defineMessages({
     url4: {
       id: 'app.components.Footer.partners.url4',
       defaultMessage: 'http://www.partner4.org',
+    },
+    url5: {
+      id: 'app.components.Footer.partners.url5',
+      defaultMessage: 'http://www.partner5.org',
+    },
+    url6: {
+      id: 'app.components.Footer.partners.url6',
+      defaultMessage: 'http://www.partner6.org',
     },
   },
 });

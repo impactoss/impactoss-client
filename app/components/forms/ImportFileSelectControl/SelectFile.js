@@ -23,13 +23,13 @@ const Styled = styled.div`
 `;
 
 const DocumentWrapEdit = styled(DocumentWrap)`
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 0)};
   position: relative;
   padding: 0;
   border: 1px solid ${palette('light', 1)};
-  font-weight: bold;
+  font-weight: 500;
   max-width: 100%;
-  padding-right: 45px;
+  padding-right: 35px;
   display: inline-block;
   vertical-align: top;
 `;
@@ -47,9 +47,9 @@ const Remove = styled(ButtonFlatIconOnly)`
   top: 0;
   bottom: 0;
   padding: 0 0.75em;
-  color: ${palette('dark', 2)};
+  color: ${palette('buttonFlat', 1)};
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${palette('buttonFlatHover', 1)};
   }
 `;
 
@@ -57,8 +57,9 @@ const ImportButton = styled(ButtonSubmit)`
   white-space: nowrap;
   display: inline-block;
   vertical-align: top;
-  border-top: 1px solid ${palette('primary', 1)};
-  border-bottom: 1px solid ${palette('primary', 1)};
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  border-color: ${palette('buttonDefault', 1)};
 `;
 
 class SelectFile extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

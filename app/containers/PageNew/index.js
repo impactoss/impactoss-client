@@ -21,7 +21,8 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -50,6 +51,12 @@ import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class PageNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -64,8 +71,8 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -102,7 +109,13 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
             },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -154,6 +167,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
                   main: this.getBodyMainFields(),
                 },
               }}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           { saveSending &&
@@ -201,7 +215,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN));
+      dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN.value));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
@@ -219,7 +233,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(formData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath('/pages'));
+      dispatch(updatePath(PATHS.PAGES, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

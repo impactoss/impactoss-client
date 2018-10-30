@@ -6,9 +6,12 @@
 
 import { fromJS } from 'immutable';
 
+import { ENABLE_SDGS } from 'themes/config';
+
 export const SAVE = 'impactoss/CategoryNew/SAVE';
 
-export const DEPENDENCIES = [
+export const DEPENDENCIES = ENABLE_SDGS
+? [
   'measures',
   'sdgtargets',
   'recommendations',
@@ -18,6 +21,16 @@ export const DEPENDENCIES = [
   'taxonomies',
   'measure_categories',
   'sdgtarget_categories',
+  'recommendation_categories',
+]
+: [
+  'measures',
+  'recommendations',
+  'users',
+  'user_roles',
+  'categories',
+  'taxonomies',
+  'measure_categories',
   'recommendation_categories',
 ];
 

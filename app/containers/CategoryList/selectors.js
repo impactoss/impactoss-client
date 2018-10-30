@@ -1,10 +1,13 @@
 import { createSelector } from 'reselect';
 import { Map } from 'immutable';
 
+import { ENABLE_SDGS } from 'themes/config';
+
 import {
   selectEntities,
   selectSortByQuery,
   selectSortOrderQuery,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import { attributesEqual } from 'utils/entities';
@@ -14,7 +17,7 @@ import { TAXONOMY_DEFAULT, SORT_OPTIONS } from './constants';
 
 export const selectTaxonomy = createSelector(
   (state, { id }) => id,
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (taxonomyId, taxonomies) =>
     taxonomies && taxonomies.get(typeof taxonomyId !== 'undefined' ? taxonomyId : TAXONOMY_DEFAULT)
 );
@@ -43,7 +46,7 @@ const selectMeasures = createSelector(
         .filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), id))
         .map((association) => association.getIn(['attributes', 'recommendation_id']))
       )
-      .set('sdgtarget_ids', sdgtargetMeasures
+      .set('sdgtarget_ids', ENABLE_SDGS && sdgtargetMeasures
         .filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), id))
         .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
       )
@@ -62,8 +65,8 @@ const selectRecommendations = createSelector(
 const selectSdgTargets = createSelector(
   (state) => selectEntities(state, 'sdgtargets'),
   (state) => selectEntities(state, 'sdgtarget_categories'),
-  (entities, sdgtargetCategories) =>
-    entities.map((entity, id) => entity.set('category_ids', sdgtargetCategories
+  (entities, sdgtargetCategories) => ENABLE_SDGS &&
+     entities.map((entity, id) => entity.set('category_ids', sdgtargetCategories
       .filter((association) => attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), id))
       .map((association) => association.getIn(['attributes', 'category_id']))
     ))
@@ -111,7 +114,7 @@ const selectCategoriesCounts = createSelector(
           }
 
           // sdgtargets
-          if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
+          if (ENABLE_SDGS && taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
             const associatedTargets = sdgtargets.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
             category = category.set('sdgtargetsTotal', associatedTargets.size);
             const associatedTargetsPublic = associatedTargets.filter((target) => !target.getIn(['attributes', 'draft']));

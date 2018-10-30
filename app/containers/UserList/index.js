@@ -23,7 +23,7 @@ import {
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
-import { USER_ROLES } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 
 import EntityList from 'containers/EntityList';
 
@@ -108,7 +108,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
   };
 }

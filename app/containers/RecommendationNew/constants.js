@@ -18,6 +18,7 @@ export const DEPENDENCIES = [
 export const FORM_INITIAL = fromJS({
   attributes: {
     title: '',
+    description: '',
     reference: '',
     accepted: true,
     response: '',

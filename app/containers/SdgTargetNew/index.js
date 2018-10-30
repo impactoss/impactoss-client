@@ -27,7 +27,8 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -64,6 +65,12 @@ import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class SdgTargetNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -78,8 +85,8 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -104,7 +111,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+        renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
         renderIndicatorControl(indicators, onCreateOption),
       ],
     },
@@ -114,7 +121,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies, onCreateOption),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption, this.context.intl),
     },
   ]);
 
@@ -133,7 +140,13 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
             },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -186,6 +199,7 @@ export class SdgTargetNew extends React.PureComponent { // eslint-disable-line r
                   aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           { saveSending &&
@@ -242,7 +256,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
@@ -298,7 +312,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath('/sdgtargets'));
+      dispatch(updatePath(PATHS.SDG_TARGETS, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

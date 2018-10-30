@@ -2,6 +2,7 @@ import { take, put, cancel, takeLatest } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { newEntity } from 'containers/App/actions';
+import { PATHS } from 'containers/App/constants';
 
 import { SAVE } from './constants';
 
@@ -9,7 +10,7 @@ export function* save({ data }) {
   yield put(newEntity({
     path: 'recommendations',
     entity: data,
-    redirect: '/recommendations',
+    redirect: PATHS.RECOMMENDATIONS,
   }));
 }
 

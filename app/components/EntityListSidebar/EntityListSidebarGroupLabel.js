@@ -16,21 +16,29 @@ import Button from 'components/buttons/Button';
 import messages from './messages';
 
 const Styled = styled(Button)`
-  display: block;
+  display: table;
   width: 100%;
   text-align: left;
-  color: ${palette('dark', 2)};
-  background-color: ${palette('light', 1)};
-  padding: 0.5em 1em 0.5em 1.5em;
+  color: ${palette('asideListGroup', 0)};
+  background-color: ${palette('asideListGroup', 1)};
+  padding: 0.25em 1em 0.25em 1.5em;
   &:hover {
-    color: ${palette('dark', 3)};
+    color: ${palette('asideListGroupHover', 0)};
+    background-color: ${palette('asideListGroupHover', 1)};
   }
+  font-size: 0.9em;
+`;
+const GroupLabel = styled.div`
+  display: table-cell;
+  vertical-align: middle;
+  width: 99%;
 `;
 const GroupIcon = styled.div`
-  color: ${palette('dark', 4)};
-  float: right;
   position: relative;
-  right: 1px;
+  right: 3px;
+  display: table-cell;
+  width: 26px;
+  vertical-align: middle;
 `;
 
 class EntityListSidebarGroupLabel extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -44,8 +52,8 @@ class EntityListSidebarGroupLabel extends React.PureComponent { // eslint-disabl
           expanded ? messages.groupExpand.hide : messages.groupExpand.show
         )}
       >
-        {label}
-        <GroupIcon><Icon name={icon} text /></GroupIcon>
+        <GroupLabel>{label}</GroupLabel>
+        <GroupIcon><Icon name={icon} /></GroupIcon>
       </Styled>
     );
   }

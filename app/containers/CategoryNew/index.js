@@ -32,7 +32,9 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
+
 import appMessages from 'containers/App/messages';
 
 import {
@@ -73,6 +75,12 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 
 export class CategoryNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -87,8 +95,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -104,6 +112,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
   getHeaderAsideFields = (taxonomy) => {
     const fields = []; // fieldGroups
+    fields.push({
+      fields: [
+        getStatusField(this.context.intl.formatMessage, appMessages),
+      ],
+    });
     if (taxonomy.getIn(['attributes', 'tags_users'])) {
       fields.push({
         fields: [
@@ -115,11 +128,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         ],
       });
     }
-    fields.push({
-      fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages),
-      ],
-    });
     return fields;
   }
 
@@ -134,11 +142,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         icon: 'connections',
         fields: [
           taxonomy.getIn(['attributes', 'tags_measures']) && measures &&
-            renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+            renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
           taxonomy.getIn(['attributes', 'tags_sdgtargets']) && sdgtargets &&
-            renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
+            renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption, this.context.intl),
           taxonomy.getIn(['attributes', 'tags_recommendations']) && recommendations &&
-            renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
+            renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
         ],
       });
     }
@@ -168,6 +176,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return fields;
   }
 
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+
   render() {
     const { taxonomy, dataReady, isAdmin, viewDomain, users, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
@@ -176,7 +186,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (taxonomy && taxonomy.get('attributes')) {
       pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
-        taxonomy: taxonomy.getIn(['attributes', 'title']),
+        taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     }
 
@@ -191,7 +201,13 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -203,6 +219,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               },
               {
                 type: 'save',
+                disabled: saveSending,
                 onClick: () => this.props.handleSubmitRemote('categoryNew.form.data'),
               }] : null
             }
@@ -228,6 +245,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             <EntityForm
               model="categoryNew.form.data"
               formData={viewDomain.form.data}
+              saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 measures,
@@ -256,6 +274,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                   aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
                 },
               }}
+              scrollContainer={this.state.scrollContainer}
             />
           }
         </Content>
@@ -316,7 +335,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
@@ -382,7 +401,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (taxonomyReference) => {
-      dispatch(updatePath(`/categories/${taxonomyReference}`));
+      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyReference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

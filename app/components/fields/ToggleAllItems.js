@@ -5,9 +5,9 @@ const ToggleAllItems = styled(Button)`
   padding: 0.5em 0;
   font-weight: bold;
   font-size: 0.85em;
-  color: ${palette('primary', 1)};
+  color: ${palette('link', 0)};
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${palette('linkHover', 0)};
   }
 `;
 export default ToggleAllItems;

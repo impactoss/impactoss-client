@@ -8,8 +8,13 @@ import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 
 
 const Styled = styled(ColumnHeader)`
-  text-align: left;
-  padding: 0 0.5em 0 1em;
+  display: none;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    display: table-cell;
+    text-align: left;
+    padding-right: 0.5em;
+    padding-left: 1em;
+  }
 `;
 
 const Wrapper = styled.div`
@@ -45,10 +50,10 @@ class ColumnExpand extends React.PureComponent { // eslint-disable-line react/pr
               onClick={onExpand}
             >
               {isExpand &&
-                <Icon name="columnCollapse" text />
+                <Icon name="columnCollapse" />
               }
               {!isExpand &&
-                <Icon name="columnExpand" text />
+                <Icon name="columnExpand" />
               }
             </ExpandButton>
           </ExpandWrapper>

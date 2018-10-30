@@ -12,8 +12,9 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { fromJS } from 'immutable';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
-// import appMessages from 'containers/App/messages';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
+import { getImportFields, getColumnAttribute } from 'utils/import';
 
 import {
   redirectIfNotPermitted,
@@ -26,8 +27,6 @@ import {
   selectReady,
   selectReadyForAuthCheck,
 } from 'containers/App/selectors';
-
-import appMessages from 'containers/App/messages';
 
 // import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -100,11 +99,27 @@ export class SdgTargetImport extends React.PureComponent { // eslint-disable-lin
             progress={this.props.progress}
             template={{
               filename: `${this.context.intl.formatMessage(messages.filename)}.csv`,
-              data: [{
-                title: this.context.intl.formatMessage(appMessages.importFields.title),
-                reference: this.context.intl.formatMessage(appMessages.importFields.referenceRequired),
-                description: this.context.intl.formatMessage(appMessages.importFields.description),
-              }],
+              data: getImportFields({
+                fields: [
+                  {
+                    attribute: 'reference',
+                    type: 'text',
+                    required: true,
+                    import: true,
+                  },
+                  {
+                    attribute: 'title',
+                    type: 'text',
+                    required: true,
+                    import: true,
+                  },
+                  {
+                    attribute: 'description',
+                    type: 'markdown',
+                    import: true,
+                  },
+                ],
+              }, this.context.intl.formatMessage),
             }}
           />
         </Content>
@@ -157,20 +172,23 @@ function mapDispatchToProps(dispatch) {
       dispatch(formActions.load(model, formData));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     handleSubmit: (formData) => {
       if (formData.get('import') !== null) {
         fromJS(formData.get('import').rows).forEach((row, index) => {
           dispatch(save({
-            attributes: row.set('draft', true).toJS(),
+            attributes: row
+              .mapKeys((k) => getColumnAttribute(k))
+              .set('draft', true)
+              .toJS(),
             saveRef: index + 1,
           }));
         });
       }
     },
     handleCancel: () => {
-      dispatch(updatePath('/sdgtargets'));
+      dispatch(updatePath(PATHS.SDG_TARGETS));
     },
     handleReset: () => {
       dispatch(resetProgress());

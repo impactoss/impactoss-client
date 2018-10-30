@@ -73,59 +73,6 @@ export const SUBMIT_INVALID = 'impactoss/App/SUBMIT_INVALID';
 
 export const DISMISS_QUERY_MESSAGES = 'impactoss/App/DISMISS_QUERY_MESSAGES';
 
-// TODO need to pull from an env file
-export const API_ENDPOINT = 'https://undp-sadata-staging.herokuapp.com';
-// export const API_ENDPOINT = 'https://sadata-production.herokuapp.com';
-export const SIGNING_URL_ENDPOINT = '/s3/sign';
-
-export const DEFAULT_LOCALE = 'en-GB';
-export const DATE_FORMAT = 'dd/mm/yyyy'; // change to format according to locale
-export const DB_DATE_FORMAT = 'YYYY-MM-DD';
-export const SHOW_FOOTER_LOGOS = true;
-
-// map server error messages
-export const SERVER_ERRORS = {
-  RECORD_OUTDATED: 'Record outdated',
-  EMAIL_FORMAT: 'Email: is not an email',
-  PASSWORD_MISMATCH: 'Password confirmation doesn\'t match Password',
-  PASSWORD_SHORT: 'Password is too short (minimum is 6 characters)',
-  PASSWORD_INVALID: 'Current password is invalid',
-  TITLE_REQUIRED: 'Title: can\'t be blank',
-  REFERENCE_REQUIRED: 'Reference: can\'t be blank',
-};
-
-export const PUBLISH_STATUSES = [
-  { value: true, label: 'Draft', message: 'ui.publishStatuses.draft' },
-  { value: false, label: 'Public', message: 'ui.publishStatuses.public' },
-];
-export const DOC_PUBLISH_STATUSES = [
-  { value: true, label: 'Public', message: 'ui.docPublishStatuses.public' },
-  { value: false, label: 'Private', message: 'ui.docPublishStatuses.private' },
-];
-export const ACCEPTED_STATUSES = [
-  { value: true, label: 'Accepted', icon: 'recommendationAccepted', message: 'ui.acceptedStatuses.accepted' },
-  { value: false, label: 'Not accepted', icon: 'recommendationNoted', message: 'ui.acceptedStatuses.noted' },
-];
-export const REPORT_FREQUENCIES = [
-  { value: 1, label: 'Monthly', message: 'ui.reportFrequencies.monthly' },
-  { value: 3, label: 'Quarterly', message: 'ui.reportFrequencies.quarterly' },
-  { value: 6, label: 'Semiannual', message: 'ui.reportFrequencies.semiannual' },
-  { value: 12, label: 'Annual', message: 'ui.reportFrequencies.annual' },
-];
-export const SORT_ORDER_OPTIONS = [
-  { value: 'asc', label: 'Ascending', icon: 'ascending', nextValue: 'desc', message: 'ui.sortOrderOptions.asc' },
-  { value: 'desc', label: 'Descending', icon: 'descending', nextValue: 'asc', message: 'ui.sortOrderOptions.desc' },
-];
-
-export const USER_ROLES = {
-  ADMIN: 1,
-  MANAGER: 2,
-  CONTRIBUTOR: 3,
-  DEFAULT: 9999,
-};
-
-export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
-
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';
 
@@ -138,29 +85,46 @@ export const DEPENDENCIES = [
   'user_roles',
   'pages',
 ];
-
+export const SORT_ORDER_OPTIONS = [
+  { value: 'asc', icon: 'ascending', nextValue: 'desc', message: 'ui.sortOrderOptions.asc' },
+  { value: 'desc', icon: 'descending', nextValue: 'asc', message: 'ui.sortOrderOptions.desc' },
+];
 export const PARAMS = {
-  GROUP_RESET: 'OFF',
+  GROUP_RESET: '0',
+  REDIRECT_ON_AUTH_SUCCESS: 'redirectOnAuthSuccess',
+  RECOVER_SUCCESS: 'recoverSuccess',
+  ALREADY_SIGNED_IN: 'alreadySignedIn',
+  NOT_SIGNED_IN: 'notSignedIn',
 };
 
-export const DB_TABLES = [
-  'users',
-  'user_roles',
-  'pages',
-  'taxonomies',
-  'categories',
-  'indicators',
-  'measure_categories',
-  'measure_indicators',
-  'measures',
-  'recommendation_categories',
-  'recommendation_measures',
-  'recommendations',
-  'sdgtarget_categories',
-  'sdgtarget_indicators',
-  'sdgtarget_measures',
-  'sdgtargets',
-  'user_categories',
-  'progress_reports',
-  'due_dates',
-];
+export const VIEWPORTS = {
+  MOBILE: 1,
+  SMALL: 2,
+  MEDIUM: 3,
+  LARGE: 4,
+};
+
+export const PATHS = {
+  ID: '/:id',
+  NEW: '/new',
+  EDIT: '/edit',
+  IMPORT: '/import',
+  PASSWORD: '/password',
+  OVERVIEW: '/overview',
+  LOGIN: '/login',
+  LOGOUT: '/logout',
+  REGISTER: '/register',
+  RESET_PASSWORD: '/resetpassword',
+  RECOVER_PASSWORD: '/recoverpassword',
+  UNAUTHORISED: '/unauthorised',
+  USERS: '/users',
+  MEASURES: '/actions',
+  INDICATORS: '/indicators',
+  SDG_TARGETS: '/sdgtargets',
+  RECOMMENDATIONS: '/recommendations',
+  PROGRESS_REPORTS: '/reports',
+  TAXONOMIES: '/categories',
+  CATEGORIES: '/category',
+  PAGES: '/pages',
+  SEARCH: '/search',
+};

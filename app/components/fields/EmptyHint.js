@@ -2,8 +2,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const EmptyHint = styled.span`
-  color: ${palette('dark', 4)};
-  font-style: italic;
+  color: ${palette('text', 1)};
   font-size: 0.85em;
 `;
 

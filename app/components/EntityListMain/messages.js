@@ -14,4 +14,12 @@ export default defineMessages({
     id: 'app.components.EntityListMain.filterFormError',
     defaultMessage: 'Errors',
   },
+  without: {
+    id: 'app.components.EntityListMain.without',
+    defaultMessage: 'Without',
+  },
+  groupSubtitle: {
+    id: 'app.components.EntityListMain.groupSubtitle',
+    defaultMessage: 'Grouped by {size} {type}',
+  },
 });

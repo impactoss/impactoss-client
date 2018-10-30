@@ -12,13 +12,14 @@ import { find } from 'lodash/collection';
 import { Map, List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { ACCEPTED_STATUSES } from 'containers/App/constants';
+import { ACCEPTED_STATUSES } from 'themes/config';
 import {
   selectReady,
   selectRecommendationTaxonomies,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
+import { PATHS } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
 
@@ -69,7 +70,13 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         onClick: () => this.props.handleImport(),
       }, {
         type: 'add',
-        title: this.context.intl.formatMessage(messages.add),
+        title: [
+          this.context.intl.formatMessage(appMessages.buttons.add),
+          {
+            title: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
+            hiddenSmall: true,
+          },
+        ],
         onClick: () => this.props.handleNew(),
       }],
     };
@@ -137,10 +144,10 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
-      dispatch(updatePath('/recommendations/new/'));
+      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}${PATHS.NEW}`, { replace: true }));
     },
     handleImport: () => {
-      dispatch(updatePath('/recommendations/import/'));
+      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}${PATHS.IMPORT}`));
     },
   };
 }

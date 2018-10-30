@@ -61,5 +61,9 @@ export default defineMessages({
       id: 'app.components.EntityListGroups.entityListHeader.noneSelected',
       defaultMessage: '{type} (showing {pageTotal} of {entitiesTotal} total)',
     },
+    notPaged: {
+      id: 'app.components.EntityListGroups.entityListHeader.notPaged',
+      defaultMessage: '{entitiesTotal} {type}',
+    },
   },
 });

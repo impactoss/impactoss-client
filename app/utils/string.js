@@ -2,7 +2,7 @@ import { toLower as loCase } from 'lodash/string';
 import { reduce } from 'lodash/collection';
 
 export const lowerCase = (str) =>
-  loCase(str).replace('un', 'UN').replace('hr', 'HR').replace('upr', 'UPR').replace('sdg', 'SDG');
+  loCase(str).replace('\bun\b', 'UN').replace('\bhr\b', 'HR').replace('\bupr\b', 'UPR').replace('sdg', 'SDG').replace('\bsmart\b', 'SMART').replace('sustainable development goal', 'Sustainable Development Goal');
 
 export const getPathFromUrl = (url) => url.split(/[?#]/)[0];
 
@@ -10,6 +10,7 @@ export const getFilenameFromUrl = (url) => url.split('/').pop();
 
 export const cleanupSearchTarget = (str) =>
   loCase(str)
+    .replace(/[’]/, '\'')
     .replace(/[ā]/, 'a')
     .replace(/[ē]/, 'e')
     .replace(/[ī]/, 'i')

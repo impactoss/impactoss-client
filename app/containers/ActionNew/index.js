@@ -12,25 +12,15 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List } from 'immutable';
 
-import {
-  renderRecommendationControl,
-  renderSdgTargetControl,
-  renderIndicatorControl,
-  renderTaxonomyControl,
-  getTitleFormField,
-  getStatusField,
-  getMarkdownField,
-  getDateField,
-  getFormField,
-} from 'utils/forms';
+import { getFields } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
-import appMessages from 'containers/App/messages';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
 
 import {
   loadEntitiesIfNeeded,
@@ -57,20 +47,28 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
+import { getInitialFormData } from 'utils/entities';
+
 import {
   selectDomain,
   selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
-import { DEPENDENCIES, FORM_INITIAL } from './constants';
+import { DEPENDENCIES } from './constants';
 import { save } from './actions';
 
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('measureNew.form.data', FORM_INITIAL);
+    this.props.initialiseForm('measureNew.form.data', getInitialFormData(MEASURE_SHAPE));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -81,62 +79,10 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
-
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage, appMessages),
-      ],
-    },
-  ]);
-
-  getHeaderAsideFields = () => ([
-    {
-      fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages),
-      ],
-    },
-  ]);
-
-  getBodyMainFields = (connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption) => ([
-    {
-      fields: [
-        getMarkdownField(this.context.intl.formatMessage, appMessages),
-      ],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
-        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
-        renderIndicatorControl(indicators, onCreateOption),
-      ],
-    },
-  ]);
-
-  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getDateField(this.context.intl.formatMessage, appMessages, 'target_date'),
-        getFormField({
-          formatMessage: this.context.intl.formatMessage,
-          appMessages,
-          controlType: 'textarea',
-          attribute: 'target_date_comment',
-        }),
-      ],
-    },
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
-      icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies, onCreateOption),
-    },
-  ]);
 
   render() {
     const { dataReady, viewDomain, connectedTaxonomies, recommendations, indicators, taxonomies, sdgtargets, onCreateOption } = this.props;
@@ -152,7 +98,13 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -195,16 +147,19 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(),
+              fields={getFields({
+                associations: {
+                  taxonomies,
+                  connectedTaxonomies,
+                  recommendations,
+                  indicators,
+                  sdgtargets,
                 },
-                body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption),
-                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
-                },
-              }}
+                onCreateOption,
+                shape: MEASURE_SHAPE,
+                contextIntl: this.context.intl,
+              })}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           {saveSending &&
@@ -263,7 +218,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
@@ -331,7 +286,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath('/actions'));
+      dispatch(updatePath(PATHS.MEASURES), { replace: true });
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

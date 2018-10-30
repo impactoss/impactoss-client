@@ -39,7 +39,8 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -80,6 +81,12 @@ import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class CategoryEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -100,8 +107,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -137,6 +144,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
   getHeaderAsideFields = (entity) => {
     const fields = []; // fieldGroups
+    fields.push({
+      fields: [
+        getStatusField(this.context.intl.formatMessage, appMessages, entity),
+        getMetaField(entity, appMessages),
+      ],
+    });
     if (entity.getIn(['taxonomy', 'attributes', 'tags_users'])) {
       fields.push({
         fields: [
@@ -149,12 +162,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         ],
       });
     }
-    fields.push({
-      fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages, entity),
-        getMetaField(entity, appMessages),
-      ],
-    });
     return fields;
   }
 
@@ -170,11 +177,11 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           icon: 'connections',
           fields: [
             entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
-              renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+              renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
             entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
-              renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
+              renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption, this.context.intl),
             entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
-              renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
+              renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
           ],
         },
       );
@@ -205,6 +212,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     return fields;
   }
 
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+
   render() {
     const { viewEntity, dataReady, isAdmin, viewDomain, users, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption } = this.props;
     const reference = this.props.params.id;
@@ -213,7 +222,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (viewEntity && viewEntity.get('taxonomy')) {
       pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
-        taxonomy: viewEntity.getIn(['taxonomy', 'attributes', 'title']),
+        taxonomy: this.getTaxTitle(viewEntity.getIn(['taxonomy', 'id'])),
       });
     }
 
@@ -225,7 +234,13 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -304,6 +319,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                   aside: this.getBodyAsideFields(viewEntity, users, isAdmin),
                 },
               }}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           {(saveSending || deleteSending) &&
@@ -364,7 +380,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
@@ -431,7 +447,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`/category/${reference}`));
+      dispatch(updatePath(`${PATHS.CATEGORIES}/${reference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
