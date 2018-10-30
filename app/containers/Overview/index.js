@@ -223,11 +223,11 @@ const DiagramButtonWrap = styled.div`
 // background-color: ${palette('primary', 1)};
 
 const DiagramButton = styled(Button)`
-  background-color: ${(props) => palette(props.paletteDefault, 0)};
+  background-color: ${palette('primary', 4)};
+  color: ${palette('primary', 1)};
   &:hover {
-    background-color: ${(props) => palette(props.paletteHover, 0)};
+    color: ${palette('primary', 0)};
   }
-  color: ${palette('primary', 4)};
   padding: 0.4em 0.5em 0.75em;
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   font-size: 0.8em;
@@ -246,6 +246,12 @@ const DiagramButton = styled(Button)`
 // font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 
 const DiagramButtonMain = styled(DiagramButton)`
+  color: ${palette('primary', 4)};
+  background-color: ${palette('primary', 1)};
+  &:hover {
+    color: ${palette('primary', 4)};
+    background-color: ${palette('primary', 0)};
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0.4em 0.75em 1em;
     &:before {

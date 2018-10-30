@@ -23,7 +23,7 @@ export const DATE_FORMAT = 'dd/mm/yyyy';
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
-export const SHOW_HEADER_TITLE = false;
+export const SHOW_HEADER_TITLE = true;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
@@ -40,7 +40,7 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = false;
 // - app.containers.App.app.claim
 export const SHOW_HOME_TITLE = true;
 
-export const SHOW_BRAND_ON_HOME = true;
+export const SHOW_BRAND_ON_HOME = false;
 export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = true;
 
 // show footer logo section
@@ -61,12 +61,17 @@ export const TAXONOMY_GROUPS = [
   {
     id: 1,
     priorityMin: 0,
-    priorityMax: 9,
+    priorityMax: 4,
     default: true,
   },
   {
     id: 2,
-    priorityMin: 10,
+    priorityMin: 5,
+    priorityMax: 6,
+  },
+  {
+    id: 3,
+    priorityMin: 7,
     priorityMax: 19,
   },
 ];
@@ -86,7 +91,7 @@ export const PROGRESS_CATEGORY_REFERENCES = {
 // General ********************
 
 export const ENDPOINTS = {
-  API: 'https://api.impactoss.org', // server API endpoint
+  API: 'https://undp-sadata-staging.herokuapp.com', // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',

@@ -12,7 +12,7 @@ injectGlobal`
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.428571429;
-    color: #1c2121;
+    color: #344547;
   }
   button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -21,22 +21,22 @@ injectGlobal`
     outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
   }
   #app {
-    background-color: #ffffff;
+    background-color: #F1F3F3;
     min-height: 100%;
     min-width: 100%;
   }
 
   a {
-    color: #0077d8;
+    color: #eb6e51;
     text-decoration: none;
 
     &:hover {
-      color: #0063b5;
+      color: #d66149;
     }
   }
   h1, h2, h3, h4, h5, h6 {
     line-height: 1.25;
-    font-weight: 500;
+    font-weight: 700;
     margin-top: 20px;
     margin-bottom: 10px;
   }
