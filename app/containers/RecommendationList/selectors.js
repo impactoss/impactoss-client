@@ -29,7 +29,7 @@ import { CONFIG } from './constants';
 const selectRecommendationsNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'recommendations',
-    searchAttributes: ['reference', 'title'],
+    searchAttributes: CONFIG.search || ['reference', 'title'],
     locationQuery,
   }),
   (state) => selectRecommendationConnections(state),
