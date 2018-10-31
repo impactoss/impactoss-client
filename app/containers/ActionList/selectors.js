@@ -99,7 +99,7 @@ export const selectConnectedTaxonomies = createSelector(
 const selectMeasuresNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'measures',
-    searchAttributes: ['title'],
+    searchAttributes: CONFIG.search || ['title'],
     locationQuery,
   }),
   (state) => selectConnections(state),

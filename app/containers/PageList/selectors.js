@@ -17,7 +17,7 @@ import { CONFIG } from './constants';
 export const selectPages = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'pages',
-    searchAttributes: ['title'],
+    searchAttributes: CONFIG.search || ['title'],
     locationQuery,
   }),
   selectSortByQuery,

@@ -92,7 +92,7 @@ export const selectConnectedTaxonomies = createSelector(
 const selectSdgTargetsNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'sdgtargets',
-    searchAttributes: ['title', 'reference'],
+    searchAttributes: CONFIG.search || ['title', 'reference'],
     locationQuery,
   }),
   (state) => selectConnections(state),
