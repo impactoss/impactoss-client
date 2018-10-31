@@ -26,7 +26,7 @@ import { CONFIG } from './constants';
 const selectUsersNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'users',
-    searchAttributes: ['name'],
+    searchAttributes: CONFIG.search || ['name'],
     locationQuery,
   }),
   (state) => selectEntities(state, 'user_categories'),
