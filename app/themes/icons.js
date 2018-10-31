@@ -98,14 +98,14 @@ const icons = {
     ],
   },
   // 8: State
-  taxonomy_8: {
+  taxonomy_9: {
     size: 40,
     paths: [
       'M12,6h2V34H12ZM27,8c-2.08,0-4.71-1-7-1a6.63,6.63,0,0,0-4,1V20a6.63,6.63,0,0,1,4-1c2.29-.05,4,1,7,1s4.92-.33,6-1V7C31.92,7.67,29.08,8,27,8Z',
     ],
   },
   // 9: SMART
-  taxonomy_9: {
+  taxonomy_10: {
     size: 40,
     paths: [
       'M18,17h9v2H18Zm0,7h9V22H18Zm0,5h9V27H18Z',
@@ -114,7 +114,7 @@ const icons = {
     ],
   },
   // 10: Progress status
-  taxonomy_10: {
+  taxonomy_8: {
     size: 40,
     paths: [
       'M15.31,9.5,14.09,6.76a14.68,14.68,0,0,0-3.27,2l1.91,2.32A11.2,11.2,0,0,1,15.31,9.5Z',

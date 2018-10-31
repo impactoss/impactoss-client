@@ -41,7 +41,7 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = false;
 export const SHOW_HOME_TITLE = true;
 
 export const SHOW_BRAND_ON_HOME = false;
-export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = true;
+export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
 // show footer logo section
 export const SHOW_FOOTER_PARTNERS = true;
@@ -61,22 +61,22 @@ export const TAXONOMY_GROUPS = [
   {
     id: 1,
     priorityMin: 0,
-    priorityMax: 4,
+    priorityMax: 10,
     default: true,
   },
   {
     id: 2,
-    priorityMin: 5,
-    priorityMax: 6,
+    priorityMin: 11,
+    priorityMax: 20,
   },
   {
     id: 3,
-    priorityMin: 7,
-    priorityMax: 19,
+    priorityMin: 21,
+    priorityMax: 30,
   },
 ];
 
-export const PROGRESS_TAXONOMY_ID = 10;
+export const PROGRESS_TAXONOMY_ID = 8;
 
 // WARNING: references as assigned by user
 export const PROGRESS_CATEGORY_REFERENCES = {

@@ -87,6 +87,7 @@ const Title = styled.h1`
   color:${palette('headerBrand', 0)};
   font-family: ${(props) => props.theme.fonts.title};
   font-size: ${(props) => props.theme.sizes.home.text.titleMobile};
+  text-transform: uppercase;
   margin-top: 0.5em;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.home.text.title};

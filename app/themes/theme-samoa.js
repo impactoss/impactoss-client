@@ -116,8 +116,9 @@ theme.palette = {
   // 5: Thematic cluster
   // 6: Organisation
   // 7: SDGs
-  taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF'],
-  taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#65C99B', '#238680', '#4EA53C', '#006096', '#178EC1', '#08C4F8'],
+  // 8: Progress status
+  taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#007c3a'],
+  taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#65C99B', '#238680', '#4EA53C', '#006096', '#178EC1', '#007034'],
 
   // bg inactive, bg hover, icon
   smartInactive: [
@@ -295,7 +296,7 @@ theme.sizes = {
   },
   header: {
     banner: {
-      height: 88,
+      height: 79,
       heightMobile: 50,
     },
     nav: {
@@ -320,8 +321,8 @@ theme.sizes = {
     text: {
       title: '2.8em',
       titleMobile: '1.4em',
-      claim: '1.3em',
-      claimMobile: '1em',
+      claim: '1em',
+      claimMobile: '0.8em',
     },
   },
 };
