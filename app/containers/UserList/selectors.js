@@ -10,7 +10,7 @@ import {
   selectSortByQuery,
   selectSortOrderQuery,
 } from 'containers/App/selectors';
-import { USER_ROLES } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 
 import {
   filterEntitiesByConnection,
@@ -26,7 +26,7 @@ import { CONFIG } from './constants';
 const selectUsersNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'users',
-    searchAttributes: ['name'],
+    searchAttributes: CONFIG.search || ['name'],
     locationQuery,
   }),
   (state) => selectEntities(state, 'user_categories'),
@@ -36,7 +36,7 @@ const selectUsersNested = createSelector(
       const entityRoleIds = entityRoles
         .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
         .map((association) => association.getIn(['attributes', 'role_id']));
-      const entityHighestRoleId = entityRoleIds.reduce((memo, roleId) => roleId < memo ? roleId : memo, USER_ROLES.DEFAULT);
+      const entityHighestRoleId = entityRoleIds.reduce((memo, roleId) => roleId < memo ? roleId : memo, USER_ROLES.DEFAULT.value);
       return entity
         .set(
           'categories',
@@ -46,7 +46,7 @@ const selectUsersNested = createSelector(
         )
         .set(
           'roles',
-          entityHighestRoleId !== USER_ROLES.DEFAULT
+          entityHighestRoleId !== USER_ROLES.DEFAULT.value
             ? Map({ 0: entityHighestRoleId })
             : Map()
         );

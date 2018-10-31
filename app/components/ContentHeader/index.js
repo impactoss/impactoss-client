@@ -11,9 +11,12 @@ import SupTitle from 'components/SupTitle';
 import ButtonFactory from 'components/buttons/ButtonFactory';
 
 const Styled = styled.div`
-  padding: ${(props) => props.isModal ? '20px 0 20px 40px' : '3em 0 1em'};
+  padding: ${(props) => props.isModal ? '0 0 10px' : '1em 0 0.5em'};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: ${(props) => props.isModal ? '20px 0 20px 40px' : '3em 0 1em'};
+  }
   border-bottom: ${(props) => props.hasBottomBorder ? '1px solid' : 'none'};
-  border-color: ${palette('light', 2)};
+  border-color: ${palette('light', 1)};
 `;
 
 const TitleLarge = styled.h1`
@@ -40,19 +43,49 @@ const ButtonWrap = styled.span`
   }
 `;
 const Table = styled.span`
-  display: table;
-  width: 100%;
+  display: block;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: table;
+    width: 100%;
+    min-height: 62px;
+  }
 `;
 const TableCell = styled.span`
+  display: ${(props) => {
+    if (props.hiddenMobile) {
+      return 'none';
+    }
+    return 'block';
+  }};
+  clear: both;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: ${(props) => {
+      if (props.visibleMobile) {
+        return 'none';
+      }
+      return 'table-cell';
+    }};
+    vertical-align: middle;
+  }
+`;
+
+const TableCellInner = styled(TableCell)`
   display: table-cell;
   vertical-align: middle;
 `;
 
 const ButtonGroup = styled.div`
-  vertical-align: middle;
+  display: table;
+  float: right;
+  text-align: right;
+  margin-bottom: 10px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    text-align:right;
+    margin-bottom: 0;
   }
+`;
+
+const SubTitle = styled.p`
+  font-size: 1.1em;
 `;
 
 class ContentHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -78,7 +111,8 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
     }
   }
   render() {
-    const { type, icon, supTitle, title, buttons } = this.props;
+    const { type, icon, supTitle, title, buttons, subTitle } = this.props;
+
     return (
       <Styled
         hasBottomBorder={type === CONTENT_PAGE || type === CONTENT_MODAL}
@@ -88,23 +122,43 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
           <SupTitle icon={icon} title={supTitle} />
         }
         <Table>
+          { buttons &&
+            <TableCell visibleMobile>
+              <ButtonGroup>
+                {
+                  buttons.map((button, i) => (
+                    <TableCellInner key={i}>
+                      <ButtonWrap>
+                        <ButtonFactory button={button} />
+                      </ButtonWrap>
+                    </TableCellInner>
+                  ))
+                }
+              </ButtonGroup>
+            </TableCell>
+          }
           <TableCell>
             {this.renderTitle(type, title, icon)}
           </TableCell>
           { buttons &&
-            <TableCell>
+            <TableCell hiddenMobile>
               <ButtonGroup>
                 {
                   buttons.map((button, i) => (
-                    <ButtonWrap key={i}>
-                      <ButtonFactory button={button} />
-                    </ButtonWrap>
+                    <TableCellInner key={i}>
+                      <ButtonWrap>
+                        <ButtonFactory button={button} />
+                      </ButtonWrap>
+                    </TableCellInner>
                   ))
                 }
               </ButtonGroup>
             </TableCell>
           }
         </Table>
+        { subTitle &&
+          <SubTitle>{subTitle}</SubTitle>
+        }
       </Styled>
     );
   }
@@ -114,6 +168,7 @@ ContentHeader.propTypes = {
   title: PropTypes.string.isRequired,
   buttons: PropTypes.array,
   supTitle: PropTypes.string,
+  subTitle: PropTypes.string,
   icon: PropTypes.string,
   type: PropTypes.string,
 };

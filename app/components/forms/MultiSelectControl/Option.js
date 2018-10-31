@@ -24,13 +24,13 @@ const New = styled.span`
   border-radius: 4px;
 `;
 const Id = styled.span`
-  font-weight: bold;
-  color: ${palette('dark', 4)}
+  color: ${palette('text', 1)};
+  font-size: 0.9em;
 `;
 const IdSpacer = styled.span`
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  color: ${palette('dark', 4)};
+  padding-left: 0.25em;
+  padding-right: 0.25em;
+  color: ${palette('text', 1)};
 `;
 // <Label bold={props.bold} italic={props.isNew}>
 class Option extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -51,13 +51,13 @@ class Option extends React.Component { // eslint-disable-line react/prefer-state
     return (
       <Label bold={false}>
         {draft &&
-          <ItemStatus draft />
+          <ItemStatus draft top />
         }
         {reference &&
           <Id>{reference}</Id>
         }
         {reference &&
-          <IdSpacer>|</IdSpacer>
+          <IdSpacer />
         }
         { optionLabel }
         {isNew &&

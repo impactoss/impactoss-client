@@ -19,6 +19,20 @@ export default defineMessages({
       defaultMessage: 'Edit',
     },
   },
+  sidebarToggle: {
+    showFilter: {
+      id: 'app.components.EntityListSidebar.sidebarToggle.showFilter',
+      defaultMessage: 'Show filter options',
+    },
+    showFilterEdit: {
+      id: 'app.components.EntityListSidebar.sidebarToggle.showFilterEdit',
+      defaultMessage: 'Show filter & edit options',
+    },
+    hide: {
+      id: 'app.components.EntityListSidebar.sidebarToggle.hide',
+      defaultMessage: 'Hide options',
+    },
+  },
   groupExpand: {
     show: {
       id: 'app.components.EntityListSidebar.groupExpand.show',

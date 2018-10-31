@@ -22,6 +22,7 @@ const getEntitySortValueMapper = (entity, sortBy) => {
     case 'measures':
     case 'recommendations':
     case 'sdgtargets':
+    case 'sortBy':
       return entity.get(sortBy) || 0;
     case 'dueDateThenUpdated':
       return entity.get('due_date')
@@ -43,7 +44,17 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
   } else if (typeof valueB === 'undefined' || valueB === null) {
     result = -1;
   } else if (type === 'date') {
-    result = new Date(valueA) < new Date(valueB) ? -1 : 1;
+    const aIsDate = new Date(valueA) instanceof Date && !isNaN(new Date(valueA));
+    const bIsDate = new Date(valueB) instanceof Date && !isNaN(new Date(valueB));
+    if (aIsDate && !bIsDate) {
+      result = 1;
+    } else if (!aIsDate && bIsDate) {
+      result = -1;
+    } else if (aIsDate && bIsDate) {
+      result = new Date(valueA) < new Date(valueB) ? -1 : 1;
+    } else {
+      result = 0;
+    }
   } else {
     const intA = parseInt(valueA, 10);
     const intB = parseInt(valueB, 10);
@@ -80,9 +91,10 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
   return sortOrder === 'desc' ? result * -1 : result;
 };
 
-export const sortEntities = (entities, sortOrder, sortBy, type) =>
-  entities
-    .sortBy(
-      (entity) => getEntitySortValueMapper(entity, sortBy || 'id'),
-      (a, b) => getEntitySortComparator(a, b, sortOrder || 'asc', type)
-    ).toList();
+export const sortEntities = (entities, sortOrder, sortBy, type, asList = true) => {
+  const sorted = entities.sortBy(
+    (entity) => getEntitySortValueMapper(entity, sortBy || 'id'),
+    (a, b) => getEntitySortComparator(a, b, sortOrder || 'asc', type)
+  );
+  return asList ? sorted.toList() : sorted;
+};

@@ -18,7 +18,7 @@ import {
   // closeEntity
 } from 'containers/App/actions';
 
-import { CONTENT_PAGE } from 'containers/App/constants';
+import { PATHS, CONTENT_PAGE } from 'containers/App/constants';
 
 import Footer from 'components/Footer';
 import Loading from 'components/Loading';
@@ -161,11 +161,8 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: () => {
-      dispatch(updatePath(`/pages/edit/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.PAGES}${PATHS.EDIT}/${props.params.id}`, { replace: true }));
     },
-    // handleClose: () => {
-    //   dispatch(closeEntity('/pages'));
-    // },
   };
 }
 

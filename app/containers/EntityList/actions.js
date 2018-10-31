@@ -22,6 +22,7 @@ import {
   SORTORDER_CHANGE,
   PATH_CHANGE,
   DISMISS_ERROR,
+  RESET_SEARCH_QUERY,
 } from './constants';
 
 export function setClientPath(path) {
@@ -87,6 +88,13 @@ export function updateQuery(value) {
   return {
     type: UPDATE_QUERY,
     value,
+  };
+}
+
+export function resetSearchQuery(values) {
+  return {
+    type: RESET_SEARCH_QUERY,
+    values,
   };
 }
 

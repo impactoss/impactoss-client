@@ -12,7 +12,9 @@ import CategoryListItem from 'components/categoryList/CategoryListItem';
 import { SORT_ORDER_OPTIONS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
-const Styled = styled.div``;
+const Styled = styled.div`
+  position: relative;
+`;
 const CategoryListBody = styled.div`
   padding-top: 1em
 `;
@@ -133,6 +135,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       };
     }));
   };
+
   render() {
     const {
       taxonomy,

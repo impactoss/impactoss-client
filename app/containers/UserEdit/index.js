@@ -44,7 +44,8 @@ import {
   selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
-import { CONTENT_SINGLE, USER_ROLES } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import Messages from 'components/Messages';
@@ -65,6 +66,12 @@ import messages from './messages';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class UserEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -81,8 +88,8 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -112,7 +119,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
         getMetaField(entity, appMessages),
       ]
       : [
-        getRoleField(entity, this.context.intl.formatMessage, appMessages),
+        getRoleField(entity),
         getMetaField(entity, appMessages),
       ],
     },
@@ -124,7 +131,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
   getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
-      fields: renderTaxonomyControl(taxonomies, onCreateOption),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption, this.context.intl),
     },
   ]);
 
@@ -136,7 +143,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
         // the session user can only assign roles "lower" (that is higher id) than his/her own role
         // and when the session user has a "higher" (lower id) role than the user profile being edited
       return roles
-        .filter((role) => sessionUserHighestRoleId === USER_ROLES.ADMIN
+        .filter((role) => sessionUserHighestRoleId === USER_ROLES.ADMIN.value
           || (sessionUserHighestRoleId < userHighestRoleId && sessionUserHighestRoleId < parseInt(role.get('id'), 10))
         );
     }
@@ -158,7 +165,13 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -217,9 +230,10 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 },
                 body: {
                   main: this.getBodyMainFields(),
-                  aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER) && this.getBodyAsideFields(taxonomies, onCreateOption),
+                  aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER.value) && this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           { saveSending &&
@@ -301,7 +315,7 @@ function mapDispatchToProps(dispatch) {
       const newHighestRole = parseInt(formData.get('associatedRole'), 10);
 
       // store all higher roles
-      const newRoleIds = newHighestRole === USER_ROLES.DEFAULT
+      const newRoleIds = newHighestRole === USER_ROLES.DEFAULT.value
         ? List()
         : roles.reduce((memo, role) =>
           newHighestRole <= parseInt(role.get('id'), 10)
@@ -327,7 +341,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`/users/${reference}`));
+      dispatch(updatePath(`${PATHS.USERS}/${reference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

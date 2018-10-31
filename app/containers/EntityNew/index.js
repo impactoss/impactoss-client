@@ -37,14 +37,22 @@ import { FORM_INITIAL } from './constants';
 import messages from './messages';
 
 export class EntityNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
   componentWillMount() {
     this.props.initialiseForm('entityNew.form.data', FORM_INITIAL);
   }
   componentWillReceiveProps(nextProps) {
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
+
+  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
 
   render() {
     const { viewDomain, path, attributes, inModal, taxonomy } = this.props;
@@ -53,14 +61,18 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
     let pageTitle = this.context.intl.formatMessage(messages[path].pageTitle);
     if (taxonomy && taxonomy.get('attributes')) {
       pageTitle = this.context.intl.formatMessage(messages[path].pageTitleTaxonomy, {
-        taxonomy: taxonomy.getIn(['attributes', 'title']),
+        taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     }
 
     return (
       <div>
         <Content
-          innerRef={(node) => { this.ScrollContainer = node; }}
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
           inModal={inModal}
         >
           <ContentHeader
@@ -105,7 +117,8 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             )}
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
-            fields={getEntityFields(path, { taxonomy }, this.context.intl.formatMessage, appMessages)}
+            fields={getEntityFields(path, { taxonomy }, this.context.intl, appMessages)}
+            scrollContainer={this.state.scrollContainer}
           />
           {saveSending &&
             <Loading />

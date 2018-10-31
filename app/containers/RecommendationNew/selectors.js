@@ -1,6 +1,9 @@
 import { createSelector } from 'reselect';
 
-import { selectEntities } from 'containers/App/selectors';
+import {
+  selectEntities,
+  selectTaxonomiesSorted,
+} from 'containers/App/selectors';
 import { prepareTaxonomiesMultiple } from 'utils/entities';
 
 export const selectDomain = createSelector(
@@ -9,7 +12,7 @@ export const selectDomain = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>
     prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])

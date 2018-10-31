@@ -11,13 +11,15 @@ injectGlobal`
   body {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
-    line-height: 1.64em;
+    line-height: 1.428571429;
     color: #344547;
   }
   button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
-
+  :focus, :visited:focus {
+    outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
+  }
   #app {
     background-color: #F1F3F3;
     min-height: 100%;
@@ -39,29 +41,56 @@ injectGlobal`
     margin-bottom: 10px;
   }
   h1 {
-    font-size: 2.6em;
+    font-weight: 700;
+    font-size: 2em;
   }
   h2 {
-    font-size: 2.25em;
-    font-weight: 500;
+    font-size: 1.6em;
   }
   h3 {
-    font-size: 1.7em;
+    font-size: 1.3em;
   }
   h4 {
-    font-size: 1.5em;
+    font-size: 1.1em;
   }
   h5 {
-    font-size: 1.25em;
-  }
-  h6 {
     font-size: 1em;
   }
-
+  h6 {
+    font-size: 0.9em;
+  }
+  @media (min-width: 769px) {
+    h1 {
+      font-size: 2.3em;
+    }
+    h2 {
+      font-size: 2.15em;
+    }
+    h3 {
+      font-size: 1.9em;
+    }
+    h4 {
+      font-size: 1.5em;
+    }
+    h5 {
+      font-size: 1.25em;
+    }
+    h6 {
+      font-size: 1em;
+    }
+  }
+  @media (min-width: 1200px) {
+    h1 {
+      font-size: 2.6em;
+    }
+    h2 {
+      font-size: 2.25em;
+    }
+  }
 
   p {
     margin-top: 0;
-    margin-bottom:16px;
+    margin-bottom: 16px;
   }
 
   * {
@@ -101,10 +130,20 @@ injectGlobal`
     .react-markdown {
       p {
         &:first-child{
-          font-size: 1.75em;
-          line-height: 1.4em;
+          font-size: 1.2em;
           color: #6A7880;
-          padding-bottom: 15px;
+        }
+      }
+    }
+  }
+  @media (min-width: 769px) {
+    .content-page {
+      .react-markdown {
+        p {
+          &:first-child{
+            font-size: 1.5em;
+            padding-bottom: 20px;
+          }
         }
       }
     }
@@ -112,19 +151,27 @@ injectGlobal`
 
   .new-entity-modal {
     position: absolute;
-    top: 40px;
-    left: 40px;
-    right: 40px;
-    bottom: 40px;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
     border: 0;
     overflow: auto;
     --webkit-overflow-scrolling: touch;
     border-radius: 0;
     outline: none;
-    padding: 20px;
     margin-right: auto;
     margin-left: auto;
     max-width: 1170px;
+  }
+  @media (min-width: 769px) {
+    .new-entity-modal {
+      padding: 20px;
+      top: 40px;
+      left: 40px;
+      right: 40px;
+      bottom: 40px;
+    }
   }
 
   .new-entity-modal-overlay {
@@ -140,5 +187,9 @@ injectGlobal`
     vertical-align: middle;
     position: relative;
     bottom: 1px;
+  }
+
+  ._react-file-reader-input {
+    display: inline-block;
   }
 `;

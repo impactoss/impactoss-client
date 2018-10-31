@@ -1,4 +1,5 @@
 import { reduce } from 'lodash/collection';
+import { sortEntities } from 'utils/sort';
 
 // figure out filter groups for filter panel
 export const makeFilterGroups = (
@@ -16,17 +17,18 @@ export const makeFilterGroups = (
     // first prepare taxonomy options
     filterGroups.taxonomies = {
       id: 'taxonomies', // filterGroupId
-      label: messages.taxonomies,
+      label: messages.taxonomyGroup,
       show: true,
       icon: 'categories',
-      options: taxonomies.reduce((taxOptions, taxonomy) => ({
-        ...taxOptions,
-        [taxonomy.get('id')]: {
-          id: taxonomy.get('id'), // filterOptionId
-          label: taxonomy.getIn(['attributes', 'title']),
-          active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
-        },
-      }), {}),
+      options: sortEntities(taxonomies, 'asc', 'priority').reduce((memo, taxonomy) =>
+        memo.concat([
+          {
+            id: taxonomy.get('id'), // filterOptionId
+            label: messages.taxonomies(taxonomy.get('id')),
+            active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+          },
+        ])
+      , []),
     };
   }
 
@@ -38,18 +40,17 @@ export const makeFilterGroups = (
       label: messages.connectedTaxonomies,
       show: true,
       icon: 'connectedCategories',
-      options: connectedTaxonomies.reduce((taxOptions, taxonomy) =>
+      options: sortEntities(connectedTaxonomies, 'asc', 'priority').reduce((taxOptions, taxonomy) =>
         config.connectedTaxonomies.exclude && taxonomy.getIn(['attributes', config.connectedTaxonomies.exclude])
           ? taxOptions
-          : ({
-            ...taxOptions,
-            [taxonomy.get('id')]: {
+          : taxOptions.concat([
+            {
               id: taxonomy.get('id'), // filterOptionId
-              label: taxonomy.getIn(['attributes', 'title']),
+              label: messages.taxonomies(taxonomy.get('id')),
               active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
             },
-          })
-      , {}),
+          ])
+      , []),
     };
   }
 
@@ -60,16 +61,15 @@ export const makeFilterGroups = (
       id: 'connections', // filterGroupId
       label: messages.connections,
       show: true,
-      options: reduce(config.connections.options, (options, option) => ({
-        ...options,
-        [option.path]: {
+      options: reduce(config.connections.options, (options, option) =>
+        options.concat({
           id: option.path, // filterOptionId
           label: option.label,
           message: option.message,
           icon: option.path,
           active: !!activeFilterOption && activeFilterOption.optionId === option.path,
-        },
-      }), {}),
+        })
+      , []),
     };
   }
 
@@ -82,17 +82,14 @@ export const makeFilterGroups = (
       show: true,
       options: reduce(config.attributes.options, (options, option) =>
         (typeof option.role === 'undefined' || hasUserRole[option.role])
-          ? {
-            ...options,
-            [option.attribute]: {
-              id: option.attribute, // filterOptionId
-              label: option.label,
-              message: option.message,
-              active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
-            },
-          }
+          ? options.concat([{
+            id: option.attribute, // filterOptionId
+            label: option.label,
+            message: option.message,
+            active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
+          }])
           : options
-      , {}),
+      , []),
     };
   }
 

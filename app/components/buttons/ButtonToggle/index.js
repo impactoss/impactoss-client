@@ -7,6 +7,7 @@ import ButtonDefaultWithIcon from 'components/buttons/ButtonDefaultWithIcon';
 const Styled = styled.div`
   position: relative;
   height: 50px;
+  max-width: 230px;
 `;
 
 const ButtonActive = styled.span`
@@ -30,6 +31,7 @@ class ButtonToggle extends React.PureComponent { // eslint-disable-line react/pr
   render() {
     const { options, activePanel, onSelect } = this.props;
     if (options.length === 2) {
+      const optionInactive = options.find((option) => option.panel !== activePanel);
       return (
         <Styled>
           { options.map((option, i) => {
@@ -44,9 +46,13 @@ class ButtonToggle extends React.PureComponent { // eslint-disable-line react/pr
                     icon={option.icon}
                     iconRight={i !== 0}
                     title={option.label}
-                    disabled
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      onSelect(optionInactive.panel);
+                    }}
                     fullWidth
                     strong
+                    outline
                     align={i === 0 ? 'left' : 'right'}
                   />
                 </ButtonActive>

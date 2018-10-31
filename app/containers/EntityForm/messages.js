@@ -15,7 +15,7 @@ export default defineMessages({
       defaultMessage: 'Cancel',
     },
     confirmDelete: {
-      id: 'app.containers.EntityForm.buttons.donfirmDelete',
+      id: 'app.containers.EntityForm.buttons.confirmDelete',
       defaultMessage: 'Delete',
     },
   },

@@ -1,4 +1,4 @@
-import { USER_ROLES, PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'containers/App/constants';
+import { USER_ROLES, PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'themes/config';
 
 export const DEPENDENCIES = [
   'user_roles',
@@ -15,7 +15,7 @@ export const DEPENDENCIES = [
 export const CONFIG = {
   serverPath: 'recommendations',
   clientPath: 'recommendations',
-  search: ['reference', 'title'],
+  search: ['reference', 'title', 'description'],
   sorting: [
     {
       attribute: 'id', // proxy for created at
@@ -74,7 +74,7 @@ export const CONFIG = {
         message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
-        role: USER_ROLES.CONTRIBUTOR,
+        role: USER_ROLES.CONTRIBUTOR.value,
       },
     ],
   },

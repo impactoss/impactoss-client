@@ -7,12 +7,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import EntityListSidebarGroupLabel from './EntityListSidebarGroupLabel';
 import EntityListSidebarOption from './EntityListSidebarOption';
 
 const Group = styled.div`
-  margin-bottom: 1px;
+  border-bottom: 1px solid;
+  border-color: ${(props) => props.expanded ? palette('aside', 0) : palette('light', 2)};
+  &:last-child {
+    border-bottom: 0;
+  }
 `;
 
 class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -25,7 +30,7 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
         { groups && groups.entrySeq().map(([groupId, group]) =>
           group.get('options') && group.get('options').size > 0
             ? (
-              <Group key={groupId}>
+              <Group key={groupId} expanded={this.props.expanded[groupId]}>
                 <EntityListSidebarGroupLabel
                   label={group.get('label')}
                   icon={group.get('icon') || group.get('id')}
@@ -37,8 +42,8 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
                 />
                 { this.props.expanded[groupId] &&
                   <div>
-                    { group.get('options') &&
-                      group.get('options').valueSeq().map((option, i) => (
+                    {
+                      group.get('options').map((option, i) => (
                         <EntityListSidebarOption
                           key={i}
                           option={option}

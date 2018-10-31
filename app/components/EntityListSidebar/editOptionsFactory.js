@@ -19,13 +19,13 @@ export const checkedState = (count, length) => {
   return CHECKBOX.UNCHECKED;
 };
 
-export const makeActiveEditOptions = (entities, config, activeEditOption, taxonomies, connections, connectedTaxonomies, messages) => {
+export const makeActiveEditOptions = (entities, config, activeEditOption, taxonomies, connections, connectedTaxonomies, messages, contextIntl) => {
   // create edit options
   switch (activeEditOption.group) {
     case 'taxonomies':
       return makeTaxonomyEditOptions(entities, taxonomies, activeEditOption, messages);
     case 'connections':
-      return makeConnectionEditOptions(entities, config, connections, connectedTaxonomies, activeEditOption, messages);
+      return makeConnectionEditOptions(entities, config, connections, connectedTaxonomies, activeEditOption, messages, contextIntl);
     case 'attributes':
       return makeAttributeEditOptions(entities, config, activeEditOption, messages);
     default:
@@ -101,7 +101,7 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
   return editOptions;
 };
 
-export const makeConnectionEditOptions = (entities, config, connections, connectedTaxonomies, activeEditOption, messages) => {
+export const makeConnectionEditOptions = (entities, config, connections, connectedTaxonomies, activeEditOption, messages, contextIntl) => {
   const option = find(config.connections.options, (o) => o.path === activeEditOption.optionId);
 
   const editOptions = {
@@ -113,7 +113,7 @@ export const makeConnectionEditOptions = (entities, config, connections, connect
     required: false,
     advanced: true,
     selectAll: true,
-    tagFilterGroups: option && makeTagFilterGroups(connectedTaxonomies),
+    tagFilterGroups: option && makeTagFilterGroups(connectedTaxonomies, contextIntl),
   };
 
   if (option) {

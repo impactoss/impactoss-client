@@ -3,7 +3,11 @@
  * IndicatorView constants
  *
  */
-export const DEPENDENCIES = [
+
+import { ENABLE_SDGS } from 'themes/config';
+
+export const DEPENDENCIES = ENABLE_SDGS
+? [
   'user_roles',
   'measures',
   'sdgtargets',
@@ -19,5 +23,20 @@ export const DEPENDENCIES = [
   'recommendation_measures',
   'measure_categories',
   'sdgtarget_categories',
+  'user_roles',
+]
+: [
+  'user_roles',
+  'measures',
+  'users',
+  'indicators',
+  'measure_indicators',
+  'progress_reports',
+  'due_dates',
+  'taxonomies',
+  'categories',
+  'recommendations',
+  'recommendation_measures',
+  'measure_categories',
   'user_roles',
 ];

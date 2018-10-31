@@ -14,6 +14,7 @@ import appMessage from 'utils/app-message';
 import { lowerCase } from 'utils/string';
 
 import Icon from 'components/Icon';
+import Button from 'components/buttons/Button';
 import ButtonTagFilter from 'components/buttons/ButtonTagFilter';
 import ButtonTagFilterInverse from 'components/buttons/ButtonTagFilterInverse';
 import DebounceInput from 'react-debounce-input';
@@ -21,27 +22,40 @@ import DebounceInput from 'react-debounce-input';
 import messages from './messages';
 
 const Search = styled.div`
-  display:flex;
-  flex-direction:row;
+  display: flex;
+  flex-direction: row;
   width: 100%;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 0)};
   color: ${palette('dark', 2)};
-  padding: ${(props) => props.small ? '0 7px' : '7px'};
+  padding: ${(props) => props.small ? '2px 7px' : '7px'};
   border: 1px solid ${(props) => props.active ? palette('light', 4) : palette('light', 2)};
   box-shadow: 0 0 3px 0 ${(props) => props.active ? palette('dark', 2) : 'transparent'};
   min-height: ${(props) => props.small ? 30 : 36}px;
   border-radius: 5px;
+  position: relative;
 `;
 const SearchInput = styled(DebounceInput)`
-  background-color: ${palette('primary', 4)};
-  border:none;
-  padding:3px;
+  background-color: ${palette('background', 0)};
+  border: none;
+  padding: 3px;
   &:focus {
     outline: none;
   }
-  flex:1
+  flex: 1;
+  font-size: 0.85em;
 `;
-const Tags = styled.div``;
+const Tags = styled.div`
+  margin-top: -2px;
+  margin-bottom: -2px;
+`;
+
+const Clear = styled(Button)`
+  padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: ${palette('background', 4)};
+`;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -73,6 +87,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       filters,
       searchQuery,
       onSearch,
+      placeholder,
     } = this.props;
     // TODO set focus to input when clicking wrapper
     //  see https://github.com/nkbt/react-debounce-input/issues/65
@@ -84,56 +99,66 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
 
     return (
       <Search active={this.state.active} small={this.props.multiselect}>
-        <Tags>
-          {
-            filters.map((filter, i) => filter.inverse
-              ? (
-                <ButtonTagFilterInverse
-                  key={i}
-                  onClick={filter.onClick}
-                  palette={filter.type}
-                  paletteHover={`${filter.type}Hover`}
-                  pIndex={parseInt(filter.id, 10) || 0}
-                  disabled={!filter.onClick}
-                >
-                  {this.getFilterLabel(filter)}
-                  { filter.onClick &&
-                    <Icon name="removeSmall" text textRight />
-                  }
-                </ButtonTagFilterInverse>
+        { filters.length > 0 &&
+          <Tags>
+            {
+              filters.map((filter, i) => filter.inverse
+                ? (
+                  <ButtonTagFilterInverse
+                    key={i}
+                    onClick={filter.onClick}
+                    palette={filter.type}
+                    paletteHover={`${filter.type}Hover`}
+                    pIndex={parseInt(filter.id, 10) || 0}
+                    disabled={!filter.onClick}
+                  >
+                    {this.getFilterLabel(filter)}
+                    { filter.onClick &&
+                      <Icon name="removeSmall" text textRight />
+                    }
+                  </ButtonTagFilterInverse>
+                )
+                : (
+                  <ButtonTagFilter
+                    key={i}
+                    onClick={filter.onClick}
+                    palette={filter.type}
+                    paletteHover={`${filter.type}Hover`}
+                    pIndex={parseInt(filter.id, 10) || 0}
+                    disabled={!filter.onClick}
+                  >
+                    {this.getFilterLabel(filter)}
+                    { filter.onClick &&
+                      <Icon name="removeSmall" text textRight />
+                    }
+                  </ButtonTagFilter>
+                )
               )
-              : (
-                <ButtonTagFilter
-                  key={i}
-                  onClick={filter.onClick}
-                  palette={filter.type}
-                  paletteHover={`${filter.type}Hover`}
-                  pIndex={parseInt(filter.id, 10) || 0}
-                  disabled={!filter.onClick}
-                >
-                  {this.getFilterLabel(filter)}
-                  { filter.onClick &&
-                    <Icon name="removeSmall" text textRight />
-                  }
-                </ButtonTagFilter>
-              )
-            )
-          }
-        </Tags>
+            }
+          </Tags>
+        }
         <SearchInput
           id="search"
           minLength={1}
-          debounceTimeout={300}
+          debounceTimeout={500}
           value={searchQuery || ''}
           onChange={(e) => onSearch(e.target.value)}
           onFocus={() => this.setState({ active: true })}
           onBlur={() => this.setState({ active: false })}
-          placeholder={this.context.intl.formatMessage(
+          placeholder={placeholder || (this.context.intl.formatMessage(
             this.props.multiselect
             ? messages.searchPlaceholderMultiSelect
             : messages.searchPlaceholderEntities
-          )}
+          ))}
         />
+        { (searchQuery || filters.length > 0) &&
+          <Clear
+            onClick={this.props.onClear}
+            small={this.props.multiselect}
+          >
+            <Icon name="removeSmall" />
+          </Clear>
+        }
       </Search>
     );
   }
@@ -142,7 +167,9 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
 TagSearch.propTypes = {
   filters: PropTypes.array,
   searchQuery: PropTypes.string,
+  placeholder: PropTypes.string,
   onSearch: PropTypes.func,
+  onClear: PropTypes.func,
   multiselect: PropTypes.bool,
 };
 

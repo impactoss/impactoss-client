@@ -14,6 +14,8 @@ import { fromJS } from 'immutable';
 
 import { checkResponseError } from 'utils/request';
 import { isSignedIn } from 'utils/api-request';
+import { DB_TABLES } from 'themes/config';
+
 import {
   AUTHENTICATE_SENDING,
   AUTHENTICATE_SUCCESS,
@@ -30,7 +32,6 @@ import {
   ENTITIES_REQUESTED,
   INVALIDATE_ENTITIES,
   DUEDATE_ASSIGNED,
-  DB_TABLES,
   OPEN_NEW_ENTITY_MODAL,
 } from './constants';
 

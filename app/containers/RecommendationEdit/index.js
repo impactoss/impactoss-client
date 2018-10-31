@@ -34,7 +34,8 @@ import {
   getMetaField,
 } from 'utils/fields';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -73,6 +74,12 @@ import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class RecommendationEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -93,8 +100,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -134,6 +141,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   getBodyMainFields = (connectedTaxonomies, entity, measures, onCreateOption) => ([
     {
       fields: [
+        getMarkdownField(this.context.intl.formatMessage, appMessages, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
         getAcceptedField(this.context.intl.formatMessage, appMessages, entity),
         getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
       ],
@@ -142,7 +150,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures, connectedTaxonomies, onCreateOption),
+        renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
       ],
     },
   ]);
@@ -151,7 +159,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     { // fieldGroup
       label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
       icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies, onCreateOption),
+      fields: renderTaxonomyControl(taxonomies, onCreateOption, this.context.intl),
     },
   ]);
 
@@ -168,7 +176,13 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -234,6 +248,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                   aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           { (saveSending || deleteSending) &&
@@ -289,7 +304,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
@@ -332,7 +347,7 @@ function mapDispatchToProps(dispatch, props) {
       // dispatch(save(formData, props.params.id));
     },
     handleCancel: () => {
-      dispatch(updatePath(`/recommendations/${props.params.id}`));
+      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}/${props.params.id}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

@@ -31,6 +31,9 @@ import { selectQueryMessages } from 'containers/App/selectors';
 import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
 import appMessages from 'containers/App/messages';
+
+import { PATHS } from 'containers/App/constants';
+
 import messages from './messages';
 
 import { register } from './actions';
@@ -97,14 +100,14 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
             <p>
               <FormattedMessage {...messages.loginLinkBefore} />
               <A
-                href="/login"
+                href={PATHS.LOGIN}
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink('/login', { keepQuery: true });
+                  this.props.handleLink(PATHS.LOGIN, { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.loginLink} />
-                <Icon name="arrowRight" text textRight />
+                <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
               </A>
             </p>
           </BottomLinks>

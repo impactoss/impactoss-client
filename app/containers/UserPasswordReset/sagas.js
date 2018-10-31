@@ -4,6 +4,9 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 import { selectLocation } from 'containers/App/selectors';
 import { updatePath } from 'containers/App/actions';
 
+import { PATHS } from 'containers/App/constants';
+import { ENDPOINTS, KEYS } from 'themes/config';
+
 import apiRequest from 'utils/api-request';
 
 import {
@@ -23,21 +26,21 @@ export function* reset({ data }) {
     yield call(
       apiRequest,
       'put',
-      'auth/password',
+      ENDPOINTS.PASSWORD,
       {
         password,
         password_confirmation: passwordConfirmation,
       },
       {
-        client: query.get('client_id'),
-        reset_password: query.get('reset_password'),
-        'access-token': query.get('token'),
-        uid: query.get('uid'),
-        expiry: query.get('expiry'),
+        [KEYS.CLIENT]: query.get('client_id'),
+        [KEYS.RESET_PASSWORD]: query.get('reset_password'),
+        [KEYS.ACCESS_TOKEN]: query.get('token'),
+        [KEYS.UID]: query.get('uid'),
+        [KEYS.EXPIRY]: query.get('expiry'),
       }
     );
     yield put(passwordResetSuccess());
-    yield put(updatePath('/login'));
+    yield put(updatePath(PATHS.LOGIN));
   } catch (error) {
     error.response.json = yield error.response.json();
     yield put(passwordResetError(error));

@@ -1,4 +1,8 @@
 import { Map, List } from 'immutable';
+import { sortEntities } from 'utils/sort';
+
+import { filter, reduce } from 'lodash/collection';
+
 import {
   getEntityTitle,
   getEntityReference,
@@ -13,13 +17,16 @@ import validateEmailFormat from 'components/forms/validators/validate-email-form
 import validateLength from 'components/forms/validators/validate-length';
 
 import {
-  PUBLISH_STATUSES,
   REPORT_FREQUENCIES,
-  ACCEPTED_STATUSES,
-  DOC_PUBLISH_STATUSES,
-  DATE_FORMAT,
+  PUBLISH_STATUSES,
   USER_ROLES,
-} from 'containers/App/constants';
+  DATE_FORMAT,
+  DOC_PUBLISH_STATUSES,
+  ACCEPTED_STATUSES,
+  MEASURE_SHAPE,
+} from 'themes/config';
+
+import appMessages from 'containers/App/messages';
 
 export const entityOption = (entity, defaultToId, hasTags) => Map({
   value: entity.get('id'),
@@ -63,15 +70,16 @@ export const dateOption = (entity, activeDateId) => Map({
 //   : List();
 
 export const taxonomyOptions = (taxonomies) => taxonomies
-  ? taxonomies.reduce((values, tax) =>
+  ? sortEntities(taxonomies, 'asc', 'priority').reduce((values, tax) =>
     values.set(tax.get('id'), entityOptions(tax.get('categories'), false, false)), Map())
   : Map();
 
+const getTaxTitle = (id, contextIntl) => contextIntl ? contextIntl.formatMessage(appMessages.entities.taxonomies[id].single) : '';
 
 // turn taxonomies into multiselect options
-export const makeTagFilterGroups = (taxonomies) =>
-  taxonomies && taxonomies.map((taxonomy) => ({
-    title: taxonomy.getIn(['attributes', 'title']),
+export const makeTagFilterGroups = (taxonomies, contextIntl) =>
+  taxonomies && sortEntities(taxonomies, 'asc', 'priority').map((taxonomy) => ({
+    title: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
     palette: ['taxonomies', parseInt(taxonomy.get('id'), 10)],
     options: taxonomy.get('categories').map((category) => ({
       reference: getEntityReference(category, false),
@@ -82,7 +90,7 @@ export const makeTagFilterGroups = (taxonomies) =>
     })).toList().toArray(),
   })).toList().toArray();
 
-export const renderMeasureControl = (entities, taxonomies, onCreateOption) => entities
+export const renderMeasureControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
 ? {
   id: 'actions',
   model: '.associatedMeasures',
@@ -92,14 +100,14 @@ export const renderMeasureControl = (entities, taxonomies, onCreateOption) => en
   options: entityOptions(entities, true),
   advanced: true,
   selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies),
+  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'measures' })
     : null,
 }
 : null;
 
-export const renderSdgTargetControl = (entities, taxonomies, onCreateOption) => entities
+export const renderSdgTargetControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
 ? {
   id: 'sdgtargets',
   model: '.associatedSdgTargets',
@@ -109,7 +117,7 @@ export const renderSdgTargetControl = (entities, taxonomies, onCreateOption) => 
   options: entityOptions(entities, true),
   advanced: true,
   selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies),
+  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'sdgtargets' })
     : null,
@@ -117,7 +125,7 @@ export const renderSdgTargetControl = (entities, taxonomies, onCreateOption) => 
 : null;
 
 
-export const renderRecommendationControl = (entities, taxonomies, onCreateOption) => entities
+export const renderRecommendationControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
 ? {
   id: 'recommendations',
   model: '.associatedRecommendations',
@@ -127,7 +135,7 @@ export const renderRecommendationControl = (entities, taxonomies, onCreateOption
   options: entityOptions(entities),
   advanced: true,
   selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies),
+  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
   onCreate: onCreateOption
     ? () => onCreateOption({ path: 'recommendations' })
     : null,
@@ -162,12 +170,12 @@ export const renderUserControl = (entities, label, activeUserId) => entities
 }
 : null;
 
-export const renderTaxonomyControl = (taxonomies, onCreateOption) => taxonomies
-? taxonomies.reduce((controls, taxonomy) => controls.concat({
+export const renderTaxonomyControl = (taxonomies, onCreateOption, contextIntl) => taxonomies
+? sortEntities(taxonomies, 'asc', 'priority').reduce((controls, taxonomy) => controls.concat({
   id: taxonomy.get('id'),
   model: `.associatedTaxonomies.${taxonomy.get('id')}`,
   dataPath: ['associatedTaxonomies', taxonomy.get('id')],
-  label: taxonomy.getIn(['attributes', 'title']),
+  label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
   controlType: 'multiselect',
   multiple: taxonomy.getIn(['attributes', 'allow_multiple']),
   options: entityOptions(taxonomy.get('categories'), false),
@@ -185,10 +193,12 @@ const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
   : Map();
 
 const getAssociatedEntities = (entities) =>
-  entities.reduce((entitiesAssociated, entity) => entity.get('associated')
+  entities
+  ? entities.reduce((entitiesAssociated, entity) => entity.get('associated')
     ? entitiesAssociated.set(entity.get('id'), entity.getIn(['associated', 'id']))
     : entitiesAssociated
-  , Map());
+  , Map())
+  : Map();
 
 export const getCategoryUpdatesFromFormData = ({ formData, taxonomies, createKey }) =>
   taxonomies.reduce((updates, tax, taxId) => {
@@ -247,30 +257,21 @@ export const getHighestUserRoleId = (roles) =>
     role.get('associated') && parseInt(role.get('id'), 10) < parseInt(currentHighestRoleId, 10)
       ? role.get('id').toString()
       : currentHighestRoleId.toString()
-  , USER_ROLES.DEFAULT);
+  , USER_ROLES.DEFAULT.value);
 
-const getRoleOptions = (roles, formatMessage, appMessages) => {
-  const roleOptions = roles.reduce((memo, role) => memo.concat([{
-    value: role.get('id').toString(),
-    label: role.getIn(['attributes', 'friendly_name']),
-  }]), []);
-  roleOptions.push({
-    value: USER_ROLES.DEFAULT.toString(),
-    label: formatMessage(appMessages.entities.roles.defaultRole),
-  });
-  return roleOptions;
-};
-
-export const getRoleFormField = (formatMessage, appMessages, roles) => ({
+export const getRoleFormField = (formatMessage, obsoleteAppMessages, roleOptions) => ({
   id: 'role',
   controlType: 'select',
   model: '.associatedRole',
   label: formatMessage(appMessages.entities.roles.single),
-  value: getHighestUserRoleId(roles).toString(),
-  options: getRoleOptions(roles, formatMessage, appMessages),
+  value: getHighestUserRoleId(roleOptions).toString(),
+  options: Object.values(filter(USER_ROLES, (userRole) =>
+    roleOptions.map((roleOption) => parseInt(roleOption.get('id'), 10)).includes(userRole.value)
+    || userRole.value === USER_ROLES.DEFAULT.value
+  )),
 });
 
-export const getAcceptedField = (formatMessage, appMessages, entity) => ({
+export const getAcceptedField = (formatMessage, obsoleteAppMessages, entity) => ({
   id: 'accepted',
   controlType: 'select',
   model: '.attributes.accepted',
@@ -279,7 +280,7 @@ export const getAcceptedField = (formatMessage, appMessages, entity) => ({
   options: ACCEPTED_STATUSES,
 });
 
-export const getFrequencyField = (formatMessage, appMessages, entity) => ({
+export const getFrequencyField = (formatMessage, obsoleteAppMessages, entity) => ({
   id: 'frequency_months',
   controlType: 'select',
   model: '.attributes.frequency_months',
@@ -288,7 +289,7 @@ export const getFrequencyField = (formatMessage, appMessages, entity) => ({
   options: REPORT_FREQUENCIES,
 });
 
-export const getDocumentStatusField = (formatMessage, appMessages, entity) => ({
+export const getDocumentStatusField = (formatMessage, obsoleteAppMessages, entity) => ({
   id: 'document_public',
   controlType: 'select',
   model: '.attributes.document_public',
@@ -297,7 +298,7 @@ export const getDocumentStatusField = (formatMessage, appMessages, entity) => ({
   options: DOC_PUBLISH_STATUSES,
 });
 
-export const getStatusField = (formatMessage, appMessages, entity) => ({
+export const getStatusField = (formatMessage, obsoleteAppMessages, entity) => ({
   id: 'status',
   controlType: 'select',
   model: '.attributes.draft',
@@ -306,7 +307,7 @@ export const getStatusField = (formatMessage, appMessages, entity) => ({
   options: PUBLISH_STATUSES,
 });
 
-const getDueDateStatus = (date, formatMessage, appMessages) => {
+const getDueDateStatus = (date, formatMessage) => {
   if (date.getIn(['attributes', 'overdue'])) {
     return ` ${formatMessage(appMessages.entities.due_dates.overdue)}`;
   }
@@ -316,7 +317,7 @@ const getDueDateStatus = (date, formatMessage, appMessages) => {
   return '';
 };
 
-export const getDueDateDateOptions = (dates, formatMessage, appMessages, formatDate, activeDateId = 'null') => {
+export const getDueDateDateOptions = (dates, formatMessage, obsoleteAppMessages, formatDate, activeDateId = 'null') => {
   const NO_OF_REPORT_OPTIONS = 1;
   let excludeCount = 0;
   const dateOptions = dates
@@ -331,7 +332,7 @@ export const getDueDateDateOptions = (dates, formatMessage, appMessages, formatD
         }
         // exclude overdue and already assigned date from max no of date options
         const label = formatDate &&
-          `${formatDate(new Date(date.getIn(['attributes', 'due_date'])))}${getDueDateStatus(date, formatMessage, appMessages)}`;
+          `${formatDate(new Date(date.getIn(['attributes', 'due_date'])))}${getDueDateStatus(date, formatMessage)}`;
         return memo.concat([
           {
             value: date.get('id'),
@@ -350,7 +351,7 @@ export const getDueDateDateOptions = (dates, formatMessage, appMessages, formatD
   });
 };
 
-export const getDueDateOptionsField = (formatMessage, appMessages, dateOptions) => ({
+export const getDueDateOptionsField = (formatMessage, obsoleteAppMessages, dateOptions) => ({
   id: 'due_date_id',
   controlType: 'radio',
   model: '.attributes.due_date_id',
@@ -360,19 +361,17 @@ export const getDueDateOptionsField = (formatMessage, appMessages, dateOptions) 
   },
 });
 
-export const getTitleFormField = (formatMessage, appMessages, controlType = 'title', attribute = 'title') =>
+export const getTitleFormField = (formatMessage, obsoleteAppMessages, controlType = 'title', attribute = 'title') =>
   getFormField({
     formatMessage,
-    appMessages,
     controlType,
     attribute,
     required: true,
   });
 
-export const getReferenceFormField = (formatMessage, appMessages, required = false, isAutoReference = false) =>
+export const getReferenceFormField = (formatMessage, obsoleteAppMessages, required = false, isAutoReference = false) =>
   getFormField({
     formatMessage,
-    appMessages,
     controlType: 'short',
     attribute: 'reference',
     required,
@@ -380,27 +379,24 @@ export const getReferenceFormField = (formatMessage, appMessages, required = fal
     hint: isAutoReference ? formatMessage(appMessages.hints.autoReference) : null,
   });
 
-export const getShortTitleFormField = (formatMessage, appMessages) =>
+export const getShortTitleFormField = (formatMessage) =>
   getFormField({
     formatMessage,
-    appMessages,
     controlType: 'short',
     attribute: 'short_title',
   });
 
-export const getMenuTitleFormField = (formatMessage, appMessages) =>
+export const getMenuTitleFormField = (formatMessage) =>
   getFormField({
     formatMessage,
-    appMessages,
     controlType: 'short',
     attribute: 'menu_title',
     required: true,
   });
 
-export const getMenuOrderFormField = (formatMessage, appMessages) => {
+export const getMenuOrderFormField = (formatMessage) => {
   const field = getFormField({
     formatMessage,
-    appMessages,
     controlType: 'short',
     attribute: 'order',
   });
@@ -409,26 +405,28 @@ export const getMenuOrderFormField = (formatMessage, appMessages) => {
   return field;
 };
 
-export const getMarkdownField = (formatMessage, appMessages, attribute = 'description') =>
+export const getMarkdownField = (formatMessage, obsoleteAppMessages, attribute = 'description', label, placeholder, hint) =>
   getFormField({
     formatMessage,
-    appMessages,
     controlType: 'markdown',
     attribute,
+    label: label || attribute,
+    placeholder: placeholder || attribute,
+    hint: hint
+      ? (appMessages.hints[hint] && formatMessage(appMessages.hints[hint]))
+      : (appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute])),
   });
 
-export const getTextareaField = (formatMessage, appMessages, attribute = 'description') =>
+export const getTextareaField = (formatMessage, obsoleteAppMessages, attribute = 'description') =>
   getFormField({
     formatMessage,
-    appMessages,
     controlType: 'textarea',
     attribute,
   });
 
-export const getDateField = (formatMessage, appMessages, attribute, required = false, label, onChange) => {
+export const getDateField = (formatMessage, obsoleteAppMessages, attribute, required = false, label, onChange) => {
   const field = getFormField({
     formatMessage,
-    appMessages,
     controlType: 'date',
     attribute,
     required,
@@ -440,7 +438,7 @@ export const getDateField = (formatMessage, appMessages, attribute, required = f
   return field;
 };
 
-export const getCheckboxField = (formatMessage, appMessages, attribute, entity, onChange) => (
+export const getCheckboxField = (formatMessage, obsoleteAppMessages, attribute, entity, onChange) => (
   {
     id: attribute,
     controlType: 'checkbox',
@@ -451,19 +449,17 @@ export const getCheckboxField = (formatMessage, appMessages, attribute, entity, 
     hint: appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute]),
   });
 
-export const getUploadField = (formatMessage, appMessages) =>
+export const getUploadField = (formatMessage) =>
   getFormField({
     formatMessage,
-    appMessages,
     controlType: 'uploader',
     attribute: 'document_url',
     placeholder: 'url',
   });
 
-export const getEmailField = (formatMessage, appMessages, model = '.attributes.email') => {
+export const getEmailField = (formatMessage, obsoleteAppMessages, model = '.attributes.email') => {
   const field = getFormField({
     formatMessage,
-    appMessages,
     controlType: 'email',
     attribute: 'email',
     type: 'email',
@@ -475,10 +471,9 @@ export const getEmailField = (formatMessage, appMessages, model = '.attributes.e
   return field;
 };
 
-export const getNameField = (formatMessage, appMessages, model = '.attributes.name') => {
+export const getNameField = (formatMessage, obsoleteAppMessages, model = '.attributes.name') => {
   const field = getFormField({
     formatMessage,
-    appMessages,
     controlType: 'input',
     attribute: 'name',
     required: true,
@@ -487,10 +482,9 @@ export const getNameField = (formatMessage, appMessages, model = '.attributes.na
   return field;
 };
 
-export const getPasswordField = (formatMessage, appMessages, model = '.attributes.password') => {
+export const getPasswordField = (formatMessage, obsoleteAppMessages, model = '.attributes.password') => {
   const field = getFormField({
     formatMessage,
-    appMessages,
     controlType: 'input',
     attribute: 'password',
     type: 'password',
@@ -502,10 +496,9 @@ export const getPasswordField = (formatMessage, appMessages, model = '.attribute
   return field;
 };
 
-export const getPasswordCurrentField = (formatMessage, appMessages, model = '.attributes.password') => {
+export const getPasswordCurrentField = (formatMessage, obsoleteAppMessages, model = '.attributes.password') => {
   const field = getFormField({
     formatMessage,
-    appMessages,
     controlType: 'input',
     attribute: 'password',
     placeholder: 'passwordCurrent',
@@ -518,10 +511,9 @@ export const getPasswordCurrentField = (formatMessage, appMessages, model = '.at
   return field;
 };
 
-export const getPasswordNewField = (formatMessage, appMessages, model = '.attributes.passwordNew') => {
+export const getPasswordNewField = (formatMessage, obsoleteAppMessages, model = '.attributes.passwordNew') => {
   const field = getFormField({
     formatMessage,
-    appMessages,
     controlType: 'input',
     attribute: 'passwordNew',
     type: 'password',
@@ -533,10 +525,9 @@ export const getPasswordNewField = (formatMessage, appMessages, model = '.attrib
   return field;
 };
 
-export const getPasswordConfirmationField = (formatMessage, appMessages, model = '.attributes.passwordConfirmation') => {
+export const getPasswordConfirmationField = (formatMessage, obsoleteAppMessages, model = '.attributes.passwordConfirmation') => {
   const field = getFormField({
     formatMessage,
-    appMessages,
     controlType: 'input',
     attribute: 'passwordConfirmation',
     type: 'password',
@@ -550,7 +541,6 @@ export const getPasswordConfirmationField = (formatMessage, appMessages, model =
 
 export const getFormField = ({
   formatMessage,
-  appMessages,
   controlType,
   attribute,
   required,
@@ -582,34 +572,33 @@ export const getFormField = ({
   return field;
 };
 
-const getCategoryFields = (args, formatMessage, appMessages) => ({
+const getCategoryFields = (args, formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
-        getReferenceFormField(formatMessage, appMessages),
-        getTitleFormField(formatMessage, appMessages),
-        getShortTitleFormField(formatMessage, appMessages),
+        getReferenceFormField(formatMessage),
+        getTitleFormField(formatMessage),
+        getShortTitleFormField(formatMessage),
       ],
     }],
     aside: args.taxonomy && args.taxonomy.getIn(['attributes', 'tags_users'])
       ? [{
         fields: [
-          getCheckboxField(formatMessage, appMessages, 'user_only'),
-          getStatusField(formatMessage, appMessages),
+          getCheckboxField(formatMessage, null, 'user_only'),
+          getStatusField(formatMessage),
         ],
       }]
       : [{
-        fields: [getStatusField(formatMessage, appMessages)],
+        fields: [getStatusField(formatMessage)],
       }],
   },
   body: {
     main: [{
-      fields: [getMarkdownField(formatMessage, appMessages)],
+      fields: [getMarkdownField(formatMessage)],
     }],
     aside: [{
       fields: [getFormField({
         formatMessage,
-        appMessages,
         controlType: 'url',
         attribute: 'url',
       })],
@@ -617,120 +606,216 @@ const getCategoryFields = (args, formatMessage, appMessages) => ({
   },
 });
 
-const getMeasureFields = (args, formatMessage, appMessages) => ({
+const getIndicatorFields = (args, formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
-        getTitleFormField(formatMessage, appMessages),
+        getReferenceFormField(formatMessage, null, false, true),
+        getTitleFormField(formatMessage, null, 'titleText'),
       ],
     }],
     aside: [{ // fieldGroup
       fields: [
-        getStatusField(formatMessage, appMessages),
+        getStatusField(formatMessage),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [getMarkdownField(formatMessage)],
+    }],
+  },
+});
+
+const getRecommendationFields = (args, formatMessage) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getReferenceFormField(formatMessage, null, true), // required
+        getTitleFormField(formatMessage, null),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getStatusField(formatMessage),
       ],
     }],
   },
   body: {
     main: [{
       fields: [
-        getMarkdownField(formatMessage, appMessages),
-        getMarkdownField(formatMessage, appMessages, 'outcome'),
-        getMarkdownField(formatMessage, appMessages, 'indicator_summary'),
-      ],
-    }],
-    aside: [{
-      fields: [
-        getDateField(formatMessage, appMessages, 'target_date'),
-        getFormField({
-          formatMessage,
-          appMessages,
-          controlType: 'textarea',
-          attribute: 'target_date_comment',
-        }),
+        getAcceptedField(formatMessage),
+        getMarkdownField(formatMessage, null, 'response'),
       ],
     }],
   },
 });
 
-const getIndicatorFields = (args, formatMessage, appMessages) => ({
+const getSdgtargetFields = (args, formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
-        getReferenceFormField(formatMessage, appMessages, false, true),
-        getTitleFormField(formatMessage, appMessages, 'titleText'),
+        getReferenceFormField(formatMessage, null, true), // required
+        getTitleFormField(formatMessage, null, 'titleText'),
       ],
     }],
     aside: [{ // fieldGroup
       fields: [
-        getStatusField(formatMessage, appMessages),
+        getStatusField(formatMessage),
       ],
     }],
   },
   body: {
     main: [{
-      fields: [getMarkdownField(formatMessage, appMessages)],
+      fields: [getMarkdownField(formatMessage)],
     }],
   },
 });
 
-const getRecommendationFields = (args, formatMessage, appMessages) => ({
-  header: {
-    main: [{ // fieldGroup
-      fields: [
-        getReferenceFormField(formatMessage, appMessages, true), // required
-        getTitleFormField(formatMessage, appMessages),
-      ],
-    }],
-    aside: [{ // fieldGroup
-      fields: [
-        getStatusField(formatMessage, appMessages),
-      ],
-    }],
-  },
-  body: {
-    main: [{
-      fields: [
-        getAcceptedField(formatMessage, appMessages),
-        getMarkdownField(formatMessage, appMessages, 'response'),
-      ],
-    }],
-  },
-});
-
-const getSdgtargetFields = (args, formatMessage, appMessages) => ({
-  header: {
-    main: [{ // fieldGroup
-      fields: [
-        getReferenceFormField(formatMessage, appMessages, true), // required
-        getTitleFormField(formatMessage, appMessages, 'titleText'),
-      ],
-    }],
-    aside: [{ // fieldGroup
-      fields: [
-        getStatusField(formatMessage, appMessages),
-      ],
-    }],
-  },
-  body: {
-    main: [{
-      fields: [getMarkdownField(formatMessage, appMessages)],
-    }],
-  },
-});
-
-export const getEntityFields = (path, args, formatMessage, appMessages) => {
+export const getEntityFields = (path, args, contextIntl) => {
   switch (path) {
     case 'categories':
-      return getCategoryFields(args, formatMessage, appMessages);
+      return getCategoryFields(args, contextIntl.formatMessage);
     case 'measures':
-      return getMeasureFields(args, formatMessage, appMessages);
+      return getFields({
+        shape: MEASURE_SHAPE,
+        contextIntl,
+      });
     case 'indicators':
-      return getIndicatorFields(args, formatMessage, appMessages);
+      return getIndicatorFields(args, contextIntl.formatMessage);
     case 'recommendations':
-      return getRecommendationFields(args, formatMessage, appMessages);
+      return getRecommendationFields(args, contextIntl.formatMessage);
     case 'sdgtargets':
-      return getSdgtargetFields(args, formatMessage, appMessages);
+      return getSdgtargetFields(args, contextIntl.formatMessage);
     default:
       return {};
   }
 };
+
+
+const getSectionFields = (shape, section, column, entity, associations, onCreateOption, contextIntl) => {
+  const fields = filter(shape.fields, (field) =>
+    field.section === section
+    && field.column === column
+    && !field.disabled
+  );
+  const sectionGroups = [{
+    fields: reduce(fields, (memo, field) => {
+      if (field.control === 'title') {
+        return memo.concat([getTitleFormField(contextIntl.formatMessage)]);
+      }
+      if (field.control === 'status') {
+        return memo.concat([getStatusField(contextIntl.formatMessage, null, entity)]);
+      }
+      if (field.control === 'date') {
+        return memo.concat([getDateField(contextIntl.formatMessage, null, field.attribute)]);
+      }
+      if (field.control === 'markdown') {
+        return memo.concat([getMarkdownField(contextIntl.formatMessage, null, field.attribute)]);
+      }
+      return memo.concat([getFormField({
+        controlType: field.control,
+        attribute: field.attribute,
+        formatMessage: contextIntl.formatMessage,
+      })]);
+    }, []),
+  }];
+  if (associations && associations.taxonomies && shape.taxonomies && shape.taxonomies.section === section && shape.taxonomies.column === column) {
+    sectionGroups.push({ // fieldGroup
+      label: contextIntl.formatMessage(appMessages.entities.taxonomies.plural),
+      icon: 'categories',
+      fields: renderTaxonomyControl(associations.taxonomies, onCreateOption, contextIntl),
+    });
+  }
+  if (associations
+    && (
+      associations.measures
+      || associations.recommendations
+      || associations.indicators
+      || associations.sgdtargets
+    )
+    && shape.connections
+    && shape.connections.tables
+    && shape.connections.section === section
+    && shape.connections.column === column
+  ) {
+    sectionGroups.push({
+      label: contextIntl.formatMessage(appMessages.entities.connections.plural),
+      icon: 'connections',
+      fields: reduce(shape.connections.tables, (memo, table) => {
+        if (table.table === 'measures' && associations.measures) {
+          return memo.concat([renderMeasureControl(associations.measures, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
+        }
+        if (table.table === 'recommendations' && associations.recommendations) {
+          return memo.concat([renderRecommendationControl(associations.recommendations, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
+        }
+        if (table.table === 'sdgtargets' && associations.sdgtargets) {
+          return memo.concat([renderSdgTargetControl(associations.sdgtargets, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
+        }
+        if (table.table === 'indicators' && associations.indicators) {
+          return memo.concat([renderIndicatorControl(associations.indicators, onCreateOption)]);
+        }
+        return memo;
+      }, []),
+    });
+  }
+  return sectionGroups;
+};
+
+// getHeaderAsideFields = (entity) => ([
+//   {
+//     fields: [
+//       getMetaField(entity, appMessages),
+//     ],
+//   },
+// ]);
+// Better handle in EntityForm
+
+export const getFields = ({
+  entity,
+  associations,
+  onCreateOption,
+  shape,
+  contextIntl,
+}) => ({
+  header: {
+    main: getSectionFields(
+      shape,
+      'header',
+      'main',
+      entity,
+      associations,
+      onCreateOption,
+      contextIntl
+    ),
+    aside: getSectionFields(
+      shape,
+      'header',
+      'aside',
+      entity,
+      associations,
+      onCreateOption,
+      contextIntl
+    ),
+  },
+  body: {
+    main: getSectionFields(
+      shape,
+      'body',
+      'main',
+      entity,
+      associations,
+      onCreateOption,
+      contextIntl
+    ),
+    aside: getSectionFields(
+      shape,
+      'body',
+      'aside',
+      entity,
+      associations,
+      onCreateOption,
+      contextIntl
+    ),
+  },
+});

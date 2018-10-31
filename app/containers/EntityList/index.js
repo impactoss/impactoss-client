@@ -28,7 +28,8 @@ import {
 } from 'containers/App/actions';
 
 // import appMessages from 'containers/App/messages';
-import { PARAMS, USER_ROLES } from 'containers/App/constants';
+import { PARAMS } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 
 import {
   selectDomain,
@@ -56,6 +57,7 @@ import {
   updateSortOrder,
   setClientPath,
   dismissError,
+  resetSearchQuery,
 } from './actions';
 
 const Progress = styled.div`
@@ -141,7 +143,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             }
             config={this.props.config}
             locationQuery={this.props.locationQuery}
-            canEdit={this.props.hasUserRole[USER_ROLES.MANAGER]}
+            canEdit={this.props.hasUserRole[USER_ROLES.MANAGER.value]}
             hasUserRole={this.props.hasUserRole}
             activePanel={this.props.activePanel}
             onPanelSelect={this.props.onPanelSelect}
@@ -169,8 +171,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           entityTitle={this.props.entityTitle}
 
           dataReady={this.props.dataReady}
-          isManager={this.props.hasUserRole[USER_ROLES.MANAGER]}
-          isContributor={this.props.hasUserRole[USER_ROLES.CONTRIBUTOR]}
+          isManager={this.props.hasUserRole[USER_ROLES.MANAGER.value]}
+          isContributor={this.props.hasUserRole[USER_ROLES.CONTRIBUTOR.value]}
 
           entityIcon={this.props.entityIcon}
           onEntitySelect={this.props.onEntitySelect}
@@ -180,6 +182,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onGroupSelect={this.props.onGroupSelect}
           onSubgroupSelect={this.props.onSubgroupSelect}
           onSearch={this.props.onSearch}
+          onResetFilters={this.props.onResetFilters}
           onPageSelect={this.props.onPageSelect}
           onPageItemsSelect={this.props.onPageItemsSelect}
           onEntityClick={(id, path) => this.props.onEntityClick(id, path, viewDomain.get('errors'))}
@@ -256,6 +259,7 @@ EntityList.propTypes = {
   onGroupSelect: PropTypes.func.isRequired,
   onSubgroupSelect: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
+  onResetFilters: PropTypes.func.isRequired,
   onPageSelect: PropTypes.func.isRequired,
   onPageItemsSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
@@ -332,6 +336,9 @@ function mapDispatchToProps(dispatch, props) {
         },
       ])));
     },
+    onResetFilters: (values) => {
+      dispatch(resetSearchQuery(values));
+    },
     onGroupSelect: (value) => {
       dispatch(updateGroup(fromJS([
         {
@@ -373,14 +380,16 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleEditSubmit: (formData, activeEditOption, entityIdsSelected, errors) => {
       dispatch(resetProgress());
+
       const entities = props.entities.filter(
         (entity) => entityIdsSelected.includes(entity.get('id'))
       );
 
       // figure out changes
       const changes = formData.get('values').filter((option) => option.get('hasChanged'));
+
       // figure out updates (either new attribute values or new connections)
-      let creates = changes
+      const creates = changes
         .filter((option) => option.get('checked') === true)
         .map((option) => option.get('value'));
 
@@ -437,12 +446,13 @@ function mapDispatchToProps(dispatch, props) {
           }
           // create connections
           if (creates.size > 0) {
-            if (!!existingAssignments && existingAssignments.size > 0) {
-              // exclude existing relations from the changeSet
-              creates = creates.filter((id) => !existingAssignments.includes(parseInt(id, 10)));
-            }
+            // exclude existing relations from the changeSet
+            const entityCreates = !!existingAssignments && existingAssignments.size > 0
+              ? creates.filter((id) => !existingAssignments.includes(parseInt(id, 10)))
+              : creates;
+
             // associations
-            creates.forEach((id) => dispatch(newConnection({
+            entityCreates.forEach((id) => dispatch(newConnection({
               path: activeEditOption.path,
               entity: {
                 attributes: {

@@ -1,28 +1,38 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
+import appMessage from 'utils/app-message';
 
-const Status = styled.div`
+import Label from 'components/styled/Label';
+import { find } from 'lodash/collection';
+
+import { USER_ROLES } from 'themes/config';
+
+const Role = styled(Label)`
   float: right;
-  font-size: 13px;
-  color: ${palette('dark', 4)};
   padding-left: 1em;
+  font-size: 12px;
 `;
-// font-weight: bold;
 
 class ItemRole extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { role } = this.props;
+    const role = this.props.role && parseInt(this.props.role, 10) !== USER_ROLES.DEFAULT.value
+      && find(USER_ROLES, { value: parseInt(this.props.role, 10) });
+
     return role
-      ? (<Status>{role}</Status>)
+      ? (<Role>
+        { role && role.message
+          ? appMessage(this.context.intl, role.message)
+          : ((role && role.label) || this.props.role)
+        }
+      </Role>)
       : null
     ;
   }
 }
 
 ItemRole.propTypes = {
-  role: PropTypes.string,
+  role: PropTypes.number,
 };
 
 export default ItemRole;

@@ -15,28 +15,16 @@ import { Map } from 'immutable';
 import {
   taxonomyOptions,
   entityOptions,
-  renderRecommendationControl,
-  renderIndicatorControl,
-  renderTaxonomyControl,
-  renderSdgTargetControl,
   getCategoryUpdatesFromFormData,
   getConnectionUpdatesFromFormData,
-  getTitleFormField,
-  getStatusField,
-  getMarkdownField,
-  getDateField,
-  getFormField,
+  getFields,
 } from 'utils/forms';
-
-import {
-  getMetaField,
-} from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
-import appMessages from 'containers/App/messages';
+import { CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
 
 import {
   loadEntitiesIfNeeded,
@@ -61,6 +49,8 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
+import { getInitialFormData } from 'utils/entities';
+
 import {
   selectDomain,
   selectViewEntity,
@@ -73,9 +63,15 @@ import {
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES, FORM_INITIAL } from './constants';
+import { DEPENDENCIES } from './constants';
 
 export class ActionEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -97,8 +93,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -111,7 +107,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       id: viewEntity.get('id'),
       attributes: viewEntity.get('attributes').mergeWith(
         (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-        FORM_INITIAL.get('attributes')
+        getInitialFormData(MEASURE_SHAPE).get('attributes')
       ),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRecommendations: entityOptions(recommendations, true),
@@ -120,59 +116,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     })
     : Map();
   }
-
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage, appMessages),
-      ],
-    },
-  ]);
-
-  getHeaderAsideFields = (entity) => ([
-    {
-      fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages, entity),
-        getMetaField(entity, appMessages),
-      ],
-    },
-  ]);
-
-  getBodyMainFields = (connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption) => ([
-    {
-      fields: [
-        getMarkdownField(this.context.intl.formatMessage, appMessages),
-      ],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption),
-        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption),
-        renderIndicatorControl(indicators, onCreateOption),
-      ],
-    },
-  ]);
-
-  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getDateField(this.context.intl.formatMessage, appMessages, 'target_date'),
-        getFormField({
-          formatMessage: this.context.intl.formatMessage,
-          appMessages,
-          controlType: 'textarea',
-          attribute: 'target_date_comment',
-        }),
-      ],
-    },
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
-      icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies, onCreateOption),
-    },
-  ]);
 
   render() {
     const { viewEntity, dataReady, viewDomain, taxonomies, connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption } = this.props;
@@ -187,7 +130,13 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={this.context.intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
@@ -247,16 +196,20 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
               handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(viewEntity),
+              fields={getFields({
+                entity: viewEntity,
+                associations: {
+                  taxonomies,
+                  connectedTaxonomies,
+                  recommendations,
+                  indicators,
+                  sdgtargets,
                 },
-                body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption),
-                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
-                },
-              }}
+                onCreateOption,
+                shape: MEASURE_SHAPE,
+                contextIntl: this.context.intl,
+              })}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           {(saveSending || deleteSending) &&
@@ -317,7 +270,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
@@ -379,7 +332,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath(`/actions/${props.params.id}`));
+      dispatch(updatePath(`/actions/${props.params.id}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

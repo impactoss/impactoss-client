@@ -9,17 +9,25 @@ export default defineMessages({
     id: 'app.components.ImportEntitiesForm.title',
     defaultMessage: 'Batch import',
   },
+  introduction: {
+    id: 'app.components.ImportEntitiesForm.introduction',
+    defaultMessage: 'Import multiple items from a CSV file.',
+  },
+  hintTitle: {
+    id: 'app.components.ImportEntitiesForm.hintLabel',
+    defaultMessage: 'Please note:',
+  },
   templateHint: {
     id: 'app.components.ImportEntitiesForm.templateHint',
-    defaultMessage: 'Import multiple items from a CSV file. For the available fields and field types please ',
+    defaultMessage: 'For the available fields and field types please ',
+  },
+  templateHintDownloadLink: {
+    id: 'app.components.ImportEntitiesForm.templateHintDownloadLink',
+    defaultMessage: 'download the CSV template',
   },
   formatHint: {
     id: 'app.components.ImportEntitiesForm.formatHint',
-    defaultMessage: 'Please note: when saving from Excel, chose file type "CSV UTF-8 (Comma delimited)".',
-  },
-  downloadTemplateAnchor: {
-    id: 'app.components.ImportEntitiesForm.downloadTemplateAnchor',
-    defaultMessage: 'download the CSV template',
+    defaultMessage: 'When saving from Excel, chose file type "CSV UTF-8 (Comma delimited)".',
   },
   someErrors: {
     id: 'app.components.ImportEntitiesForm.someErrors',

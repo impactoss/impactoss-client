@@ -2,7 +2,9 @@ import styled from 'styled-components';
 
 const DotWrapper = styled.div`
   padding: 2px 5px;
-  float: right;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: right;
 `;
 
 export default DotWrapper;

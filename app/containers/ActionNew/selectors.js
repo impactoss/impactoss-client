@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
-
-import { selectEntities } from 'containers/App/selectors';
+import { ENABLE_SDGS } from 'themes/config';
+import { selectEntities, selectTaxonomiesSorted } from 'containers/App/selectors';
 import { prepareTaxonomiesMultiple } from 'utils/entities';
 
 export const selectDomain = createSelector(
@@ -9,8 +9,9 @@ export const selectDomain = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations', 'tags_sdgtargets'])
+  (taxonomies, categories) => ENABLE_SDGS
+    ? prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations', 'tags_sdgtargets'])
+    : prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations'])
 );

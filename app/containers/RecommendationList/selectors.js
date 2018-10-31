@@ -10,6 +10,7 @@ import {
   selectSortByQuery,
   selectSortOrderQuery,
   selectRecommendationConnections,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import {
@@ -28,7 +29,7 @@ import { CONFIG } from './constants';
 const selectRecommendationsNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'recommendations',
-    searchAttributes: ['reference', 'title'],
+    searchAttributes: CONFIG.search || ['reference', 'title'],
     locationQuery,
   }),
   (state) => selectRecommendationConnections(state),
@@ -98,7 +99,7 @@ export const selectRecommendations = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>
     prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])

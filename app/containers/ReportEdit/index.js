@@ -30,7 +30,8 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { USER_ROLES, CONTENT_SINGLE } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -65,6 +66,12 @@ import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class ReportEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      scrollContainer: null,
+    };
+  }
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -86,8 +93,8 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.ScrollContainer) {
-      scrollToTop(this.ScrollContainer);
+    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
+      scrollToTop(this.state.scrollContainer);
     }
   }
 
@@ -176,7 +183,13 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content innerRef={(node) => { this.ScrollContainer = node; }} >
+        <Content
+          innerRef={(node) => {
+            if (!this.state.scrollContainer) {
+              this.setState({ scrollContainer: node });
+            }
+          }}
+        >
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -241,6 +254,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                   aside: this.getBodyAsideFields(viewEntity),
                 },
               }}
+              scrollContainer={this.state.scrollContainer}
             />
           }
           { (saveSending || deleteSending) &&
@@ -293,7 +307,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('indicators'));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR));
+      dispatch(redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
@@ -329,7 +343,7 @@ function mapDispatchToProps(dispatch, props) {
       ));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`/reports/${reference}`));
+      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}/${reference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
@@ -338,7 +352,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(deleteEntity({
         path: 'progress_reports',
         id: props.params.id,
-        redirect: `indicators/${indicatorId}`,
+        redirect: `${PATHS.INDICATORS}/${indicatorId}`,
       }));
     },
   };

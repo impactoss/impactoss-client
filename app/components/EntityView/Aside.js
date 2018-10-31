@@ -1,12 +1,13 @@
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
-import Section from './Section';
+import Main from './Main';
 
-const Aside = styled(Section)`
-  width: 30%;
-  border-left: 1px solid ${palette('light', 0)};
-  margin: 0 -1px;
+const Aside = styled(Main)`
+  border-right-style: 'none';
+  border-bottom-style: ${(props) => props.bottom ? 'none' : 'solid'};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    width: 30%;
+  }
 `;
 
 export default Aside;

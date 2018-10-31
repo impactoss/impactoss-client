@@ -8,13 +8,12 @@ const Option = styled.div`
   padding: 0.25em 0;
 `;
 const Hint = styled.div`
-  font-style: italic;
   font-size: 0.85em;
 `;
 // see also ScheduleItem
 const Label = styled.label`
   font-weight: bold;
-  color:  ${(props) => props.highlight ? palette('primary', 1) : palette('dark', 2)};
+  color:  ${(props) => props.highlight ? palette('primary', 1) : palette('text', 0)};
 `;
 const LabelInner = styled.span`
   padding-left: 5px;

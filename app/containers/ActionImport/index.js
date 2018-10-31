@@ -12,7 +12,9 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { fromJS } from 'immutable';
 
-import { USER_ROLES, CONTENT_SINGLE, DB_DATE_FORMAT } from 'containers/App/constants';
+import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
+import { getImportFields, getColumnAttribute } from 'utils/import';
 
 import {
   redirectIfNotPermitted,
@@ -25,8 +27,6 @@ import {
   selectReady,
   selectReadyForAuthCheck,
 } from 'containers/App/selectors';
-
-import appMessages from 'containers/App/messages';
 
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
@@ -97,12 +97,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             progress={this.props.progress}
             template={{
               filename: `${this.context.intl.formatMessage(messages.filename)}.csv`,
-              data: [{
-                title: this.context.intl.formatMessage(appMessages.importFields.title),
-                description: this.context.intl.formatMessage(appMessages.importFields.description),
-                target_date: this.context.intl.formatMessage(appMessages.importFields.target_date, { format: DB_DATE_FORMAT }),
-                target_date_comment: this.context.intl.formatMessage(appMessages.importFields.target_date_comment),
-              }],
+              data: getImportFields(MEASURE_SHAPE, this.context.intl.formatMessage),
             }}
           />
         </Content>
@@ -152,7 +147,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(resetForm());
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER));
+      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
@@ -161,14 +156,17 @@ function mapDispatchToProps(dispatch) {
       if (formData.get('import') !== null) {
         fromJS(formData.get('import').rows).forEach((row, index) => {
           dispatch(save({
-            attributes: row.set('draft', true).toJS(),
+            attributes: row
+              .mapKeys((k) => getColumnAttribute(k))
+              .set('draft', true)
+              .toJS(),
             saveRef: index + 1,
           }));
         });
       }
     },
     handleCancel: () => {
-      dispatch(updatePath('/actions'));
+      dispatch(updatePath(PATHS.MEASURES));
     },
     handleReset: () => {
       dispatch(resetProgress());

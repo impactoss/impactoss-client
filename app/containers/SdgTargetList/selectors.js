@@ -12,6 +12,7 @@ import {
   selectSortByQuery,
   selectSortOrderQuery,
   selectExpandQuery,
+  selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import {
@@ -52,7 +53,7 @@ export const selectConnections = createSelector(
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectConnections(state),
-  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'measure_categories'),
   (connections, taxonomies, categories, categoryMeasures) =>
@@ -91,7 +92,7 @@ export const selectConnectedTaxonomies = createSelector(
 const selectSdgTargetsNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'sdgtargets',
-    searchAttributes: ['title', 'reference'],
+    searchAttributes: CONFIG.search || ['title', 'reference'],
     locationQuery,
   }),
   (state) => selectConnections(state),

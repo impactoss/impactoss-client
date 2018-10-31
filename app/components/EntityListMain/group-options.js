@@ -1,4 +1,6 @@
 import { List, Map } from 'immutable';
+import { sortEntities } from 'utils/sort';
+import appMessages from 'containers/App/messages';
 
 export const getGroupValue = (taxonomies, connectedTaxonomies, groupAttribute, level) => {
   if (groupAttribute && taxonomies) {
@@ -20,20 +22,24 @@ export const getGroupValue = (taxonomies, connectedTaxonomies, groupAttribute, l
   return null;
 };
 
+const getTaxTitle = (id, contextIntl) => contextIntl ? contextIntl.formatMessage(appMessages.entities.taxonomies[id].single) : '';
+
 // args: immutable Maps
-export const getGroupOptions = (taxonomies, connectedTaxonomies) => {
+export const getGroupOptions = (taxonomies, connectedTaxonomies, contextIntl) => {
   let options = List();
 
   // taxonomy options
   if (taxonomies) {
     // first prepare taxonomy options
     options = options.concat(
-      taxonomies
-      .map((taxonomy) => Map({
-        value: taxonomy.get('id'), // filterOptionId
-        label: taxonomy.getIn(['attributes', 'title']),
-      }))
-      .toList()
+      sortEntities(
+        taxonomies.map((taxonomy) => Map({
+          value: taxonomy.get('id'), // filterOptionId
+          label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
+        })),
+        'asc',
+        'sortBy'
+      )
     );
   }
 
@@ -41,13 +47,16 @@ export const getGroupOptions = (taxonomies, connectedTaxonomies) => {
   if (connectedTaxonomies) {
     // first prepare taxonomy options
     options = options.concat(
-      connectedTaxonomies
+      sortEntities(
+        connectedTaxonomies
         .filter((taxonomy) => !taxonomies || !taxonomies.map((tax) => tax.get('id')).includes(taxonomy.get('id')))
         .map((taxonomy) => Map({
           value: `x:${taxonomy.get('id')}`, // filterOptionId
-          label: taxonomy.getIn(['attributes', 'title']),
-        }))
-        .toList()
+          label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
+        })),
+        'asc',
+        'sortBy'
+      )
     );
   }
   return options;

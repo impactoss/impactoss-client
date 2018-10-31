@@ -4,9 +4,9 @@ import { palette } from 'styled-theme';
 import ButtonForm from './ButtonForm';
 
 const ButtonCancel = styled(ButtonForm)`
-  color: ${palette('dark', 3)};
+  color: ${palette('buttonCancel', 0)};
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${palette('buttonCancelHover', 0)};
   }
 `;
 

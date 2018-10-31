@@ -33,47 +33,57 @@ const ChangeHint = styled.div`
   position: absolute;
   left: 0;
   right: 0;
-  bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
-  background-color: ${palette('light', 0)};
-  color: ${palette('dark', 3)};
-  font-style: italic;
+  bottom: ${(props) => props.hasFooter ? '30px' : '0px'};
+  color: ${palette('text', 1)};
+  background-color: ${palette('background', 1)};
   padding: 0.5em 1em;
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
   text-align: right;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
+  }
 `;
 
 const ChangeHintHighlighted = styled.span`
-  color: ${palette('primary', 0)};
+  color: ${palette('buttonDefault', 1)};
 `;
 
 const ControlMain = styled.div`
   position: absolute;
-  top: 60px;
+  top: 40px;
   bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
   left: 0;
   right: 0;
   overflow-y: auto;
   padding:0;
   padding-bottom: ${(props) => props.hasChangeNote ? '50px' : '0px'};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    top: 60px;
+  }
 `;
 const ControlFooter = styled.div`
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: ${palette('light', 0)};
-  height: 50px;
+  background-color: ${palette('background', 1)};
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    height: 50px;
+  }
 `;
 
 const Search = styled.div`
-  padding: 0.5em 1em;
-  background-color: ${palette('light', 0)};
+  padding: 0.75em;
+  background-color: ${palette('background', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0.75em 1em;
+  }
 `;
 
 const SelectAll = styled.div`
   padding: 0.5em 1em 0.5em 0;
-  background-color: ${palette('light', 0)};
+  background-color: ${palette('background', 1)};
   display: table;
   width: 100%;
   line-height: 1.1;
@@ -83,21 +93,25 @@ const LabelWrap = styled.div`
   display: table-cell;
   padding-left: 0.5em;
   padding-right: 1em;
-  font-size: 0.9em;
+  font-size: 0.8em;
+  vertical-align: middle;
 `;
 const CheckboxWrap = styled.div`
   text-align: center;
   display: table-cell;
-  padding-left: 1em;
-  padding-right: 0.5em;
   width: 10px;
+  vertical-align: middle;
+  padding-left: 0.75em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-right: 0.5em;
+    padding-left: 1em;
+  }
+
 `;
 const Checkbox = styled(IndeterminateCheckbox)`
   vertical-align: middle;
 `;
-const Label = styled.label`
-  vertical-align: middle;
-`;
+const Label = styled.label``;
 
 
 class MultiSelect extends React.Component {
@@ -141,6 +155,12 @@ class MultiSelect extends React.Component {
   onSearch = (value) => {
     this.setState({
       query: value,
+    });
+  }
+  onResetFilters = () => {
+    this.setState({
+      query: null,
+      queryTags: [],
     });
   }
   onTagSelected = (active, tagOption) => {
@@ -334,6 +354,7 @@ class MultiSelect extends React.Component {
             <Search>
               <TagSearch
                 onSearch={this.onSearch}
+                onClear={this.onResetFilters}
                 filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}
                 searchQuery={this.state.query || ''}
                 multiselect

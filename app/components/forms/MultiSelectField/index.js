@@ -5,6 +5,9 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { lowerCase } from 'utils/string';
 import { getEntitySortComparator } from 'utils/sort';
+
+import { fitComponent, SCROLL_PADDING } from 'utils/scroll-to-component';
+
 import { omit } from 'lodash/object';
 import Button from 'components/buttons/Button';
 import A from 'components/styled/A';
@@ -17,23 +20,28 @@ import messages from './messages';
 
 const MultiSelectWrapper = styled.div`
   position: absolute;
-  top: 38px;
+  top: 0;
   right: 0;
-  height:450px;
+  max-height: 450px;
+  min-height: 300px;
+  height: ${(props) => props.wrapperHeight ? props.wrapperHeight : 450}px;
   width: 100%;
-  min-width: 350px;
   overflow: hidden;
   display: block;
   z-index: 10;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('background', 0)};
   border-left: 1px solid;
   border-right: 1px solid;
   border-bottom: 1px solid;
   border-color: ${palette('light', 2)};
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    min-width: 350px;
+  }
 `;
 const MultiSelectFieldWrapper = styled.div`
   position: relative;
+  padding: 10px 0;
 `;
 const MultiselectActiveOptions = styled.div`
   position: relative;
@@ -43,58 +51,82 @@ const MultiselectActiveOptionList = styled.div`
 `;
 const MultiselectActiveOptionListItem = styled.div`
   position: relative;
-  background-color: ${palette('primary', 4)};
+  background-color: ${palette('mainListItem', 1)};
   border-bottom: 1px solid ${palette('light', 1)};
-  padding: 12px 0 12px 16px;
+  padding: 6px 0 6px 8px;
+  font-size: 0.8em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 12px 0 12px 16px;
+    font-size: 1em;
+  }
 `;
 const MultiselectActiveOptionRemove = styled(Button)`
   position: absolute;
   top: 0;
   right: 0;
   display: block;
-  padding: 0 16px;
   bottom: 0;
+  color: ${palette('link', 2)};
   &:hover {
-    color: ${palette('primary', 1)};
+    color: ${palette('linkHover', 2)};
+  }
+  padding: 0 8px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0 16px;
   }
 `;
 const MultiselectActiveOption = styled.div`
-  padding-right: 50px;
+  padding-right: 30px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-right: 50px;
+  }
 `;
 const MultiSelectDropdownIcon = styled.div`
   position: absolute;
   right: 0;
   top: 0;
-  padding: 12px 16px 0 0;
+  padding: 12px 8px 0 0;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-right: 16px;
+  }
 `;
 const MultiSelectDropdown = styled(Button)`
   position: relative;
   width: 100%;
   font-size: 0.85em;
   text-align: left;
-  color: ${palette('dark', 0)};
-  background-color: ${palette('light', 1)};
+  color: ${palette('multiSelectFieldButton', 0)};
+  background-color: ${palette('multiSelectFieldButton', 1)};
   &:hover {
-    color: ${palette('dark', 0)}
-    background-color: ${palette('light', 2)}
+    color: ${palette('multiSelectFieldButtonHover', 0)};
+    background-color: ${palette('multiSelectFieldButtonHover', 1)}
   }
-  padding: 12px 0 12px 16px;
+  padding: 12px 0 12px 8px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-left: 16px;
+  }
 `;
 
 const MultiSelectWithout = styled.div`
-  padding: 12px 0 12px 16px;
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
+  padding: 12px 0 12px 8px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-left: 16px;
+  }
 `;
 const MultiSelectWithoutLink = styled(A)`
-  color: ${palette('dark', 3)};
+  color: ${palette('text', 1)};
   &:hover {
-    color: ${palette('linkDefault', 1)};
+    color: ${palette('link', 0)};
   }
 `;
 
-const Id = styled.div`
-  font-weight: bold;
-  color: ${palette('dark', 3)}
+const Reference = styled.div`
+  color: ${palette('text', 1)};
+  &:hover {
+    color: ${palette('text', 0)};
+  }
+  font-size: 0.85em;
 `;
 
 const NON_CONTROL_PROPS = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages'];
@@ -105,9 +137,14 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
     super();
     this.state = {
       multiselectOpen: null,
+      controlRef: null,
     };
   }
-
+  componentDidUpdate() {
+    if (this.state.controlRef && this.props.scrollContainer) {
+      fitComponent(this.state.controlRef, this.props.scrollContainer);
+    }
+  }
   // MULTISELECT
   onToggleMultiselect = (field) => {
     this.setState({
@@ -117,6 +154,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
   onCloseMultiselect = () => {
     this.setState({
       multiselectOpen: null,
+      controlRef: null,
     });
   }
   onMultiSelectItemRemove = (option) =>
@@ -156,7 +194,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
           <ItemStatus draft />
         }
         { option.get('reference') &&
-          <Id>{option.get('reference')}</Id>
+          <Reference>{option.get('reference')}</Reference>
         }
         {option.get('label')}
       </MultiselectActiveOption>
@@ -213,7 +251,17 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
           }
         </MultiselectActiveOptions>
         { this.state.multiselectOpen === id &&
-          <MultiSelectWrapper>
+          <MultiSelectWrapper
+            wrapperHeight={this.props.scrollContainer
+              ? this.props.scrollContainer.getBoundingClientRect().height - (SCROLL_PADDING * 2)
+              : 450
+            }
+            innerRef={(node) => {
+              if (!this.state.controlRef) {
+                this.setState({ controlRef: node });
+              }
+            }}
+          >
             <MultiSelectControl
               id={id}
               model={model || `.${id}`}
@@ -247,6 +295,7 @@ MultiSelectField.propTypes = {
   fieldData: PropTypes.object,
   handleUpdate: PropTypes.func,
   closeOnClickOutside: PropTypes.bool,
+  scrollContainer: PropTypes.object,
 };
 
 MultiSelectField.contextTypes = {

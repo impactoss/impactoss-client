@@ -14,8 +14,4 @@ export default defineMessages({
     id: 'app.containers.RecommendationList.metaDescription',
     defaultMessage: 'Recommendations page description',
   },
-  add: {
-    id: 'app.containers.RecommendationList.add',
-    defaultMessage: 'Add recommendation',
-  },
 });

@@ -9,9 +9,8 @@ import messages from './messages';
 
 const MarkdownHint = styled.div`
   text-align: right;
-  color: ${palette('dark', 4)};
+  color: ${palette('text', 1)};
   font-size: 0.85em;
-  font-weight: bold;
 `;
 export class MarkdownControl extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -27,6 +26,7 @@ export class MarkdownControl extends React.PureComponent { // eslint-disable-lin
           <A
             href={this.context.intl.formatMessage(messages.url)}
             target="_blank"
+            onLightBackground
           >
             {this.context.intl.formatMessage(messages.anchor)}
           </A>
