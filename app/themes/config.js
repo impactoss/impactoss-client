@@ -95,7 +95,7 @@ export const PROGRESS_CATEGORY_REFERENCES = {
 // General ********************
 
 export const ENDPOINTS = {
-  API: 'https://undp-sadata-staging.herokuapp.com', // server API endpoint
+  API: 'https://sadata-production.herokuapp.com', // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
