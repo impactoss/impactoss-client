@@ -1,14 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
+
+import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import NormalImg from 'components/Img';
 import Container from 'components/styled/Container';
 import A from 'components/styled/A';
 
-import { SHOW_FOOTER_PARTNERS } from 'themes/config';
+import { PATHS } from 'containers/App/constants';
+import { FOOTER, DB_TABLES } from 'themes/config';
 
 import messages from './messages';
 
@@ -130,11 +134,15 @@ const PartnerNote = styled.div`
 
 class Footer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
+  componentWillMount() {
+    this.props.loadEntitiesIfNeeded();
+  }
+
   render() {
     const { theme } = this.props;
     return (
       <div>
-        { SHOW_FOOTER_PARTNERS > 0 &&
+        { FOOTER.PARTNERS > 0 &&
           <FooterLogos>
             <Container noPaddingBottom>
               { messages.partners.note && messages.partners.note !== '' &&
@@ -175,16 +183,37 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
                   </FooterLink>
                 </TableCell>
                 <TableCellSmall>
-                  <FormattedMessage {...messages.responsible.text} />
-                  <div>
-                    <FooterLink
-                      target="_blank"
-                      href={this.context.intl.formatMessage(messages.responsible.url)}
-                      title={this.context.intl.formatMessage(messages.responsible.anchor)}
-                    >
-                      <FormattedMessage {...messages.responsible.anchor} />
-                    </FooterLink>
-                  </div>
+                  { FOOTER.LINK_TARGET_INTERNAL &&
+                    <FormattedMessage
+                      {...messages.responsible.textWithInternalLink}
+                      values={{ internalLink: (
+                        <FooterLink
+                          onClick={(evt) => {
+                            if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                            this.props.onPageLink(`${PATHS.PAGES}/${FOOTER.LINK_TARGET_INTERNAL_ID}`);
+                          }}
+                          href={`${PATHS.PAGES}/${FOOTER.LINK_TARGET_INTERNAL_ID}`}
+                          title={this.context.intl.formatMessage(messages.responsible.anchor)}
+                        >
+                          <FormattedMessage {...messages.responsible.anchor} />
+                        </FooterLink>
+                      ) }}
+                    />
+                  }
+                  { !FOOTER.LINK_TARGET_INTERNAL &&
+                    <FormattedMessage {...messages.responsible.text} />
+                  }
+                  { !FOOTER.LINK_TARGET_INTERNAL &&
+                    <div>
+                      <FooterLink
+                        target="_blank"
+                        href={this.context.intl.formatMessage(messages.responsible.url)}
+                        title={this.context.intl.formatMessage(messages.responsible.anchor)}
+                      >
+                        <FormattedMessage {...messages.responsible.anchor} />
+                      </FooterLink>
+                    </div>
+                  }
                 </TableCellSmall>
                 <TableCellSmall>
                   <FormattedMessage {...messages.project.text} />
@@ -212,10 +241,25 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
 
 Footer.propTypes = {
   theme: PropTypes.object.isRequired,
+  onPageLink: PropTypes.func.isRequired,
+  loadEntitiesIfNeeded: PropTypes.func.isRequired,
 };
 
 Footer.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default withTheme(Footer);
+function mapDispatchToProps(dispatch) {
+  return {
+    loadEntitiesIfNeeded: () => {
+      loadEntitiesIfNeeded(DB_TABLES.pages);
+      // kick off loading
+    },
+    onPageLink: (path) => {
+      dispatch(updatePath(path));
+    },
+  };
+}
+
+// Wrap the component to inject dispatch and state into it
+export default connect(null, mapDispatchToProps)(withTheme(Footer));
