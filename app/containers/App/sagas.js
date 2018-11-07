@@ -488,6 +488,9 @@ export function* newEntitySaga({ data }) {
         yield put(replace(`${data.redirect}/${entityCreated.data.id}`));
       }
     }
+    if (data.invalidateEntitiesOnSuccess) {
+      yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
+    }
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(saveError(err, dataTS));

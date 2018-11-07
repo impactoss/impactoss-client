@@ -25,6 +25,10 @@ export default defineMessages({
       id: 'app.components.Footer.responsible.text',
       defaultMessage: 'Publisher\'s note, eg please visit our website to learn more about human rights',
     },
+    textWithInternalLink: {
+      id: 'app.components.Footer.responsible.textWithInternalLink',
+      defaultMessage: 'Publisher\'s note, eg please visit {internalLink} to learn more about human rights.',
+    },
     url: {
       id: 'app.components.Footer.responsible.url',
       defaultMessage: 'https://www.publisher.org/',

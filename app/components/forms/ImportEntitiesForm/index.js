@@ -79,7 +79,7 @@ const Hint = styled.div`
 const CsvDownload = styled.span`
   display: inline-block;
 `;
-const DownloadTemplate = styled(A)`
+const NoteLink = styled(A)`
   font-weight: bold;
 `;
 const RowErrors = styled.div`
@@ -152,14 +152,19 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                             datas={asArray(template.data)}
                             filename={template.filename}
                           >
-                            <DownloadTemplate href="/" onClick={(evt) => evt.preventDefault()}>
+                            <NoteLink href="/" onClick={(evt) => evt.preventDefault()}>
                               <FormattedMessage {...messages.templateHintDownloadLink} />
-                            </DownloadTemplate>
+                            </NoteLink>
                           </CsvDownloader>
                         </CsvDownload>
                       </li>
                       <li>
                         <FormattedMessage {...messages.formatHint} />
+                        { messages.formatHintLink && messages.formatHintLink !== '' &&
+                          <A href={this.context.intl.formatMessage(messages.formatHintLink)} target="_blank">
+                            {this.context.intl.formatMessage(messages.formatHintLinkAnchor)}
+                          </A>
+                        }
                       </li>
                     </HintList>
                   </Hint>
