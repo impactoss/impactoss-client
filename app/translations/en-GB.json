@@ -9,6 +9,7 @@
   "app.components.Footer.contact.email" : "contact@impactoss.org",
   "app.components.Footer.contact.anchor" : "contact@impactoss.org",
   "app.components.Footer.responsible.text" : "Learn more about Impact OSS, the Open Source Software for Integrated Management and Planning of Actions",
+  "app.components.Footer.responsible.textWithInternalLink" : "NOT USED: use when including an internal link",
   "app.components.Footer.responsible.url" : "http://impactoss.org",
   "app.components.Footer.responsible.anchor" : "www.impactoss.org",
   "app.components.Footer.project.text" : "This demo site is powered by",
