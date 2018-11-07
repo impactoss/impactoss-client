@@ -19,7 +19,7 @@ import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import ButtonHero from 'components/buttons/ButtonHero';
 import NormalImg from 'components/Img';
-import Footer from 'components/Footer';
+import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
