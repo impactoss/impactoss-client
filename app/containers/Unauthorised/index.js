@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import ContentHeader from 'components/ContentHeader';
 import Container from 'components/styled/Container';
 import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
-import Footer from 'components/Footer';
+import Footer from 'containers/Footer';
 
 import messages from './messages';
 
