@@ -44,7 +44,11 @@ export const SHOW_BRAND_ON_HOME = true;
 export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = true;
 
 // show footer logo section
-export const SHOW_FOOTER_PARTNERS = true;
+export const FOOTER = {
+  PARTNERS: true,
+  LINK_TARGET_INTERNAL: false,
+  LINK_TARGET_INTERNAL_ID: 1,
+};
 
 // entitylists items-per-page options
 export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
