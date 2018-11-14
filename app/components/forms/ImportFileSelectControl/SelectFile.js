@@ -111,7 +111,7 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
         { (this.state.errors.length > 0) &&
           <Messages
             type="error"
-            messages={[this.context.intl.formatMessage(messages.fileSelectError)]}
+            messages={[this.context.intl.formatMessage(messages.fileSelectError)].concat(this.state.errors.map((err) => `Code: "${err.code}", Message: "${err.message}"`))}
             onDismiss={this.onDismissErrors}
           />
         }
