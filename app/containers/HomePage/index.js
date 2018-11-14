@@ -19,7 +19,7 @@ import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import ButtonHero from 'components/buttons/ButtonHero';
 import NormalImg from 'components/Img';
-import Footer from 'components/Footer';
+import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
@@ -62,6 +62,7 @@ const GraphicHome = styled(NormalImg)`
 const SectionTop = styled.div`
   min-height: ${(props) => props.hasBrand ? 0 : '100vH'};
   display: ${(props) => props.hasBrand ? 'static' : 'table'};
+  width: ${(props) => props.hasBrand ? 'auto' : '100%'};
   background-color: ${palette('home', 0)};
   color: ${palette('homeIntro', 0)};
   text-align: center;

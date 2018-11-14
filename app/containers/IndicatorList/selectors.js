@@ -115,7 +115,7 @@ export const selectConnectedTaxonomies = createSelector(
 const selectIndicatorsNested = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'indicators',
-    searchAttributes: ['title', 'reference'],
+    searchAttributes: CONFIG.search || ['title', 'reference'],
     locationQuery,
   }),
   (state) => selectConnections(state),

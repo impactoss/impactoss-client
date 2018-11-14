@@ -74,10 +74,14 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
   }
 
   getReference = (entity) => {
-    if (this.context.intl && appMessages.entities[entity.get('type')] && appMessages.entities[entity.get('type')].singleShort && entity.getIn(['attributes', 'reference'])) {
-      return `${this.context.intl.formatMessage(appMessages.entities[entity.get('type')].singleShort)} ${entity.getIn(['attributes', 'reference'])}`;
+    const reference = entity.getIn(['attributes', 'reference']) || entity.get('id');
+    if (this.context.intl
+      && appMessages.entities[entity.get('type')]
+      && appMessages.entities[entity.get('type')].singleShort
+    ) {
+      return `${this.context.intl.formatMessage(appMessages.entities[entity.get('type')].singleShort)} ${reference}`;
     }
-    return entity.getIn(['attributes', 'reference']) || entity.get('id');
+    return reference;
   }
 
   getProgressTaxonomy = (taxonomies) =>

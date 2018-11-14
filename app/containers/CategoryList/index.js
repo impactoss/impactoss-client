@@ -101,7 +101,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     const nonUserCategories = categories ? categories.filter((cat) => !cat.getIn(['attributes', 'user_only'])) : null;
     const hasUserCategories = isManager && dataReady && userCategories && userCategories.size > 0;
 
-    const contentTitle = nonUserCategories && nonUserCategories.size && typeof reference !== 'undefined'
+    const contentTitle = nonUserCategories && typeof nonUserCategories.size !== 'undefined' && typeof reference !== 'undefined'
       ? this.getTaxTitle(reference, nonUserCategories.size)
       : '';
 
