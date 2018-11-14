@@ -44,7 +44,7 @@ function redirectIfNotSignedIn(store, info = PARAMS.NOT_SIGNED_IN) {
 function redirectIfNotPermitted(store, roleRequired, replacePath) {
   return (nextState, replace) => {
     if (!selectIsSignedIn(store.getState())) {
-      replaceIfNotSignedIn(nextState.location.pathname, replace, false, replacePath);
+      replaceIfNotSignedIn(nextState.location.pathname, replace, PARAMS.NOT_SIGNED_IN, replacePath);
     } else if (selectReadyForAuthCheck(store.getState()) && !hasRoleRequired(selectSessionUserRoles(store.getState()), roleRequired)) {
       replaceUnauthorised(replace, replacePath);
     }
