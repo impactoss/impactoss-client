@@ -175,12 +175,12 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         },
         {
           type: 'close',
-          onClick: () => this.props.handleClose(this.props.viewEntity.getIn(['taxonomy', 'id'])),
+          onClick: () => this.props.handleClose(this.props.viewEntity && this.props.viewEntity.getIn(['taxonomy', 'id'])),
         },
       ]
       : [{
         type: 'close',
-        onClick: () => this.props.handleClose(this.props.viewEntity.getIn(['taxonomy', 'id'])),
+        onClick: () => this.props.handleClose(this.props.viewEntity && this.props.viewEntity.getIn(['taxonomy', 'id'])),
       }];
     }
 
@@ -289,7 +289,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`${PATHS.CATEGORIES}${PATHS.EDIT}/${categoryId}`, { replace: true }));
     },
     handleClose: (taxonomyId) => {
-      dispatch(closeEntity(`${PATHS.TAXONOMIES}/${taxonomyId}`));
+      dispatch(closeEntity(taxonomyId ? `${PATHS.TAXONOMIES}/${taxonomyId}` : PATHS.OVERVIEW));
     },
   };
 }
