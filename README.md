@@ -1,6 +1,6 @@
 ![IMPACT OSS](header.png?raw=true "IMPACT OSS")
 
-## IMPACT OSS client application
+# IMPACT OSS client application
 
 This is the source code for the client-side application (the "UI") of IMPACT OSS. It is a React JavaScript application and is a single page application that is responsible for:
 * public User Interface (UI)
