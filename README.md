@@ -1,27 +1,25 @@
 ![IMPACT OSS](header.png?raw=true "IMPACT OSS")
 
-## About IMPACT OSS
+## IMPACT OSS client application
 
-IMPACT OSS is an Open Source Software (OSS) for Integrated Management and Planning of Actions (IMPACT), created to assist States with coordinating and monitoring implementation of human rights and the Sustainable Development Goals (SDGs).
-
-The IMPACT OSS project is maintained by the Impact Open Source Software Trust. To learn more about the project and the Trust see https://impactoss.org
-
-#### System components
-
-IMPACT OSS consists of a two principal components, this client-side application and a complementing server-side application
-
-##### Client application ("the UI")
-This client is a React JavaScript application and is a single page application that is responsible for:
+This is the source code for the client-side application (the "UI") of IMPACT OSS. It is a React JavaScript application and is a single page application that is responsible for:
 * public User Interface (UI)
 * admin UI
 
-##### Server application ("the API")
+It complements the IMPACT OSS server-side application that you can find here: https://github.com/impactoss/impactoss-server
+
 The server is a Rails application and is a thin server that is responsible for:
 * database management and access via an API (Application Programming Interface)
 * user authentication
 * automated email reminders
 
-See https://github.com/impactoss/impactoss-server for the server-side application code
+--
+
+## About IMPACT OSS
+
+IMPACT OSS is an Open Source Software (OSS) for Integrated Management and Planning of Actions (IMPACT), created to assist States with coordinating and monitoring implementation of human rights and the Sustainable Development Goals (SDGs).
+
+The IMPACT OSS project is maintained by the Impact Open Source Software Trust. To learn more about the project and the Trust see https://impactoss.org
 
 ---
 
@@ -32,7 +30,7 @@ See https://github.com/impactoss/impactoss-server for the server-side applicatio
 The IMPACT OSS installation guide provides detailed instructions on how to configure and install both server and client applications:
 https://install-guide.impactoss.org/
 
-##### Try out client application
+##### Try out the client application locally
 
 To quickly try out IMPACT OSS you can simply install the default demo configuration that uses the demo database of the demo server application:
 
