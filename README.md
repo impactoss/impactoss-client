@@ -1,4 +1,6 @@
-![IMPACT OSS](homeGraphic.jpg?raw=true "IMPACT OSS")
+![IMPACT OSS](homeGraphic.png?raw=true "IMPACT OSS")
+
+https://github.com/impactoss/impactoss-client/raw/master/homeGraphic.png
 
 ## About IMPACT OSS
 
