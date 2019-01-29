@@ -83,7 +83,7 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
     results.forEach((result) => {
       const [evt, file] = result;
       try {
-        const parsed = Baby.parse(evt.target.result, { header: true, skipEmptyLines: true });
+        const parsed = Baby.parse(evt.target.result, { header: true, skipEmptyLines: true, delimiter: ',' });
         if (parsed && parsed.errors && parsed.errors.length > 0) {
           this.setState({ errors: this.state.errors.concat(parsed.errors) });
         } else {
@@ -111,7 +111,7 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
         { (this.state.errors.length > 0) &&
           <Messages
             type="error"
-            messages={[this.context.intl.formatMessage(messages.fileSelectError)]}
+            messages={[this.context.intl.formatMessage(messages.fileSelectError)].concat(this.state.errors.map((err) => `Code: "${err.code}", Message: "${err.message}"`))}
             onDismiss={this.onDismissErrors}
           />
         }

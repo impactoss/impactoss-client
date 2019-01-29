@@ -20,10 +20,11 @@ export const testEntityCategoryAssociation = (entity, categoryId) =>
 export const testEntityTaxonomyAssociation = (entity, categories, taxonomyId) =>
   entity
   .get('categories')
-  .map((catId) => categories.size > 0 &&
+  .map((catId) => categories.size > 0 && categories.get(catId.toString()) &&
     categories
     .get(catId.toString())
-    .getIn(['attributes', 'taxonomy_id']))
+    .getIn(['attributes', 'taxonomy_id'])
+  )
   .includes(taxonomyId);
 
 // check if entity has any nested connection by type

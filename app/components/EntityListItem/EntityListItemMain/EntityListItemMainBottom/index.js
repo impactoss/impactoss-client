@@ -8,7 +8,7 @@ import Component from 'components/styled/Component';
 import EntityListItemMainBottomTaxonomies from './EntityListItemMainBottomTaxonomies';
 import EntityListItemMainBottomConnections from './EntityListItemMainBottomConnections';
 import EntityListItemMainBottomUser from './EntityListItemMainBottomUser';
-// import EntityListItemMainBottomTargetDate from './EntityListItemMainBottomTargetDate';
+import EntityListItemMainBottomTargetDate from './EntityListItemMainBottomTargetDate';
 
 const Styled = styled(Component)`
   margin-bottom: -5px;
@@ -21,7 +21,7 @@ const Styled = styled(Component)`
 class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { categories, taxonomies, onEntityClick, connections, wrapper, user } = this.props;
+    const { categories, taxonomies, onEntityClick, connections, wrapper, user, targetDate } = this.props;
     const smartTaxonomy = taxonomies && taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
 
     return (
@@ -44,6 +44,11 @@ class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-l
             user={user}
           />
         }
+        { targetDate &&
+          <EntityListItemMainBottomTargetDate
+            targetDate={targetDate}
+          />
+        }
       </Styled>
     );
   }
@@ -56,6 +61,7 @@ EntityListItemMainBottom.propTypes = {
   connections: PropTypes.array,
   wrapper: PropTypes.object,
   user: PropTypes.object,
+  targetDate: PropTypes.string,
 };
 
 export default EntityListItemMainBottom;

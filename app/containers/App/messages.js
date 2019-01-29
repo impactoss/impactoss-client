@@ -187,7 +187,11 @@ export default defineMessages({
     },
     required: {
       id: 'app.containers.App.import.required',
-      defaultMessage: 'Required: ',
+      defaultMessage: 'Required',
+    },
+    optional: {
+      id: 'app.containers.App.import.optional',
+      defaultMessage: 'Optional',
     },
     text: {
       id: 'app.containers.App.import.text',
