@@ -13,7 +13,7 @@ The server is a Rails application and is a thin server that is responsible for:
 * user authentication
 * automated email reminders
 
---
+---
 
 ## About IMPACT OSS
 
