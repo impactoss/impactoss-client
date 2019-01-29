@@ -6,7 +6,9 @@ This is the source code for the client-side application (the "UI") of IMPACT OSS
 * public User Interface (UI)
 * admin UI
 
-It complements the IMPACT OSS server-side application that you can find here: https://github.com/impactoss/impactoss-server
+##### IMPACT OSS server application
+
+It complements the IMPACT OSS server-side application (the "API") that you can find here: https://github.com/impactoss/impactoss-server
 
 The server is a Rails application and is a thin server that is responsible for:
 * database management and access via an API (Application Programming Interface)
