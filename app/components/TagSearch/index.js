@@ -64,6 +64,9 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       active: false,
     };
   }
+  componentDidMount() {
+    if (this.input) this.input.focus();
+  }
   getFilterLabel = (filter) => {
     // not used I think?
     if (filter.message) {
@@ -138,6 +141,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
           </Tags>
         }
         <SearchInput
+          inputRef={(el) => { this.input = el; }}
           id="search"
           minLength={1}
           debounceTimeout={500}

@@ -236,7 +236,7 @@
     "react-addons-perf": "^15.4.2",
     "react-csv-downloader": "^0.1.4",
     "react-day-picker": "^6.1.0",
-    "react-debounce-input": "^3.0.0",
+    "react-debounce-input": "^3.2.0",
     "react-dom": "^15.6.1",
     "react-file-reader-input": "^1.1.0",
     "react-helmet": "^5.1.3",
