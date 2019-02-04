@@ -295,11 +295,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         { !isHome &&
           this.renderPrimary(navItems, currentPath)
         }
-        { isHome &&
-          <ScreenReaderOnly>
-            { this.renderPrimary(navItems, currentPath)}
-          </ScreenReaderOnly>
-        }
       </Styled>
     );
   }
