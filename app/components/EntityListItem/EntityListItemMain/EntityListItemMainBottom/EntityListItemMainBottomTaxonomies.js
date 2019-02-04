@@ -109,6 +109,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
                   title={tag.title}
                   isSmartTag
                   isSmart={tag.isSmart}
+                  tabIndex={-1}
                 >
                   {tag.label}
                 </MyButtonTagCategory>
@@ -123,6 +124,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
                 taxId={parseInt(tag.taxId, 10)}
                 disabled={!tag.onClick}
                 title={tag.title}
+                tabIndex={-1}
               >
                 {tag.label}
               </MyButtonTagCategoryInverse>
@@ -134,6 +136,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
                 taxId={parseInt(tag.taxId, 10)}
                 disabled={!tag.onClick}
                 title={tag.title}
+                tabIndex={-1}
               >
                 {tag.label}
               </MyButtonTagCategory>
