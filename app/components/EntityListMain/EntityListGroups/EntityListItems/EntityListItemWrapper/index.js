@@ -20,6 +20,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
     super(props);
     this.state = { wrapper: null };
   }
+
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.expandNo !== nextProps.expandNo
     || this.props.entity !== nextProps.entity
@@ -72,6 +73,7 @@ export class EntityListItemWrapper extends React.PureComponent { // eslint-disab
               onEntityClick={onEntityClick}
               entityPath={entityPath}
               wrapper={this.state.wrapper}
+              isFocus={entity.get('id') === this.props.focusEntityId}
             />
             {config && config.expandableColumns
               && expandNo > 0
@@ -135,6 +137,7 @@ EntityListItemWrapper.propTypes = {
   entityIcon: PropTypes.func,
   simulate: PropTypes.bool,
   isConnection: PropTypes.bool,
+  focusEntityId: PropTypes.string,
 };
 
 export default EntityListItemWrapper;
