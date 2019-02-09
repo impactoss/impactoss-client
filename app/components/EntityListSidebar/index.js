@@ -16,6 +16,7 @@ import { FILTERS_PANEL, EDIT_PANEL, VIEWPORTS } from 'containers/App/constants';
 import { FILTER_FORM_MODEL, EDIT_FORM_MODEL } from 'containers/EntityListForm/constants';
 
 import Scrollable from 'components/styled/Scrollable';
+import SkipContent from 'components/styled/SkipContent';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import ButtonToggle from 'components/buttons/ButtonToggle';
@@ -80,27 +81,9 @@ const SidebarWrapper = styled.div`
   }
 `;
 
-const SkipContent = styled.a`
-  position: absolute;
-  left: -10000px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-
-  &:focus{
-    position: absolute;
-    left: 0;
-    width: auto;
-    height: auto;
-    background-color: #fff;
-    z-index: 99999;
-    box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
-  }
-`;
-
 const STATE_INITIAL = {
   activeOption: null,
+  focusComponent: false,
   expandedGroups: {
     taxonomies: true,
     connectedTaxonomies: true,
@@ -155,12 +138,18 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       || this.props.connections !== nextProps.connections
       || !isEqual(this.state, nextState);
   }
+  componentDidUpdate() {
+    if (this.state.focusComponent && this.component) this.component.focus();
+  }
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
   }
 
   onShowForm = (option) => {
-    this.setState({ activeOption: option.active ? null : option });
+    this.setState({
+      activeOption: option.active ? null : option,
+      focusComponent: false,
+    });
   };
   onShowSidebar = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -168,13 +157,13 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   };
   onHideSidebar = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.onHideForm(evt);
-    this.setState({ visible: false });
+    this.hideForm();
+    this.hideSidebar();
   };
 
   onHideForm = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.setState({ activeOption: null });
+    this.hideForm();
   };
 
   onToggleGroup = (groupId, expanded) => {
@@ -218,6 +207,16 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       submit: true,
     },
   ];
+
+  hideForm = (focusComponent = true) => {
+    this.setState({
+      activeOption: null,
+      focusComponent,
+    });
+  };
+  hideSidebar = () => {
+    this.setState({ visible: false });
+  };
 
   updateViewport() {
     let viewport = VIEWPORTS.MOBILE;
@@ -323,7 +322,11 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       }
     }
     return (
-      <div id="filter-options">
+      <div
+        id="filter-options"
+        tabIndex={0}
+        ref={(el) => { this.component = el; }}
+      >
         { (!this.state.visible && this.state.viewport < VIEWPORTS.LARGE) &&
           <ToggleShow onClick={this.onShowSidebar}>
             { canEdit &&
@@ -400,8 +403,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             showCancelButton={(activePanel === FILTERS_PANEL)}
             onSelect={() => {
               if (activePanel === FILTERS_PANEL) {
-                this.onHideForm();
-                this.onHideSidebar();
+                this.hideForm(false);
+                this.hideSidebar();
               }
             }}
             onSubmit={activePanel === EDIT_PANEL

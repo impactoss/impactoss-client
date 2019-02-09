@@ -16,6 +16,7 @@ import { lowerCase } from 'utils/string';
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
 import Content from 'components/styled/Content';
+import SkipContent from 'components/styled/SkipContent';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
@@ -43,24 +44,6 @@ const ListEntities = styled.div`
   position: relative;
 `;
 const ListWrapper = styled.div``;
-
-const SkipContent = styled.a`
-  position: absolute;
-  left: -10000px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-
-  &:focus{
-    position: absolute;
-    left: 0;
-    width: auto;
-    height: auto;
-    background-color: #fff;
-    z-index: 99999;
-    box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
-  }
-`;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {

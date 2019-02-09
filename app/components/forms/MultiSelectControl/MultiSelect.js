@@ -358,6 +358,7 @@ class MultiSelect extends React.Component {
                 filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}
                 searchQuery={this.state.query || ''}
                 multiselect
+                focusOnMount
               />
             </Search>
           }

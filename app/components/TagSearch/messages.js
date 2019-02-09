@@ -13,4 +13,12 @@ export default defineMessages({
     id: 'app.components.TagSearch.searchPlaceholderMultiSelect',
     defaultMessage: 'Filter options by reference or title',
   },
+  removeTag: {
+    id: 'app.components.TagSearch.removeTag',
+    defaultMessage: 'Active filter: {title} - click to remove',
+  },
+  removeAll: {
+    id: 'app.components.TagSearch.removeAll',
+    defaultMessage: 'Click to remove all filters',
+  },
 });

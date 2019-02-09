@@ -24,6 +24,8 @@ import { CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
 import Button from 'components/buttons/Button';
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
+import SkipContent from 'components/styled/SkipContent';
+
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
@@ -279,7 +281,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
           <EntityListSidebarLoading responsiveSmall />
         }
         { dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE &&
-          <div>
+          <div id="search-targets">
             <Sidebar responsiveSmall >
               <ScrollableWrapper>
                 <Component>
@@ -315,8 +317,15 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       searchQuery={location.query.search || ''}
                       onSearch={onSearch}
                       onClear={() => onClear(['search'])}
+                      focusOnMount
                     />
                   </EntityListSearch>
+                  <SkipContent
+                    href="#search-targets"
+                    title={this.context.intl.formatMessage(appMessages.screenreader.skipToListFilter)}
+                  >
+                    <FormattedMessage {...appMessages.screenreader.skipToSearchTarget} />
+                  </SkipContent>
                   <ListWrapper>
                     {
                       noEntry && (
