@@ -79,7 +79,7 @@ export default defineMessages({
     },
     skipToListFilter: {
       id: 'app.containers.App.screenreader.skipToListFilter',
-      defaultMessage: 'Skip to list filter options',
+      defaultMessage: 'Go to list filter options',
     },
     hideSecondaryNavigation: {
       id: 'app.containers.App.screenreader.hideSecondaryNavigation',

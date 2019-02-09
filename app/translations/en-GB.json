@@ -427,7 +427,7 @@
   "app.containers.App.ui.sortOrderOptions.asc" : "Ascending",
   "app.containers.App.ui.sortOrderOptions.desc" : "Descending",
   "app.containers.App.screenreader.skipToContent" : "Skip to content",
-  "app.containers.App.screenreader.skipToListFilter" : "Skip to list filter options",
+  "app.containers.App.screenreader.skipToListFilter" : "Go to list filter options",
   "app.containers.App.screenreader.hideSecondaryNavigation" : "Hide top menu",
   "app.containers.App.screenreader.showSecondaryNavigation" : "Show top menu",
   "app.containers.CategoryEdit.pageTitle" : "Edit Category",
