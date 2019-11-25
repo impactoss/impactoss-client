@@ -159,7 +159,8 @@ export const REPORT_FREQUENCIES = [
   { value: 12, message: 'ui.reportFrequencies.annual' },
 ];
 
-export const ENABLE_SDGS = true;
+export const ENABLE_SDGS = false;
+export const EXCLUDE_TAXONOMIES = ['4']; // SGDs
 
 // Map server database tables **************************
 export const DB_TABLES = [
@@ -179,10 +180,10 @@ export const DB_TABLES = [
   'user_categories',
   'progress_reports',
   'due_dates',
-  'sdgtarget_categories',
-  'sdgtarget_indicators',
-  'sdgtarget_measures',
-  'sdgtargets',
+  // 'sdgtarget_categories',
+  // 'sdgtarget_indicators',
+  // 'sdgtarget_measures',
+  // 'sdgtargets',
 ];
 
 // Table shapes
@@ -278,11 +279,11 @@ export const MEASURE_SHAPE = {
         via: 'measure_indicators',
         key: 'indicator_id',
       },
-      {
-        table: 'sdgtargets',
-        via: 'sdgtarget_measures',
-        key: 'sdgtarget_id',
-      },
+      // {
+      //   table: 'sdgtargets',
+      //   via: 'sdgtarget_measures',
+      //   key: 'sdgtarget_id',
+      // },
     ],
     section: 'body',
     column: 'main',

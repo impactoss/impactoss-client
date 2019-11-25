@@ -16,7 +16,7 @@ import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 import { sortEntities } from 'utils/sort';
 
-import { USER_ROLES, DB_TABLES } from 'themes/config';
+import { USER_ROLES, DB_TABLES, EXCLUDE_TAXONOMIES } from 'themes/config';
 import { PARAMS } from 'containers/App/constants';
 
 import {
@@ -293,7 +293,12 @@ export const selectEntities = createSelector(
 
 export const selectTaxonomiesSorted = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
-  (taxonomies) => taxonomies && sortEntities(taxonomies, 'asc', 'priority', null, false)
+  (taxonomies) => {
+    if (taxonomies) {
+      return sortEntities(taxonomies.filter((t) => EXCLUDE_TAXONOMIES.indexOf(t.get('id')) < 0), 'asc', 'priority', null, false);
+    }
+    return null;
+  }
 );
 
 export const selectEntity = createSelector(
