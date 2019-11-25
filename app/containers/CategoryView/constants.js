@@ -3,10 +3,10 @@
  * CategoryView constants
  *
  */
-import { ENABLE_SDGS } from 'themes/config';
+import { ENABLE_SDGS, ENABLE_INDICATORS } from 'themes/config';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
+let tables = [];
+const baseTables = [
   'user_roles',
   'categories',
   'users',
@@ -15,23 +15,23 @@ export const DEPENDENCIES = ENABLE_SDGS
   'recommendation_measures',
   'recommendation_categories',
   'measures',
-  'measure_indicators',
   'measure_categories',
+];
+const sdgTables = [
   'sdgtargets',
   'sdgtarget_indicators',
   'sdgtarget_categories',
-  'indicators',
-]
-: [
-  'user_roles',
-  'categories',
-  'users',
-  'taxonomies',
-  'recommendations',
-  'recommendation_measures',
-  'recommendation_categories',
-  'measures',
+];
+const indicatorTables = [
   'measure_indicators',
-  'measure_categories',
   'indicators',
 ];
+
+tables = baseTables;
+if (ENABLE_SDGS) {
+  tables = tables.concat(sdgTables);
+}
+if (ENABLE_INDICATORS) {
+  tables = tables.concat(indicatorTables);
+}
+export const DEPENDENCIES = tables;

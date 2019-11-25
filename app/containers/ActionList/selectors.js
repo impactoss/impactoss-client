@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 import { Map, List } from 'immutable';
 import { reduce } from 'lodash/collection';
 
-import { ENABLE_SDGS } from 'themes/config';
+import { ENABLE_SDGS, ENABLE_INDICATORS } from 'themes/config';
 
 import {
   selectEntities,
@@ -145,7 +145,7 @@ const selectMeasuresNested = createSelector(
     // nest connected indicator ids
     .set(
       'indicators',
-      measureIndicators
+      ENABLE_INDICATORS && measureIndicators
       .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
         && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
@@ -192,7 +192,7 @@ const selectMeasuresExpandables = createSelector(
   (state) => selectEntities(state, 'due_dates'),
   selectExpandQuery,
   (entities, indicators, reports, dueDates, expandNo) =>
-    entities.map((entity) => {
+    !ENABLE_INDICATORS ? entities : entities.map((entity) => {
       if (expandNo <= 0) {
         // insert expandables:
         // - indicators

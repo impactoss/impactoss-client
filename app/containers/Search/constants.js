@@ -1,25 +1,30 @@
-import { ENABLE_SDGS } from 'themes/config';
+import { ENABLE_SDGS, ENABLE_INDICATORS } from 'themes/config';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
+let tables = [];
+const baseTables = [
   'pages',
   'taxonomies',
   'categories',
-  'indicators',
-  'measures',
-  'recommendations',
-  'sdgtargets',
-  'progress_reports',
-]
-: [
-  'pages',
-  'taxonomies',
-  'categories',
-  'indicators',
   'measures',
   'recommendations',
   'progress_reports',
 ];
+const sdgTables = [
+  'sdgtargets',
+];
+const indicatorTables = [
+  'indicators',
+];
+
+tables = baseTables;
+if (ENABLE_SDGS) {
+  tables = tables.concat(sdgTables);
+}
+if (ENABLE_INDICATORS) {
+  tables = tables.concat(indicatorTables);
+}
+export const DEPENDENCIES = tables;
+
 
 export const UPDATE_QUERY = 'impactoss/Search/UPDATE_QUERY';
 export const RESET_SEARCH_QUERY = 'impactoss/Search/RESET_SEARCH_QUERY';
@@ -54,7 +59,7 @@ export const CONFIG = {
             },
           ],
         },
-        {
+        ENABLE_INDICATORS && {
           path: 'indicators',
           search: ['title', 'description', 'reference'],
           sorting: [
@@ -135,7 +140,7 @@ export const CONFIG = {
             },
           ],
         },
-        {
+        ENABLE_INDICATORS && {
           path: 'progress_reports',
           clientPath: 'reports',
           search: ['title', 'description', 'document_url'],

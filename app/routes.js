@@ -6,7 +6,7 @@ import { getAsyncInjectors } from 'utils/asyncInjectors';
 import { getRedirects } from 'utils/redirects';
 
 import { PATHS } from 'containers/App/constants';
-import { USER_ROLES, ENABLE_SDGS } from 'themes/config';
+import { USER_ROLES, ENABLE_SDGS, ENABLE_INDICATORS } from 'themes/config';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -24,8 +24,7 @@ export default function createRoutes(store) {
     redirectIfNotSignedIn,
     redirectIfNotPermitted,
   } = getRedirects(store);
-
-  return [
+  const baseRoutes = [
     {
       path: '/',
       name: 'home',
@@ -330,131 +329,6 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.SDG_TARGETS,
-      name: ENABLE_SDGS ? 'sdgtargetList' : 'notfound',
-      getComponent(nextState, cb) {
-        if (ENABLE_SDGS) {
-          const importModules = Promise.all([
-            import('containers/SdgTargetList'),
-          ]);
-
-          const renderRoute = loadModule(cb);
-
-          importModules.then(([component]) => {
-            renderRoute(component);
-          });
-
-          importModules.catch(errorLoading);
-        } else {
-          import('containers/NotFoundPage')
-            .then(loadModule(cb))
-            .catch(errorLoading);
-        }
-      },
-    }, {
-      path: `${PATHS.SDG_TARGETS}${PATHS.NEW}`,
-      name: ENABLE_SDGS ? 'sdgtargetNew' : 'notfound',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
-      getComponent(nextState, cb) {
-        if (ENABLE_SDGS) {
-          const importModules = Promise.all([
-            import('containers/SdgTargetNew/reducer'),
-            import('containers/SdgTargetNew/sagas'),
-            import('containers/SdgTargetNew'),
-          ]);
-
-          const renderRoute = loadModule(cb);
-
-          importModules.then(([reducer, sagas, component]) => {
-            injectReducer('sdgtargetNew', reducer.default);
-            injectSagas(sagas.default);
-            renderRoute(component);
-          });
-
-          importModules.catch(errorLoading);
-        } else {
-          import('containers/NotFoundPage')
-            .then(loadModule(cb))
-            .catch(errorLoading);
-        }
-      },
-    }, {
-      path: `${PATHS.SDG_TARGETS}${PATHS.IMPORT}`,
-      name: ENABLE_SDGS ? 'sdgtargetImport' : 'notfound',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
-      getComponent(nextState, cb) {
-        if (ENABLE_SDGS) {
-          const importModules = Promise.all([
-            import('containers/SdgTargetImport/reducer'),
-            import('containers/SdgTargetImport/sagas'),
-            import('containers/SdgTargetImport'),
-          ]);
-
-          const renderRoute = loadModule(cb);
-
-          importModules.then(([reducer, sagas, component]) => {
-            injectReducer('sdgtargetImport', reducer.default);
-            injectSagas(sagas.default);
-            renderRoute(component);
-          });
-
-          importModules.catch(errorLoading);
-        } else {
-          import('containers/NotFoundPage')
-            .then(loadModule(cb))
-            .catch(errorLoading);
-        }
-      },
-    }, {
-      path: `${PATHS.SDG_TARGETS}${PATHS.ID}`,
-      name: ENABLE_SDGS ? 'sdgtargetView' : 'notfound',
-      getComponent(nextState, cb) {
-        if (ENABLE_SDGS) {
-          const importModules = Promise.all([
-            import('containers/SdgTargetView'),
-          ]);
-
-          const renderRoute = loadModule(cb);
-
-          importModules.then(([component]) => {
-            renderRoute(component);
-          });
-
-          importModules.catch(errorLoading);
-        } else {
-          import('containers/NotFoundPage')
-            .then(loadModule(cb))
-            .catch(errorLoading);
-        }
-      },
-    }, {
-      path: `${PATHS.SDG_TARGETS}${PATHS.EDIT}${PATHS.ID}`,
-      name: ENABLE_SDGS ? 'sdgtargetEdit' : 'notfound',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
-      getComponent(nextState, cb) {
-        if (ENABLE_SDGS) {
-          const importModules = Promise.all([
-            import('containers/SdgTargetEdit/reducer'),
-            import('containers/SdgTargetEdit/sagas'),
-            import('containers/SdgTargetEdit'),
-          ]);
-
-          const renderRoute = loadModule(cb);
-
-          importModules.then(([reducer, sagas, component]) => {
-            injectReducer('sdgtargetEdit', reducer.default);
-            injectSagas(sagas.default);
-            renderRoute(component);
-          });
-
-          importModules.catch(errorLoading);
-        } else {
-          import('containers/NotFoundPage')
-            .then(loadModule(cb))
-            .catch(errorLoading);
-        }
-      },
-    }, {
       path: PATHS.RECOMMENDATIONS,
       name: 'recommendationList',
       getComponent(nextState, cb) {
@@ -548,164 +422,6 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
-    }, {
-      path: PATHS.INDICATORS,
-      name: 'indicatorList',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value, PATHS.MEASURES),
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/IndicatorList'),
-        ]);
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([component]) => {
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    }, {
-      path: `${PATHS.INDICATORS}${PATHS.NEW}`,
-      name: 'indicatorNew',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/IndicatorNew/reducer'),
-          import('containers/IndicatorNew/sagas'),
-          import('containers/IndicatorNew'),
-        ]);
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('indicatorNew', reducer.default);
-          injectSagas(sagas.default);
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    }, {
-      path: `${PATHS.INDICATORS}${PATHS.IMPORT}`,
-      name: 'indicatorImport',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/IndicatorImport/reducer'),
-          import('containers/IndicatorImport/sagas'),
-          import('containers/IndicatorImport'),
-        ]);
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('indicatorImport', reducer.default);
-          injectSagas(sagas.default);
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    }, {
-      path: `${PATHS.INDICATORS}${PATHS.ID}`,
-      name: 'indicatorView',
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/IndicatorView'),
-        ]);
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([component]) => {
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    }, {
-      path: `${PATHS.INDICATORS}${PATHS.EDIT}${PATHS.ID}`,
-      name: 'indicatorEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/IndicatorEdit/reducer'),
-          import('containers/IndicatorEdit/sagas'),
-          import('containers/IndicatorEdit'),
-        ]);
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('indicatorEdit', reducer.default);
-          injectSagas(sagas.default);
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    }, {
-      path: `${PATHS.PROGRESS_REPORTS}${PATHS.NEW}${PATHS.ID}`, // the indicator id
-      name: 'reportNew',
-      onEnter: redirectIfNotSignedIn('signInGuestReport'),
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/ReportNew/reducer'),
-          import('containers/ReportNew/sagas'),
-          import('containers/ReportNew'),
-        ]);
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('reportNew', reducer.default);
-          injectSagas(sagas.default);
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    }, {
-      path: `${PATHS.PROGRESS_REPORTS}${PATHS.ID}`, // the report id
-      name: 'reportView',
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/ReportView'),
-        ]);
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([component]) => {
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    }, {
-      path: `${PATHS.PROGRESS_REPORTS}${PATHS.EDIT}${PATHS.ID}`,
-      name: 'reportEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value),
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/ReportEdit/reducer'),
-          import('containers/ReportEdit/sagas'),
-          import('containers/ReportEdit'),
-        ]);
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('reportEdit', reducer.default);
-          injectSagas(sagas.default);
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    // }, {
-    //   path: PATHS.TAXONOMIES,
-    //   name: 'taxonomies',
-    //   onEnter: (nextState, replace) => replace(`${PATHS.TAXONOMIES}/1`),
     }, {
       path: `${PATHS.TAXONOMIES}${PATHS.ID}`, // the taxonomy id
       name: 'categoryList',
@@ -883,14 +599,283 @@ export default function createRoutes(store) {
           .then(loadModule(cb))
           .catch(errorLoading);
       },
-    }, {
-      path: '*',
-      name: 'notfound',
+    },
+  ];
+  let routes = [];
+  const indicatorRoutes = [
+    {
+      path: PATHS.INDICATORS,
+      name: 'indicatorList',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value, PATHS.MEASURES),
       getComponent(nextState, cb) {
-        import('containers/NotFoundPage')
-          .then(loadModule(cb))
-          .catch(errorLoading);
+        const importModules = Promise.all([
+          import('containers/IndicatorList'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: `${PATHS.INDICATORS}${PATHS.NEW}`,
+      name: 'indicatorNew',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorNew/reducer'),
+          import('containers/IndicatorNew/sagas'),
+          import('containers/IndicatorNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('indicatorNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: `${PATHS.INDICATORS}${PATHS.IMPORT}`,
+      name: 'indicatorImport',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorImport/reducer'),
+          import('containers/IndicatorImport/sagas'),
+          import('containers/IndicatorImport'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('indicatorImport', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: `${PATHS.INDICATORS}${PATHS.ID}`,
+      name: 'indicatorView',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: `${PATHS.INDICATORS}${PATHS.EDIT}${PATHS.ID}`,
+      name: 'indicatorEdit',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/IndicatorEdit/reducer'),
+          import('containers/IndicatorEdit/sagas'),
+          import('containers/IndicatorEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('indicatorEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: `${PATHS.PROGRESS_REPORTS}${PATHS.NEW}${PATHS.ID}`, // the indicator id
+      name: 'reportNew',
+      onEnter: redirectIfNotSignedIn('signInGuestReport'),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ReportNew/reducer'),
+          import('containers/ReportNew/sagas'),
+          import('containers/ReportNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('reportNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: `${PATHS.PROGRESS_REPORTS}${PATHS.ID}`, // the report id
+      name: 'reportView',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ReportView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: `${PATHS.PROGRESS_REPORTS}${PATHS.EDIT}${PATHS.ID}`,
+      name: 'reportEdit',
+      onEnter: redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ReportEdit/reducer'),
+          import('containers/ReportEdit/sagas'),
+          import('containers/ReportEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('reportEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    // }, {
+    //   path: PATHS.TAXONOMIES,
+    //   name: 'taxonomies',
+    //   onEnter: (nextState, replace) => replace(`${PATHS.TAXONOMIES}/1`),
+    },
+  ];
+  const sdgRoutes = [
+    {
+      path: PATHS.SDG_TARGETS,
+      name: 'sdgtargetList',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetList'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: `${PATHS.SDG_TARGETS}${PATHS.NEW}`,
+      name: 'sdgtargetNew',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetNew/reducer'),
+          import('containers/SdgTargetNew/sagas'),
+          import('containers/SdgTargetNew'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('sdgtargetNew', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: `${PATHS.SDG_TARGETS}${PATHS.IMPORT}`,
+      name: 'sdgtargetImport',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetImport/reducer'),
+          import('containers/SdgTargetImport/sagas'),
+          import('containers/SdgTargetImport'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('sdgtargetImport', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: `${PATHS.SDG_TARGETS}${PATHS.ID}`,
+      name: 'sdgtargetView',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetView'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: `${PATHS.SDG_TARGETS}${PATHS.EDIT}${PATHS.ID}`,
+      name: 'sdgtargetEdit',
+      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SdgTargetEdit/reducer'),
+          import('containers/SdgTargetEdit/sagas'),
+          import('containers/SdgTargetEdit'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('sdgtargetEdit', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
       },
     },
   ];
+  routes = baseRoutes;
+  if (ENABLE_SDGS) {
+    routes = routes.concat(sdgRoutes);
+  }
+  if (ENABLE_INDICATORS) {
+    routes = routes.concat(indicatorRoutes);
+  }
+  routes = routes.concat([{
+    path: '*',
+    name: 'notfound',
+    getComponent(nextState, cb) {
+      import('containers/NotFoundPage')
+        .then(loadModule(cb))
+        .catch(errorLoading);
+    },
+  }]);
+  return routes;
 }

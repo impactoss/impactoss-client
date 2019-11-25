@@ -3,36 +3,35 @@
  * ActionEdit constants
  *
  */
-import { ENABLE_SDGS } from 'themes/config';
+import { ENABLE_SDGS, ENABLE_INDICATORS } from 'themes/config';
 export const SAVE = 'impactoss/ActionEdit/SAVE';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
+let tables = [];
+const baseTables = [
+  'users',
   'user_roles',
   'measures',
-  'users',
   'categories',
   'taxonomies',
   'recommendations',
   'recommendation_measures',
   'measure_categories',
-  'indicators',
-  'measure_indicators',
-  'sdgtargets',
-  'sdgtarget_measures',
-  'recommendation_categories',
-  'sdgtarget_categories',
-]
-: [
-  'user_roles',
-  'measures',
-  'users',
-  'categories',
-  'taxonomies',
-  'recommendations',
-  'recommendation_measures',
-  'measure_categories',
-  'indicators',
-  'measure_indicators',
   'recommendation_categories',
 ];
+const sdgTables = [
+  'sdgtargets',
+  'sdgtarget_measures',
+  'sdgtarget_categories',
+];
+const indicatorTables = [
+  'indicators',
+  'measure_indicators',
+];
+tables = baseTables;
+if (ENABLE_SDGS) {
+  tables = tables.concat(sdgTables);
+}
+if (ENABLE_INDICATORS) {
+  tables = tables.concat(indicatorTables);
+}
+export const DEPENDENCIES = tables;

@@ -8,21 +8,8 @@ import { REPORT_FREQUENCIES, ENABLE_SDGS } from 'themes/config';
 
 export const SAVE = 'impactoss/IndicatorEdit/SAVE';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
-  'user_roles',
-  'measures',
-  'sdgtargets',
-  'users',
-  'indicators',
-  'measure_indicators',
-  'sdgtarget_indicators',
-  'measure_categories',
-  'sdgtarget_categories',
-  'taxonomies',
-  'categories',
-]
-: [
+let tables = [];
+const baseTables = [
   'user_roles',
   'measures',
   'users',
@@ -32,6 +19,18 @@ export const DEPENDENCIES = ENABLE_SDGS
   'taxonomies',
   'categories',
 ];
+const sdgTables = [
+  'sdgtargets',
+  'sdgtarget_indicators',
+  'sdgtarget_categories',
+];
+
+tables = baseTables;
+if (ENABLE_SDGS) {
+  tables = tables.concat(sdgTables);
+}
+export const DEPENDENCIES = tables;
+
 
 export const FORM_INITIAL = fromJS({
   id: '',

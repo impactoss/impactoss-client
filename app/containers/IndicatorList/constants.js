@@ -1,22 +1,7 @@
 import { PUBLISH_STATUSES, USER_ROLES, ENABLE_SDGS } from 'themes/config';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
-  'user_roles',
-  'indicators',
-  'users',
-  'taxonomies',
-  'categories',
-  'measures',
-  'measure_indicators',
-  'measure_categories',
-  'sdgtargets',
-  'sdgtarget_indicators',
-  'sdgtarget_categories',
-  'due_dates',
-  'progress_reports',
-]
-: [
+let tables = [];
+const baseTables = [
   'user_roles',
   'indicators',
   'users',
@@ -28,6 +13,17 @@ export const DEPENDENCIES = ENABLE_SDGS
   'due_dates',
   'progress_reports',
 ];
+const sdgTables = [
+  'sdgtargets',
+  'sdgtarget_indicators',
+  'sdgtarget_categories',
+];
+
+tables = baseTables;
+if (ENABLE_SDGS) {
+  tables = tables.concat(sdgTables);
+}
+export const DEPENDENCIES = tables;
 
 export const CONFIG = {
   serverPath: 'indicators',

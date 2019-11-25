@@ -22,7 +22,7 @@ import {
   selectReady,
 } from 'containers/App/selectors';
 import { PATHS, CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
-import { ENABLE_SDGS } from 'themes/config';
+import { ENABLE_SDGS, ENABLE_INDICATORS } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
 
@@ -74,9 +74,9 @@ const Diagram = styled.div`
     margin-bottom: 180px;
   }
 `;
-const DiagramSectionHorizontalHalf = styled.div`
+const DiagramSectionHorizontalSide = styled.div`
   display: inline-block;
-  width: 25%;
+  width: ${(props) => props.hasIndicators ? '25' : '50'}%;
   position: relative;
   height: 260px;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
@@ -138,15 +138,29 @@ const Annotation = styled.div`
   transform: translate(-50%, -50%);
   top: 50%;
   text-align: center;
-  word-spacing: 1000000px;
-  width: 200px;
   color: ${palette('text', 1)};
   line-height: 1.1;
   font-size: 0.85em;
-  margin-top: -2em;
-  left: ${(props) => props.hasSDGs ? 31 : 30}%;
+  width: 200px;
+`;
+const AnnotationAddressed = styled(Annotation)`
+  left: ${(props) => {
+    if (props.hasSDGs) return 31;
+    if (props.hasIndicators) return 30;
+    return 49;
+  }}%;
+  word-spacing: ${(props) => {
+    if (props.hasIndicators) return 1000000;
+    return 0;
+  }}px;
+  margin-top: ${(props) => {
+    if (props.hasIndicators) return -2;
+    return -1.1;
+  }}em;
 `;
 const AnnotationMeasured = styled(Annotation)`
+  margin-top: -2em;
+  word-spacing: 1000000px;
   left: 70%;
 `;
 const AnnotationVertical = styled.div`
@@ -535,10 +549,10 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
           { this.state.buttonRecs && this.state.buttonMeasures &&
             this.renderArrow(this.connectRecommendationsMeasures(vertical), vertical)
           }
-          { this.state.buttonIndicators && this.state.buttonMeasures &&
+          {ENABLE_INDICATORS && this.state.buttonIndicators && this.state.buttonMeasures &&
             this.renderPath(this.connectMeasuresIndicators(vertical))
           }
-          { this.state.buttonIndicators && this.state.buttonMeasures &&
+          {ENABLE_INDICATORS && this.state.buttonIndicators && this.state.buttonMeasures &&
             this.renderArrow(this.connectMeasuresIndicators(vertical), vertical)
           }
           {ENABLE_SDGS && this.state.buttonSdgtargets && this.state.buttonIndicators &&
@@ -754,19 +768,23 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                           {this.renderMeasuresButton()}
                         </DiagramSectionVerticalCenter>
                       </DiagramSectionVertical>
-                      <AnnotationVertical>
-                        <FormattedMessage {...messages.diagram.measured} />
-                      </AnnotationVertical>
-                      <DiagramSectionVertical>
-                        <DiagramSectionVerticalCenter>
-                          {this.renderIndicatorButton()}
-                        </DiagramSectionVerticalCenter>
-                      </DiagramSectionVertical>
+                      {ENABLE_INDICATORS &&
+                        <AnnotationVertical>
+                          <FormattedMessage {...messages.diagram.measured} />
+                        </AnnotationVertical>
+                      }
+                      {ENABLE_INDICATORS &&
+                        <DiagramSectionVertical>
+                          <DiagramSectionVerticalCenter>
+                            {this.renderIndicatorButton()}
+                          </DiagramSectionVerticalCenter>
+                        </DiagramSectionVertical>
+                      }
                     </div>
                   }
                   { this.state.viewport >= VIEWPORTS.MEDIUM && // HORIZONTAL
                     <div>
-                      <DiagramSectionHorizontalHalf>
+                      <DiagramSectionHorizontalSide hasIndicators={ENABLE_INDICATORS}>
                         { ENABLE_SDGS &&
                           <DiagramSectionHorizontalTop>
                             {this.renderRecommendationsButton()}
@@ -782,10 +800,10 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                             {this.renderSdgtargetButton()}
                           </DiagramSectionHorizontalBottom>
                         }
-                      </DiagramSectionHorizontalHalf>
-                      <Annotation hasSDGs={ENABLE_SDGS}>
+                      </DiagramSectionHorizontalSide>
+                      <AnnotationAddressed hasSDGs={ENABLE_SDGS} hasIndicators={ENABLE_INDICATORS}>
                         <FormattedMessage {...messages.diagram.addressed} />
-                      </Annotation>
+                      </AnnotationAddressed>
                       <DiagramSectionHorizontalCenter>
                         <DiagramSectionHorizontalVCenter>
                           {
@@ -793,14 +811,18 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                           }
                         </DiagramSectionHorizontalVCenter>
                       </DiagramSectionHorizontalCenter>
-                      <AnnotationMeasured>
-                        <FormattedMessage {...messages.diagram.measured} />
-                      </AnnotationMeasured>
-                      <DiagramSectionHorizontalHalf>
-                        <DiagramSectionHorizontalVCenter>
-                          {this.renderIndicatorButton()}
-                        </DiagramSectionHorizontalVCenter>
-                      </DiagramSectionHorizontalHalf>
+                      {ENABLE_INDICATORS &&
+                        <AnnotationMeasured>
+                          <FormattedMessage {...messages.diagram.measured} />
+                        </AnnotationMeasured>
+                      }
+                      {ENABLE_INDICATORS &&
+                        <DiagramSectionHorizontalSide hasIndicators>
+                          <DiagramSectionHorizontalVCenter>
+                            {this.renderIndicatorButton()}
+                          </DiagramSectionHorizontalVCenter>
+                        </DiagramSectionHorizontalSide>
+                      }
                     </div>
                   }
                 </Diagram>

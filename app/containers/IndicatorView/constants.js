@@ -6,26 +6,8 @@
 
 import { ENABLE_SDGS } from 'themes/config';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
-  'user_roles',
-  'measures',
-  'sdgtargets',
-  'users',
-  'indicators',
-  'measure_indicators',
-  'sdgtarget_indicators',
-  'progress_reports',
-  'due_dates',
-  'taxonomies',
-  'categories',
-  'recommendations',
-  'recommendation_measures',
-  'measure_categories',
-  'sdgtarget_categories',
-  'user_roles',
-]
-: [
+let tables = [];
+const baseTables = [
   'user_roles',
   'measures',
   'users',
@@ -40,3 +22,14 @@ export const DEPENDENCIES = ENABLE_SDGS
   'measure_categories',
   'user_roles',
 ];
+const sdgTables = [
+  'sdgtargets',
+  'sdgtarget_indicators',
+  'sdgtarget_categories',
+];
+
+tables = baseTables;
+if (ENABLE_SDGS) {
+  tables = tables.concat(sdgTables);
+}
+export const DEPENDENCIES = tables;

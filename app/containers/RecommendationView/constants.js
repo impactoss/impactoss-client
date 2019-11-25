@@ -1,7 +1,7 @@
-import { ENABLE_SDGS } from 'themes/config';
+import { ENABLE_SDGS, ENABLE_INDICATORS } from 'themes/config';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
+let tables = [];
+const baseTables = [
   'user_roles',
   'recommendations',
   'users',
@@ -11,21 +11,20 @@ export const DEPENDENCIES = ENABLE_SDGS
   'recommendation_measures',
   'recommendation_categories',
   'measure_categories',
-  'measure_indicators',
-  'indicators',
+];
+const sdgTables = [
   'sdgtargets',
   'sdgtarget_measures',
-]
-: [
-  'user_roles',
-  'recommendations',
-  'users',
-  'taxonomies',
-  'categories',
-  'measures',
-  'recommendation_measures',
-  'recommendation_categories',
-  'measure_categories',
+];
+const indicatorTables = [
   'measure_indicators',
   'indicators',
 ];
+tables = baseTables;
+if (ENABLE_SDGS) {
+  tables = tables.concat(sdgTables);
+}
+if (ENABLE_INDICATORS) {
+  tables = tables.concat(indicatorTables);
+}
+export const DEPENDENCIES = tables;
