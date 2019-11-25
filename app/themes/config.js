@@ -159,32 +159,46 @@ export const REPORT_FREQUENCIES = [
   { value: 12, message: 'ui.reportFrequencies.annual' },
 ];
 
-export const ENABLE_SDGS = false;
+export const ENABLE_INDICATORS = false;
+export const ENABLE_SDGS = ENABLE_INDICATORS || false; // requires ENABLE_INDICATORS = true
 export const EXCLUDE_TAXONOMIES = ['4']; // SGDs
 
 // Map server database tables **************************
-export const DB_TABLES = [
+let tables = [];
+const baseTables = [
   'users',
   'user_roles',
   'roles',
   'pages',
   'taxonomies',
   'categories',
-  'indicators',
   'measure_categories',
-  'measure_indicators',
   'measures',
   'recommendation_categories',
   'recommendation_measures',
   'recommendations',
   'user_categories',
+];
+const sdgTables = [
+  'sdgtarget_categories',
+  'sdgtarget_indicators',
+  'sdgtarget_measures',
+  'sdgtargets',
+];
+const indicatorTables = [
+  'indicators',
+  'measure_indicators',
   'progress_reports',
   'due_dates',
-  // 'sdgtarget_categories',
-  // 'sdgtarget_indicators',
-  // 'sdgtarget_measures',
-  // 'sdgtargets',
 ];
+tables = baseTables;
+if (ENABLE_SDGS) {
+  tables = tables.concat(sdgTables);
+}
+if (ENABLE_INDICATORS) {
+  tables = tables.concat(indicatorTables);
+}
+export const DB_TABLES = tables;
 
 // Table shapes
 // - define fields for each table
@@ -274,11 +288,11 @@ export const MEASURE_SHAPE = {
         via: 'recommendation_measures',
         key: 'recommendation_id',
       },
-      {
-        table: 'indicators',
-        via: 'measure_indicators',
-        key: 'indicator_id',
-      },
+      // {
+      //   table: 'indicators',
+      //   via: 'measure_indicators',
+      //   key: 'indicator_id',
+      // },
       // {
       //   table: 'sdgtargets',
       //   via: 'sdgtarget_measures',

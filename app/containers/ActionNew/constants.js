@@ -3,26 +3,30 @@
  * ActionNew constants
  *
  */
-import { ENABLE_SDGS } from 'themes/config';
+import { ENABLE_SDGS, ENABLE_INDICATORS } from 'themes/config';
 
 export const SAVE = 'impactoss/ActionNew/SAVE';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
+let tables = [];
+const baseTables = [
   'user_roles',
   'categories',
   'taxonomies',
   'recommendations',
-  'indicators',
-  'sdgtargets',
-  'recommendation_categories',
-  'sdgtarget_categories',
-]
-: [
-  'user_roles',
-  'categories',
-  'taxonomies',
-  'recommendations',
-  'indicators',
   'recommendation_categories',
 ];
+const sdgTables = [
+  'sdgtargets',
+  'sdgtarget_categories',
+];
+const indicatorTables = [
+  'indicators',
+];
+tables = baseTables;
+if (ENABLE_SDGS) {
+  tables = tables.concat(sdgTables);
+}
+if (ENABLE_INDICATORS) {
+  tables = tables.concat(indicatorTables);
+}
+export const DEPENDENCIES = tables;

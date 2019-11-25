@@ -92,7 +92,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       errors,
     } = this.props;
 
-    const expandNo = config.expandableColumns && locationQuery.get('expand')
+    const expandNo = config.expandableColumns && config.expandableColumns.length && locationQuery.get('expand')
       ? parseInt(locationQuery.get('expand'), 10)
       : 0;
     const groupSelectValue = locationQuery.get('group')

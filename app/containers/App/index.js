@@ -14,7 +14,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Header from 'components/Header';
 import EntityNew from 'containers/EntityNew';
-import { ENABLE_SDGS } from 'themes/config';
+import { ENABLE_SDGS, ENABLE_INDICATORS } from 'themes/config';
 
 import { sortEntities } from 'utils/sort';
 
@@ -103,7 +103,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         active: currentPath.startsWith(PATHS.MEASURES),
       },
     ]);
-    if (isManager) {
+    if (isManager && ENABLE_INDICATORS) {
       navItems = navItems.concat([{
         path: PATHS.INDICATORS,
         title: this.context.intl.formatMessage(messages.nav.indicators),
