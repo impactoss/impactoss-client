@@ -224,7 +224,7 @@
     "intl": "1.2.5",
     "invariant": "2.2.2",
     "ip": "1.1.4",
-    "lodash": "4.17.2",
+    "lodash": "4.17.11",
     "minimist": "1.2.0",
     "moment": "^2.18.1",
     "prop-types": "^15.5.10",
@@ -313,7 +313,7 @@
     "url-loader": "0.5.7",
     "webpack": "2.2.0-rc.3",
     "webpack-dev-middleware": "1.9.0",
-    "webpack-git-hash": "^1.0.2",    
+    "webpack-git-hash": "^1.0.2",
     "webpack-hot-middleware": "2.15.0"
   }
 }

@@ -46,7 +46,11 @@ export const SHOW_BRAND_ON_HOME = false;
 export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
 // show footer logo section
-export const SHOW_FOOTER_PARTNERS = false;
+export const FOOTER = {
+  PARTNERS: false,
+  LINK_TARGET_INTERNAL: false,
+  LINK_TARGET_INTERNAL_ID: 1,
+};
 
 // entitylists items-per-page options
 export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
@@ -72,6 +76,14 @@ export const TAXONOMY_GROUPS = [
     priorityMax: 19,
   },
 ];
+
+export const PROGRESS_TAXONOMY_ID = 10;
+
+// WARNING: references as assigned by user
+export const PROGRESS_CATEGORY_REFERENCES = {
+  ONGOING: 1,
+  COMPLETED: 2,
+};
 
 /**
  * Server settings
