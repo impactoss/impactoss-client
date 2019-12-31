@@ -52,6 +52,17 @@ export const userOptions = (entities, activeUserId) => entities
     options.push(userOption(entity, activeUserId)), List())
   : List();
 
+export const parentCategoryOption = (entity, activeParentId) => Map({
+  value: entity.get('id'),
+  label: entity.getIn(['attributes', 'title']),
+  checked: activeParentId ? entity.get('id') === activeParentId.toString() : false,
+});
+
+export const parentCategoryOptions = (entities, activeParentId) => entities
+  ? entities.reduce((options, entity) =>
+    options.push(parentCategoryOption(entity, activeParentId)), List())
+  : List();
+
 export const dateOption = (entity, activeDateId) => Map({
   value: entity.get('id'),
   label: entity.getIn(['attributes', 'due_date']),
@@ -167,6 +178,18 @@ export const renderUserControl = (entities, label, activeUserId) => entities
   controlType: 'multiselect',
   multiple: false,
   options: userOptions(entities, activeUserId),
+}
+: null;
+
+export const renderParentCategoryControl = (entities, label, activeParentId) => entities
+? {
+  id: 'associatedCategory',
+  model: '.associatedCategory',
+  dataPath: ['associatedCategory'],
+  label,
+  controlType: 'multiselect',
+  multiple: false,
+  options: parentCategoryOptions(entities, activeParentId),
 }
 : null;
 

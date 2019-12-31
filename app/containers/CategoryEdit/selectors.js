@@ -16,6 +16,7 @@ import {
   usersByRole,
   entitiesSetAssociated,
   prepareTaxonomiesMultiple,
+  attributesEqual,
 } from 'utils/entities';
 
 export const selectDomain = createSelector(
@@ -27,8 +28,36 @@ export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
   (state) => selectEntities(state, 'users'),
   (state) => selectTaxonomiesSorted(state),
-  (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies)
+  (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies));
+
+export const selectParentOptions = createSelector(
+  (state, id) => selectEntity(state, { path: 'categories', id }),
+  (state) => selectEntities(state, 'categories'),
+  (state) => selectEntities(state, 'taxonomies'),
+  (entity, categories, taxonomies) => {
+    if (entity && taxonomies && categories) {
+      const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
+      const taxonomyParentId = taxonomy.getIn(['attributes', 'parent_id']);
+      return categories.filter((otherCategory) => {
+        const otherTaxonomy = taxonomies.find((tax) => attributesEqual(otherCategory.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
+        return attributesEqual(taxonomyParentId, otherTaxonomy.get('id'));
+      });
+    }
+    return null;
+  }
 );
+
+export const selectParentTaxonomy = createSelector(
+  (state, id) => selectEntity(state, { path: 'categories', id }),
+  (state) => selectEntities(state, 'taxonomies'),
+  (entity, taxonomies) => {
+    if (entity && taxonomies) {
+      const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
+      return taxonomies.find((tax) => attributesEqual(taxonomy.getIn(['attributes', 'parent_id']), tax.get('id')));
+    }
+    return null;
+  });
+
 
 export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
