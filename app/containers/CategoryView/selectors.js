@@ -53,7 +53,7 @@ export const selectViewEntity = createSelector(
       key: 'category',
       relatedKey: 'parent_id',
     },
-  ]).set('children', categories.filter((cat) => attributesEqual(entity.get('id'), cat.getIn(['attributes', 'parent_id']))))
+  ])
 );
 
 export const selectParentTaxonomy = createSelector(
