@@ -31,7 +31,8 @@ export const selectViewEntity = createSelector(
   selectCategory,
   (state) => selectEntities(state, 'users'),
   (state) => selectTaxonomiesSorted(state),
-  (entity, users, taxonomies) => entitySetSingles(entity, [
+  (state) => selectEntities(state, 'categories'),
+  (entity, users, taxonomies, categories) => entity && entitySetSingles(entity, [
     {
       related: users,
       key: 'user',
@@ -47,8 +48,43 @@ export const selectViewEntity = createSelector(
       key: 'taxonomy',
       relatedKey: 'taxonomy_id',
     },
-  ])
+    {
+      related: categories,
+      key: 'category',
+      relatedKey: 'parent_id',
+    },
+  ]).set('children', categories.filter((cat) => attributesEqual(entity.get('id'), cat.getIn(['attributes', 'parent_id']))))
 );
+
+export const selectParentTaxonomy = createSelector(
+  selectCategory,
+  (state) => selectEntities(state, 'taxonomies'),
+  (entity, taxonomies) => {
+    if (entity && taxonomies) {
+      const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
+      return taxonomies.find((tax) => attributesEqual(taxonomy.getIn(['attributes', 'parent_id']), tax.get('id')));
+    }
+    return null;
+  });
+export const selectChildTaxonomies = createSelector(
+  selectCategory,
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (entity, taxonomies, categories) => {
+    if (entity && taxonomies) {
+      const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
+      return taxonomies
+        .filter((tax) => attributesEqual(tax.getIn(['attributes', 'parent_id']), taxonomy.get('id')))
+        .map((tax) =>
+          tax.set('categories', categories
+            .filter((cat) =>
+              attributesEqual(cat.getIn(['attributes', 'parent_id']), entity.get('id'))
+              && attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id')))
+          )
+        );
+    }
+    return null;
+  });
 
 export const selectTagsRecommendations = createSelector(
   selectTaxonomy,
