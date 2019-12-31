@@ -22,6 +22,9 @@ import {
   getRecommendationConnectionField,
   getSdgTargetConnectionField,
   getManagerField,
+  getEntityLinkField,
+  getTaxonomyFields,
+  hasTaxonomyCategories,
 } from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
@@ -41,6 +44,8 @@ import {
   selectRecommendationConnections,
 } from 'containers/App/selectors';
 
+import { getEntityTitle } from 'utils/entities';
+
 import appMessages from 'containers/App/messages';
 import messages from './messages';
 
@@ -50,6 +55,8 @@ import {
   selectMeasures,
   selectSdgTargets,
   selectTaxonomies,
+  selectParentTaxonomy,
+  selectChildTaxonomies,
 } from './selectors';
 
 import { DEPENDENCIES } from './constants';
@@ -129,8 +136,22 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     return fields;
   };
 
-  getBodyAsideFields = (entity, isManager) => {
+  getBodyAsideFields = (entity, isManager, parentTaxonomy, childTaxonomies) => {
     const fields = [];
+    // include parent link
+    if (entity.get('category') && parentTaxonomy) {
+      fields.push({
+        fields: [getEntityLinkField(entity.get('category'), '/category', '', getEntityTitle(parentTaxonomy))],
+      });
+    }
+    // include children links
+    if (childTaxonomies && hasTaxonomyCategories(childTaxonomies)) {
+      fields.push({ // fieldGroup
+        label: appMessages.entities.taxonomies.plural,
+        icon: 'categories',
+        fields: getTaxonomyFields(childTaxonomies, appMessages),
+      });
+    }
     if (entity.getIn(['attributes', 'url']) && entity.getIn(['attributes', 'url']).trim().length > 0) {
       fields.push({
         type: 'dark',
@@ -165,6 +186,8 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       sdgtargetConnections,
       measureConnections,
       recommendationConnections,
+      parentTaxonomy,
+      childTaxonomies,
     } = this.props;
 
     let buttons = [];
@@ -233,7 +256,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                     measureConnections,
                     recommendationConnections
                   ),
-                  aside: this.getBodyAsideFields(viewEntity, isManager),
+                  aside: this.getBodyAsideFields(viewEntity, isManager, parentTaxonomy, childTaxonomies),
                 },
               }}
             />
@@ -253,8 +276,10 @@ CategoryView.propTypes = {
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   isManager: PropTypes.bool,
+  parentTaxonomy: PropTypes.object,
   recommendations: PropTypes.object,
   taxonomies: PropTypes.object,
+  childTaxonomies: PropTypes.object,
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   measureConnections: PropTypes.object,
@@ -274,6 +299,8 @@ const mapStateToProps = (state, props) => ({
   measures: selectMeasures(state, props.params.id),
   sdgtargets: selectSdgTargets(state, props.params.id),
   taxonomies: selectTaxonomies(state),
+  parentTaxonomy: selectParentTaxonomy(state, props.params.id),
+  childTaxonomies: selectChildTaxonomies(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
   sdgtargetConnections: selectSdgTargetConnections(state),
   recommendationConnections: selectRecommendationConnections(state),
