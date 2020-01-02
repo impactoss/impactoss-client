@@ -10,7 +10,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fromJS } from 'immutable';
-import { mapToTaxonomyList, getDefaultTaxonomy } from 'utils/taxonomies';
+import { getDefaultTaxonomy } from 'utils/taxonomies';
 
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
@@ -110,9 +110,11 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         { !dataReady &&
           <EntityListSidebarLoading responsiveSmall />
         }
-        { dataReady && typeof reference !== 'undefined' &&
+        { taxonomies && typeof reference !== 'undefined' &&
           <TaxonomySidebar
-            taxonomies={mapToTaxonomyList(taxonomies.toList(), onTaxonomyLink, reference)}
+            taxonomies={taxonomies}
+            active={reference}
+            onTaxonomyLink={onTaxonomyLink}
           />
         }
         <ContainerWithSidebar sidebarResponsiveSmall>
