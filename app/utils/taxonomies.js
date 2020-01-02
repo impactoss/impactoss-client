@@ -1,6 +1,7 @@
 import { PATHS } from 'containers/App/constants';
-import { find } from 'lodash/collection';
+import { map } from 'lodash/collection';
 import { TAXONOMY_GROUPS } from 'themes/config';
+import { attributesEqual } from 'utils/entities';
 
 export const getTaxonomyTagList = (taxonomy) => {
   const tags = [];
@@ -24,20 +25,45 @@ export const getTaxonomyTagList = (taxonomy) => {
   }
   return tags;
 };
-export const mapToTaxonomyList = (taxonomies, onLink, activeId, onMouseOver) => taxonomies.map((tax) => ({
-  id: tax.get('id'),
-  group: find(TAXONOMY_GROUPS, (taxGroup) => {
-    const priority = tax.getIn(['attributes', 'priority']);
-    return priority
-      ? priority <= taxGroup.priorityMax
-        && priority >= taxGroup.priorityMin
-      : taxGroup.default;
-  }),
-  count: tax.count,
-  onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${tax.get('id')}`),
-  onMouseOver: (isOver = true) => onMouseOver && onMouseOver(tax.get('id'), isOver),
-  active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
-})).toArray();
+
+export const prepareTaxonomyGroups = (taxonomies, activeId, onLink, onMouseOver) => {
+  const parentTaxnomies = taxonomies.filter((tax) =>
+    tax.getIn(['attributes', 'parent_id']) === ''
+    || tax.getIn(['attributes', 'parent_id']) === null
+  );
+  return map(TAXONOMY_GROUPS, (taxGroup) => {
+    const groupTaxonomies = parentTaxnomies.filter((tax) => {
+      const priority = tax.getIn(['attributes', 'priority']);
+      return priority
+        ? priority <= taxGroup.priorityMax
+          && priority >= taxGroup.priorityMin
+        : taxGroup.default;
+    });
+    return ({
+      id: taxGroup.id,
+      taxonomies: groupTaxonomies.map((tax) => {
+        const children = taxonomies.filter((t) =>
+          attributesEqual(t.getIn(['attributes', 'parent_id']), tax.get('id'))
+        );
+        return ({
+          id: tax.get('id'),
+          count: tax.count,
+          onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${tax.get('id')}`),
+          onMouseOver: (isOver = true) => onMouseOver && onMouseOver(tax.get('id'), isOver),
+          active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
+          children: children && children.map((child) => ({
+            id: child.get('id'),
+            child: true,
+            count: child.count,
+            onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${child.get('id')}`),
+            onMouseOver: (isOver = true) => onMouseOver && onMouseOver(child.get('id'), isOver),
+            active: parseInt(activeId, 10) === parseInt(child.get('id'), 10),
+          })).toArray(),
+        });
+      }).toArray(),
+    });
+  });
+};
 
 export const getDefaultTaxonomy = (taxonomies) => {
   const taxGroup = TAXONOMY_GROUPS[0];

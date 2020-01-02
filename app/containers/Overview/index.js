@@ -13,8 +13,6 @@ import { palette } from 'styled-theme';
 
 import styled, { withTheme } from 'styled-components';
 
-import { mapToTaxonomyList } from 'utils/taxonomies';
-
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
@@ -696,7 +694,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       onTaxonomyLink,
       taxonomies,
     } = this.props;
-
     return (
       <div>
         <Helmet
@@ -710,12 +707,10 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         }
         { dataReady &&
           <TaxonomySidebar
-            taxonomies={mapToTaxonomyList(
-              taxonomies,
-              onTaxonomyLink,
-              this.state.mouseOverTaxonomyDiagram,
-              this.onTaxonomyMouseOver,
-            )}
+            taxonomies={taxonomies}
+            active={this.state.mouseOverTaxonomyDiagram}
+            onTaxonomyLink={onTaxonomyLink}
+            onTaxonomyOver={this.onTaxonomyMouseOver}
           />
         }
         <ContainerWithSidebar sidebarResponsiveSmall>
