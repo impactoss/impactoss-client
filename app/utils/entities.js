@@ -263,6 +263,11 @@ export const getCategoryShortTitle = (category) =>
     TEXT_TRUNCATE.ENTITY_TAG
   );
 
+export const getCategoryTitle = (cat) =>
+  cat.getIn(['attributes', 'reference'])
+  ? `${cat.getIn(['attributes', 'reference'])}. ${cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name'])}`
+  : cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
+
 
 const getInitialValue = (field) =>
   typeof field.default !== 'undefined' ? field.default : '';
