@@ -18,17 +18,14 @@ import { TAXONOMY_DEFAULT, SORT_OPTIONS } from './constants';
 export const selectTaxonomy = createSelector(
   (state, { id }) => id,
   (state) => selectTaxonomiesSorted(state),
-  (taxonomyId, taxonomies) =>
-    taxonomies && taxonomies.get(typeof taxonomyId !== 'undefined' ? taxonomyId : TAXONOMY_DEFAULT)
-);
-
-const selectTaxonomyCategories = createSelector(
-  selectTaxonomy,
-  (state) => selectEntities(state, 'categories'),
-  (taxonomy, categories) =>
-    taxonomy && taxonomy.set('categories', categories.filter((cat) =>
-      attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id'))
-    ))
+  (taxonomyId, taxonomies) => {
+    if (!taxonomies || taxonomies.size === 0) return taxonomies;
+    const id = typeof taxonomyId !== 'undefined' ? taxonomyId : TAXONOMY_DEFAULT;
+    const taxonomy = taxonomies.get(id);
+    return taxonomy
+      .set('children', taxonomies.filter((tax) => attributesEqual(id, tax.getIn(['attributes', 'parent_id']))))
+      .set('parent', taxonomies.find((tax) => attributesEqual(taxonomy.getIn(['attributes', 'parent_id']), tax.get('id'))));
+  }
 );
 
 const selectMeasures = createSelector(
@@ -62,6 +59,7 @@ const selectRecommendations = createSelector(
       .map((association) => association.getIn(['attributes', 'category_id']))
     ))
 );
+
 const selectSdgTargets = createSelector(
   (state) => selectEntities(state, 'sdgtargets'),
   (state) => selectEntities(state, 'sdgtarget_categories'),
@@ -74,87 +72,204 @@ const selectSdgTargets = createSelector(
 const filterAssociatedEntities = (entities, key, associations) =>
   entities.filter((entity) => associations.find((association, id) => entity.get(key).includes(parseInt(id, 10))));
 
-const selectCategoriesCounts = createSelector(
-  selectTaxonomyCategories,
+const filterChildConnections = (entities, categories, categoryId) =>
+  // all entities that are tagged with a child category of current category
+  entities.filter((entity) => categories
+    .filter((cat) => attributesEqual(categoryId, cat.getIn(['attributes', 'parent_id'])))
+    .some((cat) => entity.get('category_ids').includes(parseInt(cat.get('id'), 10)))
+  );
+
+const getCategoryCounts = (
+  taxonomyCategories,
+  taxonomy,
+  measures,
+  recommendations,
+  sdgtargets,
+  categories,
+) => taxonomyCategories
+  .map((cat, categoryId) => {
+    let category = cat;
+    // measures
+    const childCatsTagMeasures =
+      taxonomy.get('children') && taxonomy.get('children').some((childTax) => childTax.getIn(['attributes', 'tags_measures']));
+    const tagsMeasures = taxonomy.getIn(['attributes', 'tags_measures']) || childCatsTagMeasures;
+    if (tagsMeasures) {
+      let associatedMeasures;
+      if (taxonomy.getIn(['attributes', 'tags_measures'])) {
+        associatedMeasures = measures.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
+        // recommendations tagged by child categories
+      } else if (childCatsTagMeasures) {
+        associatedMeasures = filterChildConnections(measures, categories, categoryId);
+      }
+      category = category.set('measuresTotal', associatedMeasures.size);
+      // get all public associated measures
+      const associatedMeasuresPublic = associatedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
+      category = category.set('measures', associatedMeasuresPublic ? associatedMeasuresPublic.size : 0);
+    }
+
+    // recommendations
+    const childCatsTagRecs =
+      taxonomy.get('children') && taxonomy.get('children').some((childTax) => childTax.getIn(['attributes', 'tags_recommendations']));
+    const tagsRecs = taxonomy.getIn(['attributes', 'tags_recommendations']) || childCatsTagRecs;
+    if (tagsRecs) {
+      let associatedRecs;
+      // directly tagged recommendations
+      if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
+        associatedRecs = recommendations.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
+        // recommendations tagged by child categories
+      } else if (childCatsTagRecs) {
+        associatedRecs = filterChildConnections(recommendations, categories, categoryId);
+      }
+
+      category = category.set('recommendationsTotal', associatedRecs.size);
+      const associatedRecsPublic = associatedRecs.filter((rec) => !rec.getIn(['attributes', 'draft']));
+      category = category.set('recommendations', associatedRecsPublic ? associatedRecsPublic.size : 0);
+      // get all public accepted associated recs
+      const publicAccepted = associatedRecsPublic.filter((rec) => !!rec.getIn(['attributes', 'accepted']));
+      category = category.set('recommendationsAccepted', publicAccepted ? publicAccepted.size : 0);
+
+      // measures connected via recommendation
+      if (!tagsMeasures) {
+        const connectedMeasures = filterAssociatedEntities(measures, 'recommendation_ids', associatedRecs);
+        category = category.set('measuresTotal', connectedMeasures ? connectedMeasures.size : 0);
+        const connectedMeasuresPublic = connectedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
+        category = category.set('measures', connectedMeasuresPublic ? connectedMeasuresPublic.size : 0);
+      }
+    }
+
+    // sdgtargets
+    if (ENABLE_SDGS) {
+      const childCatsTagSDGTargets =
+        taxonomy.get('children') && taxonomy.get('children').some((childTax) => childTax.getIn(['attributes', 'tags_sdgtargets']));
+      const tagsSDGTargets = taxonomy.getIn(['attributes', 'tags_sdgtargets']) || childCatsTagSDGTargets;
+      if (tagsSDGTargets) {
+        let associatedTargets;
+        // directly tagged recommendations
+        if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
+          associatedTargets = sdgtargets.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
+          // recommendations tagged by child categories
+        } else if (childCatsTagSDGTargets) {
+          associatedTargets = filterChildConnections(sdgtargets, categories, categoryId);
+        }
+
+        category = category.set('sdgtargetsTotal', associatedTargets.size);
+        const associatedTargetsPublic = associatedTargets.filter((target) => !target.getIn(['attributes', 'draft']));
+        category = category.set('sdgtargets', associatedTargetsPublic ? associatedTargetsPublic.size : 0);
+
+        // measures connected via sdgtarget
+        if (!tagsMeasures) {
+          const connectedMeasuresTarget = filterAssociatedEntities(measures, 'sdgtarget_ids', associatedTargets);
+          category = category.set('measuresTotal', connectedMeasuresTarget ? connectedMeasuresTarget.size : 0);
+          const connectedMeasuresTargetPublic = connectedMeasuresTarget.filter((measure) => !measure.getIn(['attributes', 'draft']));
+          category = category.set('measures', connectedMeasuresTargetPublic ? connectedMeasuresTargetPublic.size : 0);
+        }
+      }
+    }
+    return category;
+  }
+);
+
+const selectCategoryCountGroups = createSelector(
+  selectTaxonomy,
   selectRecommendations,
   selectMeasures,
   selectSdgTargets,
-  (taxonomy, recommendations, measures, sdgtargets) => {
-    if (taxonomy && taxonomy.get('categories')) {
-      const taxonomyCategories = taxonomy
-        .get('categories')
-        .map((cat, categoryId) => {
-          let category = cat;
-          // measures
-          if (taxonomy.getIn(['attributes', 'tags_measures'])) {
-            const associatedMeasures = measures.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
-            category = category.set('measuresTotal', associatedMeasures.size);
-            // get all public associated measures
-            const associatedMeasuresPublic = associatedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
-            category = category.set('measures', associatedMeasuresPublic ? associatedMeasuresPublic.size : 0);
-          }
-
-          // recommendations
-          if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
-            const associatedRecs = recommendations.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
-            category = category.set('recommendationsTotal', associatedRecs.size);
-            const associatedRecsPublic = associatedRecs.filter((rec) => !rec.getIn(['attributes', 'draft']));
-            category = category.set('recommendations', associatedRecsPublic ? associatedRecsPublic.size : 0);
-            // get all public accepted associated recs
-            const publicAccepted = associatedRecsPublic.filter((rec) => !!rec.getIn(['attributes', 'accepted']));
-            category = category.set('recommendationsAccepted', publicAccepted ? publicAccepted.size : 0);
-
-            // measures connected via recommendation
-            if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
-              const connectedMeasures = filterAssociatedEntities(measures, 'recommendation_ids', associatedRecs);
-              category = category.set('measuresTotal', connectedMeasures ? connectedMeasures.size : 0);
-              const connectedMeasuresPublic = connectedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
-              category = category.set('measures', connectedMeasuresPublic ? connectedMeasuresPublic.size : 0);
-            }
-          }
-
-          // sdgtargets
-          if (ENABLE_SDGS && taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
-            const associatedTargets = sdgtargets.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
-            category = category.set('sdgtargetsTotal', associatedTargets.size);
-            const associatedTargetsPublic = associatedTargets.filter((target) => !target.getIn(['attributes', 'draft']));
-            category = category.set('sdgtargets', associatedTargetsPublic ? associatedTargetsPublic.size : 0);
-
-            // measures connected via recommendation
-            if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
-              const connectedMeasuresTarget = filterAssociatedEntities(measures, 'sdgtarget_ids', associatedTargets);
-              category = category.set('measuresTotal', connectedMeasuresTarget ? connectedMeasuresTarget.size : 0);
-              const connectedMeasuresTargetPublic = connectedMeasuresTarget.filter((measure) => !measure.getIn(['attributes', 'draft']));
-              category = category.set('measures', connectedMeasuresTargetPublic ? connectedMeasuresTargetPublic.size : 0);
-            }
-          }
-
-          return category;
-        }
-      );
-
-      return taxonomyCategories;
+  (state) => selectEntities(state, 'categories'),
+  (taxonomy, recommendations, measures, sdgtargets, categories) => {
+    const taxonomyCategories = categories.filter((cat) =>
+      attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id'))
+    );
+    if (taxonomy && taxonomyCategories) {
+      if (!taxonomy.get('parent')) {
+        const catCounts = getCategoryCounts(
+          taxonomyCategories,
+          taxonomy,
+          measures,
+          recommendations,
+          sdgtargets,
+          categories,
+        );
+        return Map().set(taxonomy.get('id'), taxonomy.set('categories', catCounts));
+      }
+      if (taxonomy.get('parent')) {
+        const taxParentCategories = categories.filter((cat) =>
+          attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), taxonomy.get('parent').get('id'))
+        );
+        return taxParentCategories
+          .map((parentCat) => {
+            const taxChildCategories = taxonomyCategories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'parent_id']), parentCat.get('id')));
+            const catCounts = getCategoryCounts(
+              taxChildCategories,
+              taxonomy,
+              measures,
+              recommendations,
+              sdgtargets,
+              categories,
+            );
+            return parentCat.set('categories', catCounts);
+          });
+      }
     }
     return Map();
   }
 );
 
-export const selectCategories = createSelector(
-  selectCategoriesCounts,
+export const selectCategoryGroups = createSelector(
+  selectCategoryCountGroups,
   (state, { query }) => selectSortByQuery(state, query),
   (state, { query }) => selectSortOrderQuery(state, query),
-  (categories, sort, order) => {
+  (categoryGroups, sort, order) => {
     const sortOption = getSortOption(SORT_OPTIONS, sort, 'query');
     return sortEntities(
-      sortEntities(
-        categories,
-        order || (sortOption ? sortOption.order : 'asc'),
-        sortOption ? sortOption.field : 'title',
-        sortOption ? sortOption.type : 'string',
+      categoryGroups.map((group) => group
+        .set('categories', sortEntities(
+          sortEntities(
+            group.get('categories').filter((cat) => !cat.getIn(['attributes', 'user_only'])),
+            order || (sortOption ? sortOption.order : 'asc'),
+            sortOption ? sortOption.field : 'title',
+            sortOption ? sortOption.type : 'string',
+          ),
+          'asc',
+          'draft',
+          'bool',
+        ))
+        .set('measures', group.get('categories').reduce((sum, cat) => sum + cat.get('measures'), 0))
+        .set('recommendations', group.get('categories').reduce((sum, cat) => sum + cat.get('recommendations'), 0))
+        .set('sdgtargets', group.get('categories').reduce((sum, cat) => sum + cat.get('sdgtargets'), 0))
       ),
-      'asc',
-      'draft',
-      'bool',
+      order || (sortOption ? sortOption.order : 'asc'),
+      sortOption ? sortOption.field : 'title',
+      sortOption ? sortOption.type : 'string',
+    );
+  }
+);
+
+export const selectUserOnlyCategoryGroups = createSelector(
+  selectCategoryCountGroups,
+  (state, { query }) => selectSortByQuery(state, query),
+  (state, { query }) => selectSortOrderQuery(state, query),
+  (categoryGroups, sort, order) => {
+    const sortOption = getSortOption(SORT_OPTIONS, sort, 'query');
+    return sortEntities(
+      categoryGroups.map((group) => group
+        .set('categories', sortEntities(
+          sortEntities(
+            group.get('categories').filter((cat) => cat.getIn(['attributes', 'user_only'])),
+            order || (sortOption ? sortOption.order : 'asc'),
+            sortOption ? sortOption.field : 'title',
+            sortOption ? sortOption.type : 'string',
+          ),
+          'asc',
+          'draft',
+          'bool',
+        ))
+        .set('measures', group.get('categories').reduce((sum, cat) => sum + cat.get('measures'), 0))
+        .set('recommendations', group.get('categories').reduce((sum, cat) => sum + cat.get('recommendations'), 0))
+        .set('sdgtargets', group.get('categories').reduce((sum, cat) => sum + cat.get('sdgtargets'), 0))
+      ),
+      order || (sortOption ? sortOption.order : 'asc'),
+      sortOption ? sortOption.field : 'title',
+      sortOption ? sortOption.type : 'string',
     );
   }
 );
