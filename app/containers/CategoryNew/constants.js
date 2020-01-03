@@ -45,6 +45,7 @@ export const FORM_INITIAL = fromJS({
     taxonomy_id: '',
     parent_id: '',
     reference: '',
+    date: '',
     user_only: false,
     draft: true,
   },

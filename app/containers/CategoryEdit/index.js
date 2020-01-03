@@ -29,6 +29,7 @@ import {
   getConnectionUpdatesFromFormData,
   getCheckboxField,
   getStatusField,
+  getDateField,
 } from 'utils/forms';
 
 import {
@@ -223,6 +224,21 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         ],
       });
     }
+
+    if (entity.getIn(['taxonomy', 'attributes', 'has_date'])) {
+      fields.push({
+        fields: [
+          getDateField(
+            this.context.intl.formatMessage,
+            appMessages,
+            'date',
+            false,
+            'date',
+          ),
+        ],
+      });
+    }
+
     return fields;
   }
 

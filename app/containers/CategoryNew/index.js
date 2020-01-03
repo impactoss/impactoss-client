@@ -26,6 +26,7 @@ import {
   getConnectionUpdatesFromFormData,
   getCheckboxField,
   getStatusField,
+  getDateField,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -186,6 +187,21 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         ],
       });
     }
+
+    if (taxonomy.getIn(['attributes', 'has_date'])) {
+      fields.push({
+        fields: [
+          getDateField(
+            this.context.intl.formatMessage,
+            appMessages,
+            'date',
+            false,
+            'date',
+          ),
+        ],
+      });
+    }
+
     return fields;
   }
 

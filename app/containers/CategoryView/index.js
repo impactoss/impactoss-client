@@ -25,6 +25,7 @@ import {
   getEntityLinkField,
   getTaxonomyFields,
   hasTaxonomyCategories,
+  getDateField,
 } from 'utils/fields';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
@@ -168,6 +169,13 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         )],
       });
     }
+
+    if (entity.getIn(['attributes', 'date'])) {
+      fields.push({
+        fields: [getDateField(entity, 'date')],
+      });
+    }
+
     return fields.length > 0 ? fields : null;
   };
 
