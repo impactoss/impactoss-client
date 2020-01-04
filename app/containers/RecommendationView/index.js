@@ -105,7 +105,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
+        getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
       ],
     },
   ]);

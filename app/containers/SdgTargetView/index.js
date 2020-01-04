@@ -82,15 +82,15 @@ export class SdgTargetView extends React.PureComponent { // eslint-disable-line 
   getBodyMainFields = (entity, indicators, measures, measureTaxonomies, onEntityClick, measureConnections, indicatorConnections) => ([
     {
       fields: [
-        getMarkdownField(entity, 'description', true, appMessages),
+        getMarkdownField(entity, 'description', true),
       ],
     },
     {
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
-        getIndicatorConnectionField(indicators, indicatorConnections, appMessages, onEntityClick),
+        getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
+        getIndicatorConnectionField(indicators, indicatorConnections, onEntityClick),
       ],
     },
   ]);

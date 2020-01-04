@@ -1,5 +1,5 @@
 import { truncateText } from 'utils/string';
-import { sortEntities } from 'utils/sort';
+import { sortEntities, sortCategories } from 'utils/sort';
 import { ACCEPTED_STATUSES, USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
 import { find, filter, reduce } from 'lodash/collection';
 
@@ -114,7 +114,7 @@ export const getMarkdownField = (entity, attribute, hasLabel = true, label) =>
     label: hasLabel && (appMessages.attributes[label || attribute]),
   });
 
-export const getDateField = (entity, attribute, obsoleteAppMessages, showEmpty, emptyMessage) =>
+export const getDateField = (entity, attribute, showEmpty, emptyMessage) =>
   (showEmpty || (
     !!entity.getIn(['attributes', attribute]) &&
     (entity.getIn(['attributes', attribute]).trim().length > 0)
@@ -126,7 +126,7 @@ export const getDateField = (entity, attribute, obsoleteAppMessages, showEmpty, 
     showEmpty: showEmpty && (emptyMessage || appMessages.attributes[`${attribute}_empty`]),
   });
 
-export const getDateRelatedField = (value, attribute, obsoleteAppMessages, showEmpty, emptyMessage) =>
+export const getDateRelatedField = (value, attribute, showEmpty, emptyMessage) =>
   (showEmpty || (!!value && (value.trim().length > 0))) &&
   ({
     type: 'date',
@@ -144,12 +144,8 @@ export const getTextField = (entity, attribute) =>
     label: appMessages.attributes[attribute],
   });
 
-const mapCategoryOptions = (categories) => categories
-  ? sortEntities(
-      categories,
-      'asc',
-      'referenceThenTitle',
-    )
+const mapCategoryOptions = (categories, taxId) => categories
+  ? sortCategories(categories, taxId)
     .map((cat) => ({
       label: cat.getIn(['attributes', 'title']),
       reference: cat.getIn(['attributes', 'reference']) || null,
@@ -187,7 +183,7 @@ const mapReports = (reports) => reports
   })).toArray()
   : [];
 
-export const getReportsField = (reports, obsoleteAppMessages, button) => ({
+export const getReportsField = (reports, button) => ({
   type: 'reports',
   values: reports && mapReports(reports),
   button: button || null,
@@ -213,7 +209,7 @@ export const getTaxonomyFields = (taxonomies) =>
     label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
     entityType: 'taxonomies',
     id: taxonomy.get('id'),
-    values: mapCategoryOptions(taxonomy.get('categories')),
+    values: mapCategoryOptions(taxonomy.get('categories'), taxonomy.get('id')),
   })).toArray();
 
 export const getSmartTaxonomyField = (taxonomy) => ({
@@ -271,7 +267,7 @@ const getConnectionField = ({
   })),
 });
 
-export const getIndicatorConnectionField = (entities, connections, obsoleteAppMessages, onEntityClick) =>
+export const getIndicatorConnectionField = (entities, connections, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies: null,
@@ -281,7 +277,7 @@ export const getIndicatorConnectionField = (entities, connections, obsoleteAppMe
     onEntityClick,
   });
 
-export const getRecommendationConnectionField = (entities, taxonomies, connections, obsoleteAppMessages, onEntityClick) =>
+export const getRecommendationConnectionField = (entities, taxonomies, connections, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies: taxonomies && taxonomies.filter((tax) => tax.getIn(['attributes', 'tags_recommendations'])),
@@ -297,7 +293,7 @@ export const getRecommendationConnectionField = (entities, taxonomies, connectio
     },
   });
 
-export const getSdgTargetConnectionField = (entities, taxonomies, connections, obsoleteAppMessages, onEntityClick) =>
+export const getSdgTargetConnectionField = (entities, taxonomies, connections, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies: taxonomies && taxonomies.filter((tax) => tax.getIn(['attributes', 'tags_sdgtargets'])),
@@ -307,7 +303,7 @@ export const getSdgTargetConnectionField = (entities, taxonomies, connections, o
     onEntityClick,
   });
 
-export const getMeasureConnectionField = (entities, taxonomies, connections, obsoleteAppMessages, onEntityClick) =>
+export const getMeasureConnectionField = (entities, taxonomies, connections, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'id'),
     taxonomies: taxonomies && taxonomies.filter((tax) => tax.getIn(['attributes', 'tags_measures'])),
@@ -317,6 +313,72 @@ export const getMeasureConnectionField = (entities, taxonomies, connections, obs
     entityPath: 'actions',
     onEntityClick,
   });
+
+const getConnectionGroupsField = ({
+  entityGroups,
+  groupedBy,
+  taxonomies,
+  connections,
+  connectionOptions,
+  entityType,
+  entityIcon,
+  entityPath,
+  onEntityClick,
+}) => ({
+  type: 'connectionGroups',
+  groups: entityGroups.toList(),
+  groupedBy,
+  taxonomies,
+  connections,
+  entityType,
+  entityIcon,
+  entityPath: entityPath || entityType,
+  onEntityClick,
+  showEmpty: appMessages.entities[entityType].empty,
+  connectionOptions: connectionOptions.map((option) => ({
+    label: appMessages.entities[option].plural,
+    path: option,
+    clientPath: option === 'measures' ? 'actions' : option,
+  })),
+});
+export const getRecommendationConnectionGroupsField = (entityGroups, groupedBy, taxonomies, connections, onEntityClick) =>
+  getConnectionGroupsField({
+    entityGroups,
+    groupedBy,
+    taxonomies: taxonomies && taxonomies.filter((tax) => tax.getIn(['attributes', 'tags_recommendations'])),
+    connections,
+    connectionOptions: ['measures'],
+    entityType: 'recommendations',
+    onEntityClick,
+    entityIcon: (entity) => {
+      const status = find(ACCEPTED_STATUSES,
+        (option) => option.value === entity.getIn(['attributes', 'accepted'])
+      );
+      return status ? status.icon : null;
+    },
+  });
+export const getSdgTargetConnectionGroupsField = (entityGroups, groupedBy, taxonomies, connections, onEntityClick) =>
+  getConnectionGroupsField({
+    entityGroups,
+    groupedBy,
+    taxonomies: taxonomies && taxonomies.filter((tax) => tax.getIn(['attributes', 'tags_sdgtargets'])),
+    connections,
+    connectionOptions: ['indicators', 'measures'],
+    entityType: 'sdgtargets',
+    onEntityClick,
+  });
+export const getMeasureConnectionGroupsField = (entityGroups, groupedBy, taxonomies, connections, onEntityClick) =>
+  getConnectionGroupsField({
+    entityGroups,
+    groupedBy,
+    taxonomies: taxonomies && taxonomies.filter((tax) => tax.getIn(['attributes', 'tags_measures'])),
+    connections,
+    connectionOptions: ['indicators', 'recommendations', 'sdgtargets'],
+    entityType: 'measures',
+    entityPath: 'actions',
+    onEntityClick,
+  });
+
 
 export const getManagerField = (entity, messageLabel, messageEmpty) =>
   ({
@@ -387,7 +449,7 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
       return memo.concat([getStatusField(entity)]);
     }
     if (field.control === 'date') {
-      return memo.concat([getDateField(entity, field.attribute, null, true)]);
+      return memo.concat([getDateField(entity, field.attribute, true)]);
     }
     if (field.control === 'markdown') {
       return memo.concat([getMarkdownField(entity, field.attribute)]);
