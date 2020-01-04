@@ -181,16 +181,33 @@ export const entitySetSingles = (entity, singles) =>
 
 export const prepareTaxonomiesIsAssociated = (taxonomies, categories, associations, tagsKey, associationKey, associationId) =>
   taxonomies && taxonomies
-  .filter((tax) => tax.getIn(['attributes', tagsKey]))
+  .filter((tax, key, list) =>
+    // taxonomies or parent taxonomies
+    tax.getIn(['attributes', tagsKey])
+      || list.some((other) => attributesEqual(tax.get('id'), other.getIn(['attributes', 'parent_id'])) && other.getIn(['attributes', tagsKey]))
+  )
   .map((tax) =>
     tax.set('categories', categories
-      .filter((cat) =>
-        attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))
-        && associations.find((association) =>
-          attributesEqual(association.getIn(['attributes', 'category_id']), cat.get('id'))
-          && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
-        )
-      )
+      .filter((cat, key, list) => {
+        if (attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))) {
+          if (associations.find((association) =>
+            attributesEqual(association.getIn(['attributes', 'category_id']), cat.get('id'))
+            && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
+          )) {
+            return true;
+          }
+          // if any of categories children
+          const catChildren = list.filter((item) => attributesEqual(item.getIn(['attributes', 'parent_id']), cat.get('id')));
+          if (catChildren.some((child) => associations.find((association) =>
+            attributesEqual(association.getIn(['attributes', 'category_id']), child.get('id'))
+            && attributesEqual(association.getIn(['attributes', associationKey]), associationId)
+          ))) {
+            return true;
+          }
+          return false;
+        }
+        return false;
+      })
     )
   );
 
