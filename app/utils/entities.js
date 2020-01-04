@@ -178,14 +178,19 @@ export const entitySetSingles = (entity, singles) =>
   entity && singles.reduce((memo, { related, key, relatedKey }) =>
    entitySetSingle(memo, related, key, relatedKey), entity);
 
-
-export const prepareTaxonomiesIsAssociated = (taxonomies, categories, associations, tagsKey, associationKey, associationId) =>
-  taxonomies && taxonomies
+export const filterTaxonomies = (taxonomies, tagsKey) => taxonomies && taxonomies
   .filter((tax, key, list) =>
     // taxonomies or parent taxonomies
     tax.getIn(['attributes', tagsKey])
-      || list.some((other) => attributesEqual(tax.get('id'), other.getIn(['attributes', 'parent_id'])) && other.getIn(['attributes', tagsKey]))
-  )
+      || list.some((other) =>
+        attributesEqual(tax.get('id'), other.getIn(['attributes', 'parent_id']))
+        && other.getIn(['attributes', tagsKey])
+      )
+  );
+
+export const prepareTaxonomiesIsAssociated = (taxonomies, categories, associations, tagsKey, associationKey, associationId) =>
+  taxonomies &&
+  filterTaxonomies(taxonomies, tagsKey)
   .map((tax) =>
     tax.set('categories', categories
       .filter((cat, key, list) => {
@@ -212,8 +217,8 @@ export const prepareTaxonomiesIsAssociated = (taxonomies, categories, associatio
   );
 
 export const prepareTaxonomiesAssociated = (taxonomies, categories, associations, tagsKey, associationKey, associationId) =>
-  taxonomies && taxonomies
-  .filter((tax) => tax.getIn(['attributes', tagsKey]))
+  taxonomies &&
+  filterTaxonomies(taxonomies, tagsKey)
   .map((tax) => tax.set('categories', entitiesSetAssociated(
     categories.filter((cat) =>
       attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))
@@ -230,8 +235,8 @@ export const prepareTaxonomiesMultiple = (taxonomies, categories, tagsKeys) =>
   reduce(tagsKeys, (memo, tagsKey) => memo.merge(prepareTaxonomies(taxonomies, categories, tagsKey)), Map());
 
 export const prepareTaxonomies = (taxonomies, categories, tagsKey) =>
-  taxonomies && taxonomies
-  .filter((tax) => tax.getIn(['attributes', tagsKey]))
+  taxonomies &&
+  filterTaxonomies(taxonomies, tagsKey)
   .map((tax) => tax.set('categories',
     categories.filter((cat) =>
       attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id'))
@@ -320,4 +325,20 @@ export const getInitialFormData = (shape) => {
     }, fields);
   }
   return fields;
+};
+
+export const getAllCategories = (entityId, associations, associationKey, categories) => {
+  const categoryIds = associations && associations
+    .filter((association) =>
+      attributesEqual(association.getIn(['attributes', associationKey]), entityId)
+    )
+    .map((association) => association.getIn(['attributes', 'category_id']));
+  return categories && categoryIds && categoryIds
+    .reduce((memo, id, key) => {
+      // if any of categories children
+      const parentId = categories.get(id.toString()).getIn(['attributes', 'parent_id']);
+      return parentId
+        ? memo.set(`${key}-${id}`, parseInt(parentId, 10))
+        : memo;
+    }, categoryIds);
 };

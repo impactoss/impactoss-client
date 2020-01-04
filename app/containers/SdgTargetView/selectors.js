@@ -13,6 +13,7 @@ import {
   attributesEqual,
   entitiesIsAssociated,
   prepareTaxonomiesIsAssociated,
+  getAllCategories,
 } from 'utils/entities';
 
 export const selectViewEntity = createSelector(
@@ -76,15 +77,11 @@ export const selectMeasures = createSelector(
   (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'measure_indicators'),
-  (measures, connections, measureTargets, measureRecommendations, measureCategories, measureIndicators) =>
+  (state) => selectEntities(state, 'categories'),
+  (measures, connections, measureTargets, measureRecommendations, measureCategories, measureIndicators, categories) =>
     measures && measures
     .map((measure) => measure
-      .set('categories', measureCategories && measureCategories
-        .filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
-        )
-        .map((association) => association.getIn(['attributes', 'category_id']))
-      )
+      .set('categories', getAllCategories(measure.get('id'), measureCategories, 'measure_id', categories))
       .set('sdgtargets', measureTargets && measureTargets
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
