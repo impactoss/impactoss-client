@@ -111,13 +111,13 @@ export const selectRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendation_categories'),
   (recommendations, connections, recMeasures, recCategories) =>
     recommendations && recommendations.map((rec) => rec
-      .set('categories', recCategories
+      .set('categories', recCategories && recCategories
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
         )
         .map((association) => association.getIn(['attributes', 'category_id']))
       )
-      .set('measures', recMeasures
+      .set('measures', recMeasures && recMeasures
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
           && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
@@ -137,7 +137,7 @@ const selectChildRecommendationsAssociated = createSelector(
   selectChildTaxonomies,
   (state) => selectEntities(state, 'recommendations'),
   (state) => selectEntities(state, 'recommendation_categories'),
-  (tag, childTaxonomies, entities, associations) => tag
+  (tag, childTaxonomies, entities, associations) => tag && childTaxonomies
     ? childTaxonomies.map((tax) =>
       tax.set('categories', tax.get('categories').map((cat) =>
         cat.set(
@@ -207,27 +207,27 @@ export const selectMeasures = createSelector(
   (state) => selectEntities(state, 'measure_indicators'),
   (measures, connections, measureTargets, measureRecommendations, measureCategories, measureIndicators) =>
     measures && measures.map((measure) => measure
-      .set('categories', measureCategories
+      .set('categories', measureCategories && measureCategories
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
         )
         .map((association) => association.getIn(['attributes', 'category_id']))
       )
-      .set('sdgtargets', ENABLE_SDGS && measureTargets
+      .set('sdgtargets', ENABLE_SDGS && measureTargets && measureTargets
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
           && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
         )
         .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
       )
-      .set('recommendations', measureRecommendations
+      .set('recommendations', measureRecommendations && measureRecommendations
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
           && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
         )
         .map((association) => association.getIn(['attributes', 'recommendation_id']))
       )
-      .set('indicators', measureIndicators
+      .set('indicators', measureIndicators && measureIndicators
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
           && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
@@ -276,27 +276,27 @@ export const selectChildMeasures = createSelector(
       (tax) => tax.set('categories', tax.get('categories').map(
         (cat) => cat.set('measures', cat.get('measures').map(
           (measure) => measure
-            .set('categories', measureCategories
+            .set('categories', measureCategories && measureCategories
               .filter((association) =>
                 attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
               )
               .map((association) => association.getIn(['attributes', 'category_id']))
             )
-            .set('sdgtargets', ENABLE_SDGS && measureTargets
+            .set('sdgtargets', ENABLE_SDGS && measureTargets && measureTargets
               .filter((association) =>
                 attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
                 && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
               )
               .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
             )
-            .set('recommendations', measureRecommendations
+            .set('recommendations', measureRecommendations && measureRecommendations
               .filter((association) =>
                 attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
                 && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
               )
               .map((association) => association.getIn(['attributes', 'recommendation_id']))
             )
-            .set('indicators', measureIndicators
+            .set('indicators', measureIndicators && measureIndicators
               .filter((association) =>
                 attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
                 && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
@@ -332,20 +332,20 @@ export const selectSdgTargets = createSelector(
   (state) => selectEntities(state, 'sdgtarget_indicators'),
   (targets, connections, targetMeasures, targetCategories, targetIndicators) =>
     targets && targets.map((target) => target
-    .set('categories', targetCategories
+    .set('categories', targetCategories && targetCategories
       .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
       )
       .map((association) => association.getIn(['attributes', 'category_id']))
     )
-    .set('measures', targetMeasures
+    .set('measures', targetMeasures && targetMeasures
       .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
         && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
       )
       .map((association) => association.getIn(['attributes', 'measure_id']))
     )
-    .set('indicators', targetIndicators
+    .set('indicators', targetIndicators && targetIndicators
       .filter((association) =>
         attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
         && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
@@ -393,20 +393,20 @@ export const selectChildSdgTargets = createSelector(
       (tax) => tax.set('categories', tax.get('categories').map(
         (cat) => cat.set('measures', cat.get('measures').map(
           (target) => target
-            .set('categories', targetCategories
+            .set('categories', targetCategories && targetCategories
               .filter((association) =>
                 attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
               )
               .map((association) => association.getIn(['attributes', 'category_id']))
             )
-            .set('measures', targetMeasures
+            .set('measures', targetMeasures && targetMeasures
               .filter((association) =>
                 attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
                 && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
               )
               .map((association) => association.getIn(['attributes', 'measure_id']))
             )
-            .set('indicators', targetIndicators
+            .set('indicators', targetIndicators && targetIndicators
               .filter((association) =>
                 attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
                 && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
