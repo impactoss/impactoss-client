@@ -770,6 +770,10 @@ export default defineMessages({
         id: 'app.containers.App.entities.taxonomies.plural',
         defaultMessage: 'Categories',
       },
+      children: {
+        id: 'app.containers.App.entities.taxonomies.children',
+        defaultMessage: 'Child categories',
+      },
       1: {
         single: {
           id: 'app.containers.App.entities.taxonomies.1.single',

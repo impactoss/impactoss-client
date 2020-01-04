@@ -329,6 +329,7 @@
   "app.containers.App.entities.connections.plural" : "Relationships",
   "app.containers.App.entities.taxonomies.single" : "Category",
   "app.containers.App.entities.taxonomies.plural" : "Categories",
+  "app.containers.App.entities.taxonomies.children" : "Child categories",
   "app.containers.App.entities.taxonomies.1.single" : "Human rights body",
   "app.containers.App.entities.taxonomies.1.plural" : "Human rights bodies",
   "app.containers.App.entities.taxonomies.1.empty" : "No human rights body",
