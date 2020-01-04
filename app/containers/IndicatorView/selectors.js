@@ -50,29 +50,29 @@ export const selectMeasures = createSelector(
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'measure_indicators'),
   (measures, connections, measureTargets, measureRecommendations, measureCategories, measureIndicators) =>
-    measures && measureIndicators && measures
+    measures && measures
     .map((measure) => measure
-      .set('categories', measureCategories
+      .set('categories', measureCategories && measureCategories
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
         )
         .map((association) => association.getIn(['attributes', 'category_id']))
       )
-      .set('sdgtargets', ENABLE_SDGS && measureTargets
+      .set('sdgtargets', ENABLE_SDGS && measureTargets && measureTargets
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
           && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
         )
         .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
       )
-      .set('recommendations', measureRecommendations
+      .set('recommendations', measureRecommendations && measureRecommendations
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
           && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
         )
         .map((association) => association.getIn(['attributes', 'recommendation_id']))
       )
-      .set('indicators', measureIndicators
+      .set('indicators', measureIndicators && measureIndicators
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
           && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
@@ -98,20 +98,20 @@ export const selectSdgTargets = createSelector(
   (targets, connections, targetMeasures, targetCategories, targetIndicators) =>
     targets && targetIndicators && targets
     .map((target) => target
-      .set('categories', targetCategories
+      .set('categories', targetCategories && targetCategories
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
         )
         .map((association) => association.getIn(['attributes', 'category_id']))
       )
-      .set('measures', targetMeasures
+      .set('measures', targetMeasures && targetMeasures
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
           && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
         )
         .map((association) => association.getIn(['attributes', 'measure_id']))
       )
-      .set('indicators', targetIndicators
+      .set('indicators', targetIndicators && targetIndicators
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
           && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
