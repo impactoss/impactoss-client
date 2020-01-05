@@ -49,6 +49,7 @@ import {
   selectIndicatorDraftCount,
   selectMeasureDraftCount,
   selectSdgtargetDraftCount,
+  selectRecommendationAddressedCount,
 } from './selectors';
 
 const Content = styled.div`
@@ -687,7 +688,9 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       dataReady,
       onTaxonomyLink,
       taxonomies,
+      recommendationAddressedCount,
     } = this.props;
+    console.log(recommendationAddressedCount);
     return (
       <div>
         <Helmet
@@ -750,7 +753,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                         }
                       </DiagramSectionVertical>
                       <AnnotationVertical hasSDGs={ENABLE_SDGS}>
-                        <FormattedMessage {...messages.diagram.addressed} />
+                        {`${recommendationAddressedCount} ${this.context.intl.formatMessage(messages.diagram.addressed)}`}
                       </AnnotationVertical>
                       <DiagramSectionVertical>
                         <DiagramSectionVerticalCenter>
@@ -830,6 +833,7 @@ Overview.propTypes = {
   measureDraftCount: PropTypes.number,
   sdgtargetDraftCount: PropTypes.number,
   indicatorDraftCount: PropTypes.number,
+  recommendationAddressedCount: PropTypes.number,
   theme: PropTypes.object,
 };
 
@@ -848,6 +852,7 @@ const mapStateToProps = (state) => ({
   measureDraftCount: selectMeasureDraftCount(state),
   sdgtargetDraftCount: selectSdgtargetDraftCount(state),
   indicatorDraftCount: selectIndicatorDraftCount(state),
+  recommendationAddressedCount: selectRecommendationAddressedCount(state),
 });
 
 function mapDispatchToProps(dispatch) {
