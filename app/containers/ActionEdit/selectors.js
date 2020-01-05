@@ -46,14 +46,14 @@ export const selectConnectedTaxonomies = createSelector(
 
 export const selectRecommendations = createSelector(
   (state, id) => id,
-  (state) => selectRecommendationsCategorised(state),
+  selectRecommendationsCategorised,
   (state) => selectEntities(state, 'recommendation_measures'),
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'recommendation_id', associations, 'measure_id', id)
 );
 export const selectSdgTargets = createSelector(
   (state, id) => id,
-  (state) => selectSdgTargetsCategorised(state),
+  selectSdgTargetsCategorised,
   (state) => selectEntities(state, 'sdgtarget_measures'),
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'sdgtarget_id', associations, 'measure_id', id)
