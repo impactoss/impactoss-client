@@ -22,7 +22,7 @@ import { PARAMS } from 'containers/App/constants';
 import {
   filterEntitiesByAttributes,
   filterEntitiesByKeywords,
-  entitySetCategoryIds,
+  entitiesSetCategoryIds,
   prepareTaxonomies,
 } from 'utils/entities';
 
@@ -395,20 +395,20 @@ export const selectUserTaxonomies = createSelector(
 export const selectRecommendationsCategorised = createSelector(
   (state) => selectEntities(state, 'recommendations'),
   (state) => selectEntities(state, 'recommendation_categories'),
-  (entities, categories) =>
-    entities && entities.map((entity) => entitySetCategoryIds(entity, 'recommendation_id', categories))
+  (entities, associations) =>
+    entitiesSetCategoryIds(entities, 'recommendation_id', associations)
 );
 
 export const selectSdgTargetsCategorised = createSelector(
   (state) => selectEntities(state, 'sdgtargets'),
   (state) => selectEntities(state, 'sdgtarget_categories'),
-  (entities, categories) =>
-    entities && entities.map((entity) => entitySetCategoryIds(entity, 'sdgtarget_id', categories))
+  (entities, associations) =>
+    entitiesSetCategoryIds(entities, 'sdgtarget_id', associations)
 );
 
 export const selectMeasuresCategorised = createSelector(
   (state) => selectEntities(state, 'measures'),
   (state) => selectEntities(state, 'measure_categories'),
-  (entities, categories) =>
-    entities && entities.map((entity) => entitySetCategoryIds(entity, 'measure_id', categories))
+  (entities, associations) =>
+    entitiesSetCategoryIds(entities, 'measure_id', associations)
 );

@@ -133,7 +133,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                           <TaxonomySidebarItem taxonomy={taxonomy} onTaxonomyClick={this.onHideSidebar} />
                           <div>
                             { taxonomy.children && taxonomy.children.length > 0 && map(taxonomy.children, (child) =>
-                              <TaxonomySidebarItem key={child.id} isChild taxonomy={child} onTaxonomyClick={this.onHideSidebar} />
+                              <TaxonomySidebarItem key={child.id} nested taxonomy={child} onTaxonomyClick={this.onHideSidebar} />
                             )}
                           </div>
                         </div>
