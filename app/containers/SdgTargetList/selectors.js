@@ -100,7 +100,7 @@ const selectSdgTargetsNested = createSelector(
       entity.get('id'),
       entityMeasures,
       'measure_id',
-      'indicator_id',
+      'sdgtarget_id',
       connections.get('measures'),
     ))
     // nest connected indicator ids
@@ -108,7 +108,7 @@ const selectSdgTargetsNested = createSelector(
       entity.get('id'),
       entityIndicators,
       'indicator_id',
-      'measure_id',
+      'sdgtarget_id',
       connections.get('indicators'),
     ))
   )

@@ -44,7 +44,7 @@ const selectRecommendationsNested = createSelector(
         entity.get('id'),
         entityMeasures,
         'measure_id',
-        'indicator_id',
+        'recommendation_id',
         connections.get('measures'),
       ))
     )
