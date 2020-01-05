@@ -5,6 +5,7 @@ const baseTables = [
   'taxonomies',
   'recommendations',
   'measures',
+  'recommendation_measures',
 ];
 const sdgTables = [
   'sdgtargets',
