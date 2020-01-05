@@ -26,6 +26,8 @@ import {
   entitiesSetSingle,
   entitiesSetCategoryIds,
   filterTaxonomies,
+  getEntityConnections,
+  getTaxonomyCategories,
 } from 'utils/entities';
 
 import { sortEntities, getSortOption } from 'utils/sort';
@@ -69,37 +71,18 @@ export const selectConnectedTaxonomies = createSelector(
         key: 'sdgtarget_id',
         associations: categorySdgTargets,
       },
-    ], (connectedTaxonomies, connection) =>
-      // merge connected taxonomies.
+    ], (connectedTaxonomies, relationship) =>
       // TODO deal with conflicts
-      connection
+      // merge connected taxonomies.
+      relationship
       ? connectedTaxonomies.merge(
-        filterTaxonomies(taxonomies, connection.tags, true)
-        .map((taxonomy) => taxonomy
-          .set('categories', categories
-            .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-            .map((category) => {
-              // figure out child categories if not directly tagging connection
-              const childCategories = taxonomy.getIn(['attributes', connection.tags])
-                ? null
-                : categories.filter((item) => attributesEqual(item.getIn(['attributes', 'parent_id']), category.get('id')));
-              return category.set(connection.path,
-                connection.associations
-                  .filter((association) => {
-                    if (!connections.getIn([connection.path, association.getIn(['attributes', connection.key]).toString()])) {
-                      return false;
-                    }
-                    return !childCategories
-                      ? attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
-                      : childCategories.some((child) =>
-                          attributesEqual(association.getIn(['attributes', 'category_id']), child.get('id'))
-                        );
-                  })
-                  .map((association) => association.getIn(['attributes', connection.key]))
-                );
-            })
-          )
-        )
+        filterTaxonomies(taxonomies, relationship.tags, true)
+        .map((taxonomy) => taxonomy.set('categories', getTaxonomyCategories(
+          taxonomy,
+          categories,
+          relationship,
+          connections.get(relationship.path),
+        )))
       )
       : connectedTaxonomies
     , Map())
@@ -127,43 +110,36 @@ const selectIndicatorsNested = createSelector(
     users
   ) =>
     entities.map((entity) => entity
-    .set(
-      'measures',
-      entityMeasures
-      .filter((association) =>
-        attributesEqual(association.getIn(['attributes', 'indicator_id']), entity.get('id'))
-        && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
-      )
-      .map((association) => association.getIn(['attributes', 'measure_id']))
-    )
-    .set(
-      'sdgtargets',
-      ENABLE_SDGS && entitySdgTargets
-      .filter((association) =>
-        attributesEqual(association.getIn(['attributes', 'indicator_id']), entity.get('id'))
-        && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
-      )
-      .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
-    )
+    .set('measures', getEntityConnections(
+      entity.get('id'),
+      entityMeasures,
+      'measure_id',
+      'indicator_id',
+      connections.get('measures'),
+    ))
+    // nest connected sdgtarget ids
+    .set('sdgtargets', ENABLE_SDGS && getEntityConnections(
+      entity.get('id'),
+      entitySdgTargets,
+      'sdgtarget_id',
+      'measure_id',
+      connections.get('sdgtargets'),
+    ))
     // nest reports
     .set('reports', progressReports.filter((report) =>
       attributesEqual(report.getIn(['attributes', 'indicator_id']), entity.get('id'))
     ))
     // nest dates without report
-    .set(
-      'dates',
-      dueDates
-      .filter((date) => {
-        // is associated
-        const associated = attributesEqual(date.getIn(['attributes', 'indicator_id']), entity.get('id'));
-        if (associated) {
-          // has no report
-          const dateReports = progressReports.filter((report) => attributesEqual(report.getIn(['attributes', 'due_date_id']), date.get('id')));
-          return !dateReports || dateReports.size === 0;
-        }
-        return false;
+    .set('dates', dueDates.filter((date) => {
+      // is associated
+      const associated = attributesEqual(date.getIn(['attributes', 'indicator_id']), entity.get('id'));
+      if (associated) {
+        // has no report
+        const dateReports = progressReports.filter((report) => attributesEqual(report.getIn(['attributes', 'due_date_id']), date.get('id')));
+        return !dateReports || dateReports.size === 0;
       }
-    ))
+      return false;
+    }))
     .set(
       'manager',
       users.find((user) => entity.getIn(['attributes', 'manager_id']) && attributesEqual(user.get('id'), entity.getIn(['attributes', 'manager_id'])))
