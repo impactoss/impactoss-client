@@ -13,7 +13,7 @@ import {
   prepareTaxonomiesIsAssociated,
   entitiesIsAssociated,
   attributesEqual,
-  getAllCategories,
+  getEntityCategories,
 } from 'utils/entities';
 
 export const selectViewEntity = createSelector(
@@ -50,7 +50,7 @@ export const selectMeasures = createSelector(
   (measures, connections, measureTargets, measureRecommendations, measureCategories, measureIndicators, categories) =>
     measures && measures
     .map((measure) => measure
-      .set('categories', getAllCategories(measure.get('id'), measureCategories, 'measure_id', categories))
+      .set('categories', getEntityCategories(measure.get('id'), measureCategories, 'measure_id', categories))
       .set('sdgtargets', ENABLE_SDGS && measureTargets && measureTargets
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))

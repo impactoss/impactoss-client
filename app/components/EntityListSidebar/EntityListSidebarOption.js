@@ -22,7 +22,7 @@ const Styled = styled(Button)`
   display: table;
   width: 100%;
   font-weight: bold;
-  padding: 0.75em 1em 0.75em 1.5em;
+  padding: ${(props) => props.small ? '0.5em 8px 0.5em 32px' : '0.75em 8px 0.75em 16px'};
   width: 100%;
   text-align: left;
   color:  ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
@@ -52,12 +52,14 @@ const IconWrapper = styled.div`
 const Dot = styled.div`
   background-color: ${(props) => palette(props.palette, props.pIndex)};
   display: block;
+  border: 1px solid;
+  border-color: ${(props) => props.active ? 'white' : 'transparent'};
   border-radius: ${(props) => props.round ? 999 : 3}px;
   width: 1em;
   height: 1em;
 `;
 const DotWrapper = styled.div`
-  padding: 5px;
+  padding: ${(props) => props.small ? '0px 6px' : '5px'};
   width: 26px;
   display: table-cell;
   vertical-align: middle;
@@ -65,13 +67,13 @@ const DotWrapper = styled.div`
 
 class EntityListSidebarOption extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  renderDot = (groupId, optionId) => {
+  renderDot = (groupId, optionId, active) => {
     switch (groupId) {
       case 'taxonomies':
       case 'connectedTaxonomies':
-        return (<Dot palette="taxonomies" pIndex={parseInt(optionId, 10)} />);
+        return (<Dot palette="taxonomies" pIndex={parseInt(optionId, 10)} active={active} />);
       case 'connections':
-        return (<Dot palette={optionId} pIndex={0} round />);
+        return (<Dot palette={optionId} pIndex={0} round active={active} />);
       default:
         return null;
     }
@@ -82,6 +84,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
     return (
       <Styled
         active={option.get('active')}
+        small={option.get('nested')}
         onClick={() => onShowForm({
           group: groupId,
           optionId: option.get('id'),
@@ -106,8 +109,8 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
             <Icon name={option.get('icon')} />
           </IconWrapper>
         }
-        <DotWrapper>
-          { this.renderDot(groupId, option.get('id')) }
+        <DotWrapper small={option.get('nested')}>
+          { this.renderDot(groupId, option.get('id'), option.get('active')) }
         </DotWrapper>
       </Styled>
     );

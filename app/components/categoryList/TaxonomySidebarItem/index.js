@@ -48,10 +48,10 @@ const TaxIcon = styled.div`
 class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { taxonomy, isChild, onTaxonomyClick } = this.props;
+    const { taxonomy, nested, onTaxonomyClick } = this.props;
     return (
       <Styled
-        small={isChild}
+        small={nested}
         onClick={(evt) => {
           onTaxonomyClick(evt);
           taxonomy.onLink(taxonomy.active);
@@ -64,7 +64,7 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
         onBlur={() => taxonomy.onMouseOver && taxonomy.onMouseOver(false)}
       >
         <TaxIcon>
-          <Icon name={`taxonomy_${taxonomy.id}`} size={isChild ? '28px' : null} />
+          <Icon name={`taxonomy_${taxonomy.id}`} size={nested ? '28px' : null} />
         </TaxIcon>
         <TaxTitle>
           <FormattedMessage {...appMessages.entities.taxonomies[taxonomy.id].plural} />
@@ -76,7 +76,7 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
 
 TaxonomySidebarItem.propTypes = {
   taxonomy: PropTypes.object,
-  isChild: PropTypes.bool,
+  nested: PropTypes.bool,
   onTaxonomyClick: PropTypes.func,
 };
 

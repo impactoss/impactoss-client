@@ -14,7 +14,7 @@ import {
   attributesEqual,
   entitiesIsAssociated,
   prepareTaxonomiesAssociated,
-  getAllCategories,
+  getEntityCategories,
 } from 'utils/entities';
 
 export const selectViewEntity = createSelector(
@@ -49,7 +49,7 @@ export const selectRecommendations = createSelector(
   (recommendations, connections, recMeasures, recCategories, categories) =>
     recommendations && recommendations
     .map((rec) => rec
-      .set('categories', getAllCategories(rec.get('id'), recCategories, 'recommendation_id', categories))
+      .set('categories', getEntityCategories(rec.get('id'), recCategories, 'recommendation_id', categories))
       .set('measures', recMeasures && recMeasures
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
@@ -77,7 +77,7 @@ export const selectSdgTargets = createSelector(
   (targets, connections, targetMeasures, targetCategories, targetIndicators, categories) =>
     targets && targets
     .map((target) => target
-      .set('categories', getAllCategories(target.get('id'), targetCategories, 'sdgtarget_id', categories))
+      .set('categories', getEntityCategories(target.get('id'), targetCategories, 'sdgtarget_id', categories))
       .set('measures', targetMeasures && targetMeasures
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), target.get('id'))
