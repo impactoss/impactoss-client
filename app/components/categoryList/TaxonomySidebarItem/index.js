@@ -25,7 +25,7 @@ const Styled = styled(Button)`
     border-bottom-color: ${palette('asideCatNavItemHover', 4)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding:  ${(props) => props.small ? '0.25em 8px 0.25em 76px' : '0.5em 8px 0.5em 24px'};
+    padding:  ${(props) => props.small ? '0.25em 8px 0.25em 68px' : '0.5em 8px 0.5em 16px'};
   }
 `;
 

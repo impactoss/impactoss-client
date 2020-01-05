@@ -14,15 +14,12 @@ export default styled.div`
     if (props.hasButtons) {
       return '3.5em 24px 0.5em';
     }
-    if (props.responsiveSmall) {
-      return '3em 12px 1em';
-    }
-    return '3em 24px 1em';
+    return '3em 12px 1em';
   }};
   background-color: ${palette('asideHeader', 0)};
 
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     height:${(props) => props.theme.sizes.aside.header.height}px;
-    padding: ${(props) => props.hasButtons ? '2.5em 24px 1em' : '3em 24px 1em'};
+    padding: ${(props) => props.hasButtons ? '2.5em 16px 1em' : '3em 16px 1em'};
   }
 `;
