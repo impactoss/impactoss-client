@@ -363,3 +363,35 @@ export const getEntityCategories = (entityId, associations, associationKey, cate
   }
   return categoryIds;
 };
+
+export const getEntityConnections = (entityId, associations, associationKey, entityKey, connections) =>
+  associations
+  .filter((association) =>
+    attributesEqual(association.getIn(['attributes', entityKey]), entityId)
+    && connections.get(association.getIn(['attributes', associationKey]).toString())
+  )
+  .map((association) => association.getIn(['attributes', associationKey]));
+
+export const getTaxonomyCategories = (taxonomy, categories, relationship, connections) =>
+  categories
+    .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
+    .map((category) => {
+      // figure out child categories if not directly tagging connection
+      const childCategories = taxonomy.getIn(['attributes', relationship.tags])
+        ? null
+        : categories.filter((item) => attributesEqual(item.getIn(['attributes', 'parent_id']), category.get('id')));
+      return category.set(relationship.path,
+        relationship.associations
+          .filter((association) => {
+            if (!connections.get(association.getIn(['attributes', relationship.key]).toString())) {
+              return false;
+            }
+            return !childCategories
+              ? attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
+              : childCategories.some((child) =>
+                  attributesEqual(association.getIn(['attributes', 'category_id']), child.get('id'))
+                );
+          })
+          .map((association) => association.getIn(['attributes', relationship.key]))
+        );
+    });

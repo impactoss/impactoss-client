@@ -17,10 +17,10 @@ import {
   filterEntitiesByConnection,
   filterEntitiesByCategories,
   filterEntitiesWithoutAssociation,
-  attributesEqual,
   prepareTaxonomiesMultiple,
   entitiesSetCategoryIds,
   getEntityCategories,
+  getEntityConnections,
 } from 'utils/entities';
 
 import { sortEntities, getSortOption } from 'utils/sort';
@@ -40,15 +40,13 @@ const selectRecommendationsNested = createSelector(
   (entities, connections, entityCategories, entityMeasures, categories) =>
     entities.map((entity) => entity
       .set('categories', getEntityCategories(entity.get('id'), entityCategories, 'recommendation_id', categories))
-      .set(
-        'measures',
-        entityMeasures
-        .filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'recommendation_id']), entity.get('id'))
-          && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
-        )
-        .map((association) => association.getIn(['attributes', 'measure_id']))
-      )
+      .set('measures', getEntityConnections(
+        entity.get('id'),
+        entityMeasures,
+        'measure_id',
+        'indicator_id',
+        connections.get('measures'),
+      ))
     )
 );
 const selectRecommendationsWithout = createSelector(
