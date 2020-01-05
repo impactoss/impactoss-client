@@ -8,7 +8,7 @@ background-color: ${palette('asideListGroup', 1)};
 padding: 0.25em 12px;
 font-size: 0.9em;
 @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-  padding: 0.25em 24px;
+  padding: 0.25em 16px;
 }
 `;
 export default SidebarGroupLabel;
