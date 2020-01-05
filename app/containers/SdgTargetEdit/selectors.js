@@ -30,13 +30,13 @@ export const selectTaxonomies = createSelector(
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'sdgtarget_categories'),
   (id, taxonomies, categories, associations) =>
-    prepareTaxonomiesAssociated(taxonomies, categories, associations, 'tags_sdgtargets', 'sdgtarget_id', id)
+    prepareTaxonomiesAssociated(taxonomies, categories, associations, 'tags_sdgtargets', 'sdgtarget_id', id, false)
 );
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
+    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'], false)
 );
 
 export const selectMeasures = createSelector(

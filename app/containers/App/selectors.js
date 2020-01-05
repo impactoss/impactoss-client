@@ -366,21 +366,24 @@ export const selectMeasureConnections = createSelector(
 );
 
 export const selectMeasureTaxonomies = createSelector(
+  (state, args) => args ? args.includeParents : true,
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_measures')
+  (includeParents, taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_measures', includeParents)
 );
 
 export const selectRecommendationTaxonomies = createSelector(
+  (state, args) => args ? args.includeParents : true,
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_recommendations')
+  (includeParents, taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_recommendations', includeParents)
 );
 
 export const selectSdgTargetTaxonomies = createSelector(
+  (state, args) => args ? args.includeParents : true,
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_sdgtargets')
+  (includeParents, taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_sdgtargets', includeParents)
 );
 
 export const selectUserTaxonomies = createSelector(
