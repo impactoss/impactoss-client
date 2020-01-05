@@ -122,7 +122,7 @@ const selectIndicatorsNested = createSelector(
       entity.get('id'),
       entitySdgTargets,
       'sdgtarget_id',
-      'measure_id',
+      'indicator_id',
       connections.get('sdgtargets'),
     ))
     // nest reports
