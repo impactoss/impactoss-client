@@ -29,6 +29,7 @@ import {
   getConnectionUpdatesFromFormData,
   getCheckboxField,
   getStatusField,
+  parentCategoryOptions,
 } from 'utils/forms';
 
 import {
@@ -119,7 +120,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { viewEntity, users, measures, sdgtargets, recommendations } = props;
+    const { viewEntity, users, measures, sdgtargets, recommendations, parentOptions } = props;
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
@@ -131,6 +132,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       associatedSdgTargets: entityOptions(sdgtargets, true),
       associatedRecommendations: entityOptions(recommendations, true),
       associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
+      associatedCategory: parentCategoryOptions(parentOptions, viewEntity.getIn(['attributes', 'parent_id'])),
       // TODO allow single value for singleSelect
     })
     : Map();
