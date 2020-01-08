@@ -690,7 +690,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       taxonomies,
       recommendationAddressedCount,
     } = this.props;
-    console.log(recommendationAddressedCount);
     return (
       <div>
         <Helmet
