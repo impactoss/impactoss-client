@@ -305,6 +305,8 @@ export const getCategoryTitle = (cat) =>
   ? `${cat.getIn(['attributes', 'reference'])}. ${cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name'])}`
   : cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
 
+export const getEntityParentId = (cat) =>
+  cat.getIn(['attributes', 'parent_id']) && cat.getIn(['attributes', 'parent_id']).toString();
 
 const getInitialValue = (field) =>
   typeof field.default !== 'undefined' ? field.default : '';
