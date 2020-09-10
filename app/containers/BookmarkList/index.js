@@ -18,7 +18,7 @@ import { PATHS } from 'containers/App/constants';
 import EntityList from 'containers/EntityList';
 
 import { CONFIG, DEPENDENCIES } from './constants';
-import { selectPages } from './selectors';
+import { selectBookmarks } from './selectors';
 import messages from './messages';
 
 export class BookmarkList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -91,7 +91,7 @@ BookmarkList.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  entities: selectPages(state, fromJS(props.location.query)),
+  entities: selectBookmarks(state, fromJS(props.location.query)),
 });
 function mapDispatchToProps(dispatch) {
   return {

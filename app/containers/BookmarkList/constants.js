@@ -1,21 +1,12 @@
-import { USER_ROLES, PUBLISH_STATUSES } from 'themes/config';
+// import { USER_ROLES, PUBLISH_STATUSES } from 'themes/config';
 // specify the filter and query  options
-export const DEPENDENCIES = [
-  'user_roles',
-  'pages',
-];
+export const DEPENDENCIES = ['bookmarks'];
 
 export const CONFIG = {
-  serverPath: 'pages',
-  clientPath: 'pages',
+  serverPath: 'bookmarks',
+  clientPath: 'bookmarks',
   search: ['title'],
   sorting: [
-    {
-      attribute: 'order',
-      type: 'number',
-      order: 'asc',
-      default: true,
-    },
     {
       attribute: 'title',
       type: 'string',
@@ -32,7 +23,7 @@ export const CONFIG = {
       order: 'desc',
     },
   ],
-  attributes: {  // filter by attribute value
+  /*attributes: {  // filter by attribute value
     options: [
       {
         search: false,
@@ -42,5 +33,5 @@ export const CONFIG = {
         role: USER_ROLES.CONTRIBUTOR.value,
       },
     ],
-  },
+  },*/
 };

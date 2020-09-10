@@ -170,6 +170,7 @@ export const DB_TABLES = [
   'user_roles',
   'roles',
   'pages',
+  'bookmarks',
   'taxonomies',
   'categories',
   'indicators',

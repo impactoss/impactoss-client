@@ -14,9 +14,9 @@ import { CONFIG } from './constants';
 // 1. selectEntitiesWhere filters by attribute
 // 2. selectEntitiesSearchQuery filters by keyword
 // 3. selectUsers
-export const selectPages = createSelector(
+export const selectBookmarks = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
-    path: 'pages',
+    path: 'bookmarks',
     searchAttributes: CONFIG.search || ['title'],
     locationQuery,
   }),
