@@ -705,6 +705,16 @@ export default defineMessages({
         defaultMessage: 'Users',
       },
     },
+    bookmarks: {
+      single: {
+        id: 'app.containers.App.entities.bookmarks.single',
+        defaultMessage: 'Bookmark',
+      },
+      plural: {
+        id: 'app.containers.App.entities.bookmarks.plural',
+        defaultMessage: 'Bookmarks',
+      },
+    },
     progress_reports: {
       single: {
         id: 'app.containers.App.entities.progress_reports.single',

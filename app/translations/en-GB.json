@@ -3,6 +3,7 @@
   "app.components.Header.login" : "Sign in",
   "app.components.Header.logout" : "Sign out",
   "app.components.Header.user" : "User profile",
+  "app.components.Header.bookmarks" : "Bookmarks",
   "app.components.Header.userLoading" : "Signing in...",
   "app.components.Header.register" : "Register",
   "app.containers.Footer.disclaimer" : "Please note that all data in this database has been entered for demonstrative purposes only. Please send any feedback to ",

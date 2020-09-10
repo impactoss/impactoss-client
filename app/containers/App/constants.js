@@ -25,6 +25,7 @@ export const RECOVER_PASSWORD = 'impactoss/App/RECOVER_PASSWORD';
 export const AUTHENTICATE_SUCCESS = 'impactoss/App/AUTHENTICATE_SUCCESS';
 export const AUTHENTICATE_ERROR = 'impactoss/App/AUTHENTICATE_ERROR';
 export const SET_AUTHENTICATION_STATE = 'impactoss/App/SET_AUTHENTICATION_STATE';
+export const BOOKMARKS = 'impactoss/App/BOOKMARKS';
 export const LOGOUT = 'impactoss/App/LOGOUT';
 export const LOGOUT_SUCCESS = 'impactoss/App/LOGOUT_SUCCESS';
 export const LOGOUT_ERROR = 'impactoss/App/LOGOUT_ERROR';
@@ -112,6 +113,7 @@ export const PATHS = {
   PASSWORD: '/password',
   OVERVIEW: '/overview',
   LOGIN: '/login',
+  BOOKMARKS: '/bookmarks',
   LOGOUT: '/logout',
   REGISTER: '/register',
   RESET_PASSWORD: '/resetpassword',
