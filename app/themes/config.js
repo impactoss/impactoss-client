@@ -16,7 +16,7 @@
 export const DEFAULT_LOCALE = 'en-GB';
 // date format - change to format according to locale, only used for form error message
 export const DATE_FORMAT = 'dd/mm/yyyy';
-export const NODE_ENV = sessionStorage.NODE_ENV || 'production'
+export const NODE_ENV = sessionStorage.NODE_ENV || 'production';
 
 // UI settings ************************
 
