@@ -55,6 +55,15 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
             {user.name}
           </LinkAccount>
         }
+        {isSignedIn && user &&
+          <LinkAccount
+            href={PATHS.BOOKMARKS}
+            active={currentPath === PATHS.BOOKMARKS}
+            onClick={(evt) => this.onClick(evt, PATHS.BOOKMARKS)}
+          >
+            <FormattedMessage {...messages.bookmarks} />
+          </LinkAccount>
+        }
         {isSignedIn && !user &&
           <LinkAccountLoading>
             <FormattedMessage {...messages.userLoading} />
