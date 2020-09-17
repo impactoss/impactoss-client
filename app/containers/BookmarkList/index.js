@@ -22,7 +22,6 @@ import { selectBookmarks } from './selectors';
 import messages from './messages';
 
 export class BookmarkList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
@@ -40,17 +39,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'pages',
-      actions: [{
-        type: 'add',
-        title: [
-          this.context.intl.formatMessage(appMessages.buttons.add),
-          {
-            title: this.context.intl.formatMessage(appMessages.entities.bookmarks.single),
-            hiddenSmall: true,
-          },
-        ],
-        onClick: () => this.props.handleNew(),
-      }],
+      actions: []
     };
 
     return (
