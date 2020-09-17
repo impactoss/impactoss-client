@@ -39,7 +39,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'pages',
-      actions: []
+      actions: [],
     };
 
     return (
@@ -68,7 +68,6 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
 
 BookmarkList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  handleNew: PropTypes.func,
   dataReady: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
   location: PropTypes.object,

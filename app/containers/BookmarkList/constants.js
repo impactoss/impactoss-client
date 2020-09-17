@@ -4,5 +4,5 @@ export const DEPENDENCIES = ['bookmarks'];
 export const CONFIG = {
   serverPath: 'bookmarks',
   clientPath: 'bookmarks',
-  search: ['title']
+  search: ['title'],
 };
