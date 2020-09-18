@@ -193,6 +193,22 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: `${PATHS.BOOKMARKS}${PATHS.ID}`,
+      name: 'bookmarkRedirect',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/BookmarkRedirect'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: `${PATHS.USERS}${PATHS.ID}`,
       name: 'userView',
       onEnter: redirectIfNotSignedIn(),
