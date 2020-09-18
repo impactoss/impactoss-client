@@ -11,8 +11,8 @@ import { connect } from 'react-redux';
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
 
-import appMessages from 'containers/App/messages';
-import messages from './messages';
+// import appMessages from 'containers/App/messages';
+// import messages from './messages';
 import { selectViewEntity } from './selectors';
 import { DEPENDENCIES } from './constants';
 
@@ -30,8 +30,10 @@ export class BookmarkRedirect extends React.PureComponent { // eslint-disable-li
   render() {
     const { bookmark, dataReady } = this.props;
 
-    if(dataReady) {
-      console.log('VIEW', bookmark.getIn(['attributes', 'view']).toObject())
+    if (dataReady) {
+      const jsonView = JSON.stringify(bookmark.getIn(['attributes', 'view']).toObject());
+
+      return <pre>{jsonView}</pre>;
     }
 
     return null;
@@ -41,7 +43,7 @@ export class BookmarkRedirect extends React.PureComponent { // eslint-disable-li
 BookmarkRedirect.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   bookmark: PropTypes.object,
-  dataReady: PropTypes.bool
+  dataReady: PropTypes.bool,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -49,7 +51,7 @@ const mapStateToProps = (state, props) => ({
   bookmark: selectViewEntity(state, props.params.id),
 });
 
-function mapDispatchToProps(dispatch, props) {
+function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
