@@ -7,14 +7,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Helmet from 'react-helmet';
+import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
 
-// import appMessages from 'containers/App/messages';
-// import messages from './messages';
+import Footer from 'containers/Footer';
+import Container from 'components/styled/Container';
+import ContentHeader from 'components/ContentHeader';
+
+import messages from './messages';
 import { selectViewEntity } from './selectors';
 import { DEPENDENCIES } from './constants';
+
+const ViewContainer = styled(Container)`
+  min-height: 100vH;
+`;
 
 export class BookmarkRedirect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
@@ -31,14 +41,33 @@ export class BookmarkRedirect extends React.PureComponent { // eslint-disable-li
     .filter(([, value]) => value) // filter out if parameter is not defined
   )
 
+  getErrorView(message) {
+    const pageTitle = this.context.intl.formatMessage(messages.pageTitle);
+
+    return (
+      <div>
+        <Helmet title={pageTitle} />
+        <ViewContainer>
+          <ContentHeader title={pageTitle} />
+          <FormattedMessage {...message} />
+        </ViewContainer>
+        <Footer />
+      </div>
+    );
+  }
+
   render() {
     const { bookmark, dataReady } = this.props;
 
     if (dataReady) {
+      if (!bookmark) {
+        return this.getErrorView(messages.notFound);
+      }
+
       const view = bookmark.getIn(['attributes', 'view']).toJS();
-      // if(!view.type) {
-        // TODO return error: invalid bookmark
-      // }
+      if (!view.type) {
+        return this.getErrorView(messages.invalid);
+      }
 
       const {
         type,
@@ -70,6 +99,10 @@ BookmarkRedirect.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   bookmark: PropTypes.object,
   dataReady: PropTypes.bool,
+};
+
+BookmarkRedirect.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({

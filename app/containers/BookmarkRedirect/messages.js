@@ -7,19 +7,15 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   pageTitle: {
-    id: 'app.containers.PageView.pageTitle',
-    defaultMessage: 'Page',
+    id: 'app.containers.BookmarkRedirect.pageTitle',
+    defaultMessage: 'Bookmarks',
   },
-  metaDescription: {
-    id: 'app.containers.PageView.metaDescription',
-    defaultMessage: 'Page page description',
-  },
-  header: {
-    id: 'app.containers.PageView.header',
-    defaultMessage: 'Page',
+  invalid: {
+    id: 'app.containers.BookmarkRedirect.invalid',
+    defaultMessage: 'Sorry the bookmark is invalid',
   },
   notFound: {
-    id: 'app.containers.PageView.notFound',
-    defaultMessage: 'Sorry no page found',
+    id: 'app.containers.BookmarkRedirect.notFound',
+    defaultMessage: 'Sorry no bookmark found',
   },
 });
