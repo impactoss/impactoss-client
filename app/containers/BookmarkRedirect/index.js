@@ -27,13 +27,39 @@ export class BookmarkRedirect extends React.PureComponent { // eslint-disable-li
     }
   }
 
+  getEntries = (subView) => (Object.entries(subView)
+    .filter(([, value]) => value) // filter out if parameter is not defined
+  )
+
   render() {
     const { bookmark, dataReady } = this.props;
 
     if (dataReady) {
-      const jsonView = JSON.stringify(bookmark.getIn(['attributes', 'view']).toObject());
+      const view = bookmark.getIn(['attributes', 'view']).toJS();
+      // if(!view.type) {
+        // TODO return error: invalid bookmark
+      // }
 
-      return <pre>{jsonView}</pre>;
+      const {
+        type,
+        subgroup, group, expand, sort, order,
+        cat, catx, where, connected,
+      } = view;
+
+      const singleValue = this.getEntries({ subgroup, group, expand, sort, order })
+        .map((entry) => entry.join('='));
+      const cats = (cat || []).map((id) => `cat=${id}`);
+      const multiValue = this.getEntries({ catx, where, connected })
+        .flatMap(
+          ([filter, objects]) => objects.map(
+            ({ key, value }) => `${filter}=${key}:${value}`
+          )
+        );
+
+      const queryParts = [...singleValue, ...cats, ...multiValue];
+
+      // redirecting to built url
+      window.location.href = `/${type}?${queryParts.join('&')}`;
     }
 
     return null;
