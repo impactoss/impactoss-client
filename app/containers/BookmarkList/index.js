@@ -60,6 +60,10 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
             plural: this.context.intl.formatMessage(appMessages.entities.bookmarks.plural),
           }}
           locationQuery={fromJS(this.props.location.query)}
+          onEntityClickCustom={(id) => {
+            const bookmark = this.props.entities.get(id); // Immutable Map
+            console.log('custom click:', id, bookmark);
+          }}
         />
       </div>
     );

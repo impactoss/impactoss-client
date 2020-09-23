@@ -185,7 +185,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onResetFilters={this.props.onResetFilters}
           onPageSelect={this.props.onPageSelect}
           onPageItemsSelect={this.props.onPageItemsSelect}
-          onEntityClick={(id, path) => this.props.onEntityClick(id, path, viewDomain.get('errors'))}
+          onEntityClick={(id, path) => {
+            if (this.props.onEntityClickCustom) {
+              this.props.onEntityClickCustom(id, path, viewDomain.get('errors'));
+            } else {
+              this.props.onEntityClick(id, path, viewDomain.get('errors'));
+            }
+          }}
           onSortBy={this.props.onSortBy}
           onSortOrder={this.props.onSortOrder}
           onDismissError={this.props.onDismissError}
@@ -263,6 +269,7 @@ EntityList.propTypes = {
   onPageSelect: PropTypes.func.isRequired,
   onPageItemsSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
+  onEntityClickCustom: PropTypes.func,
   resetProgress: PropTypes.func.isRequired,
   updateClientPath: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
