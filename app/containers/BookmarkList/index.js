@@ -60,6 +60,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
             plural: this.context.intl.formatMessage(appMessages.entities.bookmarks.plural),
           }}
           locationQuery={fromJS(this.props.location.query)}
+          showSidebar={false}
         />
       </div>
     );
