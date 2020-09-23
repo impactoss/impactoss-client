@@ -129,7 +129,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         { !this.props.dataReady &&
           <EntityListSidebarLoading />
         }
-        { this.props.dataReady &&
+        { this.props.dataReady && this.props.showSidebar &&
           <EntityListSidebar
             listUpdating={progress !== null && progress >= 0 && progress < 100}
             entities={entities}
@@ -237,6 +237,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   }
 }
 
+EntityList.defaultProps = {
+  showSidebar: true,
+};
+
 EntityList.propTypes = {
   // wrapper props
   entities: PropTypes.instanceOf(List).isRequired,
@@ -276,6 +280,8 @@ EntityList.propTypes = {
   onSortOrder: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
   onDismissError: PropTypes.func.isRequired,
+
+  showSidebar: PropTypes.bool,
 };
 
 EntityList.contextTypes = {
