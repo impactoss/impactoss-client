@@ -9,7 +9,7 @@ import ButtonSubmit from '../ButtonSubmit';
 import ButtonFlat from '../ButtonFlat';
 import ButtonFlatWithIcon from '../ButtonFlatWithIcon';
 import ButtonDefaultIconOnly from '../ButtonDefaultIconOnly';
-import Bookmarker from '../../bookmarker';
+import Bookmarker from '../../../containers/Bookmarker';
 
 class ButtonFactory extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 

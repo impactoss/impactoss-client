@@ -33,14 +33,14 @@ const Button = styled(ButtonFlat)`
 class ButtonFlatWithIcon extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { iconRight, title, icon, ...props } = this.props;
+    const { iconRight, title, icon, iconSize, ...props } = this.props;
     return (
       <Button
         title={title}
         {...props}
       >
         { iconRight && title }
-        <Icon name={icon} text textRight={iconRight} textLeft={!iconRight} />
+        <Icon name={icon} text textRight={iconRight} textLeft={!iconRight} size={iconSize} />
         { !iconRight && title }
       </Button>
     );
@@ -57,6 +57,7 @@ ButtonFlatWithIcon.propTypes = {
   strong: PropTypes.bool,
   align: PropTypes.string,
   border: PropTypes.object,
+  iconSize: PropTypes.string,
 };
 
 ButtonFlatWithIcon.defaultProps = {
@@ -67,6 +68,7 @@ ButtonFlatWithIcon.defaultProps = {
   strong: false,
   border: null,
   align: 'center',
+  iconSize: null,
 };
 
 export default ButtonFlatWithIcon;
