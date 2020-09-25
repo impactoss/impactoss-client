@@ -79,12 +79,6 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
     }
   }
 
-  getBookmarkIcon() {
-    const { dataReady, bookmark } = this.props;
-
-    return dataReady && bookmark ? '(*)' : '( )';
-  }
-
   render() {
     const { dataReady, bookmark } = this.props;
     const { formatMessage } = this.context.intl;
@@ -94,7 +88,10 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
 
       return (
         <BookmarkerContainer>
-          <Button onClick={() => this.setState({open: !this.state.open})}>{this.getBookmarkIcon()}</Button>
+          <Button onClick={() => this.setState({open: !this.state.open})}>
+            {bookmark && '(*)'}
+            {!bookmark && '( )'}
+          </Button>
           {this.state.open && (
             <Popout>
               <p>
