@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
@@ -96,9 +97,12 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
           <Button onClick={() => this.setState({open: !this.state.open})}>{this.getBookmarkIcon()}</Button>
           {this.state.open && (
             <Popout>
-              <p>{formatMessage(messages.popoutTitle)}</p>
               <p>
-                {formatMessage(messages.popoutNameLabel)}<br />
+                <FormattedMessage {...messages.popoutTitle} />
+              </p>
+              <p>
+                <FormattedMessage {...messages.popoutNameLabel} />
+                <br />
                 <Input type="text" value={this.state.title || ''}
                   onChange={event => this.setState({ title: event.target.value })}
                 />
@@ -112,10 +116,10 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
               />
 
               <ButtonLeft>
-                {formatMessage(messages.popoutDone)}
+                <FormattedMessage {...messages.popoutDone} />
               </ButtonLeft>
               <ButtonRight>
-                {formatMessage(messages.popoutCancel)}
+                <FormattedMessage {...messages.popoutCancel} />
               </ButtonRight>
             </Popout>
           )}
