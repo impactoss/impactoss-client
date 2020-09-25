@@ -16,6 +16,7 @@ import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
+import {bookmarkUrl} from 'utils/bookmark-url'
 
 import { CONFIG, DEPENDENCIES } from './constants';
 import { selectBookmarks } from './selectors';
@@ -34,7 +35,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
   }
 
   render() {
-    const { dataReady } = this.props;
+    const { dataReady, entities } = this.props;
 
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
@@ -51,7 +52,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
           ]}
         />
         <EntityList
-          entities={this.props.entities}
+          entities={entities}
           config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
@@ -62,8 +63,9 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
           locationQuery={fromJS(this.props.location.query)}
           showSidebar={false}
           onEntityClickCustom={(id) => {
-            const bookmark = this.props.entities.get(id); // Immutable Map
-            console.log('custom click:', id, bookmark);
+            /* @TODO handle invalid bookmark error */
+            const bookmark = entities.find((entity) => entity.get('id') === id);
+            this.props.openBookmark(bookmarkUrl.decode(bookmark));
           }}
         />
       </div>
@@ -91,8 +93,8 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    handleNew: () => {
-      dispatch(updatePath(`${PATHS.BOOKMARKS}${PATHS.NEW}`, { replace: true }));
+    openBookmark: (path) => {
+      dispatch(updatePath(path, { replace: true }));
     },
   };
 }

@@ -14,4 +14,8 @@ export default defineMessages({
     id: 'app.containers.BookmarkList.metaDescription',
     defaultMessage: 'Bookmarks bookmark description',
   },
+  invalid: {
+    id: 'app.containers.BookmarkList.invalid',
+    defaultMessage: 'Sorry the bookmark is invalid',
+  },
 });
