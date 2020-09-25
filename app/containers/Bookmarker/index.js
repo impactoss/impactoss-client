@@ -84,8 +84,6 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
     const { formatMessage } = this.context.intl;
 
     if (dataReady) {
-      const popoutClassName = `popout ${this.state.open ? 'open' : ''}`;
-
       return (
         <BookmarkerContainer>
           <Button onClick={() => this.setState({open: !this.state.open})}>
