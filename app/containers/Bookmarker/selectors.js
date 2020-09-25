@@ -1,8 +1,15 @@
 import { createSelector } from 'reselect';
+import { selectEntities, selectLocation } from 'containers/App/selectors';
+import { bookmarkToPath, locationToPath } from 'utils/bookmark'
 
-import { selectEntitiesSearchQuery } from 'containers/App/selectors';
+export const selectBookmark = createSelector(
+  (state) => selectEntities(state, 'bookmarks'),
+  (state) => selectLocation(state),
+  (bookmarks, location) => {
+    const locationPath = locationToPath(location);
 
-export const selectBookmarks = createSelector(
-  (state) => selectEntitiesSearchQuery(state, { path: 'bookmarks' }),
-  (entities) => entities,
+    return bookmarks.find(
+      (bookmark) => bookmarkToPath(bookmark) === locationPath
+    );
+  }
 );

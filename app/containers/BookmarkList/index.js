@@ -16,7 +16,7 @@ import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
-import {bookmarkUrl} from 'utils/bookmark-url'
+import {bookmarkToPath} from 'utils/bookmark'
 
 import { CONFIG, DEPENDENCIES } from './constants';
 import { selectBookmarks } from './selectors';
@@ -63,9 +63,9 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
           locationQuery={fromJS(this.props.location.query)}
           showSidebar={false}
           onEntityClickCustom={(id) => {
-            /* @TODO handle invalid bookmark error */
+            /* @TODO handle invalid bookmark null return */
             const bookmark = entities.find((entity) => entity.get('id') === id);
-            this.props.openBookmark(bookmarkUrl.decode(bookmark));
+            this.props.openBookmark(bookmarkToPath(bookmark));
           }}
         />
       </div>

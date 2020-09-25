@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-// import { List } from 'immutable';
 
 import { loadEntitiesIfNeeded } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
@@ -11,7 +10,7 @@ import ButtonDefault from 'components/buttons/ButtonDefault';
 import ButtonFlatWithIcon from 'components/buttons/ButtonFlatWithIcon';
 
 import { DEPENDENCIES } from './constants';
-import { selectBookmarks } from './selectors';
+import { selectBookmark } from './selectors';
 
 import messages from './messages';
 
@@ -29,6 +28,11 @@ const BookmarkerContainer = styled.div`
     margin-top: 0.5em;
     padding-top: 0.5em;
     padding-left: 0.5em;
+    display: none;
+
+    &.open {
+      display: block;
+    }
 
     input {
       border: 1px solid #333;
@@ -51,6 +55,12 @@ const BookmarkerContainer = styled.div`
 `;
 
 class Bookmarker extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+
+    this.state = { open: false, title: null }
+  }
+
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
@@ -61,23 +71,37 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
     }
   }
 
+  componentDidUpdate() {
+    const { dataReady, bookmark } = this.props;
+
+    if(dataReady && bookmark && this.state.title === null) {
+      this.setState({ title: bookmark.toJS().attributes.title })
+    }
+  }
+
+  getBookmarkIcon() {
+    const { dataReady, bookmark } = this.props;
+
+    return dataReady && bookmark ? '(*)' : '( )';
+  }
+
   render() {
-    // const { dataReady, entities } = this.props;
-    const { dataReady } = this.props;
+    const { dataReady, bookmark } = this.props;
     const { formatMessage } = this.context.intl;
 
     if (dataReady) {
-      // console.log('ENTITIES')
-      // console.log(entities.toJS())
+      const popoutClassName = `popout ${this.state.open ? 'open' : ''}`;
 
       return (
         <BookmarkerContainer>
-          <Button onClick={() => null}>(X)</Button>
-          <div className="popout">
+          <Button onClick={() => this.setState({open: !this.state.open})}>{this.getBookmarkIcon()}</Button>
+          <div className={popoutClassName}>
             <p>{formatMessage(messages.popoutTitle)}</p>
             <p>
               {formatMessage(messages.popoutNameLabel)}<br />
-              <input />
+              <input type="text" value={this.state.title || ''}
+                onChange={event => this.setState({ title: event.target.value })}
+              />
             </p>
 
             <ButtonFlatWithIcon
@@ -107,7 +131,6 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
 Bookmarker.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   dataReady: PropTypes.bool,
-  // entities: PropTypes.instanceOf(List).isRequired,
 };
 Bookmarker.contextTypes = {
   intl: PropTypes.object.isRequired,
@@ -115,7 +138,7 @@ Bookmarker.contextTypes = {
 
 const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  entities: selectBookmarks(state),
+  bookmark: selectBookmark(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
