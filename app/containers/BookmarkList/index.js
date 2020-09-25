@@ -61,6 +61,10 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
           }}
           locationQuery={fromJS(this.props.location.query)}
           showSidebar={false}
+          onEntityClickCustom={(id) => {
+            const bookmark = this.props.entities.get(id); // Immutable Map
+            console.log('custom click:', id, bookmark);
+          }}
         />
       </div>
     );
