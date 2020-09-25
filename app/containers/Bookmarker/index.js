@@ -17,41 +17,40 @@ import messages from './messages';
 const BookmarkerContainer = styled.div`
   position: relative;
   z-index: 10;
+`;
 
-  .popout {
-    position: absolute;
-    background-color: #fff;
-    right: 0;
-    text-align: left;
-    width: 325px;
-    border: 1px solid #333;
-    margin-top: 0.5em;
-    padding-top: 0.5em;
-    padding-left: 0.5em;
-    display: none;
+const Popout = styled.div`
+  background-color: #fff;
+  position: absolute;
+  right: 0;
+  text-align: left;
+  width: 325px;
+  border: 1px solid #333;
+  margin-top: 0.5em;
+  padding-top: 0.5em;
+  padding-left: 0.5em;
+  display: block;
+`;
 
-    &.open {
-      display: block;
-    }
+const Input = styled.input`
+  border: 1px solid #333;
+`;
 
-    input {
-      border: 1px solid #333;
-    }
+const ButtonIcon = styled(ButtonFlatWithIcon)`
+  float: left;
+`;
 
-    button {
-      text-transform: uppercase;
-      font-size: 0.75em;
-      font-weight: bold;
-
-      &.float-left {
-        float: left;
-      }
-
-      &.float-right {
-        float: right;
-      }
-    }
-  }
+const ButtonLeft = styled(ButtonDefault)`
+  text-transform: uppercase;
+  font-size: 0.75em;
+  font-weight: bold;
+  float: left;
+`;
+const ButtonRight = styled(Button)`
+  text-transform: uppercase;
+  font-size: 0.75em;
+  font-weight: bold;
+  float: right;
 `;
 
 class Bookmarker extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -95,30 +94,31 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
       return (
         <BookmarkerContainer>
           <Button onClick={() => this.setState({open: !this.state.open})}>{this.getBookmarkIcon()}</Button>
-          <div className={popoutClassName}>
-            <p>{formatMessage(messages.popoutTitle)}</p>
-            <p>
-              {formatMessage(messages.popoutNameLabel)}<br />
-              <input type="text" value={this.state.title || ''}
-                onChange={event => this.setState({ title: event.target.value })}
+          {this.state.open && (
+            <Popout>
+              <p>{formatMessage(messages.popoutTitle)}</p>
+              <p>
+                {formatMessage(messages.popoutNameLabel)}<br />
+                <Input type="text" value={this.state.title || ''}
+                  onChange={event => this.setState({ title: event.target.value })}
+                />
+              </p>
+
+              <ButtonIcon
+                icon="trash"
+                iconRight={false}
+                iconSize="24px"
+                title={formatMessage(messages.popoutDelete)}
               />
-            </p>
 
-            <ButtonFlatWithIcon
-              className="float-left"
-              icon="trash"
-              iconRight={false}
-              iconSize="24px"
-              title={formatMessage(messages.popoutDelete)}
-            />
-
-            <ButtonDefault className="float-right">
-              {formatMessage(messages.popoutDone)}
-            </ButtonDefault>
-            <Button className="float-right">
-              {formatMessage(messages.popoutCancel)}
-            </Button>
-          </div>
+              <ButtonLeft>
+                {formatMessage(messages.popoutDone)}
+              </ButtonLeft>
+              <ButtonRight>
+                {formatMessage(messages.popoutCancel)}
+              </ButtonRight>
+            </Popout>
+          )}
         </BookmarkerContainer>
       );
     }
