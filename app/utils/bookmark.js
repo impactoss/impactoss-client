@@ -38,5 +38,35 @@ export const locationToPath = (location) => {
   return getPath(pathname.substring(1), search.substring(1).split('&'));
 }
 
-// @TODO implement this on bookmark saving
-export const pathToBookmarkView = () => null
+export const locationToBookmarkView = (location) => {
+  const {pathname, search} = location.toJS();
+  const search_parts = search.substring(1)
+    .split('&').map(part => part.split('='));
+  const singleParams = ['subgroup', 'group', 'expand', 'sort', 'order'];
+  const multiParams = ['catx', 'where', 'connected'];
+
+  const singleValues = search_parts
+    .filter(([k, v]) => singleParams.includes(k))
+    .map(([k, v]) => ({[k]: v}))
+    .reduce((acc, v) => ({...acc, ...v}), {})
+
+  const cat = search_parts
+    .filter(([k]) => k === 'cat')
+    .map(([, v]) => v)
+
+  const multiValues = search_parts
+    .filter(([k]) => multiParams.includes(k))
+    .map(([param, pair]) => {
+      const [key, value] = pair.split(':');
+
+      return {param, key, value};
+    })
+    .reduce((acc, {param, key, value}) => ({
+      ...acc, [param]: [...(acc[param] || {}), {key, value}]
+    }), {})
+
+  return {
+    type: pathname.substring(1),
+    ...singleValues, cat, ...multiValues
+  };
+}

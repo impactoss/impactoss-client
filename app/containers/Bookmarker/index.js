@@ -4,14 +4,14 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 
-import { loadEntitiesIfNeeded } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, deleteEntity, saveEntity, newEntity } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
 import Button from 'components/buttons/Button';
 import ButtonDefault from 'components/buttons/ButtonDefault';
 import ButtonFlatWithIcon from 'components/buttons/ButtonFlatWithIcon';
 
 import { DEPENDENCIES } from './constants';
-import { selectBookmark } from './selectors';
+import { selectBookmark, selectNewBookmarkView } from './selectors';
 
 import messages from './messages';
 
@@ -41,13 +41,13 @@ const ButtonIcon = styled(ButtonFlatWithIcon)`
   float: left;
 `;
 
-const ButtonLeft = styled(ButtonDefault)`
+const ButtonDone = styled(ButtonDefault)`
   text-transform: uppercase;
   font-size: 0.75em;
   font-weight: bold;
   float: left;
 `;
-const ButtonRight = styled(Button)`
+const ButtonCancel = styled(Button)`
   text-transform: uppercase;
   font-size: 0.75em;
   font-weight: bold;
@@ -58,7 +58,7 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
   constructor(props) {
     super(props);
 
-    this.state = { open: false, title: null }
+    this.state = { open: false, title: null };
   }
 
   componentWillMount() {
@@ -75,12 +75,12 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
     const { dataReady, bookmark } = this.props;
 
     if(dataReady && bookmark && this.state.title === null) {
-      this.setState({ title: bookmark.toJS().attributes.title })
+      this.setState({ title: bookmark.toJS().attributes.title });
     }
   }
 
   render() {
-    const { dataReady, bookmark } = this.props;
+    const { dataReady, bookmark, newBookmarkView, handleDelete, handleDone } = this.props;
     const { formatMessage } = this.context.intl;
 
     if (dataReady) {
@@ -103,19 +103,29 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
                 />
               </p>
 
-              <ButtonIcon
+              {bookmark && <ButtonIcon
                 icon="trash"
                 iconRight={false}
                 iconSize="24px"
                 title={formatMessage(messages.popoutDelete)}
-              />
+                onClick={() => {
+                  handleDelete(bookmark)
+                  this.setState({open: false, title: ''});
+                }}
+              />}
 
-              <ButtonLeft>
+              <ButtonDone onClick={() => {
+                handleDone(bookmark, newBookmarkView, this.state.title);
+                this.setState({open: false});
+              }}>
                 <FormattedMessage {...messages.popoutDone} />
-              </ButtonLeft>
-              <ButtonRight>
+              </ButtonDone>
+              <ButtonCancel onClick={() => {
+                const title = bookmark ? bookmark.toJS().attributes.title : null;
+                this.setState({open: false, title});
+              }}>
                 <FormattedMessage {...messages.popoutCancel} />
-              </ButtonRight>
+              </ButtonCancel>
             </Popout>
           )}
         </BookmarkerContainer>
@@ -138,11 +148,39 @@ Bookmarker.contextTypes = {
 const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   bookmark: selectBookmark(state),
+  newBookmarkView: selectNewBookmarkView(state),
 });
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, ownProps) {
   return {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
+    handleDelete: (bookmark) => {
+      const {pathname, search} = window.location
+
+      dispatch(deleteEntity({
+        path: 'bookmarks',
+        id: bookmark.toJS().id,
+        redirect: `${pathname.substring(1)}${search}`,
+      }));
+    },
+    handleDone: (bookmark, newBookmarkView, newTitle) => {
+      const { id, attributes } = bookmark ? bookmark.toJS() : {};
+      const path = 'bookmarks';
+
+      // update existing bookmark with new title
+      if(bookmark && newTitle !== attributes.title) {
+        dispatch(saveEntity({
+          path, entity: { id, attributes: { ...attributes, title: newTitle } },
+        }))
+      }
+
+      // create a new bookmark
+      if(!bookmark) {
+        dispatch(newEntity({
+          path, entity: { attributes: { title: newTitle, view: newBookmarkView } },
+        }))
+      }
     },
   };
 }

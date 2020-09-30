@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { selectEntities, selectLocation } from 'containers/App/selectors';
-import { bookmarkToPath, locationToPath } from 'utils/bookmark'
+import { bookmarkToPath, locationToPath, locationToBookmarkView } from 'utils/bookmark'
 
 export const selectBookmark = createSelector(
   (state) => selectEntities(state, 'bookmarks'),
@@ -11,5 +11,10 @@ export const selectBookmark = createSelector(
     return bookmarks.find(
       (bookmark) => bookmarkToPath(bookmark) === locationPath
     );
-  }
+  },
+);
+
+export const selectNewBookmarkView = createSelector(
+  (state) => selectLocation(state),
+  (location) => locationToBookmarkView(location),
 );
