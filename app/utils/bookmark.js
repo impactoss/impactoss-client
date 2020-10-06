@@ -4,8 +4,6 @@ const getEntries = (subView) => (Object.entries(subView)
   .filter(([, value]) => value) // filter out if parameter is not defined
 )
 
-const getPath = (type, queryParts) => `/${type}?${queryParts.sort().join('&')}`;
-
 export const bookmarkToPath = (bookmark) => {
   const view = bookmark.getIn(['attributes', 'view']).toJS();
 
@@ -29,13 +27,9 @@ export const bookmarkToPath = (bookmark) => {
       )
     );
 
-  return getPath(type, [...singleValue, ...cats, ...multiValue]);
-}
+  const queryParts = [...singleValue, ...cats, ...multiValue]
 
-export const locationToPath = (location) => {
-  const {pathname, search} = location.toJS();
-
-  return getPath(pathname.substring(1), search.substring(1).split('&'));
+  return `/${type}?${queryParts.sort().join('&')}`;
 }
 
 export const locationToBookmarkView = (location) => {

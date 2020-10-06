@@ -1,15 +1,18 @@
 import { createSelector } from 'reselect';
+import deepEqual from 'deep-equal'
 import { selectEntities, selectLocation } from 'containers/App/selectors';
-import { bookmarkToPath, locationToPath, locationToBookmarkView } from 'utils/bookmark'
+import { bookmarkToPath, locationToBookmarkView } from 'utils/bookmark'
 
 export const selectBookmark = createSelector(
   (state) => selectEntities(state, 'bookmarks'),
   (state) => selectLocation(state),
   (bookmarks, location) => {
-    const locationPath = locationToPath(location);
+    const currentView = locationToBookmarkView(location)
 
     return bookmarks.find(
-      (bookmark) => bookmarkToPath(bookmark) === locationPath
+      (bookmark) => deepEqual(
+        currentView, bookmark.getIn(['attributes', 'view']).toJS()
+      )
     );
   },
 );
