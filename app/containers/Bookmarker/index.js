@@ -72,11 +72,15 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     const { dataReady, bookmark } = this.props;
 
     if(dataReady && bookmark && this.state.title === null) {
       this.setState({ title: bookmark.toJS().attributes.title });
+    }
+
+    if(!bookmark && prevProps.bookmark) {
+      this.setState({ title: '' });
     }
   }
 
