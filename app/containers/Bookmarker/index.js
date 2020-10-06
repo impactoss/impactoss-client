@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { loadEntitiesIfNeeded, deleteEntity, saveEntity, newEntity } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
+import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import ButtonDefault from 'components/buttons/ButtonDefault';
 import ButtonFlatWithIcon from 'components/buttons/ButtonFlatWithIcon';
@@ -87,8 +88,8 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
       return (
         <BookmarkerContainer>
           <Button onClick={() => this.setState({open: !this.state.open})}>
-            {bookmark && '(*)'}
-            {!bookmark && '( )'}
+            {bookmark && <Icon name="bookmark_active" />}
+            {!bookmark && <Icon name="bookmark_inactive" />}
           </Button>
           {this.state.open && (
             <Popout>

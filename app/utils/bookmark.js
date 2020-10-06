@@ -41,7 +41,7 @@ export const locationToPath = (location) => {
 export const locationToBookmarkView = (location) => {
   const {pathname, search} = location.toJS();
   const search_parts = search.substring(1)
-    .split('&').map(part => part.split('='));
+    .split('&').map(part => decodeURIComponent(part).split('='));
   const singleParams = ['subgroup', 'group', 'expand', 'sort', 'order'];
   const multiParams = ['catx', 'where', 'connected'];
 
