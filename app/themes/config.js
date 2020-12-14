@@ -93,8 +93,8 @@ export const PROGRESS_CATEGORY_REFERENCES = {
 export const ENDPOINTS = {
   API: (
     NODE_ENV === 'production'
-    ? 'https://api.impactoss.org'
-    : 'http://localhost:4000'
+    ? 'https://impactoss-dev.herokuapp.com/'
+    : 'https://impactoss-dev.herokuapp.com/'
   ), // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
