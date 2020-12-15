@@ -89,10 +89,9 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   getBodyMainFields = (entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick, sdgtargetConnections, measureConnections) => ([
     {
       fields: [
-        getMarkdownField(entity, 'description', true, appMessages),
+        getMarkdownField(entity, 'description', true),
         getReportsField(
           reports,
-          appMessages,
           {
             type: 'add',
             title: this.context.intl.formatMessage(messages.addReport),
@@ -105,8 +104,8 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        measures && getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
-        sdgtargets && getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, appMessages, onEntityClick),
+        measures && getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
+        sdgtargets && getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, onEntityClick),
       ],
     },
   ]);

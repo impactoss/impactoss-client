@@ -10,7 +10,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fromJS } from 'immutable';
-import { mapToTaxonomyList, getDefaultTaxonomy } from 'utils/taxonomies';
+import { getDefaultTaxonomy } from 'utils/taxonomies';
 
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
@@ -36,7 +36,11 @@ import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 // relative
 import messages from './messages';
 import { DEPENDENCIES, SORT_OPTIONS } from './constants';
-import { selectTaxonomy, selectCategories } from './selectors';
+import {
+  selectTaxonomy,
+  selectCategoryGroups,
+  selectUserOnlyCategoryGroups,
+} from './selectors';
 import { updateSort } from './actions';
 
 const UsersOnly = styled.h4`
@@ -73,7 +77,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
   );
 
   render() {
-    const { taxonomy, taxonomies, categories, dataReady, isManager, onPageLink, onTaxonomyLink } = this.props;
+    const { taxonomy, taxonomies, categoryGroups, userOnlyCategoryGroups, dataReady, isManager, onPageLink, onTaxonomyLink } = this.props;
     const reference = taxonomy && taxonomy.get('id');
     const contentTitle = typeof reference !== 'undefined' ? this.getTaxTitle(reference) : '';
     const contentDescription = typeof reference !== 'undefined' && this.getTaxDescription(reference);
@@ -96,8 +100,13 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     // console.log('categoryList render', this.props)
     // dataReady && console.log('getDefaultTaxonomy', getDefaultTaxonomy(taxonomies).get('id'))
 
-    const userCategories = categories ? categories.filter((cat) => cat.getIn(['attributes', 'user_only'])) : null;
-    const hasUserCategories = isManager && dataReady && userCategories && userCategories.size > 0;
+    const hasUserCategories =
+      isManager
+      && dataReady
+      && userOnlyCategoryGroups
+      && userOnlyCategoryGroups.reduce((memo, group) =>
+        memo || (group.get('categories') && group.get('categories').size > 0)
+      , false);
 
     return (
       <div>
@@ -110,9 +119,11 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         { !dataReady &&
           <EntityListSidebarLoading responsiveSmall />
         }
-        { dataReady && typeof reference !== 'undefined' &&
+        { taxonomies && typeof reference !== 'undefined' &&
           <TaxonomySidebar
-            taxonomies={mapToTaxonomyList(taxonomies.toList(), onTaxonomyLink, reference)}
+            taxonomies={taxonomies}
+            active={reference}
+            onTaxonomyLink={onTaxonomyLink}
           />
         }
         <ContainerWithSidebar sidebarResponsiveSmall>
@@ -135,7 +146,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 <CategoryListItems
                   taxonomy={taxonomy}
                   reference={reference}
-                  categories={categories.filter((cat) => !cat.getIn(['attributes', 'user_only']))}
+                  categoryGroups={categoryGroups}
                   onPageLink={onPageLink}
                   onSort={this.props.onSort}
                   sortOptions={SORT_OPTIONS}
@@ -152,7 +163,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 <CategoryListItems
                   taxonomy={taxonomy}
                   reference={reference}
-                  categories={userCategories}
+                  categoryGroups={userOnlyCategoryGroups}
                   onPageLink={onPageLink}
                   onSort={this.props.onSort}
                   sortOptions={SORT_OPTIONS}
@@ -177,7 +188,8 @@ CategoryList.propTypes = {
   handleNew: PropTypes.func,
   taxonomy: PropTypes.object,
   taxonomies: PropTypes.object,
-  categories: PropTypes.object,
+  categoryGroups: PropTypes.object,
+  userOnlyCategoryGroups: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   location: PropTypes.object,
@@ -192,7 +204,14 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectTaxonomiesSorted(state),
   taxonomy: selectTaxonomy(state, { id: props.params.id }),
-  categories: selectCategories(
+  categoryGroups: selectCategoryGroups(
+    state,
+    {
+      id: typeof props.params.id !== 'undefined' ? props.params.id : 1,
+      query: fromJS(props.location.query),
+    },
+  ),
+  userOnlyCategoryGroups: selectUserOnlyCategoryGroups(
     state,
     {
       id: typeof props.params.id !== 'undefined' ? props.params.id : 1,

@@ -71,7 +71,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     ],
   }]);
   getBodyMainFields = (entity) => ([{
-    fields: [getMarkdownField(entity, 'content', false, appMessages)],
+    fields: [getMarkdownField(entity, 'content', false)],
   }]);
 
   getFields = (entity, isContributor) => ({

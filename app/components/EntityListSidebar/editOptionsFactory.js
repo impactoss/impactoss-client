@@ -6,6 +6,7 @@ import {
   testEntityCategoryAssociation,
   getEntityTitle,
   getEntityReference,
+  getEntityParentId,
 } from 'utils/entities';
 
 import { makeTagFilterGroups } from 'utils/forms';
@@ -78,10 +79,16 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
     multiple: true,
     required: false,
     selectAll: true,
+    groups: null,
   };
 
   const taxonomy = taxonomies.get(activeEditOption.optionId);
   if (taxonomy) {
+    const parentId = getEntityParentId(taxonomy);
+    const parent = parentId && taxonomies.get(parentId);
+    if (parent) {
+      editOptions.groups = parent.get('categories').map((cat) => getEntityTitle(cat));
+    }
     editOptions.title = messages.title;
     editOptions.multiple = taxonomy.getIn(['attributes', 'allow_multiple']);
     editOptions.search = taxonomy.getIn(['attributes', 'search']);
@@ -92,6 +99,7 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
       editOptions.options[category.get('id')] = {
         reference: getEntityReference(category, false),
         label: getEntityTitle(category),
+        group: parent && getEntityParentId(category),
         value: category.get('id'),
         checked: checkedState(count, entities.size),
         draft: category && category.getIn(['attributes', 'draft']),

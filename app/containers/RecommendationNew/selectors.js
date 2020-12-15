@@ -15,5 +15,5 @@ export const selectConnectedTaxonomies = createSelector(
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
+    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'], false)
 );

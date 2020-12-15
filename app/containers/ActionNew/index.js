@@ -201,7 +201,7 @@ const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   authReady: selectReadyForAuthCheck(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectMeasureTaxonomies(state),
+  taxonomies: selectMeasureTaxonomies(state, { includeParents: false }),
   sdgtargets: selectSdgTargetsCategorised(state),
   indicators: selectEntities(state, 'indicators'),
   recommendations: selectRecommendationsCategorised(state),

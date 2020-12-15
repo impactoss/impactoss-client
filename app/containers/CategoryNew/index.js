@@ -17,6 +17,7 @@ import {
   renderMeasureControl,
   renderSdgTargetControl,
   renderRecommendationControl,
+  renderParentCategoryControl,
   getTitleFormField,
   getReferenceFormField,
   getShortTitleFormField,
@@ -63,10 +64,14 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
+import { getEntityTitle } from 'utils/entities';
+
 import {
   selectDomain,
   selectUsers,
   selectConnectedTaxonomies,
+  selectParentOptions,
+  selectParentTaxonomy,
 } from './selectors';
 
 import messages from './messages';
@@ -153,8 +158,16 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return fields;
   };
 
-  getBodyAsideFields = (users, isAdmin, taxonomy) => {
+  getBodyAsideFields = (users, isAdmin, taxonomy, parentOptions, parentTaxonomy) => {
     const fields = []; // fieldGroups
+    if (parentOptions && parentTaxonomy) {
+      fields.push({
+        fields: [renderParentCategoryControl(
+          parentOptions,
+          getEntityTitle(parentTaxonomy),
+        )],
+      });
+    }
     fields.push({
       fields: [getFormField({
         formatMessage: this.context.intl.formatMessage,
@@ -179,7 +192,20 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
 
   render() {
-    const { taxonomy, dataReady, isAdmin, viewDomain, users, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption } = this.props;
+    const {
+      taxonomy,
+      dataReady,
+      isAdmin,
+      viewDomain,
+      users,
+      connectedTaxonomies,
+      recommendations,
+      measures,
+      sdgtargets,
+      onCreateOption,
+      parentOptions,
+      parentTaxonomy,
+    } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
     const taxonomyReference = this.props.params.id;
 
@@ -271,7 +297,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                     onCreateOption,
                     viewDomain.form.data.getIn(['attributes', 'user_only'])
                   ),
-                  aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
+                  aside: this.getBodyAsideFields(users, isAdmin, taxonomy, parentOptions, parentTaxonomy),
                 },
               }}
               scrollContainer={this.state.scrollContainer}
@@ -297,6 +323,8 @@ CategoryNew.propTypes = {
   viewDomain: PropTypes.object,
   taxonomy: PropTypes.object,
   params: PropTypes.object,
+  parentOptions: PropTypes.object,
+  parentTaxonomy: PropTypes.object,
   users: PropTypes.object,
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
@@ -318,6 +346,8 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   taxonomy: selectEntity(state, { path: 'taxonomies', id: props.params.id }),
+  parentOptions: selectParentOptions(state, props.params.id),
+  parentTaxonomy: selectParentTaxonomy(state, props.params.id),
   users: selectUsers(state),
   measures: selectMeasuresCategorised(state),
   sdgtargets: selectSdgTargetsCategorised(state),
@@ -397,6 +427,13 @@ function mapDispatchToProps(dispatch) {
         saveData = saveData.setIn(['attributes', 'manager_id'], formUserIds.first());
       } else {
         saveData = saveData.setIn(['attributes', 'manager_id'], null);
+      }
+      // TODO: remove once have singleselect instead of multiselect
+      const formCategoryIds = getCheckedValuesFromOptions(formData.get('associatedCategory'));
+      if (List.isList(formCategoryIds) && formCategoryIds.size) {
+        saveData = saveData.setIn(['attributes', 'parent_id'], formCategoryIds.first());
+      } else {
+        saveData = saveData.setIn(['attributes', 'parent_id'], null);
       }
       dispatch(save(saveData.toJS()));
     },

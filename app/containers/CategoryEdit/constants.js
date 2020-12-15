@@ -41,6 +41,7 @@ export const FORM_INITIAL = fromJS({
     url: '',
     manager_id: '',
     taxonomy_id: '',
+    parent_id: '',
     reference: '',
     user_only: false,
     draft: true,
@@ -49,4 +50,5 @@ export const FORM_INITIAL = fromJS({
   associatedMeasures: [],
   associatedRecommendations: [],
   associatedUser: [],
+  associatedCategory: [],
 });

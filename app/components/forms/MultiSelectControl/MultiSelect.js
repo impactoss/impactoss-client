@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { without } from 'lodash/array';
 import { filter, find } from 'lodash/collection';
-import { List, fromJS } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { FormattedMessage } from 'react-intl';
@@ -391,6 +391,7 @@ class MultiSelect extends React.Component {
           }
           <OptionList
             options={options}
+            groups={this.props.groups}
             onCheckboxChange={(checkedState, option) => {
               this.props.onChange(this.getNextValues(checkedState, option));
             }}
@@ -439,6 +440,7 @@ class MultiSelect extends React.Component {
 MultiSelect.propTypes = {
   options: PropTypes.instanceOf(List),
   values: PropTypes.instanceOf(List),
+  groups: PropTypes.instanceOf(Map),
   onChange: PropTypes.func.isRequired,
   onCancel: PropTypes.func,
   multiple: PropTypes.bool,

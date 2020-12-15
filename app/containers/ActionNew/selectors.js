@@ -12,6 +12,6 @@ export const selectConnectedTaxonomies = createSelector(
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) => ENABLE_SDGS
-    ? prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations', 'tags_sdgtargets'])
-    : prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations'])
+    ? prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations', 'tags_sdgtargets'], false)
+    : prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations'], false)
 );
