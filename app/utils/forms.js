@@ -118,24 +118,6 @@ export const renderMeasureControl = (entities, taxonomies, onCreateOption, conte
 }
 : null;
 
-export const renderSdgTargetControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
-? {
-  id: 'sdgtargets',
-  model: '.associatedSdgTargets',
-  dataPath: ['associatedSdgTargets'],
-  label: 'SDG targets',
-  controlType: 'multiselect',
-  options: entityOptions(entities, true),
-  advanced: true,
-  selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
-  onCreate: onCreateOption
-    ? () => onCreateOption({ path: 'sdgtargets' })
-    : null,
-}
-: null;
-
-
 export const renderRecommendationControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
 ? {
   id: 'recommendations',
@@ -674,27 +656,6 @@ const getRecommendationFields = (args, formatMessage) => ({
   },
 });
 
-const getSdgtargetFields = (args, formatMessage) => ({
-  header: {
-    main: [{ // fieldGroup
-      fields: [
-        getReferenceFormField(formatMessage, null, true), // required
-        getTitleFormField(formatMessage, null, 'titleText'),
-      ],
-    }],
-    aside: [{ // fieldGroup
-      fields: [
-        getStatusField(formatMessage),
-      ],
-    }],
-  },
-  body: {
-    main: [{
-      fields: [getMarkdownField(formatMessage)],
-    }],
-  },
-});
-
 export const getEntityFields = (path, args, contextIntl) => {
   switch (path) {
     case 'categories':
@@ -708,8 +669,6 @@ export const getEntityFields = (path, args, contextIntl) => {
       return getIndicatorFields(args, contextIntl.formatMessage);
     case 'recommendations':
       return getRecommendationFields(args, contextIntl.formatMessage);
-    case 'sdgtargets':
-      return getSdgtargetFields(args, contextIntl.formatMessage);
     default:
       return {};
   }
@@ -755,7 +714,6 @@ const getSectionFields = (shape, section, column, entity, associations, onCreate
       associations.measures
       || associations.recommendations
       || associations.indicators
-      || associations.sgdtargets
     )
     && shape.connections
     && shape.connections.tables
@@ -771,9 +729,6 @@ const getSectionFields = (shape, section, column, entity, associations, onCreate
         }
         if (table.table === 'recommendations' && associations.recommendations) {
           return memo.concat([renderRecommendationControl(associations.recommendations, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
-        }
-        if (table.table === 'sdgtargets' && associations.sdgtargets) {
-          return memo.concat([renderSdgTargetControl(associations.sdgtargets, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
         }
         if (table.table === 'indicators' && associations.indicators) {
           return memo.concat([renderIndicatorControl(associations.indicators, onCreateOption)]);

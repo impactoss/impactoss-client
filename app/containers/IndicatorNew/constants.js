@@ -4,22 +4,11 @@
  *
  */
 import { fromJS } from 'immutable';
-import { REPORT_FREQUENCIES, ENABLE_SDGS } from 'themes/config';
+import { REPORT_FREQUENCIES } from 'themes/config';
 
 export const SAVE = 'impactoss/IndicatorNew/SAVE';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
-  'user_roles',
-  'measures',
-  'users',
-  'sdgtargets',
-  'measure_categories',
-  'sdgtarget_categories',
-  'categories',
-  'taxonomies',
-]
-: [
+export const DEPENDENCIES = [
   'user_roles',
   'measures',
   'users',
@@ -40,7 +29,6 @@ export const FORM_INITIAL = fromJS({
     end_date: '',
     reference: '',
   },
-  associatedSdgTargets: [],
   associatedMeasures: [],
   associatedUser: [],
 });

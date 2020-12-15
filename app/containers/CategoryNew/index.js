@@ -15,7 +15,6 @@ import { List } from 'immutable';
 import {
   renderUserControl,
   renderMeasureControl,
-  renderSdgTargetControl,
   renderRecommendationControl,
   renderParentCategoryControl,
   getTitleFormField,
@@ -54,7 +53,6 @@ import {
   selectIsUserAdmin,
   selectEntity,
   selectMeasuresCategorised,
-  selectSdgTargetsCategorised,
   selectRecommendationsCategorised,
 } from 'containers/App/selectors';
 
@@ -136,7 +134,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return fields;
   }
 
-  getBodyMainFields = (taxonomy, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption, userOnly) => {
+  getBodyMainFields = (taxonomy, connectedTaxonomies, recommendations, measures, onCreateOption, userOnly) => {
     const fields = [];
     fields.push({
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
@@ -148,8 +146,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         fields: [
           taxonomy.getIn(['attributes', 'tags_measures']) && measures &&
             renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-          taxonomy.getIn(['attributes', 'tags_sdgtargets']) && sdgtargets &&
-            renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption, this.context.intl),
           taxonomy.getIn(['attributes', 'tags_recommendations']) && recommendations &&
             renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
         ],
@@ -201,7 +197,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       connectedTaxonomies,
       recommendations,
       measures,
-      sdgtargets,
       onCreateOption,
       parentOptions,
       parentTaxonomy,
@@ -276,7 +271,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                 formData,
                 measures,
                 recommendations,
-                sdgtargets,
                 taxonomy
               )}
               handleSubmitFail={this.props.handleSubmitFail}
@@ -293,7 +287,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                     connectedTaxonomies,
                     recommendations,
                     measures,
-                    sdgtargets,
                     onCreateOption,
                     viewDomain.form.data.getIn(['attributes', 'user_only'])
                   ),
@@ -327,7 +320,6 @@ CategoryNew.propTypes = {
   parentTaxonomy: PropTypes.object,
   users: PropTypes.object,
   measures: PropTypes.object,
-  sdgtargets: PropTypes.object,
   recommendations: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   initialiseForm: PropTypes.func,
@@ -350,7 +342,6 @@ const mapStateToProps = (state, props) => ({
   parentTaxonomy: selectParentTaxonomy(state, props.params.id),
   users: selectUsers(state),
   measures: selectMeasuresCategorised(state),
-  sdgtargets: selectSdgTargetsCategorised(state),
   recommendations: selectRecommendationsCategorised(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
 });
@@ -379,7 +370,7 @@ function mapDispatchToProps(dispatch) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, measures, recommendations, sdgtargets, taxonomy) => {
+    handleSubmit: (formData, measures, recommendations, taxonomy) => {
       let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomy.get('id'));
       if (!formData.getIn(['attributes', 'user_only'])) {
         if (taxonomy.getIn(['attributes', 'tags_measures'])) {
@@ -402,18 +393,6 @@ function mapDispatchToProps(dispatch) {
               connections: recommendations,
               connectionAttribute: 'associatedRecommendations',
               createConnectionKey: 'recommendation_id',
-              createKey: 'category_id',
-            })
-          );
-        }
-        if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
-          saveData = saveData.set(
-            'sdgtargetCategories',
-            getConnectionUpdatesFromFormData({
-              formData,
-              connections: sdgtargets,
-              connectionAttribute: 'associatedSdgTargets',
-              createConnectionKey: 'sdgtarget_id',
               createKey: 'category_id',
             })
           );

@@ -17,12 +17,6 @@ export const getTaxonomyTagList = (taxonomy) => {
       icon: 'recommendations',
     });
   }
-  if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
-    tags.push({
-      type: 'sdgtargets',
-      icon: 'sdgtargets',
-    });
-  }
   return tags;
 };
 

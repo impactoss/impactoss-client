@@ -20,7 +20,6 @@ import {
   selectReady,
 } from 'containers/App/selectors';
 import { PATHS, CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
-import { ENABLE_SDGS } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
 
@@ -44,11 +43,9 @@ import {
   selectRecommendationCount,
   selectIndicatorCount,
   selectMeasureCount,
-  selectSdgtargetCount,
   selectRecommendationDraftCount,
   selectIndicatorDraftCount,
   selectMeasureDraftCount,
-  selectSdgtargetDraftCount,
   selectRecommendationAddressedCount,
 } from './selectors';
 
@@ -95,18 +92,6 @@ const DiagramSectionHorizontalCenter = styled.div`
   }
 `;
 
-const DiagramSectionHorizontalTop = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  text-align: center;
-  width: 100%;
-`;
-const DiagramSectionHorizontalBottom = styled(DiagramSectionHorizontalTop)`
-  bottom: 0;
-  top: auto;
-`;
-
 const DiagramSectionHorizontalVCenter = styled.div`
   position: absolute;
   left: 0;
@@ -120,12 +105,6 @@ const DiagramSectionVertical = styled.div`
   display: block;
   position: relative;
   text-align: center;
-`;
-
-const DiagramSectionVerticalHalf = styled.div`
-  display: inline-block;
-  width: 50%;
-  position: relative;
 `;
 
 const DiagramSectionVerticalCenter = styled.div`
@@ -145,7 +124,7 @@ const Annotation = styled.div`
   line-height: 1.1;
   font-size: 0.85em;
   margin-top: -2em;
-  left: ${(props) => props.hasSDGs ? 31 : 30}%;
+  left: 30%;
 `;
 const AnnotationMeasured = styled(Annotation)`
   left: 70%;
@@ -325,7 +304,6 @@ const STATE_INITIAL = {
   buttonRecs: null,
   buttonMeasures: null,
   buttonIndicators: null,
-  buttonSdgtargets: null,
   mouseOverTaxonomy: null,
   mouseOverTaxonomyDiagram: null,
   viewport: null,
@@ -449,37 +427,18 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     }
     this.setState({ viewport });
   }
-  connectRecommendationsMeasures = (vertical = false) => ENABLE_SDGS
-    ? this.getCurvedConnectionPath(
-      vertical,
-      this.getConnectionPoint(this.state.buttonRecs, this.state.diagram, vertical ? 'bottom' : 'right'),
-      this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'top' : 'left'),
-      vertical ? 0.6 : 0.2
-    )
-    : this.getConnectionPath(
+  connectRecommendationsMeasures = (vertical = false) =>
+    this.getConnectionPath(
       vertical,
       this.getConnectionPoint(this.state.buttonRecs, this.state.diagram, vertical ? 'bottom' : 'right'),
       this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'top' : 'left'),
     );
-  connectSdgtargetsMeasures = (vertical = false) => this.getCurvedConnectionPath(
-    vertical,
-    this.getConnectionPoint(this.state.buttonSdgtargets, this.state.diagram, vertical ? 'bottom' : 'right'),
-    this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'top' : 'left'),
-    vertical ? 0.6 : 0.2
-  );
   connectMeasuresIndicators = (vertical = false) => this.getConnectionPath(
     vertical,
     this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'bottom' : 'right'),
     this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, vertical ? 'top' : 'left'),
     vertical ? 0.6 : 0.2
   );
-  connectSdgtargetsIndicators = (vertical = false) =>
-    this.getCurvedConnectionPath(
-      vertical,
-      this.getConnectionPoint(this.state.buttonSdgtargets, this.state.diagram, vertical ? 'bottom' : 'right'),
-      this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, vertical ? 'top' : 'left'),
-      0.9
-    );
 
   resize = () => {
     // reset
@@ -547,12 +506,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
           }
           { this.state.buttonIndicators && this.state.buttonMeasures &&
             this.renderArrow(this.connectMeasuresIndicators(vertical), vertical)
-          }
-          {ENABLE_SDGS && this.state.buttonSdgtargets && this.state.buttonIndicators &&
-            this.renderPath(this.connectSdgtargetsIndicators(vertical), true)
-          }
-          {ENABLE_SDGS && this.state.buttonSdgtargets && this.state.buttonMeasures &&
-            this.renderPath(this.connectSdgtargetsMeasures(vertical))
           }
         </svg>
       }
@@ -668,21 +621,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       })}
     </DiagramButtonWrap>
   );
-  renderSdgtargetButton = () => (
-    <DiagramButtonWrap>
-      { this.renderButton({
-        path: PATHS.SDG_TARGETS,
-        paletteDefault: 'sdgtargets',
-        paletteHover: 'sdgtargetsHover',
-        stateButton: 'buttonSdgtargets',
-        icon: 'sdgtargets',
-        message: 'sdgtargets',
-        count: this.props.sdgtargetCount,
-        draftCount: this.props.sdgtargetDraftCount,
-      }) }
-      { this.renderCategoryIcons('tags_sdgtargets') }
-    </DiagramButtonWrap>
-  );
   render() {
     const {
       dataReady,
@@ -735,23 +673,11 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                   { this.state.viewport && this.state.viewport < VIEWPORTS.MEDIUM && // VERTICAL
                     <div>
                       <DiagramSectionVertical>
-                        { ENABLE_SDGS &&
-                          <DiagramSectionVerticalHalf>
-                            {this.renderRecommendationsButton()}
-                          </DiagramSectionVerticalHalf>
-                        }
-                        { !ENABLE_SDGS &&
-                          <DiagramSectionVerticalCenter>
-                            {this.renderRecommendationsButton()}
-                          </DiagramSectionVerticalCenter>
-                        }
-                        { ENABLE_SDGS &&
-                          <DiagramSectionVerticalHalf>
-                            {this.renderSdgtargetButton()}
-                          </DiagramSectionVerticalHalf>
-                        }
+                        <DiagramSectionVerticalCenter>
+                          {this.renderRecommendationsButton()}
+                        </DiagramSectionVerticalCenter>
                       </DiagramSectionVertical>
-                      <AnnotationVertical hasSDGs={ENABLE_SDGS}>
+                      <AnnotationVertical>
                         {`${recommendationAddressedCount} ${this.context.intl.formatMessage(messages.diagram.addressed)}`}
                       </AnnotationVertical>
                       <DiagramSectionVertical>
@@ -772,23 +698,11 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                   { this.state.viewport >= VIEWPORTS.MEDIUM && // HORIZONTAL
                     <div>
                       <DiagramSectionHorizontalHalf>
-                        { ENABLE_SDGS &&
-                          <DiagramSectionHorizontalTop>
-                            {this.renderRecommendationsButton()}
-                          </DiagramSectionHorizontalTop>
-                        }
-                        { !ENABLE_SDGS &&
-                          <DiagramSectionHorizontalVCenter>
-                            {this.renderRecommendationsButton()}
-                          </DiagramSectionHorizontalVCenter>
-                        }
-                        { ENABLE_SDGS &&
-                          <DiagramSectionHorizontalBottom>
-                            {this.renderSdgtargetButton()}
-                          </DiagramSectionHorizontalBottom>
-                        }
+                        <DiagramSectionHorizontalVCenter>
+                          {this.renderRecommendationsButton()}
+                        </DiagramSectionHorizontalVCenter>
                       </DiagramSectionHorizontalHalf>
-                      <Annotation hasSDGs={ENABLE_SDGS}>
+                      <Annotation>
                         <FormattedMessage {...messages.diagram.addressed} />
                       </Annotation>
                       <DiagramSectionHorizontalCenter>
@@ -826,11 +740,9 @@ Overview.propTypes = {
   dataReady: PropTypes.bool,
   recommendationCount: PropTypes.number,
   measureCount: PropTypes.number,
-  sdgtargetCount: PropTypes.number,
   indicatorCount: PropTypes.number,
   recommendationDraftCount: PropTypes.number,
   measureDraftCount: PropTypes.number,
-  sdgtargetDraftCount: PropTypes.number,
   indicatorDraftCount: PropTypes.number,
   recommendationAddressedCount: PropTypes.number,
   theme: PropTypes.object,
@@ -845,11 +757,9 @@ const mapStateToProps = (state) => ({
   taxonomies: selectTaxonomiesSorted(state),
   recommendationCount: selectRecommendationCount(state),
   measureCount: selectMeasureCount(state),
-  sdgtargetCount: selectSdgtargetCount(state),
   indicatorCount: selectIndicatorCount(state),
   recommendationDraftCount: selectRecommendationDraftCount(state),
   measureDraftCount: selectMeasureDraftCount(state),
-  sdgtargetDraftCount: selectSdgtargetDraftCount(state),
   indicatorDraftCount: selectIndicatorDraftCount(state),
   recommendationAddressedCount: selectRecommendationAddressedCount(state),
 });

@@ -27,10 +27,6 @@ export default defineMessages({
       id: 'app.containers.Overview.buttons.recommendations',
       defaultMessage: '{count} Recommendations',
     },
-    sdgtargets: {
-      id: 'app.containers.Overview.buttons.sdgtargets',
-      defaultMessage: '{count} SDG targets',
-    },
     measures: {
       id: 'app.containers.Overview.buttons.measures',
       defaultMessage: 'Implementation plan',

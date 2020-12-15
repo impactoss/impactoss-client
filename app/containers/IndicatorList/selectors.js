@@ -2,8 +2,6 @@ import { createSelector } from 'reselect';
 import { Map } from 'immutable';
 import { reduce } from 'lodash/collection';
 
-import { ENABLE_SDGS } from 'themes/config';
-
 import {
   selectEntities,
   selectEntitiesSearchQuery,
@@ -36,17 +34,12 @@ import { CONFIG } from './constants';
 
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'measures'),
-  (state) => selectEntities(state, 'sdgtargets'),
   (state) => selectEntities(state, 'measure_categories'),
-  (state) => selectEntities(state, 'sdgtarget_categories'),
   (state) => selectEntities(state, 'categories'),
-  (measures, sdgtargets, measureCategories, sdgtargetCategories, categories) =>
+  (measures, measureCategories, categories) =>
     Map()
     .set('measures',
       entitiesSetCategoryIds(measures, 'measure_id', measureCategories, categories)
-    )
-    .set('sdgtargets',
-      ENABLE_SDGS && entitiesSetCategoryIds(sdgtargets, 'sdgtarget_id', sdgtargetCategories, categories)
     )
 );
 
@@ -55,8 +48,7 @@ export const selectConnectedTaxonomies = createSelector(
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'measure_categories'),
-  (state) => selectEntities(state, 'sdgtarget_categories'),
-  (connections, taxonomies, categories, categoryMeasures, categorySdgTargets) =>
+  (connections, taxonomies, categories, categoryMeasures) =>
     // for all connections
     reduce([
       {
@@ -64,12 +56,6 @@ export const selectConnectedTaxonomies = createSelector(
         path: 'measures',
         key: 'measure_id',
         associations: categoryMeasures,
-      },
-      ENABLE_SDGS && {
-        tags: 'tags_sdgtargets',
-        path: 'sdgtargets',
-        key: 'sdgtarget_id',
-        associations: categorySdgTargets,
       },
     ], (connectedTaxonomies, relationship) =>
       // TODO deal with conflicts
@@ -96,7 +82,6 @@ const selectIndicatorsNested = createSelector(
   }),
   (state) => selectConnections(state),
   (state) => selectEntities(state, 'measure_indicators'),
-  (state) => selectEntities(state, 'sdgtarget_indicators'),
   (state) => selectEntities(state, 'progress_reports'),
   (state) => selectEntities(state, 'due_dates'),
   (state) => selectEntities(state, 'users'),
@@ -104,7 +89,6 @@ const selectIndicatorsNested = createSelector(
     entities,
     connections,
     entityMeasures,
-    entitySdgTargets,
     progressReports,
     dueDates,
     users
@@ -116,14 +100,6 @@ const selectIndicatorsNested = createSelector(
       'measure_id',
       'indicator_id',
       connections.get('measures'),
-    ))
-    // nest connected sdgtarget ids
-    .set('sdgtargets', ENABLE_SDGS && getEntityConnections(
-      entity.get('id'),
-      entitySdgTargets,
-      'sdgtarget_id',
-      'indicator_id',
-      connections.get('sdgtargets'),
     ))
     // nest reports
     .set('reports', progressReports.filter((report) =>

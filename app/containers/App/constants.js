@@ -120,7 +120,6 @@ export const PATHS = {
   USERS: '/users',
   MEASURES: '/actions',
   INDICATORS: '/indicators',
-  SDG_TARGETS: '/sdgtargets',
   RECOMMENDATIONS: '/recommendations',
   PROGRESS_REPORTS: '/reports',
   TAXONOMIES: '/categories',

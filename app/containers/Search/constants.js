@@ -1,17 +1,4 @@
-import { ENABLE_SDGS } from 'themes/config';
-
-export const DEPENDENCIES = ENABLE_SDGS
-? [
-  'pages',
-  'taxonomies',
-  'categories',
-  'indicators',
-  'measures',
-  'recommendations',
-  'sdgtargets',
-  'progress_reports',
-]
-: [
+export const DEPENDENCIES = [
   'pages',
   'taxonomies',
   'categories',
@@ -84,33 +71,6 @@ export const CONFIG = {
         {
           path: 'recommendations',
           search: ['title', 'description', 'response', 'reference'],
-          sorting: [
-            {
-              attribute: 'id', // proxy for created at
-              type: 'number',
-              order: 'desc',
-              default: true,
-            },
-            {
-              attribute: 'reference',
-              type: 'string',
-              order: 'asc',
-            },
-            {
-              attribute: 'title',
-              type: 'string',
-              order: 'asc',
-            },
-            {
-              attribute: 'updated_at',
-              type: 'date',
-              order: 'desc',
-            },
-          ],
-        },
-        ENABLE_SDGS && {
-          path: 'sdgtargets',
-          search: ['title', 'description', 'reference'],
           sorting: [
             {
               attribute: 'id', // proxy for created at

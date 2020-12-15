@@ -46,8 +46,6 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     // figure out if tagged directly or via child category
     const tagsRecs = taxonomy.getIn(['attributes', 'tags_recommendations'])
       || (taxonomy.get('children') && taxonomy.get('children').some((childTax) => childTax.getIn(['attributes', 'tags_recommendations'])));
-    const tagsSDGTargets = taxonomy.getIn(['attributes', 'tags_sdgtargets'])
-      || (taxonomy.get('children') && taxonomy.get('children').some((childTax) => childTax.getIn(['attributes', 'tags_sdgtargets'])));
     const tagsMeasures = taxonomy.getIn(['attributes', 'tags_measures'])
       || (taxonomy.get('children') && taxonomy.get('children').some((childTax) => childTax.getIn(['attributes', 'tags_measures'])));
 
@@ -58,21 +56,6 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         public: 'recommendations',
         accepted: 'recommendationsAccepted',
         label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
-      });
-      if (!tagsMeasures) {
-        attributes.push({
-          via: this.context.intl.formatMessage(appMessages.entities.connected),
-          total: 'measuresTotal',
-          public: 'measures',
-          label: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-        });
-      }
-    }
-    if (tagsSDGTargets) {
-      attributes.push({
-        total: 'sdgtargetsTotal',
-        public: 'sdgtargets',
-        label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
       });
       if (!tagsMeasures) {
         attributes.push({

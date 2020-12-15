@@ -17,7 +17,6 @@ import {
   userOptions,
   entityOptions,
   renderMeasureControl,
-  renderSdgTargetControl,
   renderUserControl,
   getConnectionUpdatesFromFormData,
   getTitleFormField,
@@ -73,7 +72,6 @@ import {
   selectDomain,
   selectViewEntity,
   selectMeasures,
-  selectSdgTargets,
   selectUsers,
   selectConnectedTaxonomies,
 } from './selectors';
@@ -118,7 +116,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { measures, viewEntity, users, sdgtargets } = props;
+    const { measures, viewEntity, users } = props;
     let attributes = viewEntity.get('attributes');
     if (!attributes.get('reference')) {
       attributes = attributes.set('reference', viewEntity.get('id'));
@@ -131,7 +129,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         FORM_INITIAL.get('attributes')
       ),
       associatedMeasures: entityOptions(measures, true),
-      associatedSdgTargets: entityOptions(sdgtargets, true),
       associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
       // TODO allow single value for singleSelect
     })
@@ -156,7 +153,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (connectedTaxonomies, measures, sdgtargets, onCreateOption) => ([
+  getBodyMainFields = (connectedTaxonomies, measures, onCreateOption) => ([
     {
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
@@ -165,7 +162,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       icon: 'connections',
       fields: [
         renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption, this.context.intl),
       ],
     },
   ]);
@@ -210,7 +206,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, users, sdgtargets, onCreateOption } = this.props;
+    const { viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, users, onCreateOption } = this.props;
     const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
 
     return (
@@ -274,7 +270,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               model="indicatorEdit.form.data"
               formData={viewDomain.form.data}
               saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, measures, sdgtargets)}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, measures)}
               handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
@@ -293,7 +289,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, measures, sdgtargets, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, measures, onCreateOption),
                   aside: this.getBodyAsideFields(viewEntity, users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
                 },
               }}
@@ -328,7 +324,6 @@ IndicatorEdit.propTypes = {
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
-  sdgtargets: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
@@ -347,7 +342,6 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
-  sdgtargets: selectSdgTargets(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   users: selectUsers(state),
@@ -451,7 +445,7 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, measures, sdgtargets) => {
+    handleSubmit: (formData, measures) => {
       let saveData = formData
         .set(
           'measureIndicators',
@@ -460,16 +454,6 @@ function mapDispatchToProps(dispatch, props) {
             connections: measures,
             connectionAttribute: 'associatedMeasures',
             createConnectionKey: 'measure_id',
-            createKey: 'indicator_id',
-          })
-        )
-        .set(
-          'sdgtargetIndicators',
-          getConnectionUpdatesFromFormData({
-            formData,
-            connections: sdgtargets,
-            connectionAttribute: 'associatedSdgTargets',
-            createConnectionKey: 'sdgtarget_id',
             createKey: 'indicator_id',
           })
         );

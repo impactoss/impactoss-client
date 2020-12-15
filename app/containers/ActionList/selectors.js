@@ -2,8 +2,6 @@ import { createSelector } from 'reselect';
 import { Map, List } from 'immutable';
 import { reduce } from 'lodash/collection';
 
-import { ENABLE_SDGS } from 'themes/config';
-
 import {
   selectEntities,
   selectEntitiesSearchQuery,
@@ -39,18 +37,13 @@ import { CONFIG } from './constants';
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'indicators'),
   (state) => selectEntities(state, 'recommendations'),
-  (state) => selectEntities(state, 'sdgtargets'),
   (state) => selectEntities(state, 'recommendation_categories'),
-  (state) => selectEntities(state, 'sdgtarget_categories'),
   (state) => selectEntities(state, 'categories'),
-  (indicators, recommendations, sdgtargets, recommendationCategories, sdgtargetCategories, categories) =>
+  (indicators, recommendations, recommendationCategories, categories) =>
     Map()
     .set('indicators', indicators)
     .set('recommendations',
       entitiesSetCategoryIds(recommendations, 'recommendation_id', recommendationCategories, categories)
-    )
-    .set('sdgtargets',
-      ENABLE_SDGS && entitiesSetCategoryIds(sdgtargets, 'sdgtarget_id', sdgtargetCategories, categories)
     )
 );
 
@@ -59,8 +52,7 @@ export const selectConnectedTaxonomies = createSelector(
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'recommendation_categories'),
-  (state) => selectEntities(state, 'sdgtarget_categories'),
-  (connections, taxonomies, categories, categoryRecommendations, categorySdgTargets) =>
+  (connections, taxonomies, categories, categoryRecommendations) =>
     // for all connections
     reduce([
       {
@@ -68,12 +60,6 @@ export const selectConnectedTaxonomies = createSelector(
         path: 'recommendations',
         key: 'recommendation_id',
         associations: categoryRecommendations,
-      },
-      ENABLE_SDGS && {
-        tags: 'tags_sdgtargets',
-        path: 'sdgtargets',
-        key: 'sdgtarget_id',
-        associations: categorySdgTargets,
       },
     ], (connectedTaxonomies, relationship) =>
       // TODO deal with conflicts
@@ -102,7 +88,6 @@ const selectMeasuresNested = createSelector(
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'measure_indicators'),
   (state) => selectEntities(state, 'recommendation_measures'),
-  (state) => selectEntities(state, 'sdgtarget_measures'),
   (state) => selectEntities(state, 'categories'),
   (
     entities,
@@ -110,7 +95,6 @@ const selectMeasuresNested = createSelector(
     entityCategories,
     entityIndicators,
     entityRecommendations,
-    entitySdgTargets,
     categories,
   ) => entities.map((entity) => entity
     // nest category ids
@@ -122,14 +106,6 @@ const selectMeasuresNested = createSelector(
       'recommendation_id',
       'measure_id',
       connections.get('recommendations'),
-    ))
-    // nest connected sdgtarget ids
-    .set('sdgtargets', ENABLE_SDGS && getEntityConnections(
-      entity.get('id'),
-      entitySdgTargets,
-      'sdgtarget_id',
-      'measure_id',
-      connections.get('sdgtargets'),
     ))
     // nest connected indicator ids
     .set('indicators', getEntityConnections(

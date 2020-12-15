@@ -339,30 +339,18 @@ export const selectRecommendationConnections = createSelector(
   (measures) => Map().set('measures', measures)
 );
 
-export const selectSdgTargetConnections = createSelector(
-  (state) => selectEntities(state, 'measures'),
-  (state) => selectEntities(state, 'indicators'),
-  (measures, indicators) => Map()
-    .set('measures', measures)
-    .set('indicators', indicators)
-);
-
 export const selectIndicatorConnections = createSelector(
   (state) => selectEntities(state, 'measures'),
-  (state) => selectEntities(state, 'sdgtargets'),
-  (measures, sdgtargets) => Map()
+  (measures) => Map()
     .set('measures', measures)
-    .set('sdgtargets', sdgtargets)
 );
 
 export const selectMeasureConnections = createSelector(
   (state) => selectEntities(state, 'recommendations'),
   (state) => selectEntities(state, 'indicators'),
-  (state) => selectEntities(state, 'sdgtargets'),
-  (recommendations, indicators, sdgtargets) => Map()
+  (recommendations, indicators) => Map()
     .set('recommendations', recommendations)
     .set('indicators', indicators)
-    .set('sdgtargets', sdgtargets)
 );
 
 export const selectMeasureTaxonomies = createSelector(
@@ -379,13 +367,6 @@ export const selectRecommendationTaxonomies = createSelector(
   (includeParents, taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_recommendations', includeParents)
 );
 
-export const selectSdgTargetTaxonomies = createSelector(
-  (state, args) => args ? args.includeParents : true,
-  (state) => selectTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
-  (includeParents, taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_sdgtargets', includeParents)
-);
-
 export const selectUserTaxonomies = createSelector(
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
@@ -397,13 +378,6 @@ export const selectRecommendationsCategorised = createSelector(
   (state) => selectEntities(state, 'recommendation_categories'),
   (entities, associations) =>
     entitiesSetCategoryIds(entities, 'recommendation_id', associations)
-);
-
-export const selectSdgTargetsCategorised = createSelector(
-  (state) => selectEntities(state, 'sdgtargets'),
-  (state) => selectEntities(state, 'sdgtarget_categories'),
-  (entities, associations) =>
-    entitiesSetCategoryIds(entities, 'sdgtarget_id', associations)
 );
 
 export const selectMeasuresCategorised = createSelector(

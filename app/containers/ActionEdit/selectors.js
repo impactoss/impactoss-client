@@ -1,11 +1,9 @@
 import { createSelector } from 'reselect';
-import { ENABLE_SDGS } from 'themes/config';
 
 import {
   selectEntity,
   selectEntities,
   selectRecommendationsCategorised,
-  selectSdgTargetsCategorised,
   selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
@@ -38,9 +36,8 @@ export const selectTaxonomies = createSelector(
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => ENABLE_SDGS
-    ? prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations', 'tags_sdgtargets'], false)
-    : prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations'], false)
+  (taxonomies, categories) =>
+    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations'], false)
 );
 
 
@@ -50,13 +47,6 @@ export const selectRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendation_measures'),
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'recommendation_id', associations, 'measure_id', id)
-);
-export const selectSdgTargets = createSelector(
-  (state, id) => id,
-  selectSdgTargetsCategorised,
-  (state) => selectEntities(state, 'sdgtarget_measures'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'sdgtarget_id', associations, 'measure_id', id)
 );
 export const selectIndicators = createSelector(
   (state, id) => id,

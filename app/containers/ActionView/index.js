@@ -26,9 +26,7 @@ import {
   selectReady,
   selectHasUserRole,
   selectRecommendationTaxonomies,
-  selectSdgTargetTaxonomies,
   selectRecommendationConnections,
-  selectSdgTargetConnections,
   selectIndicatorConnections,
 } from 'containers/App/selectors';
 
@@ -39,7 +37,6 @@ import {
   selectTaxonomies,
   selectRecommendations,
   selectIndicators,
-  selectSdgTargets,
 } from './selectors';
 
 import { DEPENDENCIES } from './constants';
@@ -65,11 +62,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       indicators,
       taxonomies,
       recTaxonomies,
-      sdgtargets,
-      sdgtargetTaxonomies,
       onEntityClick,
       recConnections,
-      sdgtargetConnections,
       indicatorConnections,
     } = this.props;
 
@@ -124,9 +118,6 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                   recConnections,
                   indicators,
                   indicatorConnections,
-                  sdgtargets,
-                  sdgtargetTaxonomies,
-                  sdgtargetConnections,
                 },
                 onEntityClick,
                 shape: MEASURE_SHAPE,
@@ -152,10 +143,7 @@ ActionView.propTypes = {
   recTaxonomies: PropTypes.object,
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
-  sdgtargets: PropTypes.object,
-  sdgtargetTaxonomies: PropTypes.object,
   recConnections: PropTypes.object,
-  sdgtargetConnections: PropTypes.object,
   indicatorConnections: PropTypes.object,
   params: PropTypes.object,
 };
@@ -170,13 +158,10 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
-  sdgtargets: selectSdgTargets(state, props.params.id),
   indicators: selectIndicators(state, props.params.id),
   recommendations: selectRecommendations(state, props.params.id),
   recTaxonomies: selectRecommendationTaxonomies(state),
-  sdgtargetTaxonomies: selectSdgTargetTaxonomies(state),
   recConnections: selectRecommendationConnections(state),
-  sdgtargetConnections: selectSdgTargetConnections(state),
   indicatorConnections: selectIndicatorConnections(state),
 });
 

@@ -1,8 +1,6 @@
 import { createSelector } from 'reselect';
 import { Map } from 'immutable';
 
-import { ENABLE_SDGS } from 'themes/config';
-
 import {
   selectEntities,
   selectSortByQuery,
@@ -32,8 +30,7 @@ const selectMeasures = createSelector(
   (state) => selectEntities(state, 'measures'),
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'recommendation_measures'),
-  (state) => selectEntities(state, 'sdgtarget_measures'),
-  (entities, measureCategories, recMeasures, sdgtargetMeasures) =>
+  (entities, measureCategories, recMeasures) =>
     entities.map((entity, id) => entity
       .set('category_ids', measureCategories
         .filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), id))
@@ -42,10 +39,6 @@ const selectMeasures = createSelector(
       .set('recommendation_ids', recMeasures
         .filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), id))
         .map((association) => association.getIn(['attributes', 'recommendation_id']))
-      )
-      .set('sdgtarget_ids', ENABLE_SDGS && sdgtargetMeasures
-        .filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), id))
-        .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
       )
     )
 );
@@ -60,15 +53,6 @@ const selectRecommendations = createSelector(
     ))
 );
 
-const selectSdgTargets = createSelector(
-  (state) => selectEntities(state, 'sdgtargets'),
-  (state) => selectEntities(state, 'sdgtarget_categories'),
-  (entities, sdgtargetCategories) => ENABLE_SDGS &&
-     entities.map((entity, id) => entity.set('category_ids', sdgtargetCategories
-      .filter((association) => attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), id))
-      .map((association) => association.getIn(['attributes', 'category_id']))
-    ))
-);
 const filterAssociatedEntities = (entities, key, associations) =>
   entities.filter((entity) => associations.find((association, id) => entity.get(key).includes(parseInt(id, 10))));
 
@@ -84,7 +68,6 @@ const getCategoryCounts = (
   taxonomy,
   measures,
   recommendations,
-  sdgtargets,
   categories,
 ) => taxonomyCategories
   .map((cat, categoryId) => {
@@ -136,35 +119,6 @@ const getCategoryCounts = (
         category = category.set('measures', connectedMeasuresPublic ? connectedMeasuresPublic.size : 0);
       }
     }
-
-    // sdgtargets
-    if (ENABLE_SDGS) {
-      const childCatsTagSDGTargets =
-        taxonomy.get('children') && taxonomy.get('children').some((childTax) => childTax.getIn(['attributes', 'tags_sdgtargets']));
-      const tagsSDGTargets = taxonomy.getIn(['attributes', 'tags_sdgtargets']) || childCatsTagSDGTargets;
-      if (tagsSDGTargets) {
-        let associatedTargets;
-        // directly tagged recommendations
-        if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
-          associatedTargets = sdgtargets.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
-          // recommendations tagged by child categories
-        } else if (childCatsTagSDGTargets) {
-          associatedTargets = filterChildConnections(sdgtargets, categories, categoryId);
-        }
-
-        category = category.set('sdgtargetsTotal', associatedTargets.size);
-        const associatedTargetsPublic = associatedTargets.filter((target) => !target.getIn(['attributes', 'draft']));
-        category = category.set('sdgtargets', associatedTargetsPublic ? associatedTargetsPublic.size : 0);
-
-        // measures connected via sdgtarget
-        if (!tagsMeasures) {
-          const connectedMeasuresTarget = filterAssociatedEntities(measures, 'sdgtarget_ids', associatedTargets);
-          category = category.set('measuresTotal', connectedMeasuresTarget ? connectedMeasuresTarget.size : 0);
-          const connectedMeasuresTargetPublic = connectedMeasuresTarget.filter((measure) => !measure.getIn(['attributes', 'draft']));
-          category = category.set('measures', connectedMeasuresTargetPublic ? connectedMeasuresTargetPublic.size : 0);
-        }
-      }
-    }
     return category;
   }
 );
@@ -173,9 +127,8 @@ const selectCategoryCountGroups = createSelector(
   selectTaxonomy,
   selectRecommendations,
   selectMeasures,
-  selectSdgTargets,
   (state) => selectEntities(state, 'categories'),
-  (taxonomy, recommendations, measures, sdgtargets, categories) => {
+  (taxonomy, recommendations, measures, categories) => {
     const taxonomyCategories = categories.filter((cat) =>
       attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id'))
     );
@@ -186,7 +139,6 @@ const selectCategoryCountGroups = createSelector(
           taxonomy,
           measures,
           recommendations,
-          sdgtargets,
           categories,
         );
         return Map().set(taxonomy.get('id'), taxonomy.set('categories', catCounts));
@@ -203,7 +155,6 @@ const selectCategoryCountGroups = createSelector(
               taxonomy,
               measures,
               recommendations,
-              sdgtargets,
               categories,
             );
             return parentCat.set('categories', catCounts);
@@ -235,7 +186,6 @@ export const selectCategoryGroups = createSelector(
         ))
         .set('measures', group.get('categories').reduce((sum, cat) => sum + cat.get('measures'), 0))
         .set('recommendations', group.get('categories').reduce((sum, cat) => sum + cat.get('recommendations'), 0))
-        .set('sdgtargets', group.get('categories').reduce((sum, cat) => sum + cat.get('sdgtargets'), 0))
       ),
       order || (sortOption ? sortOption.order : 'asc'),
       sortOption ? sortOption.field : 'title',
@@ -265,7 +215,6 @@ export const selectUserOnlyCategoryGroups = createSelector(
         ))
         .set('measures', group.get('categories').reduce((sum, cat) => sum + cat.get('measures'), 0))
         .set('recommendations', group.get('categories').reduce((sum, cat) => sum + cat.get('recommendations'), 0))
-        .set('sdgtargets', group.get('categories').reduce((sum, cat) => sum + cat.get('sdgtargets'), 0))
       ),
       order || (sortOption ? sortOption.order : 'asc'),
       sortOption ? sortOption.field : 'title',

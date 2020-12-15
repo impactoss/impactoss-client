@@ -335,9 +335,6 @@ export const getInitialFormData = (shape) => {
       if (table.table === 'measures') {
         return fields.set('associatedMeasures', List());
       }
-      if (table.table === 'sdgtargets') {
-        return fields.set('associatedSdgTargets', List());
-      }
       return memo;
     }, fields);
   }

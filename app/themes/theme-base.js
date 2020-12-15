@@ -149,8 +149,6 @@ theme.palette = {
   measures: ['#ED7000'],
   recommendationsHover: ['#023066', '#426BA6'], // accepted, noted ['#FF9B69', '#FFB28B'],
   recommendations: ['#033A89', '#6889B8'],
-  sdgtargetsHover: ['#007FAD'],
-  sdgtargets: ['#009ED8'], // 40D7FF, 00A0CC
   indicatorsHover: ['#15881A'],
   indicators: ['#1BAC29'],
   reportsHover: [error[1]],

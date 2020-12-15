@@ -273,7 +273,7 @@ export const getIndicatorConnectionField = (entities, connections, onEntityClick
     entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies: null,
     connections,
-    connectionOptions: ['measures', 'sdgtargets'],
+    connectionOptions: ['measures'],
     entityType: 'indicators',
     onEntityClick,
   });
@@ -293,23 +293,12 @@ export const getRecommendationConnectionField = (entities, taxonomies, connectio
       return status ? status.icon : null;
     },
   });
-
-export const getSdgTargetConnectionField = (entities, taxonomies, connections, onEntityClick) =>
-  getConnectionField({
-    entities: sortEntities(entities, 'asc', 'reference'),
-    taxonomies: filterTaxonomies(taxonomies, 'tags_sdgtargets'),
-    connections,
-    connectionOptions: ['indicators', 'measures'],
-    entityType: 'sdgtargets',
-    onEntityClick,
-  });
-
 export const getMeasureConnectionField = (entities, taxonomies, connections, onEntityClick) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'id'),
     taxonomies: filterTaxonomies(taxonomies, 'tags_measures'),
     connections,
-    connectionOptions: ['indicators', 'recommendations', 'sdgtargets'],
+    connectionOptions: ['indicators', 'recommendations'],
     entityType: 'measures',
     entityPath: 'actions',
     onEntityClick,
@@ -358,23 +347,13 @@ export const getRecommendationConnectionGroupsField = (entityGroups, groupedBy, 
       return status ? status.icon : null;
     },
   });
-export const getSdgTargetConnectionGroupsField = (entityGroups, groupedBy, taxonomies, connections, onEntityClick) =>
-  getConnectionGroupsField({
-    entityGroups,
-    groupedBy,
-    taxonomies: filterTaxonomies(taxonomies, 'tags_sdgtargets'),
-    connections,
-    connectionOptions: ['indicators', 'measures'],
-    entityType: 'sdgtargets',
-    onEntityClick,
-  });
 export const getMeasureConnectionGroupsField = (entityGroups, groupedBy, taxonomies, connections, onEntityClick) =>
   getConnectionGroupsField({
     entityGroups,
     groupedBy,
     taxonomies: filterTaxonomies(taxonomies, 'tags_measures'),
     connections,
-    connectionOptions: ['indicators', 'recommendations', 'sdgtargets'],
+    connectionOptions: ['indicators', 'recommendations'],
     entityType: 'measures',
     entityPath: 'actions',
     onEntityClick,
@@ -505,9 +484,6 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
       fields: reduce(shape.connections.tables, (memo, table) => {
         if (table.table === 'recommendations' && associations.recommendations && associations.recTaxonomies && associations.recConnections) {
           return memo.concat([getRecommendationConnectionField(associations.recommendations, associations.recTaxonomies, associations.recConnections, onEntityClick)]);
-        }
-        if (table.table === 'sdgtargets' && associations.sdgtargets && associations.sdgtargetTaxonomies && associations.sdgtargetConnections) {
-          return memo.concat([getSdgTargetConnectionField(associations.sdgtargets, associations.sdgtargetTaxonomies, associations.sdgtargetConnections, onEntityClick)]);
         }
         if (table.table === 'indicators' && associations.indicators && associations.indicatorConnections) {
           return memo.concat([getIndicatorConnectionField(associations.indicators, associations.indicatorConnections, onEntityClick)]);

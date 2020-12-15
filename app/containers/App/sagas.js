@@ -319,36 +319,6 @@ export function* saveEntitySaga({ data }) {
       });
     }
 
-    // update sdgtarget-indicatos connections
-    if (data.entity.sdgtargetIndicators) {
-      yield call(saveConnectionsSaga, {
-        data: {
-          path: 'sdgtarget_indicators',
-          updates: data.entity.sdgtargetIndicators,
-        },
-      });
-    }
-
-    // update sdgtarget-measure connections
-    if (data.entity.sdgtargetMeasures) {
-      yield call(saveConnectionsSaga, {
-        data: {
-          path: 'sdgtarget_measures',
-          updates: data.entity.sdgtargetMeasures,
-        },
-      });
-    }
-
-    // update measure-category connections
-    if (data.entity.sdgtargetCategories) {
-      yield call(saveConnectionsSaga, {
-        data: {
-          path: 'sdgtarget_categories',
-          updates: data.entity.sdgtargetCategories,
-        },
-      });
-    }
-
     // update recommendation-category connections
     if (data.entity.recommendationCategories) {
       yield call(saveConnectionsSaga, {
@@ -430,36 +400,6 @@ export function* newEntitySaga({ data }) {
           path: 'measure_categories',
           updates: data.entity.measureCategories,
           keyPair: ['category_id', 'measure_id'],
-        });
-      }
-
-      // update sdgtarget-indicator connections
-      if (data.entity.sdgtargetIndicators) {
-        yield call(createConnectionsSaga, {
-          entityId: entityCreated.data.id,
-          path: 'sdgtarget_indicators',
-          updates: data.entity.sdgtargetIndicators,
-          keyPair: ['indicator_id', 'sdgtarget_id'],
-        });
-      }
-
-      // update sdgtarget-indicator connections
-      if (data.entity.sdgtargetMeasures) {
-        yield call(createConnectionsSaga, {
-          entityId: entityCreated.data.id,
-          path: 'sdgtarget_measures',
-          updates: data.entity.sdgtargetMeasures,
-          keyPair: ['measure_id', 'sdgtarget_id'],
-        });
-      }
-
-      // update sdgtarget-category connections
-      if (data.entity.sdgtargetCategories) {
-        yield call(createConnectionsSaga, {
-          entityId: entityCreated.data.id,
-          path: 'sdgtarget_categories',
-          updates: data.entity.sdgtargetCategories,
-          keyPair: ['category_id', 'sdgtarget_id'],
         });
       }
 

@@ -22,8 +22,6 @@ import {
   getMeasureConnectionGroupsField,
   getRecommendationConnectionField,
   getRecommendationConnectionGroupsField,
-  getSdgTargetConnectionField,
-  getSdgTargetConnectionGroupsField,
   getManagerField,
   getEntityLinkField,
   getTaxonomyFields,
@@ -43,7 +41,6 @@ import {
   selectReady,
   selectIsUserManager,
   selectMeasureConnections,
-  selectSdgTargetConnections,
   selectRecommendationConnections,
 } from 'containers/App/selectors';
 
@@ -56,13 +53,11 @@ import {
   selectViewEntity,
   selectRecommendations,
   selectMeasures,
-  selectSdgTargets,
   selectTaxonomies,
   selectParentTaxonomy,
   selectChildTaxonomies,
   selectChildRecommendations,
   selectChildMeasures,
-  selectChildSdgTargets,
 } from './selectors';
 
 import { DEPENDENCIES } from './constants';
@@ -117,10 +112,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     measures,
     childMeasures,
     taxonomies,
-    sdgtargets,
-    childSdgTargets,
     onEntityClick,
-    sdgtargetConnections,
     measureConnections,
     recommendationConnections
   ) => {
@@ -134,9 +126,6 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         // related actions
         entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
           getMeasureConnectionField(measures, taxonomies, measureConnections, onEntityClick),
-        // related SDG targets
-        entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
-          getSdgTargetConnectionField(sdgtargets, taxonomies, sdgtargetConnections, onEntityClick),
         // related recommendations
         entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
           getRecommendationConnectionField(recommendations, taxonomies, recommendationConnections, onEntityClick),
@@ -164,20 +153,6 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
               appMessages.entities.taxonomies[tax.get('id')].single,
               taxonomies,
               measureConnections,
-              onEntityClick,
-            )
-          )
-        );
-      }
-      // child categories related sdgtargets
-      if (childSdgTargets) {
-        childSdgTargets.forEach((tax) =>
-          connections.push(
-            getSdgTargetConnectionGroupsField(
-              tax.get('categories'),
-              appMessages.entities.taxonomies[tax.get('id')].single,
-              taxonomies,
-              sdgtargetConnections,
               onEntityClick,
             )
           )
@@ -239,10 +214,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       measures,
       childMeasures,
       taxonomies,
-      sdgtargets,
-      childSdgTargets,
       onEntityClick,
-      sdgtargetConnections,
       measureConnections,
       recommendationConnections,
       parentTaxonomy,
@@ -310,10 +282,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                     measures,
                     childMeasures,
                     taxonomies,
-                    sdgtargets,
-                    childSdgTargets,
                     onEntityClick,
-                    sdgtargetConnections,
                     measureConnections,
                     recommendationConnections
                   ),
@@ -344,10 +313,7 @@ CategoryView.propTypes = {
   childTaxonomies: PropTypes.object,
   measures: PropTypes.object,
   childMeasures: PropTypes.object,
-  sdgtargets: PropTypes.object,
-  childSdgTargets: PropTypes.object,
   measureConnections: PropTypes.object,
-  sdgtargetConnections: PropTypes.object,
   recommendationConnections: PropTypes.object,
 };
 
@@ -362,14 +328,11 @@ const mapStateToProps = (state, props) => ({
   recommendations: selectRecommendations(state, props.params.id),
   childRecommendations: selectChildRecommendations(state, props.params.id),
   childMeasures: selectChildMeasures(state, props.params.id),
-  childSdgTargets: selectChildSdgTargets(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
-  sdgtargets: selectSdgTargets(state, props.params.id),
   taxonomies: selectTaxonomies(state),
   parentTaxonomy: selectParentTaxonomy(state, props.params.id),
   childTaxonomies: selectChildTaxonomies(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
-  sdgtargetConnections: selectSdgTargetConnections(state),
   recommendationConnections: selectRecommendationConnections(state),
 });
 

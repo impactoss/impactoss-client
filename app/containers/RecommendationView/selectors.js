@@ -1,4 +1,3 @@
-import { ENABLE_SDGS } from 'themes/config';
 import { createSelector } from 'reselect';
 
 import {
@@ -42,22 +41,14 @@ export const selectMeasuresAssociated = createSelector(
 export const selectMeasures = createSelector(
   selectMeasuresAssociated,
   (state) => selectMeasureConnections(state),
-  (state) => selectEntities(state, 'sdgtarget_measures'),
   (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'measure_indicators'),
   (state) => selectEntities(state, 'categories'),
-  (measures, connections, measureTargets, measureRecommendations, measureCategories, measureIndicators, categories) =>
+  (measures, connections, measureRecommendations, measureCategories, measureIndicators, categories) =>
     measures && measures
     .map((measure) => measure
       .set('categories', getEntityCategories(measure.get('id'), measureCategories, 'measure_id', categories))
-      .set('sdgtargets', ENABLE_SDGS && measureTargets && measureTargets
-        .filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
-          && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
-        )
-        .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
-      )
       .set('recommendations', measureRecommendations && measureRecommendations
         .filter((association) =>
           attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))

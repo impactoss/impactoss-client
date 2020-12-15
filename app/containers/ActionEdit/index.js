@@ -57,7 +57,6 @@ import {
   selectTaxonomies,
   selectRecommendations,
   selectIndicators,
-  selectSdgTargets,
   selectConnectedTaxonomies,
 } from './selectors';
 
@@ -100,7 +99,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { viewEntity, taxonomies, recommendations, indicators, sdgtargets } = props;
+    const { viewEntity, taxonomies, recommendations, indicators } = props;
 
     return viewEntity
     ? Map({
@@ -112,13 +111,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRecommendations: entityOptions(recommendations, true),
       associatedIndicators: entityOptions(indicators, true),
-      associatedSdgTargets: entityOptions(sdgtargets, true),
     })
     : Map();
   }
 
   render() {
-    const { viewEntity, dataReady, viewDomain, taxonomies, connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption } = this.props;
+    const { viewEntity, dataReady, viewDomain, taxonomies, connectedTaxonomies, recommendations, indicators, onCreateOption } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
 
@@ -190,7 +188,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 taxonomies,
                 recommendations,
                 indicators,
-                sdgtargets
               )}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
@@ -203,7 +200,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                   connectedTaxonomies,
                   recommendations,
                   indicators,
-                  sdgtargets,
                 },
                 onCreateOption,
                 shape: MEASURE_SHAPE,
@@ -241,7 +237,6 @@ ActionEdit.propTypes = {
   connectedTaxonomies: PropTypes.object,
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
-  sdgtargets: PropTypes.object,
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
@@ -259,7 +254,6 @@ const mapStateToProps = (state, props) => ({
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
-  sdgtargets: selectSdgTargets(state, props.params.id),
   indicators: selectIndicators(state, props.params.id),
   recommendations: selectRecommendations(state, props.params.id),
 });
@@ -288,7 +282,7 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, taxonomies, recommendations, indicators, sdgtargets) => {
+    handleSubmit: (formData, taxonomies, recommendations, indicators) => {
       const saveData = formData
         .set(
           'measureCategories',
@@ -305,16 +299,6 @@ function mapDispatchToProps(dispatch, props) {
             connections: recommendations,
             connectionAttribute: 'associatedRecommendations',
             createConnectionKey: 'recommendation_id',
-            createKey: 'measure_id',
-          })
-        )
-        .set(
-          'sdgtargetMeasures',
-          getConnectionUpdatesFromFormData({
-            formData,
-            connections: sdgtargets,
-            connectionAttribute: 'associatedSdgTargets',
-            createConnectionKey: 'sdgtarget_id',
             createKey: 'measure_id',
           })
         )

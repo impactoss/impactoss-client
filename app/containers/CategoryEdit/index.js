@@ -18,7 +18,6 @@ import {
   entityOptions,
   renderUserControl,
   renderMeasureControl,
-  renderSdgTargetControl,
   renderRecommendationControl,
   renderParentCategoryControl,
   getTitleFormField,
@@ -75,7 +74,6 @@ import {
   selectViewEntity,
   selectUsers,
   selectMeasures,
-  selectSdgTargets,
   selectRecommendations,
   selectConnectedTaxonomies,
   selectParentOptions,
@@ -120,7 +118,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { viewEntity, users, measures, sdgtargets, recommendations, parentOptions } = props;
+    const { viewEntity, users, measures, recommendations, parentOptions } = props;
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
@@ -129,7 +127,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         FORM_INITIAL.get('attributes')
       ),
       associatedMeasures: entityOptions(measures, true),
-      associatedSdgTargets: entityOptions(sdgtargets, true),
       associatedRecommendations: entityOptions(recommendations, true),
       associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
       associatedCategory: parentCategoryOptions(parentOptions, viewEntity.getIn(['attributes', 'parent_id'])),
@@ -172,7 +169,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     return fields;
   }
 
-  getBodyMainFields = (entity, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption, userOnly) => {
+  getBodyMainFields = (entity, connectedTaxonomies, recommendations, measures, onCreateOption, userOnly) => {
     const fields = [];
     fields.push({
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
@@ -185,8 +182,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           fields: [
             entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
               renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-            entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
-              renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption, this.context.intl),
             entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
               renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
           ],
@@ -240,7 +235,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       connectedTaxonomies,
       recommendations,
       measures,
-      sdgtargets,
       onCreateOption,
       parentOptions,
       parentTaxonomy,
@@ -320,7 +314,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                 formData,
                 measures,
                 recommendations,
-                sdgtargets,
                 viewEntity.get('taxonomy'),
               )}
               handleSubmitFail={this.props.handleSubmitFail}
@@ -341,7 +334,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                     connectedTaxonomies,
                     recommendations,
                     measures,
-                    sdgtargets,
                     onCreateOption,
                     viewDomain.form.data.getIn(['attributes', 'user_only'])
                   ),
@@ -379,7 +371,6 @@ CategoryEdit.propTypes = {
   parentOptions: PropTypes.object,
   parentTaxonomy: PropTypes.object,
   measures: PropTypes.object,
-  sdgtargets: PropTypes.object,
   recommendations: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   users: PropTypes.object,
@@ -401,7 +392,6 @@ const mapStateToProps = (state, props) => ({
   parentOptions: selectParentOptions(state, props.params.id),
   parentTaxonomy: selectParentTaxonomy(state, props.params.id),
   users: selectUsers(state),
-  sdgtargets: selectSdgTargets(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
   recommendations: selectRecommendations(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
@@ -431,7 +421,7 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, measures, recommendations, sdgtargets, taxonomy) => {
+    handleSubmit: (formData, measures, recommendations, taxonomy) => {
       let saveData = formData;
       if (taxonomy.getIn(['attributes', 'tags_measures'])) {
         saveData = saveData.set(
@@ -453,18 +443,6 @@ function mapDispatchToProps(dispatch, props) {
             connections: recommendations,
             connectionAttribute: 'associatedRecommendations',
             createConnectionKey: 'recommendation_id',
-            createKey: 'category_id',
-          })
-        );
-      }
-      if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
-        saveData = saveData.set(
-          'sdgtargetCategories',
-          getConnectionUpdatesFromFormData({
-            formData: !formData.getIn(['attributes', 'user_only']) ? formData : null,
-            connections: sdgtargets,
-            connectionAttribute: 'associatedSdgTargets',
-            createConnectionKey: 'sdgtarget_id',
             createKey: 'category_id',
           })
         );

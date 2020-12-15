@@ -36,7 +36,6 @@ import {
   selectEntities,
   selectReady,
   selectReadyForAuthCheck,
-  selectSdgTargetsCategorised,
   selectRecommendationsCategorised,
   selectMeasureTaxonomies,
 } from 'containers/App/selectors';
@@ -85,7 +84,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   }
 
   render() {
-    const { dataReady, viewDomain, connectedTaxonomies, recommendations, indicators, taxonomies, sdgtargets, onCreateOption } = this.props;
+    const { dataReady, viewDomain, connectedTaxonomies, recommendations, indicators, taxonomies, onCreateOption } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
     return (
       <div>
@@ -153,7 +152,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                   connectedTaxonomies,
                   recommendations,
                   indicators,
-                  sdgtargets,
                 },
                 onCreateOption,
                 shape: MEASURE_SHAPE,
@@ -185,7 +183,6 @@ ActionNew.propTypes = {
   taxonomies: PropTypes.object,
   recommendations: PropTypes.object,
   indicators: PropTypes.object,
-  sdgtargets: PropTypes.object,
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
@@ -202,7 +199,6 @@ const mapStateToProps = (state) => ({
   authReady: selectReadyForAuthCheck(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectMeasureTaxonomies(state, { includeParents: false }),
-  sdgtargets: selectSdgTargetsCategorised(state),
   indicators: selectEntities(state, 'indicators'),
   recommendations: selectRecommendationsCategorised(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
@@ -268,17 +264,6 @@ function mapDispatchToProps(dispatch) {
           create: getCheckedValuesFromOptions(formData.get('associatedIndicators'))
           .map((id) => Map({
             indicator_id: id,
-          })),
-        }));
-      }
-
-      // sdgtargets
-      if (formData.get('associatedSdgTargets')) {
-        saveData = saveData.set('sdgtargetMeasures', Map({
-          delete: List(),
-          create: getCheckedValuesFromOptions(formData.get('associatedSdgTargets'))
-          .map((id) => Map({
-            sdgtarget_id: id,
           })),
         }));
       }

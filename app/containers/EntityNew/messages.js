@@ -34,10 +34,4 @@ export default defineMessages({
       defaultMessage: 'New Recommendation',
     },
   },
-  sdgtargets: {
-    pageTitle: {
-      id: 'app.containers.EntityNew.sdgtargets.pageTitle',
-      defaultMessage: 'New SDG target',
-    },
-  },
 });

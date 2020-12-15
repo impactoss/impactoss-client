@@ -6,7 +6,7 @@ import { getAsyncInjectors } from 'utils/asyncInjectors';
 import { getRedirects } from 'utils/redirects';
 
 import { PATHS } from 'containers/App/constants';
-import { USER_ROLES, ENABLE_SDGS } from 'themes/config';
+import { USER_ROLES } from 'themes/config';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -328,131 +328,6 @@ export default function createRoutes(store) {
         });
 
         importModules.catch(errorLoading);
-      },
-    }, {
-      path: PATHS.SDG_TARGETS,
-      name: ENABLE_SDGS ? 'sdgtargetList' : 'notfound',
-      getComponent(nextState, cb) {
-        if (ENABLE_SDGS) {
-          const importModules = Promise.all([
-            import('containers/SdgTargetList'),
-          ]);
-
-          const renderRoute = loadModule(cb);
-
-          importModules.then(([component]) => {
-            renderRoute(component);
-          });
-
-          importModules.catch(errorLoading);
-        } else {
-          import('containers/NotFoundPage')
-            .then(loadModule(cb))
-            .catch(errorLoading);
-        }
-      },
-    }, {
-      path: `${PATHS.SDG_TARGETS}${PATHS.NEW}`,
-      name: ENABLE_SDGS ? 'sdgtargetNew' : 'notfound',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
-      getComponent(nextState, cb) {
-        if (ENABLE_SDGS) {
-          const importModules = Promise.all([
-            import('containers/SdgTargetNew/reducer'),
-            import('containers/SdgTargetNew/sagas'),
-            import('containers/SdgTargetNew'),
-          ]);
-
-          const renderRoute = loadModule(cb);
-
-          importModules.then(([reducer, sagas, component]) => {
-            injectReducer('sdgtargetNew', reducer.default);
-            injectSagas(sagas.default);
-            renderRoute(component);
-          });
-
-          importModules.catch(errorLoading);
-        } else {
-          import('containers/NotFoundPage')
-            .then(loadModule(cb))
-            .catch(errorLoading);
-        }
-      },
-    }, {
-      path: `${PATHS.SDG_TARGETS}${PATHS.IMPORT}`,
-      name: ENABLE_SDGS ? 'sdgtargetImport' : 'notfound',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
-      getComponent(nextState, cb) {
-        if (ENABLE_SDGS) {
-          const importModules = Promise.all([
-            import('containers/SdgTargetImport/reducer'),
-            import('containers/SdgTargetImport/sagas'),
-            import('containers/SdgTargetImport'),
-          ]);
-
-          const renderRoute = loadModule(cb);
-
-          importModules.then(([reducer, sagas, component]) => {
-            injectReducer('sdgtargetImport', reducer.default);
-            injectSagas(sagas.default);
-            renderRoute(component);
-          });
-
-          importModules.catch(errorLoading);
-        } else {
-          import('containers/NotFoundPage')
-            .then(loadModule(cb))
-            .catch(errorLoading);
-        }
-      },
-    }, {
-      path: `${PATHS.SDG_TARGETS}${PATHS.ID}`,
-      name: ENABLE_SDGS ? 'sdgtargetView' : 'notfound',
-      getComponent(nextState, cb) {
-        if (ENABLE_SDGS) {
-          const importModules = Promise.all([
-            import('containers/SdgTargetView'),
-          ]);
-
-          const renderRoute = loadModule(cb);
-
-          importModules.then(([component]) => {
-            renderRoute(component);
-          });
-
-          importModules.catch(errorLoading);
-        } else {
-          import('containers/NotFoundPage')
-            .then(loadModule(cb))
-            .catch(errorLoading);
-        }
-      },
-    }, {
-      path: `${PATHS.SDG_TARGETS}${PATHS.EDIT}${PATHS.ID}`,
-      name: ENABLE_SDGS ? 'sdgtargetEdit' : 'notfound',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
-      getComponent(nextState, cb) {
-        if (ENABLE_SDGS) {
-          const importModules = Promise.all([
-            import('containers/SdgTargetEdit/reducer'),
-            import('containers/SdgTargetEdit/sagas'),
-            import('containers/SdgTargetEdit'),
-          ]);
-
-          const renderRoute = loadModule(cb);
-
-          importModules.then(([reducer, sagas, component]) => {
-            injectReducer('sdgtargetEdit', reducer.default);
-            injectSagas(sagas.default);
-            renderRoute(component);
-          });
-
-          importModules.catch(errorLoading);
-        } else {
-          import('containers/NotFoundPage')
-            .then(loadModule(cb))
-            .catch(errorLoading);
-        }
       },
     }, {
       path: PATHS.RECOMMENDATIONS,

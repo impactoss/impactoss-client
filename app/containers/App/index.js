@@ -14,7 +14,6 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Header from 'components/Header';
 import EntityNew from 'containers/EntityNew';
-import { ENABLE_SDGS } from 'themes/config';
 
 import { sortEntities } from 'utils/sort';
 
@@ -115,13 +114,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       title: this.context.intl.formatMessage(messages.nav.recommendations),
       active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
     }]);
-    if (ENABLE_SDGS) {
-      navItems = navItems.concat([{
-        path: PATHS.SDG_TARGETS,
-        title: this.context.intl.formatMessage(messages.nav.sdgtargets),
-        active: currentPath.startsWith(PATHS.SDG_TARGETS),
-      }]);
-    }
     navItems = navItems.concat([{
       path: PATHS.SEARCH,
       title: this.context.intl.formatMessage(messages.nav.search),

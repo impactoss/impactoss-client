@@ -535,10 +535,6 @@ export default defineMessages({
       id: 'app.containers.App.nav.recommendations',
       defaultMessage: 'Recommendations',
     },
-    sdgtargets: {
-      id: 'app.containers.App.nav.sdgtargets',
-      defaultMessage: 'SDG targets',
-    },
     pages: {
       id: 'app.containers.App.nav.pages',
       defaultMessage: 'Page admin',
@@ -623,36 +619,6 @@ export default defineMessages({
       empty: {
         id: 'app.containers.App.entities.measures.empty',
         defaultMessage: 'No actions yet',
-      },
-    },
-    sdgtargets: {
-      single: {
-        id: 'app.containers.App.entities.sdgtargets.single',
-        defaultMessage: 'SDG target',
-      },
-      plural: {
-        id: 'app.containers.App.entities.sdgtargets.plural',
-        defaultMessage: 'SDG targets',
-      },
-      singleLong: {
-        id: 'app.containers.App.entities.sdgtargets.singleLong',
-        defaultMessage: 'SDG target',
-      },
-      pluralLong: {
-        id: 'app.containers.App.entities.sdgtargets.pluralLong',
-        defaultMessage: 'SDG targets',
-      },
-      singleShort: {
-        id: 'app.containers.App.entities.sdgtargets.singleShort',
-        defaultMessage: 'Target',
-      },
-      pluralShort: {
-        id: 'app.containers.App.entities.sdgtargets.pluralShort',
-        defaultMessage: 'Targets',
-      },
-      empty: {
-        id: 'app.containers.App.entities.sdgtargets.empty',
-        defaultMessage: 'No SDG targets yet',
       },
     },
     indicators: {

@@ -22,7 +22,6 @@ const getEntitySortValueMapper = (entity, sortBy) => {
     //   return entity.get(sortBy) || entity.getIn(['attributes', 'title']) || entity.get('id');
     case 'measures':
     case 'recommendations':
-    case 'sdgtargets':
     case 'sortBy':
       return entity.get(sortBy) || 0;
     case 'dueDateThenUpdated':

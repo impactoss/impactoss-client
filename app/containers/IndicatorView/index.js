@@ -17,7 +17,6 @@ import {
   getMetaField,
   getMarkdownField,
   getMeasureConnectionField,
-  getSdgTargetConnectionField,
   getManagerField,
   getScheduleField,
   getReportsField,
@@ -38,9 +37,7 @@ import {
   selectIsUserContributor,
   selectIsUserManager,
   selectMeasureTaxonomies,
-  selectSdgTargetTaxonomies,
   selectMeasureConnections,
-  selectSdgTargetConnections,
   selectQueryMessages,
 } from 'containers/App/selectors';
 
@@ -50,7 +47,6 @@ import messages from './messages';
 import {
   selectViewEntity,
   selectMeasures,
-  selectSdgTargets,
   selectReports,
   selectDueDates,
 } from './selectors';
@@ -86,7 +82,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       ],
     }]);
 
-  getBodyMainFields = (entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick, sdgtargetConnections, measureConnections) => ([
+  getBodyMainFields = (entity, measures, reports, measureTaxonomies, isContributor, onEntityClick, measureConnections) => ([
     {
       fields: [
         getMarkdownField(entity, 'description', true),
@@ -105,7 +101,6 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       icon: 'connections',
       fields: [
         measures && getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
-        sdgtargets && getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, onEntityClick),
       ],
     },
   ]);
@@ -136,13 +131,10 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       isContributor,
       isManager,
       measures,
-      sdgtargets,
       reports,
       dates,
       measureTaxonomies,
-      sdgtargetTaxonomies,
       onEntityClick,
-      sdgtargetConnections,
       measureConnections,
     } = this.props;
 
@@ -216,7 +208,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                   aside: this.getHeaderAsideFields(viewEntity, isContributor),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick, sdgtargetConnections, measureConnections),
+                  main: this.getBodyMainFields(viewEntity, measures, reports, measureTaxonomies, isContributor, onEntityClick, measureConnections),
                   aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
                 },
               }}
@@ -239,14 +231,11 @@ IndicatorView.propTypes = {
   isContributor: PropTypes.bool,
   isManager: PropTypes.bool,
   measures: PropTypes.object,
-  sdgtargets: PropTypes.object,
   reports: PropTypes.object,
   measureTaxonomies: PropTypes.object,
-  sdgtargetTaxonomies: PropTypes.object,
   dates: PropTypes.object,
   params: PropTypes.object,
   measureConnections: PropTypes.object,
-  sdgtargetConnections: PropTypes.object,
   queryMessages: PropTypes.object,
   onDismissQueryMessages: PropTypes.func,
 };
@@ -261,14 +250,11 @@ const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
-  sdgtargets: selectSdgTargets(state, props.params.id),
-  sdgtargetTaxonomies: selectSdgTargetTaxonomies(state),
   measures: selectMeasures(state, props.params.id),
   measureTaxonomies: selectMeasureTaxonomies(state),
   reports: selectReports(state, props.params.id),
   dates: selectDueDates(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
-  sdgtargetConnections: selectSdgTargetConnections(state),
   queryMessages: selectQueryMessages(state),
 });
 
