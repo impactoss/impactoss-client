@@ -242,7 +242,7 @@ const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
-  taxonomies: selectRecommendationTaxonomies(state),
+  taxonomies: selectRecommendationTaxonomies(state, { includeParents: false }),
   measures: selectMeasuresCategorised(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
 });

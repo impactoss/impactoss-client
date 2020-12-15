@@ -1,9 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router';
 import PropTypes from 'prop-types';
+import { List } from 'immutable';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import { mapToCategoryList } from 'utils/taxonomies';
 import { getSortOption } from 'utils/sort';
+import { getCategoryTitle } from 'utils/entities';
 
 import CategoryListKey from 'components/categoryList/CategoryListKey';
 import CategoryListHeader from 'components/categoryList/CategoryListHeader';
@@ -18,19 +22,44 @@ const Styled = styled.div`
 const CategoryListBody = styled.div`
   padding-top: 1em
 `;
+const GroupHeaderLink = styled(Link)`
+  color: ${palette('link', 2)};
+  &:hover {
+    color: ${palette('linkHover', 2)};
+  }
+`;
+
+const GroupHeader = styled.h6`
+  font-weight: normal;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+`;
+
 
 class CategoryListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   getCountAttributes = (taxonomy) => {
+    // figure out if tagged directly or via child category
+    const tagsRecs = taxonomy.getIn(['attributes', 'tags_recommendations'])
+      || (taxonomy.get('children') && taxonomy.get('children').some((childTax) => childTax.getIn(['attributes', 'tags_recommendations'])));
+    const tagsSDGTargets = taxonomy.getIn(['attributes', 'tags_sdgtargets'])
+      || (taxonomy.get('children') && taxonomy.get('children').some((childTax) => childTax.getIn(['attributes', 'tags_sdgtargets'])));
+    const tagsMeasures = taxonomy.getIn(['attributes', 'tags_measures'])
+      || (taxonomy.get('children') && taxonomy.get('children').some((childTax) => childTax.getIn(['attributes', 'tags_measures'])));
+
     const attributes = [];
-    if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
+    if (tagsRecs) {
       attributes.push({
         total: 'recommendationsTotal',
         public: 'recommendations',
         accepted: 'recommendationsAccepted',
         label: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
       });
-      if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
+      if (!tagsMeasures) {
         attributes.push({
           via: this.context.intl.formatMessage(appMessages.entities.connected),
           total: 'measuresTotal',
@@ -39,13 +68,13 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         });
       }
     }
-    if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
+    if (tagsSDGTargets) {
       attributes.push({
         total: 'sdgtargetsTotal',
         public: 'sdgtargets',
         label: this.context.intl.formatMessage(appMessages.entities.sdgtargets.plural),
       });
-      if (!taxonomy.getIn(['attributes', 'tags_measures'])) {
+      if (!tagsMeasures) {
         attributes.push({
           via: this.context.intl.formatMessage(appMessages.entities.connected),
           total: 'measuresTotal',
@@ -54,7 +83,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         });
       }
     }
-    if (taxonomy.getIn(['attributes', 'tags_measures'])) {
+    if (tagsMeasures) {
       attributes.push({
         total: 'measuresTotal',
         public: 'measures',
@@ -139,7 +168,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
   render() {
     const {
       taxonomy,
-      categories,
+      categoryGroups,
       reference,
       onPageLink,
       sortOptions,
@@ -149,7 +178,10 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       userOnly,
     } = this.props;
     const countAttributes = (!userOnly && taxonomy) ? this.getCountAttributes(taxonomy) : [];
-    const categoriesMapped = mapToCategoryList(categories, onPageLink, countAttributes);
+    const categories = categoryGroups.reduce((memo, group) =>
+      memo.concat(group.get('categories'))
+    , List());
+    // console.log(categories.toJS())
 
     const columns = this.getListColumns({
       taxonomyHeader: this.context.intl.formatMessage(appMessages.entities.taxonomies[reference].single),
@@ -165,13 +197,30 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         <CategoryListKey columns={columns} />
         <CategoryListHeader columns={columns} />
         <CategoryListBody>
-          {categoriesMapped.map((cat, i) =>
-            <CategoryListItem
-              key={i}
-              category={cat}
-              columns={columns}
-            />
-          )}
+          {categoryGroups.toArray().map((group) => {
+            if (group.get('categories')) {
+              const categoriesMapped = mapToCategoryList(group.get('categories'), onPageLink, countAttributes);
+              return (
+                <span key={group.get('id')}>
+                  {group.get('type') === 'categories' && group.get('categories').size > 0 &&
+                    <GroupHeaderLink to={`category/${group.get('id')}`}>
+                      <GroupHeader>
+                        {getCategoryTitle(group)}
+                      </GroupHeader>
+                    </GroupHeaderLink>
+                  }
+                  {categoriesMapped.map((cat) =>
+                    <CategoryListItem
+                      key={cat.id}
+                      category={cat}
+                      columns={columns}
+                    />
+                  )}
+                </span>
+              );
+            }
+            return null;
+          })}
         </CategoryListBody>
       </Styled>
     );
@@ -179,7 +228,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
 }
 
 CategoryListItems.propTypes = {
-  categories: PropTypes.object,
+  categoryGroups: PropTypes.object,
   taxonomy: PropTypes.object,
   reference: PropTypes.string,
   onPageLink: PropTypes.func,

@@ -26,6 +26,7 @@ export const makeFilterGroups = (
             id: taxonomy.get('id'), // filterOptionId
             label: messages.taxonomies(taxonomy.get('id')),
             active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+            nested: taxonomy.getIn(['attributes', 'parent_id']),
           },
         ])
       , []),
@@ -48,6 +49,7 @@ export const makeFilterGroups = (
               id: taxonomy.get('id'), // filterOptionId
               label: messages.taxonomies(taxonomy.get('id')),
               active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+              nested: taxonomy.getIn(['attributes', 'parent_id']),
             },
           ])
       , []),

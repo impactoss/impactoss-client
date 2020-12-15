@@ -97,6 +97,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
               required={formOptions.required}
               search={formOptions.search}
               advanced={formOptions.advanced}
+              groups={formOptions.groups}
               closeOnClickOutside={false}
               selectAll={formOptions.multiple && formOptions.selectAll}
               tagFilterGroups={formOptions.tagFilterGroups}

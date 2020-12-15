@@ -83,6 +83,8 @@ export const PROGRESS_CATEGORY_REFERENCES = {
   COMPLETED: 2,
 };
 
+export const CYCLE_TAXONOMY_ID = 2;
+
 /**
  * Server settings
  **/

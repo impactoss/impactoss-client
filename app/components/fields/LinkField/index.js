@@ -18,7 +18,9 @@ class LinkField extends React.PureComponent { // eslint-disable-line react/prefe
     return (
       <FieldWrap>
         <Label>
-          <FormattedMessage {...(field.label || appMessages.attributes.url)} />
+          { field.labelFormatted || (
+            <FormattedMessage {...(field.label || appMessages.attributes.url)} />
+          )}
         </Label>
         { !field.internal &&
           <Url target="_blank" href={field.value} title={field.anchor || field.value}>

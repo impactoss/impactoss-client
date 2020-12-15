@@ -23,6 +23,11 @@ import {
   attributesEqual,
   testEntityEntityAssociation,
   entitiesSetSingle,
+  getEntityCategories,
+  entitiesSetCategoryIds,
+  filterTaxonomies,
+  getEntityConnections,
+  getTaxonomyCategories,
 } from 'utils/entities';
 
 import { sortEntities, getSortOption } from 'utils/sort';
@@ -33,21 +38,12 @@ export const selectConnections = createSelector(
   (state) => selectEntities(state, 'indicators'),
   (state) => selectEntities(state, 'measures'),
   (state) => selectEntities(state, 'measure_categories'),
-  (indicators, measures, measureCategories) =>
+  (state) => selectEntities(state, 'categories'),
+  (indicators, measures, measureCategories, categories) =>
     Map()
     .set('indicators', indicators)
-    .set(
-      'measures',
-      measures.map((measure) =>
-        measure.set(
-          'categories',
-          measureCategories
-          .filter((association) =>
-            attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
-          )
-          .map((association) => association.getIn(['attributes', 'category_id']))
-        )
-      )
+    .set('measures',
+      entitiesSetCategoryIds(measures, 'measure_id', measureCategories, categories)
     )
 );
 
@@ -65,26 +61,17 @@ export const selectConnectedTaxonomies = createSelector(
         key: 'measure_id',
         associations: categoryMeasures,
       },
-    ], (connectedTaxonomies, connection) =>
+    ], (connectedTaxonomies, relationship) =>
       // merge connected taxonomies.
       // TODO deal with conflicts
       connectedTaxonomies.merge(
-        taxonomies
-          .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]))
-          .map((taxonomy) => taxonomy.set(
-            'categories',
-            categories
-              .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-              .map((category) => category.set(
-                connection.path,
-                connection.associations
-                .filter((association) =>
-                  attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
-                  && connections.getIn([connection.path, association.getIn(['attributes', connection.key]).toString()])
-                )
-                .map((association) => association.getIn(['attributes', connection.key]))
-              ))
-          ))
+        filterTaxonomies(taxonomies, relationship.tags, true)
+        .map((taxonomy) => taxonomy.set('categories', getTaxonomyCategories(
+          taxonomy,
+          categories,
+          relationship,
+          connections.get(relationship.path),
+        )))
       )
     , Map())
 );
@@ -99,37 +86,31 @@ const selectSdgTargetsNested = createSelector(
   (state) => selectEntities(state, 'sdgtarget_categories'),
   (state) => selectEntities(state, 'sdgtarget_indicators'),
   (state) => selectEntities(state, 'sdgtarget_measures'),
+  (state) => selectEntities(state, 'categories'),
   (
     entities,
     connections,
     entityCategories,
     entityIndicators,
     entityMeasures,
+    categories,
   ) => entities.map((entity) => entity
-    .set(
-      'categories',
-      entityCategories
-      .filter((association) => attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), entity.get('id')))
-      .map((association) => association.getIn(['attributes', 'category_id']))
-    )
-    .set(
-      'measures',
-      entityMeasures
-      .filter((association) =>
-        attributesEqual(association.getIn(['attributes', 'sdgtarget_id']), entity.get('id'))
-        && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
-      )
-      .map((association) => association.getIn(['attributes', 'measure_id']))
-    )
-    .set(
-      'indicators',
-      entityIndicators
-      .filter((entityIndicator) =>
-        attributesEqual(entityIndicator.getIn(['attributes', 'sdgtarget_id']), entity.get('id'))
-        && connections.getIn(['indicators', entityIndicator.getIn(['attributes', 'indicator_id']).toString()])
-      )
-      .map((association) => association.getIn(['attributes', 'indicator_id']))
-    )
+    .set('categories', getEntityCategories(entity.get('id'), entityCategories, 'sdgtarget_id', categories))
+    .set('measures', getEntityConnections(
+      entity.get('id'),
+      entityMeasures,
+      'measure_id',
+      'sdgtarget_id',
+      connections.get('measures'),
+    ))
+    // nest connected indicator ids
+    .set('indicators', getEntityConnections(
+      entity.get('id'),
+      entityIndicators,
+      'indicator_id',
+      'sdgtarget_id',
+      connections.get('indicators'),
+    ))
   )
 );
 const selectSdgTargetsWithout = createSelector(

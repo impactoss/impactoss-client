@@ -20,6 +20,7 @@ import {
   renderMeasureControl,
   renderSdgTargetControl,
   renderRecommendationControl,
+  renderParentCategoryControl,
   getTitleFormField,
   getReferenceFormField,
   getShortTitleFormField,
@@ -28,6 +29,7 @@ import {
   getConnectionUpdatesFromFormData,
   getCheckboxField,
   getStatusField,
+  parentCategoryOptions,
 } from 'utils/forms';
 
 import {
@@ -66,6 +68,8 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
+import { getEntityTitle } from 'utils/entities';
+
 import {
   selectDomain,
   selectViewEntity,
@@ -74,6 +78,8 @@ import {
   selectSdgTargets,
   selectRecommendations,
   selectConnectedTaxonomies,
+  selectParentOptions,
+  selectParentTaxonomy,
 } from './selectors';
 
 import messages from './messages';
@@ -114,7 +120,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { viewEntity, users, measures, sdgtargets, recommendations } = props;
+    const { viewEntity, users, measures, sdgtargets, recommendations, parentOptions } = props;
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
@@ -126,6 +132,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       associatedSdgTargets: entityOptions(sdgtargets, true),
       associatedRecommendations: entityOptions(recommendations, true),
       associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
+      associatedCategory: parentCategoryOptions(parentOptions, viewEntity.getIn(['attributes', 'parent_id'])),
       // TODO allow single value for singleSelect
     })
     : Map();
@@ -188,8 +195,17 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     }
     return fields;
   };
-  getBodyAsideFields = (entity, users, isAdmin) => {
+  getBodyAsideFields = (entity, users, isAdmin, parentOptions, parentTaxonomy) => {
     const fields = []; // fieldGroups
+    if (parentOptions && parentTaxonomy) {
+      fields.push({
+        fields: [renderParentCategoryControl(
+          parentOptions,
+          getEntityTitle(parentTaxonomy),
+          entity.getIn(['attributes', 'parent_id']),
+        )],
+      });
+    }
     fields.push({
       fields: [getFormField({
         formatMessage: this.context.intl.formatMessage,
@@ -215,7 +231,20 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
 
   render() {
-    const { viewEntity, dataReady, isAdmin, viewDomain, users, connectedTaxonomies, recommendations, measures, sdgtargets, onCreateOption } = this.props;
+    const {
+      viewEntity,
+      dataReady,
+      isAdmin,
+      viewDomain,
+      users,
+      connectedTaxonomies,
+      recommendations,
+      measures,
+      sdgtargets,
+      onCreateOption,
+      parentOptions,
+      parentTaxonomy,
+    } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
 
@@ -316,7 +345,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                     onCreateOption,
                     viewDomain.form.data.getIn(['attributes', 'user_only'])
                   ),
-                  aside: this.getBodyAsideFields(viewEntity, users, isAdmin),
+                  aside: this.getBodyAsideFields(viewEntity, users, isAdmin, parentOptions, parentTaxonomy),
                 },
               }}
               scrollContainer={this.state.scrollContainer}
@@ -347,6 +376,8 @@ CategoryEdit.propTypes = {
   authReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
   params: PropTypes.object,
+  parentOptions: PropTypes.object,
+  parentTaxonomy: PropTypes.object,
   measures: PropTypes.object,
   sdgtargets: PropTypes.object,
   recommendations: PropTypes.object,
@@ -367,6 +398,8 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
+  parentOptions: selectParentOptions(state, props.params.id),
+  parentTaxonomy: selectParentTaxonomy(state, props.params.id),
   users: selectUsers(state),
   sdgtargets: selectSdgTargets(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
@@ -443,6 +476,13 @@ function mapDispatchToProps(dispatch, props) {
         saveData = saveData.setIn(['attributes', 'manager_id'], formUserIds.first());
       } else {
         saveData = saveData.setIn(['attributes', 'manager_id'], null);
+      }
+      // TODO: remove once have singleselect instead of multiselect
+      const formCategoryIds = getCheckedValuesFromOptions(formData.get('associatedCategory'));
+      if (List.isList(formCategoryIds) && formCategoryIds.size) {
+        saveData = saveData.setIn(['attributes', 'parent_id'], formCategoryIds.first());
+      } else {
+        saveData = saveData.setIn(['attributes', 'parent_id'], null);
       }
       dispatch(save(saveData.toJS()));
     },

@@ -13,6 +13,7 @@ import {
   testEntityCategoryAssociation,
   getEntityTitle,
   getEntityReference,
+  getEntityParentId,
 } from 'utils/entities';
 
 import { makeTagFilterGroups } from 'utils/forms';
@@ -26,7 +27,7 @@ export const makeActiveFilterOptions = (entities, config, activeFilterOption, lo
   // create filterOptions
   switch (activeFilterOption.group) {
     case 'taxonomies':
-      return makeTaxonomyFilterOptions(entities, config.taxonomies, taxonomies.get(activeFilterOption.optionId), locationQuery, messages, contextIntl);
+      return makeTaxonomyFilterOptions(entities, config.taxonomies, taxonomies, activeFilterOption.optionId, locationQuery, messages, contextIntl);
     case 'connectedTaxonomies':
       return makeConnectedTaxonomyFilterOptions(entities, config, connectedTaxonomies, activeFilterOption.optionId, locationQuery, messages, contextIntl);
     case 'connections':
@@ -138,7 +139,7 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
 //
 const getTaxTitle = (id, contextIntl) => contextIntl.formatMessage(appMessages.entities.taxonomies[id].single);
 
-export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQuery, messages, contextIntl) => {
+export const makeTaxonomyFilterOptions = (entities, config, taxonomies, activeTaxId, locationQuery, messages, contextIntl) => {
   const filterOptions = {
     groupId: 'taxonomies',
     search: config.search,
@@ -146,10 +147,16 @@ export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQu
     multiple: true,
     required: false,
     selectAll: false,
+    groups: null,
   };
   // get the active taxonomy
-
+  const taxonomy = taxonomies.get(activeTaxId);
   if (taxonomy && taxonomy.get('categories')) {
+    const parentId = getEntityParentId(taxonomy);
+    const parent = parentId && taxonomies.get(parentId);
+    if (parent) {
+      filterOptions.groups = parent.get('categories').map((cat) => getEntityTitle(cat));
+    }
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl))}`;
     if (entities.size === 0) {
       if (locationQuery.get(config.query)) {
@@ -161,6 +168,7 @@ export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQu
             filterOptions.options[value] = {
               reference: getEntityReference(category, false),
               label: getEntityTitle(category),
+              group: parent && getEntityParentId(category),
               showCount: true,
               value,
               count: 0,
@@ -207,6 +215,7 @@ export const makeTaxonomyFilterOptions = (entities, config, taxonomy, locationQu
                 filterOptions.options[catId] = {
                   reference: getEntityReference(category, false),
                   label: getEntityTitle(category),
+                  group: parent && getEntityParentId(category),
                   showCount: true,
                   value: catId,
                   count: 1,
@@ -373,10 +382,16 @@ export const makeConnectedTaxonomyFilterOptions = (entities, config, connectedTa
     multiple: true,
     required: false,
     selectAll: false,
+    groups: null,
   };
 
   const taxonomy = connectedTaxonomies.get(activeOptionId);
   if (taxonomy) {
+    const parentId = getEntityParentId(taxonomy);
+    const parent = parentId && connectedTaxonomies.get(parentId);
+    if (parent) {
+      filterOptions.groups = parent.get('categories').map((cat) => getEntityTitle(cat));
+    }
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl))}`;
     const query = config.connectedTaxonomies.query;
     const locationQueryValue = locationQuery.get(query);
@@ -393,6 +408,7 @@ export const makeConnectedTaxonomyFilterOptions = (entities, config, connectedTa
                   filterOptions.options[categoryId] = {
                     reference: getEntityReference(category, false),
                     label: getEntityTitle(category),
+                    group: parent && getEntityParentId(category),
                     showCount: true,
                     value: `${connection.path}:${categoryId}`,
                     count: 0,
@@ -426,6 +442,7 @@ export const makeConnectedTaxonomyFilterOptions = (entities, config, connectedTa
                 const label = getEntityTitle(category);
                 filterOptions.options[category.get('id')] = {
                   reference: getEntityReference(category, false),
+                  group: parent && getEntityParentId(category),
                   label,
                   showCount: true,
                   value,

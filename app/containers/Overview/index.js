@@ -13,8 +13,6 @@ import { palette } from 'styled-theme';
 
 import styled, { withTheme } from 'styled-components';
 
-import { mapToTaxonomyList } from 'utils/taxonomies';
-
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
@@ -37,6 +35,8 @@ import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
+import { attributesEqual } from 'utils/entities';
+
 // relative
 import messages from './messages';
 import { DEPENDENCIES } from './constants';
@@ -49,6 +49,7 @@ import {
   selectIndicatorDraftCount,
   selectMeasureDraftCount,
   selectSdgtargetDraftCount,
+  selectRecommendationAddressedCount,
 } from './selectors';
 
 const Content = styled.div`
@@ -366,7 +367,13 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
   }
 
   getTaxonomiesByTagging = (taxonomies, tags) =>
-    taxonomies.filter((tax) => tax.getIn(['attributes', tags]))
+    taxonomies.filter((tax, key, list) => {
+      if (tax.getIn(['attributes', tags])) {
+        return true;
+      }
+      const childTaxonomies = list.filter((item) => attributesEqual(item.getIn(['attributes', 'parent_id']), tax.get('id')));
+      return childTaxonomies.some((child) => child.getIn(['attributes', tags]));
+    })
 
   getConnectionPoint = (node, nodeReference, side = 'right') => {
     const boundingRect = node.getBoundingClientRect();
@@ -681,8 +688,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       dataReady,
       onTaxonomyLink,
       taxonomies,
+      recommendationAddressedCount,
     } = this.props;
-
     return (
       <div>
         <Helmet
@@ -696,12 +703,10 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         }
         { dataReady &&
           <TaxonomySidebar
-            taxonomies={mapToTaxonomyList(
-              taxonomies,
-              onTaxonomyLink,
-              this.state.mouseOverTaxonomyDiagram,
-              this.onTaxonomyMouseOver,
-            )}
+            taxonomies={taxonomies}
+            active={this.state.mouseOverTaxonomyDiagram}
+            onTaxonomyLink={onTaxonomyLink}
+            onTaxonomyOver={this.onTaxonomyMouseOver}
           />
         }
         <ContainerWithSidebar sidebarResponsiveSmall>
@@ -747,7 +752,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                         }
                       </DiagramSectionVertical>
                       <AnnotationVertical hasSDGs={ENABLE_SDGS}>
-                        <FormattedMessage {...messages.diagram.addressed} />
+                        {`${recommendationAddressedCount} ${this.context.intl.formatMessage(messages.diagram.addressed)}`}
                       </AnnotationVertical>
                       <DiagramSectionVertical>
                         <DiagramSectionVerticalCenter>
@@ -827,6 +832,7 @@ Overview.propTypes = {
   measureDraftCount: PropTypes.number,
   sdgtargetDraftCount: PropTypes.number,
   indicatorDraftCount: PropTypes.number,
+  recommendationAddressedCount: PropTypes.number,
   theme: PropTypes.object,
 };
 
@@ -845,6 +851,7 @@ const mapStateToProps = (state) => ({
   measureDraftCount: selectMeasureDraftCount(state),
   sdgtargetDraftCount: selectSdgtargetDraftCount(state),
   indicatorDraftCount: selectIndicatorDraftCount(state),
+  recommendationAddressedCount: selectRecommendationAddressedCount(state),
 });
 
 function mapDispatchToProps(dispatch) {
