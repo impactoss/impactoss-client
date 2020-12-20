@@ -16,8 +16,10 @@ import Row from 'components/styled/Row';
 import Container from 'components/styled/Container';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { selectEntities } from 'containers/App/selectors';
 
 import ButtonHero from 'components/buttons/ButtonHero';
+import ButtonFlat from 'components/buttons/ButtonFlat';
 import NormalImg from 'components/Img';
 import Footer from 'containers/Footer';
 
@@ -25,12 +27,13 @@ import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
 
 import {
-  DB_TABLES,
   SHOW_HOME_TITLE,
   SHOW_BRAND_ON_HOME,
   HEADER_PATTERN_HEIGHT,
   SHOW_HEADER_PATTERN_HOME_GRAPHIC,
 } from 'themes/config';
+
+import { DEPENDENCIES } from './constants';
 
 import messages from './messages';
 
@@ -134,7 +137,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const { onPageLink, theme } = this.props;
+    const { onPageLink, theme, frameworks, onSelectFramework } = this.props;
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
 
     return (
@@ -174,10 +177,24 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                 <GridSpace lg={1 / 6} sm={1 / 8} />
                 <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                   <Intro source={this.context.intl.formatMessage(messages.intro)} />
+                </Grid>
+              </Row>
+              <Row>
+                <GridSpace lg={1 / 6} sm={1 / 8} />
+                <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                   <HomeActions>
-                    <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
-                      <FormattedMessage {...messages.explore} />
-                    </ButtonHero>
+                    {frameworks && (
+                      frameworks.map((fw) => (
+                        <ButtonHero onClick={() => onSelectFramework(fw.get('id'))}>
+                          <FormattedMessage {...appMessages.frameworks[fw.get('id')]} />
+                        </ButtonHero>
+                      ))
+                    )}
+                  </HomeActions>
+                  <HomeActions>
+                    <ButtonFlat onClick={() => onPageLink(PATHS.OVERVIEW)}>
+                      <FormattedMessage {...messages.exploreAllFrameworks} />
+                    </ButtonFlat>
                   </HomeActions>
                 </Grid>
               </Row>
@@ -193,33 +210,42 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 HomePage.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func.isRequired,
   onPageLink: PropTypes.func.isRequired,
+  onSelectFramework: PropTypes.func.isRequired,
   theme: PropTypes.object.isRequired,
+  frameworks: PropTypes.object,
 };
 
 HomePage.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-// const mapStateToProps = () => ({
-//   // dataReady: selectReady(state, { path: DEPENDENCIES }),
-//   // taxonomies: selectEntities(state, 'taxonomies'),
-//   // pages: selectEntitiesWhere(state, {
-//   //   path: 'pages',
-//   //   where: { draft: false },
-//   // }),
-// });
+const mapStateToProps = (state) => ({
+  frameworks: selectEntities(state, 'frameworks'),
+});
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      DB_TABLES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
-      // kick off loading although not needed
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));
+    },
+    onSelectFramework: (framework) => {
+      // dispatch(setFramework(framework));
+      dispatch(updatePath(
+        PATHS.OVERVIEW,
+        {
+          query: {
+            arg: 'fw',
+            value: framework,
+          },
+          extend: true,
+        },
+      ));
     },
   };
 }
 
 // Wrap the component to inject dispatch and state into it
-export default connect(null, mapDispatchToProps)(withTheme(HomePage));
+export default connect(mapStateToProps, mapDispatchToProps)(withTheme(HomePage));

@@ -281,6 +281,11 @@ export const selectSortByQuery = createSelector(
   (locationQuery) => locationQuery && locationQuery.get('sort')
 );
 
+export const selectCurrentFramework = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => (locationQuery && locationQuery.get('fw')) || 'all'
+);
+
 // NEW performant way of selecting and querying entities
 
 export const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
@@ -294,6 +299,10 @@ export const selectEntities = createSelector(
 export const selectTaxonomiesSorted = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
   (taxonomies) => taxonomies && sortEntities(taxonomies, 'asc', 'priority', null, false)
+);
+export const selectFrameworks = createSelector(
+  (state) => selectEntities(state, 'frameworks'),
+  (frameworks) => frameworks
 );
 
 export const selectEntity = createSelector(
@@ -336,13 +345,18 @@ export const selectUserConnections = createSelector(
 
 export const selectRecommendationConnections = createSelector(
   (state) => selectEntities(state, 'measures'),
-  (measures) => Map().set('measures', measures)
+  (state) => selectEntities(state, 'indicators'),
+  (measures, indicators) => Map()
+    .set('measures', measures)
+    .set('indicators', indicators)
 );
 
 export const selectIndicatorConnections = createSelector(
   (state) => selectEntities(state, 'measures'),
-  (measures) => Map()
+  (state) => selectEntities(state, 'recommendations'),
+  (measures, recommendations) => Map()
     .set('measures', measures)
+    .set('recommendations', recommendations)
 );
 
 export const selectMeasureConnections = createSelector(

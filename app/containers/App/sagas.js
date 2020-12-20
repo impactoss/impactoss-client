@@ -35,6 +35,7 @@ import {
   DISMISS_QUERY_MESSAGES,
   PATHS,
   PARAMS,
+  SET_FRAMEWORK,
 } from 'containers/App/constants';
 
 import {
@@ -537,6 +538,19 @@ export function* updateRouteQuerySaga({ query, extend = true }) {
   yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
+export function* setFrameworkSaga({ framework }) {
+  const location = yield select(selectLocation);
+  const queryNext = getNextQuery(
+    {
+      arg: 'fw',
+      value: framework,
+    },
+    true, // extend
+    location,
+  );
+
+  yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
+}
 
 export function* dismissQueryMessagesSaga() {
   const location = yield select(selectLocation);
@@ -606,6 +620,7 @@ export default function* rootSaga() {
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
+  yield takeEvery(SET_FRAMEWORK, setFrameworkSaga);
   yield takeEvery(DISMISS_QUERY_MESSAGES, dismissQueryMessagesSaga);
 
   yield takeEvery(CLOSE_ENTITY, closeEntitySaga);

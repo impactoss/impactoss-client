@@ -181,6 +181,11 @@ export const DB_TABLES = [
   'user_categories',
   'progress_reports',
   'due_dates',
+  'frameworks',
+  'framework_taxonomies',
+  'framework_frameworks',
+  'recommendation_indicators',
+  'recommendation_recommendations',
 ];
 
 // Table shapes

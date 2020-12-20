@@ -16,6 +16,50 @@ export default defineMessages({
       defaultMessage: 'Samoa\'s home of human rights implementation',
     },
   },
+  frameworks: {
+    1: {
+      id: 'app.containers.App.frameworks.1',
+      defaultMessage: 'Human Rights Recommendations',
+    },
+    2: {
+      id: 'app.containers.App.frameworks.2',
+      defaultMessage: 'Sustainable Development Goals',
+    },
+    3: {
+      id: 'app.containers.App.frameworks.3',
+      defaultMessage: 'Framework 3',
+    },
+    4: {
+      id: 'app.containers.App.frameworks.4',
+      defaultMessage: 'Framework 4',
+    },
+    5: {
+      id: 'app.containers.App.frameworks.5',
+      defaultMessage: 'Framework 5',
+    },
+  },
+  frameworks_short: {
+    1: {
+      id: 'app.containers.App.frameworks.1',
+      defaultMessage: 'HR Recs',
+    },
+    2: {
+      id: 'app.containers.App.frameworks.2',
+      defaultMessage: 'SDGs',
+    },
+    3: {
+      id: 'app.containers.App.frameworks.3',
+      defaultMessage: 'Framework 3',
+    },
+    4: {
+      id: 'app.containers.App.frameworks.4',
+      defaultMessage: 'Framework 4',
+    },
+    5: {
+      id: 'app.containers.App.frameworks.5',
+      defaultMessage: 'Framework 5',
+    },
+  },
   taxonomyGroups: {
     1: {
       id: 'app.containers.App.taxonomyGroups.1',
