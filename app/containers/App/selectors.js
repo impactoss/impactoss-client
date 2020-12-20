@@ -283,7 +283,12 @@ export const selectSortByQuery = createSelector(
 
 export const selectCurrentFramework = createSelector(
   (state, locationQuery) => locationQuery,
-  (locationQuery) => (locationQuery && locationQuery.get('fw')) || 'all'
+  (locationQuery) => {
+    const fwid = (locationQuery && locationQuery.get('fw'))
+      ? locationQuery.get('fw')
+      : 'all';
+    return fwid;
+  }
 );
 
 // NEW performant way of selecting and querying entities
@@ -299,10 +304,6 @@ export const selectEntities = createSelector(
 export const selectTaxonomiesSorted = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
   (taxonomies) => taxonomies && sortEntities(taxonomies, 'asc', 'priority', null, false)
-);
-export const selectFrameworks = createSelector(
-  (state) => selectEntities(state, 'frameworks'),
-  (frameworks) => frameworks
 );
 
 export const selectEntity = createSelector(

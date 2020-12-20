@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Perf from 'react-addons-perf';
 import ReactModal from 'react-modal';
+import { fromJS } from 'immutable';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -22,14 +23,17 @@ import {
   selectIsUserManager,
   selectSessionUserAttributes,
   selectReady,
+  selectEntities,
   selectEntitiesWhere,
   selectNewEntityModal,
+  selectCurrentFramework,
 } from './selectors';
 
 import {
   validateToken,
   loadEntitiesIfNeeded,
   updatePath,
+  updateRouteQuery,
   openNewEntityModal,
 } from './actions';
 
@@ -84,36 +88,45 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     }))
     .toArray();
 
-  prepareMainMenuItems = (isManager, currentPath) => {
-    let navItems = ([
-      // {
-      //   path: PATHS.OVERVIEW,
-      //   title: this.context.intl.formatMessage(messages.nav.overview),
-      //   active: currentPath.startsWith(PATHS.OVERVIEW),
-      // },
+  prepareFrameworkOptions = (frameworks) => {
+    const options = Object.values(frameworks.toJS()).map((fw) => ({
+      value: fw.id,
+      label: this.context.intl.formatMessage(messages.frameworks[fw.id]),
+    }));
+    return options.concat({
+      value: 'all',
+      label: this.context.intl.formatMessage(messages.frameworks.all),
+    });
+  }
+  prepareMainMenuItems = (isManager, currentPath, currentFrameworkId) => {
+    let navItems = [
       {
         path: PATHS.OVERVIEW,
+        titleSuper: this.context.intl.formatMessage(messages.nav.overviewSuper),
         title: this.context.intl.formatMessage(messages.nav.overview),
         active: currentPath.startsWith(PATHS.OVERVIEW) || currentPath.startsWith(PATHS.TAXONOMIES) || currentPath.startsWith(PATHS.CATEGORIES),
       },
       {
+        path: PATHS.RECOMMENDATIONS,
+        titleSuper: this.context.intl.formatMessage(messages.nav.recommendations),
+        title: this.context.intl.formatMessage(messages.frameworkObjectivesShort[currentFrameworkId]),
+        active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
+      },
+      {
         path: PATHS.MEASURES,
+        titleSuper: this.context.intl.formatMessage(messages.nav.measuresSuper),
         title: this.context.intl.formatMessage(messages.nav.measures),
         active: currentPath.startsWith(PATHS.MEASURES),
       },
-    ]);
+    ];
     if (isManager) {
       navItems = navItems.concat([{
         path: PATHS.INDICATORS,
+        titleSuper: this.context.intl.formatMessage(messages.nav.indicatorsSuper),
         title: this.context.intl.formatMessage(messages.nav.indicators),
         active: currentPath.startsWith(PATHS.INDICATORS) || currentPath.startsWith(PATHS.PROGRESS_REPORTS),
       }]);
     }
-    navItems = navItems.concat([{
-      path: PATHS.RECOMMENDATIONS,
-      title: this.context.intl.formatMessage(messages.nav.recommendations),
-      active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
-    }]);
     navItems = navItems.concat([{
       path: PATHS.SEARCH,
       title: this.context.intl.formatMessage(messages.nav.search),
@@ -143,18 +156,34 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 
   render() {
     window.Perf = Perf;
-    const { pages, onPageLink, isUserSignedIn, isManager, location, newEntityModal } = this.props;
-
+    const {
+      pages,
+      onPageLink,
+      isUserSignedIn,
+      isManager,
+      location,
+      newEntityModal,
+      currentFrameworkId,
+      frameworks,
+      onSelectFramework,
+    } = this.props;
     return (
       <div>
         <Header
           isSignedIn={isUserSignedIn}
           user={this.props.user}
           pages={pages && this.preparePageMenuPages(pages)}
-          navItems={this.prepareMainMenuItems(isUserSignedIn && isManager, location.pathname)}
+          navItems={this.prepareMainMenuItems(isUserSignedIn && isManager, location.pathname, currentFrameworkId)}
           onPageLink={onPageLink}
           currentPath={location.pathname}
           isHome={location.pathname === '/'}
+          currentFrameworkId={currentFrameworkId || 'all'}
+          onSelectFramework={onSelectFramework}
+          frameworkOptions={frameworks && this.prepareFrameworkOptions(
+            frameworks,
+            currentFrameworkId,
+            onSelectFramework,
+          )}
         />
         <Main isHome={location.pathname === '/'}>
           {React.Children.toArray(this.props.children)}
@@ -196,12 +225,15 @@ App.propTypes = {
   location: PropTypes.object.isRequired,
   newEntityModal: PropTypes.object,
   onCloseModal: PropTypes.func,
+  onSelectFramework: PropTypes.func,
+  currentFrameworkId: PropTypes.string,
+  frameworks: PropTypes.object,
 };
 App.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   isManager: selectIsUserManager(state),
   isUserSignedIn: selectIsSignedIn(state),
@@ -211,6 +243,8 @@ const mapStateToProps = (state) => ({
     where: { draft: false },
   }),
   newEntityModal: selectNewEntityModal(state),
+  currentFrameworkId: selectCurrentFramework(state, fromJS(props.location.query)),
+  frameworks: selectEntities(state, 'frameworks'),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -226,6 +260,15 @@ export function mapDispatchToProps(dispatch) {
     },
     onCloseModal: () => {
       dispatch(openNewEntityModal(null));
+    },
+    onSelectFramework: (framework) => {
+      // dispatch(setFramework(framework));
+      dispatch(updateRouteQuery(
+        {
+          arg: 'fw',
+          value: framework,
+        }
+      ));
     },
   };
 }

@@ -480,13 +480,16 @@ export function* saveConnectionsSaga({ data }) {
 const getNextQuery = (query, extend, location) => {
   // figure out new query
   // get old query or new query if not extending (replacing)
-  const queryPrevious = extend ? location.get('query').toJS() : {};
+  const queryPrevious = extend
+    ? location.get('query').toJS()
+    : location.get('query').filter((val, key) => key === 'fw').toJS();
+
   // and figure out new query
   return asArray(query).reduce((q, param) => {
     const queryUpdated = q;
-
+    const paramReplace = param.replace || typeof param.replace === 'undefined';
     // if arg already set and not replacing
-    if (queryUpdated[param.arg] && !param.replace) {
+    if (queryUpdated[param.arg] && !paramReplace) {
       // if multiple values set
       if (Array.isArray(queryUpdated[param.arg])) {
         // add if not already present
@@ -568,23 +571,27 @@ export function* dismissQueryMessagesSaga() {
 
 export function* updatePathSaga({ path, args }) {
   const relativePath = path.startsWith('/') ? path : `/${path}`;
+  const location = yield select(selectLocation);
+  let queryNext = {};
   if (args && (args.query || args.keepQuery)) {
-    const location = yield select(selectLocation);
-    let queryNext = {};
     if (args.query) {
       queryNext = getNextQuery(args.query, args.extend, location);
     }
     if (args.keepQuery) {
       queryNext = location.get('query').toJS();
     }
-    // convert to string
-    const queryNextString = getNextQueryString(queryNext);
+  } else {
+    // always keep "framework filter"
+    queryNext = location.get('query').filter((val, key) => key === 'fw').toJS();
+  }
+  // convert to string
+  const queryNextString = getNextQueryString(queryNext);
 
-    yield put(push(`${relativePath}?${queryNextString}`));
-  } else if (args && args.replace) {
+  if (args && args.replace) {
     yield put(replace(relativePath));
   } else {
-    yield put(push(relativePath));
+    // yield put(push(relativePath));
+    yield put(push(`${relativePath}?${queryNextString}`));
   }
 }
 

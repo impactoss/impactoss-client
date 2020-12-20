@@ -52,6 +52,6 @@ export default defineMessages({
   },
   exploreAllFrameworks: {
     id: 'app.containers.HomePage.exploreAllFrameworks',
-    defaultMessage: 'Explore all objectives',
+    defaultMessage: 'Explore all frameworks',
   },
 });

@@ -17,6 +17,18 @@ export default defineMessages({
     },
   },
   frameworks: {
+    single: {
+      id: 'app.containers.App.frameworks.single',
+      defaultMessage: 'Framework',
+    },
+    plural: {
+      id: 'app.containers.App.frameworks.plural',
+      defaultMessage: 'Frameworks',
+    },
+    all: {
+      id: 'app.containers.App.frameworks.all',
+      defaultMessage: 'All Frameworks',
+    },
     1: {
       id: 'app.containers.App.frameworks.1',
       defaultMessage: 'Human Rights Recommendations',
@@ -38,25 +50,77 @@ export default defineMessages({
       defaultMessage: 'Framework 5',
     },
   },
-  frameworks_short: {
+  frameworkObjectives: {
+    all: {
+      id: 'app.containers.App.frameworkObjectives.all',
+      defaultMessage: 'All frameworks',
+    },
     1: {
-      id: 'app.containers.App.frameworks.1',
-      defaultMessage: 'HR Recs',
+      id: 'app.containers.App.frameworkObjectives.1',
+      defaultMessage: 'Human Rights Recommendations',
     },
     2: {
-      id: 'app.containers.App.frameworks.2',
-      defaultMessage: 'SDGs',
+      id: 'app.containers.App.frameworkObjectives.2',
+      defaultMessage: 'SDG Targets',
     },
     3: {
-      id: 'app.containers.App.frameworks.3',
+      id: 'app.containers.App.frameworkObjectives.3',
       defaultMessage: 'Framework 3',
     },
     4: {
-      id: 'app.containers.App.frameworks.4',
+      id: 'app.containers.App.frameworkObjectives.4',
       defaultMessage: 'Framework 4',
     },
     5: {
       id: 'app.containers.App.frameworks.5',
+      defaultMessage: 'Framework 5',
+    },
+  },
+  frameworkObjectivesShort: {
+    all: {
+      id: 'app.containers.App.frameworkObjectives.all',
+      defaultMessage: 'All Frameworks',
+    },
+    1: {
+      id: 'app.containers.App.frameworkObjectives.1',
+      defaultMessage: 'HR Recommendations',
+    },
+    2: {
+      id: 'app.containers.App.frameworkObjectives.2',
+      defaultMessage: 'SDG Targets',
+    },
+    3: {
+      id: 'app.containers.App.frameworkObjectives.3',
+      defaultMessage: 'Framework 3',
+    },
+    4: {
+      id: 'app.containers.App.frameworkObjectives.4',
+      defaultMessage: 'Framework 4',
+    },
+    5: {
+      id: 'app.containers.App.frameworks.5',
+      defaultMessage: 'Framework 5',
+    },
+  },
+  frameworks_short: {
+    1: {
+      id: 'app.containers.App.frameworks_short.1',
+      defaultMessage: 'HR',
+    },
+    2: {
+      id: 'app.containers.App.frameworks_short.2',
+      defaultMessage: 'SDGs',
+    },
+    3: {
+      id: 'app.containers.App.frameworks_short.3',
+      defaultMessage: 'Framework 3',
+    },
+    4: {
+      id: 'app.containers.App.frameworks_short.4',
+      defaultMessage: 'Framework 4',
+    },
+    5: {
+      id: 'app.containers.App.frameworks_short.5',
       defaultMessage: 'Framework 5',
     },
   },
@@ -561,7 +625,11 @@ export default defineMessages({
   nav: {
     overview: {
       id: 'app.containers.App.nav.overview',
-      defaultMessage: 'Overview',
+      defaultMessage: 'Classification',
+    },
+    overviewSuper: {
+      id: 'app.containers.App.nav.overviewSuper',
+      defaultMessage: 'Explore',
     },
     taxonomies: {
       id: 'app.containers.App.nav.taxonomies',
@@ -571,13 +639,25 @@ export default defineMessages({
       id: 'app.containers.App.nav.measures',
       defaultMessage: 'Actions',
     },
+    measuresSuper: {
+      id: 'app.containers.App.nav.measuresSuper',
+      defaultMessage: 'Implementation',
+    },
     indicators: {
       id: 'app.containers.App.nav.indicators',
       defaultMessage: 'Indicators',
     },
+    indicatorsSuper: {
+      id: 'app.containers.App.nav.indicatorsSuper',
+      defaultMessage: 'Outcomes',
+    },
     recommendations: {
       id: 'app.containers.App.nav.recommendations',
-      defaultMessage: 'Recommendations',
+      defaultMessage: 'Objectives',
+    },
+    recommendationsAll: {
+      id: 'app.containers.App.nav.recommendationsAll',
+      defaultMessage: 'All frameworks',
     },
     pages: {
       id: 'app.containers.App.nav.pages',

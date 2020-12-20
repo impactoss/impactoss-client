@@ -15,6 +15,7 @@ import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
+import SelectReset from 'components/SelectReset';
 
 import Logo from './Logo';
 import Banner from './Banner';
@@ -227,11 +228,12 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     </div>
   );
   render() {
-    const { currentPath, isHome } = this.props;
+    const { currentPath, isHome, frameworkOptions, currentFrameworkId, onSelectFramework } = this.props;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
     const navItemsAdmin = filter(this.props.navItems, (item) => item.isAdmin);
 
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
+
     return (
       <Styled
         fixed={isHome}
@@ -272,7 +274,15 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         }
         { !isHome &&
           <NavMain hasBorder>
-            { navItems && navItems.map((item, i) => (
+            <SelectReset
+              label={this.context.intl.formatMessage(appMessages.frameworks.single)}
+              value={currentFrameworkId}
+              index="fw-select"
+              options={frameworkOptions}
+              isReset={false}
+              onChange={onSelectFramework}
+            />
+            {navItems && navItems.map((item, i) => (
               <LinkMain
                 key={i}
                 href={item.path}
@@ -302,11 +312,14 @@ Header.propTypes = {
   isSignedIn: PropTypes.bool,
   user: PropTypes.object,
   currentPath: PropTypes.string,
+  currentFrameworkId: PropTypes.string,
   pages: PropTypes.array,
   navItems: PropTypes.array,
   onPageLink: PropTypes.func.isRequired,
+  onSelectFramework: PropTypes.func.isRequired,
   isHome: PropTypes.bool, // not shown on home page
-  theme: PropTypes.object.isRequired, // not shown on home page
+  theme: PropTypes.object.isRequired,
+  frameworkOptions: PropTypes.array,
 };
 
 Header.defaultProps = {

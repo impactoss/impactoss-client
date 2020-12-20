@@ -7,6 +7,7 @@ import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/str
 import asList from 'utils/as-list';
 import isNumber from 'utils/is-number';
 import appMessage from 'utils/app-message';
+import quasiEquals from 'utils/quasi-equals';
 
 // check if entity has nested connection by id
 export const testEntityEntityAssociation = (entity, path, associatedId) =>
@@ -43,10 +44,7 @@ export const prepareEntitySearchTarget = (entity, fields, queryLength) =>
     , entity.get('id')
   );
 // comparison of attribute values, force string, check 'null' if unspecified
-export const attributesEqual = (testValue, value) =>
-  typeof value !== 'undefined' && value !== null && value.toString() === ((typeof testValue === 'undefined' || testValue === null)
-    ? 'null'
-    : testValue.toString());
+export const attributesEqual = (testValue, value) => quasiEquals(testValue, value);
 
 export const getConnectedCategories = (entityConnectedIds, taxonomyCategories, path) =>
   taxonomyCategories.filter((category) =>

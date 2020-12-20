@@ -137,7 +137,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const { onPageLink, theme, frameworks, onSelectFramework } = this.props;
+    const { theme, frameworks, onSelectFramework } = this.props;
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
 
     return (
@@ -184,15 +184,15 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                 <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                   <HomeActions>
                     {frameworks && (
-                      frameworks.map((fw) => (
-                        <ButtonHero onClick={() => onSelectFramework(fw.get('id'))}>
+                      frameworks.entrySeq().map(([key, fw]) => (
+                        <ButtonHero key={key} onClick={() => onSelectFramework(fw.get('id'))}>
                           <FormattedMessage {...appMessages.frameworks[fw.get('id')]} />
                         </ButtonHero>
                       ))
                     )}
                   </HomeActions>
                   <HomeActions>
-                    <ButtonFlat onClick={() => onPageLink(PATHS.OVERVIEW)}>
+                    <ButtonFlat onClick={() => onSelectFramework('all')}>
                       <FormattedMessage {...messages.exploreAllFrameworks} />
                     </ButtonFlat>
                   </HomeActions>
@@ -209,7 +209,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 
 HomePage.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func.isRequired,
-  onPageLink: PropTypes.func.isRequired,
   onSelectFramework: PropTypes.func.isRequired,
   theme: PropTypes.object.isRequired,
   frameworks: PropTypes.object,
@@ -227,9 +226,6 @@ function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
-    },
-    onPageLink: (path) => {
-      dispatch(updatePath(path));
     },
     onSelectFramework: (framework) => {
       // dispatch(setFramework(framework));
