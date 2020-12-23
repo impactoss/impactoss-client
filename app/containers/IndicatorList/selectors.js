@@ -35,11 +35,16 @@ import { CONFIG } from './constants';
 export const selectConnections = createSelector(
   (state) => selectEntities(state, 'measures'),
   (state) => selectEntities(state, 'measure_categories'),
+  (state) => selectEntities(state, 'recommendations'),
+  (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'categories'),
-  (measures, measureCategories, categories) =>
+  (measures, measureCategories, recommendations, recommendationCategories, categories) =>
     Map()
     .set('measures',
       entitiesSetCategoryIds(measures, 'measure_id', measureCategories, categories)
+    )
+    .set('recommendations',
+      entitiesSetCategoryIds(recommendations, 'recommendation_id', recommendationCategories, categories)
     )
 );
 
@@ -82,6 +87,7 @@ const selectIndicatorsNested = createSelector(
   }),
   (state) => selectConnections(state),
   (state) => selectEntities(state, 'measure_indicators'),
+  (state) => selectEntities(state, 'recommendation_indicators'),
   (state) => selectEntities(state, 'progress_reports'),
   (state) => selectEntities(state, 'due_dates'),
   (state) => selectEntities(state, 'users'),
@@ -89,6 +95,7 @@ const selectIndicatorsNested = createSelector(
     entities,
     connections,
     entityMeasures,
+    entityRecommendations,
     progressReports,
     dueDates,
     users
@@ -100,6 +107,13 @@ const selectIndicatorsNested = createSelector(
       'measure_id',
       'indicator_id',
       connections.get('measures'),
+    ))
+    .set('recommendations', getEntityConnections(
+      entity.get('id'),
+      entityRecommendations,
+      'recommendation_id',
+      'indicator_id',
+      connections.get('recommendations'),
     ))
     // nest reports
     .set('reports', progressReports.filter((report) =>

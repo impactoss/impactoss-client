@@ -17,6 +17,7 @@ import {
   taxonomyOptions,
   entityOptions,
   renderMeasureControl,
+  renderIndicatorControl,
   renderTaxonomyControl,
   getCategoryUpdatesFromFormData,
   getConnectionUpdatesFromFormData,
@@ -66,6 +67,7 @@ import {
   selectViewEntity,
   selectTaxonomies,
   selectMeasures,
+  selectIndicators,
   selectConnectedTaxonomies,
 } from './selectors';
 
@@ -107,7 +109,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, measures, viewEntity } = props;
+    const { taxonomies, measures, indicators, viewEntity } = props;
     return viewEntity
     ? Map({
       id: viewEntity.get('id'),
@@ -117,6 +119,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       ),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedMeasures: entityOptions(measures, true),
+      associatedIndicators: entityOptions(indicators, true),
     })
     : Map();
   };
@@ -138,7 +141,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       ],
     },
   ]);
-  getBodyMainFields = (connectedTaxonomies, entity, measures, onCreateOption) => ([
+  getBodyMainFields = (connectedTaxonomies, entity, measures, indicators, onCreateOption) => ([
     {
       fields: [
         getMarkdownField(this.context.intl.formatMessage, appMessages, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
@@ -151,6 +154,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       icon: 'connections',
       fields: [
         renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+        renderIndicatorControl(indicators, onCreateOption),
       ],
     },
   ]);
@@ -164,10 +168,18 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, taxonomies, onCreateOption } = this.props;
+    const {
+      viewEntity,
+      dataReady,
+      viewDomain,
+      connectedTaxonomies,
+      measures,
+      taxonomies,
+      indicators,
+      onCreateOption,
+    } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
-
     return (
       <div>
         <Helmet
@@ -232,7 +244,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 taxonomies,
-                measures
+                measures,
+                indicators,
               )}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
@@ -244,7 +257,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, viewEntity, measures, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, viewEntity, measures, indicators, onCreateOption),
                   aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
@@ -278,6 +291,7 @@ RecommendationEdit.propTypes = {
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
+  indicators: PropTypes.object,
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
@@ -295,6 +309,7 @@ const mapStateToProps = (state, props) => ({
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
+  indicators: selectIndicators(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
@@ -322,7 +337,7 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, taxonomies, measures) => {
+    handleSubmit: (formData, taxonomies, measures, indicators) => {
       const saveData = formData
         .set(
           'recommendationCategories',
@@ -339,6 +354,16 @@ function mapDispatchToProps(dispatch, props) {
             connections: measures,
             connectionAttribute: 'associatedMeasures',
             createConnectionKey: 'measure_id',
+            createKey: 'recommendation_id',
+          })
+        )
+        .set(
+          'recommendationIndicators',
+          getConnectionUpdatesFromFormData({
+            formData,
+            connections: indicators,
+            connectionAttribute: 'associatedIndicators',
+            createConnectionKey: 'indicator_id',
             createKey: 'recommendation_id',
           })
         );

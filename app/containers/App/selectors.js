@@ -372,14 +372,16 @@ export const selectMeasureTaxonomies = createSelector(
   (state, args) => args ? args.includeParents : true,
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (includeParents, taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_measures', includeParents)
+  (includeParents, taxonomies, categories) =>
+    prepareTaxonomies(taxonomies, categories, 'tags_measures', includeParents)
 );
 
 export const selectRecommendationTaxonomies = createSelector(
   (state, args) => args ? args.includeParents : true,
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (includeParents, taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_recommendations', includeParents)
+  (includeParents, taxonomies, categories) =>
+    prepareTaxonomies(taxonomies, categories, 'tags_recommendations', includeParents)
 );
 
 export const selectUserTaxonomies = createSelector(

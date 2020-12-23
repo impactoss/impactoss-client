@@ -273,7 +273,7 @@ export const getIndicatorConnectionField = (entities, connections, onEntityClick
     entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies: null,
     connections,
-    connectionOptions: ['measures'],
+    connectionOptions: ['measures', 'recommendations'],
     entityType: 'indicators',
     onEntityClick,
   });
@@ -283,7 +283,7 @@ export const getRecommendationConnectionField = (entities, taxonomies, connectio
     entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies: filterTaxonomies(taxonomies, 'tags_recommendations'),
     connections,
-    connectionOptions: ['measures'],
+    connectionOptions: ['measures', 'indicators'],
     entityType: 'recommendations',
     onEntityClick,
     entityIcon: (entity) => {

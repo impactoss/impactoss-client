@@ -4,6 +4,7 @@ import {
   selectEntity,
   selectEntities,
   selectMeasureConnections,
+  selectRecommendationConnections,
 } from 'containers/App/selectors';
 
 import {
@@ -108,3 +109,39 @@ export const selectDueDates = createSelector(
 //   path: 'progress_reports',
 //   key: 'due_date_id',
 // },
+
+export const selectRecommendationsAssociated = createSelector(
+  (state, id) => id,
+  (state) => selectEntities(state, 'recommendations'),
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (id, entities, associations) =>
+    entitiesIsAssociated(entities, 'recommendation_id', associations, 'indicator_id', id)
+);
+// all connected recs
+export const selectRecommendations = createSelector(
+  selectRecommendationsAssociated,
+  (state) => selectRecommendationConnections(state),
+  (state) => selectEntities(state, 'recommendation_measures'),
+  (state) => selectEntities(state, 'recommendation_categories'),
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (state) => selectEntities(state, 'categories'),
+  (recommendations, connections, recommendationMeasures, recommendationCategories, recommendationIndicators, categories) =>
+    recommendations && recommendationIndicators && recommendations
+    .map((rec) => rec
+      .set('categories', getEntityCategories(rec.get('id'), recommendationCategories, 'recommendation_id', categories))
+      .set('measures', recommendationMeasures && recommendationMeasures
+        .filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
+          && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
+        )
+        .map((association) => association.getIn(['attributes', 'measure_id']))
+      )
+      .set('indicators', recommendationIndicators && recommendationIndicators
+        .filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
+          && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
+        )
+        .map((association) => association.getIn(['attributes', 'indicator_id']))
+      )
+    )
+);

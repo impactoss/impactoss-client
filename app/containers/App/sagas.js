@@ -299,6 +299,15 @@ export function* saveEntitySaga({ data }) {
         },
       });
     }
+    // update recommendation-indicator connections
+    if (data.entity.recommendationIndicators) {
+      yield call(saveConnectionsSaga, {
+        data: {
+          path: 'recommendation_indicators',
+          updates: data.entity.recommendationIndicators,
+        },
+      });
+    }
 
     // update measure-indicatos connections
     if (data.entity.measureIndicators) {
@@ -383,6 +392,16 @@ export function* newEntitySaga({ data }) {
           keyPair: ['recommendation_id', 'measure_id'],
         });
       }
+      // update sdgtarget-indicator connections
+      if (data.entity.recommendationIndicators) {
+        yield call(createConnectionsSaga, {
+          entityId: entityCreated.data.id,
+          path: 'recommendation_indicators',
+          updates: data.entity.recommendationIndicators,
+          keyPair: ['indicator_id', 'recommendation_id'],
+        });
+      }
+
 
       // update action-indicator connections
       if (data.entity.measureIndicators) {

@@ -17,6 +17,7 @@ import {
   getMetaField,
   getMarkdownField,
   getMeasureConnectionField,
+  getIndicatorConnectionField,
   getTaxonomyFields,
   hasTaxonomyCategories,
 } from 'utils/fields';
@@ -36,6 +37,7 @@ import {
   selectIsUserManager,
   selectMeasureTaxonomies,
   selectMeasureConnections,
+  selectIndicatorConnections,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -45,6 +47,7 @@ import {
   selectViewEntity,
   selectTaxonomies,
   selectMeasures,
+  selectIndicators,
 } from './selectors';
 
 import { DEPENDENCIES } from './constants';
@@ -93,7 +96,15 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   ]);
 
 
-  getBodyMainFields = (entity, measures, measureTaxonomies, measureConnections, onEntityClick) => ([
+  getBodyMainFields = (
+    entity,
+    measures,
+    measureTaxonomies,
+    measureConnections,
+    indicators,
+    indicatorConnections,
+    onEntityClick,
+  ) => ([
     {
       fields: [
         getMarkdownField(entity, 'description', true, 'fullRecommendation'),
@@ -106,6 +117,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       icon: 'connections',
       fields: [
         getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
+        getIndicatorConnectionField(indicators, indicatorConnections, onEntityClick),
       ],
     },
   ]);
@@ -121,7 +133,19 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   ]);
 
   render() {
-    const { viewEntity, dataReady, isManager, measures, taxonomies, measureTaxonomies, measureConnections, onEntityClick } = this.props;
+    const {
+      viewEntity,
+      dataReady,
+      isManager,
+      measures,
+      taxonomies,
+      measureTaxonomies,
+      measureConnections,
+      indicators,
+      indicatorConnections,
+      onEntityClick,
+    } = this.props;
+
     const buttons = isManager
     ? [
       {
@@ -169,7 +193,15 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
                   aside: isManager && this.getHeaderAsideFields(viewEntity, isManager),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, measures, measureTaxonomies, measureConnections, onEntityClick),
+                  main: this.getBodyMainFields(
+                    viewEntity,
+                    measures,
+                    measureTaxonomies,
+                    measureConnections,
+                    indicators,
+                    indicatorConnections,
+                    onEntityClick,
+                  ),
                   aside: this.getBodyAsideFields(taxonomies),
                 },
               }}
@@ -192,6 +224,8 @@ RecommendationView.propTypes = {
   measureTaxonomies: PropTypes.object,
   measureConnections: PropTypes.object,
   measures: PropTypes.object,
+  indicators: PropTypes.object,
+  indicatorConnections: PropTypes.object,
   params: PropTypes.object,
   isManager: PropTypes.bool,
 };
@@ -208,6 +242,8 @@ const mapStateToProps = (state, props) => ({
   measures: selectMeasures(state, props.params.id),
   measureTaxonomies: selectMeasureTaxonomies(state),
   measureConnections: selectMeasureConnections(state),
+  indicators: selectIndicators(state, props.params.id),
+  indicatorConnections: selectIndicatorConnections(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

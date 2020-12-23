@@ -36,8 +36,16 @@ const selectRecommendationsNested = createSelector(
   (state) => selectRecommendationConnections(state),
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'recommendation_measures'),
+  (state) => selectEntities(state, 'recommendation_indicators'),
   (state) => selectEntities(state, 'categories'),
-  (entities, connections, entityCategories, entityMeasures, categories) =>
+  (
+    entities,
+    connections,
+    entityCategories,
+    entityMeasures,
+    entityIndicators,
+    categories,
+  ) =>
     entities.map((entity) => entity
       .set('categories', getEntityCategories(entity.get('id'), entityCategories, 'recommendation_id', categories))
       .set('measures', getEntityConnections(
@@ -46,6 +54,13 @@ const selectRecommendationsNested = createSelector(
         'measure_id',
         'recommendation_id',
         connections.get('measures'),
+      ))
+      .set('indicators', getEntityConnections(
+        entity.get('id'),
+        entityIndicators,
+        'indicator_id',
+        'recommendation_id',
+        connections.get('indicators'),
       ))
     )
 );
@@ -101,8 +116,11 @@ export const selectConnectedTaxonomies = createSelector(
 );
 
 export const selectConnections = createSelector(
+  (state) => selectEntities(state, 'indicators'),
   (state) => selectEntities(state, 'measures'),
   (state) => selectEntities(state, 'measure_categories'),
-  (measures, measureCategories) =>
-    Map().set('measures', entitiesSetCategoryIds(measures, 'measure_id', measureCategories))
+  (indicators, measures, measureCategories) =>
+    Map()
+    .set('indicators', indicators)
+    .set('measures', entitiesSetCategoryIds(measures, 'measure_id', measureCategories))
 );

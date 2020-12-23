@@ -14,6 +14,7 @@ import { Map, List } from 'immutable';
 
 import {
   renderMeasureControl,
+  renderRecommendationControl,
   renderUserControl,
   getTitleFormField,
   getReferenceFormField,
@@ -50,6 +51,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectMeasuresCategorised,
+  selectRecommendationsCategorised,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -111,7 +113,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getBodyMainFields = (connectedTaxonomies, measures, onCreateOption) => ([
+  getBodyMainFields = (connectedTaxonomies, measures, recommendations, onCreateOption) => ([
     {
       fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
     },
@@ -120,6 +122,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       icon: 'connections',
       fields: [
         renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+        renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
       ],
     },
   ]);
@@ -163,7 +166,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   ]);
 
   render() {
-    const { dataReady, viewDomain, connectedTaxonomies, measures, users, onCreateOption } = this.props;
+    const { dataReady, viewDomain, connectedTaxonomies, measures, recommendations, users, onCreateOption } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
     return (
       <div>
@@ -239,7 +242,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, measures, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, measures, recommendations, onCreateOption),
                   aside: this.getBodyAsideFields(users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
                 },
               }}
@@ -266,6 +269,7 @@ IndicatorNew.propTypes = {
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   measures: PropTypes.object,
+  recommendations: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
@@ -285,6 +289,7 @@ const mapStateToProps = (state) => ({
   authReady: selectReadyForAuthCheck(state),
   // all measures,
   measures: selectMeasuresCategorised(state),
+  recommendations: selectRecommendationsCategorised(state),
   // all users, listing connection if any
   users: selectUsers(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
@@ -396,6 +401,15 @@ function mapDispatchToProps(dispatch) {
           create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
           .map((id) => Map({
             measure_id: id,
+          })),
+        }));
+      }
+      if (formData.get('associatedRecommendations')) {
+        saveData = saveData.set('recommendationIndicators', Map({
+          delete: List(),
+          create: getCheckedValuesFromOptions(formData.get('associatedRecommendations'))
+          .map((id) => Map({
+            recommendation_id: id,
           })),
         }));
       }

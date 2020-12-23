@@ -56,3 +56,10 @@ export const selectMeasures = createSelector(
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'measure_id', associations, 'recommendation_id', id)
 );
+export const selectIndicators = createSelector(
+  (state, id) => id,
+  (state) => selectEntities(state, 'indicators'),
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (id, entities, associations) =>
+    entitiesSetAssociated(entities, 'indicator_id', associations, 'recommendation_id', id)
+);

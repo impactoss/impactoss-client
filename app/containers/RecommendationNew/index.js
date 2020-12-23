@@ -20,6 +20,7 @@ import {
   getAcceptedField,
   getStatusField,
   getMarkdownField,
+  renderIndicatorControl,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -46,6 +47,7 @@ import {
   selectReadyForAuthCheck,
   selectMeasuresCategorised,
   selectRecommendationTaxonomies,
+  selectEntities,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -103,7 +105,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
   }]);
 
-  getBodyMainFields = (connectedTaxonomies, measures, onCreateOption) => ([
+  getBodyMainFields = (connectedTaxonomies, measures, indicators, recommendations, onCreateOption) => ([
     {
       fields: [
         getMarkdownField(this.context.intl.formatMessage, appMessages, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
@@ -116,6 +118,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       icon: 'connections',
       fields: [
         renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+        renderIndicatorControl(indicators, onCreateOption),
       ],
     },
   ]);
@@ -129,7 +132,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
   ]);
 
   render() {
-    const { dataReady, viewDomain, connectedTaxonomies, taxonomies, measures, onCreateOption } = this.props;
+    const { dataReady, viewDomain, connectedTaxonomies, taxonomies, measures, onCreateOption, indicators } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
 
     return (
@@ -198,7 +201,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, measures, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, measures, indicators, onCreateOption),
                   aside: this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
@@ -227,6 +230,7 @@ RecommendationNew.propTypes = {
   authReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
+  indicators: PropTypes.object,
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
@@ -244,6 +248,7 @@ const mapStateToProps = (state) => ({
   authReady: selectReadyForAuthCheck(state),
   taxonomies: selectRecommendationTaxonomies(state, { includeParents: false }),
   measures: selectMeasuresCategorised(state),
+  indicators: selectEntities(state, 'indicators'),
   connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
@@ -296,6 +301,17 @@ function mapDispatchToProps(dispatch) {
           create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
           .map((id) => Map({
             measure_id: id,
+          })),
+        }));
+      }
+
+      // indicators
+      if (formData.get('associatedIndicators')) {
+        saveData = saveData.set('recommendationIndicators', Map({
+          delete: List(),
+          create: getCheckedValuesFromOptions(formData.get('associatedIndicators'))
+          .map((id) => Map({
+            indicator_id: id,
           })),
         }));
       }

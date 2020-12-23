@@ -6,6 +6,7 @@ import {
   selectEntity,
   selectEntities,
   selectMeasuresCategorised,
+  selectRecommendationsCategorised,
   selectTaxonomiesSorted,
 } from 'containers/App/selectors';
 
@@ -45,6 +46,14 @@ export const selectConnectedTaxonomies = createSelector(
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>
     prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
+);
+
+export const selectRecommendations = createSelector(
+  (state, id) => id,
+  (state) => selectRecommendationsCategorised(state),
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (id, entities, associations) =>
+    entitiesSetAssociated(entities, 'recommendation_id', associations, 'indicator_id', id)
 );
 
 export const selectUsers = createSelector(

@@ -6,10 +6,16 @@ export const DEPENDENCIES = [
   'users',
   'taxonomies',
   'categories',
+  'indicators',
   'recommendations',
   'recommendation_measures',
   'recommendation_categories',
+  'recommendation_indicators',
   'measure_categories',
+  'frameworks',
+  'framework_taxonomies',
+  'framework_frameworks',
+  'recommendation_recommendations',
 ];
 
 export const CONFIG = {
@@ -59,7 +65,21 @@ export const CONFIG = {
         connectPath: 'recommendation_measures', // filter by recommendation connection
         ownKey: 'recommendation_id',
       },
+      {
+        search: true,
+        message: 'entities.indicators.plural',
+        path: 'indicators',
+        clientPath: 'indicators', // filter by recommendation connection
+        key: 'indicator_id',
+        connectPath: 'recommendation_indicators',
+        ownKey: 'recommendation_id',
+      },
     ],
+  },
+  frameworks: { // filter by framework
+    query: 'framework',
+    key: 'framework_id',
+    path: 'frameworks',
   },
   attributes: {  // filter by attribute value
     options: [

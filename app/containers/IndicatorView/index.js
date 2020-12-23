@@ -17,6 +17,7 @@ import {
   getMetaField,
   getMarkdownField,
   getMeasureConnectionField,
+  getRecommendationConnectionField,
   getManagerField,
   getScheduleField,
   getReportsField,
@@ -38,6 +39,8 @@ import {
   selectIsUserManager,
   selectMeasureTaxonomies,
   selectMeasureConnections,
+  selectRecommendationTaxonomies,
+  selectRecommendationConnections,
   selectQueryMessages,
 } from 'containers/App/selectors';
 
@@ -47,6 +50,7 @@ import messages from './messages';
 import {
   selectViewEntity,
   selectMeasures,
+  selectRecommendations,
   selectReports,
   selectDueDates,
 } from './selectors';
@@ -82,7 +86,18 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       ],
     }]);
 
-  getBodyMainFields = (entity, measures, reports, measureTaxonomies, isContributor, onEntityClick, measureConnections) => ([
+  getBodyMainFields = (
+    entity,
+    measures,
+    reports,
+    measureTaxonomies,
+    isContributor,
+    onEntityClick,
+    measureConnections,
+    recommendations,
+    recommendationTaxonomies,
+    recommendationConnections,
+  ) => ([
     {
       fields: [
         getMarkdownField(entity, 'description', true),
@@ -101,6 +116,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       icon: 'connections',
       fields: [
         measures && getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
+        recommendations && getRecommendationConnectionField(recommendations, recommendationTaxonomies, recommendationConnections, onEntityClick),
       ],
     },
   ]);
@@ -136,6 +152,9 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       measureTaxonomies,
       onEntityClick,
       measureConnections,
+      recommendations,
+      recommendationTaxonomies,
+      recommendationConnections,
     } = this.props;
 
     const buttons = isManager
@@ -208,7 +227,18 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                   aside: this.getHeaderAsideFields(viewEntity, isContributor),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, measures, reports, measureTaxonomies, isContributor, onEntityClick, measureConnections),
+                  main: this.getBodyMainFields(
+                    viewEntity,
+                    measures,
+                    reports,
+                    measureTaxonomies,
+                    isContributor,
+                    onEntityClick,
+                    measureConnections,
+                    recommendations,
+                    recommendationTaxonomies,
+                    recommendationConnections,
+                  ),
                   aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
                 },
               }}
@@ -238,6 +268,9 @@ IndicatorView.propTypes = {
   measureConnections: PropTypes.object,
   queryMessages: PropTypes.object,
   onDismissQueryMessages: PropTypes.func,
+  recommendationTaxonomies: PropTypes.object,
+  recommendationConnections: PropTypes.object,
+  recommendations: PropTypes.object,
 };
 
 IndicatorView.contextTypes = {
@@ -252,9 +285,12 @@ const mapStateToProps = (state, props) => ({
   viewEntity: selectViewEntity(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
   measureTaxonomies: selectMeasureTaxonomies(state),
+  recommendations: selectRecommendations(state, props.params.id),
+  recommendationTaxonomies: selectRecommendationTaxonomies(state),
   reports: selectReports(state, props.params.id),
   dates: selectDueDates(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
+  recommendationConnections: selectRecommendationConnections(state),
   queryMessages: selectQueryMessages(state),
 });
 

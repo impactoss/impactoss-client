@@ -7,6 +7,7 @@ export const DEPENDENCIES = [
   'measures',
   'recommendation_measures',
   'recommendation_categories',
+  'recommendation_indicators',
   'measure_categories',
   'measure_indicators',
   'indicators',
