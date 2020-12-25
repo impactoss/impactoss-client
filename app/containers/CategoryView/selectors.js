@@ -6,6 +6,7 @@ import {
   selectRecommendationConnections,
   selectMeasureConnections,
   selectTaxonomiesSorted,
+  selectTaxonomies,
 } from 'containers/App/selectors';
 
 import {
@@ -59,7 +60,7 @@ export const selectViewEntity = createSelector(
 
 export const selectParentTaxonomy = createSelector(
   selectCategory,
-  (state) => selectEntities(state, 'taxonomies'),
+  selectTaxonomies,
   (entity, taxonomies) => {
     if (entity && taxonomies) {
       const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
@@ -275,7 +276,7 @@ export const selectChildMeasures = createSelector(
       )
 );
 
-export const selectTaxonomies = createSelector(
+export const selectTaxonomiesWithCategories = createSelector(
   selectTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>

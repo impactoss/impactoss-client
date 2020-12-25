@@ -6,6 +6,7 @@ import {
   selectMeasuresCategorised,
   selectRecommendationsCategorised,
   selectTaxonomiesSorted,
+  selectTaxonomies,
 } from 'containers/App/selectors';
 
 import { USER_ROLES } from 'themes/config';
@@ -32,7 +33,7 @@ export const selectViewEntity = createSelector(
 export const selectParentOptions = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
   (state) => selectEntities(state, 'categories'),
-  (state) => selectEntities(state, 'taxonomies'),
+  selectTaxonomies,
   (entity, categories, taxonomies) => {
     if (entity && taxonomies && categories) {
       const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
@@ -48,7 +49,7 @@ export const selectParentOptions = createSelector(
 
 export const selectParentTaxonomy = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
-  (state) => selectEntities(state, 'taxonomies'),
+  selectTaxonomies,
   (entity, taxonomies) => {
     if (entity && taxonomies) {
       const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));

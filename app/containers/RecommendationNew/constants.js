@@ -11,6 +11,7 @@ export const DEPENDENCIES = [
   'user_roles',
   'categories',
   'taxonomies',
+  'framework_taxonomies',
   'measures',
   'measure_categories',
   'indicators',

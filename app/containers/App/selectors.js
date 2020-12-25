@@ -24,6 +24,7 @@ import {
   filterEntitiesByKeywords,
   entitiesSetCategoryIds,
   prepareTaxonomies,
+  attributesEqual,
 } from 'utils/entities';
 
 // high level state selects
@@ -301,8 +302,22 @@ export const selectEntities = createSelector(
   (entities, path) => entities.get(path)
 );
 
-export const selectTaxonomiesSorted = createSelector(
+export const selectTaxonomies = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'framework_taxonomies'),
+  (taxonomies, fwTaxonomies) => taxonomies && fwTaxonomies && taxonomies.map(
+    (tax) => {
+      const hasFramework = tax.getIn(['attributes', 'framework_id']);
+      const connectedToFramework = fwTaxonomies.some(
+        (fwt) => attributesEqual(fwt.getIn(['attributes', 'taxonomy_id']), tax.get('id'))
+      );
+      return tax.setIn(['attributes', 'tags_recommendations'], hasFramework || connectedToFramework);
+    }
+  )
+);
+
+export const selectTaxonomiesSorted = createSelector(
+  selectTaxonomies,
   (taxonomies) => taxonomies && sortEntities(taxonomies, 'asc', 'priority', null, false)
 );
 

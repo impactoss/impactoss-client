@@ -17,6 +17,7 @@ export const DEPENDENCIES = [
   'recommendation_categories',
   'categories',
   'taxonomies',
+  'framework_taxonomies',
 ];
 
 export const FORM_INITIAL = fromJS({

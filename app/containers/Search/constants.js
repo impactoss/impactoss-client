@@ -1,6 +1,7 @@
 export const DEPENDENCIES = [
   'pages',
   'taxonomies',
+  'framework_taxonomies',
   'categories',
   'indicators',
   'measures',

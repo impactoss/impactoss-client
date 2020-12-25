@@ -5,6 +5,7 @@ export const DEPENDENCIES = [
   'indicators',
   'users',
   'taxonomies',
+  'framework_taxonomies',
   'categories',
   'measures',
   'measure_indicators',

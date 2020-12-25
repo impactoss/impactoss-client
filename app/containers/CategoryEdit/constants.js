@@ -14,6 +14,7 @@ export const DEPENDENCIES = [
   'user_roles',
   'categories',
   'taxonomies',
+  'framework_taxonomies',
   'measure_categories',
   'recommendation_categories',
 ];
