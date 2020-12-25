@@ -43,8 +43,9 @@ export const selectRecommendations = createSelector(
   selectRecommendationConnections,
   (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'recommendation_categories'),
+  (state) => selectEntities(state, 'recommendation_indicators'),
   (state) => selectEntities(state, 'categories'),
-  (recommendations, connections, recMeasures, recCategories, categories) =>
+  (recommendations, connections, recMeasures, recCategories, recIndicators, categories) =>
     recommendations && recommendations
     .map((rec) => rec
       .set('categories', getEntityCategories(rec.get('id'), recCategories, 'recommendation_id', categories))
@@ -54,6 +55,13 @@ export const selectRecommendations = createSelector(
           && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
         )
         .map((association) => association.getIn(['attributes', 'measure_id']))
+      )
+      .set('indicators', recIndicators
+        .filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
+          && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
+        )
+        .map((association) => association.getIn(['attributes', 'indicator_id']))
       )
     )
 );
@@ -70,7 +78,8 @@ export const selectIndicators = createSelector(
   selectIndicatorsAssociated,
   (state) => selectIndicatorConnections(state),
   (state) => selectEntities(state, 'measure_indicators'),
-  (indicators, connections, indicatorMeasures) =>
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (indicators, connections, indicatorMeasures, indicatorRecs) =>
     indicators && indicators
     .map((indicator) => indicator
       .set('measures', indicatorMeasures && indicatorMeasures
@@ -79,6 +88,13 @@ export const selectIndicators = createSelector(
           && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
         )
         .map((association) => association.getIn(['attributes', 'measure_id']))
+      )
+      .set('recommendations', indicatorRecs
+        .filter((association) =>
+        attributesEqual(association.getIn(['attributes', 'indicator_id']), indicator.get('id'))
+          && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
+        )
+        .map((association) => association.getIn(['attributes', 'recommendation_id']))
       )
     )
 );

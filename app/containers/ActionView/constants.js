@@ -10,4 +10,5 @@ export const DEPENDENCIES = [
   'recommendations',
   'recommendation_measures',
   'recommendation_categories',
+  'recommendation_indicators',
 ];

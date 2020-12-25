@@ -482,8 +482,18 @@ const getSectionFields = (shape, section, column, entity, associations, onEntity
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: reduce(shape.connections.tables, (memo, table) => {
-        if (table.table === 'recommendations' && associations.recommendations && associations.recTaxonomies && associations.recConnections) {
-          return memo.concat([getRecommendationConnectionField(associations.recommendations, associations.recTaxonomies, associations.recConnections, onEntityClick)]);
+        if (
+          table.table === 'recommendations' &&
+          associations.recommendations &&
+          associations.recTaxonomies &&
+          associations.recConnections
+        ) {
+          return memo.concat([getRecommendationConnectionField(
+            associations.recommendations,
+            associations.recTaxonomies,
+            associations.recConnections,
+            onEntityClick,
+          )]);
         }
         if (table.table === 'indicators' && associations.indicators && associations.indicatorConnections) {
           return memo.concat([getIndicatorConnectionField(associations.indicators, associations.indicatorConnections, onEntityClick)]);
