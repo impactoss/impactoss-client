@@ -10,7 +10,7 @@
  */
 import { createSelector } from 'reselect';
 import { reduce } from 'lodash/collection';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 
 import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
@@ -305,6 +305,17 @@ export const selectEntities = createSelector(
   (entities, path) => entities.get(path)
 );
 
+export const selectFrameworksForQuery = createSelector(
+  (state) => selectEntities(state, 'frameworks'),
+  selectFrameworkQuery,
+  (entities, fwQuery) => {
+    if (fwQuery && fwQuery !== 'all') {
+      return entities.filter((fw) => attributesEqual(fwQuery, fw.get('id')));
+    }
+    return entities;
+  }
+);
+
 export const selectFWRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendations'),
   selectFrameworkQuery,
@@ -387,13 +398,26 @@ export const selectFWTaxonomies = createSelector(
               fwNotSet ||
               attributesEqual(tax.getIn(['attributes', 'framework_id']), framework)
             );
+          // connected to current framework
           const connectedToFramework = fwTaxonomies.some(
             (fwt) => attributesEqual(fwt.getIn(['attributes', 'taxonomy_id']), tax.get('id')) && (
               fwNotSet ||
               attributesEqual(fwt.getIn(['attributes', 'framework_id']), framework)
             )
           );
-          return tax.setIn(['attributes', 'tags_recommendations'], hasFramework || connectedToFramework);
+          // connectedFrameworks
+          const frameworkIds = fwTaxonomies.reduce(
+            (memo, fwt) => {
+              if (attributesEqual(fwt.getIn(['attributes', 'taxonomy_id']), tax.get('id'))) {
+                return memo.push(fwt.getIn(['attributes', 'framework_id']));
+              }
+              return memo;
+            },
+            List(),
+          );
+          return tax
+            .setIn(['attributes', 'tags_recommendations'], hasFramework || connectedToFramework)
+            .set('frameworkIds', frameworkIds);
         }
       )
     .filter(

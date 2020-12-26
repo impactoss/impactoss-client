@@ -621,6 +621,10 @@ export default defineMessages({
         defaultMessage: 'Created',
       },
     },
+    framework_id: {
+      id: 'app.containers.App.attributes.framework_id',
+      defaultMessage: 'Framework',
+    },
   },
   nav: {
     overview: {
@@ -712,6 +716,66 @@ export default defineMessages({
       },
       empty: {
         id: 'app.containers.App.entities.recommendations.empty',
+        defaultMessage: 'No recommendations yet',
+      },
+    },
+    recommendations_1: {
+      single: {
+        id: 'app.containers.App.entities.recommendations_1.single',
+        defaultMessage: 'Recommendation',
+      },
+      plural: {
+        id: 'app.containers.App.entities.recommendations_1.plural',
+        defaultMessage: 'Recommendations',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.recommendations_1.singleLong',
+        defaultMessage: 'Recommendation',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.recommendations_1.pluralLong',
+        defaultMessage: 'Recommendations',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.recommendations_1.singleShort',
+        defaultMessage: 'Recommendation',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.recommendations_1.pluralShort',
+        defaultMessage: 'Recommendations',
+      },
+      empty: {
+        id: 'app.containers.App.entities.recommendations_1.empty',
+        defaultMessage: 'No recommendations yet',
+      },
+    },
+    recommendations_2: {
+      single: {
+        id: 'app.containers.App.entities.recommendations_2.single',
+        defaultMessage: 'Recommendation',
+      },
+      plural: {
+        id: 'app.containers.App.entities.recommendations_2.plural',
+        defaultMessage: 'Recommendations',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.recommendations_2.singleLong',
+        defaultMessage: 'Recommendation',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.recommendations_2.pluralLong',
+        defaultMessage: 'Recommendations',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.recommendations_2.singleShort',
+        defaultMessage: 'Recommendation',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.recommendations_2.pluralShort',
+        defaultMessage: 'Recommendations',
+      },
+      empty: {
+        id: 'app.containers.App.entities.recommendations_2.empty',
         defaultMessage: 'No recommendations yet',
       },
     },

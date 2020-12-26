@@ -311,6 +311,17 @@ export const getStatusField = (formatMessage, obsoleteAppMessages, entity) => ({
   value: entity ? entity.getIn(['attributes', 'draft']) : true,
   options: PUBLISH_STATUSES,
 });
+export const getFrameworkFormField = (formatMessage, fwOptions, value) => ({
+  id: 'framework',
+  controlType: 'select',
+  model: '.attributes.framework_id',
+  label: formatMessage(appMessages.attributes.framework_id),
+  value,
+  options: Object.values(fwOptions.toJS()).map((fw) => ({
+    value: fw.id,
+    message: `frameworks.${fw.id}`,
+  })),
+});
 
 const getDueDateStatus = (date, formatMessage) => {
   if (date.getIn(['attributes', 'overdue'])) {

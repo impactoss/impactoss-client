@@ -149,6 +149,8 @@ export const REPORT_FREQUENCIES = [
   { value: 12, message: 'ui.reportFrequencies.annual' },
 ];
 
+export const DEFAULT_FRAMEWORK = 1;
+
 // Map server database tables **************************
 export const DB_TABLES = [
   'users',
