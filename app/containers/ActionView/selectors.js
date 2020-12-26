@@ -5,6 +5,8 @@ import {
   selectRecommendationConnections,
   selectIndicatorConnections,
   selectTaxonomiesSorted,
+  selectFWRecommendations,
+  selectFWIndicators,
 } from 'containers/App/selectors';
 
 import {
@@ -32,7 +34,7 @@ export const selectTaxonomies = createSelector(
 
 export const selectRecommendationsAssociated = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'recommendations'),
+  selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_measures'),
   (id, entities, associations) =>
     entitiesIsAssociated(entities, 'recommendation_id', associations, 'measure_id', id)
@@ -68,7 +70,7 @@ export const selectRecommendations = createSelector(
 
 export const selectIndicatorsAssociated = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'indicators'),
+  selectFWIndicators,
   (state) => selectEntities(state, 'measure_indicators'),
   (id, entities, associations) =>
     entitiesIsAssociated(entities, 'indicator_id', associations, 'measure_id', id)

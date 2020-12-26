@@ -5,6 +5,8 @@ import {
   selectEntities,
   selectMeasureConnections,
   selectRecommendationConnections,
+  selectFWRecommendations,
+  selectFWMeasures,
 } from 'containers/App/selectors';
 
 import {
@@ -35,7 +37,7 @@ export const selectViewEntity = createSelector(
 );
 export const selectMeasuresAssociated = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'measures'),
+  selectFWMeasures,
   (state) => selectEntities(state, 'measure_indicators'),
   (id, entities, associations) =>
     entitiesIsAssociated(entities, 'measure_id', associations, 'indicator_id', id)
@@ -112,7 +114,7 @@ export const selectDueDates = createSelector(
 
 export const selectRecommendationsAssociated = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'recommendations'),
+  selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_indicators'),
   (id, entities, associations) =>
     entitiesIsAssociated(entities, 'recommendation_id', associations, 'indicator_id', id)

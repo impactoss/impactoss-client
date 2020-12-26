@@ -13,6 +13,7 @@ export const DEPENDENCIES = [
   'recommendations',
   'recommendation_indicators',
   'recommendation_categories',
+  'recommendation_measures',
   'due_dates',
   'progress_reports',
 ];

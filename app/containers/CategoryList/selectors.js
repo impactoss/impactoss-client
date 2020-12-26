@@ -6,6 +6,8 @@ import {
   selectSortByQuery,
   selectSortOrderQuery,
   selectTaxonomiesSorted,
+  selectFWRecommendations,
+  selectFWMeasures,
 } from 'containers/App/selectors';
 
 import { attributesEqual } from 'utils/entities';
@@ -27,7 +29,7 @@ export const selectTaxonomy = createSelector(
 );
 
 const selectMeasures = createSelector(
-  (state) => selectEntities(state, 'measures'),
+  selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'recommendation_measures'),
   (entities, measureCategories, recMeasures) =>
@@ -44,7 +46,7 @@ const selectMeasures = createSelector(
 );
 
 const selectRecommendations = createSelector(
-  (state) => selectEntities(state, 'recommendations'),
+  selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
   (entities, recCategories) =>
     entities.map((entity, id) => entity.set('category_ids', recCategories

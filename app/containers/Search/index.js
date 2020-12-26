@@ -246,7 +246,6 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
   render() {
     const { dataReady, location, onSearch, onClear, entities, onEntityClick, onSortOrder, onSortBy } = this.props;
     // console.log('render')
-
     const activeTarget = entities.reduce((memo, group) =>
         group.get('targets').find((target) => target.get('active')) || memo
       , Map());

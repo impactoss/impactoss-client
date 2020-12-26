@@ -4,7 +4,7 @@ import { reduce } from 'lodash/collection';
 
 import {
   selectEntities,
-  selectEntitiesSearchQuery,
+  selectIndicatorsSearchQuery,
   selectWithoutQuery,
   selectConnectionQuery,
   selectCategoryQuery,
@@ -13,6 +13,8 @@ import {
   selectSortOrderQuery,
   selectExpandQuery,
   selectTaxonomiesSorted,
+  selectFWRecommendations,
+  selectFWMeasures,
 } from 'containers/App/selectors';
 
 import {
@@ -33,9 +35,9 @@ import { sortEntities, getSortOption } from 'utils/sort';
 import { CONFIG } from './constants';
 
 export const selectConnections = createSelector(
-  (state) => selectEntities(state, 'measures'),
+  selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
-  (state) => selectEntities(state, 'recommendations'),
+  selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'categories'),
   (measures, measureCategories, recommendations, recommendationCategories, categories) =>
@@ -80,8 +82,7 @@ export const selectConnectedTaxonomies = createSelector(
 );
 
 const selectIndicatorsNested = createSelector(
-  (state, locationQuery) => selectEntitiesSearchQuery(state, {
-    path: 'indicators',
+  (state, locationQuery) => selectIndicatorsSearchQuery(state, {
     searchAttributes: CONFIG.search || ['title', 'reference'],
     locationQuery,
   }),

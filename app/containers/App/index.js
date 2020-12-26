@@ -9,7 +9,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Perf from 'react-addons-perf';
 import ReactModal from 'react-modal';
-import { fromJS } from 'immutable';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -26,7 +25,7 @@ import {
   selectEntities,
   selectEntitiesWhere,
   selectNewEntityModal,
-  selectCurrentFramework,
+  selectFrameworkQuery,
 } from './selectors';
 
 import {
@@ -233,7 +232,7 @@ App.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   isManager: selectIsUserManager(state),
   isUserSignedIn: selectIsSignedIn(state),
@@ -243,7 +242,7 @@ const mapStateToProps = (state, props) => ({
     where: { draft: false },
   }),
   newEntityModal: selectNewEntityModal(state),
-  currentFrameworkId: selectCurrentFramework(state, fromJS(props.location.query)),
+  currentFrameworkId: selectFrameworkQuery(state),
   frameworks: selectEntities(state, 'frameworks'),
 });
 

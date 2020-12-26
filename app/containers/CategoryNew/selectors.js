@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { selectEntity, selectEntities, selectTaxonomiesSorted, selectTaxonomies } from 'containers/App/selectors';
+import { selectEntity, selectEntities, selectTaxonomiesSorted, selectFWTaxonomies } from 'containers/App/selectors';
 
 import { USER_ROLES } from 'themes/config';
 
@@ -19,7 +19,7 @@ export const selectDomain = createSelector(
 export const selectParentOptions = createSelector(
   (state, id) => selectEntity(state, { path: 'taxonomies', id }),
   (state) => selectEntities(state, 'categories'),
-  selectTaxonomies,
+  selectFWTaxonomies,
   (taxonomy, categories, taxonomies) => {
     if (taxonomy && taxonomies && categories) {
       const taxonomyParentId = taxonomy.getIn(['attributes', 'parent_id']);
@@ -34,7 +34,7 @@ export const selectParentOptions = createSelector(
 
 export const selectParentTaxonomy = createSelector(
   (state, id) => selectEntity(state, { path: 'taxonomies', id }),
-  selectTaxonomies,
+  selectFWTaxonomies,
   (taxonomy, taxonomies) => {
     if (taxonomy && taxonomies) {
       return taxonomies.find((tax) => attributesEqual(taxonomy.getIn(['attributes', 'parent_id']), tax.get('id')));

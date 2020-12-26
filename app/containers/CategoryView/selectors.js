@@ -6,7 +6,9 @@ import {
   selectRecommendationConnections,
   selectMeasureConnections,
   selectTaxonomiesSorted,
-  selectTaxonomies,
+  selectFWTaxonomies,
+  selectFWRecommendations,
+  selectFWMeasures,
 } from 'containers/App/selectors';
 
 import {
@@ -60,7 +62,7 @@ export const selectViewEntity = createSelector(
 
 export const selectParentTaxonomy = createSelector(
   selectCategory,
-  selectTaxonomies,
+  selectFWTaxonomies,
   (entity, taxonomies) => {
     if (entity && taxonomies) {
       const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
@@ -96,7 +98,7 @@ const selectTagsRecommendations = createSelector(
 const selectRecommendationsAssociated = createSelector(
   selectTagsRecommendations,
   (state, id) => id,
-  (state) => selectEntities(state, 'recommendations'),
+  selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
   (tags, id, entities, associations) => tags
     ? entitiesIsAssociated(entities, 'recommendation_id', associations, 'category_id', id)
@@ -131,7 +133,7 @@ const selectChildrenTagRecommendations = createSelector(
 const selectChildRecommendationsAssociated = createSelector(
   selectChildrenTagRecommendations,
   selectChildTaxonomies,
-  (state) => selectEntities(state, 'recommendations'),
+  selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
   (tag, childTaxonomies, entities, associations) => tag && childTaxonomies
     ? childTaxonomies.map((tax) =>
@@ -182,7 +184,7 @@ const selectTagsMeasures = createSelector(
 const selectMeasuresAssociated = createSelector(
   selectTagsMeasures,
   (state, id) => id,
-  (state) => selectEntities(state, 'measures'),
+  selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
   (tags, id, entities, associations) => tags
     ? entitiesIsAssociated(entities, 'measure_id', associations, 'category_id', id)
@@ -225,7 +227,7 @@ const selectChildrenTagMeasures = createSelector(
 const selectChildMeasuresAssociated = createSelector(
   selectChildrenTagMeasures,
   selectChildTaxonomies,
-  (state) => selectEntities(state, 'measures'),
+  selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
   (tag, childTaxonomies, entities, associations) => tag
     ? childTaxonomies.map((tax) =>

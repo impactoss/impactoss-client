@@ -7,6 +7,9 @@ export const DEPENDENCIES = [
   'measures',
   'recommendations',
   'progress_reports',
+  'recommendation_measures',
+  'recommendation_indicators',
+  'measure_indicators',
 ];
 
 export const UPDATE_QUERY = 'impactoss/Search/UPDATE_QUERY';

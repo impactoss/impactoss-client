@@ -3,7 +3,7 @@ import { Map } from 'immutable';
 
 import {
   selectEntities,
-  selectEntitiesSearchQuery,
+  selectRecommendationsSearchQuery,
   selectWithoutQuery,
   selectConnectionQuery,
   selectCategoryQuery,
@@ -11,6 +11,8 @@ import {
   selectSortOrderQuery,
   selectRecommendationConnections,
   selectTaxonomiesSorted,
+  selectFWMeasures,
+  selectFWIndicators,
 } from 'containers/App/selectors';
 
 import {
@@ -28,8 +30,7 @@ import { sortEntities, getSortOption } from 'utils/sort';
 import { CONFIG } from './constants';
 
 const selectRecommendationsNested = createSelector(
-  (state, locationQuery) => selectEntitiesSearchQuery(state, {
-    path: 'recommendations',
+  (state, locationQuery) => selectRecommendationsSearchQuery(state, {
     searchAttributes: CONFIG.search || ['reference', 'title'],
     locationQuery,
   }),
@@ -116,8 +117,8 @@ export const selectConnectedTaxonomies = createSelector(
 );
 
 export const selectConnections = createSelector(
-  (state) => selectEntities(state, 'indicators'),
-  (state) => selectEntities(state, 'measures'),
+  selectFWIndicators,
+  selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
   (indicators, measures, measureCategories) =>
     Map()

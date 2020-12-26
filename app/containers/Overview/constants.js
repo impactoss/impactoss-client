@@ -5,4 +5,7 @@ export const DEPENDENCIES = [
   'recommendations',
   'measures',
   'indicators',
+  'recommendation_measures',
+  'recommendation_indicators',
+  'measure_indicators',
 ];

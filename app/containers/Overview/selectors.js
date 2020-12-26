@@ -1,19 +1,21 @@
 import { createSelector } from 'reselect';
 
 import {
-  selectEntitiesWhere,
+  selectRecommendationsWhere,
+  selectMeasuresWhere,
+  selectIndicatorsWhere,
   selectEntities,
 } from 'containers/App/selectors';
 
 import { attributesEqual } from 'utils/entities';
 
 export const selectRecommendationCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'recommendations', where: { draft: false } }),
+  (state) => selectRecommendationsWhere(state, { where: { draft: false } }),
   (entities) => entities.size
 );
 export const selectRecommendationAddressedCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'recommendations', where: { draft: false } }),
-  (state) => selectEntitiesWhere(state, { path: 'measures', where: { draft: false } }),
+  (state) => selectRecommendationsWhere(state, { where: { draft: false } }),
+  (state) => selectMeasuresWhere(state, { where: { draft: false } }),
   (state) => selectEntities(state, 'recommendation_measures'),
   (recommendations, measures, associations) =>
     recommendations && recommendations.filter((rec) => {
@@ -29,22 +31,22 @@ export const selectRecommendationAddressedCount = createSelector(
 );
 
 export const selectMeasureCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'measures', where: { draft: false } }),
+  (state) => selectMeasuresWhere(state, { where: { draft: false } }),
   (entities) => entities.size
 );
 export const selectIndicatorCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'indicators', where: { draft: false } }),
+  (state) => selectIndicatorsWhere(state, { where: { draft: false } }),
   (entities) => entities.size
 );
 export const selectRecommendationDraftCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'recommendations', where: { draft: true } }),
+  (state) => selectRecommendationsWhere(state, { where: { draft: true } }),
   (entities) => entities.size
 );
 export const selectMeasureDraftCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'measures', where: { draft: true } }),
+  (state) => selectMeasuresWhere(state, { where: { draft: true } }),
   (entities) => entities.size
 );
 export const selectIndicatorDraftCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'indicators', where: { draft: true } }),
+  (state) => selectIndicatorsWhere(state, { where: { draft: true } }),
   (entities) => entities.size
 );

@@ -5,6 +5,7 @@ import {
   selectEntities,
   selectMeasuresCategorised,
   selectTaxonomiesSorted,
+  selectFWIndicators,
 } from 'containers/App/selectors';
 
 import {
@@ -58,7 +59,7 @@ export const selectMeasures = createSelector(
 );
 export const selectIndicators = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'indicators'),
+  selectFWIndicators,
   (state) => selectEntities(state, 'recommendation_indicators'),
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'indicator_id', associations, 'recommendation_id', id)

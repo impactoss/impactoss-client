@@ -3,7 +3,7 @@ import { Map, fromJS } from 'immutable';
 // import { reduce } from 'lodash/collection';
 
 import {
-  selectEntitiesAll,
+  selectFWEntitiesAll,
   selectSearchQuery,
   selectSortByQuery,
   selectSortOrderQuery,
@@ -27,7 +27,7 @@ const selectPathQuery = createSelector(
 
 // kicks off series of cascading selectors
 export const selectEntitiesByQuery = createSelector(
-  selectEntitiesAll,
+  selectFWEntitiesAll,
   selectTaxonomiesSorted,
   (state, locationQuery) => selectSearchQuery(state, locationQuery),
   selectPathQuery,
