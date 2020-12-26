@@ -23,6 +23,7 @@ const Select = styled.select`
   font-weight: ${(props) => props.active ? 500 : 'normal'};
   vertical-align: middle;
   display: inline-block;
+  cursor: pointer;
 `;
 // border-bottom: 1px dotted #ccc;
 const Option = styled.option`
