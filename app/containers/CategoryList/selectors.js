@@ -22,7 +22,7 @@ export const selectTaxonomy = createSelector(
     if (!taxonomies || taxonomies.size === 0) return taxonomies;
     const id = typeof taxonomyId !== 'undefined' ? taxonomyId : TAXONOMY_DEFAULT;
     const taxonomy = taxonomies.get(id);
-    return taxonomy
+    return taxonomy && taxonomy
       .set('children', taxonomies.filter((tax) => attributesEqual(id, tax.getIn(['attributes', 'parent_id']))))
       .set('parent', taxonomies.find((tax) => attributesEqual(taxonomy.getIn(['attributes', 'parent_id']), tax.get('id'))));
   }
@@ -131,7 +131,7 @@ const selectCategoryCountGroups = createSelector(
   selectMeasures,
   (state) => selectEntities(state, 'categories'),
   (taxonomy, recommendations, measures, categories) => {
-    const taxonomyCategories = categories.filter((cat) =>
+    const taxonomyCategories = taxonomy && categories.filter((cat) =>
       attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id'))
     );
     if (taxonomy && taxonomyCategories) {

@@ -605,12 +605,12 @@ export function* updatePathSaga({ path, args }) {
   }
   // convert to string
   const queryNextString = getNextQueryString(queryNext);
-
+  const nextPath = `${relativePath}?${queryNextString}`;
   if (args && args.replace) {
-    yield put(replace(relativePath));
+    yield put(replace(nextPath));
   } else {
     // yield put(push(relativePath));
-    yield put(push(`${relativePath}?${queryNextString}`));
+    yield put(push(nextPath));
   }
 }
 

@@ -18,6 +18,7 @@ import {
   selectTaxonomiesSorted,
   selectReady,
   selectIsUserManager,
+  selectFrameworkQuery,
 } from 'containers/App/selectors';
 import { PATHS, CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -57,7 +58,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     this.props.loadEntitiesIfNeeded();
     // redirect to default taxonomy if needed
     if (this.props.dataReady && typeof this.props.taxonomy === 'undefined') {
-      this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(this.props.taxonomies).get('id'));
+      this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(this.props.taxonomies, this.props.framework).get('id'));
     }
   }
   componentWillReceiveProps(nextProps) {
@@ -67,7 +68,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     }
     // redirect to default taxonomy if needed
     if (nextProps.dataReady && typeof nextProps.taxonomy === 'undefined') {
-      this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(nextProps.taxonomies).get('id'));
+      this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(nextProps.taxonomies, nextProps.framework).get('id'));
     }
   }
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
@@ -193,6 +194,7 @@ CategoryList.propTypes = {
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   location: PropTypes.object,
+  framework: PropTypes.string,
 };
 
 CategoryList.contextTypes = {
@@ -200,6 +202,7 @@ CategoryList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
+  framework: selectFrameworkQuery(state),
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectTaxonomiesSorted(state),
