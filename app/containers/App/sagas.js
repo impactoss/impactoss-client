@@ -628,7 +628,6 @@ export function* updatePathSaga({ path, args }) {
   if (args && args.replace) {
     yield put(replace(nextPath));
   } else {
-    // yield put(push(relativePath));
     yield put(push(nextPath));
   }
 }
@@ -643,7 +642,7 @@ export function* closeEntitySaga({ path }) {
   yield put(
     !isPreviousValid && previousPath && (previousPath !== currentPath)
       ? goBack()
-      : push({ pathname: path || '/' })
+      : updatePath(path || '/')
   );
 }
 
