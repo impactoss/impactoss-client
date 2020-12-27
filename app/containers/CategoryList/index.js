@@ -15,7 +15,7 @@ import { getDefaultTaxonomy } from 'utils/taxonomies';
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   selectReady,
   selectIsUserManager,
   selectFrameworkQuery,
@@ -205,7 +205,7 @@ const mapStateToProps = (state, props) => ({
   framework: selectFrameworkQuery(state),
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectTaxonomiesSorted(state),
+  taxonomies: selectFWTaxonomiesSorted(state),
   taxonomy: selectTaxonomy(state, { id: props.params.id }),
   categoryGroups: selectCategoryGroups(
     state,

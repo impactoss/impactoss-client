@@ -31,9 +31,8 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import {
-  getMetaField,
-} from 'utils/fields';
+import { getMetaField } from 'utils/fields';
+import { attributesEqual } from 'utils/entities';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -54,6 +53,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
+  selectEntities,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -141,20 +141,20 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       ],
     },
   ]);
-  getBodyMainFields = (connectedTaxonomies, entity, measures, indicators, onCreateOption) => ([
+  getBodyMainFields = (connectedTaxonomies, entity, measures, indicators, onCreateOption, hasResponse) => ([
     {
       fields: [
         getMarkdownField(this.context.intl.formatMessage, appMessages, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
-        getAcceptedField(this.context.intl.formatMessage, appMessages, entity),
-        getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
+        hasResponse && getAcceptedField(this.context.intl.formatMessage, appMessages, entity),
+        hasResponse && getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
       ],
     },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
       icon: 'connections',
       fields: [
-        renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-        renderIndicatorControl(indicators, onCreateOption),
+        measures && renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+        indicators && renderIndicatorControl(indicators, onCreateOption),
       ],
     },
   ]);
@@ -177,13 +177,28 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       taxonomies,
       indicators,
       onCreateOption,
+      frameworks,
     } = this.props;
     const reference = this.props.params.id;
     const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
+    const frameworkId = viewEntity && viewEntity.getIn(['attributes', 'framework_id']);
+    const type = this.context.intl.formatMessage(
+      appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
+    );
+
+    const currentFramework = dataReady && frameworks.find((fw) => attributesEqual(fw.get('id'), frameworkId));
+    const hasResponse = dataReady && currentFramework.getIn(['attributes', 'has_response']);
+    const hasMeasures = dataReady && currentFramework.getIn(['attributes', 'has_measures']);
+    const hasIndicators = dataReady && currentFramework.getIn(['attributes', 'has_indicators']);
+    const fwTaxonomies = taxonomies && taxonomies.filter((tax) =>
+      tax.get('frameworkIds').find((id) => attributesEqual(id, frameworkId)) ||
+      attributesEqual(frameworkId, tax.getIn(['attributes', 'framework_id']))
+    );
+
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={`${this.context.intl.formatMessage(messages.pageTitle, { type })}: ${reference}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
@@ -196,9 +211,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           }}
         >
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={this.context.intl.formatMessage(messages.pageTitle, { type })}
             type={CONTENT_SINGLE}
-            icon="recommendations"
+            icon={frameworkId ? `recommendations_${frameworkId}` : 'recommendations'}
             buttons={
               viewEntity && dataReady ? [{
                 type: 'cancel',
@@ -243,9 +258,10 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
-                taxonomies,
+                fwTaxonomies,
                 measures,
                 indicators,
+                currentFramework,
               )}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
@@ -257,8 +273,15 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, viewEntity, measures, indicators, onCreateOption),
-                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
+                  main: this.getBodyMainFields(
+                    connectedTaxonomies,
+                    viewEntity,
+                    hasMeasures && measures,
+                    hasIndicators && indicators,
+                    onCreateOption,
+                    hasResponse,
+                  ),
+                  aside: this.getBodyAsideFields(fwTaxonomies, onCreateOption),
                 },
               }}
               scrollContainer={this.state.scrollContainer}
@@ -296,6 +319,7 @@ RecommendationEdit.propTypes = {
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   connectedTaxonomies: PropTypes.object,
+  frameworks: PropTypes.object,
 };
 
 RecommendationEdit.contextTypes = {
@@ -311,6 +335,7 @@ const mapStateToProps = (state, props) => ({
   measures: selectMeasures(state, props.params.id),
   indicators: selectIndicators(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
+  frameworks: selectEntities(state, 'frameworks'),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -337,8 +362,8 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, taxonomies, measures, indicators) => {
-      const saveData = formData
+    handleSubmit: (formData, taxonomies, measures, indicators, currentFramework) => {
+      let saveData = formData
         .set(
           'recommendationCategories',
           getCategoryUpdatesFromFormData({
@@ -367,7 +392,12 @@ function mapDispatchToProps(dispatch, props) {
             createKey: 'recommendation_id',
           })
         );
-
+      // cleanup attributes for framework
+      if (!currentFramework.getIn(['attributes', 'has_response'])) {
+        saveData = saveData
+          .setIn(['attributes', 'accepted'], null)
+          .setIn(['attributes', 'response'], null);
+      }
       dispatch(save(saveData.toJS()));
       // dispatch(save(formData, props.params.id));
     },

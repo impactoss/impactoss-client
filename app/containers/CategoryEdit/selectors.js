@@ -5,7 +5,7 @@ import {
   selectEntities,
   selectMeasuresCategorised,
   selectRecommendationsCategorised,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   selectFWTaxonomies,
 } from 'containers/App/selectors';
 
@@ -27,7 +27,7 @@ export const selectDomain = createSelector(
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
   (state) => selectEntities(state, 'users'),
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies));
 
 export const selectParentOptions = createSelector(
@@ -83,7 +83,7 @@ export const selectRecommendations = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>
     prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])

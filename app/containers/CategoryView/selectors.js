@@ -5,7 +5,7 @@ import {
   selectEntities,
   selectRecommendationConnections,
   selectMeasureConnections,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   selectFWTaxonomies,
   selectFWRecommendations,
   selectFWMeasures,
@@ -26,7 +26,7 @@ export const selectCategory = createSelector(
 );
 export const selectTaxonomy = createSelector(
   selectCategory,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   (category, taxonomies) => category && taxonomies &&
     taxonomies.get(category.getIn(['attributes', 'taxonomy_id']).toString())
 );
@@ -34,7 +34,7 @@ export const selectTaxonomy = createSelector(
 export const selectViewEntity = createSelector(
   selectCategory,
   (state) => selectEntities(state, 'users'),
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
   (entity, users, taxonomies, categories) => entity && entitySetSingles(entity, [
     {
@@ -72,7 +72,7 @@ export const selectParentTaxonomy = createSelector(
   });
 export const selectChildTaxonomies = createSelector(
   selectCategory,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
   (entity, taxonomies, categories) => {
     if (entity && taxonomies) {
@@ -279,7 +279,7 @@ export const selectChildMeasures = createSelector(
 );
 
 export const selectTaxonomiesWithCategories = createSelector(
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>
     taxonomies.map((tax) => tax.set(

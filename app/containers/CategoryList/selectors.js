@@ -5,7 +5,7 @@ import {
   selectEntities,
   selectSortByQuery,
   selectSortOrderQuery,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   selectFWRecommendations,
   selectFWMeasures,
 } from 'containers/App/selectors';
@@ -17,7 +17,7 @@ import { TAXONOMY_DEFAULT, SORT_OPTIONS } from './constants';
 
 export const selectTaxonomy = createSelector(
   (state, { id }) => id,
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (taxonomyId, taxonomies) => {
     if (!taxonomies || taxonomies.size === 0) return taxonomies;
     const id = typeof taxonomyId !== 'undefined' ? taxonomyId : TAXONOMY_DEFAULT;

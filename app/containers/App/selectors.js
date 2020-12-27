@@ -17,7 +17,6 @@ import asList from 'utils/as-list';
 import { sortEntities } from 'utils/sort';
 
 import { USER_ROLES, DB_TABLES } from 'themes/config';
-import { PARAMS } from 'containers/App/constants';
 
 import {
   filterEntitiesByAttributes,
@@ -26,6 +25,8 @@ import {
   prepareTaxonomies,
   attributesEqual,
 } from 'utils/entities';
+
+import { PARAMS, PATHS } from './constants';
 
 // high level state selects
 const getRoute = (state) => state.get('route');
@@ -384,6 +385,40 @@ export const selectFWEntitiesAll = createSelector(
       .set('indicators', indicators)
 );
 
+export const selectTaxonomies = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'framework_taxonomies'),
+  (taxonomies, fwTaxonomies) => taxonomies && fwTaxonomies &&
+    taxonomies
+      .map(
+        (tax) => {
+          const hasFramework = tax.hasIn(['attributes', 'framework_id']);
+          // connected to current framework
+          const connectedToFramework = fwTaxonomies.some(
+            (fwt) => attributesEqual(fwt.getIn(['attributes', 'taxonomy_id']), tax.get('id'))
+          );
+          // connectedFrameworks
+          const frameworkIds = fwTaxonomies.reduce(
+            (memo, fwt) => {
+              if (attributesEqual(fwt.getIn(['attributes', 'taxonomy_id']), tax.get('id'))) {
+                return memo.push(fwt.getIn(['attributes', 'framework_id']));
+              }
+              return memo;
+            },
+            List(),
+          );
+          return tax
+            .setIn(['attributes', 'tags_recommendations'], hasFramework || connectedToFramework)
+            .set('frameworkIds', frameworkIds);
+        }
+      )
+    .filter(
+      (tax) => tax.getIn(['attributes', 'tags_recommendations']) ||
+        tax.getIn(['attributes', 'tags_measures']) ||
+        tax.getIn(['attributes', 'tags_users'])
+    )
+);
+
 export const selectFWTaxonomies = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
   (state) => selectEntities(state, 'framework_taxonomies'),
@@ -428,6 +463,10 @@ export const selectFWTaxonomies = createSelector(
 );
 
 export const selectTaxonomiesSorted = createSelector(
+  selectTaxonomies,
+  (taxonomies) => taxonomies && sortEntities(taxonomies, 'asc', 'priority', null, false)
+);
+export const selectFWTaxonomiesSorted = createSelector(
   selectFWTaxonomies,
   (taxonomies) => taxonomies && sortEntities(taxonomies, 'asc', 'priority', null, false)
 );
@@ -435,7 +474,7 @@ export const selectTaxonomiesSorted = createSelector(
 export const selectEntity = createSelector(
   (state, { path }) => selectEntities(state, path),
   (state, { id }) => id,
-  (entities, id) => entities.get(id.toString())
+  (entities, id) => id && entities.get(id.toString())
 );
 
 // filter entities by attributes, using object
@@ -573,7 +612,7 @@ export const selectMeasureConnections = createSelector(
 
 export const selectMeasureTaxonomies = createSelector(
   (state, args) => args ? args.includeParents : true,
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (includeParents, taxonomies, categories) =>
     prepareTaxonomies(taxonomies, categories, 'tags_measures', includeParents)
@@ -581,14 +620,14 @@ export const selectMeasureTaxonomies = createSelector(
 
 export const selectRecommendationTaxonomies = createSelector(
   (state, args) => args ? args.includeParents : true,
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (includeParents, taxonomies, categories) =>
     prepareTaxonomies(taxonomies, categories, 'tags_recommendations', includeParents)
 );
 
 export const selectUserTaxonomies = createSelector(
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) => prepareTaxonomies(taxonomies, categories, 'tags_users')
 );
@@ -606,4 +645,20 @@ export const selectMeasuresCategorised = createSelector(
   (state) => selectEntities(state, 'measure_categories'),
   (entities, associations) =>
     entitiesSetCategoryIds(entities, 'measure_id', associations)
+);
+
+export const selectViewRecommendationFrameworkId = createSelector(
+  (state, id) => selectEntity(state, { path: 'recommendations', id }),
+  selectCurrentPathname,
+  (entity, pathname) => {
+    if (
+      pathname.startsWith(PATHS.RECOMMENDATIONS) &&
+      entity &&
+      entity.getIn(['attributes', 'framework_id'])
+    ) {
+      return entity.getIn(['attributes', 'framework_id']).toString();
+    }
+    return null;
+  }
+
 );

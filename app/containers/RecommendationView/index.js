@@ -21,6 +21,7 @@ import {
   getTaxonomyFields,
   hasTaxonomyCategories,
 } from 'utils/fields';
+import { attributesEqual } from 'utils/entities';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -38,6 +39,7 @@ import {
   selectMeasureTaxonomies,
   selectMeasureConnections,
   selectIndicatorConnections,
+  selectEntities,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -104,20 +106,21 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     indicators,
     indicatorConnections,
     onEntityClick,
+    hasResponse,
   ) => ([
     {
       fields: [
         getMarkdownField(entity, 'description', true, 'fullRecommendation'),
-        getStatusField(entity, 'accepted', ACCEPTED_STATUSES, appMessages.attributes.accepted),
-        getMarkdownField(entity, 'response', true),
+        hasResponse && getStatusField(entity, 'accepted', ACCEPTED_STATUSES, appMessages.attributes.accepted),
+        hasResponse && getMarkdownField(entity, 'response', true),
       ],
     },
     {
       label: appMessages.entities.connections.plural,
       icon: 'connections',
       fields: [
-        getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
-        getIndicatorConnectionField(indicators, indicatorConnections, onEntityClick),
+        measures && getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
+        indicators && getIndicatorConnectionField(indicators, indicatorConnections, onEntityClick),
       ],
     },
   ]);
@@ -144,8 +147,17 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       indicators,
       indicatorConnections,
       onEntityClick,
+      frameworks,
     } = this.props;
+    const frameworkId = viewEntity && viewEntity.getIn(['attributes', 'framework_id']);
+    const type = this.context.intl.formatMessage(
+      appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
+    );
 
+    const currentFramework = dataReady && frameworks.find((fw) => attributesEqual(fw.get('id'), frameworkId));
+    const hasResponse = dataReady && currentFramework.getIn(['attributes', 'has_response']);
+    const hasMeasures = dataReady && currentFramework.getIn(['attributes', 'has_measures']);
+    const hasIndicators = dataReady && currentFramework.getIn(['attributes', 'has_indicators']);
     const buttons = isManager
     ? [
       {
@@ -165,16 +177,16 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={`${this.context.intl.formatMessage(messages.pageTitle, { type })}: ${this.props.params.id}`}
           meta={[
             { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={this.context.intl.formatMessage(messages.pageTitle, { type })}
             type={CONTENT_SINGLE}
-            icon="recommendations"
+            icon={frameworkId ? `recommendations_${frameworkId}` : 'recommendations'}
             buttons={buttons}
           />
           { !dataReady &&
@@ -195,12 +207,13 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
                 body: {
                   main: this.getBodyMainFields(
                     viewEntity,
-                    measures,
+                    hasMeasures && measures,
                     measureTaxonomies,
                     measureConnections,
-                    indicators,
+                    hasIndicators && indicators,
                     indicatorConnections,
                     onEntityClick,
+                    hasResponse,
                   ),
                   aside: this.getBodyAsideFields(taxonomies),
                 },
@@ -228,6 +241,7 @@ RecommendationView.propTypes = {
   indicatorConnections: PropTypes.object,
   params: PropTypes.object,
   isManager: PropTypes.bool,
+  frameworks: PropTypes.object,
 };
 
 RecommendationView.contextTypes = {
@@ -244,6 +258,7 @@ const mapStateToProps = (state, props) => ({
   measureConnections: selectMeasureConnections(state),
   indicators: selectIndicators(state, props.params.id),
   indicatorConnections: selectIndicatorConnections(state),
+  frameworks: selectEntities(state, 'frameworks'),
 });
 
 function mapDispatchToProps(dispatch, props) {

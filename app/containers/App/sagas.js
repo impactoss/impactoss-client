@@ -67,6 +67,7 @@ import {
   recoverSuccess,
   recoverError,
   forwardOnAuthenticationChange,
+  updatePath,
 } from 'containers/App/actions';
 
 import {
@@ -173,10 +174,12 @@ export function* recoverSaga(payload) {
     });
     yield put(recoverSuccess());
     // forward to login
-    yield put(replace({
-      pathname: PATHS.LOGIN,
-      query: { info: PARAMS.RECOVER_SUCCESS },
-    }));
+    yield put(updatePath(
+      PATHS.LOGIN,
+      {
+        replace: true,
+        query: { info: PARAMS.RECOVER_SUCCESS },
+      }));
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(recoverError(err));
@@ -186,10 +189,10 @@ export function* recoverSaga(payload) {
 export function* authChangeSaga() {
   const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
   if (redirectPathname) {
-    yield put(replace(redirectPathname));
+    yield put(updatePath(redirectPathname, { replace: true }));
   } else {
     // forward to home
-    yield put(replace('/'));
+    yield put(updatePath('/', { replace: true }));
   }
 }
 
@@ -198,7 +201,7 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(replace(PATHS.LOGIN));
+    yield put(updatePath(PATHS.LOGIN, { replace: true }));
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));
@@ -341,7 +344,7 @@ export function* saveEntitySaga({ data }) {
 
     yield put(saveSuccess(dataTS));
     if (data.redirect) {
-      yield put(replace(data.redirect));
+      yield put(updatePath(data.redirect, { replace: true }));
     }
     if (data.invalidateEntitiesOnSuccess) {
       yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
@@ -359,7 +362,10 @@ export function* deleteEntitySaga({ data }) {
     yield put(deleteSending(dataTS));
     yield call(deleteEntityRequest, data.path, data.id);
     if (data.redirect !== false) {
-      yield put(replace(`/${data.redirect || data.path}`));
+      yield put(updatePath(
+        `/${data.redirect || data.path}`,
+        { replace: true },
+      ));
     }
     yield put(removeEntity(data.path, data.id));
     yield put(deleteSuccess(dataTS));
@@ -440,12 +446,18 @@ export function* newEntitySaga({ data }) {
     }
     if (data.redirect) {
       if (data.createAsGuest) {
-        yield put(replace({
-          pathname: `${data.redirect}`,
-          query: { info: 'createdAsGuest', infotype: data.path },
-        }));
+        yield put(updatePath(
+          data.redirect,
+          {
+            query: { info: 'createdAsGuest', infotype: data.path },
+            replace: true,
+          }
+        ));
       } else {
-        yield put(replace(`${data.redirect}/${entityCreated.data.id}`));
+        yield put(updatePath(
+          `${data.redirect}/${entityCreated.data.id}`,
+          { replace: true },
+        ));
       }
     }
     if (data.invalidateEntitiesOnSuccess) {
@@ -555,9 +567,14 @@ const getNextQueryString = (queryNext) =>
 
 export function* updateRouteQuerySaga({ query, extend = true }) {
   const location = yield select(selectLocation);
-  const queryNext = getNextQuery(query, extend, location);
-
-  yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
+  yield put(updatePath(
+    location.get('pathname'),
+    {
+      query,
+      extend,
+      replace: true,
+    },
+  ));
 }
 
 export function* setFrameworkSaga({ framework }) {
@@ -576,16 +593,18 @@ export function* setFrameworkSaga({ framework }) {
 
 export function* dismissQueryMessagesSaga() {
   const location = yield select(selectLocation);
-  const queryNext = getNextQuery(
-    [
-      { arg: 'info', remove: true },
-      { arg: 'warning', remove: true },
-      { arg: 'error', remove: true },
-    ],
-    true,
-    location
-  );
-  yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
+  yield put(updatePath(
+    location.get('pathname'),
+    {
+      query: [
+        { arg: 'info', remove: true },
+        { arg: 'warning', remove: true },
+        { arg: 'error', remove: true },
+      ],
+      extend: true,
+      replace: true,
+    },
+  ));
 }
 
 export function* updatePathSaga({ path, args }) {
@@ -618,9 +637,13 @@ export function* closeEntitySaga({ path }) {
   // the close icon is to function like back if possible, otherwise go to default path provided
   const previousPath = yield select(selectPreviousPathname);
   const currentPath = yield select(selectCurrentPathname);
-  yield put(previousPath && (previousPath !== currentPath)
-    ? goBack()
-    : push({ pathname: path || '/' })
+  const isPreviousValid =
+    previousPath.indexOf('/edit') > -1 ||
+    previousPath.indexOf('/new') > -1;
+  yield put(
+    !isPreviousValid && previousPath && (previousPath !== currentPath)
+      ? goBack()
+      : push({ pathname: path || '/' })
   );
 }
 

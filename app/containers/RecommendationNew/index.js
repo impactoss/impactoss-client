@@ -223,7 +223,11 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
               model="recommendationNew.form.data"
               formData={viewDomain.form.data}
               saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, currentFramework, fwTaxonomies)}
+              handleSubmit={(formData) => this.props.handleSubmit(
+                formData,
+                currentFramework,
+                fwTaxonomies,
+              )}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
@@ -320,30 +324,35 @@ function mapDispatchToProps(dispatch) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, currentFramework) => {
-    // handleSubmit: (formData, currentFramework, fwTaxonomies) => {
+    // handleSubmit: (formData, currentFramework) => {
+    handleSubmit: (formData, currentFramework, fwTaxonomies) => {
       let saveData = formData;
-      // const validCategories = fwTaxonomies && fwTaxonomies
-      //   .map((fwt) => fwt.get('categories'));
-      // console.log(validCategories && validCategories.toJS());
-      // recommendationCategories
+
+      // recommendationCategories=
       if (formData.get('associatedTaxonomies')) {
+        // get List of valid categories (for framework)
+        const validCategories = fwTaxonomies && fwTaxonomies
+          .map((fwt) => fwt.get('categories').keySeq())
+          .valueSeq()
+          .flatten();
+        // get list of selected categories by taxonomy,
+        // filter by valid categories
+        const selectedCategories = formData
+          .get('associatedTaxonomies')
+          .map(getCheckedValuesFromOptions)
+          .valueSeq()
+          .flatten()
+          .filter((id) => !validCategories || validCategories.includes(id));
+        // const categoryIds =
         saveData = saveData.set(
           'recommendationCategories',
-          formData.get('associatedTaxonomies')
-          .map(getCheckedValuesFromOptions)
-          .reduce((updates, formCategoryIds) => Map({
+          Map({
             delete: List(),
-            create: updates.get('create').concat(formCategoryIds.map((id) =>
-              Map({
-                category_id: id,
-              })
-            )),
-          }), Map({ delete: List(), create: List() }))
+            create: selectedCategories.map((id) => Map({ category_id: id })) }),
         );
       }
 
-      // measures
+      // measures if allowed by framework
       if (
         formData.get('associatedMeasures') &&
         currentFramework.getIn(['attributes', 'has_measures'])
@@ -357,7 +366,7 @@ function mapDispatchToProps(dispatch) {
         }));
       }
 
-      // indicators
+      // indicators if allowed by framework
       if (
         formData.get('associatedIndicators') &&
         currentFramework.getIn(['attributes', 'has_indicators'])
@@ -370,13 +379,15 @@ function mapDispatchToProps(dispatch) {
           })),
         }));
       }
-      // cleanup
+      // cleanup attributes for framework
       if (!currentFramework.getIn(['attributes', 'has_response'])) {
         saveData = saveData
           .setIn(['attributes', 'accepted'], null)
           .setIn(['attributes', 'response'], null);
       }
-      // console.log(saveData.toJS())
+      if (!currentFramework.getIn(['attributes', 'framework_id'])) {
+        saveData = saveData.setIn(['attributes', 'framework_id'], DEFAULT_FRAMEWORK);
+      }
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {

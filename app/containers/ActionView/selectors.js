@@ -4,7 +4,7 @@ import {
   selectEntities,
   selectRecommendationConnections,
   selectIndicatorConnections,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   selectFWRecommendations,
   selectFWIndicators,
 } from 'containers/App/selectors';
@@ -25,7 +25,7 @@ export const selectViewEntity = createSelector(
 
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'measure_categories'),
   (id, taxonomies, categories, associations) =>

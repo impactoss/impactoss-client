@@ -228,7 +228,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     </div>
   );
   render() {
-    const { currentPath, isHome, frameworkOptions, currentFrameworkId, onSelectFramework } = this.props;
+    const { isHome, frameworkOptions, currentFrameworkId, onSelectFramework } = this.props;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
     const navItemsAdmin = filter(this.props.navItems, (item) => item.isAdmin);
 
@@ -286,7 +286,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
               <LinkMain
                 key={i}
                 href={item.path}
-                active={item.active || currentPath.startsWith(item.path)}
+                active={item.active}
                 onClick={(evt) => this.onClick(evt, item.path)}
                 align={item.align}
                 icon={item.icon}

@@ -12,7 +12,7 @@ import {
   selectSortByQuery,
   selectSortOrderQuery,
   selectExpandQuery,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   selectFWRecommendations,
   selectFWIndicators,
 } from 'containers/App/selectors';
@@ -51,7 +51,7 @@ export const selectConnections = createSelector(
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectConnections(state),
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'recommendation_categories'),
   (connections, taxonomies, categories, categoryRecommendations) =>

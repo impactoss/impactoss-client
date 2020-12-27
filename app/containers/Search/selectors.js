@@ -7,7 +7,7 @@ import {
   selectSearchQuery,
   selectSortByQuery,
   selectSortOrderQuery,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
 } from 'containers/App/selectors';
 
 import {
@@ -28,7 +28,7 @@ const selectPathQuery = createSelector(
 // kicks off series of cascading selectors
 export const selectEntitiesByQuery = createSelector(
   selectFWEntitiesAll,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   (state, locationQuery) => selectSearchQuery(state, locationQuery),
   selectPathQuery,
   selectSortByQuery,

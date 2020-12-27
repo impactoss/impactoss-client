@@ -16,7 +16,7 @@ import styled, { withTheme } from 'styled-components';
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   selectReady,
 } from 'containers/App/selectors';
 import { PATHS, CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
@@ -754,7 +754,7 @@ Overview.contextTypes = {
 
 const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectTaxonomiesSorted(state),
+  taxonomies: selectFWTaxonomiesSorted(state),
   recommendationCount: selectRecommendationCount(state),
   measureCount: selectMeasureCount(state),
   indicatorCount: selectIndicatorCount(state),

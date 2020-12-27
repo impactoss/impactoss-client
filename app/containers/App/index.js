@@ -26,6 +26,7 @@ import {
   selectEntitiesWhere,
   selectNewEntityModal,
   selectFrameworkQuery,
+  selectViewRecommendationFrameworkId,
 } from './selectors';
 
 import {
@@ -97,19 +98,26 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       label: this.context.intl.formatMessage(messages.frameworks.all),
     });
   }
-  prepareMainMenuItems = (isManager, currentPath, currentFrameworkId) => {
+  prepareMainMenuItems = (isManager, currentPath, currentFrameworkId, viewRecommendationFramework) => {
     let navItems = [
       {
         path: PATHS.OVERVIEW,
         titleSuper: this.context.intl.formatMessage(messages.nav.overviewSuper),
         title: this.context.intl.formatMessage(messages.nav.overview),
-        active: currentPath.startsWith(PATHS.OVERVIEW) || currentPath.startsWith(PATHS.TAXONOMIES) || currentPath.startsWith(PATHS.CATEGORIES),
+        active:
+          currentPath.startsWith(PATHS.OVERVIEW) ||
+          currentPath.startsWith(PATHS.TAXONOMIES) ||
+          currentPath.startsWith(PATHS.CATEGORIES),
       },
       {
         path: PATHS.RECOMMENDATIONS,
         titleSuper: this.context.intl.formatMessage(messages.nav.recommendations),
         title: this.context.intl.formatMessage(messages.frameworkObjectivesShort[currentFrameworkId]),
-        active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
+        active: currentPath.startsWith(PATHS.RECOMMENDATIONS) && (
+          !viewRecommendationFramework ||
+          currentFrameworkId === 'all' ||
+          currentFrameworkId === viewRecommendationFramework
+        ),
       },
       {
         path: PATHS.MEASURES,
@@ -123,7 +131,9 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         path: PATHS.INDICATORS,
         titleSuper: this.context.intl.formatMessage(messages.nav.indicatorsSuper),
         title: this.context.intl.formatMessage(messages.nav.indicators),
-        active: currentPath.startsWith(PATHS.INDICATORS) || currentPath.startsWith(PATHS.PROGRESS_REPORTS),
+        active:
+          currentPath.startsWith(PATHS.INDICATORS) ||
+          currentPath.startsWith(PATHS.PROGRESS_REPORTS),
       }]);
     }
     navItems = navItems.concat([{
@@ -165,6 +175,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       currentFrameworkId,
       frameworks,
       onSelectFramework,
+      viewRecommendationFramework,
     } = this.props;
     return (
       <div>
@@ -172,9 +183,8 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           isSignedIn={isUserSignedIn}
           user={this.props.user}
           pages={pages && this.preparePageMenuPages(pages)}
-          navItems={this.prepareMainMenuItems(isUserSignedIn && isManager, location.pathname, currentFrameworkId)}
+          navItems={this.prepareMainMenuItems(isUserSignedIn && isManager, location.pathname, currentFrameworkId, viewRecommendationFramework)}
           onPageLink={onPageLink}
-          currentPath={location.pathname}
           isHome={location.pathname === '/'}
           currentFrameworkId={currentFrameworkId || 'all'}
           onSelectFramework={onSelectFramework}
@@ -226,13 +236,14 @@ App.propTypes = {
   onCloseModal: PropTypes.func,
   onSelectFramework: PropTypes.func,
   currentFrameworkId: PropTypes.string,
+  viewRecommendationFramework: PropTypes.string,
   frameworks: PropTypes.object,
 };
 App.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   isManager: selectIsUserManager(state),
   isUserSignedIn: selectIsSignedIn(state),
@@ -244,6 +255,7 @@ const mapStateToProps = (state) => ({
   newEntityModal: selectNewEntityModal(state),
   currentFrameworkId: selectFrameworkQuery(state),
   frameworks: selectEntities(state, 'frameworks'),
+  viewRecommendationFramework: selectViewRecommendationFrameworkId(state, props.params.id),
 });
 
 export function mapDispatchToProps(dispatch) {

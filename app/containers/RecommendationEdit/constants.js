@@ -21,6 +21,7 @@ export const DEPENDENCIES = [
   'recommendation_indicators',
   'measure_categories',
   'measure_indicators',
+  'frameworks',
 ];
 
 export const FORM_INITIAL = fromJS({
@@ -32,6 +33,7 @@ export const FORM_INITIAL = fromJS({
     accepted: '',
     response: '',
     draft: '',
+    framework_id: '',
   },
   associatedTaxonomies: {},
   associatedMeasures: [],
