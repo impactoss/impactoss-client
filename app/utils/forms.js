@@ -614,11 +614,19 @@ const getCategoryFields = (args, formatMessage) => ({
       fields: [getMarkdownField(formatMessage)],
     }],
     aside: [{
-      fields: [getFormField({
-        formatMessage,
-        controlType: 'url',
-        attribute: 'url',
-      })],
+      fields: [
+        (args.categoryParentOptions && args.parentTaxonomy)
+          ? renderParentCategoryControl(
+            args.categoryParentOptions,
+            getEntityTitle(args.parentTaxonomy),
+          )
+          : null,
+        getFormField({
+          formatMessage,
+          controlType: 'url',
+          attribute: 'url',
+        }),
+      ],
     }],
   },
 });
@@ -644,10 +652,11 @@ const getIndicatorFields = (args, formatMessage) => ({
   },
 });
 
-const getRecommendationFields = (args, formatMessage) => ({
+const getRecommendationFields = ({ frameworks, hasResponse }, formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
+        frameworks && getFrameworkFormField(formatMessage, frameworks),
         getReferenceFormField(formatMessage, true), // required
         getTitleFormField(formatMessage),
       ],
@@ -661,8 +670,9 @@ const getRecommendationFields = (args, formatMessage) => ({
   body: {
     main: [{
       fields: [
-        getAcceptedField(formatMessage),
-        getMarkdownField(formatMessage, 'response'),
+        getMarkdownField(formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
+        hasResponse && getAcceptedField(formatMessage),
+        hasResponse && getMarkdownField(formatMessage, 'response'),
       ],
     }],
   },
@@ -671,16 +681,16 @@ const getRecommendationFields = (args, formatMessage) => ({
 export const getEntityFields = (path, args, contextIntl) => {
   switch (path) {
     case 'categories':
-      return getCategoryFields(args, contextIntl.formatMessage);
+      return getCategoryFields(args.categories, contextIntl.formatMessage);
     case 'measures':
       return getFields({
         shape: MEASURE_SHAPE,
         contextIntl,
       });
     case 'indicators':
-      return getIndicatorFields(args, contextIntl.formatMessage);
+      return getIndicatorFields(args.indicators, contextIntl.formatMessage);
     case 'recommendations':
-      return getRecommendationFields(args, contextIntl.formatMessage);
+      return getRecommendationFields(args.recommendations, contextIntl.formatMessage);
     default:
       return {};
   }

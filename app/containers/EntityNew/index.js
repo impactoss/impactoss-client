@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { getEntityFields } from 'utils/forms';
-
+import { attributesEqual } from 'utils/entities';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
@@ -20,8 +20,15 @@ import {
   saveErrorDismiss,
 } from 'containers/App/actions';
 
-import { selectEntity } from 'containers/App/selectors';
+import {
+  selectEntity,
+  selectFrameworkQuery,
+  selectFrameworksForQuery,
+} from 'containers/App/selectors';
+import { selectParentOptions, selectParentTaxonomy } from 'containers/CategoryNew/selectors';
 
+
+import { DEFAULT_FRAMEWORK } from 'themes/config';
 import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -55,14 +62,49 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
 
   render() {
-    const { viewDomain, path, attributes, inModal, taxonomy } = this.props;
+    const {
+      viewDomain,
+      path,
+      attributes,
+      inModal,
+      taxonomy,
+      categoryParentOptions,
+      parentTaxonomy,
+      frameworks,
+      frameworkId,
+    } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
 
-    let pageTitle = this.context.intl.formatMessage(messages[path].pageTitle);
-    if (taxonomy && taxonomy.get('attributes')) {
+    let pageTitle;
+    let hasResponse;
+    let fwSpecified;
+    let icon = path;
+    if (path === 'categories' && taxonomy && taxonomy.get('attributes')) {
       pageTitle = this.context.intl.formatMessage(messages[path].pageTitleTaxonomy, {
         taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
+    } else if (path === 'recommendations') {
+      // check if single framework set
+      fwSpecified = (frameworkId && frameworkId !== 'all');
+      // figure out framework id from form if not set
+      const currentFrameworkId = fwSpecified
+        ? frameworkId
+        : viewDomain.form.data.getIn(['attributes', 'framework_id']) || DEFAULT_FRAMEWORK;
+      // get current framework
+      const currentFramework =
+        frameworks &&
+        frameworks.find((fw) => attributesEqual(fw.get('id'), currentFrameworkId));
+      // get framework type
+      const type = path === 'recommendations' && this.context.intl.formatMessage(
+        appMessages.entities[fwSpecified ? `${path}_${frameworkId}` : path].single
+      );
+      // check if response is required
+      hasResponse = currentFramework && currentFramework.getIn(['attributes', 'has_response']);
+      // figure out title and icon
+      pageTitle = this.context.intl.formatMessage(messages[path].pageTitle, { type });
+      icon = fwSpecified ? `${path}_${frameworkId}` : path;
+    } else {
+      pageTitle = this.context.intl.formatMessage(messages[path].pageTitle);
     }
 
     return (
@@ -78,7 +120,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={pageTitle}
             type={CONTENT_MODAL}
-            icon={path}
+            icon={icon}
             buttons={[{
               type: 'cancel',
               onClick: this.props.onCancel,
@@ -117,8 +159,22 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             )}
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
-            fields={getEntityFields(path, { taxonomy }, this.context.intl, appMessages)}
             scrollContainer={this.state.scrollContainer}
+            fields={getEntityFields(
+              path,
+              {
+                categories: {
+                  taxonomy,
+                  categoryParentOptions,
+                  parentTaxonomy,
+                },
+                recommendations: {
+                  frameworks: !fwSpecified ? frameworks : null,
+                  hasResponse,
+                },
+              },
+              this.context.intl,
+            )}
           />
           {saveSending &&
             <Loading />
@@ -133,6 +189,8 @@ EntityNew.propTypes = {
   path: PropTypes.string.isRequired,
   attributes: PropTypes.object,
   taxonomy: PropTypes.object,
+  parentTaxonomy: PropTypes.object,
+  categoryParentOptions: PropTypes.object,
   handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
@@ -143,16 +201,30 @@ EntityNew.propTypes = {
   initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  frameworkId: PropTypes.string,
+  frameworks: PropTypes.object,
 };
 
 EntityNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = (state, { path, attributes }) => ({
   viewDomain: selectDomain(state),
-  taxonomy: props.attributes && props.attributes.get('taxonomy_id')
-    ? selectEntity(state, { path: 'taxonomies', id: props.attributes.get('taxonomy_id') })
+  taxonomy: path === 'categories' && attributes && attributes.get('taxonomy_id')
+    ? selectEntity(state, { path: 'taxonomies', id: attributes.get('taxonomy_id') })
+    : null,
+  categoryParentOptions: path === 'categories' && attributes && attributes.get('taxonomy_id')
+    ? selectParentOptions(state, attributes.get('taxonomy_id'))
+    : null,
+  parentTaxonomy: path === 'categories' && attributes && attributes.get('taxonomy_id')
+    ? selectParentTaxonomy(state, attributes.get('taxonomy_id'))
+    : null,
+  frameworkId: path === 'recommendations'
+    ? selectFrameworkQuery(state)
+    : null,
+  frameworks: path === 'recommendations'
+    ? selectFrameworksForQuery(state)
     : null,
 });
 

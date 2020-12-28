@@ -462,7 +462,7 @@
   "app.containers.EntityNew.categories.pageTitleTaxonomy" : "New {taxonomy}",
   "app.containers.EntityNew.measures.pageTitle" : "New Action",
   "app.containers.EntityNew.indicators.pageTitle" : "New Indicator",
-  "app.containers.EntityNew.recommendations.pageTitle" : "New Objective",
+  "app.containers.EntityNew.recommendations.pageTitle" : "New { type }",
   "app.containers.HomePage.pageTitle" : "IMPACT OSS Home",
   "app.containers.HomePage.metaDescription" : "Home page description",
   "app.containers.HomePage.intro" : "Here you can try the application and explore how an example Government Implementation Plan may look like that covers human rights issues and the SDGs and contains detailed actions and up to date progress reports.",
