@@ -95,6 +95,7 @@ export const getChangedOptions = (options) =>
   options.filter((o) => o.get('hasChanged'));
 
 export const getCheckedValuesFromOptions = (options, onlyChanged = false) => {
+  if (!options) return null;
   const opts = onlyChanged ? getChangedOptions(options) : options;
   return opts.filter((o) => o.get('checked')).map((o) => o.get('value'));
 };

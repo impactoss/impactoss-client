@@ -4,7 +4,6 @@
  *
  */
 import { fromJS } from 'immutable';
-import { DEFAULT_FRAMEWORK } from 'themes/config';
 export const SAVE = 'impactoss/RecommendationNew/SAVE';
 
 export const DEPENDENCIES = [
@@ -26,7 +25,7 @@ export const FORM_INITIAL = fromJS({
     accepted: true,
     response: '',
     draft: true,
-    framework_id: DEFAULT_FRAMEWORK,
+    framework_id: '',
   },
   associatedTaxonomies: {},
   associatedMeasures: [],

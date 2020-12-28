@@ -399,7 +399,6 @@ function mapDispatchToProps(dispatch, props) {
           .setIn(['attributes', 'response'], null);
       }
       dispatch(save(saveData.toJS()));
-      // dispatch(save(formData, props.params.id));
     },
     handleCancel: () => {
       dispatch(updatePath(`${PATHS.RECOMMENDATIONS}/${props.params.id}`, { replace: true }));

@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { Map, List } from 'immutable';
 
 import { getEntityFields } from 'utils/forms';
 import { attributesEqual } from 'utils/entities';
@@ -31,6 +32,7 @@ import { selectParentOptions, selectParentTaxonomy } from 'containers/CategoryNe
 import { DEFAULT_FRAMEWORK } from 'themes/config';
 import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import Content from 'components/Content';
 import Messages from 'components/Messages';
@@ -51,12 +53,25 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
     };
   }
   componentWillMount() {
-    this.props.initialiseForm('entityNew.form.data', FORM_INITIAL);
+    this.props.initialiseForm('entityNew.form.data', this.getInitialFormData());
   }
   componentWillReceiveProps(nextProps) {
     if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
       scrollToTop(this.state.scrollContainer);
     }
+    if (!this.props.frameworkId && nextProps.frameworkId) {
+      this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));
+    }
+  }
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const { frameworkId } = props;
+    return Map(FORM_INITIAL.setIn(
+      ['attributes', 'framework_id'],
+      (frameworkId && frameworkId !== 'all')
+        ? frameworkId
+        : DEFAULT_FRAMEWORK,
+    ));
   }
 
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
@@ -247,9 +262,22 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.submit(model));
     },
     handleSubmit: (formData, attributes) => {
-      const saveData = attributes
+      let saveData = attributes
         ? formData.mergeIn(['attributes'], attributes)
         : formData;
+
+      // saveData = saveData.setIn(['attributes', 'taxonomy_id'], taxonomy.get('id'));
+
+      if (props.path === 'categories') {
+        const formCategoryIds =
+          formData.get('associatedCategory') &&
+          getCheckedValuesFromOptions(formData.get('associatedCategory'));
+        if (List.isList(formCategoryIds) && formCategoryIds.size) {
+          saveData = saveData.setIn(['attributes', 'parent_id'], formCategoryIds.first());
+        } else {
+          saveData = saveData.setIn(['attributes', 'parent_id'], null);
+        }
+      }
 
       dispatch(newEntity({
         entity: saveData.toJS(),

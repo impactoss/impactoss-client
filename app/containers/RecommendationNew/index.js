@@ -80,7 +80,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('recommendationNew.form.data', FORM_INITIAL);
+    this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData());
   }
 
   componentWillReceiveProps(nextProps) {
@@ -91,9 +91,23 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
+    if (!this.props.frameworkId && nextProps.frameworkId) {
+      this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));
+    }
     if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
       scrollToTop(this.state.scrollContainer);
     }
+  }
+
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const { frameworkId } = props;
+    return Map(FORM_INITIAL.setIn(
+      ['attributes', 'framework_id'],
+      (frameworkId && frameworkId !== 'all')
+        ? frameworkId
+        : DEFAULT_FRAMEWORK,
+    ));
   }
 
   getHeaderMainFields = (frameworks) => ([ // fieldGroups
@@ -385,7 +399,7 @@ function mapDispatchToProps(dispatch) {
           .setIn(['attributes', 'accepted'], null)
           .setIn(['attributes', 'response'], null);
       }
-      if (!currentFramework.getIn(['attributes', 'framework_id'])) {
+      if (!currentFramework.get('id')) {
         saveData = saveData.setIn(['attributes', 'framework_id'], DEFAULT_FRAMEWORK);
       }
       dispatch(save(saveData.toJS()));
