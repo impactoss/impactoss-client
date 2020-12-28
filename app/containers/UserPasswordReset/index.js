@@ -23,7 +23,6 @@ import AuthForm from 'components/forms/AuthForm';
 
 import { updatePath } from 'containers/App/actions';
 
-import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import { reset } from './actions';
@@ -65,8 +64,8 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
               handleCancel={this.props.handleCancel}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
               fields={[
-                getPasswordField(this.context.intl.formatMessage, appMessages, '.password'),
-                getPasswordConfirmationField(this.context.intl.formatMessage, appMessages, '.passwordConfirmation'),
+                getPasswordField(this.context.intl.formatMessage, '.password'),
+                getPasswordConfirmationField(this.context.intl.formatMessage, '.passwordConfirmation'),
               ]}
             />
           }
