@@ -141,8 +141,8 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceFormField(this.context.intl.formatMessage, appMessages, false, true),
-        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
+        getReferenceFormField(this.context.intl.formatMessage, false, true),
+        getTitleFormField(this.context.intl.formatMessage, 'titleText'),
       ],
     },
   ]);
@@ -150,15 +150,15 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages, entity),
-        getMetaField(entity, appMessages),
+        getStatusField(this.context.intl.formatMessage, entity),
+        getMetaField(entity),
       ],
     },
   ]);
 
   getBodyMainFields = (connectedTaxonomies, measures, recommendations, onCreateOption) => ([
     {
-      fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
+      fields: [getMarkdownField(this.context.intl.formatMessage)],
     },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
@@ -177,7 +177,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       fields: [
         getDateField(
           this.context.intl.formatMessage,
-          appMessages,
           'start_date',
           repeat,
           repeat ? 'start_date' : 'start_date_only',
@@ -185,15 +184,13 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         ),
         getCheckboxField(
           this.context.intl.formatMessage,
-          appMessages,
           'repeat',
           entity,
           (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
         ),
-        repeat ? getFrequencyField(this.context.intl.formatMessage, appMessages, entity) : null,
+        repeat ? getFrequencyField(this.context.intl.formatMessage, entity) : null,
         repeat ? getDateField(
           this.context.intl.formatMessage,
-          appMessages,
           'end_date',
           repeat,
           'end_date',

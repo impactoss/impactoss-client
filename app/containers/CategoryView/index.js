@@ -88,7 +88,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       fields.push({
         fields: [
           getStatusField(entity),
-          getMetaField(entity, appMessages),
+          getMetaField(entity),
         ],
       });
     }

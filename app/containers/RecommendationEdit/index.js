@@ -127,8 +127,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceFormField(this.context.intl.formatMessage, appMessages, true), // required
-        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
+        getReferenceFormField(this.context.intl.formatMessage, true), // required
+        getTitleFormField(this.context.intl.formatMessage, 'titleText'),
       ],
     },
   ]);
@@ -136,17 +136,17 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages, entity),
-        getMetaField(entity, appMessages),
+        getStatusField(this.context.intl.formatMessage, entity),
+        getMetaField(entity),
       ],
     },
   ]);
   getBodyMainFields = (connectedTaxonomies, entity, measures, indicators, onCreateOption, hasResponse) => ([
     {
       fields: [
-        getMarkdownField(this.context.intl.formatMessage, appMessages, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
-        hasResponse && getAcceptedField(this.context.intl.formatMessage, appMessages, entity),
-        hasResponse && getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
+        getMarkdownField(this.context.intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
+        hasResponse && getAcceptedField(this.context.intl.formatMessage, entity),
+        hasResponse && getMarkdownField(this.context.intl.formatMessage, 'response'),
       ],
     },
     {

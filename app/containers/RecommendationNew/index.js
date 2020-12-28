@@ -100,22 +100,22 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     { // fieldGroup
       fields: [
         frameworks && getFrameworkFormField(this.context.intl.formatMessage, frameworks), // required
-        getReferenceFormField(this.context.intl.formatMessage, appMessages, true), // required
-        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
+        getReferenceFormField(this.context.intl.formatMessage, true), // required
+        getTitleFormField(this.context.intl.formatMessage, 'titleText'),
       ],
     },
   ]);
 
   getHeaderAsideFields = () => ([{
-    fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
+    fields: [getStatusField(this.context.intl.formatMessage)],
   }]);
 
   getBodyMainFields = (connectedTaxonomies, measures, indicators, onCreateOption, hasResponse) => ([
     {
       fields: [
-        getMarkdownField(this.context.intl.formatMessage, appMessages, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
-        hasResponse && getAcceptedField(this.context.intl.formatMessage, appMessages),
-        hasResponse && getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
+        getMarkdownField(this.context.intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
+        hasResponse && getAcceptedField(this.context.intl.formatMessage),
+        hasResponse && getMarkdownField(this.context.intl.formatMessage, 'response'),
       ],
     },
     {

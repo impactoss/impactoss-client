@@ -92,7 +92,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     {
       fields: [
         getStatusField(entity),
-        getMetaField(entity, appMessages),
+        getMetaField(entity),
       ],
     },
   ]);
@@ -130,7 +130,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     ? { // fieldGroup
       label: appMessages.entities.taxonomies.plural,
       icon: 'categories',
-      fields: getTaxonomyFields(taxonomies, appMessages),
+      fields: getTaxonomyFields(taxonomies),
     }
     : null,
   ]);

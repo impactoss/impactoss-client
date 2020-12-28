@@ -65,7 +65,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     {
       fields: [
         getStatusField(entity),
-        getMetaField(entity, appMessages),
+        getMetaField(entity),
       ],
     },
   ]);

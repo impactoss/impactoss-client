@@ -120,15 +120,15 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getTitleFormField(this.context.intl.formatMessage, appMessages),
+        getTitleFormField(this.context.intl.formatMessage),
       ],
     },
   ]);
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages, entity),
-        getMetaField(entity, appMessages),
+        getStatusField(this.context.intl.formatMessage, entity),
+        getMetaField(entity),
       ],
     },
   ]);
@@ -136,9 +136,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   getBodyMainFields = (entity) => ([
     {
       fields: [
-        getMarkdownField(this.context.intl.formatMessage, appMessages),
-        getUploadField(this.context.intl.formatMessage, appMessages),
-        getDocumentStatusField(this.context.intl.formatMessage, appMessages, entity),
+        getMarkdownField(this.context.intl.formatMessage),
+        getUploadField(this.context.intl.formatMessage),
+        getDocumentStatusField(this.context.intl.formatMessage, entity),
       ],
     },
   ]);
@@ -150,11 +150,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
       fields: entity.get('indicator') && entity.getIn(['indicator', 'dates']) &&
         [getDueDateOptionsField(
           this.context.intl.formatMessage,
-          appMessages,
           getDueDateDateOptions(
             entity.getIn(['indicator', 'dates']),
             this.context.intl.formatMessage,
-            appMessages,
             this.context.intl.formatDate,
             entity.getIn(['attributes', 'due_date_id'])
               ? entity.getIn(['attributes', 'due_date_id']).toString()

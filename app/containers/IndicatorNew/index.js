@@ -99,8 +99,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceFormField(this.context.intl.formatMessage, appMessages, false, true),
-        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
+        getReferenceFormField(this.context.intl.formatMessage, false, true),
+        getTitleFormField(this.context.intl.formatMessage, 'titleText'),
       ],
     },
   ]);
@@ -108,14 +108,14 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   getHeaderAsideFields = () => ([
     {
       fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages),
+        getStatusField(this.context.intl.formatMessage),
       ],
     },
   ]);
 
   getBodyMainFields = (connectedTaxonomies, measures, recommendations, onCreateOption) => ([
     {
-      fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
+      fields: [getMarkdownField(this.context.intl.formatMessage)],
     },
     {
       label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
@@ -134,7 +134,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       fields: [
         getDateField(
           this.context.intl.formatMessage,
-          appMessages,
           'start_date',
           repeat,
           repeat ? 'start_date' : 'start_date_only',
@@ -142,15 +141,13 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
         ),
         getCheckboxField(
           this.context.intl.formatMessage,
-          appMessages,
           'repeat',
           null,
           (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
         ),
-        repeat ? getFrequencyField(this.context.intl.formatMessage, appMessages) : null,
+        repeat ? getFrequencyField(this.context.intl.formatMessage) : null,
         repeat ? getDateField(
           this.context.intl.formatMessage,
-          appMessages,
           'end_date',
           repeat,
           'end_date',

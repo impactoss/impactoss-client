@@ -106,9 +106,9 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceFormField(this.context.intl.formatMessage, appMessages),
-        getTitleFormField(this.context.intl.formatMessage, appMessages),
-        getShortTitleFormField(this.context.intl.formatMessage, appMessages),
+        getReferenceFormField(this.context.intl.formatMessage),
+        getTitleFormField(this.context.intl.formatMessage),
+        getShortTitleFormField(this.context.intl.formatMessage),
       ],
     },
   ]);
@@ -117,7 +117,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     const fields = []; // fieldGroups
     fields.push({
       fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages),
+        getStatusField(this.context.intl.formatMessage),
       ],
     });
     if (taxonomy.getIn(['attributes', 'tags_users'])) {
@@ -125,7 +125,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         fields: [
           getCheckboxField(
             this.context.intl.formatMessage,
-            appMessages,
             'user_only',
           ),
         ],
@@ -137,7 +136,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   getBodyMainFields = (taxonomy, connectedTaxonomies, recommendations, measures, onCreateOption, userOnly) => {
     const fields = [];
     fields.push({
-      fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
+      fields: [getMarkdownField(this.context.intl.formatMessage)],
     });
     if (!userOnly) {
       fields.push({
@@ -167,7 +166,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     fields.push({
       fields: [getFormField({
         formatMessage: this.context.intl.formatMessage,
-        appMessages,
         controlType: 'url',
         attribute: 'url',
       })],

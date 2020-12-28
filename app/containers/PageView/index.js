@@ -39,7 +39,6 @@ import {
   getMarkdownField,
 } from 'utils/fields';
 
-import appMessages from 'containers/App/messages';
 import messages from './messages';
 import { selectViewEntity } from './selectors';
 import { DEPENDENCIES } from './constants';
@@ -67,7 +66,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
   getBodyAsideFields = (entity) => ([{
     fields: [
       getStatusField(entity),
-      getMetaField(entity, appMessages),
+      getMetaField(entity),
     ],
   }]);
   getBodyMainFields = (entity) => ([{

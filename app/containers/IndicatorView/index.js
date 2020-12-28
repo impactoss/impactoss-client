@@ -82,7 +82,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     ([{
       fields: [
         getStatusField(entity),
-        getMetaField(entity, appMessages),
+        getMetaField(entity),
       ],
     }]);
 
@@ -127,10 +127,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       type: 'dark',
       icon: 'reminder',
       fields: [
-        getScheduleField(
-          dates,
-          appMessages,
-        ),
+        getScheduleField(dates),
         getManagerField(
           entity,
           appMessages.attributes.manager_id.indicators,
