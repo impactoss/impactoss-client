@@ -37,7 +37,13 @@ const mapTaxonomy = (tax, childTaxonomies, activeId, onLink) => {
   });
 };
 
-export const prepareTaxonomyGroups = (taxonomies, activeId, onLink, frameworkId, frameworks) => {
+export const prepareTaxonomyGroups = (
+  taxonomies,
+  activeId,
+  onLink,
+  frameworkId,
+  frameworks,
+) => {
   const parentTaxonomies = taxonomies.filter((tax) =>
     tax.getIn(['attributes', 'parent_id']) === ''
     || tax.getIn(['attributes', 'parent_id']) === null
@@ -96,20 +102,6 @@ export const prepareTaxonomyGroups = (taxonomies, activeId, onLink, frameworkId,
     groups.push({
       id: 'measures',
       taxonomies: measureOnlyTaxonomies
-        .map((tax) => mapTaxonomy(tax, taxonomies, activeId, onLink))
-        .toArray(),
-    });
-  }
-  const userOnlyTaxonomies = parentTaxonomies
-    .filter((tax) =>
-      tax.getIn(['attributes', 'tags_users']) &&
-      !tax.getIn(['attributes', 'tags_measures']) &&
-      !tax.getIn(['attributes', 'tags_recommendations'])
-    );
-  if (userOnlyTaxonomies && userOnlyTaxonomies.size > 0) {
-    groups.push({
-      id: 'users',
-      taxonomies: userOnlyTaxonomies
         .map((tax) => mapTaxonomy(tax, taxonomies, activeId, onLink))
         .toArray(),
     });
