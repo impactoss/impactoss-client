@@ -19,6 +19,7 @@ import {
   selectReady,
   selectIsUserManager,
   selectFrameworkQuery,
+  selectFrameworks,
 } from 'containers/App/selectors';
 import { PATHS, CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -58,7 +59,11 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     this.props.loadEntitiesIfNeeded();
     // redirect to default taxonomy if needed
     if (this.props.dataReady && typeof this.props.taxonomy === 'undefined') {
-      this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(this.props.taxonomies, this.props.framework).get('id'));
+      this.props.redirectToDefaultTaxonomy(
+        getDefaultTaxonomy(
+          this.props.taxonomies,
+          this.props.frameworkId,
+        ).get('id'));
     }
   }
   componentWillReceiveProps(nextProps) {
@@ -68,9 +73,14 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     }
     // redirect to default taxonomy if needed
     if (nextProps.dataReady && typeof nextProps.taxonomy === 'undefined') {
-      this.props.redirectToDefaultTaxonomy(getDefaultTaxonomy(nextProps.taxonomies, nextProps.framework).get('id'));
+      this.props.redirectToDefaultTaxonomy(
+        getDefaultTaxonomy(
+          nextProps.taxonomies,
+          nextProps.frameworkId,
+        ).get('id'));
     }
   }
+
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
   getTaxDescription = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].description);
   getTaxButtonTitle = (id) => this.context.intl.formatMessage(
@@ -78,7 +88,18 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
   );
 
   render() {
-    const { taxonomy, taxonomies, categoryGroups, userOnlyCategoryGroups, dataReady, isManager, onPageLink, onTaxonomyLink } = this.props;
+    const {
+      taxonomy,
+      taxonomies,
+      categoryGroups,
+      userOnlyCategoryGroups,
+      dataReady,
+      isManager,
+      onPageLink,
+      onTaxonomyLink,
+      frameworks,
+      frameworkId,
+    } = this.props;
     const reference = taxonomy && taxonomy.get('id');
     const contentTitle = typeof reference !== 'undefined' ? this.getTaxTitle(reference) : '';
     const contentDescription = typeof reference !== 'undefined' && this.getTaxDescription(reference);
@@ -120,10 +141,12 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         { !dataReady &&
           <EntityListSidebarLoading responsiveSmall />
         }
-        { taxonomies && typeof reference !== 'undefined' &&
+        { taxonomies && frameworks && typeof reference !== 'undefined' &&
           <TaxonomySidebar
             taxonomies={taxonomies}
             active={reference}
+            frameworkId={frameworkId}
+            frameworks={frameworks}
             onTaxonomyLink={onTaxonomyLink}
           />
         }
@@ -194,7 +217,8 @@ CategoryList.propTypes = {
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   location: PropTypes.object,
-  framework: PropTypes.string,
+  frameworks: PropTypes.object,
+  frameworkId: PropTypes.string,
 };
 
 CategoryList.contextTypes = {
@@ -202,7 +226,8 @@ CategoryList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  framework: selectFrameworkQuery(state),
+  frameworks: selectFrameworks(state),
+  frameworkId: selectFrameworkQuery(state),
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectFWTaxonomiesSorted(state),

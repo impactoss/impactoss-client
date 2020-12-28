@@ -18,10 +18,10 @@ import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
   selectFWTaxonomiesSorted,
   selectReady,
+  selectFrameworks,
+  selectFrameworkQuery,
 } from 'containers/App/selectors';
 import { PATHS, CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
-
-import appMessages from 'containers/App/messages';
 
 // components
 import Button from 'components/buttons/Button';
@@ -72,34 +72,6 @@ const Diagram = styled.div`
     margin-bottom: 180px;
   }
 `;
-const DiagramSectionHorizontalHalf = styled.div`
-  display: inline-block;
-  width: 25%;
-  position: relative;
-  height: 260px;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    height: 300px;
-  }
-`;
-
-const DiagramSectionHorizontalCenter = styled.div`
-  display: inline-block;
-  width: 50%;
-  position: relative;
-  height: 260px;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    height: 300px;
-  }
-`;
-
-const DiagramSectionHorizontalVCenter = styled.div`
-  position: absolute;
-  left: 0;
-  text-align: center;
-  width: 100%;
-  top: 50%;
-  transform: translate(0, -50%);
-`;
 
 const DiagramSectionVertical = styled.div`
   display: block;
@@ -113,22 +85,6 @@ const DiagramSectionVerticalCenter = styled.div`
   position: relative;
 `;
 
-const Annotation = styled.div`
-  position: absolute;
-  transform: translate(-50%, -50%);
-  top: 50%;
-  text-align: center;
-  word-spacing: 1000000px;
-  width: 200px;
-  color: ${palette('text', 1)};
-  line-height: 1.1;
-  font-size: 0.85em;
-  margin-top: -2em;
-  left: 30%;
-`;
-const AnnotationMeasured = styled(Annotation)`
-  left: 70%;
-`;
 const AnnotationVertical = styled.div`
   text-align: center;
   color: ${palette('text', 1)};
@@ -143,45 +99,6 @@ const AnnotationVertical = styled.div`
   }
 `;
 
-const Categorised = styled.div`
-  border-bottom: 1px solid ${palette('light', 4)};
-  padding-top: 5px;
-  padding-bottom: 5px;
-  margin: 0 5px;
-  color: ${palette('text', 1)};
-  font-weight: normal;
-  font-size: 0.75em;
-  background-color: ${palette('background', 1)};
-  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
-    position: absolute;
-    top: 100%;
-    width: 100%;
-    left: 0;
-    text-align: left;
-    border-top: 1px solid ${palette('light', 4)};
-    border-bottom: 0;
-    padding-bottom: 0;
-    margin: 0;
-  }
-`;
-
-const CategorisedIcons = styled.div``;
-
-const CategorisedIcon = styled.a`
-  display: inline-block;
-  padding: 0;
-  color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : palette('text', 1)};
-  &:hover {
-    color: ${(props) => palette('taxonomies', props.paletteId)};
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: 0 2px;
-  }
-`;
-// color: ${(props) => props.active ? palette('primary', 0) : palette('dark', 3)};
-// &:hover {
-//   color: ${palette('primary', 0)};
-// }
 const DiagramButtonWrap = styled.div`
   position: relative;
   display: inline-block;
@@ -195,12 +112,6 @@ const DiagramButtonWrap = styled.div`
     padding: 1em 0;
   }
 `;
-// color: ${palette('primary', 4)};
-// &:hover {
-//   color: ${palette('primary', 4)};
-//   background-color: ${palette('primary', 1)};
-// }
-// background-color: ${palette('primary', 1)};
 
 const DiagramButton = styled(Button)`
   background-color: ${(props) => palette(props.paletteDefault, 0)};
@@ -304,8 +215,6 @@ const STATE_INITIAL = {
   buttonRecs: null,
   buttonMeasures: null,
   buttonIndicators: null,
-  mouseOverTaxonomy: null,
-  mouseOverTaxonomyDiagram: null,
   viewport: null,
 };
 
@@ -332,18 +241,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     window.removeEventListener('resize', this.resize);
   }
 
-  onTaxonomyIconMouseOver = (taxonomyId, isOver = true) => {
-    this.setState({
-      mouseOverTaxonomyDiagram: isOver ? taxonomyId : null,
-    });
-  }
-
-  onTaxonomyMouseOver = (taxonomyId, isOver = true) => {
-    this.setState({
-      mouseOverTaxonomy: isOver ? taxonomyId : null,
-    });
-  }
-
   getTaxonomiesByTagging = (taxonomies, tags) =>
     taxonomies.filter((tax, key, list) => {
       if (tax.getIn(['attributes', tags])) {
@@ -353,19 +250,10 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       return childTaxonomies.some((child) => child.getIn(['attributes', tags]));
     })
 
-  getConnectionPoint = (node, nodeReference, side = 'right') => {
+  getConnectionPoint = (node, nodeReference, side = 'bottom') => {
     const boundingRect = node.getBoundingClientRect();
     const boundingRectReference = nodeReference.getBoundingClientRect();
 
-    if (side === 'right' || side === 'left') {
-      return ({
-        x: side === 'right'
-          ? (boundingRect.right - boundingRectReference.left)
-          : (boundingRect.left - boundingRectReference.left),
-        y: (boundingRect.top - boundingRectReference.top)
-          + (((boundingRect.bottom - boundingRectReference.top) - (boundingRect.top - boundingRectReference.top)) / 2),
-      });
-    }
     return ({
       x: (boundingRect.left - boundingRectReference.left)
         + (((boundingRect.right - boundingRectReference.left) - (boundingRect.left - boundingRectReference.left)) / 2),
@@ -375,44 +263,24 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     });
   }
 
-  getConnectionPath = (vertical = false, start, end) => vertical
-    ? [
-      { x: start.x, y: start.y + 5 },
-      { x: end.x, y: end.y - 5 },
-    ]
-    : [
-      { x: start.x + 5, y: start.y },
-      { x: end.x - 5, y: end.y },
-    ];
+  getConnectionPath = (start, end) => [
+    { x: start.x, y: start.y + 5 },
+    { x: end.x, y: end.y - 5 },
+  ];
 
-  getCurvedConnectionPath = (vertical = false, start, end, curve = 0.2) => vertical
-    ? [
-      { x: start.x, y: start.y + 5 },
-      { x: start.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
-      { x: end.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
-      { x: end.x, y: end.y - 5 },
-    ]
-    : [
-      { x: start.x + 5, y: start.y },
-      { x: (start.x + 5) + ((end.x - start.x - 10) * curve), y: start.y },
-      { x: (start.x + 5) + ((end.x - start.x - 10) * curve), y: end.y },
-      { x: end.x - 5, y: end.y },
-    ];
+  getCurvedConnectionPath = (start, end, curve = 0.2) => [
+    { x: start.x, y: start.y + 5 },
+    { x: start.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
+    { x: end.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
+    { x: end.x, y: end.y - 5 },
+  ];
 
-
-  getConnectionPathArrow = (connectionPath, vertical = false) => {
+  getConnectionPathArrow = (connectionPath) => {
     const point = connectionPath[connectionPath.length - 1];
-    return vertical
-    ? [
+    return [
       point,
       { x: point.x - 5, y: point.y - 5 },
       { x: point.x + 5, y: point.y - 5 },
-      point,
-    ]
-    : [
-      point,
-      { x: point.x - 5, y: point.y - 5 },
-      { x: point.x - 5, y: point.y + 5 },
       point,
     ];
   }
@@ -427,17 +295,15 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     }
     this.setState({ viewport });
   }
-  connectRecommendationsMeasures = (vertical = false) =>
+  connectRecommendationsMeasures = () =>
     this.getConnectionPath(
-      vertical,
-      this.getConnectionPoint(this.state.buttonRecs, this.state.diagram, vertical ? 'bottom' : 'right'),
-      this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'top' : 'left'),
+      this.getConnectionPoint(this.state.buttonRecs, this.state.diagram, 'bottom'),
+      this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, 'top'),
     );
-  connectMeasuresIndicators = (vertical = false) => this.getConnectionPath(
-    vertical,
-    this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'bottom' : 'right'),
-    this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, vertical ? 'top' : 'left'),
-    vertical ? 0.6 : 0.2
+  connectMeasuresIndicators = () => this.getConnectionPath(
+    this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, 'bottom'),
+    this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, 'top'),
+    0.6
   );
 
   resize = () => {
@@ -447,34 +313,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     this.forceUpdate();
   };
 
-  renderTaxonomyIcons = (taxonomies, activeTaxonomyId) => (
-    <CategorisedIcons>
-      {
-        taxonomies.toList().map((tax, i) =>
-          (
-            <CategorisedIcon
-              key={i}
-              href={`${PATHS.TAXONOMIES}/${tax.get('id')}`}
-              paletteId={parseInt(tax.get('id'), 10)}
-              onClick={(evt) => {
-                if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                this.props.onPageLink(`${PATHS.TAXONOMIES}/${tax.get('id')}`);
-              }}
-              onMouseOver={() => this.onTaxonomyIconMouseOver(tax.get('id'))}
-              onFocus={() => this.onTaxonomyIconMouseOver(tax.get('id'))}
-              onMouseOut={() => this.onTaxonomyIconMouseOver(tax.get('id'), false)}
-              onBlur={() => this.onTaxonomyIconMouseOver(tax.get('id'), false)}
-              active={activeTaxonomyId === tax.get('id')}
-              title={this.context.intl.formatMessage(appMessages.entities.taxonomies[tax.get('id')].plural)}
-            >
-              <Icon name={`taxonomy_${tax.get('id')}`} size={this.state.viewport < VIEWPORTS.SMALL ? '1.6em' : '2em'} />
-            </CategorisedIcon>
-          )
-        )
-      }
-    </CategorisedIcons>
-  )
-
   renderPath = (points = [], dashed = false, r = 10) => (
     <PathLineCustom
       points={points}
@@ -482,13 +320,13 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       r={r}
     />
   );
-  renderArrow = (points = [], vertical = false) => (
+  renderArrow = (points = []) => (
     <PathLineArrow
-      points={this.getConnectionPathArrow(points, vertical)}
+      points={this.getConnectionPathArrow(points)}
       r={0}
     />
   );
-  renderPathsSVG = (vertical = false) => (
+  renderPathsSVG = () => (
     <DiagramSvgWrapper>
       { this.state.diagram &&
         <svg
@@ -496,16 +334,16 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
           height={this.state.diagram.getBoundingClientRect().height}
         >
           { this.state.buttonRecs && this.state.buttonMeasures &&
-            this.renderPath(this.connectRecommendationsMeasures(vertical))
+            this.renderPath(this.connectRecommendationsMeasures())
           }
           { this.state.buttonRecs && this.state.buttonMeasures &&
-            this.renderArrow(this.connectRecommendationsMeasures(vertical), vertical)
+            this.renderArrow(this.connectRecommendationsMeasures())
           }
           { this.state.buttonIndicators && this.state.buttonMeasures &&
-            this.renderPath(this.connectMeasuresIndicators(vertical))
+            this.renderPath(this.connectMeasuresIndicators())
           }
           { this.state.buttonIndicators && this.state.buttonMeasures &&
-            this.renderArrow(this.connectMeasuresIndicators(vertical), vertical)
+            this.renderArrow(this.connectMeasuresIndicators())
           }
         </svg>
       }
@@ -536,17 +374,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       }
     </DiagramButton>
   )
-  renderCategoryIcons = (tags) => (
-    <Categorised>
-      <FormattedMessage {...messages.diagram.categorised} />
-      {
-        this.renderTaxonomyIcons(
-          this.getTaxonomiesByTagging(this.props.taxonomies, tags),
-          this.state.mouseOverTaxonomy || this.state.mouseOverTaxonomyDiagram
-        )
-      }
-    </Categorised>
-  );
 
   renderRecommendationsButton = () => (
     <DiagramButtonWrap>
@@ -560,7 +387,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         count: this.props.recommendationCount,
         draftCount: this.props.recommendationDraftCount,
       })}
-      {this.renderCategoryIcons('tags_recommendations')}
     </DiagramButtonWrap>
   );
   renderMeasuresButton = () => {
@@ -600,9 +426,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             }
           </DiagramButtonMainInside>
         </DiagramButtonMain>
-        { this.getTaxonomiesByTagging(this.props.taxonomies, 'tags_measures').size > 0 &&
-          this.renderCategoryIcons('tags_measures')
-        }
       </DiagramButtonWrap>
     );
   };
@@ -627,6 +450,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       onTaxonomyLink,
       taxonomies,
       recommendationAddressedCount,
+      frameworks,
+      frameworkId,
     } = this.props;
     return (
       <div>
@@ -642,9 +467,9 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         { dataReady &&
           <TaxonomySidebar
             taxonomies={taxonomies}
-            active={this.state.mouseOverTaxonomyDiagram}
+            frameworkId={frameworkId}
+            frameworks={frameworks}
             onTaxonomyLink={onTaxonomyLink}
-            onTaxonomyOver={this.onTaxonomyMouseOver}
           />
         }
         <ContainerWithSidebar sidebarResponsiveSmall>
@@ -669,59 +494,30 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                     }
                   }}
                 >
-                  { this.renderPathsSVG(this.state.viewport < VIEWPORTS.MEDIUM) }
-                  { this.state.viewport && this.state.viewport < VIEWPORTS.MEDIUM && // VERTICAL
-                    <div>
-                      <DiagramSectionVertical>
-                        <DiagramSectionVerticalCenter>
-                          {this.renderRecommendationsButton()}
-                        </DiagramSectionVerticalCenter>
-                      </DiagramSectionVertical>
-                      <AnnotationVertical>
-                        {`${recommendationAddressedCount} ${this.context.intl.formatMessage(messages.diagram.addressed)}`}
-                      </AnnotationVertical>
-                      <DiagramSectionVertical>
-                        <DiagramSectionVerticalCenter>
-                          {this.renderMeasuresButton()}
-                        </DiagramSectionVerticalCenter>
-                      </DiagramSectionVertical>
-                      <AnnotationVertical>
-                        <FormattedMessage {...messages.diagram.measured} />
-                      </AnnotationVertical>
-                      <DiagramSectionVertical>
-                        <DiagramSectionVerticalCenter>
-                          {this.renderIndicatorButton()}
-                        </DiagramSectionVerticalCenter>
-                      </DiagramSectionVertical>
-                    </div>
-                  }
-                  { this.state.viewport >= VIEWPORTS.MEDIUM && // HORIZONTAL
-                    <div>
-                      <DiagramSectionHorizontalHalf>
-                        <DiagramSectionHorizontalVCenter>
-                          {this.renderRecommendationsButton()}
-                        </DiagramSectionHorizontalVCenter>
-                      </DiagramSectionHorizontalHalf>
-                      <Annotation>
-                        <FormattedMessage {...messages.diagram.addressed} />
-                      </Annotation>
-                      <DiagramSectionHorizontalCenter>
-                        <DiagramSectionHorizontalVCenter>
-                          {
-                            this.renderMeasuresButton()
-                          }
-                        </DiagramSectionHorizontalVCenter>
-                      </DiagramSectionHorizontalCenter>
-                      <AnnotationMeasured>
-                        <FormattedMessage {...messages.diagram.measured} />
-                      </AnnotationMeasured>
-                      <DiagramSectionHorizontalHalf>
-                        <DiagramSectionHorizontalVCenter>
-                          {this.renderIndicatorButton()}
-                        </DiagramSectionHorizontalVCenter>
-                      </DiagramSectionHorizontalHalf>
-                    </div>
-                  }
+                  { this.renderPathsSVG() }
+                  <div>
+                    <DiagramSectionVertical>
+                      <DiagramSectionVerticalCenter>
+                        {this.renderRecommendationsButton()}
+                      </DiagramSectionVerticalCenter>
+                    </DiagramSectionVertical>
+                    <AnnotationVertical>
+                      {`${recommendationAddressedCount} ${this.context.intl.formatMessage(messages.diagram.addressed)}`}
+                    </AnnotationVertical>
+                    <DiagramSectionVertical>
+                      <DiagramSectionVerticalCenter>
+                        {this.renderMeasuresButton()}
+                      </DiagramSectionVerticalCenter>
+                    </DiagramSectionVertical>
+                    <AnnotationVertical>
+                      <FormattedMessage {...messages.diagram.measured} />
+                    </AnnotationVertical>
+                    <DiagramSectionVertical>
+                      <DiagramSectionVerticalCenter>
+                        {this.renderIndicatorButton()}
+                      </DiagramSectionVerticalCenter>
+                    </DiagramSectionVertical>
+                  </div>
                 </Diagram>
               }
             </Content>
@@ -746,6 +542,8 @@ Overview.propTypes = {
   indicatorDraftCount: PropTypes.number,
   recommendationAddressedCount: PropTypes.number,
   theme: PropTypes.object,
+  frameworks: PropTypes.object,
+  frameworkId: PropTypes.string,
 };
 
 Overview.contextTypes = {
@@ -755,6 +553,8 @@ Overview.contextTypes = {
 const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectFWTaxonomiesSorted(state),
+  frameworks: selectFrameworks(state),
+  frameworkId: selectFrameworkQuery(state),
   recommendationCount: selectRecommendationCount(state),
   measureCount: selectMeasureCount(state),
   indicatorCount: selectIndicatorCount(state),

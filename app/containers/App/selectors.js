@@ -392,7 +392,7 @@ export const selectTaxonomies = createSelector(
     taxonomies
       .map(
         (tax) => {
-          const hasFramework = tax.hasIn(['attributes', 'framework_id']);
+          const hasFramework = !!tax.getIn(['attributes', 'framework_id']);
           // connected to current framework
           const connectedToFramework = fwTaxonomies.some(
             (fwt) => attributesEqual(fwt.getIn(['attributes', 'taxonomy_id']), tax.get('id'))
@@ -428,7 +428,7 @@ export const selectFWTaxonomies = createSelector(
       .map(
         (tax) => {
           const fwNotSet = !framework || framework === 'all';
-          const hasFramework = tax.hasIn(['attributes', 'framework_id'])
+          const hasFramework = !!tax.getIn(['attributes', 'framework_id'])
             && (
               fwNotSet ||
               attributesEqual(tax.getIn(['attributes', 'framework_id']), framework)

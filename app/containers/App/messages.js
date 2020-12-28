@@ -125,21 +125,21 @@ export default defineMessages({
     },
   },
   taxonomyGroups: {
-    1: {
-      id: 'app.containers.App.taxonomyGroups.1',
-      defaultMessage: 'International classifications',
+    common: {
+      id: 'app.containers.App.taxonomyGroups.common',
+      defaultMessage: 'common',
     },
-    2: {
-      id: 'app.containers.App.taxonomyGroups.2',
-      defaultMessage: 'National classifications',
+    measures: {
+      id: 'app.containers.App.taxonomyGroups.measures',
+      defaultMessage: 'measures',
     },
-    3: {
-      id: 'app.containers.App.taxonomyGroups.3',
-      defaultMessage: 'Other classifications',
+    objectives: {
+      id: 'app.containers.App.taxonomyGroups.objectives',
+      defaultMessage: '{type}',
     },
-    4: {
-      id: 'app.containers.App.taxonomyGroups.4',
-      defaultMessage: 'Yet other classifications',
+    users: {
+      id: 'app.containers.App.taxonomyGroups.users',
+      defaultMessage: '{type}',
     },
   },
   buttons: {
