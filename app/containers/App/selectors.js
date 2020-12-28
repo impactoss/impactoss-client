@@ -306,7 +306,7 @@ export const selectEntities = createSelector(
   (entities, path) => entities.get(path)
 );
 
-export const selectFrameworksForQuery = createSelector(
+export const selectFrameworks = createSelector(
   (state) => selectEntities(state, 'frameworks'),
   selectFrameworkQuery,
   (entities, fwQuery) => {
