@@ -45,7 +45,7 @@ class Group extends React.PureComponent { // eslint-disable-line react/prefer-st
 
     return (
       <div>
-        <GroupHeaderLink to={`category/${group.get('id')}`}>
+        <GroupHeaderLink to={`/category/${group.get('id')}`}>
           <GroupHeader>
             {getCategoryTitle(group)}
           </GroupHeader>

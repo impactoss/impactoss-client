@@ -186,7 +186,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
               return (
                 <span key={group.get('id')}>
                   {group.get('type') === 'categories' && group.get('categories').size > 0 &&
-                    <GroupHeaderLink to={`category/${group.get('id')}`}>
+                    <GroupHeaderLink to={`/category/${group.get('id')}`}>
                       <GroupHeader>
                         {getCategoryTitle(group)}
                       </GroupHeader>
