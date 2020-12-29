@@ -21,6 +21,7 @@ import { selectEntities } from 'containers/App/selectors';
 import ButtonHero from 'components/buttons/ButtonHero';
 import ButtonFlat from 'components/buttons/ButtonFlat';
 import NormalImg from 'components/Img';
+import Loading from 'components/Loading';
 import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
@@ -179,25 +180,28 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                   <Intro source={this.context.intl.formatMessage(messages.intro)} />
                 </Grid>
               </Row>
-              <Row>
-                <GridSpace lg={1 / 6} sm={1 / 8} />
-                <Grid lg={2 / 3} sm={3 / 4} xs={1}>
-                  <HomeActions>
-                    {frameworks && (
-                      frameworks.entrySeq().map(([key, fw]) => (
+              {!frameworks && (
+                <Loading />
+              )}
+              {frameworks && (
+                <Row>
+                  <GridSpace lg={1 / 6} sm={1 / 8} />
+                  <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                    <HomeActions>
+                      {frameworks.entrySeq().map(([key, fw]) => (
                         <ButtonHero key={key} onClick={() => onSelectFramework(fw.get('id'))}>
                           <FormattedMessage {...appMessages.frameworks[fw.get('id')]} />
                         </ButtonHero>
-                      ))
-                    )}
-                  </HomeActions>
-                  <HomeActions>
-                    <ButtonFlat onClick={() => onSelectFramework('all')}>
-                      <FormattedMessage {...messages.exploreAllFrameworks} />
-                    </ButtonFlat>
-                  </HomeActions>
-                </Grid>
-              </Row>
+                      ))}
+                    </HomeActions>
+                    <HomeActions>
+                      <ButtonFlat onClick={() => onSelectFramework('all')}>
+                        <FormattedMessage {...messages.exploreAllFrameworks} />
+                      </ButtonFlat>
+                    </HomeActions>
+                  </Grid>
+                </Row>
+              )}
             </Container>
           </SectionWrapper>
         </SectionTop>

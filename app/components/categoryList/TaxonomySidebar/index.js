@@ -97,9 +97,9 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
   render() {
     const {
       taxonomies,
-      frameworkId,
       active,
       onTaxonomyLink,
+      frameworkId,
       frameworks,
     } = this.props;
     const taxonomyGroups = frameworks && taxonomies && prepareTaxonomyGroups(

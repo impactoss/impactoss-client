@@ -101,8 +101,8 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       frameworkId,
     } = this.props;
     const reference = taxonomy && taxonomy.get('id');
-    const contentTitle = typeof reference !== 'undefined' ? this.getTaxTitle(reference) : '';
-    const contentDescription = typeof reference !== 'undefined' && this.getTaxDescription(reference);
+    const contentTitle = (taxonomy && typeof reference !== 'undefined') ? this.getTaxTitle(reference) : '';
+    const contentDescription = (taxonomy && typeof reference !== 'undefined') && this.getTaxDescription(reference);
 
     const buttons = dataReady && isManager && typeof reference !== 'undefined'
       ? [{
@@ -118,10 +118,6 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       }]
       : null;
 
-    // //
-    // console.log('categoryList render', this.props)
-    // dataReady && console.log('getDefaultTaxonomy', getDefaultTaxonomy(taxonomies).get('id'))
-
     const hasUserCategories =
       isManager
       && dataReady
@@ -129,7 +125,6 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       && userOnlyCategoryGroups.reduce((memo, group) =>
         memo || (group.get('categories') && group.get('categories').size > 0)
       , false);
-
     return (
       <div>
         <Helmet
@@ -169,7 +164,8 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
               { dataReady && taxonomy &&
                 <CategoryListItems
                   taxonomy={taxonomy}
-                  reference={reference}
+                  frameworks={frameworks}
+                  frameworkId={frameworkId}
                   categoryGroups={categoryGroups}
                   onPageLink={onPageLink}
                   onSort={this.props.onSort}
@@ -186,7 +182,8 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
               { dataReady && taxonomy && hasUserCategories &&
                 <CategoryListItems
                   taxonomy={taxonomy}
-                  reference={reference}
+                  frameworks={frameworks}
+                  frameworkId={frameworkId}
                   categoryGroups={userOnlyCategoryGroups}
                   onPageLink={onPageLink}
                   onSort={this.props.onSort}

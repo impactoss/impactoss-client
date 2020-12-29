@@ -4,6 +4,11 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import ItemStatus from 'components/ItemStatus';
 import Clear from 'components/styled/Clear';
+import { PATHS } from 'containers/App/constants';
+
+import { mapToCategoryListItem } from 'utils/taxonomies';
+import { attributesEqual } from 'utils/entities';
+import appMessages from 'containers/App/messages';
 
 const Styled = styled.button`
   width:100%;
@@ -112,75 +117,140 @@ const Reference = styled.span`
 `;
 
 class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  renderColumnContent = (col, category) => {
-    const count = category.counts[col.countsIndex];
-    switch (col.type) {
-      case ('title'):
-        return (
-          <Title>
-            { category.reference &&
-              <Reference>{category.reference}</Reference>
-            }
-            {category.title}
-          </Title>
-        );
-      case ('count'):
-        return (count.accepted === null || typeof count.accepted === 'undefined')
-        ? (
-          <BarWrap>
-            <Bar
-              length={(count.public / col.maxCount) * 100}
-              palette={col.entity}
-            >
-              <Count palette={col.entity}>
-                {count.public}
-              </Count>
-            </Bar>
-          </BarWrap>
-        )
-        : (
-          <BarWrap secondary>
-            <Bar
-              length={(count.accepted / col.maxCount) * 100}
-              palette={col.entity}
-              secondary
-            >
-              <Count palette={col.entity}>
-                {count.accepted}
-              </Count>
-            </Bar>
-            { count.noted > 0 &&
-              <Bar
-                length={(count.noted / col.maxCount) * 100}
-                palette={col.entity}
-                pIndex={1}
-              >
-                <CountSecondary palette={col.entity}>
-                  {count.noted}
-                </CountSecondary>
-              </Bar>
-            }
-          </BarWrap>
-        );
-      default:
-        return null;
+  renderSimpleBar = (col, total) => (
+    <Bar
+      length={(total / col.maxCount) * 100}
+      palette={col.attribute.entity}
+    >
+      <Count palette={col.attribute.entity}>
+        {total}
+      </Count>
+    </Bar>
+  );
+  renderAcceptedBar = (col, total, accepted) => {
+    const noted = total - accepted;
+    return (
+      <span>
+        <Bar
+          length={(accepted / col.maxCount) * 100}
+          palette={col.attribute.entity}
+          secondary
+        >
+          <Count palette={col.attribute.entity}>
+            {accepted}
+          </Count>
+        </Bar>
+        { noted > 0 &&
+          <Bar
+            length={(noted / col.maxCount) * 100}
+            palette={col.attribute.entity}
+            pIndex={1}
+          >
+            <CountSecondary palette={col.attribute.entity}>
+              {noted}
+            </CountSecondary>
+          </Bar>
+        }
+      </span>
+    );
+  };
+  renderCountColumn = (col, category, frameworks, frameworkId) => {
+    // console.log(col)
+    // console.log(category)
+    // console.log(frameworks.toJS())
+    // console.log(frameworkId)
+    if (!col.attribute) {
+      return null;
     }
+    const fwSet = frameworkId && frameworkId !== 'all';
+    const countsByFramework = col.attribute.frameworkIds;
+    if (countsByFramework) {
+      const total = category[col.attribute.totalByFw];
+      const accepted = category[col.attribute.acceptedByFw];
+      if (!fwSet) {
+        return (
+          <div>
+            {col.attribute.frameworkIds.map((id) => {
+              const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), id));
+              const hasResponse = framework.getIn(['attributes', 'has_response']);
+              return (
+                <div key={id}>
+                  {col.attribute.frameworkIds.length > 1 && (
+                    <div>
+                      {this.context.intl.formatMessage(appMessages.entities[`recommendations_${id}`].plural)}
+                    </div>
+                  )}
+                  {hasResponse && (
+                    <BarWrap secondary>
+                      {this.renderAcceptedBar(col, total[id] || 0, accepted[id] || 0)}
+                    </BarWrap>
+                  )}
+                  {!hasResponse && (
+                    <BarWrap>
+                      {this.renderSimpleBar(col, total[id] || 0)}
+                    </BarWrap>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        );
+      } else if (fwSet) {
+        const id = frameworkId;
+        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), id));
+        const hasResponse = framework.getIn(['attributes', 'has_response']);
+        return (
+          <div>
+            {hasResponse && (
+              <BarWrap secondary>
+                {this.renderAcceptedBar(col, total[id] || 0, accepted[id] || 0)}
+              </BarWrap>
+            )}
+            {!hasResponse && (
+              <BarWrap>
+                {this.renderSimpleBar(col, total[id] || 0)}
+              </BarWrap>
+            )}
+          </div>
+        );
+      }
+    }
+    const total = category[col.attribute.total];
+    return (
+      <BarWrap>
+        {this.renderSimpleBar(col, total)}
+      </BarWrap>
+    );
+    // return null;
   };
   render() {
-    const { category, columns } = this.props;
-
+    const { category, columns, onPageLink, frameworks, frameworkId } = this.props;
+    // return null;
+    const catItem = mapToCategoryListItem(category);
     return (
-      <Styled onClick={() => category.onLink()}>
+      <Styled
+        onClick={() => onPageLink(`${PATHS.CATEGORIES}/${catItem.id}`)}
+      >
         {
           columns.map((col, i) => (
             <Column key={i} colWidth={col.width}>
-              { col.type === 'title' && category.draft &&
-              <StatusWrap>
-                <ItemStatus draft />
-                <Clear />
-              </StatusWrap>
+              {col.type === 'title' && catItem.draft && (
+                <StatusWrap>
+                  <ItemStatus draft />
+                  <Clear />
+                </StatusWrap>
+              )}
+              {col.type === 'title' && (
+                <Title>
+                  { catItem.reference &&
+                    <Reference>{catItem.reference}</Reference>
+                  }
+                  {catItem.title}
+                </Title>
+              )}
+              {col.type === 'count' &&
+                this.renderCountColumn(col, category.toJS(), frameworks, frameworkId)
               }
-              {this.renderColumnContent(col, category)}
             </Column>
           ))
         }
@@ -188,10 +258,18 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
     );
   }
 }
+//           {this.renderColumnContent(col, category)}
 
 CategoryListItem.propTypes = {
   category: PropTypes.object,
+  frameworks: PropTypes.object,
   columns: PropTypes.array,
+  onPageLink: PropTypes.func,
+  frameworkId: PropTypes.string,
+};
+
+CategoryListItem.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default CategoryListItem;
