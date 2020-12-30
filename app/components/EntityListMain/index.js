@@ -96,10 +96,10 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       ? parseInt(locationQuery.get('expand'), 10)
       : 0;
     const groupSelectValue = locationQuery.get('group')
-    || (config.taxonomies && getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 1));
+    || (config.taxonomies && getGroupValue(taxonomies, config.taxonomies.defaultGroupAttribute, 1));
     const subgroupSelectValue = groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET
       ? locationQuery.get('subgroup')
-        || (config.taxonomies && getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 2))
+        || (config.taxonomies && getGroupValue(taxonomies, config.taxonomies.defaultGroupAttribute, 2))
       : null;
 
     const headerTitle = entities && dataReady
@@ -122,15 +122,26 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     )
     : null;
 
-    const subtitle = dataReady && entityGroups && groupSelectValue && this.context.intl
-    ? this.context.intl.formatMessage(messages.groupSubtitle, {
-      size: entityGroups.size,
-      type: lowerCase(this.context.intl.formatMessage(entityGroups.size === 1
-        ? appMessages.entities.taxonomies[groupSelectValue].single
-        : appMessages.entities.taxonomies[groupSelectValue].plural
-      )),
-    })
-    : null;
+    let subtitle = null;
+    if (dataReady && entityGroups && groupSelectValue && this.context.intl) {
+      const isPlural = entityGroups.size !== 1;
+      // disable broken support for connectedTaxonomies
+      // let taxId = groupSelectValue;
+      // if (taxId.indexOf('x:') > -1 && taxId.split(':').length > 1) {
+      //   taxId = taxId.split(':')[1];
+      // }
+      subtitle = this.context.intl.formatMessage(messages.groupSubtitle, {
+        size: entityGroups.size,
+        type:
+          lowerCase(
+            this.context.intl.formatMessage(
+              isPlural
+                ? appMessages.entities.taxonomies[groupSelectValue].single
+                : appMessages.entities.taxonomies[groupSelectValue].plural
+            )
+          ),
+      });
+    }
 
     return (
       <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }} >
@@ -175,8 +186,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   />
                 </EntityListSearch>
                 <EntityListOptions
-                  groupOptions={getGroupOptions(taxonomies, null, this.context.intl)}
-                  subgroupOptions={getGroupOptions(taxonomies, null, this.context.intl)}
+                  groupOptions={getGroupOptions(taxonomies, this.context.intl)}
+                  subgroupOptions={getGroupOptions(taxonomies, this.context.intl)}
                   groupSelectValue={groupSelectValue}
                   subgroupSelectValue={subgroupSelectValue}
                   onGroupSelect={onGroupSelect}
