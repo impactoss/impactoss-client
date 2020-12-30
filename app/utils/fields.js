@@ -1,8 +1,8 @@
 import { truncateText } from 'utils/string';
 import { sortEntities, sortCategories } from 'utils/sort';
-import { filterTaxonomies } from 'utils/entities';
-import { ACCEPTED_STATUSES, USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
-import { find, filter, reduce } from 'lodash/collection';
+import { filterTaxonomies, getAcceptanceStatus } from 'utils/entities';
+import { USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
+import { filter, reduce } from 'lodash/collection';
 
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
@@ -59,10 +59,12 @@ export const getTitleTextField = (entity, isManager, attribute = 'title', label)
   isManager,
   label,
 });
-export const getStatusField = (entity, attribute = 'draft', options, label) => ({
+export const getStatusField = (entity, attribute = 'draft', options, label, defaultValue = true) => ({
   controlType: 'info',
   type: 'status',
-  value: entity ? entity.getIn(['attributes', attribute]) : true,
+  value: entity && !!entity.getIn(['attributes', attribute])
+    ? entity.getIn(['attributes', attribute])
+    : defaultValue,
   options,
   label,
 });
@@ -278,18 +280,25 @@ export const getIndicatorConnectionField = (entities, connections, onEntityClick
     onEntityClick,
   });
 
-export const getRecommendationConnectionField = (entities, taxonomies, connections, onEntityClick) =>
+export const getRecommendationConnectionField = (
+  entities,
+  taxonomies,
+  connections,
+  onEntityClick,
+  fwid, // framework id
+  hasResponse,
+) =>
   getConnectionField({
     entities: sortEntities(entities, 'asc', 'reference'),
     taxonomies: filterTaxonomies(taxonomies, 'tags_recommendations'),
     connections,
     connectionOptions: ['measures', 'indicators'],
-    entityType: 'recommendations',
+    entityType: fwid ? `recommendations_${fwid}` : 'recommendations',
+    entityPath: 'recommendations',
     onEntityClick,
     entityIcon: (entity) => {
-      const status = find(ACCEPTED_STATUSES,
-        (option) => option.value === entity.getIn(['attributes', 'accepted'])
-      );
+      if (!hasResponse) return null;
+      const status = getAcceptanceStatus(entity);
       return status ? status.icon : null;
     },
   });
@@ -331,19 +340,27 @@ const getConnectionGroupsField = ({
     clientPath: option === 'measures' ? 'actions' : option,
   })),
 });
-export const getRecommendationConnectionGroupsField = (entityGroups, groupedBy, taxonomies, connections, onEntityClick) =>
+export const getRecommendationConnectionGroupsField = (
+  entityGroups,
+  groupedBy,
+  taxonomies,
+  connections,
+  onEntityClick,
+  fwid, // framework id
+  hasResponse,
+) =>
   getConnectionGroupsField({
     entityGroups,
     groupedBy,
     taxonomies: filterTaxonomies(taxonomies, 'tags_recommendations'),
     connections,
     connectionOptions: ['measures'],
-    entityType: 'recommendations',
+    entityType: fwid ? `recommendations_${fwid}` : 'recommendations',
+    entityPath: 'recommendations',
     onEntityClick,
     entityIcon: (entity) => {
-      const status = find(ACCEPTED_STATUSES,
-        (option) => option.value === entity.getIn(['attributes', 'accepted'])
-      );
+      if (!hasResponse) return null;
+      const status = getAcceptanceStatus(entity);
       return status ? status.icon : null;
     },
   });

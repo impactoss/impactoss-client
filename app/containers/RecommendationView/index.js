@@ -111,7 +111,13 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     {
       fields: [
         getMarkdownField(entity, 'description', true, 'fullRecommendation'),
-        hasResponse && getStatusField(entity, 'accepted', ACCEPTED_STATUSES, appMessages.attributes.accepted),
+        hasResponse && getStatusField(
+          entity,
+          'accepted',
+          ACCEPTED_STATUSES,
+          appMessages.attributes.accepted,
+          false // defaultValue
+        ),
         hasResponse && getMarkdownField(entity, 'response', true),
       ],
     },

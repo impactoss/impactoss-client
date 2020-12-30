@@ -173,6 +173,7 @@
   "app.containers.App.labels.perPage" : "Per page",
   "app.containers.App.labels.smart.met" : "Met",
   "app.containers.App.labels.smart.notMet" : "Not met",
+  "app.containers.App.fields.connectionsGrouped" : "{size} {type} grouped by {byType}",
   "app.containers.App.forms.fieldRequired" : "This field cannot be empty",
   "app.containers.App.forms.dateFormatError" : "Please enter the date in the required format: dd/mm/yyyy",
   "app.containers.App.forms.emailFormatError" : "Please enter a valid email address",

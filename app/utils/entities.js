@@ -1,6 +1,6 @@
 import { Map, List, fromJS } from 'immutable';
 
-import { TEXT_TRUNCATE } from 'themes/config';
+import { TEXT_TRUNCATE, ACCEPTED_STATUSES } from 'themes/config';
 import { find, reduce } from 'lodash/collection';
 
 import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
@@ -8,6 +8,11 @@ import asList from 'utils/as-list';
 import isNumber from 'utils/is-number';
 import appMessage from 'utils/app-message';
 import quasiEquals from 'utils/quasi-equals';
+
+export const getAcceptanceStatus = (entity) =>
+  find(ACCEPTED_STATUSES, (option) =>
+    option.value === (entity.getIn(['attributes', 'accepted']) || false)
+  );
 
 // check if entity has nested connection by id
 export const testEntityEntityAssociation = (entity, path, associatedId) =>

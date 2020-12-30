@@ -204,6 +204,12 @@ export default defineMessages({
       },
     },
   },
+  fields: {
+    connectionsGrouped: {
+      id: 'app.containers.App.fields.connectionsGrouped',
+      defaultMessage: '{size} {type} grouped by {byType}',
+    },
+  },
   forms: {
     fieldRequired: {
       id: 'app.containers.App.forms.fieldRequired',

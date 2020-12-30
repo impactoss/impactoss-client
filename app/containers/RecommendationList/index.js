@@ -8,11 +8,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { find } from 'lodash/collection';
 import { Map, List, fromJS } from 'immutable';
 
+import { getAcceptanceStatus } from 'utils/entities';
+
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { ACCEPTED_STATUSES } from 'themes/config';
 import {
   selectReady,
   selectRecommendationTaxonomies,
@@ -102,9 +102,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
           }}
           entityIcon={(entity) => {
-            const status = find(ACCEPTED_STATUSES,
-              (option) => option.value === entity.getIn(['attributes', 'accepted'])
-            );
+            const status = getAcceptanceStatus(entity);
             return status ? status.icon : null;
           }}
           locationQuery={fromJS(this.props.location.query)}

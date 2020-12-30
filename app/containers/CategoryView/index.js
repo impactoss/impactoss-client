@@ -28,6 +28,8 @@ import {
   hasTaxonomyCategories,
 } from 'utils/fields';
 
+import { attributesEqual, getEntityTitle } from 'utils/entities';
+
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
@@ -42,9 +44,9 @@ import {
   selectIsUserManager,
   selectMeasureConnections,
   selectRecommendationConnections,
+  selectFrameworks,
 } from 'containers/App/selectors';
 
-import { getEntityTitle } from 'utils/entities';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -107,47 +109,29 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
 
   getBodyMainFields = (
     entity,
-    recommendations,
-    childRecommendations,
+    recommendationsByFw,
+    childRecommendationsByFw,
     measures,
     childMeasures,
     taxonomies,
     onEntityClick,
     measureConnections,
-    recommendationConnections
+    recommendationConnections,
+    frameworks,
   ) => {
     const fields = [];
+    // own attributes
     fields.push({
       fields: [getMarkdownField(entity, 'description', true)],
     });
+    // connections
     if (!entity.getIn(['attributes', 'user_only'])) {
-      // child taxonomies tag recs
-      const connections = [
-        // related actions
-        entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
-          getMeasureConnectionField(measures, taxonomies, measureConnections, onEntityClick),
-        // related recommendations
-        entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
-          getRecommendationConnectionField(recommendations, taxonomies, recommendationConnections, onEntityClick),
-      ];
-      // child categories related recommendations
-      if (childRecommendations) {
-        childRecommendations.forEach((tax) =>
-          connections.push(
-            getRecommendationConnectionGroupsField(
-              tax.get('categories'),
-              appMessages.entities.taxonomies[tax.get('id')].single,
-              taxonomies,
-              recommendationConnections,
-              onEntityClick,
-            )
-          )
-        );
-      }
+      // measures
       // child categories related measures
+      const measuresConnections = [];
       if (childMeasures) {
         childMeasures.forEach((tax) =>
-          connections.push(
+          measuresConnections.push(
             getMeasureConnectionGroupsField(
               tax.get('categories'),
               appMessages.entities.taxonomies[tax.get('id')].single,
@@ -157,11 +141,65 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             )
           )
         );
+      } else if (entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures) {
+        // related actions
+        measuresConnections.push(
+          getMeasureConnectionField(
+            measures,
+            taxonomies,
+            measureConnections,
+            onEntityClick,
+          ),
+        );
       }
       fields.push({
-        label: appMessages.entities.connections.plural,
-        icon: 'connections',
-        fields: connections,
+        label: appMessages.nav.measuresSuper,
+        icon: 'measures',
+        fields: measuresConnections,
+      });
+
+      // child taxonomies tag recs
+      // child categories related recommendations
+      const recConnections = [];
+      if (childRecommendationsByFw) {
+        childRecommendationsByFw.forEach((recs, fwid) => {
+          const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+          const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
+          recs.forEach((tax) => {
+            recConnections.push(
+              getRecommendationConnectionGroupsField(
+                tax.get('categories'),
+                appMessages.entities.taxonomies[tax.get('id')].single,
+                taxonomies,
+                recommendationConnections,
+                onEntityClick,
+                fwid,
+                hasResponse,
+              )
+            );
+          });
+        });
+        // related recommendations
+      } else if (entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendationsByFw) {
+        recommendationsByFw.forEach((recs, fwid) => {
+          const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+          const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
+          recConnections.push(
+            getRecommendationConnectionField(
+              recs,
+              taxonomies,
+              recommendationConnections,
+              onEntityClick,
+              fwid,
+              hasResponse,
+            ),
+          );
+        });
+      }
+      fields.push({
+        label: appMessages.nav.recommendations,
+        icon: 'recommendations',
+        fields: recConnections,
       });
     }
     return fields;
@@ -209,8 +247,8 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       viewEntity,
       dataReady,
       isManager,
-      recommendations,
-      childRecommendations,
+      recommendationsByFw,
+      childRecommendationsByFw,
       measures,
       childMeasures,
       taxonomies,
@@ -219,6 +257,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       recommendationConnections,
       parentTaxonomy,
       childTaxonomies,
+      frameworks,
     } = this.props;
     let buttons = [];
     if (dataReady) {
@@ -277,14 +316,15 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                 body: {
                   main: this.getBodyMainFields(
                     viewEntity,
-                    recommendations,
-                    childRecommendations,
+                    recommendationsByFw,
+                    childRecommendationsByFw,
                     measures,
                     childMeasures,
                     taxonomies,
                     onEntityClick,
                     measureConnections,
-                    recommendationConnections
+                    recommendationConnections,
+                    frameworks,
                   ),
                   aside: this.getBodyAsideFields(viewEntity, isManager, parentTaxonomy, childTaxonomies),
                 },
@@ -307,14 +347,15 @@ CategoryView.propTypes = {
   params: PropTypes.object,
   isManager: PropTypes.bool,
   parentTaxonomy: PropTypes.object,
-  recommendations: PropTypes.object,
-  childRecommendations: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
+  childRecommendationsByFw: PropTypes.object,
   taxonomies: PropTypes.object,
   childTaxonomies: PropTypes.object,
   measures: PropTypes.object,
   childMeasures: PropTypes.object,
   measureConnections: PropTypes.object,
   recommendationConnections: PropTypes.object,
+  frameworks: PropTypes.object,
 };
 
 CategoryView.contextTypes = {
@@ -325,8 +366,8 @@ const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
-  recommendations: selectRecommendations(state, props.params.id),
-  childRecommendations: selectChildRecommendations(state, props.params.id),
+  recommendationsByFw: selectRecommendations(state, props.params.id),
+  childRecommendationsByFw: selectChildRecommendations(state, props.params.id),
   childMeasures: selectChildMeasures(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
   taxonomies: selectTaxonomiesWithCategories(state),
@@ -334,6 +375,7 @@ const mapStateToProps = (state, props) => ({
   childTaxonomies: selectChildTaxonomies(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
   recommendationConnections: selectRecommendationConnections(state),
+  frameworks: selectFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch) {

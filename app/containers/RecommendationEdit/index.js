@@ -395,8 +395,10 @@ function mapDispatchToProps(dispatch, props) {
       // cleanup attributes for framework
       if (!currentFramework.getIn(['attributes', 'has_response'])) {
         saveData = saveData
-          .setIn(['attributes', 'accepted'], null)
-          .setIn(['attributes', 'response'], null);
+          .setIn(['attributes', 'accepted'], '')
+          .setIn(['attributes', 'response'], '');
+      } else if (saveData.getIn(['attributes', 'accepted']) === '') {
+        saveData = saveData.setIn(['attributes', 'accepted'], 'true');
       }
       dispatch(save(saveData.toJS()));
     },
