@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -159,6 +160,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
     }
     const fwSet = frameworkId && frameworkId !== 'all';
     const countsByFramework = col.attribute.frameworkIds;
+    const connected = col.attribute.entity === 'measures';
     if (countsByFramework) {
       const total = category[col.attribute.totalByFw];
       const accepted = category[col.attribute.acceptedByFw];
@@ -167,22 +169,32 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
           <div>
             {col.attribute.frameworkIds.map((id) => {
               const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), id));
-              const hasResponse = framework.getIn(['attributes', 'has_response']);
+              if (!framework) {
+                return null;
+              }
+              const hasResponse = !connected && framework.getIn(['attributes', 'has_response']);
               return (
                 <div key={id}>
                   {col.attribute.frameworkIds.length > 1 && (
                     <div>
-                      {this.context.intl.formatMessage(appMessages.entities[`recommendations_${id}`].plural)}
+                      {connected && (<span>&nbsp;</span>)}
+                      {!connected && (
+                        <FormattedMessage {...appMessages.entities[`recommendations_${id}`].plural} />
+                      )}
                     </div>
                   )}
                   {hasResponse && (
                     <BarWrap secondary>
-                      {this.renderAcceptedBar(col, total[id] || 0, accepted[id] || 0)}
+                      {this.renderAcceptedBar(
+                        col,
+                        (total && total[id]) || 0,
+                        (accepted && accepted[id]) || 0
+                      )}
                     </BarWrap>
                   )}
                   {!hasResponse && (
                     <BarWrap>
-                      {this.renderSimpleBar(col, total[id] || 0)}
+                      {this.renderSimpleBar(col, (total && total[id]) || 0)}
                     </BarWrap>
                   )}
                 </div>
@@ -193,17 +205,24 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
       } else if (fwSet) {
         const id = frameworkId;
         const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), id));
-        const hasResponse = framework.getIn(['attributes', 'has_response']);
+        if (!framework || !total[id]) {
+          return null;
+        }
+        const hasResponse = !connected && framework.getIn(['attributes', 'has_response']);
         return (
           <div>
             {hasResponse && (
               <BarWrap secondary>
-                {this.renderAcceptedBar(col, total[id] || 0, accepted[id] || 0)}
+                {this.renderAcceptedBar(
+                  col,
+                  (total && total[id]) || 0,
+                  (accepted && accepted[id]) || 0
+                )}
               </BarWrap>
             )}
             {!hasResponse && (
               <BarWrap>
-                {this.renderSimpleBar(col, total[id] || 0)}
+                {this.renderSimpleBar(col, (total && total[id]) || 0)}
               </BarWrap>
             )}
           </div>

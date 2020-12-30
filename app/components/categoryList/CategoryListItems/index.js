@@ -180,10 +180,21 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
           taxonomy.get('frameworkIds') &&
           taxonomy.get('frameworkIds').toArray(),
       });
+      if (!tagsMeasures) {
+        attributes.push({
+          total: 'measuresPublicCount',
+          totalByFw: 'measuresPublicCountByFw',
+          entity: 'measures',
+          frameworkIds:
+            taxonomy.get('frameworkIds') &&
+            taxonomy.get('frameworkIds').toArray(),
+        });
+      }
     }
-    if (tagsMeasures || tagsRecs) {
+    if (tagsMeasures) {
       attributes.push({
         total: 'measuresPublicCount',
+        totalByFw: 'measuresPublicCountByFw',
         entity: 'measures',
       });
     }
@@ -221,10 +232,10 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     // figure out if tagged directly or via child category
     const tagsRecs = this.getTagsTax(taxonomy, 'tags_recommendations');
     const columns = [];
-    const hasResponse = taxonomy.get('frameworkIds').toArray().reduce(
+    const hasResponse = frameworks && taxonomy.get('frameworkIds').toArray().reduce(
       (memo, fwid) => {
         const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
-        return memo || framework.getIn(['attributes', 'has_response']);
+        return memo || (framework && framework.getIn(['attributes', 'has_response']));
       },
       false,
     );

@@ -148,12 +148,28 @@ const getCategoryCounts = (
 
       // measures connected via recommendation
       if (!tagsMeasures) {
-        const connectedMeasures = filterAssociatedEntities(measures, 'recommendation_ids', associatedRecs);
+        const connectedMeasures = filterAssociatedEntities(measures, 'recommendation_ids', associatedRecsPublic);
         category = category.set('measuresCount', connectedMeasures ? connectedMeasures.size : 0);
         const connectedMeasuresPublic = connectedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
         category = category.set('measuresPublicCount', connectedMeasuresPublic ? connectedMeasuresPublic.size : 0);
         // for sorting
         category = category.set('measures', connectedMeasuresPublic ? connectedMeasuresPublic.size : 0);
+        // by framework
+        category = category.set(
+          'measuresPublicCountByFw',
+          associatedRecsPublic
+            ? associatedRecsPublic
+              .groupBy((rec) => rec.getIn(['attributes', 'framework_id']))
+              .map((group) => {
+                const connectedMeasuresForGroup = filterAssociatedEntities(measures, 'recommendation_ids', group);
+                const connectedMeasuresPublicForGroup =
+                  connectedMeasuresForGroup.filter(
+                    (measure) => !measure.getIn(['attributes', 'draft'])
+                  );
+                return connectedMeasuresPublicForGroup ? connectedMeasuresPublicForGroup.size : 0;
+              })
+            : 0,
+          );
       }
     }
     return category;
