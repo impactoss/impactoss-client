@@ -6,8 +6,9 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import { getSortOption } from 'utils/sort';
-import { getCategoryTitle } from 'utils/entities';
+import { getCategoryTitle, attributesEqual } from 'utils/entities';
 
+import CategoryListKey from 'components/categoryList/CategoryListKey';
 import CategoryListHeader from 'components/categoryList/CategoryListHeader';
 import CategoryListItem from 'components/categoryList/CategoryListItem';
 
@@ -118,8 +119,6 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     // add columns for associated recs and measures
     const headerAttributes = this.getHeaderAttributes(taxonomy, frameworkId);
     return columns.concat(headerAttributes.map((attribute) => {
-      // console.log(attribute)
-      // console.log(this.getCategoryMaxCount(categories, attribute.public, attribute.list))
       const columnSortOption = sortOptions.find((option) => option.query === attribute.query);
       const columnActive = columnSortOption.query === sortOptionActive.query;
       const columnSortOrderOption = SORT_ORDER_OPTIONS.find((option) => (sortOrder || columnSortOption.order) === option.value);
@@ -139,24 +138,11 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
             onSort(columnSortOption.query, columnSortOption.order);
           }
         },
-        // key: attribute.accepted !== null && typeof attribute.accepted !== 'undefined'
-        //   ? [
-        //     {
-        //       label: this.context.intl.formatMessage(appMessages.ui.acceptedStatuses.accepted),
-        //       palette: attribute.public,
-        //       pIndex: 0,
-        //     },
-        //     {
-        //       label: this.context.intl.formatMessage(appMessages.ui.acceptedStatuses.noted),
-        //       palette: attribute.public,
-        //       pIndex: 1,
-        //     },
-        //   ]
-        //   : null,
       };
     }));
   };
-  getCategoryMaxCount = (categoryGroups, isList) => {
+  getCategoryMaxCount = (categoryGroups, attribute) => {
+    const isList = !!attribute.frameworkIds;
     const allCategories = categoryGroups.reduce((memo, group) =>
       memo.concat(group.get('categories')),
       List(),
@@ -165,11 +151,14 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       (countsMemo, cat) => {
         if (isList) {
           const maxAttribute =
-            cat.get('public') &&
-            cat.get('public').reduce((memo, attr) => Math.max(attr, memo), 0);
+            cat.get(attribute.totalByFw) &&
+            cat.get(attribute.totalByFw).reduce(
+              (memo, attr) => Math.max(attr, memo),
+              0,
+            );
           return maxAttribute ? Math.max(maxAttribute, countsMemo) : countsMemo;
         }
-        return cat.get('public') ? Math.max(cat.get('public'), countsMemo) : countsMemo;
+        return cat.get(attribute.total) ? Math.max(cat.get(attribute.total), countsMemo) : countsMemo;
       },
       0,
     );
@@ -214,17 +203,48 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         width: TITLE_COL_RATIO * 100,
       },
     ];
-    const countAttributes = (!userOnly && taxonomy)
-      ? this.getCountAttributes(taxonomy)
-      : [];
     // add columns for associated recs and measures
-    return columns.concat(countAttributes.map((attribute, i) => ({
-      type: 'count',
-      width: ((1 - TITLE_COL_RATIO) / countAttributes.length) * 100,
-      maxCount: this.getCategoryMaxCount(categoryGroups, attribute.isList),
-      countsIndex: i,
-      attribute,
-    })));
+    return (userOnly || !taxonomy)
+      ? columns
+      : columns.concat(
+        this.getCountAttributes(taxonomy).map((attribute, i, list) => ({
+          type: 'count',
+          width: ((1 - TITLE_COL_RATIO) / list.length) * 100,
+          maxCount: this.getCategoryMaxCount(categoryGroups, attribute),
+          attribute,
+        }))
+      );
+  };
+
+
+  getListKeyColumns = ({ taxonomy, frameworks }) => {
+    // figure out if tagged directly or via child category
+    const tagsRecs = this.getTagsTax(taxonomy, 'tags_recommendations');
+    const columns = [];
+    const hasResponse = taxonomy.get('frameworkIds').toArray().reduce(
+      (memo, fwid) => {
+        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+        return memo || framework.getIn(['attributes', 'has_response']);
+      },
+      false,
+    );
+    if (hasResponse && tagsRecs) {
+      columns.push({
+        key: [
+          {
+            label: this.context.intl.formatMessage(appMessages.ui.acceptedStatuses.accepted),
+            palette: 'recommendations',
+            pIndex: 0,
+          },
+          {
+            label: this.context.intl.formatMessage(appMessages.ui.acceptedStatuses.noted),
+            palette: 'recommendations',
+            pIndex: 1,
+          },
+        ],
+      });
+    }
+    return columns;
   };
 
   render() {
@@ -249,6 +269,11 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       sortOrder,
       onSort,
     });
+    const keyColumns = this.getListKeyColumns({
+      taxonomy,
+      frameworkId,
+      frameworks,
+    });
 
     const columns = this.getListColumns({
       taxonomy,
@@ -258,6 +283,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
 
     return (
       <Styled>
+        <CategoryListKey columns={keyColumns} />
         <CategoryListHeader columns={headerColumns} />
         <CategoryListBody>
           {categoryGroups.toArray().map((group) => {

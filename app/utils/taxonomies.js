@@ -123,13 +123,3 @@ export const getDefaultTaxonomy = (taxonomies, frameworkId) =>
       }
       return tax;
     }, null);
-
-export const mapToCategoryListItem = (cat) =>
-  ({
-    id: cat.get('id'),
-    reference: cat.getIn(['attributes', 'reference']) && cat.getIn(['attributes', 'reference']).trim() !== ''
-      ? cat.getIn(['attributes', 'reference'])
-      : null,
-    title: cat.getIn(['attributes', 'title']),
-    draft: cat.getIn(['attributes', 'draft']),
-  });

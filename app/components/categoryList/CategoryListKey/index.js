@@ -53,6 +53,11 @@ class CategoryListKey extends React.PureComponent { // eslint-disable-line react
           columns.map((col, i) => col.key
             ? (
               <ColumnKey key={i}>
+                {col.key.title && (
+                  <div>
+                    {col.key.title}
+                  </div>
+                )}
                 {
                   col.key.map((item, j) => (
                     <KeyItem key={j}>

@@ -6,7 +6,6 @@ import ItemStatus from 'components/ItemStatus';
 import Clear from 'components/styled/Clear';
 import { PATHS } from 'containers/App/constants';
 
-import { mapToCategoryListItem } from 'utils/taxonomies';
 import { attributesEqual } from 'utils/entities';
 import appMessages from 'containers/App/messages';
 
@@ -155,10 +154,6 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
     );
   };
   renderCountColumn = (col, category, frameworks, frameworkId) => {
-    // console.log(col)
-    // console.log(category)
-    // console.log(frameworks.toJS())
-    // console.log(frameworkId)
     if (!col.attribute) {
       return null;
     }
@@ -226,7 +221,16 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
   render() {
     const { category, columns, onPageLink, frameworks, frameworkId } = this.props;
     // return null;
-    const catItem = mapToCategoryListItem(category);
+    const catItem = {
+      id: category.get('id'),
+      reference:
+        category.getIn(['attributes', 'reference']) &&
+        category.getIn(['attributes', 'reference']).trim() !== ''
+          ? category.getIn(['attributes', 'reference'])
+          : null,
+      title: category.getIn(['attributes', 'title']),
+      draft: category.getIn(['attributes', 'draft']),
+    };
     return (
       <Styled
         onClick={() => onPageLink(`${PATHS.CATEGORIES}/${catItem.id}`)}
