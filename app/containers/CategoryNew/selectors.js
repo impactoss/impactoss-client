@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { selectEntity, selectEntities, selectFWTaxonomiesSorted, selectFWTaxonomies } from 'containers/App/selectors';
+import { selectEntity, selectEntities, selectFWTaxonomiesSorted, selectTaxonomies } from 'containers/App/selectors';
 
 import { USER_ROLES } from 'themes/config';
 
@@ -19,14 +19,16 @@ export const selectDomain = createSelector(
 export const selectParentOptions = createSelector(
   (state, id) => selectEntity(state, { path: 'taxonomies', id }),
   (state) => selectEntities(state, 'categories'),
-  selectFWTaxonomies,
+  selectTaxonomies,
   (taxonomy, categories, taxonomies) => {
     if (taxonomy && taxonomies && categories) {
       const taxonomyParentId = taxonomy.getIn(['attributes', 'parent_id']);
-      return categories.filter((otherCategory) => {
-        const otherTaxonomy = taxonomies.find((tax) => attributesEqual(otherCategory.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
-        return attributesEqual(taxonomyParentId, otherTaxonomy.get('id'));
-      });
+      return taxonomyParentId
+        ? categories.filter((otherCategory) => {
+          const otherTaxonomy = taxonomies.find((tax) => attributesEqual(otherCategory.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
+          return attributesEqual(taxonomyParentId, otherTaxonomy.get('id'));
+        })
+        : null;
     }
     return null;
   }
@@ -34,7 +36,7 @@ export const selectParentOptions = createSelector(
 
 export const selectParentTaxonomy = createSelector(
   (state, id) => selectEntity(state, { path: 'taxonomies', id }),
-  selectFWTaxonomies,
+  selectTaxonomies,
   (taxonomy, taxonomies) => {
     if (taxonomy && taxonomies) {
       return taxonomies.find((tax) => attributesEqual(taxonomy.getIn(['attributes', 'parent_id']), tax.get('id')));
