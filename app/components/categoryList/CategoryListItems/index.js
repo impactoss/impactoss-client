@@ -38,6 +38,7 @@ const GroupHeader = styled.h6`
   }
 `;
 
+const TITLE_COL_RATIO = 0.4;
 
 class CategoryListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   getTagsTax = (taxonomy, tagsAttribute) =>
@@ -91,18 +92,26 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     }
     return attributes;
   }
-  getListHeaderColumns = ({ taxonomy, frameworkId, sortOptions, sortBy, sortOrder, onSort }) => {
-    const TITLE_COL_RATIO = 0.4;
+  getListHeaderColumns = ({
+    taxonomy,
+    frameworkId,
+    sortOptions,
+    sortBy,
+    sortOrder,
+    onSort,
+    userOnly,
+  }) => {
     const sortOptionActive = getSortOption(sortOptions, sortBy, 'query');
     const titleColumnSortOption = sortOptions.find((option) => option.query === 'title');
     const titleColumnActive = titleColumnSortOption.query === sortOptionActive.query;
     const titleColumnSortOrderOption = SORT_ORDER_OPTIONS.find((option) => (sortOrder || titleColumnSortOption.order) === option.value);
+    const headerAttributes = this.getHeaderAttributes(taxonomy, frameworkId);
     // category title column
     const columns = [
       {
         type: 'title',
         header: this.context.intl.formatMessage(appMessages.entities.taxonomies[taxonomy.get('id')].single),
-        width: TITLE_COL_RATIO * 100,
+        width: (userOnly || headerAttributes.length === 0) ? 100 : TITLE_COL_RATIO * 100,
         sortIcon: titleColumnActive && titleColumnSortOrderOption
           ? titleColumnSortOrderOption.icon
           : 'sorting',
@@ -117,13 +126,13 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       },
     ];
     // add columns for associated recs and measures
-    const headerAttributes = this.getHeaderAttributes(taxonomy, frameworkId);
-    return columns.concat(headerAttributes.map((attribute) => {
+    return userOnly
+    ? columns
+    : columns.concat(headerAttributes.map((attribute) => {
       const columnSortOption = sortOptions.find((option) => option.query === attribute.query);
       const columnActive = columnSortOption.query === sortOptionActive.query;
       const columnSortOrderOption = SORT_ORDER_OPTIONS.find((option) => (sortOrder || columnSortOption.order) === option.value);
       return {
-        type: 'count',
         header: attribute.label,
         via: attribute.via,
         width: ((1 - TITLE_COL_RATIO) / headerAttributes.length) * 100,
@@ -203,24 +212,24 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
 
   getListColumns = ({
     taxonomy,
-    userOnly,
     categoryGroups,
+    userOnly,
   }) => {
-    const TITLE_COL_RATIO = 0.4;
+    const countAttributes = this.getCountAttributes(taxonomy);
       // category title column
     const columns = [
       {
         type: 'title',
-        width: TITLE_COL_RATIO * 100,
+        width: (userOnly || !taxonomy || countAttributes.length === 0) ? 100 : TITLE_COL_RATIO * 100,
       },
     ];
     // add columns for associated recs and measures
     return (userOnly || !taxonomy)
       ? columns
       : columns.concat(
-        this.getCountAttributes(taxonomy).map((attribute, i, list) => ({
+        countAttributes.map((attribute) => ({
           type: 'count',
-          width: ((1 - TITLE_COL_RATIO) / list.length) * 100,
+          width: ((1 - TITLE_COL_RATIO) / countAttributes.length) * 100,
           maxCount: this.getCategoryMaxCount(categoryGroups, attribute),
           attribute,
         }))
@@ -279,6 +288,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       sortBy,
       sortOrder,
       onSort,
+      userOnly,
     });
     const keyColumns = this.getListKeyColumns({
       taxonomy,
@@ -288,13 +298,15 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
 
     const columns = this.getListColumns({
       taxonomy,
-      userOnly,
       categoryGroups,
+      userOnly,
     });
 
     return (
       <Styled>
-        <CategoryListKey columns={keyColumns} />
+        {!userOnly && (
+          <CategoryListKey columns={keyColumns} />
+        )}
         <CategoryListHeader columns={headerColumns} />
         <CategoryListBody>
           {categoryGroups.toArray().map((group) => {
