@@ -2,6 +2,7 @@ export const DEPENDENCIES = [
   'user_roles',
   'users',
   'taxonomies',
+  'frameworks',
   'framework_taxonomies',
   'categories',
   'indicators',

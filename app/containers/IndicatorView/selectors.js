@@ -146,4 +146,7 @@ export const selectRecommendations = createSelector(
         .map((association) => association.getIn(['attributes', 'indicator_id']))
       )
     )
+    .groupBy(
+      (r) => r.getIn(['attributes', 'framework_id'])
+    )
 );

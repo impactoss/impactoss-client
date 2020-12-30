@@ -10,12 +10,26 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
-import { getFields } from 'utils/fields';
+import {
+  getTitleField,
+  getStatusField,
+  getMetaField,
+  getMarkdownField,
+  getRecommendationConnectionField,
+  getIndicatorConnectionField,
+  getTaxonomyFields,
+  hasTaxonomyCategories,
+  getDateField,
+  getTextField,
+  getIdField,
+} from 'utils/fields';
+
+import { attributesEqual } from 'utils/entities';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
-import { MEASURE_SHAPE, USER_ROLES } from 'themes/config';
+import { USER_ROLES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -28,8 +42,10 @@ import {
   selectRecommendationTaxonomies,
   selectRecommendationConnections,
   selectIndicatorConnections,
+  selectFrameworks,
 } from 'containers/App/selectors';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import {
@@ -53,21 +69,114 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
+  getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        getIdField(entity, isManager),
+        getTitleField(entity, isManager),
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = (entity) => ([
+    {
+      fields: [
+        getStatusField(entity),
+        getMetaField(entity),
+      ],
+    },
+  ]);
+
+
+  getBodyMainFields = (
+    entity,
+    indicators,
+    indicatorConnections,
+    recommendationsByFw,
+    recommendationTaxonomies,
+    recommendationConnections,
+    frameworks,
+    onEntityClick,
+  ) => {
+    const fields = [];
+    // own attributes
+    fields.push({
+      fields: [
+        getMarkdownField(entity, 'description', true),
+        // getMarkdownField(entity, 'outcome', true),
+        // getMarkdownField(entity, 'indicator_summary', true),
+      ],
+    });
+    // indicators
+    if (indicators) {
+      fields.push({
+        label: appMessages.nav.indicatorsSuper,
+        icon: 'indicators',
+        fields: [
+          getIndicatorConnectionField(indicators, indicatorConnections, onEntityClick),
+        ],
+      });
+    }
+    // recs
+    if (recommendationsByFw) {
+      const recConnections = [];
+      recommendationsByFw.forEach((recs, fwid) => {
+        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+        const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
+        recConnections.push(
+          getRecommendationConnectionField(
+            recs,
+            recommendationTaxonomies,
+            recommendationConnections,
+            onEntityClick,
+            fwid,
+            hasResponse,
+          ),
+        );
+      });
+      fields.push({
+        label: appMessages.nav.recommendations,
+        icon: 'recommendations',
+        fields: recConnections,
+      });
+    }
+    return fields;
+  };
+
+  getBodyAsideFields = (viewEntity, taxonomies) => {
+    const fields = [];
+    fields.push({
+      type: 'dark',
+      fields: [
+        getDateField(viewEntity, 'target_date', true),
+        getTextField(viewEntity, 'target_date_comment'),
+      ],
+    });
+    if (hasTaxonomyCategories(taxonomies)) {
+      fields.push({ // fieldGroup
+        label: appMessages.entities.taxonomies.plural,
+        icon: 'categories',
+        fields: getTaxonomyFields(taxonomies),
+      });
+    }
+    return fields;
+  };
   render() {
     const {
       viewEntity,
       dataReady,
       hasUserRole,
-      recommendations,
+      recommendationsByFw,
       indicators,
       taxonomies,
       recTaxonomies,
       onEntityClick,
       recConnections,
       indicatorConnections,
+      frameworks,
     } = this.props;
-
-    const buttons = hasUserRole[USER_ROLES.MANAGER.value]
+    const isManager = hasUserRole[USER_ROLES.MANAGER.value];
+    const buttons = isManager
     ? [
       {
         type: 'edit',
@@ -108,21 +217,28 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           }
           { viewEntity && dataReady &&
             <EntityView
-              fields={getFields({
-                entity: viewEntity,
-                hasUserRole,
-                associations: {
-                  taxonomies,
-                  recommendations,
-                  recTaxonomies,
-                  recConnections,
-                  indicators,
-                  indicatorConnections,
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(viewEntity, isManager),
+                  aside: isManager && this.getHeaderAsideFields(viewEntity),
                 },
-                onEntityClick,
-                shape: MEASURE_SHAPE,
-                contextIntl: this.context.intl,
-              })}
+                body: {
+                  main: this.getBodyMainFields(
+                    viewEntity,
+                    indicators,
+                    indicatorConnections,
+                    recommendationsByFw,
+                    recTaxonomies,
+                    recConnections,
+                    frameworks,
+                    onEntityClick,
+                  ),
+                  aside: this.getBodyAsideFields(
+                    viewEntity,
+                    taxonomies,
+                  ),
+                },
+              }}
             />
           }
         </Content>
@@ -141,11 +257,12 @@ ActionView.propTypes = {
   hasUserRole: PropTypes.object,
   taxonomies: PropTypes.object,
   recTaxonomies: PropTypes.object,
-  recommendations: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
   indicators: PropTypes.object,
   recConnections: PropTypes.object,
   indicatorConnections: PropTypes.object,
   params: PropTypes.object,
+  frameworks: PropTypes.object,
 };
 
 ActionView.contextTypes = {
@@ -159,10 +276,11 @@ const mapStateToProps = (state, props) => ({
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   indicators: selectIndicators(state, props.params.id),
-  recommendations: selectRecommendations(state, props.params.id),
+  recommendationsByFw: selectRecommendations(state, props.params.id),
   recTaxonomies: selectRecommendationTaxonomies(state),
   recConnections: selectRecommendationConnections(state),
   indicatorConnections: selectIndicatorConnections(state),
+  frameworks: selectFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch) {

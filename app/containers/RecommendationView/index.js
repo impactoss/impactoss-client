@@ -39,7 +39,7 @@ import {
   selectMeasureTaxonomies,
   selectMeasureConnections,
   selectIndicatorConnections,
-  selectEntities,
+  selectFrameworks,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -264,7 +264,7 @@ const mapStateToProps = (state, props) => ({
   measureConnections: selectMeasureConnections(state),
   indicators: selectIndicators(state, props.params.id),
   indicatorConnections: selectIndicatorConnections(state),
-  frameworks: selectEntities(state, 'frameworks'),
+  frameworks: selectFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

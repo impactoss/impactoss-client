@@ -23,6 +23,8 @@ import {
   getReportsField,
 } from 'utils/fields';
 
+import { attributesEqual } from 'utils/entities';
+
 import { loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages } from 'containers/App/actions';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
@@ -42,6 +44,7 @@ import {
   selectRecommendationTaxonomies,
   selectRecommendationConnections,
   selectQueryMessages,
+  selectFrameworks,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -94,11 +97,14 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     isContributor,
     onEntityClick,
     measureConnections,
-    recommendations,
+    recommendationsByFw,
     recommendationTaxonomies,
     recommendationConnections,
-  ) => ([
-    {
+    frameworks,
+  ) => {
+    const fields = [];
+    // own attributes
+    fields.push({
       fields: [
         getMarkdownField(entity, 'description', true),
         getReportsField(
@@ -110,16 +116,40 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
           }
         ),
       ],
-    },
-    {
-      label: appMessages.entities.connections.plural,
-      icon: 'connections',
-      fields: [
-        measures && getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
-        recommendations && getRecommendationConnectionField(recommendations, recommendationTaxonomies, recommendationConnections, onEntityClick),
-      ],
-    },
-  ]);
+    });
+    // measures
+    if (measures) {
+      fields.push({
+        label: appMessages.nav.measuresSuper,
+        icon: 'measures',
+        fields: getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
+      });
+    }
+    // recs
+    if (recommendationsByFw) {
+      const recConnections = [];
+      recommendationsByFw.forEach((recs, fwid) => {
+        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+        const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
+        recConnections.push(
+          getRecommendationConnectionField(
+            recs,
+            recommendationTaxonomies,
+            recommendationConnections,
+            onEntityClick,
+            fwid,
+            hasResponse,
+          ),
+        );
+      });
+      fields.push({
+        label: appMessages.nav.measuresSuper,
+        icon: 'recommendations',
+        fields: recConnections,
+      });
+    }
+    return fields;
+  };
 
   getBodyAsideFields = (entity, dates) => ([ // fieldGroups
     { // fieldGroup
@@ -149,9 +179,10 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       measureTaxonomies,
       onEntityClick,
       measureConnections,
-      recommendations,
+      recommendationsByFw,
       recommendationTaxonomies,
       recommendationConnections,
+      frameworks,
     } = this.props;
 
     const buttons = isManager
@@ -232,9 +263,10 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                     isContributor,
                     onEntityClick,
                     measureConnections,
-                    recommendations,
+                    recommendationsByFw,
                     recommendationTaxonomies,
                     recommendationConnections,
+                    frameworks,
                   ),
                   aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
                 },
@@ -267,7 +299,8 @@ IndicatorView.propTypes = {
   onDismissQueryMessages: PropTypes.func,
   recommendationTaxonomies: PropTypes.object,
   recommendationConnections: PropTypes.object,
-  recommendations: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
+  frameworks: PropTypes.object,
 };
 
 IndicatorView.contextTypes = {
@@ -282,13 +315,14 @@ const mapStateToProps = (state, props) => ({
   viewEntity: selectViewEntity(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
   measureTaxonomies: selectMeasureTaxonomies(state),
-  recommendations: selectRecommendations(state, props.params.id),
+  recommendationsByFw: selectRecommendations(state, props.params.id),
   recommendationTaxonomies: selectRecommendationTaxonomies(state),
   reports: selectReports(state, props.params.id),
   dates: selectDueDates(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
   recommendationConnections: selectRecommendationConnections(state),
   queryMessages: selectQueryMessages(state),
+  frameworks: selectFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

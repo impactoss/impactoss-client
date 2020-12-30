@@ -13,7 +13,7 @@ import {
   entitySetUser,
   attributesEqual,
   entitiesIsAssociated,
-  prepareTaxonomiesAssociated,
+  prepareTaxonomiesIsAssociated,
   getEntityCategories,
 } from 'utils/entities';
 
@@ -29,7 +29,7 @@ export const selectTaxonomies = createSelector(
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'measure_categories'),
   (id, taxonomies, categories, associations) =>
-    prepareTaxonomiesAssociated(taxonomies, categories, associations, 'tags_measures', 'measure_id', id)
+    prepareTaxonomiesIsAssociated(taxonomies, categories, associations, 'tags_measures', 'measure_id', id)
   );
 
 export const selectRecommendationsAssociated = createSelector(
@@ -65,6 +65,9 @@ export const selectRecommendations = createSelector(
         )
         .map((association) => association.getIn(['attributes', 'indicator_id']))
       )
+    )
+    .groupBy(
+      (r) => r.getIn(['attributes', 'framework_id'])
     )
 );
 
