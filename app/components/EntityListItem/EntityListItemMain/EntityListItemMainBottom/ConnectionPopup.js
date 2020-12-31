@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { Link } from 'react-router';
+// import Link from 'containers/Link';
 
 import { TEXT_TRUNCATE } from 'themes/config';
 
@@ -11,6 +11,8 @@ import { truncateText } from 'utils/string';
 
 import messages from 'components/ItemStatus/messages';
 import ItemStatus from 'components/ItemStatus';
+
+import Link from 'containers/Link';
 
 const POPUP_WIDTH = 330;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router';
+import Link from 'containers/Link';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import styled from 'styled-components';

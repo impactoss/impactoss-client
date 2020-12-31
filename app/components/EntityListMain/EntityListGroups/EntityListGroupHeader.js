@@ -1,9 +1,10 @@
-import { Link } from 'react-router';
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+
+import Link from 'containers/Link';
 
 const ListEntitiesGroupHeaderLink = styled(Link)`
   color: ${palette('link', 2)};

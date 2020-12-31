@@ -554,7 +554,7 @@ const getNextQuery = (query, extend, location) => {
 };
 
 // convert to string
-const getNextQueryString = (queryNext) =>
+export const getNextQueryString = (queryNext) =>
   reduce(queryNext, (result, value, key) => {
     let params;
     if (Array.isArray(value)) {

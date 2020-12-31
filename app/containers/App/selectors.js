@@ -340,6 +340,7 @@ export const selectFWRecommendations = createSelector(
     return entities;
   }
 );
+// returns measures not associated or associated with current framework
 export const selectFWMeasures = createSelector(
   (state) => selectEntities(state, 'measures'),
   selectFrameworkQuery,
