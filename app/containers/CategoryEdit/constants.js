@@ -34,7 +34,7 @@ export const FORM_INITIAL = fromJS({
     draft: true,
   },
   associatedMeasures: [],
-  associatedRecommendations: [],
+  associatedRecommendationsByFw: {},
   associatedUser: [],
   associatedCategory: [],
 });

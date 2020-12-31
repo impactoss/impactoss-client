@@ -118,12 +118,18 @@ export const renderMeasureControl = (entities, taxonomies, onCreateOption, conte
 }
 : null;
 
-export const renderRecommendationControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
+export const renderRecommendationControl = (
+  fwId,
+  entities,
+  taxonomies,
+  onCreateOption,
+  contextIntl,
+) => entities
 ? {
-  id: 'recommendations',
-  model: '.associatedRecommendations',
-  dataPath: ['associatedRecommendations'],
-  label: 'Recommendations',
+  id: `recommendations.${fwId}`,
+  model: `.associatedRecommendationsByFw.${fwId}`,
+  dataPath: ['associatedRecommendationsByFw', fwId],
+  label: contextIntl.formatMessage(appMessages.entities[`recommendations_${fwId}`].plural),
   controlType: 'multiselect',
   options: entityOptions(entities),
   advanced: true,
@@ -134,6 +140,24 @@ export const renderRecommendationControl = (entities, taxonomies, onCreateOption
     : null,
 }
 : null;
+
+export const renderTaxonomyControl = (taxonomies, onCreateOption, contextIntl) => taxonomies
+? sortEntities(taxonomies, 'asc', 'priority').reduce((controls, taxonomy) => controls.concat({
+  id: taxonomy.get('id'),
+  model: `.associatedTaxonomies.${taxonomy.get('id')}`,
+  dataPath: ['associatedTaxonomies', taxonomy.get('id')],
+  label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
+  controlType: 'multiselect',
+  multiple: taxonomy.getIn(['attributes', 'allow_multiple']),
+  options: entityOptions(taxonomy.get('categories'), false),
+  onCreate: onCreateOption
+    ? () => onCreateOption({
+      path: 'categories',
+      attributes: { taxonomy_id: taxonomy.get('id') },
+    })
+    : null,
+}), [])
+: [];
 
 export const renderIndicatorControl = (entities, onCreateOption) => entities
 ? {
@@ -175,24 +199,6 @@ export const renderParentCategoryControl = (entities, label, activeParentId) => 
 }
 : null;
 
-export const renderTaxonomyControl = (taxonomies, onCreateOption, contextIntl) => taxonomies
-? sortEntities(taxonomies, 'asc', 'priority').reduce((controls, taxonomy) => controls.concat({
-  id: taxonomy.get('id'),
-  model: `.associatedTaxonomies.${taxonomy.get('id')}`,
-  dataPath: ['associatedTaxonomies', taxonomy.get('id')],
-  label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
-  controlType: 'multiselect',
-  multiple: taxonomy.getIn(['attributes', 'allow_multiple']),
-  options: entityOptions(taxonomy.get('categories'), false),
-  onCreate: onCreateOption
-    ? () => onCreateOption({
-      path: 'categories',
-      attributes: { taxonomy_id: taxonomy.get('id') },
-    })
-    : null,
-}), [])
-: [];
-
 const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
   ? getAssociatedEntities(taxonomy.get('categories'))
   : Map();
@@ -231,9 +237,14 @@ export const getCategoryUpdatesFromFormData = ({ formData, taxonomies, createKey
   }, Map({ delete: List(), create: List() }));
 
 export const getConnectionUpdatesFromFormData = ({ formData, connections, connectionAttribute, createConnectionKey, createKey }) => {
-  const formConnectionIds = formData
-    ? getCheckedValuesFromOptions(formData.get(connectionAttribute))
-    : List();
+  let formConnectionIds = List();
+  if (formData) {
+    if (Array.isArray(connectionAttribute)) {
+      formConnectionIds = getCheckedValuesFromOptions(formData.getIn(connectionAttribute));
+    } else {
+      formConnectionIds = getCheckedValuesFromOptions(formData.get(connectionAttribute));
+    }
+  }
 
   // store associated Actions as { [action.id]: [association.id], ... }
   const associatedConnections = getAssociatedEntities(connections);

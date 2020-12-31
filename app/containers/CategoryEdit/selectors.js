@@ -37,11 +37,13 @@ export const selectParentOptions = createSelector(
   (entity, categories, taxonomies) => {
     if (entity && taxonomies && categories) {
       const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
-      const taxonomyParentId = taxonomy.getIn(['attributes', 'parent_id']);
-      return categories.filter((otherCategory) => {
-        const otherTaxonomy = taxonomies.find((tax) => attributesEqual(otherCategory.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
-        return attributesEqual(taxonomyParentId, otherTaxonomy.get('id'));
-      });
+      const taxonomyParentId = taxonomy && taxonomy.getIn(['attributes', 'parent_id']);
+      return taxonomyParentId
+        ? categories.filter((otherCategory) => {
+          const otherTaxonomy = taxonomies.find((tax) => attributesEqual(otherCategory.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
+          return attributesEqual(taxonomyParentId, otherTaxonomy.get('id'));
+        })
+        : null;
     }
     return null;
   }
@@ -80,6 +82,9 @@ export const selectRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendation_categories'),
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'recommendation_id', associations, 'category_id', id)
+    .groupBy(
+      (r) => r.getIn(['attributes', 'framework_id']).toString()
+    )
 );
 
 export const selectConnectedTaxonomies = createSelector(

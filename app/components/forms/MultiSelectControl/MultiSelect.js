@@ -328,6 +328,8 @@ class MultiSelect extends React.Component {
     />
   );
 
+
+  // TODO intl
   render() {
     let options = this.prepareOptions(this.props, this.state);
 

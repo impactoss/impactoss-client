@@ -330,7 +330,7 @@ export const getInitialFormData = (shape) => {
   if (shape.connections) {
     fields = reduce(shape.connections.tables, (memo, table) => {
       if (table.table === 'recommendations') {
-        return fields.set('associatedRecommendations', List());
+        return fields.set('associatedRecommendationsByFw', Map());
       }
       if (table.table === 'indicators') {
         return fields.set('associatedIndicators', List());
