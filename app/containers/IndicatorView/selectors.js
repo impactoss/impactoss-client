@@ -7,6 +7,7 @@ import {
   selectRecommendationConnections,
   selectFWRecommendations,
   selectFWMeasures,
+  selectFrameworks,
 } from 'containers/App/selectors';
 
 import {
@@ -127,26 +128,41 @@ export const selectRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'recommendation_indicators'),
   (state) => selectEntities(state, 'categories'),
-  (recommendations, connections, recommendationMeasures, recommendationCategories, recommendationIndicators, categories) =>
-    recommendations && recommendationIndicators && recommendations
-    .map((rec) => rec
-      .set('categories', getEntityCategories(rec.get('id'), recommendationCategories, 'recommendation_id', categories))
-      .set('measures', recommendationMeasures && recommendationMeasures
-        .filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
-          && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
+  (state) => selectFrameworks(state),
+  (
+    recommendations,
+    connections,
+    recommendationMeasures,
+    recommendationCategories,
+    recommendationIndicators,
+    categories,
+    frameworks,
+  ) =>
+    recommendations && recommendationIndicators && frameworks && recommendations
+      .filter((rec) => {
+        const currentFramework = frameworks.find(
+          (fw) => attributesEqual(fw.get('id'), rec.getIn(['attributes', 'framework_id']))
+        );
+        return currentFramework.getIn(['attributes', 'has_indicators']);
+      })
+      .map((rec) => rec
+        .set('categories', getEntityCategories(rec.get('id'), recommendationCategories, 'recommendation_id', categories))
+        .set('measures', recommendationMeasures && recommendationMeasures
+          .filter((association) =>
+            attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
+            && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
+          )
+          .map((association) => association.getIn(['attributes', 'measure_id']))
         )
-        .map((association) => association.getIn(['attributes', 'measure_id']))
-      )
-      .set('indicators', recommendationIndicators && recommendationIndicators
-        .filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
-          && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
+        .set('indicators', recommendationIndicators && recommendationIndicators
+          .filter((association) =>
+            attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
+            && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
+          )
+          .map((association) => association.getIn(['attributes', 'indicator_id']))
         )
-        .map((association) => association.getIn(['attributes', 'indicator_id']))
       )
-    )
-    .groupBy(
-      (r) => r.getIn(['attributes', 'framework_id'])
-    )
+      .groupBy(
+        (r) => r.getIn(['attributes', 'framework_id'])
+      )
 );

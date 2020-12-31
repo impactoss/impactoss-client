@@ -22,7 +22,7 @@ import {
   selectIsUserManager,
   selectSessionUserAttributes,
   selectReady,
-  selectEntities,
+  selectFrameworks,
   selectEntitiesWhere,
   selectNewEntityModal,
   selectFrameworkQuery,
@@ -188,11 +188,14 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           isHome={location.pathname === '/'}
           currentFrameworkId={currentFrameworkId || 'all'}
           onSelectFramework={onSelectFramework}
-          frameworkOptions={frameworks && this.prepareFrameworkOptions(
-            frameworks,
-            currentFrameworkId,
-            onSelectFramework,
-          )}
+          frameworkOptions={(frameworks && frameworks.size > 1)
+            ? this.prepareFrameworkOptions(
+                frameworks,
+                currentFrameworkId,
+                onSelectFramework,
+              )
+            : null
+          }
         />
         <Main isHome={location.pathname === '/'}>
           {React.Children.toArray(this.props.children)}
@@ -254,7 +257,7 @@ const mapStateToProps = (state, props) => ({
   }),
   newEntityModal: selectNewEntityModal(state),
   currentFrameworkId: selectFrameworkQuery(state),
-  frameworks: selectEntities(state, 'frameworks'),
+  frameworks: selectFrameworks(state),
   viewRecommendationFramework: selectViewRecommendationFrameworkId(state, props.params.id),
 });
 

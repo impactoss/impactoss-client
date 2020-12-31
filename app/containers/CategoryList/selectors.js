@@ -8,7 +8,7 @@ import {
   selectFWTaxonomiesSorted,
   selectFWRecommendations,
   selectFWMeasures,
-  selectFrameworks,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import { attributesEqual } from 'utils/entities';
@@ -181,7 +181,7 @@ const selectCategoryCountGroups = createSelector(
   selectRecommendations,
   selectMeasures,
   (state) => selectEntities(state, 'categories'),
-  selectFrameworks,
+  selectActiveFrameworks,
   (taxonomy, recommendations, measures, categories, frameworks) => {
     if (!taxonomy) return Map();
     if (taxonomy && recommendations && measures && categories && frameworks) {

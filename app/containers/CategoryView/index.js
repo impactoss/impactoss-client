@@ -44,7 +44,7 @@ import {
   selectIsUserManager,
   selectMeasureConnections,
   selectRecommendationConnections,
-  selectFrameworks,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 
@@ -375,7 +375,7 @@ const mapStateToProps = (state, props) => ({
   childTaxonomies: selectChildTaxonomies(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
   recommendationConnections: selectRecommendationConnections(state),
-  frameworks: selectFrameworks(state),
+  frameworks: selectActiveFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch) {

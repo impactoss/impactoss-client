@@ -39,7 +39,7 @@ import {
   selectMeasureTaxonomies,
   selectMeasureConnections,
   selectIndicatorConnections,
-  selectFrameworks,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -107,8 +107,10 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     indicatorConnections,
     onEntityClick,
     hasResponse,
-  ) => ([
-    {
+  ) => {
+    const fields = [];
+    // own attributes
+    fields.push({
       fields: [
         getMarkdownField(entity, 'description', true, 'fullRecommendation'),
         hasResponse && getStatusField(
@@ -120,16 +122,38 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
         ),
         hasResponse && getMarkdownField(entity, 'response', true),
       ],
-    },
-    {
-      label: appMessages.entities.connections.plural,
-      icon: 'connections',
-      fields: [
-        measures && getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
-        indicators && getIndicatorConnectionField(indicators, indicatorConnections, onEntityClick),
-      ],
-    },
-  ]);
+    });
+    // indicators
+    if (indicators) {
+      fields.push({
+        label: appMessages.nav.indicatorsSuper,
+        icon: 'indicators',
+        fields: [
+          getIndicatorConnectionField(
+            indicators,
+            indicatorConnections,
+            onEntityClick,
+          ),
+        ],
+      });
+    }
+    // measures
+    if (measures) {
+      fields.push({
+        label: appMessages.nav.measuresSuper,
+        icon: 'measures',
+        fields: [
+          getMeasureConnectionField(
+            measures,
+            measureTaxonomies,
+            measureConnections,
+            onEntityClick,
+          ),
+        ],
+      });
+    }
+    return fields;
+  };
 
   getBodyAsideFields = (taxonomies) => ([ // fieldGroups
     hasTaxonomyCategories(taxonomies)
@@ -264,7 +288,7 @@ const mapStateToProps = (state, props) => ({
   measureConnections: selectMeasureConnections(state),
   indicators: selectIndicators(state, props.params.id),
   indicatorConnections: selectIndicatorConnections(state),
-  frameworks: selectFrameworks(state),
+  frameworks: selectActiveFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

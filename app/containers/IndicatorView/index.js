@@ -44,7 +44,7 @@ import {
   selectRecommendationTaxonomies,
   selectRecommendationConnections,
   selectQueryMessages,
-  selectFrameworks,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -122,7 +122,14 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       fields.push({
         label: appMessages.nav.measuresSuper,
         icon: 'measures',
-        fields: getMeasureConnectionField(measures, measureTaxonomies, measureConnections, onEntityClick),
+        fields: [
+          getMeasureConnectionField(
+            measures,
+            measureTaxonomies,
+            measureConnections,
+            onEntityClick,
+          ),
+        ],
       });
     }
     // recs
@@ -143,7 +150,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         );
       });
       fields.push({
-        label: appMessages.nav.measuresSuper,
+        label: appMessages.nav.recommendations,
         icon: 'recommendations',
         fields: recConnections,
       });
@@ -322,7 +329,7 @@ const mapStateToProps = (state, props) => ({
   measureConnections: selectMeasureConnections(state),
   recommendationConnections: selectRecommendationConnections(state),
   queryMessages: selectQueryMessages(state),
-  frameworks: selectFrameworks(state),
+  frameworks: selectActiveFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

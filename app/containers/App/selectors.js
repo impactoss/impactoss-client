@@ -308,9 +308,21 @@ export const selectEntities = createSelector(
 
 export const selectFrameworks = createSelector(
   (state) => selectEntities(state, 'frameworks'),
+  (entities) => entities
+);
+// use for testing single framework configuration
+// && entities.filter((fw) => fw.get('id') === '1')
+
+export const selectActiveFrameworks = createSelector(
+  selectFrameworks,
   selectFrameworkQuery,
   (entities, fwQuery) => {
-    if (fwQuery && fwQuery !== 'all') {
+    if (
+      entities &&
+      entities.size > 1 &&
+      fwQuery &&
+      fwQuery !== 'all'
+    ) {
       return entities.filter((fw) => attributesEqual(fwQuery, fw.get('id')));
     }
     return entities;

@@ -42,7 +42,7 @@ import {
   selectRecommendationTaxonomies,
   selectRecommendationConnections,
   selectIndicatorConnections,
-  selectFrameworks,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -280,7 +280,7 @@ const mapStateToProps = (state, props) => ({
   recTaxonomies: selectRecommendationTaxonomies(state),
   recConnections: selectRecommendationConnections(state),
   indicatorConnections: selectIndicatorConnections(state),
-  frameworks: selectFrameworks(state),
+  frameworks: selectActiveFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch) {

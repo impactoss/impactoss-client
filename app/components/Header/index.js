@@ -274,14 +274,16 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         }
         { !isHome &&
           <NavMain hasBorder>
-            <SelectReset
-              label={this.context.intl.formatMessage(appMessages.frameworks.single)}
-              value={currentFrameworkId}
-              index="fw-select"
-              options={frameworkOptions}
-              isReset={false}
-              onChange={onSelectFramework}
-            />
+            {frameworkOptions && (
+              <SelectReset
+                label={this.context.intl.formatMessage(appMessages.frameworks.single)}
+                value={currentFrameworkId}
+                index="fw-select"
+                options={frameworkOptions}
+                isReset={false}
+                onChange={onSelectFramework}
+              />
+            )}
             {navItems && navItems.map((item, i) => (
               <LinkMain
                 key={i}
