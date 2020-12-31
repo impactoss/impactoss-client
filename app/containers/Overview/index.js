@@ -18,7 +18,7 @@ import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
   selectFWTaxonomiesSorted,
   selectReady,
-  selectFrameworks,
+  selectActiveFrameworks,
   selectFrameworkQuery,
 } from 'containers/App/selectors';
 import { PATHS, CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
@@ -553,7 +553,7 @@ Overview.contextTypes = {
 const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectFWTaxonomiesSorted(state),
-  frameworks: selectFrameworks(state),
+  frameworks: selectActiveFrameworks(state),
   frameworkId: selectFrameworkQuery(state),
   recommendationCount: selectRecommendationCount(state),
   measureCount: selectMeasureCount(state),

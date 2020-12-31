@@ -44,7 +44,7 @@ import {
   selectRecommendationTaxonomies,
   selectRecommendationConnections,
   selectQueryMessages,
-  selectFrameworks,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -322,7 +322,7 @@ const mapStateToProps = (state, props) => ({
   measureConnections: selectMeasureConnections(state),
   recommendationConnections: selectRecommendationConnections(state),
   queryMessages: selectQueryMessages(state),
-  frameworks: selectFrameworks(state),
+  frameworks: selectActiveFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

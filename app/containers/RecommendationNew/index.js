@@ -51,7 +51,7 @@ import {
   selectRecommendationTaxonomies,
   selectEntities,
   selectFrameworkQuery,
-  selectFrameworks,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -311,7 +311,7 @@ const mapStateToProps = (state) => ({
   indicators: selectEntities(state, 'indicators'),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworkId: selectFrameworkQuery(state),
-  frameworks: selectFrameworks(state),
+  frameworks: selectActiveFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch) {

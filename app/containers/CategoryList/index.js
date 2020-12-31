@@ -19,7 +19,7 @@ import {
   selectReady,
   selectIsUserManager,
   selectFrameworkQuery,
-  selectFrameworks,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 import { PATHS, CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -223,7 +223,7 @@ CategoryList.contextTypes = {
 };
 
 const mapStateToProps = (state, props) => ({
-  frameworks: selectFrameworks(state),
+  frameworks: selectActiveFrameworks(state),
   frameworkId: selectFrameworkQuery(state),
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),

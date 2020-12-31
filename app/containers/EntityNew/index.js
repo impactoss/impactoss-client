@@ -24,7 +24,7 @@ import {
 import {
   selectEntity,
   selectFrameworkQuery,
-  selectFrameworks,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 import { selectParentOptions, selectParentTaxonomy } from 'containers/CategoryNew/selectors';
 
@@ -239,7 +239,7 @@ const mapStateToProps = (state, { path, attributes }) => ({
     ? selectFrameworkQuery(state)
     : null,
   frameworks: path === 'recommendations'
-    ? selectFrameworks(state)
+    ? selectActiveFrameworks(state)
     : null,
 });
 

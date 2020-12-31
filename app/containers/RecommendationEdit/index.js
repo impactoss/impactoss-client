@@ -53,7 +53,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
-  selectEntities,
+  selectFrameworks,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -335,7 +335,7 @@ const mapStateToProps = (state, props) => ({
   measures: selectMeasures(state, props.params.id),
   indicators: selectIndicators(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
-  frameworks: selectEntities(state, 'frameworks'),
+  frameworks: selectFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

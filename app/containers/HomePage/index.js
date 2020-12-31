@@ -16,7 +16,7 @@ import Row from 'components/styled/Row';
 import Container from 'components/styled/Container';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { selectEntities } from 'containers/App/selectors';
+import { selectFrameworks } from 'containers/App/selectors';
 
 import ButtonHero from 'components/buttons/ButtonHero';
 import ButtonFlat from 'components/buttons/ButtonFlat';
@@ -138,7 +138,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const { theme, frameworks, onSelectFramework } = this.props;
+    const { theme, frameworks, onSelectFramework, onPageLink } = this.props;
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
 
     return (
@@ -188,17 +188,24 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                   <GridSpace lg={1 / 6} sm={1 / 8} />
                   <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                     <HomeActions>
-                      {frameworks.entrySeq().map(([key, fw]) => (
+                      {frameworks.size > 1 && frameworks.entrySeq().map(([key, fw]) => (
                         <ButtonHero key={key} onClick={() => onSelectFramework(fw.get('id'))}>
                           <FormattedMessage {...appMessages.frameworks[fw.get('id')]} />
                         </ButtonHero>
                       ))}
+                      {frameworks.size === 1 && (
+                        <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
+                          <FormattedMessage {...messages.explore} />
+                        </ButtonHero>
+                      )}
                     </HomeActions>
-                    <HomeActions>
-                      <ButtonFlat onClick={() => onSelectFramework('all')}>
-                        <FormattedMessage {...messages.exploreAllFrameworks} />
-                      </ButtonFlat>
-                    </HomeActions>
+                    {frameworks.size > 1 && (
+                      <HomeActions>
+                        <ButtonFlat onClick={() => onSelectFramework('all')}>
+                          <FormattedMessage {...messages.exploreAllFrameworks} />
+                        </ButtonFlat>
+                      </HomeActions>
+                    )}
                   </Grid>
                 </Row>
               )}
@@ -214,6 +221,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 HomePage.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func.isRequired,
   onSelectFramework: PropTypes.func.isRequired,
+  onPageLink: PropTypes.func.isRequired,
   theme: PropTypes.object.isRequired,
   frameworks: PropTypes.object,
 };
@@ -223,13 +231,16 @@ HomePage.contextTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  frameworks: selectEntities(state, 'frameworks'),
+  frameworks: selectFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
+    onPageLink: (path) => {
+      dispatch(updatePath(path));
     },
     onSelectFramework: (framework) => {
       // dispatch(setFramework(framework));
