@@ -18,7 +18,7 @@ import {
   entityOptions,
   renderUserControl,
   renderMeasureControl,
-  renderRecommendationControl,
+  renderRecommendationsByFwControl,
   renderParentCategoryControl,
   getTitleFormField,
   getReferenceFormField,
@@ -29,6 +29,7 @@ import {
   getCheckboxField,
   getStatusField,
   parentCategoryOptions,
+  getDateField,
 } from 'utils/forms';
 
 import {
@@ -74,7 +75,7 @@ import {
   selectViewEntity,
   selectUsers,
   selectMeasures,
-  selectRecommendations,
+  selectRecommendationsByFw,
   selectConnectedTaxonomies,
   selectParentOptions,
   selectParentTaxonomy,
@@ -126,10 +127,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         (oldVal, newVal) => oldVal === null ? newVal : oldVal,
         FORM_INITIAL.get('attributes')
       ),
-      associatedMeasures: entityOptions(measures, true),
-      associatedRecommendationsByFw: recommendationsByFw.map(
-        (recs) => entityOptions(recs, true),
-      ),
+      associatedMeasures: measures && entityOptions(measures, true),
+      associatedRecommendationsByFw: recommendationsByFw
+        ? recommendationsByFw.map(
+            (recs) => entityOptions(recs, true),
+          )
+        : Map(),
       associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
       associatedCategory: parentCategoryOptions(parentOptions, viewEntity.getIn(['attributes', 'parent_id'])),
       // TODO allow single value for singleSelect
@@ -187,26 +190,25 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           },
         );
       }
-      if (entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendationsByFw) {
-        const recConnections = [];
-        recommendationsByFw.forEach((recs, fwid) => {
-          recConnections.push(
-            renderRecommendationControl(
-              fwid.toString(),
-              recs,
-              connectedTaxonomies,
-              onCreateOption,
-              this.context.intl,
-            ),
-          );
-        });
-        fields.push(
-          {
-            label: this.context.intl.formatMessage(appMessages.nav.recommendations),
-            icon: 'recommendations',
-            fields: recConnections,
-          },
+      if (
+        entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) &&
+        recommendationsByFw
+      ) {
+        const recConnections = renderRecommendationsByFwControl(
+          recommendationsByFw,
+          connectedTaxonomies,
+          onCreateOption,
+          this.context.intl,
         );
+        if (recConnections) {
+          fields.push(
+            {
+              label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+              icon: 'recommendations',
+              fields: recConnections,
+            },
+          );
+        }
       }
     }
     return fields;
@@ -222,13 +224,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         )],
       });
     }
-    fields.push({
-      fields: [getFormField({
-        formatMessage: this.context.intl.formatMessage,
-        controlType: 'url',
-        attribute: 'url',
-      })],
-    });
     if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({
         fields: [
@@ -240,6 +235,23 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         ],
       });
     }
+    if (entity.getIn(['taxonomy', 'attributes', 'has_date'])) {
+      fields.push({
+        fields: [
+          getDateField(
+            this.context.intl.formatMessage,
+            'date',
+          ),
+        ],
+      });
+    }
+    fields.push({
+      fields: [getFormField({
+        formatMessage: this.context.intl.formatMessage,
+        controlType: 'url',
+        attribute: 'url',
+      })],
+    });
     return fields;
   }
 
@@ -413,7 +425,7 @@ const mapStateToProps = (state, props) => ({
   parentTaxonomy: selectParentTaxonomy(state, props.params.id),
   users: selectUsers(state),
   measures: selectMeasures(state, props.params.id),
-  recommendationsByFw: selectRecommendations(state, props.params.id),
+  recommendationsByFw: selectRecommendationsByFw(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 

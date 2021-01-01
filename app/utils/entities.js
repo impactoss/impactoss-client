@@ -263,9 +263,15 @@ export const prepareTaxonomies = (taxonomies, categories, tagsKey, includeParent
   ));
 
 export const prepareCategory = (category, users, taxonomies) =>
-  category && entitySetUser(
-    category.set('taxonomy', taxonomies.find((tax) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), tax.get('id')))),
-    users
+  category &&
+  entitySetUser(
+    category.set(
+      'taxonomy',
+      taxonomies.find(
+        (tax) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), tax.get('id')),
+      ),
+    ),
+    users,
   );
 
 export const usersByRole = (users, userRoles, roleId) =>

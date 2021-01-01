@@ -141,23 +141,59 @@ export const renderRecommendationControl = (
 }
 : null;
 
-export const renderTaxonomyControl = (taxonomies, onCreateOption, contextIntl) => taxonomies
-? sortEntities(taxonomies, 'asc', 'priority').reduce((controls, taxonomy) => controls.concat({
-  id: taxonomy.get('id'),
-  model: `.associatedTaxonomies.${taxonomy.get('id')}`,
-  dataPath: ['associatedTaxonomies', taxonomy.get('id')],
-  label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
-  controlType: 'multiselect',
-  multiple: taxonomy.getIn(['attributes', 'allow_multiple']),
-  options: entityOptions(taxonomy.get('categories'), false),
-  onCreate: onCreateOption
-    ? () => onCreateOption({
-      path: 'categories',
-      attributes: { taxonomy_id: taxonomy.get('id') },
-    })
-    : null,
-}), [])
-: [];
+// recommendations grouped by framework
+export const renderRecommendationsByFwControl = (
+  entitiesByFw,
+  taxonomies,
+  onCreateOption,
+  contextIntl,
+) => entitiesByFw
+  ? entitiesByFw.reduce(
+    (controls, entities, fwid) =>
+      controls.concat({
+        id: `recommendations.${fwid}`,
+        model: `.associatedRecommendationsByFw.${fwid}`,
+        dataPath: ['associatedRecommendationsByFw', fwid],
+        label: contextIntl.formatMessage(appMessages.entities[`recommendations_${fwid}`].plural),
+        controlType: 'multiselect',
+        options: entityOptions(entities),
+        advanced: true,
+        selectAll: true,
+        tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
+        onCreate: onCreateOption
+          ? () => onCreateOption({ path: 'recommendations' })
+          : null,
+      }),
+      [],
+    )
+  : null;
+
+// taxonomies with categories "embedded"
+export const renderTaxonomyControl = (
+  taxonomies,
+  onCreateOption,
+  contextIntl,
+) => taxonomies
+  ? sortEntities(taxonomies, 'asc', 'priority').reduce(
+    (controls, taxonomy) =>
+      controls.concat({
+        id: taxonomy.get('id'),
+        model: `.associatedTaxonomies.${taxonomy.get('id')}`,
+        dataPath: ['associatedTaxonomies', taxonomy.get('id')],
+        label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
+        controlType: 'multiselect',
+        multiple: taxonomy.getIn(['attributes', 'allow_multiple']),
+        options: entityOptions(taxonomy.get('categories'), false),
+        onCreate: onCreateOption
+          ? () => onCreateOption({
+            path: 'categories',
+            attributes: { taxonomy_id: taxonomy.get('id') },
+          })
+          : null,
+      }),
+      [],
+    )
+  : [];
 
 export const renderIndicatorControl = (entities, onCreateOption) => entities
 ? {

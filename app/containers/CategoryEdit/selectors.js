@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { List } from 'immutable';
 
 import {
   selectEntity,
@@ -39,10 +40,18 @@ export const selectParentOptions = createSelector(
       const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
       const taxonomyParentId = taxonomy && taxonomy.getIn(['attributes', 'parent_id']);
       return taxonomyParentId
-        ? categories.filter((otherCategory) => {
-          const otherTaxonomy = taxonomies.find((tax) => attributesEqual(otherCategory.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
-          return attributesEqual(taxonomyParentId, otherTaxonomy.get('id'));
-        })
+        ? categories.filter(
+          (otherCategory) => {
+            const otherTaxonomy = taxonomies.find(
+              (tax) => attributesEqual(
+                otherCategory.getIn(['attributes', 'taxonomy_id']),
+                tax.get('id'),
+              ),
+            );
+            return otherTaxonomy
+              ? attributesEqual(taxonomyParentId, otherTaxonomy.get('id'))
+              : null;
+          })
         : null;
     }
     return null;
@@ -54,10 +63,40 @@ export const selectParentTaxonomy = createSelector(
   selectTaxonomies,
   (entity, taxonomies) => {
     if (entity && taxonomies) {
-      const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
-      return taxonomies.find((tax) => attributesEqual(taxonomy.getIn(['attributes', 'parent_id']), tax.get('id')));
+      // the category taxonomy
+      const taxonomy = taxonomies.find(
+        (tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')),
+      );
+      // any parent taxonomies
+      return taxonomies.find(
+        (tax) =>
+          attributesEqual(
+            taxonomy.getIn(['attributes', 'parent_id']),
+            tax.get('id'),
+          ),
+      );
     }
     return null;
+  });
+const selectIsParentTaxonomy = createSelector(
+  (state, id) => selectEntity(state, { path: 'categories', id }),
+  selectTaxonomies,
+  (entity, taxonomies) => {
+    if (entity && taxonomies) {
+      // the category taxonomy
+      const taxonomy = taxonomies.find(
+        (tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')),
+      );
+      // has any child taxonomies?
+      return taxonomies.some(
+        (tax) =>
+          attributesEqual(
+            tax.getIn(['attributes', 'parent_id']),
+            taxonomy.get('id'),
+          ),
+      );
+    }
+    return false;
   });
 
 
@@ -72,19 +111,44 @@ export const selectMeasures = createSelector(
   (state, id) => id,
   (state) => selectMeasuresCategorised(state),
   (state) => selectEntities(state, 'measure_categories'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'measure_id', associations, 'category_id', id)
+  selectIsParentTaxonomy,
+  (id, entities, associations, isParent) =>
+    isParent
+      ? null
+      : entitiesSetAssociated(entities, 'measure_id', associations, 'category_id', id)
 );
 
-export const selectRecommendations = createSelector(
+export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
+  (state, id) => selectEntity(state, { path: 'categories', id }),
+  (state) => selectEntities(state, 'framework_taxonomies'),
   (state) => selectRecommendationsCategorised(state),
   (state) => selectEntities(state, 'recommendation_categories'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'recommendation_id', associations, 'category_id', id)
-    .groupBy(
-      (r) => r.getIn(['attributes', 'framework_id']).toString()
-    )
+  selectIsParentTaxonomy,
+  (id, category, fwTaxonomies, entities, associations, isParent) => {
+    if (isParent || !category || !fwTaxonomies || !entities || !associations) {
+      return null;
+    }
+    // framework id for category
+    const frameworkIds = fwTaxonomies.reduce(
+      (memo, fwt) =>
+        attributesEqual(
+          fwt.getIn(['attributes', 'taxonomy_id']),
+          category.getIn(['attributes', 'taxonomy_id']),
+        )
+          ? memo.push(fwt.getIn(['attributes', 'framework_id']))
+          : memo,
+        List(),
+    );
+    return entitiesSetAssociated(entities, 'recommendation_id', associations, 'category_id', id)
+      .filter((r) =>
+        frameworkIds.find(
+          (fwid) => attributesEqual(fwid, r.getIn(['attributes', 'framework_id']))
+        ))
+      .groupBy(
+        (r) => r.getIn(['attributes', 'framework_id']).toString()
+      );
+  }
 );
 
 export const selectConnectedTaxonomies = createSelector(
