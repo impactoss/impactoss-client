@@ -11,13 +11,13 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import {
   userOptions,
   entityOptions,
   renderMeasureControl,
-  renderRecommendationControl,
+  renderRecommendationsByFwControl,
   renderUserControl,
   getConnectionUpdatesFromFormData,
   getTitleFormField,
@@ -73,7 +73,7 @@ import {
   selectDomain,
   selectViewEntity,
   selectMeasures,
-  selectRecommendations,
+  selectRecommendationsByFw,
   selectUsers,
   selectConnectedTaxonomies,
 } from './selectors';
@@ -118,7 +118,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { measures, viewEntity, users, recommendations } = props;
+    const { measures, viewEntity, users, recommendationsByFw } = props;
     let attributes = viewEntity.get('attributes');
     if (!attributes.get('reference')) {
       attributes = attributes.set('reference', viewEntity.get('id'));
@@ -131,7 +131,9 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         FORM_INITIAL.get('attributes')
       ),
       associatedMeasures: entityOptions(measures, true),
-      associatedRecommendations: entityOptions(recommendations, true),
+      associatedRecommendationsByFw: recommendationsByFw
+        ? recommendationsByFw.map((recs) => entityOptions(recs, true))
+        : Map(),
       associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
       // TODO allow single value for singleSelect
     })
@@ -156,19 +158,43 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     },
   ]);
 
-  getBodyMainFields = (connectedTaxonomies, measures, recommendations, onCreateOption) => ([
-    {
-      fields: [getMarkdownField(this.context.intl.formatMessage)],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-        renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
-      ],
-    },
-  ]);
+  getBodyMainFields = (connectedTaxonomies, measures, recommendationsByFw, onCreateOption) => {
+    const groups = [];
+    groups.push(
+      {
+        fields: [getMarkdownField(this.context.intl.formatMessage)],
+      },
+    );
+    if (measures) {
+      groups.push(
+        {
+          label: this.context.intl.formatMessage(appMessages.nav.measuresSuper),
+          icon: 'measures',
+          fields: [
+            renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+          ],
+        },
+      );
+    }
+    if (recommendationsByFw) {
+      const recConnections = renderRecommendationsByFwControl(
+        recommendationsByFw,
+        connectedTaxonomies,
+        onCreateOption,
+        this.context.intl,
+      );
+      if (recConnections) {
+        groups.push(
+          {
+            label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+            icon: 'recommendations',
+            fields: recConnections,
+          },
+        );
+      }
+    }
+    return groups;
+  };
 
   getBodyAsideFields = (entity, users, repeat) => ([ // fieldGroups
     { // fieldGroup
@@ -207,7 +233,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   ]);
 
   render() {
-    const { viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, recommendations, users, onCreateOption } = this.props;
+    const { viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, recommendationsByFw, users, onCreateOption } = this.props;
     const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
 
     return (
@@ -271,7 +297,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               model="indicatorEdit.form.data"
               formData={viewDomain.form.data}
               saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, measures, recommendations)}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, measures, recommendationsByFw)}
               handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
@@ -290,7 +316,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, measures, recommendations, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption),
                   aside: this.getBodyAsideFields(viewEntity, users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
                 },
               }}
@@ -325,7 +351,7 @@ IndicatorEdit.propTypes = {
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
-  recommendations: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
@@ -345,7 +371,7 @@ const mapStateToProps = (state, props) => ({
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
-  recommendations: selectRecommendations(state, props.params.id),
+  recommendationsByFw: selectRecommendationsByFw(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   users: selectUsers(state),
 });
@@ -448,7 +474,7 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, measures, recommendations) => {
+    handleSubmit: (formData, measures, recommendationsByFw) => {
       let saveData = formData
         .set(
           'measureIndicators',
@@ -459,17 +485,33 @@ function mapDispatchToProps(dispatch, props) {
             createConnectionKey: 'measure_id',
             createKey: 'indicator_id',
           })
-        )
-       .set(
-         'recommendationIndicators',
-         getConnectionUpdatesFromFormData({
-           formData,
-           connections: recommendations,
-           connectionAttribute: 'associatedRecommendations',
-           createConnectionKey: 'recommendation_id',
-           createKey: 'indicator_id',
-         })
         );
+      saveData = saveData.set(
+        'recommendationIndicators',
+        recommendationsByFw
+          .map((recs, fwid) =>
+            getConnectionUpdatesFromFormData({
+              formData: !formData.getIn(['attributes', 'user_only']) ? formData : null,
+              connections: recs,
+              connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
+              createConnectionKey: 'recommendation_id',
+              createKey: 'indicator_id',
+            })
+          )
+          .reduce(
+            (memo, deleteCreateLists) => {
+              const deletes = memo.get('delete').concat(deleteCreateLists.get('delete'));
+              const creates = memo.get('create').concat(deleteCreateLists.get('create'));
+              return memo
+                .set('delete', deletes)
+                .set('create', creates);
+            },
+            fromJS({
+              delete: [],
+              create: [],
+            }),
+          )
+      );
 
       // TODO: remove once have singleselect instead of multiselect
       const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));

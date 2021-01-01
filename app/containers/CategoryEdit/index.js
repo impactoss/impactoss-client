@@ -129,9 +129,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       ),
       associatedMeasures: measures && entityOptions(measures, true),
       associatedRecommendationsByFw: recommendationsByFw
-        ? recommendationsByFw.map(
-            (recs) => entityOptions(recs, true),
-          )
+        ? recommendationsByFw.map((recs) => entityOptions(recs, true))
         : Map(),
       associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
       associatedCategory: parentCategoryOptions(parentOptions, viewEntity.getIn(['attributes', 'parent_id'])),

@@ -10,11 +10,11 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import {
   renderMeasureControl,
-  renderRecommendationControl,
+  renderRecommendationsByFwControl,
   renderUserControl,
   getTitleFormField,
   getReferenceFormField,
@@ -23,6 +23,7 @@ import {
   getDateField,
   getFrequencyField,
   getCheckboxField,
+  getConnectionUpdatesFromFormData,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -51,7 +52,6 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectMeasuresCategorised,
-  selectRecommendationsCategorised,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -64,6 +64,7 @@ import {
   selectDomain,
   selectUsers,
   selectConnectedTaxonomies,
+  selectRecommendationsByFw,
 } from './selectors';
 
 import messages from './messages';
@@ -113,19 +114,58 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  getBodyMainFields = (connectedTaxonomies, measures, recommendations, onCreateOption) => ([
-    {
+  // getBodyMainFields = (connectedTaxonomies, measures, recommendationsByFw, onCreateOption) => ([
+  //   {
+  //     fields: [getMarkdownField(this.context.intl.formatMessage)],
+  //   },
+  //   {
+  //     label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
+  //     icon: 'connections',
+  //     fields: [
+  //       renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+  //       renderRecommendationControl(recommendationsByFw, connectedTaxonomies, onCreateOption, this.context.intl),
+  //     ],
+  //   },
+  // ]);
+
+  getBodyMainFields = (
+    connectedTaxonomies,
+    measures,
+    recommendationsByFw,
+    onCreateOption,
+  ) => {
+    const groups = [];
+    groups.push({
       fields: [getMarkdownField(this.context.intl.formatMessage)],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-        renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
-      ],
-    },
-  ]);
+    });
+    if (measures) {
+      groups.push({
+        label: this.context.intl.formatMessage(appMessages.nav.measuresSuper),
+        icon: 'measures',
+        fields: [
+          renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+        ],
+      });
+    }
+    if (recommendationsByFw) {
+      const recConnections = renderRecommendationsByFwControl(
+        recommendationsByFw,
+        connectedTaxonomies,
+        onCreateOption,
+        this.context.intl,
+      );
+      if (recConnections) {
+        groups.push(
+          {
+            label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+            icon: 'recommendations',
+            fields: recConnections,
+          },
+        );
+      }
+    }
+    return groups;
+  };
 
   getBodyAsideFields = (users, repeat) => ([ // fieldGroups
     { // fieldGroup
@@ -163,8 +203,17 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   ]);
 
   render() {
-    const { dataReady, viewDomain, connectedTaxonomies, measures, recommendations, users, onCreateOption } = this.props;
+    const {
+      dataReady,
+      viewDomain,
+      connectedTaxonomies,
+      measures,
+      recommendationsByFw,
+      users,
+      onCreateOption,
+    } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
+
     return (
       <div>
         <Helmet
@@ -221,7 +270,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               model="indicatorNew.form.data"
               formData={viewDomain.form.data}
               saving={saveSending}
-              handleSubmit={this.props.handleSubmit}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
               handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
@@ -239,7 +288,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, measures, recommendations, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption),
                   aside: this.getBodyAsideFields(users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
                 },
               }}
@@ -266,7 +315,7 @@ IndicatorNew.propTypes = {
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   measures: PropTypes.object,
-  recommendations: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
@@ -286,7 +335,7 @@ const mapStateToProps = (state) => ({
   authReady: selectReadyForAuthCheck(state),
   // all measures,
   measures: selectMeasuresCategorised(state),
-  recommendations: selectRecommendationsCategorised(state),
+  recommendationsByFw: selectRecommendationsByFw(state),
   // all users, listing connection if any
   users: selectUsers(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
@@ -389,26 +438,43 @@ function mapDispatchToProps(dispatch) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData) => {
+    handleSubmit: (formData, recommendationsByFw) => {
       let saveData = formData;
       // measures
       if (formData.get('associatedMeasures')) {
-        saveData = saveData.set('measureIndicators', Map({
-          delete: List(),
-          create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
-          .map((id) => Map({
-            measure_id: id,
-          })),
-        }));
+        saveData = saveData
+          .set('measureIndicators', Map({
+            delete: List(),
+            create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
+            .map((id) => Map({
+              measure_id: id,
+            })),
+          }));
       }
-      if (formData.get('associatedRecommendations')) {
-        saveData = saveData.set('recommendationIndicators', Map({
-          delete: List(),
-          create: getCheckedValuesFromOptions(formData.get('associatedRecommendations'))
-          .map((id) => Map({
-            recommendation_id: id,
-          })),
-        }));
+      if (formData.get('associatedRecommendationsByFw') && recommendationsByFw) {
+        saveData = saveData.set(
+          'recommendationIndicators',
+          recommendationsByFw
+            .map((recs, fwid) =>
+              getConnectionUpdatesFromFormData({
+                formData,
+                connections: recs,
+                connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
+                createConnectionKey: 'recommendation_id',
+                createKey: 'indicator_id',
+              })
+            )
+            .reduce(
+              (memo, deleteCreateLists) => {
+                const creates = memo.get('create').concat(deleteCreateLists.get('create'));
+                return memo.set('create', creates);
+              },
+              fromJS({
+                delete: [],
+                create: [],
+              }),
+            )
+        );
       }
       // TODO: remove once have singleselect instead of multiselect
       const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));
@@ -429,6 +495,7 @@ function mapDispatchToProps(dispatch) {
           .setIn(['attributes', 'frequency_months'], null)
           .setIn(['attributes', 'end_date'], null);
       }
+
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {

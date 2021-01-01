@@ -16,6 +16,7 @@ export const DEPENDENCIES = [
   'measure_indicators',
   'measure_categories',
   'taxonomies',
+  'frameworks',
   'framework_taxonomies',
   'categories',
   'recommendations',
@@ -37,6 +38,6 @@ export const FORM_INITIAL = fromJS({
     reference: '',
   },
   associatedMeasures: [],
-  associatedRecommendations: [],
+  associatedRecommendationsByFw: {},
   associatedUser: [],
 });

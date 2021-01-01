@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { List } from 'immutable';
+import { List, fromJS } from 'immutable';
 
 import {
   renderUserControl,
@@ -154,13 +154,13 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     onCreateOption,
     userOnly,
   ) => {
-    const fields = [];
-    fields.push({
+    const groups = [];
+    groups.push({
       fields: [getMarkdownField(this.context.intl.formatMessage)],
     });
     if (!userOnly) {
       if (taxonomy.getIn(['attributes', 'tags_measures']) && measures) {
-        fields.push({
+        groups.push({
           label: this.context.intl.formatMessage(appMessages.nav.measuresSuper),
           icon: 'measures',
           fields: [
@@ -179,7 +179,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
           this.context.intl,
         );
         if (recConnections) {
-          fields.push(
+          groups.push(
             {
               label: this.context.intl.formatMessage(appMessages.nav.recommendations),
               icon: 'recommendations',
@@ -189,7 +189,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         }
       }
     }
-    return fields;
+    return groups;
   };
 
   getBodyAsideFields = (users, isAdmin, taxonomy) => {
@@ -424,13 +424,26 @@ function mapDispatchToProps(dispatch) {
         if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
           saveData = saveData.set(
             'recommendationCategories',
-            getConnectionUpdatesFromFormData({
-              formData,
-              connections: recommendationsByFw,
-              connectionAttribute: 'associatedRecommendations',
-              createConnectionKey: 'recommendation_id',
-              createKey: 'category_id',
-            })
+            recommendationsByFw
+              .map((recs, fwid) =>
+                getConnectionUpdatesFromFormData({
+                  formData: !formData.getIn(['attributes', 'user_only']) ? formData : null,
+                  connections: recs,
+                  connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
+                  createConnectionKey: 'recommendation_id',
+                  createKey: 'category_id',
+                })
+              )
+              .reduce(
+                (memo, deleteCreateLists) => {
+                  const creates = memo.get('create').concat(deleteCreateLists.get('create'));
+                  return memo.set('create', creates);
+                },
+                fromJS({
+                  delete: [],
+                  create: [],
+                }),
+              )
           );
         }
       }

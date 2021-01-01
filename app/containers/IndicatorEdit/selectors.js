@@ -8,6 +8,7 @@ import {
   selectMeasuresCategorised,
   selectRecommendationsCategorised,
   selectFWTaxonomiesSorted,
+  selectFrameworks,
 } from 'containers/App/selectors';
 
 import {
@@ -15,6 +16,7 @@ import {
   entitySetUser,
   usersByRole,
   prepareTaxonomiesMultiple,
+  attributesEqual,
 } from 'utils/entities';
 
 
@@ -48,12 +50,26 @@ export const selectConnectedTaxonomies = createSelector(
     prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
 );
 
-export const selectRecommendations = createSelector(
+export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
   (state) => selectRecommendationsCategorised(state),
   (state) => selectEntities(state, 'recommendation_indicators'),
-  (id, entities, associations) =>
+  (state) => selectFrameworks(state),
+  (id, entities, associations, frameworks) =>
     entitiesSetAssociated(entities, 'recommendation_id', associations, 'indicator_id', id)
+    .filter((r) => {
+      const framework = frameworks.find(
+        (fw) =>
+          attributesEqual(
+            fw.get('id'),
+            r.getIn(['attributes', 'framework_id']),
+          )
+        );
+      return framework.getIn(['attributes', 'has_indicators']);
+    })
+    .groupBy(
+      (r) => r.getIn(['attributes', 'framework_id']).toString()
+    )
 );
 
 export const selectUsers = createSelector(
