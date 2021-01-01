@@ -930,6 +930,10 @@ export default defineMessages({
         id: 'app.containers.App.entities.taxonomies.plural',
         defaultMessage: 'Categories',
       },
+      parent: {
+        id: 'app.containers.App.entities.taxonomies.parent',
+        defaultMessage: 'Parent category',
+      },
       children: {
         id: 'app.containers.App.entities.taxonomies.children',
         defaultMessage: 'Child categories',

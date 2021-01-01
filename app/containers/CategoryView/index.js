@@ -26,6 +26,7 @@ import {
   getEntityLinkField,
   getTaxonomyFields,
   hasTaxonomyCategories,
+  getDateField,
 } from 'utils/fields';
 
 import { attributesEqual, getEntityTitle } from 'utils/entities';
@@ -75,15 +76,27 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       this.props.loadEntitiesIfNeeded();
     }
   }
-  getHeaderMainFields = (entity, isManager) => ([
-    { // fieldGroup
-      fields: [
-        getReferenceField(entity, isManager),
-        getTitleField(entity, isManager),
-        getCategoryShortTitleField(entity, isManager),
-      ],
-    },
-  ]);
+  getHeaderMainFields = (entity, isManager, parentTaxonomy) => {
+    const groups = [];
+    groups.push(
+      { // fieldGroup
+        fields: [
+          getReferenceField(entity, isManager),
+          getTitleField(entity, isManager),
+          getCategoryShortTitleField(entity, isManager),
+        ],
+      },
+    );
+    // include parent link
+    if (entity.get('category') && parentTaxonomy) {
+      groups.push({
+        label: appMessages.entities.taxonomies.parent,
+        icon: 'categories',
+        fields: [getEntityLinkField(entity.get('category'), '/category', '', getEntityTitle(parentTaxonomy))],
+      });
+    }
+    return groups;
+  };
   getHeaderAsideFields = (entity, isManager) => {
     const fields = []; // fieldGroups
     if (isManager) {
@@ -94,7 +107,10 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         ],
       });
     }
-    if (entity.getIn(['taxonomy', 'attributes', 'tags_users']) && entity.getIn(['attributes', 'user_only'])) {
+    if (
+      entity.getIn(['taxonomy', 'attributes', 'tags_users']) &&
+      entity.getIn(['attributes', 'user_only'])
+    ) {
       fields.push({
         type: 'dark',
         fields: [{
@@ -205,14 +221,8 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     return fields;
   };
 
-  getBodyAsideFields = (entity, isManager, parentTaxonomy, childTaxonomies) => {
+  getBodyAsideFields = (entity, isManager, childTaxonomies) => {
     const fields = [];
-    // include parent link
-    if (entity.get('category') && parentTaxonomy) {
-      fields.push({
-        fields: [getEntityLinkField(entity.get('category'), '/category', '', getEntityTitle(parentTaxonomy))],
-      });
-    }
     // include children links
     if (childTaxonomies && hasTaxonomyCategories(childTaxonomies)) {
       fields.push({ // fieldGroup
@@ -221,10 +231,18 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         fields: getTaxonomyFields(childTaxonomies, true),
       });
     }
-    if (entity.getIn(['attributes', 'url']) && entity.getIn(['attributes', 'url']).trim().length > 0) {
+    const showLink =
+      entity.getIn(['attributes', 'url']) &&
+      entity.getIn(['attributes', 'url']).trim().length > 0;
+    const showDate =
+      entity.getIn(['taxonomy', 'attributes', 'has_date']);
+    if (showLink || showDate) {
       fields.push({
         type: 'dark',
-        fields: [getLinkField(entity)],
+        fields: [
+          showDate && getDateField(entity, 'date', true),
+          showLink && getLinkField(entity),
+        ],
       });
     }
     if (isManager && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
@@ -310,7 +328,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             <EntityView
               fields={{
                 header: {
-                  main: this.getHeaderMainFields(viewEntity, isManager),
+                  main: this.getHeaderMainFields(viewEntity, isManager, parentTaxonomy),
                   aside: this.getHeaderAsideFields(viewEntity, isManager),
                 },
                 body: {
@@ -326,7 +344,11 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                     recommendationConnections,
                     frameworks,
                   ),
-                  aside: this.getBodyAsideFields(viewEntity, isManager, parentTaxonomy, childTaxonomies),
+                  aside: this.getBodyAsideFields(
+                    viewEntity,
+                    isManager,
+                    childTaxonomies,
+                  ),
                 },
               }}
             />

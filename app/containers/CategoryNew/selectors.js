@@ -1,5 +1,14 @@
 import { createSelector } from 'reselect';
-import { selectEntity, selectEntities, selectFWTaxonomiesSorted, selectTaxonomies } from 'containers/App/selectors';
+import { List } from 'immutable';
+
+import {
+  selectEntity,
+  selectEntities,
+  selectFWTaxonomiesSorted,
+  selectTaxonomies,
+  selectRecommendationsCategorised,
+  selectMeasuresCategorised,
+} from 'containers/App/selectors';
 
 import { USER_ROLES } from 'themes/config';
 
@@ -26,7 +35,9 @@ export const selectParentOptions = createSelector(
       return taxonomyParentId
         ? categories.filter((otherCategory) => {
           const otherTaxonomy = taxonomies.find((tax) => attributesEqual(otherCategory.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
-          return attributesEqual(taxonomyParentId, otherTaxonomy.get('id'));
+          return otherTaxonomy
+            ? attributesEqual(taxonomyParentId, otherTaxonomy.get('id'))
+            : null;
         })
         : null;
     }
@@ -58,4 +69,57 @@ export const selectConnectedTaxonomies = createSelector(
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>
     prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
+);
+const selectIsParentTaxonomy = createSelector(
+  (state, id) => selectEntity(state, { path: 'taxonomies', id }),
+  selectTaxonomies,
+  (taxonomy, taxonomies) => {
+    if (taxonomy && taxonomies) {
+      // has any child taxonomies?
+      return taxonomies.some(
+        (tax) =>
+          attributesEqual(
+            tax.getIn(['attributes', 'parent_id']),
+            taxonomy.get('id'),
+          ),
+      );
+    }
+    return false;
+  });
+
+export const selectRecommendationsByFw = createSelector(
+  (state, id) => id, // taxonomy id
+  (state) => selectEntities(state, 'framework_taxonomies'),
+  (state) => selectRecommendationsCategorised(state),
+  selectIsParentTaxonomy,
+  (id, fwTaxonomies, entities, isParent) => {
+    if (isParent || !fwTaxonomies || !entities) {
+      return null;
+    }
+    // framework id for category
+    const frameworkIds = fwTaxonomies.reduce(
+      (memo, fwt) =>
+        attributesEqual(id, fwt.getIn(['attributes', 'taxonomy_id']))
+          ? memo.push(fwt.getIn(['attributes', 'framework_id']))
+          : memo,
+      List(),
+    );
+    return entities
+      .filter((r) =>
+        frameworkIds.find(
+          (fwid) => attributesEqual(fwid, r.getIn(['attributes', 'framework_id']))
+        ))
+      .groupBy(
+        (r) => r.getIn(['attributes', 'framework_id']).toString()
+      );
+  }
+);
+
+export const selectMeasures = createSelector(
+  (state) => selectMeasuresCategorised(state),
+  selectIsParentTaxonomy,
+  (entities, isParent) =>
+    isParent
+      ? null
+      : entities
 );

@@ -15,7 +15,7 @@ import { List } from 'immutable';
 import {
   renderUserControl,
   renderMeasureControl,
-  renderRecommendationControl,
+  renderRecommendationsByFwControl,
   renderParentCategoryControl,
   getTitleFormField,
   getReferenceFormField,
@@ -25,6 +25,7 @@ import {
   getConnectionUpdatesFromFormData,
   getCheckboxField,
   getStatusField,
+  getDateField,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -51,9 +52,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
-  selectEntity,
-  selectMeasuresCategorised,
-  selectRecommendationsCategorised,
+  selectTaxonomy,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -70,6 +69,8 @@ import {
   selectConnectedTaxonomies,
   selectParentOptions,
   selectParentTaxonomy,
+  selectRecommendationsByFw,
+  selectMeasures,
 } from './selectors';
 
 import messages from './messages';
@@ -103,15 +104,27 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     }
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
+  getHeaderMainFields = (parentOptions, parentTaxonomy) => {
+    const groups = [];
+    groups.push({ // fieldGroup
       fields: [
         getReferenceFormField(this.context.intl.formatMessage),
         getTitleFormField(this.context.intl.formatMessage),
         getShortTitleFormField(this.context.intl.formatMessage),
       ],
-    },
-  ]);
+    });
+    if (parentOptions && parentTaxonomy) {
+      groups.push({
+        label: this.context.intl.formatMessage(appMessages.entities.taxonomies.parent),
+        icon: 'categories',
+        fields: [renderParentCategoryControl(
+          parentOptions,
+          getEntityTitle(parentTaxonomy),
+        )],
+      });
+    }
+    return groups;
+  };
 
   getHeaderAsideFields = (taxonomy) => {
     const fields = []; // fieldGroups
@@ -133,42 +146,67 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return fields;
   }
 
-  getBodyMainFields = (taxonomy, connectedTaxonomies, recommendations, measures, onCreateOption, userOnly) => {
+  getBodyMainFields = (
+    taxonomy,
+    connectedTaxonomies,
+    recommendationsByFw,
+    measures,
+    onCreateOption,
+    userOnly,
+  ) => {
     const fields = [];
     fields.push({
       fields: [getMarkdownField(this.context.intl.formatMessage)],
     });
     if (!userOnly) {
-      fields.push({
-        label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-        icon: 'connections',
-        fields: [
-          taxonomy.getIn(['attributes', 'tags_measures']) && measures &&
+      if (taxonomy.getIn(['attributes', 'tags_measures']) && measures) {
+        fields.push({
+          label: this.context.intl.formatMessage(appMessages.nav.measuresSuper),
+          icon: 'measures',
+          fields: [
             renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-          taxonomy.getIn(['attributes', 'tags_recommendations']) && recommendations &&
-            renderRecommendationControl(recommendations, connectedTaxonomies, onCreateOption, this.context.intl),
-        ],
-      });
+          ],
+        });
+      }
+      if (
+        taxonomy.getIn(['attributes', 'tags_recommendations']) &&
+        recommendationsByFw
+      ) {
+        const recConnections = renderRecommendationsByFwControl(
+          recommendationsByFw,
+          connectedTaxonomies,
+          onCreateOption,
+          this.context.intl,
+        );
+        if (recConnections) {
+          fields.push(
+            {
+              label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+              icon: 'recommendations',
+              fields: recConnections,
+            },
+          );
+        }
+      }
     }
     return fields;
   };
 
-  getBodyAsideFields = (users, isAdmin, taxonomy, parentOptions, parentTaxonomy) => {
+  getBodyAsideFields = (users, isAdmin, taxonomy) => {
     const fields = []; // fieldGroups
-    if (parentOptions && parentTaxonomy) {
-      fields.push({
-        fields: [renderParentCategoryControl(
-          parentOptions,
-          getEntityTitle(parentTaxonomy),
-        )],
-      });
-    }
     fields.push({
-      fields: [getFormField({
-        formatMessage: this.context.intl.formatMessage,
-        controlType: 'url',
-        attribute: 'url',
-      })],
+      fields: [
+        taxonomy.getIn(['attributes', 'has_date']) &&
+          getDateField(
+            this.context.intl.formatMessage,
+            'date',
+          ),
+        getFormField({
+          formatMessage: this.context.intl.formatMessage,
+          controlType: 'url',
+          attribute: 'url',
+        }),
+      ],
     });
     if (isAdmin && !!taxonomy.getIn(['attributes', 'has_manager'])) {
       fields.push({
@@ -193,7 +231,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       viewDomain,
       users,
       connectedTaxonomies,
-      recommendations,
+      recommendationsByFw,
       measures,
       onCreateOption,
       parentOptions,
@@ -268,7 +306,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
                 measures,
-                recommendations,
+                recommendationsByFw,
                 taxonomy
               )}
               handleSubmitFail={this.props.handleSubmitFail}
@@ -276,19 +314,19 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               handleUpdate={this.props.handleUpdate}
               fields={{ // isManager, taxonomies,
                 header: {
-                  main: this.getHeaderMainFields(),
+                  main: this.getHeaderMainFields(parentOptions, parentTaxonomy),
                   aside: this.getHeaderAsideFields(taxonomy),
                 },
                 body: {
                   main: this.getBodyMainFields(
                     taxonomy,
                     connectedTaxonomies,
-                    recommendations,
+                    recommendationsByFw,
                     measures,
                     onCreateOption,
                     viewDomain.form.data.getIn(['attributes', 'user_only'])
                   ),
-                  aside: this.getBodyAsideFields(users, isAdmin, taxonomy, parentOptions, parentTaxonomy),
+                  aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
                 },
               }}
               scrollContainer={this.state.scrollContainer}
@@ -318,7 +356,7 @@ CategoryNew.propTypes = {
   parentTaxonomy: PropTypes.object,
   users: PropTypes.object,
   measures: PropTypes.object,
-  recommendations: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
@@ -335,12 +373,12 @@ const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
-  taxonomy: selectEntity(state, { path: 'taxonomies', id: props.params.id }),
+  taxonomy: selectTaxonomy(state, props.params.id),
   parentOptions: selectParentOptions(state, props.params.id),
   parentTaxonomy: selectParentTaxonomy(state, props.params.id),
   users: selectUsers(state),
-  measures: selectMeasuresCategorised(state),
-  recommendations: selectRecommendationsCategorised(state),
+  measures: selectMeasures(state),
+  recommendationsByFw: selectRecommendationsByFw(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
@@ -368,7 +406,7 @@ function mapDispatchToProps(dispatch) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, measures, recommendations, taxonomy) => {
+    handleSubmit: (formData, measures, recommendationsByFw, taxonomy) => {
       let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomy.get('id'));
       if (!formData.getIn(['attributes', 'user_only'])) {
         if (taxonomy.getIn(['attributes', 'tags_measures'])) {
@@ -388,7 +426,7 @@ function mapDispatchToProps(dispatch) {
             'recommendationCategories',
             getConnectionUpdatesFromFormData({
               formData,
-              connections: recommendations,
+              connections: recommendationsByFw,
               connectionAttribute: 'associatedRecommendations',
               createConnectionKey: 'recommendation_id',
               createKey: 'category_id',

@@ -140,15 +140,28 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     : Map();
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
+  getHeaderMainFields = (entity, parentOptions, parentTaxonomy) => {
+    const groups = [];
+    groups.push({ // fieldGroup
       fields: [
         getReferenceFormField(this.context.intl.formatMessage),
         getTitleFormField(this.context.intl.formatMessage),
         getShortTitleFormField(this.context.intl.formatMessage),
       ],
-    },
-  ]);
+    });
+    if (parentOptions && parentTaxonomy) {
+      groups.push({
+        label: this.context.intl.formatMessage(appMessages.entities.taxonomies.parent),
+        icon: 'categories',
+        fields: [renderParentCategoryControl(
+          parentOptions,
+          getEntityTitle(parentTaxonomy),
+          entity.getIn(['attributes', 'parent_id']),
+        )],
+      });
+    }
+    return groups;
+  };
 
 
   getHeaderAsideFields = (entity) => {
@@ -173,7 +186,14 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     return fields;
   }
 
-  getBodyMainFields = (entity, connectedTaxonomies, recommendationsByFw, measures, onCreateOption, userOnly) => {
+  getBodyMainFields = (
+    entity,
+    connectedTaxonomies,
+    recommendationsByFw,
+    measures,
+    onCreateOption,
+    userOnly,
+  ) => {
     const fields = [];
     fields.push({
       fields: [getMarkdownField(this.context.intl.formatMessage)],
@@ -213,17 +233,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     }
     return fields;
   };
-  getBodyAsideFields = (entity, users, isAdmin, parentOptions, parentTaxonomy) => {
+  getBodyAsideFields = (entity, users, isAdmin) => {
     const fields = []; // fieldGroups
-    if (parentOptions && parentTaxonomy) {
-      fields.push({
-        fields: [renderParentCategoryControl(
-          parentOptions,
-          getEntityTitle(parentTaxonomy),
-          entity.getIn(['attributes', 'parent_id']),
-        )],
-      });
-    }
     if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({
         fields: [
@@ -235,22 +246,19 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         ],
       });
     }
-    if (entity.getIn(['taxonomy', 'attributes', 'has_date'])) {
-      fields.push({
-        fields: [
+    fields.push({
+      fields: [
+        entity.getIn(['taxonomy', 'attributes', 'has_date']) &&
           getDateField(
             this.context.intl.formatMessage,
             'date',
           ),
-        ],
-      });
-    }
-    fields.push({
-      fields: [getFormField({
-        formatMessage: this.context.intl.formatMessage,
-        controlType: 'url',
-        attribute: 'url',
-      })],
+        getFormField({
+          formatMessage: this.context.intl.formatMessage,
+          controlType: 'url',
+          attribute: 'url',
+        }),
+      ],
     });
     return fields;
   }
@@ -357,7 +365,11 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               }
               fields={{
                 header: {
-                  main: this.getHeaderMainFields(),
+                  main: this.getHeaderMainFields(
+                    viewEntity,
+                    parentOptions,
+                    parentTaxonomy,
+                  ),
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
@@ -367,9 +379,9 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                     recommendationsByFw,
                     measures,
                     onCreateOption,
-                    viewDomain.form.data.getIn(['attributes', 'user_only'])
+                    viewDomain.form.data.getIn(['attributes', 'user_only']),
                   ),
-                  aside: this.getBodyAsideFields(viewEntity, users, isAdmin, parentOptions, parentTaxonomy),
+                  aside: this.getBodyAsideFields(viewEntity, users, isAdmin),
                 },
               }}
               scrollContainer={this.state.scrollContainer}

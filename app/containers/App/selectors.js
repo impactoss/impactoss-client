@@ -489,6 +489,11 @@ export const selectEntity = createSelector(
   (state, { id }) => id,
   (entities, id) => id && entities.get(id.toString())
 );
+export const selectTaxonomy = createSelector(
+  (state, id) => id,
+  (state) => selectTaxonomies(state),
+  (id, entities) => id && entities.get(id.toString())
+);
 
 // filter entities by attributes, using object
 export const selectEntitiesWhere = createSelector(

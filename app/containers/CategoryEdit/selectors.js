@@ -138,7 +138,7 @@ export const selectRecommendationsByFw = createSelector(
         )
           ? memo.push(fwt.getIn(['attributes', 'framework_id']))
           : memo,
-        List(),
+      List(),
     );
     return entitiesSetAssociated(entities, 'recommendation_id', associations, 'category_id', id)
       .filter((r) =>

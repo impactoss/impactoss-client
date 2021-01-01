@@ -76,7 +76,9 @@ export const selectChildTaxonomies = createSelector(
   (state) => selectEntities(state, 'categories'),
   (entity, taxonomies, categories) => {
     if (entity && taxonomies) {
-      const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
+      const taxonomy = taxonomies.find(
+        (tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')),
+      );
       return taxonomies
         .filter((tax) => attributesEqual(tax.getIn(['attributes', 'parent_id']), taxonomy.get('id')))
         .map((tax) =>
@@ -132,7 +134,11 @@ export const selectRecommendations = createSelector(
 
 const selectChildrenTagRecommendations = createSelector(
   selectChildTaxonomies,
-  (taxonomies) => taxonomies && taxonomies.some((tax) => tax.getIn(['attributes', 'tags_recommendations']))
+  (taxonomies) =>
+    taxonomies &&
+    taxonomies.some(
+      (tax) => tax.getIn(['attributes', 'tags_recommendations']),
+    )
 );
 
 const selectChildRecommendationsAssociated = createSelector(
