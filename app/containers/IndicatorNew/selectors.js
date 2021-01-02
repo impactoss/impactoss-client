@@ -2,8 +2,8 @@ import { createSelector } from 'reselect';
 
 import {
   selectEntities,
-  selectRecommendationsCategorised,
   selectFWTaxonomiesSorted,
+  selectRecommendationsCategorised,
   selectFrameworks,
 } from 'containers/App/selectors';
 import { USER_ROLES } from 'themes/config';
@@ -30,7 +30,7 @@ export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
+    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
 );
 
 export const selectRecommendationsByFw = createSelector(

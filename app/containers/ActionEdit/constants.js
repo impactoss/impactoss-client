@@ -3,6 +3,8 @@
  * ActionEdit constants
  *
  */
+import { fromJS } from 'immutable';
+
 export const SAVE = 'impactoss/ActionEdit/SAVE';
 
 export const DEPENDENCIES = [
@@ -11,6 +13,7 @@ export const DEPENDENCIES = [
   'users',
   'categories',
   'taxonomies',
+  'frameworks',
   'framework_taxonomies',
   'recommendations',
   'recommendation_measures',
@@ -19,3 +22,19 @@ export const DEPENDENCIES = [
   'measure_indicators',
   'recommendation_categories',
 ];
+
+export const FORM_INITIAL = fromJS({
+  id: '',
+  attributes: {
+    title: '',
+    description: '',
+    draft: '',
+    outcome: '',
+    indicator_summary: '',
+    target_date: '',
+    target_date_comment: '',
+  },
+  associatedTaxonomies: {},
+  associatedRecommendationsByFw: {},
+  associatedIndicators: [],
+});

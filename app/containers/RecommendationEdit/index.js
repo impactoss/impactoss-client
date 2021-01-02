@@ -141,23 +141,42 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       ],
     },
   ]);
-  getBodyMainFields = (connectedTaxonomies, entity, measures, indicators, onCreateOption, hasResponse) => ([
-    {
+  getBodyMainFields = (
+    connectedTaxonomies,
+    entity,
+    measures,
+    indicators,
+    onCreateOption,
+    hasResponse,
+  ) => {
+    const groups = [];
+    groups.push({
       fields: [
         getMarkdownField(this.context.intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
         hasResponse && getAcceptedField(this.context.intl.formatMessage, entity),
         hasResponse && getMarkdownField(this.context.intl.formatMessage, 'response'),
       ],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        measures && renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-        indicators && renderIndicatorControl(indicators, onCreateOption),
-      ],
-    },
-  ]);
+    });
+    if (measures) {
+      groups.push({
+        label: this.context.intl.formatMessage(appMessages.nav.measuresSuper),
+        icon: 'measures',
+        fields: [
+          renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+        ],
+      });
+    }
+    if (indicators) {
+      groups.push({
+        label: this.context.intl.formatMessage(appMessages.nav.indicatorsSuper),
+        icon: 'indicators',
+        fields: [
+          renderIndicatorControl(indicators, onCreateOption),
+        ],
+      });
+    }
+    return groups;
+  }
 
   getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup

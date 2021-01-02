@@ -114,20 +114,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     },
   ]);
 
-  // getBodyMainFields = (connectedTaxonomies, measures, recommendationsByFw, onCreateOption) => ([
-  //   {
-  //     fields: [getMarkdownField(this.context.intl.formatMessage)],
-  //   },
-  //   {
-  //     label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-  //     icon: 'connections',
-  //     fields: [
-  //       renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-  //       renderRecommendationControl(recommendationsByFw, connectedTaxonomies, onCreateOption, this.context.intl),
-  //     ],
-  //   },
-  // ]);
-
   getBodyMainFields = (
     connectedTaxonomies,
     measures,

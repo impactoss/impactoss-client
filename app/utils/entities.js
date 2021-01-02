@@ -1,4 +1,4 @@
-import { Map, List, fromJS } from 'immutable';
+import { Map } from 'immutable';
 
 import { TEXT_TRUNCATE, ACCEPTED_STATUSES } from 'themes/config';
 import { find, reduce } from 'lodash/collection';
@@ -316,39 +316,6 @@ export const getCategoryTitle = (cat) =>
 
 export const getEntityParentId = (cat) =>
   cat.getIn(['attributes', 'parent_id']) && cat.getIn(['attributes', 'parent_id']).toString();
-
-const getInitialValue = (field) =>
-  typeof field.default !== 'undefined' ? field.default : '';
-
-export const getInitialFormData = (shape) => {
-  let fields = fromJS({
-    id: '',
-    attributes: {},
-  });
-  if (shape.fields) {
-    fields = reduce(shape.fields, (memo, field) =>
-      field.disabled ? memo : memo.setIn(['attributes', field.attribute], getInitialValue(field))
-    , fields);
-  }
-  if (shape.taxonomies) {
-    fields = fields.set('associatedTaxonomies', Map());
-  }
-  if (shape.connections) {
-    fields = reduce(shape.connections.tables, (memo, table) => {
-      if (table.table === 'recommendations') {
-        return fields.set('associatedRecommendationsByFw', Map());
-      }
-      if (table.table === 'indicators') {
-        return fields.set('associatedIndicators', List());
-      }
-      if (table.table === 'measures') {
-        return fields.set('associatedMeasures', List());
-      }
-      return memo;
-    }, fields);
-  }
-  return fields;
-};
 
 export const getEntityCategories = (entityId, associations, associationKey, categories, includeParents = true) => {
   // directly associated categories

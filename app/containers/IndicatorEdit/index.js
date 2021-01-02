@@ -235,7 +235,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   render() {
     const { viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, recommendationsByFw, users, onCreateOption } = this.props;
     const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
-
     return (
       <div>
         <Helmet
@@ -297,7 +296,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               model="indicatorEdit.form.data"
               formData={viewDomain.form.data}
               saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, measures, recommendationsByFw)}
+              handleSubmit={(formData) => this.props.handleSubmit(
+                formData,
+                measures,
+                recommendationsByFw,
+              )}
               handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}

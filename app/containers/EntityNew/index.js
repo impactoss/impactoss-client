@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { Map, List } from 'immutable';
 
-import { getEntityFields } from 'utils/forms';
+import { getEntityAttributeFields } from 'utils/forms';
 import { attributesEqual } from 'utils/entities';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
@@ -184,7 +184,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
             scrollContainer={this.state.scrollContainer}
-            fields={getEntityFields(
+            fields={getEntityAttributeFields(
               path,
               {
                 categories: {

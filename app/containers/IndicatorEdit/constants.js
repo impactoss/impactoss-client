@@ -29,7 +29,7 @@ export const FORM_INITIAL = fromJS({
   attributes: {
     title: '',
     description: '',
-    draft: true,
+    draft: '',
     manager_id: '',
     frequency_months: REPORT_FREQUENCIES[0] ? REPORT_FREQUENCIES[0].value : '',
     start_date: '',

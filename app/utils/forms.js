@@ -1,7 +1,7 @@
 import { Map, List } from 'immutable';
 import { sortEntities } from 'utils/sort';
 
-import { filter, reduce } from 'lodash/collection';
+import { filter } from 'lodash/collection';
 
 import {
   getEntityTitle,
@@ -23,7 +23,6 @@ import {
   DATE_FORMAT,
   DOC_PUBLISH_STATUSES,
   ACCEPTED_STATUSES,
-  MEASURE_SHAPE,
 } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
@@ -68,17 +67,6 @@ export const dateOption = (entity, activeDateId) => Map({
   label: entity.getIn(['attributes', 'due_date']),
   checked: activeDateId ? entity.get('id') === activeDateId.toString() : false,
 });
-
-// export const dateOptions = (entities, activeDateId) => entities
-//   ? entities.reduce((options, entity) => {
-//     // only allow active and those that are not associated
-//     if ((entity.has('reportCount') && entity.get('reportCount') === 0)
-//     || (activeDateId ? activeDateId.toString() === entity.get('id') : false)) {
-//       return options.push(dateOption(entity, activeDateId));
-//     }
-//     return options;
-//   }, List())
-//   : List();
 
 export const taxonomyOptions = (taxonomies) => taxonomies
   ? sortEntities(taxonomies, 'asc', 'priority').reduce((values, tax) =>
@@ -681,7 +669,7 @@ const getCategoryFields = (args, formatMessage) => ({
   },
 });
 
-const getIndicatorFields = (args, formatMessage) => ({
+const getIndicatorFields = (formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
@@ -728,135 +716,45 @@ const getRecommendationFields = ({ frameworks, hasResponse }, formatMessage) => 
   },
 });
 
-export const getEntityFields = (path, args, contextIntl) => {
+const getMeasureFields = (formatMessage) => ({
+  header: {
+    main: [{ // fieldGroup
+      fields: [
+        getTitleFormField(formatMessage),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getStatusField(formatMessage),
+      ],
+    }],
+  },
+  body: {
+    main: [{
+      fields: [
+        getMarkdownField(formatMessage),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getDateField(formatMessage, 'target_date'),
+        getTextareaField(formatMessage, 'target_date_comment'),
+      ],
+    }],
+  },
+});
+
+export const getEntityAttributeFields = (path, args, contextIntl) => {
   switch (path) {
     case 'categories':
       return getCategoryFields(args.categories, contextIntl.formatMessage);
     case 'measures':
-      return getFields({
-        shape: MEASURE_SHAPE,
-        contextIntl,
-      });
+      return getMeasureFields(contextIntl.formatMessage);
     case 'indicators':
-      return getIndicatorFields(args.indicators, contextIntl.formatMessage);
+      return getIndicatorFields(contextIntl.formatMessage);
     case 'recommendations':
       return getRecommendationFields(args.recommendations, contextIntl.formatMessage);
     default:
       return {};
   }
 };
-
-
-const getSectionFields = (shape, section, column, entity, associations, onCreateOption, contextIntl) => {
-  const fields = filter(shape.fields, (field) =>
-    field.section === section
-    && field.column === column
-    && !field.disabled
-  );
-  const sectionGroups = [{
-    fields: reduce(fields, (memo, field) => {
-      if (field.control === 'title') {
-        return memo.concat([getTitleFormField(contextIntl.formatMessage)]);
-      }
-      if (field.control === 'status') {
-        return memo.concat([getStatusField(contextIntl.formatMessage, entity)]);
-      }
-      if (field.control === 'date') {
-        return memo.concat([getDateField(contextIntl.formatMessage, field.attribute)]);
-      }
-      if (field.control === 'markdown') {
-        return memo.concat([getMarkdownField(contextIntl.formatMessage, field.attribute)]);
-      }
-      return memo.concat([getFormField({
-        controlType: field.control,
-        attribute: field.attribute,
-        formatMessage: contextIntl.formatMessage,
-      })]);
-    }, []),
-  }];
-  if (associations && associations.taxonomies && shape.taxonomies && shape.taxonomies.section === section && shape.taxonomies.column === column) {
-    sectionGroups.push({ // fieldGroup
-      label: contextIntl.formatMessage(appMessages.entities.taxonomies.plural),
-      icon: 'categories',
-      fields: renderTaxonomyControl(associations.taxonomies, onCreateOption, contextIntl),
-    });
-  }
-  if (associations
-    && (
-      associations.measures
-      || associations.recommendations
-      || associations.indicators
-    )
-    && shape.connections
-    && shape.connections.tables
-    && shape.connections.section === section
-    && shape.connections.column === column
-  ) {
-    sectionGroups.push({
-      label: contextIntl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: reduce(shape.connections.tables, (memo, table) => {
-        if (table.table === 'measures' && associations.measures) {
-          return memo.concat([renderMeasureControl(associations.measures, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
-        }
-        if (table.table === 'recommendations' && associations.recommendations) {
-          return memo.concat([renderRecommendationControl(associations.recommendations, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
-        }
-        if (table.table === 'indicators' && associations.indicators) {
-          return memo.concat([renderIndicatorControl(associations.indicators, onCreateOption)]);
-        }
-        return memo;
-      }, []),
-    });
-  }
-  return sectionGroups;
-};
-
-export const getFields = ({
-  entity,
-  associations,
-  onCreateOption,
-  shape,
-  contextIntl,
-}) => ({
-  header: {
-    main: getSectionFields(
-      shape,
-      'header',
-      'main',
-      entity,
-      associations,
-      onCreateOption,
-      contextIntl
-    ),
-    aside: getSectionFields(
-      shape,
-      'header',
-      'aside',
-      entity,
-      associations,
-      onCreateOption,
-      contextIntl
-    ),
-  },
-  body: {
-    main: getSectionFields(
-      shape,
-      'body',
-      'main',
-      entity,
-      associations,
-      onCreateOption,
-      contextIntl
-    ),
-    aside: getSectionFields(
-      shape,
-      'body',
-      'aside',
-      entity,
-      associations,
-      onCreateOption,
-      contextIntl
-    ),
-  },
-});
