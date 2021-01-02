@@ -172,16 +172,19 @@ export const entitySetSingles = (entity, singles) =>
   entity && singles.reduce((memo, { related, key, relatedKey }) =>
    entitySetSingle(memo, related, key, relatedKey), entity);
 
-export const filterTaxonomies = (taxonomies, tagsKey, includeParents = true) => taxonomies && taxonomies
-  .filter((tax, key, list) =>
+export const filterTaxonomies = (taxonomies, tagsKey, includeParents = true) =>
+  taxonomies &&
+  taxonomies.filter((tax, key, list) =>
     // taxonomies or parent taxonomies
-    tax.getIn(['attributes', tagsKey])
-      || (includeParents
-        && list.some((other) =>
-          attributesEqual(tax.get('id'), other.getIn(['attributes', 'parent_id']))
-          && other.getIn(['attributes', tagsKey])
-        )
+    tax.getIn(['attributes', tagsKey]) &&
+    (
+      includeParents ||
+      // only non-parents
+      !list.some((other) =>
+        attributesEqual(tax.get('id'), other.getIn(['attributes', 'parent_id'])) &&
+        other.getIn(['attributes', tagsKey])
       )
+    )
   );
 
 export const prepareTaxonomiesIsAssociated = (

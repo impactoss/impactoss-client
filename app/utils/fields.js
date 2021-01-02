@@ -61,7 +61,11 @@ export const getTitleTextField = (entity, isManager, attribute = 'title', label)
 export const getStatusField = (entity, attribute = 'draft', options, label, defaultValue = true) => ({
   controlType: 'info',
   type: 'status',
-  value: (entity && typeof entity.getIn(['attributes', attribute]) !== 'undefined')
+  value: (
+    entity &&
+    entity.getIn(['attributes', attribute]) !== null &&
+    typeof entity.getIn(['attributes', attribute]) !== 'undefined'
+  )
     ? entity.getIn(['attributes', attribute])
     : defaultValue,
   options,
