@@ -86,6 +86,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       categoryParentOptions,
       parentTaxonomy,
       frameworks,
+      framework,
       frameworkId,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
@@ -99,25 +100,33 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
         taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     } else if (path === 'recommendations') {
-      // check if single framework set
-      fwSpecified = (frameworkId && frameworkId !== 'all');
       // figure out framework id from form if not set
-      const currentFrameworkId = fwSpecified
-        ? frameworkId
-        : viewDomain.form.data.getIn(['attributes', 'framework_id']) || DEFAULT_FRAMEWORK;
+      const currentFrameworkId =
+        (framework && framework.get('id')) ||
+        frameworkId ||
+        viewDomain.form.data.getIn(['attributes', 'framework_id']) ||
+        DEFAULT_FRAMEWORK;
+      // check if single framework set
+      fwSpecified = (currentFrameworkId && currentFrameworkId !== 'all');
       // get current framework
       const currentFramework =
-        frameworks &&
-        frameworks.find((fw) => attributesEqual(fw.get('id'), currentFrameworkId));
-      // get framework type
-      const type = path === 'recommendations' && this.context.intl.formatMessage(
-        appMessages.entities[fwSpecified ? `${path}_${frameworkId}` : path].single
-      );
+        framework ||
+        (
+          fwSpecified &&
+          frameworks &&
+          frameworks.find((fw) => attributesEqual(fw.get('id'), currentFrameworkId))
+        );
       // check if response is required
       hasResponse = currentFramework && currentFramework.getIn(['attributes', 'has_response']);
       // figure out title and icon
-      pageTitle = this.context.intl.formatMessage(messages[path].pageTitle, { type });
-      icon = fwSpecified ? `${path}_${frameworkId}` : path;
+      pageTitle = this.context.intl.formatMessage(
+        messages[path].pageTitle,
+        {
+          type: this.context.intl.formatMessage(
+            appMessages.entities[fwSpecified ? `${path}_${currentFrameworkId}` : path].single
+          ),
+        });
+      icon = fwSpecified ? `${path}_${currentFrameworkId}` : path;
     } else {
       pageTitle = this.context.intl.formatMessage(messages[path].pageTitle);
     }
@@ -216,8 +225,9 @@ EntityNew.propTypes = {
   initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
-  frameworkId: PropTypes.string,
+  framework: PropTypes.object,
   frameworks: PropTypes.object,
+  frameworkId: PropTypes.string,
 };
 
 EntityNew.contextTypes = {
@@ -240,6 +250,9 @@ const mapStateToProps = (state, { path, attributes }) => ({
     : null,
   frameworks: path === 'recommendations'
     ? selectActiveFrameworks(state)
+    : null,
+  framework: path === 'recommendations' && attributes && attributes.get('framework_id')
+    ? selectEntity(state, { path: 'frameworks', id: attributes.get('framework_id') })
     : null,
 });
 

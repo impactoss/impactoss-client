@@ -161,7 +161,10 @@ export const renderRecommendationsByFwControl = (
         selectAll: true,
         tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
         onCreate: onCreateOption
-          ? () => onCreateOption({ path: 'recommendations' })
+          ? () => onCreateOption({
+            path: 'recommendations',
+            attributes: { framework_id: fwid },
+          })
           : null,
       }),
       [],
