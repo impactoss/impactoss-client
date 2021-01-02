@@ -301,6 +301,10 @@ export default defineMessages({
       id: 'app.containers.App.import.text',
       defaultMessage: 'text',
     },
+    number: {
+      id: 'app.containers.App.import.number',
+      defaultMessage: 'number',
+    },
     markdown: {
       id: 'app.containers.App.import.markdown',
       defaultMessage: 'text (markdown supported)',
@@ -358,6 +362,10 @@ export default defineMessages({
     target_date_comment: {
       id: 'app.containers.App.importFields.target_date_comment',
       defaultMessage: 'Target date comment',
+    },
+    framework_id: {
+      id: 'app.containers.App.importFields.framework_id',
+      defaultMessage: 'Framework id',
     },
   },
   placeholders: {
