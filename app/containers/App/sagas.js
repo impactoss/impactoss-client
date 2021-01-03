@@ -518,9 +518,8 @@ const getNextQuery = (query, extend, location) => {
   // and figure out new query
   return asArray(query).reduce((q, param) => {
     const queryUpdated = q;
-    const paramReplace = param.replace || typeof param.replace === 'undefined';
     // if arg already set and not replacing
-    if (queryUpdated[param.arg] && !paramReplace) {
+    if (queryUpdated[param.arg] && !param.replace) {
       // if multiple values set
       if (Array.isArray(queryUpdated[param.arg])) {
         // add if not already present

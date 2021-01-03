@@ -281,6 +281,7 @@ export function mapDispatchToProps(dispatch) {
         {
           arg: 'fw',
           value: framework,
+          replace: true,
         }
       ));
     },
