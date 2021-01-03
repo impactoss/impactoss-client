@@ -1,4 +1,5 @@
 import { reduce } from 'lodash/collection';
+import { List } from 'immutable';
 
 import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
 import { testEntityEntityAssociation } from 'utils/entities';
@@ -95,7 +96,7 @@ export const getChangedOptions = (options) =>
   options.filter((o) => o.get('hasChanged'));
 
 export const getCheckedValuesFromOptions = (options, onlyChanged = false) => {
-  if (!options) return null;
+  if (!options) return List();
   const opts = onlyChanged ? getChangedOptions(options) : options;
   return opts.filter((o) => o.get('checked')).map((o) => o.get('value'));
 };

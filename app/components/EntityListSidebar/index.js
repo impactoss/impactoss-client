@@ -233,6 +233,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       connectedTaxonomies,
       connections,
       entityIdsSelected,
+      frameworks,
     } = this.props;
     const activeOption = this.state.activeOption;
 
@@ -255,6 +256,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
           taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
         },
+        frameworks,
       );
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
       panelGroups = makeEditGroups(
@@ -268,6 +270,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
           taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
         },
+        frameworks,
       );
     }
     let formOptions = null;
@@ -396,6 +399,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
 EntityListSidebar.propTypes = {
   entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),

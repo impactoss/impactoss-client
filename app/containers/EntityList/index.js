@@ -134,6 +134,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             listUpdating={progress !== null && progress >= 0 && progress < 100}
             entities={entities}
             taxonomies={this.props.taxonomies}
+            frameworks={this.props.frameworks}
             connections={this.props.connections}
             connectedTaxonomies={this.props.connectedTaxonomies}
             entityIdsSelected={
@@ -235,6 +236,7 @@ EntityList.propTypes = {
   // wrapper props
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   config: PropTypes.object,
@@ -438,7 +440,7 @@ function mapDispatchToProps(dispatch, props) {
               existingAssignments = entity.get('categories');
               break;
             case ('connections'):
-              existingAssignments = entity.get(activeEditOption.optionId);
+              existingAssignments = entity.get(activeEditOption.connection);
               break;
             default:
               existingAssignments = List();

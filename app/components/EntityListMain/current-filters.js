@@ -213,7 +213,7 @@ const getCurrentConnectionFilters = (
       asList(locationQueryValue).forEach((queryValue) => {
         const valueSplit = queryValue.split(':');
         if (valueSplit.length > 0) {
-          if (option.path === valueSplit[0]) {
+          if (option.path === valueSplit[0].split('_')[0]) {
             const value = valueSplit[1].toString();
             const connection = connections.getIn([option.path, value]);
             if (connection) {
@@ -238,12 +238,24 @@ const getCurrentConnectionFilters = (
     const locationQueryValue = locationQuery.get('without');
     forEach(connectionFilters.options, (option) => {
       asList(locationQueryValue).forEach((queryValue) => {
+        const valueFw = queryValue.split('_');
+        const fwid = valueFw.length > 1 && valueFw[1];
         // numeric means taxonomy
-        if (option.path === queryValue) {
+        if (option.path === valueFw[0]) {
           tags.push({
             labels: [
               { label: withoutLabel },
-              { appMessage: true, label: option.message, lowerCase: true },
+              {
+                appMessage: true,
+                label: (
+                  option.groupByFramework &&
+                  option.message &&
+                  option.message.indexOf('{fwid}') > -1
+                )
+                  ? option.message.replace('{fwid}', fwid)
+                  : option.message,
+                lowerCase: true,
+              },
               { label: option.label },
             ],
             type: option.path,

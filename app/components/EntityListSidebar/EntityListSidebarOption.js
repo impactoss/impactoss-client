@@ -89,6 +89,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
           group: groupId,
           optionId: option.get('id'),
           path: option.get('path'),
+          connection: option.get('connection'),
           key: option.get('key'),
           ownKey: option.get('ownKey'),
           active: option.get('active'),
@@ -110,7 +111,13 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
           </IconWrapper>
         }
         <DotWrapper small={option.get('nested')}>
-          { this.renderDot(groupId, option.get('id'), option.get('active')) }
+          {
+            this.renderDot(
+              groupId,
+              option.get('color') || option.get('id'),
+              option.get('active'),
+            )
+          }
         </DotWrapper>
       </Styled>
     );

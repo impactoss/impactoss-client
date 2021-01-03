@@ -263,7 +263,13 @@ export const getCategoryUpdatesFromFormData = ({ formData, taxonomies, createKey
     });
   }, Map({ delete: List(), create: List() }));
 
-export const getConnectionUpdatesFromFormData = ({ formData, connections, connectionAttribute, createConnectionKey, createKey }) => {
+export const getConnectionUpdatesFromFormData = ({
+  formData,
+  connections,
+  connectionAttribute,
+  createConnectionKey,
+  createKey,
+}) => {
   let formConnectionIds = List();
   if (formData) {
     if (Array.isArray(connectionAttribute)) {
@@ -282,14 +288,16 @@ export const getConnectionUpdatesFromFormData = ({ formData, connections, connec
         ? associatedIds.push(associatedId)
         : associatedIds
     , List()),
-    create: formConnectionIds.reduce((payloads, id) =>
-      !associatedConnections.has(id)
-        ? payloads.push(Map({
-          [createConnectionKey]: id,
-          [createKey]: formData.get('id'),
-        }))
-        : payloads
-    , List()),
+    create: formConnectionIds.reduce(
+      (payloads, id) =>
+        !associatedConnections.has(id)
+          ? payloads.push(Map({
+            [createConnectionKey]: id,
+            [createKey]: formData.get('id'),
+          }))
+          : payloads,
+        List(),
+      ),
   });
 };
 

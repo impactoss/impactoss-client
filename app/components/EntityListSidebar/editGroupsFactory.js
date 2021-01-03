@@ -7,6 +7,7 @@ export const makeEditGroups = (
   activeEditOption,
   hasUserRole,
   messages,
+  frameworks,
 ) => {
   const editGroups = {};
 
@@ -46,21 +47,53 @@ export const makeEditGroups = (
       id: 'connections', // filterGroupId
       label: messages.connections,
       show: true,
-      options: reduce(config.connections.options, (options, option) =>
-        typeof option.edit === 'undefined' || option.edit
-        ? options.concat({
-          id: option.path, // filterOptionId
-          label: option.label,
-          message: option.message,
-          path: option.connectPath,
-          key: option.key,
-          ownKey: option.ownKey,
-          icon: option.path,
-          active: !!activeEditOption && activeEditOption.optionId === option.path,
-          create: { path: option.path },
-        })
-        : options
-      , []),
+      options: reduce(
+        config.connections.options,
+        (optionsMemo, option) => {
+          if (option.groupByFramework && frameworks) {
+            return frameworks
+              .filter((fw) =>
+                !option.frameworkFilter || fw.getIn(['attributes', option.frameworkFilter])
+              )
+              .reduce(
+                (memo, fw) => {
+                  const id = `${option.path}_${fw.get('id')}`;
+                  return memo.concat({
+                    id, // filterOptionId
+                    label: option.label,
+                    message: (option.message && option.message.indexOf('{fwid}') > -1)
+                      ? option.message.replace('{fwid}', fw.get('id'))
+                      : option.message,
+                    path: option.connectPath,
+                    connection: option.path,
+                    key: option.key,
+                    ownKey: option.ownKey,
+                    icon: id,
+                    active: !!activeEditOption && activeEditOption.optionId === id,
+                    create: { path: option.path },
+                    color: option.path,
+                  });
+                },
+                optionsMemo,
+              );
+          }
+          return typeof option.edit === 'undefined' || option.edit
+            ? optionsMemo.concat({
+              id: option.path, // filterOptionId
+              label: option.label,
+              message: option.message,
+              path: option.connectPath,
+              connection: option.path,
+              key: option.key,
+              ownKey: option.ownKey,
+              icon: option.path,
+              active: !!activeEditOption && activeEditOption.optionId === option.path,
+              create: { path: option.path },
+            })
+            : optionsMemo;
+        },
+        [],
+      ),
     };
   }
 

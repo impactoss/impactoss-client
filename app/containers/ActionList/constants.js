@@ -78,11 +78,13 @@ export const CONFIG = {
       },
       {
         search: true,
-        message: 'entities.recommendations.plural',
+        message: 'entities.recommendations_{fwid}.plural',
         path: 'recommendations', // filter by recommendation connection
         key: 'recommendation_id',
         connectPath: 'recommendation_measures', // filter by recommendation connection
         ownKey: 'measure_id',
+        groupByFramework: true,
+        frameworkFilter: 'has_measures',
       },
     ],
   },

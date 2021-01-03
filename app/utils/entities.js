@@ -36,8 +36,16 @@ export const testEntityTaxonomyAssociation = (entity, categories, taxonomyId) =>
     .includes(taxonomyId);
 
 // check if entity has any nested connection by type
-export const testEntityAssociation = (entity, associatedPath) =>
-  entity.get(associatedPath) && entity.get(associatedPath).size > 0;
+export const testEntityAssociation = (entity, associatedPath) => {
+  // check for fw
+  if (associatedPath.indexOf('_') > -1) {
+    const path = associatedPath.split('_');
+    if (entity.getIn([`${path[0]}ByFw`, path[1]])) {
+      return entity.getIn([`${path[0]}ByFw`, path[1]]).size > 0;
+    }
+  }
+  return entity.get(associatedPath) && entity.get(associatedPath).size > 0;
+};
 
 // prep searchtarget, incl id
 export const prepareEntitySearchTarget = (entity, fields, queryLength) =>
@@ -63,12 +71,16 @@ export const getConnectedCategories = (entityConnectedIds, taxonomyCategories, p
 // assumes prior nesting of relationships
 export const filterEntitiesWithoutAssociation = (entities, categories, query) =>
   entities && entities.filter((entity) =>
-    asList(query).reduce((passing, pathOrTax) =>
-      passing && !(isNumber(pathOrTax)
-        ? testEntityTaxonomyAssociation(entity, categories, parseInt(pathOrTax, 10))
-        : testEntityAssociation(entity, pathOrTax)
-      )
-    , true)
+    asList(query).reduce(
+      (passing, pathOrTax) =>
+        passing &&
+        !(
+          isNumber(pathOrTax)
+            ? testEntityTaxonomyAssociation(entity, categories, parseInt(pathOrTax, 10))
+            : testEntityAssociation(entity, pathOrTax)
+        ),
+      true,
+    ),
   );
 
 // filter entities by association with one or more categories
@@ -103,7 +115,7 @@ export const filterEntitiesByConnection = (entities, query) =>
   entities && entities.filter((entity) =>
     asList(query).reduce((passing, queryArg) => {
       const pathValue = queryArg.split(':');
-      const path = pathValue[0];
+      const path = pathValue[0].split('_')[0];
       return entity.get(path)
         ? passing && testEntityEntityAssociation(entity, path, pathValue[1])
         : passing;
@@ -350,21 +362,33 @@ export const getEntityConnections = (entityId, associations, associationKey, ent
   )
   .map((association) => association.getIn(['attributes', associationKey]));
 
+export const getEntityConnectionsByFw = (entityId, associations, associationKey, entityKey, connections) =>
+  connections
+    .groupBy((c) => c.getIn(['attributes', 'framework_id']).toString())
+    .map((connectionsForFw) =>
+      associations
+      .filter((association) =>
+        attributesEqual(association.getIn(['attributes', entityKey]), entityId)
+        && connectionsForFw.get(association.getIn(['attributes', associationKey]).toString())
+      )
+      .map((association) => association.getIn(['attributes', associationKey]))
+    );
+
 export const getTaxonomyCategories = (taxonomy, categories, relationship, connections) =>
   categories
     .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
     .map((category) => {
       // figure out child categories if not directly tagging connection
-      const childCategories = taxonomy.getIn(['attributes', relationship.tags])
-        ? null
-        : categories.filter((item) => attributesEqual(item.getIn(['attributes', 'parent_id']), category.get('id')));
+      const childCategories = categories.filter(
+        (item) => attributesEqual(item.getIn(['attributes', 'parent_id']), category.get('id')),
+      );
       return category.set(relationship.path,
         relationship.associations
           .filter((association) => {
             if (!connections.get(association.getIn(['attributes', relationship.key]).toString())) {
               return false;
             }
-            return !childCategories
+            return (!childCategories || childCategories.size === 0)
               ? attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
               : childCategories.some((child) =>
                   attributesEqual(association.getIn(['attributes', 'category_id']), child.get('id'))

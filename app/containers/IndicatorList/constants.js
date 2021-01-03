@@ -48,12 +48,16 @@ export const CONFIG = {
   connectedTaxonomies: { // filter by each category
     query: 'catx',
     search: true,
-    exclude: 'tags_indicators',
     connections: [
       {
         path: 'measures', // filter by recommendation connection
         message: 'entities.measures.plural',
         key: 'measure_id',
+      },
+      {
+        path: 'recommendations', // filter by recommendation connection
+        message: 'entities.recommendations.plural',
+        key: 'recommendation_id',
       },
     ],
   },
@@ -71,12 +75,14 @@ export const CONFIG = {
       },
       {
         search: true,
-        message: 'entities.recommendations.plural',
+        message: 'entities.recommendations_{fwid}.plural',
         path: 'recommendations',
         clientPath: 'recommendations',
         key: 'recommendation_id',
         connectPath: 'recommendation_indicators',
         ownKey: 'indicator_id',
+        groupByFramework: true,
+        frameworkFilter: 'has_indicators',
       },
     ],
   },

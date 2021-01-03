@@ -15,6 +15,7 @@ import {
   selectFWTaxonomiesSorted,
   selectFWRecommendations,
   selectFWIndicators,
+  selectFrameworks,
 } from 'containers/App/selectors';
 
 import {
@@ -29,6 +30,7 @@ import {
   getEntityCategories,
   filterTaxonomies,
   getEntityConnections,
+  getEntityConnectionsByFw,
   getTaxonomyCategories,
 } from 'utils/entities';
 
@@ -45,7 +47,12 @@ export const selectConnections = createSelector(
     Map()
     .set('indicators', indicators)
     .set('recommendations',
-      entitiesSetCategoryIds(recommendations, 'recommendation_id', recommendationCategories, categories)
+      entitiesSetCategoryIds(
+        recommendations,
+        'recommendation_id',
+        recommendationCategories,
+        categories,
+      )
     )
 );
 
@@ -54,30 +61,52 @@ export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'recommendation_categories'),
-  (connections, taxonomies, categories, categoryRecommendations) =>
-    // for all connections
-    reduce([
+  (state) => selectFrameworks(state),
+  (state) => selectEntities(state, 'framework_taxonomies'),
+  (
+    connections,
+    taxonomies,
+    categories,
+    categoryRecommendations,
+    frameworks,
+    fwTaxonomies,
+  ) => {
+    const measureFrameworks =
+      frameworks.filter((fw) => fw.getIn(['attributes', 'has_measures']));
+    const relationships = [
       {
         tags: 'tags_recommendations',
         path: 'recommendations',
         key: 'recommendation_id',
         associations: categoryRecommendations,
       },
-    ], (connectedTaxonomies, relationship) =>
-      // TODO deal with conflicts
-      // merge connected taxonomies.
-      relationship
-      ? connectedTaxonomies.merge(
-        filterTaxonomies(taxonomies, relationship.tags, true)
-        .map((taxonomy) => taxonomy.set('categories', getTaxonomyCategories(
-          taxonomy,
-          categories,
-          relationship,
-          connections.get(relationship.path),
-        )))
-      )
-      : connectedTaxonomies
-    , Map())
+    ];
+    // for all connections
+    return reduce(
+      relationships,
+      (connectedTaxonomies, relationship) =>
+        // TODO deal with conflicts
+        // merge connected taxonomies.
+        connectedTaxonomies.merge(
+          filterTaxonomies(taxonomies, relationship.tags, true)
+          .filter((taxonomy) => fwTaxonomies.some(
+            (fwt) =>
+              measureFrameworks.some(
+                (fw) =>
+                  attributesEqual(fwt.getIn(['attributes', 'framework_id']), fw.get('id')),
+              ) &&
+              attributesEqual(fwt.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id'))
+          ))
+          .map((taxonomy) => taxonomy.set('categories', getTaxonomyCategories(
+            taxonomy,
+            categories,
+            relationship,
+            connections.get(relationship.path),
+          )))
+        ),
+      Map(),
+    );
+  }
 );
 
 const selectMeasuresNested = createSelector(
@@ -99,9 +128,22 @@ const selectMeasuresNested = createSelector(
     categories,
   ) => entities.map((entity) => entity
     // nest category ids
-    .set('categories', getEntityCategories(entity.get('id'), entityCategories, 'measure_id', categories))
+    .set('categories', getEntityCategories(
+      entity.get('id'),
+      entityCategories,
+      'measure_id',
+      categories,
+    ))
     // nest connected recommendation ids
     .set('recommendations', getEntityConnections(
+      entity.get('id'),
+      entityRecommendations,
+      'recommendation_id',
+      'measure_id',
+      connections.get('recommendations'),
+    ))
+    // nest connected recommendation ids byfw
+    .set('recommendationsByFw', getEntityConnectionsByFw(
       entity.get('id'),
       entityRecommendations,
       'recommendation_id',

@@ -14,6 +14,7 @@ import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
   selectReady,
   selectMeasureTaxonomies,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -39,7 +40,15 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
   }
 
   render() {
-    const { dataReady } = this.props;
+    const {
+      dataReady,
+      entities,
+      taxonomies,
+      frameworks,
+      connections,
+      connectedTaxonomies,
+      location,
+    } = this.props;
 
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
@@ -69,10 +78,11 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           ]}
         />
         <EntityList
-          entities={this.props.entities}
-          taxonomies={this.props.taxonomies}
-          connections={this.props.connections}
-          connectedTaxonomies={this.props.connectedTaxonomies}
+          entities={entities}
+          taxonomies={taxonomies}
+          frameworks={frameworks}
+          connections={connections}
+          connectedTaxonomies={connectedTaxonomies}
           config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
@@ -80,7 +90,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             single: this.context.intl.formatMessage(appMessages.entities.measures.single),
             plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
           }}
-          locationQuery={fromJS(this.props.location.query)}
+          locationQuery={fromJS(location.query)}
         />
       </div>
     );
@@ -95,6 +105,7 @@ ActionList.propTypes = {
   location: PropTypes.object,
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
 };
@@ -109,6 +120,7 @@ const mapStateToProps = (state, props) => ({
   taxonomies: selectMeasureTaxonomies(state),
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
+  frameworks: selectActiveFrameworks(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

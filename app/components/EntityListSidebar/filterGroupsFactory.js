@@ -9,6 +9,7 @@ export const makeFilterGroups = (
   activeFilterOption,
   hasUserRole,
   messages,
+  frameworks,
 ) => {
   const filterGroups = {};
 
@@ -41,18 +42,23 @@ export const makeFilterGroups = (
       label: messages.connectedTaxonomies,
       show: true,
       icon: 'connectedCategories',
-      options: sortEntities(connectedTaxonomies, 'asc', 'priority').reduce((taxOptions, taxonomy) =>
-        config.connectedTaxonomies.exclude && taxonomy.getIn(['attributes', config.connectedTaxonomies.exclude])
-          ? taxOptions
-          : taxOptions.concat([
-            {
-              id: taxonomy.get('id'), // filterOptionId
-              label: messages.taxonomies(taxonomy.get('id')),
-              active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
-              nested: taxonomy.getIn(['attributes', 'parent_id']),
-            },
-          ])
-      , []),
+      options:
+        sortEntities(connectedTaxonomies, 'asc', 'priority')
+        .reduce(
+          (taxOptionsMemo, taxonomy) =>
+            (config.connectedTaxonomies.exclude &&
+            taxonomy.getIn(['attributes', config.connectedTaxonomies.exclude]))
+              ? taxOptionsMemo
+              : taxOptionsMemo.concat([
+                {
+                  id: taxonomy.get('id'), // filterOptionId
+                  label: messages.taxonomies(taxonomy.get('id')),
+                  active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+                  nested: taxonomy.getIn(['attributes', 'parent_id']),
+                },
+              ]),
+          [],
+        ),
     };
   }
 
@@ -63,15 +69,41 @@ export const makeFilterGroups = (
       id: 'connections', // filterGroupId
       label: messages.connections,
       show: true,
-      options: reduce(config.connections.options, (options, option) =>
-        options.concat({
-          id: option.path, // filterOptionId
-          label: option.label,
-          message: option.message,
-          icon: option.path,
-          active: !!activeFilterOption && activeFilterOption.optionId === option.path,
-        })
-      , []),
+      options: reduce(
+        config.connections.options,
+        (optionsMemo, option) => {
+          if (option.groupByFramework && frameworks) {
+            return frameworks
+              .filter((fw) =>
+                !option.frameworkFilter || fw.getIn(['attributes', option.frameworkFilter])
+              )
+              .reduce(
+                (memo, fw) => {
+                  const id = `${option.path}_${fw.get('id')}`;
+                  return memo.concat({
+                    id, // filterOptionId
+                    label: option.label,
+                    message: (option.message && option.message.indexOf('{fwid}') > -1)
+                      ? option.message.replace('{fwid}', fw.get('id'))
+                      : option.message,
+                    icon: id,
+                    color: option.path,
+                    active: !!activeFilterOption && activeFilterOption.optionId === id,
+                  });
+                },
+                optionsMemo,
+              );
+          }
+          return optionsMemo.concat({
+            id: option.path, // filterOptionId
+            label: option.label,
+            message: option.message,
+            icon: option.path,
+            active: !!activeFilterOption && activeFilterOption.optionId === option.path,
+          });
+        },
+        [],
+      ),
     };
   }
 
