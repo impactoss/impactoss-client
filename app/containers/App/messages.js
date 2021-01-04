@@ -103,6 +103,10 @@ export default defineMessages({
     },
   },
   frameworks_short: {
+    common: {
+      id: 'app.containers.App.frameworks_short.1',
+      defaultMessage: 'multiple',
+    },
     1: {
       id: 'app.containers.App.frameworks_short.1',
       defaultMessage: 'HR',

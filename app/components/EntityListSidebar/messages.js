@@ -66,6 +66,10 @@ export default defineMessages({
       id: 'app.components.EntityListSidebar.filterGroupLabel.taxonomies',
       defaultMessage: 'By category',
     },
+    taxonomiesByFw: {
+      id: 'app.components.EntityListSidebar.filterGroupLabel.taxonomiesByFw',
+      defaultMessage: 'By category ({fw})',
+    },
     connections: {
       id: 'app.components.EntityListSidebar.filterGroupLabel.connections',
       defaultMessage: 'By connection',

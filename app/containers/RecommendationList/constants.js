@@ -88,6 +88,7 @@ export const CONFIG = {
         message: 'attributes.accepted',
         attribute: 'accepted',
         options: ACCEPTED_STATUSES,
+        framework: 'has_response',
       },
       {
         search: false,

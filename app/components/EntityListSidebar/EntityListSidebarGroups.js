@@ -47,6 +47,7 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
                           key={i}
                           option={option}
                           groupId={group.get('id')}
+                          groupType={group.get('type')}
                           onShowForm={this.props.onShowForm}
                         />
                       ))

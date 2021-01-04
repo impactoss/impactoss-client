@@ -81,14 +81,14 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
     }
   }
   render() {
-    const { option, onShowForm, groupId } = this.props;
+    const { option, onShowForm, groupId, groupType } = this.props;
 
     return (
       <Styled
         active={option.get('active')}
         small={option.get('nested')}
         onClick={() => onShowForm({
-          group: groupId,
+          group: groupType || groupId,
           optionId: option.get('id'),
           path: option.get('path'),
           connection: option.get('connection'),
@@ -115,7 +115,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
         <DotWrapper small={option.get('nested')}>
           {
             this.renderDot(
-              groupId,
+              groupType || groupId,
               option.get('color') || option.get('id'),
               option.get('active'),
             )
@@ -129,6 +129,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
 EntityListSidebarOption.propTypes = {
   option: PropTypes.object.isRequired,
   groupId: PropTypes.string.isRequired,
+  groupType: PropTypes.string,
   onShowForm: PropTypes.func.isRequired,
 };
 

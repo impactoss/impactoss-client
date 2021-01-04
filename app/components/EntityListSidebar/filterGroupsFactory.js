@@ -1,5 +1,9 @@
 import { reduce } from 'lodash/collection';
 import { sortEntities } from 'utils/sort';
+import { attributesEqual } from 'utils/entities';
+
+const checkFramework = (frameworks, attribute) =>
+  frameworks.some((fw) => fw.getIn(['attributes', attribute]));
 
 // figure out filter groups for filter panel
 export const makeFilterGroups = (
@@ -30,23 +34,86 @@ export const makeFilterGroups = (
   }
   // taxonomy option group
   if (config.taxonomies && taxonomies) {
-    // first prepare taxonomy options
-    filterGroups.taxonomies = {
-      id: 'taxonomies', // filterGroupId
-      label: messages.taxonomyGroup,
-      show: true,
-      icon: 'categories',
-      options: sortEntities(taxonomies, 'asc', 'priority').reduce((memo, taxonomy) =>
-        memo.concat([
-          {
-            id: taxonomy.get('id'), // filterOptionId
-            label: messages.taxonomies(taxonomy.get('id')),
-            active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
-            nested: taxonomy.getIn(['attributes', 'parent_id']),
-          },
-        ])
-      , []),
-    };
+    // multi framework mode
+    if (config.frameworks && frameworks && frameworks.size > 1) {
+      // single framework taxonomy
+      frameworks.forEach((fw) => {
+        const fwTaxonomies =
+          taxonomies.filter((tax) => {
+            const taxFwIds = tax.get('frameworkIds');
+            return taxFwIds.size === 1 &&
+              taxFwIds.find((fwid) => attributesEqual(fwid, fw.get('id')));
+          });
+        filterGroups[`taxonomies_${fw.get('id')}`] = {
+          id: `taxonomies_${fw.get('id')}`, // filterGroupId
+          type: 'taxonomies',
+          label: messages.taxonomyGroupByFw(fw.get('id')),
+          show: true,
+          icon: 'categories',
+          options:
+            sortEntities(fwTaxonomies, 'asc', 'priority')
+            .reduce(
+              (memo, taxonomy) =>
+                memo.concat([
+                  {
+                    id: taxonomy.get('id'), // filterOptionId
+                    label: messages.taxonomies(taxonomy.get('id')),
+                    active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+                    nested: taxonomy.getIn(['attributes', 'parent_id']),
+                  },
+                ]),
+              [],
+            ),
+        };
+      });
+      const commonTaxonomies =
+        taxonomies.filter((tax) =>
+          tax.get('frameworkIds') &&
+          tax.get('frameworkIds').size > 1
+        );
+      filterGroups.taxonomies = {
+        id: 'taxonomies', // filterGroupId
+        label: messages.taxonomyGroupByFw('common'),
+        show: true,
+        icon: 'categories',
+        options:
+          sortEntities(commonTaxonomies, 'asc', 'priority')
+          .reduce(
+            (memo, taxonomy) =>
+              memo.concat([
+                {
+                  id: taxonomy.get('id'), // filterOptionId
+                  label: messages.taxonomies(taxonomy.get('id')),
+                  active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+                  nested: taxonomy.getIn(['attributes', 'parent_id']),
+                },
+              ]),
+            [],
+          ),
+      };
+    } else {
+      // first prepare taxonomy options
+      filterGroups.taxonomies = {
+        id: 'taxonomies', // filterGroupId
+        label: messages.taxonomyGroup,
+        show: true,
+        icon: 'categories',
+        options:
+          sortEntities(taxonomies, 'asc', 'priority')
+          .reduce(
+            (memo, taxonomy) =>
+              memo.concat([
+                {
+                  id: taxonomy.get('id'), // filterOptionId
+                  label: messages.taxonomies(taxonomy.get('id')),
+                  active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+                  nested: taxonomy.getIn(['attributes', 'parent_id']),
+                },
+              ]),
+            [],
+          ),
+      };
+    }
   }
 
   // connectedTaxonomies option group
@@ -130,7 +197,10 @@ export const makeFilterGroups = (
       label: messages.attributes,
       show: true,
       options: reduce(config.attributes.options, (options, option) =>
-        (typeof option.role === 'undefined' || hasUserRole[option.role])
+        (
+          (typeof option.role === 'undefined' || hasUserRole[option.role]) &&
+          (typeof option.framework === 'undefined' || checkFramework(frameworks, option.framework))
+        )
           ? options.concat([{
             id: option.attribute, // filterOptionId
             label: option.label,

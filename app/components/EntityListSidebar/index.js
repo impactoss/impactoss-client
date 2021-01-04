@@ -85,6 +85,13 @@ const STATE_INITIAL = {
   expandedGroups: {
     frameworks: true,
     taxonomies: true,
+    taxonomies_1: true,
+    taxonomies_2: true,
+    taxonomies_3: true,
+    taxonomies_4: true,
+    taxonomies_5: true,
+    taxonomies_6: true,
+    taxonomies_7: true,
     connectedTaxonomies: true,
     connections: true,
     attributes: true,
@@ -253,6 +260,14 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         {
           attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
           taxonomyGroup: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
+          taxonomyGroupByFw:
+            (fw) =>
+              this.context.intl.formatMessage(
+                messages.filterGroupLabel.taxonomiesByFw,
+                {
+                  fw: this.context.intl.formatMessage(appMessages.frameworks_short[fw]),
+                },
+              ),
           frameworksGroup: this.context.intl.formatMessage(messages.filterGroupLabel.frameworks),
           connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
           connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
