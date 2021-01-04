@@ -14,6 +14,7 @@ import {
   getEntityTitle,
   getEntityReference,
   getEntityParentId,
+  attributesEqual,
 } from 'utils/entities';
 
 import { makeTagFilterGroups } from 'utils/forms';
@@ -33,6 +34,7 @@ export const makeActiveFilterOptions = (
   connectedTaxonomies,
   messages,
   contextIntl,
+  frameworks,
 ) => {
   // create filterOptions
   switch (activeFilterOption.group) {
@@ -45,6 +47,14 @@ export const makeActiveFilterOptions = (
         locationQuery,
         messages,
         contextIntl,
+      );
+    case 'frameworks':
+      return makeFrameworkFilterOptions(
+        entities,
+        config.frameworks,
+        frameworks,
+        activeFilterOption.optionId,
+        locationQuery,
       );
     case 'connectedTaxonomies':
       return makeConnectedTaxonomyFilterOptions(
@@ -180,7 +190,82 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
 //
 const getTaxTitle = (id, contextIntl) => contextIntl.formatMessage(appMessages.entities.taxonomies[id].single);
 
-export const makeTaxonomyFilterOptions = (entities, config, taxonomies, activeTaxId, locationQuery, messages, contextIntl) => {
+export const makeFrameworkFilterOptions = (
+  entities,
+  config,
+  frameworks,
+  activeTaxId,
+  locationQuery,
+) => {
+  const filterOptions = {
+    groupId: 'frameworks',
+    search: false,
+    options: {},
+    multiple: false,
+    required: false,
+    selectAll: false,
+    groups: null,
+  };
+  if (frameworks) {
+    if (entities.size === 0) {
+      if (locationQuery.get(config.query)) {
+        const locationQueryValue = locationQuery.get(config.query);
+        forEach(asArray(locationQueryValue), (queryValue) => {
+          const value = parseInt(queryValue, 10);
+          const framework = frameworks.get(value);
+          if (framework) {
+            filterOptions.options[value] = {
+              label: getEntityTitle(framework),
+              showCount: true,
+              value,
+              count: 0,
+              query: config.query,
+              checked: true,
+            };
+          }
+        });
+      }
+    } else {
+      entities.forEach((entity) => {
+        const fwIds = [];
+        // if entity has categories
+        if (entity.getIn(['attributes', 'framework_id'])) {
+          // add categories from entities if not present otherwise increase count
+          frameworks.forEach((framework, fwId) => {
+            // if entity has category of active taxonomy
+            if (attributesEqual(entity.getIn(['attributes', 'framework_id']), fwId)) {
+              fwIds.push(fwId);
+              // if category already added
+              if (filterOptions.options[fwId]) {
+                filterOptions.options[fwId].count += 1;
+              } else {
+                filterOptions.options[fwId] = {
+                  label: getEntityTitle(framework),
+                  showCount: true,
+                  value: fwId,
+                  count: 1,
+                  query: config.query,
+                  checked: optionChecked(locationQuery.get(config.query), fwId),
+                };
+              }
+            }
+          });
+        }
+      });  // for each entities
+    }
+  }
+  return filterOptions;
+};
+
+export const makeTaxonomyFilterOptions = (
+  entities,
+  config,
+  taxonomies,
+  activeTaxId,
+  locationQuery,
+  messages,
+  contextIntl,
+) => {
   const filterOptions = {
     groupId: 'taxonomies',
     search: config.search,

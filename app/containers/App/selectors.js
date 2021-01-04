@@ -271,6 +271,10 @@ export const selectSearchQuery = createSelector(
   (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('search')
 );
+export const selectFrameworkListQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('fwx')
+);
 
 export const selectExpandQuery = createSelector(
   (state, locationQuery) => locationQuery,

@@ -12,6 +12,9 @@ import asList from 'utils/as-list';
 
 export const currentFilterArgs = (config, locationQuery) => {
   let args = [];
+  if (config.frameworks && locationQuery.get(config.frameworks.query)) {
+    args = args.concat(config.frameworks.query);
+  }
   if (config.taxonomies && locationQuery.get(config.taxonomies.query)) {
     args = args.concat(config.taxonomies.query);
   }
@@ -43,6 +46,7 @@ export const currentFilters = ({
   locationQuery,
   onTagClick,
   errors,
+  frameworks,
 },
 withoutLabel,
 errorLabel,
@@ -50,6 +54,14 @@ errorLabel,
   let filterTags = [];
   if (errors && errors.size > 0) {
     filterTags.push(getErrorTag(errorLabel));
+  }
+  if (config.frameworks && frameworks && frameworks.size > 1) {
+    filterTags = filterTags.concat(getCurrentFrameworkFilter(
+      config.frameworks,
+      frameworks,
+      locationQuery,
+      onTagClick
+    ));
   }
   if (config.taxonomies && taxonomies) {
     filterTags = filterTags.concat(getCurrentTaxonomyFilters(
@@ -160,6 +172,32 @@ const getCurrentTaxonomyFilters = (
         }
       });
     });
+  }
+  return tags;
+};
+
+const getCurrentFrameworkFilter = (
+  config,
+  frameworks,
+  locationQuery,
+  onClick,
+) => {
+  const tags = [];
+  if (locationQuery.get(config.query)) {
+    const locationQueryValue = locationQuery.get(config.query);
+    const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), locationQueryValue));
+    if (framework) {
+      tags.push({
+        message: `frameworks_short.${framework.get('id')}`,
+        type: 'recommendations',
+        id: 0,
+        onClick: () => onClick({
+          value: framework.get('id'),
+          query: config.query,
+          checked: false,
+        }),
+      });
+    }
   }
   return tags;
 };

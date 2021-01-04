@@ -67,13 +67,15 @@ const DotWrapper = styled.div`
 
 class EntityListSidebarOption extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  renderDot = (groupId, optionId, active) => {
+  renderDot = (groupId, color, active) => {
     switch (groupId) {
       case 'taxonomies':
       case 'connectedTaxonomies':
-        return (<Dot palette="taxonomies" pIndex={parseInt(optionId, 10)} active={active} />);
+        return (<Dot palette="taxonomies" pIndex={parseInt(color, 10)} active={active} />);
+      case 'frameworks':
+        return (<Dot palette={color} pIndex={0} round active={active} />);
       case 'connections':
-        return (<Dot palette={optionId} pIndex={0} round active={active} />);
+        return (<Dot palette={color} pIndex={0} round active={active} />);
       default:
         return null;
     }

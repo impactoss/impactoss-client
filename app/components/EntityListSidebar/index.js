@@ -83,10 +83,11 @@ const SidebarWrapper = styled.div`
 const STATE_INITIAL = {
   activeOption: null,
   expandedGroups: {
+    frameworks: true,
     taxonomies: true,
     connectedTaxonomies: true,
-    connections: false,
-    attributes: false,
+    connections: true,
+    attributes: true,
   },
   visible: false,
   viewport: null,
@@ -252,9 +253,11 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         {
           attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
           taxonomyGroup: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
+          frameworksGroup: this.context.intl.formatMessage(messages.filterGroupLabel.frameworks),
           connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
           connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
           taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
+          frameworks: this.context.intl.formatMessage(appMessages.frameworks.plural),
         },
         frameworks,
       );
@@ -288,7 +291,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
             without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
           },
-          this.context.intl
+          this.context.intl,
+          frameworks,
         );
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
         const entitiesSelected = entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));

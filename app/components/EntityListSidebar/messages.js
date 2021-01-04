@@ -58,6 +58,10 @@ export default defineMessages({
       id: 'app.components.EntityListSidebar.filterGroupLabel.attributes',
       defaultMessage: 'By attribute',
     },
+    frameworks: {
+      id: 'app.components.EntityListSidebar.filterGroupLabel.frameworks',
+      defaultMessage: 'By framework',
+    },
     taxonomies: {
       id: 'app.components.EntityListSidebar.filterGroupLabel.taxonomies',
       defaultMessage: 'By category',

@@ -13,6 +13,8 @@ import {
   selectFWTaxonomiesSorted,
   selectFWMeasures,
   selectFWIndicators,
+  selectFrameworkQuery,
+  selectFrameworkListQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -23,6 +25,7 @@ import {
   entitiesSetCategoryIds,
   getEntityCategories,
   getEntityConnections,
+  attributesEqual,
 } from 'utils/entities';
 
 import { sortEntities, getSortOption } from 'utils/sort';
@@ -48,7 +51,12 @@ const selectRecommendationsNested = createSelector(
     categories,
   ) =>
     entities.map((entity) => entity
-      .set('categories', getEntityCategories(entity.get('id'), entityCategories, 'recommendation_id', categories))
+      .set('categories', getEntityCategories(
+        entity.get('id'),
+        entityCategories,
+        'recommendation_id',
+        categories,
+      ))
       .set('measures', getEntityConnections(
         entity.get('id'),
         entityMeasures,
@@ -65,8 +73,23 @@ const selectRecommendationsNested = createSelector(
       ))
     )
 );
-const selectRecommendationsWithout = createSelector(
+const selectRecommendationsByFw = createSelector(
   selectRecommendationsNested,
+  selectFrameworkQuery,
+  selectFrameworkListQuery,
+  (entities, fwQuery, listQuery) =>
+    fwQuery === 'all' &&
+    listQuery
+      ? entities.filter(
+          (entity) => attributesEqual(
+            entity.getIn(['attributes', 'framework_id']),
+            listQuery,
+          )
+        )
+      : entities
+);
+const selectRecommendationsWithout = createSelector(
+  selectRecommendationsByFw,
   (state) => selectEntities(state, 'categories'),
   selectWithoutQuery,
   (entities, categories, query) => query

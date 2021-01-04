@@ -45,6 +45,10 @@ export const CONFIG = {
       order: 'desc',
     },
   ],
+  frameworks: { // filter by framework
+    query: 'fwx',
+    key: 'framework_id',
+  },
   taxonomies: { // filter by each category
     query: 'cat',
     search: true,
@@ -52,6 +56,7 @@ export const CONFIG = {
     key: 'category_id',
     ownKey: 'recommendation_id',
     defaultGroupAttribute: 'groups_recommendations_default',
+    groupBy: 'framework_id',
   },
   connections: { // filter by associated entity
     query: 'connected',
@@ -75,11 +80,6 @@ export const CONFIG = {
         ownKey: 'recommendation_id',
       },
     ],
-  },
-  frameworks: { // filter by framework
-    query: 'framework',
-    key: 'framework_id',
-    path: 'frameworks',
   },
   attributes: {  // filter by attribute value
     options: [

@@ -90,6 +90,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       entityIcon,
       entities,
       errors,
+      frameworks,
     } = this.props;
 
     const expandNo = config.expandableColumns && locationQuery.get('expand')
@@ -176,6 +177,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                         locationQuery,
                         onTagClick,
                         errors,
+                        frameworks,
                       },
                       this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
                       this.context.intl.formatMessage(messages.filterFormError),
@@ -243,6 +245,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
 EntityListMain.propTypes = {
   entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),

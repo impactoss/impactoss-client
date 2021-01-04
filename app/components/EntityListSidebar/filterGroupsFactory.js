@@ -14,6 +14,21 @@ export const makeFilterGroups = (
   const filterGroups = {};
 
   // taxonomy option group
+  if (config.frameworks && frameworks && frameworks.size > 1) {
+    filterGroups.frameworks = {
+      id: 'frameworks', // filterGroupId
+      label: messages.frameworksGroup,
+      show: true,
+      icon: 'recommendations',
+      options: [{
+        id: 'frameworks', // filterOptionId
+        label: messages.frameworks,
+        color: 'recommendations',
+        active: !!activeFilterOption && activeFilterOption.optionId === 'frameworks',
+      }],
+    };
+  }
+  // taxonomy option group
   if (config.taxonomies && taxonomies) {
     // first prepare taxonomy options
     filterGroups.taxonomies = {

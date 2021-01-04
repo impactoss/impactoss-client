@@ -24,7 +24,6 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
 
   render() {
     const groups = this.props.groups;
-
     return (
       <div>
         { groups && groups.entrySeq().map(([groupId, group]) =>
