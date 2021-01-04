@@ -196,19 +196,22 @@ export const makeFilterGroups = (
       id: 'attributes', // filterGroupId
       label: messages.attributes,
       show: true,
-      options: reduce(config.attributes.options, (options, option) =>
-        (
-          (typeof option.role === 'undefined' || hasUserRole[option.role]) &&
-          (typeof option.framework === 'undefined' || checkFramework(frameworks, option.framework))
-        )
-          ? options.concat([{
-            id: option.attribute, // filterOptionId
-            label: option.label,
-            message: option.message,
-            active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
-          }])
-          : options
-      , []),
+      options: reduce(
+        config.attributes.options,
+        (options, option) =>
+          (
+            (typeof option.role === 'undefined' || hasUserRole[option.role]) &&
+            (typeof option.frameworkFilter === 'undefined' || checkFramework(frameworks, option.frameworkFilter))
+          )
+            ? options.concat([{
+              id: option.attribute, // filterOptionId
+              label: option.label,
+              message: option.message,
+              active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
+            }])
+            : options,
+          [],
+        ),
     };
   }
 

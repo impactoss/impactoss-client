@@ -250,6 +250,13 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     const formModel = activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL;
 
     let panelGroups = null;
+
+    const entitiesSelected =
+      activePanel === EDIT_PANEL &&
+      canEdit &&
+      hasSelected &&
+      entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
+
     if (activePanel === FILTERS_PANEL) {
       panelGroups = makeFilterGroups(
         config,
@@ -289,6 +296,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
         },
         frameworks,
+        // selectedFrameworkIds
+        entitiesSelected.groupBy((e) => e.getIn(['attributes', 'framework_id'])).keySeq(),
       );
     }
     let formOptions = null;
@@ -310,7 +319,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           frameworks,
         );
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
-        const entitiesSelected = entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
         formOptions = makeActiveEditOptions(
           entitiesSelected,
           config,

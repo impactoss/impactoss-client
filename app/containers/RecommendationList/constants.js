@@ -57,6 +57,7 @@ export const CONFIG = {
     ownKey: 'recommendation_id',
     defaultGroupAttribute: 'groups_recommendations_default',
     groupBy: 'framework_id',
+    editForFrameworks: true,
   },
   connections: { // filter by associated entity
     query: 'connected',
@@ -69,6 +70,8 @@ export const CONFIG = {
         key: 'measure_id',
         connectPath: 'recommendation_measures', // filter by recommendation connection
         ownKey: 'recommendation_id',
+        editForFrameworks: true,
+        frameworkFilter: 'has_measures',
       },
       {
         search: true,
@@ -78,6 +81,8 @@ export const CONFIG = {
         key: 'indicator_id',
         connectPath: 'recommendation_indicators',
         ownKey: 'recommendation_id',
+        editForFrameworks: true,
+        frameworkFilter: 'has_indicators',
       },
     ],
   },
@@ -88,7 +93,8 @@ export const CONFIG = {
         message: 'attributes.accepted',
         attribute: 'accepted',
         options: ACCEPTED_STATUSES,
-        framework: 'has_response',
+        editForFrameworks: true,
+        frameworkFilter: 'has_response',
       },
       {
         search: false,
