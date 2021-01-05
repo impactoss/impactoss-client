@@ -10,8 +10,10 @@ import appMessage from 'utils/app-message';
 import quasiEquals from 'utils/quasi-equals';
 
 export const getAcceptanceStatus = (entity) =>
-  find(ACCEPTED_STATUSES, (option) =>
-    option.value === (entity.getIn(['attributes', 'accepted']) || false)
+  find(
+    ACCEPTED_STATUSES,
+    (option) =>
+      option.value === (entity.getIn(['attributes', 'accepted']) || null)
   );
 
 // check if entity has nested connection by id

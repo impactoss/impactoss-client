@@ -21,7 +21,7 @@ const Count = styled.span`
   position: relative;
   top: 0;
   border-radius: 999px;
-  font-size: 0.8em;
+  font-size: 0.7em;
   background-color: ${(props) => props.draft ? palette('buttonInverse', 1) : palette(props.pIndex, 0)};
   color: ${(props) => props.draft ? palette(props.pIndex, 0) : palette('buttonDefault', 0)};
   border: 1px solid ${(props) => palette(props.pIndex, 0)};
@@ -30,7 +30,7 @@ const Count = styled.span`
   text-align: center;
   vertical-align: middle;
   line-height: 1.7;
-  padding: 0 0.5em;
+  padding: 0 0.25em;
 `;
 
 const PopupWrapper = styled.div`
@@ -42,11 +42,8 @@ const PopupWrapper = styled.div`
   -ms-touch-action: manipulation;
   touch-action: manipulation;
   position: relative;
-  margin-right: 10px;
+  margin-right: 5px;
   text-align: left;
-  &:last-child {
-    margin-right: 0;
-  }
 `;
 
 const POPUP_WIDTH_PX = `${POPUP_WIDTH}px`;

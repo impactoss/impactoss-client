@@ -50,29 +50,20 @@ export const CONFIG = {
     search: true,
     connections: [
       {
-        path: 'measures', // filter by recommendation connection
-        message: 'entities.measures.plural',
-        key: 'measure_id',
-      },
-      {
         path: 'recommendations', // filter by recommendation connection
         message: 'entities.recommendations.plural',
         key: 'recommendation_id',
+      },
+      {
+        path: 'measures', // filter by recommendation connection
+        message: 'entities.measures.plural',
+        key: 'measure_id',
       },
     ],
   },
   connections: { // filter by associated entity
     query: 'connected',
     options: [
-      {
-        search: true,
-        message: 'entities.measures.plural',
-        path: 'measures',
-        clientPath: 'actions',
-        key: 'measure_id',
-        connectPath: 'measure_indicators',
-        ownKey: 'indicator_id',
-      },
       {
         search: true,
         message: 'entities.recommendations_{fwid}.plural',
@@ -83,6 +74,15 @@ export const CONFIG = {
         ownKey: 'indicator_id',
         groupByFramework: true,
         frameworkFilter: 'has_indicators',
+      },
+      {
+        search: true,
+        message: 'entities.measures.plural',
+        path: 'measures',
+        clientPath: 'actions',
+        key: 'measure_id',
+        connectPath: 'measure_indicators',
+        ownKey: 'indicator_id',
       },
     ],
   },

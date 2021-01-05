@@ -280,9 +280,9 @@ theme.sizes = {
   text: {
     aaLargeBold: '19px',
     aaLarge: '24px',
-    mainListItem: '18px',
-    nestedListItem: '15px',
-    listItemTop: '14px',
+    mainListItem: '20px',
+    nestedListItem: '16px',
+    listItemTop: '13px',
     markdown: '18px',
     markdownMobile: '16px',
     small: '13px', // used for labels
@@ -300,8 +300,8 @@ theme.sizes = {
   },
   mainListItem: {
     paddingHorizontal: 15,
-    paddingTop: 5,
-    paddingBottom: 10,
+    paddingTop: 10,
+    paddingBottom: 12,
   },
   header: {
     banner: {
