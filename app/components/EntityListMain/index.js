@@ -108,20 +108,20 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       : entityTitle.plural;
 
     // group all entities, regardless of page items
-    const entityGroups = groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET
-    ? groupEntities(
-      entities,
-      taxonomies,
-      connectedTaxonomies,
-      config,
-      groupSelectValue,
-      subgroupSelectValue !== PARAMS.GROUP_RESET && subgroupSelectValue,
-      {
-        without: this.context.intl && this.context.intl.formatMessage(messages.without),
-      },
-      this.context.intl || null
-    )
-    : null;
+    const entityGroups =
+      groupSelectValue &&
+      groupSelectValue !== PARAMS.GROUP_RESET
+      ? groupEntities(
+        entities,
+        taxonomies,
+        connectedTaxonomies,
+        config,
+        groupSelectValue,
+        subgroupSelectValue !== PARAMS.GROUP_RESET && subgroupSelectValue,
+        this.context.intl || null,
+        frameworks,
+      )
+      : null;
 
     let subtitle = null;
     if (dataReady && entityGroups && groupSelectValue && this.context.intl) {
