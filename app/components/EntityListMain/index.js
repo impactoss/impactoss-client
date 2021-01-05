@@ -92,16 +92,43 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       errors,
       frameworks,
     } = this.props;
-
     const expandNo = config.expandableColumns && locationQuery.get('expand')
       ? parseInt(locationQuery.get('expand'), 10)
       : 0;
-    const groupSelectValue = locationQuery.get('group')
-    || (config.taxonomies && getGroupValue(taxonomies, config.taxonomies.defaultGroupAttribute, 1));
-    const subgroupSelectValue = groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET
-      ? locationQuery.get('subgroup')
-        || (config.taxonomies && getGroupValue(taxonomies, config.taxonomies.defaultGroupAttribute, 2))
-      : null;
+
+    let groupSelectValue = locationQuery.get('group');
+    const groupforFramework =
+      config.taxonomies &&
+      config.taxonomies.defaultGroupsByFramework &&
+      frameworks &&
+      frameworks.size === 1;
+    if (config.taxonomies && !groupSelectValue) {
+      if (groupforFramework) {
+        groupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][1];
+      } else {
+        groupSelectValue = getGroupValue(
+          taxonomies,
+          config.taxonomies.defaultGroupAttribute,
+          1,
+        );
+      }
+    }
+
+    let subgroupSelectValue;
+    if (groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET) {
+      subgroupSelectValue = locationQuery.get('subgroup');
+      if (config.taxonomies) {
+        if (groupforFramework) {
+          subgroupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][2];
+        } else {
+          subgroupSelectValue = getGroupValue(
+            taxonomies,
+            config.taxonomies.defaultGroupAttribute,
+            2,
+          );
+        }
+      }
+    }
 
     const headerTitle = entities && dataReady
       ? `${entities.size} ${entities.size === 1 ? entityTitle.single : entityTitle.plural}`

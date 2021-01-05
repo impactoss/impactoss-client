@@ -55,7 +55,12 @@ export const CONFIG = {
     connectPath: 'recommendation_categories',
     key: 'category_id',
     ownKey: 'recommendation_id',
-    defaultGroupAttribute: 'groups_recommendations_default',
+    defaultGroupAttribute: 'groups_recommendations_default', // used when no framework is set
+    // TODO better store in database join table framework_taxonomies
+    defaultGroupsByFramework: {
+      1: { 1: '1', 2: '2' }, // framework 1 recs are grouped by taxonomies 1 & 2
+      2: { 1: '7' }, // framework 2 recs are grouped by taxonomy 7
+    },
     groupBy: 'framework_id',
     editForFrameworks: true,
   },
