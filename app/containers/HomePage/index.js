@@ -250,6 +250,7 @@ function mapDispatchToProps(dispatch) {
           query: {
             arg: 'fw',
             value: framework,
+            replace: true,
           },
           extend: true,
         },
