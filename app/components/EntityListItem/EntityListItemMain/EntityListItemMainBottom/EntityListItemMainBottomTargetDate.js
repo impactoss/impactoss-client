@@ -11,10 +11,11 @@ const Styled = styled.span`
   margin-right: 1em;
   color: ${palette('text', 1)};
   margin-bottom: 3px;
-  margin-top: 3px;  
+  margin-top: 3px;
   &:last-child: {
     margin-right: 0;
   }
+  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemBottom};
 `;
 
 const DateWrap = styled.span`

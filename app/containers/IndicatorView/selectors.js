@@ -16,6 +16,7 @@ import {
   attributesEqual,
   entitiesIsAssociated,
   getEntityCategories,
+  getEntityConnectionsByFw,
 } from 'utils/entities';
 
 import { sortEntities } from 'utils/sort';
@@ -69,6 +70,14 @@ export const selectMeasures = createSelector(
         )
         .map((association) => association.getIn(['attributes', 'indicator_id']))
       )
+      // nest connected recommendation ids byfw
+      .set('recommendationsByFw', getEntityConnectionsByFw(
+        measure.get('id'),
+        measureRecommendations,
+        'recommendation_id',
+        'measure_id',
+        connections.get('recommendations'),
+      ))
     )
 );
 // all connected reports

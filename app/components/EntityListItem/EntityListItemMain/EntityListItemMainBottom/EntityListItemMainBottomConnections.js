@@ -19,8 +19,8 @@ const ConnectionWrap = styled.span`
 `;
 const ConnectionLabel = styled.span`
   vertical-align: middle;
-  font-size: 12px;
   color: ${palette('text', 1)};
+  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemBottom};
 `;
 
 export default class EntityListItemMainBottomConnections extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

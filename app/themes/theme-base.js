@@ -283,6 +283,7 @@ theme.sizes = {
     mainListItem: '20px',
     nestedListItem: '16px',
     listItemTop: '13px',
+    listItemBottom: '12px',
     markdown: '18px',
     markdownMobile: '16px',
     small: '13px', // used for labels

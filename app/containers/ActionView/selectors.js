@@ -15,6 +15,7 @@ import {
   entitiesIsAssociated,
   prepareTaxonomiesIsAssociated,
   getEntityCategories,
+  getEntityConnectionsByFw,
 } from 'utils/entities';
 
 export const selectViewEntity = createSelector(
@@ -101,5 +102,13 @@ export const selectIndicators = createSelector(
         )
         .map((association) => association.getIn(['attributes', 'recommendation_id']))
       )
+      // nest connected recommendation ids byfw
+      .set('recommendationsByFw', getEntityConnectionsByFw(
+        indicator.get('id'),
+        indicatorRecs,
+        'recommendation_id',
+        'indicator_id',
+        connections.get('recommendations'),
+      ))
     )
 );

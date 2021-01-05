@@ -59,29 +59,31 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       ) {
         if (option.groupByFramework) {
           const entitiesByFramework = entity.get(`${option.path}ByFw`);
-          entitiesByFramework.forEach((fwentities, fwid) => {
-            if (fwentities.size > 0) {
-              const connectedEntities = fwentities.map(
-                (connectionId) =>
-                  connections.getIn([option.path, connectionId.toString()])
-                );
-              const path = `${option.path}_${fwid}`;
-              memoX = memoX.concat([{
-                option: {
-                  label: (size) =>
-                    this.context.intl &&
-                    this.context.intl.formatMessage(
-                      size === 1
-                        ? appMessages.entities[path].single
-                        : appMessages.entities[path].plural
-                    ),
-                  style: option.path,
-                  path: option.clientPath || option.path,
-                },
-                entities: connectedEntities,
-              }]);
-            }
-          });
+          if (entitiesByFramework) {
+            entitiesByFramework.forEach((fwentities, fwid) => {
+              if (fwentities.size > 0) {
+                const connectedEntities = fwentities.map(
+                  (connectionId) =>
+                    connections.getIn([option.path, connectionId.toString()])
+                  );
+                const path = `${option.path}_${fwid}`;
+                memoX = memoX.concat([{
+                  option: {
+                    label: (size) =>
+                      this.context.intl &&
+                      this.context.intl.formatMessage(
+                        size === 1
+                          ? appMessages.entities[path].single
+                          : appMessages.entities[path].plural
+                      ),
+                    style: option.path,
+                    path: option.clientPath || option.path,
+                  },
+                  entities: connectedEntities,
+                }]);
+              }
+            });
+          }
         } else {
           const connectedEntities = entity
             .get(option.path)
