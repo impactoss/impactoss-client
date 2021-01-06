@@ -75,6 +75,7 @@ export const CONFIG = {
         {
           path: 'recommendations',
           search: ['title', 'description', 'response', 'reference'],
+          groupByFramework: true,
           sorting: [
             {
               attribute: 'id', // proxy for created at

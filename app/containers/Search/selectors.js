@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { Map, fromJS } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 // import { reduce } from 'lodash/collection';
 
 import {
@@ -8,6 +8,7 @@ import {
   selectSortByQuery,
   selectSortOrderQuery,
   selectFWTaxonomiesSorted,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import {
@@ -27,14 +28,14 @@ const selectPathQuery = createSelector(
 
 // kicks off series of cascading selectors
 export const selectEntitiesByQuery = createSelector(
+  (state, locationQuery) => selectSearchQuery(state, locationQuery),
   selectFWEntitiesAll,
   selectFWTaxonomiesSorted,
-  (state, locationQuery) => selectSearchQuery(state, locationQuery),
+  selectActiveFrameworks,
   selectPathQuery,
   selectSortByQuery,
   selectSortOrderQuery,
-  (allEntities, taxonomies, searchQuery, path, sort, order) => {
-    // console.log('selectEntitiesByQuery', searchQuery)
+  (searchQuery, allEntities, taxonomies, frameworks, path, sort, order) => {
     let active = false;// || CONFIG.search[0].targets[0].path;
     return fromJS(CONFIG.search).map((group) => {
       if (group.get('group') === 'taxonomies') {
@@ -80,31 +81,98 @@ export const selectEntitiesByQuery = createSelector(
             .set('results', filteredCategories);
         }));
       }
-      return group.set('targets', group.get('targets')
+      return group.set(
+        'targets',
+        group.get('targets')
         .filter((target) => !!target)
-        .map((target) => {
-          const filteredEntities = searchQuery
-            ? filterEntitiesByKeywords(
-              allEntities.get(target.get('path')),
-              searchQuery,
-              target.get('search').toArray()
-            )
-            : allEntities.get(target.get('path'));
-          if (path === target.get('path') || (!path && !active && filteredEntities.size > 0)) {
-            active = true;
-            // only sort the active entities that will be displayed
-            const sortOption = getSortOption(target.get('sorting') && target.get('sorting').toJS(), sort);
-            return target
-              .set('active', searchQuery && true)
-              .set('results', sortEntities(
-                filteredEntities,
-                order || (sortOption ? sortOption.order : 'desc'),
-                sort || (sortOption ? sortOption.attribute : 'id'),
-                sortOption ? sortOption.type : 'number'
-              ));
-          }
-          return target.set('results', filteredEntities);
-        })
+        .reduce(
+          (memo, target) => {
+            const targetEntties = allEntities.get(target.get('path'));
+            // target by fw
+            if (frameworks && target.get('groupByFramework')) {
+              return frameworks.reduce((innerMemo, fw) => {
+                const fwEntities =
+                  targetEntties
+                  .filter(
+                    (entity) => attributesEqual(
+                      entity.getIn(['attributes', 'framework_id']),
+                      fw.get('id'),
+                    )
+                  );
+                const filteredEntities = searchQuery
+                  ? filterEntitiesByKeywords(
+                    fwEntities,
+                    searchQuery,
+                    target.get('search').toArray()
+                  )
+                  : fwEntities;
+                const fwTargetPath = `${target.get('path')}_${fw.get('id')}`;
+                const fwTarget = target
+                  .set('clientPath', target.get('path'))
+                  .set('path', fwTargetPath);
+
+                // if filtered by path
+                if (
+                  path === fwTargetPath ||
+                  (
+                    !path &&
+                    !active &&
+                    filteredEntities.size > 0
+                  )
+                ) {
+                  active = true;
+                  // only sort the active entities that will be displayed
+                  const sortOption = getSortOption(fwTarget.get('sorting') && fwTarget.get('sorting').toJS(), sort);
+                  return innerMemo.push(
+                    fwTarget
+                    .set('active', searchQuery && true)
+                    .set('results', sortEntities(
+                      filteredEntities,
+                      order || (sortOption ? sortOption.order : 'desc'),
+                      sort || (sortOption ? sortOption.attribute : 'id'),
+                      sortOption ? sortOption.type : 'number'
+                    ))
+                  );
+                }
+                return innerMemo.push(fwTarget.set('results', filteredEntities));
+              }, memo);
+            }
+            // regular target
+            const filteredEntities = searchQuery
+              ? filterEntitiesByKeywords(
+                targetEntties,
+                searchQuery,
+                target.get('search').toArray()
+              )
+              : allEntities.get(target.get('path'));
+
+            // if filtered by path
+            if (
+              path === target.get('path') ||
+              (
+                !path &&
+                !active &&
+                filteredEntities.size > 0
+              )
+            ) {
+              active = true;
+              // only sort the active entities that will be displayed
+              const sortOption = getSortOption(target.get('sorting') && target.get('sorting').toJS(), sort);
+              return memo.push(
+                target
+                .set('active', searchQuery && true)
+                .set('results', sortEntities(
+                  filteredEntities,
+                  order || (sortOption ? sortOption.order : 'desc'),
+                  sort || (sortOption ? sortOption.attribute : 'id'),
+                  sortOption ? sortOption.type : 'number'
+                ))
+              );
+            }
+            return memo.push(target.set('results', filteredEntities));
+          },
+          List(),
+        )
       );
     });
   }
