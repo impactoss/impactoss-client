@@ -16,7 +16,7 @@ import Row from 'components/styled/Row';
 import Container from 'components/styled/Container';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { selectFrameworks } from 'containers/App/selectors';
+import { selectFrameworks, selectIsSigningIn } from 'containers/App/selectors';
 
 import ButtonHero from 'components/buttons/ButtonHero';
 import ButtonFlat from 'components/buttons/ButtonFlat';
@@ -132,15 +132,19 @@ const GridSpace = styled(Grid)`
     display: inline-block;
   }
 `;
+const StyledButtonHero = styled(ButtonHero)`
+  max-width: 250px;
+`;
+
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
   render() {
-    const { theme, frameworks, onSelectFramework, onPageLink } = this.props;
+    const { theme, frameworks, onSelectFramework, onPageLink, signingIn } = this.props;
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
-
+    const loading = !frameworks;
     return (
       <div>
         <Helmet
@@ -180,35 +184,66 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                   <Intro source={this.context.intl.formatMessage(messages.intro)} />
                 </Grid>
               </Row>
-              {!frameworks && (
-                <Loading />
-              )}
-              {frameworks && (
-                <Row>
-                  <GridSpace lg={1 / 6} sm={1 / 8} />
-                  <Grid lg={2 / 3} sm={3 / 4} xs={1}>
-                    <HomeActions>
-                      {frameworks.size > 1 && frameworks.entrySeq().map(([key, fw]) => (
-                        <ButtonHero key={key} onClick={() => onSelectFramework(fw.get('id'))}>
-                          <FormattedMessage {...appMessages.frameworks[fw.get('id')]} />
-                        </ButtonHero>
-                      ))}
-                      {frameworks.size === 1 && (
-                        <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
-                          <FormattedMessage {...messages.explore} />
-                        </ButtonHero>
+              <HomeActions>
+                {(signingIn || loading) && (
+                  <Row space>
+                    <GridSpace lg={1 / 6} sm={1 / 8} />
+                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                      <Loading />
+                    </Grid>
+                  </Row>
+                )}
+                {(signingIn || loading) && (
+                  <Row space>
+                    <GridSpace lg={1 / 6} sm={1 / 8} />
+                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                      {signingIn && (
+                        <FormattedMessage {...messages.signingIn} />
                       )}
-                    </HomeActions>
-                    {frameworks.size > 1 && (
-                      <HomeActions>
+                      {!signingIn && (
+                        <FormattedMessage {...messages.loading} />
+                      )}
+                    </Grid>
+                  </Row>
+                )}
+                {!loading && !signingIn && frameworks.size > 1 && (
+                  <span>
+                    <Row>
+                      <GridSpace lg={1 / 6} sm={1 / 8} />
+                      <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                        <FormattedMessage {...messages.selectFramework} />
+                      </Grid>
+                    </Row>
+                    <Row space>
+                      <Grid lg={1} sm={1} xs={1}>
+                        {frameworks.entrySeq().map(([key, fw]) => (
+                          <StyledButtonHero space key={key} onClick={() => onSelectFramework(fw.get('id'))}>
+                            <FormattedMessage {...appMessages.frameworks[fw.get('id')]} />
+                          </StyledButtonHero>
+                        ))}
+                      </Grid>
+                    </Row>
+                    <Row space>
+                      <GridSpace lg={1 / 6} sm={1 / 8} />
+                      <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                         <ButtonFlat onClick={() => onSelectFramework('all')}>
                           <FormattedMessage {...messages.exploreAllFrameworks} />
                         </ButtonFlat>
-                      </HomeActions>
-                    )}
-                  </Grid>
-                </Row>
-              )}
+                      </Grid>
+                    </Row>
+                  </span>
+                )}
+                {!loading && !signingIn && frameworks.size === 1 && (
+                  <Row space>
+                    <GridSpace lg={1 / 6} sm={1 / 8} />
+                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                      <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
+                        <FormattedMessage {...messages.explore} />
+                      </ButtonHero>
+                    </Grid>
+                  </Row>
+                )}
+              </HomeActions>
             </Container>
           </SectionWrapper>
         </SectionTop>
@@ -224,6 +259,7 @@ HomePage.propTypes = {
   onPageLink: PropTypes.func.isRequired,
   theme: PropTypes.object.isRequired,
   frameworks: PropTypes.object,
+  signingIn: PropTypes.bool,
 };
 
 HomePage.contextTypes = {
@@ -232,6 +268,7 @@ HomePage.contextTypes = {
 
 const mapStateToProps = (state) => ({
   frameworks: selectFrameworks(state),
+  signingIn: selectIsSigningIn(state),
 });
 
 function mapDispatchToProps(dispatch) {

@@ -72,6 +72,12 @@ export const selectSessionUserId = createSelector(
   (sessionUserAttributes) => sessionUserAttributes && sessionUserAttributes.id.toString()
 );
 
+export const selectIsSigningIn = createSelector(
+  selectIsSignedIn,
+  selectSessionUserAttributes,
+  (signedIn, user) => signedIn && !user
+);
+
 // const makeSessionUserRoles = () => selectSessionUserRoles;
 export const selectSessionUserRoles = createSelector(
   (state) => state,
