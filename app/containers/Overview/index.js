@@ -35,8 +35,10 @@ import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
 import { attributesEqual } from 'utils/entities';
+import isNumber from 'utils/is-number';
 
 // relative
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 import { DEPENDENCIES } from './constants';
 import {
@@ -46,7 +48,6 @@ import {
   selectRecommendationDraftCount,
   selectIndicatorDraftCount,
   selectMeasureDraftCount,
-  selectRecommendationAddressedCount,
 } from './selectors';
 
 const Content = styled.div`
@@ -76,40 +77,26 @@ const Diagram = styled.div`
 const DiagramSectionVertical = styled.div`
   display: block;
   position: relative;
-  text-align: center;
+  border-top: 1px dashed ${palette('light', 4)};
 `;
 
 const DiagramSectionVerticalCenter = styled.div`
+  text-align: center;
   display: block;
   margin: 0 auto;
   position: relative;
 `;
 
-const AnnotationVertical = styled.div`
-  text-align: center;
-  color: ${palette('text', 1)};
-  line-height: 1.1;
-  background-color: ${palette('background', 1)};
-  position: relative;
-  width: 200px;
-  margin: 0 auto;
-  font-size: 0.8em;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    font-size: 0.85em;
-  }
-`;
-
 const DiagramButtonWrap = styled.div`
   position: relative;
   display: inline-block;
-  margin-bottom: 1.1em;
-  padding: 1.1em 0;
-  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
-    margin-bottom: 0;
-    padding: 0.5em 0;
+  padding: 20px 0;
+  margin: 30px 20px;
+  &:first-child {
+    margin-left: 0;
   }
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding: 1em 0;
+  &:last-child {
+    margin-right: 0;
   }
 `;
 
@@ -128,35 +115,13 @@ const DiagramButton = styled(Button)`
     font-weight: bold;
     font-size: 1.1em;
     padding: 0.4em 0.5em 1em;
-    min-width: 180px;
+    min-width: 220px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 0.6em 1em 1.4em;
   }
 `;
 // font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
-
-const DiagramButtonMain = styled(DiagramButton)`
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: 0.4em 0.75em 1em;
-    &:before {
-      content: '';
-      display: inline-block;
-      vertical-align: middle;
-      padding-top: 100%;
-    }
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    min-width: 230px;
-  }
-`;
-const DiagramButtonMainInside = styled.span`
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    display: inline-block;
-    vertical-align: middle;
-    margin-top: -30px;
-  }
-`;
 const DiagramButtonIcon = styled.div`
   padding-bottom: 5px;
 `;
@@ -171,26 +136,6 @@ const DraftEntities = styled.div`
     left: 0;
     right: 0;
   }
-`;
-
-const DiagramButtonMainTop = styled.div`
-  padding-bottom: 0.2px;
-  font-weight: bold;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    font-size: 1.3em;
-    padding-bottom: 5px;
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
-    font-size: 1.1em;
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    font-size: 1.3em;
-    padding-bottom: 5px;
-  }
-`;
-// font-size: ${(props) => props.theme.sizes.text.aaLarge};
-const DiagramButtonMainBottom = styled.div`
-  font-weight: normal;
 `;
 
 const DiagramSvgWrapper = styled.div`
@@ -209,10 +154,22 @@ const PathLineCustom = styled(PathLine)`
 const PathLineArrow = styled(PathLine)`
   fill: ${palette('dark', 2)};
 `;
+const SectionLabel = styled.div`
+  color: ${palette('text', 1)};
+  font-size: 13px;
+  margin-top: 5px;
+  position: absolute;
+  left: 0;
+  top: 0;
+`;
 
 const STATE_INITIAL = {
   diagram: null,
-  buttonRecs: null,
+  buttonRecs_1: null,
+  buttonRecs_2: null,
+  buttonRecs_3: null,
+  buttonRecs_4: null,
+  buttonRecs_5: null,
   buttonMeasures: null,
   buttonIndicators: null,
   viewport: null,
@@ -236,6 +193,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
+    this.resize();
   }
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
@@ -268,7 +226,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     { x: end.x, y: end.y - 5 },
   ];
 
-  getCurvedConnectionPath = (start, end, curve = 0.2) => [
+  getCurvedConnectionPath = (start, end, curve = 0.5) => [
     { x: start.x, y: start.y + 5 },
     { x: start.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
     { x: end.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
@@ -295,15 +253,21 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     }
     this.setState({ viewport });
   }
-  connectRecommendationsMeasures = () =>
-    this.getConnectionPath(
-      this.getConnectionPoint(this.state.buttonRecs, this.state.diagram, 'bottom'),
+  connectRecommendationsMeasures = (fwId) =>
+    this.getCurvedConnectionPath(
+      this.getConnectionPoint(this.state[`buttonRecs_${fwId}`], this.state.diagram, 'bottom'),
       this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, 'top'),
+      0.5,
+    );
+  connectRecommendationsIndicators = (fwId) =>
+    this.getCurvedConnectionPath(
+      this.getConnectionPoint(this.state[`buttonRecs_${fwId}`], this.state.diagram, 'bottom'),
+      this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, 'top'),
+      0.83, // curve
     );
   connectMeasuresIndicators = () => this.getConnectionPath(
     this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, 'bottom'),
     this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, 'top'),
-    0.6
   );
 
   resize = () => {
@@ -313,7 +277,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     this.forceUpdate();
   };
 
-  renderPath = (points = [], dashed = false, r = 10) => (
+  renderPath = (points = [], dashed = false, r = 33) => (
     <PathLineCustom
       points={points}
       strokeDasharray={dashed ? '5,5' : null}
@@ -326,19 +290,33 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       r={0}
     />
   );
-  renderPathsSVG = () => (
+  renderPathsSVG = (frameworks) => (
     <DiagramSvgWrapper>
       { this.state.diagram &&
         <svg
           width={this.state.diagram.getBoundingClientRect().width}
           height={this.state.diagram.getBoundingClientRect().height}
         >
-          { this.state.buttonRecs && this.state.buttonMeasures &&
-            this.renderPath(this.connectRecommendationsMeasures())
-          }
-          { this.state.buttonRecs && this.state.buttonMeasures &&
-            this.renderArrow(this.connectRecommendationsMeasures())
-          }
+          { frameworks && frameworks.valueSeq().map((fw) => {
+            const fwId = fw.get('id');
+            return fw.getIn(['attributes', 'has_indicators']) &&
+              this.state[`buttonRecs_${fwId}`] &&
+              this.state.buttonIndicators &&
+              this.renderPath(this.connectRecommendationsIndicators(fwId), true, 33);
+          })}
+          { frameworks && frameworks.valueSeq().map((fw) => {
+            const fwId = fw.get('id');
+            return this.state[`buttonRecs_${fwId}`] &&
+              this.state.buttonMeasures &&
+              this.renderPath(this.connectRecommendationsMeasures(fwId));
+          })}
+          { frameworks && frameworks.valueSeq().map((fw) => {
+            const fwId = fw.get('id');
+            return fw.getIn(['attributes', 'has_measures']) &&
+              this.state[`buttonRecs_${fwId}`] &&
+              this.state.buttonMeasures &&
+              this.renderArrow(this.connectRecommendationsMeasures(fwId));
+          })}
           { this.state.buttonIndicators && this.state.buttonMeasures &&
             this.renderPath(this.connectMeasuresIndicators())
           }
@@ -350,9 +328,19 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     </DiagramSvgWrapper>
   );
 
-  renderButton = ({ path, paletteDefault, paletteHover, icon, message, count, draftCount, stateButton }) => (
+  renderButton = ({
+    path,
+    query,
+    paletteDefault,
+    paletteHover,
+    icon,
+    type,
+    count,
+    draftCount,
+    stateButton,
+  }) => (
     <DiagramButton
-      onClick={() => this.props.onPageLink(path)}
+      onClick={() => this.props.onPageLink(path, query)}
       paletteDefault={paletteDefault}
       paletteHover={paletteHover}
       innerRef={(node) => {
@@ -365,7 +353,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         <Icon name={icon} />
       </DiagramButtonIcon>
       <div>
-        <FormattedMessage {...messages.buttons[message]} values={{ count: count || '0' }} />
+        {`${count || 0} ${this.context.intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}`}
       </div>
       { draftCount > 0 &&
         <DraftEntities>
@@ -375,84 +363,15 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     </DiagramButton>
   )
 
-  renderRecommendationsButton = () => (
-    <DiagramButtonWrap>
-      {this.renderButton({
-        path: PATHS.RECOMMENDATIONS,
-        paletteDefault: 'recommendations',
-        paletteHover: 'recommendationsHover',
-        stateButton: 'buttonRecs',
-        icon: 'recommendations',
-        message: 'recommendations',
-        count: this.props.recommendationCount,
-        draftCount: this.props.recommendationDraftCount,
-      })}
-    </DiagramButtonWrap>
-  );
-  renderMeasuresButton = () => {
-    let iconSize = '5em';
-    if (this.state.viewport === VIEWPORTS.MOBILE) {
-      iconSize = null;
-    }
-    if (this.state.viewport === VIEWPORTS.MEDIUM) {
-      iconSize = '4em';
-    }
-    return (
-      <DiagramButtonWrap>
-        <DiagramButtonMain
-          onClick={() => this.props.onPageLink(PATHS.MEASURES)}
-          paletteDefault={'measures'}
-          paletteHover={'measuresHover'}
-          innerRef={(node) => {
-            if (!this.state.buttonMeasures) {
-              this.setState({ buttonMeasures: node });
-            }
-          }}
-        >
-          <DiagramButtonMainInside>
-            <DiagramButtonIcon>
-              <Icon name="measures" size={iconSize} />
-            </DiagramButtonIcon>
-            <DiagramButtonMainTop>
-              <FormattedMessage {...messages.buttons.measures} />
-            </DiagramButtonMainTop>
-            <DiagramButtonMainBottom>
-              <FormattedMessage {...messages.buttons.measuresAdditional} values={{ count: this.props.measureCount || '0' }} />
-            </DiagramButtonMainBottom>
-            { this.props.measureDraftCount > 0 &&
-              <DraftEntities>
-                <FormattedMessage {...messages.buttons.draft} values={{ count: this.props.measureDraftCount }} />
-              </DraftEntities>
-            }
-          </DiagramButtonMainInside>
-        </DiagramButtonMain>
-      </DiagramButtonWrap>
-    );
-  };
-
-  renderIndicatorButton = () => (
-    <DiagramButtonWrap>
-      {this.renderButton({
-        path: PATHS.INDICATORS,
-        paletteDefault: 'indicators',
-        paletteHover: 'indicatorsHover',
-        stateButton: 'buttonIndicators',
-        icon: 'indicators',
-        message: 'indicators',
-        count: this.props.indicatorCount,
-        draftCount: this.props.indicatorDraftCount,
-      })}
-    </DiagramButtonWrap>
-  );
   render() {
     const {
       dataReady,
       onTaxonomyLink,
       taxonomies,
-      recommendationAddressedCount,
       frameworks,
       frameworkId,
     } = this.props;
+
     return (
       <div>
         <Helmet
@@ -494,27 +413,75 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                     }
                   }}
                 >
-                  { this.renderPathsSVG() }
+                  { this.renderPathsSVG(frameworks) }
                   <div>
                     <DiagramSectionVertical>
+                      <SectionLabel>
+                        <FormattedMessage {...appMessages.nav.recommendations} />
+                      </SectionLabel>
                       <DiagramSectionVerticalCenter>
-                        {this.renderRecommendationsButton()}
+                        {frameworks &&
+                          frameworks.valueSeq().map((fw) => {
+                            const fwId = isNumber(fw.get('id')) ? parseInt(fw.get('id'), 10) : fw.get('id');
+                            return (
+                              <DiagramButtonWrap key={fwId}>
+                                {this.renderButton({
+                                  path: PATHS.RECOMMENDATIONS,
+                                  query: {
+                                    arg: 'fwx',
+                                    value: fwId,
+                                    replace: true,
+                                  },
+                                  paletteDefault: 'recommendations',
+                                  paletteHover: 'recommendationsHover',
+                                  stateButton: `buttonRecs_${fwId}`,
+                                  icon: 'recommendations',
+                                  type: `recommendations_${fwId}`,
+                                  count: this.props.recommendationCount.get(fwId),
+                                  draftCount: this.props.recommendationDraftCount.get(fwId),
+                                })}
+                              </DiagramButtonWrap>
+                            );
+                          })
+                        }
                       </DiagramSectionVerticalCenter>
                     </DiagramSectionVertical>
-                    <AnnotationVertical>
-                      {`${recommendationAddressedCount} ${this.context.intl.formatMessage(messages.diagram.addressed)}`}
-                    </AnnotationVertical>
                     <DiagramSectionVertical>
+                      <SectionLabel>
+                        <FormattedMessage {...appMessages.nav.measuresSuper} />
+                      </SectionLabel>
                       <DiagramSectionVerticalCenter>
-                        {this.renderMeasuresButton()}
+                        <DiagramButtonWrap>
+                          {this.renderButton({
+                            path: PATHS.MEASURES,
+                            paletteDefault: 'measures',
+                            paletteHover: 'measuresHover',
+                            stateButton: 'buttonMeasures',
+                            icon: 'measures',
+                            type: 'measures',
+                            count: this.props.measureCount,
+                            draftCount: this.props.measureDraftCount,
+                          })}
+                        </DiagramButtonWrap>
                       </DiagramSectionVerticalCenter>
                     </DiagramSectionVertical>
-                    <AnnotationVertical>
-                      <FormattedMessage {...messages.diagram.measured} />
-                    </AnnotationVertical>
                     <DiagramSectionVertical>
+                      <SectionLabel>
+                        <FormattedMessage {...appMessages.nav.indicatorsSuper} />
+                      </SectionLabel>
                       <DiagramSectionVerticalCenter>
-                        {this.renderIndicatorButton()}
+                        <DiagramButtonWrap>
+                          {this.renderButton({
+                            path: PATHS.INDICATORS,
+                            paletteDefault: 'indicators',
+                            paletteHover: 'indicatorsHover',
+                            stateButton: 'buttonIndicators',
+                            icon: 'indicators',
+                            type: 'indicators',
+                            count: this.props.indicatorCount,
+                            draftCount: this.props.indicatorDraftCount,
+                          })}
+                        </DiagramButtonWrap>
                       </DiagramSectionVerticalCenter>
                     </DiagramSectionVertical>
                   </div>
@@ -527,6 +494,12 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     );
   }
 }
+// <AnnotationVertical>
+//   {`${recommendationAddressedCount} ${this.context.intl.formatMessage(messages.diagram.addressed)}`}
+// </AnnotationVertical>
+// <AnnotationVertical>
+//   <FormattedMessage {...messages.diagram.measured} />
+// </AnnotationVertical>
 
 Overview.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
@@ -540,7 +513,6 @@ Overview.propTypes = {
   recommendationDraftCount: PropTypes.number,
   measureDraftCount: PropTypes.number,
   indicatorDraftCount: PropTypes.number,
-  recommendationAddressedCount: PropTypes.number,
   theme: PropTypes.object,
   frameworks: PropTypes.object,
   frameworkId: PropTypes.string,
@@ -561,7 +533,6 @@ const mapStateToProps = (state) => ({
   recommendationDraftCount: selectRecommendationDraftCount(state),
   measureDraftCount: selectMeasureDraftCount(state),
   indicatorDraftCount: selectIndicatorDraftCount(state),
-  recommendationAddressedCount: selectRecommendationAddressedCount(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -569,8 +540,13 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    onPageLink: (path) => {
-      dispatch(updatePath(path));
+    onPageLink: (path, query) => {
+      dispatch(updatePath(
+        path,
+        {
+          query,
+        }
+      ));
     },
     onTaxonomyLink: (path) => {
       dispatch(updatePath(path, { keepQuery: true }));

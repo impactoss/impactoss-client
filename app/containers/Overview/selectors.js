@@ -4,31 +4,34 @@ import {
   selectRecommendationsWhere,
   selectMeasuresWhere,
   selectIndicatorsWhere,
-  selectEntities,
+  // selectEntities,
 } from 'containers/App/selectors';
 
-import { attributesEqual } from 'utils/entities';
+// import { attributesEqual } from 'utils/entities';
 
 export const selectRecommendationCount = createSelector(
   (state) => selectRecommendationsWhere(state, { where: { draft: false } }),
-  (entities) => entities.size
+  (entities) =>
+    entities && entities
+    .groupBy((e) => e.getIn(['attributes', 'framework_id']))
+    .map((fwentities) => fwentities.size)
 );
-export const selectRecommendationAddressedCount = createSelector(
-  (state) => selectRecommendationsWhere(state, { where: { draft: false } }),
-  (state) => selectMeasuresWhere(state, { where: { draft: false } }),
-  (state) => selectEntities(state, 'recommendation_measures'),
-  (recommendations, measures, associations) =>
-    recommendations && recommendations.filter((rec) => {
-      const recAssociations = associations.filter((association) =>
-        attributesEqual(rec.get('id'), association.getIn(['attributes', 'recommendation_id']))
-      );
-      return recAssociations.some((association) =>
-        measures.find((measure) =>
-          attributesEqual(measure.get('id'), association.getIn(['attributes', 'measure_id']))
-        )
-      );
-    }).size
-);
+// export const selectRecommendationAddressedCount = createSelector(
+//   (state) => selectRecommendationsWhere(state, { where: { draft: false } }),
+//   (state) => selectMeasuresWhere(state, { where: { draft: false } }),
+//   (state) => selectEntities(state, 'recommendation_measures'),
+//   (recommendations, measures, associations) =>
+//     recommendations && recommendations.filter((rec) => {
+//       const recAssociations = associations.filter((association) =>
+//         attributesEqual(rec.get('id'), association.getIn(['attributes', 'recommendation_id']))
+//       );
+//       return recAssociations.some((association) =>
+//         measures.find((measure) =>
+//           attributesEqual(measure.get('id'), association.getIn(['attributes', 'measure_id']))
+//         )
+//       );
+//     }).size
+// );
 
 export const selectMeasureCount = createSelector(
   (state) => selectMeasuresWhere(state, { where: { draft: false } }),
@@ -40,7 +43,10 @@ export const selectIndicatorCount = createSelector(
 );
 export const selectRecommendationDraftCount = createSelector(
   (state) => selectRecommendationsWhere(state, { where: { draft: true } }),
-  (entities) => entities.size
+  (entities) =>
+    entities && entities
+    .groupBy((e) => e.getIn(['attributes', 'framework_id']))
+    .map((fwentities) => fwentities.size)
 );
 export const selectMeasureDraftCount = createSelector(
   (state) => selectMeasuresWhere(state, { where: { draft: true } }),
