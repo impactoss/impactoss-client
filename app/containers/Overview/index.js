@@ -212,6 +212,15 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     const boundingRect = node.getBoundingClientRect();
     const boundingRectReference = nodeReference.getBoundingClientRect();
 
+    if (side === 'right' || side === 'left') {
+      return ({
+        x: side === 'right'
+          ? (boundingRect.right - boundingRectReference.left)
+          : (boundingRect.left - boundingRectReference.left),
+        y: (boundingRect.top - boundingRectReference.top)
+          + (((boundingRect.bottom - boundingRectReference.top) - (boundingRect.top - boundingRectReference.top)) / 2),
+      });
+    }
     return ({
       x: (boundingRect.left - boundingRectReference.left)
         + (((boundingRect.right - boundingRectReference.left) - (boundingRect.left - boundingRectReference.left)) / 2),
@@ -220,18 +229,24 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         : (boundingRect.top - boundingRectReference.top),
     });
   }
-
   getConnectionPath = (start, end) => [
     { x: start.x, y: start.y + 5 },
     { x: end.x, y: end.y - 5 },
   ];
 
-  getCurvedConnectionPath = (start, end, curve = 0.5) => [
-    { x: start.x, y: start.y + 5 },
-    { x: start.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
-    { x: end.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
-    { x: end.x, y: end.y - 5 },
-  ];
+  getCurvedConnectionPath = (around = false, start, end, curve = 0.2) => around
+    ? [
+      { x: start.x + 5, y: start.y },
+      { x: (start.x + 5) + ((end.x - start.x - 10) * curve), y: start.y },
+      { x: (start.x + 5) + ((end.x - start.x - 10) * curve), y: end.y },
+      { x: end.x - 5, y: end.y },
+    ]
+    : [
+      { x: start.x, y: start.y + 5 },
+      { x: start.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
+      { x: end.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
+      { x: end.x, y: end.y - 5 },
+    ];
 
   getConnectionPathArrow = (connectionPath) => {
     const point = connectionPath[connectionPath.length - 1];
@@ -255,12 +270,14 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
   }
   connectRecommendationsMeasures = (fwId) =>
     this.getCurvedConnectionPath(
+      false,
       this.getConnectionPoint(this.state[`buttonRecs_${fwId}`], this.state.diagram, 'bottom'),
       this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, 'top'),
       0.5,
     );
   connectRecommendationsIndicators = (fwId) =>
     this.getCurvedConnectionPath(
+      false,
       this.getConnectionPoint(this.state[`buttonRecs_${fwId}`], this.state.diagram, 'bottom'),
       this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, 'top'),
       0.83, // curve
