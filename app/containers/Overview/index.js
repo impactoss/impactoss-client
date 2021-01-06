@@ -444,7 +444,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                               <DiagramButtonWrap key={fwId}>
                                 {this.renderButton({
                                   path: PATHS.RECOMMENDATIONS,
-                                  query: {
+                                  query: frameworks.size > 1 && {
                                     arg: 'fwx',
                                     value: fwId,
                                     replace: true,
