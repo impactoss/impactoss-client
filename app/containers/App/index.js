@@ -88,14 +88,16 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     }))
     .toArray();
 
-  prepareFrameworkOptions = (frameworks) => {
+  prepareFrameworkOptions = (frameworks, activeId) => {
     const options = Object.values(frameworks.toJS()).map((fw) => ({
       value: fw.id,
       label: this.context.intl.formatMessage(messages.frameworks[fw.id]),
+      active: activeId === fw.id,
     }));
     return options.concat({
       value: 'all',
       label: this.context.intl.formatMessage(messages.frameworks.all),
+      active: (activeId === 'all') || frameworks.size === 0,
     });
   }
   prepareMainMenuItems = (isManager, currentPath, currentFrameworkId, viewRecommendationFramework) => {
@@ -133,13 +135,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       active:
         currentPath.startsWith(PATHS.INDICATORS) ||
         currentPath.startsWith(PATHS.PROGRESS_REPORTS),
-    }]);
-    navItems = navItems.concat([{
-      path: PATHS.SEARCH,
-      title: this.context.intl.formatMessage(messages.nav.search),
-      active: currentPath.startsWith(PATHS.SEARCH),
-      icon: 'search',
-      align: 'right',
     }]);
 
     if (isManager) {
@@ -181,19 +176,25 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           isSignedIn={isUserSignedIn}
           user={this.props.user}
           pages={pages && this.preparePageMenuPages(pages)}
-          navItems={this.prepareMainMenuItems(isUserSignedIn && isManager, location.pathname, currentFrameworkId, viewRecommendationFramework)}
+          navItems={this.prepareMainMenuItems(
+            isUserSignedIn && isManager,
+            location.pathname,
+            currentFrameworkId,
+            viewRecommendationFramework,
+          )}
+          search={{
+            path: PATHS.SEARCH,
+            title: this.context.intl.formatMessage(messages.nav.search),
+            active: location.pathname.startsWith(PATHS.SEARCH),
+            icon: 'search',
+          }}
           onPageLink={onPageLink}
           isHome={location.pathname === '/'}
-          currentFrameworkId={currentFrameworkId || 'all'}
           onSelectFramework={onSelectFramework}
-          frameworkOptions={(frameworks && frameworks.size > 1)
-            ? this.prepareFrameworkOptions(
-                frameworks,
-                currentFrameworkId,
-                onSelectFramework,
-              )
-            : null
-          }
+          frameworkOptions={this.prepareFrameworkOptions(
+              frameworks,
+              currentFrameworkId,
+            )}
         />
         <Main isHome={location.pathname === '/'}>
           {React.Children.toArray(this.props.children)}
