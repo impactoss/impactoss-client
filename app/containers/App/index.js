@@ -126,16 +126,14 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         active: currentPath.startsWith(PATHS.MEASURES),
       },
     ];
-    if (isManager) {
-      navItems = navItems.concat([{
-        path: PATHS.INDICATORS,
-        titleSuper: this.context.intl.formatMessage(messages.nav.indicatorsSuper),
-        title: this.context.intl.formatMessage(messages.nav.indicators),
-        active:
-          currentPath.startsWith(PATHS.INDICATORS) ||
-          currentPath.startsWith(PATHS.PROGRESS_REPORTS),
-      }]);
-    }
+    navItems = navItems.concat([{
+      path: PATHS.INDICATORS,
+      titleSuper: this.context.intl.formatMessage(messages.nav.indicatorsSuper),
+      title: this.context.intl.formatMessage(messages.nav.indicators),
+      active:
+        currentPath.startsWith(PATHS.INDICATORS) ||
+        currentPath.startsWith(PATHS.PROGRESS_REPORTS),
+    }]);
     navItems = navItems.concat([{
       path: PATHS.SEARCH,
       title: this.context.intl.formatMessage(messages.nav.search),
