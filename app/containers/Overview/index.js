@@ -294,19 +294,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     this.forceUpdate();
   };
 
-  renderPath = (points = [], dashed = false, r = 33) => (
-    <PathLineCustom
-      points={points}
-      strokeDasharray={dashed ? '5,5' : null}
-      r={r}
-    />
-  );
-  renderArrow = (points = []) => (
-    <PathLineArrow
-      points={this.getConnectionPathArrow(points)}
-      r={0}
-    />
-  );
   renderPathsSVG = (frameworks) => (
     <DiagramSvgWrapper>
       { this.state.diagram &&
@@ -318,28 +305,58 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             const fwId = fw.get('id');
             return fw.getIn(['attributes', 'has_indicators']) &&
               this.state[`buttonRecs_${fwId}`] &&
-              this.state.buttonIndicators &&
-              this.renderPath(this.connectRecommendationsIndicators(fwId), true, 33);
+              this.state.buttonIndicators && (
+                <PathLineCustom
+                  points={this.connectRecommendationsIndicators(fwId)}
+                  strokeDasharray={'5,5'}
+                  r={33}
+                  key={fwId}
+                />
+              );
           })}
           { frameworks && frameworks.valueSeq().map((fw) => {
             const fwId = fw.get('id');
             return this.state[`buttonRecs_${fwId}`] &&
-              this.state.buttonMeasures &&
-              this.renderPath(this.connectRecommendationsMeasures(fwId));
+              this.state.buttonMeasures && (
+                <PathLineCustom
+                  points={this.connectRecommendationsMeasures(fwId)}
+                  r={33}
+                  key={fwId}
+                />
+              );
           })}
           { frameworks && frameworks.valueSeq().map((fw) => {
             const fwId = fw.get('id');
             return fw.getIn(['attributes', 'has_measures']) &&
               this.state[`buttonRecs_${fwId}`] &&
-              this.state.buttonMeasures &&
-              this.renderArrow(this.connectRecommendationsMeasures(fwId));
+              this.state.buttonMeasures && (
+                <PathLineArrow
+                  points={
+                    this.getConnectionPathArrow(
+                      this.connectRecommendationsMeasures(fwId)
+                    )
+                  }
+                  r={0}
+                  key={fwId}
+                />
+              );
           })}
-          { this.state.buttonIndicators && this.state.buttonMeasures &&
-            this.renderPath(this.connectMeasuresIndicators())
-          }
-          { this.state.buttonIndicators && this.state.buttonMeasures &&
-            this.renderArrow(this.connectMeasuresIndicators())
-          }
+          { this.state.buttonIndicators && this.state.buttonMeasures && (
+            <PathLineCustom
+              points={this.connectMeasuresIndicators()}
+              r={33}
+            />
+          )}
+          { this.state.buttonIndicators && this.state.buttonMeasures && (
+            <PathLineArrow
+              points={
+                this.getConnectionPathArrow(
+                  this.connectMeasuresIndicators()
+                )
+              }
+              r={0}
+            />
+          )}
         </svg>
       }
     </DiagramSvgWrapper>
@@ -454,8 +471,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                                   stateButton: `buttonRecs_${fwId}`,
                                   icon: 'recommendations',
                                   type: `recommendations_${fwId}`,
-                                  count: this.props.recommendationCount.get(fwId),
-                                  draftCount: this.props.recommendationDraftCount.get(fwId),
+                                  count: this.props.recommendationCountByFw.get(fwId),
+                                  draftCount: this.props.recommendationDraftCountByFw.get(fwId),
                                 })}
                               </DiagramButtonWrap>
                             );
@@ -524,10 +541,10 @@ Overview.propTypes = {
   onTaxonomyLink: PropTypes.func,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
-  recommendationCount: PropTypes.number,
+  recommendationCountByFw: PropTypes.object,
   measureCount: PropTypes.number,
   indicatorCount: PropTypes.number,
-  recommendationDraftCount: PropTypes.number,
+  recommendationDraftCountByFw: PropTypes.object,
   measureDraftCount: PropTypes.number,
   indicatorDraftCount: PropTypes.number,
   theme: PropTypes.object,
@@ -544,10 +561,10 @@ const mapStateToProps = (state) => ({
   taxonomies: selectFWTaxonomiesSorted(state),
   frameworks: selectActiveFrameworks(state),
   frameworkId: selectFrameworkQuery(state),
-  recommendationCount: selectRecommendationCount(state),
+  recommendationCountByFw: selectRecommendationCount(state),
   measureCount: selectMeasureCount(state),
   indicatorCount: selectIndicatorCount(state),
-  recommendationDraftCount: selectRecommendationDraftCount(state),
+  recommendationDraftCountByFw: selectRecommendationDraftCount(state),
   measureDraftCount: selectMeasureDraftCount(state),
   indicatorDraftCount: selectIndicatorDraftCount(state),
 });
