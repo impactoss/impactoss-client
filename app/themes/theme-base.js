@@ -204,8 +204,8 @@ theme.palette = {
   // headerNavMain: [ '#bg', '#border'  ],
   headerNavMain: [secondary[4], secondary[4]],
   // headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
-  headerNavMainItem: [dark[3], primary[4], 'transparent', dark[2]],
-  headerNavMainItemHover: [dark[2], primary[4], 'transparent', dark[1]],
+  headerNavMainItem: [dark[3], primary[1], 'transparent', dark[2]],
+  headerNavMainItemHover: [primary[1], primary[1], 'transparent', dark[1]],
 
   //
   // SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
@@ -280,9 +280,10 @@ theme.sizes = {
   text: {
     aaLargeBold: '19px',
     aaLarge: '24px',
-    mainListItem: '18px',
-    nestedListItem: '15px',
-    listItemTop: '14px',
+    mainListItem: '20px',
+    nestedListItem: '16px',
+    listItemTop: '13px',
+    listItemBottom: '12px',
     markdown: '18px',
     markdownMobile: '16px',
     small: '13px', // used for labels
@@ -300,8 +301,8 @@ theme.sizes = {
   },
   mainListItem: {
     paddingHorizontal: 15,
-    paddingTop: 5,
-    paddingBottom: 10,
+    paddingTop: 10,
+    paddingBottom: 12,
   },
   header: {
     banner: {
@@ -309,8 +310,8 @@ theme.sizes = {
       heightMobile: 50,
     },
     nav: {
-      height: 38,
-      heightMobile: 24,
+      height: 50,
+      heightMobile: 32,
     },
     // px or em
     text: {
@@ -320,9 +321,9 @@ theme.sizes = {
       claimMobile: '1em',
     },
     paddingLeft: {
-      mobile: 6,
-      small: 12,
-      large: 20,
+      mobile: 3,
+      small: 6,
+      large: 10,
     },
   },
   home: {

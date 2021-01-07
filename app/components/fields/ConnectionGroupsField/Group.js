@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router';
+import Link from 'containers/Link';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -41,11 +41,11 @@ class Group extends React.PureComponent { // eslint-disable-line react/prefer-st
 
   render() {
     const { field, group } = this.props;
-    const size = group.get(field.entityType) ? group.get(field.entityType).size : 0;
+    const size = group.get(field.entityPath) ? group.get(field.entityPath).size : 0;
 
     return (
       <div>
-        <GroupHeaderLink to={`category/${group.get('id')}`}>
+        <GroupHeaderLink to={`/category/${group.get('id')}`}>
           <GroupHeader>
             {getCategoryTitle(group)}
           </GroupHeader>
@@ -56,8 +56,8 @@ class Group extends React.PureComponent { // eslint-disable-line react/prefer-st
           config={{ connections: { options: field.connectionOptions } }}
           entities={
             this.state.showAllConnections
-              ? group.get(field.entityType)
-              : (group.get(field.entityType).slice(0, CONNECTIONMAX)).toList()
+              ? group.get(field.entityPath)
+              : (group.get(field.entityPath).slice(0, CONNECTIONMAX)).toList()
           }
           entityIcon={field.entityIcon}
           onEntityClick={field.onEntityClick}

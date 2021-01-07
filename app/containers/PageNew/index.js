@@ -23,7 +23,6 @@ import { hasNewError } from 'utils/entity-form';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
-import appMessages from 'containers/App/messages';
 
 import {
   loadEntitiesIfNeeded,
@@ -79,19 +78,19 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getTitleFormField(this.context.intl.formatMessage, appMessages),
-        getMenuTitleFormField(this.context.intl.formatMessage, appMessages),
-        getMenuOrderFormField(this.context.intl.formatMessage, appMessages),
+        getTitleFormField(this.context.intl.formatMessage),
+        getMenuTitleFormField(this.context.intl.formatMessage),
+        getMenuOrderFormField(this.context.intl.formatMessage),
       ],
     },
   ]);
 
   getHeaderAsideFields = () => ([{
-    fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
+    fields: [getStatusField(this.context.intl.formatMessage)],
   }]);
 
   getBodyMainFields = () => ([{
-    fields: [getMarkdownField(this.context.intl.formatMessage, appMessages, 'content')],
+    fields: [getMarkdownField(this.context.intl.formatMessage, 'content')],
   }]);
 
   render() {

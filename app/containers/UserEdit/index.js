@@ -46,7 +46,6 @@ import {
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
-import appMessages from 'containers/App/messages';
 
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
@@ -109,24 +108,24 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   }
 
   getHeaderMainFields = () => ([{ // fieldGroup
-    fields: [getTitleFormField(this.context.intl.formatMessage, appMessages, 'title', 'name')],
+    fields: [getTitleFormField(this.context.intl.formatMessage, 'title', 'name')],
   }]);
 
   getHeaderAsideFields = (entity, roles) => ([
     {
       fields: (roles && roles.size > 0) ? [
-        getRoleFormField(this.context.intl.formatMessage, appMessages, roles),
-        getMetaField(entity, appMessages),
+        getRoleFormField(this.context.intl.formatMessage, roles),
+        getMetaField(entity),
       ]
       : [
         getRoleField(entity),
-        getMetaField(entity, appMessages),
+        getMetaField(entity),
       ],
     },
   ]);
 
   getBodyMainFields = () => ([{
-    fields: [getEmailField(this.context.intl.formatMessage, appMessages)],
+    fields: [getEmailField(this.context.intl.formatMessage)],
   }]);
 
   getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups

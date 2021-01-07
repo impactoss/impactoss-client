@@ -16,7 +16,12 @@ export const DEPENDENCIES = [
   'measure_indicators',
   'measure_categories',
   'taxonomies',
+  'frameworks',
+  'framework_taxonomies',
   'categories',
+  'recommendations',
+  'recommendation_indicators',
+  'recommendation_categories',
 ];
 
 export const FORM_INITIAL = fromJS({
@@ -24,7 +29,7 @@ export const FORM_INITIAL = fromJS({
   attributes: {
     title: '',
     description: '',
-    draft: true,
+    draft: '',
     manager_id: '',
     frequency_months: REPORT_FREQUENCIES[0] ? REPORT_FREQUENCIES[0].value : '',
     start_date: '',
@@ -33,5 +38,6 @@ export const FORM_INITIAL = fromJS({
     reference: '',
   },
   associatedMeasures: [],
+  associatedRecommendationsByFw: {},
   associatedUser: [],
 });

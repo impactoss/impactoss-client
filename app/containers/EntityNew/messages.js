@@ -31,7 +31,7 @@ export default defineMessages({
   recommendations: {
     pageTitle: {
       id: 'app.containers.EntityNew.recommendations.pageTitle',
-      defaultMessage: 'New Recommendation',
+      defaultMessage: 'New { type }',
     },
   },
 });

@@ -11,10 +11,14 @@ export const SAVE = 'impactoss/IndicatorNew/SAVE';
 export const DEPENDENCIES = [
   'user_roles',
   'measures',
+  'recommendations',
   'users',
   'measure_categories',
+  'recommendation_categories',
   'categories',
   'taxonomies',
+  'frameworks',
+  'framework_taxonomies',
 ];
 
 export const FORM_INITIAL = fromJS({
@@ -30,5 +34,6 @@ export const FORM_INITIAL = fromJS({
     reference: '',
   },
   associatedMeasures: [],
+  associatedRecommendationsByFw: {},
   associatedUser: [],
 });

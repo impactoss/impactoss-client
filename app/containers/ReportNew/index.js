@@ -92,7 +92,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getTitleFormField(this.context.intl.formatMessage, appMessages),
+        getTitleFormField(this.context.intl.formatMessage),
       ],
     },
   ]);
@@ -111,7 +111,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   getHeaderAsideFields = (canUserPublish) => ([{
     fields: [
       canUserPublish
-      ? getStatusField(this.context.intl.formatMessage, appMessages)
+      ? getStatusField(this.context.intl.formatMessage)
       : getStatusInfoField(),
     ],
   }]);
@@ -119,9 +119,9 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   getBodyMainFields = () => ([
     {
       fields: [
-        getMarkdownField(this.context.intl.formatMessage, appMessages),
-        getUploadField(this.context.intl.formatMessage, appMessages),
-        getDocumentStatusField(this.context.intl.formatMessage, appMessages),
+        getMarkdownField(this.context.intl.formatMessage),
+        getUploadField(this.context.intl.formatMessage),
+        getDocumentStatusField(this.context.intl.formatMessage),
       ],
     },
   ]);
@@ -133,11 +133,9 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
       fields: indicator &&
         [getDueDateOptionsField(
           this.context.intl.formatMessage,
-          appMessages,
           getDueDateDateOptions(
             indicator.get('dates'),
             this.context.intl.formatMessage,
-            appMessages,
             this.context.intl.formatDate
           )
         )],

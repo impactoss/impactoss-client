@@ -25,14 +25,10 @@ export default defineMessages({
     },
     recommendations: {
       id: 'app.containers.Overview.buttons.recommendations',
-      defaultMessage: '{count} Recommendations',
+      defaultMessage: '{count} {type}',
     },
     measures: {
       id: 'app.containers.Overview.buttons.measures',
-      defaultMessage: 'Implementation plan',
-    },
-    measuresAdditional: {
-      id: 'app.containers.Overview.buttons.measuresAdditional',
       defaultMessage: '{count} Government actions',
     },
     indicators: {

@@ -71,7 +71,6 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
         ? `${filter.messagePrefix} ${lowerCase(appMessage(this.context.intl, filter.message))}`
         : appMessage(this.context.intl, filter.message);
     }
-    // <<< not used?
     if (filter.labels) {
       return reduce(filter.labels, (memo, label) => {
         if (!label.label) return memo;
@@ -96,7 +95,6 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     // onClick={() => {
     //   this.inputNode.focus()
     // }}
-
     return (
       <Search active={this.state.active} small={this.props.multiselect}>
         { filters.length > 0 &&

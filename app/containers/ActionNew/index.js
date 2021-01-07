@@ -10,17 +10,27 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
-import { getFields } from 'utils/forms';
+import {
+  getConnectionUpdatesFromFormData,
+  getTitleFormField,
+  getStatusField,
+  getMarkdownField,
+  renderIndicatorControl,
+  renderRecommendationsByFwControl,
+  getDateField,
+  getTextareaField,
+  renderTaxonomyControl,
+} from 'utils/forms';
+
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
-
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
+import { USER_ROLES } from 'themes/config';
 
 import {
   loadEntitiesIfNeeded,
@@ -36,7 +46,6 @@ import {
   selectEntities,
   selectReady,
   selectReadyForAuthCheck,
-  selectRecommendationsCategorised,
   selectMeasureTaxonomies,
 } from 'containers/App/selectors';
 
@@ -46,15 +55,16 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
-import { getInitialFormData } from 'utils/entities';
+import appMessages from 'containers/App/messages';
 
 import {
   selectDomain,
   selectConnectedTaxonomies,
+  selectRecommendationsByFw,
 } from './selectors';
 
 import messages from './messages';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 import { save } from './actions';
 
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -67,7 +77,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('measureNew.form.data', getInitialFormData(MEASURE_SHAPE));
+    this.props.initialiseForm('measureNew.form.data', FORM_INITIAL);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -83,8 +93,85 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     }
   }
 
+  getHeaderMainFields = () => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        getTitleFormField(this.context.intl.formatMessage),
+      ],
+    },
+  ]);
+
+  getHeaderAsideFields = () => ([
+    {
+      fields: [
+        getStatusField(this.context.intl.formatMessage),
+      ],
+    },
+  ]);
+
+  getBodyMainFields = (
+    connectedTaxonomies,
+    indicators,
+    recommendationsByFw,
+    onCreateOption,
+  ) => {
+    const groups = [];
+    groups.push(
+      {
+        fields: [
+          getMarkdownField(this.context.intl.formatMessage),
+          // getMarkdownField(this.context.intl.formatMessage, 'outcome'),
+          // getMarkdownField(this.context.intl.formatMessage, 'indicator_summary'),
+        ],
+      },
+    );
+    if (indicators) {
+      groups.push(
+        {
+          label: this.context.intl.formatMessage(appMessages.nav.indicatorsSuper),
+          icon: 'indicators',
+          fields: [
+            renderIndicatorControl(indicators, onCreateOption),
+          ],
+        },
+      );
+    }
+    if (recommendationsByFw) {
+      const recConnections = renderRecommendationsByFwControl(
+        recommendationsByFw,
+        connectedTaxonomies,
+        onCreateOption,
+        this.context.intl,
+      );
+      if (recConnections) {
+        groups.push(
+          {
+            label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+            icon: 'recommendations',
+            fields: recConnections,
+          },
+        );
+      }
+    }
+    return groups;
+  };
+
+  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
+    { // fieldGroup
+      fields: [
+        getDateField(this.context.intl.formatMessage, 'target_date'),
+        getTextareaField(this.context.intl.formatMessage, 'target_date_comment'),
+      ],
+    },
+    { // fieldGroup
+      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
+      icon: 'categories',
+      fields: renderTaxonomyControl(taxonomies, onCreateOption, this.context.intl),
+    },
+  ]);
+
   render() {
-    const { dataReady, viewDomain, connectedTaxonomies, recommendations, indicators, taxonomies, onCreateOption } = this.props;
+    const { dataReady, viewDomain, connectedTaxonomies, recommendationsByFw, indicators, taxonomies, onCreateOption } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
     return (
       <div>
@@ -142,21 +229,28 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
               model="measureNew.form.data"
               formData={viewDomain.form.data}
               saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
-              fields={getFields({
-                associations: {
-                  taxonomies,
-                  connectedTaxonomies,
-                  recommendations,
-                  indicators,
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(),
+                  aside: this.getHeaderAsideFields(),
                 },
-                onCreateOption,
-                shape: MEASURE_SHAPE,
-                contextIntl: this.context.intl,
-              })}
+                body: {
+                  main: this.getBodyMainFields(
+                    connectedTaxonomies,
+                    indicators,
+                    recommendationsByFw,
+                    onCreateOption,
+                  ),
+                  aside: this.getBodyAsideFields(
+                    taxonomies,
+                    onCreateOption,
+                  ),
+                },
+              }}
               scrollContainer={this.state.scrollContainer}
             />
           }
@@ -181,7 +275,7 @@ ActionNew.propTypes = {
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   taxonomies: PropTypes.object,
-  recommendations: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
   indicators: PropTypes.object,
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
@@ -200,7 +294,7 @@ const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectMeasureTaxonomies(state, { includeParents: false }),
   indicators: selectEntities(state, 'indicators'),
-  recommendations: selectRecommendationsCategorised(state),
+  recommendationsByFw: selectRecommendationsByFw(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
 });
 
@@ -228,7 +322,7 @@ function mapDispatchToProps(dispatch) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData) => {
+    handleSubmit: (formData, recommendationsByFw) => {
       let saveData = formData;
 
       // measureCategories
@@ -247,14 +341,30 @@ function mapDispatchToProps(dispatch) {
       }
 
       // recommendations
-      if (formData.get('associatedRecommendations')) {
-        saveData = saveData.set('recommendationMeasures', Map({
-          delete: List(),
-          create: getCheckedValuesFromOptions(formData.get('associatedRecommendations'))
-          .map((id) => Map({
-            recommendation_id: id,
-          })),
-        }));
+      if (formData.get('associatedRecommendationsByFw') && recommendationsByFw) {
+        saveData = saveData.set(
+          'recommendationMeasures',
+          recommendationsByFw
+            .map((recs, fwid) =>
+              getConnectionUpdatesFromFormData({
+                formData,
+                connections: recs,
+                connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
+                createConnectionKey: 'recommendation_id',
+                createKey: 'measure_id',
+              })
+            )
+            .reduce(
+              (memo, deleteCreateLists) => {
+                const creates = memo.get('create').concat(deleteCreateLists.get('create'));
+                return memo.set('create', creates);
+              },
+              fromJS({
+                delete: [],
+                create: [],
+              }),
+            )
+        );
       }
 
       // indicators

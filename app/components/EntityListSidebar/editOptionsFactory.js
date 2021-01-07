@@ -1,5 +1,6 @@
 import { find, forEach } from 'lodash/collection';
 import { STATES as CHECKBOX } from 'components/forms/IndeterminateCheckbox';
+import { startsWith } from 'utils/string';
 
 import {
   testEntityEntityAssociation,
@@ -7,6 +8,7 @@ import {
   getEntityTitle,
   getEntityReference,
   getEntityParentId,
+  attributesEqual,
 } from 'utils/entities';
 
 import { makeTagFilterGroups } from 'utils/forms';
@@ -109,9 +111,23 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
   return editOptions;
 };
 
-export const makeConnectionEditOptions = (entities, config, connections, connectedTaxonomies, activeEditOption, messages, contextIntl) => {
-  const option = find(config.connections.options, (o) => o.path === activeEditOption.optionId);
-
+export const makeConnectionEditOptions = (
+  entities,
+  config,
+  connections,
+  connectedTaxonomies,
+  activeEditOption,
+  messages,
+  contextIntl,
+) => {
+  // const option = find(config.connections.options, (o) => o.path === activeEditOption.optionId);
+  // get the active option
+  const option = find(
+    config.connections.options,
+    (o) => o.groupByFramework
+      ? startsWith(activeEditOption.optionId, o.path)
+      : o.path === activeEditOption.optionId,
+  );
   const editOptions = {
     groupId: 'connections',
     search: true,
@@ -125,22 +141,26 @@ export const makeConnectionEditOptions = (entities, config, connections, connect
   };
 
   if (option) {
+    const fwid = option.groupByFramework && activeEditOption.optionId.split('_')[1];
     editOptions.title = messages.title;
     editOptions.path = option.connectPath;
     editOptions.search = option.search;
-    connections.get(option.path).forEach((connection) => {
-      const count = entities.reduce((counter, entity) =>
-        testEntityEntityAssociation(entity, option.path, connection.get('id')) ? counter + 1 : counter
-      , 0);
-      editOptions.options[connection.get('id')] = {
-        reference: getEntityReference(connection),
-        label: getEntityTitle(connection),
-        value: connection.get('id'),
-        checked: checkedState(count, entities.size),
-        tags: connection.get('categories'),
-        draft: connection.getIn(['attributes', 'draft']),
-      };
-    });
+    connections
+      .get(option.path)
+      .filter((c) => !option.groupByFramework || attributesEqual(fwid, c.getIn(['attributes', 'framework_id'])))
+      .forEach((connection) => {
+        const count = entities.reduce((counter, entity) =>
+          testEntityEntityAssociation(entity, option.path, connection.get('id')) ? counter + 1 : counter
+        , 0);
+        editOptions.options[connection.get('id')] = {
+          reference: getEntityReference(connection),
+          label: getEntityTitle(connection),
+          value: connection.get('id'),
+          checked: checkedState(count, entities.size),
+          tags: connection.get('categories'),
+          draft: connection.getIn(['attributes', 'draft']),
+        };
+      });
   }
   return editOptions;
 };

@@ -95,14 +95,20 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
   };
 
   render() {
-    const { taxonomies, active, onTaxonomyLink, onTaxonomyOver } = this.props;
-    const taxonomyGroups = prepareTaxonomyGroups(
+    const {
       taxonomies,
       active,
       onTaxonomyLink,
-      onTaxonomyOver,
+      frameworkId,
+      frameworks,
+    } = this.props;
+    const taxonomyGroups = frameworks && taxonomies && prepareTaxonomyGroups(
+      taxonomies,
+      active,
+      onTaxonomyLink,
+      frameworkId,
+      frameworks,
     );
-
     return (
       <div>
         { (!this.state.visible && this.state.viewport < VIEWPORTS.SMALL) &&
@@ -122,10 +128,20 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                     </ToggleHide>
                   }
                 </SidebarHeader>
-                {map(taxonomyGroups, (group) => (
+                {taxonomyGroups && map(taxonomyGroups, (group) => (
                   <div key={group.id}>
                     <SidebarGroupLabel>
-                      <FormattedMessage {... appMessages.taxonomyGroups[group.id]} />
+                      {group.frameworkId && (
+                        <FormattedMessage
+                          {... appMessages.taxonomyGroups.objectives}
+                          values={{ type: this.context.intl.formatMessage(
+                            appMessages.entities[`recommendations_${group.frameworkId}`].plural
+                          ) }}
+                        />
+                      )}
+                      {!group.frameworkId && (
+                        <FormattedMessage {... appMessages.taxonomyGroups[group.id]} />
+                      )}
                     </SidebarGroupLabel>
                     <div>
                       {map(group.taxonomies, (taxonomy) => (
@@ -152,8 +168,9 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
 
 TaxonomySidebar.propTypes = {
   taxonomies: PropTypes.object,
+  frameworks: PropTypes.object,
+  frameworkId: PropTypes.string,
   onTaxonomyLink: PropTypes.func,
-  onTaxonomyOver: PropTypes.func,
   active: PropTypes.string,
   theme: PropTypes.object,
 };

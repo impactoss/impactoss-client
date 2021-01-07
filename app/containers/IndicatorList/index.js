@@ -11,7 +11,7 @@ import Helmet from 'react-helmet';
 import { List, Map, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { selectReady } from 'containers/App/selectors';
+import { selectReady, selectActiveFrameworks } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
 
@@ -69,6 +69,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         <EntityList
           entities={this.props.entities}
           connections={this.props.connections}
+          frameworks={this.props.frameworks}
           connectedTaxonomies={this.props.connectedTaxonomies}
           config={CONFIG}
           header={headerOptions}
@@ -92,6 +93,7 @@ IndicatorList.propTypes = {
   entities: PropTypes.instanceOf(List).isRequired,
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   location: PropTypes.object,
 };
 
@@ -104,6 +106,7 @@ const mapStateToProps = (state, props) => ({
   entities: selectIndicators(state, fromJS(props.location.query)),
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
+  frameworks: selectActiveFrameworks(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

@@ -38,7 +38,7 @@ const Styled = styled(Component)`
 const EntityListItemMainTitleWrap = styled.a`
   text-decoration: none;
   display: block;
-  padding: 6px 15px 6px 0;
+  padding: 4px 15px 6px 0;
   color: ${palette('mainListItem', 0)};
   &:hover {
     color: ${palette('mainListItemHover', 0)};
@@ -49,21 +49,61 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
   getConnections = (entity, connectionOptions, connections) =>
     reduce(connectionOptions, (memo, option) => {
       // console.log(memo, option, entity.toJS())
-      if (!option.expandable && (option.popover !== false) && entity.get(option.path) && connections.get(option.path) && entity.get(option.path).size > 0) {
-        const entities = entity.get(option.path).map((connectionId) => connections.getIn([option.path, connectionId.toString()]));
-        return memo.concat([{
-          option: {
-            label: (size) => this.context.intl && this.context.intl.formatMessage(
-              size === 1 ? appMessages.entities[option.path].single : appMessages.entities[option.path].plural
-            ),
-            icon: option.path,
-            style: option.path,
-            path: option.clientPath || option.path,
-          },
-          entities,
-        }]);
+      let memoX = memo;
+      if (
+        !option.expandable &&
+        (option.popover !== false) &&
+        entity.get(option.path) &&
+        connections.get(option.path) &&
+        entity.get(option.path).size > 0
+      ) {
+        if (option.groupByFramework) {
+          const entitiesByFramework = entity.get(`${option.path}ByFw`);
+          if (entitiesByFramework) {
+            entitiesByFramework.forEach((fwentities, fwid) => {
+              if (fwentities.size > 0) {
+                const connectedEntities = fwentities.map(
+                  (connectionId) =>
+                    connections.getIn([option.path, connectionId.toString()])
+                  );
+                const path = `${option.path}_${fwid}`;
+                memoX = memoX.concat([{
+                  option: {
+                    label: (size) =>
+                      this.context.intl &&
+                      this.context.intl.formatMessage(
+                        size === 1
+                          ? appMessages.entities[path].single
+                          : appMessages.entities[path].plural
+                      ),
+                    style: option.path,
+                    path: option.clientPath || option.path,
+                  },
+                  entities: connectedEntities,
+                }]);
+              }
+            });
+          }
+        } else {
+          const connectedEntities = entity
+            .get(option.path)
+            .map(
+              (connectionId) =>
+                connections.getIn([option.path, connectionId.toString()])
+              );
+          memoX = memoX.concat([{
+            option: {
+              label: (size) => this.context.intl && this.context.intl.formatMessage(
+                size === 1 ? appMessages.entities[option.path].single : appMessages.entities[option.path].plural
+              ),
+              style: option.path,
+              path: option.clientPath || option.path,
+            },
+            entities: connectedEntities,
+          }]);
+        }
       }
-      return memo;
+      return memoX;
     }, []);
 
   getRole = (entityRoles, roles) => {
@@ -75,11 +115,15 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
 
   getReference = (entity) => {
     const reference = entity.getIn(['attributes', 'reference']) || entity.get('id');
+    let type = entity.get('type');
+    if (entity.getIn(['attributes', 'framework_id'])) {
+      type = `${type}_${entity.getIn(['attributes', 'framework_id'])}`;
+    }
     if (this.context.intl
-      && appMessages.entities[entity.get('type')]
-      && appMessages.entities[entity.get('type')].singleShort
+      && appMessages.entities[type]
+      && appMessages.entities[type].singleShort
     ) {
-      return `${this.context.intl.formatMessage(appMessages.entities[entity.get('type')].singleShort)} ${reference}`;
+      return `${this.context.intl.formatMessage(appMessages.entities[type].singleShort)}: ${reference}`;
     }
     return reference;
   }
@@ -140,6 +184,9 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       <Styled isManager={this.props.isManager} isConnection={this.props.isConnection}>
         <EntityListItemMainTop
           entity={entity}
+          categories={entity.categories}
+          taxonomies={bottomTaxonomies}
+          onEntityClick={onEntityClick}
         />
         <Clear />
         <EntityListItemMainTitleWrap
@@ -155,9 +202,6 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
         </EntityListItemMainTitleWrap>
         { (entity.categories || (entity.connectedCounts && this.props.wrapper)) &&
           <EntityListItemMainBottom
-            categories={entity.categories}
-            taxonomies={bottomTaxonomies}
-            onEntityClick={onEntityClick}
             connections={entity.connectedCounts}
             wrapper={this.props.wrapper}
             user={entity.assignedUser}

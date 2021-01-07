@@ -6,15 +6,13 @@ import { palette } from 'styled-theme';
 
 import appMessages from 'containers/App/messages';
 
-import Icon from 'components/Icon';
 import ButtonTagCategory from 'components/buttons/ButtonTagCategory';
 import ButtonTagCategoryInverse from 'components/buttons/ButtonTagCategoryInverse';
 
 import { truncateText } from 'utils/string';
 import { TEXT_TRUNCATE } from 'themes/config';
 
-import BottomIconWrap from './BottomIconWrap';
-import BottomTagGroup from './BottomTagGroup';
+import TagGroup from './TagGroup';
 
 const SmartGroup = styled.div`
   display: inline-block;
@@ -24,15 +22,9 @@ const SmartGroup = styled.div`
   border-right-color: ${palette('light', 3)};
 `;
 
-const MyButtonTagCategory = styled(ButtonTagCategory)`
-  margin-bottom: 3px;
-  margin-top: 3px;
-`;
+const MyButtonTagCategory = styled(ButtonTagCategory)``;
 
-const MyButtonTagCategoryInverse = styled(ButtonTagCategoryInverse)`
-  margin-bottom: 3px;
-  margin-top: 3px;
-`;
+const MyButtonTagCategoryInverse = styled(ButtonTagCategoryInverse)``;
 
 class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -94,10 +86,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
     const entityTags = this.getEntityTags(categories, taxonomies, onEntityClick);
 
     return (
-      <BottomTagGroup>
-        <BottomIconWrap>
-          <Icon name="categories" text />
-        </BottomIconWrap>
+      <TagGroup>
         <span>
           { smartTaxonomy &&
             <SmartGroup border={entityTags && entityTags.length > 0}>
@@ -140,7 +129,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
             )
           )}
         </span>
-      </BottomTagGroup>
+      </TagGroup>
     );
   }
 }

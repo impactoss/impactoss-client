@@ -12,6 +12,9 @@ import asList from 'utils/as-list';
 
 export const currentFilterArgs = (config, locationQuery) => {
   let args = [];
+  if (config.frameworks && locationQuery.get(config.frameworks.query)) {
+    args = args.concat(config.frameworks.query);
+  }
   if (config.taxonomies && locationQuery.get(config.taxonomies.query)) {
     args = args.concat(config.taxonomies.query);
   }
@@ -43,6 +46,7 @@ export const currentFilters = ({
   locationQuery,
   onTagClick,
   errors,
+  frameworks,
 },
 withoutLabel,
 errorLabel,
@@ -50,6 +54,14 @@ errorLabel,
   let filterTags = [];
   if (errors && errors.size > 0) {
     filterTags.push(getErrorTag(errorLabel));
+  }
+  if (config.frameworks && frameworks && frameworks.size > 1) {
+    filterTags = filterTags.concat(getCurrentFrameworkFilter(
+      config.frameworks,
+      frameworks,
+      locationQuery,
+      onTagClick
+    ));
   }
   if (config.taxonomies && taxonomies) {
     filterTags = filterTags.concat(getCurrentTaxonomyFilters(
@@ -164,6 +176,32 @@ const getCurrentTaxonomyFilters = (
   return tags;
 };
 
+const getCurrentFrameworkFilter = (
+  config,
+  frameworks,
+  locationQuery,
+  onClick,
+) => {
+  const tags = [];
+  if (locationQuery.get(config.query)) {
+    const locationQueryValue = locationQuery.get(config.query);
+    const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), locationQueryValue));
+    if (framework) {
+      tags.push({
+        message: `frameworks_short.${framework.get('id')}`,
+        type: 'recommendations',
+        id: 0,
+        onClick: () => onClick({
+          value: framework.get('id'),
+          query: config.query,
+          checked: false,
+        }),
+      });
+    }
+  }
+  return tags;
+};
+
 
 const getCurrentConnectedTaxonomyFilters = (
   taxonomyFilters,
@@ -213,7 +251,7 @@ const getCurrentConnectionFilters = (
       asList(locationQueryValue).forEach((queryValue) => {
         const valueSplit = queryValue.split(':');
         if (valueSplit.length > 0) {
-          if (option.path === valueSplit[0]) {
+          if (option.path === valueSplit[0].split('_')[0]) {
             const value = valueSplit[1].toString();
             const connection = connections.getIn([option.path, value]);
             if (connection) {
@@ -238,12 +276,24 @@ const getCurrentConnectionFilters = (
     const locationQueryValue = locationQuery.get('without');
     forEach(connectionFilters.options, (option) => {
       asList(locationQueryValue).forEach((queryValue) => {
+        const valueFw = queryValue.split('_');
+        const fwid = valueFw.length > 1 && valueFw[1];
         // numeric means taxonomy
-        if (option.path === queryValue) {
+        if (option.path === valueFw[0]) {
           tags.push({
             labels: [
               { label: withoutLabel },
-              { appMessage: true, label: option.message, lowerCase: true },
+              {
+                appMessage: true,
+                label: (
+                  option.groupByFramework &&
+                  option.message &&
+                  option.message.indexOf('{fwid}') > -1
+                )
+                  ? option.message.replace('{fwid}', fwid)
+                  : option.message,
+                lowerCase: true,
+              },
               { label: option.label },
             ],
             type: option.path,

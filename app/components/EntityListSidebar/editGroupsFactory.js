@@ -1,5 +1,6 @@
 import { reduce } from 'lodash/collection';
 import { sortEntities } from 'utils/sort';
+import { attributesEqual } from 'utils/entities';
 
 export const makeEditGroups = (
   config,
@@ -7,9 +8,13 @@ export const makeEditGroups = (
   activeEditOption,
   hasUserRole,
   messages,
+  frameworks,
+  selectedFrameworkIds,
 ) => {
   const editGroups = {};
-
+  const selectedFrameworks = frameworks.filter(
+    (fw) => selectedFrameworkIds.find((id) => attributesEqual(id, fw.get('id'))),
+  );
   // taxonomy option group
   if (config.taxonomies && taxonomies) {
     // first prepare taxonomy options
@@ -18,24 +23,44 @@ export const makeEditGroups = (
       label: messages.taxonomyGroup,
       show: true,
       icon: 'categories',
-      options: sortEntities(taxonomies, 'asc', 'priority').reduce((memo, taxonomy) =>
-        taxonomy.get('tags')
-          ? memo.concat([
-            {
-              id: taxonomy.get('id'), // filterOptionId
-              label: messages.taxonomies(taxonomy.get('id')),
-              path: config.taxonomies.connectPath,
-              key: config.taxonomies.key,
-              ownKey: config.taxonomies.ownKey,
-              active: !!activeEditOption && activeEditOption.optionId === taxonomy.get('id'),
-              create: {
-                path: 'categories',
-                attributes: { taxonomy_id: taxonomy.get('id') },
-              },
-            },
-          ])
-          : memo
-      , []),
+      options:
+        sortEntities(taxonomies, 'asc', 'priority')
+        .filter(
+          (tax) =>
+            // all selectedFrameworkIds must be included in tax.frameworkIds
+            (
+              !config.taxonomies.editForFrameworks ||
+              selectedFrameworkIds.isSubset(tax.get('frameworkIds'))
+            ) &&
+            // not a parent
+            !taxonomies.some(
+              (otherTax) =>
+                attributesEqual(
+                  tax.get('id'),
+                  otherTax.getIn(['attributes', 'parent_id']),
+                )
+            )
+        )
+        .reduce(
+          (memo, taxonomy) =>
+            taxonomy.get('tags')
+              ? memo.concat([
+                {
+                  id: taxonomy.get('id'), // filterOptionId
+                  label: messages.taxonomies(taxonomy.get('id')),
+                  path: config.taxonomies.connectPath,
+                  key: config.taxonomies.key,
+                  ownKey: config.taxonomies.ownKey,
+                  active: !!activeEditOption && activeEditOption.optionId === taxonomy.get('id'),
+                  create: {
+                    path: 'categories',
+                    attributes: { taxonomy_id: taxonomy.get('id') },
+                  },
+                },
+              ])
+              : memo,
+          [],
+        ),
     };
   }
 
@@ -46,21 +71,62 @@ export const makeEditGroups = (
       id: 'connections', // filterGroupId
       label: messages.connections,
       show: true,
-      options: reduce(config.connections.options, (options, option) =>
-        typeof option.edit === 'undefined' || option.edit
-        ? options.concat({
-          id: option.path, // filterOptionId
-          label: option.label,
-          message: option.message,
-          path: option.connectPath,
-          key: option.key,
-          ownKey: option.ownKey,
-          icon: option.path,
-          active: !!activeEditOption && activeEditOption.optionId === option.path,
-          create: { path: option.path },
-        })
-        : options
-      , []),
+      options: reduce(
+        config.connections.options,
+        (optionsMemo, option) => {
+          // exclude connections not applicabel for all frameworks
+          if (
+            option.frameworkFilter &&
+            option.editForFrameworks &&
+            frameworks &&
+            !selectedFrameworks.every((fw) => fw.getIn(['attributes', option.frameworkFilter]))
+          ) {
+            return optionsMemo;
+          }
+          if (option.groupByFramework && frameworks) {
+            return frameworks
+              .filter((fw) =>
+                !option.frameworkFilter || fw.getIn(['attributes', option.frameworkFilter])
+              )
+              .reduce(
+                (memo, fw) => {
+                  const id = `${option.path}_${fw.get('id')}`;
+                  return memo.concat({
+                    id, // filterOptionId
+                    label: option.label,
+                    message: (option.message && option.message.indexOf('{fwid}') > -1)
+                      ? option.message.replace('{fwid}', fw.get('id'))
+                      : option.message,
+                    path: option.connectPath,
+                    connection: option.path,
+                    key: option.key,
+                    ownKey: option.ownKey,
+                    icon: id,
+                    active: !!activeEditOption && activeEditOption.optionId === id,
+                    create: { path: option.path },
+                    color: option.path,
+                  });
+                },
+                optionsMemo,
+              );
+          }
+          return typeof option.edit === 'undefined' || option.edit
+            ? optionsMemo.concat({
+              id: option.path, // filterOptionId
+              label: option.label,
+              message: option.message,
+              path: option.connectPath,
+              connection: option.path,
+              key: option.key,
+              ownKey: option.ownKey,
+              icon: option.path,
+              active: !!activeEditOption && activeEditOption.optionId === option.path,
+              create: { path: option.path },
+            })
+            : optionsMemo;
+        },
+        [],
+      ),
     };
   }
 
@@ -71,17 +137,31 @@ export const makeEditGroups = (
       id: 'attributes', // filterGroupId
       label: messages.attributes,
       show: true,
-      options: reduce(config.attributes.options, (options, option) =>
-        (typeof option.edit === 'undefined' || option.edit)
-        && (typeof option.role === 'undefined' || hasUserRole[option.role])
-        ? options.concat({
-          id: option.attribute, // filterOptionId
-          label: option.label,
-          message: option.message,
-          active: !!activeEditOption && activeEditOption.optionId === option.attribute,
-        })
-        : options
-      , []),
+      options: reduce(
+        config.attributes.options,
+        (optionsMemo, option) => {
+          if (
+            option.frameworkFilter &&
+            option.editForFrameworks &&
+            frameworks &&
+            !selectedFrameworks.every((fw) => fw.getIn(['attributes', option.frameworkFilter]))
+          ) {
+            return optionsMemo;
+          }
+          return (
+            (typeof option.edit === 'undefined' || option.edit) &&
+            (typeof option.role === 'undefined' || hasUserRole[option.role])
+          )
+            ? optionsMemo.concat({
+              id: option.attribute, // filterOptionId
+              label: option.label,
+              message: option.message,
+              active: !!activeEditOption && activeEditOption.optionId === option.attribute,
+            })
+            : optionsMemo;
+        },
+        [],
+      ),
     };
   }
 

@@ -5,10 +5,15 @@ export const DEPENDENCIES = [
   'indicators',
   'users',
   'taxonomies',
+  'framework_taxonomies',
   'categories',
   'measures',
   'measure_indicators',
   'measure_categories',
+  'recommendations',
+  'recommendation_indicators',
+  'recommendation_categories',
+  'recommendation_measures',
   'due_dates',
   'progress_reports',
 ];
@@ -43,8 +48,12 @@ export const CONFIG = {
   connectedTaxonomies: { // filter by each category
     query: 'catx',
     search: true,
-    exclude: 'tags_indicators',
     connections: [
+      {
+        path: 'recommendations', // filter by recommendation connection
+        message: 'entities.recommendations.plural',
+        key: 'recommendation_id',
+      },
       {
         path: 'measures', // filter by recommendation connection
         message: 'entities.measures.plural',
@@ -55,6 +64,17 @@ export const CONFIG = {
   connections: { // filter by associated entity
     query: 'connected',
     options: [
+      {
+        search: true,
+        message: 'entities.recommendations_{fwid}.plural',
+        path: 'recommendations',
+        clientPath: 'recommendations',
+        key: 'recommendation_id',
+        connectPath: 'recommendation_indicators',
+        ownKey: 'indicator_id',
+        groupByFramework: true,
+        frameworkFilter: 'has_indicators',
+      },
       {
         search: true,
         message: 'entities.measures.plural',

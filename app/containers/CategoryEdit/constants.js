@@ -14,8 +14,10 @@ export const DEPENDENCIES = [
   'user_roles',
   'categories',
   'taxonomies',
+  'framework_taxonomies',
   'measure_categories',
   'recommendation_categories',
+  'frameworks',
 ];
 
 export const FORM_INITIAL = fromJS({
@@ -31,9 +33,10 @@ export const FORM_INITIAL = fromJS({
     reference: '',
     user_only: false,
     draft: true,
+    date: '',
   },
   associatedMeasures: [],
-  associatedRecommendations: [],
+  associatedRecommendationsByFw: {},
   associatedUser: [],
   associatedCategory: [],
 });

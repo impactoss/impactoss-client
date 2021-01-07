@@ -1,12 +1,20 @@
-import { Map, List, fromJS } from 'immutable';
+import { Map } from 'immutable';
 
-import { TEXT_TRUNCATE } from 'themes/config';
+import { TEXT_TRUNCATE, ACCEPTED_STATUSES } from 'themes/config';
 import { find, reduce } from 'lodash/collection';
 
 import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
 import asList from 'utils/as-list';
 import isNumber from 'utils/is-number';
 import appMessage from 'utils/app-message';
+import quasiEquals from 'utils/quasi-equals';
+
+export const getAcceptanceStatus = (entity) =>
+  find(
+    ACCEPTED_STATUSES,
+    (option) =>
+      option.value === (entity.getIn(['attributes', 'accepted']) || null)
+  );
 
 // check if entity has nested connection by id
 export const testEntityEntityAssociation = (entity, path, associatedId) =>
@@ -30,8 +38,16 @@ export const testEntityTaxonomyAssociation = (entity, categories, taxonomyId) =>
     .includes(taxonomyId);
 
 // check if entity has any nested connection by type
-export const testEntityAssociation = (entity, associatedPath) =>
-  entity.get(associatedPath) && entity.get(associatedPath).size > 0;
+export const testEntityAssociation = (entity, associatedPath) => {
+  // check for fw
+  if (associatedPath.indexOf('_') > -1) {
+    const path = associatedPath.split('_');
+    if (entity.getIn([`${path[0]}ByFw`, path[1]])) {
+      return entity.getIn([`${path[0]}ByFw`, path[1]]).size > 0;
+    }
+  }
+  return entity.get(associatedPath) && entity.get(associatedPath).size > 0;
+};
 
 // prep searchtarget, incl id
 export const prepareEntitySearchTarget = (entity, fields, queryLength) =>
@@ -43,10 +59,7 @@ export const prepareEntitySearchTarget = (entity, fields, queryLength) =>
     , entity.get('id')
   );
 // comparison of attribute values, force string, check 'null' if unspecified
-export const attributesEqual = (testValue, value) =>
-  typeof value !== 'undefined' && value !== null && value.toString() === ((typeof testValue === 'undefined' || testValue === null)
-    ? 'null'
-    : testValue.toString());
+export const attributesEqual = (testValue, value) => quasiEquals(testValue, value);
 
 export const getConnectedCategories = (entityConnectedIds, taxonomyCategories, path) =>
   taxonomyCategories.filter((category) =>
@@ -60,12 +73,16 @@ export const getConnectedCategories = (entityConnectedIds, taxonomyCategories, p
 // assumes prior nesting of relationships
 export const filterEntitiesWithoutAssociation = (entities, categories, query) =>
   entities && entities.filter((entity) =>
-    asList(query).reduce((passing, pathOrTax) =>
-      passing && !(isNumber(pathOrTax)
-        ? testEntityTaxonomyAssociation(entity, categories, parseInt(pathOrTax, 10))
-        : testEntityAssociation(entity, pathOrTax)
-      )
-    , true)
+    asList(query).reduce(
+      (passing, pathOrTax) =>
+        passing &&
+        !(
+          isNumber(pathOrTax)
+            ? testEntityTaxonomyAssociation(entity, categories, parseInt(pathOrTax, 10))
+            : testEntityAssociation(entity, pathOrTax)
+        ),
+      true,
+    ),
   );
 
 // filter entities by association with one or more categories
@@ -100,7 +117,7 @@ export const filterEntitiesByConnection = (entities, query) =>
   entities && entities.filter((entity) =>
     asList(query).reduce((passing, queryArg) => {
       const pathValue = queryArg.split(':');
-      const path = pathValue[0];
+      const path = pathValue[0].split('_')[0];
       return entity.get(path)
         ? passing && testEntityEntityAssociation(entity, path, pathValue[1])
         : passing;
@@ -169,16 +186,19 @@ export const entitySetSingles = (entity, singles) =>
   entity && singles.reduce((memo, { related, key, relatedKey }) =>
    entitySetSingle(memo, related, key, relatedKey), entity);
 
-export const filterTaxonomies = (taxonomies, tagsKey, includeParents = true) => taxonomies && taxonomies
-  .filter((tax, key, list) =>
+export const filterTaxonomies = (taxonomies, tagsKey, includeParents = true) =>
+  taxonomies &&
+  taxonomies.filter((tax, key, list) =>
     // taxonomies or parent taxonomies
-    tax.getIn(['attributes', tagsKey])
-      || (includeParents
-        && list.some((other) =>
-          attributesEqual(tax.get('id'), other.getIn(['attributes', 'parent_id']))
-          && other.getIn(['attributes', tagsKey])
-        )
+    tax.getIn(['attributes', tagsKey]) &&
+    (
+      includeParents ||
+      // only non-parents
+      !list.some((other) =>
+        attributesEqual(tax.get('id'), other.getIn(['attributes', 'parent_id'])) &&
+        other.getIn(['attributes', tagsKey])
       )
+    )
   );
 
 export const prepareTaxonomiesIsAssociated = (
@@ -260,9 +280,15 @@ export const prepareTaxonomies = (taxonomies, categories, tagsKey, includeParent
   ));
 
 export const prepareCategory = (category, users, taxonomies) =>
-  category && entitySetUser(
-    category.set('taxonomy', taxonomies.find((tax) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), tax.get('id')))),
-    users
+  category &&
+  entitySetUser(
+    category.set(
+      'taxonomy',
+      taxonomies.find(
+        (tax) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), tax.get('id')),
+      ),
+    ),
+    users,
   );
 
 export const usersByRole = (users, userRoles, roleId) =>
@@ -308,39 +334,6 @@ export const getCategoryTitle = (cat) =>
 export const getEntityParentId = (cat) =>
   cat.getIn(['attributes', 'parent_id']) && cat.getIn(['attributes', 'parent_id']).toString();
 
-const getInitialValue = (field) =>
-  typeof field.default !== 'undefined' ? field.default : '';
-
-export const getInitialFormData = (shape) => {
-  let fields = fromJS({
-    id: '',
-    attributes: {},
-  });
-  if (shape.fields) {
-    fields = reduce(shape.fields, (memo, field) =>
-      field.disabled ? memo : memo.setIn(['attributes', field.attribute], getInitialValue(field))
-    , fields);
-  }
-  if (shape.taxonomies) {
-    fields = fields.set('associatedTaxonomies', Map());
-  }
-  if (shape.connections) {
-    fields = reduce(shape.connections.tables, (memo, table) => {
-      if (table.table === 'recommendations') {
-        return fields.set('associatedRecommendations', List());
-      }
-      if (table.table === 'indicators') {
-        return fields.set('associatedIndicators', List());
-      }
-      if (table.table === 'measures') {
-        return fields.set('associatedMeasures', List());
-      }
-      return memo;
-    }, fields);
-  }
-  return fields;
-};
-
 export const getEntityCategories = (entityId, associations, associationKey, categories, includeParents = true) => {
   // directly associated categories
   const categoryIds = associations && associations
@@ -371,21 +364,33 @@ export const getEntityConnections = (entityId, associations, associationKey, ent
   )
   .map((association) => association.getIn(['attributes', associationKey]));
 
+export const getEntityConnectionsByFw = (entityId, associations, associationKey, entityKey, connections) =>
+  connections
+    .groupBy((c) => c.getIn(['attributes', 'framework_id']).toString())
+    .map((connectionsForFw) =>
+      associations
+      .filter((association) =>
+        attributesEqual(association.getIn(['attributes', entityKey]), entityId)
+        && connectionsForFw.get(association.getIn(['attributes', associationKey]).toString())
+      )
+      .map((association) => association.getIn(['attributes', associationKey]))
+    );
+
 export const getTaxonomyCategories = (taxonomy, categories, relationship, connections) =>
   categories
     .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
     .map((category) => {
       // figure out child categories if not directly tagging connection
-      const childCategories = taxonomy.getIn(['attributes', relationship.tags])
-        ? null
-        : categories.filter((item) => attributesEqual(item.getIn(['attributes', 'parent_id']), category.get('id')));
+      const childCategories = categories.filter(
+        (item) => attributesEqual(item.getIn(['attributes', 'parent_id']), category.get('id')),
+      );
       return category.set(relationship.path,
         relationship.associations
           .filter((association) => {
             if (!connections.get(association.getIn(['attributes', relationship.key]).toString())) {
               return false;
             }
-            return !childCategories
+            return (!childCategories || childCategories.size === 0)
               ? attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
               : childCategories.some((child) =>
                   attributesEqual(association.getIn(['attributes', 'category_id']), child.get('id'))

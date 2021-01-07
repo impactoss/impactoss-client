@@ -7,8 +7,6 @@ import appMessages from 'containers/App/messages';
 import FieldWrap from 'components/fields/FieldWrap';
 import ConnectionLabel from 'components/fields/ConnectionLabel';
 import ConnectionLabelWrap from 'components/fields/ConnectionLabelWrap';
-import Dot from 'components/fields/Dot';
-import DotWrapper from 'components/fields/DotWrapper';
 
 import Group from './Group';
 
@@ -21,26 +19,30 @@ class ConnectionGroupsField extends React.PureComponent { // eslint-disable-line
   render() {
     const { field } = this.props;
     const size = field.groups && field.groups.reduce((sum, group) =>
-      group.get(field.entityType)
-        ? sum + group.get(field.entityType).size
+      group.get(field.entityPath)
+        ? sum + group.get(field.entityPath).size
         : sum
     , 0);
-    const label = `${size} ${this.context.intl.formatMessage(
-      size === 1
-      ? appMessages.entities[field.entityType].single
-      : appMessages.entities[field.entityType].plural
-    )} grouped by ${this.context.intl.formatMessage(field.groupedBy)}`;
+    const label =
+      this.context.intl.formatMessage(
+        appMessages.fields.connectionsGrouped,
+        {
+          size,
+          type: this.context.intl.formatMessage(
+            size === 1
+            ? appMessages.entities[field.entityType].single
+            : appMessages.entities[field.entityType].plural
+          ),
+          byType: this.context.intl.formatMessage(field.groupedBy),
+        }
+      );
+
     return (
       <StyledFieldWrap>
         <ConnectionLabelWrap>
           <ConnectionLabel>
             {label}
           </ConnectionLabel>
-          {field.entityType &&
-            <DotWrapper>
-              <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
-            </DotWrapper>
-          }
         </ConnectionLabelWrap>
         { size > 0 && field.groups && field.groups.map((group, i) => (
           <Group

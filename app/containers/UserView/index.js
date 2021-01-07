@@ -97,7 +97,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
   getHeaderAsideFields = (entity) => ([{
     fields: [
       getRoleField(entity),
-      getMetaField(entity, appMessages),
+      getMetaField(entity),
     ],
   }]);
 
@@ -107,7 +107,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
   getBodyAsideFields = (taxonomies) => ([
     { // fieldGroup
-      fields: getTaxonomyFields(taxonomies, appMessages),
+      fields: getTaxonomyFields(taxonomies),
     },
   ]);
 

@@ -4,7 +4,9 @@ import {
   selectEntity,
   selectEntities,
   selectRecommendationsCategorised,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
+  selectFWIndicators,
+  selectFrameworks,
 } from 'containers/App/selectors';
 
 import {
@@ -12,6 +14,7 @@ import {
   entitySetUser,
   prepareTaxonomiesAssociated,
   prepareTaxonomiesMultiple,
+  attributesEqual,
 } from 'utils/entities';
 
 export const selectDomain = createSelector(
@@ -26,7 +29,7 @@ export const selectViewEntity = createSelector(
 );
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'measure_categories'),
   (id, taxonomies, categories, associations) =>
@@ -34,23 +37,36 @@ export const selectTaxonomies = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>
     prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations'], false)
 );
 
-
-export const selectRecommendations = createSelector(
+export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
-  selectRecommendationsCategorised,
-  (state) => selectEntities(state, 'recommendation_measures'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'recommendation_id', associations, 'measure_id', id)
+  (state) => selectRecommendationsCategorised(state),
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (state) => selectFrameworks(state),
+  (id, entities, associations, frameworks) =>
+    entitiesSetAssociated(entities, 'recommendation_id', associations, 'indicator_id', id)
+    .filter((r) => {
+      const framework = frameworks.find(
+        (fw) =>
+          attributesEqual(
+            fw.get('id'),
+            r.getIn(['attributes', 'framework_id']),
+          )
+        );
+      return framework.getIn(['attributes', 'has_measures']);
+    })
+    .groupBy(
+      (r) => r.getIn(['attributes', 'framework_id']).toString()
+    )
 );
 export const selectIndicators = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'indicators'),
+  selectFWIndicators,
   (state) => selectEntities(state, 'measure_indicators'),
   (id, entities, associations) =>
     entitiesSetAssociated(entities, 'indicator_id', associations, 'measure_id', id)

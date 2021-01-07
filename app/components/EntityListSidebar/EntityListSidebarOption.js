@@ -67,28 +67,31 @@ const DotWrapper = styled.div`
 
 class EntityListSidebarOption extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  renderDot = (groupId, optionId, active) => {
+  renderDot = (groupId, color, active) => {
     switch (groupId) {
       case 'taxonomies':
       case 'connectedTaxonomies':
-        return (<Dot palette="taxonomies" pIndex={parseInt(optionId, 10)} active={active} />);
+        return (<Dot palette="taxonomies" pIndex={parseInt(color, 10)} active={active} />);
+      case 'frameworks':
+        return (<Dot palette={color} pIndex={0} round active={active} />);
       case 'connections':
-        return (<Dot palette={optionId} pIndex={0} round active={active} />);
+        return (<Dot palette={color} pIndex={0} round active={active} />);
       default:
         return null;
     }
   }
   render() {
-    const { option, onShowForm, groupId } = this.props;
+    const { option, onShowForm, groupId, groupType } = this.props;
 
     return (
       <Styled
         active={option.get('active')}
         small={option.get('nested')}
         onClick={() => onShowForm({
-          group: groupId,
+          group: groupType || groupId,
           optionId: option.get('id'),
           path: option.get('path'),
+          connection: option.get('connection'),
           key: option.get('key'),
           ownKey: option.get('ownKey'),
           active: option.get('active'),
@@ -110,7 +113,13 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
           </IconWrapper>
         }
         <DotWrapper small={option.get('nested')}>
-          { this.renderDot(groupId, option.get('id'), option.get('active')) }
+          {
+            this.renderDot(
+              groupType || groupId,
+              option.get('color') || option.get('id'),
+              option.get('active'),
+            )
+          }
         </DotWrapper>
       </Styled>
     );
@@ -120,6 +129,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
 EntityListSidebarOption.propTypes = {
   option: PropTypes.object.isRequired,
   groupId: PropTypes.string.isRequired,
+  groupType: PropTypes.string,
   onShowForm: PropTypes.func.isRequired,
 };
 

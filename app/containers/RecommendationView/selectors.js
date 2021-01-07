@@ -5,6 +5,9 @@ import {
   selectEntities,
   selectMeasureConnections,
   selectTaxonomiesSorted,
+  selectIndicatorConnections,
+  selectFWMeasures,
+  selectFWIndicators,
 } from 'containers/App/selectors';
 
 import {
@@ -32,7 +35,7 @@ export const selectTaxonomies = createSelector(
 
 export const selectMeasuresAssociated = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'measures'),
+  selectFWMeasures,
   (state) => selectEntities(state, 'recommendation_measures'),
   (id, entities, associations) =>
     entitiesIsAssociated(entities, 'measure_id', associations, 'recommendation_id', id)
@@ -62,6 +65,40 @@ export const selectMeasures = createSelector(
           && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
         )
         .map((association) => association.getIn(['attributes', 'indicator_id']))
+      )
+    )
+);
+
+export const selectIndicatorsAssociated = createSelector(
+  (state, id) => id,
+  selectFWIndicators,
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (id, entities, associations) =>
+    entitiesIsAssociated(entities, 'indicator_id', associations, 'recommendation_id', id)
+);
+
+// selectIndicators,
+export const selectIndicators = createSelector(
+  selectIndicatorsAssociated,
+  (state) => selectIndicatorConnections(state),
+  (state) => selectEntities(state, 'measure_indicators'),
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (indicators, connections, indicatorMeasures, indicatorRecs) =>
+    indicators && indicatorRecs && indicators
+    .map((indicator) => indicator
+      .set('measures', indicatorMeasures
+        .filter((association) =>
+          attributesEqual(association.getIn(['attributes', 'indicator_id']), indicator.get('id'))
+          && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
+        )
+        .map((association) => association.getIn(['attributes', 'measure_id']))
+      )
+      .set('recommendations', indicatorRecs
+        .filter((association) =>
+        attributesEqual(association.getIn(['attributes', 'indicator_id']), indicator.get('id'))
+          && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
+        )
+        .map((association) => association.getIn(['attributes', 'recommendation_id']))
       )
     )
 );

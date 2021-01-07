@@ -6,6 +6,9 @@ import {
   selectRecommendationConnections,
   selectMeasureConnections,
   selectTaxonomiesSorted,
+  selectTaxonomies,
+  selectFWRecommendations,
+  selectFWMeasures,
 } from 'containers/App/selectors';
 
 import {
@@ -59,7 +62,7 @@ export const selectViewEntity = createSelector(
 
 export const selectParentTaxonomy = createSelector(
   selectCategory,
-  (state) => selectEntities(state, 'taxonomies'),
+  selectTaxonomies,
   (entity, taxonomies) => {
     if (entity && taxonomies) {
       const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
@@ -73,7 +76,9 @@ export const selectChildTaxonomies = createSelector(
   (state) => selectEntities(state, 'categories'),
   (entity, taxonomies, categories) => {
     if (entity && taxonomies) {
-      const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
+      const taxonomy = taxonomies.find(
+        (tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')),
+      );
       return taxonomies
         .filter((tax) => attributesEqual(tax.getIn(['attributes', 'parent_id']), taxonomy.get('id')))
         .map((tax) =>
@@ -95,7 +100,7 @@ const selectTagsRecommendations = createSelector(
 const selectRecommendationsAssociated = createSelector(
   selectTagsRecommendations,
   (state, id) => id,
-  (state) => selectEntities(state, 'recommendations'),
+  selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
   (tags, id, entities, associations) => tags
     ? entitiesIsAssociated(entities, 'recommendation_id', associations, 'category_id', id)
@@ -110,27 +115,36 @@ export const selectRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'categories'),
   (recommendations, connections, recMeasures, recCategories, categories) =>
-    recommendations && recommendations.map((rec) => rec
-      .set('categories', getEntityCategories(rec.get('id'), recCategories, 'recommendation_id', categories))
-      .set('measures', recMeasures && recMeasures
-        .filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
-          && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
+    recommendations &&
+    recommendations
+      .map((rec) => rec
+        .set('categories', getEntityCategories(rec.get('id'), recCategories, 'recommendation_id', categories))
+        .set('measures', recMeasures && recMeasures
+          .filter((association) =>
+            attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
+            && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
+          )
+          .map((association) => association.getIn(['attributes', 'measure_id']))
         )
-        .map((association) => association.getIn(['attributes', 'measure_id']))
       )
-    )
+      .groupBy(
+        (r) => r.getIn(['attributes', 'framework_id'])
+      )
 );
 
 const selectChildrenTagRecommendations = createSelector(
   selectChildTaxonomies,
-  (taxonomies) => taxonomies && taxonomies.some((tax) => tax.getIn(['attributes', 'tags_recommendations']))
+  (taxonomies) =>
+    taxonomies &&
+    taxonomies.some(
+      (tax) => tax.getIn(['attributes', 'tags_recommendations']),
+    )
 );
 
 const selectChildRecommendationsAssociated = createSelector(
   selectChildrenTagRecommendations,
   selectChildTaxonomies,
-  (state) => selectEntities(state, 'recommendations'),
+  selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
   (tag, childTaxonomies, entities, associations) => tag && childTaxonomies
     ? childTaxonomies.map((tax) =>
@@ -156,21 +170,26 @@ export const selectChildRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'categories'),
   (recommendationsByTaxCat, connections, recMeasures, recCategories, categories) =>
-    recommendationsByTaxCat && recommendationsByTaxCat.map(
-      (tax) => tax.set('categories', tax.get('categories').map(
-        (cat) => cat.set('recommendations', cat.get('recommendations').map(
-          (rec) => rec
-            .set('categories', getEntityCategories(rec.get('id'), recCategories, 'recommendation_id', categories))
-            .set('measures', recMeasures && recMeasures
-              .filter((association) =>
-                attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
-                && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
+    recommendationsByTaxCat &&
+    recommendationsByTaxCat
+      .map(
+        (tax) => tax.set('categories', tax.get('categories').map(
+          (cat) => cat.set('recommendations', cat.get('recommendations').map(
+            (rec) => rec
+              .set('categories', getEntityCategories(rec.get('id'), recCategories, 'recommendation_id', categories))
+              .set('measures', recMeasures && recMeasures
+                .filter((association) =>
+                  attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
+                  && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
+                )
+                .map((association) => association.getIn(['attributes', 'measure_id']))
               )
-              .map((association) => association.getIn(['attributes', 'measure_id']))
-            )
+          ))
         ))
-      ))
-    )
+      )
+      .groupBy(
+        (r) => r.getIn(['attributes', 'framework_id'])
+      )
 );
 
 const selectTagsMeasures = createSelector(
@@ -181,7 +200,7 @@ const selectTagsMeasures = createSelector(
 const selectMeasuresAssociated = createSelector(
   selectTagsMeasures,
   (state, id) => id,
-  (state) => selectEntities(state, 'measures'),
+  selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
   (tags, id, entities, associations) => tags
     ? entitiesIsAssociated(entities, 'measure_id', associations, 'category_id', id)
@@ -224,7 +243,7 @@ const selectChildrenTagMeasures = createSelector(
 const selectChildMeasuresAssociated = createSelector(
   selectChildrenTagMeasures,
   selectChildTaxonomies,
-  (state) => selectEntities(state, 'measures'),
+  selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
   (tag, childTaxonomies, entities, associations) => tag
     ? childTaxonomies.map((tax) =>
@@ -275,7 +294,7 @@ export const selectChildMeasures = createSelector(
       )
 );
 
-export const selectTaxonomies = createSelector(
+export const selectTaxonomiesWithCategories = createSelector(
   selectTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) =>

@@ -5,7 +5,10 @@ import {
   selectEntities,
   selectSortByQuery,
   selectSortOrderQuery,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
+  selectFWRecommendations,
+  selectFWMeasures,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import { attributesEqual } from 'utils/entities';
@@ -15,19 +18,19 @@ import { TAXONOMY_DEFAULT, SORT_OPTIONS } from './constants';
 
 export const selectTaxonomy = createSelector(
   (state, { id }) => id,
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (taxonomyId, taxonomies) => {
-    if (!taxonomies || taxonomies.size === 0) return taxonomies;
+    if (!taxonomies || taxonomies.size === 0) return null;
     const id = typeof taxonomyId !== 'undefined' ? taxonomyId : TAXONOMY_DEFAULT;
     const taxonomy = taxonomies.get(id);
-    return taxonomy
+    return taxonomy && taxonomy
       .set('children', taxonomies.filter((tax) => attributesEqual(id, tax.getIn(['attributes', 'parent_id']))))
       .set('parent', taxonomies.find((tax) => attributesEqual(taxonomy.getIn(['attributes', 'parent_id']), tax.get('id'))));
   }
 );
 
 const selectMeasures = createSelector(
-  (state) => selectEntities(state, 'measures'),
+  selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'recommendation_measures'),
   (entities, measureCategories, recMeasures) =>
@@ -44,7 +47,7 @@ const selectMeasures = createSelector(
 );
 
 const selectRecommendations = createSelector(
-  (state) => selectEntities(state, 'recommendations'),
+  selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
   (entities, recCategories) =>
     entities.map((entity, id) => entity.set('category_ids', recCategories
@@ -69,6 +72,7 @@ const getCategoryCounts = (
   measures,
   recommendations,
   categories,
+  frameworks,
 ) => taxonomyCategories
   .map((cat, categoryId) => {
     let category = cat;
@@ -84,10 +88,10 @@ const getCategoryCounts = (
       } else if (childCatsTagMeasures) {
         associatedMeasures = filterChildConnections(measures, categories, categoryId);
       }
-      category = category.set('measuresTotal', associatedMeasures.size);
+      category = category.set('measuresCount', associatedMeasures.size);
       // get all public associated measures
       const associatedMeasuresPublic = associatedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
-      category = category.set('measures', associatedMeasuresPublic ? associatedMeasuresPublic.size : 0);
+      category = category.set('measuresPublicCount', associatedMeasuresPublic ? associatedMeasuresPublic.size : 0);
     }
 
     // recommendations
@@ -96,27 +100,76 @@ const getCategoryCounts = (
     const tagsRecs = taxonomy.getIn(['attributes', 'tags_recommendations']) || childCatsTagRecs;
     if (tagsRecs) {
       let associatedRecs;
-      // directly tagged recommendations
-      if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
-        associatedRecs = recommendations.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
-        // recommendations tagged by child categories
-      } else if (childCatsTagRecs) {
+      // recommendations tagged by child categories
+      if (childCatsTagRecs) {
         associatedRecs = filterChildConnections(recommendations, categories, categoryId);
+      // directly tagged recommendations
+      } else if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
+        associatedRecs = recommendations.filter((entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)));
       }
-
-      category = category.set('recommendationsTotal', associatedRecs.size);
       const associatedRecsPublic = associatedRecs.filter((rec) => !rec.getIn(['attributes', 'draft']));
-      category = category.set('recommendations', associatedRecsPublic ? associatedRecsPublic.size : 0);
       // get all public accepted associated recs
       const publicAccepted = associatedRecsPublic.filter((rec) => !!rec.getIn(['attributes', 'accepted']));
-      category = category.set('recommendationsAccepted', publicAccepted ? publicAccepted.size : 0);
+
+      // all frameworks
+      category = category.set('recommendationsCount', associatedRecs.size);
+      category = category.set('recommendationsPublicCount', associatedRecsPublic ? associatedRecsPublic.size : 0);
+      // const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), taxonomy.get('frameworkIds').first()));
+      category = category.set('recommendationsAcceptedCount', publicAccepted ? publicAccepted.size : 0);
+      // by framework
+      category = category.set(
+        'recommendationsCountByFW',
+        associatedRecs
+          .groupBy((rec) => rec.getIn(['attributes', 'framework_id']))
+          .map((group) => group.size),
+      );
+      category = category.set(
+        'recommendationsPublicCountByFW',
+        associatedRecsPublic
+          ? associatedRecsPublic
+            .groupBy((rec) => rec.getIn(['attributes', 'framework_id']))
+            .map((group) => group.size)
+          : 0,
+        );
+      category = category.set(
+        'recommendationsAcceptedCountByFW',
+        publicAccepted
+          ? publicAccepted
+            .groupBy((rec) => rec.getIn(['attributes', 'framework_id']))
+            .map((group, key) => {
+              const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), key));
+              return (framework && framework.getIn(['attributes', 'has_response']))
+                ? group.size
+                : -1;
+            })
+          : 0);
+      // for sorting
+      category = category.set('recommendations', associatedRecsPublic ? associatedRecsPublic.size : 0);
 
       // measures connected via recommendation
       if (!tagsMeasures) {
-        const connectedMeasures = filterAssociatedEntities(measures, 'recommendation_ids', associatedRecs);
-        category = category.set('measuresTotal', connectedMeasures ? connectedMeasures.size : 0);
+        const connectedMeasures = filterAssociatedEntities(measures, 'recommendation_ids', associatedRecsPublic);
+        category = category.set('measuresCount', connectedMeasures ? connectedMeasures.size : 0);
         const connectedMeasuresPublic = connectedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
+        category = category.set('measuresPublicCount', connectedMeasuresPublic ? connectedMeasuresPublic.size : 0);
+        // for sorting
         category = category.set('measures', connectedMeasuresPublic ? connectedMeasuresPublic.size : 0);
+        // by framework
+        category = category.set(
+          'measuresPublicCountByFw',
+          associatedRecsPublic
+            ? associatedRecsPublic
+              .groupBy((rec) => rec.getIn(['attributes', 'framework_id']))
+              .map((group) => {
+                const connectedMeasuresForGroup = filterAssociatedEntities(measures, 'recommendation_ids', group);
+                const connectedMeasuresPublicForGroup =
+                  connectedMeasuresForGroup.filter(
+                    (measure) => !measure.getIn(['attributes', 'draft'])
+                  );
+                return connectedMeasuresPublicForGroup ? connectedMeasuresPublicForGroup.size : 0;
+              })
+            : 0,
+          );
       }
     }
     return category;
@@ -128,38 +181,47 @@ const selectCategoryCountGroups = createSelector(
   selectRecommendations,
   selectMeasures,
   (state) => selectEntities(state, 'categories'),
-  (taxonomy, recommendations, measures, categories) => {
-    const taxonomyCategories = categories.filter((cat) =>
-      attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id'))
-    );
-    if (taxonomy && taxonomyCategories) {
-      if (!taxonomy.get('parent')) {
-        const catCounts = getCategoryCounts(
-          taxonomyCategories,
-          taxonomy,
-          measures,
-          recommendations,
-          categories,
-        );
-        return Map().set(taxonomy.get('id'), taxonomy.set('categories', catCounts));
+  selectActiveFrameworks,
+  (taxonomy, recommendations, measures, categories, frameworks) => {
+    if (!taxonomy) return Map();
+    if (taxonomy && recommendations && measures && categories && frameworks) {
+      const taxonomyCategories = taxonomy && categories && categories.filter((cat) =>
+        attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id'))
+      );
+      if (taxonomyCategories) {
+        if (!taxonomy.get('parent')) {
+          const catCounts = getCategoryCounts(
+            taxonomyCategories,
+            taxonomy,
+            measures,
+            recommendations,
+            categories,
+            frameworks,
+          );
+          return catCounts
+            ? Map().set(taxonomy.get('id'), taxonomy.set('categories', catCounts))
+            : Map();
+        }
+        if (taxonomy.get('parent')) {
+          const taxParentCategories = categories.filter((cat) =>
+            attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), taxonomy.get('parent').get('id'))
+          );
+          return taxParentCategories
+            .map((parentCat) => {
+              const taxChildCategories = taxonomyCategories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'parent_id']), parentCat.get('id')));
+              const catCounts = getCategoryCounts(
+                taxChildCategories,
+                taxonomy,
+                measures,
+                recommendations,
+                categories,
+                frameworks,
+              );
+              return parentCat.set('categories', catCounts);
+            });
+        }
       }
-      if (taxonomy.get('parent')) {
-        const taxParentCategories = categories.filter((cat) =>
-          attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), taxonomy.get('parent').get('id'))
-        );
-        return taxParentCategories
-          .map((parentCat) => {
-            const taxChildCategories = taxonomyCategories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'parent_id']), parentCat.get('id')));
-            const catCounts = getCategoryCounts(
-              taxChildCategories,
-              taxonomy,
-              measures,
-              recommendations,
-              categories,
-            );
-            return parentCat.set('categories', catCounts);
-          });
-      }
+      return Map();
     }
     return Map();
   }
@@ -171,9 +233,18 @@ export const selectCategoryGroups = createSelector(
   (state, { query }) => selectSortOrderQuery(state, query),
   (categoryGroups, sort, order) => {
     const sortOption = getSortOption(SORT_OPTIONS, sort, 'query');
-    return sortEntities(
-      categoryGroups.map((group) => group
-        .set('categories', sortEntities(
+    const groups = categoryGroups && categoryGroups.map((group) => group
+      .set(
+        'measures',
+        group.get('categories').reduce((sum, cat) => sum + cat.get('measuresPublicCount'), 0),
+      )
+      .set(
+        'recommendations',
+        group.get('categories').reduce((sum, cat) => sum + cat.get('recommendationsPublicCount'), 0),
+      )
+      .set(
+        'categories',
+        sortEntities(
           sortEntities(
             group.get('categories').filter((cat) => !cat.getIn(['attributes', 'user_only'])),
             order || (sortOption ? sortOption.order : 'asc'),
@@ -183,10 +254,11 @@ export const selectCategoryGroups = createSelector(
           'asc',
           'draft',
           'bool',
-        ))
-        .set('measures', group.get('categories').reduce((sum, cat) => sum + cat.get('measures'), 0))
-        .set('recommendations', group.get('categories').reduce((sum, cat) => sum + cat.get('recommendations'), 0))
-      ),
+        ),
+      )
+    );
+    return sortEntities(
+      groups,
       order || (sortOption ? sortOption.order : 'asc'),
       sortOption ? sortOption.field : 'title',
       sortOption ? sortOption.type : 'string',
@@ -202,19 +274,28 @@ export const selectUserOnlyCategoryGroups = createSelector(
     const sortOption = getSortOption(SORT_OPTIONS, sort, 'query');
     return sortEntities(
       categoryGroups.map((group) => group
-        .set('categories', sortEntities(
+        .set(
+          'measures',
+          group.get('categories').reduce((sum, cat) => sum + cat.get('measuresPublicCount'), 0),
+        )
+        .set(
+          'recommendations',
+          group.get('categories').reduce((sum, cat) => sum + cat.get('recommendationsPublicCount'), 0),
+        )
+        .set(
+          'categories',
           sortEntities(
-            group.get('categories').filter((cat) => cat.getIn(['attributes', 'user_only'])),
-            order || (sortOption ? sortOption.order : 'asc'),
-            sortOption ? sortOption.field : 'title',
-            sortOption ? sortOption.type : 'string',
+            sortEntities(
+              group.get('categories').filter((cat) => cat.getIn(['attributes', 'user_only'])),
+              order || (sortOption ? sortOption.order : 'asc'),
+              sortOption ? sortOption.field : 'title',
+              sortOption ? sortOption.type : 'string',
+            ),
+            'asc',
+            'draft',
+            'bool',
           ),
-          'asc',
-          'draft',
-          'bool',
-        ))
-        .set('measures', group.get('categories').reduce((sum, cat) => sum + cat.get('measures'), 0))
-        .set('recommendations', group.get('categories').reduce((sum, cat) => sum + cat.get('recommendations'), 0))
+        )
       ),
       order || (sortOption ? sortOption.order : 'asc'),
       sortOption ? sortOption.field : 'title',

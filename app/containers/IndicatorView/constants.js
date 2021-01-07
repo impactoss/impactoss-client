@@ -13,9 +13,13 @@ export const DEPENDENCIES = [
   'progress_reports',
   'due_dates',
   'taxonomies',
+  'frameworks',
+  'framework_taxonomies',
   'categories',
   'recommendations',
   'recommendation_measures',
+  'recommendation_categories',
+  'recommendation_indicators',
   'measure_categories',
   'user_roles',
 ];
