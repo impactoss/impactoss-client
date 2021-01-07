@@ -5,6 +5,8 @@ const ButtonHero = styled(ButtonDefault)`
   font-size: 1em;
   padding: 0.6em;
   min-width: 120px;
+  margin-left: ${({ space }) => space ? 10 : 0}px;
+  margin-right: ${({ space }) => space ? 10 : 0}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 1.1em;
     padding: 0.8em;

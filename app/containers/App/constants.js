@@ -73,6 +73,7 @@ export const OPEN_NEW_ENTITY_MODAL = 'impactoss/App/OPEN_NEW_ENTITY_MODAL';
 export const SUBMIT_INVALID = 'impactoss/App/SUBMIT_INVALID';
 
 export const DISMISS_QUERY_MESSAGES = 'impactoss/App/DISMISS_QUERY_MESSAGES';
+export const SET_FRAMEWORK = 'impactoss/App/SET_FRAMEWORK';
 
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';
@@ -85,6 +86,7 @@ export const CONTENT_MODAL = 'modal';
 export const DEPENDENCIES = [
   'user_roles',
   'pages',
+  'frameworks',
 ];
 export const SORT_ORDER_OPTIONS = [
   { value: 'asc', icon: 'ascending', nextValue: 'desc', message: 'ui.sortOrderOptions.asc' },
@@ -122,7 +124,6 @@ export const PATHS = {
   USERS: '/users',
   MEASURES: '/actions',
   INDICATORS: '/indicators',
-  SDG_TARGETS: '/sdgtargets',
   RECOMMENDATIONS: '/recommendations',
   PROGRESS_REPORTS: '/reports',
   TAXONOMIES: '/categories',

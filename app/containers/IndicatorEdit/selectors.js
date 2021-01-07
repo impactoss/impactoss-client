@@ -1,13 +1,14 @@
 import { createSelector } from 'reselect';
 
-import { ENABLE_SDGS, USER_ROLES } from 'themes/config';
+import { USER_ROLES } from 'themes/config';
 
 import {
   selectEntity,
   selectEntities,
   selectMeasuresCategorised,
-  selectSdgTargetsCategorised,
-  selectTaxonomiesSorted,
+  selectRecommendationsCategorised,
+  selectFWTaxonomiesSorted,
+  selectFrameworks,
 } from 'containers/App/selectors';
 
 import {
@@ -15,6 +16,7 @@ import {
   entitySetUser,
   usersByRole,
   prepareTaxonomiesMultiple,
+  attributesEqual,
 } from 'utils/entities';
 
 
@@ -42,19 +44,32 @@ export const selectMeasures = createSelector(
 
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => ENABLE_SDGS
-    ? prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_sdgtargets'])
-    : prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
+  (taxonomies, categories) =>
+    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
 );
 
-export const selectSdgTargets = createSelector(
+export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
-  (state) => selectSdgTargetsCategorised(state),
-  (state) => selectEntities(state, 'sdgtarget_indicators'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'sdgtarget_id', associations, 'indicator_id', id)
+  (state) => selectRecommendationsCategorised(state),
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (state) => selectFrameworks(state),
+  (id, entities, associations, frameworks) =>
+    entitiesSetAssociated(entities, 'recommendation_id', associations, 'indicator_id', id)
+    .filter((r) => {
+      const framework = frameworks.find(
+        (fw) =>
+          attributesEqual(
+            fw.get('id'),
+            r.getIn(['attributes', 'framework_id']),
+          )
+        );
+      return framework.getIn(['attributes', 'has_indicators']);
+    })
+    .groupBy(
+      (r) => r.getIn(['attributes', 'framework_id']).toString()
+    )
 );
 
 export const selectUsers = createSelector(

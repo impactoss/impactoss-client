@@ -1,30 +1,14 @@
-import { ENABLE_SDGS } from 'themes/config';
-
-export const DEPENDENCIES = ENABLE_SDGS
-? [
+export const DEPENDENCIES = [
   'user_roles',
   'recommendations',
   'users',
   'taxonomies',
+  'framework_taxonomies',
   'categories',
   'measures',
   'recommendation_measures',
   'recommendation_categories',
-  'measure_categories',
-  'measure_indicators',
-  'indicators',
-  'sdgtargets',
-  'sdgtarget_measures',
-]
-: [
-  'user_roles',
-  'recommendations',
-  'users',
-  'taxonomies',
-  'categories',
-  'measures',
-  'recommendation_measures',
-  'recommendation_categories',
+  'recommendation_indicators',
   'measure_categories',
   'measure_indicators',
   'indicators',

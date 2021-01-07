@@ -5,6 +5,7 @@ import { lowerCase } from 'utils/string';
 import {
   getConnectedCategories,
   testEntityCategoryAssociation,
+  getCategoryTitle,
 } from 'utils/entities';
 import isNumber from 'utils/is-number';
 import { getEntitySortComparator } from 'utils/sort';
@@ -56,10 +57,6 @@ const makeEntityGroups = (
   }
   return List().push(Map({ entities }));
 };
-const getCategoryLabel = (cat) =>
-  cat.getIn(['attributes', 'reference'])
-  ? `${cat.getIn(['attributes', 'reference'])}. ${cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name'])}`
-  : cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
 
 const getTaxTitle = (id, contextIntl) => contextIntl ? contextIntl.formatMessage(appMessages.entities.taxonomies[id].single) : '';
 
@@ -78,7 +75,7 @@ export const makeTaxonomyGroups = (entities, taxonomy, messages, contextIntl) =>
           if (groups.get(catId)) {
             groups = groups.setIn([catId, 'entities'], groups.getIn([catId, 'entities']).push(entity));
           } else {
-            const label = getCategoryLabel(cat);
+            const label = getCategoryTitle(cat);
             groups = groups.set(catId, Map({
               label,
               entities: List().push(entity),
@@ -131,7 +128,7 @@ export const makeConnectedTaxonomyGroups = (entities, taxonomy, config, messages
           if (groups.get(catId)) {
             groups = groups.setIn([catId, 'entities'], groups.getIn([catId, 'entities']).push(entity));
           } else {
-            const label = getCategoryLabel(cat);
+            const label = getCategoryTitle(cat);
             groups = groups.set(catId, Map({
               label,
               entities: List().push(entity),

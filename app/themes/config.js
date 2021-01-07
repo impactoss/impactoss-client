@@ -62,20 +62,6 @@ export const TEXT_TRUNCATE = {
   LINK_FIELD: 30,
 };
 
-export const TAXONOMY_GROUPS = [
-  {
-    id: 1,
-    priorityMin: 0,
-    priorityMax: 9,
-    default: true,
-  },
-  {
-    id: 2,
-    priorityMin: 10,
-    priorityMax: 19,
-  },
-];
-
 export const PROGRESS_TAXONOMY_ID = 10;
 
 // WARNING: references as assigned by user
@@ -83,6 +69,8 @@ export const PROGRESS_CATEGORY_REFERENCES = {
   ONGOING: 1,
   COMPLETED: 2,
 };
+
+export const CYCLE_TAXONOMY_ID = 2;
 
 /**
  * Server settings
@@ -162,7 +150,7 @@ export const REPORT_FREQUENCIES = [
   { value: 12, message: 'ui.reportFrequencies.annual' },
 ];
 
-export const ENABLE_SDGS = true;
+export const DEFAULT_FRAMEWORK = 1;
 
 // Map server database tables **************************
 export const DB_TABLES = [
@@ -183,112 +171,9 @@ export const DB_TABLES = [
   'user_categories',
   'progress_reports',
   'due_dates',
-  'sdgtarget_categories',
-  'sdgtarget_indicators',
-  'sdgtarget_measures',
-  'sdgtargets',
+  'frameworks',
+  'framework_taxonomies',
+  'framework_frameworks',
+  'recommendation_indicators',
+  'recommendation_recommendations',
 ];
-
-// Table shapes
-// - define fields for each table
-// - set field location in entity forms and views (section/column)
-// - define fields for csv import (import)
-// - disable fields by setting 'disabled: true'
-
-// shape for table 'measures' (Actions)
-export const MEASURE_SHAPE = {
-  table: 'measures',
-  key: 'measures_id',
-  fields: [
-    {
-      attribute: 'title',
-      control: 'title',
-      type: 'text',
-      required: true,
-      import: true,
-      section: 'header',
-      column: 'main',
-    },
-    {
-      attribute: 'draft',
-      control: 'status',
-      type: 'bool',
-      default: true,
-      section: 'header',
-      column: 'aside',
-      role: USER_ROLES.MANAGER.value,
-    },
-    {
-      attribute: 'description',
-      control: 'markdown',
-      type: 'markdown',
-      import: true,
-      section: 'body',
-      column: 'main',
-    },
-    {
-      disabled: true,
-      attribute: 'outcome',
-      control: 'markdown',
-      type: 'markdown',
-      import: true,
-      section: 'body',
-      column: 'main',
-    },
-    {
-      disabled: true,
-      attribute: 'indicator_summary',
-      control: 'markdown',
-      type: 'markdown',
-      import: true,
-      section: 'body',
-      column: 'main',
-    },
-    {
-      attribute: 'target_date',
-      control: 'date',
-      type: 'date',
-      import: true,
-      section: 'body',
-      column: 'aside',
-      groupType: 'dark',
-    },
-    {
-      attribute: 'target_date_comment',
-      control: 'textarea',
-      type: 'text',
-      import: true,
-      section: 'body',
-      column: 'aside',
-      groupType: 'dark',
-    },
-  ],
-  taxonomies: {
-    table: 'measure_categories',
-    key: 'category_id',
-    section: 'body',
-    column: 'aside',
-    smart: true,
-  },
-  connections: {
-    tables: [
-      {
-        table: 'recommendations',
-        via: 'recommendation_measures',
-        key: 'recommendation_id',
-      },
-      {
-        table: 'indicators',
-        via: 'measure_indicators',
-        key: 'indicator_id',
-      },
-      {
-        table: 'sdgtargets',
-        via: 'sdgtarget_measures',
-        key: 'sdgtarget_id',
-      },
-    ],
-    section: 'body',
-    column: 'main',
-  },
-};

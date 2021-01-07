@@ -16,21 +16,25 @@ import Row from 'components/styled/Row';
 import Container from 'components/styled/Container';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { selectFrameworks, selectIsSigningIn } from 'containers/App/selectors';
 
 import ButtonHero from 'components/buttons/ButtonHero';
+import ButtonFlat from 'components/buttons/ButtonFlat';
 import NormalImg from 'components/Img';
+import Loading from 'components/Loading';
 import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
 
 import {
-  DB_TABLES,
   SHOW_HOME_TITLE,
   SHOW_BRAND_ON_HOME,
   HEADER_PATTERN_HEIGHT,
   SHOW_HEADER_PATTERN_HOME_GRAPHIC,
 } from 'themes/config';
+
+import { DEPENDENCIES } from './constants';
 
 import messages from './messages';
 
@@ -128,15 +132,19 @@ const GridSpace = styled(Grid)`
     display: inline-block;
   }
 `;
+const StyledButtonHero = styled(ButtonHero)`
+  max-width: 250px;
+`;
+
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
   render() {
-    const { onPageLink, theme } = this.props;
+    const { theme, frameworks, onSelectFramework, onPageLink, signingIn } = this.props;
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
-
+    const loading = !frameworks;
     return (
       <div>
         <Helmet
@@ -174,13 +182,68 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                 <GridSpace lg={1 / 6} sm={1 / 8} />
                 <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                   <Intro source={this.context.intl.formatMessage(messages.intro)} />
-                  <HomeActions>
-                    <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
-                      <FormattedMessage {...messages.explore} />
-                    </ButtonHero>
-                  </HomeActions>
                 </Grid>
               </Row>
+              <HomeActions>
+                {(signingIn || loading) && (
+                  <Row space>
+                    <GridSpace lg={1 / 6} sm={1 / 8} />
+                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                      <Loading />
+                    </Grid>
+                  </Row>
+                )}
+                {(signingIn || loading) && (
+                  <Row space>
+                    <GridSpace lg={1 / 6} sm={1 / 8} />
+                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                      {signingIn && (
+                        <FormattedMessage {...messages.signingIn} />
+                      )}
+                      {!signingIn && (
+                        <FormattedMessage {...messages.loading} />
+                      )}
+                    </Grid>
+                  </Row>
+                )}
+                {!loading && !signingIn && frameworks.size > 1 && (
+                  <span>
+                    <Row>
+                      <GridSpace lg={1 / 6} sm={1 / 8} />
+                      <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                        <FormattedMessage {...messages.selectFramework} />
+                      </Grid>
+                    </Row>
+                    <Row space>
+                      <Grid lg={1} sm={1} xs={1}>
+                        {frameworks.entrySeq().map(([key, fw]) => (
+                          <StyledButtonHero space key={key} onClick={() => onSelectFramework(fw.get('id'))}>
+                            <FormattedMessage {...appMessages.frameworks[fw.get('id')]} />
+                          </StyledButtonHero>
+                        ))}
+                      </Grid>
+                    </Row>
+                    <Row space>
+                      <GridSpace lg={1 / 6} sm={1 / 8} />
+                      <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                        <ButtonFlat onClick={() => onSelectFramework('all')}>
+                          <FormattedMessage {...messages.exploreAllFrameworks} />
+                        </ButtonFlat>
+                      </Grid>
+                    </Row>
+                  </span>
+                )}
+                {!loading && !signingIn && frameworks.size === 1 && (
+                  <Row space>
+                    <GridSpace lg={1 / 6} sm={1 / 8} />
+                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                      <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
+                        <FormattedMessage {...messages.explore} />
+                      </ButtonHero>
+                    </Grid>
+                  </Row>
+                )}
+              </HomeActions>
             </Container>
           </SectionWrapper>
         </SectionTop>
@@ -192,34 +255,46 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
 
 HomePage.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func.isRequired,
+  onSelectFramework: PropTypes.func.isRequired,
   onPageLink: PropTypes.func.isRequired,
   theme: PropTypes.object.isRequired,
+  frameworks: PropTypes.object,
+  signingIn: PropTypes.bool,
 };
 
 HomePage.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-// const mapStateToProps = () => ({
-//   // dataReady: selectReady(state, { path: DEPENDENCIES }),
-//   // taxonomies: selectEntities(state, 'taxonomies'),
-//   // pages: selectEntitiesWhere(state, {
-//   //   path: 'pages',
-//   //   where: { draft: false },
-//   // }),
-// });
+const mapStateToProps = (state) => ({
+  frameworks: selectFrameworks(state),
+  signingIn: selectIsSigningIn(state),
+});
 
 function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
-      DB_TABLES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
-      // kick off loading although not needed
+      DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));
+    },
+    onSelectFramework: (framework) => {
+      // dispatch(setFramework(framework));
+      dispatch(updatePath(
+        PATHS.OVERVIEW,
+        {
+          query: {
+            arg: 'fw',
+            value: framework,
+            replace: true,
+          },
+          extend: true,
+        },
+      ));
     },
   };
 }
 
 // Wrap the component to inject dispatch and state into it
-export default connect(null, mapDispatchToProps)(withTheme(HomePage));
+export default connect(mapStateToProps, mapDispatchToProps)(withTheme(HomePage));

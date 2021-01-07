@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 
-import { map, groupBy } from 'lodash/collection';
+import { map } from 'lodash/collection';
 
 import { VIEWPORTS } from 'containers/App/constants';
 
@@ -20,6 +20,7 @@ import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
 import Sidebar from 'components/styled/Sidebar';
 import Scrollable from 'components/styled/Scrollable';
 
+import { prepareTaxonomyGroups } from 'utils/taxonomies';
 
 import appMessages from 'containers/App/messages';
 
@@ -94,8 +95,20 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
   };
 
   render() {
-    const taxonomyGroups = groupBy(this.props.taxonomies, (tax) => tax.group && tax.group.id);
-
+    const {
+      taxonomies,
+      active,
+      onTaxonomyLink,
+      frameworkId,
+      frameworks,
+    } = this.props;
+    const taxonomyGroups = frameworks && taxonomies && prepareTaxonomyGroups(
+      taxonomies,
+      active,
+      onTaxonomyLink,
+      frameworkId,
+      frameworks,
+    );
     return (
       <div>
         { (!this.state.visible && this.state.viewport < VIEWPORTS.SMALL) &&
@@ -115,15 +128,32 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                     </ToggleHide>
                   }
                 </SidebarHeader>
-                {map(taxonomyGroups, (taxonomies, i) => (
-                  <div key={i}>
+                {taxonomyGroups && map(taxonomyGroups, (group) => (
+                  <div key={group.id}>
                     <SidebarGroupLabel>
-                      <FormattedMessage {... appMessages.taxonomyGroups[i]} />
+                      {group.frameworkId && (
+                        <FormattedMessage
+                          {... appMessages.taxonomyGroups.objectives}
+                          values={{ type: this.context.intl.formatMessage(
+                            appMessages.entities[`recommendations_${group.frameworkId}`].plural
+                          ) }}
+                        />
+                      )}
+                      {!group.frameworkId && (
+                        <FormattedMessage {... appMessages.taxonomyGroups[group.id]} />
+                      )}
                     </SidebarGroupLabel>
                     <div>
-                      {taxonomies.map((taxonomy, j) =>
-                        <TaxonomySidebarItem key={j} taxonomy={taxonomy} onTaxonomyClick={this.onHideSidebar} />
-                      )}
+                      {map(group.taxonomies, (taxonomy) => (
+                        <div key={taxonomy.id}>
+                          <TaxonomySidebarItem taxonomy={taxonomy} onTaxonomyClick={this.onHideSidebar} />
+                          <div>
+                            { taxonomy.children && taxonomy.children.length > 0 && map(taxonomy.children, (child) =>
+                              <TaxonomySidebarItem key={child.id} nested taxonomy={child} onTaxonomyClick={this.onHideSidebar} />
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ))}
@@ -137,7 +167,11 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
 }
 
 TaxonomySidebar.propTypes = {
-  taxonomies: PropTypes.array,
+  taxonomies: PropTypes.object,
+  frameworks: PropTypes.object,
+  frameworkId: PropTypes.string,
+  onTaxonomyLink: PropTypes.func,
+  active: PropTypes.string,
   theme: PropTypes.object,
 };
 TaxonomySidebar.contextTypes = {

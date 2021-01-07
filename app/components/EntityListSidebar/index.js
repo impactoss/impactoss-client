@@ -83,10 +83,18 @@ const SidebarWrapper = styled.div`
 const STATE_INITIAL = {
   activeOption: null,
   expandedGroups: {
+    frameworks: true,
     taxonomies: true,
+    taxonomies_1: true,
+    taxonomies_2: true,
+    taxonomies_3: true,
+    taxonomies_4: true,
+    taxonomies_5: true,
+    taxonomies_6: true,
+    taxonomies_7: true,
     connectedTaxonomies: true,
-    connections: false,
-    attributes: false,
+    connections: true,
+    attributes: true,
   },
   visible: false,
   viewport: null,
@@ -233,6 +241,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       connectedTaxonomies,
       connections,
       entityIdsSelected,
+      frameworks,
     } = this.props;
     const activeOption = this.state.activeOption;
 
@@ -241,6 +250,13 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     const formModel = activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL;
 
     let panelGroups = null;
+
+    const entitiesSelected =
+      activePanel === EDIT_PANEL &&
+      canEdit &&
+      hasSelected &&
+      entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
+
     if (activePanel === FILTERS_PANEL) {
       panelGroups = makeFilterGroups(
         config,
@@ -251,10 +267,21 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         {
           attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
           taxonomyGroup: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
+          taxonomyGroupByFw:
+            (fw) =>
+              this.context.intl.formatMessage(
+                messages.filterGroupLabel.taxonomiesByFw,
+                {
+                  fw: this.context.intl.formatMessage(appMessages.frameworks_short[fw]),
+                },
+              ),
+          frameworksGroup: this.context.intl.formatMessage(messages.filterGroupLabel.frameworks),
           connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
           connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
           taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
+          frameworks: this.context.intl.formatMessage(appMessages.frameworks.plural),
         },
+        frameworks,
       );
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
       panelGroups = makeEditGroups(
@@ -268,6 +295,9 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
           taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
         },
+        frameworks,
+        // selectedFrameworkIds
+        entitiesSelected.groupBy((e) => e.getIn(['attributes', 'framework_id'])).keySeq(),
       );
     }
     let formOptions = null;
@@ -285,10 +315,10 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
             without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
           },
-          this.context.intl
+          this.context.intl,
+          frameworks,
         );
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
-        const entitiesSelected = entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
         formOptions = makeActiveEditOptions(
           entitiesSelected,
           config,
@@ -396,6 +426,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
 EntityListSidebar.propTypes = {
   entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),

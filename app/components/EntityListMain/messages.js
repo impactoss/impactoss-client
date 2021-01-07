@@ -16,7 +16,11 @@ export default defineMessages({
   },
   without: {
     id: 'app.components.EntityListMain.without',
-    defaultMessage: 'Without',
+    defaultMessage: 'Without {taxonomy}',
+  },
+  notapplicable: {
+    id: 'app.components.EntityListMain.notapplicable',
+    defaultMessage: 'Not applicable: {taxonomy}',
   },
   groupSubtitle: {
     id: 'app.components.EntityListMain.groupSubtitle',

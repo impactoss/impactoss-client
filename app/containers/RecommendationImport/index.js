@@ -101,6 +101,12 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
               data: getImportFields({
                 fields: [
                   {
+                    attribute: 'framework_id',
+                    type: 'number',
+                    required: true,
+                    import: true,
+                  },
+                  {
                     attribute: 'reference',
                     type: 'text',
                     required: true,

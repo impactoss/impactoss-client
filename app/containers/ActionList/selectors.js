@@ -2,11 +2,9 @@ import { createSelector } from 'reselect';
 import { Map, List } from 'immutable';
 import { reduce } from 'lodash/collection';
 
-import { ENABLE_SDGS } from 'themes/config';
-
 import {
   selectEntities,
-  selectEntitiesSearchQuery,
+  selectMeasuresSearchQuery,
   selectWithoutQuery,
   selectConnectionQuery,
   selectCategoryQuery,
@@ -14,7 +12,10 @@ import {
   selectSortByQuery,
   selectSortOrderQuery,
   selectExpandQuery,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
+  selectFWRecommendations,
+  selectFWIndicators,
+  selectFrameworks,
 } from 'containers/App/selectors';
 
 import {
@@ -26,6 +27,11 @@ import {
   testEntityEntityAssociation,
   entitiesSetCategoryIds,
   entitiesSetSingle,
+  getEntityCategories,
+  filterTaxonomies,
+  getEntityConnections,
+  getEntityConnectionsByFw,
+  getTaxonomyCategories,
 } from 'utils/entities';
 
 import { sortEntities, getSortOption } from 'utils/sort';
@@ -33,72 +39,78 @@ import { sortEntities, getSortOption } from 'utils/sort';
 import { CONFIG } from './constants';
 
 export const selectConnections = createSelector(
-  (state) => selectEntities(state, 'indicators'),
-  (state) => selectEntities(state, 'recommendations'),
-  (state) => selectEntities(state, 'sdgtargets'),
+  selectFWIndicators,
+  selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
-  (state) => selectEntities(state, 'sdgtarget_categories'),
-  (indicators, recommendations, sdgtargets, recommendationCategories, sdgtargetCategories) =>
+  (state) => selectEntities(state, 'categories'),
+  (indicators, recommendations, recommendationCategories, categories) =>
     Map()
     .set('indicators', indicators)
     .set('recommendations',
-      entitiesSetCategoryIds(recommendations, 'recommendation_id', recommendationCategories)
-    )
-    .set('sdgtargets',
-      ENABLE_SDGS && entitiesSetCategoryIds(sdgtargets, 'sdgtarget_id', sdgtargetCategories)
+      entitiesSetCategoryIds(
+        recommendations,
+        'recommendation_id',
+        recommendationCategories,
+        categories,
+      )
     )
 );
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectConnections(state),
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'recommendation_categories'),
-  (state) => selectEntities(state, 'sdgtarget_categories'),
-  (connections, taxonomies, categories, categoryRecommendations, categorySdgTargets) =>
-    // for all connections
-    reduce([
+  (state) => selectFrameworks(state),
+  (state) => selectEntities(state, 'framework_taxonomies'),
+  (
+    connections,
+    taxonomies,
+    categories,
+    categoryRecommendations,
+    frameworks,
+    fwTaxonomies,
+  ) => {
+    const measureFrameworks =
+      frameworks.filter((fw) => fw.getIn(['attributes', 'has_measures']));
+    const relationships = [
       {
         tags: 'tags_recommendations',
         path: 'recommendations',
         key: 'recommendation_id',
         associations: categoryRecommendations,
       },
-      ENABLE_SDGS && {
-        tags: 'tags_sdgtargets',
-        path: 'sdgtargets',
-        key: 'sdgtarget_id',
-        associations: categorySdgTargets,
-      },
-    ], (connectedTaxonomies, connection) =>
-      // TODO deal with conflicts
-      // merge connected taxonomies.
-      connection
-      ? connectedTaxonomies.merge(
-        taxonomies
-        .filter((taxonomy) => taxonomy.getIn(['attributes', connection.tags]))
-        .map((taxonomy) => taxonomy.set(
-          'categories',
-          categories
-          .filter((category) => attributesEqual(category.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id')))
-          .map((category) => category.set(
-            connection.path,
-            connection.associations
-            .filter((association) =>
-              attributesEqual(association.getIn(['attributes', 'category_id']), category.get('id'))
-              && connections.getIn([connection.path, association.getIn(['attributes', connection.key]).toString()])
-            )
-            .map((association) => association.getIn(['attributes', connection.key]))
+    ];
+    // for all connections
+    return reduce(
+      relationships,
+      (connectedTaxonomies, relationship) =>
+        // TODO deal with conflicts
+        // merge connected taxonomies.
+        connectedTaxonomies.merge(
+          filterTaxonomies(taxonomies, relationship.tags, true)
+          .filter((taxonomy) => fwTaxonomies.some(
+            (fwt) =>
+              measureFrameworks.some(
+                (fw) =>
+                  attributesEqual(fwt.getIn(['attributes', 'framework_id']), fw.get('id')),
+              ) &&
+              attributesEqual(fwt.getIn(['attributes', 'taxonomy_id']), taxonomy.get('id'))
           ))
-        ))
-      )
-      : connectedTaxonomies
-    , Map())
+          .map((taxonomy) => taxonomy.set('categories', getTaxonomyCategories(
+            taxonomy,
+            categories,
+            relationship,
+            connections.get(relationship.path),
+          )))
+        ),
+      Map(),
+    );
+  }
 );
 
 const selectMeasuresNested = createSelector(
-  (state, locationQuery) => selectEntitiesSearchQuery(state, {
-    path: 'measures',
+  (state, locationQuery) => selectMeasuresSearchQuery(state, {
     searchAttributes: CONFIG.search || ['title'],
     locationQuery,
   }),
@@ -106,52 +118,46 @@ const selectMeasuresNested = createSelector(
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'measure_indicators'),
   (state) => selectEntities(state, 'recommendation_measures'),
-  (state) => selectEntities(state, 'sdgtarget_measures'),
+  (state) => selectEntities(state, 'categories'),
   (
     entities,
     connections,
-    measureCategories,
-    measureIndicators,
-    measureRecommendations,
-    measureSdgTargets,
+    entityCategories,
+    entityIndicators,
+    entityRecommendations,
+    categories,
   ) => entities.map((entity) => entity
     // nest category ids
-    .set(
-      'categories',
-      measureCategories
-      .filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id')))
-      .map((association) => association.getIn(['attributes', 'category_id']))
-    )
+    .set('categories', getEntityCategories(
+      entity.get('id'),
+      entityCategories,
+      'measure_id',
+      categories,
+    ))
     // nest connected recommendation ids
-    .set(
-      'recommendations',
-      measureRecommendations
-      .filter((association) =>
-        attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
-        && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
-      )
-      .map((association) => association.getIn(['attributes', 'recommendation_id']))
-    )
-    // nest connected sdgtarget ids
-    .set(
-      'sdgtargets',
-      ENABLE_SDGS && measureSdgTargets
-      .filter((association) =>
-        attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
-        && connections.getIn(['sdgtargets', association.getIn(['attributes', 'sdgtarget_id']).toString()])
-      )
-      .map((association) => association.getIn(['attributes', 'sdgtarget_id']))
-    )
+    .set('recommendations', getEntityConnections(
+      entity.get('id'),
+      entityRecommendations,
+      'recommendation_id',
+      'measure_id',
+      connections.get('recommendations'),
+    ))
+    // nest connected recommendation ids byfw
+    .set('recommendationsByFw', getEntityConnectionsByFw(
+      entity.get('id'),
+      entityRecommendations,
+      'recommendation_id',
+      'measure_id',
+      connections.get('recommendations'),
+    ))
     // nest connected indicator ids
-    .set(
-      'indicators',
-      measureIndicators
-      .filter((association) =>
-        attributesEqual(association.getIn(['attributes', 'measure_id']), entity.get('id'))
-        && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
-      )
-      .map((association) => association.getIn(['attributes', 'indicator_id']))
-    )
+    .set('indicators', getEntityConnections(
+      entity.get('id'),
+      entityIndicators,
+      'indicator_id',
+      'measure_id',
+      connections.get('indicators'),
+    ))
   )
 );
 const selectMeasuresWithout = createSelector(
@@ -187,7 +193,7 @@ const selectMeasuresByConnectedCategories = createSelector(
 
 const selectMeasuresExpandables = createSelector(
   selectMeasuresByConnectedCategories,
-  (state) => selectEntities(state, 'indicators'),
+  selectFWIndicators,
   (state) => selectEntities(state, 'progress_reports'),
   (state) => selectEntities(state, 'due_dates'),
   selectExpandQuery,

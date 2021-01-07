@@ -8,14 +8,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { find } from 'lodash/collection';
 import { Map, List, fromJS } from 'immutable';
 
+import { getAcceptanceStatus } from 'utils/entities';
+
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { ACCEPTED_STATUSES } from 'themes/config';
 import {
   selectReady,
   selectRecommendationTaxonomies,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -80,7 +81,13 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         onClick: () => this.props.handleNew(),
       }],
     };
-
+    // if (dataReady) {
+    //   console.log(this.props.entities.toJS())
+    //   console.log(this.props.connections.toJS())
+    //   console.log(this.props.taxonomies.toJS())
+    //   console.log(this.props.frameworks.toJS())
+    //   console.log(this.props.connectedTaxonomies.toJS())
+    // }
     return (
       <div>
         <Helmet
@@ -93,6 +100,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
+          frameworks={this.props.frameworks}
           connectedTaxonomies={this.props.connectedTaxonomies}
           config={CONFIG}
           header={headerOptions}
@@ -102,9 +110,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
           }}
           entityIcon={(entity) => {
-            const status = find(ACCEPTED_STATUSES,
-              (option) => option.value === entity.getIn(['attributes', 'accepted'])
-            );
+            const status = getAcceptanceStatus(entity);
             return status ? status.icon : null;
           }}
           locationQuery={fromJS(this.props.location.query)}
@@ -121,6 +127,7 @@ RecommendationList.propTypes = {
   dataReady: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   location: PropTypes.object,
@@ -136,6 +143,7 @@ const mapStateToProps = (state, props) => ({
   taxonomies: selectRecommendationTaxonomies(state),
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
+  frameworks: selectActiveFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch) {

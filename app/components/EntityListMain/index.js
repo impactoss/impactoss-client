@@ -90,47 +90,86 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       entityIcon,
       entities,
       errors,
+      frameworks,
     } = this.props;
-
     const expandNo = config.expandableColumns && locationQuery.get('expand')
       ? parseInt(locationQuery.get('expand'), 10)
       : 0;
-    const groupSelectValue = locationQuery.get('group')
-    || (config.taxonomies && getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 1));
-    const subgroupSelectValue = groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET
-      ? locationQuery.get('subgroup')
-        || (config.taxonomies && getGroupValue(taxonomies, connectedTaxonomies, config.taxonomies.defaultGroupAttribute, 2))
-      : null;
+
+    let groupSelectValue = locationQuery.get('group');
+    const groupforFramework =
+      config.taxonomies &&
+      config.taxonomies.defaultGroupsByFramework &&
+      frameworks &&
+      frameworks.size === 1;
+    if (config.taxonomies && !groupSelectValue) {
+      if (groupforFramework) {
+        groupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][1];
+      } else {
+        groupSelectValue = getGroupValue(
+          taxonomies,
+          config.taxonomies.defaultGroupAttribute,
+          1,
+        );
+      }
+    }
+
+    let subgroupSelectValue;
+    if (groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET) {
+      subgroupSelectValue = locationQuery.get('subgroup');
+      if (config.taxonomies) {
+        if (groupforFramework) {
+          subgroupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][2];
+        } else {
+          subgroupSelectValue = getGroupValue(
+            taxonomies,
+            config.taxonomies.defaultGroupAttribute,
+            2,
+          );
+        }
+      }
+    }
 
     const headerTitle = entities && dataReady
       ? `${entities.size} ${entities.size === 1 ? entityTitle.single : entityTitle.plural}`
       : entityTitle.plural;
 
     // group all entities, regardless of page items
-    const entityGroups = groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET
-    ? groupEntities(
-      entities,
-      taxonomies,
-      connectedTaxonomies,
-      config,
-      groupSelectValue,
-      subgroupSelectValue !== PARAMS.GROUP_RESET && subgroupSelectValue,
-      {
-        without: this.context.intl && this.context.intl.formatMessage(messages.without),
-      },
-      this.context.intl || null
-    )
-    : null;
+    const entityGroups =
+      groupSelectValue &&
+      groupSelectValue !== PARAMS.GROUP_RESET
+      ? groupEntities(
+        entities,
+        taxonomies,
+        connectedTaxonomies,
+        config,
+        groupSelectValue,
+        subgroupSelectValue !== PARAMS.GROUP_RESET && subgroupSelectValue,
+        this.context.intl || null,
+        frameworks,
+      )
+      : null;
 
-    const subtitle = dataReady && entityGroups && groupSelectValue && this.context.intl
-    ? this.context.intl.formatMessage(messages.groupSubtitle, {
-      size: entityGroups.size,
-      type: lowerCase(this.context.intl.formatMessage(entityGroups.size === 1
-        ? appMessages.entities.taxonomies[groupSelectValue].single
-        : appMessages.entities.taxonomies[groupSelectValue].plural
-      )),
-    })
-    : null;
+    let subtitle = null;
+    if (dataReady && entityGroups && groupSelectValue && this.context.intl) {
+      const isPlural = entityGroups.size !== 1;
+      // disable broken support for connectedTaxonomies
+      // let taxId = groupSelectValue;
+      // if (taxId.indexOf('x:') > -1 && taxId.split(':').length > 1) {
+      //   taxId = taxId.split(':')[1];
+      // }
+      subtitle = this.context.intl.formatMessage(messages.groupSubtitle, {
+        size: entityGroups.size,
+        type:
+          lowerCase(
+            this.context.intl.formatMessage(
+              isPlural
+                ? appMessages.entities.taxonomies[groupSelectValue].single
+                : appMessages.entities.taxonomies[groupSelectValue].plural
+            )
+          ),
+      });
+    }
 
     return (
       <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }} >
@@ -165,6 +204,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                         locationQuery,
                         onTagClick,
                         errors,
+                        frameworks,
                       },
                       this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
                       this.context.intl.formatMessage(messages.filterFormError),
@@ -175,8 +215,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   />
                 </EntityListSearch>
                 <EntityListOptions
-                  groupOptions={getGroupOptions(taxonomies, null, this.context.intl)}
-                  subgroupOptions={getGroupOptions(taxonomies, null, this.context.intl)}
+                  groupOptions={getGroupOptions(taxonomies, this.context.intl)}
+                  subgroupOptions={getGroupOptions(taxonomies, this.context.intl)}
                   groupSelectValue={groupSelectValue}
                   subgroupSelectValue={subgroupSelectValue}
                   onGroupSelect={onGroupSelect}
@@ -232,6 +272,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
 EntityListMain.propTypes = {
   entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),

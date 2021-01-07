@@ -1,30 +1,12 @@
-import { USER_ROLES, PUBLISH_STATUSES, ENABLE_SDGS } from 'themes/config';
+import { USER_ROLES, PUBLISH_STATUSES } from 'themes/config';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
+export const DEPENDENCIES = [
   'user_roles',
   'measures',
   'measure_categories',
   'users',
   'taxonomies',
-  'categories',
-  'recommendations',
-  'recommendation_measures',
-  'recommendation_categories',
-  'sdgtargets',
-  'sdgtarget_measures',
-  'sdgtarget_categories',
-  'indicators',
-  'measure_indicators',
-  'due_dates',
-  'progress_reports',
-]
-: [
-  'user_roles',
-  'measures',
-  'measure_categories',
-  'users',
-  'taxonomies',
+  'framework_taxonomies',
   'categories',
   'recommendations',
   'recommendation_measures',
@@ -74,20 +56,7 @@ export const CONFIG = {
     query: 'catx',
     search: true,
     exclude: 'tags_measures',
-    connections: ENABLE_SDGS
-    ? [
-      {
-        path: 'recommendations', // filter by recommendation connection
-        message: 'entities.recommendations.plural',
-        key: 'recommendation_id',
-      },
-      {
-        path: 'sdgtargets', // filter by recommendation connection
-        message: 'entities.sdgtargets.plural',
-        key: 'sdgtarget_id',
-      },
-    ]
-    : [
+    connections: [
       {
         path: 'recommendations', // filter by recommendation connection
         message: 'entities.recommendations.plural',
@@ -97,8 +66,7 @@ export const CONFIG = {
   },
   connections: { // filter by associated entity
     query: 'connected',
-    options: ENABLE_SDGS
-    ? [
+    options: [
       {
         search: true,
         message: 'entities.indicators.plural',
@@ -110,38 +78,13 @@ export const CONFIG = {
       },
       {
         search: true,
-        message: 'entities.recommendations.plural',
+        message: 'entities.recommendations_{fwid}.plural',
         path: 'recommendations', // filter by recommendation connection
         key: 'recommendation_id',
         connectPath: 'recommendation_measures', // filter by recommendation connection
         ownKey: 'measure_id',
-      },
-      {
-        search: true,
-        message: 'entities.sdgtargets.plural',
-        path: 'sdgtargets', // filter by recommendation connection
-        key: 'sdgtarget_id',
-        connectPath: 'sdgtarget_measures', // filter by recommendation connection
-        ownKey: 'measure_id',
-      },
-    ]
-    : [
-      {
-        search: true,
-        message: 'entities.indicators.plural',
-        path: 'indicators', // filter by recommendation connection
-        key: 'indicator_id',
-        expandable: true, // used for omitting from connected counts
-        connectPath: 'measure_indicators', // filter by recommendation connection
-        ownKey: 'measure_id',
-      },
-      {
-        search: true,
-        message: 'entities.recommendations.plural',
-        path: 'recommendations', // filter by recommendation connection
-        key: 'recommendation_id',
-        connectPath: 'recommendation_measures', // filter by recommendation connection
-        ownKey: 'measure_id',
+        groupByFramework: true,
+        frameworkFilter: 'has_measures',
       },
     ],
   },

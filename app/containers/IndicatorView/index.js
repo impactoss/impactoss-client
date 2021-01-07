@@ -17,11 +17,13 @@ import {
   getMetaField,
   getMarkdownField,
   getMeasureConnectionField,
-  getSdgTargetConnectionField,
+  getRecommendationConnectionField,
   getManagerField,
   getScheduleField,
   getReportsField,
 } from 'utils/fields';
+
+import { attributesEqual } from 'utils/entities';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages } from 'containers/App/actions';
 
@@ -38,10 +40,11 @@ import {
   selectIsUserContributor,
   selectIsUserManager,
   selectMeasureTaxonomies,
-  selectSdgTargetTaxonomies,
   selectMeasureConnections,
-  selectSdgTargetConnections,
+  selectRecommendationTaxonomies,
+  selectRecommendationConnections,
   selectQueryMessages,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -50,7 +53,7 @@ import messages from './messages';
 import {
   selectViewEntity,
   selectMeasures,
-  selectSdgTargets,
+  selectRecommendations,
   selectReports,
   selectDueDates,
 } from './selectors';
@@ -82,17 +85,30 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     ([{
       fields: [
         getStatusField(entity),
-        getMetaField(entity, appMessages),
+        getMetaField(entity),
       ],
     }]);
 
-  getBodyMainFields = (entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick, sdgtargetConnections, measureConnections) => ([
-    {
+  getBodyMainFields = (
+    entity,
+    measures,
+    reports,
+    measureTaxonomies,
+    isContributor,
+    onEntityClick,
+    measureConnections,
+    recommendationsByFw,
+    recommendationTaxonomies,
+    recommendationConnections,
+    frameworks,
+  ) => {
+    const fields = [];
+    // own attributes
+    fields.push({
       fields: [
-        getMarkdownField(entity, 'description', true, appMessages),
+        getMarkdownField(entity, 'description', true),
         getReportsField(
           reports,
-          appMessages,
           {
             type: 'add',
             title: this.context.intl.formatMessage(messages.addReport),
@@ -100,16 +116,47 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
           }
         ),
       ],
-    },
-    {
-      label: appMessages.entities.connections.plural,
-      icon: 'connections',
-      fields: [
-        measures && getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
-        sdgtargets && getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, appMessages, onEntityClick),
-      ],
-    },
-  ]);
+    });
+    // measures
+    if (measures) {
+      fields.push({
+        label: appMessages.nav.measuresSuper,
+        icon: 'measures',
+        fields: [
+          getMeasureConnectionField(
+            measures,
+            measureTaxonomies,
+            measureConnections,
+            onEntityClick,
+          ),
+        ],
+      });
+    }
+    // recs
+    if (recommendationsByFw) {
+      const recConnections = [];
+      recommendationsByFw.forEach((recs, fwid) => {
+        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+        const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
+        recConnections.push(
+          getRecommendationConnectionField(
+            recs,
+            recommendationTaxonomies,
+            recommendationConnections,
+            onEntityClick,
+            fwid,
+            hasResponse,
+          ),
+        );
+      });
+      fields.push({
+        label: appMessages.nav.recommendations,
+        icon: 'recommendations',
+        fields: recConnections,
+      });
+    }
+    return fields;
+  };
 
   getBodyAsideFields = (entity, dates) => ([ // fieldGroups
     { // fieldGroup
@@ -117,10 +164,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       type: 'dark',
       icon: 'reminder',
       fields: [
-        getScheduleField(
-          dates,
-          appMessages,
-        ),
+        getScheduleField(dates),
         getManagerField(
           entity,
           appMessages.attributes.manager_id.indicators,
@@ -137,14 +181,15 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       isContributor,
       isManager,
       measures,
-      sdgtargets,
       reports,
       dates,
       measureTaxonomies,
-      sdgtargetTaxonomies,
       onEntityClick,
-      sdgtargetConnections,
       measureConnections,
+      recommendationsByFw,
+      recommendationTaxonomies,
+      recommendationConnections,
+      frameworks,
     } = this.props;
 
     const buttons = isManager
@@ -217,7 +262,19 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                   aside: this.getHeaderAsideFields(viewEntity, isContributor),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick, sdgtargetConnections, measureConnections),
+                  main: this.getBodyMainFields(
+                    viewEntity,
+                    measures,
+                    reports,
+                    measureTaxonomies,
+                    isContributor,
+                    onEntityClick,
+                    measureConnections,
+                    recommendationsByFw,
+                    recommendationTaxonomies,
+                    recommendationConnections,
+                    frameworks,
+                  ),
                   aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
                 },
               }}
@@ -240,16 +297,17 @@ IndicatorView.propTypes = {
   isContributor: PropTypes.bool,
   isManager: PropTypes.bool,
   measures: PropTypes.object,
-  sdgtargets: PropTypes.object,
   reports: PropTypes.object,
   measureTaxonomies: PropTypes.object,
-  sdgtargetTaxonomies: PropTypes.object,
   dates: PropTypes.object,
   params: PropTypes.object,
   measureConnections: PropTypes.object,
-  sdgtargetConnections: PropTypes.object,
   queryMessages: PropTypes.object,
   onDismissQueryMessages: PropTypes.func,
+  recommendationTaxonomies: PropTypes.object,
+  recommendationConnections: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
+  frameworks: PropTypes.object,
 };
 
 IndicatorView.contextTypes = {
@@ -262,15 +320,16 @@ const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
-  sdgtargets: selectSdgTargets(state, props.params.id),
-  sdgtargetTaxonomies: selectSdgTargetTaxonomies(state),
   measures: selectMeasures(state, props.params.id),
   measureTaxonomies: selectMeasureTaxonomies(state),
+  recommendationsByFw: selectRecommendations(state, props.params.id),
+  recommendationTaxonomies: selectRecommendationTaxonomies(state),
   reports: selectReports(state, props.params.id),
   dates: selectDueDates(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
-  sdgtargetConnections: selectSdgTargetConnections(state),
+  recommendationConnections: selectRecommendationConnections(state),
   queryMessages: selectQueryMessages(state),
+  frameworks: selectActiveFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

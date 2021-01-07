@@ -1,4 +1,5 @@
 import { find } from 'lodash/collection';
+import { CYCLE_TAXONOMY_ID } from 'themes/config';
 
 export const getSortOption = (sortOptions, sortBy, query = 'attribute') =>
   find(sortOptions, (option) => option[query] === sortBy)
@@ -21,7 +22,6 @@ const getEntitySortValueMapper = (entity, sortBy) => {
     //   return entity.get(sortBy) || entity.getIn(['attributes', 'title']) || entity.get('id');
     case 'measures':
     case 'recommendations':
-    case 'sdgtargets':
     case 'sortBy':
       return entity.get(sortBy) || 0;
     case 'dueDateThenUpdated':
@@ -97,4 +97,20 @@ export const sortEntities = (entities, sortOrder, sortBy, type, asList = true) =
     (a, b) => getEntitySortComparator(a, b, sortOrder || 'asc', type)
   );
   return asList ? sorted.toList() : sorted;
+};
+
+export const sortCategories = (categories, taxonomyId, sortOrder, sortBy) => {
+  if (taxonomyId && parseInt(taxonomyId, 10) === CYCLE_TAXONOMY_ID) {
+    return sortEntities(
+        categories,
+        sortOrder || 'desc',
+        sortBy || 'date',
+        'date', // fild type
+      );
+  }
+  return sortEntities(
+      categories,
+      sortOrder || 'asc',
+      sortBy || 'referenceThenTitle',
+    );
 };
