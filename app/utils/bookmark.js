@@ -1,66 +1,73 @@
-import messages from 'containers/BookmarkList/messages';
+import { List } from 'immutable';
 
-const getEntries = (subView) => (Object.entries(subView)
-  .filter(([, value]) => value) // filter out if parameter is not defined
-)
+const EXCLUDES = [
+  'order',
+  'sort',
+  'items',
+  'page',
+];
 
-export const bookmarkToPath = (bookmark) => {
-  const view = bookmark.getIn(['attributes', 'view']).toJS();
+const getPathFromLocation = (location) =>
+  location.get('pathname').replace('/', '');
 
-  if (!view.type) {
-    return null
+const getBookmarksForPath = (bookmarks, path) =>
+  bookmarks.filter(
+    (b) => b.getIn(['attributes', 'view', 'path']) === path,
+  );
+
+const filterQueryForChecking = (query) =>
+  List(EXCLUDES).reduce(
+    (memo, arg) => memo.delete(arg),
+    query,
+  );
+const filterQueryForSaving = (query) =>
+  List(EXCLUDES).reduce(
+    (memo, arg) => memo.delete(arg),
+    query,
+  );
+
+const checkValues = (valueCheck, value) => {
+  if (List.isList(valueCheck) && List.isList(value)) {
+    return valueCheck.isSubset(value) &&
+      valueCheck.isSuperset(value);
+  } else if (List.isList(valueCheck) && !List.isList(value)) {
+    return false;
+  } else if (!List.isList(valueCheck) && List.isList(value)) {
+    return false;
   }
+  return valueCheck === value;
+};
 
-  const {
-    type,
-    subgroup, group, expand, sort, order,
-    cat, catx, where, connected,
-  } = view;
+export const getBookmarkForLocation = (location, bookmarks) => {
+  const pathCheck = getPathFromLocation(location);
+  const queryCheck = filterQueryForChecking(location.get('query'));
 
-  const singleValue = getEntries({ subgroup, group, expand, sort, order })
-    .map((entry) => entry.join('='));
-  const cats = (cat || []).map((id) => `cat=${id}`);
-  const multiValue = getEntries({ catx, where, connected })
-    .flatMap(
-      ([filter, objects]) => objects.map(
-        ({ key, value }) => `${filter}=${key}:${value}`
-      )
-    );
+  const bmForType = getBookmarksForPath(bookmarks, pathCheck);
 
-  const queryParts = [...singleValue, ...cats, ...multiValue]
+  return bmForType.find(
+    (bookmark) => {
+      const queryBM = bookmark.getIn(['attributes', 'view', 'query']);
+      return queryCheck.every(
+          (valueCheck, key) => checkValues(valueCheck, queryBM.get(key))
+        ) &&
+        queryBM.every(
+          (valueCheck, key) => checkValues(valueCheck, queryCheck.get(key))
+        );
+    }
+  );
+};
 
-  return `/${type}?${queryParts.sort().join('&')}`;
-}
-
-export const locationToBookmarkView = (location) => {
-  const {pathname, search} = location.toJS();
-  const search_parts = search.substring(1)
-    .split('&').map(part => decodeURIComponent(part).split('='));
-  const singleParams = ['subgroup', 'group', 'expand', 'sort', 'order'];
-  const multiParams = ['catx', 'where', 'connected'];
-
-  const singleValues = search_parts
-    .filter(([k, v]) => singleParams.includes(k))
-    .map(([k, v]) => ({[k]: v}))
-    .reduce((acc, v) => ({...acc, ...v}), {})
-
-  const cat = search_parts
-    .filter(([k]) => k === 'cat')
-    .map(([, v]) => v)
-
-  const multiValues = search_parts
-    .filter(([k]) => multiParams.includes(k))
-    .map(([param, pair]) => {
-      const [key, value] = pair.split(':');
-
-      return {param, key, value};
-    })
-    .reduce((acc, {param, key, value}) => ({
-      ...acc, [param]: [...(acc[param] || {}), {key, value}]
-    }), {})
-
+export const getBookmarkForSaving = (location, type) => {
+  const query = filterQueryForSaving(location.get('query'));
   return {
-    type: pathname.substring(1),
-    ...singleValues, cat, ...multiValues
+    type: type || getPathFromLocation(location),
+    path: getPathFromLocation(location),
+    query: query.toJS(),
   };
-}
+};
+
+export const generateBookmarkTitle = (location, bookmarks, viewTitle) => {
+  const path = getPathFromLocation(location);
+  const count = getBookmarksForPath(bookmarks, path).size;
+  return `${viewTitle} ${count + 1}`;
+};

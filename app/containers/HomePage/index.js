@@ -280,7 +280,6 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(path));
     },
     onSelectFramework: (framework) => {
-      // dispatch(setFramework(framework));
       dispatch(updatePath(
         PATHS.OVERVIEW,
         {

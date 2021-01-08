@@ -275,7 +275,6 @@ export function mapDispatchToProps(dispatch) {
       dispatch(openNewEntityModal(null));
     },
     onSelectFramework: (framework) => {
-      // dispatch(setFramework(framework));
       dispatch(updateRouteQuery(
         {
           arg: 'fw',

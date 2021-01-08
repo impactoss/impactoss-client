@@ -69,6 +69,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         onClick: () => this.props.handleNew(),
       }, {
         type: 'bookmarker',
+        title: this.context.intl.formatMessage(messages.pageTitle),
       }],
     };
     return (

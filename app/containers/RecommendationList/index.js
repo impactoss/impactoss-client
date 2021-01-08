@@ -59,12 +59,15 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   //     || !isEqual(this.state, nextState);
   // }
   render() {
-    const { dataReady } = this.props;
+    const { dataReady, frameworks } = this.props;
     // console.log('RecList:render')
-
+    const currentFramework = frameworks && frameworks.size === 1 && frameworks.first();
+    const type = currentFramework
+      ? `recommendations_${currentFramework.get('id')}`
+      : 'recommendations';
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
-      icon: 'recommendations',
+      icon: type,
       actions: [{
         type: 'text',
         title: this.context.intl.formatMessage(appMessages.buttons.import),
@@ -74,11 +77,15 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         title: [
           this.context.intl.formatMessage(appMessages.buttons.add),
           {
-            title: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
+            title: this.context.intl.formatMessage(appMessages.entities[type].single),
             hiddenSmall: true,
           },
         ],
         onClick: () => this.props.handleNew(),
+      }, {
+        type: 'bookmarker',
+        title: this.context.intl.formatMessage(appMessages.entities[type].plural),
+        entityType: type,
       }],
     };
     // if (dataReady) {
@@ -100,14 +107,14 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
-          frameworks={this.props.frameworks}
+          frameworks={frameworks}
           connectedTaxonomies={this.props.connectedTaxonomies}
           config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
-            plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+            single: this.context.intl.formatMessage(appMessages.entities[type].single),
+            plural: this.context.intl.formatMessage(appMessages.entities[type].plural),
           }}
           entityIcon={(entity) => {
             const status = getAcceptanceStatus(entity);

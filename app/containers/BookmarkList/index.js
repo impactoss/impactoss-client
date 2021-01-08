@@ -10,13 +10,11 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { List, fromJS } from 'immutable';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import { loadEntitiesIfNeeded, openBookmark } from 'containers/App/actions';
 import { selectReady } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
-import { PATHS } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
-import {bookmarkToPath} from 'utils/bookmark'
 
 import { CONFIG, DEPENDENCIES } from './constants';
 import { selectBookmarks } from './selectors';
@@ -65,7 +63,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
           onEntityClickCustom={(id) => {
             /* @TODO handle invalid bookmark null return */
             const bookmark = entities.find((entity) => entity.get('id') === id);
-            this.props.openBookmark(bookmarkToPath(bookmark));
+            this.props.openBookmark(bookmark);
           }}
         />
       </div>
@@ -75,6 +73,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
 
 BookmarkList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  openBookmark: PropTypes.func,
   dataReady: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
   location: PropTypes.object,
@@ -93,8 +92,8 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    openBookmark: (path) => {
-      dispatch(updatePath(path, { replace: true }));
+    openBookmark: (bookmark) => {
+      dispatch(openBookmark(bookmark));
     },
   };
 }

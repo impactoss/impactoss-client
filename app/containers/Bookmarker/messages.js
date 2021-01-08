@@ -1,24 +1,24 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
-  popoutTitle: {
-    id: 'app.containers.Bookmarker.popoutTitle',
-    defaultMessage: 'Bookmark added',
+  title: {
+    id: 'app.containers.Bookmarker.title',
+    defaultMessage: 'Edit bookmark',
   },
-  popoutNameLabel: {
-    id: 'app.containers.Bookmarker.popoutNameLabel',
-    defaultMessage: 'Name',
+  labelTitle: {
+    id: 'app.containers.Bookmarker.labelTitle',
+    defaultMessage: 'Bookmark title',
   },
-  popoutDelete: {
-    id: 'app.containers.Bookmarker.popoutDelete',
+  buttonDelete: {
+    id: 'app.containers.Bookmarker.buttonDelete',
     defaultMessage: 'Delete',
   },
-  popoutCancel: {
-    id: 'app.containers.Bookmarker.popoutCancel',
+  buttonCancel: {
+    id: 'app.containers.Bookmarker.buttonCancel',
     defaultMessage: 'Cancel',
   },
-  popoutDone: {
-    id: 'app.containers.Bookmarker.popoutDone',
-    defaultMessage: 'Done',
+  buttonUpdate: {
+    id: 'app.containers.Bookmarker.buttonUpdate',
+    defaultMessage: 'Update title',
   },
 });
