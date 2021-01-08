@@ -4,11 +4,18 @@ import {
   selectEntitiesSearchQuery,
   selectSortByQuery,
   selectSortOrderQuery,
+  selectLocationQuery,
 } from 'containers/App/selectors';
 
 import { sortEntities, getSortOption } from 'utils/sort';
 
 import { CONFIG } from './constants';
+
+export const selectTypeQuery = createSelector(
+  selectLocationQuery,
+  (locationQuery) =>
+    locationQuery && locationQuery.get('type')
+);
 
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
@@ -17,7 +24,7 @@ import { CONFIG } from './constants';
 export const selectBookmarks = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'bookmarks',
-    searchAttributes: CONFIG.search || ['title'],
+    searchAttributes: ['title'],
     locationQuery,
   }),
   selectSortByQuery,
@@ -26,8 +33,8 @@ export const selectBookmarks = createSelector(
     const sortOption = getSortOption(CONFIG.sorting, sort);
     return sortEntities(
       entities,
-      order || (sortOption ? sortOption.order : 'asc'),
-      sort || (sortOption ? sortOption.attribute : 'order'),
+      order || (sortOption ? sortOption.order : 'desc'),
+      sort || (sortOption ? sortOption.attribute : 'id'),
       sortOption ? sortOption.type : 'number'
     );
   }

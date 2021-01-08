@@ -689,6 +689,10 @@ export default defineMessages({
       id: 'app.containers.App.nav.users',
       defaultMessage: 'User admin',
     },
+    bookmarks: {
+      id: 'app.containers.App.nav.bookmarks',
+      defaultMessage: 'Bookmarks',
+    },
     search: {
       id: 'app.containers.App.nav.search',
       defaultMessage: 'Search',

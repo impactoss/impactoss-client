@@ -17,6 +17,7 @@ import {
   selectReady,
   selectRecommendationTaxonomies,
   selectActiveFrameworks,
+  selectIsUserManager,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -59,7 +60,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   //     || !isEqual(this.state, nextState);
   // }
   render() {
-    const { dataReady, frameworks } = this.props;
+    const { dataReady, frameworks, isManager } = this.props;
     // console.log('RecList:render')
     const currentFramework = frameworks && frameworks.size === 1 && frameworks.first();
     const type = currentFramework
@@ -68,11 +69,15 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: type,
-      actions: [{
+      actions: [],
+    };
+    if (isManager) {
+      headerOptions.actions.push({
         type: 'text',
         title: this.context.intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
-      }, {
+      });
+      headerOptions.actions.push({
         type: 'add',
         title: [
           this.context.intl.formatMessage(appMessages.buttons.add),
@@ -82,12 +87,13 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           },
         ],
         onClick: () => this.props.handleNew(),
-      }, {
-        type: 'bookmarker',
-        title: this.context.intl.formatMessage(appMessages.entities[type].plural),
-        entityType: type,
-      }],
-    };
+      });
+    }
+    headerOptions.actions.push({
+      type: 'bookmarker',
+      title: this.context.intl.formatMessage(appMessages.entities[type].plural),
+      entityType: type,
+    });
     // if (dataReady) {
     //   console.log(this.props.entities.toJS())
     //   console.log(this.props.connections.toJS())
@@ -132,6 +138,7 @@ RecommendationList.propTypes = {
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
   dataReady: PropTypes.bool,
+  isManager: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
   frameworks: PropTypes.instanceOf(Map),
@@ -151,6 +158,7 @@ const mapStateToProps = (state, props) => ({
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectActiveFrameworks(state),
+  isManager: selectIsUserManager(state),
 });
 
 function mapDispatchToProps(dispatch) {

@@ -76,6 +76,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       entityTitle,
       dataReady,
       isManager,
+      isUserSignedIn,
       isContributor,
       onGroupSelect,
       onSubgroupSelect,
@@ -182,10 +183,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
               title={headerTitle}
               subTitle={subtitle}
               sortAttributes={config.sorting}
-              buttons={dataReady && isManager
-                ? header.actions
-                : null
-              }
+              buttons={dataReady && isUserSignedIn && header.actions}
             />
             { (!dataReady || !this.props.scrollContainer) &&
               <Loading />
@@ -286,6 +284,7 @@ EntityListMain.propTypes = {
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   isContributor: PropTypes.bool,
+  isUserSignedIn: PropTypes.bool,
   entityIcon: PropTypes.func,
   // functions
   onEntityClick: PropTypes.func.isRequired,

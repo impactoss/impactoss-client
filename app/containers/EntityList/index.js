@@ -20,7 +20,11 @@ import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 import EntityListMain from 'components/EntityListMain';
 
-import { selectHasUserRole, selectCurrentPathname } from 'containers/App/selectors';
+import {
+  selectHasUserRole,
+  selectCurrentPathname,
+  selectIsSignedIn,
+ } from 'containers/App/selectors';
 
 import {
   updatePath,
@@ -110,7 +114,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
   render() {
     // make sure selected entities are still actually on page
-    const { entityIdsSelected, progress, viewDomain } = this.props;
+    const { entityIdsSelected, progress, viewDomain, canEdit } = this.props;
 
     const sending = viewDomain.get('sending');
     const success = viewDomain.get('success');
@@ -144,7 +148,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             }
             config={this.props.config}
             locationQuery={this.props.locationQuery}
-            canEdit={this.props.hasUserRole[USER_ROLES.MANAGER.value]}
+            canEdit={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
             hasUserRole={this.props.hasUserRole}
             activePanel={this.props.activePanel}
             onPanelSelect={this.props.onPanelSelect}
@@ -173,8 +177,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           entityTitle={this.props.entityTitle}
 
           dataReady={this.props.dataReady}
-          isManager={this.props.hasUserRole[USER_ROLES.MANAGER.value]}
+          isManager={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
           isContributor={this.props.hasUserRole[USER_ROLES.CONTRIBUTOR.value]}
+          isUserSignedIn={this.props.isUserSignedIn}
 
           entityIcon={this.props.entityIcon}
           onEntitySelect={this.props.onEntitySelect}
@@ -241,6 +246,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
 EntityList.defaultProps = {
   showSidebar: true,
+  canEdit: true,
 };
 
 EntityList.propTypes = {
@@ -283,7 +289,8 @@ EntityList.propTypes = {
   onSortOrder: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
   onDismissError: PropTypes.func.isRequired,
-
+  canEdit: PropTypes.bool,
+  isUserSignedIn: PropTypes.bool,
   showSidebar: PropTypes.bool,
 };
 
@@ -298,6 +305,7 @@ const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   progress: selectProgress(state),
   currentPath: selectCurrentPathname(state),
+  isUserSignedIn: selectIsSignedIn(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

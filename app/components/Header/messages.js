@@ -22,10 +22,6 @@ export default defineMessages({
     id: 'app.components.Header.user',
     defaultMessage: 'User profile',
   },
-  bookmarks: {
-    id: 'app.components.Header.bookmarks',
-    defaultMessage: 'Bookmarks',
-  },
   userLoading: {
     id: 'app.components.Header.userLoading',
     defaultMessage: 'Signing in...',
