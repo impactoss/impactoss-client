@@ -142,6 +142,7 @@ const Search = styled(LinkMain)`
     padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px 0;
     position: absolute;
     right: 0;
+    border-left: none;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding-left: 24px;
