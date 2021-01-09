@@ -40,6 +40,7 @@ import {
   selectProgress,
   selectActivePanel,
   selectSelectedEntities,
+  selectProgressTypes,
 } from './selectors';
 
 import messages from './messages';
@@ -92,6 +93,16 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   componentWillMount() {
     this.props.updateClientPath();
   }
+  getMessageForType = (type) => {
+    switch (type) {
+      case 'new':
+        return messages.createSuccess;
+      case 'delete':
+        return messages.deleteSuccess;
+      default:
+        return messages.updatesSuccess;
+    }
+  }
 
   mapError = (error, key) =>
     fromJS({
@@ -114,7 +125,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
   render() {
     // make sure selected entities are still actually on page
-    const { entityIdsSelected, progress, viewDomain, canEdit } = this.props;
+    const { entityIdsSelected, progress, viewDomain, canEdit, progressTypes } = this.props;
 
     const sending = viewDomain.get('sending');
     const success = viewDomain.get('success');
@@ -211,6 +222,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 values={{
                   processNo: Math.min(success.size + errors.size + 1, sending.size),
                   totalNo: sending.size,
+                  types:
+                    this.context.intl.formatMessage(messages[
+                      `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
+                    ]),
                 }}
               />
             </ProgressText>
@@ -223,7 +238,18 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           <Progress error>
             <Messages
               type="error"
-              message={this.context.intl.formatMessage(messages.updatesFailed, { errorNo: viewDomain.get('errors').size })}
+              message={
+                this.context.intl.formatMessage(
+                  messages.updatesFailed,
+                  {
+                    errorNo: viewDomain.get('errors').size,
+                    types:
+                      this.context.intl.formatMessage(messages[
+                        `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
+                      ]),
+                  },
+                )
+              }
               onDismiss={this.props.resetProgress}
               preMessage={false}
             />
@@ -233,7 +259,17 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           <Progress error>
             <Messages
               type="success"
-              message={this.context.intl.formatMessage(messages.updatesSuccess, { successNo: viewDomain.get('success').size })}
+              message={
+                this.context.intl.formatMessage(
+                  this.getMessageForType(
+                    progressTypes.size === 1 ? progressTypes.first() : 'save',
+                    viewDomain.get('success').size,
+                  ),
+                  {
+                    successNo: viewDomain.get('success').size,
+                  },
+                )
+              }
               onDismiss={this.props.resetProgress}
               autoDismiss={2000}
             />
@@ -268,6 +304,7 @@ EntityList.propTypes = {
   entityIdsSelected: PropTypes.object,
   viewDomain: PropTypes.object,
   progress: PropTypes.number,
+  progressTypes: PropTypes.instanceOf(List),
   // dispatch props
   onPanelSelect: PropTypes.func.isRequired,
   handleEditSubmit: PropTypes.func.isRequired,
@@ -304,6 +341,7 @@ const mapStateToProps = (state) => ({
   entityIdsSelected: selectSelectedEntities(state),
   viewDomain: selectDomain(state),
   progress: selectProgress(state),
+  progressTypes: selectProgressTypes(state),
   currentPath: selectCurrentPathname(state),
   isUserSignedIn: selectIsSignedIn(state),
 });
