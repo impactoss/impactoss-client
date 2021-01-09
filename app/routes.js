@@ -176,6 +176,25 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: PATHS.BOOKMARKS,
+      name: 'bookmarkList',
+      onEnter: redirectIfNotSignedIn(),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/BookmarkList/sagas'),
+          import('containers/BookmarkList'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([sagas, component]) => {
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: `${PATHS.USERS}${PATHS.ID}`,
       name: 'userView',
       onEnter: redirectIfNotSignedIn(),

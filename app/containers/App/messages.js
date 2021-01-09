@@ -689,6 +689,10 @@ export default defineMessages({
       id: 'app.containers.App.nav.users',
       defaultMessage: 'User admin',
     },
+    bookmarks: {
+      id: 'app.containers.App.nav.bookmarks',
+      defaultMessage: 'Bookmarks',
+    },
     search: {
       id: 'app.containers.App.nav.search',
       defaultMessage: 'Search',
@@ -875,6 +879,16 @@ export default defineMessages({
       plural: {
         id: 'app.containers.App.entities.users.plural',
         defaultMessage: 'Users',
+      },
+    },
+    bookmarks: {
+      single: {
+        id: 'app.containers.App.entities.bookmarks.single',
+        defaultMessage: 'Bookmark',
+      },
+      plural: {
+        id: 'app.containers.App.entities.bookmarks.plural',
+        defaultMessage: 'Bookmarks',
       },
     },
     progress_reports: {

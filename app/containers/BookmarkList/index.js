@@ -1,6 +1,6 @@
 /*
  *
- * Search
+ * BookmarkList
  *
  */
 
@@ -8,18 +8,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
+import { List, fromJS } from 'immutable';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
-import { Map, fromJS } from 'immutable';
 import { FormattedMessage } from 'react-intl';
 
-import { startsWith } from 'utils/string';
+import { attributesEqual } from 'utils/entities';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import {
-  selectReady,
-} from 'containers/App/selectors';
+import { loadEntitiesIfNeeded, openBookmark } from 'containers/App/actions';
+import { selectReady, selectEntities } from 'containers/App/selectors';
 import { CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 import Button from 'components/buttons/Button';
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
@@ -35,26 +34,23 @@ import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
 import SupTitle from 'components/SupTitle';
 import Component from 'components/styled/Component';
 import Content from 'components/styled/Content';
-
-
-// import EntityListItem from 'components/EntityListItem';
 import EntityListHeader from 'components/EntityListMain/EntityListGroups/EntityListHeader';
 import EntityListItemWrapper from 'components/EntityListMain/EntityListGroups/EntityListItems/EntityListItemWrapper';
 
-import appMessages from 'containers/App/messages';
-// import { PATHS } from 'containers/App/constants';
-
-import { DEPENDENCIES } from './constants';
-import { selectEntitiesByQuery } from './selectors';
 import {
   updateQuery,
   resetSearchQuery,
   updateSortBy,
   updateSortOrder,
 } from './actions';
-// import { selectConnections, selectMeasures, selectConnectedTaxonomies } from './selectors';
 
+import { DEPENDENCIES, CONFIG } from './constants';
+import { selectBookmarks, selectTypeQuery } from './selectors';
 import messages from './messages';
+
+const ScrollableWrapper = styled(Scrollable)`
+  background-color: ${palette('aside', 0)};
+`;
 
 const EntityListSearch = styled.div`
   padding: 0 0 2em;
@@ -66,10 +62,6 @@ const Group = styled.div`
   &:last-child {
     border-bottom: 0;
   }
-`;
-
-const ScrollableWrapper = styled(Scrollable)`
-  background-color: ${palette('aside', 0)};
 `;
 
 // TODO compare EntityListSidebarOption
@@ -116,29 +108,6 @@ const TargetTitle = styled.div`
   display: table-cell;
   width: 99%;
 `;
-// font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
-const TargetCount = styled.div`
-  padding-left: 5px;
-  width: 32px;
-  display: table-cell;
-  vertical-align: middle;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding-right: 5px;
-  }
-`;
-
-const Count = styled.div`
-  color:  ${(props) => (props.active || props.disabled) ? 'inherit' : palette('dark', 3)};
-  background-color: ${(props) => {
-    if (props.active) return 'inherit';
-    return props.disabled ? 'transparent' : palette('light', 0);
-  }};
-  border-radius: 999px;
-  padding: 3px;
-  font-size: 0.85em;
-  text-align: center;
-  min-width: 32px;
-`;
 
 const ListHint = styled.div`
   color:  ${palette('dark', 3)};
@@ -148,26 +117,39 @@ const ListWrapper = styled.div``;
 const ListEntitiesMain = styled.div`
   padding-top: 0.5em;
 `;
-const TargetsMobile = styled.div`
-  padding-bottom: 20px;
-`;
 
 const STATE_INITIAL = {
   viewport: null,
 };
 
-export class Search extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+const getTypeLabel = (type, formatMessage, short = true) => {
+  const [path, framework] = type.indexOf('_') > -1
+    ? type.split('_')
+    : [type, null];
+  let label = formatMessage(appMessages.entities[path].plural);
+  if (framework) {
+    label = `${label} | ${formatMessage(appMessages[short ? 'frameworks_short' : 'frameworks'][framework])}`;
+  } else if (path === 'recommendations') {
+    label = `${label} | ${formatMessage(appMessages.frameworks.all)}`;
+  }
+  return label;
+};
+
+export class BookmarkList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
     this.state = STATE_INITIAL;
   }
+
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
+
   componentDidMount() {
     this.updateViewport();
     window.addEventListener('resize', this.resize);
   }
+
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
@@ -176,13 +158,6 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
   }
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
-  }
-
-  getTargetTitle = (target) => {
-    if (startsWith(target.get('path'), 'taxonomies')) {
-      return appMessages.entities.taxonomies[target.get('taxId')];
-    }
-    return appMessages.entities[target.get('path')];
   }
   updateViewport() {
     let viewport = VIEWPORTS.MOBILE;
@@ -201,43 +176,41 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     this.updateViewport();
     this.forceUpdate();
   };
-
-  renderSearchTargets = (includeEmpty = true) => (
+  renderBookmarkTypes = () => (
     <div>
-      { this.props.entities && this.props.entities.map((group) => (
-        <Group key={group.get('group')} hasBorder={includeEmpty}>
-          { includeEmpty &&
-            <SidebarGroupLabel>
-              <FormattedMessage {...messages.groups[group.get('group')]} />
-            </SidebarGroupLabel>
+      <Group>
+        <SidebarGroupLabel>
+          <FormattedMessage {...messages.group} />
+        </SidebarGroupLabel>
+        <div>
+          { this.props.bookmarksForSearch && this.props.bookmarksForSearch
+            .groupBy((e) => e.getIn(['attributes', 'view', 'type']))
+            .keySeq()
+            .sort((a, b) => a > b ? 1 : -1)
+            .map((type) => {
+              const label = getTypeLabel(type, this.context.intl.formatMessage, true);
+              return (
+                <Target
+                  key={type}
+                  onClick={(evt) => {
+                    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                    if (type === this.props.activeType) {
+                      this.props.onTypeSelect('');
+                    } else {
+                      this.props.onTypeSelect(type);
+                    }
+                  }}
+                  active={type === this.props.activeType}
+                >
+                  <TargetTitle>
+                    {label}
+                  </TargetTitle>
+                </Target>
+              );
+            })
           }
-          <div>
-            {
-              group.get('targets') && group.get('targets').entrySeq().map(([i, target]) =>
-                (includeEmpty || target.get('results').size > 0 || target.get('active')) && (
-                  <Target
-                    key={i}
-                    onClick={(evt) => {
-                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                      this.props.onTargetSelect(target.get('path'));
-                    }}
-                    active={target.get('active')}
-                    disabled={target.get('results').size === 0}
-                  >
-                    <TargetTitle>
-                      {this.getTargetTitle(target) && this.context.intl.formatMessage(this.getTargetTitle(target).pluralLong || this.getTargetTitle(target).plural)}
-                    </TargetTitle>
-                    <TargetCount>
-                      <Count active={target.get('active')} disabled={target.get('results').size === 0}>
-                        {target.get('results').size}
-                      </Count>
-                    </TargetCount>
-                  </Target>
-              ))
-            }
-          </div>
-        </Group>
-      ))}
+        </div>
+      </Group>
     </div>
   );
 
@@ -247,31 +220,17 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       location,
       onSearch,
       onClear,
-      entities,
-      onEntityClick,
+      bookmarksForSearch,
+      onOpenBookmark,
       onSortOrder,
       onSortBy,
+      activeType,
+      allBookmarks,
     } = this.props;
-    const activeTarget = entities.reduce((memo, group) =>
-        group.get('targets').find((target) => target.get('active')) || memo
-      , Map());
-
-    const hasResults = location.query.search
-      && activeTarget.get('results')
-      && activeTarget.get('results').size > 0;
-
-    const noResults = location.query.search
-      && (!activeTarget.get('results') || activeTarget.get('results').size === 0);
-
-    const noResultsNoAlternative = noResults
-      && !entities.reduce((memo, group) =>
-        group.get('targets').find((target) =>
-          target.get('results') && target.get('results').size > 0
-        ) || memo
-      , false);
-
-    const noEntry = !location.query.search;
-
+    const filtered = activeType && activeType !== '';
+    const bookmarksFiltered = bookmarksForSearch.filter((e) =>
+      !filtered || attributesEqual(activeType, e.getIn(['attributes', 'view', 'type']))
+    );
     return (
       <div>
         <Helmet
@@ -292,7 +251,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                     <SupTitle title={this.context.intl.formatMessage(messages.sidebarTitle)} />
                   </SidebarHeader>
                   {
-                    this.renderSearchTargets(true)
+                    this.renderBookmarkTypes()
                   }
                 </Component>
               </ScrollableWrapper>
@@ -304,18 +263,25 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
             <Content>
               <ContentHeader
                 type={CONTENT_LIST}
-                supTitle={this.context.intl.formatMessage(messages.pageTitle)}
-                title={this.context.intl.formatMessage(messages.search)}
-                icon="search"
+                supTitle={this.context.intl.formatMessage(messages.supTitle)}
+                title={this.context.intl.formatMessage(messages.pageTitle)}
+                icon="bookmark_active"
               />
               { !dataReady &&
                 <Loading />
               }
-              { dataReady &&
+              { dataReady && (
                 <div>
                   <EntityListSearch>
                     <TagSearch
-                      filters={[]}
+                      filters={filtered
+                        ? [{
+                          id: 'type',
+                          label: getTypeLabel(activeType, this.context.intl.formatMessage, true),
+                          onClick: () => this.props.onTypeSelect(''),
+                        }]
+                        : []
+                      }
                       placeholder={this.context.intl.formatMessage(messages.placeholder)}
                       searchQuery={location.query.search || ''}
                       onSearch={onSearch}
@@ -323,73 +289,49 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                     />
                   </EntityListSearch>
                   <ListWrapper>
-                    {
-                      noEntry && (
-                        <ListHint>
-                          <FormattedMessage {...messages.hints.noEntry} />
-                        </ListHint>
-                      )
-                    }
-                    {
-                      noResultsNoAlternative && (
-                        <ListHint>
-                          <FormattedMessage {...messages.hints.noResultsNoAlternative} />
-                        </ListHint>
-                      )
-                    }
-                    {
-                      noResults && !noResultsNoAlternative && (
-                        <ListHint>
-                          <FormattedMessage {...messages.hints.noResults} />
-                        </ListHint>
-                      )
-                    }
-                    { !noEntry && this.state.viewport && this.state.viewport === VIEWPORTS.MOBILE &&
-                      <TargetsMobile>
-                        { !noResults &&
-                          <ListHint>
-                            <FormattedMessage {...messages.hints.targetMobile} />
-                          </ListHint>
-                        }
-                        {
-                          this.renderSearchTargets(false)
-                        }
-                      </TargetsMobile>
-                    }
-                    { hasResults &&
+                    {(allBookmarks.size === 0) && (
+                      <ListHint>
+                        <FormattedMessage {...messages.noBookmarks} />
+                      </ListHint>
+                    )}
+                    {(allBookmarks.size > 0 && bookmarksFiltered.size === 0) && (
+                      <ListHint>
+                        <FormattedMessage {...messages.noResults} />
+                      </ListHint>
+                    )}
+                    {bookmarksFiltered && bookmarksFiltered.size > 0 && (
                       <div>
-                        { this.state.viewport && this.state.viewport === VIEWPORTS.MOBILE &&
-                          <ListHint>
-                            <FormattedMessage {...messages.hints.resultsMobile} />
-                          </ListHint>
-                        }
                         <EntityListHeader
-                          entitiesTotal={activeTarget.get('results').size}
+                          entitiesTotal={bookmarksFiltered.size}
                           entityTitle={{
-                            single: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).singleLong || this.getTargetTitle(activeTarget).single),
-                            plural: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).pluralLong || this.getTargetTitle(activeTarget).plural),
+                            single: this.context.intl.formatMessage(messages.single),
+                            plural: this.context.intl.formatMessage(messages.plural),
                           }}
-                          sortOptions={activeTarget.get('sorting') && activeTarget.get('sorting').toJS()}
+                          sortOptions={CONFIG.sorting}
                           sortBy={location.query.sort}
                           sortOrder={location.query.order}
                           onSortBy={onSortBy}
                           onSortOrder={onSortOrder}
                         />
                         <ListEntitiesMain>
-                          { activeTarget.get('results').map((entity, key) =>
-                            <EntityListItemWrapper
-                              key={key}
-                              entity={entity}
-                              entityPath={activeTarget.get('clientPath') || activeTarget.get('path')}
-                              onEntityClick={onEntityClick}
-                            />
-                          )}
+                          { bookmarksFiltered.map((entity, key) => {
+                            const type = entity.getIn(['attributes', 'view', 'type']);
+                            const label = getTypeLabel(type, this.context.intl.formatMessage, false);
+                            return (
+                              <EntityListItemWrapper
+                                key={key}
+                                entity={entity.setIn(['attributes', 'reference'], label)}
+                                entityPath={entity.getIn(['attributes', 'view', 'path'])}
+                                onEntityClick={() => onOpenBookmark(entity)}
+                              />
+                            );
+                          })}
                         </ListEntitiesMain>
                       </div>
-                    }
+                    )}
                   </ListWrapper>
                 </div>
-              }
+              )}
             </Content>
           </Container>
         </ContainerWithSidebar>
@@ -398,27 +340,31 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
   }
 }
 
-Search.propTypes = {
+BookmarkList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   dataReady: PropTypes.bool,
-  entities: PropTypes.object, // List
   location: PropTypes.object,
   onSearch: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
-  onTargetSelect: PropTypes.func.isRequired,
-  onEntityClick: PropTypes.func.isRequired,
+  onOpenBookmark: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   theme: PropTypes.object,
+  bookmarksForSearch: PropTypes.instanceOf(List).isRequired,
+  allBookmarks: PropTypes.instanceOf(Map).isRequired,
+  onTypeSelect: PropTypes.func.isRequired,
+  activeType: PropTypes.string,
 };
 
-Search.contextTypes = {
+BookmarkList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  entities: selectEntitiesByQuery(state, fromJS(props.location.query)),
+  bookmarksForSearch: selectBookmarks(state, fromJS(props.location.query)),
+  activeType: selectTypeQuery(state),
+  allBookmarks: selectEntities(state, 'bookmarks'),
 });
 function mapDispatchToProps(dispatch) {
   return {
@@ -439,19 +385,19 @@ function mapDispatchToProps(dispatch) {
     onClear: (values) => {
       dispatch(resetSearchQuery(values));
     },
-    onTargetSelect: (value) => {
-      // console.log('onTargetSelect')
+    onTypeSelect: (value) => {
+      // console.log('onTypeSelect')
       dispatch(updateQuery(fromJS([
         {
-          query: 'path',
+          query: 'type',
           value,
           replace: true,
           checked: value !== '',
         },
       ])));
     },
-    onEntityClick: (id, path) => {
-      dispatch(updatePath(`/${path}/${id}`));
+    onOpenBookmark: (bookmark) => {
+      dispatch(openBookmark(bookmark));
     },
     onSortOrder: (order) => {
       dispatch(updateSortOrder(order));
@@ -462,4 +408,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default withTheme(connect(mapStateToProps, mapDispatchToProps)(Search));
+export default withTheme(connect(mapStateToProps, mapDispatchToProps)(BookmarkList));

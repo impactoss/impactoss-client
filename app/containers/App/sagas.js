@@ -36,6 +36,7 @@ import {
   PATHS,
   PARAMS,
   SET_FRAMEWORK,
+  OPEN_BOOKMARK,
 } from 'containers/App/constants';
 
 import {
@@ -590,6 +591,14 @@ export function* setFrameworkSaga({ framework }) {
   yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
 
+export function* openBookmarkSaga({ bookmark }) {
+  const path = bookmark.getIn(['attributes', 'view', 'path']);
+  const queryString = getNextQueryString(
+    bookmark.getIn(['attributes', 'view', 'query']).toJS(),
+  );
+  yield put(push(`${path}?${queryString}`));
+}
+
 export function* dismissQueryMessagesSaga() {
   const location = yield select(selectLocation);
   yield put(updatePath(
@@ -668,6 +677,7 @@ export default function* rootSaga() {
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
   yield takeEvery(SET_FRAMEWORK, setFrameworkSaga);
+  yield takeEvery(OPEN_BOOKMARK, openBookmarkSaga);
   yield takeEvery(DISMISS_QUERY_MESSAGES, dismissQueryMessagesSaga);
 
   yield takeEvery(CLOSE_ENTITY, closeEntitySaga);

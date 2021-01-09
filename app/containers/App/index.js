@@ -100,7 +100,13 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       active: (activeId === 'all') || frameworks.size === 0,
     });
   }
-  prepareMainMenuItems = (isManager, currentPath, currentFrameworkId, viewRecommendationFramework) => {
+  prepareMainMenuItems = (
+    isManager,
+    isUserSignedIn,
+    currentPath,
+    currentFrameworkId,
+    viewRecommendationFramework,
+  ) => {
     let navItems = [
       {
         path: PATHS.OVERVIEW,
@@ -140,16 +146,26 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     if (isManager) {
       navItems = navItems.concat([
         {
+          path: PATHS.PAGES,
+          title: this.context.intl.formatMessage(messages.nav.pages),
+          isAdmin: true,
+          active: currentPath === PATHS.PAGES,
+        },
+        {
           path: PATHS.USERS,
           title: this.context.intl.formatMessage(messages.nav.users),
           isAdmin: true,
           active: currentPath === PATHS.USERS,
         },
+      ]);
+    }
+    if (isUserSignedIn) {
+      navItems = navItems.concat([
         {
-          path: PATHS.PAGES,
-          title: this.context.intl.formatMessage(messages.nav.pages),
+          path: PATHS.BOOKMARKS,
+          title: this.context.intl.formatMessage(messages.nav.bookmarks),
           isAdmin: true,
-          active: currentPath === PATHS.PAGES,
+          active: currentPath === PATHS.BOOKMARKS,
         },
       ]);
     }
@@ -178,6 +194,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           pages={pages && this.preparePageMenuPages(pages)}
           navItems={this.prepareMainMenuItems(
             isUserSignedIn && isManager,
+            isUserSignedIn,
             location.pathname,
             currentFrameworkId,
             viewRecommendationFramework,
@@ -275,7 +292,6 @@ export function mapDispatchToProps(dispatch) {
       dispatch(openNewEntityModal(null));
     },
     onSelectFramework: (framework) => {
-      // dispatch(setFramework(framework));
       dispatch(updateRouteQuery(
         {
           arg: 'fw',

@@ -142,6 +142,7 @@ const Search = styled(LinkMain)`
     padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px 0;
     position: absolute;
     right: 0;
+    border-left: none;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding-left: 24px;
@@ -260,18 +261,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           }}
           currentPath={this.props.currentPath}
         />
-        <NavPages>
-          { this.props.pages && this.props.pages.map((page, i) => (
-            <LinkPage
-              key={i}
-              href={page.path}
-              active={page.active || this.props.currentPath === page.path}
-              onClick={(evt) => this.onClick(evt, page.path)}
-            >
-              {page.title}
-            </LinkPage>
-          ))}
-        </NavPages>
         { navItemsAdmin &&
           <NavAdmin>
             { navItemsAdmin.map((item, i) => (
@@ -290,6 +279,18 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             ))}
           </NavAdmin>
         }
+        <NavPages>
+          { this.props.pages && this.props.pages.map((page, i) => (
+            <LinkPage
+              key={i}
+              href={page.path}
+              active={page.active || this.props.currentPath === page.path}
+              onClick={(evt) => this.onClick(evt, page.path)}
+            >
+              {page.title}
+            </LinkPage>
+          ))}
+        </NavPages>
       </NavSecondary>
     </div>
   );

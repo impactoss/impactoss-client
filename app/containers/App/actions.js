@@ -66,6 +66,7 @@ import {
   SUBMIT_INVALID,
   DISMISS_QUERY_MESSAGES,
   SET_FRAMEWORK,
+  OPEN_BOOKMARK,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -486,5 +487,11 @@ export function setFramework(framework) {
   return {
     type: SET_FRAMEWORK,
     framework,
+  };
+}
+export function openBookmark(bookmark) {
+  return {
+    type: OPEN_BOOKMARK,
+    bookmark,
   };
 }

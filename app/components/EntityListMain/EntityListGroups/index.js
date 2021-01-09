@@ -17,8 +17,6 @@ import EntityListFooter from './EntityListFooter';
 import EntityListGroupHeader from './EntityListGroupHeader';
 
 import { getPager } from './pagination';
-// import { groupEntities } from './group-entities';
-  // getGroupedEntitiesForPage,
 import messages from './messages';
 
 const ListEntitiesMain = styled.div`

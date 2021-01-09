@@ -83,7 +83,8 @@ export const ENDPOINTS = {
     NODE_ENV === 'production'
     ? 'https://impactoss-dev.herokuapp.com/'
     : 'https://impactoss-dev.herokuapp.com/'
-  ), // server API endpoint  SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
+  ), // server API endpoint
+  SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
   PASSWORD: 'auth/password',
@@ -157,6 +158,7 @@ export const DB_TABLES = [
   'user_roles',
   'roles',
   'pages',
+  'bookmarks',
   'taxonomies',
   'categories',
   'indicators',

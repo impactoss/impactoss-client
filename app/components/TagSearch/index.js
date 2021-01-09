@@ -105,8 +105,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                   <ButtonTagFilterInverse
                     key={i}
                     onClick={filter.onClick}
-                    palette={filter.type}
-                    paletteHover={`${filter.type}Hover`}
+                    palette={filter.type || 'attributes'}
+                    paletteHover={`${filter.type || 'attributes'}Hover`}
                     pIndex={parseInt(filter.id, 10) || 0}
                     disabled={!filter.onClick}
                   >
@@ -120,8 +120,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                   <ButtonTagFilter
                     key={i}
                     onClick={filter.onClick}
-                    palette={filter.type}
-                    paletteHover={`${filter.type}Hover`}
+                    palette={filter.type || 'attributes'}
+                    paletteHover={`${filter.type || 'attributes'}Hover`}
                     pIndex={parseInt(filter.id, 10) || 0}
                     disabled={!filter.onClick}
                   >

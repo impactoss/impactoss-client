@@ -10,6 +10,7 @@ const FieldGroupLabel = styled.div`
   font-weight: bold;
   font-size: ${(props) => props.theme.sizes.text.small};
   margin-bottom: ${(props) => props.basic ? 0 : 20}px;
+  width: 100%;
 `;
 
 export default FieldGroupLabel;

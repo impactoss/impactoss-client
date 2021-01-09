@@ -11,7 +11,11 @@ import Helmet from 'react-helmet';
 import { List, Map, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { selectReady, selectActiveFrameworks } from 'containers/App/selectors';
+import {
+  selectReady,
+  selectActiveFrameworks,
+  selectIsUserManager,
+} from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
 
@@ -35,17 +39,21 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
   }
 
   render() {
-    const { dataReady } = this.props;
+    const { dataReady, isManager } = this.props;
 
     // specify the filter and query  options
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
       icon: 'indicators',
-      actions: [{
+      actions: [],
+    };
+    if (isManager) {
+      headerOptions.actions.push({
         type: 'text',
         title: this.context.intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
-      }, {
+      });
+      headerOptions.actions.push({
         type: 'add',
         title: [
           this.context.intl.formatMessage(appMessages.buttons.add),
@@ -55,8 +63,12 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
           },
         ],
         onClick: () => this.props.handleNew(),
-      }],
-    };
+      });
+    }
+    headerOptions.actions.push({
+      type: 'bookmarker',
+      title: this.context.intl.formatMessage(messages.pageTitle),
+    });
 
     return (
       <div>
@@ -95,6 +107,7 @@ IndicatorList.propTypes = {
   connectedTaxonomies: PropTypes.instanceOf(Map),
   frameworks: PropTypes.instanceOf(Map),
   location: PropTypes.object,
+  isManager: PropTypes.bool,
 };
 
 IndicatorList.contextTypes = {
@@ -107,6 +120,7 @@ const mapStateToProps = (state, props) => ({
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectActiveFrameworks(state),
+  isManager: selectIsUserManager(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
