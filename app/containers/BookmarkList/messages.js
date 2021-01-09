@@ -48,6 +48,6 @@ export default defineMessages({
   },
   noBookmarks: {
     id: 'app.containers.BookmarkList.noBookmarks',
-    defaultMessage: 'We are sorry, there are no bookmarks in the database yet',
+    defaultMessage: 'You have not created any bookmarks yet',
   },
 });

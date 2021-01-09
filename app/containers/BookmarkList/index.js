@@ -122,6 +122,19 @@ const STATE_INITIAL = {
   viewport: null,
 };
 
+const getTypeLabel = (type, formatMessage, short = true) => {
+  const [path, framework] = type.indexOf('_') > -1
+    ? type.split('_')
+    : [type, null];
+  let label = formatMessage(appMessages.entities[path].plural);
+  if (framework) {
+    label = `${label} | ${formatMessage(appMessages[short ? 'frameworks_short' : 'frameworks'][framework])}`;
+  } else if (path === 'recommendations') {
+    label = `${label} | ${formatMessage(appMessages.frameworks.all)}`;
+  }
+  return label;
+};
+
 export class BookmarkList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
@@ -175,15 +188,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
             .keySeq()
             .sort((a, b) => a > b ? 1 : -1)
             .map((type) => {
-              const [path, framework] = type.indexOf('_') > -1
-                ? type.split('_')
-                : [type, null];
-              let label = this.context.intl.formatMessage(appMessages.entities[path].plural);
-              if (framework) {
-                label = `${label} (${this.context.intl.formatMessage(appMessages.frameworks_short[framework])})`;
-              } else if (path === 'recommendations') {
-                label = `${label} (${this.context.intl.formatMessage(appMessages.frameworks.all)})`;
-              }
+              const label = getTypeLabel(type, this.context.intl.formatMessage, true);
               return (
                 <Target
                   key={type}
@@ -222,10 +227,9 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
       activeType,
       allBookmarks,
     } = this.props;
-    const filtered = bookmarksForSearch.filter((e) =>
-      !activeType ||
-      activeType === '' ||
-      attributesEqual(activeType, e.getIn(['attributes', 'view', 'type']))
+    const filtered = activeType && activeType !== '';
+    const bookmarksFiltered = bookmarksForSearch.filter((e) =>
+      !filtered || attributesEqual(activeType, e.getIn(['attributes', 'view', 'type']))
     );
     return (
       <div>
@@ -270,7 +274,14 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                 <div>
                   <EntityListSearch>
                     <TagSearch
-                      filters={[]}
+                      filters={filtered
+                        ? [{
+                          id: 'type',
+                          label: getTypeLabel(activeType, this.context.intl.formatMessage, true),
+                          onClick: () => this.props.onTypeSelect(''),
+                        }]
+                        : []
+                      }
                       placeholder={this.context.intl.formatMessage(messages.placeholder)}
                       searchQuery={location.query.search || ''}
                       onSearch={onSearch}
@@ -283,15 +294,15 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                         <FormattedMessage {...messages.noBookmarks} />
                       </ListHint>
                     )}
-                    {(allBookmarks.size > 0 && filtered.size === 0) && (
+                    {(allBookmarks.size > 0 && bookmarksFiltered.size === 0) && (
                       <ListHint>
                         <FormattedMessage {...messages.noResults} />
                       </ListHint>
                     )}
-                    {filtered && filtered.size > 0 && (
+                    {bookmarksFiltered && bookmarksFiltered.size > 0 && (
                       <div>
                         <EntityListHeader
-                          entitiesTotal={filtered.size}
+                          entitiesTotal={bookmarksFiltered.size}
                           entityTitle={{
                             single: this.context.intl.formatMessage(messages.single),
                             plural: this.context.intl.formatMessage(messages.plural),
@@ -303,17 +314,9 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                           onSortOrder={onSortOrder}
                         />
                         <ListEntitiesMain>
-                          { filtered.map((entity, key) => {
+                          { bookmarksFiltered.map((entity, key) => {
                             const type = entity.getIn(['attributes', 'view', 'type']);
-                            const [path, framework] = type.indexOf('_') > -1
-                              ? type.split('_')
-                              : [type, null];
-                            let label = this.context.intl.formatMessage(appMessages.entities[path].plural);
-                            if (framework) {
-                              label = `${label} (${this.context.intl.formatMessage(appMessages.frameworks[framework])})`;
-                            } else if (path === 'recommendations') {
-                              label = `${label} (${this.context.intl.formatMessage(appMessages.frameworks.all)})`;
-                            }
+                            const label = getTypeLabel(type, this.context.intl.formatMessage, false);
                             return (
                               <EntityListItemWrapper
                                 key={key}
