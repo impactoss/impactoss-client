@@ -23,6 +23,7 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
   constructor(props) {
     super(props);
     this.state = {
+      new: true,
       open: false,
     };
   }
@@ -65,6 +66,10 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
             onClick={
               () => {
                 if (!bookmark) {
+                  this.setState({
+                    new: true,
+                    open: true,
+                  });
                   handleNew(
                     location,
                     generateBookmarkTitle(
@@ -74,8 +79,12 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
                     ),
                     type,
                   );
+                } else {
+                  this.setState({
+                    new: false,
+                    open: !this.state.open,
+                  });
                 }
-                this.setState({ open: !this.state.open });
               }
             }
           >
@@ -85,6 +94,7 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
           {this.state.open && bookmark && (
             <BookmarkForm
               bookmark={bookmark}
+              isNew={this.state.new}
               handleUpdateTitle={
                 (title) => {
                   handleUpdateTitle(bookmark, title);

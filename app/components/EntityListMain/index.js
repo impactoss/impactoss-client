@@ -183,7 +183,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
               title={headerTitle}
               subTitle={subtitle}
               sortAttributes={config.sorting}
-              buttons={dataReady && isUserSignedIn && header.actions}
+              buttons={(dataReady && isUserSignedIn) ? header.actions : []}
             />
             { (!dataReady || !this.props.scrollContainer) &&
               <Loading />

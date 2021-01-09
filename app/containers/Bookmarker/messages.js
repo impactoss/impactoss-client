@@ -1,9 +1,13 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
-  title: {
-    id: 'app.containers.Bookmarker.title',
+  titleEdit: {
+    id: 'app.containers.Bookmarker.titleEdit',
     defaultMessage: 'Edit bookmark',
+  },
+  titleNew: {
+    id: 'app.containers.Bookmarker.titleNew',
+    defaultMessage: 'Bookmark saved',
   },
   labelTitle: {
     id: 'app.containers.Bookmarker.labelTitle',
@@ -17,8 +21,16 @@ export default defineMessages({
     id: 'app.containers.Bookmarker.buttonCancel',
     defaultMessage: 'Cancel',
   },
+  buttonClose: {
+    id: 'app.containers.Bookmarker.buttonClose',
+    defaultMessage: 'Close',
+  },
   buttonUpdate: {
     id: 'app.containers.Bookmarker.buttonUpdate',
-    defaultMessage: 'Update title',
+    defaultMessage: 'Update',
+  },
+  placeholder: {
+    id: 'app.containers.Bookmarker.placeholder',
+    defaultMessage: 'Please enter a title',
   },
 });
