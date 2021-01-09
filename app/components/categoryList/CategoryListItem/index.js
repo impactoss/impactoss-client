@@ -36,32 +36,34 @@ const Column = styled.div`
   width: ${(props) => props.colWidth}%;
   display: inline-block;
   vertical-align: middle;
+  margin: ${({ multiple }) => multiple ? '-10px 0' : '0 0'};
 `;
 const BarWrap = styled.div`
   width:100%;
   vertical-align: middle;
-  padding: 10px 6px;
+  padding: ${({ multiple }) => multiple ? '0 6px 8px' : '10px 6px'};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-left: 40px;
-    padding-right: ${(props) => props.secondary ? 36 : 18}px;
+    padding-right: ${({ secondary }) => secondary ? 36 : 18}px;
   }
+  font-size: 0px;
 `;
 const Bar = styled.div`
-  width:${(props) => props.length}%;
-  height: 15px;
+  width: ${({ length }) => length}%;
   background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
   vertical-align: middle;
   display: inline-block;
   position: relative;
   border-right: ${(props) => props.secondary ? '1px solid' : 0};
   border-right-color: ${palette('mainListItem', 1)};
+  height: ${({ multiple }) => multiple ? 10 : 15}px;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    height: 25px;
+    height: ${({ multiple }) => multiple ? 15 : 25}px;
   }
 `;
 const Count = styled.div`
   position: absolute;
-  line-height: 15px;
+  line-height: ${({ multiple }) => multiple ? 10 : 15}px;
   left: 0;
   bottom: 100%;
   padding: 2px 0;
@@ -76,7 +78,7 @@ const Count = styled.div`
     left: auto;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    line-height: 25px;
+    line-height: ${({ multiple }) => multiple ? 15 : 25}px;
   }
 `;
 const CountSecondary = styled(Count)`
@@ -104,6 +106,13 @@ const Title = styled.div`
     font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
   }
 `;
+const FrameworkLabel = styled.div`
+  font-size: 12px;
+  color: ${palette('text', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-left: 40px;
+  }
+`;
 const StatusWrap = styled.div`
   padding: 0 18px;
 `;
@@ -115,28 +124,36 @@ const Reference = styled.span`
     padding-right: 8px;
   }
 `;
+const WrapAcceptedBars = styled.span`
+  height: ${({ multiple }) => multiple ? 10 : 15}px;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    height: ${({ multiple }) => multiple ? 15 : 25}px;
+  }
+`;
 
 class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  renderSimpleBar = (col, total) => (
+  renderSimpleBar = (col, total, multiple) => (
     <Bar
       length={(total / col.maxCount) * 100}
       palette={col.attribute.entity}
+      multiple={multiple}
     >
-      <Count palette={col.attribute.entity}>
+      <Count palette={col.attribute.entity} multiple={multiple}>
         {total}
       </Count>
     </Bar>
   );
-  renderAcceptedBar = (col, total, accepted) => {
+  renderAcceptedBar = (col, total, accepted, multiple) => {
     const noted = total - accepted;
     return (
-      <span>
+      <WrapAcceptedBars multiple={multiple}>
         <Bar
           length={(accepted / col.maxCount) * 100}
           palette={col.attribute.entity}
           secondary
+          multiple={multiple}
         >
-          <Count palette={col.attribute.entity}>
+          <Count palette={col.attribute.entity} multiple={multiple}>
             {accepted}
           </Count>
         </Bar>
@@ -145,13 +162,14 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
             length={(noted / col.maxCount) * 100}
             palette={col.attribute.entity}
             pIndex={1}
+            multiple={multiple}
           >
-            <CountSecondary palette={col.attribute.entity}>
+            <CountSecondary palette={col.attribute.entity} multiple={multiple}>
               {noted}
             </CountSecondary>
           </Bar>
         }
-      </span>
+      </WrapAcceptedBars>
     );
   };
   renderCountColumn = (col, category, frameworks, frameworkId) => {
@@ -176,25 +194,30 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
               return (
                 <div key={id}>
                   {col.attribute.frameworkIds.length > 1 && (
-                    <div>
+                    <FrameworkLabel>
                       {connected && (<span>&nbsp;</span>)}
-                      {!connected && (
+                      {!connected && appMessages.entities[`recommendations_${id}`] && (
                         <FormattedMessage {...appMessages.entities[`recommendations_${id}`].plural} />
                       )}
-                    </div>
+                    </FrameworkLabel>
                   )}
                   {hasResponse && (
-                    <BarWrap secondary>
+                    <BarWrap secondary multiple>
                       {this.renderAcceptedBar(
                         col,
                         (total && total[id]) || 0,
-                        (accepted && accepted[id]) || 0
+                        (accepted && accepted[id]) || 0,
+                        true, // multiple,
                       )}
                     </BarWrap>
                   )}
                   {!hasResponse && (
-                    <BarWrap>
-                      {this.renderSimpleBar(col, (total && total[id]) || 0)}
+                    <BarWrap multiple>
+                      {this.renderSimpleBar(
+                        col,
+                        (total && total[id]) || 0,
+                        true, // multiple,
+                      )}
                     </BarWrap>
                   )}
                 </div>
@@ -256,7 +279,15 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
       >
         {
           columns.map((col, i) => (
-            <Column key={i} colWidth={col.width}>
+            <Column
+              key={i}
+              colWidth={col.width}
+              multiple={
+                col.attribute &&
+                col.attribute.frameworkIds &&
+                col.attribute.frameworkIds.length > 1
+              }
+            >
               {col.type === 'title' && catItem.draft && (
                 <StatusWrap>
                   <ItemStatus draft />

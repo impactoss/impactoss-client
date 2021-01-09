@@ -351,7 +351,7 @@ BookmarkList.propTypes = {
   onSortBy: PropTypes.func.isRequired,
   theme: PropTypes.object,
   bookmarksForSearch: PropTypes.instanceOf(List).isRequired,
-  allBookmarks: PropTypes.instanceOf(Map).isRequired,
+  allBookmarks: PropTypes.object.isRequired,
   onTypeSelect: PropTypes.func.isRequired,
   activeType: PropTypes.string,
 };
