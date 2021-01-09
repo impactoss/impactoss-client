@@ -16,7 +16,7 @@ import Row from 'components/styled/Row';
 import Container from 'components/styled/Container';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { selectFrameworks, selectIsSigningIn } from 'containers/App/selectors';
+import { selectFrameworks, selectIsSigningIn, selectReady } from 'containers/App/selectors';
 
 import ButtonHero from 'components/buttons/ButtonHero';
 import ButtonFlat from 'components/buttons/ButtonFlat';
@@ -142,9 +142,8 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const { theme, frameworks, onSelectFramework, onPageLink, signingIn } = this.props;
+    const { theme, frameworks, onSelectFramework, onPageLink, signingIn, dataReady } = this.props;
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
-    const loading = !frameworks;
     return (
       <div>
         <Helmet
@@ -185,7 +184,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                 </Grid>
               </Row>
               <HomeActions>
-                {(signingIn || loading) && (
+                {(signingIn || !dataReady) && (
                   <Row space>
                     <GridSpace lg={1 / 6} sm={1 / 8} />
                     <Grid lg={2 / 3} sm={3 / 4} xs={1}>
@@ -193,7 +192,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                     </Grid>
                   </Row>
                 )}
-                {(signingIn || loading) && (
+                {(signingIn || !dataReady) && (
                   <Row space>
                     <GridSpace lg={1 / 6} sm={1 / 8} />
                     <Grid lg={2 / 3} sm={3 / 4} xs={1}>
@@ -206,7 +205,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                     </Grid>
                   </Row>
                 )}
-                {!loading && !signingIn && frameworks.size > 1 && (
+                {dataReady && !signingIn && frameworks.size > 1 && (
                   <span>
                     <Row>
                       <GridSpace lg={1 / 6} sm={1 / 8} />
@@ -233,7 +232,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                     </Row>
                   </span>
                 )}
-                {!loading && !signingIn && frameworks.size === 1 && (
+                {dataReady && !signingIn && frameworks.size === 1 && (
                   <Row space>
                     <GridSpace lg={1 / 6} sm={1 / 8} />
                     <Grid lg={2 / 3} sm={3 / 4} xs={1}>
@@ -260,6 +259,7 @@ HomePage.propTypes = {
   theme: PropTypes.object.isRequired,
   frameworks: PropTypes.object,
   signingIn: PropTypes.bool,
+  dataReady: PropTypes.bool,
 };
 
 HomePage.contextTypes = {
@@ -269,6 +269,7 @@ HomePage.contextTypes = {
 const mapStateToProps = (state) => ({
   frameworks: selectFrameworks(state),
   signingIn: selectIsSigningIn(state),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
 });
 
 function mapDispatchToProps(dispatch) {
