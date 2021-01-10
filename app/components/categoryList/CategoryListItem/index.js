@@ -191,9 +191,10 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
                 return null;
               }
               const hasResponse = !connected && framework.getIn(['attributes', 'has_response']);
+              const multipleFWs = col.attribute.frameworkIds.length > 1;
               return (
                 <div key={id}>
-                  {col.attribute.frameworkIds.length > 1 && (
+                  {multipleFWs && (
                     <FrameworkLabel>
                       {connected && (<span>&nbsp;</span>)}
                       {!connected && appMessages.entities[`recommendations_${id}`] && (
@@ -202,21 +203,21 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
                     </FrameworkLabel>
                   )}
                   {hasResponse && (
-                    <BarWrap secondary multiple>
+                    <BarWrap secondary multiple={multipleFWs}>
                       {this.renderAcceptedBar(
                         col,
                         (total && total[id]) || 0,
                         (accepted && accepted[id]) || 0,
-                        true, // multiple,
+                        multipleFWs, // multiple,
                       )}
                     </BarWrap>
                   )}
                   {!hasResponse && (
-                    <BarWrap multiple>
+                    <BarWrap multiple={multipleFWs}>
                       {this.renderSimpleBar(
                         col,
                         (total && total[id]) || 0,
-                        true, // multiple,
+                        multipleFWs, // multiple,
                       )}
                     </BarWrap>
                   )}
