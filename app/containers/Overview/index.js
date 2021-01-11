@@ -470,7 +470,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                                   paletteDefault: 'recommendations',
                                   paletteHover: 'recommendationsHover',
                                   stateButton: `buttonRecs_${fwId}`,
-                                  icon: 'recommendations',
+                                  icon: `recommendations_${fwId}`,
                                   type: `recommendations_${fwId}`,
                                   count: this.props.recommendationCountByFw.get(fwId),
                                   draftCount: this.props.recommendationDraftCountByFw.get(fwId),
