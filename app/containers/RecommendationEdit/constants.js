@@ -13,10 +13,15 @@ export const DEPENDENCIES = [
   'users',
   'categories',
   'taxonomies',
+  'framework_taxonomies',
   'measures',
+  'indicators',
   'recommendation_measures',
   'recommendation_categories',
+  'recommendation_indicators',
   'measure_categories',
+  'measure_indicators',
+  'frameworks',
 ];
 
 export const FORM_INITIAL = fromJS({
@@ -25,10 +30,12 @@ export const FORM_INITIAL = fromJS({
     title: '',
     description: '',
     reference: '',
-    accepted: '',
+    accepted: 'false',
     response: '',
     draft: '',
+    framework_id: '',
   },
   associatedTaxonomies: {},
   associatedMeasures: [],
+  associatedIndicators: [],
 });

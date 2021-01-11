@@ -20,15 +20,18 @@ import {
   getAcceptedField,
   getStatusField,
   getMarkdownField,
+  renderIndicatorControl,
+  getFrameworkFormField,
 } from 'utils/forms';
 
+import { attributesEqual } from 'utils/entities';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, DEFAULT_FRAMEWORK } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -46,6 +49,9 @@ import {
   selectReadyForAuthCheck,
   selectMeasuresCategorised,
   selectRecommendationTaxonomies,
+  selectEntities,
+  selectFrameworkQuery,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -74,7 +80,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
 
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('recommendationNew.form.data', FORM_INITIAL);
+    this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData());
   }
 
   componentWillReceiveProps(nextProps) {
@@ -85,40 +91,74 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
+    if (!this.props.frameworkId && nextProps.frameworkId) {
+      this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));
+    }
     if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
       scrollToTop(this.state.scrollContainer);
     }
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const { frameworkId } = props;
+    return Map(FORM_INITIAL.setIn(
+      ['attributes', 'framework_id'],
+      (frameworkId && frameworkId !== 'all')
+        ? frameworkId
+        : DEFAULT_FRAMEWORK,
+    ));
+  }
+
+  getHeaderMainFields = (frameworks) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceFormField(this.context.intl.formatMessage, appMessages, true), // required
-        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
+        frameworks && getFrameworkFormField(this.context.intl.formatMessage, frameworks), // required
+        getReferenceFormField(this.context.intl.formatMessage, true), // required
+        getTitleFormField(this.context.intl.formatMessage, 'titleText'),
       ],
     },
   ]);
 
   getHeaderAsideFields = () => ([{
-    fields: [getStatusField(this.context.intl.formatMessage, appMessages)],
+    fields: [getStatusField(this.context.intl.formatMessage)],
   }]);
 
-  getBodyMainFields = (connectedTaxonomies, measures, onCreateOption) => ([
-    {
+  getBodyMainFields = (
+    connectedTaxonomies,
+    measures,
+    indicators,
+    onCreateOption,
+    hasResponse,
+  ) => {
+    const groups = [];
+    groups.push({
       fields: [
-        getMarkdownField(this.context.intl.formatMessage, appMessages, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
-        getAcceptedField(this.context.intl.formatMessage, appMessages),
-        getMarkdownField(this.context.intl.formatMessage, appMessages, 'response'),
+        getMarkdownField(this.context.intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
+        hasResponse && getAcceptedField(this.context.intl.formatMessage),
+        hasResponse && getMarkdownField(this.context.intl.formatMessage, 'response'),
       ],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-      ],
-    },
-  ]);
+    });
+    if (measures) {
+      groups.push({
+        label: this.context.intl.formatMessage(appMessages.nav.measuresSuper),
+        icon: 'measures',
+        fields: [
+          renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+        ],
+      });
+    }
+    if (indicators) {
+      groups.push({
+        label: this.context.intl.formatMessage(appMessages.nav.indicatorsSuper),
+        icon: 'indicators',
+        fields: [
+          renderIndicatorControl(indicators, onCreateOption),
+        ],
+      });
+    }
+    return groups;
+  }
 
   getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
     { // fieldGroup
@@ -129,13 +169,40 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
   ]);
 
   render() {
-    const { dataReady, viewDomain, connectedTaxonomies, taxonomies, measures, onCreateOption } = this.props;
+    const {
+      dataReady,
+      viewDomain,
+      connectedTaxonomies,
+      taxonomies,
+      measures,
+      onCreateOption,
+      indicators,
+      frameworkId,
+      frameworks,
+    } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
+    const fwSpecified = (frameworkId && frameworkId !== 'all');
 
+    const type = this.context.intl.formatMessage(
+      appMessages.entities[fwSpecified ? `recommendations_${frameworkId}` : 'recommendations'].single
+    );
+
+    const currentFrameworkId = fwSpecified
+      ? frameworkId
+      : viewDomain.form.data.getIn(['attributes', 'framework_id']) || DEFAULT_FRAMEWORK;
+    const currentFramework = dataReady && frameworks.find((fw) => attributesEqual(fw.get('id'), currentFrameworkId));
+    const hasResponse = dataReady && currentFramework.getIn(['attributes', 'has_response']);
+    const hasMeasures = dataReady && currentFramework.getIn(['attributes', 'has_measures']);
+    const hasIndicators = dataReady && currentFramework.getIn(['attributes', 'has_indicators']);
+
+    const fwTaxonomies = taxonomies && taxonomies.filter((tax) =>
+      tax.get('frameworkIds').find((id) => attributesEqual(id, currentFrameworkId)) ||
+      attributesEqual(currentFrameworkId, tax.getIn(['attributes', 'framework_id']))
+    );
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${this.context.intl.formatMessage(messages.pageTitle, { type })}`}
           meta={[
             {
               name: 'description',
@@ -151,9 +218,9 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           }}
         >
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={this.context.intl.formatMessage(messages.pageTitle, { type })}
             type={CONTENT_SINGLE}
-            icon="recommendations"
+            icon={fwSpecified ? `recommendations_${frameworkId}` : 'recommendations'}
             buttons={
               dataReady ? [{
                 type: 'cancel',
@@ -169,7 +236,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           {!submitValid &&
             <Messages
               type="error"
-              messages={this.context.intl.formatMessage(appMessages.forms.multipleErrors)}
+              messageKey="submitInvalid"
               onDismiss={this.props.onErrorDismiss}
             />
           }
@@ -188,18 +255,30 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
               model="recommendationNew.form.data"
               formData={viewDomain.form.data}
               saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
+              handleSubmit={(formData) => this.props.handleSubmit(
+                formData,
+                currentFramework,
+                fwTaxonomies,
+              )}
               handleSubmitFail={this.props.handleSubmitFail}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
               fields={{ // isManager, taxonomies,
                 header: {
-                  main: this.getHeaderMainFields(),
+                  main: this.getHeaderMainFields(
+                    frameworkId === 'all' ? frameworks : null
+                  ),
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, measures, onCreateOption),
-                  aside: this.getBodyAsideFields(taxonomies, onCreateOption),
+                  main: this.getBodyMainFields(
+                    connectedTaxonomies,
+                    hasMeasures && measures,
+                    hasIndicators && indicators,
+                    onCreateOption,
+                    hasResponse,
+                  ),
+                  aside: this.getBodyAsideFields(fwTaxonomies, onCreateOption),
                 },
               }}
               scrollContainer={this.state.scrollContainer}
@@ -227,11 +306,14 @@ RecommendationNew.propTypes = {
   authReady: PropTypes.bool,
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
+  indicators: PropTypes.object,
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  frameworkId: PropTypes.string,
+  frameworks: PropTypes.object,
 };
 
 RecommendationNew.contextTypes = {
@@ -242,9 +324,12 @@ const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
-  taxonomies: selectRecommendationTaxonomies(state),
+  taxonomies: selectRecommendationTaxonomies(state, { includeParents: false }),
   measures: selectMeasuresCategorised(state),
+  indicators: selectEntities(state, 'indicators'),
   connectedTaxonomies: selectConnectedTaxonomies(state),
+  frameworkId: selectFrameworkQuery(state),
+  frameworks: selectActiveFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -271,26 +356,39 @@ function mapDispatchToProps(dispatch) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData) => {
+    // handleSubmit: (formData, currentFramework) => {
+    handleSubmit: (formData, currentFramework, fwTaxonomies) => {
       let saveData = formData;
 
-      // measureCategories
+      // recommendationCategories=
       if (formData.get('associatedTaxonomies')) {
+        // get List of valid categories (for framework)
+        const validCategories = fwTaxonomies && fwTaxonomies
+          .map((fwt) => fwt.get('categories').keySeq())
+          .valueSeq()
+          .flatten();
+        // get list of selected categories by taxonomy,
+        // filter by valid categories
+        const selectedCategories = formData
+          .get('associatedTaxonomies')
+          .map(getCheckedValuesFromOptions)
+          .valueSeq()
+          .flatten()
+          .filter((id) => !validCategories || validCategories.includes(id));
+        // const categoryIds =
         saveData = saveData.set(
           'recommendationCategories',
-          formData.get('associatedTaxonomies')
-          .map(getCheckedValuesFromOptions)
-          .reduce((updates, formCategoryIds) => Map({
+          Map({
             delete: List(),
-            create: updates.get('create').concat(formCategoryIds.map((id) => Map({
-              category_id: id,
-            }))),
-          }), Map({ delete: List(), create: List() }))
+            create: selectedCategories.map((id) => Map({ category_id: id })) }),
         );
       }
 
-      // measures
-      if (formData.get('associatedMeasures')) {
+      // measures if allowed by framework
+      if (
+        formData.get('associatedMeasures') &&
+        currentFramework.getIn(['attributes', 'has_measures'])
+      ) {
         saveData = saveData.set('recommendationMeasures', Map({
           delete: List(),
           create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
@@ -300,6 +398,28 @@ function mapDispatchToProps(dispatch) {
         }));
       }
 
+      // indicators if allowed by framework
+      if (
+        formData.get('associatedIndicators') &&
+        currentFramework.getIn(['attributes', 'has_indicators'])
+      ) {
+        saveData = saveData.set('recommendationIndicators', Map({
+          delete: List(),
+          create: getCheckedValuesFromOptions(formData.get('associatedIndicators'))
+          .map((id) => Map({
+            indicator_id: id,
+          })),
+        }));
+      }
+      // cleanup attributes for framework
+      if (!currentFramework.getIn(['attributes', 'has_response'])) {
+        saveData = saveData
+          .setIn(['attributes', 'accepted'], null)
+          .setIn(['attributes', 'response'], null);
+      }
+      if (!currentFramework.get('id')) {
+        saveData = saveData.setIn(['attributes', 'framework_id'], DEFAULT_FRAMEWORK);
+      }
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {

@@ -14,7 +14,6 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Header from 'components/Header';
 import EntityNew from 'containers/EntityNew';
-import { ENABLE_SDGS } from 'themes/config';
 
 import { sortEntities } from 'utils/sort';
 
@@ -23,14 +22,18 @@ import {
   selectIsUserManager,
   selectSessionUserAttributes,
   selectReady,
+  selectFrameworks,
   selectEntitiesWhere,
   selectNewEntityModal,
+  selectFrameworkQuery,
+  selectViewRecommendationFrameworkId,
 } from './selectors';
 
 import {
   validateToken,
   loadEntitiesIfNeeded,
   updatePath,
+  updateRouteQuery,
   openNewEntityModal,
 } from './actions';
 
@@ -85,64 +88,84 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     }))
     .toArray();
 
-  prepareMainMenuItems = (isManager, currentPath) => {
-    let navItems = ([
-      // {
-      //   path: PATHS.OVERVIEW,
-      //   title: this.context.intl.formatMessage(messages.nav.overview),
-      //   active: currentPath.startsWith(PATHS.OVERVIEW),
-      // },
+  prepareFrameworkOptions = (frameworks, activeId) => {
+    const options = Object.values(frameworks.toJS()).map((fw) => ({
+      value: fw.id,
+      label: this.context.intl.formatMessage(messages.frameworks[fw.id]),
+      active: activeId === fw.id,
+    }));
+    return options.concat({
+      value: 'all',
+      label: this.context.intl.formatMessage(messages.frameworks.all),
+      active: (activeId === 'all') || frameworks.size === 0,
+    });
+  }
+  prepareMainMenuItems = (
+    isManager,
+    isUserSignedIn,
+    currentPath,
+    currentFrameworkId,
+    viewRecommendationFramework,
+  ) => {
+    let navItems = [
       {
         path: PATHS.OVERVIEW,
+        titleSuper: this.context.intl.formatMessage(messages.nav.overviewSuper),
         title: this.context.intl.formatMessage(messages.nav.overview),
-        active: currentPath.startsWith(PATHS.OVERVIEW) || currentPath.startsWith(PATHS.TAXONOMIES) || currentPath.startsWith(PATHS.CATEGORIES),
+        active:
+          currentPath.startsWith(PATHS.OVERVIEW) ||
+          currentPath.startsWith(PATHS.TAXONOMIES) ||
+          currentPath.startsWith(PATHS.CATEGORIES),
+      },
+      {
+        path: PATHS.RECOMMENDATIONS,
+        titleSuper: this.context.intl.formatMessage(messages.nav.recommendationsSuper),
+        title: this.context.intl.formatMessage(messages.frameworkObjectivesShort[currentFrameworkId]),
+        active: currentPath.startsWith(PATHS.RECOMMENDATIONS) && (
+          !viewRecommendationFramework ||
+          currentFrameworkId === 'all' ||
+          currentFrameworkId === viewRecommendationFramework
+        ),
       },
       {
         path: PATHS.MEASURES,
+        titleSuper: this.context.intl.formatMessage(messages.nav.measuresSuper),
         title: this.context.intl.formatMessage(messages.nav.measures),
         active: currentPath.startsWith(PATHS.MEASURES),
       },
-    ]);
-    // if (isManager) {
+    ];
     navItems = navItems.concat([{
       path: PATHS.INDICATORS,
+      titleSuper: this.context.intl.formatMessage(messages.nav.indicatorsSuper),
       title: this.context.intl.formatMessage(messages.nav.indicators),
-      active: currentPath.startsWith(PATHS.INDICATORS) || currentPath.startsWith(PATHS.PROGRESS_REPORTS),
-    }]);
-    // }
-    navItems = navItems.concat([{
-      path: PATHS.RECOMMENDATIONS,
-      title: this.context.intl.formatMessage(messages.nav.recommendations),
-      active: currentPath.startsWith(PATHS.RECOMMENDATIONS),
-    }]);
-    if (ENABLE_SDGS) {
-      navItems = navItems.concat([{
-        path: PATHS.SDG_TARGETS,
-        title: this.context.intl.formatMessage(messages.nav.sdgtargets),
-        active: currentPath.startsWith(PATHS.SDG_TARGETS),
-      }]);
-    }
-    navItems = navItems.concat([{
-      path: PATHS.SEARCH,
-      title: this.context.intl.formatMessage(messages.nav.search),
-      active: currentPath.startsWith(PATHS.SEARCH),
-      icon: 'search',
-      align: 'right',
+      active:
+        currentPath.startsWith(PATHS.INDICATORS) ||
+        currentPath.startsWith(PATHS.PROGRESS_REPORTS),
     }]);
 
     if (isManager) {
       navItems = navItems.concat([
+        {
+          path: PATHS.PAGES,
+          title: this.context.intl.formatMessage(messages.nav.pages),
+          isAdmin: true,
+          active: currentPath === PATHS.PAGES,
+        },
         {
           path: PATHS.USERS,
           title: this.context.intl.formatMessage(messages.nav.users),
           isAdmin: true,
           active: currentPath === PATHS.USERS,
         },
+      ]);
+    }
+    if (isUserSignedIn) {
+      navItems = navItems.concat([
         {
-          path: PATHS.PAGES,
-          title: this.context.intl.formatMessage(messages.nav.pages),
+          path: PATHS.BOOKMARKS,
+          title: this.context.intl.formatMessage(messages.nav.bookmarks),
           isAdmin: true,
-          active: currentPath === PATHS.PAGES,
+          active: currentPath === PATHS.BOOKMARKS,
         },
       ]);
     }
@@ -151,18 +174,44 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 
   render() {
     window.Perf = Perf;
-    const { pages, onPageLink, isUserSignedIn, isManager, location, newEntityModal } = this.props;
-
+    const {
+      pages,
+      onPageLink,
+      isUserSignedIn,
+      isManager,
+      location,
+      newEntityModal,
+      currentFrameworkId,
+      frameworks,
+      onSelectFramework,
+      viewRecommendationFramework,
+    } = this.props;
     return (
       <div>
         <Header
           isSignedIn={isUserSignedIn}
           user={this.props.user}
           pages={pages && this.preparePageMenuPages(pages)}
-          navItems={this.prepareMainMenuItems(isUserSignedIn && isManager, location.pathname)}
+          navItems={this.prepareMainMenuItems(
+            isUserSignedIn && isManager,
+            isUserSignedIn,
+            location.pathname,
+            currentFrameworkId,
+            viewRecommendationFramework,
+          )}
+          search={{
+            path: PATHS.SEARCH,
+            title: this.context.intl.formatMessage(messages.nav.search),
+            active: location.pathname.startsWith(PATHS.SEARCH),
+            icon: 'search',
+          }}
           onPageLink={onPageLink}
-          currentPath={location.pathname}
           isHome={location.pathname === '/'}
+          onSelectFramework={onSelectFramework}
+          frameworkOptions={this.prepareFrameworkOptions(
+              frameworks,
+              currentFrameworkId,
+            )}
         />
         <Main isHome={location.pathname === '/'}>
           {React.Children.toArray(this.props.children)}
@@ -204,12 +253,16 @@ App.propTypes = {
   location: PropTypes.object.isRequired,
   newEntityModal: PropTypes.object,
   onCloseModal: PropTypes.func,
+  onSelectFramework: PropTypes.func,
+  currentFrameworkId: PropTypes.string,
+  viewRecommendationFramework: PropTypes.string,
+  frameworks: PropTypes.object,
 };
 App.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   isManager: selectIsUserManager(state),
   isUserSignedIn: selectIsSignedIn(state),
@@ -219,6 +272,9 @@ const mapStateToProps = (state) => ({
     where: { draft: false },
   }),
   newEntityModal: selectNewEntityModal(state),
+  currentFrameworkId: selectFrameworkQuery(state),
+  frameworks: selectFrameworks(state),
+  viewRecommendationFramework: selectViewRecommendationFrameworkId(state, props.params.id),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -234,6 +290,15 @@ export function mapDispatchToProps(dispatch) {
     },
     onCloseModal: () => {
       dispatch(openNewEntityModal(null));
+    },
+    onSelectFramework: (framework) => {
+      dispatch(updateRouteQuery(
+        {
+          arg: 'fw',
+          value: framework,
+          replace: true,
+        }
+      ));
     },
   };
 }

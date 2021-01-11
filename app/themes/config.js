@@ -16,6 +16,7 @@
 export const DEFAULT_LOCALE = 'en-GB';
 // date format - change to format according to locale, only used for form error message
 export const DATE_FORMAT = 'dd/mm/yyyy';
+export const NODE_ENV = sessionStorage.NODE_ENV || 'production';
 
 // UI settings ************************
 
@@ -61,25 +62,6 @@ export const TEXT_TRUNCATE = {
   LINK_FIELD: 30,
 };
 
-export const TAXONOMY_GROUPS = [
-  {
-    id: 1,
-    priorityMin: 0,
-    priorityMax: 10,
-    default: true,
-  },
-  {
-    id: 2,
-    priorityMin: 11,
-    priorityMax: 20,
-  },
-  {
-    id: 3,
-    priorityMin: 21,
-    priorityMax: 30,
-  },
-];
-
 export const PROGRESS_TAXONOMY_ID = 8;
 
 // WARNING: references as assigned by user
@@ -88,6 +70,8 @@ export const PROGRESS_CATEGORY_REFERENCES = {
   COMPLETED: 2,
 };
 
+export const CYCLE_TAXONOMY_ID = 2;
+
 /**
  * Server settings
  **/
@@ -95,7 +79,11 @@ export const PROGRESS_CATEGORY_REFERENCES = {
 // General ********************
 
 export const ENDPOINTS = {
-  API: 'https://undp-sadata-staging.herokuapp.com', // server API endpoint
+  API: (
+    NODE_ENV === 'production'
+    ? 'https://undp-sadata-staging.herokuapp.com'
+    : 'https://impactoss-dev.herokuapp.com/'
+  ), // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
@@ -162,7 +150,7 @@ export const REPORT_FREQUENCIES = [
   { value: 12, message: 'ui.reportFrequencies.annual' },
 ];
 
-export const ENABLE_SDGS = true;
+export const DEFAULT_FRAMEWORK = 1;
 
 // Map server database tables **************************
 export const DB_TABLES = [
@@ -170,6 +158,7 @@ export const DB_TABLES = [
   'user_roles',
   'roles',
   'pages',
+  'bookmarks',
   'taxonomies',
   'categories',
   'indicators',
@@ -182,112 +171,9 @@ export const DB_TABLES = [
   'user_categories',
   'progress_reports',
   'due_dates',
-  'sdgtarget_categories',
-  'sdgtarget_indicators',
-  'sdgtarget_measures',
-  'sdgtargets',
+  'frameworks',
+  'framework_taxonomies',
+  'framework_frameworks',
+  'recommendation_indicators',
+  'recommendation_recommendations',
 ];
-
-// Table shapes
-// - define fields for each table
-// - set field location in entity forms and views (section/column)
-// - define fields for csv import (import)
-// - disable fields by setting 'disabled: true'
-
-// shape for table 'measures' (Actions)
-export const MEASURE_SHAPE = {
-  table: 'measures',
-  key: 'measures_id',
-  fields: [
-    {
-      attribute: 'title',
-      control: 'title',
-      type: 'text',
-      required: true,
-      import: true,
-      section: 'header',
-      column: 'main',
-    },
-    {
-      attribute: 'draft',
-      control: 'status',
-      type: 'bool',
-      default: true,
-      section: 'header',
-      column: 'aside',
-      role: USER_ROLES.MANAGER.value,
-    },
-    {
-      attribute: 'description',
-      control: 'markdown',
-      type: 'markdown',
-      import: true,
-      section: 'body',
-      column: 'main',
-    },
-    {
-      disabled: true,
-      attribute: 'outcome',
-      control: 'markdown',
-      type: 'markdown',
-      import: true,
-      section: 'body',
-      column: 'main',
-    },
-    {
-      disabled: true,
-      attribute: 'indicator_summary',
-      control: 'markdown',
-      type: 'markdown',
-      import: true,
-      section: 'body',
-      column: 'main',
-    },
-    {
-      attribute: 'target_date',
-      control: 'date',
-      type: 'date',
-      import: true,
-      section: 'body',
-      column: 'aside',
-      groupType: 'dark',
-    },
-    {
-      attribute: 'target_date_comment',
-      control: 'textarea',
-      type: 'text',
-      import: true,
-      section: 'body',
-      column: 'aside',
-      groupType: 'dark',
-    },
-  ],
-  taxonomies: {
-    table: 'measure_categories',
-    key: 'category_id',
-    section: 'body',
-    column: 'aside',
-    smart: true,
-  },
-  connections: {
-    tables: [
-      {
-        table: 'recommendations',
-        via: 'recommendation_measures',
-        key: 'recommendation_id',
-      },
-      {
-        table: 'indicators',
-        via: 'measure_indicators',
-        key: 'indicator_id',
-      },
-      {
-        table: 'sdgtargets',
-        via: 'sdgtarget_measures',
-        key: 'sdgtarget_id',
-      },
-    ],
-    section: 'body',
-    column: 'main',
-  },
-};

@@ -25,6 +25,7 @@ export const RECOVER_PASSWORD = 'impactoss/App/RECOVER_PASSWORD';
 export const AUTHENTICATE_SUCCESS = 'impactoss/App/AUTHENTICATE_SUCCESS';
 export const AUTHENTICATE_ERROR = 'impactoss/App/AUTHENTICATE_ERROR';
 export const SET_AUTHENTICATION_STATE = 'impactoss/App/SET_AUTHENTICATION_STATE';
+export const OPEN_BOOKMARK = 'impactoss/App/OPEN_BOOKMARK';
 export const LOGOUT = 'impactoss/App/LOGOUT';
 export const LOGOUT_SUCCESS = 'impactoss/App/LOGOUT_SUCCESS';
 export const LOGOUT_ERROR = 'impactoss/App/LOGOUT_ERROR';
@@ -72,6 +73,7 @@ export const OPEN_NEW_ENTITY_MODAL = 'impactoss/App/OPEN_NEW_ENTITY_MODAL';
 export const SUBMIT_INVALID = 'impactoss/App/SUBMIT_INVALID';
 
 export const DISMISS_QUERY_MESSAGES = 'impactoss/App/DISMISS_QUERY_MESSAGES';
+export const SET_FRAMEWORK = 'impactoss/App/SET_FRAMEWORK';
 
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';
@@ -84,6 +86,7 @@ export const CONTENT_MODAL = 'modal';
 export const DEPENDENCIES = [
   'user_roles',
   'pages',
+  'frameworks',
 ];
 export const SORT_ORDER_OPTIONS = [
   { value: 'asc', icon: 'ascending', nextValue: 'desc', message: 'ui.sortOrderOptions.asc' },
@@ -112,6 +115,7 @@ export const PATHS = {
   PASSWORD: '/password',
   OVERVIEW: '/overview',
   LOGIN: '/login',
+  BOOKMARKS: '/bookmarks',
   LOGOUT: '/logout',
   REGISTER: '/register',
   RESET_PASSWORD: '/resetpassword',
@@ -120,7 +124,6 @@ export const PATHS = {
   USERS: '/users',
   MEASURES: '/actions',
   INDICATORS: '/indicators',
-  SDG_TARGETS: '/sdgtargets',
   RECOMMENDATIONS: '/recommendations',
   PROGRESS_REPORTS: '/reports',
   TAXONOMIES: '/categories',

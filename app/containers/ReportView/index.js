@@ -65,15 +65,15 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     {
       fields: [
         getStatusField(entity),
-        getMetaField(entity, appMessages),
+        getMetaField(entity),
       ],
     },
   ]);
   getBodyMainFields = (entity, isContributor) => ([
     {
       fields: [
-        getMarkdownField(entity, 'description', true, appMessages),
-        getDownloadField(entity, entity.getIn(['attributes', 'document_public']) || isContributor, appMessages),
+        getMarkdownField(entity, 'description', true),
+        getDownloadField(entity, entity.getIn(['attributes', 'document_public']) || isContributor),
       ],
     },
   ]);
@@ -81,7 +81,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     {
       type: 'dark',
       fields: [
-        getDateRelatedField(entity.getIn(['date', 'attributes', 'due_date']), 'due_date_id', appMessages, true, appMessages.entities.progress_reports.unscheduled),
+        getDateRelatedField(entity.getIn(['date', 'attributes', 'due_date']), 'due_date_id', true, appMessages.entities.progress_reports.unscheduled),
       ],
     },
   ]);

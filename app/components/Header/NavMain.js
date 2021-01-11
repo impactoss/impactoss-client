@@ -14,7 +14,4 @@ export default styled.div`
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   -ms-overflow-style: -ms-autohiding-scrollbar;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    text-align: center;
-  }
 `;

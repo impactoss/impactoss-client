@@ -41,10 +41,8 @@ import Content from 'components/styled/Content';
 import EntityListHeader from 'components/EntityListMain/EntityListGroups/EntityListHeader';
 import EntityListItemWrapper from 'components/EntityListMain/EntityListGroups/EntityListItems/EntityListItemWrapper';
 
-
 import appMessages from 'containers/App/messages';
 // import { PATHS } from 'containers/App/constants';
-
 
 import { DEPENDENCIES } from './constants';
 import { selectEntitiesByQuery } from './selectors';
@@ -244,9 +242,16 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
   );
 
   render() {
-    const { dataReady, location, onSearch, onClear, entities, onEntityClick, onSortOrder, onSortBy } = this.props;
-    // console.log('render')
-
+    const {
+      dataReady,
+      location,
+      onSearch,
+      onClear,
+      entities,
+      onEntityClick,
+      onSortOrder,
+      onSortBy,
+    } = this.props;
     const activeTarget = entities.reduce((memo, group) =>
         group.get('targets').find((target) => target.get('active')) || memo
       , Map());
@@ -392,20 +397,6 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     );
   }
 }
-// <EntityList
-// entities={this.props.entities}
-// taxonomies={this.props.taxonomies}
-// connections={this.props.connections}
-// connectedTaxonomies={this.props.connectedTaxonomies}
-// config={CONFIG}
-// header={headerOptions}
-// dataReady={dataReady}
-// entityTitle={{
-//   single: this.context.intl.formatMessage(appMessages.entities.measures.single),
-//   plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
-// }}
-// locationQuery={fromJS(this.props.location.query)}
-// />
 
 Search.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,

@@ -30,8 +30,6 @@ import A from 'components/styled/A';
 import { selectQueryMessages } from 'containers/App/selectors';
 import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
-import appMessages from 'containers/App/messages';
-
 import { PATHS } from 'containers/App/constants';
 
 import messages from './messages';
@@ -89,10 +87,10 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
               handleCancel={this.props.handleCancel}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
               fields={[
-                getNameField(this.context.intl.formatMessage, appMessages),
-                getEmailField(this.context.intl.formatMessage, appMessages),
-                getPasswordField(this.context.intl.formatMessage, appMessages),
-                getPasswordConfirmationField(this.context.intl.formatMessage, appMessages),
+                getNameField(this.context.intl.formatMessage),
+                getEmailField(this.context.intl.formatMessage),
+                getPasswordField(this.context.intl.formatMessage),
+                getPasswordConfirmationField(this.context.intl.formatMessage),
               ]}
             />
           }

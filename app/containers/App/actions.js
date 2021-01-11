@@ -65,6 +65,8 @@ import {
   RESET_PROGRESS,
   SUBMIT_INVALID,
   DISMISS_QUERY_MESSAGES,
+  SET_FRAMEWORK,
+  OPEN_BOOKMARK,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -478,5 +480,18 @@ export function openNewEntityModal(args) {
 export function dismissQueryMessages() {
   return {
     type: DISMISS_QUERY_MESSAGES,
+  };
+}
+
+export function setFramework(framework) {
+  return {
+    type: SET_FRAMEWORK,
+    framework,
+  };
+}
+export function openBookmark(bookmark) {
+  return {
+    type: OPEN_BOOKMARK,
+    bookmark,
   };
 }

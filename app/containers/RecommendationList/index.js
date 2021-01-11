@@ -8,14 +8,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { find } from 'lodash/collection';
 import { Map, List, fromJS } from 'immutable';
 
+import { getAcceptanceStatus } from 'utils/entities';
+
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { ACCEPTED_STATUSES } from 'themes/config';
 import {
   selectReady,
   selectRecommendationTaxonomies,
+  selectActiveFrameworks,
+  selectIsUserManager,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -58,29 +60,47 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   //     || !isEqual(this.state, nextState);
   // }
   render() {
-    const { dataReady } = this.props;
+    const { dataReady, frameworks, isManager } = this.props;
     // console.log('RecList:render')
-
+    const currentFramework = frameworks && frameworks.size === 1 && frameworks.first();
+    const type = currentFramework
+      ? `recommendations_${currentFramework.get('id')}`
+      : 'recommendations';
     const headerOptions = {
       supTitle: this.context.intl.formatMessage(messages.pageTitle),
-      icon: 'recommendations',
-      actions: [{
+      icon: type,
+      actions: [],
+    };
+    if (isManager) {
+      headerOptions.actions.push({
         type: 'text',
         title: this.context.intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
-      }, {
+      });
+      headerOptions.actions.push({
         type: 'add',
         title: [
           this.context.intl.formatMessage(appMessages.buttons.add),
           {
-            title: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
+            title: this.context.intl.formatMessage(appMessages.entities[type].single),
             hiddenSmall: true,
           },
         ],
         onClick: () => this.props.handleNew(),
-      }],
-    };
-
+      });
+    }
+    headerOptions.actions.push({
+      type: 'bookmarker',
+      title: this.context.intl.formatMessage(appMessages.entities[type].plural),
+      entityType: type,
+    });
+    // if (dataReady) {
+    //   console.log(this.props.entities.toJS())
+    //   console.log(this.props.connections.toJS())
+    //   console.log(this.props.taxonomies.toJS())
+    //   console.log(this.props.frameworks.toJS())
+    //   console.log(this.props.connectedTaxonomies.toJS())
+    // }
     return (
       <div>
         <Helmet
@@ -93,18 +113,17 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
+          frameworks={frameworks}
           connectedTaxonomies={this.props.connectedTaxonomies}
           config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
-            plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+            single: this.context.intl.formatMessage(appMessages.entities[type].single),
+            plural: this.context.intl.formatMessage(appMessages.entities[type].plural),
           }}
           entityIcon={(entity) => {
-            const status = find(ACCEPTED_STATUSES,
-              (option) => option.value === entity.getIn(['attributes', 'accepted'])
-            );
+            const status = getAcceptanceStatus(entity);
             return status ? status.icon : null;
           }}
           locationQuery={fromJS(this.props.location.query)}
@@ -119,8 +138,10 @@ RecommendationList.propTypes = {
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
   dataReady: PropTypes.bool,
+  isManager: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   location: PropTypes.object,
@@ -136,6 +157,8 @@ const mapStateToProps = (state, props) => ({
   taxonomies: selectRecommendationTaxonomies(state),
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
+  frameworks: selectActiveFrameworks(state),
+  isManager: selectIsUserManager(state),
 });
 
 function mapDispatchToProps(dispatch) {

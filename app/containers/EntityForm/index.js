@@ -24,10 +24,10 @@ import ButtonSubmit from 'components/buttons/ButtonSubmit';
 import ButtonForm from 'components/buttons/ButtonForm';
 import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
 import FieldGroupLabel from 'components/fields/FieldGroupLabel';
-import GroupIcon from 'components/fields/GroupIcon';
-import GroupLabel from 'components/fields/GroupLabel';
 import FieldWrap from 'components/fields/FieldWrap';
 import Field from 'components/fields/Field';
+import GroupIcon from 'components/fields/GroupIcon';
+import GroupLabel from 'components/fields/GroupLabel';
 import Clear from 'components/styled/Clear';
 import ViewPanel from 'components/EntityView/ViewPanel';
 
@@ -35,9 +35,9 @@ import FieldLabel from 'components/forms/Label';
 import ErrorWrapper from 'components/forms/ErrorWrapper';
 import UploadControl from 'components/forms/UploadControl';
 import FormFooter from 'components/forms/FormFooter';
+import FormFooterButtons from 'components/forms/FormFooterButtons';
 import FormBody from 'components/forms/FormBody';
 import FormWrapper from 'components/forms/FormWrapper';
-import FormFooterButtons from 'components/forms/FormFooterButtons';
 import Aside from 'components/EntityView/Aside';
 import Main from 'components/EntityView/Main';
 import FormFieldWrap from 'components/forms/FormFieldWrap';
@@ -244,7 +244,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   }
 
   renderGroup = (group, hasEntityNewModal, scrollContainer) => (
-    <FieldGroupWrapper type={group.type}>
+    <FieldGroupWrapper>
       { group.label &&
         <FieldGroupLabel>
           <GroupLabel>
@@ -309,7 +309,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     const hasEntityNewModal = !!newEntityModal;
 
     return (
-      <FormWrapper withoutShadow={inModal} hasMarginBottom>
+      <FormWrapper withoutShadow={inModal} hasMarginBottom={!inModal}>
         <StyledForm model={model} onSubmit={this.handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
           <FormBody>
             { fields.header &&

@@ -71,7 +71,6 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
         ? `${filter.messagePrefix} ${lowerCase(appMessage(this.context.intl, filter.message))}`
         : appMessage(this.context.intl, filter.message);
     }
-    // <<< not used?
     if (filter.labels) {
       return reduce(filter.labels, (memo, label) => {
         if (!label.label) return memo;
@@ -96,7 +95,6 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     // onClick={() => {
     //   this.inputNode.focus()
     // }}
-
     return (
       <Search active={this.state.active} small={this.props.multiselect}>
         { filters.length > 0 &&
@@ -107,8 +105,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                   <ButtonTagFilterInverse
                     key={i}
                     onClick={filter.onClick}
-                    palette={filter.type}
-                    paletteHover={`${filter.type}Hover`}
+                    palette={filter.type || 'attributes'}
+                    paletteHover={`${filter.type || 'attributes'}Hover`}
                     pIndex={parseInt(filter.id, 10) || 0}
                     disabled={!filter.onClick}
                   >
@@ -122,8 +120,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                   <ButtonTagFilter
                     key={i}
                     onClick={filter.onClick}
-                    palette={filter.type}
-                    paletteHover={`${filter.type}Hover`}
+                    palette={filter.type || 'attributes'}
+                    paletteHover={`${filter.type || 'attributes'}Hover`}
                     pIndex={parseInt(filter.id, 10) || 0}
                     disabled={!filter.onClick}
                   >

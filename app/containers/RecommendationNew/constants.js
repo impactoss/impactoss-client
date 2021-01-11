@@ -4,15 +4,17 @@
  *
  */
 import { fromJS } from 'immutable';
-
 export const SAVE = 'impactoss/RecommendationNew/SAVE';
 
 export const DEPENDENCIES = [
   'user_roles',
   'categories',
   'taxonomies',
+  'framework_taxonomies',
   'measures',
   'measure_categories',
+  'indicators',
+  'frameworks',
 ];
 
 export const FORM_INITIAL = fromJS({
@@ -23,7 +25,10 @@ export const FORM_INITIAL = fromJS({
     accepted: true,
     response: '',
     draft: true,
+    framework_id: '',
   },
   associatedTaxonomies: {},
   associatedMeasures: [],
+  associatedIndicators: [],
+  associatedRecommendations: [],
 });

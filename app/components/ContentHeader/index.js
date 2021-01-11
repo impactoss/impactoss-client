@@ -111,7 +111,14 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
     }
   }
   render() {
-    const { type, icon, supTitle, title, buttons, subTitle } = this.props;
+    const {
+      type,
+      icon,
+      supTitle,
+      title,
+      buttons,
+      subTitle,
+    } = this.props;
 
     return (
       <Styled
@@ -126,7 +133,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
             <TableCell visibleMobile>
               <ButtonGroup>
                 {
-                  buttons.map((button, i) => (
+                  buttons.map((button, i) => button && (
                     <TableCellInner key={i}>
                       <ButtonWrap>
                         <ButtonFactory button={button} />

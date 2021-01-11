@@ -1,23 +1,9 @@
-import { ENABLE_SDGS } from 'themes/config';
-
-export const DEPENDENCIES = ENABLE_SDGS
-? [
+export const DEPENDENCIES = [
   'user_roles',
   'categories',
   'taxonomies',
-  'recommendation_categories',
-  'recommendations',
-  'measure_categories',
-  'recommendation_measures',
-  'measures',
-  'sdgtarget_categories',
-  'sdgtarget_measures',
-  'sdgtargets',
-]
-: [
-  'user_roles',
-  'categories',
-  'taxonomies',
+  'frameworks',
+  'framework_taxonomies',
   'recommendation_categories',
   'recommendations',
   'measure_categories',
@@ -44,12 +30,6 @@ export const SORT_OPTIONS = [
   {
     query: 'recommendations',
     field: 'recommendations',
-    type: 'number',
-    order: 'desc',
-  },
-  {
-    query: 'sdgtargets',
-    field: 'sdgtargets',
     type: 'number',
     order: 'desc',
   },

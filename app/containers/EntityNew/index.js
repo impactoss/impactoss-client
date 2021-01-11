@@ -8,9 +8,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { Map, List } from 'immutable';
 
-import { getEntityFields } from 'utils/forms';
-
+import { getEntityAttributeFields } from 'utils/forms';
+import { attributesEqual } from 'utils/entities';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
@@ -20,10 +21,18 @@ import {
   saveErrorDismiss,
 } from 'containers/App/actions';
 
-import { selectEntity } from 'containers/App/selectors';
+import {
+  selectEntity,
+  selectFrameworkQuery,
+  selectActiveFrameworks,
+} from 'containers/App/selectors';
+import { selectParentOptions, selectParentTaxonomy } from 'containers/CategoryNew/selectors';
 
+
+import { DEFAULT_FRAMEWORK } from 'themes/config';
 import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import Content from 'components/Content';
 import Messages from 'components/Messages';
@@ -44,25 +53,82 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
     };
   }
   componentWillMount() {
-    this.props.initialiseForm('entityNew.form.data', FORM_INITIAL);
+    this.props.initialiseForm('entityNew.form.data', this.getInitialFormData());
   }
   componentWillReceiveProps(nextProps) {
     if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
       scrollToTop(this.state.scrollContainer);
     }
+    if (!this.props.frameworkId && nextProps.frameworkId) {
+      this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));
+    }
+  }
+  getInitialFormData = (nextProps) => {
+    const props = nextProps || this.props;
+    const { frameworkId } = props;
+    return Map(FORM_INITIAL.setIn(
+      ['attributes', 'framework_id'],
+      (frameworkId && frameworkId !== 'all')
+        ? frameworkId
+        : DEFAULT_FRAMEWORK,
+    ));
   }
 
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
 
   render() {
-    const { viewDomain, path, attributes, inModal, taxonomy } = this.props;
+    const {
+      viewDomain,
+      path,
+      attributes,
+      inModal,
+      taxonomy,
+      categoryParentOptions,
+      parentTaxonomy,
+      frameworks,
+      framework,
+      frameworkId,
+    } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
 
-    let pageTitle = this.context.intl.formatMessage(messages[path].pageTitle);
-    if (taxonomy && taxonomy.get('attributes')) {
+    let pageTitle;
+    let hasResponse;
+    let fwSpecified;
+    let icon = path;
+    if (path === 'categories' && taxonomy && taxonomy.get('attributes')) {
       pageTitle = this.context.intl.formatMessage(messages[path].pageTitleTaxonomy, {
         taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
+    } else if (path === 'recommendations') {
+      // figure out framework id from form if not set
+      const currentFrameworkId =
+        (framework && framework.get('id')) ||
+        frameworkId ||
+        viewDomain.form.data.getIn(['attributes', 'framework_id']) ||
+        DEFAULT_FRAMEWORK;
+      // check if single framework set
+      fwSpecified = (currentFrameworkId && currentFrameworkId !== 'all');
+      // get current framework
+      const currentFramework =
+        framework ||
+        (
+          fwSpecified &&
+          frameworks &&
+          frameworks.find((fw) => attributesEqual(fw.get('id'), currentFrameworkId))
+        );
+      // check if response is required
+      hasResponse = currentFramework && currentFramework.getIn(['attributes', 'has_response']);
+      // figure out title and icon
+      pageTitle = this.context.intl.formatMessage(
+        messages[path].pageTitle,
+        {
+          type: this.context.intl.formatMessage(
+            appMessages.entities[fwSpecified ? `${path}_${currentFrameworkId}` : path].single
+          ),
+        });
+      icon = fwSpecified ? `${path}_${currentFrameworkId}` : path;
+    } else {
+      pageTitle = this.context.intl.formatMessage(messages[path].pageTitle);
     }
 
     return (
@@ -78,7 +144,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={pageTitle}
             type={CONTENT_MODAL}
-            icon={path}
+            icon={icon}
             buttons={[{
               type: 'cancel',
               onClick: this.props.onCancel,
@@ -117,8 +183,22 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             )}
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
-            fields={getEntityFields(path, { taxonomy }, this.context.intl, appMessages)}
             scrollContainer={this.state.scrollContainer}
+            fields={getEntityAttributeFields(
+              path,
+              {
+                categories: {
+                  taxonomy,
+                  categoryParentOptions,
+                  parentTaxonomy,
+                },
+                recommendations: {
+                  frameworks: !fwSpecified ? frameworks : null,
+                  hasResponse,
+                },
+              },
+              this.context.intl,
+            )}
           />
           {saveSending &&
             <Loading />
@@ -133,6 +213,8 @@ EntityNew.propTypes = {
   path: PropTypes.string.isRequired,
   attributes: PropTypes.object,
   taxonomy: PropTypes.object,
+  parentTaxonomy: PropTypes.object,
+  categoryParentOptions: PropTypes.object,
   handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
@@ -143,16 +225,34 @@ EntityNew.propTypes = {
   initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  framework: PropTypes.object,
+  frameworks: PropTypes.object,
+  frameworkId: PropTypes.string,
 };
 
 EntityNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = (state, { path, attributes }) => ({
   viewDomain: selectDomain(state),
-  taxonomy: props.attributes && props.attributes.get('taxonomy_id')
-    ? selectEntity(state, { path: 'taxonomies', id: props.attributes.get('taxonomy_id') })
+  taxonomy: path === 'categories' && attributes && attributes.get('taxonomy_id')
+    ? selectEntity(state, { path: 'taxonomies', id: attributes.get('taxonomy_id') })
+    : null,
+  categoryParentOptions: path === 'categories' && attributes && attributes.get('taxonomy_id')
+    ? selectParentOptions(state, attributes.get('taxonomy_id'))
+    : null,
+  parentTaxonomy: path === 'categories' && attributes && attributes.get('taxonomy_id')
+    ? selectParentTaxonomy(state, attributes.get('taxonomy_id'))
+    : null,
+  frameworkId: path === 'recommendations'
+    ? selectFrameworkQuery(state)
+    : null,
+  frameworks: path === 'recommendations'
+    ? selectActiveFrameworks(state)
+    : null,
+  framework: path === 'recommendations' && attributes && attributes.get('framework_id')
+    ? selectEntity(state, { path: 'frameworks', id: attributes.get('framework_id') })
     : null,
 });
 
@@ -175,9 +275,22 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(formActions.submit(model));
     },
     handleSubmit: (formData, attributes) => {
-      const saveData = attributes
+      let saveData = attributes
         ? formData.mergeIn(['attributes'], attributes)
         : formData;
+
+      // saveData = saveData.setIn(['attributes', 'taxonomy_id'], taxonomy.get('id'));
+
+      if (props.path === 'categories') {
+        const formCategoryIds =
+          formData.get('associatedCategory') &&
+          getCheckedValuesFromOptions(formData.get('associatedCategory'));
+        if (List.isList(formCategoryIds) && formCategoryIds.size) {
+          saveData = saveData.setIn(['attributes', 'parent_id'], formCategoryIds.first());
+        } else {
+          saveData = saveData.setIn(['attributes', 'parent_id'], null);
+        }
+      }
 
       dispatch(newEntity({
         entity: saveData.toJS(),

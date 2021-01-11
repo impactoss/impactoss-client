@@ -5,6 +5,8 @@ import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { filter } from 'lodash/collection';
 
+import { truncateText } from 'utils/string';
+
 import {
   SHOW_HEADER_TITLE,
   SHOW_HEADER_PATTERN,
@@ -115,8 +117,66 @@ const HideSecondaryWrap = styled.div`
 `;
 const HideSecondary = styled(Button)``;
 
+const LinkSuperTitle = styled.div`
+  font-size: 12px;
+`;
+const LinkTitle = styled.div`
+  font-size: 16px;
+  font-weight: bold;
+  color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
+`;
+const SelectFrameworks = styled(LinkMain)`
+  min-width: ${({ theme }) => theme.sizes.aside.width.small}px;
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    min-width: ${({ theme }) => theme.sizes.aside.width.large}px;
+  }
+`;
+const Search = styled(LinkMain)`
+  color: ${(props) => props.active ? palette('headerNavMainItem', 1) : palette('headerNavMainItem', 0)};
+  &:hover {
+    color:${palette('headerNavMainItemHover', 0)};
+  }
+  padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    min-width: auto;
+    padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px 0;
+    position: absolute;
+    right: 0;
+    border-left: none;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+`;
+
+const FrameworkOptions = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: block;
+  min-width: ${({ theme }) => theme.sizes.aside.width.small}px;
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    min-width: ${({ theme }) => theme.sizes.aside.width.large}px;
+  }
+  background: white;
+  box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  margin-top: 3px;
+  padding: 5px 0;
+`;
+const FrameworkOption = styled(Button)`
+  display: block;
+  width: 100%;
+  text-align: left;
+  &:hover {
+    color:${palette('headerNavMainItemHover', 0)};
+  }
+  color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
+`;
+
 const STATE_INITIAL = {
   showSecondary: false,
+  showFrameworks: false,
 };
 
 class Header extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -137,6 +197,14 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
   onHideSecondary = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ showSecondary: false });
+  };
+  onShowFrameworks = (evt) => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    this.setState({ showFrameworks: true });
+  };
+  onHideFrameworks = (evt) => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    this.setState({ showFrameworks: false });
   };
   onClick = (evt, path, currentPath) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -193,18 +261,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           }}
           currentPath={this.props.currentPath}
         />
-        <NavPages>
-          { this.props.pages && this.props.pages.map((page, i) => (
-            <LinkPage
-              key={i}
-              href={page.path}
-              active={page.active || this.props.currentPath === page.path}
-              onClick={(evt) => this.onClick(evt, page.path)}
-            >
-              {page.title}
-            </LinkPage>
-          ))}
-        </NavPages>
         { navItemsAdmin &&
           <NavAdmin>
             { navItemsAdmin.map((item, i) => (
@@ -223,15 +279,36 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             ))}
           </NavAdmin>
         }
+        <NavPages>
+          { this.props.pages && this.props.pages.map((page, i) => (
+            <LinkPage
+              key={i}
+              href={page.path}
+              active={page.active || this.props.currentPath === page.path}
+              onClick={(evt) => this.onClick(evt, page.path)}
+            >
+              {page.title}
+            </LinkPage>
+          ))}
+        </NavPages>
       </NavSecondary>
     </div>
   );
   render() {
-    const { currentPath, isHome } = this.props;
+    const {
+      isHome,
+      frameworkOptions,
+      onSelectFramework,
+      search,
+    } = this.props;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
     const navItemsAdmin = filter(this.props.navItems, (item) => item.isAdmin);
 
     const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
+
+    const currentFrameworkOption =
+      frameworkOptions &&
+      frameworkOptions.find((option) => option.active);
     return (
       <Styled
         fixed={isHome}
@@ -241,6 +318,22 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         hasNav={!isHome}
         hasBrand={SHOW_BRAND_ON_HOME || !isHome}
       >
+        {this.state.showFrameworks && (
+          <FrameworkOptions>
+            {frameworkOptions && frameworkOptions.map((option) => (
+              <FrameworkOption
+                key={option.value}
+                active={option.active}
+                onClick={() => {
+                  onSelectFramework(option.value);
+                  this.onHideFrameworks();
+                }}
+              >
+                {option.label}
+              </FrameworkOption>
+            ))}
+          </FrameworkOptions>
+        )}
         { !SHOW_BRAND_ON_HOME && isHome &&
           <HomeNavWrap>
             { this.renderSecondary(navItemsAdmin) }
@@ -272,21 +365,57 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         }
         { !isHome &&
           <NavMain hasBorder>
-            { navItems && navItems.map((item, i) => (
+            <SelectFrameworks
+              as="button"
+              onClick={(evt) =>
+                this.state.showFrameworks
+                ? this.onHideFrameworks(evt)
+                : this.onShowFrameworks(evt)
+              }
+            >
+              <LinkSuperTitle>
+                {this.context.intl.formatMessage(appMessages.frameworks.single)}
+              </LinkSuperTitle>
+              {currentFrameworkOption && (
+                <LinkTitle active>
+                  {truncateText(currentFrameworkOption.label, 30, false)}
+                  {!this.state.showFrameworks && (
+                    <Icon name="dropdownOpen" text textRight size={'1em'} />
+                  )}
+                  {this.state.showFrameworks && (
+                    <Icon name="dropdownClose" text textRight size={'1em'} />
+                  )}
+                </LinkTitle>
+              )}
+            </SelectFrameworks>
+            {navItems && navItems.map((item, i) => (
               <LinkMain
                 key={i}
                 href={item.path}
-                active={item.active || currentPath.startsWith(item.path)}
+                active={item.active}
                 onClick={(evt) => this.onClick(evt, item.path)}
-                align={item.align}
-                icon={item.icon}
               >
-                {item.title}
-                { item.icon &&
-                  <Icon title={item.title} name={item.icon} text textRight size={'1em'} />
-                }
+                <LinkSuperTitle>
+                  {item.titleSuper}
+                </LinkSuperTitle>
+                <LinkTitle active={item.active}>
+                  {item.title}
+                </LinkTitle>
               </LinkMain>
             ))}
+            {search && (
+              <Search
+                href={search.path}
+                active={search.active}
+                onClick={(evt) => this.onClick(evt, search.path)}
+                icon={search.icon}
+              >
+                {search.title}
+                {search.icon &&
+                  <Icon title={search.title} name={search.icon} text textRight size={'1em'} />
+                }
+              </Search>
+            )}
           </NavMain>
         }
       </Styled>
@@ -305,8 +434,11 @@ Header.propTypes = {
   pages: PropTypes.array,
   navItems: PropTypes.array,
   onPageLink: PropTypes.func.isRequired,
+  onSelectFramework: PropTypes.func.isRequired,
   isHome: PropTypes.bool, // not shown on home page
-  theme: PropTypes.object.isRequired, // not shown on home page
+  theme: PropTypes.object.isRequired,
+  search: PropTypes.object,
+  frameworkOptions: PropTypes.array,
 };
 
 Header.defaultProps = {

@@ -1,9 +1,11 @@
 ### `sadata, impactoss-client`
 - tmfrnz
 - tim-field
-- tony-luisi 
+- tony-luisi
 - dmprk
 - dankerk
+- oventi
+- hannahnorthover
 
 ### `react-boilerplate`
 - mxstbr

@@ -1,24 +1,15 @@
-import { ENABLE_SDGS } from 'themes/config';
-
-export const DEPENDENCIES = ENABLE_SDGS
-? [
+export const DEPENDENCIES = [
   'pages',
   'taxonomies',
-  'categories',
-  'indicators',
-  'measures',
-  'recommendations',
-  'sdgtargets',
-  'progress_reports',
-]
-: [
-  'pages',
-  'taxonomies',
+  'framework_taxonomies',
   'categories',
   'indicators',
   'measures',
   'recommendations',
   'progress_reports',
+  'recommendation_measures',
+  'recommendation_indicators',
+  'measure_indicators',
 ];
 
 export const UPDATE_QUERY = 'impactoss/Search/UPDATE_QUERY';
@@ -84,33 +75,7 @@ export const CONFIG = {
         {
           path: 'recommendations',
           search: ['title', 'description', 'response', 'reference'],
-          sorting: [
-            {
-              attribute: 'id', // proxy for created at
-              type: 'number',
-              order: 'desc',
-              default: true,
-            },
-            {
-              attribute: 'reference',
-              type: 'string',
-              order: 'asc',
-            },
-            {
-              attribute: 'title',
-              type: 'string',
-              order: 'asc',
-            },
-            {
-              attribute: 'updated_at',
-              type: 'date',
-              order: 'desc',
-            },
-          ],
-        },
-        ENABLE_SDGS && {
-          path: 'sdgtargets',
-          search: ['title', 'description', 'reference'],
+          groupByFramework: true,
           sorting: [
             {
               attribute: 'id', // proxy for created at

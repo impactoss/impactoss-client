@@ -1,9 +1,14 @@
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import ItemStatus from 'components/ItemStatus';
 import Clear from 'components/styled/Clear';
+import { PATHS } from 'containers/App/constants';
+
+import { attributesEqual } from 'utils/entities';
+import appMessages from 'containers/App/messages';
 
 const Styled = styled.button`
   width:100%;
@@ -31,32 +36,34 @@ const Column = styled.div`
   width: ${(props) => props.colWidth}%;
   display: inline-block;
   vertical-align: middle;
+  margin: ${({ multiple }) => multiple ? '-10px 0' : '0 0'};
 `;
 const BarWrap = styled.div`
   width:100%;
   vertical-align: middle;
-  padding: 10px 6px;
+  padding: ${({ multiple }) => multiple ? '0 6px 8px' : '10px 6px'};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-left: 40px;
-    padding-right: ${(props) => props.secondary ? 36 : 18}px;
+    padding-right: ${({ secondary }) => secondary ? 36 : 18}px;
   }
+  font-size: 0px;
 `;
 const Bar = styled.div`
-  width:${(props) => props.length}%;
-  height: 15px;
+  width: ${({ length }) => length}%;
   background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
   vertical-align: middle;
   display: inline-block;
   position: relative;
   border-right: ${(props) => props.secondary ? '1px solid' : 0};
   border-right-color: ${palette('mainListItem', 1)};
+  height: ${({ multiple }) => multiple ? 10 : 15}px;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    height: 25px;
+    height: ${({ multiple }) => multiple ? 15 : 25}px;
   }
 `;
 const Count = styled.div`
   position: absolute;
-  line-height: 15px;
+  line-height: ${({ multiple }) => multiple ? 10 : 15}px;
   left: 0;
   bottom: 100%;
   padding: 2px 0;
@@ -71,7 +78,7 @@ const Count = styled.div`
     left: auto;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    line-height: 25px;
+    line-height: ${({ multiple }) => multiple ? 15 : 25}px;
   }
 `;
 const CountSecondary = styled(Count)`
@@ -99,6 +106,13 @@ const Title = styled.div`
     font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
   }
 `;
+const FrameworkLabel = styled.div`
+  font-size: 12px;
+  color: ${palette('text', 1)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-left: 40px;
+  }
+`;
 const StatusWrap = styled.div`
   padding: 0 18px;
 `;
@@ -110,77 +124,188 @@ const Reference = styled.span`
     padding-right: 8px;
   }
 `;
+const WrapAcceptedBars = styled.span`
+  height: ${({ multiple }) => multiple ? 10 : 15}px;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    height: ${({ multiple }) => multiple ? 15 : 25}px;
+  }
+`;
 
 class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  renderColumnContent = (col, category) => {
-    const count = category.counts[col.countsIndex];
-    switch (col.type) {
-      case ('title'):
-        return (
-          <Title>
-            { category.reference &&
-              <Reference>{category.reference}</Reference>
-            }
-            {category.title}
-          </Title>
-        );
-      case ('count'):
-        return (count.accepted === null || typeof count.accepted === 'undefined')
-        ? (
-          <BarWrap>
-            <Bar
-              length={(count.public / col.maxCount) * 100}
-              palette={col.entity}
-            >
-              <Count palette={col.entity}>
-                {count.public}
-              </Count>
-            </Bar>
-          </BarWrap>
-        )
-        : (
-          <BarWrap secondary>
-            <Bar
-              length={(count.accepted / col.maxCount) * 100}
-              palette={col.entity}
-              secondary
-            >
-              <Count palette={col.entity}>
-                {count.accepted}
-              </Count>
-            </Bar>
-            { count.noted > 0 &&
-              <Bar
-                length={(count.noted / col.maxCount) * 100}
-                palette={col.entity}
-                pIndex={1}
-              >
-                <CountSecondary palette={col.entity}>
-                  {count.noted}
-                </CountSecondary>
-              </Bar>
-            }
-          </BarWrap>
-        );
-      default:
-        return null;
+  renderSimpleBar = (col, total, multiple) => (
+    <Bar
+      length={(total / col.maxCount) * 100}
+      palette={col.attribute.entity}
+      multiple={multiple}
+    >
+      <Count palette={col.attribute.entity} multiple={multiple}>
+        {total}
+      </Count>
+    </Bar>
+  );
+  renderAcceptedBar = (col, total, accepted, multiple) => {
+    const noted = total - accepted;
+    return (
+      <WrapAcceptedBars multiple={multiple}>
+        <Bar
+          length={(accepted / col.maxCount) * 100}
+          palette={col.attribute.entity}
+          secondary
+          multiple={multiple}
+        >
+          <Count palette={col.attribute.entity} multiple={multiple}>
+            {accepted}
+          </Count>
+        </Bar>
+        { noted > 0 &&
+          <Bar
+            length={(noted / col.maxCount) * 100}
+            palette={col.attribute.entity}
+            pIndex={1}
+            multiple={multiple}
+          >
+            <CountSecondary palette={col.attribute.entity} multiple={multiple}>
+              {noted}
+            </CountSecondary>
+          </Bar>
+        }
+      </WrapAcceptedBars>
+    );
+  };
+  renderCountColumn = (col, category, frameworks, frameworkId) => {
+    if (!col.attribute) {
+      return null;
     }
+    const fwSet = frameworkId && frameworkId !== 'all';
+    const countsByFramework = col.attribute.frameworkIds;
+    const connected = col.attribute.entity === 'measures';
+    if (countsByFramework) {
+      const total = category[col.attribute.totalByFw];
+      const accepted = category[col.attribute.acceptedByFw];
+      if (!fwSet) {
+        return (
+          <div>
+            {col.attribute.frameworkIds.map((id) => {
+              const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), id));
+              if (!framework) {
+                return null;
+              }
+              const hasResponse = !connected && framework.getIn(['attributes', 'has_response']);
+              const multipleFWs = col.attribute.frameworkIds.length > 1;
+              return (
+                <div key={id}>
+                  {multipleFWs && (
+                    <FrameworkLabel>
+                      {connected && (<span>&nbsp;</span>)}
+                      {!connected && appMessages.entities[`recommendations_${id}`] && (
+                        <FormattedMessage {...appMessages.entities[`recommendations_${id}`].plural} />
+                      )}
+                    </FrameworkLabel>
+                  )}
+                  {hasResponse && (
+                    <BarWrap secondary multiple={multipleFWs}>
+                      {this.renderAcceptedBar(
+                        col,
+                        (total && total[id]) || 0,
+                        (accepted && accepted[id]) || 0,
+                        multipleFWs, // multiple,
+                      )}
+                    </BarWrap>
+                  )}
+                  {!hasResponse && (
+                    <BarWrap multiple={multipleFWs}>
+                      {this.renderSimpleBar(
+                        col,
+                        (total && total[id]) || 0,
+                        multipleFWs, // multiple,
+                      )}
+                    </BarWrap>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        );
+      } else if (fwSet) {
+        const id = frameworkId;
+        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), id));
+        if (!framework || !total[id]) {
+          return null;
+        }
+        const hasResponse = !connected && framework.getIn(['attributes', 'has_response']);
+        return (
+          <div>
+            {hasResponse && (
+              <BarWrap secondary>
+                {this.renderAcceptedBar(
+                  col,
+                  (total && total[id]) || 0,
+                  (accepted && accepted[id]) || 0
+                )}
+              </BarWrap>
+            )}
+            {!hasResponse && (
+              <BarWrap>
+                {this.renderSimpleBar(col, (total && total[id]) || 0)}
+              </BarWrap>
+            )}
+          </div>
+        );
+      }
+    }
+    const total = category[col.attribute.total];
+    return (
+      <BarWrap>
+        {this.renderSimpleBar(col, total)}
+      </BarWrap>
+    );
+    // return null;
   };
   render() {
-    const { category, columns } = this.props;
-
+    const { category, columns, onPageLink, frameworks, frameworkId } = this.props;
+    // return null;
+    const catItem = {
+      id: category.get('id'),
+      reference:
+        category.getIn(['attributes', 'reference']) &&
+        category.getIn(['attributes', 'reference']).trim() !== ''
+          ? category.getIn(['attributes', 'reference'])
+          : null,
+      title: category.getIn(['attributes', 'title']),
+      draft: category.getIn(['attributes', 'draft']),
+    };
     return (
-      <Styled onClick={() => category.onLink()}>
+      <Styled
+        onClick={() => onPageLink(`${PATHS.CATEGORIES}/${catItem.id}`)}
+      >
         {
           columns.map((col, i) => (
-            <Column key={i} colWidth={col.width}>
-              { col.type === 'title' && category.draft &&
-              <StatusWrap>
-                <ItemStatus draft />
-                <Clear />
-              </StatusWrap>
+            <Column
+              key={i}
+              colWidth={col.width}
+              multiple={
+                col.attribute &&
+                col.attribute.frameworkIds &&
+                col.attribute.frameworkIds.length > 1
               }
-              {this.renderColumnContent(col, category)}
+            >
+              {col.type === 'title' && catItem.draft && (
+                <StatusWrap>
+                  <ItemStatus draft />
+                  <Clear />
+                </StatusWrap>
+              )}
+              {col.type === 'title' && (
+                <Title>
+                  { catItem.reference &&
+                    <Reference>{catItem.reference}</Reference>
+                  }
+                  {catItem.title}
+                </Title>
+              )}
+              {col.type === 'count' &&
+                this.renderCountColumn(col, category.toJS(), frameworks, frameworkId)
+              }
             </Column>
           ))
         }
@@ -188,10 +313,18 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
     );
   }
 }
+//           {this.renderColumnContent(col, category)}
 
 CategoryListItem.propTypes = {
   category: PropTypes.object,
+  frameworks: PropTypes.object,
   columns: PropTypes.array,
+  onPageLink: PropTypes.func,
+  frameworkId: PropTypes.string,
+};
+
+CategoryListItem.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default CategoryListItem;

@@ -25,7 +25,6 @@ import AuthForm from 'components/forms/AuthForm';
 import { updatePath } from 'containers/App/actions';
 
 import { PATHS } from 'containers/App/constants';
-import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import { save } from './actions';
@@ -68,9 +67,9 @@ export class UserPassword extends React.PureComponent { // eslint-disable-line r
               handleCancel={() => this.props.handleCancel(reference)}
               labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
               fields={[
-                getPasswordCurrentField(this.context.intl.formatMessage, appMessages),
-                getPasswordNewField(this.context.intl.formatMessage, appMessages),
-                getPasswordConfirmationField(this.context.intl.formatMessage, appMessages),
+                getPasswordCurrentField(this.context.intl.formatMessage),
+                getPasswordNewField(this.context.intl.formatMessage),
+                getPasswordConfirmationField(this.context.intl.formatMessage),
               ]}
             />
           }

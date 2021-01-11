@@ -13,7 +13,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 import { fromJS } from 'immutable';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
+import { USER_ROLES } from 'themes/config';
 import { getImportFields, getColumnAttribute } from 'utils/import';
 
 import {
@@ -97,7 +97,43 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             progress={this.props.progress}
             template={{
               filename: `${this.context.intl.formatMessage(messages.filename)}.csv`,
-              data: getImportFields(MEASURE_SHAPE, this.context.intl.formatMessage),
+              data: getImportFields({
+                fields: [
+                  {
+                    attribute: 'title',
+                    type: 'text',
+                    required: true,
+                    import: true,
+                  },
+                  {
+                    attribute: 'description',
+                    type: 'markdown',
+                    import: true,
+                  },
+                  {
+                    disabled: true,
+                    attribute: 'outcome',
+                    type: 'markdown',
+                    import: true,
+                  },
+                  {
+                    disabled: true,
+                    attribute: 'indicator_summary',
+                    type: 'markdown',
+                    import: true,
+                  },
+                  {
+                    attribute: 'target_date',
+                    type: 'date',
+                    import: true,
+                  },
+                  {
+                    attribute: 'target_date_comment',
+                    type: 'text',
+                    import: true,
+                  },
+                ],
+              }, this.context.intl.formatMessage),
             }}
           />
         </Content>

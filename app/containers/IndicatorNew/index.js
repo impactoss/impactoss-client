@@ -10,11 +10,11 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import {
   renderMeasureControl,
-  renderSdgTargetControl,
+  renderRecommendationsByFwControl,
   renderUserControl,
   getTitleFormField,
   getReferenceFormField,
@@ -23,6 +23,7 @@ import {
   getDateField,
   getFrequencyField,
   getCheckboxField,
+  getConnectionUpdatesFromFormData,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -51,7 +52,6 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectMeasuresCategorised,
-  selectSdgTargetsCategorised,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -64,6 +64,7 @@ import {
   selectDomain,
   selectUsers,
   selectConnectedTaxonomies,
+  selectRecommendationsByFw,
 } from './selectors';
 
 import messages from './messages';
@@ -99,8 +100,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   getHeaderMainFields = () => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getReferenceFormField(this.context.intl.formatMessage, appMessages, false, true),
-        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
+        getReferenceFormField(this.context.intl.formatMessage, false, true),
+        getTitleFormField(this.context.intl.formatMessage, 'titleText'),
       ],
     },
   ]);
@@ -108,24 +109,49 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   getHeaderAsideFields = () => ([
     {
       fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages),
+        getStatusField(this.context.intl.formatMessage),
       ],
     },
   ]);
 
-  getBodyMainFields = (connectedTaxonomies, measures, sdgtargets, onCreateOption) => ([
-    {
-      fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption, this.context.intl),
-      ],
-    },
-  ]);
+  getBodyMainFields = (
+    connectedTaxonomies,
+    measures,
+    recommendationsByFw,
+    onCreateOption,
+  ) => {
+    const groups = [];
+    groups.push({
+      fields: [getMarkdownField(this.context.intl.formatMessage)],
+    });
+    if (measures) {
+      groups.push({
+        label: this.context.intl.formatMessage(appMessages.nav.measuresSuper),
+        icon: 'measures',
+        fields: [
+          renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+        ],
+      });
+    }
+    if (recommendationsByFw) {
+      const recConnections = renderRecommendationsByFwControl(
+        recommendationsByFw,
+        connectedTaxonomies,
+        onCreateOption,
+        this.context.intl,
+      );
+      if (recConnections) {
+        groups.push(
+          {
+            label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+            icon: 'recommendations',
+            fields: recConnections,
+          },
+        );
+      }
+    }
+    return groups;
+  };
 
   getBodyAsideFields = (users, repeat) => ([ // fieldGroups
     { // fieldGroup
@@ -134,7 +160,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       fields: [
         getDateField(
           this.context.intl.formatMessage,
-          appMessages,
           'start_date',
           repeat,
           repeat ? 'start_date' : 'start_date_only',
@@ -142,15 +167,13 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
         ),
         getCheckboxField(
           this.context.intl.formatMessage,
-          appMessages,
           'repeat',
           null,
           (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
         ),
-        repeat ? getFrequencyField(this.context.intl.formatMessage, appMessages) : null,
+        repeat ? getFrequencyField(this.context.intl.formatMessage) : null,
         repeat ? getDateField(
           this.context.intl.formatMessage,
-          appMessages,
           'end_date',
           repeat,
           'end_date',
@@ -166,8 +189,17 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   ]);
 
   render() {
-    const { dataReady, viewDomain, connectedTaxonomies, measures, users, sdgtargets, onCreateOption } = this.props;
+    const {
+      dataReady,
+      viewDomain,
+      connectedTaxonomies,
+      measures,
+      recommendationsByFw,
+      users,
+      onCreateOption,
+    } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.page;
+
     return (
       <div>
         <Helmet
@@ -224,7 +256,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               model="indicatorNew.form.data"
               formData={viewDomain.form.data}
               saving={saveSending}
-              handleSubmit={this.props.handleSubmit}
+              handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
               handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
               handleCancel={this.props.handleCancel}
               handleUpdate={this.props.handleUpdate}
@@ -242,7 +274,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                   aside: this.getHeaderAsideFields(),
                 },
                 body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, measures, sdgtargets, onCreateOption),
+                  main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption),
                   aside: this.getBodyAsideFields(users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
                 },
               }}
@@ -269,7 +301,7 @@ IndicatorNew.propTypes = {
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   measures: PropTypes.object,
-  sdgtargets: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
   initialiseForm: PropTypes.func,
@@ -289,8 +321,7 @@ const mapStateToProps = (state) => ({
   authReady: selectReadyForAuthCheck(state),
   // all measures,
   measures: selectMeasuresCategorised(state),
-  // all sdgtargets,
-  sdgtargets: selectSdgTargetsCategorised(state),
+  recommendationsByFw: selectRecommendationsByFw(state),
   // all users, listing connection if any
   users: selectUsers(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
@@ -393,26 +424,43 @@ function mapDispatchToProps(dispatch) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData) => {
+    handleSubmit: (formData, recommendationsByFw) => {
       let saveData = formData;
       // measures
       if (formData.get('associatedMeasures')) {
-        saveData = saveData.set('measureIndicators', Map({
-          delete: List(),
-          create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
-          .map((id) => Map({
-            measure_id: id,
-          })),
-        }));
+        saveData = saveData
+          .set('measureIndicators', Map({
+            delete: List(),
+            create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
+            .map((id) => Map({
+              measure_id: id,
+            })),
+          }));
       }
-      if (formData.get('associatedSdgTargets')) {
-        saveData = saveData.set('sdgtargetIndicators', Map({
-          delete: List(),
-          create: getCheckedValuesFromOptions(formData.get('associatedSdgTargets'))
-          .map((id) => Map({
-            sdgtarget_id: id,
-          })),
-        }));
+      if (formData.get('associatedRecommendationsByFw') && recommendationsByFw) {
+        saveData = saveData.set(
+          'recommendationIndicators',
+          recommendationsByFw
+            .map((recs, fwid) =>
+              getConnectionUpdatesFromFormData({
+                formData,
+                connections: recs,
+                connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
+                createConnectionKey: 'recommendation_id',
+                createKey: 'indicator_id',
+              })
+            )
+            .reduce(
+              (memo, deleteCreateLists) => {
+                const creates = memo.get('create').concat(deleteCreateLists.get('create'));
+                return memo.set('create', creates);
+              },
+              fromJS({
+                delete: [],
+                create: [],
+              }),
+            )
+        );
       }
       // TODO: remove once have singleselect instead of multiselect
       const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));
@@ -433,6 +481,7 @@ function mapDispatchToProps(dispatch) {
           .setIn(['attributes', 'frequency_months'], null)
           .setIn(['attributes', 'end_date'], null);
       }
+
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {

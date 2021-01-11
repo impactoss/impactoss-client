@@ -4,25 +4,11 @@
  *
  */
 import { fromJS } from 'immutable';
-import { REPORT_FREQUENCIES, ENABLE_SDGS } from 'themes/config';
+import { REPORT_FREQUENCIES } from 'themes/config';
 
 export const SAVE = 'impactoss/IndicatorEdit/SAVE';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
-  'user_roles',
-  'measures',
-  'sdgtargets',
-  'users',
-  'indicators',
-  'measure_indicators',
-  'sdgtarget_indicators',
-  'measure_categories',
-  'sdgtarget_categories',
-  'taxonomies',
-  'categories',
-]
-: [
+export const DEPENDENCIES = [
   'user_roles',
   'measures',
   'users',
@@ -30,7 +16,12 @@ export const DEPENDENCIES = ENABLE_SDGS
   'measure_indicators',
   'measure_categories',
   'taxonomies',
+  'frameworks',
+  'framework_taxonomies',
   'categories',
+  'recommendations',
+  'recommendation_indicators',
+  'recommendation_categories',
 ];
 
 export const FORM_INITIAL = fromJS({
@@ -38,7 +29,7 @@ export const FORM_INITIAL = fromJS({
   attributes: {
     title: '',
     description: '',
-    draft: true,
+    draft: '',
     manager_id: '',
     frequency_months: REPORT_FREQUENCIES[0] ? REPORT_FREQUENCIES[0].value : '',
     start_date: '',
@@ -46,7 +37,7 @@ export const FORM_INITIAL = fromJS({
     end_date: '',
     reference: '',
   },
-  associatedSdgTargets: [],
   associatedMeasures: [],
+  associatedRecommendationsByFw: {},
   associatedUser: [],
 });
