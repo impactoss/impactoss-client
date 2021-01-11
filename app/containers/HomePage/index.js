@@ -136,6 +136,10 @@ const StyledButtonHero = styled(ButtonHero)`
   max-width: 250px;
 `;
 
+const StyledButtonFlat = styled(ButtonFlat)`
+  color: ${palette('homeIntro', 0)};
+`;
+
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -225,9 +229,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                     <Row space>
                       <GridSpace lg={1 / 6} sm={1 / 8} />
                       <Grid lg={2 / 3} sm={3 / 4} xs={1}>
-                        <ButtonFlat onClick={() => onSelectFramework('all')}>
+                        <StyledButtonFlat onClick={() => onSelectFramework('all')}>
                           <FormattedMessage {...messages.exploreAllFrameworks} />
-                        </ButtonFlat>
+                        </StyledButtonFlat>
                       </Grid>
                     </Row>
                   </span>
