@@ -14,8 +14,6 @@ export const DEPENDENCIES = [
   'measure_categories',
   'frameworks',
   'framework_taxonomies',
-  'framework_frameworks',
-  'recommendation_recommendations',
 ];
 
 export const CONFIG = {
@@ -60,6 +58,7 @@ export const CONFIG = {
     defaultGroupsByFramework: {
       1: { 1: '1', 2: '2' }, // framework 1 recs are grouped by taxonomies 1 & 2
       2: { 1: '7' }, // framework 2 recs are grouped by taxonomy 7
+      3: { 1: '9', 2: '10' }, // framework 2 recs are grouped by taxonomy 7
     },
     groupBy: 'framework_id',
     editForFrameworks: true,

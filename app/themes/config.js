@@ -81,8 +81,8 @@ export const CYCLE_TAXONOMY_ID = 2;
 export const ENDPOINTS = {
   API: (
     NODE_ENV === 'production'
-    ? 'https://undp-sadata-staging.herokuapp.com/'
-    : 'https://undp-sadata-staging.herokuapp.com/'
+    ? 'https://impactoss-dev.herokuapp.com/'
+    : 'https://impactoss-dev.herokuapp.com/'
   ), // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
@@ -173,7 +173,5 @@ export const DB_TABLES = [
   'due_dates',
   'frameworks',
   'framework_taxonomies',
-  'framework_frameworks',
   'recommendation_indicators',
-  'recommendation_recommendations',
 ];
