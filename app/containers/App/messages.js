@@ -673,13 +673,9 @@ export default defineMessages({
       id: 'app.containers.App.nav.indicatorsSuper',
       defaultMessage: 'Outcomes',
     },
-    recommendations: {
-      id: 'app.containers.App.nav.recommendations',
+    recommendationsSuper: {
+      id: 'app.containers.App.nav.recommendationsSuper',
       defaultMessage: 'Objectives',
-    },
-    recommendationsAll: {
-      id: 'app.containers.App.nav.recommendationsAll',
-      defaultMessage: 'All frameworks',
     },
     pages: {
       id: 'app.containers.App.nav.pages',
@@ -798,6 +794,96 @@ export default defineMessages({
       },
       empty: {
         id: 'app.containers.App.entities.recommendations_2.empty',
+        defaultMessage: 'No recommendations yet',
+      },
+    },
+    recommendations_3: {
+      single: {
+        id: 'app.containers.App.entities.recommendations_3.single',
+        defaultMessage: 'Recommendation',
+      },
+      plural: {
+        id: 'app.containers.App.entities.recommendations_3.plural',
+        defaultMessage: 'Recommendations',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.recommendations_3.singleLong',
+        defaultMessage: 'Recommendation',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.recommendations_3.pluralLong',
+        defaultMessage: 'Recommendations',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.recommendations_3.singleShort',
+        defaultMessage: 'Recommendation',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.recommendations_3.pluralShort',
+        defaultMessage: 'Recommendations',
+      },
+      empty: {
+        id: 'app.containers.App.entities.recommendations_3.empty',
+        defaultMessage: 'No recommendations yet',
+      },
+    },
+    recommendations_4: {
+      single: {
+        id: 'app.containers.App.entities.recommendations_4.single',
+        defaultMessage: 'Recommendation',
+      },
+      plural: {
+        id: 'app.containers.App.entities.recommendations_4.plural',
+        defaultMessage: 'Recommendations',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.recommendations_4.singleLong',
+        defaultMessage: 'Recommendation',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.recommendations_4.pluralLong',
+        defaultMessage: 'Recommendations',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.recommendations_4.singleShort',
+        defaultMessage: 'Recommendation',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.recommendations_4.pluralShort',
+        defaultMessage: 'Recommendations',
+      },
+      empty: {
+        id: 'app.containers.App.entities.recommendations_4.empty',
+        defaultMessage: 'No recommendations yet',
+      },
+    },
+    recommendations_5: {
+      single: {
+        id: 'app.containers.App.entities.recommendations_5.single',
+        defaultMessage: 'Recommendation',
+      },
+      plural: {
+        id: 'app.containers.App.entities.recommendations_5.plural',
+        defaultMessage: 'Recommendations',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.recommendations_5.singleLong',
+        defaultMessage: 'Recommendation',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.recommendations_5.pluralLong',
+        defaultMessage: 'Recommendations',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.recommendations_5.singleShort',
+        defaultMessage: 'Recommendation',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.recommendations_5.pluralShort',
+        defaultMessage: 'Recommendations',
+      },
+      empty: {
+        id: 'app.containers.App.entities.recommendations_5.empty',
         defaultMessage: 'No recommendations yet',
       },
     },

@@ -119,7 +119,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       },
       {
         path: PATHS.RECOMMENDATIONS,
-        titleSuper: this.context.intl.formatMessage(messages.nav.recommendations),
+        titleSuper: this.context.intl.formatMessage(messages.nav.recommendationsSuper),
         title: this.context.intl.formatMessage(messages.frameworkObjectivesShort[currentFrameworkId]),
         active: currentPath.startsWith(PATHS.RECOMMENDATIONS) && (
           !viewRecommendationFramework ||
