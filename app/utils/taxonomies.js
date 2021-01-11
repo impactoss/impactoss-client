@@ -66,19 +66,22 @@ export const prepareTaxonomyGroups = (
     // multi-framework mode
     // exclusive taxonomies (one framework only)
     frameworks.forEach((fw) => {
-      groups.push({
-        id: fw.get('id'),
-        frameworkId: fw.get('id'),
-        taxonomies: parentTaxonomies
-          .filter((tax) => {
-            const taxFwIds = tax.get('frameworkIds');
-            return tax.getIn(['attributes', 'tags_recommendations']) &&
-              taxFwIds.size === 1 &&
-              taxFwIds.find((fwid) => attributesEqual(fwid, fw.get('id')));
-          })
-          .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
-          .toArray(),
-      });
+      const fwTaxonomies = parentTaxonomies
+        .filter((tax) => {
+          const taxFwIds = tax.get('frameworkIds');
+          return tax.getIn(['attributes', 'tags_recommendations']) &&
+            taxFwIds.size === 1 &&
+            taxFwIds.find((fwid) => attributesEqual(fwid, fw.get('id')));
+        })
+        .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
+        .toArray();
+      if (fwTaxonomies && fwTaxonomies.length > 0) {
+        groups.push({
+          id: fw.get('id'),
+          frameworkId: fw.get('id'),
+          taxonomies: fwTaxonomies,
+        });
+      }
     });
     // common frameworks
     groups.push({

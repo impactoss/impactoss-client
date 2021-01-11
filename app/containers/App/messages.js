@@ -104,7 +104,7 @@ export default defineMessages({
   },
   frameworks_short: {
     common: {
-      id: 'app.containers.App.frameworks_short.1',
+      id: 'app.containers.App.frameworks_short.common',
       defaultMessage: 'multiple',
     },
     1: {
