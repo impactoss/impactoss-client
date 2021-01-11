@@ -106,7 +106,7 @@ const DiagramButton = styled(Button)`
     background-color: ${(props) => palette(props.paletteHover, 0)};
   }
   color: ${palette('primary', 4)};
-  padding: 0.4em 0.5em 0.75em;
+  padding: ${({ draft }) => draft ? '0.4em 0.5em 0.75em' : '0.6em 0.5em'};
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   font-size: 0.8em;
   border-radius: 10px;
@@ -114,11 +114,11 @@ const DiagramButton = styled(Button)`
     border-radius: 999px;
     font-weight: bold;
     font-size: 1.1em;
-    padding: 0.4em 0.5em 1em;
+    padding: ${({ draft }) => draft ? '0.4em 0.5em 1em' : '0.6em 0.5em'};
     min-width: 220px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding: 0.6em 1em 1.4em;
+    padding: ${({ draft }) => draft ? '0.6em 1em 1.4em' : '0.8em 1em'};
   }
 `;
 // font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
@@ -382,6 +382,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
           this.setState({ [stateButton]: node });
         }
       }}
+      draft={draftCount > 0}
     >
       <DiagramButtonIcon>
         <Icon name={icon} />
