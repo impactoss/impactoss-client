@@ -72,33 +72,33 @@ export default defineMessages({
       defaultMessage: 'Framework 4',
     },
     5: {
-      id: 'app.containers.App.frameworks.5',
+      id: 'app.containers.App.frameworkObjectives.5',
       defaultMessage: 'Framework 5',
     },
   },
   frameworkObjectivesShort: {
     all: {
-      id: 'app.containers.App.frameworkObjectives.all',
+      id: 'app.containers.App.frameworkObjectivesShort.all',
       defaultMessage: 'All Frameworks',
     },
     1: {
-      id: 'app.containers.App.frameworkObjectives.1',
+      id: 'app.containers.App.frameworkObjectivesShort.1',
       defaultMessage: 'HR Recommendations',
     },
     2: {
-      id: 'app.containers.App.frameworkObjectives.2',
+      id: 'app.containers.App.frameworkObjectivesShort.2',
       defaultMessage: 'SDG Targets',
     },
     3: {
-      id: 'app.containers.App.frameworkObjectives.3',
+      id: 'app.containers.App.frameworkObjectivesShort.3',
       defaultMessage: 'Framework 3',
     },
     4: {
-      id: 'app.containers.App.frameworkObjectives.4',
+      id: 'app.containers.App.frameworkObjectivesShort.4',
       defaultMessage: 'Framework 4',
     },
     5: {
-      id: 'app.containers.App.frameworks.5',
+      id: 'app.containers.App.frameworkObjectivesShort.5',
       defaultMessage: 'Framework 5',
     },
   },
