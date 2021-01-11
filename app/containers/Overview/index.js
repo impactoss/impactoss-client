@@ -451,7 +451,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                   <div>
                     <DiagramSectionVertical>
                       <SectionLabel>
-                        <FormattedMessage {...appMessages.nav.recommendations} />
+                        <FormattedMessage {...appMessages.nav.recommendationsSuper} />
                       </SectionLabel>
                       <DiagramSectionVerticalCenter>
                         {frameworks &&
