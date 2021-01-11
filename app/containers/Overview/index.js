@@ -106,7 +106,7 @@ const DiagramButton = styled(Button)`
   &:hover {
     color: ${palette('primary', 0)};
   }
-  padding: 0.4em 0.5em 0.75em;
+  padding: 0.6em 0.5em;
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   font-size: 0.8em;
   border-radius: 10px;
@@ -114,11 +114,11 @@ const DiagramButton = styled(Button)`
     border-radius: 999px;
     font-weight: bold;
     font-size: 1.1em;
-    padding: 0.4em 0.5em 1em;
+    padding: 0.6em 0.5em;
     min-width: 220px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding: 0.6em 1em 1.4em;
+    padding: 0.8em 1em;
   }
 `;
 // font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
