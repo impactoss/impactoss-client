@@ -11,6 +11,7 @@ import styled from 'styled-components';
 
 import { jumpToComponent } from 'utils/scroll-to-component';
 import { lowerCase } from 'utils/string';
+import { attributesEqual } from 'utils/entities';
 
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
@@ -118,16 +119,16 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     let subgroupSelectValue;
     if (groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET) {
       subgroupSelectValue = locationQuery.get('subgroup');
-      if (config.taxonomies) {
-        if (groupforFramework) {
-          subgroupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][2];
-        } else {
-          subgroupSelectValue = getGroupValue(
-            taxonomies,
-            config.taxonomies.defaultGroupAttribute,
-            2,
-          );
-        }
+      if (
+        config.taxonomies &&
+        !subgroupSelectValue &&
+        groupforFramework &&
+        attributesEqual(
+          groupSelectValue,
+          config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][1],
+        )
+      ) {
+        subgroupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][2];
       }
     }
 
