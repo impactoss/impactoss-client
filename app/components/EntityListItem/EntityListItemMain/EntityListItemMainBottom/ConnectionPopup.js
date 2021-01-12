@@ -28,7 +28,6 @@ const Count = styled.span`
   height: 1.8em;
   min-width: 1.8em;
   text-align: center;
-  vertical-align: middle;
   line-height: 1.7;
   padding: 0 0.25em;
 `;
@@ -38,7 +37,6 @@ const PopupWrapper = styled.div`
   cursor: pointer;
   font-size: 1em;
   text-align: center;
-  vertical-align: middle;
   -ms-touch-action: manipulation;
   touch-action: manipulation;
   position: relative;

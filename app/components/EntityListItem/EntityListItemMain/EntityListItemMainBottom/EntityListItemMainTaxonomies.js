@@ -12,8 +12,6 @@ import ButtonTagCategoryInverse from 'components/buttons/ButtonTagCategoryInvers
 import { truncateText } from 'utils/string';
 import { TEXT_TRUNCATE } from 'themes/config';
 
-import TagGroup from './TagGroup';
-
 const SmartGroup = styled.div`
   display: inline-block;
   margin-right: 0.5em;
@@ -21,6 +19,13 @@ const SmartGroup = styled.div`
   border-right: ${(props) => props.border ? '1px solid' : 'none'};
   border-right-color: ${palette('light', 3)};
 `;
+const Styled = styled.div`
+  width: 100%;
+  display: block;
+  padding-top: 3px;
+  margin-top: 8px;
+`;
+// border-top-color:;
 
 class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -82,50 +87,48 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
     const entityTags = this.getEntityTags(categories, taxonomies, onEntityClick);
 
     return (
-      <TagGroup>
-        <span>
-          { smartTaxonomy &&
-            <SmartGroup border={entityTags && entityTags.length > 0}>
-              { this.getEntitySmartTags(categories, smartTaxonomy, onEntityClick).map((tag, i) =>
-                <ButtonTagCategory
-                  key={i}
-                  onClick={tag.onClick}
-                  taxId={parseInt(tag.taxId, 10)}
-                  title={tag.title}
-                  isSmartTag
-                  isSmart={tag.isSmart}
-                >
-                  {tag.label}
-                </ButtonTagCategory>
-              )}
-            </SmartGroup>
-          }
-          { entityTags.map((tag, i) => tag.inverse
-            ? (
-              <ButtonTagCategoryInverse
-                key={i}
-                onClick={tag.onClick}
-                taxId={parseInt(tag.taxId, 10)}
-                disabled={!tag.onClick}
-                title={tag.title}
-              >
-                {tag.label}
-              </ButtonTagCategoryInverse>
-            )
-            : (
+      <Styled>
+        { smartTaxonomy &&
+          <SmartGroup border={entityTags && entityTags.length > 0}>
+            { this.getEntitySmartTags(categories, smartTaxonomy, onEntityClick).map((tag, i) =>
               <ButtonTagCategory
                 key={i}
                 onClick={tag.onClick}
                 taxId={parseInt(tag.taxId, 10)}
-                disabled={!tag.onClick}
                 title={tag.title}
+                isSmartTag
+                isSmart={tag.isSmart}
               >
                 {tag.label}
               </ButtonTagCategory>
-            )
-          )}
-        </span>
-      </TagGroup>
+            )}
+          </SmartGroup>
+        }
+        { entityTags.map((tag, i) => tag.inverse
+          ? (
+            <ButtonTagCategoryInverse
+              key={i}
+              onClick={tag.onClick}
+              taxId={parseInt(tag.taxId, 10)}
+              disabled={!tag.onClick}
+              title={tag.title}
+            >
+              {tag.label}
+            </ButtonTagCategoryInverse>
+          )
+          : (
+            <ButtonTagCategory
+              key={i}
+              onClick={tag.onClick}
+              taxId={parseInt(tag.taxId, 10)}
+              disabled={!tag.onClick}
+              title={tag.title}
+            >
+              {tag.label}
+            </ButtonTagCategory>
+          )
+        )}
+      </Styled>
     );
   }
 }

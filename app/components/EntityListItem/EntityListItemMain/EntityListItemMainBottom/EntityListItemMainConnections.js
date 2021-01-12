@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import BottomTagGroup from './BottomTagGroup';
 import ConnectionPopup from './ConnectionPopup';
 
 const ConnectionWrap = styled.span`
@@ -18,12 +17,20 @@ const ConnectionWrap = styled.span`
   }
 `;
 const ConnectionLabel = styled.span`
-  vertical-align: middle;
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemBottom};
+  padding-top: 2px;
+`;
+const Styled = styled.div`
+  width: 100%;
+  display: block;
+  border-top: 1px solid ${palette('light', 1)};
+  margin-top: 8px;
+  margin-bottom: 5px;
+  padding-top: 5px;
 `;
 
-export default class EntityListItemMainBottomConnections extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListItemMainConnections extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     connections: PropTypes.array.isRequired,
     wrapper: PropTypes.object,
@@ -31,7 +38,7 @@ export default class EntityListItemMainBottomConnections extends React.PureCompo
 
   render() {
     return (
-      <BottomTagGroup>
+      <Styled>
         {
           this.props.connections.map((connection, i) => {
             const draftEntities = connection.entities.filter((entity) => entity.getIn(['attributes', 'draft']));
@@ -58,7 +65,7 @@ export default class EntityListItemMainBottomConnections extends React.PureCompo
             );
           })
         }
-      </BottomTagGroup>
+      </Styled>
     );
   }
 }

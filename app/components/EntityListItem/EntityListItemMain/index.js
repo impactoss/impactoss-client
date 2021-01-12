@@ -17,18 +17,19 @@ import EntityListItemMainBottom from './EntityListItemMainBottom';
 
 
 const Styled = styled(Component)`
-  padding-right: ${(props) => props.isConnection ? 0 : 4}px;
+  padding-right: 4px;
   padding-top: 2px;
   padding-bottom: 4px;
-  padding-left: ${(props) => (props.isManager || props.isConnection) ? 0 : 4}px;
+  padding-left: ${(props) => props.isManager ? 0 : 4}px;
+  box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
-    padding-right: ${(props) => (!props.theme.sizes || props.isConnection)
+    padding-right: ${(props) => (!props.theme.sizes)
       ? 0
       : props.theme.sizes.mainListItem.paddingHorizontal
     }px;
     padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
     padding-bottom: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingBottom}px;
-    padding-left: ${(props) => (!props.theme.sizes || props.isManager || props.isConnection)
+    padding-left: ${(props) => (!props.theme.sizes || props.isManager)
       ? 0
       : props.theme.sizes.mainListItem.paddingHorizontal
     }px;
@@ -38,7 +39,7 @@ const Styled = styled(Component)`
 const EntityListItemMainTitleWrap = styled.a`
   text-decoration: none;
   display: block;
-  padding: 6px 15px 4px 0;
+  padding: 6px 15px 8px 0;
   color: ${palette('mainListItem', 0)};
   &:hover {
     color: ${palette('mainListItemHover', 0)};
@@ -182,12 +183,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
 
     return (
       <Styled isManager={this.props.isManager} isConnection={this.props.isConnection}>
-        <EntityListItemMainTop
-          entity={entity}
-          categories={entity.categories}
-          taxonomies={bottomTaxonomies}
-          onEntityClick={onEntityClick}
-        />
+        <EntityListItemMainTop entity={entity} />
         <Clear />
         <EntityListItemMainTitleWrap
           onClick={(evt) => {
@@ -204,8 +200,9 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
           <EntityListItemMainBottom
             connections={entity.connectedCounts}
             wrapper={this.props.wrapper}
-            user={entity.assignedUser}
-            targetDate={entity.targetDate}
+            categories={entity.categories}
+            taxonomies={bottomTaxonomies}
+            onEntityClick={onEntityClick}
           />
         }
       </Styled>
