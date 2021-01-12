@@ -306,7 +306,7 @@ theme.sizes = {
   },
   mainListItem: {
     paddingHorizontal: 15,
-    paddingTop: 10,
+    paddingTop: 12,
     paddingBottom: 12,
   },
   header: {
