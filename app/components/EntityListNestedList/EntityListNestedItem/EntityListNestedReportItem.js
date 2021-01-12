@@ -18,7 +18,7 @@ const Styled = styled.a`
   padding-bottom: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingBottom}px;
   position: relative;
   background-color: ${palette('mainListItem', 1)};
-  margin-bottom: 1px;
+  margin-bottom: 3px;
   display: block;
   color: ${palette('mainListItem', 0)};
   &:hover {
@@ -26,7 +26,7 @@ const Styled = styled.a`
   }
 `;
 const Top = styled.div`
-  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};  
+  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
 `;
 
 const Reference = styled(Label)`

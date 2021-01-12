@@ -10,9 +10,9 @@ import EntityListNestedReportList from 'components/EntityListNestedList/EntityLi
 import EntityListNestedNoItem from 'components/EntityListNestedList/EntityListNestedItem/EntityListNestedNoItem';
 
 const ItemWrapper = styled.div`
-  border-top: 3px solid;
-  padding: ${(props) => props.separated ? '5px 0 10px' : '0'};
-  border-color: ${(props) => props.separated ? palette('light', 3) : palette('light', 0)};
+  border-top: ${({ separated }) => separated ? 1 : 10}px solid;
+  padding: ${({ separated }) => separated ? '5px 0 10px' : '0'};
+  border-color: ${({ separated }) => separated ? palette('light', 3) : palette('light', 0)};
 `;
 
 export class EntityListItemWrapper extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

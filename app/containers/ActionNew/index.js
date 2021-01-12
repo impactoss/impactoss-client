@@ -146,7 +146,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       if (recConnections) {
         groups.push(
           {
-            label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+            label: this.context.intl.formatMessage(appMessages.nav.recommendationsSuper),
             icon: 'recommendations',
             fields: recConnections,
           },

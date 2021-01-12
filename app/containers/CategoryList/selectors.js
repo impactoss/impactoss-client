@@ -92,6 +92,8 @@ const getCategoryCounts = (
       // get all public associated measures
       const associatedMeasuresPublic = associatedMeasures.filter((measure) => !measure.getIn(['attributes', 'draft']));
       category = category.set('measuresPublicCount', associatedMeasuresPublic ? associatedMeasuresPublic.size : 0);
+      // for sorting
+      category = category.set('measures', associatedMeasuresPublic ? associatedMeasuresPublic.size : 0);
     }
 
     // recommendations

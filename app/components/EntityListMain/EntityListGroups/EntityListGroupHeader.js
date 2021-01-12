@@ -19,7 +19,7 @@ const ListEntitiesGroupHeader = styled.h3`
   margin-bottom: 5px;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     margin-top: 30px;
-    margin-bottom: 20px;
+    margin-bottom: 8px;
   }
 `;
 const ListEntitiesSubgroupHeader = styled.h5`
@@ -28,7 +28,7 @@ const ListEntitiesSubgroupHeader = styled.h5`
   margin-bottom: 5px;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     margin-top: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 8px;
   }
 `;
 

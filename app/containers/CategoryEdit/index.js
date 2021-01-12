@@ -221,7 +221,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         if (recConnections) {
           fields.push(
             {
-              label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+              label: this.context.intl.formatMessage(appMessages.nav.recommendationsSuper),
               icon: 'recommendations',
               fields: recConnections,
             },

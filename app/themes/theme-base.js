@@ -288,6 +288,7 @@ theme.sizes = {
     markdownMobile: '16px',
     small: '13px', // used for labels
     smallMobile: '11px', // used for labels
+    default: '16px', // used for labels
   },
   // px only
   aside: {

@@ -291,6 +291,7 @@
   "app.containers.App.attributes.frequency_months" : "Update frequency",
   "app.containers.App.attributes.repeat" : "Repeat?",
   "app.containers.App.attributes.target_date_empty" : "No target date set",
+  "app.containers.App.attributes.date_empty" : "No date set",
   "app.containers.App.attributes.document_url" : "Attached document",
   "app.containers.App.attributes.document_upload" : "Upload document",
   "app.containers.App.attributes.document_uploading" : "Uploading document",

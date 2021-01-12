@@ -69,7 +69,7 @@ const Count = styled.div`
   padding: 2px 0;
   color: ${(props) => palette(props.palette, 0)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
+    font-size: ${({ theme, multiple }) => multiple ? theme.sizes.text.default : theme.sizes.text.aaLargeBold};
     font-weight: bold;
     text-align: right;
     padding: 0 5px 0 0;
@@ -192,6 +192,10 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
               }
               const hasResponse = !connected && framework.getIn(['attributes', 'has_response']);
               const multipleFWs = col.attribute.frameworkIds.length > 1;
+              const totalCount = (total && total[id]) || 0;
+              if (totalCount === 0) {
+                return null;
+              }
               return (
                 <div key={id}>
                   {multipleFWs && (
@@ -206,7 +210,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
                     <BarWrap secondary multiple={multipleFWs}>
                       {this.renderAcceptedBar(
                         col,
-                        (total && total[id]) || 0,
+                        totalCount,
                         (accepted && accepted[id]) || 0,
                         multipleFWs, // multiple,
                       )}
@@ -216,7 +220,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
                     <BarWrap multiple={multipleFWs}>
                       {this.renderSimpleBar(
                         col,
-                        (total && total[id]) || 0,
+                        totalCount,
                         multipleFWs, // multiple,
                       )}
                     </BarWrap>
@@ -263,17 +267,19 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
   };
   render() {
     const { category, columns, onPageLink, frameworks, frameworkId } = this.props;
+    const reference =
+      category.getIn(['attributes', 'reference']) &&
+      category.getIn(['attributes', 'reference']).trim() !== ''
+        ? category.getIn(['attributes', 'reference'])
+        : null;
     // return null;
     const catItem = {
       id: category.get('id'),
-      reference:
-        category.getIn(['attributes', 'reference']) &&
-        category.getIn(['attributes', 'reference']).trim() !== ''
-          ? category.getIn(['attributes', 'reference'])
-          : null,
+      reference,
       title: category.getIn(['attributes', 'title']),
       draft: category.getIn(['attributes', 'draft']),
     };
+
     return (
       <Styled
         onClick={() => onPageLink(`${PATHS.CATEGORIES}/${catItem.id}`)}
