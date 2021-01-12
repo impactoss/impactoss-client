@@ -56,7 +56,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     { // fieldGroup
       fields: [
         getTitleField(entity, isManager),
-        getEntityLinkField(indicator, 'indicators', appMessages.entities.indicators.single),
+        getEntityLinkField(indicator, '/indicators', appMessages.entities.indicators.single),
       ],
     },
   ]);
