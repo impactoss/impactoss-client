@@ -153,7 +153,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       errors,
       entityGroups,
     } = this.props;
-
     const pageSize = Math.min(
       (locationQuery.get('items') && parseInt(locationQuery.get('items'), 10)) || PAGE_SIZE,
       PAGE_SIZE_MAX

@@ -206,9 +206,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     );
 
     const currentFramework = dataReady && frameworks.find((fw) => attributesEqual(fw.get('id'), frameworkId));
-    const hasResponse = dataReady && currentFramework.getIn(['attributes', 'has_response']);
-    const hasMeasures = dataReady && currentFramework.getIn(['attributes', 'has_measures']);
-    const hasIndicators = dataReady && currentFramework.getIn(['attributes', 'has_indicators']);
+    const hasResponse = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_response']);
+    const hasMeasures = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_measures']);
+    const hasIndicators = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_indicators']);
     const fwTaxonomies = taxonomies && taxonomies.filter((tax) =>
       tax.get('frameworkIds').find((id) => attributesEqual(id, frameworkId)) ||
       attributesEqual(frameworkId, tax.getIn(['attributes', 'framework_id']))
@@ -412,7 +412,7 @@ function mapDispatchToProps(dispatch, props) {
           })
         );
       // cleanup attributes for framework
-      if (!currentFramework.getIn(['attributes', 'has_response'])) {
+      if (!currentFramework || !currentFramework.getIn(['attributes', 'has_response'])) {
         saveData = saveData
           .setIn(['attributes', 'accepted'], '')
           .setIn(['attributes', 'response'], '');
