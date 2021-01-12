@@ -143,7 +143,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       if (recConnections) {
         groups.push(
           {
-            label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+            label: this.context.intl.formatMessage(appMessages.nav.recommendationsSuper),
             icon: 'recommendations',
             fields: recConnections,
           },

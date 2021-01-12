@@ -182,7 +182,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       if (recConnections) {
         groups.push(
           {
-            label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+            label: this.context.intl.formatMessage(appMessages.nav.recommendationsSuper),
             icon: 'recommendations',
             fields: recConnections,
           },

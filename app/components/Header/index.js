@@ -11,6 +11,7 @@ import {
   SHOW_HEADER_TITLE,
   SHOW_HEADER_PATTERN,
   SHOW_BRAND_ON_HOME,
+  TEXT_TRUNCATE,
 } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
@@ -378,7 +379,11 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
               </LinkSuperTitle>
               {currentFrameworkOption && (
                 <LinkTitle active>
-                  {truncateText(currentFrameworkOption.label, 30, false)}
+                  {truncateText(
+                    currentFrameworkOption.label,
+                    TEXT_TRUNCATE.FW_SELECT,
+                    false,
+                  )}
                   {!this.state.showFrameworks && (
                     <Icon name="dropdownOpen" text textRight size={'1em'} />
                   )}

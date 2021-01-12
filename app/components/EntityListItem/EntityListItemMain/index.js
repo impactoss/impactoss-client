@@ -38,7 +38,7 @@ const Styled = styled(Component)`
 const EntityListItemMainTitleWrap = styled.a`
   text-decoration: none;
   display: block;
-  padding: 4px 15px 6px 0;
+  padding: 6px 15px 4px 0;
   color: ${palette('mainListItem', 0)};
   &:hover {
     color: ${palette('mainListItemHover', 0)};

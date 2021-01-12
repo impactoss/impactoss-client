@@ -15,7 +15,7 @@ const Styled = styled(Component)`
     text-align: center;
     cursor: pointer;
     width:${(props) => props.width * 100}%;
-    border-right: 1px solid ${palette('light', 0)};
+    border-right: 3px solid ${palette('light', 0)};
     vertical-align: middle;
     padding: 5px 10px;
   }

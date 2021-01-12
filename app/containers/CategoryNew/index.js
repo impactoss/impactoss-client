@@ -181,7 +181,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         if (recConnections) {
           groups.push(
             {
-              label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+              label: this.context.intl.formatMessage(appMessages.nav.recommendationsSuper),
               icon: 'recommendations',
               fields: recConnections,
             },

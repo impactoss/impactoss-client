@@ -63,7 +63,11 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     if (tagsRecs) {
       let recLabel;
       if (isList && !fwSet) {
-        recLabel = this.context.intl.formatMessage(appMessages.entities.recommendations.plural);
+        recLabel = `${this.context.intl.formatMessage(
+          appMessages.entities.recommendations.plural
+        )} (${this.context.intl.formatMessage(
+          appMessages.frameworks.all
+        )})`;
       } else if (fwSet) {
         recLabel = this.context.intl.formatMessage(appMessages.entities[`recommendations_${frameworkId}`].plural);
       } else {

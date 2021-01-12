@@ -1,5 +1,6 @@
 import { toLower as loCase } from 'lodash/string';
 import { reduce } from 'lodash/collection';
+import { TEXT_TRUNCATE } from 'themes/config';
 
 export const lowerCase = (str) =>
   loCase(str).replace('\bun\b', 'UN').replace('\bhr\b', 'HR').replace('\bupr\b', 'UPR').replace('sdg', 'SDG').replace('\bsmart\b', 'SMART').replace('sustainable development goal', 'Sustainable Development Goal');
@@ -26,9 +27,9 @@ export const regExMultipleWordsMatchStart = (str) =>
   reduce(str.split(' '), (words, s) => `${words}(?=.*\\b${s})`, '');
 
 export const truncateText = (text, limit, keepWords = true) => {
-  if (text.length > limit) {
+  if (text.length > (limit + TEXT_TRUNCATE.GRACE)) {
     if (!keepWords) {
-      return `${text.substring(0, limit)}\u2026`;
+      return `${text.substring(0, limit).trim()}\u2026`;
     }
     const words = text.split(' ');
     let truncated = '';

@@ -571,6 +571,10 @@ export default defineMessages({
       id: 'app.containers.App.attributes.repeat',
       defaultMessage: 'Repeat?',
     },
+    date_empty: {
+      id: 'app.containers.App.attributes.date_empty',
+      defaultMessage: 'No date set',
+    },
     target_date_empty: {
       id: 'app.containers.App.attributes.target_date_empty',
       defaultMessage: 'No target date set',

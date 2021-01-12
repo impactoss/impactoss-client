@@ -39,6 +39,10 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
             <Icon name={entity.entityIcon} text />
           </EntityListItemMainTopIcon>
         }
+        {
+          entity.progressCategory &&
+          <ItemProgress status={entity.progressCategory} />
+        }
         { entity.role &&
           <ItemRole role={entity.role} />
         }
@@ -48,10 +52,6 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
             taxonomies={taxonomies}
             onEntityClick={onEntityClick}
           />
-        }
-        {
-          entity.progressCategory &&
-          <ItemProgress status={entity.progressCategory} />
         }
       </Component>
     );

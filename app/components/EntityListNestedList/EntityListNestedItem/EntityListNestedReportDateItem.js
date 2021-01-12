@@ -23,7 +23,7 @@ const Styled = styled.div`
   position: relative;
   color:  ${(props) => props.overdue ? palette('reports', 0) : palette('text', 1)};
   background-color: ${palette('mainListItem', 1)};
-  margin-bottom: 1px;
+  margin-bottom: 3px;
 `;
 const Status = styled.div`
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
