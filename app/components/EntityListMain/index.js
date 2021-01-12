@@ -139,6 +139,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     // group all entities, regardless of page items
     const entityGroups =
       groupSelectValue &&
+      taxonomies &&
       taxonomies.get(groupSelectValue) &&
       groupSelectValue !== PARAMS.GROUP_RESET
       ? groupEntities(
@@ -217,8 +218,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 <EntityListOptions
                   groupOptions={getGroupOptions(taxonomies, this.context.intl)}
                   subgroupOptions={getGroupOptions(taxonomies, this.context.intl)}
-                  groupSelectValue={taxonomies.get(groupSelectValue) ? groupSelectValue : ''}
-                  subgroupSelectValue={taxonomies.get(subgroupSelectValue) ? subgroupSelectValue : ''}
+                  groupSelectValue={(taxonomies && taxonomies.get(groupSelectValue)) ? groupSelectValue : ''}
+                  subgroupSelectValue={(taxonomies && taxonomies.get(subgroupSelectValue)) ? subgroupSelectValue : ''}
                   onGroupSelect={onGroupSelect}
                   onSubgroupSelect={onSubgroupSelect}
                   onExpand={() => onExpand(expandNo < config.expandableColumns.length ? config.expandableColumns.length : 0)}
@@ -235,8 +236,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     connections={connections}
                     entityIdsSelected={this.props.entityIdsSelected}
                     locationQuery={this.props.locationQuery}
-                    groupSelectValue={taxonomies.get(groupSelectValue) ? groupSelectValue : ''}
-                    subgroupSelectValue={taxonomies.get(subgroupSelectValue) ? subgroupSelectValue : ''}
+                    groupSelectValue={(taxonomies && taxonomies.get(groupSelectValue)) ? groupSelectValue : ''}
+                    subgroupSelectValue={(taxonomies && taxonomies.get(subgroupSelectValue)) ? subgroupSelectValue : ''}
                     onEntityClick={this.props.onEntityClick}
                     entityTitle={entityTitle}
                     config={config}
