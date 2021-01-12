@@ -138,6 +138,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     // group all entities, regardless of page items
     const entityGroups =
       groupSelectValue &&
+      taxonomies.get(groupSelectValue) &&
       groupSelectValue !== PARAMS.GROUP_RESET
       ? groupEntities(
         entities,
@@ -165,8 +166,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
           lowerCase(
             this.context.intl.formatMessage(
               isPlural
-                ? appMessages.entities.taxonomies[groupSelectValue].single
-                : appMessages.entities.taxonomies[groupSelectValue].plural
+                ? appMessages.entities.taxonomies[groupSelectValue].plural
+                : appMessages.entities.taxonomies[groupSelectValue].single
             )
           ),
       });
@@ -215,8 +216,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 <EntityListOptions
                   groupOptions={getGroupOptions(taxonomies, this.context.intl)}
                   subgroupOptions={getGroupOptions(taxonomies, this.context.intl)}
-                  groupSelectValue={groupSelectValue}
-                  subgroupSelectValue={subgroupSelectValue}
+                  groupSelectValue={taxonomies.get(groupSelectValue) ? groupSelectValue : ''}
+                  subgroupSelectValue={taxonomies.get(subgroupSelectValue) ? subgroupSelectValue : ''}
                   onGroupSelect={onGroupSelect}
                   onSubgroupSelect={onSubgroupSelect}
                   onExpand={() => onExpand(expandNo < config.expandableColumns.length ? config.expandableColumns.length : 0)}
@@ -233,8 +234,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     connections={connections}
                     entityIdsSelected={this.props.entityIdsSelected}
                     locationQuery={this.props.locationQuery}
-                    groupSelectValue={groupSelectValue}
-                    subgroupSelectValue={subgroupSelectValue}
+                    groupSelectValue={taxonomies.get(groupSelectValue) ? groupSelectValue : ''}
+                    subgroupSelectValue={taxonomies.get(subgroupSelectValue) ? subgroupSelectValue : ''}
                     onEntityClick={this.props.onEntityClick}
                     entityTitle={entityTitle}
                     config={config}
