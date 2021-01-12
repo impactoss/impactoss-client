@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Map } from 'immutable';
 
 import Component from 'components/styled/Component';
 import Icon from 'components/Icon';
@@ -11,20 +10,17 @@ import ItemProgress from 'components/ItemProgress';
 
 import EntityListItemMainTopReference from './EntityListItemMainTopReference';
 import EntityListItemMainTopIcon from './EntityListItemMainTopIcon';
-import EntityListItemMainTaxonomies from './EntityListItemMainTaxonomies';
+import EntityListItemMainTargetDate from './EntityListItemMainTargetDate';
+import EntityListItemMainUser from './EntityListItemMainUser';
 
 export default class EntityListItemMainTop extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   static propTypes = {
     entity: PropTypes.object.isRequired,
-    categories: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
-    taxonomies: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
-    onEntityClick: PropTypes.func,
   };
 
   render() {
-    const { categories, taxonomies, onEntityClick, entity } = this.props;
-    const smartTaxonomy = taxonomies && taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
+    const { entity } = this.props;
 
     return (
       <Component>
@@ -34,6 +30,16 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
         <EntityListItemMainTopReference>
           {entity.reference}
         </EntityListItemMainTopReference>
+        { entity.targetDate &&
+          <EntityListItemMainTargetDate
+            targetDate={entity.targetDate}
+          />
+        }
+        { entity.assignedUser &&
+          <EntityListItemMainUser
+            user={entity.assignedUser}
+          />
+        }
         { entity.entityIcon &&
           <EntityListItemMainTopIcon>
             <Icon name={entity.entityIcon} text />
@@ -45,13 +51,6 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
         }
         { entity.role &&
           <ItemRole role={entity.role} />
-        }
-        { categories && (categories.size > 0 || smartTaxonomy) &&
-          <EntityListItemMainTaxonomies
-            categories={categories}
-            taxonomies={taxonomies}
-            onEntityClick={onEntityClick}
-          />
         }
       </Component>
     );

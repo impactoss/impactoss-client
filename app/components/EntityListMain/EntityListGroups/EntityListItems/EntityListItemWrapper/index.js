@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 import { Map, List } from 'immutable';
 
 import EntityListItem from 'components/EntityListItem';
@@ -10,9 +9,8 @@ import EntityListNestedReportList from 'components/EntityListNestedList/EntityLi
 import EntityListNestedNoItem from 'components/EntityListNestedList/EntityListNestedItem/EntityListNestedNoItem';
 
 const ItemWrapper = styled.div`
-  border-top: ${({ separated }) => separated ? 1 : 10}px solid;
   padding: ${({ separated }) => separated ? '5px 0 10px' : '0'};
-  border-color: ${({ separated }) => separated ? palette('light', 3) : palette('light', 0)};
+  margin-top: 10px;
 `;
 
 export class EntityListItemWrapper extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
