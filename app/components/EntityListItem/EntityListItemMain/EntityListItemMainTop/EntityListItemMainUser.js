@@ -7,12 +7,15 @@ import Icon from 'components/Icon';
 import IconWrap from './IconWrap';
 
 const Styled = styled.span`
+  float: left;
   display: inline-block;
-  margin-right: 1em;
+  margin-left: 1em;
   color: ${palette('text', 1)};
+  margin-top: -2px;
   &:last-child: {
     margin-right: 0;
   }
+  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemBottom};
 `;
 
 const UserWrap = styled.span``;
