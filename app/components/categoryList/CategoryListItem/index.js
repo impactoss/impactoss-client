@@ -237,13 +237,17 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
           return null;
         }
         const hasResponse = !connected && framework.getIn(['attributes', 'has_response']);
+        const totalCount = (total && total[id]) || 0;
+        if (totalCount === 0) {
+          return null;
+        }
         return (
           <div>
             {hasResponse && (
               <BarWrap secondary>
                 {this.renderAcceptedBar(
                   col,
-                  (total && total[id]) || 0,
+                  totalCount,
                   (accepted && accepted[id]) || 0
                 )}
               </BarWrap>
@@ -258,6 +262,9 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
       }
     }
     const total = category[col.attribute.total];
+    if (total === 0) {
+      return null;
+    }
     return (
       <BarWrap>
         {this.renderSimpleBar(col, total)}
