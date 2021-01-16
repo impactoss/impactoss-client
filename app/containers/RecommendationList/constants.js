@@ -58,7 +58,8 @@ export const CONFIG = {
     defaultGroupsByFramework: {
       1: { 1: '1', 2: '2' }, // framework 1 recs are grouped by taxonomies 1 & 2
       2: { 1: '7' }, // framework 2 recs are grouped by taxonomy 7
-      3: { 1: '9', 2: '10' }, // framework 2 recs are grouped by taxonomy 7
+      3: { 1: '9', 2: '10' }, // framework 3 recs are grouped by taxonomy 7
+      4: { 1: '11' }, // framework 4 recs are grouped by taxonomy 7
     },
     groupBy: 'framework_id',
     editForFrameworks: true,

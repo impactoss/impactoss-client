@@ -120,6 +120,8 @@ theme.palette = {
     '#007c3a',  // 8: Progress status
     '#55B542',  // 9: SDS Key outcome
     '#55B542', // 10: SDS priority area
+    '#6B3285', // 11: Conventions
+    '#6B3285', // 12: Provenance
   ],
   taxonomiesHover: [
     '#DBDCDD',  // 0: default/fallback
@@ -133,6 +135,8 @@ theme.palette = {
     '#007034',  // 8: Progress status
     '#4EA53',  // 9: SDS Key outcome
     '#4EA53', // 10: SDS priority area
+    '#622E79', // 11: Conventions
+    '#622E79', // 12: Provenance
   ],
 
   // bg inactive, bg hover, icon
