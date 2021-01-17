@@ -111,7 +111,7 @@ theme.palette = {
   taxonomies: [
     '#E8EAEB',  // 0: default/fallback
     '#6B3285',  // 1: Human Rights Body
-    '#5149AD',  // 2: UN session
+    '#6B3285',  // 2: UN cycle
     '#75D6AC',  // 3: Human right
     '#26938C',  // 4: Affected persons
     '#0069A4',  // 5: Thematic cluster
@@ -120,13 +120,13 @@ theme.palette = {
     '#007c3a',  // 8: Progress status
     '#55B542',  // 9: SDS Key outcome
     '#55B542', // 10: SDS priority area
-    '#6B3285', // 11: Conventions
-    '#6B3285', // 12: Provenance
+    '#5149AD', // 11: Conventions
+    '#182635', // 12: Provenance
   ],
   taxonomiesHover: [
     '#DBDCDD',  // 0: default/fallback
     '#622E79',  // 1: Human Rights Body
-    '#4A439E',  // 2: UN session
+    '#622E79',  // 2: UN cycle
     '#65C99B',  // 3: Human right
     '#238680',  // 4: Affected persons
     '#006096',  // 5: Thematic cluster
@@ -135,8 +135,8 @@ theme.palette = {
     '#007034',  // 8: Progress status
     '#4EA53',  // 9: SDS Key outcome
     '#4EA53', // 10: SDS priority area
-    '#622E79', // 11: Conventions
-    '#622E79', // 12: Provenance
+    '#4A439E', // 11: Conventions
+    '#162331', // 12: Provenance
   ],
 
   // bg inactive, bg hover, icon

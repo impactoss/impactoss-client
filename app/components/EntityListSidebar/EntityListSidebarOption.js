@@ -73,7 +73,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
       case 'connectedTaxonomies':
         return (<Dot palette="taxonomies" pIndex={parseInt(color, 10)} active={active} />);
       case 'frameworks':
-        return (<Dot palette={color} pIndex={0} round active={active} />);
+        return (<Dot palette={color} pIndex={0} active={active} />);
       case 'connections':
         return (<Dot palette={color} pIndex={0} round active={active} />);
       default:
@@ -112,15 +112,17 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
             <Icon name={option.get('icon')} />
           </IconWrapper>
         }
-        <DotWrapper small={option.get('nested')}>
-          {
-            this.renderDot(
-              groupType || groupId,
-              option.get('color') || option.get('id'),
-              option.get('active'),
-            )
-          }
-        </DotWrapper>
+        {(!option.get('nested') || option.get('nested') === false) && (
+          <DotWrapper>
+            {
+              this.renderDot(
+                groupType || groupId,
+                option.get('color') || option.get('id'),
+                option.get('active'),
+              )
+            }
+          </DotWrapper>
+        )}
       </Styled>
     );
   }

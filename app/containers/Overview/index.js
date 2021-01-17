@@ -385,7 +385,15 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       draft={draftCount > 0}
     >
       <DiagramButtonIcon>
-        <Icon name={icon} />
+        <Icon
+          name={icon}
+          sizes={{
+            mobile: '24px',
+            small: '24px',
+            medium: '24px',
+            large: '24px',
+          }}
+        />
       </DiagramButtonIcon>
       <div>
         {`${count || 0} ${this.context.intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}`}

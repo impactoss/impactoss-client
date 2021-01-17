@@ -64,7 +64,10 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
         onBlur={() => taxonomy.onMouseOver && taxonomy.onMouseOver(false)}
       >
         <TaxIcon>
-          <Icon name={`taxonomy_${taxonomy.id}`} size={nested ? '28px' : null} />
+          <Icon
+            name={`taxonomy_${taxonomy.id}`}
+            size={nested ? '28px' : '40px'}
+          />
         </TaxIcon>
         <TaxTitle>
           <FormattedMessage {...appMessages.entities.taxonomies[taxonomy.id].plural} />
