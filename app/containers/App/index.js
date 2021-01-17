@@ -7,7 +7,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Perf from 'react-addons-perf';
 import ReactModal from 'react-modal';
 
 import styled from 'styled-components';
@@ -173,7 +172,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   render() {
-    window.Perf = Perf;
     const {
       pages,
       onPageLink,
