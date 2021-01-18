@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getRenderedHeight } from 'react-rendered-size';
 import { Watch } from 'scrollmonitor-react';
 import styled from 'styled-components';
 // import { isEqual } from 'lodash/lang';
@@ -18,7 +17,8 @@ class EntityListItemWatch extends React.PureComponent { // eslint-disable-line r
     this.state = { height: 0 };
   }
   componentWillMount() {
-    this.setState({ height: getRenderedHeight(this.props.renderEntity(true)) });
+    // TODO temp set random height
+    this.setState({ height: 200 });
   }
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.isInViewport !== nextProps.isInViewport
@@ -31,7 +31,7 @@ class EntityListItemWatch extends React.PureComponent { // eslint-disable-line r
   componentWillUpdate(nextProps) {
     // only recalculate height if not in viewport and only if things changed
     if (!nextProps.isInViewport && (this.props.expandNo !== nextProps.expandNo || this.props.entity !== nextProps.entity)) {
-      this.setState({ height: getRenderedHeight(this.props.renderEntity(true)) });
+      this.setState({ height: 200 });
     }
   }
 

@@ -1,8 +1,8 @@
 /* DayPicker styles */
-import { injectGlobal } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 
 /* eslint no-unused-expressions: 0 */
-injectGlobal`
+const GlobalStyle = createGlobalStyle`
 
   .DayPicker {
     display: inline-block;
@@ -205,3 +205,5 @@ injectGlobal`
     }
   }
 `;
+
+export default GlobalStyle;
