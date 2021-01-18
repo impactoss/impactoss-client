@@ -6,7 +6,7 @@
  */
 
 // Needed for redux-saga es6 generator support
-import 'babel-polyfill';
+import '@babel/polyfill';
 
 // Import all the third party stuff
 import React from 'react';
@@ -14,7 +14,6 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { applyRouterMiddleware, Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
-import { useScroll } from 'react-router-scroll';
 import 'sanitize.css/sanitize.css';
 
 // Import root app
@@ -51,7 +50,6 @@ import { translationMessages } from './i18n';
 // Import root routes
 import createRoutes from './routes';
 
-
 // Create redux store with history
 // this uses the singleton browserHistory provided by react-router
 // Optionally, this could be changed to leverage a created history
@@ -73,7 +71,7 @@ const rootRoute = {
 };
 
 // console.log(this.props.location)
-const render = (messages) => {
+const render = messages => {
   ReactDOM.render(
     <Provider store={store}>
       <LanguageProvider messages={messages}>
@@ -82,15 +80,15 @@ const render = (messages) => {
             history={history}
             routes={rootRoute}
             render={
-              // Scroll to top when going to a new page, imitating default browser
+              // TODO: Scroll to top when going to a new page, imitating default browser
               // behaviour
-              applyRouterMiddleware(useScroll())
+              applyRouterMiddleware()
             }
           />
         </ThemeProvider>
       </LanguageProvider>
     </Provider>,
-    document.getElementById('app')
+    document.getElementById('app'),
   );
 };
 
@@ -105,14 +103,12 @@ if (module.hot) {
 
 // Chunked polyfill for browsers without Intl support
 if (!window.Intl) {
-  (new Promise((resolve) => {
+  new Promise(resolve => {
     resolve(import('intl'));
-  }))
-    .then(() => Promise.all([
-      import('intl/locale-data/jsonp/en.js'),
-    ]))
+  })
+    .then(() => Promise.all([import('intl/locale-data/jsonp/en.js')]))
     .then(() => render(translationMessages))
-    .catch((err) => {
+    .catch(err => {
       throw err;
     });
 } else {
@@ -123,5 +119,12 @@ if (!window.Intl) {
 // it's not most important operation and if main code fails,
 // we do not want it installed
 if (process.env.NODE_ENV === 'production') {
-  require('offline-plugin/runtime').install(); // eslint-disable-line global-require
+  const runtime = require('offline-plugin/runtime'); // eslint-disable-line global-require
+  runtime.install({
+    onUpdateReady: () => {
+      // console.log('SW Event:', 'onUpdateReady');
+      // Tells to new SW to take control immediately
+      runtime.applyUpdate();
+    },
+  });
 }
