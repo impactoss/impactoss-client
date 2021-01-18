@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import ReactModal from 'react-modal';
+import GlobalStyle from 'global-styles';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -234,6 +235,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             />
           </ReactModal>
         }
+        <GlobalStyle />
       </div>
     );
   }
