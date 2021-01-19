@@ -8,7 +8,7 @@ import messages from './messages';
 
 const Status = styled(Label)`
   float: ${({ float }) => float || 'right'};
-  padding-left: ${({ float }) => float === 'left' ? 0 : '1em'};;
+  padding-left: ${({ float }) => float === 'left' ? 0 : '1em'};
   padding-right: ${({ float }) => float === 'left' ? '1em' : 0};
   font-weight: bold;
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};

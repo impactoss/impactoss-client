@@ -6,7 +6,7 @@ import ButtonDefault from '../ButtonDefault';
 const ButtonDefaultIconOnly = styled(ButtonDefault)`
   padding: 0;
   color: ${palette('buttonDefaultIconOnly', 0)};
-  background-color: ${palette('buttonDefaultIconOnly', 1)};;
+  background-color: ${palette('buttonDefaultIconOnly', 1)};
   border: 2px solid ${palette('buttonDefaultIconOnly', 2)};
   &:hover {
     color: ${palette('buttonDefaultIconOnlyHover', 0)};

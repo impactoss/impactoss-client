@@ -71,8 +71,6 @@ const Progress = styled.div`
   display: block;
   background: white;
   bottom: 0;
-  -webkit-box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
-  -moz-box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   background-color: ${palette('primary', 4)};
   padding: ${(props) => props.error ? 0 : 40}px;

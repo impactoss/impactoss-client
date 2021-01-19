@@ -53,13 +53,13 @@ const Main = styled.div`
       : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
     }px;
   }
-  overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
   left: 0;
   right: 0;
   bottom:0;
   background-color: ${(props) => props.isHome ? 'transparent' : palette('light', 0)};
   overflow: hidden;
 `;
+// overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 

@@ -12,11 +12,7 @@ const Button = styled.button`
   text-align: center;
   vertical-align: middle;
   line-height: 1.25;
-  -ms-touch-action: manipulation;
   touch-action: manipulation;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
   background-image: none;
   border: none;
