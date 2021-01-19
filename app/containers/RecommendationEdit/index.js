@@ -223,7 +223,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           ]}
         />
         <Content
-          innerRef={(node) => {
+          ref={(node) => {
             if (!this.state.scrollContainer) {
               this.setState({ scrollContainer: node });
             }

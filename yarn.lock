@@ -8978,8 +8978,9 @@ scrollmonitor-react@^2.4.1:
     scrollmonitor "^1.1.1"
 
 scrollmonitor@^1.1.1:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/scrollmonitor/-/scrollmonitor-1.2.3.tgz#87bf912ca28da64796f529e8129fa4a9b106fb74"
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/scrollmonitor/-/scrollmonitor-1.2.4.tgz#823d04cc1574aa3b71de7cc70ef91ebe633344a0"
+  integrity sha512-HBQpeZVAYETbNk0DAmi+X4hdTQMk5WRa/Udez9o8yC8GcRiPDgBxyEdV9g9Su/TWOuUeVfVGfNcyboEyzkte4Q==
 
 seek-bzip@^1.0.5:
   version "1.0.6"

@@ -53,6 +53,7 @@ const ListInlineItemLink = styled(A)`
   line-height: 1.6;
   font-weight: bold;
   display: block;
+  text-align: center;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     width: 2em;
     height: 2em;

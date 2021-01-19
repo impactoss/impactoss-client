@@ -142,7 +142,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         currentPath.startsWith(PATHS.INDICATORS) ||
         currentPath.startsWith(PATHS.PROGRESS_REPORTS),
     }]);
-
     if (isManager) {
       navItems = navItems.concat([
         {

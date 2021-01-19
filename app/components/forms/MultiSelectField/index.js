@@ -252,11 +252,14 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
         </MultiselectActiveOptions>
         { this.state.multiselectOpen === id &&
           <MultiSelectWrapper
-            wrapperHeight={this.props.scrollContainer
+            wrapperHeight={(
+              this.props.scrollContainer &&
+              this.props.scrollContainer.getBoundingClientRect
+            )
               ? this.props.scrollContainer.getBoundingClientRect().height - (SCROLL_PADDING * 2)
               : 450
             }
-            innerRef={(node) => {
+            ref={(node) => {
               if (!this.state.controlRef) {
                 this.setState({ controlRef: node });
               }

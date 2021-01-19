@@ -377,7 +377,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       onClick={() => this.props.onPageLink(path, query)}
       paletteDefault={paletteDefault}
       paletteHover={paletteHover}
-      innerRef={(node) => {
+      ref={(node) => {
         if (!this.state[stateButton]) {
           this.setState({ [stateButton]: node });
         }
@@ -450,7 +450,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
               }
               { dataReady &&
                 <Diagram
-                  innerRef={(node) => {
+                  ref={(node) => {
                     if (!this.state.diagram) {
                       this.setState({ diagram: node });
                     }

@@ -21,7 +21,7 @@ import {
 
 export const selectDomain = createSelector(
   (state) => state.get('categoryNew'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 

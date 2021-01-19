@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 
 export default styled.a`
+  background: transparent;
+  border: none;
+  text-align: left;
   cursor:${(props) => props.disabled ? 'default' : 'pointer'};
   display: inline-flex;
   padding: 8px 0.75em;

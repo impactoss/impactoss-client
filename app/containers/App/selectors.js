@@ -89,7 +89,7 @@ export const selectSessionUserRoles = createSelector(
       where: { user_id: sessionUserId },
     })
     .map((role) => role.getIn(['attributes', 'role_id']))
-    .toArray()
+    .toList()
     : Map()
 );
 
@@ -101,15 +101,17 @@ export const selectIsUserAdmin = createSelector(
 
 export const selectIsUserManager = createSelector(
   selectSessionUserRoles,
-  (userRoles) => userRoles.includes(USER_ROLES.MANAGER.value)
-  || userRoles.includes(USER_ROLES.ADMIN.value)
+  (userRoles) =>
+    userRoles.includes(USER_ROLES.MANAGER.value) ||
+    userRoles.includes(USER_ROLES.ADMIN.value)
 );
 
 export const selectIsUserContributor = createSelector(
   selectSessionUserRoles,
-  (userRoles) => userRoles.includes(USER_ROLES.CONTRIBUTOR.value)
-    || userRoles.includes(USER_ROLES.MANAGER.value)
-    || userRoles.includes(USER_ROLES.ADMIN.value)
+  (userRoles) =>
+    userRoles.includes(USER_ROLES.CONTRIBUTOR.value) ||
+    userRoles.includes(USER_ROLES.MANAGER.value) ||
+    userRoles.includes(USER_ROLES.ADMIN.value)
 );
 
 

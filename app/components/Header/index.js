@@ -233,7 +233,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         <ScreenReaderOnly>
           <FormattedMessage {...appMessages.buttons.showSecondaryNavigation} />
         </ScreenReaderOnly>
-        <Icon name="menu" stroke />
+        <Icon name="menu" hasStroke />
       </ShowSecondary>
       <NavSecondary
         visible={this.state.showSecondary}

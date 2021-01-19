@@ -56,7 +56,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
             type={button.submit ? 'submit' : 'button'}
             title={button.title || this.context.intl.formatMessage(appMessages.buttons.add)}
             disabled={button.disabled}
-            form
+            inForm
           />
         );
       case 'save' :
@@ -107,7 +107,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
             onClick={() => button.onClick()}
             type={button.submit ? 'submit' : 'button'}
             disabled={button.disabled}
-            form
+            inForm
           >
             {button.title || this.context.intl.formatMessage(appMessages.buttons.close)}
           </ButtonFlat>

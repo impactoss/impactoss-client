@@ -176,8 +176,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     }
 
     return (
-      <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }} >
-        <Container innerRef={(node) => { this.ScrollReference = node; }}>
+      <ContainerWithSidebar ref={(node) => { this.ScrollContainer = node; }} >
+        <Container ref={(node) => { this.ScrollReference = node; }}>
           <Content>
             <ContentHeader
               type={CONTENT_LIST}
@@ -226,7 +226,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   expanded={config.expandableColumns && expandNo === config.expandableColumns.length}
                   expandable={config.expandableColumns && config.expandableColumns.length > 0}
                 />
-                <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
+                <ListWrapper ref={(node) => { this.ScrollTarget = node; }}>
                   <EntityListGroups
                     entities={entities}
                     errors={errors}

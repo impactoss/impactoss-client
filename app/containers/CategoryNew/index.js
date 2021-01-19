@@ -81,9 +81,7 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 export class CategoryNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
   componentWillMount() {
@@ -99,8 +97,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer);
     }
   }
 
@@ -237,7 +235,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       parentOptions,
       parentTaxonomy,
     } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const taxonomyReference = this.props.params.id;
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
@@ -258,13 +256,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
             },
           ]}
         />
-        <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -301,7 +293,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
           {dataReady &&
             <EntityForm
               model="categoryNew.form.data"
-              formData={viewDomain.form.data}
+              formData={viewDomain.getIn(['form', 'data'])}
               saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
@@ -324,12 +316,12 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                     recommendationsByFw,
                     measures,
                     onCreateOption,
-                    viewDomain.form.data.getIn(['attributes', 'user_only'])
+                    viewDomain.getIn(['form', 'data', 'attributes', 'user_only'])
                   ),
                   aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
                 },
               }}
-              scrollContainer={this.state.scrollContainer}
+              scrollContainer={this.scrollContainer.current}
             />
           }
         </Content>

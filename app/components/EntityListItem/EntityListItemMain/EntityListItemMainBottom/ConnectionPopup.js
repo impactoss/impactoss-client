@@ -179,7 +179,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
         onMouseOver={() => this.openPopup()}
         onMouseLeave={() => this.closePopup()}
         onClick={() => this.state.popupOpen ? this.closePopup() : this.openPopup()}
-        innerRef={(node) => {
+        ref={(node) => {
           if (!this.state.popupRef) {
             this.setState({ popupRef: node });
           }
@@ -211,7 +211,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                     return (
                       <ListItem
                         key={i}
-                        innerRef={(node) => i < 3 && this.setState({ [`listItem_${i}`]: node })}
+                        ref={(node) => i < 3 && this.setState({ [`listItem_${i}`]: node })}
                       >
                         <ListItemLink to={`/${option.path}/${entity.get('id')}`} >
                           { entity.getIn(['attributes', 'draft']) &&

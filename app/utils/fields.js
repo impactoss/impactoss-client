@@ -158,7 +158,7 @@ const mapCategoryOptions = (categories, taxId) => categories
       draft: cat.getIn(['attributes', 'draft']) || null,
       linkTo: `${PATHS.CATEGORIES}/${cat.get('id')}`,
     }))
-    .toArray()
+    .valueSeq().toArray()
   : [];
 
 const mapSmartCategoryOptions = (categories) => categories
@@ -174,7 +174,7 @@ const mapSmartCategoryOptions = (categories) => categories
       draft: cat.getIn(['attributes', 'draft']) || null,
       linkTo: `${PATHS.CATEGORIES}/${cat.get('id')}`,
     }))
-    .toArray()
+    .valueSeq().toArray()
   : [];
 
 const mapReports = (reports) => reports
@@ -186,7 +186,7 @@ const mapReports = (reports) => reports
     draft: report.getIn(['attributes', 'draft']),
     linkTo: `${PATHS.PROGRESS_REPORTS}/${report.get('id')}`,
     updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
-  })).toArray()
+  })).valueSeq().toArray()
   : [];
 
 export const getReportsField = (reports, button) => ({
@@ -201,7 +201,7 @@ const mapDates = (dates) => dates
     date: date.getIn(['attributes', 'due_date']),
     due: date.getIn(['attributes', 'due']),
     overdue: date.getIn(['attributes', 'overdue']),
-  })).toArray()
+  })).valueSeq().toArray()
   : [];
 
 export const getScheduleField = (dates) => ({
@@ -216,7 +216,7 @@ export const getTaxonomyFields = (taxonomies) =>
     entityType: 'taxonomies',
     id: taxonomy.get('id'),
     values: mapCategoryOptions(taxonomy.get('categories'), taxonomy.get('id')),
-  })).toArray();
+  })).valueSeq().toArray();
 
 export const getSmartTaxonomyField = (taxonomy) => ({
   type: 'smartTaxonomy',
