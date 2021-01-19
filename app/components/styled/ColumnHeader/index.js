@@ -6,7 +6,6 @@ const ColumnHeader = styled.div`
   padding: 4px;
   overflow: hidden;
   word-break: break-word;
-  overflow: hidden;
   width:${(props) => props.width * 100}%;
   position: relative;
   display: table-cell;

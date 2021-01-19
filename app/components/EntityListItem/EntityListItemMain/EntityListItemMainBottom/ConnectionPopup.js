@@ -36,8 +36,6 @@ const PopupWrapper = styled.div`
   display: inline-block;
   cursor: pointer;
   font-size: 1em;
-  text-align: center;
-  -ms-touch-action: manipulation;
   touch-action: manipulation;
   position: relative;
   margin-right: 5px;

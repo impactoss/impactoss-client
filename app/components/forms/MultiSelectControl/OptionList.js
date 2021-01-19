@@ -79,7 +79,6 @@ const OptionLabel = styled.label`
     padding-top: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
     padding-bottom: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
   }
-}
 `;
 
 const OptionCount = styled.span`

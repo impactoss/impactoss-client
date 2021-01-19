@@ -73,7 +73,7 @@ const HomeNavWrap = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  wdith: 100%;
+  width: 100%;
   z-index: 101;
 `;
 

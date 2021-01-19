@@ -12,7 +12,7 @@ export default styled.div`
   background-color: ${palette('header', 0)};
   color: ${palette('headerBrand', 1)};
   &:hover {
-    color:${palette('headerBrandHover', 1)}
+    color:${palette('headerBrandHover', 1)};
     opacity: 0.95;
   }
 `;

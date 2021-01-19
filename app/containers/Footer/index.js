@@ -98,7 +98,6 @@ const TableCell = styled.div`
   border-bottom: 1px solid ${palette('footer', 3)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: table-cell;
-    width: 100%;
     vertical-align: top;
     width: 50%;
     padding-left: 15px;

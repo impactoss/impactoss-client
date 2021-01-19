@@ -38,7 +38,7 @@ const Option = styled.div`
   background-color: ${palette('asideListItem', 2)};
   border-bottom: 1px solid ${palette('asideListItem', 4)};
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding: 1em 8px 1em 24px
+    padding: 1em 8px 1em 24px;
     height: 50px;
   }
 `;

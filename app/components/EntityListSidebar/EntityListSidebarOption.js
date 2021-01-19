@@ -23,7 +23,6 @@ const Styled = styled(Button)`
   width: 100%;
   font-weight: bold;
   padding: ${(props) => props.small ? '0.5em 8px 0.5em 36px' : '0.75em 8px 0.75em 16px'};
-  width: 100%;
   text-align: left;
   color:  ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
   background-color: ${(props) => props.active ? palette('asideListItem', 3) : palette('asideListItem', 2)};

@@ -8,7 +8,6 @@ export default styled.a`
   -webkit-font-smoothing: antialiased;
   -webkit-touch-callout: none;
   user-select: none;
-  cursor: pointer;
   outline: 0;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 8px 1em;
