@@ -94,7 +94,13 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
           <Messages
             key={i}
             type="error"
-            messages={updateError.getIn(['error', 'messages']).map((msg) => this.transformMessage(updateError.get('type'), msg)).toArray()}
+            messages={
+              updateError
+              .getIn(['error', 'messages'])
+              .map((msg) => this.transformMessage(updateError.get('type'), msg))
+              .valueSeq()
+              .toArray()
+            }
             onDismiss={() => this.props.onDismissError(updateError.get('key'))}
             preMessage={false}
             details

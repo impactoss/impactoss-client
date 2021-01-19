@@ -182,7 +182,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           ]}
         />
         <Content
-          innerRef={(node) => {
+          ref={(node) => {
             if (!this.state.scrollContainer) {
               this.setState({ scrollContainer: node });
             }

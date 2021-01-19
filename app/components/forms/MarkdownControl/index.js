@@ -26,7 +26,7 @@ export class MarkdownControl extends React.PureComponent { // eslint-disable-lin
           <A
             href={this.context.intl.formatMessage(messages.url)}
             target="_blank"
-            onLightBackground
+            isOnLightBackground
           >
             {this.context.intl.formatMessage(messages.anchor)}
           </A>

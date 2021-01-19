@@ -86,8 +86,8 @@ export const makeTagFilterGroups = (taxonomies, contextIntl) =>
       filterLabel: getCategoryShortTitle(category),
       showCount: false,
       value: category.get('id'),
-    })).toList().toArray(),
-  })).toList().toArray();
+    })).valueSeq().toArray(),
+  })).toArray();
 
 export const renderMeasureControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
 ? {

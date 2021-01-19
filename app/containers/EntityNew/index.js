@@ -134,7 +134,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
     return (
       <div>
         <Content
-          innerRef={(node) => {
+          ref={(node) => {
             if (!this.state.scrollContainer) {
               this.setState({ scrollContainer: node });
             }

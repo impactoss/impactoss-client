@@ -53,6 +53,9 @@ const ButtonDefault = styled(Button)`
       return 'none';
     }};
   }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0.5em 1.75em;
+  }
 `;
 
 export default ButtonDefault;

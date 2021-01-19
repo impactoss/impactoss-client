@@ -235,7 +235,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           ]}
         />
         <Content
-          innerRef={(node) => {
+          ref={(node) => {
             if (!this.state.scrollContainer) {
               this.setState({ scrollContainer: node });
             }

@@ -109,6 +109,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
       frameworkId,
       frameworks,
     );
+
     return (
       <div>
         { (!this.state.visible && this.state.viewport < VIEWPORTS.SMALL) &&

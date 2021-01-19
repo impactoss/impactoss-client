@@ -46,6 +46,9 @@ const SortWrapper = styled.div`
 const SortButton = styled(ButtonFlatIconOnly)`
   color: inherit;
   padding: 0;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0;
+  }
 `;
 
 

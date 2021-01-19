@@ -55,7 +55,7 @@ export const selectEntitiesByQuery = createSelector(
             ? filterEntitiesByKeywords(
               categories,
               searchQuery,
-              group.get('categorySearch').toArray()
+              group.get('categorySearch').valueSeq().toArray()
             )
             : categories;
           if (path === `taxonomies-${tax.get('id')}` || (!path && !active && filteredCategories.size > 0)) {
@@ -103,7 +103,7 @@ export const selectEntitiesByQuery = createSelector(
                   ? filterEntitiesByKeywords(
                     fwEntities,
                     searchQuery,
-                    target.get('search').toArray()
+                    target.get('search').valueSeq().toArray()
                   )
                   : fwEntities;
                 const fwTargetPath = `${target.get('path')}_${fw.get('id')}`;
@@ -142,7 +142,7 @@ export const selectEntitiesByQuery = createSelector(
               ? filterEntitiesByKeywords(
                 targetEntties,
                 searchQuery,
-                target.get('search').toArray()
+                target.get('search').valueSeq().toArray()
               )
               : allEntities.get(target.get('path'));
 

@@ -14,9 +14,9 @@ const Button = styled(ButtonFlat)`
   border: ${(props) => props.border ? '1px solid' : 0};
   border-color: ${(props) => props.border ? palette(props.border.palette, props.border.pIndex) : 'transparent'};
   min-height: 2.2em;
-  padding: ${(props) => props.form ? '0.7em 0.5em' : '0.25em 1.25em'};
+  padding: ${(props) => props.inForm ? '0.7em 0.5em' : '0.25em 1.25em'};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: ${(props) => props.form ? '1em 1.2em' : '0.25em 1.25em'};
+    padding: ${(props) => props.inForm ? '1em 1.2em' : '0.25em 1.25em'};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     min-height: 3em;

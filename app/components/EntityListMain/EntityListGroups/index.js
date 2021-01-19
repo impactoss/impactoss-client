@@ -224,10 +224,12 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           onSortBy={this.props.onSortBy}
           onSortOrder={this.props.onSortOrder}
           onSelect={(checked) => {
-            onEntitySelectAll(checked ? entityIdsOnPage.toArray() : []);
+            onEntitySelectAll(checked ? entityIdsOnPage.valueSeq().toArray() : []);
           }}
           onSelectAll={() => {
-            onEntitySelectAll(entities.map((entity) => entity.get('id')).toArray());
+            onEntitySelectAll(
+              entities.map((entity) => entity.get('id')).valueSeq().toArray(),
+            );
           }}
         />
         <ListEntitiesMain>
@@ -255,7 +257,12 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                 <Messages
                   key={i}
                   type="error"
-                  messages={updateError.getIn(['error', 'messages']).map((msg) => this.transformMessage(msg, entityId)).toArray()}
+                  messages={updateError
+                    .getIn(['error', 'messages'])
+                    .map((msg) => this.transformMessage(msg, entityId))
+                    .valueSeq()
+                    .toArray()
+                  }
                   onDismiss={() => this.props.onDismissError(updateError.get('key'))}
                   preMessage={false}
                 />

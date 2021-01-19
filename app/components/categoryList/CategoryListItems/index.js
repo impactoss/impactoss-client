@@ -313,7 +313,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         )}
         <CategoryListHeader columns={headerColumns} />
         <CategoryListBody>
-          {categoryGroups.toArray().map((group) => {
+          {categoryGroups.valueSeq().toArray().map((group) => {
             if (group.get('categories')) {
               return (
                 <span key={group.get('id')}>

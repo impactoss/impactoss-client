@@ -68,6 +68,7 @@ const Count = styled.div`
   bottom: 100%;
   padding: 2px 0;
   color: ${(props) => palette(props.palette, 0)};
+  white-space: nowrap;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${({ theme, multiple }) => multiple ? theme.sizes.text.default : theme.sizes.text.aaLargeBold};
     font-weight: bold;

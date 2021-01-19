@@ -35,6 +35,9 @@ const Styled = styled(Button)`
   &:last-child {
     border-bottom: 0;
   }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: ${(props) => props.small ? '0.5em 8px 0.5em 36px' : '0.75em 8px 0.75em 16px'};
+  }
 `;
 const Label = styled.div`
   vertical-align: middle;

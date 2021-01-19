@@ -244,7 +244,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           ]}
         />
         <Content
-          innerRef={(node) => {
+          ref={(node) => {
             if (!this.state.scrollContainer) {
               this.setState({ scrollContainer: node });
             }

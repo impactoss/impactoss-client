@@ -16,6 +16,11 @@ const GlobalStyle = createGlobalStyle`
   }
   button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: transparent;
+    border-style: none;
+    color: inherit;
+    font-size: 1em;
+    margin: 0;
   }
   :focus, :visited:focus {
     outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
@@ -26,7 +31,15 @@ const GlobalStyle = createGlobalStyle`
     min-width: 100%;
   }
 
+  button {
+    background: transparent;
+    border: none;
+    text-align: left;
+  }
   a {
+    background: transparent;
+    border: none;
+    text-align: left;
     color: #0077d8;
     text-decoration: none;
 

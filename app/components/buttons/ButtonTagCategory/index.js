@@ -24,9 +24,9 @@ const getColor = (props, isHover = false) => {
 const ButtonTagCategory = styled(Button)`
   color: ${palette('text', 2)};
   background-color: ${(props) => getColor(props)};
-  padding: 1px 6px;
   margin-right: 2px;
   border-radius: ${(props) => props.isSmartTag ? 9999 : 3}px;
+  padding: 1px 6px;
   font-size: 0.85em;
   cursor:${(props) => props.disabled ? 'default' : 'pointer'};
   border: 1px solid ${(props) => getColor(props)};
@@ -37,6 +37,10 @@ const ButtonTagCategory = styled(Button)`
   }
   &:last-child {
     margin-right: 0;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 1px 6px;
+    font-size: 0.85em;
   }
 `;
 

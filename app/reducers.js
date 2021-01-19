@@ -37,12 +37,12 @@ function routeReducer(state = routeInitialState, action) {
     case LOGOUT_SUCCESS:
       return routeInitialState;
     case LOCATION_CHANGE: {
-      return state.merge({
+      return state.merge(fromJS({
         locationBeforeTransitions: {
           ...action.payload,
           pathnamePrevious: state.getIn(['locationBeforeTransitions', 'pathname']),
         },
-      });
+      }));
     }
     default:
       return state;

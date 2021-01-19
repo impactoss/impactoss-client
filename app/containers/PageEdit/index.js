@@ -145,7 +145,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           ]}
         />
         <Content
-          innerRef={(node) => {
+          ref={(node) => {
             if (!this.state.scrollContainer) {
               this.setState({ scrollContainer: node });
             }

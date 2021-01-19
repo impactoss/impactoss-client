@@ -296,7 +296,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           ]}
         />
         <Content
-          innerRef={(node) => {
+          ref={(node) => {
             if (!this.state.scrollContainer) {
               this.setState({ scrollContainer: node });
             }

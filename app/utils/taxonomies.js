@@ -1,5 +1,6 @@
 import { PATHS } from 'containers/App/constants';
 import { attributesEqual } from 'utils/entities';
+import { fromJS } from 'immutable';
 
 export const getTaxonomyTagList = (taxonomy) => {
   const tags = [];
@@ -19,26 +20,29 @@ export const getTaxonomyTagList = (taxonomy) => {
 };
 
 const mapTaxonomy = (tax, childTaxonomies, activeId, onLink) => {
-  const children = childTaxonomies.filter((t) =>
-    attributesEqual(t.getIn(['attributes', 'parent_id']), tax.get('id'))
-  );
-  return ({
+  const children = childTaxonomies
+    .filter((t) =>
+      attributesEqual(t.getIn(['attributes', 'parent_id']), tax.get('id'))
+    )
+    .toList()
+    .toJS();
+  return fromJS({
     id: tax.get('id'),
     count: tax.count,
     onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${tax.get('id')}`),
     active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
     children: children && children.map((child) => ({
-      id: child.get('id'),
+      id: child.id,
       child: true,
       count: child.count,
-      onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${child.get('id')}`),
-      active: parseInt(activeId, 10) === parseInt(child.get('id'), 10),
-    })).toArray(),
+      onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${child.id}`),
+      active: parseInt(activeId, 10) === parseInt(child.id, 10),
+    })),
   });
 };
 
 export const prepareTaxonomyGroups = (
-  taxonomies,
+  taxonomies, // OrderedMap
   activeId,
   onLink,
   frameworkId,
@@ -60,25 +64,31 @@ export const prepareTaxonomyGroups = (
       taxonomies: parentTaxonomies
         .filter((tax) => tax.get('frameworkIds').find((fw) => attributesEqual(fw, frameworkId)))
         .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
-        .toArray(),
+        .toList()
+        .toJS(),
     });
   } else {
     // multi-framework mode
     // exclusive taxonomies (one framework only)
     frameworks.forEach((fw) => {
-      groups.push({
-        id: fw.get('id'),
-        frameworkId: fw.get('id'),
-        taxonomies: parentTaxonomies
-          .filter((tax) => {
-            const taxFwIds = tax.get('frameworkIds');
-            return tax.getIn(['attributes', 'tags_recommendations']) &&
-              taxFwIds.size === 1 &&
-              taxFwIds.find((fwid) => attributesEqual(fwid, fw.get('id')));
-          })
-          .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
-          .toArray(),
-      });
+      const fwTaxonomies = parentTaxonomies
+        .filter((tax) => {
+          const taxFwIds = tax.get('frameworkIds');
+          return tax.getIn(['attributes', 'tags_recommendations']) &&
+            taxFwIds.size === 1 &&
+            taxFwIds.find((fwid) => attributesEqual(fwid, fw.get('id')));
+        })
+        .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
+        .toList()
+        .toJS();
+
+      if (fwTaxonomies && fwTaxonomies.length > 0) {
+        groups.push({
+          id: fw.get('id'),
+          frameworkId: fw.get('id'),
+          taxonomies: fwTaxonomies,
+        });
+      }
     });
     // common frameworks
     groups.push({
@@ -89,7 +99,8 @@ export const prepareTaxonomyGroups = (
           tax.get('frameworkIds').size > 1
         )
         .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
-        .toArray(),
+        .toList()
+        .toJS(),
     });
   }
 
@@ -103,7 +114,7 @@ export const prepareTaxonomyGroups = (
       id: 'measures',
       taxonomies: measureOnlyTaxonomies
         .map((tax) => mapTaxonomy(tax, taxonomies, activeId, onLink))
-        .toArray(),
+        .toJS(),
     });
   }
   return groups;
