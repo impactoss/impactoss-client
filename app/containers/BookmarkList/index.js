@@ -68,6 +68,8 @@ const Group = styled.div`
 const Target = styled(Button)`
   display: table;
   width: 100%;
+  font-size: 0.85em;
+  font-weight: ${(props) => props.active ? 'bold' : 'normal'};
   padding: 0.3em 8px 0.3em 12px;
   text-align: left;
   color:  ${(props) => {
@@ -96,8 +98,10 @@ const Target = styled(Button)`
   &:last-child {
     border-bottom: 0;
   }
-  font-size: 0.85em;
-  font-weight: ${(props) => props.active ? 'bold' : 'normal'};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: 0.85em;
+    padding: 0.3em 8px 0.3em 12px;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 0.4em 20px 0.4em 24px
   }

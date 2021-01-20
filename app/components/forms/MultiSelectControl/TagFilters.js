@@ -22,6 +22,9 @@ const Styled = styled.div`
 // padding: 0.75em 2em;
 const Group = styled(Button)`
   padding: 0 0.5em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0 0.5em;
+  }
 `;
 
 const GroupWrapper = styled.span`

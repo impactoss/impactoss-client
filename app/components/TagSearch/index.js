@@ -55,6 +55,9 @@ const Clear = styled(Button)`
   top: 0;
   right: 0;
   background-color: ${palette('background', 4)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
+  }
 `;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
