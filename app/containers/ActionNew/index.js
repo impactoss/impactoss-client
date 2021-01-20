@@ -91,21 +91,27 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     }
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
+  getHeaderMainFields = () => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getTitleFormField(intl.formatMessage),
+        ],
+      },
+    ]);
+  };
 
-  getHeaderAsideFields = () => ([
-    {
-      fields: [
-        getStatusField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
+  getHeaderAsideFields = () => {
+    const { intl } = this.context;
+    return ([
+      {
+        fields: [
+          getStatusField(intl.formatMessage),
+        ],
+      },
+    ]);
+  }
 
   getBodyMainFields = (
     connectedTaxonomies,
@@ -113,20 +119,21 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     recommendationsByFw,
     onCreateOption,
   ) => {
+    const { intl } = this.context;
     const groups = [];
     groups.push(
       {
         fields: [
-          getMarkdownField(this.context.intl.formatMessage),
-          // getMarkdownField(this.context.intl.formatMessage, 'outcome'),
-          // getMarkdownField(this.context.intl.formatMessage, 'indicator_summary'),
+          getMarkdownField(intl.formatMessage),
+          // getMarkdownField(intl.formatMessage, 'outcome'),
+          // getMarkdownField(intl.formatMessage, 'indicator_summary'),
         ],
       },
     );
     if (indicators) {
       groups.push(
         {
-          label: this.context.intl.formatMessage(appMessages.nav.indicatorsSuper),
+          label: intl.formatMessage(appMessages.nav.indicatorsSuper),
           icon: 'indicators',
           fields: [
             renderIndicatorControl(indicators, onCreateOption),
@@ -139,12 +146,12 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
         recommendationsByFw,
         connectedTaxonomies,
         onCreateOption,
-        this.context.intl,
+        intl,
       );
       if (recConnections) {
         groups.push(
           {
-            label: this.context.intl.formatMessage(appMessages.nav.recommendationsSuper),
+            label: intl.formatMessage(appMessages.nav.recommendationsSuper),
             icon: 'recommendations',
             fields: recConnections,
           },
@@ -154,43 +161,43 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getDateField(this.context.intl.formatMessage, 'target_date'),
-        getTextareaField(this.context.intl.formatMessage, 'target_date_comment'),
-      ],
-    },
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
-      icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies, onCreateOption, this.context.intl),
-    },
-  ]);
+  getBodyAsideFields = (taxonomies, onCreateOption) => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getDateField(intl.formatMessage, 'target_date'),
+          getTextareaField(intl.formatMessage, 'target_date_comment'),
+        ],
+      },
+      { // fieldGroup
+        label: intl.formatMessage(appMessages.entities.taxonomies.plural),
+        icon: 'categories',
+        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+      },
+    ]);
+  }
 
   render() {
-    const { dataReady, viewDomain, connectedTaxonomies, recommendationsByFw, indicators, taxonomies, onCreateOption } = this.props;
+    const { intl } = this.context;
+    const {
+      dataReady, viewDomain, connectedTaxonomies, recommendationsByFw, indicators, taxonomies, onCreateOption,
+    } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
-        <Content
-          ref={(node) => {
-            if (!this.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="measures"
             buttons={
@@ -205,55 +212,61 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
               }] : null
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {(saveSending || !dataReady) &&
-            <Loading />
+          {(saveSending || !dataReady)
+            && <Loading />
           }
-          {dataReady &&
-            <EntityForm
-              model="measureNew.form.data"
-              formData={viewDomain.getIn(['form', 'data'])}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={this.props.handleCancel}
-              handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(),
-                },
-                body: {
-                  main: this.getBodyMainFields(
-                    connectedTaxonomies,
-                    indicators,
-                    recommendationsByFw,
-                    onCreateOption,
-                  ),
-                  aside: this.getBodyAsideFields(
-                    taxonomies,
-                    onCreateOption,
-                  ),
-                },
-              }}
-              scrollContainer={this.scrollContainer}
-            />
+          {dataReady
+            && (
+              <EntityForm
+                model="measureNew.form.data"
+                formData={viewDomain.getIn(['form', 'data'])}
+                saving={saveSending}
+                handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={this.props.handleCancel}
+                handleUpdate={this.props.handleUpdate}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(),
+                    aside: this.getHeaderAsideFields(),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(
+                      connectedTaxonomies,
+                      indicators,
+                      recommendationsByFw,
+                      onCreateOption,
+                    ),
+                    aside: this.getBodyAsideFields(
+                      taxonomies,
+                      onCreateOption,
+                    ),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          {saveSending &&
-            <Loading />
+          {saveSending
+            && <Loading />
           }
         </Content>
       </div>
@@ -328,13 +341,13 @@ function mapDispatchToProps(dispatch) {
         saveData = saveData.set(
           'measureCategories',
           formData.get('associatedTaxonomies')
-          .map(getCheckedValuesFromOptions)
-          .reduce((updates, formCategoryIds) => Map({
-            delete: List(),
-            create: updates.get('create').concat(formCategoryIds.map((id) => Map({
-              category_id: id,
-            }))),
-          }), Map({ delete: List(), create: List() }))
+            .map(getCheckedValuesFromOptions)
+            .reduce((updates, formCategoryIds) => Map({
+              delete: List(),
+              create: updates.get('create').concat(formCategoryIds.map((id) => Map({
+                category_id: id,
+              }))),
+            }), Map({ delete: List(), create: List() }))
         );
       }
 
@@ -343,15 +356,13 @@ function mapDispatchToProps(dispatch) {
         saveData = saveData.set(
           'recommendationMeasures',
           recommendationsByFw
-            .map((recs, fwid) =>
-              getConnectionUpdatesFromFormData({
-                formData,
-                connections: recs,
-                connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
-                createConnectionKey: 'recommendation_id',
-                createKey: 'measure_id',
-              })
-            )
+            .map((recs, fwid) => getConnectionUpdatesFromFormData({
+              formData,
+              connections: recs,
+              connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
+              createConnectionKey: 'recommendation_id',
+              createKey: 'measure_id',
+            }))
             .reduce(
               (memo, deleteCreateLists) => {
                 const creates = memo.get('create').concat(deleteCreateLists.get('create'));
@@ -370,9 +381,9 @@ function mapDispatchToProps(dispatch) {
         saveData = saveData.set('measureIndicators', Map({
           delete: List(),
           create: getCheckedValuesFromOptions(formData.get('associatedIndicators'))
-          .map((id) => Map({
-            indicator_id: id,
-          })),
+            .map((id) => Map({
+              indicator_id: id,
+            })),
         }));
       }
 

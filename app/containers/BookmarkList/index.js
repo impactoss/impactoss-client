@@ -82,17 +82,17 @@ const Target = styled(Button)`
   border-bottom: 1px solid ${palette('asideListItem', 4)};
   &:hover {
     color: ${(props) => {
-      if (props.disabled) {
-        return props.active ? palette('asideListItem', 1) : palette('dark', 4);
-      }
-      return props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0);
-    }};
+    if (props.disabled) {
+      return props.active ? palette('asideListItem', 1) : palette('dark', 4);
+    }
+    return props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0);
+  }};
     background-color: ${(props) => {
-      if (props.disabled) {
-        return props.active ? palette('asideListItem', 3) : palette('asideListItem', 2);
-      }
-      return props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2);
-    }};
+    if (props.disabled) {
+      return props.active ? palette('asideListItem', 3) : palette('asideListItem', 2);
+    }
+    return props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2);
+  }};
     border-bottom-color: ${palette('asideListItemHover', 4)}
   }
   &:last-child {
@@ -160,9 +160,59 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
       this.props.loadEntitiesIfNeeded();
     }
   }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
   }
+
+  resize = () => {
+    // reset
+    this.setState(STATE_INITIAL);
+    this.updateViewport();
+    this.forceUpdate();
+  };
+
+  renderBookmarkTypes = () => {
+    const { intl } = this.context;
+    return (
+      <div>
+        <Group>
+          <SidebarGroupLabel>
+            <FormattedMessage {...messages.group} />
+          </SidebarGroupLabel>
+          <div>
+            { this.props.bookmarksForSearch && this.props.bookmarksForSearch
+              .groupBy((e) => e.getIn(['attributes', 'view', 'type']))
+              .keySeq()
+              .sort((a, b) => a > b ? 1 : -1)
+              .map((type) => {
+                const label = getTypeLabel(type, intl.formatMessage, true);
+                return (
+                  <Target
+                    key={type}
+                    onClick={(evt) => {
+                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                      if (type === this.props.activeType) {
+                        this.props.onTypeSelect('');
+                      } else {
+                        this.props.onTypeSelect(type);
+                      }
+                    }}
+                    active={type === this.props.activeType}
+                  >
+                    <TargetTitle>
+                      {label}
+                    </TargetTitle>
+                  </Target>
+                );
+              })
+            }
+          </div>
+        </Group>
+      </div>
+    );
+  };
+
   updateViewport() {
     let viewport = VIEWPORTS.MOBILE;
     if (window.innerWidth >= parseInt(this.props.theme.breakpoints.large, 10)) {
@@ -174,51 +224,9 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
     }
     this.setState({ viewport });
   }
-  resize = () => {
-    // reset
-    this.setState(STATE_INITIAL);
-    this.updateViewport();
-    this.forceUpdate();
-  };
-  renderBookmarkTypes = () => (
-    <div>
-      <Group>
-        <SidebarGroupLabel>
-          <FormattedMessage {...messages.group} />
-        </SidebarGroupLabel>
-        <div>
-          { this.props.bookmarksForSearch && this.props.bookmarksForSearch
-            .groupBy((e) => e.getIn(['attributes', 'view', 'type']))
-            .keySeq()
-            .sort((a, b) => a > b ? 1 : -1)
-            .map((type) => {
-              const label = getTypeLabel(type, this.context.intl.formatMessage, true);
-              return (
-                <Target
-                  key={type}
-                  onClick={(evt) => {
-                    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                    if (type === this.props.activeType) {
-                      this.props.onTypeSelect('');
-                    } else {
-                      this.props.onTypeSelect(type);
-                    }
-                  }}
-                  active={type === this.props.activeType}
-                >
-                  <TargetTitle>
-                    {label}
-                  </TargetTitle>
-                </Target>
-              );
-            })
-          }
-        </div>
-      </Group>
-    </div>
-  );
 
   render() {
+    const { intl } = this.context;
     const {
       dataReady,
       location,
@@ -232,47 +240,47 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
       allBookmarks,
     } = this.props;
     const filtered = activeType && activeType !== '';
-    const bookmarksFiltered = bookmarksForSearch.filter((e) =>
-      !filtered || attributesEqual(activeType, e.getIn(['attributes', 'view', 'type']))
-    );
+    const bookmarksFiltered = bookmarksForSearch.filter((e) => !filtered || attributesEqual(activeType, e.getIn(['attributes', 'view', 'type'])));
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !dataReady &&
-          <EntityListSidebarLoading responsiveSmall />
+        { !dataReady
+          && <EntityListSidebarLoading responsiveSmall />
         }
-        { dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE &&
-          <div>
-            <Sidebar responsiveSmall >
-              <ScrollableWrapper>
-                <Component>
-                  <SidebarHeader responsiveSmall>
-                    <SupTitle title={this.context.intl.formatMessage(messages.sidebarTitle)} />
-                  </SidebarHeader>
-                  {
-                    this.renderBookmarkTypes()
-                  }
-                </Component>
-              </ScrollableWrapper>
-            </Sidebar>
-          </div>
+        { dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE
+          && (
+            <div>
+              <Sidebar responsiveSmall>
+                <ScrollableWrapper>
+                  <Component>
+                    <SidebarHeader responsiveSmall>
+                      <SupTitle title={intl.formatMessage(messages.sidebarTitle)} />
+                    </SidebarHeader>
+                    {
+                      this.renderBookmarkTypes()
+                    }
+                  </Component>
+                </ScrollableWrapper>
+              </Sidebar>
+            </div>
+          )
         }
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
               <ContentHeader
                 type={CONTENT_LIST}
-                supTitle={this.context.intl.formatMessage(messages.supTitle)}
-                title={this.context.intl.formatMessage(messages.pageTitle)}
+                supTitle={intl.formatMessage(messages.supTitle)}
+                title={intl.formatMessage(messages.pageTitle)}
                 icon="bookmark_active"
               />
-              { !dataReady &&
-                <Loading />
+              { !dataReady
+                && <Loading />
               }
               { dataReady && (
                 <div>
@@ -281,12 +289,12 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                       filters={filtered
                         ? [{
                           id: 'type',
-                          label: getTypeLabel(activeType, this.context.intl.formatMessage, true),
+                          label: getTypeLabel(activeType, intl.formatMessage, true),
                           onClick: () => this.props.onTypeSelect(''),
                         }]
                         : []
                       }
-                      placeholder={this.context.intl.formatMessage(messages.placeholder)}
+                      placeholder={intl.formatMessage(messages.placeholder)}
                       searchQuery={location.query.search || ''}
                       onSearch={onSearch}
                       onClear={() => onClear(['search'])}
@@ -308,8 +316,8 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                         <EntityListHeader
                           entitiesTotal={bookmarksFiltered.size}
                           entityTitle={{
-                            single: this.context.intl.formatMessage(messages.single),
-                            plural: this.context.intl.formatMessage(messages.plural),
+                            single: intl.formatMessage(messages.single),
+                            plural: intl.formatMessage(messages.plural),
                           }}
                           sortOptions={CONFIG.sorting}
                           sortBy={location.query.sort}
@@ -320,7 +328,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                         <ListEntitiesMain>
                           { bookmarksFiltered.map((entity, key) => {
                             const type = entity.getIn(['attributes', 'view', 'type']);
-                            const label = getTypeLabel(type, this.context.intl.formatMessage, false);
+                            const label = getTypeLabel(type, intl.formatMessage, false);
                             return (
                               <EntityListItemWrapper
                                 key={key}

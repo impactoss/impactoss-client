@@ -17,13 +17,15 @@ class ManagerField extends React.PureComponent { // eslint-disable-line react/pr
         <Label>
           <FormattedMessage {...(field.label || appMessages.attributes.manager_id.categories)} />
         </Label>
-        { field.value &&
-          <Manager>{field.value}</Manager>
+        { field.value
+          && <Manager>{field.value}</Manager>
         }
-        { !field.value &&
-          <EmptyHint>
-            <FormattedMessage {...field.showEmpty} />
-          </EmptyHint>
+        { !field.value
+          && (
+            <EmptyHint>
+              <FormattedMessage {...field.showEmpty} />
+            </EmptyHint>
+          )
         }
       </FieldWrap>
     );

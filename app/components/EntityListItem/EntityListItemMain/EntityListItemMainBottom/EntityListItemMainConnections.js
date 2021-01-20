@@ -50,13 +50,15 @@ export default class EntityListItemMainConnections extends React.PureComponent {
                   option={connection.option}
                   wrapper={this.props.wrapper}
                 />
-                { draftEntities.size > 0 &&
-                  <ConnectionPopup
-                    entities={draftEntities}
-                    option={connection.option}
-                    wrapper={this.props.wrapper}
-                    draft
-                  />
+                { draftEntities.size > 0
+                  && (
+                    <ConnectionPopup
+                      entities={draftEntities}
+                      option={connection.option}
+                      wrapper={this.props.wrapper}
+                      draft
+                    />
+                  )
                 }
                 <ConnectionLabel>
                   {connection.option.label(entitiesTotal)}

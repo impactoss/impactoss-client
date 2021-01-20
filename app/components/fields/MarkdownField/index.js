@@ -20,10 +20,12 @@ class MarkdownField extends React.PureComponent { // eslint-disable-line react/p
     const { field } = this.props;
     return (
       <FieldWrap>
-        {field.label &&
-          <Label>
-            <FormattedMessage {...field.label} />
-          </Label>
+        {field.label
+          && (
+            <Label>
+              <FormattedMessage {...field.label} />
+            </Label>
+          )
         }
         <Markdown source={field.value} className="react-markdown" />
       </FieldWrap>

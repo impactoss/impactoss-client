@@ -17,11 +17,11 @@ const ButtonFlat = styled(Button)`
   }};
   &:hover {
     color: ${(props) => {
-      if (props.disabled) {
-        return palette('buttonFlat', 2);
-      }
-      return props.primary ? palette('buttonFlatHover', 0) : palette('buttonFlatHover', 1);
-    }};
+    if (props.disabled) {
+      return palette('buttonFlat', 2);
+    }
+    return props.primary ? palette('buttonFlatHover', 0) : palette('buttonFlatHover', 1);
+  }};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     letter-spacing: 1px;

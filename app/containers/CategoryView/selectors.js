@@ -27,8 +27,8 @@ export const selectCategory = createSelector(
 export const selectTaxonomy = createSelector(
   selectCategory,
   selectTaxonomiesSorted,
-  (category, taxonomies) => category && taxonomies &&
-    taxonomies.get(category.getIn(['attributes', 'taxonomy_id']).toString())
+  (category, taxonomies) => category && taxonomies
+    && taxonomies.get(category.getIn(['attributes', 'taxonomy_id']).toString())
 );
 
 export const selectViewEntity = createSelector(
@@ -69,7 +69,8 @@ export const selectParentTaxonomy = createSelector(
       return taxonomies.find((tax) => attributesEqual(taxonomy.getIn(['attributes', 'parent_id']), tax.get('id')));
     }
     return null;
-  });
+  }
+);
 export const selectChildTaxonomies = createSelector(
   selectCategory,
   selectTaxonomiesSorted,
@@ -81,16 +82,13 @@ export const selectChildTaxonomies = createSelector(
       );
       return taxonomies
         .filter((tax) => attributesEqual(tax.getIn(['attributes', 'parent_id']), taxonomy.get('id')))
-        .map((tax) =>
-          tax.set('categories', sortCategories(categories, tax.get('id'))
-            .filter((cat) =>
-              attributesEqual(cat.getIn(['attributes', 'parent_id']), entity.get('id'))
-              && attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id')))
-          )
-        );
+        .map((tax) => tax.set('categories', sortCategories(categories, tax.get('id'))
+          .filter((cat) => attributesEqual(cat.getIn(['attributes', 'parent_id']), entity.get('id'))
+              && attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id')))));
     }
     return null;
-  });
+  }
+);
 
 const selectTagsRecommendations = createSelector(
   selectTaxonomy,
@@ -114,19 +112,14 @@ export const selectRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'categories'),
-  (recommendations, connections, recMeasures, recCategories, categories) =>
-    recommendations &&
-    recommendations
+  (recommendations, connections, recMeasures, recCategories, categories) => recommendations
+    && recommendations
       .map((rec) => rec
         .set('categories', getEntityCategories(rec.get('id'), recCategories, 'recommendation_id', categories))
         .set('measures', recMeasures && recMeasures
-          .filter((association) =>
-            attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
-            && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
-          )
-          .map((association) => association.getIn(['attributes', 'measure_id']))
-        )
-      )
+          .filter((association) => attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
+            && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()]))
+          .map((association) => association.getIn(['attributes', 'measure_id']))))
       .groupBy(
         (r) => r.getIn(['attributes', 'framework_id'])
       )
@@ -134,9 +127,8 @@ export const selectRecommendations = createSelector(
 
 const selectChildrenTagRecommendations = createSelector(
   selectChildTaxonomies,
-  (taxonomies) =>
-    taxonomies &&
-    taxonomies.some(
+  (taxonomies) => taxonomies
+    && taxonomies.some(
       (tax) => tax.getIn(['attributes', 'tags_recommendations']),
     )
 );
@@ -147,18 +139,14 @@ const selectChildRecommendationsAssociated = createSelector(
   selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
   (tag, childTaxonomies, entities, associations) => tag && childTaxonomies
-    ? childTaxonomies.map((tax) =>
-      tax.set('categories', tax.get('categories').map((cat) =>
-        cat.set(
-          'recommendations',
-          sortEntities(
-            entitiesIsAssociated(entities, 'recommendation_id', associations, 'category_id', cat.get('id')),
-            'asc',
-            'reference',
-          ),
-        )
-      ))
-    )
+    ? childTaxonomies.map((tax) => tax.set('categories', tax.get('categories').map((cat) => cat.set(
+      'recommendations',
+      sortEntities(
+        entitiesIsAssociated(entities, 'recommendation_id', associations, 'category_id', cat.get('id')),
+        'asc',
+        'reference',
+      ),
+    ))))
     : null
 );
 
@@ -169,21 +157,17 @@ export const selectChildRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendation_measures'),
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'categories'),
-  (recommendationsByTaxCat, connections, recMeasures, recCategories, categories) =>
-    recommendationsByTaxCat &&
-    recommendationsByTaxCat
+  (recommendationsByTaxCat, connections, recMeasures, recCategories, categories) => recommendationsByTaxCat
+    && recommendationsByTaxCat
       .map(
         (tax) => tax.set('categories', tax.get('categories').map(
           (cat) => cat.set('recommendations', cat.get('recommendations').map(
             (rec) => rec
               .set('categories', getEntityCategories(rec.get('id'), recCategories, 'recommendation_id', categories))
               .set('measures', recMeasures && recMeasures
-                .filter((association) =>
-                  attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
-                  && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()])
-                )
-                .map((association) => association.getIn(['attributes', 'measure_id']))
-              )
+                .filter((association) => attributesEqual(association.getIn(['attributes', 'recommendation_id']), rec.get('id'))
+                  && connections.getIn(['measures', association.getIn(['attributes', 'measure_id']).toString()]))
+                .map((association) => association.getIn(['attributes', 'measure_id'])))
           ))
         ))
       )
@@ -215,24 +199,16 @@ export const selectMeasures = createSelector(
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'measure_indicators'),
   (state) => selectEntities(state, 'categories'),
-  (measures, connections, measureRecommendations, measureCategories, measureIndicators, categories) =>
-    measures && measures.map((measure) => measure
-      .set('categories', getEntityCategories(measure.get('id'), measureCategories, 'measure_id', categories))
-      .set('recommendations', measureRecommendations && measureRecommendations
-        .filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
-          && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
-        )
-        .map((association) => association.getIn(['attributes', 'recommendation_id']))
-      )
-      .set('indicators', measureIndicators && measureIndicators
-        .filter((association) =>
-          attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
-          && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
-        )
-        .map((association) => association.getIn(['attributes', 'indicator_id']))
-      )
-    )
+  (measures, connections, measureRecommendations, measureCategories, measureIndicators, categories) => measures && measures.map((measure) => measure
+    .set('categories', getEntityCategories(measure.get('id'), measureCategories, 'measure_id', categories))
+    .set('recommendations', measureRecommendations && measureRecommendations
+      .filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
+          && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()]))
+      .map((association) => association.getIn(['attributes', 'recommendation_id'])))
+    .set('indicators', measureIndicators && measureIndicators
+      .filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
+          && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()]))
+      .map((association) => association.getIn(['attributes', 'indicator_id']))))
 );
 
 const selectChildrenTagMeasures = createSelector(
@@ -246,18 +222,14 @@ const selectChildMeasuresAssociated = createSelector(
   selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
   (tag, childTaxonomies, entities, associations) => tag
-    ? childTaxonomies.map((tax) =>
-      tax.set('categories', tax.get('categories').map((cat) =>
-        cat.set(
-          'measures',
-          sortEntities(
-            entitiesIsAssociated(entities, 'measure_id', associations, 'category_id', cat.get('id')),
-            'asc',
-            'reference',
-          ),
-        )
-      ))
-    )
+    ? childTaxonomies.map((tax) => tax.set('categories', tax.get('categories').map((cat) => cat.set(
+      'measures',
+      sortEntities(
+        entitiesIsAssociated(entities, 'measure_id', associations, 'category_id', cat.get('id')),
+        'asc',
+        'reference',
+      ),
+    ))))
     : null
 );
 
@@ -269,37 +241,29 @@ export const selectChildMeasures = createSelector(
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'measure_indicators'),
   (state) => selectEntities(state, 'categories'),
-  (measuresByTaxCat, connections, measureRecommendations, measureCategories, measureIndicators, categories) =>
-    measuresByTaxCat && measuresByTaxCat.map(
-      (tax) => tax.set('categories', tax.get('categories').map(
-        (cat) => cat.set('measures', cat.get('measures').map(
-          (measure) => measure
-            .set('categories', getEntityCategories(measure.get('id'), measureCategories, 'measure_id', categories))
-            .set('recommendations', measureRecommendations && measureRecommendations
-              .filter((association) =>
-                attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
-                && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()])
-              )
-              .map((association) => association.getIn(['attributes', 'recommendation_id']))
-            )
-            .set('indicators', measureIndicators && measureIndicators
-              .filter((association) =>
-                attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
-                && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()])
-              )
-              .map((association) => association.getIn(['attributes', 'indicator_id']))
-            )
-          ))
-        ))
-      )
+  (measuresByTaxCat, connections, measureRecommendations, measureCategories, measureIndicators, categories) => measuresByTaxCat && measuresByTaxCat.map(
+    (tax) => tax.set('categories', tax.get('categories').map(
+      (cat) => cat.set('measures', cat.get('measures').map(
+        (measure) => measure
+          .set('categories', getEntityCategories(measure.get('id'), measureCategories, 'measure_id', categories))
+          .set('recommendations', measureRecommendations && measureRecommendations
+            .filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
+                && connections.getIn(['recommendations', association.getIn(['attributes', 'recommendation_id']).toString()]))
+            .map((association) => association.getIn(['attributes', 'recommendation_id'])))
+          .set('indicators', measureIndicators && measureIndicators
+            .filter((association) => attributesEqual(association.getIn(['attributes', 'measure_id']), measure.get('id'))
+                && connections.getIn(['indicators', association.getIn(['attributes', 'indicator_id']).toString()]))
+            .map((association) => association.getIn(['attributes', 'indicator_id'])))
+      ))
+    ))
+  )
 );
 
 export const selectTaxonomiesWithCategories = createSelector(
   selectTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    taxonomies.map((tax) => tax.set(
-      'categories',
-      categories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id')))
-    ))
+  (taxonomies, categories) => taxonomies.map((tax) => tax.set(
+    'categories',
+    categories.filter((cat) => attributesEqual(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id')))
+  ))
 );

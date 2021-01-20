@@ -102,72 +102,87 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     let attributes = viewEntity.get('attributes');
     attributes = attributes.set('due_date_id', attributes.get('due_date_id')
       ? attributes.get('due_date_id').toString()
-      : '0'
-    );
+      : '0');
     return viewEntity
-    ? Map({
-      id: viewEntity.get('id'),
-      attributes: attributes.mergeWith(
-        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-        FORM_INITIAL.get('attributes')
-      ),
-    })
-    : Map();
+      ? Map({
+        id: viewEntity.get('id'),
+        attributes: attributes.mergeWith(
+          (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+          FORM_INITIAL.get('attributes')
+        ),
+      })
+      : Map();
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
-  getHeaderAsideFields = (entity) => ([
-    {
-      fields: [
-        getStatusField(this.context.intl.formatMessage),
-        getMetaField(entity),
-      ],
-    },
-  ]);
+  getHeaderMainFields = () => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getTitleFormField(intl.formatMessage),
+        ],
+      },
+    ]);
+  };
 
-  getBodyMainFields = () => ([
-    {
-      fields: [
-        getMarkdownField(this.context.intl.formatMessage),
-        getUploadField(this.context.intl.formatMessage),
-        getDocumentStatusField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
+  getHeaderAsideFields = (entity) => {
+    const { intl } = this.context;
+    return ([
+      {
+        fields: [
+          getStatusField(intl.formatMessage),
+          getMetaField(entity),
+        ],
+      },
+    ]);
+  };
 
-  getBodyAsideFields = (entity) => ([ // fieldGroups
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.due_dates.single),
-      icon: 'calendar',
-      fields: entity.get('indicator') && entity.getIn(['indicator', 'dates']) &&
-        [getDueDateOptionsField(
-          this.context.intl.formatMessage,
-          getDueDateDateOptions(
-            entity.getIn(['indicator', 'dates']),
-            this.context.intl.formatMessage,
-            this.context.intl.formatDate,
-            entity.getIn(['attributes', 'due_date_id'])
-              ? entity.getIn(['attributes', 'due_date_id']).toString()
-              : '0',
-          ),
-        )],
-    },
-  ]);
+  getBodyMainFields = () => {
+    const { intl } = this.context;
+    return ([
+      {
+        fields: [
+          getMarkdownField(intl.formatMessage),
+          getUploadField(intl.formatMessage),
+          getDocumentStatusField(intl.formatMessage),
+        ],
+      },
+    ]);
+  };
+
+  getBodyAsideFields = (entity) => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        label: intl.formatMessage(appMessages.entities.due_dates.single),
+        icon: 'calendar',
+        fields: entity.get('indicator') && entity.getIn(['indicator', 'dates'])
+          && [getDueDateOptionsField(
+            intl.formatMessage,
+            getDueDateDateOptions(
+              entity.getIn(['indicator', 'dates']),
+              intl.formatMessage,
+              intl.formatDate,
+              entity.getIn(['attributes', 'due_date_id'])
+                ? entity.getIn(['attributes', 'due_date_id']).toString()
+                : '0',
+            ),
+          )],
+      },
+    ]);
+  };
 
   render() {
+    const { intl } = this.context;
     const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.get('page').toJS();
+    const {
+      saveSending, saveError, deleteSending, deleteError, submitValid,
+    } = viewDomain.get('page').toJS();
 
-    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
+    let pageTitle = intl.formatMessage(messages.pageTitle);
     if (viewEntity && dataReady) {
-      pageTitle = this.context.intl.formatMessage(messages.pageTitleReference, {
+      pageTitle = intl.formatMessage(messages.pageTitleReference, {
         indicatorReference: viewEntity.getIn(['attributes', 'indicator_id']),
       });
     }
@@ -176,16 +191,10 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         <Helmet
           title={pageTitle}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content
-          ref={(node) => {
-            if (!this.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -202,59 +211,67 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
               }] : null
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {deleteError &&
-            <Messages type="error" messages={deleteError} />
+          {deleteError
+            && <Messages type="error" messages={deleteError} />
           }
-          {(saveSending || deleteSending || !dataReady) &&
-            <Loading />
+          {(saveSending || deleteSending || !dataReady)
+            && <Loading />
           }
-          {!viewEntity && dataReady && !saveError && !deleteSending &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          {!viewEntity && dataReady && !saveError && !deleteSending
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          {viewEntity && dataReady && !deleteSending &&
-            <EntityForm
-              model="reportEdit.form.data"
-              formData={viewDomain.getIn(['form', 'data'])}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity.getIn(['attributes', 'due_date_id']))}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={() => this.props.handleCancel(reference)}
-              handleUpdate={this.props.handleUpdate}
-              handleDelete={() => this.props.isUserAdmin
-                ? this.props.handleDelete(viewEntity.getIn(['attributes', 'indicator_id']))
-                : null
-              }
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(viewEntity),
-                },
-                body: {
-                  main: this.getBodyMainFields(),
-                  aside: this.getBodyAsideFields(viewEntity),
-                },
-              }}
-              scrollContainer={this.scrollContainer}
-            />
+          {viewEntity && dataReady && !deleteSending
+            && (
+              <EntityForm
+                model="reportEdit.form.data"
+                formData={viewDomain.getIn(['form', 'data'])}
+                saving={saveSending}
+                handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity.getIn(['attributes', 'due_date_id']))}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={() => this.props.handleCancel(reference)}
+                handleUpdate={this.props.handleUpdate}
+                handleDelete={() => this.props.isUserAdmin
+                  ? this.props.handleDelete(viewEntity.getIn(['attributes', 'indicator_id']))
+                  : null
+                }
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(),
+                    aside: this.getHeaderAsideFields(viewEntity),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(),
+                    aside: this.getBodyAsideFields(viewEntity),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          { (saveSending || deleteSending) &&
-            <Loading />
+          { (saveSending || deleteSending)
+            && <Loading />
           }
         </Content>
       </div>
@@ -327,8 +344,8 @@ function mapDispatchToProps(dispatch, props) {
       saveData = saveData.setIn(
         ['attributes', 'due_date_id'],
         dateAssigned === '0' || dateAssigned === 0
-        ? null
-        : parseInt(dateAssigned, 10)
+          ? null
+          : parseInt(dateAssigned, 10)
       );
 
       dispatch(save(

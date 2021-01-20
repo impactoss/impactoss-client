@@ -157,18 +157,22 @@ class MultiSelect extends React.Component {
       query: value,
     });
   }
+
   onResetFilters = () => {
     this.setState({
       query: null,
       queryTags: [],
     });
   }
+
   onTagSelected = (active, tagOption) => {
-    this.setState({
-      queryTags: active
-        ? this.state.queryTags.concat([tagOption.get('value')])
-        : without(this.state.queryTags, tagOption.get('value')),
-    });
+    this.setState(
+      (prevState) => ({
+        queryTags: active
+          ? prevState.queryTags.concat([tagOption.get('value')])
+          : without(prevState.queryTags, tagOption.get('value')),
+      })
+    );
   }
 
   setWrapperRef(node) {
@@ -179,11 +183,9 @@ class MultiSelect extends React.Component {
     const { multiple, required, values } = this.props;
     // do not update if required and change would result in empty list
     if (!checked && required) {
-      const otherCheckedValues = values.find((v) =>
-        v.get('checked')
+      const otherCheckedValues = values.find((v) => v.get('checked')
           && v.get('value') !== option.get('value')
-          && (option.get('query') ? v.get('query') === option.get('query') : true)
-      );
+          && (option.get('query') ? v.get('query') === option.get('query') : true));
       if (!otherCheckedValues) {
         return values;
       }
@@ -191,15 +193,11 @@ class MultiSelect extends React.Component {
 
     // uncheck all others if single mode (!multiple)
     let nextValues = values;
-    const existingValueIndex = values.findIndex((v) =>
-      v.get('value') === option.get('value')
-        && (option.get('query') ? v.get('query') === option.get('query') : true)
-    );
+    const existingValueIndex = values.findIndex((v) => v.get('value') === option.get('value')
+        && (option.get('query') ? v.get('query') === option.get('query') : true));
     if (!multiple && checked) {
       // uncheck all other options
-      nextValues = nextValues.map((value, index) =>
-        existingValueIndex !== index ? value.set('checked', false).set('hasChanged', true) : value
-      );
+      nextValues = nextValues.map((value, index) => existingValueIndex !== index ? value.set('checked', false).set('hasChanged', true) : value);
     }
     // set new value
     const newValue = option.set('checked', checked).set('hasChanged', true);
@@ -213,10 +211,8 @@ class MultiSelect extends React.Component {
     // uncheck all others if single mode (!multiple)
     let nextValues = values;
     options.forEach((option) => {
-      const existingValueIndex = values.findIndex((v) =>
-        v.get('value') === option.get('value')
-          && (option.get('query') ? v.get('query') === option.get('query') : true)
-      );
+      const existingValueIndex = values.findIndex((v) => v.get('value') === option.get('value')
+          && (option.get('query') ? v.get('query') === option.get('query') : true));
       const newValue = option.set('checked', checked).set('hasChanged', true);
       // set new value
       // set current value, add if not present
@@ -237,12 +233,6 @@ class MultiSelect extends React.Component {
     return CHECKBOX_STATES.INDETERMINATE;
   }
 
-  handleClickOutside(event) {
-    if (this.props.closeOnClickOutside && this.wrapperRef && !this.wrapperRef.contains(event.target)) {
-      this.props.onCancel();
-    }
-  }
-
   // props, state
   // map options
   prepareOptions = ({ options, values, threeState }, { optionsInitial }) => options.map((option) => {
@@ -250,18 +240,14 @@ class MultiSelect extends React.Component {
     const isNew = !optionsInitial.includes(option);
     const isIndeterminateInitial = threeState && this.isOptionIndeterminate(option);
     const isCheckedIntitial = option.get('checked');
-    const optionUpdated = option.withMutations((o) =>
-      o.set('isNew', isNew)
+    const optionUpdated = option.withMutations((o) => o.set('isNew', isNew)
       .set('initialChecked', isCheckedIntitial)
-      .set('isIndeterminate', isIndeterminateInitial)
-    );
+      .set('isIndeterminate', isIndeterminateInitial));
     return value
-    ? optionUpdated.withMutations((o) =>
-      o.set('checked', value.get('checked'))
-      .set('changedToChecked', value.get('checked') && !isCheckedIntitial)
-      .set('changedToUnchecked', !value.get('checked') && !this.isOptionIndeterminate(value) && (isCheckedIntitial || isIndeterminateInitial))
-    )
-    : optionUpdated;
+      ? optionUpdated.withMutations((o) => o.set('checked', value.get('checked'))
+        .set('changedToChecked', value.get('checked') && !isCheckedIntitial)
+        .set('changedToUnchecked', !value.get('checked') && !this.isOptionIndeterminate(value) && (isCheckedIntitial || isIndeterminateInitial)))
+      : optionUpdated;
   });
 
   filterOptions = (options, { search, advanced }, { query, queryTags }) => { // filter options
@@ -279,10 +265,10 @@ class MultiSelect extends React.Component {
   currentTagFilterGroups = (tagFilterGroups, options) => {
     // get all actually connected categories from connections
     const optionTagIds = options
-    .map((option) => option.get('tags'))
-    .flatten()
-    .toSet()
-    .toList();
+      .map((option) => option.get('tags'))
+      .flatten()
+      .toSet()
+      .toList();
 
     // filter multiselect options
     return optionTagIds.size > 0
@@ -295,25 +281,28 @@ class MultiSelect extends React.Component {
       : [];
   };
 
-  currentFilters = (queryTags, filterGroups) =>
-    queryTags.map((tagValue) =>
-      filterGroups.reduce((memo, group) => {
-        const option = find(group.options, (groupOption) => groupOption.value === tagValue);
-        return option
-        ? ({
-          label: option.filterLabel,
-          type: group.palette[0],
-          id: group.palette[1],
-          onClick: (evt) => {
-            if (evt && evt.preventDefault) evt.preventDefault();
-            this.onTagSelected(false, fromJS(option));
-          },
-        })
-        : memo;
-      }, null)
-    );
+  currentFilters = (queryTags, filterGroups) => queryTags.map((tagValue) => filterGroups.reduce((memo, group) => {
+    const option = find(group.options, (groupOption) => groupOption.value === tagValue);
+    return option
+      ? ({
+        label: option.filterLabel,
+        type: group.palette[0],
+        id: group.palette[1],
+        onClick: (evt) => {
+          if (evt && evt.preventDefault) evt.preventDefault();
+          this.onTagSelected(false, fromJS(option));
+        },
+      })
+      : memo;
+  }, null));
 
   isOptionIndeterminate = (option) => option.get('checked') === CHECKBOX_STATES.INDETERMINATE;
+
+  handleClickOutside(event) {
+    if (this.props.closeOnClickOutside && this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+      this.props.onCancel();
+    }
+  }
 
   renderButton = (action, i, hasChanges) => (
     <ButtonFactory
@@ -352,44 +341,49 @@ class MultiSelect extends React.Component {
           hasFooter={this.props.buttons}
           hasChangeNote={showChangeHint}
         >
-          { this.props.search &&
-            <Search>
-              <TagSearch
-                onSearch={this.onSearch}
-                onClear={this.onResetFilters}
-                filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}
-                searchQuery={this.state.query || ''}
-                multiselect
-              />
-            </Search>
-          }
-          { this.props.advanced && this.props.tagFilterGroups &&
-            <TagFilters
-              queryTags={this.state.queryTags}
-              tagFilterGroups={this.currentTagFilterGroups(this.props.tagFilterGroups, options)}
-              onTagSelected={this.onTagSelected}
-            />
-          }
-          { this.props.selectAll &&
-            <SelectAll>
-              <CheckboxWrap>
-                <Checkbox
-                  id="select-all-multiselect"
-                  checked={this.getSelectedState(filteredOptionsSelected.size, filteredOptionsSelected.size === options.size)}
-                  onChange={(checkedState) =>
-                    this.props.onChange(this.getAllSelectedValues(checkedState, options))
-                  }
+          { this.props.search
+            && (
+              <Search>
+                <TagSearch
+                  onSearch={this.onSearch}
+                  onClear={this.onResetFilters}
+                  filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}
+                  searchQuery={this.state.query || ''}
+                  multiselect
                 />
-              </CheckboxWrap>
-              <LabelWrap>
-                <Label htmlFor="select-all-multiselect">
-                  {filteredOptionsSelected.size > 0
-                    ? `${filteredOptionsSelected.size} option(s) selected`
-                    : 'Options'
-                  }
-                </Label>
-              </LabelWrap>
-            </SelectAll>
+              </Search>
+            )
+          }
+          { this.props.advanced && this.props.tagFilterGroups
+            && (
+              <TagFilters
+                queryTags={this.state.queryTags}
+                tagFilterGroups={this.currentTagFilterGroups(this.props.tagFilterGroups, options)}
+                onTagSelected={this.onTagSelected}
+              />
+            )
+          }
+          { this.props.selectAll
+            && (
+              <SelectAll>
+                <CheckboxWrap>
+                  <Checkbox
+                    id="select-all-multiselect"
+                    checked={this.getSelectedState(filteredOptionsSelected.size, filteredOptionsSelected.size === options.size)}
+                    onChange={(checkedState) => this.props.onChange(this.getAllSelectedValues(checkedState, options))
+                    }
+                  />
+                </CheckboxWrap>
+                <LabelWrap>
+                  <Label htmlFor="select-all-multiselect">
+                    {filteredOptionsSelected.size > 0
+                      ? `${filteredOptionsSelected.size} option(s) selected`
+                      : 'Options'
+                    }
+                  </Label>
+                </LabelWrap>
+              </SelectAll>
+            )
           }
           <OptionList
             options={options}
@@ -399,39 +393,46 @@ class MultiSelect extends React.Component {
             }}
           />
         </ControlMain>
-        { showChangeHint &&
-          <ChangeHint hasFooter={this.props.buttons}>
-            <FormattedMessage {...messages.changeHint} />
-            {optionsChangedToChecked.size > 0 &&
-              <ChangeHintHighlighted>
-                <FormattedMessage {...messages.changeHintSelected} values={{ no: optionsChangedToChecked.size }} />
+        { showChangeHint
+          && (
+            <ChangeHint hasFooter={this.props.buttons}>
+              <FormattedMessage {...messages.changeHint} />
+              {optionsChangedToChecked.size > 0
+              && (
+                <ChangeHintHighlighted>
+                  <FormattedMessage {...messages.changeHintSelected} values={{ no: optionsChangedToChecked.size }} />
                 .
-              </ChangeHintHighlighted>
-            }
-            {optionsChangedToUnchecked.size > 0 &&
-              <ChangeHintHighlighted>
-                <FormattedMessage {...messages.changeHintUnselected} values={{ no: optionsChangedToUnchecked.size }} />
+                </ChangeHintHighlighted>
+              )
+              }
+              {optionsChangedToUnchecked.size > 0
+              && (
+                <ChangeHintHighlighted>
+                  <FormattedMessage {...messages.changeHintUnselected} values={{ no: optionsChangedToUnchecked.size }} />
                 .
-              </ChangeHintHighlighted>
-            }
-          </ChangeHint>
+                </ChangeHintHighlighted>
+              )
+              }
+            </ChangeHint>
+          )
         }
-        { this.props.buttons &&
-          <ControlFooter>
-            <ButtonGroup>
-              {
-                this.props.buttons.map((action, i) =>
-                  action && action.position !== 'left' && this.renderButton(action, i, hasChanges))
-              }
-            </ButtonGroup>
-            <ButtonGroup left>
-              {
-                this.props.buttons.map((action, i) => (
-                  action && action.position === 'left' && this.renderButton(action, i, hasChanges)
-                ))
-              }
-            </ButtonGroup>
-          </ControlFooter>
+        { this.props.buttons
+          && (
+            <ControlFooter>
+              <ButtonGroup>
+                {
+                  this.props.buttons.map((action, i) => action && action.position !== 'left' && this.renderButton(action, i, hasChanges))
+                }
+              </ButtonGroup>
+              <ButtonGroup left>
+                {
+                  this.props.buttons.map((action, i) => (
+                    action && action.position === 'left' && this.renderButton(action, i, hasChanges)
+                  ))
+                }
+              </ButtonGroup>
+            </ControlFooter>
+          )
         }
       </div>
     );
@@ -453,6 +454,7 @@ MultiSelect.propTypes = {
   advanced: PropTypes.bool,
   selectAll: PropTypes.bool,
   closeOnClickOutside: PropTypes.bool,
+  threeState: PropTypes.bool,
   panelId: PropTypes.string,
   tagFilterGroups: PropTypes.array,
 };

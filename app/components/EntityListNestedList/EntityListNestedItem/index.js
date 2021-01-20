@@ -29,7 +29,6 @@ const MainWrapper = styled(Component)`
   border-right: 3px solid ${palette('background', 1)};
 `;
 export default class EntityListNestedItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   static propTypes = {
     entity: PropTypes.object.isRequired,
     expandNo: PropTypes.number,
@@ -61,8 +60,8 @@ export default class EntityListNestedItem extends React.PureComponent { // eslin
             />
           </MainWrapper>
           {
-            entity.get('expandable') &&
-            asList(entity.get('expandable')).map((attribute, i, list) =>
+            entity.get('expandable')
+            && asList(entity.get('expandable')).map((attribute, i, list) => (
               <EntityListItemExpandable
                 key={i}
                 column={find(config.expandableColumns, (col) => col.type === attribute)}
@@ -74,7 +73,7 @@ export default class EntityListNestedItem extends React.PureComponent { // eslin
                 }}
                 width={(1 - 0.66) / list.size}
               />
-            )
+            ))
           }
         </Item>
       </Styled>

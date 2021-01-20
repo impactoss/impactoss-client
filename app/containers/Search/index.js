@@ -90,17 +90,17 @@ const Target = styled(Button)`
   border-bottom: 1px solid ${palette('asideListItem', 4)};
   &:hover {
     color: ${(props) => {
-      if (props.disabled) {
-        return props.active ? palette('asideListItem', 1) : palette('dark', 4);
-      }
-      return props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0);
-    }};
+    if (props.disabled) {
+      return props.active ? palette('asideListItem', 1) : palette('dark', 4);
+    }
+    return props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0);
+  }};
     background-color: ${(props) => {
-      if (props.disabled) {
-        return props.active ? palette('asideListItem', 3) : palette('asideListItem', 2);
-      }
-      return props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2);
-    }};
+    if (props.disabled) {
+      return props.active ? palette('asideListItem', 3) : palette('asideListItem', 2);
+    }
+    return props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2);
+  }};
     border-bottom-color: ${palette('asideListItemHover', 4)}
   }
   &:last-child {
@@ -165,19 +165,23 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     super(props);
     this.state = STATE_INITIAL;
   }
+
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
+
   componentDidMount() {
     this.updateViewport();
     window.addEventListener('resize', this.resize);
   }
+
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
   }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
   }
@@ -188,6 +192,14 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     }
     return appMessages.entities[target.get('path')];
   }
+
+  resize = () => {
+    // reset
+    this.setState(STATE_INITIAL);
+    this.updateViewport();
+    this.forceUpdate();
+  };
+
   updateViewport() {
     let viewport = VIEWPORTS.MOBILE;
     if (window.innerWidth >= parseInt(this.props.theme.breakpoints.large, 10)) {
@@ -199,26 +211,23 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     }
     this.setState({ viewport });
   }
-  resize = () => {
-    // reset
-    this.setState(STATE_INITIAL);
-    this.updateViewport();
-    this.forceUpdate();
-  };
 
-  renderSearchTargets = (includeEmpty = true) => (
-    <div>
-      { this.props.entities && this.props.entities.map((group) => (
-        <Group key={group.get('group')} hasBorder={includeEmpty}>
-          { includeEmpty &&
-            <SidebarGroupLabel>
-              <FormattedMessage {...messages.groups[group.get('group')]} />
-            </SidebarGroupLabel>
-          }
-          <div>
-            {
-              group.get('targets') && group.get('targets').entrySeq().map(([i, target]) =>
-                (includeEmpty || target.get('results').size > 0 || target.get('active')) && (
+  renderSearchTargets = (includeEmpty = true) => {
+    const { intl } = this.context;
+    return (
+      <div>
+        { this.props.entities && this.props.entities.map((group) => (
+          <Group key={group.get('group')} hasBorder={includeEmpty}>
+            { includeEmpty
+              && (
+                <SidebarGroupLabel>
+                  <FormattedMessage {...messages.groups[group.get('group')]} />
+                </SidebarGroupLabel>
+              )
+            }
+            <div>
+              {
+                group.get('targets') && group.get('targets').entrySeq().map(([i, target]) => (includeEmpty || target.get('results').size > 0 || target.get('active')) && (
                   <Target
                     key={i}
                     onClick={(evt) => {
@@ -229,7 +238,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                     disabled={target.get('results').size === 0}
                   >
                     <TargetTitle>
-                      {this.getTargetTitle(target) && this.context.intl.formatMessage(this.getTargetTitle(target).pluralLong || this.getTargetTitle(target).plural)}
+                      {this.getTargetTitle(target) && intl.formatMessage(this.getTargetTitle(target).pluralLong || this.getTargetTitle(target).plural)}
                     </TargetTitle>
                     <TargetCount>
                       <Count active={target.get('active')} disabled={target.get('results').size === 0}>
@@ -237,15 +246,17 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       </Count>
                     </TargetCount>
                   </Target>
-              ))
-            }
-          </div>
-        </Group>
-      ))}
-    </div>
-  );
+                ))
+              }
+            </div>
+          </Group>
+        ))}
+      </div>
+    );
+  };
 
   render() {
+    const { intl } = this.context;
     const {
       dataReady,
       location,
@@ -256,9 +267,8 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       onSortOrder,
       onSortBy,
     } = this.props;
-    const activeTarget = entities.reduce((memo, group) =>
-        group.get('targets').find((target) => target.get('active')) || memo
-      , Map());
+    const activeTarget = entities.reduce((memo, group) => group.get('targets').find((target) => target.get('active')) || memo,
+      Map());
 
     const hasResults = location.query.search
       && activeTarget.get('results')
@@ -268,131 +278,140 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       && (!activeTarget.get('results') || activeTarget.get('results').size === 0);
 
     const noResultsNoAlternative = noResults
-      && !entities.reduce((memo, group) =>
-        group.get('targets').find((target) =>
-          target.get('results') && target.get('results').size > 0
-        ) || memo
-      , false);
+      && !entities.reduce((memo, group) => group.get('targets').find((target) => target.get('results') && target.get('results').size > 0) || memo,
+        false);
 
     const noEntry = !location.query.search;
 
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !dataReady &&
-          <EntityListSidebarLoading responsiveSmall />
+        { !dataReady
+          && <EntityListSidebarLoading responsiveSmall />
         }
-        { dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE &&
-          <div>
-            <Sidebar responsiveSmall >
-              <ScrollableWrapper>
-                <Component>
-                  <SidebarHeader responsiveSmall>
-                    <SupTitle title={this.context.intl.formatMessage(messages.sidebarTitle)} />
-                  </SidebarHeader>
-                  {
-                    this.renderSearchTargets(true)
-                  }
-                </Component>
-              </ScrollableWrapper>
-            </Sidebar>
-          </div>
+        { dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE
+          && (
+            <div>
+              <Sidebar responsiveSmall>
+                <ScrollableWrapper>
+                  <Component>
+                    <SidebarHeader responsiveSmall>
+                      <SupTitle title={intl.formatMessage(messages.sidebarTitle)} />
+                    </SidebarHeader>
+                    {
+                      this.renderSearchTargets(true)
+                    }
+                  </Component>
+                </ScrollableWrapper>
+              </Sidebar>
+            </div>
+          )
         }
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
               <ContentHeader
                 type={CONTENT_LIST}
-                supTitle={this.context.intl.formatMessage(messages.pageTitle)}
-                title={this.context.intl.formatMessage(messages.search)}
+                supTitle={intl.formatMessage(messages.pageTitle)}
+                title={intl.formatMessage(messages.search)}
                 icon="search"
               />
-              { !dataReady &&
-                <Loading />
+              { !dataReady
+                && <Loading />
               }
-              { dataReady &&
-                <div>
-                  <EntityListSearch>
-                    <TagSearch
-                      filters={[]}
-                      placeholder={this.context.intl.formatMessage(messages.placeholder)}
-                      searchQuery={location.query.search || ''}
-                      onSearch={onSearch}
-                      onClear={() => onClear(['search'])}
-                    />
-                  </EntityListSearch>
-                  <ListWrapper>
-                    {
-                      noEntry && (
-                        <ListHint>
-                          <FormattedMessage {...messages.hints.noEntry} />
-                        </ListHint>
-                      )
-                    }
-                    {
-                      noResultsNoAlternative && (
-                        <ListHint>
-                          <FormattedMessage {...messages.hints.noResultsNoAlternative} />
-                        </ListHint>
-                      )
-                    }
-                    {
-                      noResults && !noResultsNoAlternative && (
-                        <ListHint>
-                          <FormattedMessage {...messages.hints.noResults} />
-                        </ListHint>
-                      )
-                    }
-                    { !noEntry && this.state.viewport && this.state.viewport === VIEWPORTS.MOBILE &&
-                      <TargetsMobile>
-                        { !noResults &&
+              { dataReady
+                && (
+                  <div>
+                    <EntityListSearch>
+                      <TagSearch
+                        filters={[]}
+                        placeholder={intl.formatMessage(messages.placeholder)}
+                        searchQuery={location.query.search || ''}
+                        onSearch={onSearch}
+                        onClear={() => onClear(['search'])}
+                      />
+                    </EntityListSearch>
+                    <ListWrapper>
+                      {
+                        noEntry && (
                           <ListHint>
-                            <FormattedMessage {...messages.hints.targetMobile} />
+                            <FormattedMessage {...messages.hints.noEntry} />
                           </ListHint>
-                        }
-                        {
-                          this.renderSearchTargets(false)
-                        }
-                      </TargetsMobile>
-                    }
-                    { hasResults &&
-                      <div>
-                        { this.state.viewport && this.state.viewport === VIEWPORTS.MOBILE &&
+                        )
+                      }
+                      {
+                        noResultsNoAlternative && (
                           <ListHint>
-                            <FormattedMessage {...messages.hints.resultsMobile} />
+                            <FormattedMessage {...messages.hints.noResultsNoAlternative} />
                           </ListHint>
-                        }
-                        <EntityListHeader
-                          entitiesTotal={activeTarget.get('results').size}
-                          entityTitle={{
-                            single: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).singleLong || this.getTargetTitle(activeTarget).single),
-                            plural: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).pluralLong || this.getTargetTitle(activeTarget).plural),
-                          }}
-                          sortOptions={activeTarget.get('sorting') && activeTarget.get('sorting').toJS()}
-                          sortBy={location.query.sort}
-                          sortOrder={location.query.order}
-                          onSortBy={onSortBy}
-                          onSortOrder={onSortOrder}
-                        />
-                        <ListEntitiesMain>
-                          { activeTarget.get('results').map((entity, key) =>
-                            <EntityListItemWrapper
-                              key={key}
-                              entity={entity}
-                              entityPath={activeTarget.get('clientPath') || activeTarget.get('path')}
-                              onEntityClick={onEntityClick}
-                            />
-                          )}
-                        </ListEntitiesMain>
-                      </div>
-                    }
-                  </ListWrapper>
-                </div>
+                        )
+                      }
+                      {
+                        noResults && !noResultsNoAlternative && (
+                          <ListHint>
+                            <FormattedMessage {...messages.hints.noResults} />
+                          </ListHint>
+                        )
+                      }
+                      { !noEntry && this.state.viewport && this.state.viewport === VIEWPORTS.MOBILE
+                      && (
+                        <TargetsMobile>
+                          { !noResults
+                          && (
+                            <ListHint>
+                              <FormattedMessage {...messages.hints.targetMobile} />
+                            </ListHint>
+                          )
+                          }
+                          {
+                            this.renderSearchTargets(false)
+                          }
+                        </TargetsMobile>
+                      )
+                      }
+                      { hasResults
+                      && (
+                        <div>
+                          { this.state.viewport && this.state.viewport === VIEWPORTS.MOBILE
+                          && (
+                            <ListHint>
+                              <FormattedMessage {...messages.hints.resultsMobile} />
+                            </ListHint>
+                          )
+                          }
+                          <EntityListHeader
+                            entitiesTotal={activeTarget.get('results').size}
+                            entityTitle={{
+                              single: intl.formatMessage(this.getTargetTitle(activeTarget).singleLong || this.getTargetTitle(activeTarget).single),
+                              plural: intl.formatMessage(this.getTargetTitle(activeTarget).pluralLong || this.getTargetTitle(activeTarget).plural),
+                            }}
+                            sortOptions={activeTarget.get('sorting') && activeTarget.get('sorting').toJS()}
+                            sortBy={location.query.sort}
+                            sortOrder={location.query.order}
+                            onSortBy={onSortBy}
+                            onSortOrder={onSortOrder}
+                          />
+                          <ListEntitiesMain>
+                            { activeTarget.get('results').map((entity, key) => (
+                              <EntityListItemWrapper
+                                key={key}
+                                entity={entity}
+                                entityPath={activeTarget.get('clientPath') || activeTarget.get('path')}
+                                onEntityClick={onEntityClick}
+                              />
+                            ))}
+                          </ListEntitiesMain>
+                        </div>
+                      )
+                      }
+                    </ListWrapper>
+                  </div>
+                )
               }
             </Content>
           </Container>

@@ -33,27 +33,26 @@ const Word = styled.span`
   display: ${(props) => props.hiddenSmall ? 'none' : 'inline'};
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     display: ${(props) => {
-      if (props.hiddenMedium) return 'none';
-      if (props.visibleSmall) return 'none';
-      return 'inline';
-    }};
+    if (props.hiddenMedium) return 'none';
+    if (props.visibleSmall) return 'none';
+    return 'inline';
+  }};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     display: ${(props) => {
-      if (props.hiddenLarge) return 'none';
-      if (props.visibleSmall) return 'none';
-      if (props.visibleMedium) return 'none';
-      return 'inline';
-    }};
+    if (props.hiddenLarge) return 'none';
+    if (props.visibleSmall) return 'none';
+    if (props.visibleMedium) return 'none';
+    return 'inline';
+  }};
   }
   ${(props) => props.iconRight
     ? '&:after { content: " "; }'
     : '&:before { content: " "; }'
-  }
+}
 `;
 
 class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   renderTitle = (title, iconRight) => {
     if (typeof title === 'string') return <Word iconRight={iconRight}>{title}</Word>;
     if (Array.isArray(title)) {
@@ -85,8 +84,11 @@ class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line
     }
     return '';
   }
+
   render() {
-    const { icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong, border, outline } = this.props;
+    const {
+      icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong, border, outline,
+    } = this.props;
     return (
       <Button
         onClick={onClick}

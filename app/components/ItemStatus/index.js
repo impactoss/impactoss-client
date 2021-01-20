@@ -19,12 +19,14 @@ const Status = styled(Label)`
 class ItemStatus extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { draft, top, float } = this.props;
+    const { intl } = this.context;
     return draft
-      ? (<Status top={top} float={float}>
-        {this.context.intl && this.context.intl.formatMessage(messages.draft)}
-      </Status>)
-      : null
-    ;
+      ? (
+        <Status top={top} float={float}>
+          {intl && intl.formatMessage(messages.draft)}
+        </Status>
+      )
+      : null;
   }
 }
 

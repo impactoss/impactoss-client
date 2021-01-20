@@ -33,38 +33,37 @@ const ListEntitiesSubgroupHeader = styled.h5`
 `;
 
 export class EntityListGroupHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { group, level } = this.props;
 
     if (group.get('id') === 'without') {
       return level === 1
-      ? (
-        <ListEntitiesGroupHeader>
-          {group.get('label')}
-        </ListEntitiesGroupHeader>
-      )
-      : (
-        <ListEntitiesSubgroupHeader>
-          {group.get('label')}
-        </ListEntitiesSubgroupHeader>
-      );
+        ? (
+          <ListEntitiesGroupHeader>
+            {group.get('label')}
+          </ListEntitiesGroupHeader>
+        )
+        : (
+          <ListEntitiesSubgroupHeader>
+            {group.get('label')}
+          </ListEntitiesSubgroupHeader>
+        );
     }
     return level === 1
-    ? (
-      <ListEntitiesGroupHeaderLink to={`/category/${group.get('id')}`}>
-        <ListEntitiesGroupHeader>
-          {group.get('label')}
-        </ListEntitiesGroupHeader>
-      </ListEntitiesGroupHeaderLink>
-    )
-    : (
-      <ListEntitiesGroupHeaderLink to={`/category/${group.get('id')}`}>
-        <ListEntitiesSubgroupHeader>
-          {group.get('label')}
-        </ListEntitiesSubgroupHeader>
-      </ListEntitiesGroupHeaderLink>
-    );
+      ? (
+        <ListEntitiesGroupHeaderLink to={`/category/${group.get('id')}`}>
+          <ListEntitiesGroupHeader>
+            {group.get('label')}
+          </ListEntitiesGroupHeader>
+        </ListEntitiesGroupHeaderLink>
+      )
+      : (
+        <ListEntitiesGroupHeaderLink to={`/category/${group.get('id')}`}>
+          <ListEntitiesSubgroupHeader>
+            {group.get('label')}
+          </ListEntitiesSubgroupHeader>
+        </ListEntitiesGroupHeaderLink>
+      );
   }
 }
 EntityListGroupHeader.propTypes = {

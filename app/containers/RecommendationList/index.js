@@ -30,10 +30,10 @@ import { selectRecommendations, selectConnectedTaxonomies, selectConnections } f
 import messages from './messages';
 
 export class RecommendationList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
+
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
@@ -49,6 +49,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     // console.log('test connections', isEqual(this.props.connections, nextProps.connections));
     // console.log('test connections', this.props.connections === nextProps.connections);
   }
+
   // shouldComponentUpdate(nextProps, nextState) {
   //   // console.log('EntityListSidebar.shouldComponentUpdate')
   //   // console.log('props isEqual', isEqual(this.props, nextProps))
@@ -60,6 +61,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   //     || !isEqual(this.state, nextState);
   // }
   render() {
+    const { intl } = this.context;
     const { dataReady, frameworks, isManager } = this.props;
     // console.log('RecList:render')
     const currentFramework = frameworks && frameworks.size === 1 && frameworks.first();
@@ -67,22 +69,22 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       ? `recommendations_${currentFramework.get('id')}`
       : 'recommendations';
     const headerOptions = {
-      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      supTitle: intl.formatMessage(messages.pageTitle),
       icon: type,
       actions: [],
     };
     if (isManager) {
       headerOptions.actions.push({
         type: 'text',
-        title: this.context.intl.formatMessage(appMessages.buttons.import),
+        title: intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       });
       headerOptions.actions.push({
         type: 'add',
         title: [
-          this.context.intl.formatMessage(appMessages.buttons.add),
+          intl.formatMessage(appMessages.buttons.add),
           {
-            title: this.context.intl.formatMessage(appMessages.entities[type].single),
+            title: intl.formatMessage(appMessages.entities[type].single),
             hiddenSmall: true,
           },
         ],
@@ -91,7 +93,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     }
     headerOptions.actions.push({
       type: 'bookmarker',
-      title: this.context.intl.formatMessage(appMessages.entities[type].plural),
+      title: intl.formatMessage(appMessages.entities[type].plural),
       entityType: type,
     });
     // if (dataReady) {
@@ -104,9 +106,9 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <EntityList
@@ -119,8 +121,8 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities[type].single),
-            plural: this.context.intl.formatMessage(appMessages.entities[type].plural),
+            single: intl.formatMessage(appMessages.entities[type].single),
+            plural: intl.formatMessage(appMessages.entities[type].plural),
           }}
           entityIcon={(entity) => {
             const status = getAcceptanceStatus(entity);

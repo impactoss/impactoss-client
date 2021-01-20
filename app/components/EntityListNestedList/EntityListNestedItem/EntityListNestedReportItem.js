@@ -40,10 +40,9 @@ const Title = styled.div`
 `;
 
 class EntityListNestedReportItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { report, onEntityClick } = this.props;
-
+    const { intl } = this.context;
     return (
       <Styled
         onClick={(evt) => {
@@ -53,15 +52,19 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
         href={`${PATHS.PROGRESS_REPORTS}/${report.get('id')}`}
       >
         <Top>
-          {report.get('date') &&
-            <Reference>
-              { this.context.intl && `${this.context.intl.formatMessage(appMessages.entities.progress_reports.singleShort)} ${this.context.intl.formatDate(new Date(report.getIn(['date', 'attributes', 'due_date'])))}`}
-            </Reference>
+          {report.get('date')
+            && (
+              <Reference>
+                { intl && `${intl.formatMessage(appMessages.entities.progress_reports.singleShort)} ${intl.formatDate(new Date(report.getIn(['date', 'attributes', 'due_date'])))}`}
+              </Reference>
+            )
           }
-          {!report.get('date') &&
-            <Reference>
-              { this.context.intl && `${this.context.intl.formatMessage(appMessages.entities.progress_reports.singleShort)} (${lowerCase(this.context.intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short))})` }
-            </Reference>
+          {!report.get('date')
+            && (
+              <Reference>
+                { intl && `${intl.formatMessage(appMessages.entities.progress_reports.singleShort)} (${lowerCase(intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short))})` }
+              </Reference>
+            )
           }
           <ItemStatus draft={report.getIn(['attributes', 'draft'])} />
         </Top>

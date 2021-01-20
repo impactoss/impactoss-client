@@ -7,7 +7,7 @@ import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
 class Content extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     return (
-      <ContainerWrapper ref={this.props.innerRef} >
+      <ContainerWrapper ref={this.props.innerRef}>
         <Container inModal={this.props.inModal}>
           {this.props.children}
         </Container>

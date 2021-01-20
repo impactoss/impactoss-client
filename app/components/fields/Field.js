@@ -13,14 +13,14 @@ const Field = styled.div`
   }}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-bottom: ${(props) => {
-      if (props.nested || props.noPadding) {
-        return 0;
-      }
-      if (props.labelledGroup) {
-        return 15;
-      }
-      return 30;
-    }}px;
+    if (props.nested || props.noPadding) {
+      return 0;
+    }
+    if (props.labelledGroup) {
+      return 15;
+    }
+    return 30;
+  }}px;
   }
 `;
 

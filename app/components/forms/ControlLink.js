@@ -6,7 +6,6 @@ import A from 'components/styled/A';
 const ControlMain = styled(A)``;
 
 export default class ControlLink extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   static propTypes = {
     text: PropTypes.string,
     path: PropTypes.string,

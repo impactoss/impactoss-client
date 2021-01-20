@@ -49,8 +49,7 @@ export const currentFilters = ({
   frameworks,
 },
 withoutLabel,
-errorLabel,
-) => {
+errorLabel,) => {
   let filterTags = [];
   if (errors && errors.size > 0) {
     filterTags.push(getErrorTag(errorLabel));
@@ -112,8 +111,7 @@ const getConnectionLabel = (connection, value) => {
     : upperFirst(value);
   return truncateText(label, TEXT_TRUNCATE.CONNECTION_TAG);
 };
-const getCategoryLabel = (category) =>
-  truncateText(getCategoryShortTitle(category), TEXT_TRUNCATE.ENTITY_TAG);
+const getCategoryLabel = (category) => truncateText(getCategoryShortTitle(category), TEXT_TRUNCATE.ENTITY_TAG);
 
 const getCurrentTaxonomyFilters = (
   taxonomyFilters,
@@ -286,9 +284,9 @@ const getCurrentConnectionFilters = (
               {
                 appMessage: true,
                 label: (
-                  option.groupByFramework &&
-                  option.message &&
-                  option.message.indexOf('{fwid}') > -1
+                  option.groupByFramework
+                  && option.message
+                  && option.message.indexOf('{fwid}') > -1
                 )
                   ? option.message.replace('{fwid}', fwid)
                   : option.message,
@@ -339,11 +337,11 @@ const getCurrentAttributeFilters = (entities, attributeFiltersOptions, locationQ
                 const label = referenceEntity && referenceEntity.getIn([option.reference.key, 'attributes', option.reference.label]);
                 tags.push({
                   labels: label
-                  ? [{ label }]
-                  : [
-                    { appMessage: !!option.message, label: option.message || option.label, postfix: ':' },
-                    { label: value },
-                  ],
+                    ? [{ label }]
+                    : [
+                      { appMessage: !!option.message, label: option.message || option.label, postfix: ':' },
+                      { label: value },
+                    ],
                   type: 'attributes',
                   onClick: () => onClick({
                     value: queryValue,

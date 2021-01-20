@@ -36,10 +36,12 @@ const Header = (props) => (
     <Title>
       { props.title }
     </Title>
-    { props.onCancel &&
-      <CloseWrap>
-        <Close onCancel={props.onCancel} />
-      </CloseWrap>
+    { props.onCancel
+      && (
+        <CloseWrap>
+          <Close onCancel={props.onCancel} />
+        </CloseWrap>
+      )
     }
   </Styled>
 );

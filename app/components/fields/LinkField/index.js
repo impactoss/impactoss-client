@@ -22,21 +22,25 @@ class LinkField extends React.PureComponent { // eslint-disable-line react/prefe
             <FormattedMessage {...(field.label || appMessages.attributes.url)} />
           )}
         </Label>
-        { !field.internal &&
-          <Url target="_blank" href={field.value} title={field.anchor || field.value}>
-            {field.aside
-              ? truncateText(field.anchor || field.value, field.length || TEXT_TRUNCATE.LINK_FIELD, false)
-              : field.anchor || field.value
-            }
-          </Url>
+        { !field.internal
+          && (
+            <Url target="_blank" href={field.value} title={field.anchor || field.value}>
+              {field.aside
+                ? truncateText(field.anchor || field.value, field.length || TEXT_TRUNCATE.LINK_FIELD, false)
+                : field.anchor || field.value
+              }
+            </Url>
+          )
         }
-        { field.internal &&
-          <Link to={field.value} title={field.anchor || field.value}>
-            {field.aside
-              ? truncateText(field.anchor || field.value, field.length || TEXT_TRUNCATE.LINK_FIELD, false)
-              : field.anchor || field.value
-            }
-          </Link>
+        { field.internal
+          && (
+            <Link to={field.value} title={field.anchor || field.value}>
+              {field.aside
+                ? truncateText(field.anchor || field.value, field.length || TEXT_TRUNCATE.LINK_FIELD, false)
+                : field.anchor || field.value
+              }
+            </Link>
+          )
         }
       </FieldWrap>
     );

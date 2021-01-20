@@ -24,7 +24,7 @@ import {
   selectHasUserRole,
   selectCurrentPathname,
   selectIsSignedIn,
- } from 'containers/App/selectors';
+} from 'containers/App/selectors';
 
 import {
   updatePath,
@@ -87,10 +87,10 @@ const ProgressText = styled.div`
 `;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.updateClientPath();
   }
+
   getMessageForType = (type) => {
     switch (type) {
       case 'new':
@@ -102,12 +102,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  mapError = (error, key) =>
-    fromJS({
-      type: error.data.type,
-      error: error.error,
-      key,
-    });
+  mapError = (error, key) => fromJS({
+    type: error.data.type,
+    error: error.error,
+    key,
+  });
 
   mapErrors = (errors) => errors.reduce((errorMap, error, key) => {
     const entityId = error.data.saveRef;
@@ -116,14 +115,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       : errorMap.set(entityId, List().push(this.mapError(error, key)));
   }, Map());
 
-  filterByError = (entities, errors) =>
-    entities.filter((entity) =>
-      errors.has(entity.get('id'))
-    );
+  filterByError = (entities, errors) => entities.filter((entity) => errors.has(entity.get('id')));
 
   render() {
+    const { intl } = this.context;
     // make sure selected entities are still actually on page
-    const { entityIdsSelected, progress, viewDomain, canEdit, progressTypes } = this.props;
+    const {
+      entityIdsSelected, progress, viewDomain, canEdit, progressTypes,
+    } = this.props;
 
     const sending = viewDomain.get('sending');
     const success = viewDomain.get('success');
@@ -139,32 +138,33 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     return (
       <div>
-        { !this.props.dataReady &&
-          <EntityListSidebarLoading />
+        { !this.props.dataReady
+          && <EntityListSidebarLoading />
         }
-        { this.props.dataReady && this.props.showSidebar &&
-          <EntityListSidebar
-            listUpdating={progress !== null && progress >= 0 && progress < 100}
-            entities={entities}
-            taxonomies={this.props.taxonomies}
-            frameworks={this.props.frameworks}
-            connections={this.props.connections}
-            connectedTaxonomies={this.props.connectedTaxonomies}
-            entityIdsSelected={
-              entityIdsSelected.size === entityIdsSelectedFiltered.size
-              ? entityIdsSelected
-              : entityIdsSelectedFiltered
-            }
-            config={this.props.config}
-            locationQuery={this.props.locationQuery}
-            canEdit={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
-            hasUserRole={this.props.hasUserRole}
-            activePanel={this.props.activePanel}
-            onPanelSelect={this.props.onPanelSelect}
-            onCreateOption={this.props.onCreateOption}
-            onUpdate={(associations, activeEditOption) =>
-              this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected, viewDomain.get('errors'))}
-          />
+        { this.props.dataReady && this.props.showSidebar
+          && (
+            <EntityListSidebar
+              listUpdating={progress !== null && progress >= 0 && progress < 100}
+              entities={entities}
+              taxonomies={this.props.taxonomies}
+              frameworks={this.props.frameworks}
+              connections={this.props.connections}
+              connectedTaxonomies={this.props.connectedTaxonomies}
+              entityIdsSelected={
+                entityIdsSelected.size === entityIdsSelectedFiltered.size
+                  ? entityIdsSelected
+                  : entityIdsSelectedFiltered
+              }
+              config={this.props.config}
+              locationQuery={this.props.locationQuery}
+              canEdit={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
+              hasUserRole={this.props.hasUserRole}
+              activePanel={this.props.activePanel}
+              onPanelSelect={this.props.onPanelSelect}
+              onCreateOption={this.props.onCreateOption}
+              onUpdate={(associations, activeEditOption) => this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected, viewDomain.get('errors'))}
+            />
+          )
         }
         <EntityListMain
           listUpdating={progress !== null && progress >= 0 && progress < 100}
@@ -176,8 +176,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           connectedTaxonomies={this.props.connectedTaxonomies}
           entityIdsSelected={
             entityIdsSelected.size === entityIdsSelectedFiltered.size
-            ? entityIdsSelected
-            : entityIdsSelectedFiltered
+              ? entityIdsSelected
+              : entityIdsSelectedFiltered
           }
           locationQuery={this.props.locationQuery}
 
@@ -212,66 +212,72 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onSortOrder={this.props.onSortOrder}
           onDismissError={this.props.onDismissError}
         />
-        { (progress !== null && progress < 100) &&
-          <Progress>
-            <ProgressText>
-              <FormattedMessage
-                {...messages.processingUpdates}
-                values={{
-                  processNo: Math.min(success.size + errors.size + 1, sending.size),
-                  totalNo: sending.size,
-                  types:
-                    this.context.intl.formatMessage(messages[
+        { (progress !== null && progress < 100)
+          && (
+            <Progress>
+              <ProgressText>
+                <FormattedMessage
+                  {...messages.processingUpdates}
+                  values={{
+                    processNo: Math.min(success.size + errors.size + 1, sending.size),
+                    totalNo: sending.size,
+                    types:
+                    intl.formatMessage(messages[
                       `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
                     ]),
-                }}
+                  }}
+                />
+              </ProgressText>
+              <Loading
+                progress={progress}
               />
-            </ProgressText>
-            <Loading
-              progress={progress}
-            />
-          </Progress>
+            </Progress>
+          )
         }
-        {(viewDomain.get('errors').size > 0 && progress >= 100) &&
-          <Progress error>
-            <Messages
-              type="error"
-              message={
-                this.context.intl.formatMessage(
-                  messages.updatesFailed,
-                  {
-                    errorNo: viewDomain.get('errors').size,
-                    types:
-                      this.context.intl.formatMessage(messages[
+        {(viewDomain.get('errors').size > 0 && progress >= 100)
+          && (
+            <Progress error>
+              <Messages
+                type="error"
+                message={
+                  intl.formatMessage(
+                    messages.updatesFailed,
+                    {
+                      errorNo: viewDomain.get('errors').size,
+                      types:
+                      intl.formatMessage(messages[
                         `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
                       ]),
-                  },
-                )
-              }
-              onDismiss={this.props.resetProgress}
-              preMessage={false}
-            />
-          </Progress>
+                    },
+                  )
+                }
+                onDismiss={this.props.resetProgress}
+                preMessage={false}
+              />
+            </Progress>
+          )
         }
-        {(viewDomain.get('errors').size === 0 && progress >= 100) &&
-          <Progress error>
-            <Messages
-              type="success"
-              message={
-                this.context.intl.formatMessage(
-                  this.getMessageForType(
-                    progressTypes.size === 1 ? progressTypes.first() : 'save',
-                    viewDomain.get('success').size,
-                  ),
-                  {
-                    successNo: viewDomain.get('success').size,
-                  },
-                )
-              }
-              onDismiss={this.props.resetProgress}
-              autoDismiss={2000}
-            />
-          </Progress>
+        {(viewDomain.get('errors').size === 0 && progress >= 100)
+          && (
+            <Progress error>
+              <Messages
+                type="success"
+                message={
+                  intl.formatMessage(
+                    this.getMessageForType(
+                      progressTypes.size === 1 ? progressTypes.first() : 'save',
+                      viewDomain.get('success').size,
+                    ),
+                    {
+                      successNo: viewDomain.get('success').size,
+                    },
+                  )
+                }
+                onDismiss={this.props.resetProgress}
+                autoDismiss={2000}
+              />
+            </Progress>
+          )
         }
       </div>
     );
@@ -383,8 +389,7 @@ function mapDispatchToProps(dispatch, props) {
       // default expand by 1
       dispatch(updateExpand(typeof expandNoNew !== 'undefined'
         ? expandNoNew
-        : props.expandNo + 1
-      ));
+        : props.expandNo + 1));
     },
     onSearch: (value) => {
       dispatch(updateQuery(fromJS([
@@ -472,8 +477,7 @@ function mapDispatchToProps(dispatch, props) {
                 .set('path', props.config.serverPath)
                 .set('entity', entity.setIn(['attributes', activeEditOption.optionId], newValue))
                 .set('saveRef', entity.get('id'))
-                .toJS()
-              ));
+                .toJS()));
             }
           });
         }

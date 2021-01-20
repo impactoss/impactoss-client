@@ -73,10 +73,10 @@ const TriangleBottom = styled.div`
    position: relative;
    overflow: hidden;
    left: ${(props) => {
-     if (props.align === 'right') return '95';
-     if (props.align === 'left') return '5';
-     return '50';
-   }}%;
+    if (props.align === 'right') return '95';
+    if (props.align === 'left') return '5';
+    return '50';
+  }}%;
    margin-left: -10px;
 
    &:after {
@@ -169,14 +169,18 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
   }
 
   render() {
-    const { entities, option, wrapper, draft } = this.props;
-
+    const {
+      entities, option, wrapper, draft,
+    } = this.props;
+    const { intl } = this.context;
     const entitiesTotal = entities ? entities.size : 0;
 
     return (
       <PopupWrapper
         onMouseOver={() => this.openPopup()}
         onMouseLeave={() => this.closePopup()}
+        onFocus={() => this.openPopup()}
+        onBlur={() => null}
         onClick={() => this.state.popupOpen ? this.closePopup() : this.openPopup()}
         ref={(node) => {
           if (!this.state.popupRef) {
@@ -185,50 +189,55 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
         }}
       >
         <Count pIndex={option.style} draft={draft}>{entitiesTotal}</Count>
-        {this.state.popupOpen &&
-          <Popup
-            align={this.getPopupAlign(wrapper, this.state.popupRef)}
-            total={entitiesTotal}
-          >
-            <PopupInner>
-              <PopupHeader>
-                <PopupHeaderMain>
-                  {`${entitiesTotal} ${option.label(entitiesTotal)}`}
-                </PopupHeaderMain>
-                { draft &&
+        {this.state.popupOpen
+          && (
+            <Popup
+              align={this.getPopupAlign(wrapper, this.state.popupRef)}
+              total={entitiesTotal}
+            >
+              <PopupInner>
+                <PopupHeader>
                   <PopupHeaderMain>
-                    {` (${this.context.intl && this.context.intl.formatMessage(messages.draft)})`}
+                    {`${entitiesTotal} ${option.label(entitiesTotal)}`}
                   </PopupHeaderMain>
-                }
-              </PopupHeader>
-              <PopupContent height={this.calcHeight()}>
-                {
-                  sortEntities(entities, 'asc', 'reference')
-                  .toList()
-                  .map((entity, i) => {
-                    const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
-                    return (
-                      <ListItem
-                        key={i}
-                        ref={(node) => i < 3 && this.setState({ [`listItem_${i}`]: node })}
-                      >
-                        <ListItemLink to={`/${option.path}/${entity.get('id')}`} >
-                          { entity.getIn(['attributes', 'draft']) &&
-                            <ItemStatus draft />
-                          }
-                          <Id>{ref}</Id>
-                          <IdSpacer />
-                          <ItemContent>
-                            {truncateText(entity.getIn(['attributes', 'title']), TEXT_TRUNCATE.CONNECTION_POPUP - ref.length)}</ItemContent>
-                        </ListItemLink>
-                      </ListItem>
-                    );
-                  })
-                }
-              </PopupContent>
-            </PopupInner>
-            <TriangleBottom align={this.getPopupAlign(wrapper, this.state.popupRef)} />
-          </Popup>
+                  { draft
+                  && (
+                    <PopupHeaderMain>
+                      {` (${intl && intl.formatMessage(messages.draft)})`}
+                    </PopupHeaderMain>
+                  )
+                  }
+                </PopupHeader>
+                <PopupContent height={this.calcHeight()}>
+                  {
+                    sortEntities(entities, 'asc', 'reference')
+                      .toList()
+                      .map((entity, i) => {
+                        const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
+                        return (
+                          <ListItem
+                            key={i}
+                            ref={(node) => i < 3 && this.setState({ [`listItem_${i}`]: node })}
+                          >
+                            <ListItemLink to={`/${option.path}/${entity.get('id')}`}>
+                              { entity.getIn(['attributes', 'draft'])
+                            && <ItemStatus draft />
+                              }
+                              <Id>{ref}</Id>
+                              <IdSpacer />
+                              <ItemContent>
+                                {truncateText(entity.getIn(['attributes', 'title']), TEXT_TRUNCATE.CONNECTION_POPUP - ref.length)}
+                              </ItemContent>
+                            </ListItemLink>
+                          </ListItem>
+                        );
+                      })
+                  }
+                </PopupContent>
+              </PopupInner>
+              <TriangleBottom align={this.getPopupAlign(wrapper, this.state.popupRef)} />
+            </Popup>
+          )
         }
       </PopupWrapper>
     );

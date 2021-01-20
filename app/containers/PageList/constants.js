@@ -32,7 +32,7 @@ export const CONFIG = {
       order: 'desc',
     },
   ],
-  attributes: {  // filter by attribute value
+  attributes: { // filter by attribute value
     options: [
       {
         search: false,

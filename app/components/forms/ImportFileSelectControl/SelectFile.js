@@ -66,7 +66,6 @@ const ImportButton = styled(ButtonSubmit)`
 `;
 
 class SelectFile extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   constructor() {
     super();
     this.state = {
@@ -77,10 +76,12 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
   componentWillMount() {
     this.setState({ errors: [] });
   }
+
   onDismissErrors = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ errors: [] });
   }
+
   handleChange = (e, results) => {
     // todo: limit to 1 file?
     results.forEach((result) => {
@@ -88,7 +89,11 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
       try {
         const parsed = Baby.parse(evt.target.result, { header: true, skipEmptyLines: true, delimiter: ',' });
         if (parsed && parsed.errors && parsed.errors.length > 0) {
-          this.setState({ errors: this.state.errors.concat(parsed.errors) });
+          this.setState(
+            (prevState) => ({
+              errors: prevState.errors.concat(parsed.errors),
+            })
+          );
         } else {
           this.props.onChange({
             rows: parsed.data,
@@ -97,7 +102,11 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
           });
         }
       } catch (err) {
-        this.setState({ errors: this.state.errors.concat([{ error: 0 }]) });
+        this.setState(
+          (prevState) => ({
+            errors: prevState.errors.concat([{ error: 0 }]),
+          })
+        );
       }
     });
   }
@@ -109,43 +118,50 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
 
   render() {
     // console.log(this.props.value)
+    const { intl } = this.context;
     return (
       <Styled>
-        { (this.state.errors.length > 0) &&
-          <Messages
-            type="error"
-            messages={[this.context.intl.formatMessage(messages.fileSelectError)].concat(this.state.errors.map((err) => `Code: "${err.code}", Message: "${err.message}"`))}
-            onDismiss={this.onDismissErrors}
-          />
+        { (this.state.errors.length > 0)
+          && (
+            <Messages
+              type="error"
+              messages={[intl.formatMessage(messages.fileSelectError)].concat(this.state.errors.map((err) => `Code: "${err.code}", Message: "${err.message}"`))}
+              onDismiss={this.onDismissErrors}
+            />
+          )
         }
-        { this.props.value && (this.state.errors.length === 0) &&
-          <div>
-            <DocumentWrapEdit>
-              <FileName>
-                {this.props.value.file.name}
-              </FileName>
-              <Remove onClick={this.handleRemove}>
-                <Icon name="removeLarge" />
-              </Remove>
-            </DocumentWrapEdit>
-            <ImportButton type="submit" primary>
-              { this.props.value.rows.length === 1 &&
-                <FormattedMessage {...messages.import.single} values={{ total: this.props.value.rows.length }} />
-              }
-              { this.props.value.rows.length !== 1 &&
-                <FormattedMessage {...messages.import.plural} values={{ total: this.props.value.rows.length }} />
-              }
-            </ImportButton>
-          </div>
+        { this.props.value && (this.state.errors.length === 0)
+          && (
+            <div>
+              <DocumentWrapEdit>
+                <FileName>
+                  {this.props.value.file.name}
+                </FileName>
+                <Remove onClick={this.handleRemove}>
+                  <Icon name="removeLarge" />
+                </Remove>
+              </DocumentWrapEdit>
+              <ImportButton type="submit" primary>
+                { this.props.value.rows.length === 1
+                && <FormattedMessage {...messages.import.single} values={{ total: this.props.value.rows.length }} />
+                }
+                { this.props.value.rows.length !== 1
+                && <FormattedMessage {...messages.import.plural} values={{ total: this.props.value.rows.length }} />
+                }
+              </ImportButton>
+            </div>
+          )
         }
-        { !this.props.value && (this.state.errors.length === 0) &&
-          <FileReaderInput
-            as={this.props.as}
-            accept={this.props.accept}
-            onChange={this.handleChange}
-          >
-            <ButtonDefaultWithIcon type="button" title={this.context.intl.formatMessage(messages.selectFile)} icon="add" />
-          </FileReaderInput>
+        { !this.props.value && (this.state.errors.length === 0)
+          && (
+            <FileReaderInput
+              as={this.props.as}
+              accept={this.props.accept}
+              onChange={this.handleChange}
+            >
+              <ButtonDefaultWithIcon type="button" title={intl.formatMessage(messages.selectFile)} icon="add" />
+            </FileReaderInput>
+          )
         }
       </Styled>
     );

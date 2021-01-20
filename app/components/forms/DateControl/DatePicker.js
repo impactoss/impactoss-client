@@ -12,9 +12,10 @@ import DatePickerStyle from './styles';
 
 class DatePicker extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
+    const { intl } = this.context;
     const localeFormat = 'MM/DD/YYYY';
     // TODO localise
-    // moment.localeData(this.context.intl.locale).longDateFormat('L');
+    // moment.localeData(intl.locale).longDateFormat('L');
 
     const formattedDay = this.props.value;
     // && moment(this.props.value, DB_DATE_FORMAT, true).isValid()
@@ -31,8 +32,8 @@ class DatePicker extends React.PureComponent { // eslint-disable-line react/pref
           component={InputComponent}
           placeholder={toLower(localeFormat)}
           dayPickerProps={{
-            locale: this.context.intl.locale,
-            firstDayOfWeek: 1, // moment.localeData(this.context.intl.locale).firstDayOfWeek(),
+            locale: intl.locale,
+            firstDayOfWeek: 1, // moment.localeData(intl.locale).firstDayOfWeek(),
             fixedWeeks: true,
             // todayButton: 'Go to Today',
           }}

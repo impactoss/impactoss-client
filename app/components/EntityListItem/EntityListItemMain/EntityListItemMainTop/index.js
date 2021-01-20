@@ -14,7 +14,6 @@ import EntityListItemMainTargetDate from './EntityListItemMainTargetDate';
 import EntityListItemMainUser from './EntityListItemMainUser';
 
 export default class EntityListItemMainTop extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   static propTypes = {
     entity: PropTypes.object.isRequired,
   };
@@ -24,33 +23,39 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
 
     return (
       <Component>
-        { entity.draft &&
-          <ItemStatus draft={entity.draft} float="left" />
+        { entity.draft
+          && <ItemStatus draft={entity.draft} float="left" />
         }
         <EntityListItemMainTopReference>
           {entity.reference}
         </EntityListItemMainTopReference>
-        { entity.targetDate &&
-          <EntityListItemMainTargetDate
-            targetDate={entity.targetDate}
-          />
+        { entity.targetDate
+          && (
+            <EntityListItemMainTargetDate
+              targetDate={entity.targetDate}
+            />
+          )
         }
-        { entity.assignedUser &&
-          <EntityListItemMainUser
-            user={entity.assignedUser}
-          />
+        { entity.assignedUser
+          && (
+            <EntityListItemMainUser
+              user={entity.assignedUser}
+            />
+          )
         }
-        { entity.entityIcon &&
-          <EntityListItemMainTopIcon>
-            <Icon name={entity.entityIcon} text />
-          </EntityListItemMainTopIcon>
+        { entity.entityIcon
+          && (
+            <EntityListItemMainTopIcon>
+              <Icon name={entity.entityIcon} text />
+            </EntityListItemMainTopIcon>
+          )
         }
         {
-          entity.progressCategory &&
-          <ItemProgress status={entity.progressCategory} />
+          entity.progressCategory
+          && <ItemProgress status={entity.progressCategory} />
         }
-        { entity.role &&
-          <ItemRole role={entity.role} />
+        { entity.role
+          && <ItemRole role={entity.role} />
         }
       </Component>
     );

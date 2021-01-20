@@ -13,10 +13,12 @@ class ReferenceField extends React.PureComponent { // eslint-disable-line react/
     const { field } = this.props;
     return (
       <FieldWrapInline>
-        {field.isManager &&
-          <Label>
-            <FormattedMessage {...(field.label || appMessages.attributes.reference)} />
-          </Label>
+        {field.isManager
+          && (
+            <Label>
+              <FormattedMessage {...(field.label || appMessages.attributes.reference)} />
+            </Label>
+          )
         }
         <ReferenceLarge>{field.value}</ReferenceLarge>
       </FieldWrapInline>

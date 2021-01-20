@@ -58,10 +58,10 @@ import {
 import { DEPENDENCIES } from './constants';
 
 export class ActionView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
+
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
@@ -161,7 +161,9 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     }
     return fields;
   };
+
   render() {
+    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -177,69 +179,73 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     } = this.props;
     const isManager = hasUserRole[USER_ROLES.MANAGER.value];
     const buttons = isManager
-    ? [
-      {
-        type: 'edit',
-        onClick: () => this.props.handleEdit(this.props.params.id),
-      },
-      {
+      ? [
+        {
+          type: 'edit',
+          onClick: () => this.props.handleEdit(this.props.params.id),
+        },
+        {
+          type: 'close',
+          onClick: this.props.handleClose,
+        },
+      ]
+      : [{
         type: 'close',
         onClick: this.props.handleClose,
-      },
-    ]
-    : [{
-      type: 'close',
-      onClick: this.props.handleClose,
-    }];
+      }];
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={`${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="measures"
             buttons={buttons}
           />
-          { !dataReady &&
-            <Loading />
+          { !dataReady
+            && <Loading />
           }
-          { !viewEntity && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          { !viewEntity && dataReady
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          { viewEntity && dataReady &&
-            <EntityView
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(viewEntity, isManager),
-                  aside: isManager && this.getHeaderAsideFields(viewEntity),
-                },
-                body: {
-                  main: this.getBodyMainFields(
-                    viewEntity,
-                    indicators,
-                    indicatorConnections,
-                    recommendationsByFw,
-                    recTaxonomies,
-                    recConnections,
-                    frameworks,
-                    onEntityClick,
-                  ),
-                  aside: this.getBodyAsideFields(
-                    viewEntity,
-                    taxonomies,
-                  ),
-                },
-              }}
-            />
+          { viewEntity && dataReady
+            && (
+              <EntityView
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(viewEntity, isManager),
+                    aside: isManager && this.getHeaderAsideFields(viewEntity),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(
+                      viewEntity,
+                      indicators,
+                      indicatorConnections,
+                      recommendationsByFw,
+                      recTaxonomies,
+                      recConnections,
+                      frameworks,
+                      onEntityClick,
+                    ),
+                    aside: this.getBodyAsideFields(
+                      viewEntity,
+                      taxonomies,
+                    ),
+                  },
+                }}
+              />
+            )
           }
         </Content>
       </div>

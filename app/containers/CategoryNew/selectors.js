@@ -53,22 +53,21 @@ export const selectParentTaxonomy = createSelector(
       return taxonomies.find((tax) => attributesEqual(taxonomy.getIn(['attributes', 'parent_id']), tax.get('id')));
     }
     return null;
-  });
+  }
+);
 
 
 // all users of role manager
 export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
-  (entities, associations) =>
-    usersByRole(entities, associations, USER_ROLES.MANAGER.value)
+  (entities, associations) => usersByRole(entities, associations, USER_ROLES.MANAGER.value)
 );
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
+  (taxonomies, categories) => prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
 );
 const selectIsParentTaxonomy = createSelector(
   (state, id) => selectEntity(state, { path: 'taxonomies', id }),
@@ -77,15 +76,15 @@ const selectIsParentTaxonomy = createSelector(
     if (taxonomy && taxonomies) {
       // has any child taxonomies?
       return taxonomies.some(
-        (tax) =>
-          attributesEqual(
-            tax.getIn(['attributes', 'parent_id']),
-            taxonomy.get('id'),
-          ),
+        (tax) => attributesEqual(
+          tax.getIn(['attributes', 'parent_id']),
+          taxonomy.get('id'),
+        ),
       );
     }
     return false;
-  });
+  }
+);
 
 export const selectRecommendationsByFw = createSelector(
   (state, id) => id, // taxonomy id
@@ -98,17 +97,15 @@ export const selectRecommendationsByFw = createSelector(
     }
     // framework id for category
     const frameworkIds = fwTaxonomies.reduce(
-      (memo, fwt) =>
-        attributesEqual(id, fwt.getIn(['attributes', 'taxonomy_id']))
-          ? memo.push(fwt.getIn(['attributes', 'framework_id']))
-          : memo,
+      (memo, fwt) => attributesEqual(id, fwt.getIn(['attributes', 'taxonomy_id']))
+        ? memo.push(fwt.getIn(['attributes', 'framework_id']))
+        : memo,
       List(),
     );
     return entities
-      .filter((r) =>
-        frameworkIds.find(
-          (fwid) => attributesEqual(fwid, r.getIn(['attributes', 'framework_id']))
-        ))
+      .filter((r) => frameworkIds.find(
+        (fwid) => attributesEqual(fwid, r.getIn(['attributes', 'framework_id']))
+      ))
       .groupBy(
         (r) => r.getIn(['attributes', 'framework_id']).toString()
       );
@@ -118,8 +115,7 @@ export const selectRecommendationsByFw = createSelector(
 export const selectMeasures = createSelector(
   (state) => selectMeasuresCategorised(state),
   selectIsParentTaxonomy,
-  (entities, isParent) =>
-    isParent
-      ? null
-      : entities
+  (entities, isParent) => isParent
+    ? null
+    : entities
 );

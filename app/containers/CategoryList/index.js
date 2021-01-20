@@ -53,7 +53,6 @@ const Description = styled.p`
   font-size: 1em;
 `;
 export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   // make sure to load all data from server
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -63,9 +62,11 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         getDefaultTaxonomy(
           this.props.taxonomies,
           this.props.frameworkId,
-        ).get('id'));
+        ).get('id')
+      );
     }
   }
+
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
@@ -77,17 +78,23 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         getDefaultTaxonomy(
           nextProps.taxonomies,
           nextProps.frameworkId,
-        ).get('id'));
+        ).get('id')
+      );
     }
   }
 
+  /* eslint-disable react/destructuring-assignment */
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+
   getTaxDescription = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].description);
+
   getTaxButtonTitle = (id) => this.context.intl.formatMessage(
     appMessages.entities.taxonomies[id].shortSingle || appMessages.entities.taxonomies[id].single
   );
+  /* eslint-enable react/destructuring-assignment */
 
   render() {
+    const { intl } = this.context;
     const {
       taxonomy,
       taxonomies,
@@ -108,7 +115,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       ? [{
         type: 'add',
         title: [
-          this.context.intl.formatMessage(appMessages.buttons.add),
+          intl.formatMessage(appMessages.buttons.add),
           {
             title: this.getTaxButtonTitle(reference),
             hiddenSmall: true,
@@ -118,32 +125,32 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       }]
       : null;
 
-    const hasUserCategories =
-      isManager
+    const hasUserCategories = isManager
       && dataReady
       && userOnlyCategoryGroups
-      && userOnlyCategoryGroups.reduce((memo, group) =>
-        memo || (group.get('categories') && group.get('categories').size > 0)
-      , false);
+      && userOnlyCategoryGroups.reduce((memo, group) => memo || (group.get('categories') && group.get('categories').size > 0),
+        false);
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.supTitle)}: ${contentTitle}`}
+          title={`${intl.formatMessage(messages.supTitle)}: ${contentTitle}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !dataReady &&
-          <EntityListSidebarLoading responsiveSmall />
+        { !dataReady
+          && <EntityListSidebarLoading responsiveSmall />
         }
-        { taxonomies && frameworks && typeof reference !== 'undefined' &&
-          <TaxonomySidebar
-            taxonomies={taxonomies}
-            active={reference}
-            frameworkId={frameworkId}
-            frameworks={frameworks}
-            onTaxonomyLink={onTaxonomyLink}
-          />
+        { taxonomies && frameworks && typeof reference !== 'undefined'
+          && (
+            <TaxonomySidebar
+              taxonomies={taxonomies}
+              active={reference}
+              frameworkId={frameworkId}
+              frameworks={frameworks}
+              onTaxonomyLink={onTaxonomyLink}
+            />
+          )
         }
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
@@ -151,47 +158,53 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
               <ContentHeader
                 type={CONTENT_LIST}
                 icon="categories"
-                supTitle={this.context.intl.formatMessage(messages.supTitle)}
+                supTitle={intl.formatMessage(messages.supTitle)}
                 title={contentTitle}
                 buttons={buttons}
               />
-              { contentDescription &&
-                <Description>{contentDescription}</Description>
+              { contentDescription
+                && <Description>{contentDescription}</Description>
               }
-              { !dataReady &&
-                <Loading />
+              { !dataReady
+                && <Loading />
               }
-              { dataReady && taxonomy &&
-                <CategoryListItems
-                  taxonomy={taxonomy}
-                  frameworks={frameworks}
-                  frameworkId={frameworkId}
-                  categoryGroups={categoryGroups}
-                  onPageLink={onPageLink}
-                  onSort={this.props.onSort}
-                  sortOptions={SORT_OPTIONS}
-                  sortBy={this.props.location.query && this.props.location.query.sort}
-                  sortOrder={this.props.location.query && this.props.location.query.order}
-                />
+              { dataReady && taxonomy
+                && (
+                  <CategoryListItems
+                    taxonomy={taxonomy}
+                    frameworks={frameworks}
+                    frameworkId={frameworkId}
+                    categoryGroups={categoryGroups}
+                    onPageLink={onPageLink}
+                    onSort={this.props.onSort}
+                    sortOptions={SORT_OPTIONS}
+                    sortBy={this.props.location.query && this.props.location.query.sort}
+                    sortOrder={this.props.location.query && this.props.location.query.order}
+                  />
+                )
               }
-              { hasUserCategories &&
-                <UsersOnly>
-                  <FormattedMessage {...messages.usersOnly} />
-                </UsersOnly>
+              { hasUserCategories
+                && (
+                  <UsersOnly>
+                    <FormattedMessage {...messages.usersOnly} />
+                  </UsersOnly>
+                )
               }
-              { dataReady && taxonomy && hasUserCategories &&
-                <CategoryListItems
-                  taxonomy={taxonomy}
-                  frameworks={frameworks}
-                  frameworkId={frameworkId}
-                  categoryGroups={userOnlyCategoryGroups}
-                  onPageLink={onPageLink}
-                  onSort={this.props.onSort}
-                  sortOptions={SORT_OPTIONS}
-                  sortBy={'title'}
-                  sortOrder={this.props.location.query && this.props.location.query.order}
-                  userOnly
-                />
+              { dataReady && taxonomy && hasUserCategories
+                && (
+                  <CategoryListItems
+                    taxonomy={taxonomy}
+                    frameworks={frameworks}
+                    frameworkId={frameworkId}
+                    categoryGroups={userOnlyCategoryGroups}
+                    onPageLink={onPageLink}
+                    onSort={this.props.onSort}
+                    sortOptions={SORT_OPTIONS}
+                    sortBy="title"
+                    sortOrder={this.props.location.query && this.props.location.query.order}
+                    userOnly
+                  />
+                )
               }
             </Content>
           </Container>

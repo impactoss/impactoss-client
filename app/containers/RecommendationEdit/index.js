@@ -107,38 +107,47 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { taxonomies, measures, indicators, viewEntity } = props;
+    const {
+      taxonomies, measures, indicators, viewEntity,
+    } = props;
     return viewEntity
-    ? Map({
-      id: viewEntity.get('id'),
-      attributes: viewEntity.get('attributes').mergeWith(
-        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-        FORM_INITIAL.get('attributes')
-      ),
-      associatedTaxonomies: taxonomyOptions(taxonomies),
-      associatedMeasures: entityOptions(measures, true),
-      associatedIndicators: entityOptions(indicators, true),
-    })
-    : Map();
+      ? Map({
+        id: viewEntity.get('id'),
+        attributes: viewEntity.get('attributes').mergeWith(
+          (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+          FORM_INITIAL.get('attributes')
+        ),
+        associatedTaxonomies: taxonomyOptions(taxonomies),
+        associatedMeasures: entityOptions(measures, true),
+        associatedIndicators: entityOptions(indicators, true),
+      })
+      : Map();
   };
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getReferenceFormField(this.context.intl.formatMessage, true), // required
-        getTitleFormField(this.context.intl.formatMessage, 'titleText'),
-      ],
-    },
-  ]);
+  getHeaderMainFields = () => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getReferenceFormField(intl.formatMessage, true), // required
+          getTitleFormField(intl.formatMessage, 'titleText'),
+        ],
+      },
+    ]);
+  };
 
-  getHeaderAsideFields = (entity) => ([
-    {
-      fields: [
-        getStatusField(this.context.intl.formatMessage),
-        getMetaField(entity),
-      ],
-    },
-  ]);
+  getHeaderAsideFields = (entity) => {
+    const { intl } = this.context;
+    return ([
+      {
+        fields: [
+          getStatusField(intl.formatMessage),
+          getMetaField(entity),
+        ],
+      },
+    ]);
+  };
+
   getBodyMainFields = (
     connectedTaxonomies,
     entity,
@@ -147,26 +156,27 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     onCreateOption,
     hasResponse,
   ) => {
+    const { intl } = this.context;
     const groups = [];
     groups.push({
       fields: [
-        getMarkdownField(this.context.intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
-        hasResponse && getAcceptedField(this.context.intl.formatMessage, entity),
-        hasResponse && getMarkdownField(this.context.intl.formatMessage, 'response'),
+        getMarkdownField(intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
+        hasResponse && getAcceptedField(intl.formatMessage, entity),
+        hasResponse && getMarkdownField(intl.formatMessage, 'response'),
       ],
     });
     if (measures) {
       groups.push({
-        label: this.context.intl.formatMessage(appMessages.nav.measuresSuper),
+        label: intl.formatMessage(appMessages.nav.measuresSuper),
         icon: 'measures',
         fields: [
-          renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+          renderMeasureControl(measures, connectedTaxonomies, onCreateOption, intl),
         ],
       });
     }
     if (indicators) {
       groups.push({
-        label: this.context.intl.formatMessage(appMessages.nav.indicatorsSuper),
+        label: intl.formatMessage(appMessages.nav.indicatorsSuper),
         icon: 'indicators',
         fields: [
           renderIndicatorControl(indicators, onCreateOption),
@@ -176,15 +186,19 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     return groups;
   }
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.taxonomies.plural),
-      icon: 'categories',
-      fields: renderTaxonomyControl(taxonomies, onCreateOption, this.context.intl),
-    },
-  ]);
+  getBodyAsideFields = (taxonomies, onCreateOption) => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        label: intl.formatMessage(appMessages.entities.taxonomies.plural),
+        icon: 'categories',
+        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+      },
+    ]);
+  };
 
   render() {
+    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -197,9 +211,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       frameworks,
     } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.get('page').toJS();
+    const {
+      saveSending, saveError, deleteSending, deleteError, submitValid,
+    } = viewDomain.get('page').toJS();
     const frameworkId = viewEntity && viewEntity.getIn(['attributes', 'framework_id']);
-    const type = this.context.intl.formatMessage(
+    const type = intl.formatMessage(
       appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
     );
 
@@ -207,28 +223,20 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     const hasResponse = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_response']);
     const hasMeasures = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_measures']);
     const hasIndicators = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_indicators']);
-    const fwTaxonomies = taxonomies && taxonomies.filter((tax) =>
-      tax.get('frameworkIds').find((id) => attributesEqual(id, frameworkId)) ||
-      attributesEqual(frameworkId, tax.getIn(['attributes', 'framework_id']))
-    );
+    const fwTaxonomies = taxonomies && taxonomies.filter((tax) => tax.get('frameworkIds').find((id) => attributesEqual(id, frameworkId))
+      || attributesEqual(frameworkId, tax.getIn(['attributes', 'framework_id'])));
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle, { type })}: ${reference}`}
+          title={`${intl.formatMessage(messages.pageTitle, { type })}: ${reference}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content
-          ref={(node) => {
-            if (!this.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle, { type })}
+            title={intl.formatMessage(messages.pageTitle, { type })}
             type={CONTENT_SINGLE}
             icon={frameworkId ? `recommendations_${frameworkId}` : 'recommendations'}
             buttons={
@@ -243,69 +251,77 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               }] : null
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {deleteError &&
-            <Messages type="error" messages={deleteError} />
+          {deleteError
+            && <Messages type="error" messages={deleteError} />
           }
-          {(saveSending || deleteSending || !dataReady) &&
-            <Loading />
+          {(saveSending || deleteSending || !dataReady)
+            && <Loading />
           }
-          {!viewEntity && dataReady && !saveError && !deleteSending &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          {!viewEntity && dataReady && !saveError && !deleteSending
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          {viewEntity && dataReady && !deleteSending &&
-            <EntityForm
-              model="recommendationEdit.form.data"
-              formData={viewDomain.getIn(['form', 'data'])}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(
-                formData,
-                fwTaxonomies,
-                measures,
-                indicators,
-                currentFramework,
-              )}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={this.props.handleCancel}
-              handleUpdate={this.props.handleUpdate}
-              handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(viewEntity),
-                },
-                body: {
-                  main: this.getBodyMainFields(
-                    connectedTaxonomies,
-                    viewEntity,
-                    hasMeasures && measures,
-                    hasIndicators && indicators,
-                    onCreateOption,
-                    hasResponse,
-                  ),
-                  aside: this.getBodyAsideFields(fwTaxonomies, onCreateOption),
-                },
-              }}
-              scrollContainer={this.scrollContainer}
-            />
+          {viewEntity && dataReady && !deleteSending
+            && (
+              <EntityForm
+                model="recommendationEdit.form.data"
+                formData={viewDomain.getIn(['form', 'data'])}
+                saving={saveSending}
+                handleSubmit={(formData) => this.props.handleSubmit(
+                  formData,
+                  fwTaxonomies,
+                  measures,
+                  indicators,
+                  currentFramework,
+                )}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={this.props.handleCancel}
+                handleUpdate={this.props.handleUpdate}
+                handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(),
+                    aside: this.getHeaderAsideFields(viewEntity),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(
+                      connectedTaxonomies,
+                      viewEntity,
+                      hasMeasures && measures,
+                      hasIndicators && indicators,
+                      onCreateOption,
+                      hasResponse,
+                    ),
+                    aside: this.getBodyAsideFields(fwTaxonomies, onCreateOption),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          { (saveSending || deleteSending) &&
-            <Loading />
+          { (saveSending || deleteSending)
+            && <Loading />
           }
         </Content>
       </div>
