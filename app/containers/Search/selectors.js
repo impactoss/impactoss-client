@@ -42,14 +42,9 @@ export const selectEntitiesByQuery = createSelector(
         return group.set('targets', taxonomies.map((tax) => {
           const categories = allEntities
             .get('categories')
-            .filter((cat) =>
-              attributesEqual(tax.get('id'), cat.getIn(['attributes', 'taxonomy_id']))
-            )
-            .map((cat) =>
-              group.get('search').reduce((memo, attribute) =>
-                memo.setIn(['attributes', attribute.get('as')], tax.getIn(['attributes', attribute.get('attribute')]))
-              , cat)
-            );
+            .filter((cat) => attributesEqual(tax.get('id'), cat.getIn(['attributes', 'taxonomy_id'])))
+            .map((cat) => group.get('search').reduce((memo, attribute) => memo.setIn(['attributes', attribute.get('as')], tax.getIn(['attributes', attribute.get('attribute')])),
+              cat));
 
           const filteredCategories = searchQuery
             ? filterEntitiesByKeywords(
@@ -71,8 +66,7 @@ export const selectEntitiesByQuery = createSelector(
               .set('results', sortEntities(filteredCategories,
                 order || (sortOption ? sortOption.order : 'desc'),
                 sort || (sortOption ? sortOption.attribute : 'id'),
-                sortOption ? sortOption.type : 'number'
-              ));
+                sortOption ? sortOption.type : 'number'));
           }
           return Map()
             .set('path', `taxonomies-${tax.get('id')}`)
@@ -84,47 +78,81 @@ export const selectEntitiesByQuery = createSelector(
       return group.set(
         'targets',
         group.get('targets')
-        .filter((target) => !!target)
-        .reduce(
-          (memo, target) => {
-            const targetEntties = allEntities.get(target.get('path'));
-            // target by fw
-            if (frameworks && target.get('groupByFramework')) {
-              return frameworks.reduce((innerMemo, fw) => {
-                const fwEntities =
-                  targetEntties
-                  .filter(
-                    (entity) => attributesEqual(
-                      entity.getIn(['attributes', 'framework_id']),
-                      fw.get('id'),
+          .filter((target) => !!target)
+          .reduce(
+            (memo, target) => {
+              const targetEntties = allEntities.get(target.get('path'));
+              // target by fw
+              if (frameworks && target.get('groupByFramework')) {
+                return frameworks.reduce((innerMemo, fw) => {
+                  const fwEntities = targetEntties
+                    .filter(
+                      (entity) => attributesEqual(
+                        entity.getIn(['attributes', 'framework_id']),
+                        fw.get('id'),
+                      )
+                    );
+                  const filteredEntities = searchQuery
+                    ? filterEntitiesByKeywords(
+                      fwEntities,
+                      searchQuery,
+                      target.get('search').valueSeq().toArray()
                     )
-                  );
-                const filteredEntities = searchQuery
-                  ? filterEntitiesByKeywords(
-                    fwEntities,
-                    searchQuery,
-                    target.get('search').valueSeq().toArray()
-                  )
-                  : fwEntities;
-                const fwTargetPath = `${target.get('path')}_${fw.get('id')}`;
-                const fwTarget = target
-                  .set('clientPath', target.get('path'))
-                  .set('path', fwTargetPath);
+                    : fwEntities;
+                  const fwTargetPath = `${target.get('path')}_${fw.get('id')}`;
+                  const fwTarget = target
+                    .set('clientPath', target.get('path'))
+                    .set('path', fwTargetPath);
 
-                // if filtered by path
-                if (
-                  path === fwTargetPath ||
-                  (
-                    !path &&
-                    !active &&
-                    filteredEntities.size > 0
+                  // if filtered by path
+                  if (
+                    path === fwTargetPath
+                  || (
+                    !path
+                    && !active
+                    && filteredEntities.size > 0
                   )
-                ) {
-                  active = true;
-                  // only sort the active entities that will be displayed
-                  const sortOption = getSortOption(fwTarget.get('sorting') && fwTarget.get('sorting').toJS(), sort);
-                  return innerMemo.push(
-                    fwTarget
+                  ) {
+                    active = true;
+                    // only sort the active entities that will be displayed
+                    const sortOption = getSortOption(fwTarget.get('sorting') && fwTarget.get('sorting').toJS(), sort);
+                    return innerMemo.push(
+                      fwTarget
+                        .set('active', searchQuery && true)
+                        .set('results', sortEntities(
+                          filteredEntities,
+                          order || (sortOption ? sortOption.order : 'desc'),
+                          sort || (sortOption ? sortOption.attribute : 'id'),
+                          sortOption ? sortOption.type : 'number'
+                        ))
+                    );
+                  }
+                  return innerMemo.push(fwTarget.set('results', filteredEntities));
+                }, memo);
+              }
+              // regular target
+              const filteredEntities = searchQuery
+                ? filterEntitiesByKeywords(
+                  targetEntties,
+                  searchQuery,
+                  target.get('search').valueSeq().toArray()
+                )
+                : allEntities.get(target.get('path'));
+
+              // if filtered by path
+              if (
+                path === target.get('path')
+              || (
+                !path
+                && !active
+                && filteredEntities.size > 0
+              )
+              ) {
+                active = true;
+                // only sort the active entities that will be displayed
+                const sortOption = getSortOption(target.get('sorting') && target.get('sorting').toJS(), sort);
+                return memo.push(
+                  target
                     .set('active', searchQuery && true)
                     .set('results', sortEntities(
                       filteredEntities,
@@ -132,47 +160,12 @@ export const selectEntitiesByQuery = createSelector(
                       sort || (sortOption ? sortOption.attribute : 'id'),
                       sortOption ? sortOption.type : 'number'
                     ))
-                  );
-                }
-                return innerMemo.push(fwTarget.set('results', filteredEntities));
-              }, memo);
-            }
-            // regular target
-            const filteredEntities = searchQuery
-              ? filterEntitiesByKeywords(
-                targetEntties,
-                searchQuery,
-                target.get('search').valueSeq().toArray()
-              )
-              : allEntities.get(target.get('path'));
-
-            // if filtered by path
-            if (
-              path === target.get('path') ||
-              (
-                !path &&
-                !active &&
-                filteredEntities.size > 0
-              )
-            ) {
-              active = true;
-              // only sort the active entities that will be displayed
-              const sortOption = getSortOption(target.get('sorting') && target.get('sorting').toJS(), sort);
-              return memo.push(
-                target
-                .set('active', searchQuery && true)
-                .set('results', sortEntities(
-                  filteredEntities,
-                  order || (sortOption ? sortOption.order : 'desc'),
-                  sort || (sortOption ? sortOption.attribute : 'id'),
-                  sortOption ? sortOption.type : 'number'
-                ))
-              );
-            }
-            return memo.push(target.set('results', filteredEntities));
-          },
-          List(),
-        )
+                );
+              }
+              return memo.push(target.set('results', filteredEntities));
+            },
+            List(),
+          )
       );
     });
   }

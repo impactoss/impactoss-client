@@ -21,9 +21,7 @@ export const getTaxonomyTagList = (taxonomy) => {
 
 const mapTaxonomy = (tax, childTaxonomies, activeId, onLink) => {
   const children = childTaxonomies
-    .filter((t) =>
-      attributesEqual(t.getIn(['attributes', 'parent_id']), tax.get('id'))
-    )
+    .filter((t) => attributesEqual(t.getIn(['attributes', 'parent_id']), tax.get('id')))
     .toList()
     .toJS();
   return fromJS({
@@ -48,13 +46,9 @@ export const prepareTaxonomyGroups = (
   frameworkId,
   frameworks,
 ) => {
-  const parentTaxonomies = taxonomies.filter((tax) =>
-    tax.getIn(['attributes', 'parent_id']) === ''
-    || tax.getIn(['attributes', 'parent_id']) === null
-  );
-  const childTaxonomies = taxonomies.filter((tax) =>
-    !!tax.getIn(['attributes', 'parent_id'])
-  );
+  const parentTaxonomies = taxonomies.filter((tax) => tax.getIn(['attributes', 'parent_id']) === ''
+    || tax.getIn(['attributes', 'parent_id']) === null);
+  const childTaxonomies = taxonomies.filter((tax) => !!tax.getIn(['attributes', 'parent_id']));
   const groups = [];
   if (frameworkId && frameworkId !== 'all') {
     // single framework mode
@@ -74,9 +68,9 @@ export const prepareTaxonomyGroups = (
       const fwTaxonomies = parentTaxonomies
         .filter((tax) => {
           const taxFwIds = tax.get('frameworkIds');
-          return tax.getIn(['attributes', 'tags_recommendations']) &&
-            taxFwIds.size === 1 &&
-            taxFwIds.find((fwid) => attributesEqual(fwid, fw.get('id')));
+          return tax.getIn(['attributes', 'tags_recommendations'])
+            && taxFwIds.size === 1
+            && taxFwIds.find((fwid) => attributesEqual(fwid, fw.get('id')));
         })
         .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
         .toList()
@@ -94,10 +88,8 @@ export const prepareTaxonomyGroups = (
     groups.push({
       id: 'common',
       taxonomies: parentTaxonomies
-        .filter((tax) =>
-          tax.getIn(['attributes', 'tags_recommendations']) &&
-          tax.get('frameworkIds').size > 1
-        )
+        .filter((tax) => tax.getIn(['attributes', 'tags_recommendations'])
+          && tax.get('frameworkIds').size > 1)
         .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
         .toList()
         .toJS(),
@@ -105,10 +97,8 @@ export const prepareTaxonomyGroups = (
   }
 
   const measureOnlyTaxonomies = parentTaxonomies
-    .filter((tax) =>
-      tax.getIn(['attributes', 'tags_measures']) &&
-      !tax.getIn(['attributes', 'tags_recommendations'])
-    );
+    .filter((tax) => tax.getIn(['attributes', 'tags_measures'])
+      && !tax.getIn(['attributes', 'tags_recommendations']));
   if (measureOnlyTaxonomies && measureOnlyTaxonomies.size > 0) {
     groups.push({
       id: 'measures',
@@ -120,17 +110,15 @@ export const prepareTaxonomyGroups = (
   return groups;
 };
 
-export const getDefaultTaxonomy = (taxonomies, frameworkId) =>
-  taxonomies
-    .filter((tax) =>
-      attributesEqual(tax.getIn(['attributes', 'framework_id']), frameworkId))
-    .reduce((memo, tax) => {
-      if (memo) {
-        const priority = tax.getIn(['attributes', 'priority']);
-        if (priority && priority < memo.getIn(['attributes', 'priority'])) {
-          return tax;
-        }
-        return memo;
+export const getDefaultTaxonomy = (taxonomies, frameworkId) => taxonomies
+  .filter((tax) => attributesEqual(tax.getIn(['attributes', 'framework_id']), frameworkId))
+  .reduce((memo, tax) => {
+    if (memo) {
+      const priority = tax.getIn(['attributes', 'priority']);
+      if (priority && priority < memo.getIn(['attributes', 'priority'])) {
+        return tax;
       }
-      return tax;
-    }, null);
+      return memo;
+    }
+    return tax;
+  }, null);

@@ -11,8 +11,7 @@ import {
 
 export const selectRecommendationCount = createSelector(
   (state) => selectRecommendationsWhere(state, { where: { draft: false } }),
-  (entities) =>
-    entities && entities
+  (entities) => entities && entities
     .groupBy((e) => e.getIn(['attributes', 'framework_id']))
     .map((fwentities) => fwentities.size)
 );
@@ -43,8 +42,7 @@ export const selectIndicatorCount = createSelector(
 );
 export const selectRecommendationDraftCount = createSelector(
   (state) => selectRecommendationsWhere(state, { where: { draft: true } }),
-  (entities) =>
-    entities && entities
+  (entities) => entities && entities
     .groupBy((e) => e.getIn(['attributes', 'framework_id']))
     .map((fwentities) => fwentities.size)
 );

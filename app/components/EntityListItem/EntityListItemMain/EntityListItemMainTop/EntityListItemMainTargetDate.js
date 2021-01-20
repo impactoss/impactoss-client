@@ -24,6 +24,7 @@ export default class EntityListItemMainTargetDate extends React.PureComponent { 
   static propTypes = {
     targetDate: PropTypes.string.isRequired,
   };
+
   render() {
     return (
       <Styled>

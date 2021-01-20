@@ -32,44 +32,56 @@ class TaxonomyField extends React.PureComponent { // eslint-disable-line react/p
           <ListLabel>
             <FormattedMessage {...field.label} />
           </ListLabel>
-          {field.entityType &&
-            <DotWrapper>
-              <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
-            </DotWrapper>
+          {field.entityType
+            && (
+              <DotWrapper>
+                <Dot palette={field.entityType} pIndex={parseInt(field.id, 10)} />
+              </DotWrapper>
+            )
           }
         </ListLabelWrap>
         {field.values.map((value, i) => (
           <ListItem key={i}>
             {value.linkTo
-              ? <ListLink to={value.linkTo}>
-                {value.draft &&
-                  <ItemStatus draft />
-                }
-                {value.reference &&
-                  <Reference>
-                    {value.reference}
-                  </Reference>
-                }
-                {value.label}
-              </ListLink>
-              : <div>
-                {value.draft &&
-                  <ItemStatus draft />
-                }
-                {value.reference &&
-                  <Reference>
-                    {value.reference}
-                  </Reference>
-                }
-                {value.label}
-              </div>
+              ? (
+                <ListLink to={value.linkTo}>
+                  {value.draft
+                  && <ItemStatus draft />
+                  }
+                  {value.reference
+                  && (
+                    <Reference>
+                      {value.reference}
+                    </Reference>
+                  )
+                  }
+                  {value.label}
+                </ListLink>
+              )
+              : (
+                <div>
+                  {value.draft
+                  && <ItemStatus draft />
+                  }
+                  {value.reference
+                  && (
+                    <Reference>
+                      {value.reference}
+                    </Reference>
+                  )
+                  }
+                  {value.label}
+                </div>
+              )
             }
           </ListItem>
         ))}
-        { field.showEmpty && (!field.values || field.values.length === 0) &&
-          <EmptyHint>
-            <FormattedMessage {...field.showEmpty} />
-          </EmptyHint>
+        { field.showEmpty && (!field.values || field.values.length === 0)
+          && (
+            <EmptyHint>
+              <FormattedMessage {...field.showEmpty} />
+            </EmptyHint>
+          )
         }
       </StyledFieldWrap>
     );

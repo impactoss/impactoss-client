@@ -22,15 +22,13 @@ export const selectDomain = createSelector(
 export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
-  (entities, associations) =>
-    usersByRole(entities, associations, USER_ROLES.CONTRIBUTOR.value)
+  (entities, associations) => usersByRole(entities, associations, USER_ROLES.CONTRIBUTOR.value)
 );
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
+  (taxonomies, categories) => prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
 );
 
 export const selectRecommendationsByFw = createSelector(
@@ -43,16 +41,15 @@ export const selectRecommendationsByFw = createSelector(
       return null;
     }
     return entities
-    .filter((r) => {
-      const framework = frameworks.find(
-        (fw) =>
-          attributesEqual(
+      .filter((r) => {
+        const framework = frameworks.find(
+          (fw) => attributesEqual(
             fw.get('id'),
             r.getIn(['attributes', 'framework_id']),
           )
         );
-      return framework.getIn(['attributes', 'has_indicators']);
-    })
+        return framework.getIn(['attributes', 'has_indicators']);
+      })
       .groupBy(
         (r) => r.getIn(['attributes', 'framework_id']).toString()
       );

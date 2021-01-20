@@ -24,6 +24,6 @@ export const selectIndicator = createSelector(
       dates.filter((date) => attributesEqual(date.getIn(['attributes', 'indicator_id']), indicator.get('id'))),
       'asc',
       'due_date',
-      'date')
-    )
+      'date'
+    ))
 );

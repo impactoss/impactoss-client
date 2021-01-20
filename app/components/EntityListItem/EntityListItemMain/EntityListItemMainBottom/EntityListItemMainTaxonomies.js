@@ -28,37 +28,40 @@ const Styled = styled.div`
 // border-top-color:;
 
 class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   getEntityTags = (categories, taxonomies, onClick) => {
     const tags = [];
     if (categories) {
       taxonomies
-      .filter((tax) => !tax.getIn(['attributes', 'is_smart']))
-      .forEach((tax) => {
-        tax
-        .get('categories')
-        .sortBy((category) => category.getIn(['attributes', 'draft']))
-        .forEach((category, catId) => {
-          if (categories.includes(parseInt(catId, 10))) {
-            const label = (category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
-              ? category.getIn(['attributes', 'short_title'])
-              : category.getIn(['attributes', 'title']));
-            tags.push({
-              taxId: tax.get('id'),
-              title: category.getIn(['attributes', 'title']),
-              inverse: category.getIn(['attributes', 'draft']),
-              label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG, false),
-              onClick: () => onClick(catId, 'category'),
+        .filter((tax) => !tax.getIn(['attributes', 'is_smart']))
+        .forEach((tax) => {
+          tax
+            .get('categories')
+            .sortBy((category) => category.getIn(['attributes', 'draft']))
+            .forEach((category, catId) => {
+              if (categories.includes(parseInt(catId, 10))) {
+                const label = (category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
+                  ? category.getIn(['attributes', 'short_title'])
+                  : category.getIn(['attributes', 'title']));
+                tags.push({
+                  taxId: tax.get('id'),
+                  title: category.getIn(['attributes', 'title']),
+                  inverse: category.getIn(['attributes', 'draft']),
+                  label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG, false),
+                  onClick: () => onClick(catId, 'category'),
+                });
+              }
             });
-          }
         });
-      });
     }
     return tags;
   };
-  getSmartTitle = (title, isSmart) => this.context.intl
-    ? `${title}: ${this.context.intl.formatMessage(isSmart ? appMessages.labels.smart.met : appMessages.labels.smart.notMet)}`
-    : title;
+
+  getSmartTitle = (title, isSmart) => {
+    const { intl } = this.context;
+    return intl
+      ? `${title}: ${intl.formatMessage(isSmart ? appMessages.labels.smart.met : appMessages.labels.smart.notMet)}`
+      : title;
+  };
 
   getEntitySmartTags = (categories, smartTaxonomy, onClick) => {
     const tags = [];
@@ -88,21 +91,23 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
 
     return (
       <Styled>
-        { smartTaxonomy &&
-          <SmartGroup border={entityTags && entityTags.length > 0}>
-            { this.getEntitySmartTags(categories, smartTaxonomy, onEntityClick).map((tag, i) =>
-              <ButtonTagCategory
-                key={i}
-                onClick={tag.onClick}
-                taxId={parseInt(tag.taxId, 10)}
-                title={tag.title}
-                isSmartTag
-                isSmart={tag.isSmart}
-              >
-                {tag.label}
-              </ButtonTagCategory>
-            )}
-          </SmartGroup>
+        { smartTaxonomy
+          && (
+            <SmartGroup border={entityTags && entityTags.length > 0}>
+              { this.getEntitySmartTags(categories, smartTaxonomy, onEntityClick).map((tag, i) => (
+                <ButtonTagCategory
+                  key={i}
+                  onClick={tag.onClick}
+                  taxId={parseInt(tag.taxId, 10)}
+                  title={tag.title}
+                  isSmartTag
+                  isSmart={tag.isSmart}
+                >
+                  {tag.label}
+                </ButtonTagCategory>
+              ))}
+            </SmartGroup>
+          )
         }
         { entityTags.map((tag, i) => tag.inverse
           ? (
@@ -126,8 +131,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
             >
               {tag.label}
             </ButtonTagCategory>
-          )
-        )}
+          ))}
       </Styled>
     );
   }

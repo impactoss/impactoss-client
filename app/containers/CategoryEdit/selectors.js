@@ -29,7 +29,8 @@ export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
   (state) => selectEntities(state, 'users'),
   (state) => selectFWTaxonomiesSorted(state),
-  (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies));
+  (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies)
+);
 
 export const selectParentOptions = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
@@ -51,7 +52,8 @@ export const selectParentOptions = createSelector(
             return otherTaxonomy
               ? attributesEqual(taxonomyParentId, otherTaxonomy.get('id'))
               : null;
-          })
+          }
+        )
         : null;
     }
     return null;
@@ -69,15 +71,15 @@ export const selectParentTaxonomy = createSelector(
       );
       // any parent taxonomies
       return taxonomies.find(
-        (tax) =>
-          attributesEqual(
-            taxonomy.getIn(['attributes', 'parent_id']),
-            tax.get('id'),
-          ),
+        (tax) => attributesEqual(
+          taxonomy.getIn(['attributes', 'parent_id']),
+          tax.get('id'),
+        ),
       );
     }
     return null;
-  });
+  }
+);
 const selectIsParentTaxonomy = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
   selectTaxonomies,
@@ -89,22 +91,21 @@ const selectIsParentTaxonomy = createSelector(
       );
       // has any child taxonomies?
       return taxonomies.some(
-        (tax) =>
-          attributesEqual(
-            tax.getIn(['attributes', 'parent_id']),
-            taxonomy.get('id'),
-          ),
+        (tax) => attributesEqual(
+          tax.getIn(['attributes', 'parent_id']),
+          taxonomy.get('id'),
+        ),
       );
     }
     return false;
-  });
+  }
+);
 
 
 export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
-  (entities, associations) =>
-    usersByRole(entities, associations, USER_ROLES.MANAGER.value)
+  (entities, associations) => usersByRole(entities, associations, USER_ROLES.MANAGER.value)
 );
 
 export const selectMeasures = createSelector(
@@ -112,10 +113,9 @@ export const selectMeasures = createSelector(
   (state) => selectMeasuresCategorised(state),
   (state) => selectEntities(state, 'measure_categories'),
   selectIsParentTaxonomy,
-  (id, entities, associations, isParent) =>
-    isParent
-      ? null
-      : entitiesSetAssociated(entities, 'measure_id', associations, 'category_id', id)
+  (id, entities, associations, isParent) => isParent
+    ? null
+    : entitiesSetAssociated(entities, 'measure_id', associations, 'category_id', id)
 );
 
 export const selectRecommendationsByFw = createSelector(
@@ -131,20 +131,18 @@ export const selectRecommendationsByFw = createSelector(
     }
     // framework id for category
     const frameworkIds = fwTaxonomies.reduce(
-      (memo, fwt) =>
-        attributesEqual(
-          fwt.getIn(['attributes', 'taxonomy_id']),
-          category.getIn(['attributes', 'taxonomy_id']),
-        )
-          ? memo.push(fwt.getIn(['attributes', 'framework_id']))
-          : memo,
+      (memo, fwt) => attributesEqual(
+        fwt.getIn(['attributes', 'taxonomy_id']),
+        category.getIn(['attributes', 'taxonomy_id']),
+      )
+        ? memo.push(fwt.getIn(['attributes', 'framework_id']))
+        : memo,
       List(),
     );
     return entitiesSetAssociated(entities, 'recommendation_id', associations, 'category_id', id)
-      .filter((r) =>
-        frameworkIds.find(
-          (fwid) => attributesEqual(fwid, r.getIn(['attributes', 'framework_id']))
-        ))
+      .filter((r) => frameworkIds.find(
+        (fwid) => attributesEqual(fwid, r.getIn(['attributes', 'framework_id']))
+      ))
       .groupBy(
         (r) => r.getIn(['attributes', 'framework_id']).toString()
       );
@@ -154,6 +152,5 @@ export const selectRecommendationsByFw = createSelector(
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
+  (taxonomies, categories) => prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
 );

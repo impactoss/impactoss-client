@@ -54,7 +54,6 @@ const ScrollableWrapper = styled(Scrollable)`
 `;
 
 export class EntityListSidebarLoading extends React.Component { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     return (
       <Styled responsiveSmall={this.props.responsiveSmall}>

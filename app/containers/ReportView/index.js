@@ -42,16 +42,17 @@ import { selectViewEntity } from './selectors';
 import { DEPENDENCIES } from './constants';
 
 export class ReportView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
+
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
   }
+
   getHeaderMainFields = (entity, isManager, indicator) => ([ // fieldGroups
     { // fieldGroup
       fields: [
@@ -69,6 +70,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
       ],
     },
   ]);
+
   getBodyMainFields = (entity, isContributor) => ([
     {
       fields: [
@@ -77,6 +79,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
       ],
     },
   ]);
+
   getBodyAsideFields = (entity) => ([ // fieldGroups
     {
       type: 'dark',
@@ -88,7 +91,10 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
 
 
   render() {
-    const { viewEntity, dataReady, isContributor, isManager, sessionUserId } = this.props;
+    const { intl } = this.context;
+    const {
+      viewEntity, dataReady, isContributor, isManager, sessionUserId,
+    } = this.props;
 
     const canEdit = isManager
       || (
@@ -102,14 +108,14 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={`${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="report"
             buttons={canEdit
@@ -129,29 +135,33 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
                   onClick: () => this.props.handleClose(viewEntity.getIn(['indicator', 'id'])),
                 },
               ]
-             }
+            }
           />
-          { !dataReady &&
-            <Loading />
+          { !dataReady
+            && <Loading />
           }
-          { !viewEntity && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          { !viewEntity && dataReady
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          { viewEntity && dataReady &&
-            <EntityView
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(viewEntity, isContributor, viewEntity.get('indicator')),
-                  aside: isContributor && this.getHeaderAsideFields(viewEntity),
-                },
-                body: {
-                  main: this.getBodyMainFields(viewEntity, isContributor),
-                  aside: isContributor ? this.getBodyAsideFields(viewEntity) : null,
-                },
-              }}
-            />
+          { viewEntity && dataReady
+            && (
+              <EntityView
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(viewEntity, isContributor, viewEntity.get('indicator')),
+                    aside: isContributor && this.getHeaderAsideFields(viewEntity),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(viewEntity, isContributor),
+                    aside: isContributor ? this.getBodyAsideFields(viewEntity) : null,
+                  },
+                }}
+              />
+            )
           }
         </Content>
       </div>

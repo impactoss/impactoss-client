@@ -19,7 +19,6 @@ const ItemWrapper = styled.div`
   border-bottom: 1px solid transparent;
 `;
 export class EntityListNestedList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const {
       entities,
@@ -35,7 +34,7 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
     return (
       <Styled>
         {
-          entities.map((entity, i) =>
+          entities.map((entity, i) => (
             <ItemWrapper key={i} separated={(expandNo - nestLevel) > 0 && i > 0}>
               <EntityListNestedItem
                 entity={entity}
@@ -45,17 +44,19 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
                 onEntityClick={onEntityClick}
                 onExpand={onExpand}
               />
-              {expandNo > nestLevel && entity.get('expanded') && entity.get('expanded') === 'reports' && entity.get('reports') &&
-                <EntityListNestedReportList
-                  reports={entity.get('reports').toList()}
-                  dates={entity.get('dates')}
-                  onEntityClick={onEntityClick}
-                  isContributor={isContributor}
-                  nestLevel={nestLevel + 1}
-                />
+              {expandNo > nestLevel && entity.get('expanded') && entity.get('expanded') === 'reports' && entity.get('reports')
+                && (
+                  <EntityListNestedReportList
+                    reports={entity.get('reports').toList()}
+                    dates={entity.get('dates')}
+                    onEntityClick={onEntityClick}
+                    isContributor={isContributor}
+                    nestLevel={nestLevel + 1}
+                  />
+                )
               }
             </ItemWrapper>
-          )
+          ))
         }
       </Styled>
     );

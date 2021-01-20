@@ -49,7 +49,6 @@ const TaxIcon = styled.div`
 `;
 
 class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { taxonomy, nested, onTaxonomyClick } = this.props;
     return (

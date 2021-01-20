@@ -17,35 +17,35 @@ const Status = styled.div`
 `;
 
 class ItemProgress extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { status } = this.props;
     return status
-      ? <Status>
-        {
-          attributesEqual(status.attributes.reference, PROGRESS_CATEGORY_REFERENCES.COMPLETED)
-          ? (
-            <ButtonTagCategory
-              title={status.attributes.title}
-              taxId={parseInt(status.attributes.taxonomy_id, 10)}
-              disabled
-            >
-              {status.attributes.title}
-            </ButtonTagCategory>
-          )
-          : (
-            <ButtonTagCategoryInverse
-              taxId={parseInt(status.attributes.taxonomy_id, 10)}
-              disabled
-              title={status.attributes.title}
-            >
-              {status.attributes.title}
-            </ButtonTagCategoryInverse>
-          )
-        }
-      </Status>
-      : null
-    ;
+      ? (
+        <Status>
+          {
+            attributesEqual(status.attributes.reference, PROGRESS_CATEGORY_REFERENCES.COMPLETED)
+              ? (
+                <ButtonTagCategory
+                  title={status.attributes.title}
+                  taxId={parseInt(status.attributes.taxonomy_id, 10)}
+                  disabled
+                >
+                  {status.attributes.title}
+                </ButtonTagCategory>
+              )
+              : (
+                <ButtonTagCategoryInverse
+                  taxId={parseInt(status.attributes.taxonomy_id, 10)}
+                  disabled
+                  title={status.attributes.title}
+                >
+                  {status.attributes.title}
+                </ButtonTagCategoryInverse>
+              )
+          }
+        </Status>
+      )
+      : null;
   }
 }
 

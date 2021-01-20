@@ -53,7 +53,6 @@ const SortButton = styled(ButtonFlatIconOnly)`
 
 
 class CategoryListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { columns } = this.props;
 
@@ -64,16 +63,18 @@ class CategoryListHeader extends React.PureComponent { // eslint-disable-line re
             <Column key={i} colWidth={col.width}>
               <Title>
                 {col.header}
-                {col.via &&
-                  <Via>{` ${col.via}`}</Via>
+                {col.via
+                  && <Via>{` ${col.via}`}</Via>
                 }
               </Title>
-              {col.onClick &&
-                <SortWrapper>
-                  <SortButton onClick={col.onClick}>
-                    <Icon name={col.sortIcon} />
-                  </SortButton>
-                </SortWrapper>
+              {col.onClick
+                && (
+                  <SortWrapper>
+                    <SortButton onClick={col.onClick}>
+                      <Icon name={col.sortIcon} />
+                    </SortButton>
+                  </SortWrapper>
+                )
               }
             </Column>
           ))

@@ -26,40 +26,42 @@ const WIDTH_OTHER = 0.34;
 
 class EntityListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   getListHeaderLabel = (entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage) => {
+    const { intl } = this.context;
     if (selectedTotal > 0) {
       if (allSelected) {
         // return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected. `;
-        return this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.allSelected, {
+        return intl && intl.formatMessage(messages.entityListHeader.allSelected, {
           total: selectedTotal,
           type: selectedTotal === 1 ? entityTitle.single : entityTitle.plural,
         });
       }
       if (allSelectedOnPage) {
         // return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} on this page are selected. `;
-        return this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.allSelectedOnPage, {
+        return intl && intl.formatMessage(messages.entityListHeader.allSelectedOnPage, {
           total: selectedTotal,
           type: selectedTotal === 1 ? entityTitle.single : entityTitle.plural,
         });
       }
       // return `${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected. `;
-      return this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.selected, {
+      return intl && intl.formatMessage(messages.entityListHeader.selected, {
         total: selectedTotal,
         type: selectedTotal === 1 ? entityTitle.single : entityTitle.plural,
       });
     }
     if (pageTotal && (pageTotal < entitiesTotal)) {
-      return this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.noneSelected, {
+      return intl && intl.formatMessage(messages.entityListHeader.noneSelected, {
         pageTotal,
         entitiesTotal,
         type: entityTitle.plural,
       });
     }
     // console.log((entitiesTotal === 1) ? entityTitle.single : entityTitle.plural)
-    return this.context.intl && this.context.intl.formatMessage(messages.entityListHeader.notPaged, {
+    return intl && intl.formatMessage(messages.entityListHeader.notPaged, {
       entitiesTotal,
       type: (entitiesTotal === 1) ? entityTitle.single : entityTitle.plural,
     });
   }
+
   getSelectedState = (selectedTotal, allSelected) => {
     if (selectedTotal === 0) {
       return CHECKBOX_STATES.UNCHECKED;
@@ -69,6 +71,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
     }
     return CHECKBOX_STATES.INDETERMINATE;
   }
+
   getFirstColumnWidth = (expandableColumns, expandNo) => {
     // TODO figure out a betterway to determine column widths.
     const hasNested = expandableColumns && expandableColumns.length > 0;
@@ -82,6 +85,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
     }
     return WIDTH_HALF;
   }
+
   // TODO figure out a betterway to determine column widths
   getExpandableColumnWidth = (i, total, expandNo) => {
     const onlyItem = total === 1;
@@ -104,6 +108,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
   };
 
   render() {
+    const { intl } = this.context;
     const {
       selectedTotal,
       pageTotal,
@@ -142,20 +147,20 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
           onSortBy={this.props.onSortBy}
           onSortOrder={this.props.onSortOrder}
         />
-        { expandableColumns && expandableColumns.length > 0 &&
-          expandableColumns.map((col, i, list) =>
+        { expandableColumns && expandableColumns.length > 0
+          && expandableColumns.map((col, i, list) => (
             <ColumnExpand
               hiddenMobile
               key={i}
               isExpand={expandNo > i}
               onExpand={() => onExpand(expandNo > i ? i : i + 1)}
               label={col.message
-                ? appMessage(this.context.intl, col.message)
+                ? appMessage(intl, col.message)
                 : col.label
               }
               width={(1 - firstColumnWidth) * this.getExpandableColumnWidth(i, list.length, expandNo)}
             />
-          )
+          ))
         }
       </Styled>
     );

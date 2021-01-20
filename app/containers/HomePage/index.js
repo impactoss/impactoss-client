@@ -43,17 +43,17 @@ const GraphicHomeWrapper = styled.div`
   padding-top: ${(props) => props.hasBrand
     ? props.theme.sizes.header.banner.heightMobile
     : 0
-  }px;
+}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-top: ${(props) => props.hasBrand
-      ? props.theme.sizes.header.banner.height
-      : 0
-    }px;
+    ? props.theme.sizes.header.banner.height
+    : 0
+}px;
   }
   background-image: ${(props) => (props.showPattern && props.theme.backgroundImages.header)
     ? props.theme.backgroundImages.header
     : 'none'
-  };
+};
   background-repeat: repeat;
   background-size: ${HEADER_PATTERN_HEIGHT}px auto;
 `;
@@ -142,14 +142,17 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const { theme, frameworks, onSelectFramework, onPageLink, signingIn, dataReady } = this.props;
-    const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
+    const { intl } = this.context;
+    const {
+      theme, frameworks, onSelectFramework, onPageLink, signingIn, dataReady,
+    } = this.props;
+    const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
@@ -158,29 +161,31 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               hasBrand={SHOW_BRAND_ON_HOME}
               showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
             >
-              <GraphicHome src={theme.media.graphicHome} alt={this.context.intl.formatMessage(appMessages.app.title)} />
+              <GraphicHome src={theme.media.graphicHome} alt={intl.formatMessage(appMessages.app.title)} />
             </GraphicHomeWrapper>
-            { !SHOW_HOME_TITLE &&
-              <GraphicHome src={theme.media.titleHome} alt={appTitle} />
+            { !SHOW_HOME_TITLE
+              && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
             }
-            <Container noPaddingBottom >
-              { SHOW_HOME_TITLE &&
-                <Row>
-                  <GridSpace lg={1 / 8} />
-                  <Grid lg={3 / 4} sm={1}>
-                    <Title>
-                      <FormattedMessage {...appMessages.app.title} />
-                    </Title>
-                    <Claim>
-                      <FormattedMessage {...appMessages.app.claim} />
-                    </Claim>
-                  </Grid>
-                </Row>
+            <Container noPaddingBottom>
+              { SHOW_HOME_TITLE
+                && (
+                  <Row>
+                    <GridSpace lg={1 / 8} />
+                    <Grid lg={3 / 4} sm={1}>
+                      <Title>
+                        <FormattedMessage {...appMessages.app.title} />
+                      </Title>
+                      <Claim>
+                        <FormattedMessage {...appMessages.app.claim} />
+                      </Claim>
+                    </Grid>
+                  </Row>
+                )
               }
               <Row>
                 <GridSpace lg={1 / 6} sm={1 / 8} />
                 <Grid lg={2 / 3} sm={3 / 4} xs={1}>
-                  <Intro source={this.context.intl.formatMessage(messages.intro)} />
+                  <Intro source={intl.formatMessage(messages.intro)} />
                 </Grid>
               </Row>
               <HomeActions>

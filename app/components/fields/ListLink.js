@@ -4,8 +4,10 @@ import { palette } from 'styled-theme';
 import Link from 'containers/Link';
 
 const ListLink = styled(
-  ({ paletteName, pIndex, paletteHover, pIndexHover, ...props }) => // eslint-disable-line no-unused-vars
-    <Link {...props} /> // eslint-disable-line jsx-a11y/anchor-has-content
+  // eslint-disable-line no-unused-vars
+  ({
+    paletteName, pIndex, paletteHover, pIndexHover, ...props
+  }) => <Link {...props} /> // eslint-disable-line jsx-a11y/anchor-has-content
 )`
   color: ${({ paletteName, pIndex }) => palette(paletteName || 'mainListItem', pIndex || 0)};
   display: block;

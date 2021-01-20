@@ -47,12 +47,14 @@ const GroupIcon = styled.div`
 
 class EntityListSidebarGroupLabel extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { label, icon, onToggle, expanded } = this.props;
-
+    const {
+      label, icon, onToggle, expanded,
+    } = this.props;
+    const { intl } = this.context;
     return (
       <Styled
         onClick={onToggle}
-        title={this.context.intl.formatMessage(
+        title={intl.formatMessage(
           expanded ? messages.groupExpand.hide : messages.groupExpand.show
         )}
       >

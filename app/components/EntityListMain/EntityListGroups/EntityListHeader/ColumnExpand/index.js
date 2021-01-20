@@ -39,9 +39,10 @@ const ExpandButton = styled(ButtonFlatIconOnly)`
   }
 `;
 class ColumnExpand extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
-    const { isExpand, label, width, onExpand } = this.props;
+    const {
+      isExpand, label, width, onExpand,
+    } = this.props;
     return (
       <Styled
         width={width}
@@ -52,11 +53,11 @@ class ColumnExpand extends React.PureComponent { // eslint-disable-line react/pr
             <ExpandButton
               onClick={onExpand}
             >
-              {isExpand &&
-                <Icon name="columnCollapse" />
+              {isExpand
+                && <Icon name="columnCollapse" />
               }
-              {!isExpand &&
-                <Icon name="columnExpand" />
+              {!isExpand
+                && <Icon name="columnExpand" />
               }
             </ExpandButton>
           </ExpandWrapper>

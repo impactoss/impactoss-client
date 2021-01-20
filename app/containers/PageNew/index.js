@@ -73,48 +73,52 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
     }
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage),
-        getMenuTitleFormField(this.context.intl.formatMessage),
-        getMenuOrderFormField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
+  getHeaderMainFields = () => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getTitleFormField(intl.formatMessage),
+          getMenuTitleFormField(intl.formatMessage),
+          getMenuOrderFormField(intl.formatMessage),
+        ],
+      },
+    ]);
+  }
 
-  getHeaderAsideFields = () => ([{
-    fields: [getStatusField(this.context.intl.formatMessage)],
-  }]);
+  getHeaderAsideFields = () => {
+    const { intl } = this.context;
+    return ([{
+      fields: [getStatusField(intl.formatMessage)],
+    }]);
+  };
 
-  getBodyMainFields = () => ([{
-    fields: [getMarkdownField(this.context.intl.formatMessage, 'content')],
-  }]);
+  getBodyMainFields = () => {
+    const { intl } = this.context;
+    return ([{
+      fields: [getMarkdownField(intl.formatMessage, 'content')],
+    }]);
+  };
 
   render() {
+    const { intl } = this.context;
     const { viewDomain, dataReady } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
-        <Content
-          ref={(node) => {
-            if (!this.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="categories"
             buttons={
@@ -129,46 +133,52 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
               }] : null
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {(saveSending || !dataReady) &&
-            <Loading />
+          {(saveSending || !dataReady)
+            && <Loading />
           }
-          {dataReady &&
-            <EntityForm
-              model="pageNew.form.data"
-              formData={viewDomain.getIn(['form', 'data'])}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={this.props.handleCancel}
-              handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(),
-                },
-                body: {
-                  main: this.getBodyMainFields(),
-                },
-              }}
-              scrollContainer={this.scrollContainer}
-            />
+          {dataReady
+            && (
+              <EntityForm
+                model="pageNew.form.data"
+                formData={viewDomain.getIn(['form', 'data'])}
+                saving={saveSending}
+                handleSubmit={(formData) => this.props.handleSubmit(formData)}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={this.props.handleCancel}
+                handleUpdate={this.props.handleUpdate}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(),
+                    aside: this.getHeaderAsideFields(),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          { saveSending &&
-            <Loading />
+          { saveSending
+            && <Loading />
           }
         </Content>
       </div>

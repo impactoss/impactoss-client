@@ -31,9 +31,10 @@ const Button = styled(ButtonFlat)`
 // `;
 
 class ButtonFlatWithIcon extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
-    const { iconRight, title, icon, iconSize, ...props } = this.props;
+    const {
+      iconRight, title, icon, iconSize, ...props
+    } = this.props;
     return (
       <Button
         title={title}

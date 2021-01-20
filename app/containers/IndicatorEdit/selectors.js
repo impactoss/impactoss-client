@@ -38,16 +38,14 @@ export const selectMeasures = createSelector(
   (state, id) => id,
   (state) => selectMeasuresCategorised(state),
   (state) => selectEntities(state, 'measure_indicators'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'measure_id', associations, 'indicator_id', id)
+  (id, entities, associations) => entitiesSetAssociated(entities, 'measure_id', associations, 'indicator_id', id)
 );
 
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
+  (taxonomies, categories) => prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
 );
 
 export const selectRecommendationsByFw = createSelector(
@@ -55,16 +53,14 @@ export const selectRecommendationsByFw = createSelector(
   (state) => selectRecommendationsCategorised(state),
   (state) => selectEntities(state, 'recommendation_indicators'),
   (state) => selectFrameworks(state),
-  (id, entities, associations, frameworks) =>
-    entitiesSetAssociated(entities, 'recommendation_id', associations, 'indicator_id', id)
+  (id, entities, associations, frameworks) => entitiesSetAssociated(entities, 'recommendation_id', associations, 'indicator_id', id)
     .filter((r) => {
       const framework = frameworks.find(
-        (fw) =>
-          attributesEqual(
-            fw.get('id'),
-            r.getIn(['attributes', 'framework_id']),
-          )
-        );
+        (fw) => attributesEqual(
+          fw.get('id'),
+          r.getIn(['attributes', 'framework_id']),
+        )
+      );
       return framework.getIn(['attributes', 'has_indicators']);
     })
     .groupBy(
@@ -75,6 +71,5 @@ export const selectRecommendationsByFw = createSelector(
 export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
-  (entities, associations) =>
-    usersByRole(entities, associations, USER_ROLES.CONTRIBUTOR.value)
+  (entities, associations) => usersByRole(entities, associations, USER_ROLES.CONTRIBUTOR.value)
 );

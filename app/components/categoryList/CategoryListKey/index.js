@@ -43,7 +43,6 @@ const Square = styled.div`
 
 
 class CategoryListKey extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { columns } = this.props;
 
@@ -68,8 +67,7 @@ class CategoryListKey extends React.PureComponent { // eslint-disable-line react
                 }
               </ColumnKey>
             )
-            : null
-          )
+            : null)
         }
       </Styled>
     );

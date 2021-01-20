@@ -25,7 +25,8 @@ export const scrollToY = (scrollTargetY, speed = 2000) => {
   tick();
 };
 
-export const scrollToTop = (scrollContainer) => {
+// export const scrollToTop = (scrollContainer) => {
+export const scrollToTop = () => {
   // TODO scroll to top
   // scrollContainer.scrollTop = 0; // eslint-disable-line no-param-reassign
 };
@@ -40,19 +41,20 @@ export const jumpToComponent = (scrollTarget, scrollReference, scrollContainer) 
 export const SCROLL_PADDING = 5;
 export const fitComponent = (scrollTarget, scrollContainer) => {
   if (
-    scrollTarget &&
-    scrollTarget.getBoundingClientRect &&
-    scrollContainer &&
-    scrollContainer.getBoundingClientRect
+    scrollTarget
+    && scrollTarget.getBoundingClientRect
+    && scrollContainer
+    && scrollContainer.getBoundingClientRect
   ) {
     if (
-      scrollTarget.getBoundingClientRect().height > scrollContainer.getBoundingClientRect().height ||
-      scrollTarget.getBoundingClientRect().top < scrollContainer.getBoundingClientRect().top
+      scrollTarget.getBoundingClientRect().height > scrollContainer.getBoundingClientRect().height
+      || scrollTarget.getBoundingClientRect().top < scrollContainer.getBoundingClientRect().top
     ) {
-      scrollContainer.scrollTop +=
-        scrollTarget.getBoundingClientRect().top -
-        scrollContainer.getBoundingClientRect().top -
-        SCROLL_PADDING; // eslint-disable-line no-param-reassign
+      /* eslint-disable no-param-reassign */
+      scrollContainer.scrollTop
+        += scrollTarget.getBoundingClientRect().top
+        - scrollContainer.getBoundingClientRect().top
+        - SCROLL_PADDING; // eslint-disable-line no-param-reassign
     }
     if (scrollTarget.getBoundingClientRect().bottom > scrollContainer.getBoundingClientRect().bottom) {
       scrollContainer.scrollTop += ((scrollTarget.getBoundingClientRect().bottom - scrollContainer.getBoundingClientRect().bottom) + SCROLL_PADDING); // eslint-disable-line no-param-reassign

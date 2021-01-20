@@ -76,15 +76,15 @@ export const CYCLE_TAXONOMY_ID = 2;
 
 /**
  * Server settings
- **/
+ * */
 
 // General ********************
 
 export const ENDPOINTS = {
   API: (
     NODE_ENV === 'production'
-    ? 'https://impactoss-dev.herokuapp.com/'
-    : 'https://impactoss-dev.herokuapp.com/'
+      ? 'https://impactoss-dev.herokuapp.com/'
+      : 'https://impactoss-dev.herokuapp.com/'
   ), // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',

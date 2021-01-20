@@ -2,7 +2,9 @@
  * Gets the entities from server
  */
 
-import { call, put, select, takeLatest, takeEvery, race, take } from 'redux-saga/effects';
+import {
+  call, put, select, takeLatest, takeEvery, race, take,
+} from 'redux-saga/effects';
 import { push, replace, goBack } from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
@@ -180,7 +182,8 @@ export function* recoverSaga(payload) {
       {
         replace: true,
         query: { info: PARAMS.RECOVER_SUCCESS },
-      }));
+      }
+    ));
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(recoverError(err));
@@ -250,7 +253,9 @@ function stampPayload(payload, type) {
 }
 
 
-function* createConnectionsSaga({ entityId, path, updates, keyPair }) {
+function* createConnectionsSaga({
+  entityId, path, updates, keyPair,
+}) {
   // make sure to use new entity id for full payload
   // we should have either the one (recommendation_id) or the other (measure_id)
   const updatesUpdated = updates;
@@ -531,7 +536,7 @@ const getNextQuery = (query, extend, location) => {
           queryUpdated[param.arg] = without(queryUpdated[param.arg], param.value.toString());
           // convert to single value if only one value left
           if (queryUpdated[param.arg].length === 1) {
-            queryUpdated[param.arg] = queryUpdated[param.arg][0];
+            [queryUpdated[param.arg]] = queryUpdated[param.arg];
           }
         }
       // if single value set
@@ -554,16 +559,15 @@ const getNextQuery = (query, extend, location) => {
 };
 
 // convert to string
-export const getNextQueryString = (queryNext) =>
-  reduce(queryNext, (result, value, key) => {
-    let params;
-    if (Array.isArray(value)) {
-      params = value.reduce((memo, val) => `${memo}${memo.length > 0 ? '&' : ''}${key}=${encodeURIComponent(val)}`, '');
-    } else {
-      params = `${key}=${encodeURIComponent(value)}`;
-    }
-    return `${result}${result.length > 0 ? '&' : ''}${params}`;
-  }, '');
+export const getNextQueryString = (queryNext) => reduce(queryNext, (result, value, key) => {
+  let params;
+  if (Array.isArray(value)) {
+    params = value.reduce((memo, val) => `${memo}${memo.length > 0 ? '&' : ''}${key}=${encodeURIComponent(val)}`, '');
+  } else {
+    params = `${key}=${encodeURIComponent(value)}`;
+  }
+  return `${result}${result.length > 0 ? '&' : ''}${params}`;
+}, '');
 
 export function* updateRouteQuerySaga({ query, extend = true }) {
   const location = yield select(selectLocation);
@@ -644,9 +648,8 @@ export function* closeEntitySaga({ path }) {
   // the close icon is to function like back if possible, otherwise go to default path provided
   const previousPath = yield select(selectPreviousPathname);
   const currentPath = yield select(selectCurrentPathname);
-  const isPreviousValid =
-    previousPath.indexOf('/edit') > -1 ||
-    previousPath.indexOf('/new') > -1;
+  const isPreviousValid = previousPath.indexOf('/edit') > -1
+    || previousPath.indexOf('/new') > -1;
   yield put(
     !isPreviousValid && previousPath && (previousPath !== currentPath)
       ? goBack()

@@ -28,7 +28,6 @@ import { selectConnections, selectMeasures, selectConnectedTaxonomies } from './
 import messages from './messages';
 
 export class ActionList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
@@ -51,24 +50,24 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       location,
       isManager,
     } = this.props;
-
+    const { intl } = this.context;
     const headerOptions = {
-      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'measures',
       actions: [],
     };
     if (isManager) {
       headerOptions.actions.push({
         type: 'text',
-        title: this.context.intl.formatMessage(appMessages.buttons.import),
+        title: intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       });
       headerOptions.actions.push({
         type: 'add',
         title: [
-          this.context.intl.formatMessage(appMessages.buttons.add),
+          intl.formatMessage(appMessages.buttons.add),
           {
-            title: this.context.intl.formatMessage(appMessages.entities.measures.single),
+            title: intl.formatMessage(appMessages.entities.measures.single),
             hiddenSmall: true,
           },
         ],
@@ -77,14 +76,14 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     }
     headerOptions.actions.push({
       type: 'bookmarker',
-      title: this.context.intl.formatMessage(messages.pageTitle),
+      title: intl.formatMessage(messages.pageTitle),
     });
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <EntityList
@@ -97,8 +96,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities.measures.single),
-            plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+            single: intl.formatMessage(appMessages.entities.measures.single),
+            plural: intl.formatMessage(appMessages.entities.measures.plural),
           }}
           locationQuery={fromJS(location.query)}
         />

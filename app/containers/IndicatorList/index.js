@@ -26,7 +26,6 @@ import { selectConnections, selectIndicators, selectConnectedTaxonomies } from '
 import messages from './messages';
 
 export class IndicatorList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
@@ -39,26 +38,27 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
   }
 
   render() {
+    const { intl } = this.context;
     const { dataReady, isManager } = this.props;
 
     // specify the filter and query  options
     const headerOptions = {
-      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'indicators',
       actions: [],
     };
     if (isManager) {
       headerOptions.actions.push({
         type: 'text',
-        title: this.context.intl.formatMessage(appMessages.buttons.import),
+        title: intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       });
       headerOptions.actions.push({
         type: 'add',
         title: [
-          this.context.intl.formatMessage(appMessages.buttons.add),
+          intl.formatMessage(appMessages.buttons.add),
           {
-            title: this.context.intl.formatMessage(appMessages.entities.indicators.single),
+            title: intl.formatMessage(appMessages.entities.indicators.single),
             hiddenSmall: true,
           },
         ],
@@ -67,15 +67,15 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
     }
     headerOptions.actions.push({
       type: 'bookmarker',
-      title: this.context.intl.formatMessage(messages.pageTitle),
+      title: intl.formatMessage(messages.pageTitle),
     });
 
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <EntityList
@@ -87,8 +87,8 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities.indicators.single),
-            plural: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+            single: intl.formatMessage(appMessages.entities.indicators.single),
+            plural: intl.formatMessage(appMessages.entities.indicators.plural),
           }}
           locationQuery={fromJS(this.props.location.query)}
         />

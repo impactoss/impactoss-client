@@ -2,21 +2,26 @@ import { toLower as loCase } from 'lodash/string';
 import { reduce } from 'lodash/collection';
 import { TEXT_TRUNCATE } from 'themes/config';
 
-export const lowerCase = (str) =>
-  loCase(str).replace('\bun\b', 'UN').replace('\bhr\b', 'HR').replace('\bupr\b', 'UPR').replace('sdg', 'SDG').replace('\bsmart\b', 'SMART').replace('sustainable development goal', 'Sustainable Development Goal');
+export const lowerCase = (str) => loCase(str)
+  .replace('\bun\b', 'UN')
+  .replace('\bhr\b', 'HR')
+  .replace('\bupr\b', 'UPR')
+  .replace('sdg', 'SDG')
+  .replace('sds', 'SDS')
+  .replace('\bsmart\b', 'SMART')
+  .replace('sustainable development goal', 'Sustainable Development Goal');
 
 export const getPathFromUrl = (url) => url.split(/[?#]/)[0];
 
 export const getFilenameFromUrl = (url) => url.split('/').pop();
 
-export const cleanupSearchTarget = (str) =>
-  loCase(str)
-    .replace(/[’]/, '\'')
-    .replace(/[ā]/, 'a')
-    .replace(/[ē]/, 'e')
-    .replace(/[ī]/, 'i')
-    .replace(/[ō]/, 'o')
-    .replace(/[ū]/, 'u');
+export const cleanupSearchTarget = (str) => loCase(str)
+  .replace(/[’]/, '\'')
+  .replace(/[ā]/, 'a')
+  .replace(/[ē]/, 'e')
+  .replace(/[ī]/, 'i')
+  .replace(/[ō]/, 'o')
+  .replace(/[ū]/, 'u');
 
 // adapted from
 // https://stackoverflow.com/questions/19793221/javascript-text-between-double-quotes
@@ -37,14 +42,13 @@ const extractAllPhrases = (str) => {
 export const regExMultipleWords = (str) => {
   // first extract phrases and turn to words
   const phrases = extractAllPhrases(str);
-  const phraseWords =
-    phrases.length > 0
-      ? reduce(
-        phrases,
-        (memo, p) => `${memo}(?=.*${p})`,
-        '',
-      )
-      : '';
+  const phraseWords = phrases.length > 0
+    ? reduce(
+      phrases,
+      (memo, p) => `${memo}(?=.*${p})`,
+      '',
+    )
+    : '';
   // then remove phrases from original string
   // and turn to words
   const strWithoutPhrases = reduce(
@@ -56,8 +60,7 @@ export const regExMultipleWords = (str) => {
     strWithoutPhrases
       .replace('"', '')
       .split(' '),
-    (memo, s) =>
-      s !== ''
+    (memo, s) => s !== ''
       ? `${memo}(?=.*${s})`
       : memo,
     '',
@@ -67,8 +70,7 @@ export const regExMultipleWords = (str) => {
 };
 
 // match multiple words
-export const regExMultipleWordsMatchStart = (str) =>
-  reduce(str.split(' '), (words, s) => `${words}(?=.*\\b${s})`, '');
+export const regExMultipleWordsMatchStart = (str) => reduce(str.split(' '), (words, s) => `${words}(?=.*\\b${s})`, '');
 
 export const truncateText = (text, limit, keepWords = true) => {
   if (text.length > (limit + TEXT_TRUNCATE.GRACE)) {

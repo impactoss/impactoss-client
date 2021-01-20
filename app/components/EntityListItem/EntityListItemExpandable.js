@@ -40,27 +40,27 @@ const Info = styled.div`
 `;
 
 class EntityListItemExpandable extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const {
       count,
       onClick,
       dates,
       width,
+      column,
     } = this.props;
-    const { type, icon } = this.props.column;
-
+    const { type, icon } = column;
+    const { intl } = this.context;
     const info = [];
     if (dates) {
       if (dates.due) {
         info.push({
-          label: this.context.intl && this.context.intl.formatMessage(messages.due, { total: dates.due }),
+          label: intl && intl.formatMessage(messages.due, { total: dates.due }),
         });
       }
       if (dates.overdue) {
         info.push({
           style: type,
-          label: this.context.intl && this.context.intl.formatMessage(messages.overdue, { total: dates.overdue }),
+          label: intl && intl.formatMessage(messages.overdue, { total: dates.overdue }),
         });
       }
     }
@@ -70,10 +70,8 @@ class EntityListItemExpandable extends React.PureComponent { // eslint-disable-l
           <Icon name={icon} text iconRight />
         </IconWrap>
         <Count type={type} count={count}>{count}</Count>
-        { info &&
-          info.map((infoItem, i) =>
-            (<Info key={i} palette={infoItem.style}>{infoItem.label}</Info>)
-          )
+        { info
+          && info.map((infoItem, i) => (<Info key={i} palette={infoItem.style}>{infoItem.label}</Info>))
         }
       </Styled>
     );

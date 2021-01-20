@@ -27,10 +27,11 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
 
   render() {
     const { field } = this.props;
-    const label = `${field.values.size} ${this.context.intl.formatMessage(
+    const { intl } = this.context;
+    const label = `${field.values.size} ${intl.formatMessage(
       field.values.size === 1
-      ? appMessages.entities[field.entityType].single
-      : appMessages.entities[field.entityType].plural
+        ? appMessages.entities[field.entityType].single
+        : appMessages.entities[field.entityType].plural
     )}`;
 
     return (
@@ -40,40 +41,50 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
             {label}
           </ConnectionLabel>
         </ConnectionLabelWrap>
-        { (field.values && field.values.size > 0) &&
-          <div>
-            <EntityListItems
-              taxonomies={field.taxonomies}
-              connections={field.connections}
-              config={{ connections: { options: field.connectionOptions } }}
-              entities={
-                this.state.showAllConnections
-                  ? field.values
-                  : (field.values.slice(0, CONNECTIONMAX))
+        { (field.values && field.values.size > 0)
+          && (
+            <div>
+              <EntityListItems
+                taxonomies={field.taxonomies}
+                connections={field.connections}
+                config={{ connections: { options: field.connectionOptions } }}
+                entities={
+                  this.state.showAllConnections
+                    ? field.values
+                    : (field.values.slice(0, CONNECTIONMAX))
+                }
+                entityIcon={field.entityIcon}
+                onEntityClick={field.onEntityClick}
+                entityPath={field.entityPath}
+                isConnection
+              />
+              { field.values.size > CONNECTIONMAX
+              && (
+                <ToggleAllItems
+                  onClick={() => this.setState(
+                    (prevState) => (
+                      { showAllConnections: !prevState.showAllConnections }
+                    )
+                  )}
+                >
+                  { this.state.showAllConnections
+                  && <FormattedMessage {...appMessages.entities.showLess} />
+                  }
+                  { !this.state.showAllConnections
+                  && <FormattedMessage {...appMessages.entities.showAll} />
+                  }
+                </ToggleAllItems>
+              )
               }
-              entityIcon={field.entityIcon}
-              onEntityClick={field.onEntityClick}
-              entityPath={field.entityPath}
-              isConnection
-            />
-            { field.values.size > CONNECTIONMAX &&
-              <ToggleAllItems
-                onClick={() => this.setState({ showAllConnections: !this.state.showAllConnections })}
-              >
-                { this.state.showAllConnections &&
-                  <FormattedMessage {...appMessages.entities.showLess} />
-                }
-                { !this.state.showAllConnections &&
-                  <FormattedMessage {...appMessages.entities.showAll} />
-                }
-              </ToggleAllItems>
-            }
-          </div>
+            </div>
+          )
         }
-        { (!field.values || field.values.size === 0) &&
-          <EmptyHint>
-            <FormattedMessage {...field.showEmpty} />
-          </EmptyHint>
+        { (!field.values || field.values.size === 0)
+          && (
+            <EmptyHint>
+              <FormattedMessage {...field.showEmpty} />
+            </EmptyHint>
+          )
         }
       </StyledFieldWrap>
     );

@@ -39,7 +39,7 @@ import {
   deleteEntity,
   submitInvalid,
   saveErrorDismiss,
-  } from 'containers/App/actions';
+} from 'containers/App/actions';
 
 import {
   selectReady,
@@ -96,61 +96,67 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     const props = nextProps || this.props;
     const { viewEntity } = props;
     return viewEntity
-    ? Map({
-      id: viewEntity.get('id'),
-      attributes: viewEntity.get('attributes').mergeWith(
-        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-        FORM_INITIAL.get('attributes')
-      ),
-    })
-    : Map();
+      ? Map({
+        id: viewEntity.get('id'),
+        attributes: viewEntity.get('attributes').mergeWith(
+          (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+          FORM_INITIAL.get('attributes')
+        ),
+      })
+      : Map();
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage),
-        getMenuTitleFormField(this.context.intl.formatMessage),
-        getMenuOrderFormField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
+  getHeaderMainFields = () => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getTitleFormField(intl.formatMessage),
+          getMenuTitleFormField(intl.formatMessage),
+          getMenuOrderFormField(intl.formatMessage),
+        ],
+      },
+    ]);
+  };
 
-  getHeaderAsideFields = (entity) => ([
-    {
-      fields: [
-        getStatusField(this.context.intl.formatMessage),
-        getMetaField(entity),
-      ],
-    },
-  ]);
+  getHeaderAsideFields = (entity) => {
+    const { intl } = this.context;
+    return ([
+      {
+        fields: [
+          getStatusField(intl.formatMessage),
+          getMetaField(entity),
+        ],
+      },
+    ]);
+  };
 
-  getBodyMainFields = () => ([{
-    fields: [getMarkdownField(this.context.intl.formatMessage, 'content')],
-  }]);
+  getBodyMainFields = () => {
+    const { intl } = this.context;
+    return ([{
+      fields: [getMarkdownField(intl.formatMessage, 'content')],
+    }]);
+  };
 
   render() {
+    const { intl } = this.context;
     const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.get('page').toJS();
+    const {
+      saveSending, saveError, deleteSending, deleteError, submitValid,
+    } = viewDomain.get('page').toJS();
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={`${intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content
-          ref={(node) => {
-            if (!this.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             buttons={
               viewEntity && dataReady ? [{
@@ -164,55 +170,63 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
               }] : null
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {deleteError &&
-            <Messages type="error" messages={deleteError} />
+          {deleteError
+            && <Messages type="error" messages={deleteError} />
           }
-          {(saveSending || deleteSending || !dataReady) &&
-            <Loading />
+          {(saveSending || deleteSending || !dataReady)
+            && <Loading />
           }
-          {!viewEntity && dataReady && !saveError && !deleteSending &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          {!viewEntity && dataReady && !saveError && !deleteSending
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          {viewEntity && dataReady && !deleteSending &&
-            <EntityForm
-              model="pageEdit.form.data"
-              formData={viewDomain.getIn(['form', 'data'])}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={this.props.handleCancel}
-              handleUpdate={this.props.handleUpdate}
-              handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(viewEntity),
-                },
-                body: {
-                  main: this.getBodyMainFields(viewEntity),
-                },
-              }}
-              scrollContainer={this.scrollContainer}
-            />
+          {viewEntity && dataReady && !deleteSending
+            && (
+              <EntityForm
+                model="pageEdit.form.data"
+                formData={viewDomain.getIn(['form', 'data'])}
+                saving={saveSending}
+                handleSubmit={(formData) => this.props.handleSubmit(formData)}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={this.props.handleCancel}
+                handleUpdate={this.props.handleUpdate}
+                handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(),
+                    aside: this.getHeaderAsideFields(viewEntity),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(viewEntity),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          { (saveSending || deleteSending) &&
-            <Loading />
+          { (saveSending || deleteSending)
+            && <Loading />
           }
         </Content>
       </div>

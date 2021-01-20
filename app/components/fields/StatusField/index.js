@@ -14,6 +14,7 @@ import Status from 'components/fields/Status';
 
 class StatusField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
+    const { intl } = this.context;
     const { field } = this.props;
     const status = find(field.options || PUBLISH_STATUSES, { value: field.value });
 
@@ -24,7 +25,7 @@ class StatusField extends React.PureComponent { // eslint-disable-line react/pre
         </Label>
         <Status>
           { status && status.message
-            ? appMessage(this.context.intl, status.message)
+            ? appMessage(intl, status.message)
             : ((status && status.label) || field.value)
           }
         </Status>

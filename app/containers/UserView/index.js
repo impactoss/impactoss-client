@@ -45,7 +45,6 @@ import {
 import { DEPENDENCIES } from './constants';
 
 export class UserView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
@@ -65,12 +64,13 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     handleClose,
     handleEditPassword,
   }) => {
+    const { intl } = this.context;
     const userId = user.get('id') || user.getIn(['attributes', 'id']);
     const buttons = [];
     if (userId === sessionUserId) {
       buttons.push({
         type: 'edit',
-        title: this.context.intl.formatMessage(messages.editPassword),
+        title: intl.formatMessage(messages.editPassword),
         onClick: () => handleEditPassword(userId),
       });
     }
@@ -112,51 +112,55 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
   ]);
 
   // only show the highest rated role (lower role ids means higher)
-  getHighestUserRoleId = (roles) =>
-    roles.reduce((memo, role) =>
-      (role.get('id') < memo) ? role.get('id') : memo
-      , USER_ROLES.DEFAULT.value
-    );
+  getHighestUserRoleId = (roles) => roles.reduce((memo, role) => (role.get('id') < memo) ? role.get('id') : memo,
+    USER_ROLES.DEFAULT.value);
 
   render() {
-    const { user, dataReady, sessionUserHighestRoleId, taxonomies } = this.props;
+    const { intl } = this.context;
+    const {
+      user, dataReady, sessionUserHighestRoleId, taxonomies,
+    } = this.props;
     const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="users"
             buttons={user && this.getButtons(this.props)}
           />
-          { !user && !dataReady &&
-            <Loading />
+          { !user && !dataReady
+            && <Loading />
           }
-          { !user && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          { !user && dataReady
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          { user && dataReady &&
-            <EntityView
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(user, isManager),
-                  aside: isManager && this.getHeaderAsideFields(user),
-                },
-                body: {
-                  main: this.getBodyMainFields(user),
-                  aside: isManager && this.getBodyAsideFields(taxonomies),
-                },
-              }}
-            />
+          { user && dataReady
+            && (
+              <EntityView
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(user, isManager),
+                    aside: isManager && this.getHeaderAsideFields(user),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(user),
+                    aside: isManager && this.getBodyAsideFields(taxonomies),
+                  },
+                }}
+              />
+            )
           }
         </Content>
       </div>

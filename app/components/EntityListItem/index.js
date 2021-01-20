@@ -57,14 +57,15 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
   }
 
   transformMessage = (type, msg) => {
+    const { intl } = this.context;
     if (type === 'delete') {
-      return this.context.intl
-        ? this.context.intl.formatMessage(messages.associationNotExistent)
+      return intl
+        ? intl.formatMessage(messages.associationNotExistent)
         : msg;
     }
     if (type === 'new') {
-      return this.context.intl
-        ? this.context.intl.formatMessage(messages.associationAlreadyPresent)
+      return intl
+        ? intl.formatMessage(messages.associationAlreadyPresent)
         : msg;
     }
     return msg;
@@ -96,10 +97,10 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
             type="error"
             messages={
               updateError
-              .getIn(['error', 'messages'])
-              .map((msg) => this.transformMessage(updateError.get('type'), msg))
-              .valueSeq()
-              .toArray()
+                .getIn(['error', 'messages'])
+                .map((msg) => this.transformMessage(updateError.get('type'), msg))
+                .valueSeq()
+                .toArray()
             }
             onDismiss={() => this.props.onDismissError(updateError.get('key'))}
             preMessage={false}
@@ -109,8 +110,8 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
         <Item error={error}>
           <MainWrapper expandable={entity.get('expandable')}>
             <MainInnerWrapper>
-              {isManager &&
-                <EntityListItemSelect checked={isSelected} onSelect={onSelect} />
+              {isManager
+                && <EntityListItemSelect checked={isSelected} onSelect={onSelect} />
               }
               <EntityListItemMain
                 entity={entity}
@@ -127,8 +128,8 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
             </MainInnerWrapper>
           </MainWrapper>
           {
-            entity.get('expandable') &&
-            asList(entity.get('expandable')).map((attribute, i, list) =>
+            entity.get('expandable')
+            && asList(entity.get('expandable')).map((attribute, i, list) => (
               <EntityListItemExpandable
                 key={i}
                 column={find(config.expandableColumns, (col) => col.type === attribute)}
@@ -137,7 +138,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
                 onClick={() => onExpand(expandNo > i ? i : i + 1)}
                 width={(1 - 0.66) / list.size}
               />
-            )
+            ))
           }
         </Item>
       </Styled>

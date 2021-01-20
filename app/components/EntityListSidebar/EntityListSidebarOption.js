@@ -68,7 +68,6 @@ const DotWrapper = styled.div`
 `;
 
 class EntityListSidebarOption extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   renderDot = (groupId, color, active) => {
     switch (groupId) {
       case 'taxonomies':
@@ -82,9 +81,12 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
         return null;
     }
   }
-  render() {
-    const { option, onShowForm, groupId, groupType } = this.props;
 
+  render() {
+    const {
+      option, onShowForm, groupId, groupType,
+    } = this.props;
+    const { intl } = this.context;
     return (
       <Styled
         active={option.get('active')}
@@ -99,20 +101,22 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
           active: option.get('active'),
           create: option.get('create') && option.get('create').toJS(),
         })}
-        title={this.context.intl.formatMessage(
+        title={intl.formatMessage(
           option.get('active') ? messages.groupOptionSelect.hide : messages.groupOptionSelect.show
         )}
       >
         <Label>
           { option.get('message')
-            ? appMessage(this.context.intl, option.get('message'))
+            ? appMessage(intl, option.get('message'))
             : option.get('label')
           }
         </Label>
-        { option.get('icon') &&
-          <IconWrapper>
-            <Icon name={option.get('icon')} />
-          </IconWrapper>
+        { option.get('icon')
+          && (
+            <IconWrapper>
+              <Icon name={option.get('icon')} />
+            </IconWrapper>
+          )
         }
         <DotWrapper small={option.get('nested')}>
           {
