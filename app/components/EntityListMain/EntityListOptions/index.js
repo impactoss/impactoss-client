@@ -47,7 +47,7 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
   }
 `;
 
-export class EntityListOptions extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class EntityListOptions extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
     return !isEqual(this.props, nextProps);
   }

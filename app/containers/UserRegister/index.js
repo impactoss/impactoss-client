@@ -46,7 +46,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
     this.props.initialiseForm();
   }
   render() {
-    const { registerError, registerSending } = this.props.viewDomain.page;
+    const { registerError, registerSending } = this.props.viewDomain.get('page').toJS();
 
     return (
       <div>

@@ -14,7 +14,7 @@ import {
 
 export const selectDomain = createSelector(
   (state) => state.get('measureNew'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectConnectedTaxonomies = createSelector(

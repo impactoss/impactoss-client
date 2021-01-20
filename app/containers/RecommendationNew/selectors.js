@@ -8,7 +8,7 @@ import { prepareTaxonomiesMultiple } from 'utils/entities';
 
 export const selectDomain = createSelector(
   (state) => state.get('recommendationNew'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectConnectedTaxonomies = createSelector(

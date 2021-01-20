@@ -47,7 +47,7 @@ const MainInnerWrapper = styled(Component)`
   width: 100%;
 `;
 
-class EntityListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class EntityListItem extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
     return this.props.entity !== nextProps.entity
       || this.props.isSelected !== nextProps.isSelected

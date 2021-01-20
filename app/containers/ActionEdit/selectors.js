@@ -19,7 +19,7 @@ import {
 
 export const selectDomain = createSelector(
   (state) => state.get('measureEdit'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectViewEntity = createSelector(

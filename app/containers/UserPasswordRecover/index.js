@@ -43,7 +43,7 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
     this.props.initialiseForm();
   }
   render() {
-    const { error, sending } = this.props.viewDomain.page;
+    const { error, sending } = this.props.viewDomain.get('page').toJS();
 
     return (
       <div>

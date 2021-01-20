@@ -89,7 +89,7 @@ const ListInlineItemNavDisabled = styled.div`
     padding: 0 0.5em;
   }`;
 
-export class EntityListFooter extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class EntityListFooter extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
     return !isEqual(this.props.pager, nextProps.pager)
       || this.props.pageSize !== nextProps.pageSize;

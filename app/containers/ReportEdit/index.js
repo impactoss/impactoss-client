@@ -68,9 +68,7 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 export class ReportEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
   componentWillMount() {
@@ -93,8 +91,8 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer);
     }
   }
 
@@ -127,18 +125,18 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        getStatusField(this.context.intl.formatMessage, entity),
+        getStatusField(this.context.intl.formatMessage),
         getMetaField(entity),
       ],
     },
   ]);
 
-  getBodyMainFields = (entity) => ([
+  getBodyMainFields = () => ([
     {
       fields: [
         getMarkdownField(this.context.intl.formatMessage),
         getUploadField(this.context.intl.formatMessage),
-        getDocumentStatusField(this.context.intl.formatMessage, entity),
+        getDocumentStatusField(this.context.intl.formatMessage),
       ],
     },
   ]);
@@ -165,7 +163,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   render() {
     const { viewEntity, dataReady, viewDomain } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.get('page').toJS();
 
     let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
     if (viewEntity && dataReady) {
@@ -183,7 +181,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         />
         <Content
           ref={(node) => {
-            if (!this.state.scrollContainer) {
+            if (!this.scrollContainer) {
               this.setState({ scrollContainer: node });
             }
           }}
@@ -232,7 +230,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="reportEdit.form.data"
-              formData={viewDomain.form.data}
+              formData={viewDomain.getIn(['form', 'data'])}
               saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity.getIn(['attributes', 'due_date_id']))}
               handleSubmitFail={this.props.handleSubmitFail}
@@ -248,11 +246,11 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                   aside: this.getHeaderAsideFields(viewEntity),
                 },
                 body: {
-                  main: this.getBodyMainFields(viewEntity),
+                  main: this.getBodyMainFields(),
                   aside: this.getBodyAsideFields(viewEntity),
                 },
               }}
-              scrollContainer={this.state.scrollContainer}
+              scrollContainer={this.scrollContainer}
             />
           }
           { (saveSending || deleteSending) &&

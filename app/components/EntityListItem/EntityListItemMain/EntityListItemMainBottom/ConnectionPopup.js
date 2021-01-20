@@ -175,7 +175,6 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
 
     return (
       <PopupWrapper
-        onFocus={false}
         onMouseOver={() => this.openPopup()}
         onMouseLeave={() => this.closePopup()}
         onClick={() => this.state.popupOpen ? this.closePopup() : this.openPopup()}

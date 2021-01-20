@@ -315,54 +315,48 @@ export const getRoleFormField = (formatMessage, roleOptions) => ({
   controlType: 'select',
   model: '.associatedRole',
   label: formatMessage(appMessages.entities.roles.single),
-  value: getHighestUserRoleId(roleOptions).toString(),
   options: Object.values(filter(USER_ROLES, (userRole) =>
     roleOptions.map((roleOption) => parseInt(roleOption.get('id'), 10)).includes(userRole.value)
     || userRole.value === USER_ROLES.DEFAULT.value
   )),
 });
 
-export const getAcceptedField = (formatMessage, entity) => ({
+export const getAcceptedField = (formatMessage) => ({
   id: 'accepted',
   controlType: 'select',
   model: '.attributes.accepted',
   label: formatMessage(appMessages.attributes.accepted),
-  value: entity ? entity.getIn(['attributes', 'accepted']) : true,
   options: ACCEPTED_STATUSES,
 });
 
-export const getFrequencyField = (formatMessage, entity) => ({
+export const getFrequencyField = (formatMessage) => ({
   id: 'frequency_months',
   controlType: 'select',
   model: '.attributes.frequency_months',
   label: formatMessage(appMessages.attributes.frequency_months),
-  value: entity ? parseInt(entity.getIn(['attributes', 'frequency_months']), 10) : 1,
   options: REPORT_FREQUENCIES,
 });
 
-export const getDocumentStatusField = (formatMessage, entity) => ({
+export const getDocumentStatusField = (formatMessage) => ({
   id: 'document_public',
   controlType: 'select',
   model: '.attributes.document_public',
   label: formatMessage(appMessages.attributes.document_public),
-  value: entity ? entity.getIn(['attributes', 'document_public']) : false,
   options: DOC_PUBLISH_STATUSES,
 });
 
-export const getStatusField = (formatMessage, entity) => ({
+export const getStatusField = (formatMessage) => ({
   id: 'status',
   controlType: 'select',
   model: '.attributes.draft',
   label: formatMessage(appMessages.attributes.draft),
-  value: entity ? entity.getIn(['attributes', 'draft']) : true,
   options: PUBLISH_STATUSES,
 });
-export const getFrameworkFormField = (formatMessage, fwOptions, value) => ({
+export const getFrameworkFormField = (formatMessage, fwOptions) => ({
   id: 'framework',
   controlType: 'select',
   model: '.attributes.framework_id',
   label: formatMessage(appMessages.attributes.framework_id),
-  value,
   options: Object.values(fwOptions.toJS()).map((fw) => ({
     value: fw.id,
     message: `frameworks.${fw.id}`,
@@ -501,13 +495,13 @@ export const getDateField = (formatMessage, attribute, required = false, label, 
   return field;
 };
 
-export const getCheckboxField = (formatMessage, attribute, entity, onChange) => (
+export const getCheckboxField = (formatMessage, attribute, onChange) => (
   {
     id: attribute,
     controlType: 'checkbox',
     model: `.attributes.${attribute}`,
     label: appMessages.attributes[attribute] && formatMessage(appMessages.attributes[attribute]),
-    value: entity && entity.getIn(['attributes', attribute]) ? entity.getIn(['attributes', attribute]) : false,
+    // value: entity && entity.getIn(['attributes', attribute]) ? entity.getIn(['attributes', attribute]) : false,
     changeAction: onChange,
     hint: appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute]),
   });

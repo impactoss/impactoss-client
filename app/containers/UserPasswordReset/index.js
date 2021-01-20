@@ -33,7 +33,7 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
     this.props.initialiseForm();
   }
   render() {
-    const { resetSending, resetError } = this.props.viewDomain.page;
+    const { resetSending, resetError } = this.props.viewDomain.get('page').toJS();
 
     return (
       <div>

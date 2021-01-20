@@ -70,9 +70,7 @@ import { save } from './actions';
 export class ActionNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
   componentWillMount() {
@@ -88,8 +86,8 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer);
     }
   }
 
@@ -172,7 +170,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
 
   render() {
     const { dataReady, viewDomain, connectedTaxonomies, recommendationsByFw, indicators, taxonomies, onCreateOption } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     return (
       <div>
         <Helmet
@@ -186,7 +184,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
         />
         <Content
           ref={(node) => {
-            if (!this.state.scrollContainer) {
+            if (!this.scrollContainer) {
               this.setState({ scrollContainer: node });
             }
           }}
@@ -227,7 +225,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           {dataReady &&
             <EntityForm
               model="measureNew.form.data"
-              formData={viewDomain.form.data}
+              formData={viewDomain.getIn(['form', 'data'])}
               saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
               handleSubmitFail={this.props.handleSubmitFail}
@@ -251,7 +249,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                   ),
                 },
               }}
-              scrollContainer={this.state.scrollContainer}
+              scrollContainer={this.scrollContainer}
             />
           }
           {saveSending &&

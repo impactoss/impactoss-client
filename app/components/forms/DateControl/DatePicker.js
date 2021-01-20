@@ -8,7 +8,7 @@ import { DB_DATE_FORMAT } from 'themes/config';
 import InputComponent from './InputComponent';
 
 // Import DayPicker styles
-import GlobalStyle from './styles';
+import DatePickerStyle from './styles';
 
 class DatePicker extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -37,8 +37,7 @@ class DatePicker extends React.PureComponent { // eslint-disable-line react/pref
             // todayButton: 'Go to Today',
           }}
         />
-        // Import DayPicker styles
-        <GlobalStyle/>
+        <DatePickerStyle />
       </React.Fragment>
     );
   }

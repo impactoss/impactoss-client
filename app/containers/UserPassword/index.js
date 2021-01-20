@@ -35,7 +35,7 @@ export class UserPassword extends React.PureComponent { // eslint-disable-line r
     this.props.initialiseForm();
   }
   render() {
-    const { passwordSending, passwordError } = this.props.userPassword.page;
+    const { passwordSending, passwordError } = this.props.userPassword.get('page').toJS();
     const reference = this.props.params.id;
 
     return (
@@ -59,7 +59,7 @@ export class UserPassword extends React.PureComponent { // eslint-disable-line r
           {passwordSending &&
             <Loading />
           }
-          { this.props.userPassword.form &&
+          { this.props.userPassword.get('form') &&
             <AuthForm
               model="userPassword.form.data"
               sending={passwordSending}
