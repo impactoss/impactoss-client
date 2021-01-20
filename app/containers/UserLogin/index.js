@@ -43,7 +43,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
     this.props.initialiseForm();
   }
   render() {
-    const { authError, authSending } = this.props.viewDomain.page;
+    const { authError, authSending } = this.props.viewDomain.get('page').toJS();
 
     return (
       <div>

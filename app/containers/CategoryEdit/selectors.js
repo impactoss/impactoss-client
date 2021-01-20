@@ -22,7 +22,7 @@ import {
 
 export const selectDomain = createSelector(
   (state) => state.get('categoryEdit'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectViewEntity = createSelector(

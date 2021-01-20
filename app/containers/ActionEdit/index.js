@@ -78,9 +78,7 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 export class ActionEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
   componentWillMount() {
@@ -103,8 +101,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer);
     }
   }
 
@@ -139,7 +137,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   getHeaderAsideFields = (entity) => ([
     {
       fields: [
-        getStatusField(this.context.intl.formatMessage, entity),
+        getStatusField(this.context.intl.formatMessage),
         getMetaField(entity),
       ],
     },
@@ -224,7 +222,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       onCreateOption,
     } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.get('page').toJS();
 
     return (
       <div>
@@ -236,7 +234,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
         />
         <Content
           ref={(node) => {
-            if (!this.state.scrollContainer) {
+            if (!this.scrollContainer) {
               this.setState({ scrollContainer: node });
             }
           }}
@@ -287,7 +285,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           {viewEntity && dataReady && !deleteSending &&
             <EntityForm
               model="measureEdit.form.data"
-              formData={viewDomain.form.data}
+              formData={viewDomain.getIn(['form', 'data'])}
               saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
@@ -317,7 +315,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                   ),
                 },
               }}
-              scrollContainer={this.state.scrollContainer}
+              scrollContainer={this.scrollContainer}
             />
           }
           {(saveSending || deleteSending) &&

@@ -73,9 +73,7 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 export class RecommendationNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
   componentWillMount() {
@@ -94,8 +92,8 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     if (!this.props.frameworkId && nextProps.frameworkId) {
       this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer);
     }
   }
 
@@ -180,7 +178,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       frameworkId,
       frameworks,
     } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const fwSpecified = (frameworkId && frameworkId !== 'all');
 
     const type = this.context.intl.formatMessage(
@@ -189,7 +187,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
 
     const currentFrameworkId = fwSpecified
       ? frameworkId
-      : viewDomain.form.data.getIn(['attributes', 'framework_id']) || DEFAULT_FRAMEWORK;
+      : viewDomain.getIn(['form', 'data', 'attributes', 'framework_id']) || DEFAULT_FRAMEWORK;
     const currentFramework = dataReady && frameworks.find((fw) => attributesEqual(fw.get('id'), currentFrameworkId));
     const hasResponse = dataReady && currentFramework.getIn(['attributes', 'has_response']);
     const hasMeasures = dataReady && currentFramework.getIn(['attributes', 'has_measures']);
@@ -212,7 +210,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
         />
         <Content
           ref={(node) => {
-            if (!this.state.scrollContainer) {
+            if (!this.scrollContainer) {
               this.setState({ scrollContainer: node });
             }
           }}
@@ -253,7 +251,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           {dataReady &&
             <EntityForm
               model="recommendationNew.form.data"
-              formData={viewDomain.form.data}
+              formData={viewDomain.getIn(['form', 'data'])}
               saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
@@ -281,7 +279,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                   aside: this.getBodyAsideFields(fwTaxonomies, onCreateOption),
                 },
               }}
-              scrollContainer={this.state.scrollContainer}
+              scrollContainer={this.scrollContainer}
             />
           }
           { saveSending &&

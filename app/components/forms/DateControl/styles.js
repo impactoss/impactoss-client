@@ -3,7 +3,7 @@ import { createGlobalStyle } from 'styled-components';
 
 /* eslint no-unused-expressions: 0 */
 /* stylelint-disable */
-const GlobalStyle = createGlobalStyle`
+const DatePickerStyle = createGlobalStyle`
 
   .DayPicker {
     display: inline-block;
@@ -114,6 +114,7 @@ const GlobalStyle = createGlobalStyle`
     text-align: center;
     cursor: pointer;
     vertical-align: middle;
+    white-space: nowrap;
     @media (min-width: 769px) {
       padding: .5rem;
     }
@@ -207,4 +208,4 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-export default GlobalStyle;
+export default DatePickerStyle;

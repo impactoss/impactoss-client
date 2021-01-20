@@ -16,7 +16,7 @@ import {
 
 export const selectDomain = createSelector(
   (state) => state.get('indicatorNew'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 // all users of role contributor
 export const selectUsers = createSelector(

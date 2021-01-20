@@ -9,7 +9,7 @@ import { entitySetUser } from 'utils/entities';
 
 export const selectDomain = createSelector(
   (state) => state.get('pageEdit'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectViewEntity = createSelector(

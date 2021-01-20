@@ -66,9 +66,9 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   constructor(props) {
     super(props);
     this.state = {
-      scrollContainer: null,
       guestDismissed: false,
     };
+    this.scrollContainer = React.createRef();
   }
 
   componentWillMount() {
@@ -85,8 +85,8 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
       this.props.initialiseForm('reportNew.form.data', this.getInitialFormData(nextProps));
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer);
     }
   }
   getHeaderMainFields = () => ([ // fieldGroups
@@ -152,7 +152,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
 
   render() {
     const { dataReady, indicator, viewDomain, isUserContributor, isUserManager, userId } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const indicatorReference = this.props.params.id;
     const canUserPublish = dataReady && this.canUserPublish(
       isUserContributor,
@@ -176,7 +176,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
         />
         <Content
           ref={(node) => {
-            if (!this.state.scrollContainer) {
+            if (!this.scrollContainer) {
               this.setState({ scrollContainer: node });
             }
           }}
@@ -227,7 +227,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           {dataReady &&
             <EntityForm
               model="reportNew.form.data"
-              formData={viewDomain.form.data}
+              formData={viewDomain.getIn(['form', 'data'])}
               saving={saveSending}
               handleSubmit={(formData) => {
                 this.dismissGuestMessage();
@@ -250,7 +250,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                   aside: canUserPublish && this.getBodyAsideFields(indicator),
                 },
               }}
-              scrollContainer={this.state.scrollContainer}
+              scrollContainer={this.scrollContainer}
             />
           }
           { saveSending &&

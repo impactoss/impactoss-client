@@ -13,7 +13,7 @@ import { sortEntities } from 'utils/sort';
 
 export const selectDomain = createSelector(
   (state) => state.get('reportNew'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectIndicator = createSelector(

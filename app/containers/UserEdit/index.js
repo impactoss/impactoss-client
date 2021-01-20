@@ -67,9 +67,7 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 export class UserEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
   componentWillMount() {
@@ -87,8 +85,8 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer);
     }
   }
 
@@ -152,7 +150,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   render() {
     const { viewEntity, dataReady, viewDomain, taxonomies, roles, sessionUserHighestRoleId, onCreateOption } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
     const editableRoles = this.getEditableUserRoles(roles, sessionUserHighestRoleId);
 
@@ -166,7 +164,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
         />
         <Content
           ref={(node) => {
-            if (!this.state.scrollContainer) {
+            if (!this.scrollContainer) {
               this.setState({ scrollContainer: node });
             }
           }}
@@ -212,7 +210,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           {viewEntity && dataReady &&
             <EntityForm
               model="userEdit.form.data"
-              formData={viewDomain.form.data}
+              formData={viewDomain.getIn(['form', 'data'])}
               saving={saveSending}
               handleSubmit={(formData) => this.props.handleSubmit(
                 formData,
@@ -232,7 +230,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                   aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER.value) && this.getBodyAsideFields(taxonomies, onCreateOption),
                 },
               }}
-              scrollContainer={this.state.scrollContainer}
+              scrollContainer={this.scrollContainer}
             />
           }
           { saveSending &&

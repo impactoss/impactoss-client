@@ -48,16 +48,14 @@ import messages from './messages';
 export class EntityNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
   componentWillMount() {
     this.props.initialiseForm('entityNew.form.data', this.getInitialFormData());
   }
   componentWillReceiveProps(nextProps) {
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer);
     }
     if (!this.props.frameworkId && nextProps.frameworkId) {
       this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));
@@ -89,7 +87,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       framework,
       frameworkId,
     } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
     let pageTitle;
     let hasResponse;
@@ -104,7 +102,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       const currentFrameworkId =
         (framework && framework.get('id')) ||
         frameworkId ||
-        viewDomain.form.data.getIn(['attributes', 'framework_id']) ||
+        viewDomain.getIn(['form', 'data', 'attributes', 'framework_id']) ||
         DEFAULT_FRAMEWORK;
       // check if single framework set
       fwSpecified = (currentFrameworkId && currentFrameworkId !== 'all');
@@ -135,7 +133,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       <div>
         <Content
           ref={(node) => {
-            if (!this.state.scrollContainer) {
+            if (!this.scrollContainer) {
               this.setState({ scrollContainer: node });
             }
           }}
@@ -174,7 +172,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           }
           <EntityForm
             model="entityNew.form.data"
-            formData={viewDomain.form.data}
+            formData={viewDomain.getIn(['form', 'data'])}
             inModal={inModal}
             saving={saveSending}
             handleSubmit={(formData) => this.props.handleSubmit(
@@ -183,7 +181,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             )}
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
-            scrollContainer={this.state.scrollContainer}
+            scrollContainer={this.scrollContainer}
             fields={getEntityAttributeFields(
               path,
               {

@@ -27,7 +27,7 @@ export const FORM_INITIAL = fromJS({
     description: '',
     draft: true,
     manager_id: '',
-    frequency_months: REPORT_FREQUENCIES[0] ? REPORT_FREQUENCIES[0].value : '',
+    frequency_months: REPORT_FREQUENCIES[0] ? REPORT_FREQUENCIES[0].value : 1,
     start_date: '',
     repeat: false,
     end_date: '',

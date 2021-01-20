@@ -13,7 +13,7 @@ const ItemWrapper = styled.div`
   margin-top: 10px;
 `;
 
-export class EntityListItemWrapper extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class EntityListItemWrapper extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
     this.state = { wrapper: null };
