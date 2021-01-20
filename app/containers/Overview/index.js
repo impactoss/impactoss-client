@@ -116,6 +116,7 @@ const DiagramButton = styled(Button)`
     font-size: 1.1em;
     padding: ${({ draft }) => draft ? '0.4em 0.5em 1em' : '0.6em 0.5em'};
     min-width: 220px;
+    padding: ${({ draft }) => draft ? '0.4em 0.5em 0.75em' : '0.6em 0.5em'};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: ${({ draft }) => draft ? '0.6em 1em 1.4em' : '0.8em 1em'};

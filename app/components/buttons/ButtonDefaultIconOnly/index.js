@@ -14,6 +14,7 @@ const ButtonDefaultIconOnly = styled(ButtonDefault)`
     border-color: ${palette('buttonDefaultIconOnlyHover', 2)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0;
     border-width: 4px;
   }
 `;

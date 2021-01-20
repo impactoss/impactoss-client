@@ -38,6 +38,8 @@ const ToggleShow = styled(ButtonDefault)`
   font-size: 0.85em;
   width: 100%;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0.75em 1em;
+    font-size: 0.85em;
     width: ${(props) => props.theme.sizes.aside.width.large}px;
   }
 `;

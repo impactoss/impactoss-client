@@ -103,7 +103,8 @@ const MultiSelectDropdown = styled(Button)`
   }
   padding: 12px 0 12px 8px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding-left: 16px;
+    font-size: 0.85em;
+    padding: 12px 0 12px 16px;
   }
 `;
 

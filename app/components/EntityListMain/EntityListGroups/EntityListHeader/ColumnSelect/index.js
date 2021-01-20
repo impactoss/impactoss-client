@@ -16,6 +16,9 @@ import messages from './messages';
 const SortButton = styled(ButtonFlatIconOnly)`
   padding: 0;
   color: inherit;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0;
+  }
 `;
 const Styled = styled(ColumnHeader)`
   padding-right: 0;

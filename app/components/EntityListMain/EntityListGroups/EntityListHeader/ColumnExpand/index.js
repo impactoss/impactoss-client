@@ -34,6 +34,9 @@ const ExpandWrapper = styled.div`
 const ExpandButton = styled(ButtonFlatIconOnly)`
   padding: 0;
   color: inherit;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0;
+  }
 `;
 class ColumnExpand extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 

@@ -39,6 +39,9 @@ const Reset = styled(ButtonSimple)`
   }
   margin-right: 20px;
   font-weight: 500;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0 0.5em 0 0;
+  }
 `;
 
 export class SelectReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

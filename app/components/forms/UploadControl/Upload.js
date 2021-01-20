@@ -41,6 +41,9 @@ const Remove = styled(ButtonFlatIconOnly)`
   &:hover {
     color: ${palette('linkHover', 2)};
   }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 14px 0.75em;
+  }
 `;
 
 const Uploading = styled.div`

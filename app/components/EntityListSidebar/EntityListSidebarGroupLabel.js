@@ -22,11 +22,15 @@ const Styled = styled(Button)`
   color: ${palette('asideListGroup', 0)};
   background-color: ${palette('asideListGroup', 1)};
   padding: 0.25em 8px 0.25em 16px;
+  font-size: 0.9em;
   &:hover {
     color: ${palette('asideListGroupHover', 0)};
     background-color: ${palette('asideListGroupHover', 1)};
   }
-  font-size: 0.9em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0.25em 8px 0.25em 16px;
+    font-size: 0.9em;
+  }
 `;
 const GroupLabel = styled.div`
   display: table-cell;

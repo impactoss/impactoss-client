@@ -20,6 +20,7 @@ const Button = styled(ButtonDefault)`
   min-height: 2.2em;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 0.85em;
+    padding: 0.3em 1em 0.2em;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     min-width: 90px;

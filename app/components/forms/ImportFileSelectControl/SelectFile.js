@@ -51,6 +51,9 @@ const Remove = styled(ButtonFlatIconOnly)`
   &:hover {
     color: ${palette('buttonFlatHover', 1)};
   }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0 0.75em;
+  }
 `;
 
 const ImportButton = styled(ButtonSubmit)`
