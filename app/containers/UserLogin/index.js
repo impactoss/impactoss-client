@@ -82,7 +82,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           {authSending
             && <Loading />
           }
-          { this.props.viewDomain.form
+          { this.props.viewDomain.get('form')
             && (
               <AuthForm
                 model="userLogin.form.data"

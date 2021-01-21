@@ -85,7 +85,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
           {registerSending
             && <Loading />
           }
-          { this.props.viewDomain.form
+          { this.props.viewDomain.get('form')
             && (
               <AuthForm
                 model="userRegister.form.data"
