@@ -68,7 +68,7 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
           {sending
             && <Loading />
           }
-          { this.props.viewDomain.form
+          { this.props.viewDomain.get('form')
             && (
               <AuthForm
                 model="userPasswordRecover.form.data"
