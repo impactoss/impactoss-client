@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "sadata-staging"
+    "default": "sadata-dev",
+    "stage": "sadata-staging"
   }
 }
