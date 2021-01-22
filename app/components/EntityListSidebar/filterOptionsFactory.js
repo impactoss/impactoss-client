@@ -14,9 +14,8 @@ import {
   getEntityTitle,
   getEntityReference,
   getEntityParentId,
-  attributesEqual,
 } from 'utils/entities';
-
+import { qe } from 'utils/quasi-equals';
 import { makeTagFilterGroups } from 'utils/forms';
 
 import {
@@ -233,7 +232,7 @@ export const makeFrameworkFilterOptions = (
           // add categories from entities if not present otherwise increase count
           frameworks.forEach((framework, fwId) => {
             // if entity has category of active taxonomy
-            if (attributesEqual(entity.getIn(['attributes', 'framework_id']), fwId)) {
+            if (qe(entity.getIn(['attributes', 'framework_id']), fwId)) {
               fwIds.push(fwId);
               // if category already added
               if (filterOptions.options[fwId]) {

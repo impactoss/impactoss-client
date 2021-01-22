@@ -32,7 +32,7 @@ import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
 import { getMetaField } from 'utils/fields';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -219,12 +219,12 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
     );
 
-    const currentFramework = dataReady && frameworks.find((fw) => attributesEqual(fw.get('id'), frameworkId));
+    const currentFramework = dataReady && frameworks.find((fw) => qe(fw.get('id'), frameworkId));
     const hasResponse = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_response']);
     const hasMeasures = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_measures']);
     const hasIndicators = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_indicators']);
-    const fwTaxonomies = taxonomies && taxonomies.filter((tax) => tax.get('frameworkIds').find((id) => attributesEqual(id, frameworkId))
-      || attributesEqual(frameworkId, tax.getIn(['attributes', 'framework_id'])));
+    const fwTaxonomies = taxonomies && taxonomies.filter((tax) => tax.get('frameworkIds').find((id) => qe(id, frameworkId))
+      || qe(frameworkId, tax.getIn(['attributes', 'framework_id'])));
 
     return (
       <div>

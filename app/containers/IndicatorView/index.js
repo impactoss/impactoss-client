@@ -23,7 +23,7 @@ import {
   getReportsField,
 } from 'utils/fields';
 
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import {
   loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages,
@@ -139,7 +139,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     if (recommendationsByFw) {
       const recConnections = [];
       recommendationsByFw.forEach((recs, fwid) => {
-        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+        const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
         const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
         recConnections.push(
           getRecommendationConnectionField(

@@ -15,6 +15,7 @@ const Markdown = styled(ReactMarkdown)`
   }
 `;
 
+// TODO also render HTML if not markdown
 class MarkdownField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { field } = this.props;

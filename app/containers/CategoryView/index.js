@@ -29,7 +29,8 @@ import {
   getDateField,
 } from 'utils/fields';
 
-import { attributesEqual, getEntityTitle } from 'utils/entities';
+import { getEntityTitle } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -180,7 +181,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       const recConnections = [];
       if (childRecommendationsByFw) {
         childRecommendationsByFw.forEach((recs, fwid) => {
-          const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+          const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
           const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
           recs.forEach((tax) => {
             recConnections.push(
@@ -199,7 +200,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         // related recommendations
       } else if (entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendationsByFw) {
         recommendationsByFw.forEach((recs, fwid) => {
-          const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+          const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
           const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
           recConnections.push(
             getRecommendationConnectionField(

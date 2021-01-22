@@ -8,9 +8,9 @@ import {
 
 import {
   entitySetUser,
-  attributesEqual,
   prepareTaxonomiesIsAssociated,
 } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'users', id }),
@@ -20,8 +20,8 @@ export const selectViewEntity = createSelector(
   (entity, users, userRoles, roles) => entity && users && userRoles && roles && entitySetUser(entity, users).set(
     'roles',
     userRoles
-      .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
-      .map((association) => roles.find((role) => attributesEqual(role.get('id'), association.getIn(['attributes', 'role_id']))))
+      .filter((association) => qe(association.getIn(['attributes', 'user_id']), entity.get('id')))
+      .map((association) => roles.find((role) => qe(role.get('id'), association.getIn(['attributes', 'role_id']))))
   )
 );
 

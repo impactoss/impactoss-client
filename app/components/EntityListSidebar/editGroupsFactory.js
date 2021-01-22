@@ -1,6 +1,6 @@
 import { reduce } from 'lodash/collection';
 import { sortEntities } from 'utils/sort';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 export const makeEditGroups = (
   config,
@@ -13,7 +13,7 @@ export const makeEditGroups = (
 ) => {
   const editGroups = {};
   const selectedFrameworks = frameworks.filter(
-    (fw) => selectedFrameworkIds.find((id) => attributesEqual(id, fw.get('id'))),
+    (fw) => selectedFrameworkIds.find((id) => qe(id, fw.get('id'))),
   );
   // taxonomy option group
   if (config.taxonomies && taxonomies) {
@@ -33,7 +33,7 @@ export const makeEditGroups = (
             )
             // not a parent
             && !taxonomies.some(
-              (otherTax) => attributesEqual(
+              (otherTax) => qe(
                 tax.get('id'),
                 otherTax.getIn(['attributes', 'parent_id']),
               )

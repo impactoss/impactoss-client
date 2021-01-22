@@ -11,10 +11,8 @@ import {
   selectActiveFrameworks,
 } from 'containers/App/selectors';
 
-import {
-  attributesEqual,
-  filterEntitiesByKeywords,
-} from 'utils/entities';
+import { filterEntitiesByKeywords } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import { sortEntities, getSortOption } from 'utils/sort';
 
@@ -42,7 +40,7 @@ export const selectEntitiesByQuery = createSelector(
         return group.set('targets', taxonomies.map((tax) => {
           const categories = allEntities
             .get('categories')
-            .filter((cat) => attributesEqual(tax.get('id'), cat.getIn(['attributes', 'taxonomy_id'])))
+            .filter((cat) => qe(tax.get('id'), cat.getIn(['attributes', 'taxonomy_id'])))
             .map((cat) => group.get('search').reduce((memo, attribute) => memo.setIn(['attributes', attribute.get('as')], tax.getIn(['attributes', attribute.get('attribute')])),
               cat));
 
@@ -87,7 +85,7 @@ export const selectEntitiesByQuery = createSelector(
                 return frameworks.reduce((innerMemo, fw) => {
                   const fwEntities = targetEntties
                     .filter(
-                      (entity) => attributesEqual(
+                      (entity) => qe(
                         entity.getIn(['attributes', 'framework_id']),
                         fw.get('id'),
                       )

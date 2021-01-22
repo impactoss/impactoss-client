@@ -14,5 +14,10 @@ export const selectDomain = createSelector(
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'], false)
+  (taxonomies, categories) => prepareTaxonomiesMultiple(
+    taxonomies,
+    categories,
+    ['tags_measures'],
+    false,
+  )
 );

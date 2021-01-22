@@ -17,3 +17,5 @@ export default function quasiEquals(testValue, value) {
   }
   return value.toString() === testValue.toString();
 }
+
+export { quasiEquals as qe };

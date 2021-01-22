@@ -45,18 +45,35 @@ export const selectTaxonomies = createSelector(
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'], false)
+  (taxonomies, categories) => prepareTaxonomiesMultiple(
+    taxonomies,
+    categories,
+    ['tags_measures'],
+    false,
+  )
 );
 
 export const selectMeasures = createSelector(
   (state, id) => id,
   (state) => selectMeasuresCategorised(state),
   (state) => selectEntities(state, 'recommendation_measures'),
-  (id, entities, associations) => entitiesSetAssociated(entities, 'measure_id', associations, 'recommendation_id', id)
+  (id, entities, associations) => entitiesSetAssociated(
+    entities,
+    'measure_id',
+    associations,
+    'recommendation_id',
+    id,
+  )
 );
 export const selectIndicators = createSelector(
   (state, id) => id,
   selectFWIndicators,
   (state) => selectEntities(state, 'recommendation_indicators'),
-  (id, entities, associations) => entitiesSetAssociated(entities, 'indicator_id', associations, 'recommendation_id', id)
+  (id, entities, associations) => entitiesSetAssociated(
+    entities,
+    'indicator_id',
+    associations,
+    'recommendation_id',
+    id,
+  )
 );

@@ -7,7 +7,7 @@ import ItemStatus from 'components/ItemStatus';
 import Clear from 'components/styled/Clear';
 import { PATHS } from 'containers/App/constants';
 
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import appMessages from 'containers/App/messages';
 
 const Styled = styled.button`
@@ -191,7 +191,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
         return (
           <div>
             {col.attribute.frameworkIds.map((id) => {
-              const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), id));
+              const framework = frameworks.find((fw) => qe(fw.get('id'), id));
               if (!framework) {
                 return null;
               }
@@ -237,7 +237,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
         );
       } if (fwSet) {
         const id = frameworkId;
-        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), id));
+        const framework = frameworks.find((fw) => qe(fw.get('id'), id));
         if (!framework || !total[id]) {
           return null;
         }

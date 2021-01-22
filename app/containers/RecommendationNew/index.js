@@ -24,7 +24,7 @@ import {
   getFrameworkFormField,
 } from 'utils/forms';
 
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
@@ -199,13 +199,13 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     const currentFrameworkId = fwSpecified
       ? frameworkId
       : viewDomain.getIn(['form', 'data', 'attributes', 'framework_id']) || DEFAULT_FRAMEWORK;
-    const currentFramework = dataReady && frameworks.find((fw) => attributesEqual(fw.get('id'), currentFrameworkId));
+    const currentFramework = dataReady && frameworks.find((fw) => qe(fw.get('id'), currentFrameworkId));
     const hasResponse = dataReady && currentFramework.getIn(['attributes', 'has_response']);
     const hasMeasures = dataReady && currentFramework.getIn(['attributes', 'has_measures']);
     const hasIndicators = dataReady && currentFramework.getIn(['attributes', 'has_indicators']);
 
-    const fwTaxonomies = taxonomies && taxonomies.filter((tax) => tax.get('frameworkIds').find((id) => attributesEqual(id, currentFrameworkId))
-      || attributesEqual(currentFrameworkId, tax.getIn(['attributes', 'framework_id'])));
+    const fwTaxonomies = taxonomies && taxonomies.filter((tax) => tax.get('frameworkIds').find((id) => qe(id, currentFrameworkId))
+      || qe(currentFrameworkId, tax.getIn(['attributes', 'framework_id'])));
     return (
       <div>
         <Helmet

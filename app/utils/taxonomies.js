@@ -1,5 +1,5 @@
 import { PATHS } from 'containers/App/constants';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import { fromJS } from 'immutable';
 
 export const getTaxonomyTagList = (taxonomy) => {
@@ -21,7 +21,7 @@ export const getTaxonomyTagList = (taxonomy) => {
 
 const mapTaxonomy = (tax, childTaxonomies, activeId, onLink) => {
   const children = childTaxonomies
-    .filter((t) => attributesEqual(t.getIn(['attributes', 'parent_id']), tax.get('id')))
+    .filter((t) => qe(t.getIn(['attributes', 'parent_id']), tax.get('id')))
     .toList()
     .toJS();
   return fromJS({
@@ -56,7 +56,7 @@ export const prepareTaxonomyGroups = (
       id: frameworkId,
       frameworkId,
       taxonomies: parentTaxonomies
-        .filter((tax) => tax.get('frameworkIds').find((fw) => attributesEqual(fw, frameworkId)))
+        .filter((tax) => tax.get('frameworkIds').find((fw) => qe(fw, frameworkId)))
         .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
         .toList()
         .toJS(),
@@ -70,7 +70,7 @@ export const prepareTaxonomyGroups = (
           const taxFwIds = tax.get('frameworkIds');
           return tax.getIn(['attributes', 'tags_recommendations'])
             && taxFwIds.size === 1
-            && taxFwIds.find((fwid) => attributesEqual(fwid, fw.get('id')));
+            && taxFwIds.find((fwid) => qe(fwid, fw.get('id')));
         })
         .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
         .toList()
@@ -111,7 +111,7 @@ export const prepareTaxonomyGroups = (
 };
 
 export const getDefaultTaxonomy = (taxonomies, frameworkId) => taxonomies
-  .filter((tax) => attributesEqual(tax.getIn(['attributes', 'framework_id']), frameworkId))
+  .filter((tax) => qe(tax.getIn(['attributes', 'framework_id']), frameworkId))
   .reduce((memo, tax) => {
     if (memo) {
       const priority = tax.getIn(['attributes', 'priority']);

@@ -21,7 +21,7 @@ import {
   getTaxonomyFields,
   hasTaxonomyCategories,
 } from 'utils/fields';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -186,7 +186,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
     );
 
-    const currentFramework = dataReady && frameworks.find((fw) => attributesEqual(fw.get('id'), frameworkId));
+    const currentFramework = dataReady && frameworks.find((fw) => qe(fw.get('id'), frameworkId));
     const hasResponse = dataReady && currentFramework.getIn(['attributes', 'has_response']);
     const hasMeasures = dataReady && currentFramework.getIn(['attributes', 'has_measures']);
     const hasIndicators = dataReady && currentFramework.getIn(['attributes', 'has_indicators']);
