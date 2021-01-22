@@ -115,7 +115,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       && frameworks.size === 1;
     if (config.taxonomies && !groupSelectValue) {
       if (groupforFramework) {
-        [, groupSelectValue] = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')];
+        /* eslint-disable prefer-destructuring */
+        groupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][1];
+        /* eslint-enable prefer-destructuring */
       } else {
         groupSelectValue = getGroupValue(
           taxonomies,
@@ -137,7 +139,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
           config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][1],
         )
       ) {
-        [, , subgroupSelectValue] = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')];
+        /* eslint-disable prefer-destructuring */
+        subgroupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][2];
+        /* eslint-enable prefer-destructuring */
       }
     }
 
