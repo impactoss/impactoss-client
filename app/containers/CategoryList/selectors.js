@@ -134,16 +134,16 @@ const getCategoryCounts = (
       );
     if (tagsMeasures || childCatsTagMeasures) {
       let associatedMeasures;
-      if (tagsMeasures) {
-        associatedMeasures = measures.filter(
-          (entity) => entity.get('category_ids').includes(parseInt(categoryId, 10))
-        );
-        // recommendations tagged by child categories
-      } else if (childCatsTagMeasures) {
+      // recommendations tagged by child categories
+      if (childCatsTagMeasures) {
         associatedMeasures = filterChildConnections(
           measures,
           categories,
           categoryId
+        );
+      } else if (tagsMeasures) {
+        associatedMeasures = measures.filter(
+          (entity) => entity.get('category_ids').includes(parseInt(categoryId, 10))
         );
       }
       category = category.set('measuresCount', associatedMeasures.size);
@@ -163,24 +163,24 @@ const getCategoryCounts = (
     }
 
     // recommendations
+    const tagsRecs = taxonomy.getIn(['attributes', 'tags_recommendations']);
     const childCatsTagRecs = taxonomy.get('children')
       && taxonomy.get('children').some(
         (childTax) => childTax.getIn(['attributes', 'tags_recommendations'])
       );
-    const tagsRecs = taxonomy.getIn(['attributes', 'tags_recommendations']);
     if (tagsRecs || childCatsTagRecs) {
       let associatedRecs;
-      // directly tagged recommendations
-      if (tagsRecs) {
-        associatedRecs = recommendations.filter(
-          (entity) => entity.get('category_ids').includes(parseInt(categoryId, 10))
-        );
-      } else if (childCatsTagRecs) {
-        // recommendations tagged by child categories
+      // recommendations tagged by child categories
+      if (childCatsTagRecs) {
         associatedRecs = filterChildConnections(
           recommendations,
           categories,
           categoryId,
+        );
+        // directly tagged recommendations
+      } else if (tagsRecs) {
+        associatedRecs = recommendations.filter(
+          (entity) => entity.get('category_ids').includes(parseInt(categoryId, 10))
         );
       }
       const associatedRecsPublic = associatedRecs.filter(
