@@ -536,7 +536,9 @@ const getNextQuery = (query, extend, location) => {
           queryUpdated[param.arg] = without(queryUpdated[param.arg], param.value.toString());
           // convert to single value if only one value left
           if (queryUpdated[param.arg].length === 1) {
-            [queryUpdated[param.arg]] = queryUpdated[param.arg];
+            /* eslint-disable prefer-destructuring */
+            queryUpdated[param.arg] = queryUpdated[param.arg][0];
+            /* eslint-enable prefer-destructuring */
           }
         }
       // if single value set
