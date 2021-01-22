@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { Map, List, fromJS } from 'immutable';
+import { Map, List } from 'immutable';
 
 import {
   selectEntities,
@@ -41,15 +41,18 @@ export const selectConnections = createSelector(
   selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'categories'),
-  (indicators, recommendations, recommendationCategories, categories) => Map()
-    .set('indicators', indicators)
-    .set('recommendations',
-      entitiesSetCategoryIds(
-        recommendations,
-        'recommendation_id',
-        recommendationCategories,
-        categories,
-      ))
+  (indicators, recommendations, recommendationCategories, categories) => Map().set(
+    'indicators',
+    indicators,
+  ).set(
+    'recommendations',
+    entitiesSetCategoryIds(
+      recommendations,
+      'recommendation_id',
+      recommendationCategories,
+      categories,
+    ),
+  )
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -70,29 +73,29 @@ export const selectConnectedTaxonomies = createSelector(
     const measureFrameworks = frameworks.filter(
       (fw) => fw.getIn(['attributes', 'has_measures'])
     );
-    const relationships = fromJS([
+    const relationships = [
       {
         tags: 'tags_recommendations',
         path: 'recommendations',
         key: 'recommendation_id',
         associations: categoryRecommendations,
       },
-    ]);
+    ];
     // for all connections
-    // TODO deal with conflicts
-    // merge connected taxonomies.
     return relationships.reduce(
-      (memo, relationship) => memo.merge(
+      // TODO deal with conflicts
+      // merge connected taxonomies.
+      (connectedTaxonomies, relationship) => connectedTaxonomies.merge(
         filterTaxonomies(taxonomies, relationship.tags, true).filter(
           (taxonomy) => fwTaxonomies.some(
-            (fwt) => qe(
-              fwt.getIn(['attributes', 'taxonomy_id']),
-              taxonomy.get('id')
-            ) && measureFrameworks.some(
+            (fwt) => measureFrameworks.some(
               (fw) => qe(
                 fwt.getIn(['attributes', 'framework_id']),
-                fw.get('id')
+                fw.get('id'),
               ),
+            ) && qe(
+              fwt.getIn(['attributes', 'taxonomy_id']),
+              taxonomy.get('id'),
             )
           )
         ).map(
