@@ -23,7 +23,6 @@ import {
   filterEntitiesWithoutAssociation,
   prepareTaxonomiesMultiple,
   entitiesSetCategoryIds,
-  getEntityCategories,
   getEntityConnections,
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
@@ -32,55 +31,80 @@ import { sortEntities, getSortOption } from 'utils/sort';
 
 import { CONFIG } from './constants';
 
-const selectRecommendationsNested = createSelector(
+const selectRecommendationsQ = createSelector(
   (state, locationQuery) => selectRecommendationsSearchQuery(state, {
     searchAttributes: CONFIG.search || ['reference', 'title'],
     locationQuery,
   }),
-  (state) => selectRecommendationConnections(state),
+  (entities) => entities
+);
+const selectRecommendationsWithCategories = createSelector(
+  selectRecommendationsQ,
   (state) => selectEntities(state, 'recommendation_categories'),
-  (state) => selectEntities(state, 'recommendation_measures'),
-  (state) => selectEntities(state, 'recommendation_indicators'),
   (state) => selectEntities(state, 'categories'),
-  (
-    entities,
-    connections,
-    entityCategories,
-    entityMeasures,
-    entityIndicators,
-    categories,
-  ) => entities.map(
-    (entity) => entity.set(
-      'categories',
-      getEntityCategories(
-        entity.get('id'),
+  (entities, entityCategories, categories) => {
+    if (
+      entityCategories
+      && entityCategories.size > 0
+      && categories
+      && categories.size > 0
+    ) {
+      return entitiesSetCategoryIds(
+        entities,
+        'recommendation_id',
         entityCategories,
-        'recommendation_id',
         categories,
-      )
-    ).set(
-      'measures',
-      getEntityConnections(
-        entity.get('id'),
-        entityMeasures,
-        'measure_id',
-        'recommendation_id',
-        connections.get('measures'),
-      )
-    ).set(
-      'indicators',
-      getEntityConnections(
-        entity.get('id'),
-        entityIndicators,
-        'indicator_id',
-        'recommendation_id',
-        connections.get('indicators'),
-      )
-    )
-  )
+      );
+    }
+    return entities;
+  }
+);
+const selectRecommendationsWithMeasures = createSelector(
+  selectRecommendationsWithCategories,
+  (state) => selectRecommendationConnections(state),
+  (state) => selectEntities(state, 'recommendation_measures'),
+  (entities, connections, entityMeasures) => {
+    if (entityMeasures && entityMeasures.size > 0) {
+      return entities.map(
+        (entity) => entity.set(
+          'measures',
+          getEntityConnections(
+            entity.get('id'),
+            entityMeasures,
+            'measure_id',
+            'recommendation_id',
+            connections.get('measures'),
+          )
+        )
+      );
+    }
+    return entities;
+  }
+);
+const selectRecommendationsWithIndicators = createSelector(
+  selectRecommendationsWithMeasures,
+  (state) => selectRecommendationConnections(state),
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (entities, connections, entityIndicators) => {
+    if (entityIndicators && entityIndicators.size > 0) {
+      return entities.map(
+        (entity) => entity.set(
+          'indicators',
+          getEntityConnections(
+            entity.get('id'),
+            entityIndicators,
+            'indicator_id',
+            'recommendation_id',
+            connections.get('indicators'),
+          )
+        )
+      );
+    }
+    return entities;
+  }
 );
 const selectRecommendationsByFw = createSelector(
-  selectRecommendationsNested,
+  selectRecommendationsWithIndicators,
   selectFrameworkQuery,
   selectFrameworkListQuery,
   (entities, fwQuery, listQuery) => fwQuery === 'all'
@@ -147,19 +171,31 @@ export const selectConnectedTaxonomies = createSelector(
   )
 );
 
-export const selectConnections = createSelector(
+const selectConnectionsIndicators = createSelector(
   selectFWIndicators,
+  (indicators) => Map().set('indicators', indicators)
+);
+
+export const selectConnections = createSelector(
+  selectConnectionsIndicators,
   selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
-  (indicators, measures, measureCategories) => Map().set(
-    'indicators',
-    indicators,
-  ).set(
-    'measures',
-    entitiesSetCategoryIds(
-      measures,
-      'measure_id',
-      measureCategories,
-    )
-  )
+  (connections, measures, measureCategories) => {
+    if (
+      measures
+      && measures.size > 0
+      && measureCategories
+      && measureCategories.size > 0
+    ) {
+      return connections.set(
+        'measures',
+        entitiesSetCategoryIds(
+          measures,
+          'measure_id',
+          measureCategories,
+        )
+      );
+    }
+    return connections;
+  }
 );

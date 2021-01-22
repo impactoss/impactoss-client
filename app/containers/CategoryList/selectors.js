@@ -47,35 +47,38 @@ const selectMeasures = createSelector(
   selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
   (state) => selectEntities(state, 'recommendation_measures'),
-  (entities, measureCategories, recMeasures) => entities.map(
-    (entity, id) => entity.set(
-      'category_ids',
-      measureCategories.filter(
-        (association) => qe(
-          association.getIn(['attributes', 'measure_id']),
-          id,
+  (entities, measureCategories, recMeasures) => entities
+    && measureCategories
+    && recMeasures
+    && entities.map(
+      (entity, id) => entity.set(
+        'category_ids',
+        measureCategories.filter(
+          (association) => qe(
+            association.getIn(['attributes', 'measure_id']),
+            id,
+          )
+        ).map(
+          (association) => association.getIn(['attributes', 'category_id'])
         )
-      ).map(
-        (association) => association.getIn(['attributes', 'category_id'])
-      )
-    ).set(
-      'recommendation_ids',
-      recMeasures.filter(
-        (association) => qe(
-          association.getIn(['attributes', 'measure_id']),
-          id,
+      ).set(
+        'recommendation_ids',
+        recMeasures.filter(
+          (association) => qe(
+            association.getIn(['attributes', 'measure_id']),
+            id,
+          )
+        ).map(
+          (association) => association.getIn(['attributes', 'recommendation_id'])
         )
-      ).map(
-        (association) => association.getIn(['attributes', 'recommendation_id'])
       )
     )
-  )
 );
 
 const selectRecommendations = createSelector(
   selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
-  (entities, recCategories) => entities.map(
+  (entities, recCategories) => entities && recCategories && entities.map(
     (entity, id) => entity.set(
       'category_ids',
       recCategories.filter(
@@ -295,7 +298,6 @@ const selectCategoryCountGroups = createSelector(
   (state) => selectEntities(state, 'categories'),
   selectActiveFrameworks,
   (taxonomy, recommendations, measures, categories, frameworks) => {
-    if (!taxonomy) return Map();
     if (taxonomy && recommendations && measures && categories && frameworks) {
       const taxonomyCategories = taxonomy && categories && categories.filter(
         (cat) => qe(
@@ -350,7 +352,7 @@ const selectCategoryCountGroups = createSelector(
       }
       return Map();
     }
-    return Map();
+    return null;
   }
 );
 
@@ -361,39 +363,42 @@ const mapCategoryGroups = (
   userOnly = false,
 ) => {
   const sortOption = getSortOption(SORT_OPTIONS, sort, 'query');
-  const groups = categoryGroups && categoryGroups.map((group) => group
-    .set(
-      'measures',
-      group.get('categories').reduce(
-        (sum, cat) => sum + cat.get('measuresPublicCount'),
-        0,
-      ),
-    )
-    .set(
-      'recommendations',
-      group.get('categories').reduce(
-        (sum, cat) => sum + cat.get('recommendationsPublicCount'),
-        0,
-      ),
-    )
-    .set(
-      'categories',
-      sortEntities(
-        sortEntities(
-          group.get('categories').filter(
-            (cat) => userOnly
-              ? cat.getIn(['attributes', 'user_only'])
-              : !cat.getIn(['attributes', 'user_only'])
-          ),
-          order || (sortOption ? sortOption.order : 'asc'),
-          sortOption ? sortOption.field : 'title',
-          sortOption ? sortOption.type : 'string',
+  const groups = categoryGroups && categoryGroups.map(
+    (group) => {
+      const filtered = group.get('categories').filter(
+        (cat) => userOnly
+          ? cat.getIn(['attributes', 'user_only'])
+          : !cat.getIn(['attributes', 'user_only'])
+      );
+      return group.set(
+        'measures',
+        filtered.reduce(
+          (sum, cat) => sum + cat.get('measuresPublicCount'),
+          0,
         ),
-        'asc',
-        'draft',
-        'bool',
-      ),
-    ));
+      ).set(
+        'recommendations',
+        filtered.reduce(
+          (sum, cat) => sum + cat.get('recommendationsPublicCount'),
+          0,
+        ),
+      ).set(
+        'categories',
+        sortEntities(
+          sortEntities(
+            filtered,
+            order || (sortOption ? sortOption.order : 'asc'),
+            sortOption ? sortOption.field : 'title',
+            sortOption ? sortOption.type : 'string',
+          ),
+          'asc',
+          'draft',
+          'bool',
+        ),
+      );
+    }
+  );
+
   return sortEntities(
     groups,
     order || (sortOption ? sortOption.order : 'asc'),
@@ -406,21 +411,25 @@ export const selectCategoryGroups = createSelector(
   selectCategoryCountGroups,
   (state, { query }) => selectSortByQuery(state, query),
   (state, { query }) => selectSortOrderQuery(state, query),
-  (categoryGroups, sort, order) => mapCategoryGroups(
-    categoryGroups,
-    sort,
-    order
-  )
+  (categoryGroups, sort, order) => categoryGroups
+    ? mapCategoryGroups(
+      categoryGroups,
+      sort,
+      order
+    )
+    : Map()
 );
 
 export const selectUserOnlyCategoryGroups = createSelector(
   selectCategoryCountGroups,
   (state, { query }) => selectSortByQuery(state, query),
   (state, { query }) => selectSortOrderQuery(state, query),
-  (categoryGroups, sort, order) => mapCategoryGroups(
-    categoryGroups,
-    sort,
-    order,
-    true, // userOnly
-  )
+  (categoryGroups, sort, order) => categoryGroups
+    ? mapCategoryGroups(
+      categoryGroups,
+      sort,
+      order,
+      true, // userOnly
+    )
+    : Map()
 );

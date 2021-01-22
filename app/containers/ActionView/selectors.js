@@ -67,42 +67,44 @@ export const selectRecommendations = createSelector(
     recIndicators,
     categories,
   ) => recommendations && recommendations.map(
-    (rec) => rec
-      .set('categories', getEntityCategories(
+    (rec) => rec.set(
+      'categories',
+      getEntityCategories(
         rec.get('id'),
         recCategories,
         'recommendation_id',
         categories,
-      ))
-      .set(
-        'measures',
-        recMeasures && recMeasures.filter(
-          (association) => qe(
-            association.getIn(['attributes', 'recommendation_id']),
-            rec.get('id')
-          ) && connections.getIn([
-            'measures',
-            association.getIn(['attributes', 'measure_id']).toString(),
-          ])
-        ).map(
-          (association) => association.getIn(['attributes', 'measure_id'])
-        )
       )
-      .set(
-        'indicators',
-        recIndicators.filter(
-          (association) => qe(
-            association.getIn(['attributes', 'recommendation_id']),
-            rec.get('id')
-          ) && connections.getIn([
-            'indicators',
-            association.getIn(['attributes', 'indicator_id']).toString(),
-          ])
-        ).map(
-          (association) => association.getIn(['attributes', 'indicator_id'])
-        )
+    ).set(
+      'measures',
+      recMeasures && recMeasures.filter(
+        (association) => qe(
+          association.getIn(['attributes', 'recommendation_id']),
+          rec.get('id')
+        ) && connections.getIn([
+          'measures',
+          association.getIn(['attributes', 'measure_id']).toString(),
+        ])
+      ).map(
+        (association) => association.getIn(['attributes', 'measure_id'])
       )
-  ).groupBy((r) => r.getIn(['attributes', 'framework_id']))
+    ).set(
+      'indicators',
+      recIndicators.filter(
+        (association) => qe(
+          association.getIn(['attributes', 'recommendation_id']),
+          rec.get('id')
+        ) && connections.getIn([
+          'indicators',
+          association.getIn(['attributes', 'indicator_id']).toString(),
+        ])
+      ).map(
+        (association) => association.getIn(['attributes', 'indicator_id'])
+      )
+    )
+  ).groupBy(
+    (r) => r.getIn(['attributes', 'framework_id'])
+  )
 );
 
 export const selectIndicatorsAssociated = createSelector(
