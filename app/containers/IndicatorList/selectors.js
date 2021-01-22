@@ -1,6 +1,5 @@
 import { createSelector } from 'reselect';
 import { Map } from 'immutable';
-import { reduce } from 'lodash/collection';
 
 import {
   selectEntities,
@@ -93,22 +92,24 @@ export const selectConnectedTaxonomies = createSelector(
         path: 'measures',
         key: 'measure_id',
         associations: categoryMeasures,
+        needFw: false,
       },
       {
         tags: 'tags_recommendations',
         path: 'recommendations',
         key: 'recommendation_id',
         associations: categoryRecommendations,
+        needFw: true,
       },
     ];
     // for all connections
     // TODO deal with conflicts
     // merge connected taxonomies.
-    return reduce(
-      relationships,
-      (connectedTaxonomies, relationship) => relationship
-        ? connectedTaxonomies.merge(
-          filterTaxonomies(taxonomies, relationship.tags, true).filter(
+    return relationships.reduce(
+      (connectedTaxonomies, relationship) => {
+        let filtered = filterTaxonomies(taxonomies, relationship.tags, true);
+        if (relationship.needFw) {
+          filtered = filtered.filter(
             (taxonomy) => fwTaxonomies.some(
               (fwt) => indicatorFrameworks.some(
                 (fw) => qe(
@@ -120,7 +121,10 @@ export const selectConnectedTaxonomies = createSelector(
                 taxonomy.get('id')
               )
             )
-          ).map(
+          );
+        }
+        return connectedTaxonomies.merge(
+          filtered.map(
             (taxonomy) => taxonomy.set(
               'categories',
               getTaxonomyCategories(
@@ -131,8 +135,8 @@ export const selectConnectedTaxonomies = createSelector(
               )
             )
           )
-        )
-        : connectedTaxonomies,
+        );
+      },
       Map(),
     );
   }
