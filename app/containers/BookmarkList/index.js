@@ -13,7 +13,7 @@ import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { FormattedMessage } from 'react-intl';
 
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, openBookmark } from 'containers/App/actions';
 import { selectReady, selectEntities } from 'containers/App/selectors';
@@ -240,7 +240,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
       allBookmarks,
     } = this.props;
     const filtered = activeType && activeType !== '';
-    const bookmarksFiltered = bookmarksForSearch.filter((e) => !filtered || attributesEqual(activeType, e.getIn(['attributes', 'view', 'type'])));
+    const bookmarksFiltered = bookmarksForSearch.filter((e) => !filtered || qe(activeType, e.getIn(['attributes', 'view', 'type'])));
     return (
       <div>
         <Helmet

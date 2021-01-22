@@ -8,9 +8,8 @@ import {
   getEntityTitle,
   getEntityReference,
   getEntityParentId,
-  attributesEqual,
 } from 'utils/entities';
-
+import { qe } from 'utils/quasi-equals';
 import { makeTagFilterGroups } from 'utils/forms';
 
 export const checkedState = (count, length) => {
@@ -145,7 +144,7 @@ export const makeConnectionEditOptions = (
     editOptions.search = option.search;
     connections
       .get(option.path)
-      .filter((c) => !option.groupByFramework || attributesEqual(fwid, c.getIn(['attributes', 'framework_id'])))
+      .filter((c) => !option.groupByFramework || qe(fwid, c.getIn(['attributes', 'framework_id'])))
       .forEach((connection) => {
         const count = entities.reduce((counter, entity) => testEntityEntityAssociation(entity, option.path, connection.get('id')) ? counter + 1 : counter,
           0);

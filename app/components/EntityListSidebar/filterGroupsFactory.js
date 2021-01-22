@@ -1,6 +1,6 @@
 import { reduce } from 'lodash/collection';
 import { sortEntities } from 'utils/sort';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 const checkFramework = (frameworks, attribute) => frameworks.some((fw) => fw.getIn(['attributes', attribute]));
 
@@ -40,7 +40,7 @@ export const makeFilterGroups = (
         const fwTaxonomies = taxonomies.filter((tax) => {
           const taxFwIds = tax.get('frameworkIds');
           return taxFwIds.size === 1
-              && taxFwIds.find((fwid) => attributesEqual(fwid, fw.get('id')));
+              && taxFwIds.find((fwid) => qe(fwid, fw.get('id')));
         });
         filterGroups[`taxonomies_${fw.get('id')}`] = {
           id: `taxonomies_${fw.get('id')}`, // filterGroupId

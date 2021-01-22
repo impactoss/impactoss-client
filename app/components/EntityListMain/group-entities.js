@@ -3,8 +3,8 @@ import { toLower as loCase } from 'lodash/string';
 import { lowerCase } from 'utils/string';
 import {
   testEntityCategoryAssociation,
-  attributesEqual,
 } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import isNumber from 'utils/is-number';
 import { getEntitySortComparator } from 'utils/sort';
 
@@ -87,7 +87,7 @@ export const makeTaxonomyGroups = (entities, taxonomy, contextIntl, frameworks) 
     );
     const taxNotApplicable = checkFrameworks
       && !taxonomy.get('frameworkIds').find(
-        (id) => attributesEqual(id, entity.getIn(['attributes', 'framework_id'])),
+        (id) => qe(id, entity.getIn(['attributes', 'framework_id'])),
       );
     if (
       !taxNotApplicable

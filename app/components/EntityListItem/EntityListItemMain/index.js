@@ -5,7 +5,7 @@ import { palette } from 'styled-theme';
 // import { isEqual } from 'lodash/lang';
 import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import Component from 'components/styled/Component';
 import Clear from 'components/styled/Clear';
 import { USER_ROLES, PROGRESS_TAXONOMY_ID } from 'themes/config';
@@ -129,7 +129,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     return reference;
   }
 
-  getProgressTaxonomy = (taxonomies) => taxonomies && taxonomies.find((tax) => attributesEqual(tax.get('id'), PROGRESS_TAXONOMY_ID));
+  getProgressTaxonomy = (taxonomies) => taxonomies && taxonomies.find((tax) => qe(tax.get('id'), PROGRESS_TAXONOMY_ID));
 
   getProgressCategory = (taxonomies, categoryIds) => {
     const progressTaxonomy = taxonomies && this.getProgressTaxonomy(taxonomies);
@@ -181,7 +181,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     const { nestLevel, onEntityClick, taxonomies } = this.props;
     const entity = this.mapToEntityListItem(this.props);
 
-    const bottomTaxonomies = taxonomies && taxonomies.filter((tax) => !attributesEqual(tax.get('id'), PROGRESS_TAXONOMY_ID));
+    const bottomTaxonomies = taxonomies && taxonomies.filter((tax) => !qe(tax.get('id'), PROGRESS_TAXONOMY_ID));
 
     return (
       <Styled isManager={this.props.isManager} isConnection={this.props.isConnection}>

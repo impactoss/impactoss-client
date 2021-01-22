@@ -11,7 +11,7 @@ import styled from 'styled-components';
 
 import { jumpToComponent } from 'utils/scroll-to-component';
 import { lowerCase } from 'utils/string';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
@@ -134,7 +134,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
         config.taxonomies
         && !subgroupSelectValue
         && groupforFramework
-        && attributesEqual(
+        && qe(
           groupSelectValue,
           config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][1],
         )

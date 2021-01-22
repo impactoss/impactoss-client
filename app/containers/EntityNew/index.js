@@ -11,7 +11,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 import { Map, List } from 'immutable';
 
 import { getEntityAttributeFields } from 'utils/forms';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
@@ -116,7 +116,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
         || (
           fwSpecified
           && frameworks
-          && frameworks.find((fw) => attributesEqual(fw.get('id'), currentFrameworkId))
+          && frameworks.find((fw) => qe(fw.get('id'), currentFrameworkId))
         );
       // check if response is required
       hasResponse = currentFramework && currentFramework.getIn(['attributes', 'has_response']);

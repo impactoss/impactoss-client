@@ -3,7 +3,9 @@ import { upperFirst } from 'lodash/string';
 
 import { TEXT_TRUNCATE } from 'themes/config';
 
-import { getCategoryShortTitle, attributesEqual } from 'utils/entities';
+import { getCategoryShortTitle } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
+
 import { sortEntities } from 'utils/sort';
 import { truncateText } from 'utils/string';
 import isNumber from 'utils/is-number';
@@ -183,7 +185,7 @@ const getCurrentFrameworkFilter = (
   const tags = [];
   if (locationQuery.get(config.query)) {
     const locationQueryValue = locationQuery.get(config.query);
-    const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), locationQueryValue));
+    const framework = frameworks.find((fw) => qe(fw.get('id'), locationQueryValue));
     if (framework) {
       tags.push({
         message: `frameworks_short.${framework.get('id')}`,
@@ -333,7 +335,7 @@ const getCurrentAttributeFilters = (entities, attributeFiltersOptions, locationQ
                   }),
                 });
               } else {
-                const referenceEntity = entities.find((entity) => attributesEqual(entity.getIn(['attributes', option.attribute]), value));
+                const referenceEntity = entities.find((entity) => qe(entity.getIn(['attributes', option.attribute]), value));
                 const label = referenceEntity && referenceEntity.getIn([option.reference.key, 'attributes', option.reference.label]);
                 tags.push({
                   labels: label

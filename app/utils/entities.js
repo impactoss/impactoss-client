@@ -7,10 +7,7 @@ import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/str
 import asList from 'utils/as-list';
 import isNumber from 'utils/is-number';
 import appMessage from 'utils/app-message';
-import quasiEquals from 'utils/quasi-equals';
-
-// comparison of attribute values, force string, check 'null' if unspecified
-export { quasiEquals as attributesEqual };
+import { qe } from 'utils/quasi-equals';
 
 export const getAcceptanceStatus = (entity) => find(
   ACCEPTED_STATUSES,
@@ -46,10 +43,14 @@ export const testEntityTaxonomyAssociation = (
   .get('categories')
   .some(
     (catId) => categories.size > 0
-      && categories
-        .get(catId.toString())
-      && categories
-        .getIn([catId.toString(), 'attributes', 'taxonomy_id']) === taxonomyId
+      && categories.get(catId.toString())
+      && qe(
+        taxonomyId,
+        categories.getIn([
+          catId.toString(),
+          'attributes', 'taxonomy_id',
+        ])
+      )
   );
 
 // check if entity has any nested connection by type
@@ -90,15 +91,18 @@ export const getConnectedCategories = (
 
 // filter entities by absence of association either by taxonomy id or connection type
 // assumes prior nesting of relationships
-export const filterEntitiesWithoutAssociation = (entities, categories, query) => entities && entities.filter((entity) => asList(query).reduce(
-  (passing, pathOrTax) => passing
-        && !(
-          isNumber(pathOrTax)
-            ? testEntityTaxonomyAssociation(entity, categories, parseInt(pathOrTax, 10))
-            : testEntityAssociation(entity, pathOrTax)
-        ),
-  true,
-),);
+export const filterEntitiesWithoutAssociation = (
+  entities,
+  categories,
+  query,
+) => entities && entities.filter(
+  (entity) => asList(query).reduce(
+    (passing, pathOrTax) => passing && !isNumber(pathOrTax)
+      ? testEntityTaxonomyAssociation(entity, categories, parseInt(pathOrTax, 10))
+      : testEntityAssociation(entity, pathOrTax),
+    true,
+  ),
+);
 
 // filter entities by association with one or more categories
 // assumes prior nesting of relationships
@@ -109,11 +113,10 @@ export const filterEntitiesByCategories = (
   && entities.filter(
     // consider replacing with .every()
     (entity) => asList(query).reduce(
-      (passing, categoryId) => passing
-        && testEntityCategoryAssociation(
-          entity,
-          parseInt(categoryId, 10),
-        ),
+      (passing, categoryId) => passing && testEntityCategoryAssociation(
+        entity,
+        parseInt(categoryId, 10),
+      ),
       true,
     )
   );
@@ -175,8 +178,8 @@ export const filterEntitiesByAttributes = (entities, query) => entities
       query,
       (passing, value, attribute) => passing
         && ((attribute === 'id')
-          ? quasiEquals(entity.get('id'), value)
-          : quasiEquals(entity.getIn(['attributes', attribute]), value)
+          ? qe(entity.get('id'), value)
+          : qe(entity.getIn(['attributes', attribute]), value)
         ),
       true,
     )
@@ -245,12 +248,14 @@ export const entitySetAssociated = (
   associationKey,
   associationId,
 ) => {
-  const filteredAssociations = associations.filter((association) => quasiEquals(
-    association.getIn(['attributes', associationKey]),
-    associationId,
-  ));
+  const filteredAssociations = associations.filter(
+    (association) => qe(
+      association.getIn(['attributes', associationKey]),
+      associationId,
+    )
+  );
   const entityAssociation = filteredAssociations.find(
-    (association) => quasiEquals(
+    (association) => qe(
       association.getIn(['attributes', entityKey]),
       entity.get('id'),
     )
@@ -265,13 +270,15 @@ export const entitiesIsAssociated = (
   associationKey,
   associationId,
 ) => {
-  const filteredAssociations = associations.filter((association) => quasiEquals(
-    association.getIn(['attributes', associationKey]),
-    associationId,
-  ));
+  const filteredAssociations = associations.filter(
+    (association) => qe(
+      association.getIn(['attributes', associationKey]),
+      associationId,
+    )
+  );
   return entities && associations && entities.filter(
     (entity) => filteredAssociations.find(
-      (association) => quasiEquals(
+      (association) => qe(
         association.getIn(['attributes', entityKey]),
         entity.get('id'),
       )
@@ -297,10 +304,7 @@ export const entitySetSingle = (
   && entity.set(
     key,
     related.find(
-      (r) => quasiEquals(
-        entity.getIn(['attributes', relatedKey]),
-        r.get('id'),
-      )
+      (r) => qe(entity.getIn(['attributes', relatedKey]), r.get('id'))
     )
   );
 
@@ -324,16 +328,18 @@ export const filterTaxonomies = (
   tagsKey,
   includeParents = true,
 ) => taxonomies && taxonomies.filter(
-  (tax, key, list) => tax.getIn(['attributes', tagsKey]) && (
-    includeParents
-    // only non-parents
-    || !list.some(
-      (other) => other.getIn(['attributes', tagsKey]) && quasiEquals(
-        tax.get('id'),
-        other.getIn(['attributes', 'parent_id'])
+  (tax, key, list) => tax.getIn(['attributes', tagsKey])
+    && (
+      includeParents
+      // only non-parents
+      || !list.some(
+        (other) => other.getIn(['attributes', tagsKey])
+          && qe(
+            tax.get('id'),
+            other.getIn(['attributes', 'parent_id'])
+          )
       )
     )
-  )
 );
 
 export const prepareTaxonomiesIsAssociated = (
@@ -346,23 +352,31 @@ export const prepareTaxonomiesIsAssociated = (
   includeParents = true,
 ) => {
   const filteredAssociations = associations.filter(
-    (association) => quasiEquals(
+    (association) => qe(
       association.getIn(['attributes', associationKey]),
       associationId
     )
   );
-  return taxonomies && filterTaxonomies(taxonomies, tagsKey, includeParents)
-    .map((tax) => tax
-      .set('tags', tax.getIn(['attributes', tagsKey]))
+  return taxonomies && filterTaxonomies(
+    taxonomies,
+    tagsKey,
+    includeParents,
+  ).map(
+    (tax) => tax.set(
+      'tags',
+      tax.getIn(['attributes', tagsKey])
       // set categories
-      .set('categories', categories
-        .filter((cat) => quasiEquals(
+    ).set(
+      'categories',
+      categories.filter(
+        (cat) => qe(
           cat.getIn(['attributes', 'taxonomy_id']),
           tax.get('id')
-        ))
-        .filter((cat, key, list) => {
+        )
+      ).filter(
+        (cat, key, list) => {
           const hasAssociations = filteredAssociations.find(
-            (association) => quasiEquals(
+            (association) => qe(
               association.getIn(['attributes', 'category_id']),
               cat.get('id')
             )
@@ -371,26 +385,27 @@ export const prepareTaxonomiesIsAssociated = (
             return true;
           }
           // if any of categories children
-          return list
-            .filter(
-              (item) => quasiEquals(
-                item.getIn(['attributes', 'parent_id']),
-                cat.get('id')
+          return list.filter(
+            (item) => qe(
+              item.getIn(['attributes', 'parent_id']),
+              cat.get('id')
+            )
+          ).some(
+            (child) => filteredAssociations.find(
+              (association) => qe(
+                association.getIn(['attributes', 'category_id']),
+                child.get('id')
               )
             )
-            .some(
-              (child) => filteredAssociations.find(
-                (association) => quasiEquals(
-                  association.getIn(['attributes', 'category_id']),
-                  child.get('id')
-                )
-              )
-            );
-        })));
+          ); // some
+        }
+      ) // filter
+    ) // set
+  ); // map/return
 };
 
 const getTaxCategories = (categories, taxonomy, tagsKey) => categories.filter(
-  (cat) => quasiEquals(
+  (cat) => qe(
     cat.getIn(['attributes', 'taxonomy_id']),
     taxonomy.get('id')
   ) && (
@@ -406,19 +421,22 @@ export const prepareTaxonomiesAssociated = (
   associationKey,
   associationId,
   includeParents = true,
-) => taxonomies && filterTaxonomies(taxonomies, tagsKey, includeParents)
-  .map((tax) => {
-    const taxCategories = getTaxCategories(categories, tax, tagsKey);
-    return tax
-      .set('tags', tax.getIn(['attributes', tagsKey]))
-      .set('categories', entitiesSetAssociated(
+) => taxonomies
+  && filterTaxonomies(taxonomies, tagsKey, includeParents).map(
+    (tax) => {
+      const taxCategories = getTaxCategories(categories, tax, tagsKey);
+      return tax.set(
+        'tags',
+        tax.getIn(['attributes', tagsKey]),
+      ).set('categories', entitiesSetAssociated(
         taxCategories,
         'category_id',
         associations,
         associationKey,
         associationId
       ));
-  });
+    }
+  );
 
 // TODO deal with conflicts
 export const prepareTaxonomiesMultiple = (
@@ -444,13 +462,16 @@ export const prepareTaxonomies = (
   categories,
   tagsKey,
   includeParents = true,
-) => taxonomies && filterTaxonomies(taxonomies, tagsKey, includeParents)
-  .map((tax) => {
-    const taxCategories = getTaxCategories(categories, tax, tagsKey);
-    return tax
-      .set('tags', tax.getIn(['attributes', tagsKey]))
-      .set('categories', taxCategories);
-  });
+) => taxonomies
+  && filterTaxonomies(taxonomies, tagsKey, includeParents).map(
+    (tax) => {
+      const taxCategories = getTaxCategories(categories, tax, tagsKey);
+      return tax.set(
+        'tags',
+        tax.getIn(['attributes', tagsKey])
+      ).set('categories', taxCategories);
+    }
+  );
 
 export const prepareCategory = (
   category,
@@ -461,7 +482,7 @@ export const prepareCategory = (
     const catWithTaxonomy = category.set(
       'taxonomy',
       taxonomies.find(
-        (tax) => quasiEquals(
+        (tax) => qe(
           category.getIn(['attributes', 'taxonomy_id']),
           tax.get('id')
         ),
@@ -482,10 +503,10 @@ export const usersByRole = (
 ) => users && users.filter(
   (user) => {
     const roles = userRoles.filter(
-      (association) => quasiEquals(
+      (association) => qe(
         association.getIn(['attributes', 'role_id']),
         roleId,
-      ) && quasiEquals(
+      ) && qe(
         association.getIn(['attributes', 'user_id']),
         user.get('id')
       )
@@ -539,25 +560,27 @@ export const getEntityCategories = (
   includeParents = true,
 ) => {
   // directly associated categories
-  const categoryIds = associations && associations
-    .filter(
-      (association) => quasiEquals(
-        association.getIn(['attributes', associationKey]),
-        entityId,
-      )
+  const categoryIds = associations && associations.filter(
+    (association) => qe(
+      association.getIn(['attributes', associationKey]),
+      entityId,
     )
-    .map((association) => association.getIn(['attributes', 'category_id']));
+  ).map(
+    (association) => association.getIn(['attributes', 'category_id'])
+  );
   if (categories && includeParents && categoryIds) {
     // include parent categories of associated categories when categories present
-    return categoryIds
-      .reduce((memo, id, key) => {
+    return categoryIds.reduce(
+      (memo, id, key) => {
         // if any of categories children
         const category = categories.get(id.toString());
         const parentId = category && category.getIn(['attributes', 'parent_id']);
         return parentId
           ? memo.set(`${key}-${id}`, parseInt(parentId, 10))
           : memo;
-      }, categoryIds);
+      },
+      categoryIds,
+    );
   }
   return categoryIds;
 };
@@ -569,7 +592,7 @@ export const getEntityConnections = (
   entityKey,
   connections,
 ) => associations.filter(
-  (association) => quasiEquals(
+  (association) => qe(
     association.getIn(['attributes', entityKey]),
     entityId
   ) && connections.get(
@@ -585,24 +608,23 @@ export const getEntityConnectionsByFw = (
   connections,
 ) => {
   const filteredAssociations = associations.filter(
-    (association) => quasiEquals(
+    (association) => qe(
       association.getIn(['attributes', entityKey]),
       entityId
     )
   );
-  return connections
-    .groupBy((c) => c.getIn(['attributes', 'framework_id']).toString())
-    .map(
-      // consider reduce for combined filter and map
-      (connectionsForFw) => filteredAssociations
-        .filter(
-          (association) => connectionsForFw.get(
-            association.getIn(['attributes', associationKey]).toString()
-          )
-        ).map(
-          (association) => association.getIn(['attributes', associationKey])
-        )
-    );
+  return connections.groupBy(
+    (c) => c.getIn(['attributes', 'framework_id']).toString()
+  ).map(
+    // consider reduce for combined filter and map
+    (connectionsForFw) => filteredAssociations.filter(
+      (association) => connectionsForFw.get(
+        association.getIn(['attributes', associationKey]).toString()
+      )
+    ).map(
+      (association) => association.getIn(['attributes', associationKey])
+    )
+  );
 };
 
 export const getTaxonomyCategories = (
@@ -611,7 +633,7 @@ export const getTaxonomyCategories = (
   relationship,
   connections,
 ) => categories.filter(
-  (category) => quasiEquals(
+  (category) => qe(
     category.getIn(['attributes', 'taxonomy_id']),
     taxonomy.get('id')
   )
@@ -619,7 +641,7 @@ export const getTaxonomyCategories = (
   (category) => {
     // figure out child categories if not directly tagging connection
     const childCategories = categories.filter(
-      (item) => quasiEquals(
+      (item) => qe(
         item.getIn(['attributes', 'parent_id']),
         category.get('id'),
       ),
@@ -633,12 +655,12 @@ export const getTaxonomyCategories = (
             return false;
           }
           return (!childCategories || childCategories.size === 0)
-            ? quasiEquals(
+            ? qe(
               association.getIn(['attributes', 'category_id']),
               category.get('id'),
             )
             : childCategories.some(
-              (child) => quasiEquals(
+              (child) => qe(
                 association.getIn(['attributes', 'category_id']),
                 child.get('id'),
               )

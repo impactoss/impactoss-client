@@ -34,7 +34,7 @@ import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import isNumber from 'utils/is-number';
 
 // relative
@@ -207,7 +207,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     if (tax.getIn(['attributes', tags])) {
       return true;
     }
-    const childTaxonomies = list.filter((item) => attributesEqual(item.getIn(['attributes', 'parent_id']), tax.get('id')));
+    const childTaxonomies = list.filter((item) => qe(item.getIn(['attributes', 'parent_id']), tax.get('id')));
     return childTaxonomies.some((child) => child.getIn(['attributes', tags]));
   })
 

@@ -6,7 +6,8 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import { getSortOption } from 'utils/sort';
-import { getCategoryTitle, attributesEqual } from 'utils/entities';
+import { getCategoryTitle } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import CategoryListKey from 'components/categoryList/CategoryListKey';
 import CategoryListHeader from 'components/categoryList/CategoryListHeader';
@@ -248,7 +249,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     const columns = [];
     const hasResponse = frameworks && taxonomy.get('frameworkIds').toArray().reduce(
       (memo, fwid) => {
-        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+        const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
         return memo || (framework && framework.getIn(['attributes', 'has_response']));
       },
       false,

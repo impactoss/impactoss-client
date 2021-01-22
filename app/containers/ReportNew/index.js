@@ -24,7 +24,7 @@ import {
 
 import { getStatusField as getStatusInfoField } from 'utils/fields';
 
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
@@ -161,7 +161,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     this.setState({ guestDismissed: true });
   }
 
-  canUserPublish = (isUserContributor, isUserManager, userId, indicator) => isUserManager || (isUserContributor && attributesEqual(userId, indicator.getIn(['attributes', 'manager_id'])));
+  canUserPublish = (isUserContributor, isUserManager, userId, indicator) => isUserManager || (isUserContributor && qe(userId, indicator.getIn(['attributes', 'manager_id'])));
 
   render() {
     const { intl } = this.context;
