@@ -40,8 +40,7 @@ export const selectConnections = createSelector(
   selectFWIndicators,
   selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
-  (state) => selectEntities(state, 'categories'),
-  (indicators, recommendations, recommendationCategories, categories) => Map().set(
+  (indicators, recommendations, recommendationCategories) => Map().set(
     'indicators',
     indicators,
   ).set(
@@ -50,7 +49,6 @@ export const selectConnections = createSelector(
       recommendations,
       'recommendation_id',
       recommendationCategories,
-      categories,
     ),
   )
 );

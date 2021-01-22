@@ -343,11 +343,11 @@ export const selectFWRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendations'),
   selectFrameworkQuery,
   (entities, framework) => {
-    if (framework && framework !== 'all') {
+    if (entities && framework && framework !== 'all') {
       return entities.filter(
         (rec) => qe(
-          rec.getIn(['attributes', 'framework_id']),
           framework,
+          rec.getIn(['attributes', 'framework_id']),
         )
       );
     }
@@ -361,26 +361,29 @@ export const selectFWMeasures = createSelector(
   selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_measures'),
   (entities, framework, recs, recMeasures) => {
-    if (recs && recMeasures && framework && framework !== 'all') {
-      return entities.filter(
-        (measure) => {
-          const recIds = recMeasures.filter(
-            (rm) => qe(
-              rm.getIn(['attributes', 'measure_id']),
-              measure.get('id'),
-            )
-          ).map(
-            (rm) => rm.getIn(['attributes', 'recommendation_id'])
-          );
-          return recIds.size === 0 || recIds.some(
-            (id) => !!recs.find(
-              (rec) => qe(rec.get('id'), id)
-            )
-          );
-        }
-      );
+    if (entities && recs && recMeasures) {
+      if (framework && framework !== 'all') {
+        return entities.filter(
+          (measure) => {
+            const recIds = recMeasures.filter(
+              (rm) => qe(
+                rm.getIn(['attributes', 'measure_id']),
+                measure.get('id'),
+              )
+            ).map(
+              (rm) => rm.getIn(['attributes', 'recommendation_id'])
+            );
+            return recIds.size === 0 || recIds.some(
+              (id) => !!recs.find(
+                (rec) => qe(rec.get('id'), id)
+              )
+            );
+          }
+        );
+      }
+      return entities;
     }
-    return entities;
+    return null;
   }
 );
 

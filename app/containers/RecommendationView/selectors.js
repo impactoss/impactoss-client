@@ -69,7 +69,12 @@ export const selectMeasures = createSelector(
   ) => measures && measures.map(
     (measure) => measure.set(
       'categories',
-      getEntityCategories(measure.get('id'), measureCategories, 'measure_id', categories)
+      getEntityCategories(
+        measure.get('id'),
+        measureCategories,
+        'measure_id',
+        categories,
+      )
     ).set(
       'recommendations',
       measureRecommendations && measureRecommendations.filter(

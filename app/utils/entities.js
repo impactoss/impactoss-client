@@ -210,8 +210,7 @@ export const entitiesSetCategoryIds = (
   entities,
   entityKey,
   associations,
-  categories,
-  includeParents = true,
+  categories
 ) => entities && entities.map(
   (entity) => entity.set(
     'categories',
@@ -220,7 +219,6 @@ export const entitiesSetCategoryIds = (
       associations,
       entityKey,
       categories,
-      includeParents,
     )
   )
 );
@@ -557,30 +555,65 @@ export const getEntityCategories = (
   associations,
   associationKey,
   categories,
-  includeParents = true,
 ) => {
+  // directly associated categories
+  // console.log('getEntityCategories', entityId)
+  // return associations && associations.reduce(
+  //   (memo, association, key) => {
+  //     if (qe(
+  //       entityId,
+  //       association.getIn(['attributes', associationKey]),
+  //     )) {
+  //       const catId = association.getIn(['attributes', 'category_id']);
+  //       // include parent categories of associated categories when categories present
+  //       if (categories && includeParents) {
+  //         const parentId = categories.getIn([
+  //           catId.toString(),
+  //           'attributes',
+  //           'parent_id',
+  //         ]);
+  //         if (parentId) {
+  //           return memo.set(
+  //             key,
+  //             catId,
+  //           ).set(
+  //             `${key}-${catId}`,
+  //             parseInt(parentId, 10),
+  //           );
+  //         }
+  //       }
+  //       return memo.set(key, catId);
+  //     }
+  //     return memo;
+  //   },
+  //   Map(),
+  // );
   // directly associated categories
   const categoryIds = associations && associations.filter(
     (association) => qe(
-      association.getIn(['attributes', associationKey]),
       entityId,
+      association.getIn(['attributes', associationKey]),
     )
   ).map(
     (association) => association.getIn(['attributes', 'category_id'])
   );
-  if (categories && includeParents && categoryIds) {
-    // include parent categories of associated categories when categories present
-    return categoryIds.reduce(
+  // include parent categories of associated categories when categories present
+  if (categories && categoryIds) {
+    const parentCategoryIds = categoryIds.reduce(
       (memo, id, key) => {
         // if any of categories children
-        const category = categories.get(id.toString());
-        const parentId = category && category.getIn(['attributes', 'parent_id']);
+        const parentId = categories.getIn([
+          id.toString(),
+          'attributes',
+          'parent_id',
+        ]);
         return parentId
           ? memo.set(`${key}-${id}`, parseInt(parentId, 10))
           : memo;
       },
-      categoryIds,
+      Map(),
     );
+    return categoryIds.merge(parentCategoryIds);
   }
   return categoryIds;
 };
