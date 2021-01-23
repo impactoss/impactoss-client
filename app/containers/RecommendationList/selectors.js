@@ -64,7 +64,11 @@ const selectRecommendationsWithMeasures = createSelector(
   (state) => selectRecommendationConnections(state),
   (state) => selectEntities(state, 'recommendation_measures'),
   (entities, connections, entityMeasures) => {
-    if (entityMeasures && entityMeasures.size > 0) {
+    if (
+      connections.get('measures')
+      && entityMeasures
+      && entityMeasures.size > 0
+    ) {
       return entities.map(
         (entity) => entity.set(
           'measures',
@@ -86,7 +90,11 @@ const selectRecommendationsWithIndicators = createSelector(
   (state) => selectRecommendationConnections(state),
   (state) => selectEntities(state, 'recommendation_indicators'),
   (entities, connections, entityIndicators) => {
-    if (entityIndicators && entityIndicators.size > 0) {
+    if (
+      connections.get('indicators')
+      && entityIndicators
+      && entityIndicators.size > 0
+    ) {
       return entities.map(
         (entity) => entity.set(
           'indicators',

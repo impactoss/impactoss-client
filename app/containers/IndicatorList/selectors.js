@@ -35,35 +35,58 @@ import { sortEntities, getSortOption } from 'utils/sort';
 
 import { CONFIG } from './constants';
 
-export const selectConnections = createSelector(
+export const selectConnectionsMeasures = createSelector(
   selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
+  (state) => selectEntities(state, 'categories'),
+  (measures, measureCategories, categories) => {
+    if (
+      measures
+      && measures.size > 0
+      && measureCategories
+      && measureCategories.size > 0
+      && categories
+      && categories.size > 0
+    ) {
+      return Map().set(
+        'measures',
+        entitiesSetCategoryIds(
+          measures,
+          'measure_id',
+          measureCategories,
+          categories,
+        )
+      );
+    }
+    return Map();
+  }
+);
+export const selectConnections = createSelector(
+  selectConnectionsMeasures,
   selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'categories'),
-  (
-    measures,
-    measureCategories,
-    recommendations,
-    recommendationCategories,
-    categories,
-  ) => Map().set(
-    'measures',
-    entitiesSetCategoryIds(
-      measures,
-      'measure_id',
-      measureCategories,
-      categories,
-    )
-  ).set(
-    'recommendations',
-    entitiesSetCategoryIds(
-      recommendations,
-      'recommendation_id',
-      recommendationCategories,
-      categories,
-    )
-  )
+  (connections, recommendations, recommendationCategories, categories) => {
+    if (
+      recommendations
+      && recommendations.size > 0
+      && recommendationCategories
+      && recommendationCategories.size > 0
+      && categories
+      && categories.size > 0
+    ) {
+      return connections.set(
+        'recommendations',
+        entitiesSetCategoryIds(
+          recommendations,
+          'recommendation_id',
+          recommendationCategories,
+          categories,
+        )
+      );
+    }
+    return connections;
+  }
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -123,6 +146,24 @@ export const selectConnectedTaxonomies = createSelector(
             )
           );
         }
+        if (
+          !connections.get(relationship.path)
+          || !relationship.associations
+          || relationship.associations.size === 0
+          || !categories
+          || categories.size === 0
+        ) {
+          return connectedTaxonomies;
+        }
+        const groupedAssociations = relationship.associations.filter(
+          (association) => association.getIn(['attributes', relationship.key])
+            && connections.getIn([
+              relationship.path,
+              association.getIn(['attributes', relationship.key]).toString(),
+            ])
+        ).groupBy(
+          (association) => association.getIn(['attributes', 'category_id'])
+        );
         return connectedTaxonomies.merge(
           filtered.map(
             (taxonomy) => taxonomy.set(
@@ -131,7 +172,7 @@ export const selectConnectedTaxonomies = createSelector(
                 taxonomy,
                 categories,
                 relationship,
-                connections.get(relationship.path),
+                groupedAssociations,
               )
             )
           )
@@ -142,89 +183,135 @@ export const selectConnectedTaxonomies = createSelector(
   }
 );
 
-const selectIndicatorsNested = createSelector(
+const selectIndicatorsNestedQ = createSelector(
   (state, locationQuery) => selectIndicatorsSearchQuery(state, {
     searchAttributes: CONFIG.search || ['title', 'reference'],
     locationQuery,
   }),
+  (entities) => entities
+);
+
+// nest connected recommendation ids
+// nest connected recommendation ids byfw
+const selectIndicatorsNestedWithRecs = createSelector(
+  selectIndicatorsNestedQ,
+  (state) => selectConnections(state),
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (entities, connections, entityRecommendations) => {
+    if (
+      connections.get('recommendations')
+      && entityRecommendations
+      && entityRecommendations.size > 0
+    ) {
+      // currently requires both for filtering & display
+      return entities.map(
+        (entity) => {
+          const connectionsByFw = getEntityConnectionsByFw(
+            entity.get('id'),
+            entityRecommendations,
+            'recommendation_id',
+            'indicator_id',
+            connections.get('recommendations'),
+          );
+          return entity.set(
+            'recommendations',
+            connectionsByFw && connectionsByFw.flatten(),
+          ).set(
+            'recommendationsByFw',
+            connectionsByFw,
+          );
+        }
+      );
+    }
+    return entities;
+  }
+);
+
+
+const selectIndicatorsNestedWithMeasures = createSelector(
+  selectIndicatorsNestedWithRecs,
   (state) => selectConnections(state),
   (state) => selectEntities(state, 'measure_indicators'),
-  (state) => selectEntities(state, 'recommendation_indicators'),
+  (entities, connections, entityMeasures) => {
+    if (
+      connections.get('measures')
+      && entityMeasures
+      && entityMeasures.size > 0
+    ) {
+      return entities.map(
+        (entity) => entity.set(
+          'measures',
+          getEntityConnections(
+            entity.get('id'),
+            entityMeasures,
+            'measure_id',
+            'indicator_id',
+            connections.get('measures'),
+          )
+        )
+      );
+    }
+    return entities;
+  }
+);
+const selectIndicatorsNested = createSelector(
+  selectIndicatorsNestedWithMeasures,
   (state) => selectEntities(state, 'progress_reports'),
   (state) => selectEntities(state, 'due_dates'),
   (state) => selectEntities(state, 'users'),
   (
     entities,
-    connections,
-    entityMeasures,
-    entityRecommendations,
     progressReports,
     dueDates,
     users
-  ) => entities.map(
-    (entity) => entity.set(
-      'measures',
-      getEntityConnections(
-        entity.get('id'),
-        entityMeasures,
-        'measure_id',
-        'indicator_id',
-        connections.get('measures'),
-      )
-    ).set(
-      'recommendations',
-      getEntityConnections(
-        entity.get('id'),
-        entityRecommendations,
-        'recommendation_id',
-        'indicator_id',
-        connections.get('recommendations'),
-      )
-    // nest connected recommendation ids byfw
-    ).set(
-      'recommendationsByFw',
-      getEntityConnectionsByFw(
-        entity.get('id'),
-        entityRecommendations,
-        'recommendation_id',
-        'indicator_id',
-        connections.get('recommendations'),
-      )
-      // nest reports
-    ).set(
-      'reports',
-      progressReports.filter(
-        (report) => qe(
-          report.getIn(['attributes', 'indicator_id']),
-          entity.get('id')
-        )
-      )
-      // nest dates without report
-    ).set(
-      'dates',
-      dueDates.filter(
-        (date) => {
-          // is associated
-          const associated = qe(date.getIn(['attributes', 'indicator_id']), entity.get('id'));
-          if (associated) {
-            // has no report
-            const dateReports = progressReports.filter((report) => qe(report.getIn(['attributes', 'due_date_id']), date.get('id')));
-            return !dateReports || dateReports.size === 0;
-          }
-          return false;
-        }
-      )
-    ).set(
-      'manager',
-      users.find(
-        (user) => entity.getIn(['attributes', 'manager_id'])
-          && qe(
-            user.get('id'),
-            entity.getIn(['attributes', 'manager_id'])
+  ) => {
+    if (
+      progressReports
+      && progressReports.size > 0
+      && dueDates
+      && dueDates.size > 0
+      && users
+      && users.size > 0
+    ) {
+      return entities.map(
+        // nest reports
+        (entity) => entity.set(
+          'reports',
+          progressReports.filter(
+            (report) => qe(
+              entity.get('id'),
+              report.getIn(['attributes', 'indicator_id']),
+            )
           )
-      )
-    )
-  )
+          // nest dates without report
+        ).set(
+          'dates',
+          dueDates.filter(
+            (date) => {
+              // is associated
+              const associated = qe(date.getIn(['attributes', 'indicator_id']), entity.get('id'));
+              if (associated) {
+                // has no report
+                const dateReports = progressReports.filter((report) => qe(report.getIn(['attributes', 'due_date_id']), date.get('id')));
+                return !dateReports || dateReports.size === 0;
+              }
+              return false;
+            }
+          )
+        ).set(
+          'manager',
+          users.find(
+            (user) => entity.getIn(['attributes', 'manager_id'])
+              && qe(
+                user.get('id'),
+                entity.getIn(['attributes', 'manager_id'])
+              )
+          )
+        )
+      );
+    }
+    return entities;
+  }
 );
 const selectIndicatorsWithout = createSelector(
   selectIndicatorsNested,
