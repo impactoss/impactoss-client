@@ -15,6 +15,7 @@ import {
   selectFWIndicators,
   selectFrameworkQuery,
   selectFrameworkListQuery,
+  selectReady,
 } from 'containers/App/selectors';
 
 import {
@@ -29,7 +30,7 @@ import { qe } from 'utils/quasi-equals';
 
 import { sortEntities, getSortOption } from 'utils/sort';
 
-import { CONFIG } from './constants';
+import { CONFIG, DEPENDENCIES } from './constants';
 
 const selectRecommendationsQ = createSelector(
   (state, locationQuery) => selectRecommendationsSearchQuery(state, {
@@ -39,16 +40,12 @@ const selectRecommendationsQ = createSelector(
   (entities) => entities
 );
 const selectRecommendationsWithCategories = createSelector(
+  (state) => selectReady(state, { path: DEPENDENCIES }),
   selectRecommendationsQ,
   (state) => selectEntities(state, 'recommendation_categories'),
   (state) => selectEntities(state, 'categories'),
-  (entities, entityCategories, categories) => {
-    if (
-      entityCategories
-      && entityCategories.size > 0
-      && categories
-      && categories.size > 0
-    ) {
+  (ready, entities, entityCategories, categories) => {
+    if (ready) {
       return entitiesSetCategoryIds(
         entities,
         'recommendation_id',
@@ -60,15 +57,12 @@ const selectRecommendationsWithCategories = createSelector(
   }
 );
 const selectRecommendationsWithMeasures = createSelector(
+  (state) => selectReady(state, { path: DEPENDENCIES }),
   selectRecommendationsWithCategories,
   (state) => selectRecommendationConnections(state),
   (state) => selectEntities(state, 'recommendation_measures'),
-  (entities, connections, entityMeasures) => {
-    if (
-      connections.get('measures')
-      && entityMeasures
-      && entityMeasures.size > 0
-    ) {
+  (ready, entities, connections, entityMeasures) => {
+    if (ready && connections.get('measures')) {
       return entities.map(
         (entity) => entity.set(
           'measures',
@@ -86,15 +80,12 @@ const selectRecommendationsWithMeasures = createSelector(
   }
 );
 const selectRecommendationsWithIndicators = createSelector(
+  (state) => selectReady(state, { path: DEPENDENCIES }),
   selectRecommendationsWithMeasures,
   (state) => selectRecommendationConnections(state),
   (state) => selectEntities(state, 'recommendation_indicators'),
-  (entities, connections, entityIndicators) => {
-    if (
-      connections.get('indicators')
-      && entityIndicators
-      && entityIndicators.size > 0
-    ) {
+  (ready, entities, connections, entityIndicators) => {
+    if (ready && connections.get('indicators')) {
       return entities.map(
         (entity) => entity.set(
           'indicators',
@@ -185,16 +176,12 @@ const selectConnectionsIndicators = createSelector(
 );
 
 export const selectConnections = createSelector(
+  (state) => selectReady(state, { path: DEPENDENCIES }),
   selectConnectionsIndicators,
   selectFWMeasures,
   (state) => selectEntities(state, 'measure_categories'),
-  (connections, measures, measureCategories) => {
-    if (
-      measures
-      && measures.size > 0
-      && measureCategories
-      && measureCategories.size > 0
-    ) {
+  (ready, connections, measures, measureCategories) => {
+    if (ready) {
       return connections.set(
         'measures',
         entitiesSetCategoryIds(
