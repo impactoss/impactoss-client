@@ -149,7 +149,7 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
                 onProgress={this.onUploadProgress}
                 onError={this.onUploadError}
                 onFinish={this.onUploadFinish}
-                server={ENDPOINTS.API}
+                server={`${ENDPOINTS.API}/`}
                 preprocess={this.modifyFileType}
                 scrubFilename={(filename) => filename.replace(/(\.[\w\d_-]+)$/i, `_${Date.now()}$1`)}
               />
