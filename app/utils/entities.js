@@ -624,14 +624,19 @@ export const getEntityConnections = (
   associationKey,
   entityKey,
   connections,
-) => associations.filter(
-  (association) => qe(
-    association.getIn(['attributes', entityKey]),
-    entityId
-  ) && connections.get(
-    association.getIn(['attributes', associationKey]).toString()
-  )
-).map((association) => association.getIn(['attributes', associationKey]));
+) => {
+  if (!connections) return null;
+  return associations.filter(
+    (association) => qe(
+      association.getIn(['attributes', entityKey]),
+      entityId
+    ) && connections.get(
+      association.getIn(['attributes', associationKey]).toString()
+    )
+  ).map(
+    (association) => association.getIn(['attributes', associationKey])
+  );
+};
 
 export const getEntityConnectionsByFw = (
   entityId,
@@ -640,6 +645,7 @@ export const getEntityConnectionsByFw = (
   entityKey,
   connections,
 ) => {
+  if (!connections) return null;
   const filteredAssociations = associations.filter(
     (association) => qe(
       association.getIn(['attributes', entityKey]),
@@ -664,44 +670,48 @@ export const getTaxonomyCategories = (
   taxonomy,
   categories,
   relationship,
-  connections,
-) => categories.filter(
-  (category) => qe(
-    category.getIn(['attributes', 'taxonomy_id']),
-    taxonomy.get('id')
-  )
-).map(
-  (category) => {
-    // figure out child categories if not directly tagging connection
-    const childCategories = categories.filter(
-      (item) => qe(
-        item.getIn(['attributes', 'parent_id']),
-        category.get('id'),
-      ),
-    );
-    return category.set(
-      relationship.path,
-      // consider reduce for combined filter and map
-      relationship.associations.filter(
-        (association) => {
-          if (!connections.get(association.getIn(['attributes', relationship.key]).toString())) {
-            return false;
-          }
-          return (!childCategories || childCategories.size === 0)
-            ? qe(
-              association.getIn(['attributes', 'category_id']),
-              category.get('id'),
-            )
-            : childCategories.some(
-              (child) => qe(
-                association.getIn(['attributes', 'category_id']),
-                child.get('id'),
-              )
+  groupedAssociations, // grouped by category
+) => {
+  if (!groupedAssociations) return null;
+  const taxCategories = categories.filter(
+    (category) => qe(
+      category.getIn(['attributes', 'taxonomy_id']),
+      taxonomy.get('id')
+    )
+  );
+  return taxCategories.map(
+    (category) => {
+      let categoryAssocations = groupedAssociations.get(parseInt(category.get('id'), 10));
+
+      // figure out child categories if not directly tagging connection
+      const childCategories = categories.filter(
+        (item) => qe(
+          category.get('id'),
+          item.getIn(['attributes', 'parent_id']),
+        ),
+      );
+      if (childCategories && childCategories.size > 0) {
+        categoryAssocations = childCategories.reduce(
+          (memo, child) => {
+            if (!groupedAssociations.get(parseInt(child.get('id'), 10))) {
+              return memo;
+            }
+            return memo.merge(
+              groupedAssociations.get(parseInt(child.get('id'), 10))
             );
-        }
-      ).map(
-        (association) => association.getIn(['attributes', relationship.key])
-      )
-    );
-  }
-);
+          },
+          categoryAssocations || Map(),
+        );
+      }
+      return categoryAssocations
+        ? category.set(
+          relationship.path,
+          // consider reduce for combined filter and map
+          categoryAssocations.map(
+            (association) => association.getIn(['attributes', relationship.key])
+          )
+        )
+        : category;
+    }
+  );
+};
