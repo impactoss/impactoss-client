@@ -167,13 +167,17 @@ const selectMeasuresNestedWithRecs = createSelector(
   selectMeasuresNestedWithCategories,
   (state) => selectConnections(state),
   selectRecommendationMeasuresByMeasure,
-  (state) => selectEntities(state, 'recommendation_measures'),
   (ready, entities, connections, associationsGrouped) => {
     if (ready && connections.get('recommendations')) {
       return entities.map(
         (entity) => {
           const entityRecs = associationsGrouped.get(parseInt(entity.get('id'), 10));
-          const entityRecsByFw = entityRecs && entityRecs.groupBy(
+          const entityRecsByFw = entityRecs && entityRecs.filter(
+            (recId) => connections.getIn([
+              'recommendations',
+              recId.toString(),
+            ])
+          ).groupBy(
             (recId) => connections.getIn([
               'recommendations',
               recId.toString(),
@@ -181,6 +185,7 @@ const selectMeasuresNestedWithRecs = createSelector(
               'framework_id',
             ])
           );
+          // console.log(entityRecsByFw && entityRecsByFw.toJS());
           // currently requires both for filtering & display
           return entity.set(
             'recommendations',

@@ -86,7 +86,12 @@ export const selectMeasures = createSelector(
         const entityRecs = measureRecommendations.get(parseInt(measure.get('id'), 10));
         const entityRecsByFw = entityRecs
           && connections.get('recommendations')
-          && entityRecs.groupBy(
+          && entityRecs.filter(
+            (recId) => connections.getIn([
+              'recommendations',
+              recId.toString(),
+            ])
+          ).groupBy(
             (recId) => connections.getIn([
               'recommendations',
               recId.toString(),
@@ -153,7 +158,12 @@ export const selectIndicators = createSelector(
         const entityRecs = indicatorRecs.get(parseInt(indicator.get('id'), 10));
         const entityRecsByFw = entityRecs
           && connections.get('recommendations')
-          && entityRecs.groupBy(
+          && entityRecs.filter(
+            (recId) => connections.getIn([
+              'recommendations',
+              recId.toString(),
+            ])
+          ).groupBy(
             (recId) => connections.getIn([
               'recommendations',
               recId.toString(),

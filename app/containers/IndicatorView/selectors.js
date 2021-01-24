@@ -84,7 +84,12 @@ export const selectMeasures = createSelector(
         const entityRecs = measureRecommendations.get(parseInt(measure.get('id'), 10));
         const entityRecsByFw = entityRecs
           && connections.get('recommendations')
-          && entityRecs.groupBy(
+          && entityRecs.filter(
+            (recId) => connections.getIn([
+              'recommendations',
+              recId.toString(),
+            ])
+          ).groupBy(
             (recId) => connections.getIn([
               'recommendations',
               recId.toString(),

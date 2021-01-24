@@ -61,6 +61,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       ) {
         if (option.groupByFramework) {
           const entitiesByFramework = entity.get(`${option.path}ByFw`);
+          // console.log(entity, entity.toJS())
           if (entitiesByFramework) {
             entitiesByFramework.forEach((fwentities, fwid) => {
               if (fwentities.size > 0) {
