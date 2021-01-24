@@ -191,7 +191,12 @@ const selectIndicatorsNestedWithRecs = createSelector(
       return entities.map(
         (entity) => {
           const entityRecs = associationsGrouped.get(parseInt(entity.get('id'), 10));
-          const entityRecsByFw = entityRecs && entityRecs.groupBy(
+          const entityRecsByFw = entityRecs && entityRecs.filter(
+            (recId) => connections.getIn([
+              'recommendations',
+              recId.toString(),
+            ])
+          ).groupBy(
             (recId) => connections.getIn([
               'recommendations',
               recId.toString(),

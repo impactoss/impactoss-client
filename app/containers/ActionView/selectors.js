@@ -151,7 +151,12 @@ export const selectIndicators = createSelector(
         const entityRecs = indicatorRecs.get(parseInt(indicator.get('id'), 10));
         const entityRecsByFw = entityRecs
           && connections.get('recommendations')
-          && entityRecs.groupBy(
+          && entityRecs.filter(
+            (recId) => connections.getIn([
+              'recommendations',
+              recId.toString(),
+            ])
+          ).groupBy(
             (recId) => connections.getIn([
               'recommendations',
               recId.toString(),
