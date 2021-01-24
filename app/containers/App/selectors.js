@@ -740,24 +740,133 @@ export const selectUserTaxonomies = createSelector(
   )
 );
 
+export const selectRecommendationCategoriesByRecommendation = createSelector(
+  (state) => selectEntities(state, 'recommendation_categories'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'recommendation_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'category_id'])
+      )
+    ),
+);
+export const selectRecommendationCategoriesByCategory = createSelector(
+  (state) => selectEntities(state, 'recommendation_categories'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'category_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'recommendation_id'])
+      )
+    ),
+);
+export const selectRecommendationMeasuresByRecommendation = createSelector(
+  (state) => selectEntities(state, 'recommendation_measures'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'recommendation_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'measure_id'])
+      )
+    ),
+);
+export const selectRecommendationMeasuresByMeasure = createSelector(
+  (state) => selectEntities(state, 'recommendation_measures'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'measure_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'recommendation_id'])
+      )
+    ),
+);
+export const selectRecommendationIndicatorsByRecommendation = createSelector(
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'recommendation_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'indicator_id'])
+      )
+    ),
+);
+export const selectRecommendationIndicatorsByIndicator = createSelector(
+  (state) => selectEntities(state, 'recommendation_indicators'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'indicator_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'recommendation_id'])
+      )
+    ),
+);
+export const selectMeasureIndicatorsByMeasure = createSelector(
+  (state) => selectEntities(state, 'measure_indicators'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'measure_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'indicator_id'])
+      )
+    ),
+);
+export const selectMeasureIndicatorsByIndicator = createSelector(
+  (state) => selectEntities(state, 'measure_indicators'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'indicator_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'measure_id'])
+      )
+    ),
+);
+export const selectMeasureCategoriesByMeasure = createSelector(
+  (state) => selectEntities(state, 'measure_categories'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'measure_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'category_id'])
+      )
+    ),
+);
+export const selectMeasureCategoriesByCategory = createSelector(
+  (state) => selectEntities(state, 'measure_categories'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'category_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'measure_id'])
+      )
+    ),
+);
+
 // get recommendations with category ids
 export const selectRecommendationsCategorised = createSelector(
   selectFWRecommendations,
-  (state) => selectEntities(state, 'recommendation_categories'),
-  (entities, associations) => entitiesSetCategoryIds(
+  selectRecommendationCategoriesByRecommendation,
+  (entities, associationsGrouped) => entitiesSetCategoryIds(
     entities,
-    'recommendation_id',
-    associations,
+    associationsGrouped,
   )
 );
 
 export const selectMeasuresCategorised = createSelector(
   selectFWMeasures,
-  (state) => selectEntities(state, 'measure_categories'),
-  (entities, associations) => entitiesSetCategoryIds(
+  selectMeasureCategoriesByMeasure,
+  (entities, associationsGrouped) => entitiesSetCategoryIds(
     entities,
-    'measure_id',
-    associations,
+    associationsGrouped,
   )
 );
 
@@ -776,3 +885,15 @@ export const selectViewRecommendationFrameworkId = createSelector(
   }
 
 );
+
+// export const selectCategoriesByParent = createSelector(
+//   (state) => selectEntities(state, 'categories'),
+//   (categories) => categories && categories.map(
+//     (cat) => categories.filter(
+//       (child) => qe(
+//         cat.get('id'),
+//         child.getIn(['attributes', 'parent_id']),
+//       )
+//     ).keySeq()
+//   ),
+// );

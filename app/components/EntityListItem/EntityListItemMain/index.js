@@ -133,17 +133,25 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
 
   getProgressCategory = (taxonomies, categoryIds) => {
     const progressTaxonomy = taxonomies && this.getProgressTaxonomy(taxonomies);
-    const progressCategory = progressTaxonomy && progressTaxonomy.get('categories').find((cat) => categoryIds.includes(parseInt(cat.get('id'), 10)));
+    const progressCategory = progressTaxonomy
+      && categoryIds
+      && progressTaxonomy.get('categories').find(
+        (cat) => categoryIds.includes(parseInt(cat.get('id'), 10))
+      );
     return progressCategory && progressCategory.toJS();
   }
 
   getWithoutProgressCategories = (taxonomies, categoryIds) => {
     const progressTaxonomy = taxonomies && this.getProgressTaxonomy(taxonomies);
-    return progressTaxonomy
-      ? categoryIds.filter((cat) => {
-        const progressCategoryIds = progressTaxonomy.get('categories').map((pCat) => parseInt(pCat.get('id'), 10));
-        return !progressCategoryIds || !progressCategoryIds.includes(parseInt(cat, 10));
-      })
+    return (progressTaxonomy && categoryIds)
+      ? categoryIds.filter(
+        (cat) => {
+          const progressCategoryIds = progressTaxonomy.get('categories').map(
+            (pCat) => parseInt(pCat.get('id'), 10)
+          );
+          return !progressCategoryIds || !progressCategoryIds.includes(parseInt(cat, 10));
+        }
+      )
       : categoryIds;
   }
 

@@ -16,6 +16,10 @@ import {
   selectFWIndicators,
   selectFrameworks,
   selectReady,
+  selectRecommendationCategoriesByRecommendation,
+  selectMeasureCategoriesByMeasure,
+  selectMeasureIndicatorsByMeasure,
+  selectRecommendationMeasuresByMeasure,
 } from 'containers/App/selectors';
 
 import {
@@ -27,8 +31,6 @@ import {
   entitiesSetCategoryIds,
   entitiesSetSingle,
   filterTaxonomies,
-  getEntityConnections,
-  getEntityConnectionsByFw,
   getTaxonomyCategories,
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
@@ -46,17 +48,14 @@ export const selectConnections = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectConnectionsIndicators,
   selectFWRecommendations,
-  (state) => selectEntities(state, 'recommendation_categories'),
-  (state) => selectEntities(state, 'categories'),
-  (ready, connections, recommendations, recommendationCategories, categories) => {
+  selectRecommendationCategoriesByRecommendation,
+  (ready, connections, recommendations, associationsGrouped) => {
     if (ready) {
       return connections.set(
         'recommendations',
         entitiesSetCategoryIds(
           recommendations,
-          'recommendation_id',
-          recommendationCategories,
-          categories,
+          associationsGrouped,
         )
       );
     }
@@ -147,14 +146,13 @@ const selectMeasuresNestedQ = createSelector(
 const selectMeasuresNestedWithCategories = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectMeasuresNestedQ,
-  (state) => selectEntities(state, 'measure_categories'),
+  selectMeasureCategoriesByMeasure,
   (state) => selectEntities(state, 'categories'),
-  (ready, entities, entityCategories, categories) => {
+  (ready, entities, associationsGrouped, categories) => {
     if (ready) {
       return entitiesSetCategoryIds(
         entities,
-        'measure_id',
-        entityCategories,
+        associationsGrouped,
         categories,
       );
     }
@@ -168,25 +166,28 @@ const selectMeasuresNestedWithRecs = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectMeasuresNestedWithCategories,
   (state) => selectConnections(state),
+  selectRecommendationMeasuresByMeasure,
   (state) => selectEntities(state, 'recommendation_measures'),
-  (ready, entities, connections, entityRecommendations) => {
+  (ready, entities, connections, associationsGrouped) => {
     if (ready && connections.get('recommendations')) {
-      // currently requires both for filtering & display
       return entities.map(
         (entity) => {
-          const connectionsByFw = getEntityConnectionsByFw(
-            entity.get('id'),
-            entityRecommendations,
-            'recommendation_id',
-            'measure_id',
-            connections.get('recommendations'),
+          const entityRecs = associationsGrouped.get(parseInt(entity.get('id'), 10));
+          const entityRecsByFw = entityRecs && entityRecs.groupBy(
+            (recId) => connections.getIn([
+              'recommendations',
+              recId.toString(),
+              'attributes',
+              'framework_id',
+            ])
           );
+          // currently requires both for filtering & display
           return entity.set(
             'recommendations',
-            connectionsByFw && connectionsByFw.flatten(),
+            entityRecs,
           ).set(
             'recommendationsByFw',
-            connectionsByFw,
+            entityRecsByFw,
           );
         }
       );
@@ -200,19 +201,13 @@ const selectMeasuresNested = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectMeasuresNestedWithRecs,
   (state) => selectConnections(state),
-  (state) => selectEntities(state, 'measure_indicators'),
-  (ready, entities, connections, entityIndicators) => {
+  selectMeasureIndicatorsByMeasure,
+  (ready, entities, connections, associationsGrouped) => {
     if (ready && connections.get('indicators')) {
       return entities.map(
         (entity) => entity.set(
           'indicators',
-          getEntityConnections(
-            entity.get('id'),
-            entityIndicators,
-            'indicator_id',
-            'measure_id',
-            connections.get('indicators'),
-          )
+          associationsGrouped.get(parseInt(entity.get('id'), 10)),
         )
       );
     }
