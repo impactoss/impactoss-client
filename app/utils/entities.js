@@ -219,43 +219,52 @@ export const entitiesSetCategoryIds = (
   )
 );
 
+
+const entitySetAssociated = (
+  entity,
+  associationsGrouped,
+  associationId,
+) => {
+  const associations = associationsGrouped.get(
+    parseInt(associationId, 10)
+  );
+  const entityAssociation = associations
+    && associations.includes(
+      parseInt(entity.get('id'), 10),
+    );
+  return entity.set('associated', !!entityAssociation);
+};
 export const entitiesSetAssociated = (
   entities,
-  entityKey,
-  associations,
-  associationKey,
+  associationsGrouped,
   associationId,
 ) => entities && entities.map(
   (entity) => entitySetAssociated(
     entity,
-    entityKey,
-    associations,
-    associationKey,
+    associationsGrouped,
     associationId,
   )
 );
 
-export const entitySetAssociated = (
-  entity,
-  entityKey,
-  associations,
-  associationKey,
-  associationId,
-) => {
-  const filteredAssociations = associations.filter(
-    (association) => qe(
-      association.getIn(['attributes', associationKey]),
-      associationId,
-    )
-  );
-  const entityAssociation = filteredAssociations.find(
-    (association) => qe(
-      association.getIn(['attributes', entityKey]),
-      entity.get('id'),
-    )
-  );
-  return entity.set('associated', entityAssociation || false);
-};
+const entitySetAssociatedCategory = (
+  entityCategorised,
+  categoryId,
+) => entityCategorised.set(
+  'associated',
+  !!entityCategorised.get('categories')
+  && !!entityCategorised.get('categories').find(
+    (id) => qe(id, categoryId)
+  ),
+);
+export const entitiesSetAssociatedCategory = (
+  entitiesCategorised,
+  categoryId,
+) => entitiesCategorised && entitiesCategorised.map(
+  (entity) => entitySetAssociatedCategory(
+    entity,
+    categoryId,
+  )
+);
 
 export const entitiesSetSingle = (
   entities,
@@ -387,9 +396,8 @@ const getTaxCategories = (categories, taxonomy, tagsKey) => categories.filter(
 export const prepareTaxonomiesAssociated = (
   taxonomies,
   categories,
-  associations,
+  associationsGrouped,
   tagsKey,
-  associationKey,
   associationId,
   includeParents = true,
 ) => taxonomies
@@ -401,9 +409,7 @@ export const prepareTaxonomiesAssociated = (
         tax.getIn(['attributes', tagsKey]),
       ).set('categories', entitiesSetAssociated(
         taxCategories,
-        'category_id',
-        associations,
-        associationKey,
+        associationsGrouped,
         associationId
       ));
     }

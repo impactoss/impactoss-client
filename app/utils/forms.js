@@ -37,7 +37,9 @@ export const entityOption = (entity, defaultToId, hasTags) => Map({
 });
 
 export const entityOptions = (entities, defaultToId = true, hasTags = true) => entities
-  ? entities.toList().map((entity) => entityOption(entity, defaultToId, hasTags))
+  ? entities.toList().map(
+    (entity) => entityOption(entity, defaultToId, hasTags)
+  )
   : List();
 
 export const userOption = (entity, activeUserId) => Map({
@@ -67,7 +69,13 @@ export const dateOption = (entity, activeDateId) => Map({
 });
 
 export const taxonomyOptions = (taxonomies) => taxonomies
-  ? sortEntities(taxonomies, 'asc', 'priority').reduce((values, tax) => values.set(tax.get('id'), entityOptions(tax.get('categories'), false, false)), Map())
+  ? sortEntities(taxonomies, 'asc', 'priority').reduce(
+    (values, tax) => values.set(
+      tax.get('id'),
+      entityOptions(tax.get('categories'), false, false)
+    ),
+    Map(),
+  )
   : Map();
 
 const getTaxTitle = (id, contextIntl) => contextIntl ? contextIntl.formatMessage(appMessages.entities.taxonomies[id].single) : '';

@@ -6,6 +6,9 @@ import {
   selectMeasuresCategorised,
   selectTaxonomiesSorted,
   selectFWIndicators,
+  selectRecommendationMeasuresByRecommendation,
+  selectRecommendationCategoriesByRecommendation,
+  selectRecommendationIndicatorsByRecommendation,
 } from 'containers/App/selectors';
 
 import {
@@ -28,15 +31,19 @@ export const selectViewEntity = createSelector(
 
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectTaxonomiesSorted(state),
+  selectTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
-  (state) => selectEntities(state, 'recommendation_categories'),
-  (id, taxonomies, categories, associations) => prepareTaxonomiesAssociated(
+  selectRecommendationCategoriesByRecommendation,
+  (
+    id,
+    taxonomies,
+    categories,
+    associations,
+  ) => prepareTaxonomiesAssociated(
     taxonomies,
     categories,
     associations,
     'tags_recommendations',
-    'recommendation_id',
     id,
     false, //  do not include parent taxonomies
   )
@@ -55,25 +62,21 @@ export const selectConnectedTaxonomies = createSelector(
 
 export const selectMeasures = createSelector(
   (state, id) => id,
-  (state) => selectMeasuresCategorised(state),
-  (state) => selectEntities(state, 'recommendation_measures'),
+  selectMeasuresCategorised,
+  selectRecommendationMeasuresByRecommendation,
   (id, entities, associations) => entitiesSetAssociated(
     entities,
-    'measure_id',
     associations,
-    'recommendation_id',
     id,
   )
 );
 export const selectIndicators = createSelector(
   (state, id) => id,
   selectFWIndicators,
-  (state) => selectEntities(state, 'recommendation_indicators'),
+  selectRecommendationIndicatorsByRecommendation,
   (id, entities, associations) => entitiesSetAssociated(
     entities,
-    'indicator_id',
     associations,
-    'recommendation_id',
     id,
   )
 );

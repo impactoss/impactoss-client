@@ -15,7 +15,7 @@ import { USER_ROLES } from 'themes/config';
 import {
   prepareCategory,
   usersByRole,
-  entitiesSetAssociated,
+  entitiesSetAssociatedCategory,
   prepareTaxonomiesMultiple,
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
@@ -125,29 +125,25 @@ export const selectUsers = createSelector(
 
 export const selectMeasures = createSelector(
   (state, id) => id,
-  (state) => selectMeasuresCategorised(state),
-  (state) => selectEntities(state, 'measure_categories'),
+  selectMeasuresCategorised,
   selectIsParentTaxonomy,
-  (id, entities, associations, isParent) => isParent
-    ? null
-    : entitiesSetAssociated(
+  (id, entities, isParent) => {
+    if (isParent) return null;
+    return entitiesSetAssociatedCategory(
       entities,
-      'measure_id',
-      associations,
-      'category_id',
       id,
-    )
+    );
+  }
 );
 
 export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
   (state, id) => selectEntity(state, { path: 'categories', id }),
   (state) => selectEntities(state, 'framework_taxonomies'),
-  (state) => selectRecommendationsCategorised(state),
-  (state) => selectEntities(state, 'recommendation_categories'),
+  selectRecommendationsCategorised,
   selectIsParentTaxonomy,
-  (id, category, fwTaxonomies, entities, associations, isParent) => {
-    if (isParent || !category || !fwTaxonomies || !entities || !associations) {
+  (id, category, fwTaxonomies, entities, isParent) => {
+    if (isParent || !category || !fwTaxonomies || !entities) {
       return null;
     }
     // framework id for category
@@ -165,11 +161,8 @@ export const selectRecommendationsByFw = createSelector(
         (fwid) => qe(fwid, r.getIn(['attributes', 'framework_id']))
       )
     );
-    return entitiesSetAssociated(
+    return entitiesSetAssociatedCategory(
       filtered,
-      'recommendation_id',
-      associations,
-      'category_id',
       id,
     ).groupBy(
       (r) => r.getIn(['attributes', 'framework_id']).toString()

@@ -9,6 +9,8 @@ import {
   selectRecommendationsCategorised,
   selectFWTaxonomiesSorted,
   selectFrameworks,
+  selectMeasureIndicatorsByIndicator,
+  selectRecommendationIndicatorsByIndicator,
 } from 'containers/App/selectors';
 
 import {
@@ -36,13 +38,11 @@ export const selectViewEntity = createSelector(
 
 export const selectMeasures = createSelector(
   (state, id) => id,
-  (state) => selectMeasuresCategorised(state),
-  (state) => selectEntities(state, 'measure_indicators'),
-  (id, entities, associations) => entitiesSetAssociated(
-    entities,
-    'measure_id',
+  selectMeasuresCategorised,
+  selectMeasureIndicatorsByIndicator,
+  (id, measures, associations) => entitiesSetAssociated(
+    measures,
     associations,
-    'indicator_id',
     id,
   )
 );
@@ -61,7 +61,7 @@ export const selectConnectedTaxonomies = createSelector(
 export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
   (state) => selectRecommendationsCategorised(state),
-  (state) => selectEntities(state, 'recommendation_indicators'),
+  selectRecommendationIndicatorsByIndicator,
   (state) => selectFrameworks(state),
   (id, recs, associations, frameworks) => {
     const filtered = recs.filter(
@@ -77,9 +77,7 @@ export const selectRecommendationsByFw = createSelector(
     );
     return entitiesSetAssociated(
       filtered,
-      'recommendation_id',
       associations,
-      'indicator_id',
       id,
     ).groupBy(
       (r) => r.getIn(['attributes', 'framework_id']).toString()
