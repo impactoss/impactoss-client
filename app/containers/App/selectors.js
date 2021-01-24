@@ -850,6 +850,28 @@ export const selectMeasureCategoriesByCategory = createSelector(
       )
     ),
 );
+export const selectUserCategoriesByUser = createSelector(
+  (state) => selectEntities(state, 'user_categories'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'user_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'category_id'])
+      )
+    ),
+);
+export const selectUserCategoriesByCategory = createSelector(
+  (state) => selectEntities(state, 'user_categories'),
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'category_id'])
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'user_id'])
+      )
+    ),
+);
 
 // get recommendations with category ids
 export const selectRecommendationsCategorised = createSelector(

@@ -35,6 +35,7 @@ export const selectViewEntity = createSelector(
   (entity, users) => entitySetUser(entity, users)
 );
 
+// TODO optimise use selectMeasureCategoriesByMeasure
 export const selectTaxonomies = createSelector(
   (state, id) => id,
   (state) => selectFWTaxonomiesSorted(state),
@@ -145,7 +146,7 @@ export const selectIndicators = createSelector(
     indicatorRecs,
   ) => {
     if (!ready) return Map();
-    return indicators.map(
+    return indicators && indicators.map(
       (indicator) => {
         const entityRecs = indicatorRecs.get(parseInt(indicator.get('id'), 10));
         const entityRecsByFw = entityRecs

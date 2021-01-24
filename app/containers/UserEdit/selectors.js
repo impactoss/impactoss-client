@@ -4,10 +4,10 @@ import {
   selectEntity,
   selectEntities,
   selectTaxonomiesSorted,
+  selectUserCategoriesByUser,
 } from 'containers/App/selectors';
 
 import {
-  entitiesSetAssociated,
   entitySetUser,
   prepareTaxonomiesAssociated,
 } from 'utils/entities';
@@ -43,15 +43,14 @@ export const selectViewEntity = createSelector(
 
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectTaxonomiesSorted(state),
+  selectTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
-  (state) => selectEntities(state, 'user_categories'),
+  selectUserCategoriesByUser,
   (id, taxonomies, categories, associations) => prepareTaxonomiesAssociated(
     taxonomies,
     categories,
     associations,
     'tags_users',
-    'user_id',
     id,
   )
 );
@@ -60,11 +59,21 @@ export const selectRoles = createSelector(
   (state, id) => id,
   (state) => selectEntities(state, 'roles'),
   (state) => selectEntities(state, 'user_roles'),
-  (id, roles, userRoles) => entitiesSetAssociated(
-    roles,
-    'role_id',
-    userRoles,
-    'user_id',
-    id,
+  (id, roles, userRoles) => roles && roles.map(
+    (role) => {
+      const filteredAssociations = userRoles.filter(
+        (association) => qe(
+          association.getIn(['attributes', 'user_id']),
+          id,
+        )
+      );
+      const entityAssociation = filteredAssociations.find(
+        (association) => qe(
+          association.getIn(['attributes', 'role_id']),
+          role.get('id'),
+        )
+      );
+      return role.set('associated', !!entityAssociation || false);
+    }
   )
 );
