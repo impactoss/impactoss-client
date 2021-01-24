@@ -158,15 +158,13 @@ export const filterEntitiesByConnection = (
   query,
 ) => entities && entities.filter(
   // consider replacing with .every()
-  (entity) => asList(query).reduce(
-    (passing, queryArg) => {
+  (entity) => asList(query).every(
+    (queryArg) => {
       const pathValue = queryArg.split(':');
       const path = pathValue[0].split('_')[0];
       return entity.get(path)
-        ? passing && testEntityEntityAssociation(entity, path, pathValue[1])
-        : passing;
+        && testEntityEntityAssociation(entity, path, pathValue[1]);
     },
-    true,
   )
 );
 
@@ -208,16 +206,14 @@ export const filterEntitiesByKeywords = (
 
 export const entitiesSetCategoryIds = (
   entities,
-  entityKey,
-  associations,
+  associationsGrouped,
   categories
 ) => entities && entities.map(
   (entity) => entity.set(
     'categories',
     getEntityCategories(
-      entity.get('id'),
-      associations,
-      entityKey,
+      parseInt(entity.get('id'), 10),
+      associationsGrouped,
       categories,
     )
   )
@@ -259,29 +255,6 @@ export const entitySetAssociated = (
     )
   );
   return entity.set('associated', entityAssociation || false);
-};
-
-export const entitiesIsAssociated = (
-  entities,
-  entityKey,
-  associations,
-  associationKey,
-  associationId,
-) => {
-  const filteredAssociations = associations.filter(
-    (association) => qe(
-      association.getIn(['attributes', associationKey]),
-      associationId,
-    )
-  );
-  return entities && associations && entities.filter(
-    (entity) => filteredAssociations.find(
-      (association) => qe(
-        association.getIn(['attributes', entityKey]),
-        entity.get('id'),
-      )
-    )
-  );
 };
 
 export const entitiesSetSingle = (
@@ -552,51 +525,14 @@ export const getEntityParentId = (cat) => cat.getIn(['attributes', 'parent_id'])
 
 export const getEntityCategories = (
   entityId,
-  associations,
-  associationKey,
+  associationsGrouped,
   categories,
 ) => {
   // directly associated categories
-  // console.log('getEntityCategories', entityId)
-  // return associations && associations.reduce(
-  //   (memo, association, key) => {
-  //     if (qe(
-  //       entityId,
-  //       association.getIn(['attributes', associationKey]),
-  //     )) {
-  //       const catId = association.getIn(['attributes', 'category_id']);
-  //       // include parent categories of associated categories when categories present
-  //       if (categories && includeParents) {
-  //         const parentId = categories.getIn([
-  //           catId.toString(),
-  //           'attributes',
-  //           'parent_id',
-  //         ]);
-  //         if (parentId) {
-  //           return memo.set(
-  //             key,
-  //             catId,
-  //           ).set(
-  //             `${key}-${catId}`,
-  //             parseInt(parentId, 10),
-  //           );
-  //         }
-  //       }
-  //       return memo.set(key, catId);
-  //     }
-  //     return memo;
-  //   },
-  //   Map(),
-  // );
-  // directly associated categories
-  const categoryIds = associations && associations.filter(
-    (association) => qe(
-      entityId,
-      association.getIn(['attributes', associationKey]),
-    )
-  ).map(
-    (association) => association.getIn(['attributes', 'category_id'])
+  const categoryIds = associationsGrouped.get(
+    parseInt(entityId, 10)
   );
+
   // include parent categories of associated categories when categories present
   if (categories && categoryIds) {
     const parentCategoryIds = categoryIds.reduce(
@@ -616,54 +552,6 @@ export const getEntityCategories = (
     return categoryIds.merge(parentCategoryIds);
   }
   return categoryIds;
-};
-
-export const getEntityConnections = (
-  entityId,
-  associations,
-  associationKey,
-  entityKey,
-  connections,
-) => {
-  if (!connections) return null;
-  return associations.filter(
-    (association) => qe(
-      association.getIn(['attributes', entityKey]),
-      entityId
-    ) && connections.get(
-      association.getIn(['attributes', associationKey]).toString()
-    )
-  ).map(
-    (association) => association.getIn(['attributes', associationKey])
-  );
-};
-
-export const getEntityConnectionsByFw = (
-  entityId,
-  associations,
-  associationKey,
-  entityKey,
-  connections,
-) => {
-  if (!connections) return null;
-  const filteredAssociations = associations.filter(
-    (association) => qe(
-      association.getIn(['attributes', entityKey]),
-      entityId
-    )
-  );
-  return connections.groupBy(
-    (c) => c.getIn(['attributes', 'framework_id']).toString()
-  ).map(
-    // consider reduce for combined filter and map
-    (connectionsForFw) => filteredAssociations.filter(
-      (association) => connectionsForFw.get(
-        association.getIn(['attributes', associationKey]).toString()
-      )
-    ).map(
-      (association) => association.getIn(['attributes', associationKey])
-    )
-  );
 };
 
 export const getTaxonomyCategories = (

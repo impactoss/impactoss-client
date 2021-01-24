@@ -16,6 +16,10 @@ import {
   selectFrameworkQuery,
   selectFrameworkListQuery,
   selectReady,
+  selectRecommendationCategoriesByRecommendation,
+  selectMeasureCategoriesByMeasure,
+  selectRecommendationMeasuresByRecommendation,
+  selectRecommendationIndicatorsByRecommendation,
 } from 'containers/App/selectors';
 
 import {
@@ -24,7 +28,6 @@ import {
   filterEntitiesWithoutAssociation,
   prepareTaxonomiesMultiple,
   entitiesSetCategoryIds,
-  getEntityConnections,
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
 
@@ -42,14 +45,13 @@ const selectRecommendationsQ = createSelector(
 const selectRecommendationsWithCategories = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectRecommendationsQ,
-  (state) => selectEntities(state, 'recommendation_categories'),
+  (state) => selectRecommendationCategoriesByRecommendation(state),
   (state) => selectEntities(state, 'categories'),
-  (ready, entities, entityCategories, categories) => {
+  (ready, entities, associationsGrouped, categories) => {
     if (ready) {
       return entitiesSetCategoryIds(
         entities,
-        'recommendation_id',
-        entityCategories,
+        associationsGrouped,
         categories,
       );
     }
@@ -60,19 +62,13 @@ const selectRecommendationsWithMeasures = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectRecommendationsWithCategories,
   (state) => selectRecommendationConnections(state),
-  (state) => selectEntities(state, 'recommendation_measures'),
-  (ready, entities, connections, entityMeasures) => {
+  selectRecommendationMeasuresByRecommendation,
+  (ready, entities, connections, associationsGrouped) => {
     if (ready && connections.get('measures')) {
       return entities.map(
         (entity) => entity.set(
           'measures',
-          getEntityConnections(
-            entity.get('id'),
-            entityMeasures,
-            'measure_id',
-            'recommendation_id',
-            connections.get('measures'),
-          )
+          associationsGrouped.get(parseInt(entity.get('id'), 10)),
         )
       );
     }
@@ -83,19 +79,13 @@ const selectRecommendationsWithIndicators = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectRecommendationsWithMeasures,
   (state) => selectRecommendationConnections(state),
-  (state) => selectEntities(state, 'recommendation_indicators'),
-  (ready, entities, connections, entityIndicators) => {
+  selectRecommendationIndicatorsByRecommendation,
+  (ready, entities, connections, associationsGrouped) => {
     if (ready && connections.get('indicators')) {
       return entities.map(
         (entity) => entity.set(
           'indicators',
-          getEntityConnections(
-            entity.get('id'),
-            entityIndicators,
-            'indicator_id',
-            'recommendation_id',
-            connections.get('indicators'),
-          )
+          associationsGrouped.get(parseInt(entity.get('id'), 10)),
         )
       );
     }
@@ -179,15 +169,14 @@ export const selectConnections = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectConnectionsIndicators,
   selectFWMeasures,
-  (state) => selectEntities(state, 'measure_categories'),
-  (ready, connections, measures, measureCategories) => {
+  selectMeasureCategoriesByMeasure,
+  (ready, connections, measures, associationsGrouped) => {
     if (ready) {
       return connections.set(
         'measures',
         entitiesSetCategoryIds(
           measures,
-          'measure_id',
-          measureCategories,
+          associationsGrouped,
         )
       );
     }

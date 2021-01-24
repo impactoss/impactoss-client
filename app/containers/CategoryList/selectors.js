@@ -9,6 +9,9 @@ import {
   selectFWRecommendations,
   selectFWMeasures,
   selectActiveFrameworks,
+  selectRecommendationMeasuresByMeasure,
+  selectMeasureCategoriesByMeasure,
+  selectRecommendationCategoriesByRecommendation,
 } from 'containers/App/selectors';
 
 import { qe } from 'utils/quasi-equals';
@@ -45,50 +48,29 @@ export const selectTaxonomy = createSelector(
 
 const selectMeasures = createSelector(
   selectFWMeasures,
-  (state) => selectEntities(state, 'measure_categories'),
-  (state) => selectEntities(state, 'recommendation_measures'),
-  (entities, measureCategories, recMeasures) => entities
+  selectMeasureCategoriesByMeasure,
+  selectRecommendationMeasuresByMeasure,
+  (entities, measureCategories, measureRecommendations) => entities
     && measureCategories
-    && recMeasures
+    && measureRecommendations
     && entities.map(
       (entity, id) => entity.set(
         'category_ids',
-        measureCategories.filter(
-          (association) => qe(
-            association.getIn(['attributes', 'measure_id']),
-            id,
-          )
-        ).map(
-          (association) => association.getIn(['attributes', 'category_id'])
-        )
+        measureCategories.get(parseInt(id, 10)) || Map(),
       ).set(
         'recommendation_ids',
-        recMeasures.filter(
-          (association) => qe(
-            association.getIn(['attributes', 'measure_id']),
-            id,
-          )
-        ).map(
-          (association) => association.getIn(['attributes', 'recommendation_id'])
-        )
+        measureRecommendations.get(parseInt(id, 10)) || Map(),
       )
     )
 );
 
 const selectRecommendations = createSelector(
   selectFWRecommendations,
-  (state) => selectEntities(state, 'recommendation_categories'),
+  selectRecommendationCategoriesByRecommendation,
   (entities, recCategories) => entities && recCategories && entities.map(
     (entity, id) => entity.set(
       'category_ids',
-      recCategories.filter(
-        (association) => qe(
-          association.getIn(['attributes', 'recommendation_id']),
-          id,
-        )
-      ).map(
-        (association) => association.getIn(['attributes', 'category_id'])
-      )
+      recCategories.get(parseInt(id, 10)) || Map(),
     )
   )
 );
