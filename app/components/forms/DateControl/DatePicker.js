@@ -28,6 +28,15 @@ class DatePicker extends React.PureComponent { // eslint-disable-line react/pref
     return (
       <React.Fragment>
         <DayPickerInput
+          parseDate={(value) => {
+            if (
+              value.trim() !== ''
+              && validateDateFormat(value, DATE_FORMAT)
+            ) {
+              return parse(value, DATE_FORMAT, new Date());
+            }
+            return null;
+          }}
           value={formattedDay}
           onDayChange={(valueDate) => {
             // format to DB format
