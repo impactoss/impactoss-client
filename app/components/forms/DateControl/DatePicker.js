@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { toLower } from 'lodash/string';
+import { format, parse } from 'date-fns';
 
+import validateDateFormat from 'components/forms/validators/validate-date-format';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import { DB_DATE_FORMAT } from 'themes/config';
+import { DATE_FORMAT, DB_DATE_FORMAT } from 'themes/config';
 
 import InputComponent from './InputComponent';
 
@@ -13,24 +15,49 @@ import DatePickerStyle from './styles';
 class DatePicker extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { intl } = this.context;
-    const localeFormat = 'MM/DD/YYYY';
-    // TODO localise
-    // moment.localeData(intl.locale).longDateFormat('L');
 
-    const formattedDay = this.props.value;
-    // && moment(this.props.value, DB_DATE_FORMAT, true).isValid()
-    //   ? moment(this.props.value).format(localeFormat)
-    //   : this.props.value;
+    // format from db format to input format if valid
+    const formattedDay = this.props.value
+      && validateDateFormat(this.props.value, DB_DATE_FORMAT)
+      ? format(
+        parse(this.props.value, DB_DATE_FORMAT, new Date()),
+        DATE_FORMAT,
+      )
+      : this.props.value;
 
     return (
       <React.Fragment>
         <DayPickerInput
           value={formattedDay}
-          onChange={(evt) => this.props.onChange(evt.target.value)}
-          onDayChange={(value) => value && value.format && this.props.onChange(value.format(DB_DATE_FORMAT))}
-          format={localeFormat}
+          onDayChange={(valueDate) => {
+            // format to DB format
+            if (valueDate) {
+              const formattedDB = valueDate && format(valueDate, DB_DATE_FORMAT);
+              return formattedDB && this.props.onChange(formattedDB);
+            }
+            return null;
+          }}
+          inputProps={{
+            onChange: ({ target }) => {
+              const { value } = target;
+              // format string to db format if in valid input format
+              if (
+                value.trim() !== ''
+                && validateDateFormat(value, DATE_FORMAT)
+              ) {
+                // parse from input format to db format
+                const formattedDB = format(
+                  parse(value, DATE_FORMAT, new Date()),
+                  DB_DATE_FORMAT,
+                );
+                this.props.onChange(formattedDB);
+              } else {
+                this.props.onChange(value);
+              }
+            },
+          }}
           component={InputComponent}
-          placeholder={toLower(localeFormat)}
+          placeholder={toLower(DATE_FORMAT)}
           dayPickerProps={{
             locale: intl.locale,
             firstDayOfWeek: 1, // moment.localeData(intl.locale).firstDayOfWeek(),
