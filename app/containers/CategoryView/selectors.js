@@ -153,8 +153,14 @@ const selectRecommendationsAssociated = createSelector(
   selectRecommendationAssociations,
   selectFWRecommendations,
   (tags, associations, recommendations) => tags
-    ? associations && associations.map(
-      (id) => recommendations.get(id.toString())
+    ? associations && associations.reduce(
+      (memo, id) => {
+        const entity = recommendations.get(id.toString());
+        return entity
+          ? memo.set(id, entity)
+          : memo;
+      },
+      Map(),
     )
     : null,
 );
@@ -182,8 +188,15 @@ export const selectRecommendations = createSelector(
     return recommendations
       && recommendationIndicators
       && frameworks
-      && recommendations.map(
-        (rec) => rec.set(
+      && recommendations.filter(
+        (rec) => {
+          const currentFramework = frameworks.find(
+            (fw) => qe(fw.get('id'), rec && rec.getIn(['attributes', 'framework_id']))
+          );
+          return currentFramework && currentFramework.getIn(['attributes', 'has_measures']);
+        }
+      ).map(
+        (rec) => rec && rec.set(
           'categories',
           getEntityCategories(
             rec.get('id'),

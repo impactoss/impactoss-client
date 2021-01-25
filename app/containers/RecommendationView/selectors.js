@@ -60,7 +60,15 @@ const selectMeasuresAssociated = createSelector(
   selectMeasureAssociations,
   selectFWMeasures,
   (associations, measures) => associations
-    && associations.map((id) => measures.get(id.toString()))
+    && associations.reduce(
+      (memo, id) => {
+        const entity = measures.get(id.toString());
+        return entity
+          ? memo.set(id, entity)
+          : memo;
+      },
+      Map(),
+    )
 );
 // all connected measures
 export const selectMeasures = createSelector(
@@ -134,7 +142,15 @@ const selectIndicatorsAssociated = createSelector(
   selectIndicatorAssociations,
   selectFWIndicators,
   (associations, indicators) => associations
-    && associations.map((id) => indicators.get(id.toString()))
+    && associations.reduce(
+      (memo, id) => {
+        const entity = indicators.get(id.toString());
+        return entity
+          ? memo.set(id, entity)
+          : memo;
+      },
+      Map(),
+    )
 );
 
 // selectIndicators,
