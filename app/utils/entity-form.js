@@ -1,6 +1,6 @@
 export const hasNewError = (nextProps, props) => {
   const { viewDomain } = props;
-  const { nextViewDomain } = nextProps;
+  const { viewDomain: nextViewDomain } = nextProps;
   return (!nextViewDomain || !viewDomain) || (
     !nextViewDomain.getIn(['page', 'submitValid'])
     && !!viewDomain.getIn(['page', 'submitValid'])

@@ -93,7 +93,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
-      scrollToTop(this.scrollContainer);
+      scrollToTop(this.scrollContainer.current);
     }
   }
 

@@ -87,7 +87,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
       this.props.initialiseForm('reportNew.form.data', this.getInitialFormData(nextProps));
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
-      scrollToTop(this.scrollContainer);
+      scrollToTop(this.scrollContainer.current);
     }
   }
 

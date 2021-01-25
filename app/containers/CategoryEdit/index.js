@@ -111,7 +111,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
-      scrollToTop(this.scrollContainer);
+      scrollToTop(this.scrollContainer.current);
     }
   }
 

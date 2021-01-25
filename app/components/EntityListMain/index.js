@@ -5,7 +5,6 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ScrollContainer } from 'scrollmonitor-react';
 import { Map, List } from 'immutable';
 import styled from 'styled-components';
 
@@ -61,21 +60,14 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.dataReady !== nextProps.dataReady
       || this.props.locationQuery !== nextProps.locationQuery
-      || this.props.errors !== nextProps.errors
-      || typeof this.props.scrollContainer !== typeof nextProps.scrollContainer;
-  }
-
-  componentDidUpdate() {
-    if (this.props.scrollContainer) {
-      this.props.scrollContainer.recalculateLocations();
-    }
+      || this.props.errors !== nextProps.errors;
   }
 
   scrollToTop = () => {
     jumpToComponent(
-      this.ScrollTarget,
-      this.ScrollReference,
-      this.ScrollContainer
+      this.ScrollTarget.current,
+      this.ScrollReference.current,
+      this.ScrollContainer.current
     );
   }
 
@@ -200,83 +192,78 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
               sortAttributes={config.sorting}
               buttons={(dataReady && isUserSignedIn) ? header.actions : []}
             />
-            { (!dataReady || !this.props.scrollContainer)
-              && <Loading />
-            }
-            { dataReady && this.props.scrollContainer
-              && (
-                <ListEntities>
-                  <EntityListSearch>
-                    <TagSearch
-                      filters={currentFilters(
-                        {
-                          config,
-                          entities,
-                          taxonomies,
-                          connections,
-                          connectedTaxonomies,
-                          locationQuery,
-                          onTagClick,
-                          errors,
-                          frameworks,
-                        },
-                        intl.formatMessage(messages.filterFormWithoutPrefix),
-                        intl.formatMessage(messages.filterFormError),
-                      )}
-                      searchQuery={locationQuery.get('search') || ''}
-                      onSearch={onSearch}
-                      onClear={() => onResetFilters(currentFilterArgs(config, locationQuery))}
-                    />
-                  </EntityListSearch>
-                  <EntityListOptions
-                    groupOptions={getGroupOptions(taxonomies, intl)}
-                    subgroupOptions={getGroupOptions(taxonomies, intl)}
+            {!dataReady && <Loading />}
+            {dataReady && (
+              <ListEntities>
+                <EntityListSearch>
+                  <TagSearch
+                    filters={currentFilters(
+                      {
+                        config,
+                        entities,
+                        taxonomies,
+                        connections,
+                        connectedTaxonomies,
+                        locationQuery,
+                        onTagClick,
+                        errors,
+                        frameworks,
+                      },
+                      intl.formatMessage(messages.filterFormWithoutPrefix),
+                      intl.formatMessage(messages.filterFormError),
+                    )}
+                    searchQuery={locationQuery.get('search') || ''}
+                    onSearch={onSearch}
+                    onClear={() => onResetFilters(currentFilterArgs(config, locationQuery))}
+                  />
+                </EntityListSearch>
+                <EntityListOptions
+                  groupOptions={getGroupOptions(taxonomies, intl)}
+                  subgroupOptions={getGroupOptions(taxonomies, intl)}
+                  groupSelectValue={(taxonomies && taxonomies.get(groupSelectValue)) ? groupSelectValue : ''}
+                  subgroupSelectValue={(taxonomies && taxonomies.get(subgroupSelectValue)) ? subgroupSelectValue : ''}
+                  onGroupSelect={onGroupSelect}
+                  onSubgroupSelect={onSubgroupSelect}
+                  onExpand={() => onExpand(expandNo < config.expandableColumns.length ? config.expandableColumns.length : 0)}
+                  expanded={config.expandableColumns && expandNo === config.expandableColumns.length}
+                  expandable={config.expandableColumns && config.expandableColumns.length > 0}
+                />
+                <ListWrapper ref={this.ScrollTarget}>
+                  <EntityListGroups
+                    entities={entities}
+                    errors={errors}
+                    onDismissError={this.props.onDismissError}
+                    entityGroups={entityGroups}
+                    taxonomies={taxonomies}
+                    connections={connections}
+                    entityIdsSelected={this.props.entityIdsSelected}
+                    locationQuery={this.props.locationQuery}
                     groupSelectValue={(taxonomies && taxonomies.get(groupSelectValue)) ? groupSelectValue : ''}
                     subgroupSelectValue={(taxonomies && taxonomies.get(subgroupSelectValue)) ? subgroupSelectValue : ''}
-                    onGroupSelect={onGroupSelect}
-                    onSubgroupSelect={onSubgroupSelect}
-                    onExpand={() => onExpand(expandNo < config.expandableColumns.length ? config.expandableColumns.length : 0)}
-                    expanded={config.expandableColumns && expandNo === config.expandableColumns.length}
-                    expandable={config.expandableColumns && config.expandableColumns.length > 0}
+                    onEntityClick={this.props.onEntityClick}
+                    entityTitle={entityTitle}
+                    config={config}
+                    entityIcon={entityIcon}
+                    isManager={isManager}
+                    isContributor={isContributor}
+                    onExpand={onExpand}
+                    expandNo={expandNo}
+                    onPageItemsSelect={(no) => {
+                      this.scrollToTop();
+                      this.props.onPageItemsSelect(no);
+                    }}
+                    onPageSelect={(page) => {
+                      this.scrollToTop();
+                      this.props.onPageSelect(page);
+                    }}
+                    onEntitySelect={this.props.onEntitySelect}
+                    onEntitySelectAll={this.props.onEntitySelectAll}
+                    onSortBy={this.props.onSortBy}
+                    onSortOrder={this.props.onSortOrder}
                   />
-                  <ListWrapper ref={this.ScrollTarget}>
-                    <EntityListGroups
-                      entities={entities}
-                      errors={errors}
-                      onDismissError={this.props.onDismissError}
-                      entityGroups={entityGroups}
-                      taxonomies={taxonomies}
-                      connections={connections}
-                      entityIdsSelected={this.props.entityIdsSelected}
-                      locationQuery={this.props.locationQuery}
-                      groupSelectValue={(taxonomies && taxonomies.get(groupSelectValue)) ? groupSelectValue : ''}
-                      subgroupSelectValue={(taxonomies && taxonomies.get(subgroupSelectValue)) ? subgroupSelectValue : ''}
-                      onEntityClick={this.props.onEntityClick}
-                      entityTitle={entityTitle}
-                      config={config}
-                      entityIcon={entityIcon}
-                      isManager={isManager}
-                      isContributor={isContributor}
-                      onExpand={onExpand}
-                      expandNo={expandNo}
-                      onPageItemsSelect={(no) => {
-                        this.scrollToTop();
-                        this.props.onPageItemsSelect(no);
-                      }}
-                      onPageSelect={(page) => {
-                        this.scrollToTop();
-                        this.props.onPageSelect(page);
-                      }}
-                      onEntitySelect={this.props.onEntitySelect}
-                      onEntitySelectAll={this.props.onEntitySelectAll}
-                      scrollContainer={this.props.scrollContainer}
-                      onSortBy={this.props.onSortBy}
-                      onSortOrder={this.props.onSortOrder}
-                    />
-                  </ListWrapper>
-                </ListEntities>
-              )
-            }
+                </ListWrapper>
+              </ListEntities>
+            )}
           </Content>
         </Container>
       </ContainerWithSidebar>
@@ -318,7 +305,6 @@ EntityListMain.propTypes = {
   onSortOrder: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   onDismissError: PropTypes.func.isRequired,
-  scrollContainer: PropTypes.object,
   listUpdating: PropTypes.bool,
 };
 
@@ -326,5 +312,5 @@ EntityListMain.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default ScrollContainer(EntityListMain);
+export default EntityListMain;
 // export default EntityListMain;
