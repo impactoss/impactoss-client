@@ -98,7 +98,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
-      scrollToTop(this.scrollContainer);
+      scrollToTop(this.scrollContainer.current);
     }
   }
 

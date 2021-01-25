@@ -69,7 +69,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
-      scrollToTop(this.scrollContainer);
+      scrollToTop(this.scrollContainer.current);
     }
   }
 

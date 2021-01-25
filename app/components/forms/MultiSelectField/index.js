@@ -137,13 +137,17 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
     super();
     this.state = {
       multiselectOpen: null,
-      controlRef: null,
     };
+    this.controlRef = React.createRef();
   }
 
   componentDidUpdate() {
-    if (this.state.controlRef && this.props.scrollContainer) {
-      fitComponent(this.state.controlRef, this.props.scrollContainer);
+    if (
+      this.controlRef
+      && this.controlRef.current
+      && this.props.scrollContainer
+    ) {
+      fitComponent(this.controlRef.current, this.props.scrollContainer);
     }
   }
 
@@ -161,7 +165,6 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
   onCloseMultiselect = () => {
     this.setState({
       multiselectOpen: null,
-      controlRef: null,
     });
   }
 
@@ -266,18 +269,15 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
         { this.state.multiselectOpen === id
           && (
             <MultiSelectWrapper
+              ref={this.controlRef}
               wrapperHeight={(
                 this.props.scrollContainer
-              && this.props.scrollContainer.getBoundingClientRect
+                && this.props.scrollContainer.current
+                && this.props.scrollContainer.current.getBoundingClientRect
               )
-                ? this.props.scrollContainer.getBoundingClientRect().height - (SCROLL_PADDING * 2)
+                ? this.props.scrollContainer.current.getBoundingClientRect().height - (SCROLL_PADDING * 2)
                 : 450
               }
-              ref={(node) => {
-                if (!this.state.controlRef) {
-                  this.setState({ controlRef: node });
-                }
-              }}
             >
               <MultiSelectControl
                 id={id}

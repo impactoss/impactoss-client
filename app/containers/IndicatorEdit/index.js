@@ -109,7 +109,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
-      scrollToTop(this.scrollContainer);
+      scrollToTop(this.scrollContainer.current);
     }
   }
 

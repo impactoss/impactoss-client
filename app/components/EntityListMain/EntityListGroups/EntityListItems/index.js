@@ -24,7 +24,6 @@ EntityListItems.propTypes = {
   entities: PropTypes.instanceOf(List).isRequired,
   entityIdsSelected: PropTypes.instanceOf(List),
   errors: PropTypes.instanceOf(Map),
-  scrollContainer: PropTypes.object,
   expandNo: PropTypes.number,
 };
 

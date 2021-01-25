@@ -88,7 +88,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
-      scrollToTop(this.scrollContainer);
+      scrollToTop(this.scrollContainer.current);
     }
   }
 

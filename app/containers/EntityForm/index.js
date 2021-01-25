@@ -221,7 +221,12 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
           formField = this.renderCombo(field);
           break;
         case 'multiselect':
-          formField = this.renderMultiSelect(field, this.props.formData, hasEntityNewModal, scrollContainer);
+          formField = this.renderMultiSelect(
+            field,
+            this.props.formData,
+            hasEntityNewModal,
+            scrollContainer,
+          );
           break;
         default:
           formField = this.renderComponent(field);
@@ -270,7 +275,12 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         group.fields.map((field, i) => field
           ? (
             <Field labelledGroup={!!group.label} key={i}>
-              {this.renderFormField(field, false, hasEntityNewModal, scrollContainer)}
+              {this.renderFormField(
+                field,
+                false,
+                hasEntityNewModal,
+                scrollContainer,
+              )}
               {
                 field.errorMessages
                 && (
@@ -291,53 +301,100 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     </FieldGroupWrapper>
   )
 
-  renderMain = (fieldGroups, hasAside = true, bottom = false, hasEntityNewModal = false, scrollContainer) => (
+  renderMain = (
+    fieldGroups,
+    hasAside = true,
+    bottom = false,
+    hasEntityNewModal = false,
+    scrollContainer,
+  ) => (
     <Main hasAside={hasAside} bottom={bottom}>
       {
-        asArray(fieldGroups).map((fieldGroup, i) => fieldGroup.fields && (
-          <div key={i}>
-            {this.renderGroup(fieldGroup, hasEntityNewModal, scrollContainer)}
-          </div>
-        ))
+        asArray(fieldGroups).map(
+          (fieldGroup, i) => fieldGroup.fields && (
+            <div key={i}>
+              {this.renderGroup(fieldGroup, hasEntityNewModal, scrollContainer)}
+            </div>
+          )
+        )
       }
     </Main>
   );
 
-  renderAside = (fieldGroups, bottom = false, hasEntityNewModal = false, scrollContainer) => (
+  renderAside = (
+    fieldGroups,
+    bottom = false,
+    hasEntityNewModal = false,
+    scrollContainer,
+  ) => (
     <Aside bottom={bottom}>
       {
-        asArray(fieldGroups).map((fieldGroup, i) => (
-          <div key={i}>
-            {this.renderGroup(fieldGroup, hasEntityNewModal, scrollContainer)}
-          </div>
-        ))
+        asArray(fieldGroups).map(
+          (fieldGroup, i) => (
+            <div key={i}>
+              {this.renderGroup(fieldGroup, hasEntityNewModal, scrollContainer)}
+            </div>
+          )
+        )
       }
     </Aside>
   );
 
   render() {
     const {
-      fields, model, handleCancel, handleSubmitFail, inModal, validators, newEntityModal, scrollContainer,
+      fields,
+      model,
+      handleCancel,
+      handleSubmitFail,
+      inModal,
+      validators,
+      newEntityModal,
+      scrollContainer,
     } = this.props;
     const hasEntityNewModal = !!newEntityModal;
 
     return (
       <FormWrapper withoutShadow={inModal} hasMarginBottom={!inModal}>
-        <StyledForm model={model} onSubmit={this.handleSubmit} onSubmitFailed={handleSubmitFail} validators={validators}>
+        <StyledForm
+          model={model}
+          onSubmit={this.handleSubmit}
+          onSubmitFailed={handleSubmitFail}
+          validators={validators}
+        >
           <FormBody>
-            { fields.header
-              && (
-                <ViewPanel>
-                  { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, false, hasEntityNewModal, scrollContainer) }
-                  { fields.header.aside && this.renderAside(fields.header.aside, false, hasEntityNewModal, scrollContainer) }
-                </ViewPanel>
-              )
-            }
+            { fields.header && (
+              <ViewPanel>
+                {fields.header.main && this.renderMain(
+                  fields.header.main,
+                  !!fields.header.aside,
+                  false,
+                  hasEntityNewModal,
+                  scrollContainer,
+                )}
+                {fields.header.aside && this.renderAside(
+                  fields.header.aside,
+                  false,
+                  hasEntityNewModal,
+                  scrollContainer,
+                )}
+              </ViewPanel>
+            )}
             { fields.body
               && (
                 <ViewPanel>
-                  { fields.body.main && this.renderMain(fields.body.main, true, true, hasEntityNewModal, scrollContainer) }
-                  { fields.body.aside && this.renderAside(fields.body.aside, true, hasEntityNewModal, scrollContainer) }
+                  {fields.body.main && this.renderMain(
+                    fields.body.main,
+                    true,
+                    true,
+                    hasEntityNewModal,
+                    scrollContainer,
+                  )}
+                  {fields.body.aside && this.renderAside(
+                    fields.body.aside,
+                    true,
+                    hasEntityNewModal,
+                    scrollContainer,
+                  )}
                 </ViewPanel>
               )
             }
@@ -358,7 +415,10 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                   <DeleteConfirmText>
                     <FormattedMessage {...messages.confirmDeleteQuestion} />
                   </DeleteConfirmText>
-                  <ButtonCancel type="button" onClick={() => this.preDelete(false)}>
+                  <ButtonCancel
+                    type="button"
+                    onClick={() => this.preDelete(false)}
+                  >
                     <FormattedMessage {...messages.buttons.cancelDelete} />
                   </ButtonCancel>
                   <ButtonDelete type="button" onClick={this.props.handleDelete}>

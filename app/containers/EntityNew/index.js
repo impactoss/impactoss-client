@@ -57,7 +57,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
 
   componentWillReceiveProps(nextProps) {
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
-      scrollToTop(this.scrollContainer);
+      scrollToTop(this.scrollContainer.current);
     }
     if (!this.props.frameworkId && nextProps.frameworkId) {
       this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));

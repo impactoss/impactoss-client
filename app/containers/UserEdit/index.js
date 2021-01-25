@@ -86,7 +86,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
-      scrollToTop(this.scrollContainer);
+      scrollToTop(this.scrollContainer.current);
     }
   }
 

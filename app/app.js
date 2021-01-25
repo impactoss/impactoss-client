@@ -12,7 +12,7 @@ import '@babel/polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { applyRouterMiddleware, Router, browserHistory } from 'react-router';
+import { Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import 'sanitize.css/sanitize.css';
 
@@ -79,11 +79,6 @@ const render = (messages) => {
           <Router
             history={history}
             routes={rootRoute}
-            render={
-              // TODO: Scroll to top when going to a new page, imitating default browser
-              // behaviour
-              applyRouterMiddleware()
-            }
           />
         </ThemeProvider>
       </LanguageProvider>

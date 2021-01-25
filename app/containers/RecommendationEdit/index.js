@@ -101,7 +101,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       this.props.redirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
-      scrollToTop(this.scrollContainer);
+      scrollToTop(this.scrollContainer.current);
     }
   }
 
@@ -225,6 +225,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     const hasIndicators = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_indicators']);
     const fwTaxonomies = taxonomies && taxonomies.filter((tax) => tax.get('frameworkIds').find((id) => qe(id, frameworkId))
       || qe(frameworkId, tax.getIn(['attributes', 'framework_id'])));
+
+    // console.log('render', this.scrollContainer)
+    // console.log('render', this.scrollContainer.current)
+    // console.log('render', this.scrollContainer.current && this.scrollContainer.current.getBoundingClientRect)
+
 
     return (
       <div>

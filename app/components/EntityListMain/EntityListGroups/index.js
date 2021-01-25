@@ -301,7 +301,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             onEntitySelect={onEntitySelect}
                             expandNo={expandNo}
                             onExpand={onExpand}
-                            scrollContainer={this.props.scrollContainer}
                             onDismissError={this.props.onDismissError}
                           />
                         </ListEntitiesSubGroup>
@@ -323,7 +322,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                           onEntitySelect={onEntitySelect}
                           expandNo={expandNo}
                           onExpand={onExpand}
-                          scrollContainer={this.props.scrollContainer}
                           onDismissError={this.props.onDismissError}
                         />
                       )
@@ -373,7 +371,6 @@ EntityListGroups.propTypes = {
   onSortBy: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
   onDismissError: PropTypes.func.isRequired,
-  scrollContainer: PropTypes.object,
   groupSelectValue: PropTypes.string,
   subgroupSelectValue: PropTypes.string,
 };
