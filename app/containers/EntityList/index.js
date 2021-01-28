@@ -48,9 +48,9 @@ import messages from './messages';
 import {
   resetProgress,
   showPanel,
-  save,
-  newConnection,
-  deleteConnection,
+  saveMultiple,
+  newMultipleConnections,
+  deleteMultipleConnections,
   selectEntity,
   selectEntities,
   updateQuery,
@@ -62,6 +62,7 @@ import {
   updateSortOrder,
   setClientPath,
   dismissError,
+  dismissAllErrors,
   resetSearchQuery,
 } from './actions';
 
@@ -121,7 +122,11 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     const { intl } = this.context;
     // make sure selected entities are still actually on page
     const {
-      entityIdsSelected, progress, viewDomain, canEdit, progressTypes,
+      entityIdsSelected,
+      progress, viewDomain,
+      canEdit,
+      progressTypes,
+      onDismissAllErrors,
     } = this.props;
 
     const sending = viewDomain.get('sending');
@@ -162,7 +167,13 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               activePanel={this.props.activePanel}
               onPanelSelect={this.props.onPanelSelect}
               onCreateOption={this.props.onCreateOption}
-              onUpdate={(associations, activeEditOption) => this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected, viewDomain.get('errors'))}
+              onUpdate={
+                (associations, activeEditOption) => this.props.handleEditSubmit(
+                  associations,
+                  activeEditOption,
+                  this.props.entityIdsSelected,
+                  viewDomain.get('errors'),
+                )}
             />
           )
         }
@@ -211,6 +222,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onSortBy={this.props.onSortBy}
           onSortOrder={this.props.onSortOrder}
           onDismissError={this.props.onDismissError}
+          onDismissAllErrors={onDismissAllErrors}
         />
         { (progress !== null && progress < 100)
           && (
@@ -330,6 +342,7 @@ EntityList.propTypes = {
   onSortOrder: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
   onDismissError: PropTypes.func.isRequired,
+  onDismissAllErrors: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
   isUserSignedIn: PropTypes.bool,
   showSidebar: PropTypes.bool,
@@ -355,6 +368,10 @@ function mapDispatchToProps(dispatch, props) {
     onDismissError: (key) => {
       dispatch(resetProgress());
       dispatch(dismissError(key));
+    },
+    onDismissAllErrors: () => {
+      dispatch(resetProgress());
+      dispatch(dismissAllErrors());
     },
     resetProgress: () => {
       dispatch(resetProgress());
@@ -461,9 +478,11 @@ function mapDispatchToProps(dispatch, props) {
       // attributes
       if (activeEditOption.group === 'attributes') {
         if (creates.size > 0) {
-          // take the first TODO multiselect should be run in single value mode and only return 1 value
+          // take the first
+          // TODO multiselect should be run in single value mode and only return 1 value
           const newValue = creates.first();
           entities.forEach((entity) => {
+            // not exactly sure what is happening here?
             if (errors && errors.size) {
               errors.forEach((error, key) => {
                 if (error.data.saveRef === entity.get('id')) {
@@ -471,15 +490,18 @@ function mapDispatchToProps(dispatch, props) {
                 }
               });
             }
-
-            if (entity.getIn(['attributes', activeEditOption.optionId]) !== newValue) {
-              dispatch(save(Map()
+          });
+          dispatch(saveMultiple(
+            props.config.serverPath,
+            entities.filter(
+              (entity) => entity.getIn(['attributes', activeEditOption.optionId]) !== newValue
+            ).map(
+              (entity) => Map()
                 .set('path', props.config.serverPath)
                 .set('entity', entity.setIn(['attributes', activeEditOption.optionId], newValue))
                 .set('saveRef', entity.get('id'))
-                .toJS()));
-            }
-          });
+            ).toJS()
+          ));
         }
       // connections
       } else {
@@ -488,58 +510,104 @@ function mapDispatchToProps(dispatch, props) {
           .filter((option) => option.get('checked') === false)
           .map((option) => option.get('value'));
 
-        entities.forEach((entity) => {
-          if (errors && errors.size) {
-            errors.forEach((error, key) => {
-              if (error.data.saveRef === entity.get('id')) {
-                dispatch(dismissError(key));
-              }
-            });
+        entities.forEach(
+          (entity) => {
+            if (errors && errors.size) {
+              errors.forEach((error, key) => {
+                if (error.data.saveRef === entity.get('id')) {
+                  dispatch(dismissError(key));
+                }
+              });
+            }
           }
-          let existingAssignments;
-          switch (activeEditOption.group) {
-            case ('taxonomies'):
-              existingAssignments = entity.get('categories');
-              break;
-            case ('connections'):
-              existingAssignments = entity.get(activeEditOption.connection);
-              break;
-            default:
-              existingAssignments = List();
-              break;
-          }
-          // create connections
-          if (creates.size > 0) {
-            // exclude existing relations from the changeSet
-            const entityCreates = !!existingAssignments && existingAssignments.size > 0
-              ? creates.filter((id) => !existingAssignments.includes(parseInt(id, 10)))
-              : creates;
-
-            // associations
-            entityCreates.forEach((id) => dispatch(newConnection({
-              path: activeEditOption.path,
-              entity: {
-                attributes: {
-                  [activeEditOption.ownKey]: entity.get('id'),
-                  [activeEditOption.key]: id,
-                },
-              },
-              saveRef: entity.get('id'),
-            })));
-          }
-          // delete connections
-          if (deletes.size > 0) {
-            if (!!existingAssignments && existingAssignments.size > 0) {
-              existingAssignments
-                .filter((assigned) => deletes.includes(assigned.toString()))
-                .forEach((assigned, id) => dispatch(deleteConnection({
+        );
+        const updates = entities.reduce(
+          (memo, entity) => {
+            let entityCreates = List();
+            let entityDeletes = List();
+            let existingAssignments;
+            switch (activeEditOption.group) {
+              case ('taxonomies'):
+                existingAssignments = entity.get('categories');
+                break;
+              case ('connections'):
+                existingAssignments = entity.get(activeEditOption.connection);
+                break;
+              default:
+                existingAssignments = List();
+                break;
+            }
+            // create connections
+            if (creates.size > 0) {
+              // exclude existing relations from the changeSet
+              entityCreates = creates.filter(
+                (id) => !!existingAssignments
+                  && existingAssignments.size > 0
+                  && !existingAssignments.includes(parseInt(id, 10))
+              ).map(
+                (id) => fromJS({
+                  path: activeEditOption.path,
+                  entity: {
+                    attributes: {
+                      [activeEditOption.ownKey]: entity.get('id'),
+                      [activeEditOption.key]: id,
+                    },
+                  },
+                  saveRef: entity.get('id'),
+                })
+              );
+            }
+            // delete connections
+            if (
+              deletes.size > 0
+              && !!existingAssignments
+              && existingAssignments.size > 0
+            ) {
+              entityDeletes = existingAssignments.filter(
+                (assigned) => deletes.includes(assigned.toString())
+              ).map(
+                (assigned, id) => fromJS({
                   path: activeEditOption.path,
                   id,
                   saveRef: entity.get('id'),
-                })));
+                })
+              ).toList();
             }
-          }
-        }); // each entity
+            return memo
+              .set('creates', memo.get('creates').concat(entityCreates))
+              .set('deletes', memo.get('deletes').concat(entityDeletes));
+          },
+          Map().set('creates', List()).set('deletes', List()),
+        ); // reduce entities
+        // associations
+        if (updates.get('creates') && updates.get('creates').size > 0) {
+          dispatch(newMultipleConnections(
+            activeEditOption.path,
+            updates.get('creates').toJS(),
+          ));
+        }
+        if (updates.get('deletes') && updates.get('deletes').size > 0) {
+          dispatch(deleteMultipleConnections(
+            activeEditOption.path,
+            updates.get('deletes').toJS(),
+          ));
+        }
+        // entityCreates.forEach((id) => dispatch(newConnection({
+        //   path: activeEditOption.path,
+        //   entity: {
+        //     attributes: {
+        //       [activeEditOption.ownKey]: entity.get('id'),
+        //       [activeEditOption.key]: id,
+        //     },
+        //   },
+        //   saveRef: entity.get('id'),
+        // })));
+        // existingAssignments
+        //   .forEach((assigned, id) => dispatch(deleteConnection({
+        //     path: activeEditOption.path,
+        //     id,
+        //     saveRef: entity.get('id'),
+        //   })));
       }
     },
   };

@@ -39,10 +39,12 @@ export const UPDATE_ENTITIES = 'impactoss/App/UPDATE_ENTITIES';
 export const UPDATE_CONNECTIONS = 'impactoss/App/UPDATE_CONNECTIONS';
 
 export const SAVE_ENTITY = 'impactoss/App/SAVE_ENTITY';
+export const SAVE_MULTIPLE_ENTITIES = 'impactoss/App/SAVE_MULTIPLE_ENTITIES';
 export const NEW_ENTITY = 'impactoss/App/NEW_ENTITY';
+export const NEW_MULTIPLE_ENTITIES = 'impactoss/App/NEW_MULTIPLE_ENTITIES';
 export const DELETE_ENTITY = 'impactoss/App/DELETE_ENTITY';
+export const DELETE_MULTIPLE_ENTITIES = 'impactoss/App/DELETE_MULTIPLE_ENTITIES';
 export const SAVE_CONNECTIONS = 'impactoss/App/SAVE_CONNECTIONS';
-export const SAVE_ENTITIES = 'impactoss/App/SAVE_ENTITIES';
 export const DUEDATE_ASSIGNED = 'impactoss/App/DUEDATE_ASSIGNED';
 export const DUEDATE_UNASSIGNED = 'impactoss/App/DUEDATE_UNASSIGNED';
 
