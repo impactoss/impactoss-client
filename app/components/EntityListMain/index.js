@@ -94,6 +94,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       entities,
       errors,
       frameworks,
+      onDismissAllErrors,
     } = this.props;
     const { intl } = this.context;
     const expandNo = config.expandableColumns && locationQuery.get('expand')
@@ -214,7 +215,10 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     )}
                     searchQuery={locationQuery.get('search') || ''}
                     onSearch={onSearch}
-                    onClear={() => onResetFilters(currentFilterArgs(config, locationQuery))}
+                    onClear={() => {
+                      onResetFilters(currentFilterArgs(config, locationQuery));
+                      onDismissAllErrors();
+                    }}
                   />
                 </EntityListSearch>
                 <EntityListOptions
@@ -305,6 +309,7 @@ EntityListMain.propTypes = {
   onSortOrder: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   onDismissError: PropTypes.func.isRequired,
+  onDismissAllErrors: PropTypes.func.isRequired,
   listUpdating: PropTypes.bool,
 };
 
