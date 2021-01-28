@@ -23,9 +23,11 @@ import {
   getReportsField,
 } from 'utils/fields';
 
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
-import { loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages,
+} from 'containers/App/actions';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 
@@ -61,10 +63,10 @@ import {
 import { DEPENDENCIES } from './constants';
 
 export class IndicatorView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
+
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
@@ -81,8 +83,8 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     },
   ]);
 
-  getHeaderAsideFields = (entity, isContributor) => isContributor &&
-    ([{
+  getHeaderAsideFields = (entity, isContributor) => isContributor
+    && ([{
       fields: [
         getStatusField(entity),
         getMetaField(entity),
@@ -102,6 +104,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     recommendationConnections,
     frameworks,
   ) => {
+    const { intl } = this.context;
     const fields = [];
     // own attributes
     fields.push({
@@ -111,7 +114,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
           reports,
           {
             type: 'add',
-            title: this.context.intl.formatMessage(messages.addReport),
+            title: intl.formatMessage(messages.addReport),
             onClick: this.props.handleNewReport,
           }
         ),
@@ -136,7 +139,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     if (recommendationsByFw) {
       const recConnections = [];
       recommendationsByFw.forEach((recs, fwid) => {
-        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+        const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
         const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
         recConnections.push(
           getRecommendationConnectionField(
@@ -175,6 +178,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   ]);
 
   render() {
+    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -193,92 +197,98 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     } = this.props;
 
     const buttons = isManager
-    ? [
-      {
-        type: 'text',
-        title: this.context.intl.formatMessage(messages.addReport),
-        onClick: this.props.handleNewReport,
-      },
-      {
-        type: 'edit',
-        onClick: this.props.handleEdit,
-      },
-      {
-        type: 'close',
-        onClick: this.props.handleClose,
-      },
-    ]
-    : [
-      {
-        type: 'text',
-        title: this.context.intl.formatMessage(messages.addReport),
-        onClick: this.props.handleNewReport,
-      },
-      {
-        type: 'close',
-        onClick: this.props.handleClose,
-      },
-    ];
+      ? [
+        {
+          type: 'text',
+          title: intl.formatMessage(messages.addReport),
+          onClick: this.props.handleNewReport,
+        },
+        {
+          type: 'edit',
+          onClick: this.props.handleEdit,
+        },
+        {
+          type: 'close',
+          onClick: this.props.handleClose,
+        },
+      ]
+      : [
+        {
+          type: 'text',
+          title: intl.formatMessage(messages.addReport),
+          onClick: this.props.handleNewReport,
+        },
+        {
+          type: 'close',
+          onClick: this.props.handleClose,
+        },
+      ];
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={`${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="indicators"
             buttons={buttons}
           />
-          { !viewEntity && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          { !viewEntity && dataReady
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          {this.props.queryMessages.info && appMessages.entities[this.props.queryMessages.infotype] &&
-            <Messages
-              spaceMessage
-              type="success"
-              onDismiss={this.props.onDismissQueryMessages}
-              messageKey={this.props.queryMessages.info}
-              messageArgs={{
-                entityType: this.context.intl.formatMessage(appMessages.entities[this.props.queryMessages.infotype].single),
-              }}
-            />
+          {this.props.queryMessages.info && appMessages.entities[this.props.queryMessages.infotype]
+            && (
+              <Messages
+                spaceMessage
+                type="success"
+                onDismiss={this.props.onDismissQueryMessages}
+                messageKey={this.props.queryMessages.info}
+                messageArgs={{
+                  entityType: intl.formatMessage(appMessages.entities[this.props.queryMessages.infotype].single),
+                }}
+              />
+            )
           }
-          { !dataReady &&
-            <Loading />
+          { !dataReady
+            && <Loading />
           }
-          { viewEntity && dataReady &&
-            <EntityView
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(viewEntity, isContributor),
-                  aside: this.getHeaderAsideFields(viewEntity, isContributor),
-                },
-                body: {
-                  main: this.getBodyMainFields(
-                    viewEntity,
-                    measures,
-                    reports,
-                    measureTaxonomies,
-                    isContributor,
-                    onEntityClick,
-                    measureConnections,
-                    recommendationsByFw,
-                    recommendationTaxonomies,
-                    recommendationConnections,
-                    frameworks,
-                  ),
-                  aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
-                },
-              }}
-            />
+          { viewEntity && dataReady
+            && (
+              <EntityView
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(viewEntity, isContributor),
+                    aside: this.getHeaderAsideFields(viewEntity, isContributor),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(
+                      viewEntity,
+                      measures,
+                      reports,
+                      measureTaxonomies,
+                      isContributor,
+                      onEntityClick,
+                      measureConnections,
+                      recommendationsByFw,
+                      recommendationTaxonomies,
+                      recommendationConnections,
+                      frameworks,
+                    ),
+                    aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
+                  },
+                }}
+              />
+            )
           }
         </Content>
       </div>

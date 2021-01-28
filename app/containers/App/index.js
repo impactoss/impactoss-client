@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import ReactModal from 'react-modal';
+import GlobalStyle from 'global-styles';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -45,23 +46,22 @@ const Main = styled.div`
   top: ${(props) => props.isHome
     ? 0
     : props.theme.sizes.header.banner.heightMobile + props.theme.sizes.header.nav.heightMobile
-  }px;
+}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     top: ${(props) => props.isHome
-      ? 0
-      : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
-    }px;
+    ? 0
+    : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
+}px;
   }
-  overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
   left: 0;
   right: 0;
   bottom:0;
   background-color: ${(props) => props.isHome ? 'transparent' : palette('light', 0)};
   overflow: hidden;
 `;
+// overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.validateToken();
     this.props.loadEntitiesIfNeeded();
@@ -74,13 +74,12 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     }
   }
 
-  preparePageMenuPages = (pages) =>
-    sortEntities(
-      pages,
-      'asc',
-      'order',
-      'number'
-    )
+  preparePageMenuPages = (pages) => sortEntities(
+    pages,
+    'asc',
+    'order',
+    'number'
+  )
     .map((page) => ({
       path: `${PATHS.PAGES}/${page.get('id')}`,
       title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
@@ -88,17 +87,19 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     .toArray();
 
   prepareFrameworkOptions = (frameworks, activeId) => {
+    const { intl } = this.context;
     const options = Object.values(frameworks.toJS()).map((fw) => ({
       value: fw.id,
-      label: this.context.intl.formatMessage(messages.frameworks[fw.id]),
+      label: intl.formatMessage(messages.frameworks[fw.id]),
       active: activeId === fw.id,
     }));
     return options.concat({
       value: 'all',
-      label: this.context.intl.formatMessage(messages.frameworks.all),
+      label: intl.formatMessage(messages.frameworks.all),
       active: (activeId === 'all') || frameworks.size === 0,
     });
   }
+
   prepareMainMenuItems = (
     isManager,
     isUserSignedIn,
@@ -106,53 +107,53 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     currentFrameworkId,
     viewRecommendationFramework,
   ) => {
+    const { intl } = this.context;
     let navItems = [
       {
         path: PATHS.OVERVIEW,
-        titleSuper: this.context.intl.formatMessage(messages.nav.overviewSuper),
-        title: this.context.intl.formatMessage(messages.nav.overview),
+        titleSuper: intl.formatMessage(messages.nav.overviewSuper),
+        title: intl.formatMessage(messages.nav.overview),
         active:
-          currentPath.startsWith(PATHS.OVERVIEW) ||
-          currentPath.startsWith(PATHS.TAXONOMIES) ||
-          currentPath.startsWith(PATHS.CATEGORIES),
+          currentPath.startsWith(PATHS.OVERVIEW)
+          || currentPath.startsWith(PATHS.TAXONOMIES)
+          || currentPath.startsWith(PATHS.CATEGORIES),
       },
       {
         path: PATHS.RECOMMENDATIONS,
-        titleSuper: this.context.intl.formatMessage(messages.nav.recommendationsSuper),
-        title: this.context.intl.formatMessage(messages.frameworkObjectivesShort[currentFrameworkId]),
+        titleSuper: intl.formatMessage(messages.nav.recommendationsSuper),
+        title: intl.formatMessage(messages.frameworkObjectivesShort[currentFrameworkId]),
         active: currentPath.startsWith(PATHS.RECOMMENDATIONS) && (
-          !viewRecommendationFramework ||
-          currentFrameworkId === 'all' ||
-          currentFrameworkId === viewRecommendationFramework
+          !viewRecommendationFramework
+          || currentFrameworkId === 'all'
+          || currentFrameworkId === viewRecommendationFramework
         ),
       },
       {
         path: PATHS.MEASURES,
-        titleSuper: this.context.intl.formatMessage(messages.nav.measuresSuper),
-        title: this.context.intl.formatMessage(messages.nav.measures),
+        titleSuper: intl.formatMessage(messages.nav.measuresSuper),
+        title: intl.formatMessage(messages.nav.measures),
         active: currentPath.startsWith(PATHS.MEASURES),
       },
     ];
     navItems = navItems.concat([{
       path: PATHS.INDICATORS,
-      titleSuper: this.context.intl.formatMessage(messages.nav.indicatorsSuper),
-      title: this.context.intl.formatMessage(messages.nav.indicators),
+      titleSuper: intl.formatMessage(messages.nav.indicatorsSuper),
+      title: intl.formatMessage(messages.nav.indicators),
       active:
-        currentPath.startsWith(PATHS.INDICATORS) ||
-        currentPath.startsWith(PATHS.PROGRESS_REPORTS),
+        currentPath.startsWith(PATHS.INDICATORS)
+        || currentPath.startsWith(PATHS.PROGRESS_REPORTS),
     }]);
-
     if (isManager) {
       navItems = navItems.concat([
         {
           path: PATHS.PAGES,
-          title: this.context.intl.formatMessage(messages.nav.pages),
+          title: intl.formatMessage(messages.nav.pages),
           isAdmin: true,
           active: currentPath === PATHS.PAGES,
         },
         {
           path: PATHS.USERS,
-          title: this.context.intl.formatMessage(messages.nav.users),
+          title: intl.formatMessage(messages.nav.users),
           isAdmin: true,
           active: currentPath === PATHS.USERS,
         },
@@ -162,7 +163,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       navItems = navItems.concat([
         {
           path: PATHS.BOOKMARKS,
-          title: this.context.intl.formatMessage(messages.nav.bookmarks),
+          title: intl.formatMessage(messages.nav.bookmarks),
           isAdmin: true,
           active: currentPath === PATHS.BOOKMARKS,
         },
@@ -183,12 +184,15 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       frameworks,
       onSelectFramework,
       viewRecommendationFramework,
+      user,
+      children,
     } = this.props;
+    const { intl } = this.context;
     return (
       <div>
         <Header
           isSignedIn={isUserSignedIn}
-          user={this.props.user}
+          user={user}
           pages={pages && this.preparePageMenuPages(pages)}
           navItems={this.prepareMainMenuItems(
             isUserSignedIn && isManager,
@@ -199,7 +203,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           )}
           search={{
             path: PATHS.SEARCH,
-            title: this.context.intl.formatMessage(messages.nav.search),
+            title: intl.formatMessage(messages.nav.search),
             active: location.pathname.startsWith(PATHS.SEARCH),
             icon: 'search',
           }}
@@ -207,33 +211,36 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           isHome={location.pathname === '/'}
           onSelectFramework={onSelectFramework}
           frameworkOptions={this.prepareFrameworkOptions(
-              frameworks,
-              currentFrameworkId,
-            )}
+            frameworks,
+            currentFrameworkId,
+          )}
         />
         <Main isHome={location.pathname === '/'}>
-          {React.Children.toArray(this.props.children)}
+          {React.Children.toArray(children)}
         </Main>
-        {newEntityModal &&
-          <ReactModal
-            isOpen
-            contentLabel={newEntityModal.get('path')}
-            onRequestClose={this.props.onCloseModal}
-            className="new-entity-modal"
-            overlayClassName="new-entity-modal-overlay"
-            style={{
-              overlay: { zIndex: 99999999 },
-            }}
-          >
-            <EntityNew
-              path={newEntityModal.get('path')}
-              attributes={newEntityModal.get('attributes')}
-              onSaveSuccess={this.props.onCloseModal}
-              onCancel={this.props.onCloseModal}
-              inModal
-            />
-          </ReactModal>
+        {newEntityModal
+          && (
+            <ReactModal
+              isOpen
+              contentLabel={newEntityModal.get('path')}
+              onRequestClose={this.props.onCloseModal}
+              className="new-entity-modal"
+              overlayClassName="new-entity-modal-overlay"
+              style={{
+                overlay: { zIndex: 99999999 },
+              }}
+            >
+              <EntityNew
+                path={newEntityModal.get('path')}
+                attributes={newEntityModal.get('attributes')}
+                onSaveSuccess={this.props.onCloseModal}
+                onCancel={this.props.onCloseModal}
+                inModal
+              />
+            </ReactModal>
+          )
         }
+        <GlobalStyle />
       </div>
     );
   }
@@ -255,6 +262,7 @@ App.propTypes = {
   currentFrameworkId: PropTypes.string,
   viewRecommendationFramework: PropTypes.string,
   frameworks: PropTypes.object,
+  dataReady: PropTypes.bool,
 };
 App.contextTypes = {
   intl: PropTypes.object.isRequired,

@@ -1,8 +1,7 @@
 import { find } from 'lodash/collection';
 import { CYCLE_TAXONOMY_ID } from 'themes/config';
 
-export const getSortOption = (sortOptions, sortBy, query = 'attribute') =>
-  find(sortOptions, (option) => option[query] === sortBy)
+export const getSortOption = (sortOptions, sortBy, query = 'attribute') => find(sortOptions, (option) => option[query] === sortBy)
   || find(sortOptions, (option) => option.default);
 
 const getEntitySortValueMapper = (entity, sortBy) => {
@@ -44,8 +43,10 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
   } else if (typeof valueB === 'undefined' || valueB === null) {
     result = -1;
   } else if (type === 'date') {
+    /* eslint-disable no-restricted-globals */
     const aIsDate = new Date(valueA) instanceof Date && !isNaN(new Date(valueA));
     const bIsDate = new Date(valueB) instanceof Date && !isNaN(new Date(valueB));
+    /* eslint-enable no-restricted-globals */
     if (aIsDate && !bIsDate) {
       result = 1;
     } else if (!aIsDate && bIsDate) {
@@ -58,8 +59,10 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
   } else {
     const intA = parseInt(valueA, 10);
     const intB = parseInt(valueB, 10);
+    /* eslint-disable no-restricted-globals */
     const aStartsWithNumber = !isNaN(intA);
     const bStartsWithNumber = !isNaN(intB);
+    /* eslint-enable no-restricted-globals */
     if (aStartsWithNumber && !bStartsWithNumber) {
       result = -1;
     } else if (!aStartsWithNumber && bStartsWithNumber) {
@@ -102,15 +105,15 @@ export const sortEntities = (entities, sortOrder, sortBy, type, asList = true) =
 export const sortCategories = (categories, taxonomyId, sortOrder, sortBy) => {
   if (taxonomyId && parseInt(taxonomyId, 10) === CYCLE_TAXONOMY_ID) {
     return sortEntities(
-        categories,
-        sortOrder || 'desc',
-        sortBy || 'date',
-        'date', // fild type
-      );
+      categories,
+      sortOrder || 'desc',
+      sortBy || 'date',
+      'date', // fild type
+    );
   }
   return sortEntities(
-      categories,
-      sortOrder || 'asc',
-      sortBy || 'referenceThenTitle',
-    );
+    categories,
+    sortOrder || 'asc',
+    sortBy || 'referenceThenTitle',
+  );
 };

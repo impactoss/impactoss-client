@@ -6,11 +6,11 @@ const ShortTitleTag = styled.span`
   color: ${(props) => props.inverse
     ? palette('taxonomies', parseInt(props.pIndex, 10) || 0)
     : palette('text', 2)
-  };
+};
   background-color: ${(props) => props.inverse
     ? palette('background', 0)
     : palette('taxonomies', parseInt(props.pIndex, 10) || 0)
-  };
+};
   padding: 1px 6px;
   margin-right: 2px;
   border-radius: 3px;

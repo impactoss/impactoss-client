@@ -5,7 +5,9 @@ import styled from 'styled-components';
 
 import { getBookmarkForSaving, generateBookmarkTitle } from 'utils/bookmark';
 
-import { loadEntitiesIfNeeded, deleteEntity, saveEntity, newEntity } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded, deleteEntity, saveEntity, newEntity,
+} from 'containers/App/actions';
 import { selectReady, selectLocation, selectEntities } from 'containers/App/selectors';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
@@ -35,10 +37,10 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
   // const { dataReady, bookmark } = this.props;
   //
   // if (dataReady && bookmark && this.state.title === null) {
-    //   this.setState({ title: bookmark.getIn(['attributes', 'title']) });
-    // } else {
-      //   this.setState({ title: '' });
-      // }
+  //   this.setState({ title: bookmark.getIn(['attributes', 'title']) });
+  // } else {
+  //   this.setState({ title: '' });
+  // }
 
   componentWillReceiveProps(nextProps) {
     if (!nextProps.dataReady) {
@@ -80,10 +82,12 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
                     type,
                   );
                 } else {
-                  this.setState({
-                    new: false,
-                    open: !this.state.open,
-                  });
+                  this.setState(
+                    (prevState) => ({
+                      new: false,
+                      open: !prevState.open,
+                    })
+                  );
                 }
               }
             }
@@ -117,7 +121,6 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
     }
     return null;
   }
-
 }
 
 Bookmarker.propTypes = {

@@ -56,12 +56,12 @@ theme.breakpoints = {
 // 3: main colour, lighter (UNUSED)
 // 4: white
 const primary = coolorsToHex('https://coolors.co/d66149-eb6e51-ff9b69-ffb996-ffffff');
-  // secondary color palette: dark to light
-  // 0: dark header colour, darker
-  // 1: dark header colour
-  // 2: dark header colour, lighter (UNUSED)
-  // 3: white/placeholder
-  // 4: white/placeholder
+// secondary color palette: dark to light
+// 0: dark header colour, darker
+// 1: dark header colour
+// 2: dark header colour, lighter (UNUSED)
+// 3: white/placeholder
+// 4: white/placeholder
 const secondary = coolorsToHex('https://coolors.co/162331-182635-34404d-ffffff-ffffff');
 // dark grayscale: dark to light
 // 0:  darkest
@@ -109,31 +109,31 @@ theme.palette = {
   // taxonomy/category colours
 
   taxonomies: [
-    '#E8EAEB',  // 0: default/fallback
-    '#6B3285',  // 1: Human Rights Body
-    '#6B3285',  // 2: UN cycle
-    '#75D6AC',  // 3: Human right
-    '#26938C',  // 4: Affected persons
-    '#0069A4',  // 5: Thematic cluster
-    '#34404d',  // 6: Organisation
-    '#199CD4',  // 7: SDGs
-    '#007c3a',  // 8: Progress status
-    '#55B542',  // 9: SDS Key outcome
+    '#E8EAEB', // 0: default/fallback
+    '#6B3285', // 1: Human Rights Body
+    '#6B3285', // 2: UN cycle
+    '#75D6AC', // 3: Human right
+    '#26938C', // 4: Affected persons
+    '#0069A4', // 5: Thematic cluster
+    '#34404d', // 6: Organisation
+    '#199CD4', // 7: SDGs
+    '#007c3a', // 8: Progress status
+    '#55B542', // 9: SDS Key outcome
     '#55B542', // 10: SDS priority area
     '#5149AD', // 11: Conventions
     '#182635', // 12: Provenance
   ],
   taxonomiesHover: [
-    '#DBDCDD',  // 0: default/fallback
-    '#622E79',  // 1: Human Rights Body
-    '#622E79',  // 2: UN cycle
-    '#65C99B',  // 3: Human right
-    '#238680',  // 4: Affected persons
-    '#006096',  // 5: Thematic cluster
-    '#182635',  // 6: Organisation
-    '#178EC1',  // 7: SDGs
-    '#007034',  // 8: Progress status
-    '#4EA53',  // 9: SDS Key outcome
+    '#DBDCDD', // 0: default/fallback
+    '#622E79', // 1: Human Rights Body
+    '#622E79', // 2: UN cycle
+    '#65C99B', // 3: Human right
+    '#238680', // 4: Affected persons
+    '#006096', // 5: Thematic cluster
+    '#182635', // 6: Organisation
+    '#178EC1', // 7: SDGs
+    '#007034', // 8: Progress status
+    '#4EA53', // 9: SDS Key outcome
     '#4EA53', // 10: SDS priority area
     '#4A439E', // 11: Conventions
     '#162331', // 12: Provenance

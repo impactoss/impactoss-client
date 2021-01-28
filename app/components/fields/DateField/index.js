@@ -22,15 +22,19 @@ class DateField extends React.PureComponent { // eslint-disable-line react/prefe
         <Label>
           <FormattedMessage {...(field.label || appMessages.attributes.date)} />
         </Label>
-        { field.value &&
-          <DateValue>
-            <FormattedDate value={new Date(field.value)} />
-          </DateValue>
+        { field.value
+          && (
+            <DateValue>
+              <FormattedDate value={new Date(field.value)} />
+            </DateValue>
+          )
         }
-        { !field.value &&
-          <EmptyHint>
-            <FormattedMessage {...field.showEmpty} />
-          </EmptyHint>
+        { !field.value
+          && (
+            <EmptyHint>
+              <FormattedMessage {...field.showEmpty} />
+            </EmptyHint>
+          )
         }
       </FieldWrap>
     );

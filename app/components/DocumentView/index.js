@@ -10,14 +10,14 @@ const DocumentView = ({ status, url, isManager }) => {
   const visibleDoc = status || isManager;
   return (
     <span>
-      {url && visibleDoc &&
-        <DownloadFile url={url} />
+      {url && visibleDoc
+        && <DownloadFile url={url} />
       }
-      {url && !visibleDoc &&
-        <FormattedMessage {...messages.privateFile} />
+      {url && !visibleDoc
+        && <FormattedMessage {...messages.privateFile} />
       }
-      {!url &&
-        <FormattedMessage {...messages.noFile} />
+      {!url
+        && <FormattedMessage {...messages.noFile} />
       }
     </span>
   );

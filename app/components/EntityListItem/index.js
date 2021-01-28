@@ -47,7 +47,7 @@ const MainInnerWrapper = styled(Component)`
   width: 100%;
 `;
 
-class EntityListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class EntityListItem extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
     return this.props.entity !== nextProps.entity
       || this.props.isSelected !== nextProps.isSelected
@@ -57,14 +57,15 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
   }
 
   transformMessage = (type, msg) => {
+    const { intl } = this.context;
     if (type === 'delete') {
-      return this.context.intl
-        ? this.context.intl.formatMessage(messages.associationNotExistent)
+      return intl
+        ? intl.formatMessage(messages.associationNotExistent)
         : msg;
     }
     if (type === 'new') {
-      return this.context.intl
-        ? this.context.intl.formatMessage(messages.associationAlreadyPresent)
+      return intl
+        ? intl.formatMessage(messages.associationAlreadyPresent)
         : msg;
     }
     return msg;
@@ -94,7 +95,13 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
           <Messages
             key={i}
             type="error"
-            messages={updateError.getIn(['error', 'messages']).map((msg) => this.transformMessage(updateError.get('type'), msg)).toArray()}
+            messages={
+              updateError
+                .getIn(['error', 'messages'])
+                .map((msg) => this.transformMessage(updateError.get('type'), msg))
+                .valueSeq()
+                .toArray()
+            }
             onDismiss={() => this.props.onDismissError(updateError.get('key'))}
             preMessage={false}
             details
@@ -103,8 +110,8 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
         <Item error={error}>
           <MainWrapper expandable={entity.get('expandable')}>
             <MainInnerWrapper>
-              {isManager &&
-                <EntityListItemSelect checked={isSelected} onSelect={onSelect} />
+              {isManager
+                && <EntityListItemSelect checked={isSelected} onSelect={onSelect} />
               }
               <EntityListItemMain
                 entity={entity}
@@ -121,8 +128,8 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
             </MainInnerWrapper>
           </MainWrapper>
           {
-            entity.get('expandable') &&
-            asList(entity.get('expandable')).map((attribute, i, list) =>
+            entity.get('expandable')
+            && asList(entity.get('expandable')).map((attribute, i, list) => (
               <EntityListItemExpandable
                 key={i}
                 column={find(config.expandableColumns, (col) => col.type === attribute)}
@@ -131,7 +138,7 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
                 onClick={() => onExpand(expandNo > i ? i : i + 1)}
                 width={(1 - 0.66) / list.size}
               />
-            )
+            ))
           }
         </Item>
       </Styled>

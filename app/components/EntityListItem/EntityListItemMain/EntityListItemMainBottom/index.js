@@ -17,7 +17,6 @@ const Styled = styled(Component)`
 `;
 
 class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const {
       connections,
@@ -26,11 +25,12 @@ class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-l
       taxonomies,
       onEntityClick,
     } = this.props;
-    const smartTaxonomy = taxonomies && taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
+    const smartTaxonomy = taxonomies && taxonomies.find(
+      (tax) => tax.getIn(['attributes', 'is_smart'])
+    );
     const hasUpper = connections && connections.length > 0;
-    const hasLower =
-      categories &&
-      (categories.size > 0 || smartTaxonomy);
+    const hasLower = categories
+      && (categories.size > 0 || smartTaxonomy);
     return (
       <Styled>
         {hasLower && (

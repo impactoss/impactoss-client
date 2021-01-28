@@ -16,23 +16,26 @@ class FieldGroup extends React.PureComponent { // eslint-disable-line react/pref
 
     return (
       <FieldGroupWrapper groupType={group.type} seamless={seamless}>
-        { group.label &&
-          <FieldGroupLabel basic={group.type === 'smartTaxonomy'}>
-            <GroupLabel>
-              <FormattedMessage {...group.label} />
-            </GroupLabel>
-            { group.icon &&
-              <GroupIcon>
-                <Icon name={group.icon} />
-              </GroupIcon>
-            }
-          </FieldGroupLabel>
+        { group.label
+          && (
+            <FieldGroupLabel basic={group.type === 'smartTaxonomy'}>
+              <GroupLabel>
+                <FormattedMessage {...group.label} />
+              </GroupLabel>
+              { group.icon
+              && (
+                <GroupIcon>
+                  <Icon name={group.icon} />
+                </GroupIcon>
+              )
+              }
+            </FieldGroupLabel>
+          )
         }
         {
           group.fields.map((field, i) => field
             ? (<FieldFactory key={i} field={Object.assign({}, field, { aside: this.props.aside })} />)
-            : null
-          )
+            : null)
         }
       </FieldGroupWrapper>
     );

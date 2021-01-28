@@ -7,21 +7,22 @@ import {
   selectFrameworks,
 } from 'containers/App/selectors';
 
-import {
-  prepareTaxonomiesMultiple,
-  attributesEqual,
-} from 'utils/entities';
-
+import { prepareTaxonomiesMultiple } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 export const selectDomain = createSelector(
   (state) => state.get('measureNew'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations'], false)
+  (taxonomies, categories) => prepareTaxonomiesMultiple(
+    taxonomies,
+    categories,
+    ['tags_recommendations'],
+    false,
+  )
 );
 
 export const selectRecommendationsByFw = createSelector(
@@ -33,19 +34,18 @@ export const selectRecommendationsByFw = createSelector(
     if (!fwTaxonomies || !entities) {
       return null;
     }
-    return entities
-    .filter((r) => {
-      const framework = frameworks.find(
-        (fw) =>
-          attributesEqual(
+    return entities.filter(
+      (r) => {
+        const framework = frameworks.find(
+          (fw) => qe(
             fw.get('id'),
             r.getIn(['attributes', 'framework_id']),
           )
         );
-      return framework.getIn(['attributes', 'has_measures']);
-    })
-      .groupBy(
-        (r) => r.getIn(['attributes', 'framework_id']).toString()
-      );
+        return framework.getIn(['attributes', 'has_measures']);
+      }
+    ).groupBy(
+      (r) => r.getIn(['attributes', 'framework_id']).toString()
+    );
   }
 );

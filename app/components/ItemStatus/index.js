@@ -8,7 +8,7 @@ import messages from './messages';
 
 const Status = styled(Label)`
   float: ${({ float }) => float || 'right'};
-  padding-left: ${({ float }) => float === 'left' ? 0 : '1em'};;
+  padding-left: ${({ float }) => float === 'left' ? 0 : '1em'};
   padding-right: ${({ float }) => float === 'left' ? '1em' : 0};
   font-weight: bold;
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
@@ -19,12 +19,14 @@ const Status = styled(Label)`
 class ItemStatus extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { draft, top, float } = this.props;
+    const { intl } = this.context;
     return draft
-      ? (<Status top={top} float={float}>
-        {this.context.intl && this.context.intl.formatMessage(messages.draft)}
-      </Status>)
-      : null
-    ;
+      ? (
+        <Status top={top} float={float}>
+          {intl && intl.formatMessage(messages.draft)}
+        </Status>
+      )
+      : null;
   }
 }
 

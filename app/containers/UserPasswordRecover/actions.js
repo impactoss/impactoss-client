@@ -3,11 +3,11 @@
  * UserPasswordRecover actions
  *
  */
- import { RECOVER } from './constants';
+import { RECOVER } from './constants';
 
- export function recover(data) {
-   return {
-     type: RECOVER,
-     data,
-   };
- }
+export function recover(data) {
+  return {
+    type: RECOVER,
+    data,
+  };
+}

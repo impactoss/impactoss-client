@@ -50,13 +50,13 @@ const IconWrapUnscheduled = styled(IconWrap)`
 
 
 class EntityListNestedReportDateItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   static propTypes = {
     dates: PropTypes.instanceOf(Map),
   }
 
   render() {
     const { dates } = this.props;
+    const { intl } = this.context;
     const date = dates.get('scheduled');
     const scheduled = !!date;
     const overdue = scheduled && date.getIn(['attributes', 'overdue']);
@@ -64,42 +64,52 @@ class EntityListNestedReportDateItem extends React.PureComponent { // eslint-dis
 
     return (
       <Styled overdue={overdue} scheduled={scheduled}>
-        { scheduled &&
-          <span>
-            <IconWrap overdue={overdue}>
-              <Icon name="reminder" />
-            </IconWrap>
-            <Status>
-              { overdue &&
-                <span>
-                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.overdueNext)}
-                </span>
-              }
-              { due &&
-                <span>
-                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.dueNext)}
-                </span>
-              }
-              { !overdue && !due &&
-                <span>
-                  {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.scheduledNext)}
-                </span>
-              }
-            </Status>
-            <DueDate overdue={overdue}>
-              { this.context.intl && this.context.intl.formatDate(new Date(date.getIn(['attributes', 'due_date'])))}
-            </DueDate>
-          </span>
+        { scheduled
+          && (
+            <span>
+              <IconWrap overdue={overdue}>
+                <Icon name="reminder" />
+              </IconWrap>
+              <Status>
+                { overdue
+                && (
+                  <span>
+                    {intl && intl.formatMessage(appMessages.entities.due_dates.overdueNext)}
+                  </span>
+                )
+                }
+                { due
+                && (
+                  <span>
+                    {intl && intl.formatMessage(appMessages.entities.due_dates.dueNext)}
+                  </span>
+                )
+                }
+                { !overdue && !due
+                && (
+                  <span>
+                    {intl && intl.formatMessage(appMessages.entities.due_dates.scheduledNext)}
+                  </span>
+                )
+                }
+              </Status>
+              <DueDate overdue={overdue}>
+                { intl && intl.formatDate(new Date(date.getIn(['attributes', 'due_date'])))}
+              </DueDate>
+            </span>
+          )
         }
-        { !scheduled &&
-          <span>
-            <IconWrapUnscheduled overdue={overdue}>
-              <Icon name="reminder" />
-            </IconWrapUnscheduled>
-            <Status unscheduled>
-              {this.context.intl && this.context.intl.formatMessage(appMessages.entities.due_dates.empty)}
-            </Status>
-          </span>
+        { !scheduled
+          && (
+            <span>
+              <IconWrapUnscheduled overdue={overdue}>
+                <Icon name="reminder" />
+              </IconWrapUnscheduled>
+              <Status unscheduled>
+                {intl && intl.formatMessage(appMessages.entities.due_dates.empty)}
+              </Status>
+            </span>
+          )
         }
       </Styled>
     );

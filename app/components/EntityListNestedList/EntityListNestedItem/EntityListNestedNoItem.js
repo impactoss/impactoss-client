@@ -17,12 +17,12 @@ const Styled = styled.span`
 `;
 
 class EntityListNestedNoItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { type, nestLevel } = this.props;
+    const { intl } = this.context;
     return (
       <Styled nestLevel={nestLevel}>
-        {this.context.intl && this.context.intl.formatMessage(messages.nestedListEmpty[type])}
+        {intl && intl.formatMessage(messages.nestedListEmpty[type])}
       </Styled>
     );
   }

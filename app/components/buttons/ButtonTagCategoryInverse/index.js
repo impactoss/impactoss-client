@@ -16,12 +16,16 @@ const ButtonTagCategoryInverse = styled(Button)`
   &:hover {
     background-color: ${palette('buttonInverseHover', 1)};
     color: ${(props) => props.disabled
-      ? palette('taxonomies', props.taxId || 0)
-      : palette('taxonomiesHover', props.taxId || 0)
-    };
+    ? palette('taxonomies', props.taxId || 0)
+    : palette('taxonomiesHover', props.taxId || 0)
+};
   }
   &:last-child {
     margin-right: 0;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 1px 6px;
+    font-size: 0.85em;
   }
 `;
 

@@ -15,6 +15,7 @@ import Status from 'components/fields/Status';
 
 class RoleField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
+    const { intl } = this.context;
     const { field } = this.props;
 
     const role = find(field.options || USER_ROLES, { value: parseInt(field.value, 10) });
@@ -26,7 +27,7 @@ class RoleField extends React.PureComponent { // eslint-disable-line react/prefe
         </Label>
         <Status>
           { role && role.message
-            ? appMessage(this.context.intl, role.message)
+            ? appMessage(intl, role.message)
             : ((role && role.label) || field.value)
           }
         </Status>

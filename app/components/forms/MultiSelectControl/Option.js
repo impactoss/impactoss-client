@@ -34,15 +34,17 @@ const IdSpacer = styled.span`
 `;
 // <Label bold={props.bold} italic={props.isNew}>
 class Option extends React.Component { // eslint-disable-line react/prefer-stateless-function
-
   render() {
-    const { draft, reference, message, label, messagePrefix, isNew } = this.props;
+    const { intl } = this.context;
+    const {
+      draft, reference, message, label, messagePrefix, isNew,
+    } = this.props;
 
     let optionLabel;
     if (message) {
       optionLabel = messagePrefix
-        ? `${messagePrefix} ${lowerCase(appMessage(this.context.intl, message))}`
-        : appMessage(this.context.intl, message);
+        ? `${messagePrefix} ${lowerCase(appMessage(intl, message))}`
+        : appMessage(intl, message);
     } else {
       optionLabel = label;
     }
@@ -50,20 +52,22 @@ class Option extends React.Component { // eslint-disable-line react/prefer-state
 
     return (
       <Label bold={false}>
-        {draft &&
-          <ItemStatus draft top />
+        {draft
+          && <ItemStatus draft top />
         }
-        {reference &&
-          <Id>{reference}</Id>
+        {reference
+          && <Id>{reference}</Id>
         }
-        {reference &&
-          <IdSpacer />
+        {reference
+          && <IdSpacer />
         }
         { optionLabel }
-        {isNew &&
-          <New>
-            <FormattedMessage {...messages.new} />
-          </New>
+        {isNew
+          && (
+            <New>
+              <FormattedMessage {...messages.new} />
+            </New>
+          )
         }
       </Label>
     );

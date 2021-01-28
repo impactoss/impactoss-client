@@ -4,9 +4,7 @@ import appMessages from 'containers/App/messages';
 
 export const getGroupValue = (taxonomies, groupAttribute, level) => {
   if (groupAttribute && taxonomies) {
-    const defaultTaxomony = taxonomies.find((tax) =>
-      tax.getIn(['attributes', groupAttribute]) === level
-    );
+    const defaultTaxomony = taxonomies.find((tax) => tax.getIn(['attributes', groupAttribute]) === level);
     if (defaultTaxomony) {
       return defaultTaxomony.get('id');
     }

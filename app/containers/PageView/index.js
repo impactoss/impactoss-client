@@ -52,10 +52,10 @@ const ViewContainer = styled(Container)`
 `;
 
 export class PageView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
+
   componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
@@ -69,6 +69,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
       getMetaField(entity),
     ],
   }]);
+
   getBodyMainFields = (entity) => ([{
     fields: [getMarkdownField(entity, 'content', false)],
   }]);
@@ -84,21 +85,24 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
 
 
   render() {
-    const { page, dataReady, isAdmin, isContributor } = this.props;
+    const { intl } = this.context;
+    const {
+      page, dataReady, isAdmin, isContributor,
+    } = this.props;
 
     const buttons = isAdmin
-    ? [{
-      type: 'edit',
-      onClick: this.props.handleEdit,
-    }]
-    : [];
+      ? [{
+        type: 'edit',
+        onClick: this.props.handleEdit,
+      }]
+      : [];
 
     return (
       <div>
         <Helmet
-          title={page ? page.getIn(['attributes', 'title']) : `${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={page ? page.getIn(['attributes', 'title']) : `${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Styled className={`content-${CONTENT_PAGE}`}>
@@ -109,19 +113,23 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
               type={CONTENT_PAGE}
               buttons={buttons}
             />
-            { !dataReady &&
-              <Loading />
+            { !dataReady
+              && <Loading />
             }
-            { !page && dataReady &&
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
+            { !page && dataReady
+              && (
+                <div>
+                  <FormattedMessage {...messages.notFound} />
+                </div>
+              )
             }
-            { page && dataReady &&
-              <EntityView
-                fields={this.getFields(page, isContributor)}
-                seamless
-              />
+            { page && dataReady
+              && (
+                <EntityView
+                  fields={this.getFields(page, isContributor)}
+                  seamless
+                />
+              )
             }
           </ViewContainer>
           <Footer />

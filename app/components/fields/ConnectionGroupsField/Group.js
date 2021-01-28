@@ -64,22 +64,30 @@ class Group extends React.PureComponent { // eslint-disable-line react/prefer-st
           entityPath={field.entityPath}
           isConnection
         />
-        { size > CONNECTIONMAX &&
-          <ToggleAllItems
-            onClick={() => this.setState({ showAllConnections: !this.state.showAllConnections })}
-          >
-            { this.state.showAllConnections &&
-              <FormattedMessage {...appMessages.entities.showLess} />
-            }
-            { !this.state.showAllConnections &&
-              <FormattedMessage {...appMessages.entities.showAll} />
-            }
-          </ToggleAllItems>
+        { size > CONNECTIONMAX
+          && (
+            <ToggleAllItems
+              onClick={() => this.setState(
+                (prevState) => (
+                  { showAllConnections: !prevState.showAllConnections }
+                )
+              )}
+            >
+              { this.state.showAllConnections
+              && <FormattedMessage {...appMessages.entities.showLess} />
+              }
+              { !this.state.showAllConnections
+              && <FormattedMessage {...appMessages.entities.showAll} />
+              }
+            </ToggleAllItems>
+          )
         }
-        { (size === 0) &&
-          <EmptyHint>
-            <FormattedMessage {...field.showEmpty} />
-          </EmptyHint>
+        { (size === 0)
+          && (
+            <EmptyHint>
+              <FormattedMessage {...field.showEmpty} />
+            </EmptyHint>
+          )
         }
       </div>
     );

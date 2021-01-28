@@ -7,12 +7,11 @@ import {
   // selectEntities,
 } from 'containers/App/selectors';
 
-// import { attributesEqual } from 'utils/entities';
+// import { qe } from 'utils/quasi-equals';
 
 export const selectRecommendationCount = createSelector(
   (state) => selectRecommendationsWhere(state, { where: { draft: false } }),
-  (entities) =>
-    entities && entities
+  (entities) => entities && entities
     .groupBy((e) => e.getIn(['attributes', 'framework_id']))
     .map((fwentities) => fwentities.size)
 );
@@ -23,11 +22,11 @@ export const selectRecommendationCount = createSelector(
 //   (recommendations, measures, associations) =>
 //     recommendations && recommendations.filter((rec) => {
 //       const recAssociations = associations.filter((association) =>
-//         attributesEqual(rec.get('id'), association.getIn(['attributes', 'recommendation_id']))
+//         qe(rec.get('id'), association.getIn(['attributes', 'recommendation_id']))
 //       );
 //       return recAssociations.some((association) =>
 //         measures.find((measure) =>
-//           attributesEqual(measure.get('id'), association.getIn(['attributes', 'measure_id']))
+//           qe(measure.get('id'), association.getIn(['attributes', 'measure_id']))
 //         )
 //       );
 //     }).size
@@ -43,8 +42,7 @@ export const selectIndicatorCount = createSelector(
 );
 export const selectRecommendationDraftCount = createSelector(
   (state) => selectRecommendationsWhere(state, { where: { draft: true } }),
-  (entities) =>
-    entities && entities
+  (entities) => entities && entities
     .groupBy((e) => e.getIn(['attributes', 'framework_id']))
     .map((fwentities) => fwentities.size)
 );

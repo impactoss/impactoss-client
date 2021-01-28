@@ -69,17 +69,15 @@ const OptionLabel = styled.label`
   padding-left: 8px;
   padding-right: 8px;
   border-bottom: 1px solid ${palette('light', 1)};
-  border-right: ${(props) =>
-    (props.changedToChecked || props.changedToUnchecked)
-      ? '0.5em solid'
-      : 'none'
-  };
+  border-right: ${(props) => (props.changedToChecked || props.changedToUnchecked)
+    ? '0.5em solid'
+    : 'none'
+};
   border-right-color: ${palette('buttonDefault', 1)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-top: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
     padding-bottom: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
   }
-}
 `;
 
 const OptionCount = styled.span`
@@ -136,9 +134,11 @@ class OptionList extends React.PureComponent {
   }
 
   showMore = () => {
-    this.setState({
-      show: this.state.show + SHOW_INCREMENT,
-    });
+    this.setState(
+      (prevState) => ({
+        show: prevState.show + SHOW_INCREMENT,
+      })
+    );
   }
 
   render() {
@@ -152,8 +152,7 @@ class OptionList extends React.PureComponent {
         ? Map()
           .set('options', group)
           .set('title', this.props.groups.get(key))
-        : Map().set('options', group)
-      );
+        : Map().set('options', group));
 
     const hasMore = options.size < this.props.options.size;
 
@@ -180,25 +179,29 @@ class OptionList extends React.PureComponent {
                       secondary={this.props.secondary}
                     >
                       <CheckboxWrapper>
-                        { isIndeterminate &&
-                          <IndeterminateCheckbox
-                            id={id}
-                            checked={checked}
-                            onChange={(checkedState) => {
-                              this.props.onCheckboxChange(checkedState, option);
-                            }}
-                          />
+                        { isIndeterminate
+                          && (
+                            <IndeterminateCheckbox
+                              id={id}
+                              checked={checked}
+                              onChange={(checkedState) => {
+                                this.props.onCheckboxChange(checkedState, option);
+                              }}
+                            />
+                          )
                         }
-                        { !isIndeterminate &&
-                          <input
-                            id={id}
-                            type="checkbox"
-                            checked={checked}
-                            onChange={(evt) => {
-                              evt.stopPropagation();
-                              this.props.onCheckboxChange(evt.target.checked, option);
-                            }}
-                          />
+                        { !isIndeterminate
+                          && (
+                            <input
+                              id={id}
+                              type="checkbox"
+                              checked={checked}
+                              onChange={(evt) => {
+                                evt.stopPropagation();
+                                this.props.onCheckboxChange(evt.target.checked, option);
+                              }}
+                            />
+                          )
                         }
                       </CheckboxWrapper>
                       <OptionLabel
@@ -217,10 +220,12 @@ class OptionList extends React.PureComponent {
                           draft={option.get('draft')}
                         />
                       </OptionLabel>
-                      { option.get('showCount') && typeof option.get('count') !== 'undefined' &&
-                        <OptionCount secondary={this.props.secondary}>
-                          {option.get('count')}
-                        </OptionCount>
+                      { option.get('showCount') && typeof option.get('count') !== 'undefined'
+                        && (
+                          <OptionCount secondary={this.props.secondary}>
+                            {option.get('count')}
+                          </OptionCount>
+                        )
                       }
                     </OptionWrapper>
                   );
@@ -228,31 +233,35 @@ class OptionList extends React.PureComponent {
               </OptionsWrapper>
             </GroupWrapper>
           ))}
-          { (!this.props.options || this.props.options.size === 0) &&
-            <Empty>
-              <FormattedMessage {...messages.empty} />
-            </Empty>
+          { (!this.props.options || this.props.options.size === 0)
+            && (
+              <Empty>
+                <FormattedMessage {...messages.empty} />
+              </Empty>
+            )
           }
         </ListWrapper>
-        { hasMore &&
-          <More>
-            <FormattedMessage
-              {...messages.showingOptions}
-              values={{
-                no: options.size,
-                total: this.props.options.size,
-              }}
-            />
-            <MoreLink
-              href="/"
-              onClick={(evt) => {
-                if (evt && evt.preventDefault) evt.preventDefault();
-                this.showMore();
-              }}
-            >
-              <FormattedMessage {...messages.showMore} />
-            </MoreLink>
-          </More>
+        { hasMore
+          && (
+            <More>
+              <FormattedMessage
+                {...messages.showingOptions}
+                values={{
+                  no: options.size,
+                  total: this.props.options.size,
+                }}
+              />
+              <MoreLink
+                href="/"
+                onClick={(evt) => {
+                  if (evt && evt.preventDefault) evt.preventDefault();
+                  this.showMore();
+                }}
+              >
+                <FormattedMessage {...messages.showMore} />
+              </MoreLink>
+            </More>
+          )
         }
       </Styled>
     );

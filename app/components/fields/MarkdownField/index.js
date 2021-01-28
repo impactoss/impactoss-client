@@ -15,15 +15,18 @@ const Markdown = styled(ReactMarkdown)`
   }
 `;
 
+// TODO also render HTML if not markdown
 class MarkdownField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { field } = this.props;
     return (
       <FieldWrap>
-        {field.label &&
-          <Label>
-            <FormattedMessage {...field.label} />
-          </Label>
+        {field.label
+          && (
+            <Label>
+              <FormattedMessage {...field.label} />
+            </Label>
+          )
         }
         <Markdown source={field.value} className="react-markdown" />
       </FieldWrap>

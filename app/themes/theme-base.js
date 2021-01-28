@@ -56,12 +56,12 @@ theme.breakpoints = {
 // 3: white/placeholder
 // 4: white/placeholder
 const primary = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-ffffff-ffffff');
-  // secondary color palette: dark to light
-  // 0: secondary colour, dark / white/placeholder
-  // 1: secondary colour, medium / white/placeholder
-  // 2: secondary colour, main / white/placeholder
-  // 3: white/placeholder
-  // 4: white/placeholder
+// secondary color palette: dark to light
+// 0: secondary colour, dark / white/placeholder
+// 1: secondary colour, medium / white/placeholder
+// 2: secondary colour, main / white/placeholder
+// 3: white/placeholder
+// 4: white/placeholder
 const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-ffffff');
 // dark grayscale: dark to light
 // 0:  darkest (AA)

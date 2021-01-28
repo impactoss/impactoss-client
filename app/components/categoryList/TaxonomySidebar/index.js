@@ -38,6 +38,8 @@ const ToggleShow = styled(ButtonDefault)`
   font-size: 0.85em;
   width: 100%;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0.75em 1em;
+    font-size: 0.85em;
     width: ${(props) => props.theme.sizes.aside.width.large}px;
   }
 `;
@@ -53,29 +55,41 @@ const STATE_INITIAL = {
 };
 
 class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   constructor() {
     super();
     this.state = STATE_INITIAL;
   }
+
   componentWillMount() {
     this.setState(STATE_INITIAL);
   }
+
   componentDidMount() {
     this.updateViewport();
     window.addEventListener('resize', this.resize);
   }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
   }
+
   onShowSidebar = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ visible: true });
   };
+
   onHideSidebar = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ visible: false });
   };
+
+  resize = () => {
+    // reset
+    this.setState(STATE_INITIAL);
+    this.updateViewport();
+    this.forceUpdate();
+  };
+
   updateViewport() {
     let viewport = VIEWPORTS.MOBILE;
     if (window.innerWidth >= parseInt(this.props.theme.breakpoints.large, 10)) {
@@ -87,12 +101,6 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
     }
     this.setState({ viewport });
   }
-  resize = () => {
-    // reset
-    this.setState(STATE_INITIAL);
-    this.updateViewport();
-    this.forceUpdate();
-  };
 
   render() {
     const {
@@ -109,57 +117,64 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
       frameworkId,
       frameworks,
     );
+    const { intl } = this.context;
     return (
       <div>
-        { (!this.state.visible && this.state.viewport < VIEWPORTS.SMALL) &&
-          <ToggleShow onClick={this.onShowSidebar}>
-            <FormattedMessage {...messages.show} />
-          </ToggleShow>
+        { (!this.state.visible && this.state.viewport < VIEWPORTS.SMALL)
+          && (
+            <ToggleShow onClick={this.onShowSidebar}>
+              <FormattedMessage {...messages.show} />
+            </ToggleShow>
+          )
         }
-        { (this.state.visible || this.state.viewport >= VIEWPORTS.SMALL) &&
-          <Sidebar responsiveSmall>
-            <Scrollable>
-              <Component>
-                <SidebarHeader responsiveSmall>
-                  <SupTitle title={this.context.intl.formatMessage(messages.title)} />
-                  { this.state.viewport < VIEWPORTS.SMALL &&
-                    <ToggleHide onClick={this.onHideSidebar} >
-                      <Icon name="close" />
-                    </ToggleHide>
-                  }
-                </SidebarHeader>
-                {taxonomyGroups && map(taxonomyGroups, (group) => (
-                  <div key={group.id}>
-                    <SidebarGroupLabel>
-                      {group.frameworkId && (
-                        <FormattedMessage
-                          {... appMessages.taxonomyGroups.objectives}
-                          values={{ type: this.context.intl.formatMessage(
-                            appMessages.entities[`recommendations_${group.frameworkId}`].pluralLong
-                          ) }}
-                        />
-                      )}
-                      {!group.frameworkId && (
-                        <FormattedMessage {... appMessages.taxonomyGroups[group.id]} />
-                      )}
-                    </SidebarGroupLabel>
-                    <div>
-                      {map(group.taxonomies, (taxonomy) => (
-                        <div key={taxonomy.id}>
-                          <TaxonomySidebarItem taxonomy={taxonomy} onTaxonomyClick={this.onHideSidebar} />
-                          <div>
-                            { taxonomy.children && taxonomy.children.length > 0 && map(taxonomy.children, (child) =>
-                              <TaxonomySidebarItem key={child.id} nested taxonomy={child} onTaxonomyClick={this.onHideSidebar} />
-                            )}
+        { (this.state.visible || this.state.viewport >= VIEWPORTS.SMALL)
+          && (
+            <Sidebar responsiveSmall>
+              <Scrollable>
+                <Component>
+                  <SidebarHeader responsiveSmall>
+                    <SupTitle title={intl.formatMessage(messages.title)} />
+                    { this.state.viewport < VIEWPORTS.SMALL
+                    && (
+                      <ToggleHide onClick={this.onHideSidebar}>
+                        <Icon name="close" />
+                      </ToggleHide>
+                    )
+                    }
+                  </SidebarHeader>
+                  {taxonomyGroups && map(taxonomyGroups, (group) => (
+                    <div key={group.id}>
+                      <SidebarGroupLabel>
+                        {group.frameworkId && (
+                          <FormattedMessage
+                            {... appMessages.taxonomyGroups.objectives}
+                            values={{
+                              type: intl.formatMessage(
+                                appMessages.entities[`recommendations_${group.frameworkId}`].pluralLong
+                              ),
+                            }}
+                          />
+                        )}
+                        {!group.frameworkId && (
+                          <FormattedMessage {... appMessages.taxonomyGroups[group.id]} />
+                        )}
+                      </SidebarGroupLabel>
+                      <div>
+                        {map(group.taxonomies, (taxonomy) => (
+                          <div key={taxonomy.id}>
+                            <TaxonomySidebarItem taxonomy={taxonomy} onTaxonomyClick={this.onHideSidebar} />
+                            <div>
+                              { taxonomy.children && taxonomy.children.length > 0 && map(taxonomy.children, (child) => <TaxonomySidebarItem key={child.id} nested taxonomy={child} onTaxonomyClick={this.onHideSidebar} />)}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </Component>
-            </Scrollable>
-          </Sidebar>
+                  ))}
+                </Component>
+              </Scrollable>
+            </Sidebar>
+          )
         }
       </div>
     );

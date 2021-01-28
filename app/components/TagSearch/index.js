@@ -55,6 +55,9 @@ const Clear = styled(Button)`
   top: 0;
   right: 0;
   background-color: ${palette('background', 4)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
+  }
 `;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -64,23 +67,26 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       active: false,
     };
   }
+
   getFilterLabel = (filter) => {
+    const { intl } = this.context;
     // not used I think?
     if (filter.message) {
       return filter.messagePrefix
-        ? `${filter.messagePrefix} ${lowerCase(appMessage(this.context.intl, filter.message))}`
-        : appMessage(this.context.intl, filter.message);
+        ? `${filter.messagePrefix} ${lowerCase(appMessage(intl, filter.message))}`
+        : appMessage(intl, filter.message);
     }
     if (filter.labels) {
       return reduce(filter.labels, (memo, label) => {
         if (!label.label) return memo;
-        let labelValue = label.appMessage ? appMessage(this.context.intl, label.label) : label.label;
+        let labelValue = label.appMessage ? appMessage(intl, label.label) : label.label;
         labelValue = label.postfix ? `${labelValue}${label.postfix}` : labelValue;
         return `${memo}${label.lowerCase ? lowerCase(labelValue) : labelValue} `;
       }, '').trim();
     }
     return filter.label;
   }
+
   render() {
     const {
       filters,
@@ -88,6 +94,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       onSearch,
       placeholder,
     } = this.props;
+    const { intl } = this.context;
     // TODO set focus to input when clicking wrapper
     //  see https://github.com/nkbt/react-debounce-input/issues/65
     //  https://github.com/yannickcr/eslint-plugin-react/issues/678
@@ -97,43 +104,44 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     // }}
     return (
       <Search active={this.state.active} small={this.props.multiselect}>
-        { filters.length > 0 &&
-          <Tags>
-            {
-              filters.map((filter, i) => filter.inverse
-                ? (
-                  <ButtonTagFilterInverse
-                    key={i}
-                    onClick={filter.onClick}
-                    palette={filter.type || 'attributes'}
-                    paletteHover={`${filter.type || 'attributes'}Hover`}
-                    pIndex={parseInt(filter.id, 10) || 0}
-                    disabled={!filter.onClick}
-                  >
-                    {this.getFilterLabel(filter)}
-                    { filter.onClick &&
-                      <Icon name="removeSmall" text textRight />
-                    }
-                  </ButtonTagFilterInverse>
-                )
-                : (
-                  <ButtonTagFilter
-                    key={i}
-                    onClick={filter.onClick}
-                    palette={filter.type || 'attributes'}
-                    paletteHover={`${filter.type || 'attributes'}Hover`}
-                    pIndex={parseInt(filter.id, 10) || 0}
-                    disabled={!filter.onClick}
-                  >
-                    {this.getFilterLabel(filter)}
-                    { filter.onClick &&
-                      <Icon name="removeSmall" text textRight />
-                    }
-                  </ButtonTagFilter>
-                )
-              )
-            }
-          </Tags>
+        { filters.length > 0
+          && (
+            <Tags>
+              {
+                filters.map((filter, i) => filter.inverse
+                  ? (
+                    <ButtonTagFilterInverse
+                      key={i}
+                      onClick={filter.onClick}
+                      palette={filter.type || 'attributes'}
+                      paletteHover={`${filter.type || 'attributes'}Hover`}
+                      pIndex={parseInt(filter.id, 10) || 0}
+                      disabled={!filter.onClick}
+                    >
+                      {this.getFilterLabel(filter)}
+                      { filter.onClick
+                      && <Icon name="removeSmall" text textRight />
+                      }
+                    </ButtonTagFilterInverse>
+                  )
+                  : (
+                    <ButtonTagFilter
+                      key={i}
+                      onClick={filter.onClick}
+                      palette={filter.type || 'attributes'}
+                      paletteHover={`${filter.type || 'attributes'}Hover`}
+                      pIndex={parseInt(filter.id, 10) || 0}
+                      disabled={!filter.onClick}
+                    >
+                      {this.getFilterLabel(filter)}
+                      { filter.onClick
+                      && <Icon name="removeSmall" text textRight />
+                      }
+                    </ButtonTagFilter>
+                  ))
+              }
+            </Tags>
+          )
         }
         <SearchInput
           id="search"
@@ -143,19 +151,21 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
           onChange={(e) => onSearch(e.target.value)}
           onFocus={() => this.setState({ active: true })}
           onBlur={() => this.setState({ active: false })}
-          placeholder={placeholder || (this.context.intl.formatMessage(
+          placeholder={placeholder || (intl.formatMessage(
             this.props.multiselect
-            ? messages.searchPlaceholderMultiSelect
-            : messages.searchPlaceholderEntities
+              ? messages.searchPlaceholderMultiSelect
+              : messages.searchPlaceholderEntities
           ))}
         />
-        { (searchQuery || filters.length > 0) &&
-          <Clear
-            onClick={this.props.onClear}
-            small={this.props.multiselect}
-          >
-            <Icon name="removeSmall" />
-          </Clear>
+        { (searchQuery || filters.length > 0)
+          && (
+            <Clear
+              onClick={this.props.onClear}
+              small={this.props.multiselect}
+            >
+              <Icon name="removeSmall" />
+            </Clear>
+          )
         }
       </Search>
     );

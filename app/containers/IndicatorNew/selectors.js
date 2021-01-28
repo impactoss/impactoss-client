@@ -11,26 +11,32 @@ import { USER_ROLES } from 'themes/config';
 import {
   usersByRole,
   prepareTaxonomiesMultiple,
-  attributesEqual,
 } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 export const selectDomain = createSelector(
   (state) => state.get('indicatorNew'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 // all users of role contributor
 export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
-  (entities, associations) =>
-    usersByRole(entities, associations, USER_ROLES.CONTRIBUTOR.value)
+  (entities, associations) => usersByRole(
+    entities,
+    associations,
+    USER_ROLES.CONTRIBUTOR.value,
+  )
 );
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
+  (taxonomies, categories) => prepareTaxonomiesMultiple(
+    taxonomies,
+    categories,
+    ['tags_measures', 'tags_recommendations']
+  )
 );
 
 export const selectRecommendationsByFw = createSelector(
@@ -42,19 +48,18 @@ export const selectRecommendationsByFw = createSelector(
     if (!fwTaxonomies || !entities) {
       return null;
     }
-    return entities
-    .filter((r) => {
-      const framework = frameworks.find(
-        (fw) =>
-          attributesEqual(
+    return entities.filter(
+      (r) => {
+        const framework = frameworks.find(
+          (fw) => qe(
             fw.get('id'),
             r.getIn(['attributes', 'framework_id']),
           )
         );
-      return framework.getIn(['attributes', 'has_indicators']);
-    })
-      .groupBy(
-        (r) => r.getIn(['attributes', 'framework_id']).toString()
-      );
+        return framework.getIn(['attributes', 'has_indicators']);
+      }
+    ).groupBy(
+      (r) => r.getIn(['attributes', 'framework_id']).toString()
+    );
   }
 );

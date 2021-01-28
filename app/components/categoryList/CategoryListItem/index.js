@@ -7,7 +7,7 @@ import ItemStatus from 'components/ItemStatus';
 import Clear from 'components/styled/Clear';
 import { PATHS } from 'containers/App/constants';
 
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import appMessages from 'containers/App/messages';
 
 const Styled = styled.button`
@@ -68,6 +68,7 @@ const Count = styled.div`
   bottom: 100%;
   padding: 2px 0;
   color: ${(props) => palette(props.palette, 0)};
+  white-space: nowrap;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${({ theme, multiple }) => multiple ? theme.sizes.text.default : theme.sizes.text.aaLargeBold};
     font-weight: bold;
@@ -143,6 +144,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
       </Count>
     </Bar>
   );
+
   renderAcceptedBar = (col, total, accepted, multiple) => {
     const noted = total - accepted;
     return (
@@ -157,21 +159,24 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
             {accepted}
           </Count>
         </Bar>
-        { noted > 0 &&
-          <Bar
-            length={(noted / col.maxCount) * 100}
-            palette={col.attribute.entity}
-            pIndex={1}
-            multiple={multiple}
-          >
-            <CountSecondary palette={col.attribute.entity} multiple={multiple}>
-              {noted}
-            </CountSecondary>
-          </Bar>
+        { noted > 0
+          && (
+            <Bar
+              length={(noted / col.maxCount) * 100}
+              palette={col.attribute.entity}
+              pIndex={1}
+              multiple={multiple}
+            >
+              <CountSecondary palette={col.attribute.entity} multiple={multiple}>
+                {noted}
+              </CountSecondary>
+            </Bar>
+          )
         }
       </WrapAcceptedBars>
     );
   };
+
   renderCountColumn = (col, category, frameworks, frameworkId) => {
     if (!col.attribute) {
       return null;
@@ -186,7 +191,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
         return (
           <div>
             {col.attribute.frameworkIds.map((id) => {
-              const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), id));
+              const framework = frameworks.find((fw) => qe(fw.get('id'), id));
               if (!framework) {
                 return null;
               }
@@ -230,9 +235,9 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
             })}
           </div>
         );
-      } else if (fwSet) {
+      } if (fwSet) {
         const id = frameworkId;
-        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), id));
+        const framework = frameworks.find((fw) => qe(fw.get('id'), id));
         if (!framework || !total[id]) {
           return null;
         }
@@ -272,13 +277,15 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
     );
     // return null;
   };
+
   render() {
-    const { category, columns, onPageLink, frameworks, frameworkId } = this.props;
-    const reference =
-      category.getIn(['attributes', 'reference']) &&
-      category.getIn(['attributes', 'reference']).trim() !== ''
-        ? category.getIn(['attributes', 'reference'])
-        : null;
+    const {
+      category, columns, onPageLink, frameworks, frameworkId,
+    } = this.props;
+    const reference = category.getIn(['attributes', 'reference'])
+      && category.getIn(['attributes', 'reference']).trim() !== ''
+      ? category.getIn(['attributes', 'reference'])
+      : null;
     // return null;
     const catItem = {
       id: category.get('id'),
@@ -297,9 +304,9 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
               key={i}
               colWidth={col.width}
               multiple={
-                col.attribute &&
-                col.attribute.frameworkIds &&
-                col.attribute.frameworkIds.length > 1
+                col.attribute
+                && col.attribute.frameworkIds
+                && col.attribute.frameworkIds.length > 1
               }
             >
               {col.type === 'title' && catItem.draft && (
@@ -310,14 +317,14 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
               )}
               {col.type === 'title' && (
                 <Title>
-                  { catItem.reference &&
-                    <Reference>{catItem.reference}</Reference>
+                  { catItem.reference
+                    && <Reference>{catItem.reference}</Reference>
                   }
                   {catItem.title}
                 </Title>
               )}
-              {col.type === 'count' &&
-                this.renderCountColumn(col, category.toJS(), frameworks, frameworkId)
+              {col.type === 'count'
+                && this.renderCountColumn(col, category.toJS(), frameworks, frameworkId)
               }
             </Column>
           ))

@@ -1,8 +1,9 @@
 /* DayPicker styles */
-import { injectGlobal } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 
 /* eslint no-unused-expressions: 0 */
-injectGlobal`
+/* stylelint-disable */
+const DatePickerStyle = createGlobalStyle`
 
   .DayPicker {
     display: inline-block;
@@ -113,6 +114,7 @@ injectGlobal`
     text-align: center;
     cursor: pointer;
     vertical-align: middle;
+    white-space: nowrap;
     @media (min-width: 769px) {
       padding: .5rem;
     }
@@ -205,3 +207,5 @@ injectGlobal`
     }
   }
 `;
+
+export default DatePickerStyle;

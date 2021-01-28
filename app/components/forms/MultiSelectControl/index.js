@@ -29,7 +29,7 @@ const MultiSelectControl = (props) => {
     tagFilterGroups,
     closeOnClickOutside,
     groups,
-     ...otherProps
+    ...otherProps
   } = props;
 
   return (

@@ -8,15 +8,14 @@ import {
   getEntityTitle,
   getEntityReference,
   getEntityParentId,
-  attributesEqual,
 } from 'utils/entities';
-
+import { qe } from 'utils/quasi-equals';
 import { makeTagFilterGroups } from 'utils/forms';
 
 export const checkedState = (count, length) => {
   if (count === length) {
     return CHECKBOX.CHECKED;
-  } else if (count < length && count > 0) {
+  } if (count < length && count > 0) {
     return CHECKBOX.INDETERMINATE;
   }
   return CHECKBOX.UNCHECKED;
@@ -52,13 +51,12 @@ export const makeAttributeEditOptions = (entities, config, activeEditOption, mes
     editOptions.title = messages.title;
     editOptions.search = option.search;
     forEach(option.options, (attributeOption) => {
-      const count = entities.reduce((counter, entity) =>
-        typeof entity.getIn(['attributes', option.attribute]) !== 'undefined'
+      const count = entities.reduce((counter, entity) => typeof entity.getIn(['attributes', option.attribute]) !== 'undefined'
           && entity.getIn(['attributes', option.attribute]) !== null
           && entity.getIn(['attributes', option.attribute]).toString() === attributeOption.value.toString()
-          ? counter + 1
-          : counter
-      , 0);
+        ? counter + 1
+        : counter,
+      0);
 
       editOptions.options[attributeOption.value] = {
         label: attributeOption.label,
@@ -95,9 +93,8 @@ export const makeTaxonomyEditOptions = (entities, taxonomies, activeEditOption, 
     editOptions.multiple = taxonomy.getIn(['attributes', 'allow_multiple']);
     editOptions.search = taxonomy.getIn(['attributes', 'search']);
     taxonomy.get('categories').forEach((category) => {
-      const count = entities.reduce((counter, entity) =>
-        testEntityCategoryAssociation(entity, category.get('id')) ? counter + 1 : counter
-      , 0);
+      const count = entities.reduce((counter, entity) => testEntityCategoryAssociation(entity, category.get('id')) ? counter + 1 : counter,
+        0);
       editOptions.options[category.get('id')] = {
         reference: getEntityReference(category, false),
         label: getEntityTitle(category),
@@ -147,11 +144,10 @@ export const makeConnectionEditOptions = (
     editOptions.search = option.search;
     connections
       .get(option.path)
-      .filter((c) => !option.groupByFramework || attributesEqual(fwid, c.getIn(['attributes', 'framework_id'])))
+      .filter((c) => !option.groupByFramework || qe(fwid, c.getIn(['attributes', 'framework_id'])))
       .forEach((connection) => {
-        const count = entities.reduce((counter, entity) =>
-          testEntityEntityAssociation(entity, option.path, connection.get('id')) ? counter + 1 : counter
-        , 0);
+        const count = entities.reduce((counter, entity) => testEntityEntityAssociation(entity, option.path, connection.get('id')) ? counter + 1 : counter,
+          0);
         editOptions.options[connection.get('id')] = {
           reference: getEntityReference(connection),
           label: getEntityTitle(connection),

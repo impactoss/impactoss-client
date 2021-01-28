@@ -37,7 +37,9 @@ export const entityOption = (entity, defaultToId, hasTags) => Map({
 });
 
 export const entityOptions = (entities, defaultToId = true, hasTags = true) => entities
-  ? entities.toList().map((entity) => entityOption(entity, defaultToId, hasTags))
+  ? entities.toList().map(
+    (entity) => entityOption(entity, defaultToId, hasTags)
+  )
   : List();
 
 export const userOption = (entity, activeUserId) => Map({
@@ -47,8 +49,7 @@ export const userOption = (entity, activeUserId) => Map({
 });
 
 export const userOptions = (entities, activeUserId) => entities
-  ? entities.reduce((options, entity) =>
-    options.push(userOption(entity, activeUserId)), List())
+  ? entities.reduce((options, entity) => options.push(userOption(entity, activeUserId)), List())
   : List();
 
 export const parentCategoryOption = (entity, activeParentId) => Map({
@@ -58,8 +59,7 @@ export const parentCategoryOption = (entity, activeParentId) => Map({
 });
 
 export const parentCategoryOptions = (entities, activeParentId) => entities
-  ? entities.reduce((options, entity) =>
-    options.push(parentCategoryOption(entity, activeParentId)), List())
+  ? entities.reduce((options, entity) => options.push(parentCategoryOption(entity, activeParentId)), List())
   : List();
 
 export const dateOption = (entity, activeDateId) => Map({
@@ -69,42 +69,46 @@ export const dateOption = (entity, activeDateId) => Map({
 });
 
 export const taxonomyOptions = (taxonomies) => taxonomies
-  ? sortEntities(taxonomies, 'asc', 'priority').reduce((values, tax) =>
-    values.set(tax.get('id'), entityOptions(tax.get('categories'), false, false)), Map())
+  ? sortEntities(taxonomies, 'asc', 'priority').reduce(
+    (values, tax) => values.set(
+      tax.get('id'),
+      entityOptions(tax.get('categories'), false, false)
+    ),
+    Map(),
+  )
   : Map();
 
 const getTaxTitle = (id, contextIntl) => contextIntl ? contextIntl.formatMessage(appMessages.entities.taxonomies[id].single) : '';
 
 // turn taxonomies into multiselect options
-export const makeTagFilterGroups = (taxonomies, contextIntl) =>
-  taxonomies && sortEntities(taxonomies, 'asc', 'priority').map((taxonomy) => ({
-    title: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
-    palette: ['taxonomies', parseInt(taxonomy.get('id'), 10)],
-    options: taxonomy.get('categories').map((category) => ({
-      reference: getEntityReference(category, false),
-      label: getEntityTitle(category),
-      filterLabel: getCategoryShortTitle(category),
-      showCount: false,
-      value: category.get('id'),
-    })).toList().toArray(),
-  })).toList().toArray();
+export const makeTagFilterGroups = (taxonomies, contextIntl) => taxonomies && sortEntities(taxonomies, 'asc', 'priority').map((taxonomy) => ({
+  title: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
+  palette: ['taxonomies', parseInt(taxonomy.get('id'), 10)],
+  options: taxonomy.get('categories').map((category) => ({
+    reference: getEntityReference(category, false),
+    label: getEntityTitle(category),
+    filterLabel: getCategoryShortTitle(category),
+    showCount: false,
+    value: category.get('id'),
+  })).valueSeq().toArray(),
+})).toArray();
 
 export const renderMeasureControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
-? {
-  id: 'actions',
-  model: '.associatedMeasures',
-  dataPath: ['associatedMeasures'],
-  label: 'Actions',
-  controlType: 'multiselect',
-  options: entityOptions(entities, true),
-  advanced: true,
-  selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
-  onCreate: onCreateOption
-    ? () => onCreateOption({ path: 'measures' })
-    : null,
-}
-: null;
+  ? {
+    id: 'actions',
+    model: '.associatedMeasures',
+    dataPath: ['associatedMeasures'],
+    label: 'Actions',
+    controlType: 'multiselect',
+    options: entityOptions(entities, true),
+    advanced: true,
+    selectAll: true,
+    tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
+    onCreate: onCreateOption
+      ? () => onCreateOption({ path: 'measures' })
+      : null,
+  }
+  : null;
 
 export const renderRecommendationControl = (
   fwId,
@@ -113,21 +117,21 @@ export const renderRecommendationControl = (
   onCreateOption,
   contextIntl,
 ) => entities
-? {
-  id: `recommendations.${fwId}`,
-  model: `.associatedRecommendationsByFw.${fwId}`,
-  dataPath: ['associatedRecommendationsByFw', fwId],
-  label: contextIntl.formatMessage(appMessages.entities[`recommendations_${fwId}`].plural),
-  controlType: 'multiselect',
-  options: entityOptions(entities),
-  advanced: true,
-  selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
-  onCreate: onCreateOption
-    ? () => onCreateOption({ path: 'recommendations' })
-    : null,
-}
-: null;
+  ? {
+    id: `recommendations.${fwId}`,
+    model: `.associatedRecommendationsByFw.${fwId}`,
+    dataPath: ['associatedRecommendationsByFw', fwId],
+    label: contextIntl.formatMessage(appMessages.entities[`recommendations_${fwId}`].plural),
+    controlType: 'multiselect',
+    options: entityOptions(entities),
+    advanced: true,
+    selectAll: true,
+    tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
+    onCreate: onCreateOption
+      ? () => onCreateOption({ path: 'recommendations' })
+      : null,
+  }
+  : null;
 
 // recommendations grouped by framework
 export const renderRecommendationsByFwControl = (
@@ -137,26 +141,25 @@ export const renderRecommendationsByFwControl = (
   contextIntl,
 ) => entitiesByFw
   ? entitiesByFw.reduce(
-    (controls, entities, fwid) =>
-      controls.concat({
-        id: `recommendations.${fwid}`,
-        model: `.associatedRecommendationsByFw.${fwid}`,
-        dataPath: ['associatedRecommendationsByFw', fwid],
-        label: contextIntl.formatMessage(appMessages.entities[`recommendations_${fwid}`].plural),
-        controlType: 'multiselect',
-        options: entityOptions(entities),
-        advanced: true,
-        selectAll: true,
-        tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
-        onCreate: onCreateOption
-          ? () => onCreateOption({
-            path: 'recommendations',
-            attributes: { framework_id: fwid },
-          })
-          : null,
-      }),
-      [],
-    )
+    (controls, entities, fwid) => controls.concat({
+      id: `recommendations.${fwid}`,
+      model: `.associatedRecommendationsByFw.${fwid}`,
+      dataPath: ['associatedRecommendationsByFw', fwid],
+      label: contextIntl.formatMessage(appMessages.entities[`recommendations_${fwid}`].plural),
+      controlType: 'multiselect',
+      options: entityOptions(entities),
+      advanced: true,
+      selectAll: true,
+      tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
+      onCreate: onCreateOption
+        ? () => onCreateOption({
+          path: 'recommendations',
+          attributes: { framework_id: fwid },
+        })
+        : null,
+    }),
+    [],
+  )
   : null;
 
 // taxonomies with categories "embedded"
@@ -166,102 +169,97 @@ export const renderTaxonomyControl = (
   contextIntl,
 ) => taxonomies
   ? sortEntities(taxonomies, 'asc', 'priority').reduce(
-    (controls, taxonomy) =>
-      controls.concat({
-        id: taxonomy.get('id'),
-        model: `.associatedTaxonomies.${taxonomy.get('id')}`,
-        dataPath: ['associatedTaxonomies', taxonomy.get('id')],
-        label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
-        controlType: 'multiselect',
-        multiple: taxonomy.getIn(['attributes', 'allow_multiple']),
-        options: entityOptions(taxonomy.get('categories'), false),
-        onCreate: onCreateOption
-          ? () => onCreateOption({
-            path: 'categories',
-            attributes: { taxonomy_id: taxonomy.get('id') },
-          })
-          : null,
-      }),
-      [],
-    )
+    (controls, taxonomy) => controls.concat({
+      id: taxonomy.get('id'),
+      model: `.associatedTaxonomies.${taxonomy.get('id')}`,
+      dataPath: ['associatedTaxonomies', taxonomy.get('id')],
+      label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
+      controlType: 'multiselect',
+      multiple: taxonomy.getIn(['attributes', 'allow_multiple']),
+      options: entityOptions(taxonomy.get('categories'), false),
+      onCreate: onCreateOption
+        ? () => onCreateOption({
+          path: 'categories',
+          attributes: { taxonomy_id: taxonomy.get('id') },
+        })
+        : null,
+    }),
+    [],
+  )
   : [];
 
 export const renderIndicatorControl = (entities, onCreateOption) => entities
-? {
-  id: 'indicators',
-  model: '.associatedIndicators',
-  dataPath: ['associatedIndicators'],
-  label: 'Indicators',
-  controlType: 'multiselect',
-  options: entityOptions(entities, true),
-  advanced: true,
-  selectAll: true,
-  onCreate: onCreateOption
-    ? () => onCreateOption({ path: 'indicators' })
-    : null,
-}
-: null;
+  ? {
+    id: 'indicators',
+    model: '.associatedIndicators',
+    dataPath: ['associatedIndicators'],
+    label: 'Indicators',
+    controlType: 'multiselect',
+    options: entityOptions(entities, true),
+    advanced: true,
+    selectAll: true,
+    onCreate: onCreateOption
+      ? () => onCreateOption({ path: 'indicators' })
+      : null,
+  }
+  : null;
 
 export const renderUserControl = (entities, label, activeUserId) => entities
-? {
-  id: 'users',
-  model: '.associatedUser',
-  dataPath: ['associatedUser'],
-  label,
-  controlType: 'multiselect',
-  multiple: false,
-  options: userOptions(entities, activeUserId),
-}
-: null;
+  ? {
+    id: 'users',
+    model: '.associatedUser',
+    dataPath: ['associatedUser'],
+    label,
+    controlType: 'multiselect',
+    multiple: false,
+    options: userOptions(entities, activeUserId),
+  }
+  : null;
 
 export const renderParentCategoryControl = (entities, label, activeParentId) => entities
-? {
-  id: 'associatedCategory',
-  model: '.associatedCategory',
-  dataPath: ['associatedCategory'],
-  label,
-  controlType: 'multiselect',
-  multiple: false,
-  options: parentCategoryOptions(entities, activeParentId),
-}
-: null;
+  ? {
+    id: 'associatedCategory',
+    model: '.associatedCategory',
+    dataPath: ['associatedCategory'],
+    label,
+    controlType: 'multiselect',
+    multiple: false,
+    options: parentCategoryOptions(entities, activeParentId),
+  }
+  : null;
 
 const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
   ? getAssociatedEntities(taxonomy.get('categories'))
   : Map();
 
-const getAssociatedEntities = (entities) =>
-  entities
+const getAssociatedEntities = (entities) => entities
   ? entities.reduce((entitiesAssociated, entity) => entity.get('associated')
     ? entitiesAssociated.set(entity.get('id'), entity.getIn(['associated', 'id']))
-    : entitiesAssociated
-  , Map())
+    : entitiesAssociated,
+  Map())
   : Map();
 
-export const getCategoryUpdatesFromFormData = ({ formData, taxonomies, createKey }) =>
-  taxonomies.reduce((updates, tax, taxId) => {
-    const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
+export const getCategoryUpdatesFromFormData = ({ formData, taxonomies, createKey }) => taxonomies.reduce((updates, tax, taxId) => {
+  const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
 
-    // store associated cats as { [cat.id]: [association.id], ... }
-    // then we can use keys for creating new associations and values for deleting
-    const associatedCategories = getAssociatedCategories(tax);
+  // store associated cats as { [cat.id]: [association.id], ... }
+  // then we can use keys for creating new associations and values for deleting
+  const associatedCategories = getAssociatedCategories(tax);
 
-    return Map({
-      delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) =>
-        !formCategoryIds.includes(catId)
-          ? associatedIds.push(associatedId)
-          : associatedIds
-      , List())),
-      create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) =>
-        !associatedCategories.has(catId)
-          ? payloads.push(Map({
-            category_id: catId,
-            [createKey]: formData.get('id'),
-          }))
-          : payloads
-      , List())),
-    });
-  }, Map({ delete: List(), create: List() }));
+  return Map({
+    delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) => !formCategoryIds.includes(catId)
+      ? associatedIds.push(associatedId)
+      : associatedIds,
+    List())),
+    create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) => !associatedCategories.has(catId)
+      ? payloads.push(Map({
+        category_id: catId,
+        [createKey]: formData.get('id'),
+      }))
+      : payloads,
+    List())),
+  });
+}, Map({ delete: List(), create: List() }));
 
 export const getConnectionUpdatesFromFormData = ({
   formData,
@@ -283,86 +281,74 @@ export const getConnectionUpdatesFromFormData = ({
   const associatedConnections = getAssociatedEntities(connections);
 
   return Map({
-    delete: associatedConnections.reduce((associatedIds, associatedId, id) =>
-      !formConnectionIds.includes(id)
-        ? associatedIds.push(associatedId)
-        : associatedIds
-    , List()),
+    delete: associatedConnections.reduce((associatedIds, associatedId, id) => !formConnectionIds.includes(id)
+      ? associatedIds.push(associatedId)
+      : associatedIds,
+    List()),
     create: formConnectionIds.reduce(
-      (payloads, id) =>
-        !associatedConnections.has(id)
-          ? payloads.push(Map({
-            [createConnectionKey]: id,
-            [createKey]: formData.get('id'),
-          }))
-          : payloads,
-        List(),
-      ),
+      (payloads, id) => !associatedConnections.has(id)
+        ? payloads.push(Map({
+          [createConnectionKey]: id,
+          [createKey]: formData.get('id'),
+        }))
+        : payloads,
+      List(),
+    ),
   });
 };
 
 
 // only show the highest rated role (lower role ids means higher)
-export const getHighestUserRoleId = (roles) =>
-  roles.reduce((currentHighestRoleId, role) =>
-    role.get('associated') && parseInt(role.get('id'), 10) < parseInt(currentHighestRoleId, 10)
-      ? role.get('id').toString()
-      : currentHighestRoleId.toString()
-  , USER_ROLES.DEFAULT.value);
+export const getHighestUserRoleId = (roles) => roles.reduce((currentHighestRoleId, role) => role.get('associated') && parseInt(role.get('id'), 10) < parseInt(currentHighestRoleId, 10)
+  ? role.get('id').toString()
+  : currentHighestRoleId.toString(),
+USER_ROLES.DEFAULT.value);
 
 export const getRoleFormField = (formatMessage, roleOptions) => ({
   id: 'role',
   controlType: 'select',
   model: '.associatedRole',
   label: formatMessage(appMessages.entities.roles.single),
-  value: getHighestUserRoleId(roleOptions).toString(),
-  options: Object.values(filter(USER_ROLES, (userRole) =>
-    roleOptions.map((roleOption) => parseInt(roleOption.get('id'), 10)).includes(userRole.value)
-    || userRole.value === USER_ROLES.DEFAULT.value
-  )),
+  options: Object.values(filter(USER_ROLES, (userRole) => roleOptions.map((roleOption) => parseInt(roleOption.get('id'), 10)).includes(userRole.value)
+    || userRole.value === USER_ROLES.DEFAULT.value)),
 });
 
-export const getAcceptedField = (formatMessage, entity) => ({
+export const getAcceptedField = (formatMessage) => ({
   id: 'accepted',
   controlType: 'select',
   model: '.attributes.accepted',
   label: formatMessage(appMessages.attributes.accepted),
-  value: entity ? entity.getIn(['attributes', 'accepted']) : true,
   options: ACCEPTED_STATUSES,
 });
 
-export const getFrequencyField = (formatMessage, entity) => ({
+export const getFrequencyField = (formatMessage) => ({
   id: 'frequency_months',
   controlType: 'select',
   model: '.attributes.frequency_months',
   label: formatMessage(appMessages.attributes.frequency_months),
-  value: entity ? parseInt(entity.getIn(['attributes', 'frequency_months']), 10) : 1,
   options: REPORT_FREQUENCIES,
 });
 
-export const getDocumentStatusField = (formatMessage, entity) => ({
+export const getDocumentStatusField = (formatMessage) => ({
   id: 'document_public',
   controlType: 'select',
   model: '.attributes.document_public',
   label: formatMessage(appMessages.attributes.document_public),
-  value: entity ? entity.getIn(['attributes', 'document_public']) : false,
   options: DOC_PUBLISH_STATUSES,
 });
 
-export const getStatusField = (formatMessage, entity) => ({
+export const getStatusField = (formatMessage) => ({
   id: 'status',
   controlType: 'select',
   model: '.attributes.draft',
   label: formatMessage(appMessages.attributes.draft),
-  value: entity ? entity.getIn(['attributes', 'draft']) : true,
   options: PUBLISH_STATUSES,
 });
-export const getFrameworkFormField = (formatMessage, fwOptions, value) => ({
+export const getFrameworkFormField = (formatMessage, fwOptions) => ({
   id: 'framework',
   controlType: 'select',
   model: '.attributes.framework_id',
   label: formatMessage(appMessages.attributes.framework_id),
-  value,
   options: Object.values(fwOptions.toJS()).map((fw) => ({
     value: fw.id,
     message: `frameworks.${fw.id}`,
@@ -393,8 +379,8 @@ export const getDueDateDateOptions = (dates, formatMessage, formatDate, activeDa
           excludeCount += 1;
         }
         // exclude overdue and already assigned date from max no of date options
-        const label = formatDate &&
-          `${formatDate(new Date(date.getIn(['attributes', 'due_date'])))}${getDueDateStatus(date, formatMessage)}`;
+        const label = formatDate
+          && `${formatDate(new Date(date.getIn(['attributes', 'due_date'])))}${getDueDateStatus(date, formatMessage)}`;
         return memo.concat([
           {
             value: date.get('id'),
@@ -406,7 +392,7 @@ export const getDueDateDateOptions = (dates, formatMessage, formatDate, activeDa
       excludeCount += 1;
       return memo;
     }, [])
-  : [];
+    : [];
   return dateOptions.concat({
     value: '0',
     label: formatMessage && formatMessage(appMessages.entities.progress_reports.unscheduled_short),
@@ -423,38 +409,34 @@ export const getDueDateOptionsField = (formatMessage, dateOptions) => ({
   },
 });
 
-export const getTitleFormField = (formatMessage, controlType = 'title', attribute = 'title') =>
-  getFormField({
-    formatMessage,
-    controlType,
-    attribute,
-    required: true,
-  });
+export const getTitleFormField = (formatMessage, controlType = 'title', attribute = 'title') => getFormField({
+  formatMessage,
+  controlType,
+  attribute,
+  required: true,
+});
 
-export const getReferenceFormField = (formatMessage, required = false, isAutoReference = false) =>
-  getFormField({
-    formatMessage,
-    controlType: 'short',
-    attribute: 'reference',
-    required,
-    label: required ? 'reference' : 'referenceOptional',
-    hint: isAutoReference ? formatMessage(appMessages.hints.autoReference) : null,
-  });
+export const getReferenceFormField = (formatMessage, required = false, isAutoReference = false) => getFormField({
+  formatMessage,
+  controlType: 'short',
+  attribute: 'reference',
+  required,
+  label: required ? 'reference' : 'referenceOptional',
+  hint: isAutoReference ? formatMessage(appMessages.hints.autoReference) : null,
+});
 
-export const getShortTitleFormField = (formatMessage) =>
-  getFormField({
-    formatMessage,
-    controlType: 'short',
-    attribute: 'short_title',
-  });
+export const getShortTitleFormField = (formatMessage) => getFormField({
+  formatMessage,
+  controlType: 'short',
+  attribute: 'short_title',
+});
 
-export const getMenuTitleFormField = (formatMessage) =>
-  getFormField({
-    formatMessage,
-    controlType: 'short',
-    attribute: 'menu_title',
-    required: true,
-  });
+export const getMenuTitleFormField = (formatMessage) => getFormField({
+  formatMessage,
+  controlType: 'short',
+  attribute: 'menu_title',
+  required: true,
+});
 
 export const getMenuOrderFormField = (formatMessage) => {
   const field = getFormField({
@@ -467,25 +449,23 @@ export const getMenuOrderFormField = (formatMessage) => {
   return field;
 };
 
-export const getMarkdownField = (formatMessage, attribute = 'description', label, placeholder, hint) =>
-  getFormField({
-    formatMessage,
-    controlType: 'markdown',
-    attribute,
-    label: label || attribute,
-    placeholder: placeholder || attribute,
-    hint: hint
-      ? (appMessages.hints[hint] && formatMessage(appMessages.hints[hint]))
-      : (appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute])),
-  });
+export const getMarkdownField = (formatMessage, attribute = 'description', label, placeholder, hint) => getFormField({
+  formatMessage,
+  controlType: 'markdown',
+  attribute,
+  label: label || attribute,
+  placeholder: placeholder || attribute,
+  hint: hint
+    ? (appMessages.hints[hint] && formatMessage(appMessages.hints[hint]))
+    : (appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute])),
+});
 
 // unused
-export const getTextareaField = (formatMessage, attribute = 'description') =>
-  getFormField({
-    formatMessage,
-    controlType: 'textarea',
-    attribute,
-  });
+export const getTextareaField = (formatMessage, attribute = 'description') => getFormField({
+  formatMessage,
+  controlType: 'textarea',
+  attribute,
+});
 
 export const getDateField = (formatMessage, attribute, required = false, label, onChange) => {
   const field = getFormField({
@@ -501,24 +481,23 @@ export const getDateField = (formatMessage, attribute, required = false, label, 
   return field;
 };
 
-export const getCheckboxField = (formatMessage, attribute, entity, onChange) => (
+export const getCheckboxField = (formatMessage, attribute, onChange) => (
   {
     id: attribute,
     controlType: 'checkbox',
     model: `.attributes.${attribute}`,
     label: appMessages.attributes[attribute] && formatMessage(appMessages.attributes[attribute]),
-    value: entity && entity.getIn(['attributes', attribute]) ? entity.getIn(['attributes', attribute]) : false,
+    // value: entity && entity.getIn(['attributes', attribute]) ? entity.getIn(['attributes', attribute]) : false,
     changeAction: onChange,
     hint: appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute]),
   });
 
-export const getUploadField = (formatMessage) =>
-  getFormField({
-    formatMessage,
-    controlType: 'uploader',
-    attribute: 'document_url',
-    placeholder: 'url',
-  });
+export const getUploadField = (formatMessage) => getFormField({
+  formatMessage,
+  controlType: 'uploader',
+  attribute: 'document_url',
+  placeholder: 'url',
+});
 
 export const getEmailField = (formatMessage, model = '.attributes.email') => {
   const field = getFormField({

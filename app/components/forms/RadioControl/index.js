@@ -36,17 +36,20 @@ export class RadioControl extends React.PureComponent { // eslint-disable-line r
                 <LabelInner>{option.label}</LabelInner>
               </Label>
             </Option>
+          ))}
+        { hints && options.length === 0
+          && (
+            <Hint>
+              {hints[0]}
+            </Hint>
           )
-        )}
-        { hints && options.length === 0 &&
-          <Hint>
-            {hints[0]}
-          </Hint>
         }
-        { hints && options.length === 1 &&
-          <Hint>
-            {hints[1]}
-          </Hint>
+        { hints && options.length === 1
+          && (
+            <Hint>
+              {hints[1]}
+            </Hint>
+          )
         }
       </Field>
     );

@@ -18,7 +18,6 @@ const Select = styled.div`
 `;
 
 export default class EntityListItemSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   static propTypes = {
     checked: PropTypes.bool,
     onSelect: PropTypes.func,

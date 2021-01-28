@@ -47,10 +47,11 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
   }
 `;
 
-export class EntityListOptions extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class EntityListOptions extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
     return !isEqual(this.props, nextProps);
   }
+
   render() {
     // console.log('EntityListOptions.render')
 
@@ -66,38 +67,44 @@ export class EntityListOptions extends React.PureComponent { // eslint-disable-l
     } = this.props;
     return (
       <Styled>
-        { groupOptions.size > 0 &&
-          <EntityListGroupBy
-            value={groupSelectValue}
-            options={groupOptions &&
-              groupOptions.filter((option) => option.get('value') !== subgroupSelectValue).toJS()
-            }
-            onChange={onGroupSelect}
-          />
+        { groupOptions.size > 0
+          && (
+            <EntityListGroupBy
+              value={groupSelectValue}
+              options={groupOptions
+              && groupOptions.filter((option) => option.get('value') !== subgroupSelectValue).toJS()
+              }
+              onChange={onGroupSelect}
+            />
+          )
         }
-        { groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET && subgroupOptions.size > 0 &&
-          <EntityListGroupBy
-            value={subgroupSelectValue}
-            options={subgroupOptions &&
-              subgroupOptions.filter((option) => option.get('value') !== groupSelectValue).toJS()
-            }
-            onChange={onSubgroupSelect}
-            isSubgroup
-          />
+        { groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET && subgroupOptions.size > 0
+          && (
+            <EntityListGroupBy
+              value={subgroupSelectValue}
+              options={subgroupOptions
+              && subgroupOptions.filter((option) => option.get('value') !== groupSelectValue).toJS()
+              }
+              onChange={onSubgroupSelect}
+              isSubgroup
+            />
+          )
         }
-        { (expandable) &&
-          <ListEntitiesHeaderOptionLink
-            onClick={this.props.onExpand}
-          >
-            {
-              !expanded &&
-              <FormattedMessage {...messages.expand} />
-            }
-            {
-              expanded &&
-              <FormattedMessage {...messages.collapse} />
-            }
-          </ListEntitiesHeaderOptionLink>
+        { (expandable)
+          && (
+            <ListEntitiesHeaderOptionLink
+              onClick={this.props.onExpand}
+            >
+              {
+                !expanded
+              && <FormattedMessage {...messages.expand} />
+              }
+              {
+                expanded
+              && <FormattedMessage {...messages.collapse} />
+              }
+            </ListEntitiesHeaderOptionLink>
+          )
         }
       </Styled>
     );

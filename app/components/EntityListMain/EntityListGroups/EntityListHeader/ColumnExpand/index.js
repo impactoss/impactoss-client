@@ -34,11 +34,15 @@ const ExpandWrapper = styled.div`
 const ExpandButton = styled(ButtonFlatIconOnly)`
   padding: 0;
   color: inherit;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0;
+  }
 `;
 class ColumnExpand extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
-    const { isExpand, label, width, onExpand } = this.props;
+    const {
+      isExpand, label, width, onExpand,
+    } = this.props;
     return (
       <Styled
         width={width}
@@ -49,11 +53,11 @@ class ColumnExpand extends React.PureComponent { // eslint-disable-line react/pr
             <ExpandButton
               onClick={onExpand}
             >
-              {isExpand &&
-                <Icon name="columnCollapse" />
+              {isExpand
+                && <Icon name="columnCollapse" />
               }
-              {!isExpand &&
-                <Icon name="columnExpand" />
+              {!isExpand
+                && <Icon name="columnExpand" />
               }
             </ExpandButton>
           </ExpandWrapper>

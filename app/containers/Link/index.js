@@ -10,7 +10,9 @@ import { selectFrameworkQuery } from 'containers/App/selectors';
 
 // const A = styled.a``;
 
-const Link = ({ to, children, onClick, frameworkId, args, ...p }) => {
+const Link = ({
+  to, children, onClick, frameworkId, args, ...p
+}) => {
   const external = !startsWith(to, '/');
   // make sure to set the fw query for href default link (i.e. open in new tab)
   const query = (args && args.query) || {};

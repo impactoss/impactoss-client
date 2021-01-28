@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import { CONTENT_LIST, CONTENT_SINGLE, CONTENT_PAGE, CONTENT_MODAL } from 'containers/App/constants';
+import {
+  CONTENT_LIST, CONTENT_SINGLE, CONTENT_PAGE, CONTENT_MODAL,
+} from 'containers/App/constants';
 
 import SupTitle from 'components/SupTitle';
 // import Icon from 'components/Icon';
@@ -60,11 +62,11 @@ const TableCell = styled.span`
   clear: both;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: ${(props) => {
-      if (props.visibleMobile) {
-        return 'none';
-      }
-      return 'table-cell';
-    }};
+    if (props.visibleMobile) {
+      return 'none';
+    }
+    return 'table-cell';
+  }};
     vertical-align: middle;
   }
 `;
@@ -89,7 +91,6 @@ const SubTitle = styled.p`
 `;
 
 class ContentHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   renderTitle = (type, title, icon) => {
     switch (type) {
       case CONTENT_PAGE:
@@ -110,6 +111,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
         return (<TitleMedium>{title}</TitleMedium>);
     }
   }
+
   render() {
     const {
       type,
@@ -125,46 +127,50 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
         hasBottomBorder={type === CONTENT_PAGE || type === CONTENT_MODAL}
         isModal={type === CONTENT_MODAL}
       >
-        { supTitle &&
-          <SupTitle icon={icon} title={supTitle} />
+        { supTitle
+          && <SupTitle icon={icon} title={supTitle} />
         }
         <Table>
-          { buttons &&
-            <TableCell visibleMobile>
-              <ButtonGroup>
-                {
-                  buttons.map((button, i) => button && (
-                    <TableCellInner key={i}>
-                      <ButtonWrap>
-                        <ButtonFactory button={button} />
-                      </ButtonWrap>
-                    </TableCellInner>
-                  ))
-                }
-              </ButtonGroup>
-            </TableCell>
+          { buttons
+            && (
+              <TableCell visibleMobile>
+                <ButtonGroup>
+                  {
+                    buttons.map((button, i) => button && (
+                      <TableCellInner key={i}>
+                        <ButtonWrap>
+                          <ButtonFactory button={button} />
+                        </ButtonWrap>
+                      </TableCellInner>
+                    ))
+                  }
+                </ButtonGroup>
+              </TableCell>
+            )
           }
           <TableCell>
             {this.renderTitle(type, title, icon)}
           </TableCell>
-          { buttons &&
-            <TableCell hiddenMobile>
-              <ButtonGroup>
-                {
-                  buttons.map((button, i) => (
-                    <TableCellInner key={i}>
-                      <ButtonWrap>
-                        <ButtonFactory button={button} />
-                      </ButtonWrap>
-                    </TableCellInner>
-                  ))
-                }
-              </ButtonGroup>
-            </TableCell>
+          { buttons
+            && (
+              <TableCell hiddenMobile>
+                <ButtonGroup>
+                  {
+                    buttons.map((button, i) => (
+                      <TableCellInner key={i}>
+                        <ButtonWrap>
+                          <ButtonFactory button={button} />
+                        </ButtonWrap>
+                      </TableCellInner>
+                    ))
+                  }
+                </ButtonGroup>
+              </TableCell>
+            )
           }
         </Table>
-        { subTitle &&
-          <SubTitle>{subTitle}</SubTitle>
+        { subTitle
+          && <SubTitle>{subTitle}</SubTitle>
         }
       </Styled>
     );

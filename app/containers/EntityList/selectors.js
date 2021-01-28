@@ -6,8 +6,8 @@ import { List } from 'immutable';
 export const selectEntityListDomain = (state) => state.get('entityList');
 
 export const selectDomain = createSelector(
-   selectEntityListDomain,
-   (substate) => substate.get('page')
+  selectEntityListDomain,
+  (substate) => substate.get('page')
 );
 
 export const selectActivePanel = createSelector(
@@ -22,24 +22,22 @@ export const selectSelectedEntities = createSelector(
 
 export const selectProgress = createSelector(
   selectDomain,
-  (pageState) =>
-    pageState.get('sending') && pageState.get('sending').size > 0
-      ? ((pageState.get('success').size + pageState.get('errors').size) / pageState.get('sending').size) * 100
-      : null
+  (pageState) => pageState.get('sending') && pageState.get('sending').size > 0
+    ? ((pageState.get('success').size + pageState.get('errors').size) / pageState.get('sending').size) * 100
+    : null
 );
 export const selectProgressTypes = createSelector(
   selectDomain,
-  (pageState) =>
-    pageState.get('sending') && pageState.get('sending').size > 0
-      ? pageState.get('sending').reduce(
-        (types, transaction) => {
-          const { type } = transaction;
-          if (types.includes(type)) {
-            return types;
-          }
-          return types.push(type);
-        },
-        List(),
-      )
-      : null,
+  (pageState) => pageState.get('sending') && pageState.get('sending').size > 0
+    ? pageState.get('sending').reduce(
+      (types, transaction) => {
+        const { type } = transaction;
+        if (types.includes(type)) {
+          return types;
+        }
+        return types.push(type);
+      },
+      List(),
+    )
+    : null,
 );

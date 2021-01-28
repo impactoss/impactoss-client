@@ -1,7 +1,7 @@
-import { injectGlobal } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 
 /* eslint no-unused-expressions: 0 */
-injectGlobal`
+const GlobalStyle = createGlobalStyle`
 
   html,
   body {
@@ -16,6 +16,11 @@ injectGlobal`
   }
   button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: transparent;
+    border-style: none;
+    color: inherit;
+    font-size: 1em;
+    margin: 0;
   }
   :focus, :visited:focus {
     outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
@@ -26,7 +31,15 @@ injectGlobal`
     min-width: 100%;
   }
 
+  button {
+    background: transparent;
+    border: none;
+    text-align: left;
+  }
   a {
+    background: transparent;
+    border: none;
+    text-align: left;
     color: #eb6e51;
     text-decoration: none;
 
@@ -94,8 +107,6 @@ injectGlobal`
   }
 
   * {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
 
@@ -193,3 +204,5 @@ injectGlobal`
     display: inline-block;
   }
 `;
+
+export default GlobalStyle;

@@ -8,7 +8,7 @@ export default styled.div`
   background-image: ${(props) => (SHOW_SIDEBAR_HEADER_PATTERN && props.theme.backgroundImages.asideHeader)
     ? props.theme.backgroundImages.asideHeader
     : 'none'
-  };
+};
   background-repeat: repeat;
   padding: ${(props) => {
     if (props.hasButtons) {

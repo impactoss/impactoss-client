@@ -15,7 +15,7 @@
 // default language locale
 export const DEFAULT_LOCALE = 'en-GB';
 // date format - change to format according to locale, only used for form error message
-export const DATE_FORMAT = 'dd/mm/yyyy';
+export const DATE_FORMAT = 'dd/MM/yyyy';
 export const NODE_ENV = sessionStorage.NODE_ENV || 'production';
 
 // UI settings ************************
@@ -76,15 +76,15 @@ export const CYCLE_TAXONOMY_ID = 2;
 
 /**
  * Server settings
- **/
+ * */
 
 // General ********************
 
 export const ENDPOINTS = {
   API: (
     NODE_ENV === 'production'
-    ? 'https://impactoss-dev.herokuapp.com/'
-    : 'https://impactoss-dev.herokuapp.com/'
+      ? 'https://impactoss-dev.herokuapp.com'
+      : 'https://impactoss-dev.herokuapp.com'
   ), // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
@@ -104,7 +104,7 @@ export const KEYS = {
 };
 
 // database date format
-export const DB_DATE_FORMAT = 'YYYY-MM-DD';
+export const DB_DATE_FORMAT = 'yyyy-MM-dd';
 
 
 // Map server messages *********************************

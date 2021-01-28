@@ -5,6 +5,5 @@ import { getBookmarkForLocation } from 'utils/bookmark';
 export const selectBookmarkForLocation = createSelector(
   (state) => selectEntities(state, 'bookmarks'),
   (state) => selectLocation(state),
-  (bookmarks, location) =>
-    getBookmarkForLocation(location, bookmarks),
+  (bookmarks, location) => getBookmarkForLocation(location, bookmarks),
 );

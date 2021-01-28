@@ -2,8 +2,7 @@ import { filter, reduce } from 'lodash/collection';
 import appMessages from 'containers/App/messages';
 import { DB_DATE_FORMAT } from 'themes/config';
 
-const getColumnTitle = (field, formatMessage) =>
-  `${formatMessage(appMessages.importFields[field.label || field.attribute])} [database:${field.attribute}]`;
+const getColumnTitle = (field, formatMessage) => `${formatMessage(appMessages.importFields[field.label || field.attribute])} [database:${field.attribute}]`;
 
 export const getImportFields = (shape, formatMessage) => {
   const fields = filter(shape.fields, (field) => field.import === true && !field.disabled);
@@ -19,6 +18,6 @@ export const getImportFields = (shape, formatMessage) => {
 export const getColumnAttribute = (columnTitle) => {
   const split = columnTitle.split('[database:');
   return split.length > 1
-  ? split[1].replace(']', '')
-  : columnTitle;
+    ? split[1].replace(']', '')
+    : columnTitle;
 };
