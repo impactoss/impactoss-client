@@ -18,6 +18,7 @@ import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
+import PrintHide from 'components/styled/PrintHide';
 
 import Logo from './Logo';
 import Banner from './Banner';
@@ -67,6 +68,12 @@ const Styled = styled.div`
   background-color: ${(props) => props.hasBackground ? palette('header', 0) : 'transparent'};
   box-shadow: ${(props) => props.hasShadow ? '0px 0px 15px 0px rgba(0,0,0,0.5)' : 'none'};
   z-index: 101;
+  @media print {
+    height: ${({ theme }) => theme.sizes.header.banner.height}px;
+    position: static;
+    box-shadow: none;
+    background: white;
+  }
 `;
 const HomeNavWrap = styled.div`
   position: absolute;
@@ -77,7 +84,7 @@ const HomeNavWrap = styled.div`
   z-index: 101;
 `;
 
-const NavSecondary = styled.div`
+const NavSecondary = styled(PrintHide)`
   display: ${(props) => props.visible ? 'block' : 'none'};
   position: fixed;
   top: 0;
@@ -151,7 +158,7 @@ const Search = styled(LinkMain)`
   }
 `;
 
-const FrameworkOptions = styled.div`
+const FrameworkOptions = styled(PrintHide)`
   position: absolute;
   top: 100%;
   left: 0;
@@ -234,7 +241,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
   };
 
   renderSecondary = (navItemsAdmin) => (
-    <div>
+    <PrintHide>
       <ShowSecondary
         visible={!this.state.showSecondary}
         onClick={this.onShowSecondary}
@@ -304,7 +311,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           ))}
         </NavPages>
       </NavSecondary>
-    </div>
+    </PrintHide>
   );
 
   render() {

@@ -29,6 +29,9 @@ const GlobalStyle = createGlobalStyle`
     background-color: #ffffff;
     min-height: 100%;
     min-width: 100%;
+    @media print {
+      background-color: white;
+    }
   }
 
   button {

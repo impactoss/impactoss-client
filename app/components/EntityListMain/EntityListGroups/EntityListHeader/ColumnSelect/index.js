@@ -10,6 +10,7 @@ import Icon from 'components/Icon';
 
 import A from 'components/styled/A';
 import ColumnHeader from 'components/styled/ColumnHeader';
+import PrintHide from 'components/styled/PrintHide';
 
 import messages from './messages';
 
@@ -30,7 +31,7 @@ const LabelWrap = styled.div`
     padding-left: ${(props) => props.isSelect ? 0 : 7}px;
   }
 `;
-const CheckboxWrap = styled.div`
+const CheckboxWrap = styled(PrintHide)`
   display: table-cell;
   text-align: center;
   width: 20px;

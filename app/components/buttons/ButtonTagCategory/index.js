@@ -42,6 +42,16 @@ const ButtonTagCategory = styled(Button)`
     padding: 1px 6px;
     font-size: 0.85em;
   }
+  @media print {
+    color: ${palette('text', 1)};
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    border-top: 3px solid;
+    border-color: ${(props) => getColor(props)};
+    margin-right: 10px;
+    padding: 1px 2px;
+  }
 `;
 
 export default ButtonTagCategory;

@@ -11,6 +11,11 @@ import EntityListNestedNoItem from 'components/EntityListNestedList/EntityListNe
 const ItemWrapper = styled.div`
   padding: ${({ separated }) => separated ? '5px 0 10px' : '0'};
   margin-top: 10px;
+  @media print {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    break-inside: avoid;
+  }
 `;
 
 export class EntityListItemWrapper extends React.Component { // eslint-disable-line react/prefer-stateless-function

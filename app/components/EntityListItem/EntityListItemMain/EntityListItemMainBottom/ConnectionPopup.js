@@ -30,6 +30,10 @@ const Count = styled.span`
   text-align: center;
   line-height: 1.7;
   padding: 0 0.25em;
+  @media print {
+    color: ${palette('text', 1)};
+    background: transparent;
+  }
 `;
 
 const PopupWrapper = styled.div`

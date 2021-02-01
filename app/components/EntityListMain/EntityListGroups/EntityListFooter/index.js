@@ -15,9 +15,11 @@ import A from 'components/styled/A';
 import Icon from 'components/Icon';
 import SelectReset from 'components/SelectReset';
 import appMessages from 'containers/App/messages';
+import PrintHide from 'components/styled/PrintHide';
+
 import { PAGE_ITEM_OPTIONS } from 'themes/config';
 
-const Styled = styled.div`
+const Styled = styled(PrintHide)`
   padding-top: 0.5em;
   position: relative;
   text-align: center;

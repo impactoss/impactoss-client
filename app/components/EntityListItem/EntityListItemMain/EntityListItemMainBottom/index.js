@@ -14,6 +14,9 @@ const Styled = styled(Component)`
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     display: block;
   }
+  @media print {
+    display: block !important;
+  }
 `;
 
 class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
