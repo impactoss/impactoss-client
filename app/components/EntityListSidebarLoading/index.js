@@ -11,8 +11,9 @@ import { palette } from 'styled-theme';
 import Scrollable from 'components/styled/Scrollable';
 import Sidebar from 'components/styled/Sidebar';
 import SidebarHeader from 'components/styled/SidebarHeader';
+import PrintHide from 'components/styled/PrintHide';
 
-const Styled = styled.div`
+const Styled = styled(PrintHide)`
   display: none;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: ${(props) => props.responsiveSmall ? 'block' : 'none'};

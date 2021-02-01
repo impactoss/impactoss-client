@@ -21,6 +21,7 @@ import TagSearch from 'components/TagSearch';
 
 import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
+import PrintHide from 'components/styled/PrintHide';
 
 import EntityListGroups from './EntityListGroups';
 
@@ -31,7 +32,7 @@ import { groupEntities } from './group-entities';
 
 import messages from './messages';
 
-const EntityListSearch = styled.div`
+const EntityListSearch = styled(PrintHide)`
   padding-bottom: 1em;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-bottom: 2em;

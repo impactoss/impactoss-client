@@ -153,10 +153,19 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       entityGroups,
     } = this.props;
     const { intl } = this.context;
-    const pageSize = Math.min(
-      (locationQuery.get('items') && parseInt(locationQuery.get('items'), 10)) || PAGE_SIZE,
-      PAGE_SIZE_MAX
-    );
+    let pageSize = PAGE_SIZE_MAX;
+    if (locationQuery.get('items')) {
+      if (locationQuery.get('items') === 'all') {
+        pageSize = entities.size;
+      } else {
+        pageSize = Math.min(
+          (locationQuery.get('items') && parseInt(locationQuery.get('items'), 10)),
+          PAGE_SIZE_MAX
+        );
+      }
+    } else {
+      pageSize = Math.min(PAGE_SIZE, PAGE_SIZE_MAX);
+    }
     let entityIdsOnPage;
     let entityGroupsPaged;
     let pager;
@@ -336,7 +345,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
         { entityGroupsPaged.size > 0
           && (
             <EntityListFooter
-              pageSize={pageSize}
+              pageSize={locationQuery.get('items') === 'all' ? 'all' : pageSize}
               pager={pager}
               onPageSelect={this.props.onPageSelect}
               onPageItemsSelect={this.props.onPageItemsSelect}

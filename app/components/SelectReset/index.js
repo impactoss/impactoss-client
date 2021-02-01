@@ -24,6 +24,12 @@ const Select = styled.select`
   vertical-align: middle;
   display: inline-block;
   cursor: pointer;
+  @media print {
+    appearance: none;
+    text-overflow: '';
+    text-indent: 0.01px; /* Removes default arrow from firefox */
+    text-overflow: "";  /* Removes default arrow from firefox */
+  }
 `;
 // border-bottom: 1px dotted #ccc;
 const Option = styled.option`

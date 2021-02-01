@@ -17,6 +17,21 @@ const Styled = styled.div`
   width:100%;
   background-color: ${palette('light', 1)};
   display: table;
+  @media print {
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+    &:before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      z-index: -1;
+      border-bottom: 100px solid ${palette('light', 1)};
+    }
+  }
 `;
 
 const WIDTH_FULL = 1;

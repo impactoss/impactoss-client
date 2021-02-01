@@ -52,7 +52,7 @@ export const FOOTER = {
 };
 
 // entitylists items-per-page options
-export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
+export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100, 'all'];
 
 export const TEXT_TRUNCATE = {
   CONNECTION_TAG: 20,

@@ -43,6 +43,9 @@ const ButtonWrap = styled.span`
   &:last-child {
     padding: 0;
   }
+  @media print {
+    display: none;
+  }
 `;
 const Table = styled.span`
   display: block;

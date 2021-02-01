@@ -26,6 +26,7 @@ import EntityListForm from 'containers/EntityListForm';
 import appMessages from 'containers/App/messages';
 import Sidebar from 'components/styled/Sidebar';
 import SidebarHeader from 'components/styled/SidebarHeader';
+import PrintHide from 'components/styled/PrintHide';
 
 import EntityListSidebarGroups from './EntityListSidebarGroups';
 
@@ -36,7 +37,7 @@ import { makeActiveEditOptions } from './editOptionsFactory';
 
 import messages from './messages';
 
-// const Styled = styled.div``;
+const Styled = styled(PrintHide)``;
 // const Main = styled.div``;
 const ScrollableWrapper = styled(Scrollable)`
   background-color: ${palette('aside', 0)};
@@ -351,7 +352,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       }
     }
     return (
-      <div>
+      <Styled>
         { (!this.state.visible && this.state.viewport < VIEWPORTS.LARGE)
           && (
             <ToggleShow onClick={this.onShowSidebar}>
@@ -452,7 +453,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             />
           )
         }
-      </div>
+      </Styled>
     );
   }
 }

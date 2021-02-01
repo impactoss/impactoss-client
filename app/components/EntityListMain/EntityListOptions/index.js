@@ -14,11 +14,13 @@ import { isEqual } from 'lodash/lang';
 
 import { PARAMS } from 'containers/App/constants';
 import Button from 'components/buttons/Button';
+import PrintHide from 'components/styled/PrintHide';
+
 import EntityListGroupBy from './EntityListGroupBy';
 
 import messages from './messages';
 
-const Styled = styled.div`
+const Styled = styled(PrintHide)`
   padding: 0.25em 0;
   position: relative;
   min-height: 2em;
