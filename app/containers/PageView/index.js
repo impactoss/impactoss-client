@@ -89,13 +89,21 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     const {
       page, dataReady, isAdmin, isContributor,
     } = this.props;
-
-    const buttons = isAdmin
-      ? [{
-        type: 'edit',
-        onClick: this.props.handleEdit,
-      }]
-      : [];
+    const buttons = [];
+    if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+      if (isAdmin) {
+        buttons.push({
+          type: 'edit',
+          onClick: this.props.handleEdit,
+        });
+      }
+    }
 
     return (
       <div>

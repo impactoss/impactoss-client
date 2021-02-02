@@ -282,8 +282,14 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     } = this.props;
     let buttons = [];
     if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
       buttons = isManager
-        ? [
+        ? buttons.concat([
           {
             type: 'edit',
             onClick: () => this.props.handleEdit(this.props.params.id),
@@ -292,22 +298,28 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             type: 'close',
             onClick: () => this.props.handleClose(this.props.viewEntity && this.props.viewEntity.getIn(['taxonomy', 'id'])),
           },
-        ]
-        : [{
+        ])
+        : buttons.concat([{
           type: 'close',
           onClick: () => this.props.handleClose(this.props.viewEntity && this.props.viewEntity.getIn(['taxonomy', 'id'])),
-        }];
+        }]);
     }
 
     let pageTitle = intl.formatMessage(messages.pageTitle);
+    let metaTitle = intl.formatMessage(messages.pageTitle);
+    if (viewEntity && viewEntity.getIn(['attributes', 'title'])) {
+      metaTitle = `${metaTitle}: ${viewEntity.getIn(['attributes', 'title'])}`;
+    }
     if (viewEntity && viewEntity.get('taxonomy')) {
       pageTitle = this.getTaxTitle(viewEntity.getIn(['taxonomy', 'id']));
+      metaTitle = `${metaTitle} (${pageTitle})`;
     }
+
 
     return (
       <div>
         <Helmet
-          title={`${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={metaTitle}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}

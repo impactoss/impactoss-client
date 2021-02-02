@@ -19,6 +19,7 @@ import SidebarHeader from 'components/styled/SidebarHeader';
 import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
 import Sidebar from 'components/styled/Sidebar';
 import Scrollable from 'components/styled/Scrollable';
+import PrintHide from 'components/styled/PrintHide';
 
 import { prepareTaxonomyGroups } from 'utils/taxonomies';
 
@@ -122,7 +123,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
     );
     const { intl } = this.context;
     return (
-      <div>
+      <PrintHide>
         { (!this.state.visible && this.state.viewport < VIEWPORTS.SMALL)
           && (
             <ToggleShow onClick={this.onShowSidebar}>
@@ -179,7 +180,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
             </Sidebar>
           )
         }
-      </div>
+      </PrintHide>
     );
   }
 }

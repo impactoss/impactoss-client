@@ -45,8 +45,19 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
     const headerOptions = {
       supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'indicators',
-      actions: [],
+      actions: [{
+        type: 'bookmarker',
+        title: intl.formatMessage(messages.pageTitle),
+      }],
     };
+    if (window.print) {
+      headerOptions.actions.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+    }
     if (isManager) {
       headerOptions.actions.push({
         type: 'text',
@@ -65,10 +76,6 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         onClick: () => this.props.handleNew(),
       });
     }
-    headerOptions.actions.push({
-      type: 'bookmarker',
-      title: intl.formatMessage(messages.pageTitle),
-    });
 
     return (
       <div>
