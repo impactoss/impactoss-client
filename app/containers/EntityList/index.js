@@ -19,7 +19,6 @@ import Loading from 'components/Loading';
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 import EntityListMain from 'components/EntityListMain';
-import PrintHide from 'components/styled/PrintHide';
 
 import {
   selectHasUserRole,
@@ -146,7 +145,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       : entityIdsSelected;
 
     return (
-      <PrintHide>
+      <div>
         { !this.props.dataReady
           && <EntityListSidebarLoading />
         }
@@ -295,7 +294,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             </Progress>
           )
         }
-      </PrintHide>
+      </div>
     );
   }
 }
