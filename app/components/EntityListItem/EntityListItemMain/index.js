@@ -34,6 +34,11 @@ const Styled = styled(Component)`
     : props.theme.sizes.mainListItem.paddingHorizontal
 }px;
   }
+  @media print {
+    box-shadow: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
 `;
 
 const EntityListItemMainTitleWrap = styled.a`

@@ -18,5 +18,7 @@ export default styled.div`
   @media print {
     background: transparent;
     font-size: ${(props) => props.theme.sizes.header.print.claim};
+    padding: 0;
+    color: ${palette('primary', 0)};
   }
 `;

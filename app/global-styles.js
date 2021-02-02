@@ -205,6 +205,9 @@ const GlobalStyle = createGlobalStyle`
   }
 
   @media print {
+    @page {
+      margin: 1.5cm 1.2cm 1.5cm;
+    }
     body {
       font-size: 10pt;
     }
