@@ -10,7 +10,7 @@ import {
 } from 'containers/App/actions';
 import { selectReady, selectLocation, selectEntities } from 'containers/App/selectors';
 import Icon from 'components/Icon';
-import Button from 'components/buttons/Button';
+import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 
 import BookmarkForm from './BookmarkForm';
 import { DEPENDENCIES } from './constants';
@@ -64,7 +64,8 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
     if (dataReady) {
       return (
         <BookmarkerContainer>
-          <Button
+          <ButtonFlatIconOnly
+            subtle
             onClick={
               () => {
                 if (!bookmark) {
@@ -94,7 +95,7 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
           >
             {bookmark && <Icon name="bookmark_active" />}
             {!bookmark && <Icon name="bookmark_inactive" />}
-          </Button>
+          </ButtonFlatIconOnly>
           {this.state.open && bookmark && (
             <BookmarkForm
               bookmark={bookmark}
