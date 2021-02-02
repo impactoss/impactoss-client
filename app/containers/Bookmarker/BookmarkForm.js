@@ -53,6 +53,9 @@ const StyledFieldGroupWrapper = styled(FieldGroupWrapper)`
 `;
 const StyledGroupLabel = styled(GroupLabel)`
   font-size: 1.2em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
+  }
 `;
 const ButtonIcon = styled(ButtonFlatWithIcon)`
   position: absolute;

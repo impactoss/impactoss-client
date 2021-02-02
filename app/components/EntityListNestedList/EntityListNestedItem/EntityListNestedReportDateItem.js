@@ -28,6 +28,9 @@ const Styled = styled.div`
 const Status = styled.div`
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
   color:  ${(props) => props.unscheduled ? palette('text', 1) : 'inherit'};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.listItemTop};
+  }
 `;
 const DueDate = styled.div`
   font-weight: 500;

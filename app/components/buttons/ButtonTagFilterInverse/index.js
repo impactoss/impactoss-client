@@ -17,6 +17,9 @@ const ButtonTagFilterInverse = styled(ButtonTagFilter)`
     padding: 1px 6px;
     font-size: 0.85em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 export default ButtonTagFilterInverse;

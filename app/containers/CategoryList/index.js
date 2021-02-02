@@ -51,6 +51,9 @@ const UsersOnly = styled.h4`
 const Description = styled.p`
   margin-bottom: 2em;
   font-size: 1em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   // make sure to load all data from server

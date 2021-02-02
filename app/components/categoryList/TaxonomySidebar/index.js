@@ -42,6 +42,9 @@ const ToggleShow = styled(ButtonDefault)`
     font-size: 0.85em;
     width: ${(props) => props.theme.sizes.aside.width.large}px;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const ToggleHide = styled(Button)`

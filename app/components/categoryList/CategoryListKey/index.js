@@ -13,6 +13,9 @@ const Styled = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     font-size: 0.8em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const ColumnKey = styled.span`

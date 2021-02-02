@@ -22,10 +22,16 @@ const New = styled.span`
   font-size: 0.8em;
   margin-left: 0.5em;
   border-radius: 4px;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 const Id = styled.span`
   color: ${palette('text', 1)};
   font-size: 0.9em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 const IdSpacer = styled.span`
   padding-left: 0.25em;

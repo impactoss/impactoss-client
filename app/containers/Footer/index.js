@@ -90,6 +90,9 @@ const Table = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-size: 1em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 
 const TableCell = styled.div`
@@ -128,6 +131,9 @@ const PartnerNote = styled.div`
   font-size: ${(props) => props.theme.sizes.text.smallMobile};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.text.small};
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
   }
 `;
 

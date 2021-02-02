@@ -18,6 +18,9 @@ const Styled = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 0.85em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 export class EntityListGroupBy extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -46,6 +49,7 @@ export class EntityListGroupBy extends React.PureComponent { // eslint-disable-l
               options={options}
               isReset
               onChange={onChange}
+              hidePrint={!value || value === PARAMS.GROUP_RESET}
             />
           )
         }

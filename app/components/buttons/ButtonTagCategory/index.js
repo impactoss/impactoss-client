@@ -51,6 +51,7 @@ const ButtonTagCategory = styled(Button)`
     border-color: ${(props) => getColor(props)};
     margin-right: 10px;
     padding: 1px 2px;
+    font-size: ${(props) => props.theme.sizes.print.smaller};
   }
 `;
 

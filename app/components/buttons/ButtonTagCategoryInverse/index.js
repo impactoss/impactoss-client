@@ -39,6 +39,7 @@ const ButtonTagCategoryInverse = styled(Button)`
 };
     margin-right: 10px;
     padding: 1px 2px;
+    font-size: ${(props) => props.theme.sizes.print.smaller};
 `;
 
 export default ButtonTagCategoryInverse;

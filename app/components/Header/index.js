@@ -126,10 +126,16 @@ const HideSecondaryWrap = styled.div`
 const HideSecondary = styled(Button)``;
 
 const LinkSuperTitle = styled.div`
-  font-size: 12px;
+  font-size: ${(props) => props.theme.sizes.text.smaller};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 const LinkTitle = styled.div`
-  font-size: 16px;
+  font-size: ${(props) => props.theme.sizes.text.default};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
   font-weight: bold;
   color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
 `;

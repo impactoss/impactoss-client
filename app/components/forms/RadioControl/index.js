@@ -9,6 +9,9 @@ const Option = styled.div`
 `;
 const Hint = styled.div`
   font-size: 0.85em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 // see also ScheduleItem
 const Label = styled.label`

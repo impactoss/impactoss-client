@@ -65,6 +65,9 @@ const Description = styled.p`
     margin-bottom: 2em;
     font-size: 1.1em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 const Diagram = styled.div`
   position: relative;
@@ -120,8 +123,10 @@ const DiagramButton = styled(Button)`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: ${({ draft }) => draft ? '0.6em 1em 1.4em' : '0.8em 1em'};
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
-// font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 const DiagramButtonIcon = styled.div`
   padding-bottom: 5px;
 `;
@@ -135,6 +140,9 @@ const DraftEntities = styled.div`
     position: absolute;
     left: 0;
     right: 0;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
   }
 `;
 
@@ -156,11 +164,14 @@ const PathLineArrow = styled(PathLine)`
 `;
 const SectionLabel = styled.div`
   color: ${palette('text', 1)};
-  font-size: 13px;
+  font-size: ${(props) => props.theme.sizes.text.small};
   margin-top: 5px;
   position: absolute;
   left: 0;
   top: 0;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 const STATE_INITIAL = {

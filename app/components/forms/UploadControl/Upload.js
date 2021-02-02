@@ -53,6 +53,9 @@ const Uploading = styled.div`
   margin-bottom: 0.25em;
   margin-top: -0.5em;
   overflow: hidden;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 const Styled = styled.div`
   padding-top: 1em;
@@ -71,6 +74,9 @@ const ReactS3UploaderLabelWrap = styled.label`
   &:hover {
     color: ${palette('buttonDefaultHover', 0)};
     background-color: ${palette('buttonDefaultHover', 1)};
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
   }
 `;
 

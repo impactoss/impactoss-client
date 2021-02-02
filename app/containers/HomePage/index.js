@@ -99,6 +99,9 @@ const Title = styled.h1`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     margin-top: 1em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.home.print.title};
+  }
 `;
 
 const Claim = styled.p`
@@ -113,6 +116,9 @@ const Claim = styled.p`
     font-size: ${(props) => props.theme.sizes.home.text.claim};
     margin-bottom: 1.5em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.home.print.claim};
+  }
 `;
 
 const Intro = styled(ReactMarkdown)`
@@ -125,6 +131,9 @@ const Intro = styled(ReactMarkdown)`
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-size: 1.25em;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
   }
 `;
 const GridSpace = styled(Grid)`
