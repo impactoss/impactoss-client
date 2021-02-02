@@ -36,6 +36,7 @@ import Component from 'components/styled/Component';
 import Content from 'components/styled/Content';
 import EntityListHeader from 'components/EntityListMain/EntityListGroups/EntityListHeader';
 import EntityListItemWrapper from 'components/EntityListMain/EntityListGroups/EntityListItems/EntityListItemWrapper';
+import PrintHide from 'components/styled/PrintHide';
 
 import {
   updateQuery,
@@ -257,7 +258,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
         }
         { dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE
           && (
-            <div>
+            <PrintHide>
               <Sidebar responsiveSmall>
                 <ScrollableWrapper>
                   <Component>
@@ -270,7 +271,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                   </Component>
                 </ScrollableWrapper>
               </Sidebar>
-            </div>
+            </PrintHide>
           )
         }
         <ContainerWithSidebar sidebarResponsiveSmall>
