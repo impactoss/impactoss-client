@@ -71,8 +71,22 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     const headerOptions = {
       supTitle: intl.formatMessage(messages.pageTitle),
       icon: type,
-      actions: [],
+      actions: [
+        {
+          type: 'bookmarker',
+          title: intl.formatMessage(appMessages.entities[type].plural),
+          entityType: type,
+        },
+      ],
     };
+    if (window.print) {
+      headerOptions.actions.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+    }
     if (isManager) {
       headerOptions.actions.push({
         type: 'text',
@@ -91,11 +105,6 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         onClick: () => this.props.handleNew(),
       });
     }
-    headerOptions.actions.push({
-      type: 'bookmarker',
-      title: intl.formatMessage(appMessages.entities[type].plural),
-      entityType: type,
-    });
     // if (dataReady) {
     //   console.log(this.props.entities.toJS())
     //   console.log(this.props.connections.toJS())

@@ -181,14 +181,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       });
     }
     const headerActions = (dataReady && isUserSignedIn) ? header.actions : [];
-    if (dataReady && window.print) {
-      headerActions.push({
-        type: 'icon',
-        onClick: () => window.print(),
-        title: 'Print',
-        icon: 'print',
-      });
-    }
+
     return (
       <ContainerWithSidebar ref={this.ScrollContainer}>
         <Container ref={this.ScrollReference}>

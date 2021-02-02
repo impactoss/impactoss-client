@@ -190,21 +190,30 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     const hasResponse = dataReady && currentFramework.getIn(['attributes', 'has_response']);
     const hasMeasures = dataReady && currentFramework.getIn(['attributes', 'has_measures']);
     const hasIndicators = dataReady && currentFramework.getIn(['attributes', 'has_indicators']);
-    const buttons = isManager
-      ? [
-        {
-          type: 'edit',
-          onClick: this.props.handleEdit,
-        },
-        {
+    let buttons = [];
+    if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+      buttons = isManager
+        ? buttons.concat([
+          {
+            type: 'edit',
+            onClick: () => this.props.handleEdit(this.props.params.id),
+          },
+          {
+            type: 'close',
+            onClick: this.props.handleClose,
+          },
+        ])
+        : buttons.concat([{
           type: 'close',
           onClick: this.props.handleClose,
-        },
-      ]
-      : [{
-        type: 'close',
-        onClick: this.props.handleClose,
-      }];
+        }]);
+    }
 
     return (
       <div>
