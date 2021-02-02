@@ -113,6 +113,9 @@ const Target = styled(Button)`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 0.4em 20px 0.4em 24px
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const TargetTitle = styled.div`
@@ -120,7 +123,6 @@ const TargetTitle = styled.div`
   display: table-cell;
   width: 99%;
 `;
-// font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 const TargetCount = styled.div`
   padding-left: 5px;
   width: 32px;
@@ -142,6 +144,9 @@ const Count = styled.div`
   font-size: 0.85em;
   text-align: center;
   min-width: 32px;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const ListHint = styled.div`

@@ -20,6 +20,9 @@ const ConnectionLabel = styled.span`
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemBottom};
   padding-top: 2px;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.listItemBottom};
+  }
 `;
 const Styled = styled.div`
   width: 100%;

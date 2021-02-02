@@ -38,7 +38,6 @@ const TaxTitle = styled.div`
   display: table-cell;
 `;
 
-// font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 const TaxIcon = styled.div`
   padding-right: 8px;
   vertical-align: middle;

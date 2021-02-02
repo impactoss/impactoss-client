@@ -16,6 +16,9 @@ const Styled = styled.span`
     margin-right: 0;
   }
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemBottom};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.listItemBottom};
+  }
 `;
 
 const DateWrap = styled.span``;

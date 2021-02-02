@@ -48,6 +48,9 @@ const ListInlineItem = styled.li`
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     font-size: 1.25em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
+  }
 `;
 const ListInlineItemLink = styled(A)`
   width: 1.5em;

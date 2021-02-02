@@ -31,6 +31,9 @@ const Styled = styled(Button)`
     padding: 0.25em 8px 0.25em 16px;
     font-size: 0.9em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 const GroupLabel = styled.div`
   display: table-cell;

@@ -81,6 +81,9 @@ const Count = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     line-height: ${({ multiple }) => multiple ? 15 : 25}px;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 const CountSecondary = styled(Count)`
   right: 0;
@@ -106,12 +109,18 @@ const Title = styled.div`
     padding: 0 18px;
     font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
+  }
 `;
 const FrameworkLabel = styled.div`
-  font-size: 12px;
+  font-size: ${(props) => props.theme.sizes.text.smaller};
   color: ${palette('text', 1)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-left: 40px;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
   }
 `;
 const StatusWrap = styled.div`

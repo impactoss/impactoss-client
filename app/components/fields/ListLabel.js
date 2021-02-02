@@ -8,6 +8,9 @@ const ListLabel = styled.h4`
   color: ${palette('text', 0)};
   margin: 0;
   font-size: 1em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 
 export default ListLabel;

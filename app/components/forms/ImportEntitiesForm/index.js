@@ -51,6 +51,9 @@ const ImportingText = styled.div`
   margin-bottom: 0.25em;
   margin-top: -0.5em;
   overflow: hidden;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 
 const DocumentWrapEdit = styled(DocumentWrap)`
@@ -63,17 +66,24 @@ const FormTitle = styled.h2`
   padding-top: 0;
   margin-top: 0;
 `;
+
 const Intro = styled.div`
-margin-bottom: 10px;
+  margin-bottom: 10px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     margin-bottom: 16px;
     font-size: 1.2em;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
   }
 `;
 const Hint = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     margin-bottom: 16px;
     font-size: 1.2em;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
   }
 `;
 const CsvDownload = styled.span`

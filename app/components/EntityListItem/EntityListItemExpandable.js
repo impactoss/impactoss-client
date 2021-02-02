@@ -32,6 +32,9 @@ const Count = styled.span`
   color: ${palette('text', 1)};
   padding: 0 8px;
   font-size: 1.5em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.larger};
+  }
 `;
 
 const Info = styled.div`

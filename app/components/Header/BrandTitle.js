@@ -8,4 +8,7 @@ export default styled.h1`
   }
   text-transform: uppercase;
   margin: 0;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.header.print.title};
+  }
 `;

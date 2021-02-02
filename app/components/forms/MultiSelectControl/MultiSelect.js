@@ -95,6 +95,9 @@ const LabelWrap = styled.div`
   padding-right: 1em;
   font-size: 0.8em;
   vertical-align: middle;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 const CheckboxWrap = styled.div`
   text-align: center;

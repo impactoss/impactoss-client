@@ -47,6 +47,9 @@ const ListEntitiesEmpty = styled.div`
   font-size: 1.2em;
   padding: 1.5em;
   color: ${palette('text', 1)};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
+  }
 `;
 
 const ToggleShow = styled(ButtonDefault)`
@@ -64,6 +67,9 @@ const ToggleShow = styled(ButtonDefault)`
     font-size: 0.85em;
     padding: 0.75em 1em;
     width: ${(props) => props.theme.sizes.aside.width.large}px;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
   }
 `;
 

@@ -13,6 +13,9 @@ const Markdown = styled(ReactMarkdown)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.text.markdown};
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.markdown};
+  }
 `;
 
 // TODO also render HTML if not markdown

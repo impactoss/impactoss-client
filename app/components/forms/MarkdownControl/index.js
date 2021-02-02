@@ -11,6 +11,9 @@ const MarkdownHint = styled.div`
   text-align: right;
   color: ${palette('text', 1)};
   font-size: 0.85em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 export class MarkdownControl extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {

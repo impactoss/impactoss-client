@@ -43,6 +43,9 @@ const SearchInput = styled(DebounceInput)`
   }
   flex: 1;
   font-size: 0.85em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 const Tags = styled.div`
   margin-top: -2px;

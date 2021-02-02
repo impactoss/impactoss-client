@@ -12,6 +12,9 @@ const Styled = styled.span`
   font-size: 0.85em;
   letter-spacing: 0.75px;
   display: inline-block;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 class SupTitle extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

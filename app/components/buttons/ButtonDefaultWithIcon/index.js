@@ -27,6 +27,9 @@ const Button = styled(ButtonDefault)`
     min-height: 3em;
     padding: 0.3em 1.5em 0.2em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 
 const Word = styled.span`

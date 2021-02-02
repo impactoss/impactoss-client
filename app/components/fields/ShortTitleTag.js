@@ -17,6 +17,9 @@ const ShortTitleTag = styled.span`
   font-size: 0.85em;
   border: 1px solid;
   line-height: normal;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 export default ShortTitleTag;

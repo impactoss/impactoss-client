@@ -23,5 +23,8 @@ const ColumnHeader = styled.div`
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.medium : '993px'}) {
     font-size: 0.85em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 export default ColumnHeader;

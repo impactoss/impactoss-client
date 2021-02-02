@@ -105,6 +105,9 @@ const Target = styled(Button)`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 0.4em 20px 0.4em 24px
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const TargetTitle = styled.div`

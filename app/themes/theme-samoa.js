@@ -295,8 +295,22 @@ theme.sizes = {
     markdown: '18px',
     markdownMobile: '16px',
     small: '13px', // used for labels
+    smaller: '12px', // used for labels
     smallMobile: '11px', // used for labels
     default: '16px', // used for labels
+  },
+  print: {
+    mainListItem: '11pt',
+    nestedListItem: '10pt',
+    listItemTop: '8pt',
+    listItemBottom: '7pt',
+    markdown: '10pt',
+    smallest: '7pt', // used for labels
+    smaller: '8pt', // used for labels
+    small: '9pt', // used for labels
+    default: '10pt', // used for labels
+    large: '11pt', // used for labels
+    larger: '12pt', // used for labels
   },
   // px only
   aside: {
@@ -329,6 +343,10 @@ theme.sizes = {
       claim: '12px',
       claimMobile: '1em',
     },
+    print: {
+      title: '18pt',
+      claim: '9pt',
+    },
     paddingLeft: {
       mobile: 3,
       small: 6,
@@ -342,6 +360,10 @@ theme.sizes = {
       titleMobile: '1.4em',
       claim: '1em',
       claimMobile: '0.8em',
+    },
+    print: {
+      title: '2.8em',
+      claim: '1em',
     },
   },
 };
