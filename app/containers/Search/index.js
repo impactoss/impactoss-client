@@ -35,7 +35,7 @@ import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
 import SupTitle from 'components/SupTitle';
 import Component from 'components/styled/Component';
 import Content from 'components/styled/Content';
-
+import PrintHide from 'components/styled/PrintHide';
 
 // import EntityListItem from 'components/EntityListItem';
 import EntityListHeader from 'components/EntityListMain/EntityListGroups/EntityListHeader';
@@ -301,7 +301,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
         }
         { dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE
           && (
-            <div>
+            <PrintHide>
               <Sidebar responsiveSmall>
                 <ScrollableWrapper>
                   <Component>
@@ -314,7 +314,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                   </Component>
                 </ScrollableWrapper>
               </Sidebar>
-            </div>
+            </PrintHide>
           )
         }
         <ContainerWithSidebar sidebarResponsiveSmall>
