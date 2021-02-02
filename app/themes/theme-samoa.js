@@ -344,7 +344,7 @@ theme.sizes = {
       claimMobile: '1em',
     },
     print: {
-      title: '18pt',
+      title: '14pt',
       claim: '9pt',
     },
     paddingLeft: {

@@ -8,6 +8,9 @@ const Aside = styled(Main)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     width: 30%;
   }
+  @media print {
+    width: 100%;
+  }
 `;
 
 export default Aside;

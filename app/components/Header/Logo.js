@@ -13,6 +13,9 @@ const Logo = styled(NormalImg)`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding-left: ${(props) => props.theme.sizes.header.paddingLeft.large || 20}px;
   }
+  @media print {
+    padding-left: 0;
+  }
 `;
 
 export default Logo;

@@ -6,4 +6,7 @@ export default styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 5px 20px;
   }
+  @media print {
+    padding: 5px 10px;
+  }
 `;
