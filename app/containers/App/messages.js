@@ -197,6 +197,10 @@ export default defineMessages({
       id: 'app.containers.App.labels.perPage',
       defaultMessage: 'Per page',
     },
+    groupedByTaxonomy: {
+      id: 'app.containers.App.labels.groupedByTaxonomy',
+      defaultMessage: ' (by {tax})',
+    },
     smart: {
       met: {
         id: 'app.containers.App.labels.smart.met',

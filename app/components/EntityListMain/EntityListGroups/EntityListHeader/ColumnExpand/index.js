@@ -44,9 +44,7 @@ class ColumnExpand extends React.PureComponent { // eslint-disable-line react/pr
       isExpand, label, width, onExpand,
     } = this.props;
     return (
-      <Styled
-        width={width}
-      >
+      <Styled colWidth={width * 100}>
         <Wrapper>
           <Label>{label}</Label>
           <ExpandWrapper>
