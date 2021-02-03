@@ -200,6 +200,7 @@
   "app.containers.App.buttons.hideSecondaryNavigation": "Hide top menu",
   "app.containers.App.buttons.showSecondaryNavigation": "Show top menu",
   "app.containers.App.labels.perPage": "Per page",
+  "app.containers.App.labels.groupedByTaxonomy": " (by {tax})",
   "app.containers.App.labels.smart.met": "Met",
   "app.containers.App.labels.smart.notMet": "Not met",
   "app.containers.App.fields.connectionsGrouped": "{size} {type} grouped by {byType}",
