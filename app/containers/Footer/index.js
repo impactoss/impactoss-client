@@ -25,6 +25,10 @@ const FooterMain = styled.div`
   background-color: ${palette('footer', 1)};
   color: ${palette('footer', 0)};
   padding: 0;
+  @media print {
+    color: ${palette('text', 0)};
+    background: transparent;
+  }
 `;
 
 const FooterLink = styled.a`
@@ -40,6 +44,10 @@ const ImpactLink = styled.a`
   &:hover {
     color: ${palette('footerLinksHover', 0)};
     opacity: 0.8;
+  }
+  @media print {
+    color: ${palette('text', 0)};
+    text-decoration: underline;
   }
 `;
 

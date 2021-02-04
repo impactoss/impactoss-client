@@ -69,6 +69,7 @@ const Styled = styled.div`
   box-shadow: ${(props) => props.hasShadow ? '0px 0px 15px 0px rgba(0,0,0,0.5)' : 'none'};
   z-index: 101;
   @media print {
+    display: ${({ isHome }) => isHome ? 'none' : 'block'};
     height: ${({ theme }) => theme.sizes.header.banner.height}px;
     position: static;
     box-shadow: none;
@@ -337,6 +338,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       && frameworkOptions.find((option) => option.active);
     return (
       <Styled
+        isHome={isHome}
         fixed={isHome}
         sticky={!isHome}
         hasBackground={!isHome}

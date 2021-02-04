@@ -65,15 +65,21 @@ const GraphicHome = styled(NormalImg)`
 
 const SectionTop = styled.div`
   min-height: ${(props) => props.hasBrand ? 0 : '100vH'};
-  display: ${(props) => props.hasBrand ? 'static' : 'table'};
+  display: ${(props) => props.hasBrand ? 'block' : 'table'};
   width: ${(props) => props.hasBrand ? 'auto' : '100%'};
   background-color: ${palette('home', 0)};
   color: ${palette('homeIntro', 0)};
   text-align: center;
+  @media print {
+    background-color: transparent;
+    color: ${palette('text', 0)};
+    display: block;
+    min-height: auto;
+  }
 `;
 
 const SectionWrapper = styled.div`
-  display: ${(props) => props.hasBrand ? 'static' : 'table-cell'};
+  display: ${(props) => props.hasBrand ? 'block' : 'table-cell'};
   vertical-align: ${(props) => props.hasBrand ? 'baseline' : 'middle'};
   padding-bottom: 3em;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
@@ -100,6 +106,7 @@ const Title = styled.h1`
   }
   @media print {
     font-size: ${(props) => props.theme.sizes.home.print.title};
+    color: ${palette('primary', 0)}
   }
 `;
 
@@ -117,6 +124,7 @@ const Claim = styled.p`
   }
   @media print {
     font-size: ${(props) => props.theme.sizes.home.print.claim};
+    color: ${palette('primary', 0)}
   }
 `;
 
@@ -141,9 +149,27 @@ const GridSpace = styled(Grid)`
     display: inline-block;
   }
 `;
-const StyledButtonHero = styled(ButtonHero)`
-  max-width: 250px;
+const FrameworkButton = styled(ButtonHero)`
+  max-width: ${({ single }) => single ? 'auto' : '250px'};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+    color: ${palette('primary', 0)};
+    background: transparent;
+    border: 1px solid ${palette('light', 3)};
+    border-radius: 10px;
+    max-width: ${({ count }) => count ? ((100 / count) - 2) : 100}%;
+    min-width: auto;
+    margin: 0 1%;
+  }
 `;
+
+// const StyledButtonFlat = styled(ButtonFlat)`
+//   color: ${palette('homeIntro', 0)};
+//   @media print {
+//     color: ${palette('text', 1)};
+//     text-decoration: underline;
+//   }
+// `;
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
@@ -230,9 +256,14 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                     <Row space>
                       <Grid lg={1} sm={1} xs={1}>
                         {frameworks.entrySeq().map(([key, fw]) => (
-                          <StyledButtonHero space key={key} onClick={() => onSelectFramework(fw.get('id'))}>
+                          <FrameworkButton
+                            space
+                            key={key}
+                            onClick={() => onSelectFramework(fw.get('id'))}
+                            count={frameworks.size}
+                          >
                             <FormattedMessage {...appMessages.frameworks[fw.get('id')]} />
-                          </StyledButtonHero>
+                          </FrameworkButton>
                         ))}
                       </Grid>
                     </Row>
@@ -250,9 +281,13 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                   <Row space>
                     <GridSpace lg={1 / 6} sm={1 / 8} />
                     <Grid lg={2 / 3} sm={3 / 4} xs={1}>
-                      <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
+                      <FrameworkButton
+                        single
+                        onClick={() => onPageLink(PATHS.OVERVIEW)}
+                        count={1}
+                      >
                         <FormattedMessage {...messages.explore} />
-                      </ButtonHero>
+                      </FrameworkButton>
                     </Grid>
                   </Row>
                 )}
