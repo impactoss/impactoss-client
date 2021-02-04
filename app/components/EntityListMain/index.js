@@ -79,7 +79,6 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       entityTitle,
       dataReady,
       isManager,
-      isUserSignedIn,
       isContributor,
       onGroupSelect,
       onSubgroupSelect,
@@ -180,7 +179,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
           ),
       });
     }
-    const headerActions = (dataReady && isUserSignedIn) ? header.actions : [];
+    const headerActions = dataReady ? header.actions : [];
 
     return (
       <ContainerWithSidebar ref={this.ScrollContainer}>
@@ -294,7 +293,6 @@ EntityListMain.propTypes = {
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   isContributor: PropTypes.bool,
-  isUserSignedIn: PropTypes.bool,
   entityIcon: PropTypes.func,
   // functions
   onEntityClick: PropTypes.func.isRequired,
