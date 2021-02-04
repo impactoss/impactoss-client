@@ -18,6 +18,7 @@ import {
   selectRecommendationTaxonomies,
   selectActiveFrameworks,
   selectIsUserManager,
+  selectIsSignedIn,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -62,7 +63,12 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   // }
   render() {
     const { intl } = this.context;
-    const { dataReady, frameworks, isManager } = this.props;
+    const {
+      dataReady,
+      frameworks,
+      isManager,
+      isUserSignedIn,
+    } = this.props;
     // console.log('RecList:render')
     const currentFramework = frameworks && frameworks.size === 1 && frameworks.first();
     const type = currentFramework
@@ -71,14 +77,15 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     const headerOptions = {
       supTitle: intl.formatMessage(messages.pageTitle),
       icon: type,
-      actions: [
-        {
-          type: 'bookmarker',
-          title: intl.formatMessage(appMessages.entities[type].plural),
-          entityType: type,
-        },
-      ],
+      actions: [],
     };
+    if (isUserSignedIn) {
+      headerOptions.actions.push({
+        type: 'bookmarker',
+        title: intl.formatMessage(appMessages.entities[type].plural),
+        entityType: type,
+      });
+    }
     if (window.print) {
       headerOptions.actions.push({
         type: 'icon',
@@ -156,6 +163,7 @@ RecommendationList.propTypes = {
   connectedTaxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   location: PropTypes.object,
+  isUserSignedIn: PropTypes.bool,
 };
 
 RecommendationList.contextTypes = {
@@ -170,6 +178,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectActiveFrameworks(state),
   isManager: selectIsUserManager(state),
+  isUserSignedIn: selectIsSignedIn(state),
 });
 
 function mapDispatchToProps(dispatch) {

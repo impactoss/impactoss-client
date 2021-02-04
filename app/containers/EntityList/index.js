@@ -23,7 +23,6 @@ import EntityListMain from 'components/EntityListMain';
 import {
   selectHasUserRole,
   selectCurrentPathname,
-  selectIsSignedIn,
 } from 'containers/App/selectors';
 
 import {
@@ -202,7 +201,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           dataReady={this.props.dataReady}
           isManager={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
           isContributor={this.props.hasUserRole[USER_ROLES.CONTRIBUTOR.value]}
-          isUserSignedIn={this.props.isUserSignedIn}
 
           entityIcon={this.props.entityIcon}
           onEntitySelect={this.props.onEntitySelect}
@@ -347,7 +345,6 @@ EntityList.propTypes = {
   onDismissError: PropTypes.func.isRequired,
   onDismissAllErrors: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
-  isUserSignedIn: PropTypes.bool,
   showSidebar: PropTypes.bool,
 };
 
@@ -363,7 +360,6 @@ const mapStateToProps = (state) => ({
   progress: selectProgress(state),
   progressTypes: selectProgressTypes(state),
   currentPath: selectCurrentPathname(state),
-  isUserSignedIn: selectIsSignedIn(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
