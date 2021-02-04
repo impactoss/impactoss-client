@@ -5,11 +5,11 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { reduce } from 'lodash/collection';
-
 import appMessage from 'utils/app-message';
 import { lowerCase } from 'utils/string';
 
@@ -18,6 +18,7 @@ import Button from 'components/buttons/Button';
 import ButtonTagFilter from 'components/buttons/ButtonTagFilter';
 import ButtonTagFilterInverse from 'components/buttons/ButtonTagFilterInverse';
 import DebounceInput from 'react-debounce-input';
+import PrintOnly from 'components/styled/PrintOnly';
 
 import messages from './messages';
 
@@ -33,6 +34,12 @@ const Search = styled.div`
   min-height: ${(props) => props.small ? 30 : 36}px;
   border-radius: 5px;
   position: relative;
+  @media print {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    display: ${({ hidePrint }) => hidePrint ? 'none' : 'block'};
+  }
 `;
 const SearchInput = styled(DebounceInput)`
   background-color: ${palette('background', 0)};
@@ -44,7 +51,7 @@ const SearchInput = styled(DebounceInput)`
   flex: 1;
   font-size: 0.85em;
   @media print {
-    font-size: ${(props) => props.theme.sizes.print.smaller};
+    display: none;
   }
 `;
 const Tags = styled.div`
@@ -61,6 +68,18 @@ const Clear = styled(Button)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
   }
+  @media print {
+    display: none;
+  }
+`;
+
+const LabelPrint = styled(PrintOnly)`
+  margin-top: 10px;
+  font-size: ${(props) => props.theme.sizes.print.small};
+`;
+const SearchValuePrint = styled(PrintOnly)`
+  font-size: ${(props) => props.theme.sizes.print.default};
+  font-weight: bold;
 `;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -105,8 +124,18 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     // onClick={() => {
     //   this.inputNode.focus()
     // }}
+    const hasFilters = (searchQuery || filters.length > 0);
     return (
-      <Search active={this.state.active} small={this.props.multiselect}>
+      <Search
+        active={this.state.active}
+        small={this.props.multiselect}
+        hidePrint={!hasFilters}
+      >
+        {filters.length > 0 && (
+          <LabelPrint>
+            <FormattedMessage {...messages.labelPrintFilters} />
+          </LabelPrint>
+        )}
         { filters.length > 0
           && (
             <Tags>
@@ -123,7 +152,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                     >
                       {this.getFilterLabel(filter)}
                       { filter.onClick
-                      && <Icon name="removeSmall" text textRight />
+                      && <Icon name="removeSmall" text textRight hidePrint />
                       }
                     </ButtonTagFilterInverse>
                   )
@@ -138,7 +167,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                     >
                       {this.getFilterLabel(filter)}
                       { filter.onClick
-                      && <Icon name="removeSmall" text textRight />
+                      && <Icon name="removeSmall" text textRight hidePrint />
                       }
                     </ButtonTagFilter>
                   ))
@@ -160,16 +189,24 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
               : messages.searchPlaceholderEntities
           ))}
         />
-        { (searchQuery || filters.length > 0)
-          && (
-            <Clear
-              onClick={this.props.onClear}
-              small={this.props.multiselect}
-            >
-              <Icon name="removeSmall" />
-            </Clear>
-          )
-        }
+        { hasFilters && (
+          <Clear
+            onClick={this.props.onClear}
+            small={this.props.multiselect}
+          >
+            <Icon name="removeSmall" />
+          </Clear>
+        )}
+        {searchQuery && (
+          <LabelPrint>
+            <FormattedMessage {...messages.labelPrintKeywords} />
+          </LabelPrint>
+        )}
+        {searchQuery && (
+          <SearchValuePrint>
+            {searchQuery}
+          </SearchValuePrint>
+        )}
       </Search>
     );
   }

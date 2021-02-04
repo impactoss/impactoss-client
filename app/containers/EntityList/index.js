@@ -18,7 +18,9 @@ import Loading from 'components/Loading';
 
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
+import EntityListPrintKey from 'components/EntityListPrintKey';
 import EntityListMain from 'components/EntityListMain';
+import PrintOnly from 'components/styled/PrintOnly';
 
 import {
   selectHasUserRole,
@@ -143,42 +145,45 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       ? entityIdsSelected.filter((id) => entities.map((entity) => entity.get('id')).includes(id))
       : entityIdsSelected;
 
+    // detect print to avoid expensive rendering
+    const printing = !!(
+      typeof window !== 'undefined'
+      && window.matchMedia
+      && window.matchMedia('print').matches
+    );
+
     return (
       <div>
-        { !this.props.dataReady
-          && <EntityListSidebarLoading />
-        }
-        { this.props.dataReady && this.props.showSidebar
-          && (
-            <EntityListSidebar
-              listUpdating={progress !== null && progress >= 0 && progress < 100}
-              entities={entities}
-              taxonomies={this.props.taxonomies}
-              frameworks={this.props.frameworks}
-              connections={this.props.connections}
-              connectedTaxonomies={this.props.connectedTaxonomies}
-              entityIdsSelected={
-                entityIdsSelected.size === entityIdsSelectedFiltered.size
-                  ? entityIdsSelected
-                  : entityIdsSelectedFiltered
-              }
-              config={this.props.config}
-              locationQuery={this.props.locationQuery}
-              canEdit={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
-              hasUserRole={this.props.hasUserRole}
-              activePanel={this.props.activePanel}
-              onPanelSelect={this.props.onPanelSelect}
-              onCreateOption={this.props.onCreateOption}
-              onUpdate={
-                (associations, activeEditOption) => this.props.handleEditSubmit(
-                  associations,
-                  activeEditOption,
-                  this.props.entityIdsSelected,
-                  viewDomain.get('errors'),
-                )}
-            />
-          )
-        }
+        {!this.props.dataReady && <EntityListSidebarLoading />}
+        {this.props.dataReady && this.props.showSidebar && !printing && (
+          <EntityListSidebar
+            listUpdating={progress !== null && progress >= 0 && progress < 100}
+            entities={entities}
+            taxonomies={this.props.taxonomies}
+            frameworks={this.props.frameworks}
+            connections={this.props.connections}
+            connectedTaxonomies={this.props.connectedTaxonomies}
+            entityIdsSelected={
+              entityIdsSelected.size === entityIdsSelectedFiltered.size
+                ? entityIdsSelected
+                : entityIdsSelectedFiltered
+            }
+            config={this.props.config}
+            locationQuery={this.props.locationQuery}
+            canEdit={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
+            hasUserRole={this.props.hasUserRole}
+            activePanel={this.props.activePanel}
+            onPanelSelect={this.props.onPanelSelect}
+            onCreateOption={this.props.onCreateOption}
+            onUpdate={
+              (associations, activeEditOption) => this.props.handleEditSubmit(
+                associations,
+                activeEditOption,
+                this.props.entityIdsSelected,
+                viewDomain.get('errors'),
+              )}
+          />
+        )}
         <EntityListMain
           listUpdating={progress !== null && progress >= 0 && progress < 100}
           entities={entities}
@@ -225,6 +230,16 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onDismissError={this.props.onDismissError}
           onDismissAllErrors={onDismissAllErrors}
         />
+        {this.props.dataReady && (
+          <PrintOnly>
+            <EntityListPrintKey
+              entities={entities}
+              taxonomies={this.props.taxonomies}
+              config={this.props.config}
+              locationQuery={this.props.locationQuery}
+            />
+          </PrintOnly>
+        )}
         { (progress !== null && progress < 100)
           && (
             <Progress>

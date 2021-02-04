@@ -7,6 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Map, List } from 'immutable';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import { jumpToComponent } from 'utils/scroll-to-component';
 import { lowerCase } from 'utils/string';
@@ -18,10 +19,10 @@ import Content from 'components/styled/Content';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
+import PrintOnly from 'components/styled/PrintOnly';
 
 import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
-import PrintHide from 'components/styled/PrintHide';
 
 import EntityListGroups from './EntityListGroups';
 
@@ -32,7 +33,7 @@ import { groupEntities } from './group-entities';
 
 import messages from './messages';
 
-const EntityListSearch = styled(PrintHide)`
+const EntityListSearch = styled.div`
   padding-bottom: 1em;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-bottom: 2em;
@@ -41,6 +42,11 @@ const EntityListSearch = styled(PrintHide)`
 
 const ListEntities = styled.div``;
 const ListWrapper = styled.div``;
+const PrintHintKey = styled(PrintOnly)`
+  font-style: italic;
+  font-size: ${(props) => props.theme.sizes.print.smaller};
+  margin-bottom: 20px;
+`;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -197,6 +203,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
             {!dataReady && <Loading />}
             {dataReady && (
               <ListEntities>
+                <PrintHintKey>
+                  <FormattedMessage {...messages.printHintKey} />
+                </PrintHintKey>
                 <EntityListSearch>
                   <TagSearch
                     filters={currentFilters(
