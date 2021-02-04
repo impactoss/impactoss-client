@@ -188,8 +188,14 @@ export const makeFilterGroups = (
       options: reduce(
         config.attributes.options,
         (options, option) => (
-          (typeof option.role === 'undefined' || hasUserRole[option.role])
-            && (typeof option.frameworkFilter === 'undefined' || checkFramework(frameworks, option.frameworkFilter))
+          (
+            typeof option.role === 'undefined'
+            || (hasUserRole && hasUserRole[option.role])
+          )
+          && (
+            typeof option.frameworkFilter === 'undefined'
+            || checkFramework(frameworks, option.frameworkFilter)
+          )
         )
           ? options.concat([{
             id: option.attribute, // filterOptionId
