@@ -44,6 +44,14 @@ const ButtonTagCategoryInverse = styled(Button)`
     padding: 0 4px;
     font-size: ${(props) => props.theme.sizes.print.smallest};
     line-height: 10pt;
+    &:hover {
+      color: ${palette('text', 1)};
+      background-color: transparent;
+      border-color: ${(props) => props.disabled
+    ? palette('taxonomies', props.taxId || 0)
+    : palette('taxonomiesHover', props.taxId || 0)
+};
+    }
 `;
 
 export default ButtonTagCategoryInverse;

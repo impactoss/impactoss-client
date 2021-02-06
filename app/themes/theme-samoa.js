@@ -311,6 +311,7 @@ theme.sizes = {
     default: '10pt', // used for labels
     large: '11pt', // used for labels
     larger: '12pt', // used for labels
+    largest: '14pt', // used for labels
   },
   // px only
   aside: {

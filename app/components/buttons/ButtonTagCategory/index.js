@@ -44,7 +44,7 @@ const ButtonTagCategory = styled(Button)`
   }
   @media print {
     color: ${palette('text', 1)};
-    background: transparent;
+    background-color: transparent;
     margin-right: 8px;
     border-radius: 3px;
     border-right: 1px solid;
@@ -55,6 +55,11 @@ const ButtonTagCategory = styled(Button)`
     padding: 0 4px;
     font-size: ${(props) => props.theme.sizes.print.smallest};
     line-height: 10pt;
+    &:hover {
+      color: ${palette('text', 1)};
+      background-color: transparent;
+      border-color: ${(props) => getColor(props)};
+    }
   }
 `;
 

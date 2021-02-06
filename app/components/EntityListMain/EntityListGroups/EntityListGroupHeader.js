@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import Link from 'containers/Link';
+import { PATHS } from 'containers/App/constants';
 
 const ListEntitiesGroupHeaderLink = styled(Link)`
   color: ${palette('link', 2)};
@@ -51,14 +52,14 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
     }
     return level === 1
       ? (
-        <ListEntitiesGroupHeaderLink to={`/category/${group.get('id')}`}>
+        <ListEntitiesGroupHeaderLink to={`${PATHS.CATEGORIES}/${group.get('id')}`}>
           <ListEntitiesGroupHeader>
             {group.get('label')}
           </ListEntitiesGroupHeader>
         </ListEntitiesGroupHeaderLink>
       )
       : (
-        <ListEntitiesGroupHeaderLink to={`/category/${group.get('id')}`}>
+        <ListEntitiesGroupHeaderLink to={`${PATHS.CATEGORIES}/${group.get('id')}`}>
           <ListEntitiesSubgroupHeader>
             {group.get('label')}
           </ListEntitiesSubgroupHeader>

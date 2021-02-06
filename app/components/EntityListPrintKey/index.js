@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Map, List } from 'immutable';
 import { sortEntities } from 'utils/sort';
+import { PATHS } from 'containers/App/constants';
 
 import ButtonTagCategory from 'components/buttons/ButtonTagCategory';
 
@@ -17,11 +18,23 @@ import appMessages from 'containers/App/messages';
 
 import { makeCategoriesForTaxonomy } from './categoryFactory';
 
-// import messages from './messages';
+import messages from './messages';
+
+const Styled = styled.div`
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid;
+`;
+
+const Title = styled.div`
+  font-weight: bold;
+  font-size: ${(props) => props.theme.sizes.print.largest};
+  margin-bottom: 20px;
+`;
 
 const Taxonomy = styled.div`
   width: 100%;
-  padding: ${(props) => props.small ? '0.5em 8px 0.5em 36px' : '0.75em 8px 0.75em 16px'};
+  padding: 0.75em 0;
   text-align: left;
   color: ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
   background-color: ${(props) => props.active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
@@ -29,16 +42,20 @@ const Taxonomy = styled.div`
   &:last-child {
     border-bottom: 0;
   }
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: ${(props) => props.small ? '0.5em 8px 0.5em 36px' : '0.75em 8px 0.75em 16px'};
-  }
 `;
-const Label = styled.div`
+const TaxLabel = styled.div`
   font-weight: bold;
+  font-size: ${(props) => props.theme.sizes.print.small};
+  margin-bottom: 5px;
 `;
-
-
-const Styled = styled.div``;
+const TagWrapper = styled.span`
+  display: inline-block;
+  min-width: 80px;
+`;
+const CatLabel = styled.span`
+  font-size: ${(props) => props.theme.sizes.print.small};
+  color: ${palette('text', 0)};
+`;
 
 export class EntityListPrintKey extends React.Component { // eslint-disable-line react/prefer-stateless-function
   render() {
@@ -51,6 +68,9 @@ export class EntityListPrintKey extends React.Component { // eslint-disable-line
     // only show taxonomy & associated categories if some list items have such category
     return (
       <Styled>
+        <Title>
+          <FormattedMessage {...messages.title} />
+        </Title>
         {config.taxonomies && taxonomies && sortEntities(taxonomies, 'asc', 'priority').map(
           (tax) => {
             const categories = makeCategoriesForTaxonomy(
@@ -64,19 +84,25 @@ export class EntityListPrintKey extends React.Component { // eslint-disable-line
             if (categories && categories.items && categories.items.length > 0) {
               return (
                 <Taxonomy key={tax.get('id')}>
-                  <Label>
+                  <TaxLabel>
                     <FormattedMessage {...appMessages.entities.taxonomies[tax.get('id')].plural} />
-                  </Label>
+                  </TaxLabel>
                   <div>
                     {categories.items.map((cat) => (
                       <div key={cat.id}>
-                        <ButtonTagCategory
-                          as="span"
-                          taxId={parseInt(tax.get('id'), 10)}
-                        >
-                          {cat.short}
-                        </ButtonTagCategory>
-                        {cat.label}
+                        <TagWrapper>
+                          <ButtonTagCategory
+                            as="span"
+                            taxId={parseInt(tax.get('id'), 10)}
+                          >
+                            {cat.short}
+                          </ButtonTagCategory>
+                        </TagWrapper>
+                        <a href={`${PATHS.CATEGORIES}/${cat.id}`}>
+                          <CatLabel>
+                            {cat.label}
+                          </CatLabel>
+                        </a>
                       </div>
                     ))}
                   </div>
@@ -95,7 +121,6 @@ EntityListPrintKey.propTypes = {
   taxonomies: PropTypes.instanceOf(Map),
   locationQuery: PropTypes.instanceOf(Map),
   config: PropTypes.object,
-  // theme: PropTypes.object,
 };
 
 EntityListPrintKey.contextTypes = {

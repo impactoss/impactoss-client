@@ -33,6 +33,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
     if (categories) {
       taxonomies
         .filter((tax) => !tax.getIn(['attributes', 'is_smart']))
+        .sortBy((tax) => tax.getIn(['attributes', 'priority']))
         .forEach((tax) => {
           tax
             .get('categories')

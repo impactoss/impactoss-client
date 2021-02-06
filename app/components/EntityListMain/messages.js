@@ -28,6 +28,6 @@ export default defineMessages({
   },
   printHintKey: {
     id: 'app.components.EntityListMain.printHintKey',
-    defaultMessage: 'Please refer to the end of this document for a category key and overview',
+    defaultMessage: 'Please refer to the end of this document for a category overview and tag key',
   },
 });
