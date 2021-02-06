@@ -16,6 +16,9 @@ const Styled = styled(ColumnHeader)`
     padding-right: 0.5em;
     padding-left: 1em;
   }
+  @media print {
+    display: table-cell;
+  }
 `;
 
 const Wrapper = styled.div`
