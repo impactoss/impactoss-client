@@ -55,7 +55,6 @@ export const makeCategoriesForTaxonomy = (
             short: truncateText(
               getCategoryShortTitle(category),
               TEXT_TRUNCATE.ENTITY_TAG,
-              false,
             ),
             label: getEntityTitle(category),
             group: parent && getEntityParentId(category),

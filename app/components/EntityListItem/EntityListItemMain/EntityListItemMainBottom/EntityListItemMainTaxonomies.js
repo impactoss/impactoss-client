@@ -51,7 +51,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
                   taxId: tax.get('id'),
                   title: category.getIn(['attributes', 'title']),
                   inverse: category.getIn(['attributes', 'draft']),
-                  label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG, false),
+                  label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG, categories.size < 5),
                   onClick: () => onClick(catId, 'category'),
                 });
               }

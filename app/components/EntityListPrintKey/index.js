@@ -45,7 +45,8 @@ const TaxLabel = styled.div`
 `;
 const TagWrapper = styled.span`
   display: inline-block;
-  min-width: 80px;
+  padding-right: 5px;
+  min-width: 100px;
 `;
 const CatLabel = styled.span`
   font-size: ${(props) => props.theme.sizes.print.small};
