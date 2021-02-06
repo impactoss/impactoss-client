@@ -204,6 +204,13 @@ const GlobalStyle = createGlobalStyle`
     display: inline-block;
   }
 
+  @media print and (color){
+    #app {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color-adjust: exact;
+    }
+  }
   @media print {
     @page {
       margin: 1.5cm 1.2cm 1.5cm;
