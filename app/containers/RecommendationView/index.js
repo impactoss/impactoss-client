@@ -186,10 +186,22 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
     );
 
-    const currentFramework = dataReady && frameworks.find((fw) => qe(fw.get('id'), frameworkId));
-    const hasResponse = dataReady && currentFramework.getIn(['attributes', 'has_response']);
-    const hasMeasures = dataReady && currentFramework.getIn(['attributes', 'has_measures']);
-    const hasIndicators = dataReady && currentFramework.getIn(['attributes', 'has_indicators']);
+    const currentFramework = dataReady
+      && (
+        frameworks.find(
+          (fw) => qe(fw.get('id'), frameworkId)
+        )
+        || frameworks.first()
+      );
+    const hasResponse = dataReady
+      && currentFramework
+      && currentFramework.getIn(['attributes', 'has_response']);
+    const hasMeasures = dataReady
+      && currentFramework
+      && currentFramework.getIn(['attributes', 'has_measures']);
+    const hasIndicators = dataReady
+      && currentFramework
+      && currentFramework.getIn(['attributes', 'has_indicators']);
     let buttons = [];
     if (dataReady) {
       buttons.push({
