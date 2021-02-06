@@ -21,6 +21,10 @@ const Styled = styled(Component)`
   }
   @media print {
     border: none;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    width:${(props) => props.colWidth * 100}%;
   }
 `;
 const IconWrap = styled.span`

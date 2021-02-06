@@ -60,6 +60,15 @@ export class EntityListPrintKey extends React.Component { // eslint-disable-line
       taxonomies,
       locationQuery,
     } = this.props;
+
+    const hasSome = config.taxonomies
+      && taxonomies
+      && taxonomies.some(
+        (tax) => tax.get('categories') && tax.get('categories').size > 0
+      );
+    if (!hasSome) {
+      return null;
+    }
     // only show taxonomy & associated categories if some list items have such category
     return (
       <Styled>

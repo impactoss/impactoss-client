@@ -226,7 +226,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onDismissError={this.props.onDismissError}
           onDismissAllErrors={onDismissAllErrors}
         />
-        {this.props.dataReady && (
+        {this.props.dataReady && this.props.config.taxonomies && (
           <PrintOnly>
             <EntityListPrintKey
               entities={entities}

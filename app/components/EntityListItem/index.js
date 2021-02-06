@@ -47,6 +47,8 @@ const MainWrapper = styled(Component)`
   }
   @media print {
     border: none;
+    display: table-cell;
+    width: ${(props) => props.expandable ? COLUMN_WIDTHS.MAIN * 100 : 100}%;
   }
 `;
 const MainInnerWrapper = styled(Component)`
