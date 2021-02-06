@@ -34,7 +34,11 @@ export const makeCategoriesForTaxonomy = (
         (cat) => getEntityTitle(cat),
       ).toJS();
     }
-    taxonomy.get('categories').forEach(
+    taxonomy.get(
+      'categories'
+    ).sortBy(
+      (cat) => cat.getIn(['attributes', 'title'])
+    ).forEach(
       (category, catId) => {
         // add categories from entities if present
         const present = entities.some(

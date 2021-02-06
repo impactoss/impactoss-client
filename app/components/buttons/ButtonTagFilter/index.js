@@ -32,6 +32,10 @@ const ButtonTagFilter = styled(Button)`
     padding: 0 4px;
     font-size: ${(props) => props.theme.sizes.print.smallest};
     line-height: 10pt;
+    &:hover {
+      color: ${palette('text', 1)};
+      background: transparent;
+    }
   }
 `;
 

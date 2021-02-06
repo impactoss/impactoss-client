@@ -75,7 +75,7 @@ const Clear = styled(Button)`
 
 const LabelPrint = styled(PrintOnly)`
   margin-top: 10px;
-  font-size: ${(props) => props.theme.sizes.print.small};
+  font-size: ${(props) => props.theme.sizes.print.smaller};
 `;
 const SearchValuePrint = styled(PrintOnly)`
   font-size: ${(props) => props.theme.sizes.print.default};
