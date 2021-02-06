@@ -10,7 +10,7 @@ const FieldGroupWrapper = styled.div`
     padding: ${(props) => props.seamless ? '30px 30px 20px 0' : '30px'};
   }
   @media print {
-    padding: 15px 0 10px;
+    padding: ${({ aside, bottom }) => (aside && !bottom) ? '15px 0 10px 20px' : '15px 0 10px'};
     background-color: transparent;
   }
 `;
