@@ -22,7 +22,6 @@ const ButtonTagFilter = styled(Button)`
   @media print {
     color: ${palette('text', 1)};
     background: transparent;
-    margin-right: 8px;
     border-radius: 3px;
     border-right: 1px solid;
     border-top: 1px solid;

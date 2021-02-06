@@ -49,6 +49,9 @@ const EntityListItemMainTitleWrap = styled.a`
   &:hover {
     color: ${palette('mainListItemHover', 0)};
   }
+  @media print {
+    padding: 1px 15px 5px 0;
+  }
 `;
 
 class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

@@ -300,9 +300,9 @@ theme.sizes = {
     default: '16px', // used for labels
   },
   print: {
-    mainListItem: '11pt',
-    nestedListItem: '10pt',
-    listItemTop: '8pt',
+    mainListItem: '10pt',
+    nestedListItem: '8pt',
+    listItemTop: '7pt',
     listItemBottom: '7pt',
     markdown: '10pt',
     smallest: '7pt', // used for labels

@@ -1,5 +1,6 @@
 import { find } from 'lodash/collection';
 import { CYCLE_TAXONOMY_ID } from 'themes/config';
+import { getCategoryShortTitle } from 'utils/entities';
 
 export const getSortOption = (sortOptions, sortBy, query = 'attribute') => find(sortOptions, (option) => option[query] === sortBy)
   || find(sortOptions, (option) => option.default);
@@ -17,6 +18,10 @@ const getEntitySortValueMapper = (entity, sortBy) => {
       return entity.getIn(['attributes', 'reference'])
       || entity.getIn(['attributes', 'title'])
       || entity.get('id');
+    case 'referenceThenShortTitle':
+      // use id field when reference not available
+      return entity.getIn(['attributes', 'reference'])
+      || getCategoryShortTitle(entity);
     // case 'titleSort':
     //   return entity.get(sortBy) || entity.getIn(['attributes', 'title']) || entity.get('id');
     case 'measures':

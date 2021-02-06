@@ -177,3 +177,10 @@ export const DB_TABLES = [
   'framework_taxonomies',
   'recommendation_indicators',
 ];
+
+export const COLUMN_WIDTHS = {
+  FULL: 1,
+  HALF: 0.5,
+  MAIN: 0.72,
+  OTHER: 0.28,
+};

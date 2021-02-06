@@ -21,15 +21,13 @@ import { makeCategoriesForTaxonomy } from './categoryFactory';
 import messages from './messages';
 
 const Styled = styled.div`
-  margin-top: 30px;
-  padding-top: 30px;
-  border-top: 1px solid;
+  page-break-before: always;
 `;
 
 const Title = styled.div`
   font-weight: bold;
   font-size: ${(props) => props.theme.sizes.print.largest};
-  margin-bottom: 20px;
+  margin: 15px 0 20px;
 `;
 
 const Taxonomy = styled.div`
@@ -38,10 +36,7 @@ const Taxonomy = styled.div`
   text-align: left;
   color: ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
   background-color: ${(props) => props.active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
-  border-bottom: 1px solid ${palette('asideListItem', 4)};
-  &:last-child {
-    border-bottom: 0;
-  }
+  border-top: 1px solid ${palette('light', 1)};
 `;
 const TaxLabel = styled.div`
   font-weight: bold;
@@ -87,25 +82,23 @@ export class EntityListPrintKey extends React.Component { // eslint-disable-line
                   <TaxLabel>
                     <FormattedMessage {...appMessages.entities.taxonomies[tax.get('id')].plural} />
                   </TaxLabel>
-                  <div>
-                    {categories.items.map((cat) => (
-                      <div key={cat.id}>
-                        <TagWrapper>
-                          <ButtonTagCategory
-                            as="span"
-                            taxId={parseInt(tax.get('id'), 10)}
-                          >
-                            {cat.short}
-                          </ButtonTagCategory>
-                        </TagWrapper>
-                        <a href={`${PATHS.CATEGORIES}/${cat.id}`}>
-                          <CatLabel>
-                            {cat.label}
-                          </CatLabel>
-                        </a>
-                      </div>
-                    ))}
-                  </div>
+                  {categories.items.map((cat) => (
+                    <div key={cat.id}>
+                      <TagWrapper>
+                        <ButtonTagCategory
+                          as="span"
+                          taxId={parseInt(tax.get('id'), 10)}
+                        >
+                          {cat.short}
+                        </ButtonTagCategory>
+                      </TagWrapper>
+                      <a href={`${PATHS.CATEGORIES}/${cat.id}`}>
+                        <CatLabel>
+                          {cat.label}
+                        </CatLabel>
+                      </a>
+                    </div>
+                  ))}
                 </Taxonomy>
               );
             }

@@ -46,6 +46,9 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
       padding: 0 0 0 0.5em;
     }
   }
+  @media print {
+    display: none;
+  }
 `;
 
 export class EntityListOptions extends React.Component { // eslint-disable-line react/prefer-stateless-function

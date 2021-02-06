@@ -14,10 +14,13 @@ const Styled = styled(Component)`
     display: table-cell;
     text-align: center;
     cursor: pointer;
-    width:${(props) => props.width * 100}%;
+    width:${(props) => props.colWidth * 100}%;
     border-right: 3px solid ${palette('light', 0)};
     vertical-align: middle;
     padding: 5px 10px;
+  }
+  @media print {
+    border: none;
   }
 `;
 const IconWrap = styled.span`
@@ -48,7 +51,7 @@ class EntityListItemExpandable extends React.PureComponent { // eslint-disable-l
       count,
       onClick,
       dates,
-      width,
+      colWidth,
       column,
     } = this.props;
     const { type, icon } = column;
@@ -68,7 +71,7 @@ class EntityListItemExpandable extends React.PureComponent { // eslint-disable-l
       }
     }
     return (
-      <Styled width={width} onClick={onClick}>
+      <Styled colWidth={colWidth} onClick={onClick}>
         <IconWrap>
           <Icon name={icon} text iconRight />
         </IconWrap>
@@ -85,7 +88,7 @@ EntityListItemExpandable.propTypes = {
   column: PropTypes.object,
   count: PropTypes.number,
   onClick: PropTypes.func,
-  width: PropTypes.number,
+  colWidth: PropTypes.number,
   dates: PropTypes.object,
 };
 

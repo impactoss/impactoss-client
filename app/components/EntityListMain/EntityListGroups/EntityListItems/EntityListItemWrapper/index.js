@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 import { Map, List } from 'immutable';
 
 import EntityListItem from 'components/EntityListItem';
@@ -14,7 +15,8 @@ const ItemWrapper = styled.div`
   @media print {
     margin-top: 20px;
     margin-bottom: 20px;
-    break-inside: avoid;
+    page-break-inside: avoid;
+    border-top: 1px solid ${palette('light', 1)};
   }
 `;
 

@@ -31,6 +31,11 @@ const Styled = styled.div`
   margin-top: 8px;
   margin-bottom: 5px;
   padding-top: 5px;
+  @media print {
+    border-top: none;
+    margin-top: 3px;
+    margin-bottom: 2px;
+  }
 `;
 
 export default class EntityListItemMainConnections extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
