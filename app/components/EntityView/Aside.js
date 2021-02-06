@@ -9,7 +9,9 @@ const Aside = styled(Main)`
     width: 30%;
   }
   @media print {
-    width: 100%;
+    width: ${({ bottom }) => !bottom ? '30%' : '100%'};
+    border-right-style: 'none';
+    display: ${({ bottom }) => !bottom ? 'table-cell' : 'block'};
   }
 `;
 

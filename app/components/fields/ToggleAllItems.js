@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Button from 'components/buttons/Button';
+
 const ToggleAllItems = styled(Button)`
   padding: 0.5em 0;
   font-size: 0.85em;
@@ -14,7 +15,7 @@ const ToggleAllItems = styled(Button)`
     font-size: 0.85em;
   }
   @media print {
-    font-size: ${(props) => props.theme.sizes.print.smaller};
+    display: none;
   }
 `;
 export default ToggleAllItems;

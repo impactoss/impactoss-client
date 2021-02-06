@@ -285,6 +285,10 @@ export default defineMessages({
       id: 'app.containers.App.hints.fullRecommendation',
       defaultMessage: 'Note: use only if title field does not already contain full text',
     },
+    printListMore: {
+      id: 'app.containers.App.hints.printListMore',
+      defaultMessage: 'List only showing {no} items.',
+    },
   },
   textValues: {
     user_only: {

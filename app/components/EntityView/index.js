@@ -24,7 +24,12 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
     <Main hasAside={hasAside} bottom={bottom}>
       {
         asArray(fieldGroups).map((fieldGroup, i) => fieldGroup && hasFields(fieldGroup) && (
-          <FieldGroup key={i} group={fieldGroup} seamless={seamless} />
+          <FieldGroup
+            key={i}
+            group={fieldGroup}
+            seamless={seamless}
+            bottom={bottom}
+          />
         ))
       }
     </Main>
@@ -34,7 +39,13 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
     <Aside bottom={bottom}>
       {
         asArray(fieldGroups).map((fieldGroup, i) => fieldGroup && (
-          <FieldGroup key={i} group={fieldGroup} seamless={seamless} aside />
+          <FieldGroup
+            key={i}
+            group={fieldGroup}
+            seamless={seamless}
+            bottom={bottom}
+            aside
+          />
         ))
       }
     </Aside>
@@ -42,32 +53,55 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
 
   render() {
     const { fields, seamless } = this.props;
-
+    const hasBodyFields = fields.body
+      && (
+        (
+          fields.body.main
+          && fields.body.main[0]
+          && fields.body.main[0].fields
+        )
+        || (
+          fields.body.aside
+          && fields.body.aside[0]
+          && fields.body.aside[0].fields
+        )
+      );
     return (
       <ViewWrapper seamless={seamless}>
-        { fields.header
-          && (
-            <ViewPanel>
-              <ViewPanelInside>
-                { fields.header.main && this.renderMain(fields.header.main, !!fields.header.aside, false, seamless) }
-                { fields.header.aside && this.renderAside(fields.header.aside, false) }
-              </ViewPanelInside>
-            </ViewPanel>
-          )
-        }
-        { fields.body
-          && ((fields.body.main && fields.body.main[0] && fields.body.main[0].fields)
-            || (fields.body.aside && fields.body.aside[0] && fields.body.aside[0].fields)
-          )
-          && (
-            <ViewPanel>
-              <ViewPanelInside>
-                { fields.body.main && this.renderMain(fields.body.main, !!fields.body.aside, true, seamless) }
-                { fields.body.aside && this.renderAside(fields.body.aside, true) }
-              </ViewPanelInside>
-            </ViewPanel>
-          )
-        }
+        {fields.header && (
+          <ViewPanel>
+            <ViewPanelInside>
+              {fields.header.main
+                && this.renderMain(
+                  fields.header.main,
+                  !!fields.header.aside,
+                  false,
+                  seamless,
+                )
+              }
+              {fields.header.aside
+                && this.renderAside(fields.header.aside, false)
+              }
+            </ViewPanelInside>
+          </ViewPanel>
+        )}
+        {hasBodyFields && (
+          <ViewPanel>
+            <ViewPanelInside>
+              {fields.body.main
+                && this.renderMain(
+                  fields.body.main,
+                  !!fields.body.aside,
+                  true,
+                  seamless,
+                )
+              }
+              {fields.body.aside
+                && this.renderAside(fields.body.aside, true)
+              }
+            </ViewPanelInside>
+          </ViewPanel>
+        )}
       </ViewWrapper>
     );
   }
