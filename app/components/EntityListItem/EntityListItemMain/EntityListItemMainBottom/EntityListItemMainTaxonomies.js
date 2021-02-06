@@ -24,6 +24,10 @@ const Styled = styled.div`
   display: block;
   padding-top: 3px;
   margin-top: 8px;
+  @media print {
+    padding-top: 2px;
+    margin-top: 3px;
+  }
 `;
 // border-top-color:;
 

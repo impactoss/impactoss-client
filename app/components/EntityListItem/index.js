@@ -5,6 +5,7 @@ import { palette } from 'styled-theme';
 import { find } from 'lodash/collection';
 import { Map, List } from 'immutable';
 import asList from 'utils/as-list';
+import { COLUMN_WIDTHS } from 'themes/config';
 
 import Messages from 'components/Messages';
 import Component from 'components/styled/Component';
@@ -20,7 +21,10 @@ const Styled = styled.span`
   vertical-align: top;
   width: 100%;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
-    width: ${(props) => props.expanded ? 50 : 100}%;
+    width: ${(props) => props.expanded ? COLUMN_WIDTHS.HALF * 100 : 100}%;
+  }
+  @media print {
+    width: ${(props) => props.expanded ? COLUMN_WIDTHS.HALF * 100 : 100}%;
   }
 `;
 const Item = styled(Component)`
@@ -37,9 +41,12 @@ const MainWrapper = styled(Component)`
   width:100%;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     display: table-cell;
-    width: ${(props) => props.expandable ? 66 : 100}%;
+    width: ${(props) => props.expandable ? COLUMN_WIDTHS.MAIN * 100 : 100}%;
     border-right: ${(props) => props.expandable ? '3px solid' : '0'};
     border-right-color: ${palette('background', 1)};
+  }
+  @media print {
+    border: none;
   }
 `;
 const MainInnerWrapper = styled(Component)`
@@ -136,7 +143,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
                 count={entity.get(attribute) ? entity.get(attribute).size : 0}
                 dates={attribute === 'reports' ? entity.get('dates').toJS() : null}
                 onClick={() => onExpand(expandNo > i ? i : i + 1)}
-                width={(1 - 0.66) / list.size}
+                colWidth={COLUMN_WIDTHS.OTHER / list.size}
               />
             ))
           }

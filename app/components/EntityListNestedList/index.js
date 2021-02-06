@@ -17,6 +17,9 @@ const ItemWrapper = styled.div`
   border-top-color: ${(props) => props.separated ? palette('light', 3) : 'transparent'};
   padding: ${(props) => props.separated ? '5px 0 20px' : '0 0 10px'};
   border-bottom: 1px solid transparent;
+  @media print {
+    border-top-color: ${palette('light', 1)};
+  }
 `;
 export class EntityListNestedList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {

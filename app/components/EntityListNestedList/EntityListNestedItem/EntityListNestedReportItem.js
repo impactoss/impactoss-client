@@ -24,6 +24,9 @@ const Styled = styled.a`
   &:hover {
     color: ${palette('mainListItemHover', 0)};
   }
+  @media print {
+    border-top: 1px solid ${palette('light', 1)};
+  }
 `;
 const Top = styled.div`
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};

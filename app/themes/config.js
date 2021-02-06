@@ -179,3 +179,10 @@ export const DB_TABLES = [
   'recommendation_indicators',
   'recommendation_recommendations',
 ];
+
+export const COLUMN_WIDTHS = {
+  FULL: 1,
+  HALF: 0.5,
+  MAIN: 0.72,
+  OTHER: 0.28,
+};

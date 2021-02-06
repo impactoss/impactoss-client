@@ -5,8 +5,9 @@ import {
   getEntityParentId,
   getCategoryShortTitle,
 } from 'utils/entities';
-import { TEXT_TRUNCATE } from 'themes/config';
 import { truncateText } from 'utils/string';
+import { sortEntities } from 'utils/sort';
+import { TEXT_TRUNCATE } from 'themes/config';
 
 import {
   optionChecked,
@@ -34,10 +35,12 @@ export const makeCategoriesForTaxonomy = (
         (cat) => getEntityTitle(cat),
       ).toJS();
     }
-    taxonomy.get(
-      'categories'
-    ).sortBy(
-      (cat) => cat.getIn(['attributes', 'title'])
+    sortEntities(
+      taxonomy.get('categories'),
+      'asc',
+      'referenceThenShortTitle',
+      null,
+      false,
     ).forEach(
       (category, catId) => {
         // add categories from entities if present
