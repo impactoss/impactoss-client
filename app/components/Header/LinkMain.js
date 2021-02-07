@@ -25,4 +25,7 @@ export default styled(Link)`
     padding-left: ${(props) => props.theme.sizes.header.paddingLeft.large}px;
     padding-right: ${(props) => props.theme.sizes.header.paddingLeft.large}px;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;

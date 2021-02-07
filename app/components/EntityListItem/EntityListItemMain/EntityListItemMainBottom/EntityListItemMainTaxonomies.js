@@ -24,6 +24,10 @@ const Styled = styled.div`
   display: block;
   padding-top: 3px;
   margin-top: 8px;
+  @media print {
+    padding-top: 2px;
+    margin-top: 3px;
+  }
 `;
 // border-top-color:;
 
@@ -33,6 +37,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
     if (categories) {
       taxonomies
         .filter((tax) => !tax.getIn(['attributes', 'is_smart']))
+        .sortBy((tax) => tax.getIn(['attributes', 'priority']))
         .forEach((tax) => {
           tax
             .get('categories')
@@ -46,7 +51,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
                   taxId: tax.get('id'),
                   title: category.getIn(['attributes', 'title']),
                   inverse: category.getIn(['attributes', 'draft']),
-                  label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG, false),
+                  label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG, categories.size < 5),
                   onClick: () => onClick(catId, 'category'),
                 });
               }

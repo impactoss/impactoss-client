@@ -30,6 +30,10 @@ const Count = styled.span`
   text-align: center;
   line-height: 1.7;
   padding: 0 0.25em;
+  @media print {
+    color: ${palette('text', 1)};
+    background: transparent;
+  }
 `;
 
 const PopupWrapper = styled.div`
@@ -40,6 +44,9 @@ const PopupWrapper = styled.div`
   position: relative;
   margin-right: 5px;
   text-align: left;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 
 const POPUP_WIDTH_PX = `${POPUP_WIDTH}px`;
@@ -59,6 +66,9 @@ const Popup = styled.div`
   z-index: 1;
   padding-bottom: 4px;
   font-size: 0.8em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 const PopupInner = styled.div`
   width: 100%;
@@ -110,6 +120,9 @@ const PopupContent = styled.div`
 const Id = styled.span`
   color: ${palette('text', 1)};
   font-size: 0.8em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 const IdSpacer = styled.span`
   padding-left: 0.25em;

@@ -14,6 +14,9 @@ const Status = styled(Label)`
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
   margin-top: ${({ top }) => top ? '-7px' : 0};
   color: ${palette('dark', 4)};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.listItemTop};
+  }
 `;
 
 class ItemStatus extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

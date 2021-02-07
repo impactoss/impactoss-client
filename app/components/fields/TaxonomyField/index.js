@@ -17,6 +17,9 @@ import ItemStatus from 'components/ItemStatus';
 const Reference = styled.div`
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes.text.small};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 const StyledFieldWrap = styled(FieldWrap)`

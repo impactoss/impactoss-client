@@ -14,10 +14,17 @@ const Styled = styled(Component)`
     display: table-cell;
     text-align: center;
     cursor: pointer;
-    width:${(props) => props.width * 100}%;
+    width:${(props) => props.colWidth * 100}%;
     border-right: 3px solid ${palette('light', 0)};
     vertical-align: middle;
     padding: 5px 10px;
+  }
+  @media print {
+    border: none;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    width:${(props) => props.colWidth * 100}%;
   }
 `;
 const IconWrap = styled.span`
@@ -32,6 +39,9 @@ const Count = styled.span`
   color: ${palette('text', 1)};
   padding: 0 8px;
   font-size: 1.5em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.larger};
+  }
 `;
 
 const Info = styled.div`
@@ -45,7 +55,7 @@ class EntityListItemExpandable extends React.PureComponent { // eslint-disable-l
       count,
       onClick,
       dates,
-      width,
+      colWidth,
       column,
     } = this.props;
     const { type, icon } = column;
@@ -65,7 +75,7 @@ class EntityListItemExpandable extends React.PureComponent { // eslint-disable-l
       }
     }
     return (
-      <Styled width={width} onClick={onClick}>
+      <Styled colWidth={colWidth} onClick={onClick}>
         <IconWrap>
           <Icon name={icon} text iconRight />
         </IconWrap>
@@ -82,7 +92,7 @@ EntityListItemExpandable.propTypes = {
   column: PropTypes.object,
   count: PropTypes.number,
   onClick: PropTypes.func,
-  width: PropTypes.number,
+  colWidth: PropTypes.number,
   dates: PropTypes.object,
 };
 

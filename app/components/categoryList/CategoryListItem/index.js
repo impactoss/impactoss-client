@@ -25,28 +25,37 @@ const Styled = styled.button`
     color: ${palette('mainListItemHover', 0)};
     background-color: ${palette('mainListItemHover', 1)};
   }
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: 0.75em 0;
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+  @media print {
     padding: 1em 0;
+    border-top: 1px solid ${palette('light', 1)};
   }
 `;
+const TableWrap = styled.div`
+  width:100%;
+  display: table;
+  table-layout: fixed;
+`;
+
 const Column = styled.div`
   width: ${(props) => props.colWidth}%;
-  display: inline-block;
+  display: table-cell;
   vertical-align: middle;
-  margin: ${({ multiple }) => multiple ? '-10px 0' : '0 0'};
 `;
 const BarWrap = styled.div`
   width:100%;
   vertical-align: middle;
+  font-size: 0px;
   padding: ${({ multiple }) => multiple ? '0 6px 8px' : '10px 6px'};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding-left: 40px;
     padding-right: ${({ secondary }) => secondary ? 36 : 18}px;
+    padding-left: 40px;
   }
-  font-size: 0px;
+  @media print {
+    padding-top: ${({ multiple }) => multiple ? 0 : 4}px;
+    padding-right: ${({ secondary }) => secondary ? 24 : 14}px;
+    padding-bottom: 4px;
+    padding-left: 24px;
+  }
 `;
 const Bar = styled.div`
   width: ${({ length }) => length}%;
@@ -56,20 +65,33 @@ const Bar = styled.div`
   position: relative;
   border-right: ${(props) => props.secondary ? '1px solid' : 0};
   border-right-color: ${palette('mainListItem', 1)};
-  height: ${({ multiple }) => multiple ? 10 : 15}px;
+  height: ${({ multiple }) => multiple ? 8 : 16}px;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    height: ${({ multiple }) => multiple ? 15 : 25}px;
+    height: ${({ multiple }) => multiple ? 12 : 24}px;
+  }
+  @media print {
+    z-index: 0;
+    &:before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      z-index: -1;
+      border-bottom: ${({ multiple }) => (multiple ? 8 : 16)}px solid ${(props) => palette(props.palette, props.pIndex || 0)};
+    }
   }
 `;
 const Count = styled.div`
   position: absolute;
-  line-height: ${({ multiple }) => multiple ? 10 : 15}px;
+  line-height: ${({ multiple }) => multiple ? 8 : 16}px;
   left: 0;
   bottom: 100%;
   padding: 2px 0;
   color: ${(props) => palette(props.palette, 0)};
   white-space: nowrap;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+  @media print, (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${({ theme, multiple }) => multiple ? theme.sizes.text.default : theme.sizes.text.aaLargeBold};
     font-weight: bold;
     text-align: right;
@@ -79,14 +101,18 @@ const Count = styled.div`
     left: auto;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    line-height: ${({ multiple }) => multiple ? 15 : 25}px;
+    line-height: ${({ multiple }) => multiple ? 12 : 24}px;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+    font-weight: regular;
   }
 `;
 const CountSecondary = styled(Count)`
   right: 0;
   top: 100%;
   color: ${(props) => palette(props.palette, 1)};
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+  @media print, (min-width: ${(props) => props.theme.breakpoints.small}) {
     text-align: left;
     padding: 0 0 0 5px;
     left: 100%;
@@ -100,18 +126,26 @@ const Title = styled.div`
   padding: 0 4px;
   width: 100%;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: 0 8px;
+    padding: 8px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding: 0 18px;
+    padding: 18px;
     font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+    padding: 0;
   }
 `;
 const FrameworkLabel = styled.div`
-  font-size: 12px;
+  font-size: ${(props) => props.theme.sizes.text.smaller};
   color: ${palette('text', 1)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-left: 40px;
+  }
+  @media print {
+    padding-left: 24px;
+    font-size: ${(props) => props.theme.sizes.print.smallest};
   }
 `;
 const StatusWrap = styled.div`
@@ -298,37 +332,39 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
       <Styled
         onClick={() => onPageLink(`${PATHS.CATEGORIES}/${catItem.id}`)}
       >
-        {
-          columns.map((col, i) => (
-            <Column
-              key={i}
-              colWidth={col.width}
-              multiple={
-                col.attribute
-                && col.attribute.frameworkIds
-                && col.attribute.frameworkIds.length > 1
-              }
-            >
-              {col.type === 'title' && catItem.draft && (
-                <StatusWrap>
-                  <ItemStatus draft />
-                  <Clear />
-                </StatusWrap>
-              )}
-              {col.type === 'title' && (
-                <Title>
-                  { catItem.reference
-                    && <Reference>{catItem.reference}</Reference>
-                  }
-                  {catItem.title}
-                </Title>
-              )}
-              {col.type === 'count'
-                && this.renderCountColumn(col, category.toJS(), frameworks, frameworkId)
-              }
-            </Column>
-          ))
-        }
+        <TableWrap>
+          {
+            columns.map((col, i) => (
+              <Column
+                key={i}
+                colWidth={col.width}
+                multiple={
+                  col.attribute
+                  && col.attribute.frameworkIds
+                  && col.attribute.frameworkIds.length > 1
+                }
+              >
+                {col.type === 'title' && catItem.draft && (
+                  <StatusWrap>
+                    <ItemStatus draft />
+                    <Clear />
+                  </StatusWrap>
+                )}
+                {col.type === 'title' && (
+                  <Title>
+                    { catItem.reference
+                      && <Reference>{catItem.reference}</Reference>
+                    }
+                    {catItem.title}
+                  </Title>
+                )}
+                {col.type === 'count'
+                  && this.renderCountColumn(col, category.toJS(), frameworks, frameworkId)
+                }
+              </Column>
+            ))
+          }
+        </TableWrap>
       </Styled>
     );
   }

@@ -33,6 +33,9 @@ const OptionWrapper = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 1em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 // background-color: ${(props) => {
 //   if (props.changedToChecked) {
@@ -90,6 +93,9 @@ const OptionCount = styled.span`
   padding-right: 1em;
   text-align: right;
   border-bottom: 1px solid ${palette('light', 1)};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 const GroupWrapper = styled.div`
@@ -105,6 +111,9 @@ const GroupTitle = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 0.7em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smallest};
+  }
 `;
 
 const Empty = styled.div`
@@ -118,6 +127,9 @@ const More = styled.div`
   padding: 0.5em 1em;
   text-align: center;
   font-size: 0.85em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 const MoreLink = styled(A)`
   font-weight: bold;

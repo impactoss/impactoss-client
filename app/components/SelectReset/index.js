@@ -18,12 +18,27 @@ const Label = styled.label`
   padding: 0 0.5em 0 0;
   vertical-align: middle;
   display: inline-block;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
+`;
+const Styled = styled.span`;
+  @media print {
+    display: ${({ hidePrint }) => (hidePrint ? 'none' : 'inline')};
+  }
 `;
 const Select = styled.select`
   font-weight: ${(props) => props.active ? 500 : 'normal'};
   vertical-align: middle;
   display: inline-block;
   cursor: pointer;
+  @media print {
+    appearance: none;
+    text-overflow: '';
+    text-indent: 0.01px; /* Removes default arrow from firefox */
+    text-overflow: "";  /* Removes default arrow from firefox */
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 // border-bottom: 1px dotted #ccc;
 const Option = styled.option`
@@ -42,17 +57,26 @@ const Reset = styled(ButtonSimple)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0 0.5em 0 0;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 export class SelectReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const {
-      onChange, value, emptyValue, label, options, isReset, index,
+      onChange,
+      value,
+      emptyValue,
+      label,
+      options,
+      isReset,
+      index,
+      hidePrint,
     } = this.props;
     const optionActive = find(options, (option) => option.value === value);
-
     return (
-      <span>
+      <Styled hidePrint={hidePrint}>
         {label
           && <Label htmlFor={index}>{ label }</Label>
         }
@@ -82,11 +106,11 @@ export class SelectReset extends React.PureComponent { // eslint-disable-line re
           && (
             <Reset onClick={() => onChange(emptyValue)}>
               {optionActive.label}
-              <Icon name="removeSmall" text textRight />
+              <Icon name="removeSmall" text textRight hidePrint />
             </Reset>
           )
         }
-      </span>
+      </Styled>
     );
   }
 }
@@ -99,6 +123,7 @@ SelectReset.propTypes = {
   options: PropTypes.array,
   onChange: PropTypes.func,
   isReset: PropTypes.bool,
+  hidePrint: PropTypes.bool,
 };
 
 SelectReset.contextTypes = {

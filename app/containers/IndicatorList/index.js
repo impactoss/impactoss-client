@@ -15,6 +15,7 @@ import {
   selectReady,
   selectActiveFrameworks,
   selectIsUserManager,
+  selectIsSignedIn,
 } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
@@ -39,7 +40,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
 
   render() {
     const { intl } = this.context;
-    const { dataReady, isManager } = this.props;
+    const { dataReady, isManager, isUserSignedIn } = this.props;
 
     // specify the filter and query  options
     const headerOptions = {
@@ -47,6 +48,20 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
       icon: 'indicators',
       actions: [],
     };
+    if (isUserSignedIn) {
+      headerOptions.actions.push({
+        type: 'bookmarker',
+        title: intl.formatMessage(messages.pageTitle),
+      });
+    }
+    if (window.print) {
+      headerOptions.actions.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+    }
     if (isManager) {
       headerOptions.actions.push({
         type: 'text',
@@ -65,10 +80,6 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         onClick: () => this.props.handleNew(),
       });
     }
-    headerOptions.actions.push({
-      type: 'bookmarker',
-      title: intl.formatMessage(messages.pageTitle),
-    });
 
     return (
       <div>
@@ -108,6 +119,7 @@ IndicatorList.propTypes = {
   frameworks: PropTypes.instanceOf(Map),
   location: PropTypes.object,
   isManager: PropTypes.bool,
+  isUserSignedIn: PropTypes.bool,
 };
 
 IndicatorList.contextTypes = {
@@ -121,6 +133,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectActiveFrameworks(state),
   isManager: selectIsUserManager(state),
+  isUserSignedIn: selectIsSignedIn(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

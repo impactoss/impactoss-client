@@ -35,7 +35,7 @@ import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
 import SupTitle from 'components/SupTitle';
 import Component from 'components/styled/Component';
 import Content from 'components/styled/Content';
-
+import PrintHide from 'components/styled/PrintHide';
 
 // import EntityListItem from 'components/EntityListItem';
 import EntityListHeader from 'components/EntityListMain/EntityListGroups/EntityListHeader';
@@ -113,6 +113,9 @@ const Target = styled(Button)`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 0.4em 20px 0.4em 24px
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const TargetTitle = styled.div`
@@ -120,7 +123,6 @@ const TargetTitle = styled.div`
   display: table-cell;
   width: 99%;
 `;
-// font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 const TargetCount = styled.div`
   padding-left: 5px;
   width: 32px;
@@ -142,6 +144,9 @@ const Count = styled.div`
   font-size: 0.85em;
   text-align: center;
   min-width: 32px;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const ListHint = styled.div`
@@ -296,7 +301,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
         }
         { dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE
           && (
-            <div>
+            <PrintHide>
               <Sidebar responsiveSmall>
                 <ScrollableWrapper>
                   <Component>
@@ -309,7 +314,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                   </Component>
                 </ScrollableWrapper>
               </Sidebar>
-            </div>
+            </PrintHide>
           )
         }
         <ContainerWithSidebar sidebarResponsiveSmall>

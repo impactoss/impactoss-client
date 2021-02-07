@@ -59,6 +59,9 @@ const MultiselectActiveOptionListItem = styled.div`
     padding: 12px 0 12px 16px;
     font-size: 1em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 const MultiselectActiveOptionRemove = styled(Button)`
   position: absolute;
@@ -106,6 +109,9 @@ const MultiSelectDropdown = styled(Button)`
     font-size: 0.85em;
     padding: 12px 0 12px 16px;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const MultiSelectWithout = styled.div`
@@ -128,6 +134,9 @@ const Reference = styled.div`
     color: ${palette('text', 0)};
   }
   font-size: 0.85em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const NON_CONTROL_PROPS = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages'];

@@ -65,6 +65,9 @@ const Hint = styled.div`
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes.text.small};
   margin-top: -6px;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 const DeleteConfirmText = styled.span`

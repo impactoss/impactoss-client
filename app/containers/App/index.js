@@ -47,17 +47,22 @@ const Main = styled.div`
     ? 0
     : props.theme.sizes.header.banner.heightMobile + props.theme.sizes.header.nav.heightMobile
 }px;
+  left: 0;
+  right: 0;
+  bottom:0;
+  background-color: ${(props) => props.isHome ? 'transparent' : palette('light', 0)};
+  overflow: hidden;
+
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     top: ${(props) => props.isHome
     ? 0
     : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
 }px;
   }
-  left: 0;
-  right: 0;
-  bottom:0;
-  background-color: ${(props) => props.isHome ? 'transparent' : palette('light', 0)};
-  overflow: hidden;
+  @media print {
+    background: white;
+    position: static;
+  }
 `;
 // overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
 

@@ -17,11 +17,12 @@ const Button = styled.button`
   background-image: none;
   border: none;
   border-radius: 0;
-  @media (min-width: ${(props) => props.theme
-    && (props.theme.breakpoints ? props.theme.breakpoints.small : '769px')
-}) {
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.small ? 0.9 : 1}em;
     padding: 6px 12px;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
   }
 `;
 

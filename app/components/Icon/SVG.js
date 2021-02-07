@@ -29,6 +29,9 @@ const SVG = styled.svg`
     width: ${(props) => (props.sizes && props.sizes.large) ? props.sizes.large : props.size};
     height: ${(props) => (props.sizes && props.sizes.large) ? props.sizes.large : props.size};
   }
+  @media print {
+    display: ${({ hidePrint }) => (hidePrint ? 'none' : 'inline-block')};
+  }
 `;
 
 SVG.defaultProps = {

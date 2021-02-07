@@ -550,7 +550,6 @@ export const selectFWTaxonomies = createSelector(
         || tax.getIn(['attributes', 'tags_users'])
     )
 );
-
 export const selectTaxonomiesSorted = createSelector(
   selectTaxonomies,
   (taxonomies) => taxonomies

@@ -27,6 +27,30 @@ const ButtonTagCategoryInverse = styled(Button)`
     padding: 1px 6px;
     font-size: 0.85em;
   }
+  @media print {
+    color: ${palette('text', 1)};
+    background: transparent;
+    border-radius: 3px;
+    border-right: 1px solid;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    border-left: 7px solid;
+    border-color: ${(props) => props.disabled
+    ? palette('taxonomies', props.taxId || 0)
+    : palette('taxonomiesHover', props.taxId || 0)
+};
+    margin-right: 10px;
+    padding: 0 4px;
+    font-size: ${(props) => props.theme.sizes.print.smallest};
+    line-height: 10pt;
+    &:hover {
+      color: ${palette('text', 1)};
+      background-color: transparent;
+      border-color: ${(props) => props.disabled
+    ? palette('taxonomies', props.taxId || 0)
+    : palette('taxonomiesHover', props.taxId || 0)
+};
+    }
 `;
 
 export default ButtonTagCategoryInverse;

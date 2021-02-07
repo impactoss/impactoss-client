@@ -14,6 +14,9 @@ import ListLink from 'components/fields/ListLink';
 const StyledFieldWrap = styled(FieldWrap)`
   padding-top: 15px;
   font-size: 0.65em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const SmartLabel = styled.div`

@@ -178,22 +178,30 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       frameworks,
     } = this.props;
     const isManager = hasUserRole[USER_ROLES.MANAGER.value];
-    const buttons = isManager
-      ? [
-        {
-          type: 'edit',
-          onClick: () => this.props.handleEdit(this.props.params.id),
-        },
-        {
+    let buttons = [];
+    if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+      buttons = isManager
+        ? buttons.concat([
+          {
+            type: 'edit',
+            onClick: () => this.props.handleEdit(this.props.params.id),
+          },
+          {
+            type: 'close',
+            onClick: this.props.handleClose,
+          },
+        ])
+        : buttons.concat([{
           type: 'close',
           onClick: this.props.handleClose,
-        },
-      ]
-      : [{
-        type: 'close',
-        onClick: this.props.handleClose,
-      }];
-
+        }]);
+    }
     return (
       <div>
         <Helmet

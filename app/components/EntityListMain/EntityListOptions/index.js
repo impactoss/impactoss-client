@@ -14,6 +14,7 @@ import { isEqual } from 'lodash/lang';
 
 import { PARAMS } from 'containers/App/constants';
 import Button from 'components/buttons/Button';
+
 import EntityListGroupBy from './EntityListGroupBy';
 
 import messages from './messages';
@@ -44,6 +45,9 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
     &:last-child {
       padding: 0 0 0 0.5em;
     }
+  }
+  @media print {
+    display: none;
   }
 `;
 

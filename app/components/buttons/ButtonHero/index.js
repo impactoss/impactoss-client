@@ -16,6 +16,9 @@ const ButtonHero = styled(ButtonDefault)`
     font-size: 1.25em;
     min-width: 200px;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
+  }
 `;
 
 export default ButtonHero;

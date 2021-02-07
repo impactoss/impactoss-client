@@ -9,6 +9,7 @@ import ButtonSubmit from '../ButtonSubmit';
 import ButtonFlat from '../ButtonFlat';
 import ButtonFlatWithIcon from '../ButtonFlatWithIcon';
 import ButtonDefaultIconOnly from '../ButtonDefaultIconOnly';
+import ButtonFlatIconOnly from '../ButtonFlatIconOnly';
 import Bookmarker from '../../../containers/Bookmarker';
 
 class ButtonFactory extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -125,6 +126,16 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
         );
       case 'bookmarker':
         return <Bookmarker viewTitle={button.title} type={button.entityType} />;
+      case 'icon':
+        return (
+          <ButtonFlatIconOnly
+            onClick={button.onClick && (() => button.onClick())}
+            title={button.title}
+            subtle
+          >
+            <Icon name={button.icon} />
+          </ButtonFlatIconOnly>
+        );
       case 'simple':
       case 'text':
       case 'delete':

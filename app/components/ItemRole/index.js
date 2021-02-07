@@ -11,7 +11,10 @@ import { USER_ROLES } from 'themes/config';
 const Role = styled(Label)`
   float: right;
   padding-left: 1em;
-  font-size: 12px;
+  font-size: ${(props) => props.theme.sizes.text.smaller};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 class ItemRole extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

@@ -290,6 +290,19 @@ theme.sizes = {
     smallMobile: '11px', // used for labels
     default: '16px', // used for labels
   },
+  print: {
+    aaLargeBold: '14pt',
+    aaLarge: '18pt',
+    mainListItem: '15pt',
+    nestedListItem: '12pt',
+    listItemTop: '10pt',
+    listItemBottom: '9pt',
+    markdown: '14pt',
+    markdownMobile: '12pt',
+    small: '10pt', // used for labels
+    smallMobile: '8pt', // used for labels
+    default: '12pt', // used for labels
+  },
   // px only
   aside: {
     header: {

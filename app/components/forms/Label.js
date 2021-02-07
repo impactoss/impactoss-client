@@ -7,6 +7,9 @@ const Label = styled.label`
   font-size: ${(props) => props.theme.sizes.text.small};
   position: relative;
   display: ${(props) => props.inline ? 'inline-block' : 'block'};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 export default Label;

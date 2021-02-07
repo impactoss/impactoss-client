@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 import { Map, List } from 'immutable';
 
 import EntityListItem from 'components/EntityListItem';
@@ -11,6 +12,12 @@ import EntityListNestedNoItem from 'components/EntityListNestedList/EntityListNe
 const ItemWrapper = styled.div`
   padding: ${({ separated }) => separated ? '5px 0 10px' : '0'};
   margin-top: 10px;
+  @media print {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+    border-top: 1px solid ${palette('light', 1)};
+  }
 `;
 
 export class EntityListItemWrapper extends React.Component { // eslint-disable-line react/prefer-stateless-function

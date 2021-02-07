@@ -21,6 +21,9 @@ const ShowAll = styled(A)`
   display: block;
   text-align: center;
   font-weight: 500;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const REPORT_MAX = 5;

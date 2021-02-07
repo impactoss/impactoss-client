@@ -19,6 +19,7 @@ import SidebarHeader from 'components/styled/SidebarHeader';
 import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
 import Sidebar from 'components/styled/Sidebar';
 import Scrollable from 'components/styled/Scrollable';
+import PrintHide from 'components/styled/PrintHide';
 
 import { prepareTaxonomyGroups } from 'utils/taxonomies';
 
@@ -41,6 +42,9 @@ const ToggleShow = styled(ButtonDefault)`
     padding: 0.75em 1em;
     font-size: 0.85em;
     width: ${(props) => props.theme.sizes.aside.width.large}px;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
   }
 `;
 
@@ -119,7 +123,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
     );
     const { intl } = this.context;
     return (
-      <div>
+      <PrintHide>
         { (!this.state.visible && this.state.viewport < VIEWPORTS.SMALL)
           && (
             <ToggleShow onClick={this.onShowSidebar}>
@@ -176,7 +180,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
             </Sidebar>
           )
         }
-      </div>
+      </PrintHide>
     );
   }
 }

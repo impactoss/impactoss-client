@@ -43,6 +43,9 @@ const ButtonWrap = styled.span`
   &:last-child {
     padding: 0;
   }
+  @media print {
+    display: none;
+  }
 `;
 const Table = styled.span`
   display: block;
@@ -88,6 +91,9 @@ const ButtonGroup = styled.div`
 
 const SubTitle = styled.p`
   font-size: 1.1em;
+  @media print {
+    display: none;
+  }
 `;
 
 class ContentHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

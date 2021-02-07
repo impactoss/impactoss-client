@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Icon from 'components/Icon';
 import ColumnHeader from 'components/styled/ColumnHeader';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
+import PrintHide from 'components/styled/PrintHide';
 
 
 const Styled = styled(ColumnHeader)`
@@ -15,18 +16,27 @@ const Styled = styled(ColumnHeader)`
     padding-right: 0.5em;
     padding-left: 1em;
   }
+  @media print {
+    display: table-cell;
+  }
 `;
 
 const Wrapper = styled.div`
   display: table;
   width: 100%;
+  @media print {
+    display: block;
+  }
 `;
 const Label = styled.div`
   display: table-cell;
   vertical-align: middle;
+  @media print {
+    display: block;
+  }
 `;
 
-const ExpandWrapper = styled.div`
+const ExpandWrapper = styled(PrintHide)`
   display: table-cell;
   text-align:right;
 `;
@@ -44,9 +54,7 @@ class ColumnExpand extends React.PureComponent { // eslint-disable-line react/pr
       isExpand, label, width, onExpand,
     } = this.props;
     return (
-      <Styled
-        width={width}
-      >
+      <Styled colWidth={width * 100}>
         <Wrapper>
           <Label>{label}</Label>
           <ExpandWrapper>

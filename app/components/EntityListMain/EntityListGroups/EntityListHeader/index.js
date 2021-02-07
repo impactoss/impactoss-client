@@ -7,6 +7,7 @@ import appMessage from 'utils/app-message';
 
 import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 import { SORT_ORDER_OPTIONS } from 'containers/App/constants';
+import { COLUMN_WIDTHS } from 'themes/config';
 
 import messages from 'components/EntityListMain/EntityListGroups/messages';
 
@@ -18,11 +19,6 @@ const Styled = styled.div`
   background-color: ${palette('light', 1)};
   display: table;
 `;
-
-const WIDTH_FULL = 1;
-const WIDTH_MAIN = 0.66;
-const WIDTH_HALF = 0.5;
-const WIDTH_OTHER = 0.34;
 
 class EntityListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   getListHeaderLabel = (entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage) => {
@@ -78,12 +74,12 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
     const isNestedExpand = expandNo > 0;
 
     if (!hasNested && !isNestedExpand) {
-      return WIDTH_FULL;
+      return COLUMN_WIDTHS.FULL;
     }
     if (hasNested && !isNestedExpand) {
-      return WIDTH_MAIN;
+      return COLUMN_WIDTHS.MAIN;
     }
-    return WIDTH_HALF;
+    return COLUMN_WIDTHS.HALF;
   }
 
   // TODO figure out a betterway to determine column widths
@@ -96,15 +92,15 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
 
     // if only item
     if (onlyItem) {
-      return WIDTH_FULL;
+      return COLUMN_WIDTHS.FULL;
     }
     if (isExpand && hasNested && !isNestedExpand) {
-      return WIDTH_MAIN;
+      return COLUMN_WIDTHS.MAIN;
     }
     if (!isExpand && !hasNested && isParentExpand) {
-      return WIDTH_OTHER;
+      return COLUMN_WIDTHS.OTHER;
     }
-    return WIDTH_HALF;
+    return COLUMN_WIDTHS.HALF;
   };
 
   render() {

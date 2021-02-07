@@ -7,6 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Map, List } from 'immutable';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import { jumpToComponent } from 'utils/scroll-to-component';
 import { lowerCase } from 'utils/string';
@@ -18,6 +19,7 @@ import Content from 'components/styled/Content';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
+import PrintOnly from 'components/styled/PrintOnly';
 
 import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -40,6 +42,11 @@ const EntityListSearch = styled.div`
 
 const ListEntities = styled.div``;
 const ListWrapper = styled.div``;
+const PrintHintKey = styled(PrintOnly)`
+  font-style: italic;
+  font-size: ${(props) => props.theme.sizes.print.smaller};
+  margin-bottom: 20px;
+`;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -78,7 +85,6 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       entityTitle,
       dataReady,
       isManager,
-      isUserSignedIn,
       isContributor,
       onGroupSelect,
       onSubgroupSelect,
@@ -179,6 +185,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
           ),
       });
     }
+    const headerActions = dataReady ? header.actions : [];
 
     return (
       <ContainerWithSidebar ref={this.ScrollContainer}>
@@ -191,11 +198,14 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
               title={headerTitle}
               subTitle={subtitle}
               sortAttributes={config.sorting}
-              buttons={(dataReady && isUserSignedIn) ? header.actions : []}
+              buttons={headerActions}
             />
             {!dataReady && <Loading />}
             {dataReady && (
               <ListEntities>
+                <PrintHintKey>
+                  <FormattedMessage {...messages.printHintKey} />
+                </PrintHintKey>
                 <EntityListSearch>
                   <TagSearch
                     filters={currentFilters(
@@ -292,7 +302,6 @@ EntityListMain.propTypes = {
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   isContributor: PropTypes.bool,
-  isUserSignedIn: PropTypes.bool,
   entityIcon: PropTypes.func,
   // functions
   onEntityClick: PropTypes.func.isRequired,

@@ -65,6 +65,9 @@ const Description = styled.p`
     margin-bottom: 2em;
     font-size: 1.1em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 const Diagram = styled.div`
   position: relative;
@@ -98,6 +101,10 @@ const DiagramButtonWrap = styled.div`
   &:last-child {
     margin-right: 0;
   }
+  @media print {
+    margin: 15px 5px;
+    padding: 0;
+  }
 `;
 
 const DiagramButton = styled(Button)`
@@ -120,8 +127,16 @@ const DiagramButton = styled(Button)`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: ${({ draft }) => draft ? '0.6em 1em 1.4em' : '0.8em 1em'};
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+    box-shadow: none;
+    border: 1px solid ${palette('light', 3)};
+    min-width: auto;
+    width: 130px;
+    height: 90px;
+    border-radius: 10px;
+  }
 `;
-// font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 const DiagramButtonIcon = styled.div`
   padding-bottom: 5px;
 `;
@@ -136,14 +151,21 @@ const DraftEntities = styled.div`
     left: 0;
     right: 0;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
+const DiagramSvg = styled.svg``;
 const DiagramSvgWrapper = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  @media print {
+    display: none;
+  }
 `;
 
 const PathLineCustom = styled(PathLine)`
@@ -156,11 +178,14 @@ const PathLineArrow = styled(PathLine)`
 `;
 const SectionLabel = styled.div`
   color: ${palette('text', 1)};
-  font-size: 13px;
+  font-size: ${(props) => props.theme.sizes.text.small};
   margin-top: 5px;
   position: absolute;
   left: 0;
   top: 0;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 const STATE_INITIAL = {
@@ -304,7 +329,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     <DiagramSvgWrapper>
       { this.state.diagram
         && (
-          <svg
+          <DiagramSvg
             width={this.state.diagram.getBoundingClientRect().width}
             height={this.state.diagram.getBoundingClientRect().height}
           >
@@ -364,7 +389,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 r={0}
               />
             )}
-          </svg>
+          </DiagramSvg>
         )
       }
     </DiagramSvgWrapper>

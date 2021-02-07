@@ -195,34 +195,42 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       recommendationConnections,
       frameworks,
     } = this.props;
-
-    const buttons = isManager
-      ? [
-        {
-          type: 'text',
-          title: intl.formatMessage(messages.addReport),
-          onClick: this.props.handleNewReport,
-        },
-        {
-          type: 'edit',
-          onClick: this.props.handleEdit,
-        },
-        {
-          type: 'close',
-          onClick: this.props.handleClose,
-        },
-      ]
-      : [
-        {
-          type: 'text',
-          title: intl.formatMessage(messages.addReport),
-          onClick: this.props.handleNewReport,
-        },
-        {
-          type: 'close',
-          onClick: this.props.handleClose,
-        },
-      ];
+    let buttons = [];
+    if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+      buttons = isManager
+        ? buttons.concat([
+          {
+            type: 'text',
+            title: intl.formatMessage(messages.addReport),
+            onClick: this.props.handleNewReport,
+          },
+          {
+            type: 'edit',
+            onClick: () => this.props.handleEdit(this.props.params.id),
+          },
+          {
+            type: 'close',
+            onClick: this.props.handleClose,
+          },
+        ])
+        : buttons.concat([
+          {
+            type: 'text',
+            title: intl.formatMessage(messages.addReport),
+            onClick: this.props.handleNewReport,
+          },
+          {
+            type: 'close',
+            onClick: this.props.handleClose,
+          },
+        ]);
+    }
 
     return (
       <div>

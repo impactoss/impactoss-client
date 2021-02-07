@@ -14,6 +14,9 @@ const Styled = styled.span`
   vertical-align: top;
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.listItemTop};
+  }
 `;
 
 class EntityListNestedNoItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

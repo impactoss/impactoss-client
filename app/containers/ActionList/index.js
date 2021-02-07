@@ -16,6 +16,7 @@ import {
   selectMeasureTaxonomies,
   selectActiveFrameworks,
   selectIsUserManager,
+  selectIsSignedIn,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -49,6 +50,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       connectedTaxonomies,
       location,
       isManager,
+      isUserSignedIn,
     } = this.props;
     const { intl } = this.context;
     const headerOptions = {
@@ -56,6 +58,20 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       icon: 'measures',
       actions: [],
     };
+    if (isUserSignedIn) {
+      headerOptions.actions.push({
+        type: 'bookmarker',
+        title: intl.formatMessage(messages.pageTitle),
+      });
+    }
+    if (window.print) {
+      headerOptions.actions.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+    }
     if (isManager) {
       headerOptions.actions.push({
         type: 'text',
@@ -74,10 +90,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         onClick: () => this.props.handleNew(),
       });
     }
-    headerOptions.actions.push({
-      type: 'bookmarker',
-      title: intl.formatMessage(messages.pageTitle),
-    });
     return (
       <div>
         <Helmet
@@ -118,6 +130,7 @@ ActionList.propTypes = {
   frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
+  isUserSignedIn: PropTypes.bool,
 };
 
 ActionList.contextTypes = {
@@ -132,6 +145,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectActiveFrameworks(state),
   isManager: selectIsUserManager(state),
+  isUserSignedIn: selectIsSignedIn(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

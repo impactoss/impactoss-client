@@ -51,6 +51,9 @@ const UsersOnly = styled.h4`
 const Description = styled.p`
   margin-bottom: 2em;
   font-size: 1em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   // make sure to load all data from server
@@ -110,20 +113,28 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     const reference = taxonomy && taxonomy.get('id');
     const contentTitle = (taxonomy && typeof reference !== 'undefined') ? this.getTaxTitle(reference) : '';
     const contentDescription = (taxonomy && typeof reference !== 'undefined') && this.getTaxDescription(reference);
-
-    const buttons = dataReady && isManager && typeof reference !== 'undefined'
-      ? [{
-        type: 'add',
-        title: [
-          intl.formatMessage(appMessages.buttons.add),
-          {
-            title: this.getTaxButtonTitle(reference),
-            hiddenSmall: true,
-          },
-        ],
-        onClick: () => this.props.handleNew(reference),
-      }]
-      : null;
+    const buttons = [];
+    if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+      if (isManager && typeof reference !== 'undefined') {
+        buttons.push({
+          type: 'add',
+          title: [
+            intl.formatMessage(appMessages.buttons.add),
+            {
+              title: this.getTaxButtonTitle(reference),
+              hiddenSmall: true,
+            },
+          ],
+          onClick: () => this.props.handleNew(reference),
+        });
+      }
+    }
 
     const hasUserCategories = isManager
       && dataReady

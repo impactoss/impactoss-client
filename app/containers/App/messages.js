@@ -197,6 +197,10 @@ export default defineMessages({
       id: 'app.containers.App.labels.perPage',
       defaultMessage: 'Per page',
     },
+    groupedByTaxonomy: {
+      id: 'app.containers.App.labels.groupedByTaxonomy',
+      defaultMessage: ' (by {tax})',
+    },
     smart: {
       met: {
         id: 'app.containers.App.labels.smart.met',
@@ -280,6 +284,10 @@ export default defineMessages({
     fullRecommendation: {
       id: 'app.containers.App.hints.fullRecommendation',
       defaultMessage: 'Note: use only if title field does not already contain full text',
+    },
+    printListMore: {
+      id: 'app.containers.App.hints.printListMore',
+      defaultMessage: 'List only showing {no} items.',
     },
   },
   textValues: {

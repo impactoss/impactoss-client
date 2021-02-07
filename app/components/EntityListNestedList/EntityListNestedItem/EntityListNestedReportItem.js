@@ -24,9 +24,15 @@ const Styled = styled.a`
   &:hover {
     color: ${palette('mainListItemHover', 0)};
   }
+  @media print {
+    border-top: 1px solid ${palette('light', 1)};
+  }
 `;
 const Top = styled.div`
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.listItemTop};
+  }
 `;
 
 const Reference = styled(Label)`
@@ -37,6 +43,9 @@ const Reference = styled(Label)`
 const Title = styled.div`
   text-decoration: none;
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.nestedListItem};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.nestedListItem};
+  }
 `;
 
 class EntityListNestedReportItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

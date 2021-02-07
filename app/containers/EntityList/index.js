@@ -18,12 +18,13 @@ import Loading from 'components/Loading';
 
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
+import EntityListPrintKey from 'components/EntityListPrintKey';
 import EntityListMain from 'components/EntityListMain';
+import PrintOnly from 'components/styled/PrintOnly';
 
 import {
   selectHasUserRole,
   selectCurrentPathname,
-  selectIsSignedIn,
 } from 'containers/App/selectors';
 
 import {
@@ -85,6 +86,9 @@ const ProgressText = styled.div`
   margin-bottom: 0.25em;
   margin-top: -0.5em;
   overflow: hidden;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -141,42 +145,45 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       ? entityIdsSelected.filter((id) => entities.map((entity) => entity.get('id')).includes(id))
       : entityIdsSelected;
 
+    // detect print to avoid expensive rendering
+    const printing = !!(
+      typeof window !== 'undefined'
+      && window.matchMedia
+      && window.matchMedia('print').matches
+    );
+
     return (
       <div>
-        { !this.props.dataReady
-          && <EntityListSidebarLoading />
-        }
-        { this.props.dataReady && this.props.showSidebar
-          && (
-            <EntityListSidebar
-              listUpdating={progress !== null && progress >= 0 && progress < 100}
-              entities={entities}
-              taxonomies={this.props.taxonomies}
-              frameworks={this.props.frameworks}
-              connections={this.props.connections}
-              connectedTaxonomies={this.props.connectedTaxonomies}
-              entityIdsSelected={
-                entityIdsSelected.size === entityIdsSelectedFiltered.size
-                  ? entityIdsSelected
-                  : entityIdsSelectedFiltered
-              }
-              config={this.props.config}
-              locationQuery={this.props.locationQuery}
-              canEdit={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
-              hasUserRole={this.props.hasUserRole}
-              activePanel={this.props.activePanel}
-              onPanelSelect={this.props.onPanelSelect}
-              onCreateOption={this.props.onCreateOption}
-              onUpdate={
-                (associations, activeEditOption) => this.props.handleEditSubmit(
-                  associations,
-                  activeEditOption,
-                  this.props.entityIdsSelected,
-                  viewDomain.get('errors'),
-                )}
-            />
-          )
-        }
+        {!this.props.dataReady && <EntityListSidebarLoading />}
+        {this.props.dataReady && this.props.showSidebar && !printing && (
+          <EntityListSidebar
+            listUpdating={progress !== null && progress >= 0 && progress < 100}
+            entities={entities}
+            taxonomies={this.props.taxonomies}
+            frameworks={this.props.frameworks}
+            connections={this.props.connections}
+            connectedTaxonomies={this.props.connectedTaxonomies}
+            entityIdsSelected={
+              entityIdsSelected.size === entityIdsSelectedFiltered.size
+                ? entityIdsSelected
+                : entityIdsSelectedFiltered
+            }
+            config={this.props.config}
+            locationQuery={this.props.locationQuery}
+            canEdit={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
+            hasUserRole={this.props.hasUserRole}
+            activePanel={this.props.activePanel}
+            onPanelSelect={this.props.onPanelSelect}
+            onCreateOption={this.props.onCreateOption}
+            onUpdate={
+              (associations, activeEditOption) => this.props.handleEditSubmit(
+                associations,
+                activeEditOption,
+                this.props.entityIdsSelected,
+                viewDomain.get('errors'),
+              )}
+          />
+        )}
         <EntityListMain
           listUpdating={progress !== null && progress >= 0 && progress < 100}
           entities={entities}
@@ -199,7 +206,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           dataReady={this.props.dataReady}
           isManager={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
           isContributor={this.props.hasUserRole[USER_ROLES.CONTRIBUTOR.value]}
-          isUserSignedIn={this.props.isUserSignedIn}
 
           entityIcon={this.props.entityIcon}
           onEntitySelect={this.props.onEntitySelect}
@@ -212,18 +218,24 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onResetFilters={this.props.onResetFilters}
           onPageSelect={this.props.onPageSelect}
           onPageItemsSelect={this.props.onPageItemsSelect}
-          onEntityClick={(id, path) => {
-            if (this.props.onEntityClickCustom) {
-              this.props.onEntityClickCustom(id, path, viewDomain.get('errors'));
-            } else {
-              this.props.onEntityClick(id, path, viewDomain.get('errors'));
-            }
-          }}
+          onEntityClick={(id, path) => this.props.onEntityClick(
+            id, path, viewDomain.get('errors')
+          )}
           onSortBy={this.props.onSortBy}
           onSortOrder={this.props.onSortOrder}
           onDismissError={this.props.onDismissError}
           onDismissAllErrors={onDismissAllErrors}
         />
+        {this.props.dataReady && this.props.config.taxonomies && (
+          <PrintOnly>
+            <EntityListPrintKey
+              entities={entities}
+              taxonomies={this.props.taxonomies}
+              config={this.props.config}
+              locationQuery={this.props.locationQuery}
+            />
+          </PrintOnly>
+        )}
         { (progress !== null && progress < 100)
           && (
             <Progress>
@@ -335,7 +347,6 @@ EntityList.propTypes = {
   onPageSelect: PropTypes.func.isRequired,
   onPageItemsSelect: PropTypes.func.isRequired,
   onEntityClick: PropTypes.func.isRequired,
-  onEntityClickCustom: PropTypes.func,
   resetProgress: PropTypes.func.isRequired,
   updateClientPath: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
@@ -344,7 +355,6 @@ EntityList.propTypes = {
   onDismissError: PropTypes.func.isRequired,
   onDismissAllErrors: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
-  isUserSignedIn: PropTypes.bool,
   showSidebar: PropTypes.bool,
 };
 
@@ -360,7 +370,6 @@ const mapStateToProps = (state) => ({
   progress: selectProgress(state),
   progressTypes: selectProgressTypes(state),
   currentPath: selectCurrentPathname(state),
-  isUserSignedIn: selectIsSignedIn(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

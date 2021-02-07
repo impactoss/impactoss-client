@@ -10,6 +10,12 @@ const EntityListItemMainTitle = styled.div`
 };
     line-height: 1.2em;
   }
+  @media print {
+    font-size: ${(props) => props.nested
+    ? (props.theme.sizes && props.theme.sizes.print.nestedListItem)
+    : (props.theme.sizes && props.theme.sizes.print.mainListItem)
+}
+  }
 `;
 
 export default EntityListItemMainTitle;

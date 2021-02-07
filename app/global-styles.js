@@ -203,6 +203,77 @@ const GlobalStyle = createGlobalStyle`
   ._react-file-reader-input {
     display: inline-block;
   }
+
+  @media print and (color){
+    #app {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color-adjust: exact;
+    }
+  }
+  @media print {
+    @page {
+      margin: 1.5cm 1.2cm 1.5cm;
+    }
+    body {
+      font-size: 10pt;
+    }
+    button, input, select, textarea {
+      font-size: 10pt;
+      page-break-inside: avoid;
+    }
+    a {
+      page-break-inside: avoid;
+    }
+    #app {
+      background-color: white;
+    }
+    h1 {
+      font-size: 20pt;
+    }
+    h2 {
+      font-size: 16pt;
+    }
+    h3 {
+      font-size: 13pt;
+    }
+    h4 {
+      font-size: 11pt;
+    }
+    h5 {
+      font-size: 10pt;
+    }
+    h6 {
+      font-size: 9pt;
+    }
+    blockquote {
+      page-break-inside: avoid;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      page-break-after: avoid;
+      page-break-inside: avoid;
+    }
+    img {
+      page-break-inside: avoid;
+      page-break-after: avoid;
+    }
+    table, pre {
+      page-break-inside: avoid;
+    }
+    ul, ol, dl {
+      page-break-before: avoid;
+    }
+
+    .content-page {
+      .react-markdown {
+        p {
+          &:first-child{
+            font-size: 12pt;
+          }
+        }
+      }
+    }
+  }
 `;
 
 export default GlobalStyle;

@@ -186,25 +186,46 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
     );
 
-    const currentFramework = dataReady && frameworks.find((fw) => qe(fw.get('id'), frameworkId));
-    const hasResponse = dataReady && currentFramework.getIn(['attributes', 'has_response']);
-    const hasMeasures = dataReady && currentFramework.getIn(['attributes', 'has_measures']);
-    const hasIndicators = dataReady && currentFramework.getIn(['attributes', 'has_indicators']);
-    const buttons = isManager
-      ? [
-        {
-          type: 'edit',
-          onClick: this.props.handleEdit,
-        },
-        {
+    const currentFramework = dataReady
+      && (
+        frameworks.find(
+          (fw) => qe(fw.get('id'), frameworkId)
+        )
+        || frameworks.first()
+      );
+    const hasResponse = dataReady
+      && currentFramework
+      && currentFramework.getIn(['attributes', 'has_response']);
+    const hasMeasures = dataReady
+      && currentFramework
+      && currentFramework.getIn(['attributes', 'has_measures']);
+    const hasIndicators = dataReady
+      && currentFramework
+      && currentFramework.getIn(['attributes', 'has_indicators']);
+    let buttons = [];
+    if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+      buttons = isManager
+        ? buttons.concat([
+          {
+            type: 'edit',
+            onClick: () => this.props.handleEdit(this.props.params.id),
+          },
+          {
+            type: 'close',
+            onClick: this.props.handleClose,
+          },
+        ])
+        : buttons.concat([{
           type: 'close',
           onClick: this.props.handleClose,
-        },
-      ]
-      : [{
-        type: 'close',
-        onClick: this.props.handleClose,
-      }];
+        }]);
+    }
 
     return (
       <div>

@@ -18,6 +18,9 @@ const FileName = styled.div`
   overflow: hidden;
   font-weight: 500;
   font-size: 1.1em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
+  }
 `;
 const DownloadIcon = styled.div`
   display: block;

@@ -20,6 +20,9 @@ const ConnectionLabel = styled.span`
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemBottom};
   padding-top: 2px;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.listItemBottom};
+  }
 `;
 const Styled = styled.div`
   width: 100%;
@@ -28,6 +31,11 @@ const Styled = styled.div`
   margin-top: 8px;
   margin-bottom: 5px;
   padding-top: 5px;
+  @media print {
+    border-top: none;
+    margin-top: 3px;
+    margin-bottom: 2px;
+  }
 `;
 
 export default class EntityListItemMainConnections extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

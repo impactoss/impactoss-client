@@ -129,6 +129,9 @@ const DatePickerStyle = createGlobalStyle`
     font-size: 0.75em;
     cursor: pointer;
     color: #8b9898;
+    @media print {
+      font-size: ${(props) => props.theme.sizes.print.smallest};
+    }
   }
 
   .DayPicker--interactionDisabled .DayPicker-Day {
@@ -150,6 +153,9 @@ const DatePickerStyle = createGlobalStyle`
     cursor: pointer;
     color: #4A90E2;
     font-size: 0.875em;
+    @media print {
+      font-size: ${(props) => props.theme.sizes.print.large};
+    }
   }
 
   /* Default modifiers */

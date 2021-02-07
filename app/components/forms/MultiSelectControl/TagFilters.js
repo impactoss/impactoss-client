@@ -66,6 +66,9 @@ const Label = styled.div`
   top: 1px;
   font-size: 0.9em;
   font-weight: bold;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 class TagFilters extends React.PureComponent {
