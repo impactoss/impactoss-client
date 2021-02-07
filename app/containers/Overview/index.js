@@ -457,7 +457,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     return (
       <div>
         <Helmet
-          title={intl.formatMessage(messages.title)}
+          title={intl.formatMessage(messages.supTitle)}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
