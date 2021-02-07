@@ -314,10 +314,7 @@ export const filterTaxonomies = (
       // only non-parents
       || !list.some(
         (other) => other.getIn(['attributes', tagsKey])
-          && qe(
-            tax.get('id'),
-            other.getIn(['attributes', 'parent_id'])
-          )
+          && qe(tax.get('id'), other.getIn(['attributes', 'parent_id']))
       )
     )
 );
@@ -337,7 +334,7 @@ export const prepareTaxonomiesIsAssociated = (
       associationId
     )
   );
-  return taxonomies && filterTaxonomies(
+  const filteredTaxonomies = taxonomies && filterTaxonomies(
     taxonomies,
     tagsKey,
     includeParents,
@@ -346,41 +343,58 @@ export const prepareTaxonomiesIsAssociated = (
       'tags',
       tax.getIn(['attributes', tagsKey])
       // set categories
-    ).set(
-      'categories',
-      categories.filter(
-        (cat) => qe(
-          cat.getIn(['attributes', 'taxonomy_id']),
+    )
+  );
+  return filteredTaxonomies.map(
+    (tax) => {
+      const childTax = includeParents
+        && taxonomies.find((potential) => qe(
+          potential.getIn(['attributes', 'parent_id']),
           tax.get('id')
-        )
-      ).filter(
-        (cat, key, list) => {
-          const hasAssociations = filteredAssociations.find(
-            (association) => qe(
-              association.getIn(['attributes', 'category_id']),
-              cat.get('id')
-            )
-          );
-          if (hasAssociations) {
-            return true;
-          }
-          // if any of categories children
-          return list.filter(
-            (item) => qe(
-              item.getIn(['attributes', 'parent_id']),
-              cat.get('id')
-            )
-          ).some(
-            (child) => filteredAssociations.find(
+        ));
+      return tax.set(
+        'categories',
+        categories.filter(
+          (cat) => qe(
+            cat.getIn(['attributes', 'taxonomy_id']),
+            tax.get('id')
+          )
+        ).filter(
+          (cat) => {
+            const hasAssociations = filteredAssociations.some(
               (association) => qe(
                 association.getIn(['attributes', 'category_id']),
-                child.get('id')
+                cat.get('id')
               )
-            )
-          ); // some
-        }
-      ) // filter
-    ) // set
+            );
+            if (hasAssociations) {
+              return true;
+            }
+            if (!includeParents) {
+              return false;
+            }
+            return childTax && categories.filter(
+              (childCat) => qe(
+                childCat.getIn(['attributes', 'taxonomy_id']),
+                childTax.get('id'),
+              )
+            ).filter(
+              (childCat) => qe(
+                childCat.getIn(['attributes', 'parent_id']),
+                cat.get('id'),
+              )
+            ).some(
+              (child) => filteredAssociations.find(
+                (association) => qe(
+                  association.getIn(['attributes', 'category_id']),
+                  child.get('id')
+                )
+              )
+            ); // some
+          }
+        ) // filter
+      ); // set
+    },
   ); // map/return
 };
 

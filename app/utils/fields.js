@@ -202,13 +202,20 @@ export const getScheduleField = (dates) => ({
   values: mapDates(dates),
 });
 
-export const getTaxonomyFields = (taxonomies) => taxonomies && sortEntities(taxonomies, 'asc', 'priority').map((taxonomy) => ({
-  type: 'taxonomy',
-  label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
-  entityType: 'taxonomies',
-  id: taxonomy.get('id'),
-  values: mapCategoryOptions(taxonomy.get('categories'), taxonomy.get('id')),
-})).valueSeq().toArray();
+export const getTaxonomyFields = (taxonomies) => taxonomies
+  && sortEntities(
+    taxonomies,
+    'asc',
+    'priority',
+  ).map(
+    (taxonomy) => ({
+      type: 'taxonomy',
+      label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
+      entityType: 'taxonomies',
+      id: taxonomy.get('id'),
+      values: mapCategoryOptions(taxonomy.get('categories'), taxonomy.get('id')),
+    })
+  ).valueSeq().toArray();
 
 export const getSmartTaxonomyField = (taxonomy) => ({
   type: 'smartTaxonomy',
