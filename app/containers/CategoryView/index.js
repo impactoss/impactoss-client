@@ -215,7 +215,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         });
       }
       fields.push({
-        label: appMessages.nav.recommendations,
+        label: appMessages.nav.recommendationsSuper,
         icon: 'recommendations',
         fields: recConnections,
       });
