@@ -15,10 +15,12 @@ import partner1 from 'themes/media/partner1.png';
 import partner2 from 'themes/media/partner2.png';
 import partner3 from 'themes/media/partner3.png';
 import partner4 from 'themes/media/partner4.png';
+import partner5 from 'themes/media/partner5.png';
 import partner1x2x from 'themes/media/partner1@2x.png';
 import partner2x2x from 'themes/media/partner2@2x.png';
 import partner3x2x from 'themes/media/partner3@2x.png';
 import partner4x2x from 'themes/media/partner4@2x.png';
+import partner5x2x from 'themes/media/partner5@2x.png';
 
 const theme = {};
 
@@ -37,6 +39,7 @@ theme.media = {
     [partner2, partner2x2x],
     [partner3, partner3x2x],
     [partner4, partner4x2x],
+    [partner5, partner5x2x],
   ],
 };
 
