@@ -135,7 +135,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
         );
       });
       fields.push({
-        label: appMessages.nav.recommendations,
+        label: appMessages.nav.recommendationsSuper,
         icon: 'recommendations',
         fields: recConnections,
       });

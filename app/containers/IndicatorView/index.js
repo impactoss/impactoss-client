@@ -153,7 +153,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         );
       });
       fields.push({
-        label: appMessages.nav.recommendations,
+        label: appMessages.nav.recommendationsSuper,
         icon: 'recommendations',
         fields: recConnections,
       });
