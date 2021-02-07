@@ -20,6 +20,8 @@ import {
   getEntityLinkField,
 } from 'utils/fields';
 
+import { getEntityTitleTruncated } from 'utils/entities';
+
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
@@ -104,38 +106,51 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
         && viewEntity.get('indicator').getIn(['attributes', 'manager_id'])
         && viewEntity.get('indicator').getIn(['attributes', 'manager_id']).toString() === sessionUserId
       );
+    let buttons = [];
+    if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+      buttons = canEdit
+        ? buttons.concat([
+          {
+            type: 'edit',
+            onClick: this.props.handleEdit,
+          },
+          {
+            type: 'close',
+            onClick: () => this.props.handleClose(viewEntity.getIn(['indicator', 'id'])),
+          },
+        ])
+        : buttons.concat([
+          {
+            type: 'close',
+            onClick: () => this.props.handleClose(viewEntity.getIn(['indicator', 'id'])),
+          },
+        ]);
+    }
+    const pageTitle = intl.formatMessage(messages.pageTitle);
+    const metaTitle = viewEntity
+      ? `${pageTitle}: ${getEntityTitleTruncated(viewEntity)}`
+      : `${pageTitle}: ${this.props.params.id}`;
 
     return (
       <div>
         <Helmet
-          title={`${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={metaTitle}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={intl.formatMessage(messages.pageTitle)}
+            title={pageTitle}
             type={CONTENT_SINGLE}
             icon="report"
-            buttons={canEdit
-              ? [
-                {
-                  type: 'edit',
-                  onClick: this.props.handleEdit,
-                },
-                {
-                  type: 'close',
-                  onClick: () => this.props.handleClose(viewEntity.getIn(['indicator', 'id'])),
-                },
-              ]
-              : [
-                {
-                  type: 'close',
-                  onClick: () => this.props.handleClose(viewEntity.getIn(['indicator', 'id'])),
-                },
-              ]
-            }
+            buttons={buttons}
           />
           { !dataReady
             && <Loading />

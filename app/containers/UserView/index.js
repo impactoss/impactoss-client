@@ -18,6 +18,8 @@ import {
   getTaxonomyFields,
 } from 'utils/fields';
 
+import { getEntityTitle } from 'utils/entities';
+
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
@@ -63,10 +65,19 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     handleEdit,
     handleClose,
     handleEditPassword,
+    dataReady,
   }) => {
     const { intl } = this.context;
     const userId = user.get('id') || user.getIn(['attributes', 'id']);
     const buttons = [];
+    if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+    }
     if (userId === sessionUserId) {
       buttons.push({
         type: 'edit',
@@ -121,17 +132,23 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
       user, dataReady, sessionUserHighestRoleId, taxonomies,
     } = this.props;
     const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
+
+    const pageTitle = intl.formatMessage(messages.pageTitle);
+    const metaTitle = user
+      ? `${pageTitle}: ${getEntityTitle(user)}`
+      : `${pageTitle} ${this.props.params.id}`;
+
     return (
       <div>
         <Helmet
-          title={intl.formatMessage(messages.pageTitle)}
+          title={metaTitle}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={intl.formatMessage(messages.pageTitle)}
+            title={pageTitle}
             type={CONTENT_SINGLE}
             icon="users"
             buttons={user && this.getButtons(this.props)}
@@ -177,6 +194,7 @@ UserView.propTypes = {
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
   sessionUserHighestRoleId: PropTypes.number,
+  params: PropTypes.object,
   // sessionUserId: PropTypes.string,
 };
 

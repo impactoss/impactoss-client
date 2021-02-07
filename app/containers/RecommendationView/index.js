@@ -22,6 +22,7 @@ import {
   hasTaxonomyCategories,
 } from 'utils/fields';
 import { qe } from 'utils/quasi-equals';
+import { getEntityTitleTruncated, getEntityReference } from 'utils/entities';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -226,18 +227,22 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
           onClick: this.props.handleClose,
         }]);
     }
+    const pageTitle = intl.formatMessage(messages.pageTitle, { type });
+    const metaTitle = viewEntity
+      ? `${pageTitle} ${getEntityReference(viewEntity)}: ${getEntityTitleTruncated(viewEntity)}`
+      : `${pageTitle} ${this.props.params.id}`;
 
     return (
       <div>
         <Helmet
-          title={`${intl.formatMessage(messages.pageTitle, { type })}: ${this.props.params.id}`}
+          title={metaTitle}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={intl.formatMessage(messages.pageTitle, { type })}
+            title={pageTitle}
             type={CONTENT_SINGLE}
             icon={frameworkId ? `recommendations_${frameworkId}` : 'recommendations'}
             buttons={buttons}

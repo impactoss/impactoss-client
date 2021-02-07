@@ -29,7 +29,11 @@ import {
   getDateField,
 } from 'utils/fields';
 
-import { getEntityTitle } from 'utils/entities';
+import {
+  getEntityTitle,
+  getEntityTitleTruncated,
+  getEntityReference,
+} from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
@@ -259,7 +263,9 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
   };
 
   /* eslint-disable react/destructuring-assignment */
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  getTaxTitle = (id) => this.context.intl.formatMessage(
+    appMessages.entities.taxonomies[id].single
+  );
   /* eslint-ensable react/destructuring-assignment */
 
   render() {
@@ -306,15 +312,17 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     }
 
     let pageTitle = intl.formatMessage(messages.pageTitle);
-    let metaTitle = intl.formatMessage(messages.pageTitle);
-    if (viewEntity && viewEntity.getIn(['attributes', 'title'])) {
-      metaTitle = `${metaTitle}: ${viewEntity.getIn(['attributes', 'title'])}`;
-    }
-    if (viewEntity && viewEntity.get('taxonomy')) {
+    let metaTitle = pageTitle;
+    if (
+      viewEntity
+      && viewEntity.get('taxonomy')
+    ) {
       pageTitle = this.getTaxTitle(viewEntity.getIn(['taxonomy', 'id']));
-      metaTitle = `${metaTitle} (${pageTitle})`;
+      const ref = getEntityReference(viewEntity, false);
+      metaTitle = ref
+        ? `${pageTitle} ${ref}: ${getEntityTitleTruncated(viewEntity)}`
+        : `${pageTitle}: ${getEntityTitleTruncated(viewEntity)}`;
     }
-
 
     return (
       <div>
