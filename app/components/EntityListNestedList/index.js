@@ -13,11 +13,13 @@ const Styled = styled.span`
   vertical-align: top;
 `;
 const ItemWrapper = styled.div`
-  border-top: ${(props) => props.separated ? '1px solid' : 'none'};
-  border-top-color: ${(props) => props.separated ? palette('light', 3) : 'transparent'};
-  padding: ${(props) => props.separated ? '5px 0 20px' : '0 0 10px'};
+  border-top: ${({ borderTop }) => borderTop ? '1px solid' : 'none'};
+  border-top-color: ${({ borderTop }) => borderTop ? palette('light', 3) : 'transparent'};
+  padding: ${({ borderTop }) => borderTop ? '5px 0 15px' : '0 0 10px'};
   border-bottom: 1px solid transparent;
   @media print {
+    padding: ${({ borderTopPrint }) => borderTopPrint ? '5px 0 15px' : '0 0 10px'};
+    border-top: ${({ borderTopPrint }) => borderTopPrint ? '1px solid' : 'none'};
     border-top-color: ${palette('light', 1)};
   }
 `;
@@ -38,7 +40,11 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
       <Styled>
         {
           entities.map((entity, i) => (
-            <ItemWrapper key={i} separated={(expandNo - nestLevel) > 0 && i > 0}>
+            <ItemWrapper
+              key={i}
+              borderTop={expandNo > nestLevel && i > 0}
+              borderTopPrint={expandNo >= nestLevel && i > 0}
+            >
               <EntityListNestedItem
                 entity={entity}
                 expandNo={expandNo}
@@ -47,7 +53,10 @@ export class EntityListNestedList extends React.PureComponent { // eslint-disabl
                 onEntityClick={onEntityClick}
                 onExpand={onExpand}
               />
-              {expandNo > nestLevel && entity.get('expanded') && entity.get('expanded') === 'reports' && entity.get('reports')
+              {expandNo > nestLevel
+                && entity.get('expanded')
+                && entity.get('expanded') === 'reports'
+                && entity.get('reports')
                 && (
                   <EntityListNestedReportList
                     reports={entity.get('reports').toList()}
