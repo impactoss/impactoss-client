@@ -405,7 +405,9 @@ export const makeConnectionFilterOptions = (
   );
   // if option active
   if (option) {
-    const fwid = option.groupByFramework && activeOptionId.split('_')[1];
+    const fwid = option.groupByFramework
+      && activeOptionId.indexOf('_') > -1
+      && parseInt(activeOptionId.split('_')[1], 10);
     // the option path
     const path = activeOptionId;
     filterOptions.messagePrefix = messages.titlePrefix;
