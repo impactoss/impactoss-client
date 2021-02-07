@@ -505,6 +505,14 @@ export const getEntityTitle = (entity, labels, contextIntl) => {
   return entity.getIn(['attributes', 'title'])
     || entity.getIn(['attributes', 'name']);
 };
+export const getEntityTitleTruncated = (
+  entity,
+  labels,
+  contextIntl,
+) => truncateText(
+  getEntityTitle(entity, labels, contextIntl),
+  TEXT_TRUNCATE.META_TITLE,
+);
 
 export const getEntityReference = (entity, defaultToId = true) => defaultToId
   ? (

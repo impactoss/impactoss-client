@@ -6,6 +6,9 @@ export const getSortOption = (sortOptions, sortBy, query = 'attribute') => find(
   || find(sortOptions, (option) => option.default);
 
 const getEntitySortValueMapper = (entity, sortBy) => {
+  if (!entity) {
+    return 1;
+  }
   switch (sortBy) {
     case 'id':
       return entity.get(sortBy);
@@ -100,7 +103,7 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
 };
 
 export const sortEntities = (entities, sortOrder, sortBy, type, asList = true) => {
-  const sorted = entities.sortBy(
+  const sorted = entities && entities.sortBy(
     (entity) => getEntitySortValueMapper(entity, sortBy || 'id'),
     (a, b) => getEntitySortComparator(a, b, sortOrder || 'asc', type)
   );

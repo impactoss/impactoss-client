@@ -62,6 +62,7 @@ export const TEXT_TRUNCATE = {
   LINK_FIELD: 30,
   FW_SELECT: 32,
   GRACE: 2,
+  META_TITLE: 20,
 };
 
 export const PROGRESS_TAXONOMY_ID = 10;
