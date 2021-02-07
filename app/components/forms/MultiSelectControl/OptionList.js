@@ -93,6 +93,7 @@ const OptionCount = styled.span`
   padding-right: 1em;
   text-align: right;
   border-bottom: 1px solid ${palette('light', 1)};
+  white-space: nowrap;
   @media print {
     font-size: ${(props) => props.theme.sizes.print.small};
   }
