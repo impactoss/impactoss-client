@@ -542,7 +542,7 @@
   "app.containers.EntityNew.measures.pageTitle": "New Action",
   "app.containers.EntityNew.indicators.pageTitle": "New Indicator",
   "app.containers.EntityNew.recommendations.pageTitle": "New { type }",
-  "app.containers.HomePage.pageTitle": "Sadata Home",
+  "app.containers.HomePage.pageTitle": "Home",
   "app.containers.HomePage.metaDescription": "Home page description",
   "app.containers.HomePage.intro": "Welcome to Sadata, the one stop show for everything you need to know about human rights implementation in Samoa. Explore inside where you will find the Government's Implementation Plan covering all human rights and the SDGs and containing detailed actions and reports of progress to date. ",
   "app.containers.HomePage.explore": "Explore",

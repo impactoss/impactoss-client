@@ -7,6 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Helmet } from 'react-helmet';
 import ReactModal from 'react-modal';
 import GlobalStyle from 'global-styles';
 
@@ -193,8 +194,10 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       children,
     } = this.props;
     const { intl } = this.context;
+    const title = intl.formatMessage(messages.app.title);
     return (
       <div>
+        <Helmet titleTemplate={`${title} - %s`} defaultTitle={title} />
         <Header
           isSignedIn={isUserSignedIn}
           user={user}
