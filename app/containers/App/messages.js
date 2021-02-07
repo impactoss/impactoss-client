@@ -1549,5 +1549,11 @@ export default defineMessages({
         defaultMessage: 'Descending',
       },
     },
+    pageItemOptions: {
+      all: {
+        id: 'app.containers.App.ui.pageItemOptions.all',
+        defaultMessage: 'All',
+      },
+    },
   },
 });

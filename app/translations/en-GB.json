@@ -509,6 +509,7 @@
   "app.containers.App.ui.reportFrequencies.annual": "Annual",
   "app.containers.App.ui.sortOrderOptions.asc": "Ascending",
   "app.containers.App.ui.sortOrderOptions.desc": "Descending",
+  "app.containers.App.ui.pageItemOptions.all": "All",
   "app.containers.CategoryEdit.pageTitle": "Edit Category",
   "app.containers.CategoryEdit.pageTitleTaxonomy": "Edit {taxonomy}",
   "app.containers.CategoryEdit.metaDescription": "Edit Category page description",

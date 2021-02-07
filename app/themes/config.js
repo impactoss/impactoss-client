@@ -52,7 +52,25 @@ export const FOOTER = {
 };
 
 // entitylists items-per-page options
-export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100, 'all'];
+// export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100, 'all'];
+export const PAGE_ITEM_OPTIONS = [
+  {
+    value: 10,
+  },
+  {
+    value: 20,
+  },
+  {
+    value: 50,
+  },
+  {
+    value: 100,
+  },
+  {
+    value: 'all',
+    message: 'ui.pageItemOptions.all',
+  },
+];
 
 export const TEXT_TRUNCATE = {
   CONNECTION_TAG: 20,

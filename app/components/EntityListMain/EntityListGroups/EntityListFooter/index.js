@@ -10,6 +10,8 @@ import { palette } from 'styled-theme';
 
 import { isEqual } from 'lodash/lang';
 
+import appMessage from 'utils/app-message';
+
 import A from 'components/styled/A';
 
 import Icon from 'components/Icon';
@@ -111,8 +113,10 @@ export class EntityListFooter extends React.Component { // eslint-disable-line r
     } = this.props;
 
     const perPageOptions = PAGE_ITEM_OPTIONS.map((option) => ({
-      value: option.toString(),
-      label: option.toString(),
+      value: option.value.toString(),
+      label: option.message
+        ? appMessage(intl, option.message)
+        : option.value.toString(),
     }));
 
     return (
