@@ -1,7 +1,7 @@
 import { Map } from 'immutable';
 
 import { TEXT_TRUNCATE, ACCEPTED_STATUSES } from 'themes/config';
-import { find, reduce } from 'lodash/collection';
+import { find, reduce, every } from 'lodash/collection';
 
 import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
 import asList from 'utils/as-list';
@@ -39,9 +39,8 @@ export const testEntityTaxonomyAssociation = (
   entity,
   categories,
   taxonomyId,
-) => entity
-  .get('categories')
-  .some(
+) => entity.get('categories')
+  && entity.get('categories').some(
     (catId) => categories.size > 0
       && categories.get(catId.toString())
       && qe(
@@ -96,11 +95,10 @@ export const filterEntitiesWithoutAssociation = (
   categories,
   query,
 ) => entities && entities.filter(
-  (entity) => asList(query).reduce(
-    (passing, pathOrTax) => passing && !isNumber(pathOrTax)
-      ? testEntityTaxonomyAssociation(entity, categories, parseInt(pathOrTax, 10))
-      : testEntityAssociation(entity, pathOrTax),
-    true,
+  (entity) => asList(query).every(
+    (pathOrTax) => isNumber(pathOrTax)
+      ? !testEntityTaxonomyAssociation(entity, categories, parseInt(pathOrTax, 10))
+      : !testEntityAssociation(entity, pathOrTax)
   ),
 );
 
@@ -111,13 +109,11 @@ export const filterEntitiesByCategories = (
   query,
 ) => entities
   && entities.filter(
-    // consider replacing with .every()
-    (entity) => asList(query).reduce(
-      (passing, categoryId) => passing && testEntityCategoryAssociation(
+    (entity) => asList(query).every(
+      (categoryId) => testEntityCategoryAssociation(
         entity,
         parseInt(categoryId, 10),
-      ),
-      true,
+      )
     )
   );
 
@@ -129,25 +125,22 @@ export const filterEntitiesByConnectedCategories = (
   query,
 ) => entities && entities.filter(
   // consider replacing with .every()
-  (entity) => asList(query).reduce(
-    (passing, queryArg) => {
+  (entity) => asList(query).every(
+    (queryArg) => {
       const pathValue = queryArg.split(':');
       const path = pathValue[0];
       const connectionsForPath = connections.get(path);
-      return connectionsForPath
-        ? passing && connectionsForPath.some(
-          (connection) => testEntityEntityAssociation(
-            entity,
-            path,
-            connection.get('id'),
-          ) && testEntityCategoryAssociation(
-            connection,
-            pathValue[1],
-          )
+      return !connectionsForPath || connectionsForPath.some(
+        (connection) => testEntityEntityAssociation(
+          entity,
+          path,
+          connection.get('id'),
+        ) && testEntityCategoryAssociation(
+          connection,
+          pathValue[1],
         )
-        : passing;
+      );
     },
-    true,
   )
 );
 
@@ -169,17 +162,13 @@ export const filterEntitiesByConnection = (
 );
 
 // query is object not string!
-// TODO if !passing return false, no point going further | some!
 export const filterEntitiesByAttributes = (entities, query) => entities
   && entities.filter(
-    (entity) => reduce(
+    (entity) => every(
       query,
-      (passing, value, attribute) => passing
-        && ((attribute === 'id')
-          ? qe(entity.get('id'), value)
-          : qe(entity.getIn(['attributes', attribute]), value)
-        ),
-      true,
+      (value, attribute) => attribute === 'id'
+        ? qe(entity.get('id'), value)
+        : qe(entity.getIn(['attributes', attribute]), value),
     )
   );
 
