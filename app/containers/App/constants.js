@@ -92,10 +92,16 @@ export const DEPENDENCIES = [
 ];
 export const SORT_ORDER_OPTIONS = [
   {
-    value: 'asc', icon: 'ascending', nextValue: 'desc', message: 'ui.sortOrderOptions.asc',
+    value: 'asc',
+    icon: 'ascending',
+    nextValue: 'desc',
+    message: 'ui.sortOrderOptions.asc',
   },
   {
-    value: 'desc', icon: 'descending', nextValue: 'asc', message: 'ui.sortOrderOptions.desc',
+    value: 'desc',
+    icon: 'descending',
+    nextValue: 'asc',
+    message: 'ui.sortOrderOptions.desc',
   },
 ];
 export const PARAMS = {
