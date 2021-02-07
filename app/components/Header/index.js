@@ -198,6 +198,8 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
   constructor() {
     super();
     this.state = STATE_INITIAL;
+    this.fwWrapperRef = React.createRef();
+    this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
   componentWillMount() {
@@ -206,6 +208,22 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
 
   componentDidMount() {
     window.addEventListener('resize', this.resize);
+    window.addEventListener('mousedown', this.handleClickOutside);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize);
+    window.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  /**
+   * Alert if clicked on outside of element
+   * after https://stackoverflow.com/questions/32553158/detect-click-outside-react-component
+   */
+  handleClickOutside = (evt) => {
+    if (this.fwWrapperRef && !this.fwWrapperRef.current.contains(evt.target)) {
+      this.setState({ showFrameworks: false });
+    }
   }
 
   onShowSecondary = (evt) => {
@@ -347,7 +365,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         hasBrand={SHOW_BRAND_ON_HOME || !isHome}
       >
         {this.state.showFrameworks && (
-          <FrameworkOptions>
+          <FrameworkOptions ref={this.fwWrapperRef}>
             {frameworkOptions && frameworkOptions.map((option) => (
               <FrameworkOption
                 key={option.value}
