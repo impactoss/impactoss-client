@@ -82,8 +82,11 @@ export const filterOptionsByKeywords = (options, query) => { // filter checkboxe
   return options;
 };
 
-export const filterOptionsByTags = (options, queryTags) => options.filter((option) => asArray(queryTags).reduce((passing, tag) => passing && testEntityEntityAssociation(option, 'tags', parseInt(tag, 10)),
-  true));
+export const filterOptionsByTags = (options, queryTags) => options.filter(
+  (option) => asArray(queryTags).every(
+    (tag) => testEntityEntityAssociation(option, 'tags', parseInt(tag, 10)),
+  )
+);
 
 export const getChangedOptions = (options) => options.filter((o) => o.get('hasChanged'));
 
