@@ -93,6 +93,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       onResetFilters,
       onTagClick,
       taxonomies,
+      allTaxonomies,
       connections,
       connectedTaxonomies,
       locationQuery,
@@ -186,7 +187,6 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       });
     }
     const headerActions = dataReady ? header.actions : [];
-
     return (
       <ContainerWithSidebar ref={this.ScrollContainer}>
         <Container ref={this.ScrollReference}>
@@ -212,9 +212,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                       {
                         config,
                         entities,
-                        taxonomies,
+                        taxonomies: allTaxonomies,
                         connections,
-                        connectedTaxonomies,
                         locationQuery,
                         onTagClick,
                         errors,
@@ -288,6 +287,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
 EntityListMain.propTypes = {
   entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
+  allTaxonomies: PropTypes.instanceOf(Map),
   frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),

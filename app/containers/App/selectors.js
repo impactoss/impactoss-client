@@ -728,6 +728,27 @@ export const selectRecommendationTaxonomies = createSelector(
     includeParents,
   )
 );
+export const selectAllTaxonomiesWithCategories = createSelector(
+  (state) => selectEntities(state, 'taxonomies'),
+  (state) => selectEntities(state, 'categories'),
+  (taxonomies, categories) => sortEntities(
+    taxonomies,
+    'asc',
+    'priority',
+    null,
+    false // as Map
+  ).map(
+    (tax) => tax.set(
+      'categories',
+      categories.filter(
+        (cat) => qe(
+          tax.get('id'),
+          cat.getIn(['attributes', 'taxonomy_id']),
+        )
+      )
+    )
+  )
+);
 
 export const selectUserTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),

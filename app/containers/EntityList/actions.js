@@ -102,7 +102,7 @@ export function selectEntity(data) {
   };
 }
 
-export function selectEntities(ids) {
+export function selectMultipleEntities(ids) {
   return {
     type: ENTITIES_SELECT,
     ids,

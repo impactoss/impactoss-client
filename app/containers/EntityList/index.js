@@ -25,6 +25,7 @@ import PrintOnly from 'components/styled/PrintOnly';
 import {
   selectHasUserRole,
   selectCurrentPathname,
+  selectAllTaxonomiesWithCategories,
 } from 'containers/App/selectors';
 
 import {
@@ -53,7 +54,7 @@ import {
   newMultipleConnections,
   deleteMultipleConnections,
   selectEntity,
-  selectEntities,
+  selectMultipleEntities,
   updateQuery,
   updateGroup,
   updatePage,
@@ -131,6 +132,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       canEdit,
       progressTypes,
       onDismissAllErrors,
+      allTaxonomies,
     } = this.props;
 
     const sending = viewDomain.get('sending');
@@ -189,6 +191,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           entities={entities}
           errors={errors}
           taxonomies={this.props.taxonomies}
+          allTaxonomies={allTaxonomies}
           frameworks={this.props.frameworks}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
@@ -317,6 +320,7 @@ EntityList.propTypes = {
   // wrapper props
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
+  allTaxonomies: PropTypes.instanceOf(Map),
   frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
@@ -370,6 +374,7 @@ const mapStateToProps = (state) => ({
   progress: selectProgress(state),
   progressTypes: selectProgressTypes(state),
   currentPath: selectCurrentPathname(state),
+  allTaxonomies: selectAllTaxonomiesWithCategories(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -406,7 +411,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updatePath(`/${path || props.config.clientPath}/${id}`));
     },
     onEntitySelectAll: (ids) => {
-      dispatch(selectEntities(ids));
+      dispatch(selectMultipleEntities(ids));
     },
     onTagClick: (value) => {
       dispatch(updateQuery(fromJS([value])));
