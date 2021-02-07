@@ -221,7 +221,11 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
    * after https://stackoverflow.com/questions/32553158/detect-click-outside-react-component
    */
   handleClickOutside = (evt) => {
-    if (this.fwWrapperRef && !this.fwWrapperRef.current.contains(evt.target)) {
+    if (
+      this.fwWrapperRef
+      && this.fwWrapperRef.current
+      && !this.fwWrapperRef.current.contains(evt.target)
+    ) {
       this.setState({ showFrameworks: false });
     }
   }
