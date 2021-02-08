@@ -199,6 +199,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     super();
     this.state = STATE_INITIAL;
     this.fwWrapperRef = React.createRef();
+    this.fwButtonRef = React.createRef();
     this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
@@ -221,11 +222,13 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
    * after https://stackoverflow.com/questions/32553158/detect-click-outside-react-component
    */
   handleClickOutside = (evt) => {
-    if (
-      this.fwWrapperRef
+    const wrapperContains = this.fwWrapperRef
       && this.fwWrapperRef.current
-      && !this.fwWrapperRef.current.contains(evt.target)
-    ) {
+      && this.fwWrapperRef.current.contains(evt.target);
+    const buttonContains = this.fwButtonRef
+      && this.fwButtonRef.current
+      && this.fwButtonRef.current.contains(evt.target);
+    if (!wrapperContains && !buttonContains) {
       this.setState({ showFrameworks: false });
     }
   }
@@ -424,6 +427,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             <NavMain hasBorder>
               <SelectFrameworks
                 as="button"
+                ref={this.fwButtonRef}
                 onClick={(evt) => this.state.showFrameworks
                   ? this.onHideFrameworks(evt)
                   : this.onShowFrameworks(evt)
