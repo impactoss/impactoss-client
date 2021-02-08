@@ -87,7 +87,7 @@ export const selectMeasures = createSelector(
     categories,
   ) => {
     if (!ready) return Map();
-    return measures.map(
+    return measures && measures.map(
       (measure) => {
         const entityRecs = measureRecommendations.get(parseInt(measure.get('id'), 10));
         const entityRecsByFw = entityRecs
