@@ -30,14 +30,6 @@ const TitleMedium = styled.h3`
   margin-top: 0;
   display: inline-block;
 `;
-// const TitleSmall = styled.h4`
-//   line-height: 1;
-//   margin-top: 0;
-//   display: inline-block;
-// `;
-// const TitleIconWrap = styled.span`
-//   color: ${palette('dark', 4)};
-// `;
 const ButtonWrap = styled.span`
   padding: 0 0.3em;
   &:last-child {
@@ -64,12 +56,7 @@ const TableCell = styled.span`
   }};
   clear: both;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    display: ${(props) => {
-    if (props.visibleMobile) {
-      return 'none';
-    }
-    return 'table-cell';
-  }};
+    display: table-cell;
     vertical-align: middle;
   }
 `;
@@ -80,8 +67,8 @@ const TableCellInner = styled(TableCell)`
 `;
 
 const ButtonGroup = styled.div`
-  display: table;
   float: right;
+  display: table;
   text-align: right;
   margin-bottom: 10px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
@@ -92,6 +79,15 @@ const ButtonGroup = styled.div`
 const SubTitle = styled.p`
   font-size: 1.1em;
   @media print {
+    display: none;
+  }
+`;
+const TitleWrap = styled.div`
+  clear: both;
+`;
+const VisibleMobile = styled.span`
+  display: block;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: none;
   }
 `;
@@ -133,32 +129,28 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
         hasBottomBorder={type === CONTENT_PAGE || type === CONTENT_MODAL}
         isModal={type === CONTENT_MODAL}
       >
-        { supTitle
-          && <SupTitle icon={icon} title={supTitle} />
-        }
-        <Table>
-          { buttons
-            && (
-              <TableCell visibleMobile>
-                <ButtonGroup>
-                  {
-                    buttons.map((button, i) => button && (
-                      <TableCellInner key={i}>
-                        <ButtonWrap>
-                          <ButtonFactory button={button} />
-                        </ButtonWrap>
-                      </TableCellInner>
-                    ))
-                  }
-                </ButtonGroup>
-              </TableCell>
-            )
-          }
-          <TableCell>
-            {this.renderTitle(type, title, icon)}
-          </TableCell>
-          { buttons
-            && (
+        {buttons && (
+          <VisibleMobile>
+            <ButtonGroup>
+              {
+                buttons.map((button, i) => button && (
+                  <TableCellInner key={i}>
+                    <ButtonWrap>
+                      <ButtonFactory button={button} />
+                    </ButtonWrap>
+                  </TableCellInner>
+                ))
+              }
+            </ButtonGroup>
+          </VisibleMobile>
+        )}
+        <TitleWrap>
+          {supTitle && <SupTitle icon={icon} title={supTitle} />}
+          <Table>
+            <TableCell>
+              {this.renderTitle(type, title, icon)}
+            </TableCell>
+            {buttons && (
               <TableCell hiddenMobile>
                 <ButtonGroup>
                   {
@@ -172,12 +164,10 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
                   }
                 </ButtonGroup>
               </TableCell>
-            )
-          }
-        </Table>
-        { subTitle
-          && <SubTitle>{subTitle}</SubTitle>
-        }
+            )}
+          </Table>
+          {subTitle && <SubTitle>{subTitle}</SubTitle>}
+        </TitleWrap>
       </Styled>
     );
   }

@@ -27,12 +27,18 @@ import messages from './messages';
 
 const Styled = styled.div`
   position: absolute;
-  top: 100%;
-  right: 0;
-  width: 340px;
   display: block;
   text-align: left;
   margin-top: 3px;
+  width: 100%;
+  top: 0;
+  z-index: 10;
+  left: 0;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    top: 100%;
+    right: 0;
+    width: 340px;
+  }
 `;
 const StyledForm = styled.form`
   position: relative;

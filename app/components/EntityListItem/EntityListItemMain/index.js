@@ -17,10 +17,10 @@ import EntityListItemMainBottom from './EntityListItemMainBottom';
 
 
 const Styled = styled(Component)`
-  padding-right: 4px;
-  padding-top: 2px;
-  padding-bottom: 4px;
-  padding-left: ${(props) => props.isManager ? 0 : 4}px;
+  padding-right: 6px;
+  padding-top: 4px;
+  padding-bottom: 6px;
+  padding-left: ${(props) => props.isManager ? 0 : 6}px;
   box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-right: ${(props) => (!props.theme.sizes)

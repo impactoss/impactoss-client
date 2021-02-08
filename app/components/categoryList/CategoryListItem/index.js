@@ -45,8 +45,10 @@ const BarWrap = styled.div`
   width:100%;
   vertical-align: middle;
   font-size: 0px;
-  padding: ${({ multiple }) => multiple ? '0 6px 8px' : '10px 6px'};
+  padding: ${({ multiple }) => multiple ? '4px 6px' : '10px 6px'};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-top: ${({ multiple }) => multiple ? 0 : 10}px;
+    padding-bottom: ${({ multiple }) => multiple ? 8 : 10}px;
     padding-right: ${({ secondary }) => secondary ? 36 : 18}px;
     padding-left: 40px;
   }
@@ -84,6 +86,7 @@ const Bar = styled.div`
   }
 `;
 const Count = styled.div`
+  display: none;
   position: absolute;
   line-height: ${({ multiple }) => multiple ? 8 : 16}px;
   left: 0;
@@ -92,6 +95,7 @@ const Count = styled.div`
   color: ${(props) => palette(props.palette, 0)};
   white-space: nowrap;
   @media print, (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: block;
     font-size: ${({ theme, multiple }) => multiple ? theme.sizes.text.default : theme.sizes.text.aaLargeBold};
     font-weight: bold;
     text-align: right;
@@ -125,8 +129,10 @@ const Title = styled.div`
   display: inline-block;
   padding: 0 4px;
   width: 100%;
+  font-size: ${(props) => props.theme.sizes.text.smaller};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 8px;
+    font-size: ${(props) => props.theme.sizes.text.default};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 18px;
@@ -138,10 +144,12 @@ const Title = styled.div`
   }
 `;
 const FrameworkLabel = styled.div`
+  display: none;
   font-size: ${(props) => props.theme.sizes.text.smaller};
   color: ${palette('text', 1)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-left: 40px;
+    display: block;
   }
   @media print {
     padding-left: 24px;
