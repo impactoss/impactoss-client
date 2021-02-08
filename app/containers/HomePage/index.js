@@ -149,8 +149,27 @@ const GridSpace = styled(Grid)`
     display: inline-block;
   }
 `;
+const FrameworkButtonGrid = styled(Grid)`
+  display: inline-block !important;
+  width: auto !important;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: flex !important;
+    width: 100% !important;
+  }
+`;
+
 const FrameworkButton = styled(ButtonHero)`
   max-width: ${({ single }) => single ? 'auto' : '250px'};
+  width: 100%;
+  display: block;
+  margin-bottom: 10px;
+  min-width: auto;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
+    margin-bottom: 0;
+    width: auto;
+    min-width: auto;
+  }
   @media print {
     font-size: ${(props) => props.theme.sizes.print.small};
     color: ${palette('primary', 0)};
@@ -170,6 +189,9 @@ const FrameworkButton = styled(ButtonHero)`
 //     text-decoration: underline;
 //   }
 // `;
+const FrameworkHint = styled.div`
+  font-size: ${({ theme }) => theme.sizes.text.small};
+`;
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
@@ -250,11 +272,13 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                     <Row>
                       <GridSpace lg={1 / 6} sm={1 / 8} />
                       <Grid lg={2 / 3} sm={3 / 4} xs={1}>
-                        <FormattedMessage {...messages.selectFramework} />
+                        <FrameworkHint>
+                          <FormattedMessage {...messages.selectFramework} />
+                        </FrameworkHint>
                       </Grid>
                     </Row>
                     <Row space>
-                      <Grid lg={1} sm={1} xs={1}>
+                      <FrameworkButtonGrid lg={1} sm={1} xs={1}>
                         {frameworks.entrySeq().map(([key, fw]) => (
                           <FrameworkButton
                             space
@@ -265,7 +289,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                             <FormattedMessage {...appMessages.frameworks[fw.get('id')]} />
                           </FrameworkButton>
                         ))}
-                      </Grid>
+                      </FrameworkButtonGrid>
                     </Row>
                     <Row space>
                       <GridSpace lg={1 / 6} sm={1 / 8} />

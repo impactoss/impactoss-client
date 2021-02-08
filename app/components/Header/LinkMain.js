@@ -13,8 +13,8 @@ export default styled(Link)`
   font-size: 0.8em;
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
   height: ${(props) => props.theme.sizes.header.nav.heightMobile - 1}px;
+  border-left: 1px solid;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    border-left: 1px solid;
     min-width: 200px;
     font-size: 0.9em;
     padding: 8px ${(props) => props.theme.sizes.header.paddingLeft.small}px;

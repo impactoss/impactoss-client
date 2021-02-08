@@ -68,9 +68,12 @@ const LogoItemLink = styled(A)`
   }
 `;
 const PartnerLogo = styled(NormalImg)`
-  height: 45px;
+  height: 55px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     height: 90px;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    height: 100px;
   }
 `;
 const ImpactLogo = styled(NormalImg)`
