@@ -17,8 +17,10 @@ import { DEPENDENCIES } from './constants';
 import { selectBookmarkForLocation } from './selectors';
 
 const BookmarkerContainer = styled.div`
-  position: relative;
   z-index: 10;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    position: relative;
+  }
 `;
 
 class Bookmarker extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -33,14 +35,6 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
   componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  //
-  // const { dataReady, bookmark } = this.props;
-  //
-  // if (dataReady && bookmark && this.state.title === null) {
-  //   this.setState({ title: bookmark.getIn(['attributes', 'title']) });
-  // } else {
-  //   this.setState({ title: '' });
-  // }
 
   componentWillReceiveProps(nextProps) {
     if (!nextProps.dataReady) {

@@ -16,7 +16,11 @@ const ColumnKey = styled.div`
 `;
 
 const KeyItem = styled.span`
-  padding-right: 1em;
+  display: block;
+  @media (min-width: ${(props) => props.theme.breakpoints.smallest}) {
+    padding-right: 1em;
+    display: inline-block;
+  }
 `;
 
 const ItemTitle = styled.div`
