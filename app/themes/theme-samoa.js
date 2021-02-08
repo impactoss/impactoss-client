@@ -297,7 +297,7 @@ theme.sizes = {
     listItemBottom: '12px',
     markdown: '18px',
     markdownMobile: '16px',
-    small: '13px', // used for labels
+    small: '14px', // used for labels
     smaller: '12px', // used for labels
     smallMobile: '11px', // used for labels
     default: '16px', // used for labels
@@ -334,26 +334,26 @@ theme.sizes = {
   header: {
     banner: {
       height: 60,
-      heightMobile: 50,
+      heightMobile: 40,
     },
     nav: {
       height: 50,
-      heightMobile: 32,
+      heightMobile: 40,
     },
     // px or em
     text: {
       title: '30px',
-      titleMobile: '1em',
+      titleMobile: '20px',
       claim: '12px',
-      claimMobile: '1em',
+      claimMobile: '9px',
     },
     print: {
       title: '14pt',
       claim: '9pt',
     },
     paddingLeft: {
-      mobile: 3,
-      small: 6,
+      mobile: 8,
+      small: 8,
       large: 10,
     },
   },

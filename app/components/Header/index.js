@@ -83,6 +83,7 @@ const HomeNavWrap = styled.div`
   right: 0;
   width: 100%;
   z-index: 101;
+  color: ${palette('headerBrand', 0)};
 `;
 
 const NavSecondary = styled(PrintHide)`
@@ -127,32 +128,44 @@ const HideSecondaryWrap = styled.div`
 const HideSecondary = styled(Button)``;
 
 const LinkSuperTitle = styled.div`
-  font-size: ${(props) => props.theme.sizes.text.smaller};
+  font-size: ${(props) => props.theme.sizes.text.smallMobile};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.text.smaller};
+  }
   @media print {
     font-size: ${(props) => props.theme.sizes.print.smaller};
   }
 `;
 const LinkTitle = styled.div`
-  font-size: ${(props) => props.theme.sizes.text.default};
+  font-size: ${(props) => props.theme.sizes.text.small};
+  font-weight: bold;
+  color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.text.default};
+  }
   @media print {
     font-size: ${(props) => props.theme.sizes.print.default};
   }
-  font-weight: bold;
-  color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
 `;
 const SelectFrameworks = styled(LinkMain)`
-  min-width: ${({ theme }) => theme.sizes.aside.width.small}px;
+  display: none;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
+    min-width: ${({ theme }) => theme.sizes.aside.width.small}px;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     min-width: ${({ theme }) => theme.sizes.aside.width.large}px;
   }
 `;
 const Search = styled(LinkMain)`
+  display: none;
   color: ${(props) => props.active ? palette('headerNavMainItem', 1) : palette('headerNavMainItem', 0)};
   &:hover {
     color:${palette('headerNavMainItemHover', 0)};
   }
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
     min-width: auto;
     padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px 0;
     position: absolute;
@@ -166,11 +179,14 @@ const Search = styled(LinkMain)`
 `;
 
 const FrameworkOptions = styled(PrintHide)`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  display: block;
-  min-width: ${({ theme }) => theme.sizes.aside.width.small}px;
+  display: none;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    display: block;
+    min-width: ${({ theme }) => theme.sizes.aside.width.small}px;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     min-width: ${({ theme }) => theme.sizes.aside.width.large}px;
   }
@@ -394,95 +410,89 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             </HomeNavWrap>
           )
         }
-        { (SHOW_BRAND_ON_HOME || !isHome)
-          && (
-            <Banner
-              showPattern={(!isHome && SHOW_HEADER_PATTERN)}
+        {(SHOW_BRAND_ON_HOME || !isHome) && (
+          <Banner
+            showPattern={(!isHome && SHOW_HEADER_PATTERN)}
+          >
+            <Brand
+              href="/"
+              onClick={(evt) => this.onClick(evt, '/')}
+              title={appTitle}
             >
-              <Brand
-                href="/"
-                onClick={(evt) => this.onClick(evt, '/')}
-                title={appTitle}
-              >
-                <Logo src={this.props.theme.media.headerLogo} alt={appTitle} />
-                { SHOW_HEADER_TITLE
-                && (
-                  <BrandText>
-                    <BrandTitle>
-                      <FormattedMessage {...appMessages.app.title} />
-                    </BrandTitle>
-                    <BrandClaim>
-                      <FormattedMessage {...appMessages.app.claim} />
-                    </BrandClaim>
-                  </BrandText>
-                )
-                }
-              </Brand>
-              { this.renderSecondary(navItemsAdmin) }
-            </Banner>
-          )
-        }
-        { !isHome
-          && (
-            <NavMain hasBorder>
-              <SelectFrameworks
-                as="button"
-                ref={this.fwButtonRef}
-                onClick={(evt) => this.state.showFrameworks
-                  ? this.onHideFrameworks(evt)
-                  : this.onShowFrameworks(evt)
-                }
+              <Logo src={this.props.theme.media.headerLogo} alt={appTitle} />
+              {SHOW_HEADER_TITLE && (
+                <BrandText>
+                  <BrandTitle>
+                    <FormattedMessage {...appMessages.app.title} />
+                  </BrandTitle>
+                  <BrandClaim>
+                    <FormattedMessage {...appMessages.app.claim} />
+                  </BrandClaim>
+                </BrandText>
+              )}
+            </Brand>
+            {this.renderSecondary(navItemsAdmin)}
+          </Banner>
+        )}
+        {!isHome && (
+          <NavMain hasBorder>
+            <SelectFrameworks
+              as="button"
+              ref={this.fwButtonRef}
+              onClick={(evt) => this.state.showFrameworks
+                ? this.onHideFrameworks(evt)
+                : this.onShowFrameworks(evt)
+              }
+            >
+              <LinkSuperTitle>
+                {intl.formatMessage(appMessages.frameworks.single)}
+              </LinkSuperTitle>
+              {currentFrameworkOption && (
+                <LinkTitle active>
+                  {truncateText(
+                    currentFrameworkOption.label,
+                    TEXT_TRUNCATE.FW_SELECT,
+                    false,
+                  )}
+                  {!this.state.showFrameworks && (
+                    <Icon name="dropdownOpen" text textRight size="1em" />
+                  )}
+                  {this.state.showFrameworks && (
+                    <Icon name="dropdownClose" text textRight size="1em" />
+                  )}
+                </LinkTitle>
+              )}
+            </SelectFrameworks>
+            {navItems && navItems.map((item, i) => (
+              <LinkMain
+                key={i}
+                href={item.path}
+                active={item.active}
+                onClick={(evt) => this.onClick(evt, item.path)}
               >
                 <LinkSuperTitle>
-                  {intl.formatMessage(appMessages.frameworks.single)}
+                  {item.titleSuper}
                 </LinkSuperTitle>
-                {currentFrameworkOption && (
-                  <LinkTitle active>
-                    {truncateText(
-                      currentFrameworkOption.label,
-                      TEXT_TRUNCATE.FW_SELECT,
-                      false,
-                    )}
-                    {!this.state.showFrameworks && (
-                      <Icon name="dropdownOpen" text textRight size="1em" />
-                    )}
-                    {this.state.showFrameworks && (
-                      <Icon name="dropdownClose" text textRight size="1em" />
-                    )}
-                  </LinkTitle>
-                )}
-              </SelectFrameworks>
-              {navItems && navItems.map((item, i) => (
-                <LinkMain
-                  key={i}
-                  href={item.path}
-                  active={item.active}
-                  onClick={(evt) => this.onClick(evt, item.path)}
-                >
-                  <LinkSuperTitle>
-                    {item.titleSuper}
-                  </LinkSuperTitle>
-                  <LinkTitle active={item.active}>
-                    {item.title}
-                  </LinkTitle>
-                </LinkMain>
-              ))}
-              {search && (
-                <Search
-                  href={search.path}
-                  active={search.active}
-                  onClick={(evt) => this.onClick(evt, search.path)}
-                  icon={search.icon}
-                >
-                  {search.title}
-                  {search.icon
-                  && <Icon title={search.title} name={search.icon} text textRight size="1em" />
-                  }
-                </Search>
-              )}
-            </NavMain>
-          )
-        }
+                <LinkTitle active={item.active}>
+                  {item.title}
+                </LinkTitle>
+              </LinkMain>
+            ))}
+            {search && (
+              <Search
+                href={search.path}
+                active={search.active}
+                onClick={(evt) => this.onClick(evt, search.path)}
+                icon={search.icon}
+              >
+                {search.title}
+                {search.icon
+                && <Icon title={search.title} name={search.icon} text textRight size="1em" />
+                }
+              </Search>
+            )}
+          </NavMain>
+        )}
       </Styled>
     );
   }
