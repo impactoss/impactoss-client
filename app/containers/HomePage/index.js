@@ -156,6 +156,7 @@ const FrameworkButtonGrid = styled(Grid)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: flex !important;
     width: 100% !important;
+    justify-content: center;
   }
 `;
 
@@ -168,8 +169,8 @@ const FrameworkButton = styled(ButtonHero)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
     margin-bottom: 0;
-    width: auto;
     min-width: auto;
+    width: ${({ single }) => single ? 'auto' : '250px'};
   }
   @media print {
     font-size: ${(props) => props.theme.sizes.print.small};
@@ -248,7 +249,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               </Row>
               <HomeActions>
                 {(signingIn || !dataReady) && (
-                  <Row space>
+                  <Row>
                     <GridSpace lg={1 / 6} sm={1 / 8} />
                     <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                       <Loading />
@@ -256,7 +257,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                   </Row>
                 )}
                 {(signingIn || !dataReady) && (
-                  <Row space>
+                  <Row>
                     <GridSpace lg={1 / 6} sm={1 / 8} />
                     <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                       {signingIn && (
@@ -278,7 +279,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                         </FrameworkHint>
                       </Grid>
                     </Row>
-                    <Row space>
+                    <Row>
                       <FrameworkButtonGrid lg={1} sm={1} xs={1}>
                         {frameworks.entrySeq().map(([key, fw]) => (
                           <FrameworkButton
@@ -292,7 +293,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                         ))}
                       </FrameworkButtonGrid>
                     </Row>
-                    <Row space>
+                    <Row>
                       <GridSpace lg={1 / 6} sm={1 / 8} />
                       <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                         <StyledButtonFlat onClick={() => onSelectFramework('all')}>
@@ -303,7 +304,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                   </span>
                 )}
                 {dataReady && !signingIn && frameworks.size === 1 && (
-                  <Row space>
+                  <Row>
                     <GridSpace lg={1 / 6} sm={1 / 8} />
                     <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                       <FrameworkButton
