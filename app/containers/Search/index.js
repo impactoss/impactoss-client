@@ -288,6 +288,13 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
 
     const noEntry = !location.query.search;
 
+    const headerButtons = [{
+      type: 'icon',
+      onClick: () => window.print(),
+      title: 'Print',
+      icon: 'print',
+    }];
+
     return (
       <div>
         <Helmet
@@ -325,6 +332,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                 supTitle={intl.formatMessage(messages.pageTitle)}
                 title={intl.formatMessage(messages.search)}
                 icon="search"
+                buttons={headerButtons}
               />
               { !dataReady
                 && <Loading />
