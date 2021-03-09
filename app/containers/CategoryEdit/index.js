@@ -490,7 +490,7 @@ function mapDispatchToProps(dispatch, props) {
           })
         );
       }
-      if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
+      if (recommendationsByFw && taxonomy.getIn(['attributes', 'tags_recommendations'])) {
         saveData = saveData.set(
           'recommendationCategories',
           recommendationsByFw
