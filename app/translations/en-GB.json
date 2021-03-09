@@ -240,7 +240,7 @@
   "app.containers.App.importFields.indicator_summary": "Indicator summary",
   "app.containers.App.importFields.target_date": "Target date",
   "app.containers.App.importFields.target_date_comment": "Target date comment",
-  "app.containers.App.importFields.framework_id": "Framework: 1 - HR Recs; 2 - SDGs; 3 - SDS; 4 - HR Articles",
+  "app.containers.App.importFields.framework_id": "Framework: 2 - HR; 3 - SDS; 4 - SDGs",
   "app.containers.App.placeholders.title": "Enter title",
   "app.containers.App.placeholders.name": "Enter full name",
   "app.containers.App.placeholders.email": "Email address",
