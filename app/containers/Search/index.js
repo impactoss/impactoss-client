@@ -171,7 +171,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     this.state = STATE_INITIAL;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
@@ -180,7 +180,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     window.addEventListener('resize', this.resize);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

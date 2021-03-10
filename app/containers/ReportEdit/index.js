@@ -71,7 +71,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     this.scrollContainer = React.createRef();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
     if (this.props.dataReady && this.props.viewEntity) {
@@ -79,7 +79,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

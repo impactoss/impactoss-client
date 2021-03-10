@@ -93,7 +93,7 @@ const ProgressText = styled.div`
 `;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.updateClientPath();
   }
 

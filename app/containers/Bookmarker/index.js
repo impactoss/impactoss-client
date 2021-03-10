@@ -32,11 +32,11 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }

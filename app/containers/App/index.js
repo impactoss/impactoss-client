@@ -68,12 +68,12 @@ const Main = styled.div`
 // overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.validateToken();
     this.props.loadEntitiesIfNeeded();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -270,7 +270,6 @@ App.propTypes = {
   currentFrameworkId: PropTypes.string,
   viewRecommendationFramework: PropTypes.string,
   frameworks: PropTypes.object,
-  dataReady: PropTypes.bool,
 };
 App.contextTypes = {
   intl: PropTypes.object.isRequired,

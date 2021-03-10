@@ -219,7 +219,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
   }
 
   // make sure to load all data from server
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
@@ -227,7 +227,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     window.addEventListener('resize', this.resize);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
