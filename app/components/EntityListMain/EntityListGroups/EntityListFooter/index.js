@@ -257,7 +257,7 @@ export class EntityListFooter extends React.Component { // eslint-disable-line r
 }
 
 EntityListFooter.propTypes = {
-  pageSize: PropTypes.number,
+  pageSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   pager: PropTypes.object,
   onPageSelect: PropTypes.func,
   onPageItemsSelect: PropTypes.func,
