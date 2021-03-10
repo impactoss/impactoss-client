@@ -68,14 +68,14 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     this.scrollContainer = React.createRef();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.viewEntity) {
       this.props.initialiseForm('pageEdit.form.data', this.getInitialFormData());
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

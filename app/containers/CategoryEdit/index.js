@@ -91,7 +91,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     this.scrollContainer = React.createRef();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
     if (this.props.dataReady && this.props.viewEntity) {
@@ -99,7 +99,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

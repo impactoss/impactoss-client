@@ -70,11 +70,11 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   //     || this.props.dataReady !== nextProps.dataReady
   //     || this.props.measures !== nextProps.measures
   // }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

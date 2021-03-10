@@ -219,7 +219,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setState(STATE_INITIAL);
   }
 

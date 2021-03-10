@@ -115,7 +115,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     this.state = STATE_INITIAL;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setState(STATE_INITIAL);
   }
 
@@ -124,7 +124,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     window.addEventListener('resize', this.resize);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.activePanel !== this.props.activePanel) {
       // close and reset option panel
       this.setState({ activeOption: null });

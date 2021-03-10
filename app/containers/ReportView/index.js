@@ -44,11 +44,11 @@ import { selectViewEntity } from './selectors';
 import { DEPENDENCIES } from './constants';
 
 export class ReportView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

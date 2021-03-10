@@ -35,6 +35,7 @@ module.exports = {
       2,
       "as-needed"
     ],
+    "camelcase": 0,
     "comma-dangle": [
       2,
       "always-multiline"
@@ -78,6 +79,7 @@ module.exports = {
     "react/require-extension": 0,
     "react/destructuring-assignment": 0,
     "react/self-closing-comp": 0,
+    "react/sort-comp": 0,
     "redux-saga/no-yield-in-race": 2,
     "redux-saga/yield-effects": 2,
     "require-yield": 0,

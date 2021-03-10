@@ -29,7 +29,7 @@ import { reset } from './actions';
 import { selectDomain } from './selectors';
 
 export class UserPasswordReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.initialiseForm();
   }
 

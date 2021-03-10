@@ -51,11 +51,11 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
     this.scrollContainer = React.createRef();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.initialiseForm('entityNew.form.data', this.getInitialFormData());
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
       scrollToTop(this.scrollContainer.current);
     }

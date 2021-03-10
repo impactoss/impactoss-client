@@ -82,7 +82,7 @@ class BookmarkForm extends React.PureComponent { // eslint-disable-line react/pr
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.bookmark) {
       this.setState({ title: this.props.bookmark.getIn(['attributes', 'title']) });
     }
