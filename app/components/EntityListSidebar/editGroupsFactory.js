@@ -12,7 +12,7 @@ export const makeEditGroups = (
   selectedFrameworkIds,
 ) => {
   const editGroups = {};
-  const selectedFrameworks = frameworks.filter(
+  const selectedFrameworks = frameworks && frameworks.filter(
     (fw) => selectedFrameworkIds.find((id) => qe(id, fw.get('id'))),
   );
   // taxonomy option group
