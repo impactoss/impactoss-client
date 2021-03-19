@@ -483,7 +483,6 @@ function mapDispatchToProps(dispatch, props) {
 
       // figure out changes
       const changes = formData.get('values').filter((option) => option.get('hasChanged'));
-
       // figure out updates (either new attribute values or new connections)
       const creates = changes
         .filter((option) => option.get('checked') === true)
@@ -554,11 +553,12 @@ function mapDispatchToProps(dispatch, props) {
             // create connections
             if (creates.size > 0) {
               // exclude existing relations from the changeSet
-              entityCreates = creates.filter(
-                (id) => !!existingAssignments
-                  && existingAssignments.size > 0
-                  && !existingAssignments.includes(parseInt(id, 10))
-              ).map(
+              entityCreates = !!existingAssignments && existingAssignments.size > 0
+                ? creates.filter(
+                  (id) => !existingAssignments.includes(parseInt(id, 10))
+                )
+                : creates;
+              entityCreates = entityCreates.map(
                 (id) => fromJS({
                   path: activeEditOption.path,
                   entity: {
