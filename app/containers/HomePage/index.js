@@ -194,6 +194,10 @@ const FrameworkHint = styled.div`
   font-size: ${({ theme }) => theme.sizes.text.small};
 `;
 
+const StyledButtonFlat = styled(ButtonFlat)`
+  color: ${palette('homeIntro', 0)};
+`;
+
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -295,9 +299,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                     <Row>
                       <GridSpace lg={1 / 6} sm={1 / 8} />
                       <Grid lg={2 / 3} sm={3 / 4} xs={1}>
-                        <ButtonFlat onClick={() => onSelectFramework('all')}>
+                        <StyledButtonFlat onClick={() => onSelectFramework('all')}>
                           <FormattedMessage {...messages.exploreAllFrameworks} />
-                        </ButtonFlat>
+                        </StyledButtonFlat>
                       </Grid>
                     </Row>
                   </span>

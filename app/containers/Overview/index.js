@@ -129,6 +129,11 @@ const DiagramButton = styled(Button)`
   &:hover {
     background-color: ${(props) => palette(props.paletteHover, 0)};
   }
+  color: ${palette('primary', 4)};
+  padding: ${({ draft }) => draft ? '0.4em 0.5em 0.75em' : '0.6em 0.5em'};
+  box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  font-size: 0.8em;
+  border-radius: 10px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 1em;
     padding: ${({ draft }) => draft ? '0.4em 0.5em 0.4em' : '0.6em 0.5em'};
@@ -138,6 +143,7 @@ const DiagramButton = styled(Button)`
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     font-size: 1.1em;
     min-width: ${({ multiple }) => multiple ? 'none' : '180px'};
+    padding: ${({ draft }) => draft ? '0.4em 0.5em 1em' : '0.6em 0.5em'};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-weight: bold;
@@ -561,7 +567,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                                   paletteDefault: 'recommendations',
                                   paletteHover: 'recommendationsHover',
                                   stateButton: `buttonRecs_${fwId}`,
-                                  icon: 'recommendations',
+                                  icon: `recommendations_${fwId}`,
                                   type: `recommendations_${fwId}`,
                                   count: this.props.recommendationCountByFw.get(fwId),
                                   draftCount: this.props.recommendationDraftCountByFw.get(fwId),
