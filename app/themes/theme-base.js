@@ -291,17 +291,18 @@ theme.sizes = {
     default: '16px', // used for labels
   },
   print: {
-    aaLargeBold: '14pt',
-    aaLarge: '18pt',
-    mainListItem: '15pt',
-    nestedListItem: '12pt',
-    listItemTop: '10pt',
-    listItemBottom: '9pt',
-    markdown: '14pt',
-    markdownMobile: '12pt',
-    small: '10pt', // used for labels
-    smallMobile: '8pt', // used for labels
-    default: '12pt', // used for labels
+    mainListItem: '10pt',
+    nestedListItem: '8pt',
+    listItemTop: '7pt',
+    listItemBottom: '7pt',
+    markdown: '10pt',
+    smallest: '7pt', // used for labels
+    smaller: '8pt', // used for labels
+    small: '9pt', // used for labels
+    default: '10pt', // used for labels
+    large: '11pt', // used for labels
+    larger: '12pt', // used for labels
+    largest: '14pt', // used for labels
   },
   // px only
   aside: {
@@ -347,6 +348,10 @@ theme.sizes = {
       titleMobile: '1.4em',
       claim: '1.3em',
       claimMobile: '1em',
+    },
+    print: {
+      title: '2.8em',
+      claim: '1em',
     },
   },
 };
