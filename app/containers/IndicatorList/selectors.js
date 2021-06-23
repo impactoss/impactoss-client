@@ -60,13 +60,15 @@ export const selectConnections = createSelector(
   selectConnectionsMeasures,
   selectFWRecommendations,
   selectRecommendationCategoriesByRecommendation,
-  (ready, connections, recommendations, associationsGrouped) => {
+  (state) => selectEntities(state, 'categories'),
+  (ready, connections, recommendations, associationsGrouped, categories) => {
     if (ready) {
       return connections.set(
         'recommendations',
         entitiesSetCategoryIds(
           recommendations,
           associationsGrouped,
+          categories,
         )
       );
     }
