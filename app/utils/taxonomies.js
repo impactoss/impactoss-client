@@ -104,6 +104,7 @@ export const prepareTaxonomyGroups = (
       id: 'measures',
       taxonomies: measureOnlyTaxonomies
         .map((tax) => mapTaxonomy(tax, taxonomies, activeId, onLink))
+        .toList()
         .toJS(),
     });
   }
