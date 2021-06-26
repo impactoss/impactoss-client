@@ -176,7 +176,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           label: intl.formatMessage(appMessages.nav.indicatorsSuper),
           icon: 'indicators',
           fields: [
-            renderIndicatorControl(indicators, onCreateOption),
+            renderIndicatorControl(indicators, onCreateOption, intl),
           ],
         },
       );

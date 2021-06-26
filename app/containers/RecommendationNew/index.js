@@ -158,7 +158,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
         label: intl.formatMessage(appMessages.nav.indicatorsSuper),
         icon: 'indicators',
         fields: [
-          renderIndicatorControl(indicators, onCreateOption),
+          renderIndicatorControl(indicators, onCreateOption, intl),
         ],
       });
     }

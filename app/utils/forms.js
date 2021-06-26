@@ -98,7 +98,7 @@ export const renderMeasureControl = (entities, taxonomies, onCreateOption, conte
     id: 'actions',
     model: '.associatedMeasures',
     dataPath: ['associatedMeasures'],
-    label: 'Actions',
+    label: contextIntl.formatMessage(appMessages.entities.measures.plural),
     controlType: 'multiselect',
     options: entityOptions(entities, true),
     advanced: true,
@@ -188,12 +188,12 @@ export const renderTaxonomyControl = (
   )
   : [];
 
-export const renderIndicatorControl = (entities, onCreateOption) => entities
+export const renderIndicatorControl = (entities, onCreateOption, contextIntl) => entities
   ? {
     id: 'indicators',
     model: '.associatedIndicators',
     dataPath: ['associatedIndicators'],
-    label: 'Indicators',
+    label: contextIntl.formatMessage(appMessages.entities.indicators.plural),
     controlType: 'multiselect',
     options: entityOptions(entities, true),
     advanced: true,
