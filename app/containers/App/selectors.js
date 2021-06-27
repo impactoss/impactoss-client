@@ -360,7 +360,8 @@ export const selectFWMeasures = createSelector(
   selectFrameworkQuery,
   selectFWRecommendations,
   (state) => selectEntities(state, 'recommendation_measures'),
-  (entities, framework, recs, recMeasures) => {
+  selectIsUserManager,
+  (entities, framework, recs, recMeasures, isManager) => {
     if (entities && recs && recMeasures) {
       if (framework && framework !== 'all') {
         return entities.filter(
@@ -373,7 +374,7 @@ export const selectFWMeasures = createSelector(
             ).map(
               (rm) => rm.getIn(['attributes', 'recommendation_id'])
             );
-            return recIds.size === 0 || recIds.some(
+            return (isManager && recIds.size === 0) || recIds.some(
               (id) => !!recs.find(
                 (rec) => qe(rec.get('id'), id)
               )
@@ -395,7 +396,8 @@ export const selectFWIndicators = createSelector(
   selectFWMeasures,
   (state) => selectEntities(state, 'recommendation_indicators'),
   (state) => selectEntities(state, 'measure_indicators'),
-  (entities, framework, recs, measures, recIndicators, measureIndicators) => {
+  selectIsUserManager,
+  (entities, framework, recs, measures, recIndicators, measureIndicators, isManager) => {
     if (
       recs
       && measures
@@ -424,7 +426,8 @@ export const selectFWIndicators = createSelector(
           );
           // consider includes instead of !!find
           return (
-            recIds.size === 0
+            isManager
+            && recIds.size === 0
             && measureIds.size === 0
           ) || recIds.some(
             (id) => !!recs.find(
